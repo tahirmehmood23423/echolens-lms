@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens - Sign in</title>
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="auth-body">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <img src="/img/logo.png" alt="EchoLens" class="auth-logo">
+      <h1 class="auth-title">Learning portal</h1>
+      <p class="auth-sub">Sign in with the username and password issued to you.</p>
+      <div class="form-msg" id="msg"></div>
+      <form id="loginForm" autocomplete="on">
+        <label class="field"><span>Username or email</span>
+          <input type="text" name="login" autocomplete="username" required autofocus placeholder="e.g. bilal.noor"></label>
+        <label class="field"><span>Password</span>
+          <input type="password" name="password" autocomplete="current-password" required placeholder="Your password"></label>
+        <button type="submit" class="btn btn-primary btn-block" id="submit">Sign in</button>
+      </form>
+      <p class="auth-foot">Need access? Contact <a href="mailto:echolens816@gmail.com">echolens816@gmail.com</a></p>
+    </div>
+    <p class="auth-copy">EchoLens &middot; Empowering Pakistan through Artificial Intelligence</p>
+  </div>
+<script src="/js/login.js"></script>
+</body>
+</html>

@@ -4,3 +4,4 @@ echolens.json
 *.log
 .DS_Store
 uploads/
+backups/

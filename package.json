@@ -1,7 +1,7 @@
 {
   "name": "echolens-lms",
-  "version": "1.0.0",
-  "description": "EchoLens Learning Management System - public catalogue and member dashboard",
+  "version": "8.0.0",
+  "description": "EchoLens Learning Management System - gamified learning portal",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
@@ -18,6 +18,8 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.2.0",
-    "nodemailer": "^9.0.3"
+    "nodemailer": "^9.0.3",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.8.0"
   }
 }

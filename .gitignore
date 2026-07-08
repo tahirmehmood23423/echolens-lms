@@ -1,7 +1,0 @@
-node_modules/
-echolens.json
-.env
-*.log
-.DS_Store
-uploads/
-backups/

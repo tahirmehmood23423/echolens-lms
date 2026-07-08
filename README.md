@@ -1,4 +1,60 @@
-# EchoLens LMS v8
+# EchoLens LMS v10
+
+## New in v10: Professional compiler with a real terminal, full-page task workspace, anonymous course chat, email everywhere, public landing site with open quests
+
+**The compiler is now a complete environment.** The v9 stdin-box design (which broke `input()` and confused students) is gone. In its place:
+- **Interactive `input()`** - the program's prompt appears in the terminal, an input field opens right there, the student types and presses Enter, and the program continues. Exactly like a real terminal.
+- **Scientific stack built in** - `numpy`, `pandas`, `matplotlib`, `scikit-learn` (and any other Pyodide package) load automatically from the imports in the code. No setup.
+- **Charts render on screen** - matplotlib figures appear as images below the terminal output.
+- **Live streamed output** - print() output appears as it happens, not all at the end. Python tracebacks are shown cleanly (internal Pyodide frames stripped) so students see *their* error.
+- **Safe by construction** - still Pyodide in a Web Worker: zero server load, and a stuck loop is killed by a dual watchdog (45s silence / 4min hard cap, package downloads don't false-trigger). Stop button any time.
+- How interactive input works without special headers: when input() needs an answer, the run pauses, the student answers in the terminal, and the program transparently re-runs with the answer queued - already-seen output is suppressed, so it looks and feels like a simple continuation.
+
+**Tasks are a full page now, not a popup.** Opening a task lands on a dedicated workspace: assignment brief, resources, and status on the left; a professional IDE on the right - toolbar (language, Run/Stop, Clear), dark editor with Python auto-indent and Tab support, status bar, terminal, and the submit bar. File upload (PDF/Word) remains as a collapsible alternative for reports and notebooks. Teachers get the same terminal inside the grading modal to run student code interactively.
+
+**Anonymous course chat.** Every course has a Chat tab. Students choose per message: post with their real name, or as their stable gem alias (e.g. "Opal-374" - same alias every time in that course, so conversations stay followable). Anonymity is absolute: the API never reveals who is behind an alias, not even to teachers, so shy students can finally ask. Teachers and admins always reply named with a role badge. Auto-refreshes every 12 seconds; teachers can moderate, students can delete their own messages.
+
+**Email at every important moment** (works once SMTP is configured; silently logs otherwise):
+- New student created with an email (add students as "Full Name, email") → credentials, username, password, and **registration number mailed automatically**
+- Announcement posted → everyone on the course (as before)
+- Quest track published → every enrolled student
+- Student submits a task → the course teachers
+- Teacher grades a task → the student (grade, gems, remarks)
+- **Remind button** on every quest level (teachers) → emails exactly the students who haven't finished that level
+
+**Public landing site with open quests.** Visiting the root URL now shows a proper website - what EchoLens is, every feature, the full course catalogue with PKR pricing, and a **free quest playground**: anyone can pick any of the 16 tracks and complete the first 3 levels in the real browser compiler, no account needed. Levels 4+ show locked with a "Register to unlock" call-to-action (registration/payment stays the academy's manual flow: pay via JazzCash/Easypaisa/bank, admin creates the account, credentials arrive by email). Sign in sits in the top corner and leads to /login; signed-in visitors see "Open dashboard" instead. Solutions are never exposed publicly, and locked levels hide their problems entirely.
+
+Migration: none. Deploy over v9 - databases, tracks, submissions, gems, reviews all carry forward. New env: set the SMTP_* variables to activate email.
+
+---
+
+## New in v9: Built-in code compiler, assignments merged into quests, AI review sharing, overall reports
+
+**The quest IS the assignment system now.** The separate Assignments tab, creation form, and routes are gone - quests replace them completely. Legacy assignment data stays in the database (all gems and history preserved), it just isn't surfaced anymore.
+
+**Clean task portal.** Each quest problem now shows as a simple topic heading (title, difficulty, gems, status). Tapping it opens the task portal: the full assignment detail (brief, resources, teacher-only solution guideline) plus the submission portal - everything in one place.
+
+**Built-in Python compiler.** Inside every task, students write code in a dark-themed editor, press Run, and see the output instantly - no more exporting Word/PDF documents for coding work. Direct submit sends exactly what's in the editor.
+- Runs on **Pyodide inside a Web Worker**: entirely in the browser, zero server load (safe on Render Starter), and an infinite loop can never freeze the page - it's terminated at the 25s timeout with a friendly message.
+- Lazy-loaded (~7 MB) only when Run is first pressed - page loads stay fast on slow connections.
+- Supports `input()` via an optional stdin box; a "Written answer" mode for non-code tasks; Tab key indents.
+- **File upload stays available** as a second mode for reports, screenshots, and notebook exports (PDF/Word only, enforced server-side as before).
+- Teachers see the submitted code right in the grading modal, with their own Run and Copy buttons.
+
+**AI review sharing - teacher permission only.** After running an AI review, the teacher gets a "Share key points with student" toggle. The student then sees the key concepts, mistakes, and better approach on their task - **never the suggested score**. Fresh reviews start unshared; resubmitting clears the old review automatically. Students can never access the raw review through the API.
+
+**Complete reviews at three levels:**
+- **Per task**: the AI review on each submission (as before, now code-aware - editor submissions are read directly, no text extraction needed).
+- **Per course**: the skill report, now built from quest data (per-problem grades, teacher remarks, and AI review notes).
+- **Overall, across all courses**: new "Overall" button in the Report tab generates one review covering every course the student has taken - progress comparison, strengths, direction. Teacher-reviewed before publishing, appears on the student's profile as "Across all courses".
+
+**AI provider fix.** The "billing/quota" errors are gone: default model updated to gemini-2.5-flash-lite, quota errors translated into plain English, and **automatic fallback** - set both GEMINI_API_KEY and GROQ_API_KEY and the app switches providers silently when one runs out of quota.
+
+**Also**: the Report tab now shows quest levels reached and quest-based at-risk detection (unsubmitted problems in unlocked levels); teacher pending-count and admin stats count quest submissions; badges and course-completion are quest-aware; gems_possible counts quest points.
+
+Migration: none needed. Deploy over v8 - existing databases, tracks, submissions, and gems all carry forward untouched.
+
+---
 
 ## New in v8: Full course catalogue, 16 prebuilt tracks, AI review layer
 

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * EchoLens LMS - mailer
+ * EchoLens LMS - mailer (v10)
  * Sends email through SMTP when SMTP_HOST is configured; otherwise logs to
  * the console so nothing breaks before email is set up.
  * Env: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_FROM
@@ -26,6 +26,15 @@ async function send({ to, subject, text }) {
   await transport.sendMail({ from: FROM, to, subject, text });
 }
 
+// Fire-and-forget notify: never throws, never blocks the request.
+// `to` is one address or an array; empty/missing addresses are skipped.
+function notify(to, subject, text) {
+  const list = (Array.isArray(to) ? to : [to]).filter(Boolean);
+  for (const addr of list) {
+    send({ to: addr, subject, text: text + '\n\n- EchoLens' }).catch((e) => console.error('Mail failed for', addr, e.message));
+  }
+}
+
 async function sendAnnouncement(recipients, title, body) {
   for (const r of recipients || []) {
     try { await send({ to: r.email, subject: `EchoLens: ${title}`, text: `Hi ${r.name},\n\n${body}\n\n- EchoLens` }); }
@@ -33,4 +42,4 @@ async function sendAnnouncement(recipients, title, body) {
   }
 }
 
-module.exports = { send, sendAnnouncement, configured };
+module.exports = { send, notify, sendAnnouncement, configured };

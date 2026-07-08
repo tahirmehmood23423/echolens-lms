@@ -38,10 +38,10 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0 },
   issued_usernames: [],
   issued_regnos: [],
-  users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [],
+  users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [],
 });
 
 let data = empty();
@@ -263,15 +263,21 @@ function badgesFor(u) {
   const wins = data.challenge_submissions.filter((cs) => cs.user_id === u.id && cs.status === 'approved').length;
   if (wins >= 1) out.push({ key: 'challenge-1', label: 'Challenge solved', kind: 'moment' });
   if (wins >= 5) out.push({ key: 'challenge-5', label: '5 challenges solved', kind: 'moment' });
-  const subs = data.submissions.filter((s) => s.user_id === u.id);
+  const subs = [...data.submissions.filter((s) => s.user_id === u.id), ...data.quest_submissions.filter((s) => s.user_id === u.id)];
   if (subs.length) out.push({ key: 'first-submit', label: 'First submission', kind: 'moment' });
-  if (subs.some((s) => (s.grade || 0) >= 90)) out.push({ key: 'top-marks', label: '90%+ on an assignment', kind: 'moment' });
-  // Course completion: every assignment in an enrolled batch graded.
+  if (subs.some((s) => (s.grade || 0) >= 90)) out.push({ key: 'top-marks', label: '90%+ on a task', kind: 'moment' });
+  // Course completion: the quest track fully passed (or, for legacy courses
+  // without a track, every old assignment graded).
   for (const e of data.enrollments.filter((x) => x.user_id === u.id)) {
-    const aids = data.assignments.filter((a) => a.batch_id === e.batch_id).map((a) => a.id);
-    if (aids.length && aids.every((aid) => subs.some((s) => s.assignment_id === aid && s.grade != null))) {
-      const b = Batches.byId(e.batch_id); const c = b ? Courses.byId(b.course_id) : null;
-      out.push({ key: `complete-${e.batch_id}`, label: `Completed ${c ? c.title : 'a course'}`, kind: 'course' });
+    const b = Batches.byId(e.batch_id); const c = b ? Courses.byId(b.course_id) : null;
+    if (Quests.installed(e.batch_id)) {
+      const prog = Quests.progress(u.id, e.batch_id);
+      if (prog && prog.completed) out.push({ key: `complete-${e.batch_id}`, label: `Completed ${c ? c.title : 'a course'}`, kind: 'course' });
+    } else {
+      const aids = data.assignments.filter((a) => a.batch_id === e.batch_id).map((a) => a.id);
+      if (aids.length && aids.every((aid) => data.submissions.some((s) => s.user_id === u.id && s.assignment_id === aid && s.grade != null))) {
+        out.push({ key: `complete-${e.batch_id}`, label: `Completed ${c ? c.title : 'a course'}`, kind: 'course' });
+      }
     }
   }
   return out;
@@ -321,7 +327,10 @@ const Batches = {
     if (!b) return null;
     const c = Courses.byId(b.course_id) || {};
     const teachers = (b.instructor_ids || []).map((id) => Users.byId(id)).filter(Boolean).map((t) => ({ id: t.id, name: t.name }));
-    const points = data.assignments.filter((a) => a.batch_id === b.id).reduce((s, a) => s + (a.points || DEFAULT_ASSIGNMENT_POINTS), 0);
+    const questPoints = data.quests.filter((q) => q.batch_id === b.id)
+      .reduce((s, q) => s + q.problems.reduce((s2, p) => s2 + (p.points || DEFAULT_ASSIGNMENT_POINTS), 0), 0);
+    const legacyPoints = data.assignments.filter((a) => a.batch_id === b.id).reduce((s, a) => s + (a.points || DEFAULT_ASSIGNMENT_POINTS), 0);
+    const points = questPoints + legacyPoints;
     return {
       ...b, title: c.title, tier: c.tier, level: c.level, weeks: c.weeks, hours: c.hours, summary: c.summary,
       teachers, teacher_names: teachers.map((t) => t.name).join(', ') || null,
@@ -639,8 +648,14 @@ const Hackathons = {
 
 /* -------------------------------- AI reports -------------------------------- */
 const AiReports = {
-  create({ user_id, batch_id, markdown }, by) {
-    const r = { id: nextId('ai_reports'), user_id: Number(user_id), batch_id: Number(batch_id), markdown, status: 'draft', created_at: now(), by };
+  // scope 'course' (batch_id set) or 'overall' (batch_id null - covers every course).
+  create({ user_id, batch_id, markdown, scope }, by) {
+    const r = {
+      id: nextId('ai_reports'), user_id: Number(user_id),
+      batch_id: batch_id == null ? null : Number(batch_id),
+      scope: scope || (batch_id == null ? 'overall' : 'course'),
+      markdown, status: 'draft', created_at: now(), by,
+    };
     data.ai_reports.push(r); save();
     return r;
   },
@@ -648,10 +663,15 @@ const AiReports = {
   publish(id) { const r = AiReports.byId(id); if (r) { r.status = 'published'; r.published_at = now(); save(); } return r; },
   remove(id) { data.ai_reports = data.ai_reports.filter((r) => r.id !== Number(id)); save(); },
   forBatch(bid) {
-    return data.ai_reports.filter((r) => r.batch_id === Number(bid)).map((r) => ({ ...r, student_name: (Users.byId(r.user_id) || {}).name }));
+    // Course reports for this batch, plus overall reports for its students.
+    const studentIds = new Set(data.enrollments.filter((e) => e.batch_id === Number(bid)).map((e) => e.user_id));
+    return data.ai_reports
+      .filter((r) => r.batch_id === Number(bid) || (r.batch_id == null && studentIds.has(r.user_id)))
+      .map((r) => ({ ...r, student_name: (Users.byId(r.user_id) || {}).name, scope: r.scope || (r.batch_id == null ? 'overall' : 'course') }));
   },
   publishedFor(uid) {
     return data.ai_reports.filter((r) => r.user_id === Number(uid) && r.status === 'published').map((r) => {
+      if (r.batch_id == null) return { ...r, course_title: 'Across all courses' };
       const b = Batches.byId(r.batch_id); const c = b ? Courses.byId(b.course_id) : null;
       return { ...r, course_title: c ? c.title : 'Course' };
     });
@@ -719,11 +739,21 @@ const Quests = {
   },
   forBatch(bid) { return data.quests.filter((q) => q.batch_id === Number(bid)).sort((a, b) => a.no - b.no); },
   byId(id) { return data.quests.find((q) => q.id === Number(id)) || null; },
-  submit({ quest_id, pid, user_id, file_url, note }) {
+  submit({ quest_id, pid, user_id, file_url, code, language, note }) {
     let s = data.quest_submissions.find((x) => x.quest_id === Number(quest_id) && x.pid === Number(pid) && x.user_id === Number(user_id));
-    if (s) { s.file_url = file_url || s.file_url; s.note = note ?? s.note; s.submitted_at = now(); }
-    else {
-      s = { id: nextId('quest_submissions'), quest_id: Number(quest_id), pid: Number(pid), user_id: Number(user_id), file_url, note: note || null, grade: null, gems: 0, remarks: null, submitted_at: now() };
+    if (s) {
+      // Latest submission wins: switching mode replaces the previous one.
+      if (code) { s.code = code; s.language = language || 'python'; s.file_url = null; }
+      else if (file_url) { s.file_url = file_url; s.code = null; s.language = null; }
+      s.note = note ?? s.note; s.submitted_at = now();
+      // The old AI review no longer matches the new work.
+      delete s.ai_review; delete s.review_shared; delete s.review_shared_at;
+    } else {
+      s = {
+        id: nextId('quest_submissions'), quest_id: Number(quest_id), pid: Number(pid), user_id: Number(user_id),
+        file_url: file_url || null, code: code || null, language: code ? (language || 'python') : null,
+        note: note || null, grade: null, gems: 0, remarks: null, submitted_at: now(),
+      };
       data.quest_submissions.push(s);
     }
     save();
@@ -806,6 +836,51 @@ const Quests = {
 // Quest gems count toward global stages and course totals.
 function questGemsGlobal(uid) { return data.quest_submissions.filter((s) => s.user_id === Number(uid)).reduce((sum, s) => sum + (s.gems || 0), 0); }
 
+/* ------------------------------ course chat ------------------------------ */
+// Anonymous-friendly Q&A inside each course. Students choose per message
+// whether to show their real name or a stable gem alias (same alias every
+// time in the same course, so conversations stay followable). The alias is
+// anonymous to EVERYONE - the API never reveals who is behind it, not even
+// to teachers, so shy students can ask freely. Staff always post named.
+const ALIAS_GEMS = ['Amber', 'Opal', 'Jade', 'Ruby', 'Topaz', 'Pearl', 'Onyx', 'Coral', 'Quartz', 'Zircon', 'Garnet', 'Beryl'];
+function chatAlias(uid, bid) {
+  const h = ((Number(uid) * 2654435761) ^ (Number(bid) * 40503)) >>> 0;
+  return `${ALIAS_GEMS[h % ALIAS_GEMS.length]}-${(h % 900) + 100}`;
+}
+const Chat = {
+  post({ batch_id, user, body, anonymous }) {
+    const staff = ['admin', 'instructor', 'coordinator'].includes(user.role);
+    const m = {
+      id: nextId('course_messages'), batch_id: Number(batch_id), user_id: user.id,
+      body: String(body).slice(0, 2000),
+      anonymous: staff ? false : !!anonymous, // staff always post with their name
+      staff_role: staff ? user.role : null,
+      created_at: now(),
+    };
+    data.course_messages.push(m); save();
+    return Chat.render(m, user);
+  },
+  render(m, viewer) {
+    const u = Users.byId(m.user_id) || {};
+    return {
+      id: m.id, batch_id: m.batch_id, body: m.body, created_at: m.created_at,
+      display_name: m.anonymous ? chatAlias(m.user_id, m.batch_id) : (u.name || 'Learner'),
+      anonymous: !!m.anonymous,
+      staff_role: m.staff_role || null,
+      mine: viewer ? m.user_id === viewer.id : false,
+    };
+  },
+  forBatch(bid, viewer) {
+    return data.course_messages
+      .filter((m) => m.batch_id === Number(bid))
+      .slice(-200)
+      .map((m) => Chat.render(m, viewer));
+  },
+  byId(id) { return data.course_messages.find((m) => m.id === Number(id)) || null; },
+  remove(id) { data.course_messages = data.course_messages.filter((m) => m.id !== Number(id)); save(); },
+  myAlias: chatAlias,
+};
+
 /* ------------------------------ leaderboards ------------------------------ */
 function studentLeaderboard() {
   return data.users.filter((u) => ['student', 'free'].includes(u.role)).map((u) => {
@@ -830,28 +905,37 @@ function courseLeaderboard() {
 }
 
 /* ------------------------------ course report ------------------------------ */
+// Quest-based: the quest track IS the assignment system. Every problem in
+// the installed track is a task; "missing" counts unsubmitted problems in
+// levels the student has already unlocked (i.e. work that is open to them).
 function courseReport(bid) {
   const b = Batches.decorate(Batches.byId(bid));
-  const assignments = Assignments.forBatch(bid);
-  const aids = assignments.map((a) => a.id);
+  const quests = Quests.forBatch(bid);
+  const problems = quests.flatMap((q) => q.problems.map((p) => ({
+    quest_id: q.id, pid: p.pid, level: q.no, week: q.week,
+    title: `L${q.no} · ${p.title}`, points: p.points || DEFAULT_ASSIGNMENT_POINTS, difficulty: p.difficulty,
+  })));
+  const qids = quests.map((q) => q.id);
   const students = Enrollments.studentsForBatch(bid).map((s) => {
-    const subs = data.submissions.filter((x) => x.user_id === s.id && aids.includes(x.assignment_id));
+    const subs = data.quest_submissions.filter((x) => x.user_id === s.id && qids.includes(x.quest_id));
     const graded = subs.filter((x) => x.grade != null);
     const gems = gemsForStudentInBatch(s.id, bid);
     const lastRemark = graded.map((x) => x.remarks).filter(Boolean).slice(-1)[0] || null;
     const avg = graded.length ? Math.round(graded.reduce((sum, x) => sum + x.grade, 0) / graded.length) : null;
     const inactive_days = s.last_active ? Math.floor((Date.now() - new Date(s.last_active + 'T00:00:00').getTime()) / 86400000) : null;
-    const dueAids = assignments.filter((a) => a.due_date && a.due_date < today()).map((a) => a.id);
-    const missing = dueAids.filter((aid) => !subs.some((x) => x.assignment_id === aid)).length;
+    const prog = quests.length ? Quests.progress(s.id, bid) : null;
+    const openLevel = prog ? prog.unlocked_up_to : 0;
+    const missing = problems.filter((p) => p.level <= openLevel && !subs.some((x) => x.quest_id === p.quest_id && x.pid === p.pid)).length;
     return {
       id: s.id, name: s.name, username: s.username, reg_no: s.reg_no, email: s.email,
-      submitted: subs.length, graded: graded.length, total_assignments: aids.length,
+      submitted: subs.length, graded: graded.length, total_assignments: problems.length,
+      level: openLevel, of_levels: quests.length,
       gems, avg, streak: s.streak || 0, stage: stageFor(totalGemsForStudent(s.id)), last_remark: lastRemark,
       inactive_days, missing,
       at_risk: (inactive_days == null || inactive_days >= 7) || missing >= 2,
     };
   });
-  return { batch: b, assignments, students };
+  return { batch: b, assignments: problems, students };
 }
 
 /* --------------------------------- admin --------------------------------- */
@@ -863,8 +947,10 @@ const Admin = {
       pending_challenge_reviews: Challenges.pendingCount(),
       coordinators: Users.countByRole('coordinator'),
       courses: data.courses.length, running_courses: data.batches.length,
-      enrollments: data.enrollments.length, assignments: data.assignments.length, submissions: data.submissions.length,
-      graded: data.submissions.filter((s) => s.grade != null).length,
+      enrollments: data.enrollments.length,
+      assignments: data.quests.reduce((s, q) => s + q.problems.length, 0) + data.assignments.length,
+      submissions: data.submissions.length + data.quest_submissions.length,
+      graded: data.submissions.filter((s) => s.grade != null).length + data.quest_submissions.filter((s) => s.grade != null).length,
       total_gems: data.users.filter((u) => u.role === 'student').reduce((s, u) => s + totalGemsForStudent(u.id), 0),
       batches: Batches.all(),
     };
@@ -950,7 +1036,7 @@ function backupNow() {
 load();
 
 module.exports = {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, backupNow, loadOfficialCatalogue, persist: save,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,

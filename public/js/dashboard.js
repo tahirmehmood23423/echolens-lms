@@ -48,10 +48,11 @@ function prismGem(key, size = 84) {
 }
 
 /* ------------------------------ modal ------------------------------ */
-function openModal(title, bodyHTML) {
+function openModal(title, bodyHTML, wide) {
   $('modalTitle').textContent = title;
   $('modalBody').innerHTML = bodyHTML;
   modalMsg('');
+  $('modalBox').classList.toggle('wide', !!wide);
   $('modal').classList.add('open');
 }
 function closeModal() { $('modal').classList.remove('open'); }
@@ -74,6 +75,7 @@ const TITLES = {
   'admin-catalogue': 'Catalogue & new course', 'admin-users': 'People',
 };
 function show(view) {
+  if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   $(`view-${view}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach((n) => n.classList.toggle('active', n.dataset.view === view));
@@ -256,7 +258,6 @@ async function openCourse(id) {
   if (canManage) {
     menu.push(`<button onclick="formSession()">Schedule a class</button>`);
     menu.push(`<button onclick="formLesson()">Add content</button>`);
-    menu.push(`<button onclick="formAssignment()">Add assignment</button>`);
     menu.push(`<button onclick="formAnnouncement()">Post announcement</button>`);
     menu.push(`<button onclick="formAward()">Award bonus gems</button>`);
   }
@@ -266,7 +267,7 @@ async function openCourse(id) {
     menu.push(`<button class="danger" onclick="deleteBatch()">Delete this course</button>`);
   }
 
-  const tabs = ['Quest', 'Classes', 'Content', 'Assignments', 'Leaderboard'];
+  const tabs = ['Quest', 'Chat', 'Classes', 'Content', 'Leaderboard'];
   if (isStaff()) tabs.push('People', 'Report');
 
   $('view-course').innerHTML = `
@@ -293,8 +294,10 @@ function courseTab(el) {
 function drawCourseTab(tab) {
   const d = CURRENT_BATCH; const body = $('courseTabBody');
   const canManage = d.can_manage;
+  if (CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
 
   if (tab === 'Quest') { renderQuestTab(body); return; }
+  if (tab === 'Chat') { renderChatTab(body); return; }
 
   if (tab === 'Classes') {
     body.innerHTML = `<div class="card"><div class="card-body tight">
@@ -317,31 +320,6 @@ function drawCourseTab(tab) {
           <a class="btn btn-ghost btn-sm" href="${esc(l.url)}" target="_blank" rel="noopener">Open</a>
           ${canManage ? `<button class="btn btn-danger btn-sm" onclick="del('/api/lessons/${l.id}','content')">Remove</button>` : ''}
         </div>`).join('') : '<div class="empty">No content added yet.</div>'}
-    </div></div>`;
-  }
-
-  if (tab === 'Assignments') {
-    body.innerHTML = `<div class="card"><div class="card-body tight">
-      ${d.assignments.length ? d.assignments.map((a) => {
-        const mine = d.my_submissions ? d.my_submissions[a.id] : null;
-        let studentBits = '';
-        if (ME.role === 'student') {
-          if (mine && mine.grade != null) studentBits = `<div class="s" style="margin-top:4px">Graded: <strong>${mine.grade}%</strong> &middot; ${gemChip(mine.gems)} ${mine.remarks ? '&middot; &ldquo;' + esc(mine.remarks) + '&rdquo;' : ''}</div>`;
-          else if (mine) studentBits = `<div class="s" style="margin-top:4px;color:var(--ok)">Submitted ${esc((mine.submitted_at || '').slice(0, 10))} - awaiting grade</div>`;
-        }
-        return `<div class="list-row">
-          <div class="when">Due<small>${fmtDate(a.due_date)}</small></div>
-          <div class="grow">
-            <div class="t">${esc(a.title)} <span class="s" style="font-weight:500;color:var(--muted)">&middot; ${a.points || 100} gems</span></div>
-            ${a.description ? `<div class="s">${esc(a.description)}</div>` : ''}
-            ${a.file_url ? `<a class="s" href="${esc(a.file_url)}" target="_blank" rel="noopener">Attached brief</a>` : ''}
-            ${studentBits}
-          </div>
-          ${ME.role === 'student' ? `<button class="btn btn-teal btn-sm" onclick="formSubmit(${a.id},'${esc(a.title).replace(/'/g, '&#39;')}')">${mine ? 'Resubmit' : 'Submit'}</button>` : ''}
-          ${isStaff() ? `<button class="btn btn-ghost btn-sm" onclick="openSubmissions(${a.id})">Submissions (${a.submissions_count})</button>` : ''}
-          ${canManage ? `<button class="btn btn-danger btn-sm" onclick="del('/api/assignments/${a.id}','assignment')">Remove</button>` : ''}
-        </div>`;
-      }).join('') : '<div class="empty">No assignments yet.</div>'}
     </div></div>`;
   }
 
@@ -375,18 +353,20 @@ function drawCourseTab(tab) {
         <button class="btn btn-ghost btn-sm" onclick="aiClassSummary()">&#10024; AI class summary</button>
         <button class="btn btn-ghost btn-sm" onclick="openBatchReports()">Skill reports</button>
       </div></div>` : ''}
-      <div class="card"><div class="card-head"><h3>Progress report</h3><span class="s" style="color:var(--muted)">${r.assignments.length} assignment${r.assignments.length === 1 ? '' : 's'}${atRisk ? ` &middot; <strong style="color:var(--danger)">${atRisk} at risk</strong>` : ''}</span></div>
+      <div class="card"><div class="card-head"><h3>Progress report</h3><span class="s" style="color:var(--muted)">${r.assignments.length} quest task${r.assignments.length === 1 ? '' : 's'}${atRisk ? ` &middot; <strong style="color:var(--danger)">${atRisk} at risk</strong>` : ''}</span></div>
       <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-        <tr><th>Student</th><th>Reg no</th><th>Stage</th><th>Submitted</th><th>Graded</th><th>Avg</th><th>Gems</th><th>Streak</th><th>Risk</th><th>Latest remark</th>${canManage && ME.ai_enabled ? '<th></th>' : ''}</tr>
+        <tr><th>Student</th><th>Reg no</th><th>Stage</th><th>Level</th><th>Submitted</th><th>Graded</th><th>Avg</th><th>Gems</th><th>Streak</th><th>Risk</th><th>Latest remark</th>${canManage && ME.ai_enabled ? '<th></th>' : ''}</tr>
         ${r.students.map((s) => `<tr>
           <td>${esc(s.name)}</td><td class="mono">${esc(s.reg_no || '—')}</td>
           <td>${stagePill(s.stage)}</td>
+          <td>${s.of_levels ? s.level + '/' + s.of_levels : '—'}</td>
           <td>${s.submitted}/${s.total_assignments}</td><td>${s.graded}/${s.total_assignments}</td>
           <td>${s.avg != null ? s.avg + '%' : '—'}</td><td>${gemChip(s.gems)}</td>
           <td>${s.streak ? '&#128293; ' + s.streak + 'd' : '—'}</td>
           <td>${s.at_risk ? `<span class="s" style="color:var(--danger);font-weight:700">At risk</span><div class="s" style="color:var(--muted-2)">${s.missing ? s.missing + ' missing' : ''}${s.missing && s.inactive_days != null ? ' &middot; ' : ''}${s.inactive_days != null ? s.inactive_days + 'd quiet' : 'never active'}</div>` : '<span class="s" style="color:var(--ok)">OK</span>'}</td>
           <td class="s" style="max-width:200px">${esc(s.last_remark || '—')}</td>
-          ${canManage && ME.ai_enabled ? `<td><button class="btn btn-ghost btn-sm" onclick="aiSkillReport(${s.id},'${esc(s.name).replace(/'/g, '&#39;')}')">&#10024; Report</button></td>` : ''}</tr>`).join('') || `<tr><td colspan="11" class="empty">No students enrolled yet.</td></tr>`}
+          ${canManage && ME.ai_enabled ? `<td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="aiSkillReport(${s.id},'${esc(s.name).replace(/'/g, '&#39;')}')">&#10024; Course</button>
+            <button class="btn btn-ghost btn-sm" onclick="aiOverallReport(${s.id},'${esc(s.name).replace(/'/g, '&#39;')}')">&#10024; Overall</button></td>` : ''}</tr>`).join('') || `<tr><td colspan="12" class="empty">No students enrolled yet.</td></tr>`}
       </table></div></div>`;
   }
 }
@@ -442,19 +422,6 @@ function formLesson() {
       <button class="btn btn-primary btn-block">Add content</button></form>`);
   hookForm(`/api/batches/${bid()}/lessons`, 'Content added.', true);
 }
-function formAssignment() {
-  openModal('Add assignment', `
-    <form id="f">
-      <label class="field"><span>Title</span><input name="title" required></label>
-      <label class="field"><span>Instructions</span><textarea name="description"></textarea></label>
-      <div class="form-grid">
-        <label class="field"><span>Due date</span><input name="due_date" type="date"></label>
-        <label class="field"><span>Gems (points)</span><input name="points" type="number" min="10" max="1000" value="100"></label>
-      </div>
-      <label class="field"><span>Attach a brief (optional)</span><input name="file" type="file"></label>
-      <button class="btn btn-primary btn-block">Publish assignment</button></form>`);
-  hookForm(`/api/batches/${bid()}/assignments`, 'Assignment published.', true);
-}
 function formAnnouncement() {
   openModal('Post announcement', `
     <form id="f">
@@ -480,8 +447,8 @@ function formAward() {
 function formStudents() {
   openModal('Add students', `
     <form id="f">
-      <label class="field"><span>New students - one full name per line</span><textarea name="names" placeholder="Ayesha Khan&#10;Bilal Noor"></textarea></label>
-      <p class="hint">Each gets a generated username, password, and unique registration number - shown once below to copy and share.</p>
+      <label class="field"><span>New students - one per line as "Full Name" or "Full Name, email"</span><textarea name="names" placeholder="Ayesha Khan, ayesha@gmail.com&#10;Bilal Noor"></textarea></label>
+      <p class="hint">Each gets a generated username, password, and unique registration number - shown once below. With an email, the credentials and registration number are also mailed to the student automatically.</p>
       <label class="field"><span>Existing students - one reg no or username per line</span><textarea name="existing" placeholder="4821736"></textarea></label>
       <p class="hint">Enrolls students who already have accounts, so one student can take several courses.</p>
       <button class="btn btn-primary btn-block">Add to course</button></form>
@@ -494,7 +461,7 @@ function formStudents() {
       const out = await api(`/api/batches/${bid()}/students`, { method: 'POST', body: JSON.stringify({ names, existing }) });
       let html = '';
       if (out.created.length) html += `<p style="margin:12px 0 4px;font-weight:600">New accounts - copy these now, passwords are shown once:</p>` +
-        out.created.map((c) => `<div class="cred-box">${esc(c.name)}<br>Reg no: <strong>${esc(c.reg_no)}</strong><br>Username: ${esc(c.username)}<br>Password: ${esc(c.password)}</div>`).join('');
+        out.created.map((c) => `<div class="cred-box">${esc(c.name)}<br>Reg no: <strong>${esc(c.reg_no)}</strong><br>Username: ${esc(c.username)}<br>Password: ${esc(c.password)}${c.emailed ? '<br><span style="color:var(--ok)">&#10003; credentials emailed to ' + esc(c.email) + '</span>' : ''}</div>`).join('');
       if (out.added.length) html += `<p style="margin:12px 0 4px;font-weight:600">Enrolled existing students:</p>` + out.added.map((a) => `<div class="cred-box">${esc(a.name)} (${esc(a.reg_no)})</div>`).join('');
       if (out.missing.length) html += `<p style="margin:12px 0 4px;color:var(--danger)">Not found: ${out.missing.map(esc).join(', ')}</p>`;
       $('credOut').innerHTML = html || '';
@@ -524,53 +491,6 @@ function formTeacher() {
 }
 async function openCoursePreserveModal() {
   const d = await api(`/api/batches/${bid()}`); CURRENT_BATCH = d;
-}
-function formSubmit(aid, title) {
-  openModal(`Submit: ${title}`, `
-    <form id="f">
-      <label class="field"><span>Your work - PDF or Word only</span><input name="file" type="file" accept=".pdf,.doc,.docx" required></label>
-      <label class="field"><span>Note to your teacher (optional)</span><textarea name="note"></textarea></label>
-      <button class="btn btn-primary btn-block">Submit assignment</button></form>`);
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    const fd = new FormData(f);
-    try { await api(`/api/assignments/${aid}/submit`, { method: 'POST', body: fd }); toast('Submitted - good luck!'); closeModal(); openCourse(bid()); }
-    catch (err) { modalMsg(err.message); btn.disabled = false; }
-  });
-}
-async function openSubmissions(aid) {
-  const d = await api(`/api/assignments/${aid}/submissions`);
-  const canGrade = CURRENT_BATCH.can_manage;
-  openModal(`Submissions: ${d.assignment.title}`, `
-    <div class="card-body tight" style="max-height:56vh;overflow-y:auto">
-      ${d.submissions.length ? d.submissions.map((s) => `
-        <div class="list-row" style="padding:12px 4px">
-          <div class="grow">
-            <div class="t">${esc(s.student_name)} <span class="mono s" style="color:var(--muted)">${esc(s.student_reg || '')}</span></div>
-            <div class="s">${esc((s.submitted_at || '').slice(0, 16))} ${s.note ? '&middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
-            ${s.grade != null ? `<div class="s">Graded <strong>${s.grade}%</strong> &middot; ${s.gems} gems ${s.remarks ? '&middot; ' + esc(s.remarks) : ''}</div>` : '<div class="s" style="color:var(--gold)">Awaiting grade</div>'}
-          </div>
-          <a class="btn btn-ghost btn-sm" href="${esc(s.file_url)}" target="_blank" rel="noopener">Open file</a>
-          ${canGrade ? `<button class="btn btn-teal btn-sm" onclick="formGrade(${s.id},${aid})">${s.grade != null ? 'Regrade' : 'Grade'}</button>` : ''}
-        </div>`).join('') : '<div class="empty">No submissions yet.</div>'}
-    </div>`);
-}
-function formGrade(sid, aid) {
-  openModal('Grade submission', `
-    ${ME.ai_enabled ? `<button class="btn btn-ghost btn-sm" id="aiDraftBtn" onclick="aiReview('assignment',${sid})" style="margin-bottom:12px">&#10024; AI Review</button>
-      <div id="aiRationale" style="display:none"></div>` : ''}
-    <form id="f">
-      <label class="field"><span>Grade (0&ndash;100%)</span><input name="grade" type="number" min="0" max="100" required></label>
-      <label class="field"><span>Remarks for the student</span><textarea name="remarks" placeholder="What went well, what to improve"></textarea></label>
-      <p class="hint">Gems are awarded automatically: assignment points &times; grade. Students see gems and remarks.${ME.ai_enabled ? ' AI drafts are suggestions - you decide what publishes.' : ''}</p>
-      <button class="btn btn-primary btn-block">Save grade</button></form>`);
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    try {
-      await api(`/api/submissions/${sid}/grade`, { method: 'POST', body: JSON.stringify({ grade: f.grade.value, remarks: f.remarks.value }) });
-      toast('Grade saved - gems awarded.'); await openCoursePreserveModal(); openSubmissions(aid);
-    } catch (err) { modalMsg(err.message); btn.disabled = false; }
-  });
 }
 function hookForm(path, okMsg, isMultipart) {
   $('f').addEventListener('submit', async (e) => {
@@ -1049,10 +969,17 @@ async function loadMyReports() {
 
 /* ========================== AI SKILL REPORTS (teacher) ========================== */
 async function aiSkillReport(uid, name) {
-  openModal(`Skill report: ${name}`, `<div class="s" style="color:var(--muted)">Generating from grades, remarks, and activity&hellip; The student sees nothing until you publish.</div>`);
+  openModal(`Course report: ${name}`, `<div class="s" style="color:var(--muted)">Generating from grades, remarks, and activity on this course&hellip; The student sees nothing until you publish.</div>`);
   try {
     const out = await api('/api/ai/skill-report', { method: 'POST', body: JSON.stringify({ user_id: uid, batch_id: bid() }) });
     showReportDraft(out.report, name);
+  } catch (e) { modalMsg(e.message); }
+}
+async function aiOverallReport(uid, name) {
+  openModal(`Overall report: ${name}`, `<div class="s" style="color:var(--muted)">Reviewing every course this student has taken&hellip; The student sees nothing until you publish.</div>`);
+  try {
+    const out = await api('/api/ai/overall-report', { method: 'POST', body: JSON.stringify({ user_id: uid }) });
+    showReportDraft(out.report, name + ' (all courses)');
   } catch (e) { modalMsg(e.message); }
 }
 function showReportDraft(r, name) {
@@ -1077,7 +1004,7 @@ async function openBatchReports() {
     <div class="card-body tight" style="max-height:56vh;overflow-y:auto">
       ${d.reports.length ? d.reports.map((r) => `
         <div class="list-row" style="padding:12px 4px">
-          <div class="grow"><div class="t">${esc(r.student_name)}</div>
+          <div class="grow"><div class="t">${esc(r.student_name)} ${r.scope === 'overall' ? '<span class="s" style="color:var(--teal-deep);font-weight:600">&middot; all courses</span>' : ''}</div>
             <div class="s">${esc((r.created_at || '').slice(0, 16))} &middot; <strong>${esc(r.status)}</strong></div></div>
           <button class="btn btn-ghost btn-sm" onclick='showReportDraft(${JSON.stringify({ id: r.id, markdown: r.markdown }).replace(/'/g, "&#39;")}, "${esc(r.student_name).replace(/"/g, '&quot;')}")'>Open</button>
         </div>`).join('') : '<div class="empty">No reports yet - generate them from the Report tab.</div>'}
@@ -1280,6 +1207,8 @@ async function renderQuestTab(body) {
       <span class="quest-title-chip"><span class="bd"></span>${p.track.titles.map((t) => esc(t.name)).join(' &rarr; ')}</span>
     </div></div>`;
 
+  QUEST_DATA = d; // cached for the task portal
+
   const map = `<div class="quest-map">${p.levels.map((l) => {
     const q = l.quest;
     const state = l.passed ? 'passed' : (l.unlocked ? 'current' : 'locked');
@@ -1291,27 +1220,27 @@ async function renderQuestTab(body) {
           <span class="lvl">W${q.week} &middot; LVL ${q.no}</span>
           <span class="qt">${esc(q.title)}<div class="qs">${esc(q.topic)}</div></span>
           <span class="qstate ${state}">${l.passed ? 'Passed' : (l.unlocked ? 'Open' : 'Locked')}</span>
+          ${d.can_manage ? `<button class="btn btn-ghost btn-sm" style="margin-right:10px" onclick="event.stopPropagation();remindLevel(${q.id})" title="Email students who have not finished this level">&#128276; Remind</button>` : ''}
         </div>
         <div class="qproblems">
           ${q.problems.map((pr) => {
             const sub = isStudent ? mySubFor(pr.pid) : null;
-            let status = '';
+            let chip = '';
             if (isStudent && sub) {
-              status = sub.grade != null
-                ? `<div class="s" style="margin-top:4px">Graded <strong>${sub.grade}%</strong> &middot; ${gemChip(sub.gems)} ${sub.remarks ? '&middot; &ldquo;' + esc(sub.remarks) + '&rdquo;' : ''}</div>`
-                : `<div class="s" style="margin-top:4px;color:var(--gold)">Submitted - awaiting grade</div>`;
+              chip = sub.grade != null
+                ? `<span class="s" style="color:var(--teal-deep);font-weight:700;white-space:nowrap">${sub.grade}% &middot; ${sub.gems} gems</span>`
+                : `<span class="s" style="color:var(--gold);font-weight:600;white-space:nowrap">Awaiting grade</span>`;
             }
-            const refsHtml = (pr.refs || []).length ? `<div class="s" style="margin-top:5px">Resources: ${pr.refs.map((r) => `<a href="${esc(r[1])}" target="_blank" rel="noopener">${esc(r[0])}</a>`).join(' &middot; ')}</div>` : '';
-            const solHtml = (!isStudent && pr.solution) ? `<details style="margin-top:6px"><summary class="s" style="cursor:pointer;color:var(--teal-deep);font-weight:600">Solution guideline (teachers only)</summary><div class="s" style="background:#FDF8EC;border:1px solid #F0E2BC;border-radius:9px;padding:9px 12px;margin-top:5px">${esc(pr.solution)}</div></details>` : '';
-            return `<div class="qproblem">
+            return `<div class="qproblem qtopic" onclick="openTask(${q.id},${pr.pid})">
               <span class="qdiff ${esc(pr.difficulty)}">${esc(pr.difficulty)}</span>
               <div style="flex:1;min-width:0">
-                <div class="t" style="font-size:13.5px">${esc(pr.title)} <span class="s" style="font-weight:500;color:var(--muted)">&middot; ${pr.points} gems</span></div>
-                <div class="s" style="white-space:pre-line">${esc(pr.description)}</div>${refsHtml}${solHtml}${status}
+                <div class="t" style="font-size:13.5px">${esc(pr.title)}</div>
+                <div class="s" style="color:var(--muted)">${pr.points} gems${sub && sub.shared_review ? ' &middot; <span style="color:var(--teal-deep)">&#10024; AI feedback shared</span>' : ''}</div>
               </div>
-              ${isStudent && l.unlocked && !l.passed ? `<button class="btn btn-teal btn-sm" onclick="formQuestSubmit(${q.id},${pr.pid},'${esc(pr.title).replace(/'/g, '&#39;')}')">${sub ? 'Resubmit' : 'Submit'}</button>` : ''}
-              ${d.can_manage ? `<button class="btn btn-ghost btn-sm" onclick="formEditProblem(${q.id},${pr.pid})">Edit</button>` : ''}
-              ${d.can_manage || ME.role === 'coordinator' ? `<button class="btn btn-ghost btn-sm" onclick="openQuestSubs(${q.id},${pr.pid})">Submissions</button>` : ''}
+              ${chip}
+              <button class="btn btn-teal btn-sm" onclick="event.stopPropagation();openTask(${q.id},${pr.pid})">Open</button>
+              ${d.can_manage ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();formEditProblem(${q.id},${pr.pid})">Edit</button>` : ''}
+              ${d.can_manage || ME.role === 'coordinator' ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openQuestSubs(${q.id},${pr.pid})">Submissions</button>` : ''}
             </div>`;
           }).join('')}
         </div>
@@ -1357,20 +1286,223 @@ async function uninstallTrack() {
   try { await api(`/api/batches/${bid()}/track`, { method: 'DELETE' }); toast('Track removed.'); openCourse(bid()); }
   catch (e) { toast(e.message, true); }
 }
-function formQuestSubmit(qid, pid, title) {
-  openModal(`Submit: ${title}`, `
-    <form id="f">
-      <label class="field"><span>Your solution - PDF or Word only</span><input name="file" type="file" accept=".pdf,.doc,.docx" required></label>
-      <p class="hint">Export your code/notebook and outputs into one PDF or Word document.</p>
-      <label class="field"><span>Note to your instructor (optional)</span><textarea name="note"></textarea></label>
-      <p class="hint">Your instructor grades this; the level average must reach the pass mark to unlock the next level.</p>
-      <button class="btn btn-primary btn-block">Submit solution</button></form>`);
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    try { await api(`/api/quests/${qid}/problems/${pid}/submit`, { method: 'POST', body: new FormData(f) }); toast('Submitted - gems incoming once graded.'); closeModal(); openCourse(bid()); }
-    catch (err) { modalMsg(err.message); btn.disabled = false; }
+/* ============================ TASK WORKSPACE ============================ */
+// A full page per task: the assignment brief on one side, a professional
+// editor + real terminal on the other. input() is interactive - the prompt
+// appears in the terminal and the student answers right there. numpy,
+// pandas, matplotlib, and scikit-learn load automatically from imports;
+// matplotlib charts render below the output.
+let QUEST_DATA = null;
+let TASK_CTX = null; // { qid, pid, term }
+
+function sharedReviewBox(sr) {
+  if (!sr) return '';
+  const rows = [['Key concepts you showed', sr.key_concepts], ['Things to fix', sr.mistakes], ['A better approach', sr.better_approach]]
+    .filter(([, v]) => v)
+    .map(([k, v]) => `<div style="margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${k}:</span> <span style="white-space:pre-line">${esc(v)}</span></div>`).join('');
+  return `<div class="review-share-box"><div class="rsb-head">&#10024; AI feedback - shared by your teacher</div>${rows}
+    <div class="s" style="color:var(--muted-2)">Generated with AI and released by your instructor. Your grade always comes from your teacher.</div></div>`;
+}
+
+function backToQuest() { openCourse(bid()); }
+
+function openTask(qid, pid) {
+  const d = QUEST_DATA;
+  if (!d || !d.progress) return;
+  const lvl = d.progress.levels.find((l) => l.quest.id === qid);
+  if (!lvl) return;
+  const q = lvl.quest;
+  const pr = q.problems.find((x) => x.pid === pid);
+  if (!pr) return;
+  const isStudent = ME.role === 'student';
+  const sub = isStudent ? d.my_subs[`${q.id}:${pid}`] : null;
+  const canSubmit = isStudent && lvl.unlocked && !lvl.passed;
+
+  document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+  $('view-task').classList.add('active');
+  $('pageTitle').textContent = pr.title;
+  $('sidebar').classList.remove('open');
+
+  const refsHtml = (pr.refs || []).length
+    ? `<div class="s" style="margin-top:10px"><strong>Resources:</strong> ${pr.refs.map((r) => `<a href="${esc(r[1])}" target="_blank" rel="noopener">${esc(r[0])}</a>`).join(' &middot; ')}</div>` : '';
+  const solHtml = (!isStudent && pr.solution)
+    ? `<details style="margin-top:12px"><summary class="s" style="cursor:pointer;color:var(--teal-deep);font-weight:600">Solution guideline (teachers only)</summary><div class="s" style="background:#FDF8EC;border:1px solid #F0E2BC;border-radius:9px;padding:9px 12px;margin-top:5px;white-space:pre-line">${esc(pr.solution)}</div></details>` : '';
+
+  let statusHtml = '';
+  if (isStudent && sub) {
+    statusHtml = sub.grade != null
+      ? `<div class="task-status ok">Graded <strong>${sub.grade}%</strong> &middot; ${gemChip(sub.gems)} ${sub.remarks ? '&middot; &ldquo;' + esc(sub.remarks) + '&rdquo;' : ''}</div>`
+      : `<div class="task-status wait">Submitted ${esc((sub.submitted_at || '').slice(0, 16))} - awaiting grade</div>`;
+    statusHtml += sharedReviewBox(sub.shared_review);
+  }
+  if (isStudent && !lvl.unlocked) statusHtml = `<div class="task-status lock">&#128274; This level is locked - pass the previous level first. You can read the task and practice in the editor, but not submit yet.</div>`;
+
+  const fileMode = canSubmit ? `
+    <details style="margin-top:14px"><summary class="s" style="cursor:pointer;color:var(--muted);font-weight:600">Submit a file instead (reports, screenshots, notebooks - PDF/Word)</summary>
+      <form id="taskFileForm" style="margin-top:10px">
+        <label class="field"><span>Your file - PDF or Word only</span><input name="file" type="file" accept=".pdf,.doc,.docx" required></label>
+        <label class="field"><span>Note to your instructor (optional)</span><input name="note" value="${esc((sub && sub.note) || '')}"></label>
+        <button class="btn btn-primary">${sub ? 'Resubmit file' : 'Submit file'}</button>
+      </form></details>` : '';
+
+  const prevCode = sub && sub.code ? sub.code : '';
+  const prevLang = (sub && sub.language) || 'python';
+
+  $('view-task').innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="backToQuest()" style="margin-bottom:14px">&larr; Back to quest</button>
+    <div class="task-head">
+      <div>
+        <h2 style="margin-bottom:4px">${esc(pr.title)}</h2>
+        <div class="task-meta">
+          <span class="qdiff ${esc(pr.difficulty)}">${esc(pr.difficulty)}</span>
+          <span class="s"><strong>${pr.points}</strong> gems</span>
+          <span class="s" style="color:var(--muted)">Level ${q.no} &middot; ${esc(q.topic)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="task-grid">
+      <div class="task-brief">
+        <div class="card"><div class="card-head"><h3>Assignment</h3></div>
+          <div class="card-body">
+            <div class="s" style="white-space:pre-line;line-height:1.6;font-size:13.5px">${esc(pr.description)}</div>
+            ${refsHtml}${solHtml}${statusHtml}${fileMode}
+          </div></div>
+      </div>
+      <div class="task-ide card">
+        <div class="ide-toolbar">
+          <select id="taskLang" onchange="taskLangChanged()">
+            <option value="python"${prevLang !== 'text' ? ' selected' : ''}>Python 3</option>
+            <option value="text"${prevLang === 'text' ? ' selected' : ''}>Written answer</option>
+          </select>
+          <span class="ide-pkgs" id="idePkgs">numpy &middot; pandas &middot; matplotlib &middot; scikit-learn ready</span>
+          <span style="flex:1"></span>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="clearTaskTerm()">Clear output</button>
+          <button type="button" class="btn btn-teal btn-sm" id="runBtn" onclick="runTaskCode()">&#9654; Run</button>
+        </div>
+        <textarea id="codeBox" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your Python solution here, then press Run.">${esc(prevCode)}</textarea>
+        <div class="ide-status-row"><span class="s" id="runStatus" style="color:var(--muted-2)">Ready.</span></div>
+        <div id="taskTerm"></div>
+        ${canSubmit ? `
+        <div class="ide-submit">
+          <input id="taskNote" placeholder="Note to your instructor (optional)" value="${esc((sub && sub.note) || '')}">
+          <button class="btn btn-primary" id="taskSubmitBtn" onclick="submitTaskCode(${q.id},${pid})">${sub ? 'Resubmit solution' : 'Submit solution'}</button>
+        </div>
+        <p class="hint" style="margin:8px 14px 14px">Submitting sends exactly what is in the editor. The level average must reach the pass mark to unlock the next level.</p>` : '<div style="height:14px"></div>'}
+      </div>
+    </div>`;
+
+  const term = EchoTerm.mount($('taskTerm'));
+  TASK_CTX = { qid, pid, term };
+  EchoRun.wireEditor($('codeBox'));
+  taskLangChanged();
+
+  const ff = $('taskFileForm');
+  if (ff) ff.addEventListener('submit', async (e) => {
+    e.preventDefault(); const btn = ff.querySelector('button'); btn.disabled = true;
+    try {
+      await api(`/api/quests/${q.id}/problems/${pid}/submit`, { method: 'POST', body: new FormData(ff) });
+      toast('Submitted - gems incoming once graded.'); backToQuest();
+    } catch (err) { toast(err.message, true); btn.disabled = false; }
   });
 }
+function taskLangChanged() {
+  const py = $('taskLang').value === 'python';
+  $('runBtn').style.display = py ? '' : 'none';
+  $('taskTerm').style.display = py ? '' : 'none';
+  $('idePkgs').style.display = py ? '' : 'none';
+  $('codeBox').placeholder = py
+    ? '# Write your Python solution here, then press Run.'
+    : 'Write your answer here, then press Submit.';
+}
+function clearTaskTerm() { if (TASK_CTX) TASK_CTX.term.clear(); const s = $('runStatus'); if (s) s.textContent = 'Ready.'; }
+async function runTaskCode() {
+  const btn = $('runBtn'); const status = $('runStatus');
+  const code = $('codeBox').value;
+  if (!code.trim()) { toast('Write some code first.', true); return; }
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
+  btn.innerHTML = '&#9632; Stop';
+  try { await EchoRun.execute(code, { term: TASK_CTX.term, onStatus: (t) => { status.textContent = t; } }); }
+  catch (e) { status.textContent = e.message; }
+  btn.innerHTML = '&#9654; Run';
+}
+async function submitTaskCode(qid, pid) {
+  const btn = $('taskSubmitBtn'); const code = $('codeBox').value;
+  if (!code.trim() || code.trim().length < 5) { toast('Write your solution in the editor first.', true); return; }
+  btn.disabled = true;
+  try {
+    await api(`/api/quests/${qid}/problems/${pid}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ code, language: $('taskLang').value, note: $('taskNote').value }),
+    });
+    toast('Submitted - gems incoming once graded.'); backToQuest();
+  } catch (err) { toast(err.message, true); btn.disabled = false; }
+}
+async function remindLevel(qid) {
+  if (!confirm('Email a reminder to every student who has not finished this level yet?')) return;
+  try {
+    const out = await api(`/api/quests/${qid}/remind`, { method: 'POST' });
+    toast(out.behind ? `Reminder sent to ${out.reminded} student${out.reminded === 1 ? '' : 's'} (${out.behind} behind).` : 'Everyone has finished this level - no reminders needed.');
+  } catch (e) { toast(e.message, true); }
+}
+
+/* ============================== COURSE CHAT ============================== */
+// Ask-anything space per course. Students choose per message: real name or
+// their stable anonymous alias - nobody (not even the teacher) can see who
+// is behind an alias, so shy students can ask freely.
+let CHAT_TIMER = null;
+async function renderChatTab(body) {
+  body.innerHTML = '<div class="empty">Loading chat&hellip;</div>';
+  const d = await api(`/api/batches/${bid()}/chat`);
+  const isLearner = ['student', 'free'].includes(ME.role);
+  body.innerHTML = `
+    <div class="card"><div class="card-head"><h3>Course chat</h3>
+      <span class="s" style="color:var(--muted)">${isLearner ? `Ask anything - post with your name or as <strong>${esc(d.my_alias)}</strong>, your anonymous alias. Nobody can see who an alias is.` : 'Questions from your students - anonymous aliases stay anonymous, even to you.'}</span></div>
+      <div class="card-body">
+        <div id="chatList" class="chat-list"></div>
+        <form id="chatForm" class="chat-composer">
+          ${isLearner ? `<select id="chatAnon"><option value="0">As ${esc(ME.name.split(' ')[0])}</option><option value="1">As ${esc(d.my_alias)} (anonymous)</option></select>` : ''}
+          <input id="chatBody" maxlength="2000" placeholder="${isLearner ? 'Ask a question about this course...' : 'Reply to your students...'}" autocomplete="off">
+          <button class="btn btn-primary btn-sm">Send</button>
+        </form>
+      </div></div>`;
+  drawChat_(d);
+  $('chatForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const inp = $('chatBody'); const text = inp.value.trim(); if (!text) return;
+    const anon = $('chatAnon') ? $('chatAnon').value === '1' : false;
+    inp.value = '';
+    try {
+      await api(`/api/batches/${bid()}/chat`, { method: 'POST', body: JSON.stringify({ body: text, anonymous: anon }) });
+      const fresh = await api(`/api/batches/${bid()}/chat`); drawChat_(fresh);
+    } catch (err) { toast(err.message, true); inp.value = text; }
+  });
+  CHAT_TIMER = setInterval(async () => {
+    if (!$('chatList')) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; return; }
+    try { const fresh = await api(`/api/batches/${bid()}/chat`); drawChat_(fresh); } catch {}
+  }, 12000);
+}
+function drawChat_(d) {
+  const list = $('chatList'); if (!list) return;
+  const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+  list.innerHTML = d.messages.length ? d.messages.map((m) => `
+    <div class="chat-msg${m.mine ? ' mine' : ''}${m.staff_role ? ' staff' : ''}">
+      <div class="cm-head">
+        <span class="cm-name">${esc(m.display_name)}</span>
+        ${m.staff_role ? `<span class="cm-role">${m.staff_role === 'admin' ? 'Admin' : m.staff_role === 'coordinator' ? 'Coordinator' : 'Teacher'}</span>` : (m.anonymous ? '<span class="cm-anon">anonymous</span>' : '')}
+        <span class="cm-time">${esc((m.created_at || '').slice(5, 16))}</span>
+        ${(m.mine || d.can_moderate) ? `<button class="cm-del" title="Delete" onclick="delChatMsg(${m.id})">&times;</button>` : ''}
+      </div>
+      <div class="cm-body">${esc(m.body)}</div>
+    </div>`).join('') : '<div class="empty">No questions yet - be the first to ask. Anonymous posting means nobody will know it was you.</div>';
+  if (atBottom || !list.dataset.drawn) list.scrollTop = list.scrollHeight;
+  list.dataset.drawn = '1';
+}
+async function delChatMsg(id) {
+  if (!confirm('Delete this message?')) return;
+  try { await api(`/api/chat/${id}`, { method: 'DELETE' }); const fresh = await api(`/api/batches/${bid()}/chat`); drawChat_(fresh); }
+  catch (e) { toast(e.message, true); }
+}
+
 async function openQuestSubs(qid, pid) {
   const d = await api(`/api/quests/${qid}/submissions`);
   const p = d.quest.problems.find((x) => x.pid === pid) || {};
@@ -1381,71 +1513,100 @@ async function openQuestSubs(qid, pid) {
         <div class="list-row" style="padding:12px 4px">
           <div class="grow">
             <div class="t">${esc(s.student_name)} <span class="mono s" style="color:var(--muted)">${esc(s.student_reg || '')}</span></div>
-            <div class="s">${esc((s.submitted_at || '').slice(0, 16))} ${s.note ? '&middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
+            <div class="s">${esc((s.submitted_at || '').slice(0, 16))} &middot; ${s.code ? '&#9998; code submission' : '&#128206; file'} ${s.note ? '&middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
             ${s.grade != null ? `<div class="s">Graded <strong>${s.grade}%</strong> &middot; ${s.gems} gems ${s.remarks ? '&middot; ' + esc(s.remarks) : ''}</div>` : '<div class="s" style="color:var(--gold)">Awaiting grade</div>'}
+            ${s.ai_review ? `<div class="s" style="color:${s.review_shared ? 'var(--teal-deep)' : 'var(--muted-2)'}">&#10024; AI review ${s.review_shared ? 'shared with student' : 'ready (not shared)'}</div>` : ''}
           </div>
-          <a class="btn btn-ghost btn-sm" href="${esc(s.file_url)}" target="_blank" rel="noopener">Open file</a>
+          ${s.file_url ? `<a class="btn btn-ghost btn-sm" href="${esc(s.file_url)}" target="_blank" rel="noopener">Open file</a>` : ''}
           ${CURRENT_BATCH.can_manage ? `<button class="btn btn-teal btn-sm" onclick="formQuestGrade(${s.id},${qid},${pid})">${s.grade != null ? 'Regrade' : 'Grade'}</button>` : ''}
         </div>`).join('') : '<div class="empty">No submissions for this problem yet.</div>'}
     </div>`);
 }
 function formQuestGrade(sid, qid, pid) {
-  openModal('Grade quest submission', `
-    ${ME.ai_enabled ? `<button class="btn btn-ghost btn-sm" id="aiDraftBtn" onclick="aiReview('quest',${sid})" style="margin-bottom:12px">&#10024; AI Review</button>
-      <div id="aiRationale" style="display:none"></div>` : ''}
-    <form id="f">
-      <label class="field"><span>Grade (0&ndash;100%)</span><input name="grade" type="number" min="0" max="100" required></label>
-      <label class="field"><span>Remarks for the student</span><textarea name="remarks" placeholder="What went well, what to improve"></textarea></label>
-      <p class="hint">Gems = problem points &times; grade. When the level's average reaches the pass mark, the next level unlocks automatically.</p>
-      <button class="btn btn-primary btn-block">Save grade</button></form>`);
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type="submit"],button:not([type])'); btn.disabled = true; modalMsg('');
-    try {
-      await api(`/api/quest-submissions/${sid}/grade`, { method: 'POST', body: JSON.stringify({ grade: f.grade.value, remarks: f.remarks.value }) });
-      toast('Graded - gems awarded.'); await openCoursePreserveModal(); openQuestSubs(qid, pid);
-    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  api(`/api/quests/${qid}/submissions`).then((d) => {
+    const s = d.submissions.find((x) => x.id === sid) || {};
+    const codeBlock = s.code ? `
+      <div class="pub-sec" style="margin-top:0">Submitted ${s.language === 'text' ? 'answer' : 'code'}</div>
+      <div class="cp-toolbar">
+        <span class="s" style="color:var(--muted-2)">${esc(s.language || 'python')}</span>
+        <span style="flex:1"></span>
+        <span class="s" id="runStatus" style="color:var(--muted-2)"></span>
+        ${s.language !== 'text' ? `<button type="button" class="btn btn-ghost btn-sm" id="runBtn" onclick="runGradeCode()">&#9654; Run</button>` : ''}
+        <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('gradeCode').textContent).then(()=>toast('Code copied.'))">Copy</button>
+      </div>
+      <pre id="gradeCode" class="code-out" style="display:block;max-height:30vh">${esc(s.code)}</pre>
+      <div id="gradeTerm" style="display:none"></div>`
+      : (s.file_url ? `<a class="btn btn-ghost btn-sm" href="${esc(s.file_url)}" target="_blank" rel="noopener" style="margin-bottom:12px">&#128206; Open submitted file</a>` : '');
+    openModal('Grade quest submission', `
+      ${codeBlock}
+      ${ME.ai_enabled ? `<button class="btn btn-ghost btn-sm" id="aiDraftBtn" onclick="aiReview(${sid})" style="margin:10px 0 12px">&#10024; AI Review</button>
+        <div id="aiRationale" style="display:none"></div>` : ''}
+      <form id="f">
+        <label class="field"><span>Grade (0&ndash;100%)</span><input name="grade" type="number" min="0" max="100" ${s.grade != null ? `value="${s.grade}"` : ''} required></label>
+        <label class="field"><span>Remarks for the student</span><textarea name="remarks" placeholder="What went well, what to improve">${esc(s.remarks || '')}</textarea></label>
+        <p class="hint">Gems = problem points &times; grade. When the level's average reaches the pass mark, the next level unlocks automatically.</p>
+        <button class="btn btn-primary btn-block">Save grade</button></form>`, true);
+    $('f').addEventListener('submit', async (e) => {
+      e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type="submit"],button:not([type])'); btn.disabled = true; modalMsg('');
+      try {
+        await api(`/api/quest-submissions/${sid}/grade`, { method: 'POST', body: JSON.stringify({ grade: f.grade.value, remarks: f.remarks.value }) });
+        toast('Graded - gems awarded.'); openQuestSubs(qid, pid);
+      } catch (err) { modalMsg(err.message); btn.disabled = false; }
+    });
   });
 }
-async function aiQuestDraft(sid) {
-  const btn = $('aiDraftBtn'); btn.disabled = true; btn.textContent = 'Thinking...';
-  try {
-    const out = await api('/api/ai/quest-grade-draft', { method: 'POST', body: JSON.stringify({ submission_id: sid }) });
-    const f = $('f');
-    if (out.draft.grade != null) f.grade.value = out.draft.grade;
-    f.remarks.value = out.draft.remarks || '';
-    const r = $('aiRationale');
-    r.style.display = '';
-    r.innerHTML = `<strong>AI rationale (only you see this):</strong> ${esc(out.draft.rationale || '—')}${out.readable ? '' : '<br><em>File not readable as text - draft is from the problem brief and note only. Review carefully.</em>'}`;
-    modalMsg('Draft filled in - you decide what publishes.', true);
-  } catch (e) { modalMsg(e.message); }
-  btn.disabled = false; btn.innerHTML = '&#10024; Draft with AI';
+async function runGradeCode() {
+  const btn = $('runBtn'); const status = $('runStatus');
+  const code = $('gradeCode').textContent;
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
+  const wrap = $('gradeTerm');
+  wrap.style.display = '';
+  if (!wrap._term) wrap._term = EchoTerm.mount(wrap);
+  btn.innerHTML = '&#9632; Stop';
+  try { await EchoRun.execute(code, { term: wrap._term, onStatus: (t) => { status.textContent = t; } }); }
+  catch (e) { status.textContent = e.message; }
+  btn.innerHTML = '&#9654; Run';
 }
-
-
-/* ============================ AI REVIEW (unified) ============================ */
-async function aiReview(kind, sid, force) {
+/* ============================ AI REVIEW (teacher) ============================ */
+async function aiReview(sid, force) {
   const btn = $('aiDraftBtn'); if (btn) { btn.disabled = true; btn.textContent = 'Reviewing...'; }
   try {
-    const out = await api('/api/ai/review', { method: 'POST', body: JSON.stringify({ kind, submission_id: sid, force: !!force }) });
+    const out = await api('/api/ai/review', { method: 'POST', body: JSON.stringify({ submission_id: sid, force: !!force }) });
     const r = out.review;
     const f = $('f');
     if (f && r.suggested_score != null && !f.grade.value) f.grade.value = r.suggested_score;
     const box = $('aiRationale');
     box.style.display = '';
     box.innerHTML = `<div style="background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:12px;font-size:12.5px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <strong>AI review (only staff see this)</strong>
-        <span style="display:flex;gap:8px;align-items:center">${out.cached ? `<button class="btn btn-ghost btn-sm" onclick="aiReview('${kind}',${sid},true)">Regenerate</button>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap">
+        <strong>AI review (staff only until you share)</strong>
+        <span style="display:flex;gap:8px;align-items:center">${out.cached ? `<button class="btn btn-ghost btn-sm" onclick="aiReview(${sid},true)">Regenerate</button>` : ''}
         <span class="s" style="color:var(--muted-2)">suggested: <strong>${r.suggested_score != null ? r.suggested_score + '%' : '—'}</strong></span></span>
       </div>
       ${[['Question', r.question_summary], ['What the student did', r.solution_summary], ['Key concepts grasped', r.key_concepts], ['Mistakes', r.mistakes], ['Better approach', r.better_approach]]
         .filter(([, v]) => v).map(([k, v]) => `<div style="margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${k}:</span> <span style="white-space:pre-line">${esc(v)}</span></div>`).join('')}
-      ${r.readable === false ? '<div style="color:var(--danger)"><em>The file was not readable as text - review is based on the brief and note only. Open the file yourself.</em></div>' : ''}
-      <div class="s" style="color:var(--muted-2);margin-top:4px">You decide the final score - edit anything before saving.</div>
+      ${r.readable === false ? '<div style="color:var(--danger)"><em>The submission was not readable as text - review is based on the brief and note only. Check it yourself.</em></div>' : ''}
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-teal btn-sm" id="shareBtn" onclick="shareReview(${sid}, ${out.shared ? 'false' : 'true'})">${out.shared ? 'Stop sharing with student' : 'Share key points with student'}</button>
+        <span class="s" style="color:var(--muted-2)">${out.shared ? 'The student can see the key points, mistakes, and better approach - never the suggested score.' : 'Nothing reaches the student until you share. The suggested score is never shared.'}</span>
+      </div>
+      <div class="s" style="color:var(--muted-2);margin-top:6px">You decide the final score - edit anything before saving.</div>
     </div>`;
     modalMsg('AI review ready - the final score is yours.', true);
   } catch (e) { modalMsg(e.message); }
   if (btn) { btn.disabled = false; btn.innerHTML = '&#10024; AI Review'; }
+}
+async function shareReview(sid, share) {
+  const btn = $('shareBtn'); if (btn) btn.disabled = true;
+  try {
+    const out = await api(`/api/quest-submissions/${sid}/share-review`, { method: 'POST', body: JSON.stringify({ share }) });
+    toast(out.shared ? 'Key points shared - the student sees them on the task.' : 'Sharing stopped.');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = out.shared ? 'Stop sharing with student' : 'Share key points with student';
+      btn.setAttribute('onclick', `shareReview(${sid}, ${out.shared ? 'false' : 'true'})`);
+    }
+  } catch (e) { modalMsg(e.message); if (btn) btn.disabled = false; }
 }
 
 /* =========================== EDIT QUEST PROBLEM =========================== */

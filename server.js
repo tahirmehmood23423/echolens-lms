@@ -18,7 +18,7 @@ const store = require('./store');
 const ai = require('./ai');
 const mailer = require('./mailer');
 const {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, officialCatalogue,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -158,9 +158,7 @@ app.get('/api/overview', authRequired, (req, res) => {
     return res.json({ ...base, admin: Admin.overview(), leaderboard: studentLeaderboard().slice(0, 10) });
   }
   if (u.role === 'instructor') {
-    const pending = base.courses.reduce((sum, b) => {
-      return sum + Assignments.forBatch(b.id).reduce((s2, a) => s2 + Submissions.forAssignment(a.id).filter((x) => x.grade == null).length, 0);
-    }, 0);
+    const pending = base.courses.reduce((sum, b) => sum + Quests.pendingCount(b.id), 0);
     return res.json({ ...base, teaching: { pending_to_grade: pending }, leaderboard: studentLeaderboard().slice(0, 10) });
   }
   if (u.role === 'free') {
@@ -186,18 +184,15 @@ app.get('/api/batches/:id/leaderboard', authRequired, viewBatch, (req, res) => {
 app.get('/api/batches/:id', authRequired, viewBatch, (req, res) => {
   const b = Batches.decorate(req.batch);
   const u = req.user;
-  const assignments = Assignments.forBatch(b.id).map((a) => ({ ...a, submissions_count: Submissions.countForAssignment(a.id) }));
   const out = {
     batch: b,
     sessions: Sessions.forBatch(b.id),
     lessons: Lessons.forBatch(b.id),
-    assignments,
     announcements: Announcements.forUser(u).filter((a) => a.batch_id === b.id),
     can_manage: canManageBatch(u, req.batch),
     leaderboard: batchLeaderboard(b.id).slice(0, 10),
   };
   if (u.role === 'student') {
-    out.my_submissions = Submissions.forStudent(u.id, assignments.map((a) => a.id));
     out.my_gems_here = gemsForStudentInBatch(u.id, b.id);
   }
   if (['admin', 'coordinator', 'instructor'].includes(u.role)) {
@@ -235,10 +230,19 @@ app.post('/api/batches/:id/students', authRequired, adminRequired, (req, res) =>
   const { names, existing } = req.body || {};
   const created = [], added = [], missing = [];
   for (const raw of Array.isArray(names) ? names : []) {
-    const name = String(raw).trim(); if (!name) continue;
-    const { user, password } = Users.create({ name, role: 'student' });
+    // Each line: "Full Name" or "Full Name, email@domain" - with an email,
+    // the credentials (username, password, registration number) are mailed.
+    const parts = String(raw).split(',').map((x) => x.trim());
+    const name = parts[0]; if (!name) continue;
+    const email = parts[1] && isEmail(parts[1]) ? parts[1] : null;
+    const { user, password } = Users.create({ name, role: 'student', email });
     Enrollments.create(user.id, b.id);
-    created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password });
+    created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: !!(email && mailer.configured) });
+    if (email) {
+      const bd = Batches.decorate(b);
+      mailer.notify(email, 'Welcome to EchoLens - your account',
+        `Hi ${user.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
+    }
   }
   for (const raw of Array.isArray(existing) ? existing : []) {
     const u = Users.byLogin(String(raw).trim());
@@ -331,51 +335,10 @@ app.delete('/api/lessons/:id', authRequired, (req, res) => {
   if (!canManageBatch(req.user, Batches.byId(l.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
   Lessons.remove(l.id); res.json({ ok: true });
 });
-app.post('/api/batches/:id/assignments', authRequired, manageBatch, upload.single('file'), (req, res) => {
-  const { title, description, due_date, points } = req.body || {};
-  if (!title) return res.status(400).json({ error: 'A title is required.' });
-  const a = Assignments.create({
-    batch_id: req.batch.id, title, description: description || null, due_date: due_date || null,
-    points: Math.max(10, Math.min(1000, Number(points) || 100)),
-    file_url: req.file ? `/uploads/${req.file.filename}` : null, created_by: req.user.id,
-  });
-  res.json({ ok: true, assignment: a });
-});
-app.delete('/api/assignments/:id', authRequired, (req, res) => {
-  const a = Assignments.byId(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assignment not found.' });
-  if (!canManageBatch(req.user, Batches.byId(a.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
-  Assignments.remove(a.id); res.json({ ok: true });
-});
-
-/* ------------------------------- submissions ------------------------------- */
-app.post('/api/assignments/:id/submit', authRequired, upload.single('file'), (req, res) => {
-  if (req.user.role !== 'student') return res.status(403).json({ error: 'Only students submit assignments.' });
-  const a = Assignments.byId(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assignment not found.' });
-  if (!canViewBatch(req.user, Batches.byId(a.batch_id))) return res.status(403).json({ error: 'You are not on this course.' });
-  if (!requireDocFile(req, res)) return;
-  const s = Submissions.upsert({ assignment_id: a.id, user_id: req.user.id, file_url: `/uploads/${req.file.filename}`, note: (req.body || {}).note });
-  res.json({ ok: true, submission: s });
-});
-app.get('/api/assignments/:id/submissions', authRequired, (req, res) => {
-  const a = Assignments.byId(req.params.id);
-  if (!a) return res.status(404).json({ error: 'Assignment not found.' });
-  const b = Batches.byId(a.batch_id);
-  const canSee = canManageBatch(req.user, b) || req.user.role === 'coordinator';
-  if (!canSee) return res.status(403).json({ error: 'Not available for your role.' });
-  res.json({ assignment: a, submissions: Submissions.forAssignment(a.id) });
-});
-app.post('/api/submissions/:id/grade', authRequired, (req, res) => {
-  const s = Submissions.byId(req.params.id);
-  if (!s) return res.status(404).json({ error: 'Submission not found.' });
-  const a = Assignments.byId(s.assignment_id);
-  if (!canManageBatch(req.user, Batches.byId(a.batch_id))) return res.status(403).json({ error: 'You cannot grade on this course.' });
-  const { grade, remarks } = req.body || {};
-  if (grade == null || isNaN(Number(grade))) return res.status(400).json({ error: 'Enter a grade between 0 and 100.' });
-  const out = Submissions.grade(s.id, Number(grade), remarks, req.user.id);
-  res.json({ ok: true, submission: out });
-});
+/* -------------------------- assignments (removed) -------------------------- */
+// The quest system is the assignment system. Legacy assignment data stays in
+// the database (gems and history are preserved) but is no longer surfaced,
+// and no new assignments or assignment submissions can be created.
 
 /* ------------------------------- gem awards ------------------------------- */
 // Teachers/admin can award bonus gems for participation, attendance, helping peers.
@@ -387,6 +350,33 @@ app.post('/api/batches/:id/award', authRequired, manageBatch, (req, res) => {
   if (!amt || amt < 1 || amt > 200) return res.status(400).json({ error: 'Award between 1 and 200 gems.' });
   const ev = GemEvents.create({ user_id: target.id, batch_id: req.batch.id, amount: amt, source: 'award', note: (reason || '').slice(0, 200) || 'Teacher award', by: req.user.id });
   res.json({ ok: true, event: ev });
+});
+
+/* ------------------------------- course chat ------------------------------- */
+// In-course Q&A. Students pick per message: real name or anonymous gem
+// alias (stable per course). The API never reveals who an anonymous poster
+// is - not even to teachers. Staff replies are always named.
+app.get('/api/batches/:id/chat', authRequired, viewBatch, (req, res) => {
+  res.json({
+    messages: Chat.forBatch(req.batch.id, req.user),
+    my_alias: ['student', 'free'].includes(req.user.role) ? Chat.myAlias(req.user.id, req.batch.id) : null,
+    can_moderate: canManageBatch(req.user, req.batch) || req.user.role === 'admin',
+  });
+});
+app.post('/api/batches/:id/chat', authRequired, viewBatch, (req, res) => {
+  const body = String((req.body || {}).body || '').trim();
+  if (!body) return res.status(400).json({ error: 'Write a message first.' });
+  if (body.length > 2000) return res.status(400).json({ error: 'Keep messages under 2000 characters.' });
+  const m = Chat.post({ batch_id: req.batch.id, user: req.user, body, anonymous: !!(req.body || {}).anonymous });
+  res.json({ ok: true, message: m });
+});
+app.delete('/api/chat/:id', authRequired, (req, res) => {
+  const m = Chat.byId(req.params.id);
+  if (!m) return res.status(404).json({ error: 'Message not found.' });
+  const b = Batches.byId(m.batch_id);
+  const own = m.user_id === req.user.id;
+  if (!own && !canManageBatch(req.user, b)) return res.status(403).json({ error: 'You can only remove your own messages.' });
+  Chat.remove(m.id); res.json({ ok: true });
 });
 
 /* ------------------------------ announcements ------------------------------ */
@@ -429,7 +419,7 @@ const G_REDIRECT = `${APP_URL}/auth/google/callback`;
 app.get('/api/auth/providers', (req, res) => res.json({ google: !!(G_ID && G_SECRET) }));
 
 app.get('/auth/google', (req, res) => {
-  if (!G_ID || !G_SECRET) return res.redirect('/?err=' + encodeURIComponent('Google sign-in is not configured yet.'));
+  if (!G_ID || !G_SECRET) return res.redirect('/login?err=' + encodeURIComponent('Google sign-in is not configured yet.'));
   const state = jwt.sign({ n: Date.now() }, JWT_SECRET, { expiresIn: '10m' });
   const params = new URLSearchParams({
     client_id: G_ID, redirect_uri: G_REDIRECT, response_type: 'code',
@@ -457,7 +447,7 @@ app.get('/auth/google/callback', async (req, res) => {
     setAuthCookie(res, sign(u));
     res.redirect('/dashboard');
   } catch (e) {
-    res.redirect('/?err=' + encodeURIComponent(e.message || 'Google sign-in failed.'));
+    res.redirect('/login?err=' + encodeURIComponent(e.message || 'Google sign-in failed.'));
   }
 });
 
@@ -488,32 +478,16 @@ app.post('/api/ai/outline', authRequired, teacherOrAdmin, async (req, res) => {
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
-// AI grade DRAFT: proposes grade + remarks for the teacher to review.
-// The AI never publishes gems - only /api/submissions/:id/grade does, and
-// that stays teacher-only. Student identity is never sent to the provider.
 const TEXT_EXT = ['.txt', '.md', '.py', '.js', '.ts', '.html', '.css', '.json', '.ipynb', '.csv', '.sql', '.java', '.c', '.cpp'];
-app.post('/api/ai/grade-draft', authRequired, teacherOrAdmin, async (req, res) => {
-  try {
-    const s = Submissions.byId(req.body?.submission_id);
-    if (!s) return res.status(404).json({ error: 'Submission not found.' });
-    const a = Assignments.byId(s.assignment_id);
-    if (!canManageBatch(req.user, Batches.byId(a.batch_id))) return res.status(403).json({ error: 'You cannot grade on this course.' });
-    let fileText = null, fileName = null;
-    if (s.file_url) {
-      fileName = path.basename(s.file_url);
-      const ext = path.extname(fileName).toLowerCase();
-      const full = path.join(UPLOAD_DIR, fileName);
-      if (TEXT_EXT.includes(ext) && fs.existsSync(full)) {
-        try { fileText = fs.readFileSync(full, 'utf8').slice(0, 60000); } catch {}
-      }
-    }
-    const draft = await ai.gradeDraft(req.user.id, {
-      assignmentTitle: a.title, assignmentBrief: a.description, points: a.points || 100,
-      studentNote: s.note, fileText, fileName,
-    });
-    res.json({ draft, readable: !!fileText });
-  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
-});
+// Prefer the code a student wrote in the built-in editor; fall back to
+// extracting text from an uploaded file.
+async function submissionText(sub) {
+  if (sub.code) {
+    const ext = sub.language === 'python' ? 'py' : 'txt';
+    return { text: String(sub.code).slice(0, 60000), name: `submission.${ext}` };
+  }
+  return extractText(sub.file_url);
+}
 
 /* -------------------------------- challenges -------------------------------- */
 // Open challenges: the free tier's home, also open to portal students.
@@ -616,6 +590,29 @@ app.post('/api/admin/hackathons/:id/finalize', authRequired, adminRequired, (req
 });
 
 /* ------------------------- AI skill reports & analytics ------------------------- */
+// Per-problem performance lines for one student on one course, built from
+// quest submissions. Includes teacher remarks and (teacher-side only) the
+// AI review's noted mistakes, so course/overall reports synthesize both.
+function questPerformanceDetail(bid, uid) {
+  const quests = Quests.forBatch(bid);
+  const subs = store.allData().quest_submissions;
+  const lines = [];
+  for (const q of quests) {
+    for (const p of q.problems) {
+      const sub = subs.find((x) => x.quest_id === q.id && x.pid === p.pid && x.user_id === Number(uid));
+      let line = `- L${q.no} "${p.title}" (${p.difficulty}): `;
+      if (!sub) line += 'NOT SUBMITTED';
+      else if (sub.grade == null) line += 'submitted, ungraded';
+      else {
+        line += `${sub.grade}%`;
+        if (sub.remarks) line += ` - teacher said: ${String(sub.remarks).slice(0, 200)}`;
+        if (sub.ai_review && sub.ai_review.mistakes) line += ` - review noted: ${String(sub.ai_review.mistakes).replace(/\n/g, '; ').slice(0, 200)}`;
+      }
+      lines.push(line);
+    }
+  }
+  return lines.join('\n');
+}
 app.post('/api/ai/skill-report', authRequired, teacherOrAdmin, async (req, res) => {
   try {
     const { user_id, batch_id } = req.body || {};
@@ -624,25 +621,52 @@ app.post('/api/ai/skill-report', authRequired, teacherOrAdmin, async (req, res) 
     const report = courseReport(b.id);
     const row = report.students.find((s) => s.id === Number(user_id));
     if (!row) return res.status(404).json({ error: 'Student not on this course.' });
-    // Anonymized per-assignment detail: titles + grades + remarks, never the name.
-    const detail = report.assignments.map((a) => {
-      const sub = store.allData().submissions.find((x) => x.assignment_id === a.id && x.user_id === row.id);
-      return `- ${a.title}: ${sub ? (sub.grade != null ? sub.grade + '%' + (sub.remarks ? ' - teacher said: ' + sub.remarks : '') : 'submitted, ungraded') : 'NOT SUBMITTED'}`;
-    }).join('\n');
-    const performance = `Average grade: ${row.avg != null ? row.avg + '%' : 'n/a'}. Submitted ${row.submitted}/${row.total_assignments}. Gems in course: ${row.gems}. Activity streak: ${row.streak} days.\nAssignments:\n${detail}`;
+    const performance = `Average grade: ${row.avg != null ? row.avg + '%' : 'n/a'}. Submitted ${row.submitted}/${row.total_assignments} tasks. Level ${row.level}/${row.of_levels}. Gems in course: ${row.gems}. Activity streak: ${row.streak} days.\nTasks:\n${questPerformanceDetail(b.id, row.id)}`;
     const markdown = await ai.skillReport(req.user.id, { courseTitle: report.batch.title || report.batch.name, performance });
-    const rec = AiReports.create({ user_id: row.id, batch_id: b.id, markdown }, req.user.id);
+    const rec = AiReports.create({ user_id: row.id, batch_id: b.id, markdown, scope: 'course' }, req.user.id);
     res.json({ ok: true, report: rec });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
+// Overall report: every course the student has taken, in one review.
+// Teachers may generate it for students on their own courses; admin for anyone.
+app.post('/api/ai/overall-report', authRequired, teacherOrAdmin, async (req, res) => {
+  try {
+    const target = Users.byId((req.body || {}).user_id);
+    if (!target || target.role !== 'student') return res.status(404).json({ error: 'Student not found.' });
+    const batches = Enrollments.batchesForStudent(target.id);
+    if (!batches.length) return res.status(400).json({ error: 'This student is not enrolled in any course yet.' });
+    if (req.user.role !== 'admin' && !batches.some((b) => canManageBatch(req.user, b))) {
+      return res.status(403).json({ error: 'You can only generate overall reports for students on your own courses.' });
+    }
+    const blocks = batches.map((b) => {
+      const rep = courseReport(b.id);
+      const row = rep.students.find((s) => s.id === target.id);
+      const title = rep.batch.title || rep.batch.name;
+      if (!row || !rep.assignments.length) return `COURSE: ${title}\n(no quest track or no activity yet)`;
+      return `COURSE: ${title}\nAverage: ${row.avg != null ? row.avg + '%' : 'n/a'} | Submitted ${row.submitted}/${row.total_assignments} | Level ${row.level}/${row.of_levels} | Gems ${row.gems}\n${questPerformanceDetail(b.id, target.id)}`;
+    });
+    const g = gamifyFor(target);
+    const performance = `Courses taken: ${batches.length}. Total gems: ${g.gems}. Stage: ${g.stage.name}. Best streak: ${g.best_streak} days.\n\n${blocks.join('\n\n')}`;
+    const markdown = await ai.overallReport(req.user.id, { performance });
+    const rec = AiReports.create({ user_id: target.id, batch_id: null, markdown, scope: 'overall' }, req.user.id);
+    res.json({ ok: true, report: rec });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+// Overall reports (batch_id null) can be published/removed by admin or the
+// teacher who generated them; course reports by anyone managing that course.
+function canManageReport(u, r) {
+  if (!r) return false;
+  if (r.batch_id == null) return u.role === 'admin' || r.by === u.id;
+  return canManageBatch(u, Batches.byId(r.batch_id));
+}
 app.post('/api/ai-reports/:id/publish', authRequired, teacherOrAdmin, (req, res) => {
   const r = AiReports.byId(req.params.id);
-  if (!r || !canManageBatch(req.user, Batches.byId(r.batch_id))) return res.status(403).json({ error: 'Not your course.' });
+  if (!canManageReport(req.user, r)) return res.status(403).json({ error: 'Not your course.' });
   res.json({ ok: true, report: AiReports.publish(r.id) });
 });
 app.delete('/api/ai-reports/:id', authRequired, teacherOrAdmin, (req, res) => {
   const r = AiReports.byId(req.params.id);
-  if (!r || !canManageBatch(req.user, Batches.byId(r.batch_id))) return res.status(403).json({ error: 'Not your course.' });
+  if (!canManageReport(req.user, r)) return res.status(403).json({ error: 'Not your course.' });
   AiReports.remove(r.id); res.json({ ok: true });
 });
 app.get('/api/batches/:id/reports', authRequired, viewBatch, staffView, (req, res) => res.json({ reports: AiReports.forBatch(req.batch.id) }));
@@ -671,7 +695,26 @@ app.get('/api/tracks', authRequired, staffView, (req, res) => res.json({ tracks:
 app.post('/api/batches/:id/install-track', authRequired, manageBatch, (req, res) => {
   const out = Quests.install(req.batch.id, req.body?.track);
   if (out.error) return res.status(400).json({ error: out.error });
+  const bd = Batches.decorate(req.batch);
+  const studentMails = Enrollments.studentsForBatch(req.batch.id).map((u) => u.email).filter(Boolean);
+  mailer.notify(studentMails, `New quest published - ${bd.title || bd.name}`,
+    `Your instructor just published the quest track for ${bd.title || bd.name}: ${out.levels} levels of assignments.\n\nLevel 1 is open now - sign in and start earning gems: ${APP_URL}/dashboard`);
   res.json(out);
+});
+// Teacher nudge: email every enrolled student who has not finished this
+// level's tasks yet. Manual by design - quests gate on passing, not dates.
+app.post('/api/quests/:qid/remind', authRequired, (req, res) => {
+  const q = Quests.byId(req.params.qid);
+  if (!q) return res.status(404).json({ error: 'Level not found.' });
+  if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
+  const bd = Batches.decorate(Batches.byId(q.batch_id));
+  const subs = store.allData().quest_submissions;
+  const behind = Enrollments.studentsForBatch(q.batch_id).filter((u) =>
+    q.problems.some((p) => !subs.some((x) => x.quest_id === q.id && x.pid === p.pid && x.user_id === u.id)));
+  const mails = behind.map((u) => u.email).filter(Boolean);
+  mailer.notify(mails, `Reminder - Level ${q.no} tasks are waiting (${bd.title || bd.name})`,
+    `A friendly reminder from your instructor: you still have unsubmitted tasks in Level ${q.no}: ${q.title}.\n\nOpen the quest, write your solution in the built-in editor, and submit: ${APP_URL}/dashboard`);
+  res.json({ ok: true, reminded: mails.length, behind: behind.length });
 });
 app.delete('/api/batches/:id/track', authRequired, adminRequired, (req, res) => {
   Quests.uninstall(req.params.id); res.json({ ok: true });
@@ -688,10 +731,25 @@ app.get('/api/batches/:id/quest', authRequired, viewBatch, (req, res) => {
     })),
   });
   const progress = isStudent ? stripSolutions(rawProgress) : rawProgress;
+  // Students never see the raw AI review or its suggested score - only the
+  // key points their teacher explicitly chose to share.
+  const sanitizeSub = (s) => ({
+    id: s.id, quest_id: s.quest_id, pid: s.pid,
+    code: s.code || null, language: s.language || null, file_url: s.file_url || null,
+    note: s.note, grade: s.grade, gems: s.gems, remarks: s.remarks, submitted_at: s.submitted_at,
+    shared_review: (s.review_shared && s.ai_review) ? {
+      key_concepts: s.ai_review.key_concepts || null,
+      mistakes: s.ai_review.mistakes || null,
+      better_approach: s.ai_review.better_approach || null,
+    } : null,
+  });
+  const mySubsRaw = isStudent ? Quests.mySubs(req.user.id, req.batch.id) : {};
+  const mySubs = {};
+  for (const k of Object.keys(mySubsRaw)) mySubs[k] = sanitizeSub(mySubsRaw[k]);
   res.json({
     installed: true,
     progress: isStudent ? progress : { ...progress, levels: progress.levels.map((l) => ({ ...l, unlocked: true })) }, // staff and admin see every level and solution, no gating
-    my_subs: isStudent ? Quests.mySubs(req.user.id, req.batch.id) : {},
+    my_subs: mySubs,
     scoreboard: Quests.scoreboard(req.batch.id),
     can_manage: canManageBatch(req.user, req.batch),
     pending: ['admin', 'coordinator', 'instructor'].includes(req.user.role) ? Quests.pendingCount(req.batch.id) : undefined,
@@ -709,9 +767,44 @@ app.post('/api/quests/:qid/problems/:pid/submit', authRequired, upload.single('f
   const prog = Quests.progress(req.user.id, q.batch_id);
   const lvl = prog.levels.find((l) => l.quest.id === q.id);
   if (!lvl || !lvl.unlocked) return res.status(403).json({ error: 'This level is locked - pass the previous level first.' });
-  if (!requireDocFile(req, res)) return;
-  const s = Quests.submit({ quest_id: q.id, pid: p.pid, user_id: req.user.id, file_url: `/uploads/${req.file.filename}`, note: (req.body || {}).note });
+
+  const body = req.body || {};
+  const code = typeof body.code === 'string' ? body.code.replace(/\r\n/g, '\n') : '';
+  let payload = null;
+  if (req.file) {
+    // File mode: PDF/Word only, enforced server-side as before.
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    if (!DOC_EXT.includes(ext)) {
+      try { fs.unlinkSync(req.file.path); } catch {}
+      return res.status(400).json({ error: 'Only PDF or Word (.doc/.docx) files are accepted.' });
+    }
+    payload = { file_url: `/uploads/${req.file.filename}` };
+  } else if (code.trim().length >= 5) {
+    // Code / written-answer mode from the built-in editor.
+    if (code.length > 200000) return res.status(400).json({ error: 'Your solution is too long - keep it under 200,000 characters.' });
+    payload = { code, language: ['python', 'text'].includes(String(body.language)) ? String(body.language) : 'python' };
+  } else {
+    return res.status(400).json({ error: 'Write your solution in the editor, or attach it as a PDF/Word file.' });
+  }
+  const s = Quests.submit({ quest_id: q.id, pid: p.pid, user_id: req.user.id, ...payload, note: body.note });
+  const batch = Batches.decorate(Batches.byId(q.batch_id));
+  const teacherMails = (Batches.byId(q.batch_id).instructor_ids || []).map((tid) => (Users.byId(tid) || {}).email).filter(Boolean);
+  mailer.notify(teacherMails, `New submission - ${batch.title || batch.name}`,
+    `${req.user.name} submitted "${p.title}" (Level ${q.no}: ${q.title}).\n\nOpen the course to review and grade it: ${APP_URL}/dashboard`);
   res.json({ ok: true, submission: s });
+});
+// Teacher permission gate: share (or unshare) the AI review's key points
+// with the student who submitted. The suggested score is never shared.
+app.post('/api/quest-submissions/:id/share-review', authRequired, (req, res) => {
+  const s = Quests.subById(req.params.id);
+  if (!s) return res.status(404).json({ error: 'Submission not found.' });
+  const q = Quests.byId(s.quest_id);
+  if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
+  if (!s.ai_review) return res.status(400).json({ error: 'Run the AI review first - there is nothing to share yet.' });
+  s.review_shared = !!(req.body || {}).share;
+  s.review_shared_at = s.review_shared ? new Date().toISOString().replace('T', ' ').slice(0, 19) : null;
+  store.persist();
+  res.json({ ok: true, shared: s.review_shared });
 });
 app.get('/api/quests/:qid/submissions', authRequired, (req, res) => {
   const q = Quests.byId(req.params.qid);
@@ -727,7 +820,14 @@ app.post('/api/quest-submissions/:id/grade', authRequired, (req, res) => {
   if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot grade on this course.' });
   const { grade, remarks } = req.body || {};
   if (grade == null || isNaN(Number(grade))) return res.status(400).json({ error: 'Enter a grade between 0 and 100.' });
-  res.json({ ok: true, submission: Quests.grade(s.id, Number(grade), remarks, req.user.id) });
+  const graded = Quests.grade(s.id, Number(grade), remarks, req.user.id);
+  const student = Users.byId(s.user_id);
+  const p = q.problems.find((x) => x.pid === s.pid) || {};
+  if (student && student.email) {
+    mailer.notify(student.email, `Your task was graded - ${p.title || 'quest task'}`,
+      `Hi ${student.name},\n\nYour submission for "${p.title}" (Level ${q.no}) was graded: ${graded.grade}% - you earned ${graded.gems} gems.${graded.remarks ? '\n\nYour teacher says: ' + graded.remarks : ''}\n\nSee your progress: ${APP_URL}/dashboard`);
+  }
+  res.json({ ok: true, submission: graded });
 });
 // AI draft for quest submissions - same rules: draft only, teacher publishes.
 app.post('/api/ai/quest-grade-draft', authRequired, teacherOrAdmin, async (req, res) => {
@@ -737,18 +837,12 @@ app.post('/api/ai/quest-grade-draft', authRequired, teacherOrAdmin, async (req, 
     const q = Quests.byId(s.quest_id);
     if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot grade on this course.' });
     const p = q.problems.find((x) => x.pid === s.pid) || {};
-    let fileText = null, fileName = null;
-    if (s.file_url) {
-      fileName = path.basename(s.file_url);
-      const ext = path.extname(fileName).toLowerCase();
-      const full = path.join(UPLOAD_DIR, fileName);
-      if (TEXT_EXT.includes(ext) && fs.existsSync(full)) { try { fileText = fs.readFileSync(full, 'utf8').slice(0, 60000); } catch {} }
-    }
+    const { text, name } = await submissionText(s);
     const draft = await ai.gradeDraft(req.user.id, {
       assignmentTitle: `${q.title} - ${p.title}`, assignmentBrief: p.description, points: p.points || 100,
-      studentNote: s.note, fileText, fileName,
+      studentNote: s.note, fileText: text, fileName: name,
     });
-    res.json({ draft, readable: !!fileText });
+    res.json({ draft, readable: !!text });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
@@ -775,33 +869,24 @@ app.patch('/api/quests/:qid', authRequired, (req, res) => {
 // submission. The instructor ALWAYS decides the final score.
 app.post('/api/ai/review', authRequired, teacherOrAdmin, async (req, res) => {
   try {
-    const { kind, submission_id, force } = req.body || {};
-    let sub, problemTitle, problemBrief, points, solutionGuideline, batchId;
-    if (kind === 'quest') {
-      sub = Quests.subById(submission_id);
-      if (!sub) return res.status(404).json({ error: 'Submission not found.' });
-      const q = Quests.byId(sub.quest_id);
-      batchId = q.batch_id;
-      const p = q.problems.find((x) => x.pid === sub.pid) || {};
-      problemTitle = `${q.title} - ${p.title}`; problemBrief = p.description; points = p.points || 100; solutionGuideline = p.solution || null;
-    } else {
-      sub = Submissions.byId(submission_id);
-      if (!sub) return res.status(404).json({ error: 'Submission not found.' });
-      const a = Assignments.byId(sub.assignment_id);
-      batchId = a.batch_id;
-      problemTitle = a.title; problemBrief = a.description; points = a.points || 100; solutionGuideline = null;
-    }
-    if (!canManageBatch(req.user, Batches.byId(batchId))) return res.status(403).json({ error: 'You cannot grade on this course.' });
-    if (sub.ai_review && !force) return res.json({ review: sub.ai_review, cached: true });
-    const { text, name } = await extractText(sub.file_url);
+    const { submission_id, force } = req.body || {};
+    const sub = Quests.subById(submission_id);
+    if (!sub) return res.status(404).json({ error: 'Submission not found.' });
+    const q = Quests.byId(sub.quest_id);
+    const p = q.problems.find((x) => x.pid === sub.pid) || {};
+    if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot grade on this course.' });
+    if (sub.ai_review && !force) return res.json({ review: sub.ai_review, cached: true, shared: !!sub.review_shared });
+    const { text, name } = await submissionText(sub);
     const review = await ai.review(req.user.id, {
-      problemTitle, problemBrief, points, solutionGuideline,
+      problemTitle: `${q.title} - ${p.title}`, problemBrief: p.description, points: p.points || 100,
+      solutionGuideline: p.solution || null,
       studentNote: sub.note, fileText: text, fileName: name,
     });
     review.readable = !!text;
     sub.ai_review = review;
+    sub.review_shared = false; // a fresh review is unshared until the teacher decides
     store.persist(); // cache the review on the submission record
-    res.json({ review, cached: false });
+    res.json({ review, cached: false, shared: false });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
@@ -810,11 +895,45 @@ app.post('/api/admin/catalogue/load-official', authRequired, adminRequired, (req
   res.json({ ok: true, ...store.loadOfficialCatalogue() });
 });
 
+/* ------------------------- public site (no sign-in) ------------------------- */
+// The landing page shows what EchoLens offers and lets anyone try the first
+// levels of every quest track in the browser compiler. Everything beyond the
+// open levels requires an account (created by the academy after payment).
+const OPEN_LEVELS = 3;
+app.get('/api/public/info', (req, res) => {
+  res.json({
+    catalogue: officialCatalogue(),
+    stats: {
+      students: Users.countByRole('student') + Users.countByRole('free'),
+      courses: officialCatalogue().length,
+      tracks: Quests.tracks().length,
+    },
+    open_levels: OPEN_LEVELS,
+    contact: 'echolens816@gmail.com',
+  });
+});
+app.get('/api/public/tracks', (req, res) => res.json({ tracks: Quests.tracks(), open_levels: OPEN_LEVELS }));
+app.get('/api/public/tracks/:key', (req, res) => {
+  const t = Quests.trackDef(req.params.key);
+  if (!t) return res.status(404).json({ error: 'Track not found.' });
+  const levels = t.levels.map((l) => {
+    if (l.no <= OPEN_LEVELS) {
+      return {
+        no: l.no, week: l.week, title: l.title, topic: l.topic, locked: false,
+        problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [] })),
+      };
+    }
+    return { no: l.no, week: l.week, title: l.title, topic: l.topic, locked: true, problems_count: l.problems.length };
+  });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null }, levels, open_levels: OPEN_LEVELS });
+});
+
 /* --------------------------------- static --------------------------------- */
 app.use('/uploads', authGate, express.static(UPLOAD_DIR));
 function authGate(req, res, next) { if (!currentUser(req)) return res.status(401).send('Sign in to view files.'); next(); }
 app.use(express.static(path.join(__dirname, 'public')));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 
 app.use((err, req, res, next) => {
@@ -822,4 +941,4 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => console.log(`EchoLens LMS v4 running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`EchoLens LMS v10 running on http://localhost:${PORT}`));

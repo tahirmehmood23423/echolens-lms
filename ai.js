@@ -1,31 +1,37 @@
 'use strict';
 
 /**
- * EchoLens AI copilot - provider layer (v5)
+ * EchoLens AI copilot - provider layer (v9)
  *
  * Teacher-facing only. Free-tier friendly by design:
- *  - Providers: Google Gemini (default) or Groq. Swap with one env var -
- *    no code changes - so moving to paid models later is a config change.
+ *  - Providers: Google Gemini (default) or Groq. Swap with one env var.
+ *  - Automatic fallback: if BOTH keys are set and the primary provider fails
+ *    with a quota/billing/rate error (or a 5xx), the call is retried on the
+ *    other provider automatically. Teachers never see raw billing errors.
  *  - Per-user rate limit protects free-tier quotas.
- *  - Privacy: callers must never pass student names or emails. Submissions
- *    are graded anonymously (free tiers may train on inputs).
+ *  - Privacy: callers must never pass student names or emails.
  *
  * Env:
  *   AI_PROVIDER=gemini | groq        (default gemini)
  *   GEMINI_API_KEY=...               (free at aistudio.google.com)
  *   GROQ_API_KEY=...                 (free at console.groq.com)
- *   AI_MODEL=...                     (optional override)
+ *   AI_MODEL=...                     (optional override for the PRIMARY provider)
  *   AI_HOURLY_LIMIT=30               (per user per hour)
  */
 
 const PROVIDER = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
 const GEMINI_KEY = process.env.GEMINI_API_KEY || '';
 const GROQ_KEY = process.env.GROQ_API_KEY || '';
-const MODEL = process.env.AI_MODEL || (PROVIDER === 'groq' ? 'llama-3.3-70b-versatile' : 'gemini-2.0-flash');
+
+// gemini-2.0-flash is being retired and its free-tier quotas collapsed;
+// flash-lite has the most generous free quota of the 2.5 family.
+const GEMINI_DEFAULT = 'gemini-2.5-flash-lite';
+const GROQ_DEFAULT = 'llama-3.3-70b-versatile';
+const MODEL = process.env.AI_MODEL || (PROVIDER === 'groq' ? GROQ_DEFAULT : GEMINI_DEFAULT);
 const HOURLY_LIMIT = Number(process.env.AI_HOURLY_LIMIT || 30);
 
 function enabled() {
-  return PROVIDER === 'groq' ? !!GROQ_KEY : !!GEMINI_KEY;
+  return !!(GEMINI_KEY || GROQ_KEY);
 }
 
 /* ------------------------------ rate limiting ------------------------------ */
@@ -43,9 +49,31 @@ function checkLimit(userId) {
   u.count += 1;
 }
 
+/* --------------------------- error classification --------------------------- */
+function isRetryable(status, message) {
+  if (status === 429 || status === 402 || (status >= 500 && status < 600)) return true;
+  const m = String(message || '').toLowerCase();
+  return /quota|billing|exceeded|resource.?exhausted|rate.?limit|overloaded|unavailable/.test(m);
+}
+function friendly(providerName, status, rawMessage) {
+  const m = String(rawMessage || '').toLowerCase();
+  if (status === 429 || /quota|resource.?exhausted|rate.?limit/.test(m)) {
+    return `${providerName} free-tier quota is used up for now. It resets automatically (per-minute limits within a minute, daily limits at midnight Pacific). No billing is required - just wait, or set the other provider's key so the app can switch automatically.`;
+  }
+  if (/billing|payment/.test(m) || status === 402) {
+    return `${providerName} says this API key's project needs attention (billing/quota). Easiest fix: create a fresh free key (Gemini: aistudio.google.com, Groq: console.groq.com) and update the environment variable - no payment needed for free-tier use.`;
+  }
+  if (status === 401 || status === 403 || /api key|permission|unauthorized/.test(m)) {
+    return `${providerName} rejected the API key. Check the key in the server environment (no extra spaces) and that the key is active.`;
+  }
+  if (status >= 500) return `${providerName} is having a temporary problem (${status}). Try again in a minute.`;
+  return rawMessage || `${providerName} error (${status}).`;
+}
+
 /* ------------------------------- providers ------------------------------- */
-async function callGemini(system, messages) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_KEY}`;
+async function callGemini(system, messages, model) {
+  const useModel = model || (PROVIDER === 'gemini' ? MODEL : GEMINI_DEFAULT);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${useModel}:generateContent?key=${GEMINI_KEY}`;
   const contents = messages.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
   const res = await fetch(url, {
     method: 'POST',
@@ -57,33 +85,60 @@ async function callGemini(system, messages) {
     }),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error?.message || `Gemini error (${res.status}).`);
+  if (!res.ok) {
+    const raw = data.error?.message || `Gemini error (${res.status}).`;
+    const err = new Error(friendly('Gemini', res.status, raw));
+    err.status = res.status; err.retryable = isRetryable(res.status, raw);
+    throw err;
+  }
   const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text).join('') || '';
-  if (!text) throw new Error('The AI returned an empty answer - try again.');
+  if (!text) { const e = new Error('The AI returned an empty answer - try again.'); e.retryable = true; throw e; }
   return text;
 }
 
-async function callGroq(system, messages) {
+async function callGroq(system, messages, model) {
+  const useModel = model || (PROVIDER === 'groq' ? MODEL : GROQ_DEFAULT);
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${GROQ_KEY}` },
     body: JSON.stringify({
-      model: MODEL,
+      model: useModel,
       messages: [{ role: 'system', content: system }, ...messages],
       temperature: 0.4, max_tokens: 2048,
     }),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error?.message || `Groq error (${res.status}).`);
+  if (!res.ok) {
+    const raw = data.error?.message || `Groq error (${res.status}).`;
+    const err = new Error(friendly('Groq', res.status, raw));
+    err.status = res.status; err.retryable = isRetryable(res.status, raw);
+    throw err;
+  }
   const text = data.choices?.[0]?.message?.content || '';
-  if (!text) throw new Error('The AI returned an empty answer - try again.');
+  if (!text) { const e = new Error('The AI returned an empty answer - try again.'); e.retryable = true; throw e; }
   return text;
 }
 
+/* ------------------------- completion with fallback ------------------------- */
 async function complete(userId, system, messages) {
   if (!enabled()) { const e = new Error('AI is not configured. Set GEMINI_API_KEY or GROQ_API_KEY in the environment.'); e.status = 503; throw e; }
   checkLimit(userId);
-  return PROVIDER === 'groq' ? callGroq(system, messages) : callGemini(system, messages);
+
+  const primaryIsGroq = PROVIDER === 'groq';
+  const primary = primaryIsGroq ? { fn: callGroq, ok: !!GROQ_KEY, name: 'Groq' } : { fn: callGemini, ok: !!GEMINI_KEY, name: 'Gemini' };
+  const backup = primaryIsGroq ? { fn: callGemini, ok: !!GEMINI_KEY, name: 'Gemini' } : { fn: callGroq, ok: !!GROQ_KEY, name: 'Groq' };
+
+  if (!primary.ok && backup.ok) return backup.fn(system, messages);
+
+  try {
+    return await primary.fn(system, messages);
+  } catch (err) {
+    if (err.retryable && backup.ok) {
+      console.warn(`[ai] ${primary.name} failed (${err.message}) - falling back to ${backup.name}.`);
+      return backup.fn(system, messages);
+    }
+    throw err;
+  }
 }
 
 /* ------------------------------ copilot tasks ------------------------------ */
@@ -149,6 +204,18 @@ Base every claim strictly on the performance data given. Be encouraging but hone
   return complete(userId, system, [{ role: 'user', content }]);
 }
 
+async function overallReport(userId, { performance }) {
+  const system = BASE + ` You write an OVERALL learning report covering EVERY course a learner has taken, which a TEACHER reviews before the learner sees it.
+Refer to the learner only as "you" - never invent a name. Output clean markdown with EXACTLY these sections:
+## Overall picture
+## Strengths across courses
+## Areas to improve
+## Recommended direction
+## Suggested next steps
+Base every claim strictly on the performance data given. Compare progress between courses where useful. Be encouraging but honest; 200-320 words total.`;
+  return complete(userId, system, [{ role: 'user', content: `Performance data across all courses (grades are percentages):\n${performance}` }]);
+}
+
 async function classSummary(userId, { courseTitle, table }) {
   const system = BASE + ' You analyse class performance for the teacher. Output clean markdown: 1) overall picture in 2-3 sentences, 2) topics/assignments the class struggled with, 3) students-at-risk patterns (refer to students by row number only, never names), 4) three concrete teaching actions for next week.';
   return complete(userId, system, [{ role: 'user', content: `Course: ${courseTitle}\nAnonymised class data:\n${table}` }]);
@@ -184,4 +251,4 @@ ${fileText ? fileText.slice(0, 14000) : '[Content not readable as text.]'}`;
   };
 }
 
-module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, outline, skillReport, classSummary, review };
+module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, outline, skillReport, overallReport, classSummary, review };

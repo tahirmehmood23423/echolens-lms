@@ -364,3 +364,71 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
   background:linear-gradient(180deg,var(--ink-2),var(--ink));box-shadow:0 14px 24px -12px rgba(13,27,62,.4)}
 .pod1 .pod-block{height:74px;background:linear-gradient(180deg,#2A3C7A,var(--ink))}
 .pod2 .pod-block{height:54px}.pod3 .pod-block{height:42px}
+
+/* ------------------------- v9: task portal & compiler ------------------------- */
+.modal.wide{max-width:860px}
+.qtopic{cursor:pointer;transition:background .15s ease}
+.qtopic:hover{background:var(--canvas)}
+.task-meta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.task-status{border-radius:11px;padding:10px 14px;font-size:13px;margin-top:12px;border:1px solid var(--line)}
+.task-status.ok{background:#F0FBF7;border-color:#BEE9DA;color:var(--ink)}
+.task-status.wait{background:#FDF8EC;border-color:#F0E2BC;color:var(--ink)}
+.task-status.lock{background:var(--canvas);color:var(--muted)}
+.portal-modes{display:flex;gap:8px;margin:10px 0 12px}
+.pm-btn{border:1px solid var(--line-strong);background:#fff;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);font-family:inherit}
+.pm-btn.active{border-color:var(--teal);color:var(--teal-deep);background:rgba(15,191,168,.07)}
+.cp-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.cp-toolbar select{border:1px solid var(--line-strong);border-radius:9px;padding:7px 10px;font-size:12.5px;font-family:inherit;background:#fff}
+.code-editor{width:100%;min-height:220px;border:1px solid var(--line-strong);border-radius:11px;padding:12px 14px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.55;resize:vertical;
+  background:#0E1630;color:#DCE6F5;caret-color:#0FBFA8;tab-size:4}
+.code-editor::placeholder{color:#5A6A8C}
+.code-editor:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,191,168,.15)}
+.code-out{white-space:pre-wrap;background:#0A0F24;color:#B8E6D5;border:1px solid #1C2B52;border-radius:11px;
+  padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;
+  max-height:26vh;overflow-y:auto;margin-top:8px}
+.review-share-box{background:rgba(15,191,168,.06);border:1px solid rgba(15,191,168,.35);border-radius:11px;padding:12px 14px;margin-top:12px;font-size:12.5px}
+.review-share-box .rsb-head{font-weight:700;color:var(--teal-deep);margin-bottom:8px}
+@media (max-width:640px){.modal.wide{max-width:100%}.code-editor{min-height:170px;font-size:12.5px}}
+
+/* --------------------------- v10: task workspace --------------------------- */
+.task-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+.task-grid{display:grid;grid-template-columns:2fr 3fr;gap:20px;align-items:start}
+@media (max-width:1020px){.task-grid{grid-template-columns:1fr}}
+.task-ide{overflow:hidden}
+.ide-toolbar{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--canvas)}
+.ide-toolbar select{border:1px solid var(--line-strong);border-radius:9px;padding:7px 10px;font-size:12.5px;font-family:inherit;background:#fff}
+.ide-pkgs{font-size:11.5px;color:var(--muted-2);background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 10px}
+.ide-editor{border:none;border-radius:0;min-height:300px;display:block}
+.ide-editor:focus{box-shadow:none;border:none}
+.ide-status-row{padding:7px 14px;border-top:1px solid #1C2B52;background:#0B1128;display:flex;align-items:center;min-height:32px}
+.ide-status-row .s{color:#7E92BD !important}
+.ide-submit{display:flex;gap:10px;padding:12px 14px;border-top:1px solid var(--line);background:var(--canvas)}
+.ide-submit input{flex:1;border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit}
+
+/* ------------------------------- v10: terminal ------------------------------- */
+.term{background:#0A0F24;border-top:1px solid #1C2B52}
+.term-body{max-height:300px;min-height:130px;overflow-y:auto;padding:12px 14px}
+.term-out{white-space:pre-wrap;word-break:break-word;color:#B8E6D5;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.55;margin:0;background:none;border:none;padding:0}
+.term-in-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.term-caret{color:#0FBFA8;font-weight:700;font-size:15px}
+.term-in{flex:1;background:#101836;border:1px solid #24365F;border-radius:8px;color:#EAF2FF;padding:7px 10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+.term-in:focus{outline:none;border-color:#0FBFA8;box-shadow:0 0 0 3px rgba(15,191,168,.18)}
+.term-img{display:block;max-width:100%;border-radius:10px;margin-top:10px;background:#fff;padding:6px}
+
+/* -------------------------------- v10: chat -------------------------------- */
+.chat-list{max-height:52vh;min-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;padding-right:4px}
+.chat-msg{background:var(--canvas);border:1px solid var(--line);border-radius:12px;padding:9px 13px;max-width:88%;align-self:flex-start}
+.chat-msg.mine{align-self:flex-end;background:#EFFBF8;border-color:#BEE9DA}
+.chat-msg.staff{border-color:rgba(124,108,245,.45);background:#F6F4FF}
+.cm-head{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.cm-name{font-weight:700;font-size:12.5px;color:var(--ink)}
+.cm-role{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#7C6CF5;color:#fff;border-radius:20px;padding:2px 8px}
+.cm-anon{font-size:10.5px;color:var(--muted-2);font-style:italic}
+.cm-time{font-size:11px;color:var(--muted-2);margin-left:auto}
+.cm-del{border:none;background:none;color:var(--muted-2);cursor:pointer;font-size:15px;padding:0 2px}
+.cm-del:hover{color:var(--danger)}
+.cm-body{font-size:13.5px;white-space:pre-wrap;word-break:break-word}
+.chat-composer{display:flex;gap:8px}
+.chat-composer select{border:1px solid var(--line-strong);border-radius:10px;padding:8px 10px;font-size:12.5px;font-family:inherit;background:#fff;max-width:220px}
+.chat-composer input{flex:1;border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;font-size:13.5px;font-family:inherit}

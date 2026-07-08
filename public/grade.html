@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens - Grade submission</title>
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="grade-page">
+
+<div id="gate" class="gate"><img src="/img/logo.png" alt="EchoLens" style="width:120px"><div>Loading the submission</div></div>
+
+<div class="grade-app" id="app" style="display:none">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="logo-pill" style="height:34px"><img src="/img/logo.png" alt="EchoLens" style="height:22px"></span>
+      <span class="page-title" id="pageTitle">Grade submission</span>
+    </div>
+    <div class="user">
+      <span class="s" id="courseLine" style="color:var(--muted)"></span>
+      <button class="btn btn-ghost btn-sm" onclick="window.close()">Close tab</button>
+    </div>
+  </header>
+  <div class="content" id="gradeBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/coderunner.js"></script>
+<script src="/js/grade.js"></script>
+</body>
+</html>

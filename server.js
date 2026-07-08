@@ -19,6 +19,7 @@ const ai = require('./ai');
 const mailer = require('./mailer');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, officialCatalogue,
+  LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -124,6 +125,7 @@ app.get('/api/auth/me', authRequired, (req, res) => {
   const u = req.user;
   res.json({
     id: u.id, name: u.name, role: u.role, username: u.username, email: u.email, reg_no: u.reg_no,
+    avatar: u.avatar || null, signature: u.signature || null,
     profile: u.profile || {}, gamify: ['student', 'free'].includes(u.role) ? gamifyFor(u) : null,
     ai_enabled: ['admin', 'instructor'].includes(u.role) && ai.enabled(),
   });
@@ -196,7 +198,7 @@ app.get('/api/batches/:id', authRequired, viewBatch, (req, res) => {
     out.my_gems_here = gemsForStudentInBatch(u.id, b.id);
   }
   if (['admin', 'coordinator', 'instructor'].includes(u.role)) {
-    out.students = Enrollments.studentsForBatch(b.id).map((s) => ({ id: s.id, name: s.name, username: s.username, reg_no: s.reg_no, email: s.email }));
+    out.students = Enrollments.studentsForBatch(b.id).map((s) => ({ id: s.id, name: s.name, username: s.username, reg_no: s.reg_no, email: s.email, avatar: s.avatar || null }));
     out.report = courseReport(b.id);
   }
   res.json(out);
@@ -356,26 +358,54 @@ app.post('/api/batches/:id/award', authRequired, manageBatch, (req, res) => {
 // In-course Q&A. Students pick per message: real name or anonymous gem
 // alias (stable per course). The API never reveals who an anonymous poster
 // is - not even to teachers. Staff replies are always named.
+// Everyone taggable in this course: teachers + enrolled students (names only).
+function chatMembers(batch) {
+  const teachers = (batch.instructor_ids || []).map((tid) => Users.byId(tid)).filter(Boolean)
+    .map((u) => ({ id: u.id, name: u.name, role: 'instructor' }));
+  const students = Enrollments.studentsForBatch(batch.id).map((u) => ({ id: u.id, name: u.name, role: 'student' }));
+  return [...teachers, ...students];
+}
 app.get('/api/batches/:id/chat', authRequired, viewBatch, (req, res) => {
   res.json({
     messages: Chat.forBatch(req.batch.id, req.user),
     my_alias: ['student', 'free'].includes(req.user.role) ? Chat.myAlias(req.user.id, req.batch.id) : null,
     can_moderate: canManageBatch(req.user, req.batch) || req.user.role === 'admin',
+    members: chatMembers(req.batch), // for @-tagging
   });
 });
 app.post('/api/batches/:id/chat', authRequired, viewBatch, (req, res) => {
   const body = String((req.body || {}).body || '').trim();
   if (!body) return res.status(400).json({ error: 'Write a message first.' });
   if (body.length > 2000) return res.status(400).json({ error: 'Keep messages under 2000 characters.' });
-  const m = Chat.post({ batch_id: req.batch.id, user: req.user, body, anonymous: !!(req.body || {}).anonymous });
+  // Resolve @mentions server-side against real course members. Students can
+  // tag their teacher; teachers can tag any student. Longest names first so
+  // "@Ali Raza" beats "@Ali".
+  const members = chatMembers(req.batch).sort((a, b) => b.name.length - a.name.length);
+  const mentions = [];
+  for (const mem of members) {
+    if (mem.id === req.user.id) continue;
+    if (new RegExp('@' + mem.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(body) && !mentions.some((x) => x.id === mem.id)) {
+      mentions.push({ id: mem.id, name: mem.name, role: mem.role });
+    }
+  }
+  const anonymous = !!(req.body || {}).anonymous && !mentions.length; // tagging someone reveals you - no anonymous tags
+  const m = Chat.post({ batch_id: req.batch.id, user: req.user, body, anonymous, mentions });
+  // Email the tagged people so nothing gets missed.
+  const bd = Batches.decorate(req.batch);
+  const mails = mentions.map((x) => (Users.byId(x.id) || {}).email).filter(Boolean);
+  if (mails.length) {
+    mailer.notify(mails, `You were tagged in ${bd.title || bd.name} chat`,
+      `${req.user.name} tagged you in the course chat of ${bd.title || bd.name}:\n\n"${body.slice(0, 400)}"\n\nOpen the course chat to reply: ${APP_URL}/dashboard`);
+  }
   res.json({ ok: true, message: m });
 });
+// v11: messages are permanent for learners - only course staff or the admin
+// can remove a message (moderation), so conversations cannot be scrubbed.
 app.delete('/api/chat/:id', authRequired, (req, res) => {
   const m = Chat.byId(req.params.id);
   if (!m) return res.status(404).json({ error: 'Message not found.' });
   const b = Batches.byId(m.batch_id);
-  const own = m.user_id === req.user.id;
-  if (!own && !canManageBatch(req.user, b)) return res.status(403).json({ error: 'You can only remove your own messages.' });
+  if (!(canManageBatch(req.user, b) || req.user.role === 'admin')) return res.status(403).json({ error: 'Messages cannot be deleted. Only course staff can moderate the chat.' });
   Chat.remove(m.id); res.json({ ok: true });
 });
 
@@ -737,6 +767,7 @@ app.get('/api/batches/:id/quest', authRequired, viewBatch, (req, res) => {
     id: s.id, quest_id: s.quest_id, pid: s.pid,
     code: s.code || null, language: s.language || null, file_url: s.file_url || null,
     note: s.note, grade: s.grade, gems: s.gems, remarks: s.remarks, submitted_at: s.submitted_at,
+    late: !!s.late, late_deduction: s.late_deduction || 0,
     shared_review: (s.review_shared && s.ai_review) ? {
       key_concepts: s.ai_review.key_concepts || null,
       mistakes: s.ai_review.mistakes || null,
@@ -750,6 +781,9 @@ app.get('/api/batches/:id/quest', authRequired, viewBatch, (req, res) => {
     installed: true,
     progress: isStudent ? progress : { ...progress, levels: progress.levels.map((l) => ({ ...l, unlocked: true })) }, // staff and admin see every level and solution, no gating
     my_subs: mySubs,
+    task_files: Quests.forBatch(req.batch.id).flatMap((q) => TaskFiles.forQuest(q.id)), // datasets attached to problems
+    late_penalty_pct: 20,
+    ide_enabled: store.ideEnabled(req.batch.id), // no-code courses hide the compiler
     scoreboard: Quests.scoreboard(req.batch.id),
     can_manage: canManageBatch(req.user, req.batch),
     pending: ['admin', 'coordinator', 'instructor'].includes(req.user.role) ? Quests.pendingCount(req.batch.id) : undefined,
@@ -770,21 +804,24 @@ app.post('/api/quests/:qid/problems/:pid/submit', authRequired, upload.single('f
 
   const body = req.body || {};
   const code = typeof body.code === 'string' ? body.code.replace(/\r\n/g, '\n') : '';
+  const isWritten = p.type === 'written' || !store.ideEnabled(q.batch_id); // no-IDE courses submit written work everywhere
   let payload = null;
   if (req.file) {
-    // File mode: PDF/Word only, enforced server-side as before.
+    // File mode. Coding tasks: PDF/Word. Written (logic) problems also accept
+    // plain-text files, since the answer is prose.
+    const okExt = isWritten ? [...DOC_EXT, '.txt'] : DOC_EXT;
     const ext = path.extname(req.file.originalname).toLowerCase();
-    if (!DOC_EXT.includes(ext)) {
+    if (!okExt.includes(ext)) {
       try { fs.unlinkSync(req.file.path); } catch {}
-      return res.status(400).json({ error: 'Only PDF or Word (.doc/.docx) files are accepted.' });
+      return res.status(400).json({ error: isWritten ? 'Only PDF, Word (.doc/.docx) or text (.txt) files are accepted for written answers.' : 'Only PDF or Word (.doc/.docx) files are accepted.' });
     }
     payload = { file_url: `/uploads/${req.file.filename}` };
   } else if (code.trim().length >= 5) {
-    // Code / written-answer mode from the built-in editor.
+    // Editor mode: Python / web (HTML+CSS+JS) code, or a typed written answer.
     if (code.length > 200000) return res.status(400).json({ error: 'Your solution is too long - keep it under 200,000 characters.' });
-    payload = { code, language: ['python', 'text'].includes(String(body.language)) ? String(body.language) : 'python' };
+    payload = { code, language: ['python', 'text', 'web'].includes(String(body.language)) ? String(body.language) : (isWritten ? 'text' : 'python') };
   } else {
-    return res.status(400).json({ error: 'Write your solution in the editor, or attach it as a PDF/Word file.' });
+    return res.status(400).json({ error: isWritten ? 'Write your logical answer in the editor, or upload it as a PDF or text file.' : 'Write your solution in the editor, or attach it as a PDF/Word file.' });
   }
   const s = Quests.submit({ quest_id: q.id, pid: p.pid, user_id: req.user.id, ...payload, note: body.note });
   const batch = Batches.decorate(Batches.byId(q.batch_id));
@@ -862,6 +899,43 @@ app.patch('/api/quests/:qid', authRequired, (req, res) => {
   if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot edit this course.' });
   res.json({ ok: true, quest: Quests.updateLevel(q.id, req.body || {}) });
 });
+// v11: teachers add extra problems to a level - e.g. a WRITTEN logic problem
+// where the student explains the reasoning instead of coding it.
+app.post('/api/quests/:qid/problems', authRequired, (req, res) => {
+  const q = Quests.byId(req.params.qid);
+  if (!q) return res.status(404).json({ error: 'Level not found.' });
+  if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot edit this course.' });
+  const { title, description } = req.body || {};
+  if (!title || !description) return res.status(400).json({ error: 'A title and problem statement are required.' });
+  const p = Quests.addProblem(q.id, req.body);
+  res.json({ ok: true, problem: p });
+});
+app.delete('/api/quests/:qid/problems/:pid', authRequired, (req, res) => {
+  const q = Quests.byId(req.params.qid);
+  if (!q) return res.status(404).json({ error: 'Level not found.' });
+  if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot edit this course.' });
+  if (q.problems.length <= 1) return res.status(400).json({ error: 'A level needs at least one problem.' });
+  Quests.removeProblem(q.id, req.params.pid);
+  res.json({ ok: true });
+});
+// Single submission with full context - powers the dedicated grading page.
+app.get('/api/quest-submissions/:id', authRequired, (req, res) => {
+  const s = Quests.subById(req.params.id);
+  if (!s) return res.status(404).json({ error: 'Submission not found.' });
+  const q = Quests.byId(s.quest_id);
+  const b = Batches.byId(q.batch_id);
+  if (!(canManageBatch(req.user, b) || req.user.role === 'coordinator')) return res.status(403).json({ error: 'Not available for your role.' });
+  const p = q.problems.find((x) => x.pid === s.pid) || {};
+  const u = Users.byId(s.user_id) || {};
+  const bd = Batches.decorate(b);
+  res.json({
+    submission: { ...s, student_name: u.name, student_reg: u.reg_no, student_avatar: u.avatar || null },
+    problem: p, quest: { id: q.id, no: q.no, title: q.title, topic: q.topic, deadline: q.deadline || null, batch_id: q.batch_id },
+    course: { id: b.id, title: bd.title || bd.name, cohort: bd.name },
+    can_grade: canManageBatch(req.user, b),
+    files: TaskFiles.forProblem(q.id, s.pid),
+  });
+});
 
 /* ----------------------- AI review layer (teacher-only) ----------------------- */
 // Summarizes the question + student solution, lists mistakes, a better
@@ -928,6 +1002,368 @@ app.get('/api/public/tracks/:key', (req, res) => {
   res.json({ track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null }, levels, open_levels: OPEN_LEVELS });
 });
 
+/* ================================ v11 routes ================================ */
+
+/* ------------------------- avatars & signatures ------------------------- */
+// Course staff decide whether their course shows the built-in compiler.
+// No-code tracks (automation, prompting, UI/UX, graphics, WordPress, BI
+// tools) default to OFF; coding tracks default to ON.
+app.post('/api/batches/:id/ide', authRequired, manageBatch, (req, res) => {
+  res.json({ ok: true, ide_enabled: store.setIde(req.batch.id, !!(req.body || {}).enabled) });
+});
+const IMG_EXT = ['.png', '.jpg', '.jpeg', '.webp'];
+function requireImage(req, res, maxMb = 3) {
+  if (!req.file) { res.status(400).json({ error: 'Choose an image first.' }); return false; }
+  const ext = path.extname(req.file.originalname).toLowerCase();
+  if (!IMG_EXT.includes(ext)) { try { fs.unlinkSync(req.file.path); } catch {} res.status(400).json({ error: 'Only PNG, JPG or WebP images are accepted.' }); return false; }
+  if (req.file.size > maxMb * 1024 * 1024) { try { fs.unlinkSync(req.file.path); } catch {} res.status(400).json({ error: `Keep the image under ${maxMb} MB.` }); return false; }
+  return true;
+}
+app.post('/api/me/avatar', authRequired, upload.single('file'), (req, res) => {
+  if (!requireImage(req, res)) return;
+  Users.setAvatar(req.user.id, `/uploads/${req.file.filename}`);
+  res.json({ ok: true, avatar: `/uploads/${req.file.filename}` });
+});
+// Instructors upload their signature once; it appears on every certificate
+// they sign. PNG with transparent background looks best.
+app.post('/api/me/signature', authRequired, teacherOrAdmin, upload.single('file'), (req, res) => {
+  if (!requireImage(req, res, 1)) return;
+  Users.setSignature(req.user.id, `/uploads/${req.file.filename}`);
+  res.json({ ok: true, signature: `/uploads/${req.file.filename}` });
+});
+
+/* ------------------------- live classes + attendance ------------------------- */
+// The class runs INSIDE the portal (embedded Jitsi room - open source, no
+// account needed). Joining marks attendance; a heartbeat counts minutes.
+app.post('/api/batches/:id/live/start', authRequired, manageBatch, (req, res) => {
+  const out = LiveClasses.create({ batch_id: req.batch.id, title: (req.body || {}).title, started_by: req.user.id });
+  if (out.error) return res.status(400).json({ error: out.error });
+  const bd = Batches.decorate(req.batch);
+  const mails = Enrollments.studentsForBatch(req.batch.id).map((u) => u.email).filter(Boolean);
+  mailer.notify(mails, `Live class started - ${bd.title || bd.name}`,
+    `${req.user.name} just started "${out.live.title}" live inside the portal.\n\nJoin from the Live tab of your course: ${APP_URL}/dashboard`);
+  res.json(out);
+});
+app.post('/api/live/:id/end', authRequired, (req, res) => {
+  const c = LiveClasses.byId(req.params.id);
+  if (!c) return res.status(404).json({ error: 'Class not found.' });
+  if (!canManageBatch(req.user, Batches.byId(c.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
+  LiveClasses.end(c.id);
+  res.json({ ok: true });
+});
+app.get('/api/batches/:id/live', authRequired, viewBatch, (req, res) => {
+  const active = LiveClasses.active(req.batch.id);
+  const staff = ['admin', 'coordinator', 'instructor'].includes(req.user.role);
+  const past = LiveClasses.forBatch(req.batch.id).filter((c) => c.ended_at).slice(0, 30).map((c) => {
+    const sheet = Attendance.sheet(c);
+    const present = sheet.filter((r) => r.present).length;
+    const row = { id: c.id, title: c.title, date: c.date, started_at: c.started_at, ended_at: c.ended_at, present, absent: sheet.length - present, total: sheet.length };
+    if (!staff) row.me_present = sheet.some((r) => r.id === req.user.id && r.present);
+    return row;
+  });
+  const out = { active: active ? { id: active.id, title: active.title, room: staff || req.user.role === 'student' ? active.room : null, started_at: active.started_at } : null, past, can_manage: canManageBatch(req.user, req.batch) };
+  if (active && staff) out.live_attendance = Attendance.sheet(active);
+  if (req.user.role === 'student') out.my_rate = Attendance.rate(req.user.id, req.batch.id);
+  res.json(out);
+});
+app.post('/api/live/:id/join', authRequired, (req, res) => {
+  const c = LiveClasses.byId(req.params.id);
+  if (!c || c.ended_at) return res.status(404).json({ error: 'This class has ended.' });
+  const b = Batches.byId(c.batch_id);
+  if (!canViewBatch(req.user, b)) return res.status(403).json({ error: 'You are not on this course.' });
+  if (req.user.role === 'student') Attendance.mark(c.id, req.user.id); // attendance = actually joining the room
+  res.json({ ok: true, room: c.room, display_name: req.user.name });
+});
+app.post('/api/live/:id/heartbeat', authRequired, (req, res) => {
+  const c = LiveClasses.byId(req.params.id);
+  if (!c || c.ended_at) return res.json({ ok: true, ended: true });
+  if (req.user.role === 'student') Attendance.heartbeat(c.id, req.user.id);
+  res.json({ ok: true });
+});
+app.get('/api/live/:id/attendance', authRequired, staffView, (req, res) => {
+  const c = LiveClasses.byId(req.params.id);
+  if (!c) return res.status(404).json({ error: 'Class not found.' });
+  if (!canViewBatch(req.user, Batches.byId(c.batch_id))) return res.status(403).json({ error: 'You are not on this course.' });
+  res.json({ class: { id: c.id, title: c.title, date: c.date, started_at: c.started_at, ended_at: c.ended_at }, sheet: Attendance.sheet(c) });
+});
+
+/* ------------------------------ live quizzes ------------------------------ */
+app.get('/api/batches/:id/quizzes', authRequired, viewBatch, (req, res) => {
+  const staff = ['admin', 'coordinator', 'instructor'].includes(req.user.role);
+  const all = Quizzes.forBatch(req.batch.id);
+  if (staff) {
+    return res.json({
+      can_manage: canManageBatch(req.user, req.batch),
+      quizzes: all.map((q) => ({ ...q, open: Quizzes.isOpen(q), attempts: Quizzes.results(q.id).length })),
+    });
+  }
+  // Students: only quizzes that are open right now (without answers), plus
+  // their own past attempts. Closed quizzes disappear until reopened.
+  res.json({
+    quizzes: all.filter((q) => Quizzes.isOpen(q)).map((q) => {
+      const mine = Quizzes.myAttempt(q.id, req.user.id);
+      return {
+        id: q.id, title: q.title, points: q.points, closes_at: q.closes_at, duration_min: q.duration_min,
+        allow_ide: !!q.allow_ide, // shows a practice IDE terminal beside the questions
+        questions: mine ? [] : q.questions.map((x) => ({ no: x.no, q: x.q, options: x.options })), // answers never leave the server
+        taken: !!mine, my_score: mine ? mine.score_pct : null,
+      };
+    }),
+    my_attempts: store.allData().quiz_attempts.filter((a) => a.user_id === req.user.id && all.some((q) => q.id === a.quiz_id))
+      .map((a) => ({ quiz_id: a.quiz_id, title: (Quizzes.byId(a.quiz_id) || {}).title, score_pct: a.score_pct, correct: a.correct, total: a.total, gems: a.gems, taken_at: a.taken_at })),
+  });
+});
+app.post('/api/batches/:id/quizzes', authRequired, manageBatch, (req, res) => {
+  const out = Quizzes.create({ batch_id: req.batch.id, ...req.body, created_by: req.user.id });
+  if (out.error) return res.status(400).json({ error: out.error });
+  res.json(out);
+});
+// AI-generated quiz (teacher reviews before opening it).
+app.post('/api/batches/:id/quizzes/generate', authRequired, manageBatch, async (req, res) => {
+  try {
+    const { topic, count, level } = req.body || {};
+    if (!topic) return res.status(400).json({ error: 'Give the quiz a topic first.' });
+    const questions = await ai.quizJson(req.user.id, { topic, count, level });
+    if (!questions.length) return res.status(502).json({ error: 'The AI did not return usable questions - try again.' });
+    res.json({ ok: true, questions });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+function manageQuiz(req, res, next) {
+  const q = Quizzes.byId(req.params.id);
+  if (!q) return res.status(404).json({ error: 'Quiz not found.' });
+  if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
+  req.quiz = q; next();
+}
+app.post('/api/quizzes/:id/open', authRequired, manageQuiz, (req, res) => {
+  const q = Quizzes.open(req.quiz.id, (req.body || {}).minutes);
+  const b = Batches.decorate(Batches.byId(q.batch_id));
+  const mails = Enrollments.studentsForBatch(q.batch_id).map((u) => u.email).filter(Boolean);
+  mailer.notify(mails, `Quiz is LIVE for ${q.duration_min} minutes - ${b.title || b.name}`,
+    `"${q.title}" is open right now and closes in ${q.duration_min} minutes.\n\nTake it from the Quizzes tab: ${APP_URL}/dashboard`);
+  res.json({ ok: true, quiz: q });
+});
+app.post('/api/quizzes/:id/close', authRequired, manageQuiz, (req, res) => { Quizzes.close(req.quiz.id); res.json({ ok: true }); });
+app.delete('/api/quizzes/:id', authRequired, manageQuiz, (req, res) => { Quizzes.remove(req.quiz.id); res.json({ ok: true }); });
+app.get('/api/quizzes/:id/results', authRequired, staffView, (req, res) => {
+  const q = Quizzes.byId(req.params.id);
+  if (!q) return res.status(404).json({ error: 'Quiz not found.' });
+  if (!canViewBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You are not on this course.' });
+  res.json({ quiz: { id: q.id, title: q.title, questions: q.questions, points: q.points }, results: Quizzes.results(q.id) });
+});
+app.post('/api/quizzes/:id/attempt', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.status(403).json({ error: 'Only students take quizzes.' });
+  const q = Quizzes.byId(req.params.id);
+  if (!q) return res.status(404).json({ error: 'Quiz not found.' });
+  if (!canViewBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You are not on this course.' });
+  const out = Quizzes.attempt(q.id, req.user.id, (req.body || {}).answers);
+  if (out.error) return res.status(400).json({ error: out.error });
+  res.json({ ok: true, score_pct: out.attempt.score_pct, correct: out.attempt.correct, total: out.attempt.total, gems: out.attempt.gems });
+});
+
+/* --------------------- datasets attached to quest problems --------------------- */
+app.get('/api/quests/:qid/problems/:pid/files', authRequired, (req, res) => {
+  const q = Quests.byId(req.params.qid);
+  if (!q) return res.status(404).json({ error: 'Level not found.' });
+  if (!canViewBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You are not on this course.' });
+  res.json({ files: TaskFiles.forProblem(q.id, req.params.pid) });
+});
+const DATA_EXT = ['.csv', '.tsv', '.txt', '.json', '.xlsx', '.xls', '.parquet', '.zip'];
+app.post('/api/quests/:qid/problems/:pid/files', authRequired, upload.single('file'), (req, res) => {
+  const q = Quests.byId(req.params.qid);
+  if (!q) return res.status(404).json({ error: 'Level not found.' });
+  if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'Only course staff attach datasets.' });
+  if (!req.file) return res.status(400).json({ error: 'Choose a dataset file first.' });
+  const ext = path.extname(req.file.originalname).toLowerCase();
+  if (!DATA_EXT.includes(ext)) { try { fs.unlinkSync(req.file.path); } catch {} return res.status(400).json({ error: 'Datasets can be CSV, TSV, TXT, JSON, Excel, Parquet or ZIP.' }); }
+  const f = TaskFiles.add({ quest_id: q.id, pid: req.params.pid, name: req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_'), url: `/uploads/${req.file.filename}`, size: req.file.size, by: req.user.id });
+  res.json({ ok: true, file: f });
+});
+app.delete('/api/task-files/:id', authRequired, (req, res) => {
+  const f = TaskFiles.byId(req.params.id);
+  if (!f) return res.status(404).json({ error: 'File not found.' });
+  const q = Quests.byId(f.quest_id);
+  if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'Only course staff remove datasets.' });
+  TaskFiles.remove(f.id);
+  res.json({ ok: true });
+});
+
+/* --------------------------- integrity (teacher-only) --------------------------- */
+// Two independent signals, both advisory:
+//  1. Similarity: token 3-gram Jaccard against every other submission to the
+//     same problem in this course - catches copying between classmates.
+//  2. AI likelihood: model-based estimate that the work is AI-generated.
+function normalizeForSimilarity(text) {
+  return String(text || '').toLowerCase()
+    .replace(/#.*$/gm, '').replace(/\/\/.*$/gm, '').replace(/"""[\s\S]*?"""/g, '') // strip comments
+    .replace(/[a-z_][a-z0-9_]*/g, 'v') // rename identifiers so renaming variables doesn't hide copying
+    .replace(/\s+/g, ' ').trim();
+}
+function trigrams(s) {
+  const t = new Set(); const words = s.split(' ');
+  for (let i = 0; i < words.length - 2; i++) t.add(words[i] + ' ' + words[i + 1] + ' ' + words[i + 2]);
+  return t;
+}
+function similarityPct(a, b) {
+  const A = trigrams(normalizeForSimilarity(a)), B = trigrams(normalizeForSimilarity(b));
+  if (!A.size || !B.size) return 0;
+  let inter = 0; for (const x of A) if (B.has(x)) inter++;
+  return Math.round((inter / (A.size + B.size - inter)) * 100);
+}
+app.post('/api/ai/integrity', authRequired, teacherOrAdmin, async (req, res) => {
+  try {
+    const { submission_id, force } = req.body || {};
+    const sub = Quests.subById(submission_id);
+    if (!sub) return res.status(404).json({ error: 'Submission not found.' });
+    const q = Quests.byId(sub.quest_id);
+    if (!canManageBatch(req.user, Batches.byId(q.batch_id))) return res.status(403).json({ error: 'You cannot review this course.' });
+    if (sub.integrity && !force) return res.json({ integrity: sub.integrity, cached: true });
+    const p = q.problems.find((x) => x.pid === sub.pid) || {};
+    const { text } = sub.code ? { text: sub.code } : await extractText(sub.file_url);
+    // 1) cross-student similarity on the same problem
+    const others = store.allData().quest_submissions.filter((s) => s.quest_id === sub.quest_id && s.pid === sub.pid && s.id !== sub.id);
+    const matches = [];
+    for (const o of others) {
+      const otherText = o.code || (await extractText(o.file_url)).text;
+      if (!otherText || !text) continue;
+      const pct = similarityPct(text, otherText);
+      if (pct >= 40) {
+        const u = Users.byId(o.user_id) || {};
+        matches.push({ student: u.name, reg_no: u.reg_no, similarity: pct });
+      }
+    }
+    matches.sort((a, b) => b.similarity - a.similarity);
+    // 2) AI-likelihood (only if AI is configured and we have readable text)
+    let aiCheck = null;
+    if (ai.enabled() && text) {
+      try { aiCheck = await ai.integrity(req.user.id, { problemTitle: p.title, problemBrief: p.description, text, kind: p.type }); }
+      catch (e) { aiCheck = { error: e.message }; }
+    }
+    const report = {
+      checked_at: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      readable: !!text,
+      similarity: { compared: others.length, matches: matches.slice(0, 5) },
+      ai_check: aiCheck,
+      note: 'Advisory signals only - never proof. Confirm with a quick viva before acting.',
+    };
+    sub.integrity = report; store.persist();
+    res.json({ integrity: report, cached: false });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+/* ------------------------ student search + full profile ------------------------ */
+// Admin/coordinator: search everyone. Teacher: only students on their courses.
+function visibleStudents(user) {
+  const students = Users.all().filter((u) => ['student', 'free'].includes(u.role));
+  if (['admin', 'coordinator'].includes(user.role)) return students;
+  const myBatchIds = Batches.all().filter((b) => (b.instructor_ids || []).includes(user.id)).map((b) => b.id);
+  const myStudentIds = new Set(store.allData().enrollments.filter((e) => myBatchIds.includes(e.batch_id)).map((e) => e.user_id));
+  return students.filter((u) => myStudentIds.has(u.id));
+}
+app.get('/api/students/search', authRequired, staffView, (req, res) => {
+  const q = String(req.query.q || '').trim().toLowerCase();
+  if (!q) return res.json({ students: [] });
+  const hits = visibleStudents(req.user).filter((u) =>
+    (u.reg_no && u.reg_no.includes(q)) || u.name.toLowerCase().includes(q) || (u.username && u.username.toLowerCase().includes(q)))
+    .slice(0, 20)
+    .map((u) => ({ id: u.id, name: u.name, reg_no: u.reg_no, avatar: u.avatar || null, courses: coursesForUser(u).map((b) => b.title || b.name).slice(0, 3) }));
+  res.json({ students: hits });
+});
+app.get('/api/students/:id/full', authRequired, staffView, (req, res) => {
+  const target = Users.byId(req.params.id);
+  if (!target || !['student', 'free'].includes(target.role)) return res.status(404).json({ error: 'Student not found.' });
+  if (!visibleStudents(req.user).some((u) => u.id === target.id)) return res.status(403).json({ error: 'This student is not on any of your courses.' });
+  res.json({ student: fullStudentProfile(target.id) });
+});
+
+/* ------------------------------ at-risk students ------------------------------ */
+app.get('/api/batches/:id/at-risk', authRequired, viewBatch, staffView, (req, res) => {
+  res.json({ report: riskReport(req.batch.id) });
+});
+
+/* --------------------------- QR verified certificates --------------------------- */
+// Certificate settings: official organisation name, tagline, CEO name and
+// CEO signature image. Admin-only.
+app.get('/api/admin/cert-settings', authRequired, teacherOrAdmin, (req, res) => res.json({ settings: Settings.cert() }));
+app.post('/api/admin/cert-settings', authRequired, adminRequired, (req, res) => {
+  res.json({ ok: true, settings: Settings.setCert(req.body || {}) });
+});
+app.post('/api/admin/cert-settings/ceo-signature', authRequired, adminRequired, upload.single('file'), (req, res) => {
+  if (!requireImage(req, res, 1)) return;
+  const settings = Settings.setCert({ ceo_sig: `/uploads/${req.file.filename}` });
+  res.json({ ok: true, settings });
+});
+// Issue one certificate (course completion / hackathon / competition).
+app.post('/api/certificates/issue', authRequired, teacherOrAdmin, (req, res) => {
+  const { reg_no, user_id, batch_id, kind, title, completion_date, detail } = req.body || {};
+  const student = user_id ? Users.byId(user_id) : Users.byReg(String(reg_no || ''));
+  if (!student) return res.status(404).json({ error: 'No student found for that registration number.' });
+  if (batch_id) {
+    const b = Batches.byId(batch_id);
+    if (!b) return res.status(404).json({ error: 'Course not found.' });
+    if (!canManageBatch(req.user, b)) return res.status(403).json({ error: 'You cannot issue certificates on this course.' });
+  } else if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only the admin issues certificates outside a course.' });
+  }
+  if (!title) return res.status(400).json({ error: 'A course / hackathon / competition name is required.' });
+  const instructorId = req.user.role === 'instructor' ? req.user.id
+    : (batch_id ? ((Batches.byId(batch_id).instructor_ids || [])[0] || null) : null);
+  const out = Certificates.issue({ user_id: student.id, batch_id, kind, title, completion_date, detail, instructor_id: instructorId, issued_by: req.user.id });
+  if (out.error) return res.status(400).json({ error: out.error });
+  const cert = out.cert;
+  if (student.email) {
+    mailer.notify(student.email, `Your certificate is ready - ${cert.title}`,
+      `Congratulations ${student.name}!\n\nYour verified certificate for "${cert.title}" has been issued (serial ${cert.serial}).\n\nView, download and share it to LinkedIn from your profile, or open it directly: ${APP_URL}/cert?s=${cert.serial}`);
+  }
+  res.json({ ok: true, cert, url: `${APP_URL}/cert?s=${cert.serial}` });
+});
+// Issue for every student who COMPLETED the course's quest track.
+app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (req, res) => {
+  const bd = Batches.decorate(req.batch);
+  const title = (req.body || {}).title || bd.title || bd.name;
+  const completion_date = (req.body || {}).completion_date;
+  const onlyCompleted = (req.body || {}).only_completed !== false;
+  const instructorId = req.user.role === 'instructor' ? req.user.id : ((req.batch.instructor_ids || [])[0] || null);
+  const issued = [], skipped = [];
+  for (const u of Enrollments.studentsForBatch(req.batch.id)) {
+    const prog = Quests.installed(req.batch.id) ? Quests.progress(u.id, req.batch.id) : null;
+    if (onlyCompleted && prog && !prog.completed) { skipped.push(u.name); continue; }
+    const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id });
+    if (out.ok) {
+      issued.push(u.name);
+      if (u.email) mailer.notify(u.email, `Your certificate is ready - ${title}`, `Congratulations ${u.name}! Your verified certificate for "${title}" is ready: ${APP_URL}/cert?s=${out.cert.serial}`);
+    }
+  }
+  res.json({ ok: true, issued: issued.length, skipped: skipped.length, skipped_names: skipped.slice(0, 20) });
+});
+app.get('/api/certificates/mine', authRequired, (req, res) => {
+  res.json({ certificates: Certificates.forUser(req.user.id).map((c) => ({ ...Certificates.publicView(c), url: `${APP_URL}/cert?s=${c.serial}` })) });
+});
+app.get('/api/batches/:id/certificates', authRequired, viewBatch, staffView, (req, res) => {
+  res.json({ certificates: Certificates.forBatch(req.batch.id).map((c) => ({ serial: c.serial, student_name: c.student_name, reg_no: c.reg_no, title: c.title, completion_date: c.completion_date })) });
+});
+app.delete('/api/certificates/:serial', authRequired, adminRequired, (req, res) => {
+  const c = Certificates.bySerial(req.params.serial);
+  if (!c) return res.status(404).json({ error: 'Certificate not found.' });
+  Certificates.revoke(c.id);
+  res.json({ ok: true });
+});
+// PUBLIC verification: this is what the QR code opens. Anyone (an employer,
+// LinkedIn viewer) can confirm the certificate is genuine.
+app.get('/api/verify/:serial', (req, res) => {
+  const c = Certificates.bySerial(req.params.serial);
+  if (!c) return res.status(404).json({ valid: false, error: 'No certificate exists for this serial. It may have been revoked.' });
+  res.json({ valid: true, certificate: Certificates.publicView(c), verify_url: `${APP_URL}/cert?s=${c.serial}` });
+});
+// Signature images must be publicly visible on the certificate page.
+app.get('/api/public/cert-image/:name', (req, res) => {
+  const name = path.basename(String(req.params.name));
+  const full = path.join(UPLOAD_DIR, name);
+  const c = Settings.cert();
+  const allowed = new Set([c.ceo_sig, ...store.allData().certificates.map((x) => x.instructor_sig)].filter(Boolean).map((u) => path.basename(u)));
+  if (!allowed.has(name) || !fs.existsSync(full)) return res.status(404).send('Not found');
+  res.sendFile(full);
+});
+
 /* --------------------------------- static --------------------------------- */
 app.use('/uploads', authGate, express.static(UPLOAD_DIR));
 function authGate(req, res, next) { if (!currentUser(req)) return res.status(401).send('Sign in to view files.'); next(); }
@@ -935,10 +1371,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+app.get('/grade', (req, res) => res.sendFile(path.join(__dirname, 'public', 'grade.html')));
+app.get('/cert', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cert.html')));
+app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cert.html')));
 
 app.use((err, req, res, next) => {
   if (err) return res.status(400).json({ error: err.message || 'Something went wrong.' });
   next();
 });
 
-app.listen(PORT, () => console.log(`EchoLens LMS v10 running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`EchoLens LMS v11 running on http://localhost:${PORT}`));

@@ -1,4 +1,34 @@
-# EchoLens LMS v10
+# EchoLens LMS v11
+
+## New in v11: Live classes with attendance, AI/plagiarism integrity checks, QR-verified certificates, pop quizzes, deadlines with late penalties, at-risk radar, full-screen multi-language compiler with datasets, student search + complete profiles
+
+**Live classes run inside the portal (no Zoom/Meet links).** Course staff press *Start live class* in the new **Live** tab; every enrolled student is emailed and a Join button appears in their portal. The class runs in an embedded open-source meeting room (Jitsi) - camera, mic, screen share, chat - without leaving EchoLens. **Attendance is automatic:** joining marks a student present, a heartbeat counts their minutes, and every class produces a present/absent sheet. Students see their own attendance percentage; teachers see the live roster and per-class sheets.
+
+**AI & plagiarism detection on every assignment.** From the new grading page, one click runs an integrity report with two independent signals: (1) *similarity vs classmates* - token 3-gram matching that survives variable renaming, run across every submission to the same problem; (2) *AI-generated likelihood* - a model-based estimate with concrete indicators and a suggested viva question. Both are advisory drafts for the **teacher only**, never shown to students, never proof on their own.
+
+**QR-verified certificates with one-click LinkedIn sharing.** Issue certificates per student or for the whole course (optionally only quest-completers) for courses, hackathons, or competitions. Each certificate carries the official academy name, the instructor's signature, the CEO's signature, the completion date, a unique serial, and a QR code that opens a public verification page - scan it and the server confirms it is genuine. Students get a *Print / Save as PDF* button and an *Add to LinkedIn* button that pre-fills LinkedIn's certification form. Admin sets the organisation name, CEO name and CEO signature once (People -> Certificate settings); instructors upload their signature from Profile -> ... -> Certificate signature.
+
+**Pop quizzes on a timer.** Teachers create quizzes any time (hand-written or AI-generated, always reviewed first) and open them for a short window - 5 minutes, 15, whatever - even mid-class. Students see the quiz **only while it is open**, with a live countdown; when the window closes it disappears until the teacher reopens it. Auto-scored, gems awarded instantly, answers never leave the server. Teachers can optionally include a **practice IDE terminal inside the quiz** - a scratchpad where students run Python beside the questions ("what does this code print?").
+
+**Deadlines with a late-work rule, stated on every task.** Installing a track sets each level's deadline to the end of its week (from the course start date); instructors change any deadline in one click. Students can still submit late, but late work loses **20% of its earned gems** - the rule is printed on every assignment card and in the task portal, and late submissions are flagged to the teacher.
+
+**At-risk radar.** A dedicated course tab lists every student with attendance %, tasks submitted, and average grade, and flags exactly *why* someone is at risk (low attendance, missing work, low grades, gone quiet). Two or more flags = high risk, sorted to the top.
+
+**Written (logic) assignments.** Teachers can add written problems to any level - the student explains the reasoning in words (typed, or uploaded as PDF/Word/text) instead of writing code. Courses that don't need a compiler at all (UI/UX, graphic design, WordPress, no-code automation, prompting) hide it automatically - every task gets a clean written-answer workspace instead - and teachers can toggle the compiler per course from the Quest tab.
+
+**The compiler grew up.** Full-screen workspace (sidebar untouched) with a Focus mode that hides the brief; language picker with **Python and HTML/CSS/JS** (live web preview with console output); and **datasets attached to tasks** - a teacher uploads `sales.csv` once, and it is mounted into every student's Python filesystem automatically, so `pd.read_csv('sales.csv')` just works. Students can copy the file path in one click.
+
+**Grading in its own tab.** The Grade button opens a dedicated page: brief + solution guideline, the student's runnable code (with the task's datasets mounted), AI review, integrity check, and the grade form side by side. Grades appear on the quest board immediately with clear chips: *Graded 85%*, *Submitted - not graded yet*, *Not submitted*.
+
+**Find any student in seconds.** Admins and coordinators search everyone; teachers search their own students - by registration number or name. The result opens a complete profile: photo, personal details, every enrolled course with level, gems, submissions, average grade and attendance, plus certificates, badges and streaks. Course People tabs get their own search box too.
+
+**Profiles are institute-grade.** Students and staff can record phone, CNIC/B-form, father/guardian name, DOB, address, emergency contact, education (and for staff: designation, qualification, expertise, joining date). Everyone can **upload a profile picture** - it shows in the top bar, chat and profiles. The profile page now has a **... menu** (top right) with Change password, Update profile, Upload picture, Certificate signature (teachers) and Sign out, keeping the page itself clean for the stage analytics.
+
+**Chat with @tags, without message deletion.** Students tag their teacher and teachers tag any student with an @-autocomplete; tagged people are highlighted and emailed. Students can no longer delete messages - conversations are permanent, with moderation reserved for course staff.
+
+---
+
+# (v10 notes)
 
 ## New in v10: Professional compiler with a real terminal, full-page task workspace, anonymous course chat, email everywhere, public landing site with open quests
 

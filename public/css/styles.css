@@ -432,3 +432,167 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .chat-composer{display:flex;gap:8px}
 .chat-composer select{border:1px solid var(--line-strong);border-radius:10px;padding:8px 10px;font-size:12.5px;font-family:inherit;background:#fff;max-width:220px}
 .chat-composer input{flex:1;border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;font-size:13.5px;font-family:inherit}
+
+/* ============================================================
+   v11 - live classes, quizzes, integrity, certificates, search,
+   full-screen compiler, and the global alignment/polish pass.
+   ============================================================ */
+
+/* avatars: images everywhere the letter avatar was */
+.avatar{overflow:hidden;flex:none}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.av-sm{border-radius:50%;background:var(--gem-grad);color:#04231F;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;vertical-align:middle;overflow:hidden;flex:none}
+.av-sm img{width:100%;height:100%;object-fit:cover}
+
+/* profile header + kebab menu */
+.profile-top{margin-bottom:0}
+.profile-id{margin-bottom:18px}
+.kebab{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font-size:19px;font-weight:700;color:var(--navy);cursor:pointer;line-height:1}
+.kebab:hover{background:var(--canvas)}
+.kv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));column-gap:28px}
+
+/* search */
+.search-input{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:11px;font:500 14px var(--font-body);color:var(--text);background:#fff;margin-bottom:10px}
+.search-input:focus{outline:none;border-color:var(--teal)}
+.search-out{display:flex;flex-direction:column;gap:8px}
+.search-hit{display:flex;gap:12px;align-items:center;width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-family:var(--font-body)}
+.search-hit:hover{border-color:var(--teal);background:#F4FBF9}
+
+/* deadlines + grading status */
+.due-chip{font-size:11.5px;font-weight:700;color:#7A5A00;background:#FFF4D6;border:1px solid #F0DFA6;border-radius:999px;padding:3px 10px;white-space:nowrap;margin-right:10px}
+.due-chip.overdue{color:#8F2C2C;background:#FDEAEA;border-color:#F2C6C6}
+.deadline-box{background:#FFF8E4;border:1.5px solid #F0DFA6;border-radius:12px;padding:11px 15px;font-size:13.5px;margin-bottom:16px}
+.deadline-box.overdue{background:#FDEEEE;border-color:#F2C6C6}
+.grade-chip{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.grade-chip.ok{color:#0A6E5F;background:#EAF9F4;border:1px solid #B7E9DA}
+.grade-chip.wait{color:#7A5A00;background:#FFF4D6;border:1px solid #F0DFA6}
+.grade-chip.none{color:var(--muted-2);background:var(--canvas);border:1px solid var(--line)}
+.grade-chip.late{color:#8F2C2C;background:#FDEAEA;border:1px solid #F2C6C6}
+.late-flag{font-size:10px;font-weight:800;letter-spacing:.08em;color:#8F2C2C;background:#FDEAEA;border:1px solid #F2C6C6;border-radius:6px;padding:1px 6px;vertical-align:2px}
+.type-badge.written{font-size:10.5px;font-weight:700;color:#5B3FA8;background:#F0EBFD;border:1px solid #DCD2F5;border-radius:6px;padding:1px 7px}
+
+/* full-screen task workspace: the IDE fills the viewport; the brief column
+   is collapsible via Focus mode. Sidebar stays untouched. */
+.task-topline{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.task-grid.full{grid-template-columns:minmax(300px,1fr) 2.2fr;min-height:calc(100vh - 250px)}
+.task-grid.full .task-ide{display:flex;flex-direction:column;min-height:calc(100vh - 250px)}
+.task-grid.full .ide-editor{flex:1;min-height:340px;font-size:14px;line-height:1.6}
+.task-grid.full #taskTerm .term-body{max-height:32vh}
+.task-grid.full.focus{grid-template-columns:1fr}
+.task-grid.full.focus .task-brief{display:none}
+.task-grid.full .task-brief{max-height:calc(100vh - 250px);overflow-y:auto}
+@media (max-width:1020px){.task-grid.full{grid-template-columns:1fr;min-height:0}.task-grid.full .task-ide{min-height:70vh}.task-grid.full .task-brief{max-height:none}}
+
+/* web (HTML/CSS/JS) live preview */
+.web-frame{width:100%;height:44vh;border:none;background:#fff;border-top:1px solid var(--line)}
+.web-log{margin:0;padding:10px 14px;background:#0B1530;color:#B7E9DA;font:12.5px/1.55 var(--font-mono);max-height:16vh;overflow-y:auto;white-space:pre-wrap}
+.web-log:empty{display:none}
+
+/* task datasets */
+.task-files{margin-top:14px;background:var(--canvas);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+.tf-row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+.tf-row:last-of-type{border-bottom:none}
+
+/* live classes */
+.live-card{border:1.5px solid #B7E9DA}
+.live-dot{width:11px;height:11px;border-radius:50%;background:#E0483E;flex:none;animation:livePulse 1.4s ease-in-out infinite}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(224,72,62,.45)}50%{box-shadow:0 0 0 7px rgba(224,72,62,0)}}
+.live-pill{font-size:10px;font-weight:800;letter-spacing:.08em;color:#fff;background:#E0483E;border-radius:6px;padding:2px 7px;vertical-align:2px}
+.closed-pill{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--muted);background:var(--canvas);border:1px solid var(--line);border-radius:6px;padding:2px 7px;vertical-align:2px}
+.jitsi-box{height:min(72vh,640px);background:#0B1530}
+.jitsi-box iframe{width:100%;height:100%;border:none}
+.live-stage{overflow:hidden;margin-top:16px}
+.att-grid{display:flex;flex-wrap:wrap;gap:7px}
+.att-chip{font-size:12px;font-weight:600;border-radius:999px;padding:4px 11px}
+.att-chip.in{color:#0A6E5F;background:#EAF9F4;border:1px solid #B7E9DA}
+.att-chip.out{color:var(--muted-2);background:var(--canvas);border:1px dashed var(--line-strong)}
+.att-ring{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;flex:none;border:5px solid var(--line);color:var(--navy)}
+.att-ring.good{border-color:#1FA36B}
+.att-ring.mid{border-color:#F0A82A}
+.att-ring.low{border-color:#D9534F}
+
+/* quizzes */
+.quiz-live{border:1.5px solid #F0DFA6}
+.quiz-timer{font-family:var(--font-mono);font-weight:700;font-size:14px;color:#7A5A00;background:#FFF4D6;border:1px solid #F0DFA6;border-radius:999px;padding:4px 13px}
+.quiz-timer.urgent{color:#8F2C2C;background:#FDEAEA;border-color:#F2C6C6;animation:livePulse 1.2s infinite}
+.quiz-q{padding:13px 0;border-bottom:1px dashed var(--line)}
+.quiz-q:last-of-type{border-bottom:none}
+.quiz-opt{display:flex;gap:9px;align-items:center;padding:7px 10px;border:1.5px solid var(--line);border-radius:10px;margin:6px 0;cursor:pointer;font-size:13.5px}
+.quiz-opt:hover{border-color:var(--teal)}
+.quiz-opt input{width:auto;accent-color:var(--teal-deep)}
+.quiz-build{border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--canvas)}
+.quiz-build input{background:#fff}
+.qb-opts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.qb-opt{display:flex;gap:7px;align-items:center}
+.qb-opt input[type=radio]{width:auto;accent-color:var(--ok)}
+.qb-opt .qb-o{flex:1}
+@media (max-width:640px){.qb-opts{grid-template-columns:1fr}}
+
+/* at-risk */
+.risk-pill{font-size:10.5px;font-weight:800;letter-spacing:.06em;border-radius:6px;padding:2px 8px}
+.risk-pill.high{color:#fff;background:#D9534F}
+.risk-pill.watch{color:#7A5A00;background:#FFF4D6;border:1px solid #F0DFA6}
+.risk-pill.ok{color:#0A6E5F;background:#EAF9F4;border:1px solid #B7E9DA}
+tr.risk-high td{background:#FFF7F7}
+
+/* chat mentions */
+.mention{color:var(--teal-deep);font-weight:700;background:#E8F8F4;border-radius:5px;padding:0 4px}
+.mention.me{color:#5B3FA8;background:#F0EBFD}
+.chat-msg.tagged-me{border-left:3px solid var(--violet)}
+.mention-pick{display:flex;flex-direction:column;gap:2px;border:1.5px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--shadow-md);padding:5px;margin-bottom:8px}
+.mention-pick button{display:flex;justify-content:space-between;gap:10px;background:none;border:none;text-align:left;padding:8px 11px;border-radius:8px;font:600 13.5px var(--font-body);color:var(--text);cursor:pointer}
+.mention-pick button:hover{background:var(--canvas)}
+
+/* student profile modal */
+.prof-course{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.prof-bar{height:7px;background:var(--canvas);border-radius:999px;margin-top:9px;overflow:hidden}
+.prof-fill{height:100%;background:var(--gem-grad);border-radius:999px;transition:width .5s ease}
+
+/* grading page + integrity */
+.grade-page .content{max-width:1280px;margin:0 auto;width:100%}
+.grade-app{display:flex;flex-direction:column;min-height:100vh}
+.grade-app .content{padding:22px 26px;flex:1}
+.grade-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+@media (max-width:1020px){.grade-grid{grid-template-columns:1fr}}
+.ai-box{background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:12px;font-size:12.5px}
+.int-box{border-color:#DCD2F5}
+.int-meter{font-family:var(--font-mono);font-weight:800;border-radius:6px;padding:1px 7px;font-size:11.5px}
+.int-meter.low{color:#0A6E5F;background:#EAF9F4}
+.int-meter.mid{color:#7A5A00;background:#FFF4D6}
+.int-meter.high{color:#fff;background:#D9534F}
+
+/* ---------- v11 alignment & polish pass (global consistency) ---------- */
+.view>.card,.view>div>.card{margin-bottom:18px}
+.card{width:100%}
+.card-head{min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.card-head h3{margin:0}
+.card-body .kv{align-items:baseline}
+.list-row{align-items:center;gap:10px}
+.list-row .btn{flex:none}
+.tbl th{white-space:nowrap}
+.tbl td{vertical-align:middle}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px 14px;align-items:end}
+.field{margin-bottom:12px}
+.field span{display:block;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%}
+.btn{white-space:nowrap}
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;align-items:stretch}
+.course-card{display:flex;flex-direction:column;height:100%}
+.course-card .cc-body{flex:1;display:flex;flex-direction:column}
+.course-card .meta{margin-top:auto}
+.tabs{flex-wrap:wrap;row-gap:6px}
+.qhead{flex-wrap:wrap;row-gap:6px}
+.qproblem{flex-wrap:wrap;row-gap:8px}
+.chat-composer{align-items:stretch}
+.chat-composer input{min-width:0}
+.modal .form-grid{align-items:end}
+@media (max-width:640px){
+  .card-head{min-height:0}
+  .task-topline{flex-wrap:wrap}
+  .grade-app .content{padding:14px}
+}
+
+/* v11.1 - course IDE toggle + quiz practice terminal */
+.ide-toggle-strip{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#fff;border:1.5px dashed var(--line-strong);border-radius:12px;padding:10px 15px;margin:14px 0 4px;color:var(--muted)}
+.quiz-ide{border:1.5px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.quiz-ide .ide-editor{min-height:120px;border-bottom:1px solid var(--line)}

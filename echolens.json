@@ -18,7 +18,13 @@
     "ai_reports": 0,
     "quests": 12,
     "quest_submissions": 0,
-    "course_messages": 0
+    "course_messages": 0,
+    "live_classes": 0,
+    "attendance": 0,
+    "quizzes": 1,
+    "quiz_attempts": 0,
+    "certificates": 2,
+    "task_files": 0
   },
   "issued_usernames": [
     "admin@echolens.digital",
@@ -27,7 +33,7 @@
     "student@echolens.digital"
   ],
   "issued_regnos": [
-    "153047"
+    "638095"
   ],
   "users": [
     {
@@ -37,12 +43,12 @@
       "username": "admin@echolens.digital",
       "email": "admin@echolens.digital",
       "reg_no": null,
-      "password_hash": "$2a$10$YTCY34J3V2PIk232KUOhPOTj70wKo6JLzHmPs9IATkwxrjRuwaAwi",
+      "password_hash": "$2a$10$PkQshchbcx1uW.zEb5VPZuaTY6Z1Fpomvr7L2Nb2YYAxB2thPMlHC",
       "profile": {},
       "streak": 0,
       "best_streak": 0,
       "last_active": null,
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 2,
@@ -51,12 +57,12 @@
       "username": "teacher@echolens.digital",
       "email": "teacher@echolens.digital",
       "reg_no": null,
-      "password_hash": "$2a$10$vIvOiOs07NKNKMigGuRRheN/jpvoa0FkbrNQNVMf0erJQAlMKbU..",
+      "password_hash": "$2a$10$Do9Y0hhpseHIs9/Ed6ByjuhA4sdjpunVSynPB8nrv8STt.ix.vgHK",
       "profile": {},
       "streak": 0,
       "best_streak": 0,
       "last_active": null,
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 3,
@@ -65,12 +71,12 @@
       "username": "coordinator@echolens.digital",
       "email": "coordinator@echolens.digital",
       "reg_no": null,
-      "password_hash": "$2a$10$vEGNIujU5lsOXOwY5pUP/eXPQsRYnDZSSzS3SZ/p1ivuK5.QXpfJ2",
+      "password_hash": "$2a$10$mLblupLbTPlaLTyZWAOP0ugf/UXtHOFc34YbuqQhSz5MFjypzawpq",
       "profile": {},
       "streak": 0,
       "best_streak": 0,
       "last_active": null,
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 4,
@@ -78,13 +84,13 @@
       "role": "student",
       "username": "student@echolens.digital",
       "email": "student@echolens.digital",
-      "reg_no": "153047",
-      "password_hash": "$2a$10$GOLIWIxVIUedidMS71tcyONZeGpJul5/78TQOl5DJQLq.bcE7MPfC",
+      "reg_no": "638095",
+      "password_hash": "$2a$10$9nETVjSXrucJvl9Y1x/45Opzmv6xWq5oRyDD67dpLZQXViPD3wpAW",
       "profile": {},
       "streak": 1,
       "best_streak": 1,
       "last_active": "2026-07-08",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     }
   ],
   "courses": [
@@ -98,7 +104,7 @@
       "hours": 8,
       "price_pkr": 5000,
       "summary": "Fast-paced, high-impact introduction to business automation.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 2,
@@ -110,7 +116,7 @@
       "hours": 8,
       "price_pkr": 5000,
       "summary": "From casual chatting to engineered, reusable prompts.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 3,
@@ -122,7 +128,7 @@
       "hours": 8,
       "price_pkr": 5000,
       "summary": "Make AI a daily advantage in study, work, and content.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 4,
@@ -134,7 +140,7 @@
       "hours": 24,
       "price_pkr": 12500,
       "summary": "Core Python through NumPy, pandas, Matplotlib and first ML.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 5,
@@ -146,7 +152,7 @@
       "hours": 24,
       "price_pkr": 14000,
       "summary": "Understand, use, and build with generative AI.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 6,
@@ -158,7 +164,7 @@
       "hours": 24,
       "price_pkr": 13500,
       "summary": "End-to-end analytics: querying, dashboards & business reporting.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 7,
@@ -170,7 +176,7 @@
       "hours": 24,
       "price_pkr": 13000,
       "summary": "From ML intuition to trained, honestly-evaluated models.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 8,
@@ -182,7 +188,7 @@
       "hours": 24,
       "price_pkr": 14000,
       "summary": "Modern productivity toolkits for business workflows.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 9,
@@ -194,7 +200,7 @@
       "hours": 32,
       "price_pkr": 20000,
       "summary": "Themes, custom layouts & client-ready delivery.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 10,
@@ -206,7 +212,7 @@
       "hours": 32,
       "price_pkr": 20000,
       "summary": "Brand identity, marketing collateral & creative assets.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 11,
@@ -218,7 +224,7 @@
       "hours": 32,
       "price_pkr": 21000,
       "summary": "Wireframing, prototyping, user journeys & Figma mastery.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 12,
@@ -230,7 +236,7 @@
       "hours": 32,
       "price_pkr": 21500,
       "summary": "The full analyst workflow: Python, SQL, statistics, storytelling.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 13,
@@ -242,7 +248,7 @@
       "hours": 32,
       "price_pkr": 22500,
       "summary": "Engineering real LLM applications: RAG, evaluation, production.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 14,
@@ -254,7 +260,7 @@
       "hours": 32,
       "price_pkr": 23000,
       "summary": "From tool-calling to multi-step autonomous agents.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 15,
@@ -266,7 +272,7 @@
       "hours": 32,
       "price_pkr": 21500,
       "summary": "The complete classical ML toolkit with rigor.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 16,
@@ -278,7 +284,7 @@
       "hours": 32,
       "price_pkr": 23000,
       "summary": "Tensors to trained networks: vision, transfer learning, deployment.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 17,
@@ -290,7 +296,7 @@
       "hours": 48,
       "price_pkr": 40000,
       "summary": "Robust backend development, MVC patterns & database architectures.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 18,
@@ -302,7 +308,7 @@
       "hours": 48,
       "price_pkr": 38000,
       "summary": "Flagship multi-project data science program.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 19,
@@ -314,7 +320,7 @@
       "hours": 48,
       "price_pkr": 42000,
       "summary": "Flagship GenAI engineering program with portfolio.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 20,
@@ -326,7 +332,7 @@
       "hours": 48,
       "price_pkr": 45000,
       "summary": "The flagship for serious AI career-builders.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 21,
@@ -338,21 +344,21 @@
       "hours": 48,
       "price_pkr": 40000,
       "summary": "Multi-project ML engineering with interview prep.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     }
   ],
   "batches": [
     {
       "id": 1,
       "course_id": 4,
-      "code": "EL-4355",
+      "code": "EL-8452",
       "name": "August 2026 Cohort",
       "start_date": "2026-08-01",
       "status": "running",
       "instructor_ids": [
         2
       ],
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     }
   ],
   "enrollments": [
@@ -360,7 +366,7 @@
       "id": 1,
       "user_id": 4,
       "batch_id": 1,
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     }
   ],
   "sessions": [
@@ -373,7 +379,7 @@
       "start_time": "20:00",
       "end_time": "22:00",
       "join_url": "https://meet.google.com/your-live-class-link",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 2,
@@ -384,7 +390,7 @@
       "start_time": "20:00",
       "end_time": "22:00",
       "join_url": "https://meet.google.com/your-live-class-link",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     },
     {
       "id": 3,
@@ -395,7 +401,7 @@
       "start_time": "20:00",
       "end_time": "22:00",
       "join_url": "https://meet.google.com/your-live-class-link",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     }
   ],
   "lessons": [
@@ -408,7 +414,7 @@
       "type": "slides",
       "url": "#",
       "position": 1,
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     }
   ],
   "assignments": [
@@ -420,7 +426,7 @@
       "description": "Submit a PDF showing your Python setup and first program running.",
       "due_date": "2026-08-10",
       "created_by": 2,
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     }
   ],
   "submissions": [],
@@ -431,7 +437,7 @@
       "author_id": 1,
       "title": "Welcome to EchoLens",
       "body": "Sign in to reach your courses, schedule, content and assignments.",
-      "created_at": "2026-07-08 05:03:33"
+      "created_at": "2026-07-08 17:39:56"
     }
   ],
   "gem_events": [],
@@ -451,9 +457,11 @@
       "session": 1,
       "title": "First Contact",
       "topic": "Python foundations: variables, types, input/output",
+      "deadline": "2026-08-07",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Hello, Data",
           "points": 40,
           "difficulty": "Basic",
@@ -461,6 +469,7 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "Bill Splitter",
           "points": 60,
           "difficulty": "Core",
@@ -468,13 +477,14 @@
         },
         {
           "pid": 3,
+          "type": "code",
           "title": "Type Detective",
           "points": 80,
           "difficulty": "Boss",
           "description": "Take any input from the user and report whether it is an integer, a float, or text - without crashing on any input. Show the converted value when conversion is possible. Hint: try/except."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 2,
@@ -485,9 +495,11 @@
       "session": 2,
       "title": "Flow Control",
       "topic": "Conditionals and loops",
+      "deadline": "2026-08-07",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Grade Gatekeeper",
           "points": 50,
           "difficulty": "Basic",
@@ -495,6 +507,7 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "FizzBuzz, Pakistan Edition",
           "points": 70,
           "difficulty": "Core",
@@ -502,13 +515,14 @@
         },
         {
           "pid": 3,
+          "type": "code",
           "title": "Prime Hunter",
           "points": 90,
           "difficulty": "Boss",
           "description": "Ask for a number N and print all prime numbers up to N, plus the count. Your loop must skip even numbers greater than 2 for efficiency. Add a comment explaining why."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 3,
@@ -519,9 +533,11 @@
       "session": 3,
       "title": "The Collection",
       "topic": "Lists, dictionaries, tuples, sets",
+      "deadline": "2026-08-14",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Tuck Shop Inventory",
           "points": 50,
           "difficulty": "Basic",
@@ -529,6 +545,7 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "Word Counter",
           "points": 80,
           "difficulty": "Core",
@@ -536,13 +553,14 @@
         },
         {
           "pid": 3,
+          "type": "code",
           "title": "Duplicate Buster",
           "points": 100,
           "difficulty": "Boss",
           "description": "Given a list of student registration numbers (make up 15, with some repeats), produce: the unique numbers in original order, the duplicates, and a dictionary of number -> count. Compare doing it with and without a set, in comments."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 4,
@@ -553,9 +571,11 @@
       "session": 4,
       "title": "The Craftsman",
       "topic": "Functions and working with files",
+      "deadline": "2026-08-14",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Function Toolbox",
           "points": 60,
           "difficulty": "Basic",
@@ -563,6 +583,7 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "Marks File Reader",
           "points": 90,
           "difficulty": "Core",
@@ -570,13 +591,14 @@
         },
         {
           "pid": 3,
+          "type": "code",
           "title": "Mini Gradebook",
           "points": 120,
           "difficulty": "Boss",
           "description": "Combine everything: a menu-driven program (add student, show all, show topper, save to file, load from file) using functions and a dictionary. It must not crash on bad menu input."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 5,
@@ -587,9 +609,11 @@
       "session": 5,
       "title": "Enter NumPy",
       "topic": "Arrays, indexing, vectorised math",
+      "deadline": "2026-08-21",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Array Basics",
           "points": 60,
           "difficulty": "Basic",
@@ -597,6 +621,7 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "Temperature Lab",
           "points": 90,
           "difficulty": "Core",
@@ -604,13 +629,14 @@
         },
         {
           "pid": 3,
+          "type": "code",
           "title": "Matrix Mission",
           "points": 120,
           "difficulty": "Boss",
           "description": "Create two 3x3 matrices. Show element-wise product vs matrix product (@), the transpose, and solve a small system of linear equations with np.linalg.solve. Explain the difference between * and @ in comments."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 6,
@@ -621,9 +647,11 @@
       "session": 6,
       "title": "NumPy Deep Dive",
       "topic": "Reshaping, aggregation, normalisation",
+      "deadline": "2026-08-21",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Reshape Rally",
           "points": 70,
           "difficulty": "Core",
@@ -631,13 +659,14 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "Score Normaliser",
           "points": 110,
           "difficulty": "Boss",
           "description": "Generate marks for 5 subjects x 30 students (matrix). Compute per-subject mean and std, then min-max normalise each subject to 0-1 WITHOUT loops. Print which subject had the widest spread and the top student by normalised total."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 7,
@@ -648,9 +677,11 @@
       "session": 7,
       "title": "Pandas Awakens",
       "topic": "DataFrames: load, inspect, select, filter",
+      "deadline": "2026-08-28",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "DataFrame Debut",
           "points": 70,
           "difficulty": "Basic",
@@ -658,6 +689,7 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "CSV Detective",
           "points": 100,
           "difficulty": "Core",
@@ -665,13 +697,14 @@
         },
         {
           "pid": 3,
+          "type": "code",
           "title": "Dirty Data Rescue",
           "points": 130,
           "difficulty": "Boss",
           "description": "Deliberately inject problems into your CSV: missing marks, duplicated rows, a city written 3 different ways (\"Lahore\", \"lahore\", \" LHR \"). Write a cleaning script that fixes all three and proves it with before/after counts."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 8,
@@ -682,9 +715,11 @@
       "session": 8,
       "title": "Pandas Mastery",
       "topic": "GroupBy, merge, transformation",
+      "deadline": "2026-08-28",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Sales Splitter",
           "points": 90,
           "difficulty": "Core",
@@ -692,13 +727,14 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "The Merge Job",
           "points": 130,
           "difficulty": "Boss",
           "description": "Create two DataFrames: students (id, name, city) and results (id, course, marks) where some students have no results and one result has no student. Demonstrate inner, left, and outer merges, and explain in comments what each one kept and lost."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 9,
@@ -709,9 +745,11 @@
       "session": 9,
       "title": "Picture the Data",
       "topic": "Matplotlib: line, bar, scatter, styling",
+      "deadline": "2026-09-04",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Chart Starter Pack",
           "points": 80,
           "difficulty": "Basic",
@@ -719,13 +757,14 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "The Dashboard Figure",
           "points": 130,
           "difficulty": "Boss",
           "description": "One figure, 2x2 subplots: line, bar, scatter, and a histogram of marks. Style it: consistent colors, a main title, tight layout, and one annotation pointing at the most interesting data point. This is a portfolio piece - make it clean."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 10,
@@ -736,9 +775,11 @@
       "session": 10,
       "title": "Think Like a Model",
       "topic": "ML concepts: features, labels, EDA",
+      "deadline": "2026-09-04",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Feature Hunt",
           "points": 90,
           "difficulty": "Core",
@@ -746,13 +787,14 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "EDA Mini-Report",
           "points": 130,
           "difficulty": "Boss",
           "description": "Produce a short EDA notebook: distributions of every feature, missing-value check, at least 2 charts, and a 5-line written summary at the end stating which features you expect to predict price best and why. You will test your prediction next level."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 11,
@@ -763,9 +805,11 @@
       "session": 11,
       "title": "Split and Fit",
       "topic": "Train/test split and linear regression",
+      "deadline": "2026-09-11",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "The Split",
           "points": 90,
           "difficulty": "Core",
@@ -773,13 +817,14 @@
         },
         {
           "pid": 2,
+          "type": "code",
           "title": "Honest Evaluation",
           "points": 130,
           "difficulty": "Boss",
           "description": "Evaluate your model on the test set: MAE, RMSE, and R2. Then deliberately overfit (train and evaluate on the same data) and show both results side by side with a 3-line explanation of the gap."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     },
     {
       "id": 12,
@@ -790,18 +835,77 @@
       "session": 12,
       "title": "The Capstone",
       "topic": "End-to-end regression project",
+      "deadline": "2026-09-11",
       "problems": [
         {
           "pid": 1,
+          "type": "code",
           "title": "Full Pipeline: Predict the Price",
           "points": 250,
           "difficulty": "Boss",
           "description": "One notebook, end to end: load data -> clean -> EDA (2+ charts) -> encode -> split -> train LinearRegression -> evaluate (MAE, RMSE, R2) -> write a 10-line conclusion: what the model learned, where it fails, what you would try next. This is your track finale and a portfolio project - it will be graded on completeness, correctness, and clarity."
         }
       ],
-      "created_at": "2026-07-08 05:04:35"
+      "created_at": "2026-07-08 17:45:07"
     }
   ],
   "quest_submissions": [],
-  "course_messages": []
+  "course_messages": [],
+  "live_classes": [],
+  "attendance": [],
+  "quizzes": [
+    {
+      "id": 1,
+      "batch_id": 1,
+      "title": "1",
+      "questions": [
+        {
+          "no": 1,
+          "q": "what is python",
+          "options": [
+            "language",
+            "nothing",
+            "library",
+            "all of these"
+          ],
+          "answer": 0
+        }
+      ],
+      "duration_min": 10,
+      "points": 20,
+      "allow_ide": false,
+      "opened_at": null,
+      "closes_at": null,
+      "created_by": 2,
+      "created_at": "2026-07-08 17:45:48"
+    }
+  ],
+  "quiz_attempts": [],
+  "certificates": [
+    {
+      "id": 2,
+      "serial": "EL-2026-E8E7C06F",
+      "user_id": 4,
+      "student_name": "Demo Student",
+      "reg_no": "638095",
+      "batch_id": 1,
+      "kind": "course",
+      "title": "Python for Data Science",
+      "detail": "Cohort: August 2026 Cohort",
+      "completion_date": "2026-07-08",
+      "instructor_name": "Lead Teacher",
+      "instructor_sig": null,
+      "issued_by": 1,
+      "issued_at": "2026-07-08 17:42:33"
+    }
+  ],
+  "task_files": [],
+  "settings": {
+    "cert": {
+      "org": "EchoLens AI Academy",
+      "ceo_name": "",
+      "ceo_sig": null,
+      "tagline": "Gamified AI & Data Science Education"
+    }
+  }
 }

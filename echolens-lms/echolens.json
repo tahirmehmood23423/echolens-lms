@@ -1,0 +1,807 @@
+{
+  "seq": {
+    "users": 4,
+    "courses": 21,
+    "batches": 1,
+    "enrollments": 1,
+    "sessions": 3,
+    "lessons": 1,
+    "assignments": 1,
+    "submissions": 0,
+    "announcements": 1,
+    "gem_events": 0,
+    "challenges": 0,
+    "challenge_submissions": 0,
+    "hackathons": 0,
+    "hackathon_entries": 0,
+    "hackathon_submissions": 0,
+    "ai_reports": 0,
+    "quests": 12,
+    "quest_submissions": 0,
+    "course_messages": 0
+  },
+  "issued_usernames": [
+    "admin@echolens.digital",
+    "teacher@echolens.digital",
+    "coordinator@echolens.digital",
+    "student@echolens.digital"
+  ],
+  "issued_regnos": [
+    "153047"
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "EchoLens Admin",
+      "role": "admin",
+      "username": "admin@echolens.digital",
+      "email": "admin@echolens.digital",
+      "reg_no": null,
+      "password_hash": "$2a$10$YTCY34J3V2PIk232KUOhPOTj70wKo6JLzHmPs9IATkwxrjRuwaAwi",
+      "profile": {},
+      "streak": 0,
+      "best_streak": 0,
+      "last_active": null,
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 2,
+      "name": "Lead Teacher",
+      "role": "instructor",
+      "username": "teacher@echolens.digital",
+      "email": "teacher@echolens.digital",
+      "reg_no": null,
+      "password_hash": "$2a$10$vIvOiOs07NKNKMigGuRRheN/jpvoa0FkbrNQNVMf0erJQAlMKbU..",
+      "profile": {},
+      "streak": 0,
+      "best_streak": 0,
+      "last_active": null,
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 3,
+      "name": "Student Coordinator",
+      "role": "coordinator",
+      "username": "coordinator@echolens.digital",
+      "email": "coordinator@echolens.digital",
+      "reg_no": null,
+      "password_hash": "$2a$10$vEGNIujU5lsOXOwY5pUP/eXPQsRYnDZSSzS3SZ/p1ivuK5.QXpfJ2",
+      "profile": {},
+      "streak": 0,
+      "best_streak": 0,
+      "last_active": null,
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 4,
+      "name": "Demo Student",
+      "role": "student",
+      "username": "student@echolens.digital",
+      "email": "student@echolens.digital",
+      "reg_no": "153047",
+      "password_hash": "$2a$10$GOLIWIxVIUedidMS71tcyONZeGpJul5/78TQOl5DJQLq.bcE7MPfC",
+      "profile": {},
+      "streak": 1,
+      "best_streak": 1,
+      "last_active": "2026-07-08",
+      "created_at": "2026-07-08 05:03:33"
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "code": "BC-01",
+      "title": "AI Automation with n8n & Make.com",
+      "tier": "Bootcamp",
+      "level": "Beginner",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "summary": "Fast-paced, high-impact introduction to business automation.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 2,
+      "code": "BC-02",
+      "title": "Prompt Engineering & ChatGPT/Claude Mastery",
+      "tier": "Bootcamp",
+      "level": "Beginner",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "summary": "From casual chatting to engineered, reusable prompts.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 3,
+      "code": "BC-03",
+      "title": "Everyday AI: Smarter Study, Work & Content",
+      "tier": "Bootcamp",
+      "level": "Beginner",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "summary": "Make AI a daily advantage in study, work, and content.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 4,
+      "code": "SC-01",
+      "title": "Python for Data Science",
+      "tier": "Short Course",
+      "level": "Foundational",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 12500,
+      "summary": "Core Python through NumPy, pandas, Matplotlib and first ML.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 5,
+      "code": "SC-02",
+      "title": "Generative AI Essentials",
+      "tier": "Short Course",
+      "level": "Foundational",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 14000,
+      "summary": "Understand, use, and build with generative AI.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 6,
+      "code": "SC-03",
+      "title": "Data Analytics with SQL & Power BI",
+      "tier": "Short Course",
+      "level": "Foundational",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 13500,
+      "summary": "End-to-end analytics: querying, dashboards & business reporting.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 7,
+      "code": "SC-04",
+      "title": "Introduction to Machine Learning",
+      "tier": "Short Course",
+      "level": "Foundational",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 13000,
+      "summary": "From ML intuition to trained, honestly-evaluated models.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 8,
+      "code": "SC-05",
+      "title": "AI Automation Tools Track",
+      "tier": "Short Course",
+      "level": "Foundational",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 14000,
+      "summary": "Modern productivity toolkits for business workflows.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 9,
+      "code": "ST-01",
+      "title": "WordPress Development",
+      "tier": "Specialist Track",
+      "level": "Intermediate",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 20000,
+      "summary": "Themes, custom layouts & client-ready delivery.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 10,
+      "code": "ST-02",
+      "title": "Graphic Designing",
+      "tier": "Specialist Track",
+      "level": "Intermediate",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 20000,
+      "summary": "Brand identity, marketing collateral & creative assets.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 11,
+      "code": "ST-03",
+      "title": "UI/UX Designing",
+      "tier": "Specialist Track",
+      "level": "Intermediate",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 21000,
+      "summary": "Wireframing, prototyping, user journeys & Figma mastery.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 12,
+      "code": "ST-04",
+      "title": "Data Analytics Specialist Track",
+      "tier": "Specialist Track",
+      "level": "Intermediate",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 21500,
+      "summary": "The full analyst workflow: Python, SQL, statistics, storytelling.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 13,
+      "code": "ST-05",
+      "title": "Generative AI Engineering",
+      "tier": "Specialist Track",
+      "level": "Intermediate",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 22500,
+      "summary": "Engineering real LLM applications: RAG, evaluation, production.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 14,
+      "code": "ST-06",
+      "title": "AI Agents & Automation Engineering",
+      "tier": "Specialist Track",
+      "level": "Intermediate",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 23000,
+      "summary": "From tool-calling to multi-step autonomous agents.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 15,
+      "code": "ST-07",
+      "title": "Machine Learning Fundamentals",
+      "tier": "Specialist Track",
+      "level": "Intermediate",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 21500,
+      "summary": "The complete classical ML toolkit with rigor.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 16,
+      "code": "ST-08",
+      "title": "Deep Learning with PyTorch",
+      "tier": "Specialist Track",
+      "level": "Intermediate",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 23000,
+      "summary": "Tensors to trained networks: vision, transfer learning, deployment.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 17,
+      "code": "CT-01",
+      "title": "Full-Stack Development (Laravel)",
+      "tier": "Career Track",
+      "level": "Advanced",
+      "weeks": 12,
+      "hours": 48,
+      "price_pkr": 40000,
+      "summary": "Robust backend development, MVC patterns & database architectures.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 18,
+      "code": "CT-02",
+      "title": "Complete Data Science Bootcamp",
+      "tier": "Career Track",
+      "level": "Advanced",
+      "weeks": 12,
+      "hours": 48,
+      "price_pkr": 38000,
+      "summary": "Flagship multi-project data science program.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 19,
+      "code": "CT-03",
+      "title": "Generative AI & LLM Engineering Mastery",
+      "tier": "Career Track",
+      "level": "Advanced",
+      "weeks": 12,
+      "hours": 48,
+      "price_pkr": 42000,
+      "summary": "Flagship GenAI engineering program with portfolio.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 20,
+      "code": "CT-04",
+      "title": "AI Engineering Career Track",
+      "tier": "Career Track",
+      "level": "Advanced",
+      "weeks": 12,
+      "hours": 48,
+      "price_pkr": 45000,
+      "summary": "The flagship for serious AI career-builders.",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 21,
+      "code": "CT-05",
+      "title": "Machine Learning Engineer Track",
+      "tier": "Career Track",
+      "level": "Advanced",
+      "weeks": 12,
+      "hours": 48,
+      "price_pkr": 40000,
+      "summary": "Multi-project ML engineering with interview prep.",
+      "created_at": "2026-07-08 05:03:33"
+    }
+  ],
+  "batches": [
+    {
+      "id": 1,
+      "course_id": 4,
+      "code": "EL-4355",
+      "name": "August 2026 Cohort",
+      "start_date": "2026-08-01",
+      "status": "running",
+      "instructor_ids": [
+        2
+      ],
+      "created_at": "2026-07-08 05:03:33"
+    }
+  ],
+  "enrollments": [
+    {
+      "id": 1,
+      "user_id": 4,
+      "batch_id": 1,
+      "created_at": "2026-07-08 05:03:33"
+    }
+  ],
+  "sessions": [
+    {
+      "id": 1,
+      "batch_id": 1,
+      "week_no": 1,
+      "title": "Course kickoff and the RAG mental model",
+      "session_date": "2026-07-07",
+      "start_time": "20:00",
+      "end_time": "22:00",
+      "join_url": "https://meet.google.com/your-live-class-link",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 2,
+      "batch_id": 1,
+      "week_no": 1,
+      "title": "Variables, types and first programs",
+      "session_date": "2026-07-09",
+      "start_time": "20:00",
+      "end_time": "22:00",
+      "join_url": "https://meet.google.com/your-live-class-link",
+      "created_at": "2026-07-08 05:03:33"
+    },
+    {
+      "id": 3,
+      "batch_id": 1,
+      "week_no": 2,
+      "title": "Control flow: conditionals and loops",
+      "session_date": "2026-07-14",
+      "start_time": "20:00",
+      "end_time": "22:00",
+      "join_url": "https://meet.google.com/your-live-class-link",
+      "created_at": "2026-07-08 05:03:33"
+    }
+  ],
+  "lessons": [
+    {
+      "id": 1,
+      "course_id": 4,
+      "batch_id": 1,
+      "week_no": 1,
+      "title": "Week 1 slides: Python foundations",
+      "type": "slides",
+      "url": "#",
+      "position": 1,
+      "created_at": "2026-07-08 05:03:33"
+    }
+  ],
+  "assignments": [
+    {
+      "id": 1,
+      "points": 100,
+      "batch_id": 1,
+      "title": "Setup proof: your first script",
+      "description": "Submit a PDF showing your Python setup and first program running.",
+      "due_date": "2026-08-10",
+      "created_by": 2,
+      "created_at": "2026-07-08 05:03:33"
+    }
+  ],
+  "submissions": [],
+  "announcements": [
+    {
+      "id": 1,
+      "batch_id": null,
+      "author_id": 1,
+      "title": "Welcome to EchoLens",
+      "body": "Sign in to reach your courses, schedule, content and assignments.",
+      "created_at": "2026-07-08 05:03:33"
+    }
+  ],
+  "gem_events": [],
+  "challenges": [],
+  "challenge_submissions": [],
+  "hackathons": [],
+  "hackathon_entries": [],
+  "hackathon_submissions": [],
+  "ai_reports": [],
+  "quests": [
+    {
+      "id": 1,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 1,
+      "week": 1,
+      "session": 1,
+      "title": "First Contact",
+      "topic": "Python foundations: variables, types, input/output",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Hello, Data",
+          "points": 40,
+          "difficulty": "Basic",
+          "description": "Write a program that asks for your name and city, then prints: \"<name> from <city> has joined EchoLens!\" using an f-string. Submit your .py file."
+        },
+        {
+          "pid": 2,
+          "title": "Bill Splitter",
+          "points": 60,
+          "difficulty": "Core",
+          "description": "Ask for a restaurant bill amount and the number of friends. Print each person's share rounded to 2 decimal places, and add a 5% tip option. Handle the input as numbers, not text."
+        },
+        {
+          "pid": 3,
+          "title": "Type Detective",
+          "points": 80,
+          "difficulty": "Boss",
+          "description": "Take any input from the user and report whether it is an integer, a float, or text - without crashing on any input. Show the converted value when conversion is possible. Hint: try/except."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 2,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 2,
+      "week": 1,
+      "session": 2,
+      "title": "Flow Control",
+      "topic": "Conditionals and loops",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Grade Gatekeeper",
+          "points": 50,
+          "difficulty": "Basic",
+          "description": "Read a score 0-100 and print the EchoLens stage it maps to: 0-49 Spark, 50-69 Glow, 70-84 Beam, 85-94 Prism, 95+ Nova. Use if/elif/else."
+        },
+        {
+          "pid": 2,
+          "title": "FizzBuzz, Pakistan Edition",
+          "points": 70,
+          "difficulty": "Core",
+          "description": "Print 1 to 50. Multiples of 3 print \"Chai\", multiples of 5 print \"Samosa\", multiples of both print \"ChaiSamosa\". Then print how many of each appeared."
+        },
+        {
+          "pid": 3,
+          "title": "Prime Hunter",
+          "points": 90,
+          "difficulty": "Boss",
+          "description": "Ask for a number N and print all prime numbers up to N, plus the count. Your loop must skip even numbers greater than 2 for efficiency. Add a comment explaining why."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 3,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 3,
+      "week": 2,
+      "session": 3,
+      "title": "The Collection",
+      "topic": "Lists, dictionaries, tuples, sets",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Tuck Shop Inventory",
+          "points": 50,
+          "difficulty": "Basic",
+          "description": "Build a dictionary of 6 tuck-shop items with prices. Print each item on its own line, then the most expensive item and the total value of the shop."
+        },
+        {
+          "pid": 2,
+          "title": "Word Counter",
+          "points": 80,
+          "difficulty": "Core",
+          "description": "Take a paragraph of text and print the 5 most common words with their counts, ignoring case and punctuation. Use a dictionary - no imports allowed except string."
+        },
+        {
+          "pid": 3,
+          "title": "Duplicate Buster",
+          "points": 100,
+          "difficulty": "Boss",
+          "description": "Given a list of student registration numbers (make up 15, with some repeats), produce: the unique numbers in original order, the duplicates, and a dictionary of number -> count. Compare doing it with and without a set, in comments."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 4,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 4,
+      "week": 2,
+      "session": 4,
+      "title": "The Craftsman",
+      "topic": "Functions and working with files",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Function Toolbox",
+          "points": 60,
+          "difficulty": "Basic",
+          "description": "Write three functions: area_of_circle(r), is_leap_year(y), and celsius_to_fahrenheit(c). Each must have a docstring and be demonstrated with 3 test calls printing inputs and outputs."
+        },
+        {
+          "pid": 2,
+          "title": "Marks File Reader",
+          "points": 90,
+          "difficulty": "Core",
+          "description": "Create a text file with 10 lines of \"name,marks\". Write a program that reads it, prints each student with PASS/FAIL (pass = 50+), and writes the failures to a new file failures.txt."
+        },
+        {
+          "pid": 3,
+          "title": "Mini Gradebook",
+          "points": 120,
+          "difficulty": "Boss",
+          "description": "Combine everything: a menu-driven program (add student, show all, show topper, save to file, load from file) using functions and a dictionary. It must not crash on bad menu input."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 5,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 5,
+      "week": 3,
+      "session": 5,
+      "title": "Enter NumPy",
+      "topic": "Arrays, indexing, vectorised math",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Array Basics",
+          "points": 60,
+          "difficulty": "Basic",
+          "description": "Create a NumPy array of 20 random integers between 1 and 100. Print its shape, dtype, min, max, mean, and the array sorted. Seed the generator so results are repeatable."
+        },
+        {
+          "pid": 2,
+          "title": "Temperature Lab",
+          "points": 90,
+          "difficulty": "Core",
+          "description": "Given 30 days of Lahore temperatures (generate realistic values), convert all to Fahrenheit in ONE vectorised operation (no loop), then report days above 35C using boolean masking."
+        },
+        {
+          "pid": 3,
+          "title": "Matrix Mission",
+          "points": 120,
+          "difficulty": "Boss",
+          "description": "Create two 3x3 matrices. Show element-wise product vs matrix product (@), the transpose, and solve a small system of linear equations with np.linalg.solve. Explain the difference between * and @ in comments."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 6,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 6,
+      "week": 3,
+      "session": 6,
+      "title": "NumPy Deep Dive",
+      "topic": "Reshaping, aggregation, normalisation",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Reshape Rally",
+          "points": 70,
+          "difficulty": "Core",
+          "description": "Build an array of 1-24. Reshape it to 4x6, then 2x3x4. Extract: the second row, the last column, and every alternate element of the flattened array - all with slicing only."
+        },
+        {
+          "pid": 2,
+          "title": "Score Normaliser",
+          "points": 110,
+          "difficulty": "Boss",
+          "description": "Generate marks for 5 subjects x 30 students (matrix). Compute per-subject mean and std, then min-max normalise each subject to 0-1 WITHOUT loops. Print which subject had the widest spread and the top student by normalised total."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 7,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 7,
+      "week": 4,
+      "session": 7,
+      "title": "Pandas Awakens",
+      "topic": "DataFrames: load, inspect, select, filter",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "DataFrame Debut",
+          "points": 70,
+          "difficulty": "Basic",
+          "description": "Build a DataFrame of 12 students (name, city, marks, attendance). Show head(), info(), describe(), then select only name+marks, and filter students with marks > 70 AND attendance > 80%."
+        },
+        {
+          "pid": 2,
+          "title": "CSV Detective",
+          "points": 100,
+          "difficulty": "Core",
+          "description": "Save your DataFrame to CSV, reload it, and answer with code: how many unique cities? Average marks per city? Who has the highest marks in each city? Use value_counts and groupby-idxmax."
+        },
+        {
+          "pid": 3,
+          "title": "Dirty Data Rescue",
+          "points": 130,
+          "difficulty": "Boss",
+          "description": "Deliberately inject problems into your CSV: missing marks, duplicated rows, a city written 3 different ways (\"Lahore\", \"lahore\", \" LHR \"). Write a cleaning script that fixes all three and proves it with before/after counts."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 8,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 8,
+      "week": 4,
+      "session": 8,
+      "title": "Pandas Mastery",
+      "topic": "GroupBy, merge, transformation",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Sales Splitter",
+          "points": 90,
+          "difficulty": "Core",
+          "description": "Create a sales DataFrame (date, city, product, units, price). Add a revenue column, then report revenue by city, by product, and by month - each with a single groupby chain."
+        },
+        {
+          "pid": 2,
+          "title": "The Merge Job",
+          "points": 130,
+          "difficulty": "Boss",
+          "description": "Create two DataFrames: students (id, name, city) and results (id, course, marks) where some students have no results and one result has no student. Demonstrate inner, left, and outer merges, and explain in comments what each one kept and lost."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 9,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 9,
+      "week": 5,
+      "session": 9,
+      "title": "Picture the Data",
+      "topic": "Matplotlib: line, bar, scatter, styling",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Chart Starter Pack",
+          "points": 80,
+          "difficulty": "Basic",
+          "description": "From your sales data: a line chart of revenue over time, a bar chart of revenue by city, and a scatter of units vs price. Every chart needs a title, axis labels, and a legend. Submit code + saved PNGs."
+        },
+        {
+          "pid": 2,
+          "title": "The Dashboard Figure",
+          "points": 130,
+          "difficulty": "Boss",
+          "description": "One figure, 2x2 subplots: line, bar, scatter, and a histogram of marks. Style it: consistent colors, a main title, tight layout, and one annotation pointing at the most interesting data point. This is a portfolio piece - make it clean."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 10,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 10,
+      "week": 5,
+      "session": 10,
+      "title": "Think Like a Model",
+      "topic": "ML concepts: features, labels, EDA",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Feature Hunt",
+          "points": 90,
+          "difficulty": "Core",
+          "description": "Take a house-price style dataset (create ~50 rows: area, bedrooms, city, age, price). Identify features vs label in comments, one-hot encode the city column with pandas, and show the correlation of each numeric feature with price."
+        },
+        {
+          "pid": 2,
+          "title": "EDA Mini-Report",
+          "points": 130,
+          "difficulty": "Boss",
+          "description": "Produce a short EDA notebook: distributions of every feature, missing-value check, at least 2 charts, and a 5-line written summary at the end stating which features you expect to predict price best and why. You will test your prediction next level."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 11,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 11,
+      "week": 6,
+      "session": 11,
+      "title": "Split and Fit",
+      "topic": "Train/test split and linear regression",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "The Split",
+          "points": 90,
+          "difficulty": "Core",
+          "description": "Using your house dataset: train_test_split (80/20, fixed random_state), fit a LinearRegression on the training set, and print the coefficients matched to their feature names. In comments: why do we NEVER evaluate on training data?"
+        },
+        {
+          "pid": 2,
+          "title": "Honest Evaluation",
+          "points": 130,
+          "difficulty": "Boss",
+          "description": "Evaluate your model on the test set: MAE, RMSE, and R2. Then deliberately overfit (train and evaluate on the same data) and show both results side by side with a 3-line explanation of the gap."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    },
+    {
+      "id": 12,
+      "batch_id": 1,
+      "track_key": "python-6w",
+      "no": 12,
+      "week": 6,
+      "session": 12,
+      "title": "The Capstone",
+      "topic": "End-to-end regression project",
+      "problems": [
+        {
+          "pid": 1,
+          "title": "Full Pipeline: Predict the Price",
+          "points": 250,
+          "difficulty": "Boss",
+          "description": "One notebook, end to end: load data -> clean -> EDA (2+ charts) -> encode -> split -> train LinearRegression -> evaluate (MAE, RMSE, R2) -> write a 10-line conclusion: what the model learned, where it fails, what you would try next. This is your track finale and a portfolio project - it will be graded on completeness, correctness, and clarity."
+        }
+      ],
+      "created_at": "2026-07-08 05:04:35"
+    }
+  ],
+  "quest_submissions": [],
+  "course_messages": []
+}

@@ -62,6 +62,11 @@
             throw new Error('ECHO_NEED_INPUT');
           },
         });
+        // Mount attached datasets into Python's filesystem so
+        // pd.read_csv('sales.csv') works exactly like on a laptop.
+        for (const f of m.files || []) {
+          try { py.FS.writeFile('/home/pyodide/' + f.name, new Uint8Array(f.bytes)); } catch (fsErr) {}
+        }
         // Auto-load packages from the imports (numpy, pandas, matplotlib,
         // scikit-learn, ...). Progress lines go to the status bar.
         postMessage({ type: 'status', text: 'Checking packages...' });
@@ -174,10 +179,22 @@
   /* ------------------------------ run session ------------------------------ */
   // Orchestrates the run: package status, streamed output, interactive
   // input via re-run with suppressed replay, images, watchdogs.
-  async function execute(code, { term, onStatus }) {
+  async function execute(code, { term, onStatus, files }) {
     if (busy) throw new Error('A program is already running - stop it first.');
     busy = true;
     const status = (t) => { try { onStatus && onStatus(t); } catch {} };
+    // Fetch attached datasets once per run (same-origin, signed-in cookie).
+    let fileBytes = [];
+    if (files && files.length) {
+      status('Loading dataset' + (files.length > 1 ? 's' : '') + '...');
+      try {
+        fileBytes = await Promise.all(files.map(async (f) => {
+          const r = await fetch(f.url, { credentials: 'same-origin' });
+          if (!r.ok) throw new Error('Could not load ' + f.name);
+          return { name: f.name, bytes: await r.arrayBuffer() };
+        }));
+      } catch (e) { busy = false; throw new Error(e.message + ' - refresh and try again.'); }
+    }
     const stdinLines = [];
     let streamPrinted = 0; // python-stream chars already shown (for replay suppression)
     let stopped = false;
@@ -240,7 +257,7 @@
             if (m.type === 'done') { clearInterval(tick); worker.removeEventListener('message', onMsg); resolve({ kind: 'done', ok: m.ok, images: m.images }); }
           };
           worker.addEventListener('message', onMsg);
-          worker.postMessage({ type: 'run', code: String(code), stdin: stdinLines.slice(), url: PYODIDE_URL });
+          worker.postMessage({ type: 'run', code: String(code), stdin: stdinLines.slice(), url: PYODIDE_URL, files: fileBytes });
         });
 
         if (result.kind === 'stopped') return { ok: false, stopped: true };
@@ -293,6 +310,32 @@
     });
   }
 
+  /* --------------------------- web runner (v11) --------------------------- */
+  // HTML / CSS / JavaScript run in a sandboxed live preview. A full page
+  // (with <html> or <!doctype>) renders as-is; a fragment gets wrapped.
+  // console.log / errors are forwarded to the terminal-style log below.
+  function webPreview(iframe, code, onLog) {
+    const raw = String(code || '');
+    const isFullPage = /<\s*html|<!doctype/i.test(raw);
+    const bridge = `<script>
+      (function(){
+        function send(kind, args){ parent.postMessage({ echoweb: true, kind: kind, text: args.map(function(a){ try { return typeof a === 'object' ? JSON.stringify(a) : String(a); } catch(e){ return String(a); } }).join(' ') }, '*'); }
+        ['log','warn','error','info'].forEach(function(k){ var orig = console[k]; console[k] = function(){ send(k, [].slice.call(arguments)); orig.apply(console, arguments); }; });
+        window.addEventListener('error', function(e){ send('error', [e.message + ' (line ' + e.lineno + ')']); });
+      })();
+    <\/script>`;
+    const doc = isFullPage
+      ? raw.replace(/<head(\s[^>]*)?>/i, (m2) => m2 + bridge) || bridge + raw
+      : `<!doctype html><html><head><meta charset="utf-8">${bridge}<style>body{font-family:system-ui,sans-serif;margin:12px;color:#16233A}</style></head><body>${raw}</body></html>`;
+    if (iframe._echoLogHandler) window.removeEventListener('message', iframe._echoLogHandler);
+    iframe._echoLogHandler = (e) => {
+      if (e.data && e.data.echoweb && onLog) onLog(e.data.kind, e.data.text);
+    };
+    window.addEventListener('message', iframe._echoLogHandler);
+    iframe.srcdoc = isFullPage && !/<head/i.test(raw) ? bridge + raw : doc;
+  }
+
   window.EchoTerm = { mount };
   window.EchoRun = { execute, cancel, isRunning: () => busy, wireEditor };
+  window.EchoWeb = { preview: webPreview };
 })();

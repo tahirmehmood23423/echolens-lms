@@ -1,0 +1,143 @@
+{
+  "seq": {
+    "users": 4,
+    "courses": 3,
+    "batches": 0,
+    "enrollments": 0,
+    "sessions": 0,
+    "lessons": 0,
+    "assignments": 0,
+    "submissions": 0,
+    "announcements": 0,
+    "gem_events": 0,
+    "challenges": 0,
+    "challenge_submissions": 0,
+    "hackathons": 0,
+    "hackathon_entries": 0,
+    "hackathon_submissions": 0,
+    "ai_reports": 0,
+    "quests": 0,
+    "quest_submissions": 0
+  },
+  "issued_usernames": [
+    "admin@echolens.digital",
+    "teacher@echolens.digital",
+    "coordinator@echolens.digital",
+    "student@echolens.digital"
+  ],
+  "issued_regnos": [
+    "8882328"
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "EchoLens Admin",
+      "role": "admin",
+      "username": "admin@echolens.digital",
+      "email": "admin@echolens.digital",
+      "reg_no": null,
+      "password_hash": "$2a$10$6HZ9yVVOZxyUbatk.rxB1OeDIvfsoXwiSmhNeIUp1ybzU0JZUmTF.",
+      "profile": {},
+      "streak": 0,
+      "best_streak": 0,
+      "last_active": null,
+      "created_at": "2026-07-07 10:10:01"
+    },
+    {
+      "id": 2,
+      "name": "Lead Teacher",
+      "role": "instructor",
+      "username": "teacher@echolens.digital",
+      "email": "teacher@echolens.digital",
+      "reg_no": null,
+      "password_hash": "$2a$10$7XiZbiprwAOQG0ZHtthXVuMJeXUnUTDGqA/dpfjjIntkd//.3f7OS",
+      "profile": {},
+      "streak": 0,
+      "best_streak": 0,
+      "last_active": null,
+      "created_at": "2026-07-07 10:10:01"
+    },
+    {
+      "id": 3,
+      "name": "Student Coordinator",
+      "role": "coordinator",
+      "username": "coordinator@echolens.digital",
+      "email": "coordinator@echolens.digital",
+      "reg_no": null,
+      "password_hash": "$2a$10$YSiqriOEZ1sqe5WQfhDs6uLoUefOdIDE0/lg5S1QU05.oOydAqSpe",
+      "profile": {},
+      "streak": 0,
+      "best_streak": 0,
+      "last_active": null,
+      "created_at": "2026-07-07 10:10:01"
+    },
+    {
+      "id": 4,
+      "name": "Demo Student",
+      "role": "student",
+      "username": "student@echolens.digital",
+      "email": "student@echolens.digital",
+      "reg_no": "8882328",
+      "password_hash": "$2a$10$d5gqVnIPKmTJzCP1oRxhROhPB2myMSgcGRiYO3XpZskir3S1rpQvS",
+      "profile": {},
+      "streak": 0,
+      "best_streak": 0,
+      "last_active": null,
+      "created_at": "2026-07-07 10:10:01"
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "code": "BC-01",
+      "title": "AI Automation with n8n & Make.com",
+      "tier": "Bootcamp",
+      "level": "Beginner",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "summary": "Fast-paced, high-impact introduction to business automation.",
+      "created_at": "2026-07-07 10:10:01"
+    },
+    {
+      "id": 2,
+      "code": "BC-02",
+      "title": "Prompt Engineering & ChatGPT/Claude Mastery",
+      "tier": "Bootcamp",
+      "level": "Beginner",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "summary": "From casual chatting to engineered, reusable prompts.",
+      "created_at": "2026-07-07 10:10:01"
+    },
+    {
+      "id": 3,
+      "code": "BC-03",
+      "title": "Everyday AI: Smarter Study, Work & Content",
+      "tier": "Bootcamp",
+      "level": "Beginner",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "summary": "Make AI a daily advantage in study, work, and content.",
+      "created_at": "2026-07-07 10:10:01"
+    }
+  ],
+  "batches": [],
+  "enrollments": [],
+  "sessions": [],
+  "lessons": [],
+  "assignments": [],
+  "submissions": [],
+  "announcements": [],
+  "gem_events": [],
+  "challenges": [],
+  "challenge_submissions": [],
+  "hackathons": [],
+  "hackathon_entries": [],
+  "hackathon_submissions": [],
+  "ai_reports": [],
+  "quests": [],
+  "quest_submissions": []
+}

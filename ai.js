@@ -251,4 +251,41 @@ ${fileText ? fileText.slice(0, 14000) : '[Content not readable as text.]'}`;
   };
 }
 
-module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, outline, skillReport, overallReport, classSummary, review };
+/* --------------------------- integrity (teacher-only) --------------------------- */
+// Estimates how likely a submission was AI-generated. This is a SIGNAL for
+// the teacher, never proof - the response says so explicitly. Combined
+// server-side with cross-student similarity for the full integrity report.
+async function integrity(userId, { problemTitle, problemBrief, text, kind }) {
+  const system = BASE + ` You are an academic-integrity assistant for TEACHERS. Analyse whether a student ${kind === 'written' ? 'written answer' : 'code submission'} shows signs of being AI-generated. You are advisory only - never proof.
+Reply in EXACTLY this format:
+AI LIKELIHOOD: <number 0-100, your estimated probability the work is largely AI-generated>
+VERDICT: <one of: Likely original / Unclear / Possibly AI-assisted / Likely AI-generated>
+INDICATORS: <2-4 short lines of concrete observations, e.g. commenting style, vocabulary vs level, boilerplate patterns, over-perfection>
+ADVICE: <1-2 lines: what the teacher should do next, e.g. a quick viva question to ask the student>`;
+  const content = `Problem: ${problemTitle}\nBrief: ${problemBrief || 'Not provided.'}\nStudent submission:\n${String(text || '').slice(0, 14000) || '[Empty]'}`;
+  const raw = await complete(userId, system, [{ role: 'user', content }]);
+  const grab = (label, next) => ((raw.match(new RegExp(label + ':\\s*([\\s\\S]*?)(?=' + next + ':|$)', 'i')) || [])[1] || '').trim();
+  const n = Number((raw.match(/AI LIKELIHOOD:\s*(\d{1,3})/i) || [])[1]);
+  return {
+    ai_likelihood: Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : null,
+    verdict: grab('VERDICT', 'INDICATORS') || 'Unclear',
+    indicators: grab('INDICATORS', 'ADVICE'),
+    advice: grab('ADVICE', '$$$'),
+  };
+}
+
+// Structured quiz for the live pop-quiz feature: strict JSON the server can store.
+async function quizJson(userId, { topic, content, count, level }) {
+  const system = BASE + ' You write multiple-choice quizzes. Reply with ONLY a JSON array, no markdown, no backticks, no preamble.';
+  const prompt = `Write exactly ${Math.max(1, Math.min(20, Number(count) || 5))} multiple-choice questions${level ? ` at ${level} level` : ''} on: ${topic}.
+${content ? 'Base them strictly on this content:\n' + String(content).slice(0, 8000) : ''}
+JSON schema: [{"q":"question text","options":["A","B","C","D"],"answer":0}] where answer is the INDEX of the correct option. Reply with the JSON array only.`;
+  const raw = await complete(userId, system, [{ role: 'user', content: prompt }]);
+  const cleaned = raw.replace(/```json|```/g, '').trim();
+  const start = cleaned.indexOf('['), end = cleaned.lastIndexOf(']');
+  if (start === -1 || end === -1) { const e = new Error('The AI reply was not valid quiz JSON - try again.'); e.status = 502; throw e; }
+  const arr = JSON.parse(cleaned.slice(start, end + 1));
+  return arr.filter((q) => q && q.q && Array.isArray(q.options) && q.options.length >= 2);
+}
+
+module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity };

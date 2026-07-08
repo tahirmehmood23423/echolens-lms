@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens - Learn AI by doing. Earn gems doing it.</title>
+<meta name="description" content="EchoLens is a gamified AI education academy in Pakistan: live courses, quest-based assignments, a built-in Python compiler in your browser, gems and stages instead of boring grades.">
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<style>
+  body{background:#FBFAF7}
+  .land-nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:22px;padding:14px 5vw;background:rgba(251,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .land-nav img{height:38px}
+  .land-nav a.lnk{font-size:13.5px;font-weight:600;color:var(--muted);text-decoration:none}
+  .land-nav a.lnk:hover{color:var(--ink)}
+  .land-wrap{max-width:1180px;margin:0 auto;padding:0 5vw}
+  .hero{padding:64px 0 44px;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+  .hero h1{font-family:var(--font-display);font-size:clamp(30px,4.4vw,52px);line-height:1.08;color:var(--ink);margin-bottom:16px}
+  .hero h1 .hl{background:linear-gradient(100deg,var(--teal-deep),#7C6CF5);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{font-size:15.5px;color:var(--muted);line-height:1.65;max-width:520px;margin-bottom:24px}
+  .hero-side{background:linear-gradient(140deg,#0E1630,#17224A);border-radius:20px;padding:26px;color:#EAF2FF;box-shadow:var(--shadow-md)}
+  .hero-side .row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.09);font-size:13.5px}
+  .hero-side .row:last-child{border:none}
+  .hero-side .row strong{color:#5EE6CF}
+  .stat-strip{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 40px}
+  .stat-pill{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 22px;box-shadow:var(--shadow-sm)}
+  .stat-pill .n{font-family:var(--font-display);font-size:24px;color:var(--teal-deep)}
+  .stat-pill .l{font-size:12px;color:var(--muted)}
+  .sec{padding:38px 0}
+  .sec h2{font-family:var(--font-display);font-size:clamp(24px,3vw,34px);color:var(--ink);margin-bottom:6px}
+  .sec .sub{color:var(--muted);font-size:14.5px;margin-bottom:24px;max-width:640px}
+  .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:16px}
+  .feat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)}
+  .feat .ic{font-size:24px;margin-bottom:10px}
+  .feat h4{font-size:15px;margin-bottom:6px;color:var(--ink)}
+  .feat p{font-size:13px;color:var(--muted);line-height:1.55}
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:16px}
+  .cat-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:6px}
+  .cat-card .tier{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal-deep)}
+  .cat-card h4{font-size:14.5px;color:var(--ink)}
+  .cat-card .meta{font-size:12px;color:var(--muted)}
+  .cat-card .price{font-family:var(--font-display);font-size:17px;color:var(--ink);margin-top:auto}
+  .track-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .track-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .15s ease,border-color .15s ease}
+  .track-card:hover{transform:translateY(-2px);border-color:var(--teal)}
+  .track-card.active{border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,191,168,.14)}
+  .play-panel{margin-top:26px}
+  .lvl-row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 16px;margin-bottom:10px}
+  .lvl-row.locked{opacity:.66}
+  .lvl-no{font-family:var(--font-display);font-size:13px;color:var(--muted-2);white-space:nowrap}
+  .prob-chip{display:inline-block;background:var(--canvas);border:1px solid var(--line-strong);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;margin:3px 4px 0 0}
+  .prob-chip:hover{border-color:var(--teal);color:var(--teal-deep)}
+  .play-ide{margin-top:22px;display:grid;grid-template-columns:2fr 3fr;gap:18px;align-items:start}
+  @media (max-width:1020px){.play-ide{grid-template-columns:1fr}.hero{grid-template-columns:1fr}}
+  .register-band{background:linear-gradient(120deg,#0E1630,#1D1450);border-radius:20px;color:#EAF2FF;padding:34px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:20px 0 48px}
+  .register-band h3{font-family:var(--font-display);font-size:24px;margin-bottom:8px}
+  .register-band p{font-size:13.5px;color:#B9C6E4;max-width:560px;line-height:1.6}
+  footer{border-top:1px solid var(--line);padding:26px 5vw;font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<nav class="land-nav">
+  <img src="/img/logo.png" alt="EchoLens">
+  <a class="lnk" href="#features">Features</a>
+  <a class="lnk" href="#courses">Courses</a>
+  <a class="lnk" href="#quest">Try the quest</a>
+  <a class="lnk" href="#register">Register</a>
+  <span style="flex:1"></span>
+  <a class="btn btn-primary btn-sm" id="signinBtn" href="/login">Sign in</a>
+</nav>
+
+<div class="land-wrap">
+  <section class="hero">
+    <div>
+      <h1>Learn AI by doing.<br><span class="hl">Earn gems doing it.</span></h1>
+      <p>EchoLens is a gamified AI education academy from Pakistan. No boring grades - you climb quest levels, collect gems, and rise through stages from <strong>Spark</strong> to <strong>Nova</strong>. Live classes, real projects, and a full Python environment that runs right in your browser: write code, hit Run, see results. Nothing to install.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn btn-primary" href="#quest">Try the quest - free</a>
+        <a class="btn btn-ghost" href="#courses">Browse courses</a>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div style="font-family:var(--font-display);font-size:18px;margin-bottom:10px">How EchoLens works</div>
+      <div class="row"><span>1. Pick a course</span><strong>bootcamp &rarr; career track</strong></div>
+      <div class="row"><span>2. Attend live classes</span><strong>evenings, online</strong></div>
+      <div class="row"><span>3. Beat quest levels</span><strong>code in the browser</strong></div>
+      <div class="row"><span>4. Get teacher feedback</span><strong>AI-assisted, human-decided</strong></div>
+      <div class="row"><span>5. Collect gems &amp; rise</span><strong>Spark &rarr; Nova</strong></div>
+    </div>
+  </section>
+
+  <div class="stat-strip" id="statStrip"></div>
+
+  <section class="sec" id="features">
+    <h2>What you get inside the portal</h2>
+    <p class="sub">Everything a serious learner needs, wrapped in a system that makes you want to come back tomorrow.</p>
+    <div class="feat-grid">
+      <div class="feat"><div class="ic">&#128142;</div><h4>Gems instead of grades</h4><p>Every task pays out gems. Gems move you through six stages - Spark, Glow, Beam, Prism, Aurora, Nova - with badges and a public profile you can share anywhere.</p></div>
+      <div class="feat"><div class="ic">&#128506;</div><h4>Quest-based assignments</h4><p>Courses ship as quest ladders. Pass a level to unlock the next - no skipping ahead, no falling through the cracks. Your progress is a map, not a spreadsheet.</p></div>
+      <div class="feat"><div class="ic">&#128187;</div><h4>Python in your browser</h4><p>A full editor and interactive terminal inside every task. input() works live, numpy, pandas, matplotlib and scikit-learn load automatically, and charts render on screen. Zero setup.</p></div>
+      <div class="feat"><div class="ic">&#127891;</div><h4>Live classes &amp; content</h4><p>Scheduled online classes with join links, plus slides, notebooks, and readings organised week by week inside each course.</p></div>
+      <div class="feat"><div class="ic">&#10024;</div><h4>Real teacher feedback, faster</h4><p>Instructors use AI to review your work in depth - then they decide your grade and choose what feedback to share. A human always makes the call.</p></div>
+      <div class="feat"><div class="ic">&#128172;</div><h4>Ask anything, anonymously</h4><p>Every course has a chat where you can post questions with your name - or as an anonymous alias nobody can trace. Shy is fine here; stuck is not.</p></div>
+      <div class="feat"><div class="ic">&#9889;</div><h4>Hackathons &amp; challenges</h4><p>Time-boxed build events with gem prizes, plus open challenges for extra gems. Solo or in teams.</p></div>
+      <div class="feat"><div class="ic">&#128293;</div><h4>Streaks &amp; leaderboards</h4><p>Daily activity streaks pay bonus gems. Course and academy-wide leaderboards keep the race friendly and visible.</p></div>
+      <div class="feat"><div class="ic">&#128200;</div><h4>Skill reports</h4><p>Per-course and across-all-courses reports on your strengths, gaps, and recommended direction - reviewed by your teacher, delivered to your profile.</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="courses">
+    <h2>Course catalogue</h2>
+    <p class="sub">From 2-week bootcamps to 12-week career tracks. Prices in PKR; every running course includes live classes, the quest ladder, and teacher feedback.</p>
+    <div class="cat-grid" id="catGrid"><div class="empty">Loading courses&hellip;</div></div>
+  </section>
+
+  <section class="sec" id="quest">
+    <h2>Try the quest - right here, free</h2>
+    <p class="sub">Pick any track and play its first <span id="openLvlN">3</span> levels in the open playground below. Write real Python, press Run, see real output. The rest of the ladder - plus submissions, gems, teacher feedback, live classes, and the leaderboard - unlocks when you register.</p>
+    <div class="track-grid" id="trackGrid"><div class="empty">Loading tracks&hellip;</div></div>
+    <div class="play-panel" id="playPanel"></div>
+    <div class="play-ide" id="playIde" style="display:none">
+      <div class="card"><div class="card-head"><h3 id="pbTitle">Task</h3></div>
+        <div class="card-body"><div class="s" id="pbDesc" style="white-space:pre-line;line-height:1.6;font-size:13.5px"></div><div class="s" id="pbRefs" style="margin-top:10px"></div></div></div>
+      <div class="task-ide card">
+        <div class="ide-toolbar">
+          <span class="ide-pkgs">Python 3 &middot; numpy &middot; pandas &middot; matplotlib &middot; scikit-learn</span>
+          <span style="flex:1"></span>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="clearPlayTerm()">Clear output</button>
+          <button type="button" class="btn btn-teal btn-sm" id="playRunBtn" onclick="runPlayCode()">&#9654; Run</button>
+        </div>
+        <textarea id="playCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your Python solution here, then press Run."></textarea>
+        <div class="ide-status-row"><span class="s" id="playStatus" style="color:var(--muted-2)">Ready - your code runs in your browser, nothing to install.</span></div>
+        <div id="playTerm"></div>
+        <p class="hint" style="margin:10px 14px 14px">Practice mode: runs are real, submissions need an account. <a href="#register">Register</a> to submit, earn gems, and unlock every level.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="register">
+    <div class="register-band">
+      <div style="flex:1;min-width:260px">
+        <h3>Ready to unlock the full quest?</h3>
+        <p>Registration is simple: pick your course, pay the fee (JazzCash, Easypaisa, or bank transfer), and the academy creates your account - your username, password, and registration number arrive by email. Then every level, live class, and gem is yours to earn.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a class="btn btn-primary" id="contactBtn" href="mailto:echolens816@gmail.com?subject=EchoLens%20Registration">Register - contact us</a>
+        <a class="btn btn-ghost" href="/login" style="color:#EAF2FF;border-color:rgba(255,255,255,.35)">Already registered? Sign in</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <span>EchoLens - AI education academy, Pakistan</span>
+  <span>Contact: <a href="mailto:echolens816@gmail.com" id="footMail">echolens816@gmail.com</a></span>
+</footer>
+
+<script src="/js/coderunner.js"></script>
+<script src="/js/landing.js"></script>
+</body>
+</html>

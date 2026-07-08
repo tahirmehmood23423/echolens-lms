@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens learner profile</title>
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="pub-body">
+  <div class="pub-card" id="card">
+    <div class="empty" style="padding:40px 10px">Loading profile&hellip;</div>
+  </div>
+<script>
+'use strict';
+const STAGE_COLORS = { spark:'#F59E0B', glow:'#14B8A6', beam:'#38BDF8', prism:'#8B5CF6', aurora:'#10B981', nova:'#F0A82A' };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function gemSVG(color, size) {
+  return `<svg class="pub-gem" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true">
+    <polygon points="50,4 90,34 74,92 26,92 10,34" fill="${color}" opacity=".92"/>
+    <polygon points="50,4 90,34 50,50" fill="#fff" opacity=".22"/>
+    <polygon points="10,34 50,50 26,92" fill="#000" opacity=".12"/>
+    <polygon points="50,4 50,50 10,34" fill="#fff" opacity=".1"/>
+  </svg>`;
+}
+(async () => {
+  const reg = location.pathname.split('/').pop();
+  const card = document.getElementById('card');
+  try {
+    const res = await fetch(`/api/public/profile/${encodeURIComponent(reg)}`);
+    const p = await res.json();
+    if (!res.ok) throw new Error(p.error || 'Profile not found.');
+    const color = STAGE_COLORS[p.stage.key] || '#0FBFA8';
+    document.title = `${p.name} - EchoLens learner`;
+    card.innerHTML = `
+      <div class="pub-head">
+        ${gemSVG(color, 70)}
+        <div>
+          <h1>${esc(p.name)}</h1>
+          <div class="pub-reg">Reg no ${esc(p.reg_no)} &middot; since ${esc(p.member_since)}</div>
+          <div style="margin-top:7px"><span class="stage-pill stage-${esc(p.stage.key)}">${esc(p.stage.name)} stage</span></div>
+        </div>
+      </div>
+      <div class="pub-stats">
+        <div class="pub-stat"><div class="n">${p.gems}</div><div class="l">Gems</div></div>
+        <div class="pub-stat"><div class="n">${p.streak}</div><div class="l">Day streak</div></div>
+        <div class="pub-stat"><div class="n">${p.best_streak}</div><div class="l">Best streak</div></div>
+      </div>
+      ${p.badges.length ? `<div class="pub-sec">Badges</div>
+        <div class="badge-grid">${p.badges.map((b) => `<span class="badge ${esc(b.kind)}"><span class="bd"></span>${esc(b.label)}</span>`).join('')}</div>` : ''}
+      ${p.courses.length ? `<div class="pub-sec">Courses</div>
+        <div class="badge-grid">${p.courses.map((c) => `<span class="badge course"><span class="bd"></span>${esc(c.title || c.name)}</span>`).join('')}</div>` : ''}
+      <div class="pub-foot">EchoLens &middot; Empowering Pakistan through Artificial Intelligence</div>`;
+  } catch (e) {
+    card.innerHTML = `<div class="empty" style="padding:40px 10px">${esc(e.message)}</div>`;
+  }
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/js/gem3d.js"></script>
+</body>
+</html>

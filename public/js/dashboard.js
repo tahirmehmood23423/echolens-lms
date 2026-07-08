@@ -37,6 +37,15 @@ function gemIcon(color = 'url(#gemGrad)') {
   return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="gemGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0FBFA8"/><stop offset=".55" stop-color="#38BDF8"/><stop offset="1" stop-color="#7C6CF5"/></linearGradient></defs><polygon points="50,4 90,34 74,92 26,92 10,34" fill="${color}"/><polygon points="50,4 90,34 50,50" fill="#fff" opacity=".25"/><polygon points="10,34 50,50 26,92" fill="#000" opacity=".12"/></svg>`;
 }
 function gemChip(n) { return `<span class="gem-chip">${gemIcon()}${n}</span>`; }
+function drawAvatar() {
+  const el = $('avatar'); if (!el) return;
+  if (ME.avatar) el.innerHTML = `<img src="${esc(ME.avatar)}" alt="">`;
+  else el.textContent = (ME.name || 'E').trim()[0].toUpperCase();
+}
+function avatarHtml(url, name, size = 34) {
+  return url ? `<span class="avatar av-sm" style="width:${size}px;height:${size}px"><img src="${esc(url)}" alt=""></span>`
+    : `<span class="avatar av-sm" style="width:${size}px;height:${size}px">${esc((name || 'E').trim()[0].toUpperCase())}</span>`;
+}
 function stagePill(stage) { return `<span class="stage-pill stage-${esc(stage.key)}">${esc(stage.name)}</span>`; }
 function prismGem(key, size = 84) {
   const c = STAGE_COLORS[key] || '#0FBFA8';
@@ -99,7 +108,7 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   } catch { return; }
   $('userName').textContent = ME.name;
   $('rolePill').textContent = roleLabel(ME.role);
-  $('avatar').textContent = (ME.name || 'E').trim()[0].toUpperCase();
+  drawAvatar();
   if (ME.role === 'admin') document.querySelectorAll('.admin-only').forEach((el) => (el.style.display = ''));
   if (['admin', 'coordinator'].includes(ME.role)) document.querySelectorAll('.staff-only').forEach((el) => (el.style.display = ''));
   if (ME.ai_enabled) document.querySelectorAll('.teacher-only').forEach((el) => (el.style.display = ''));
@@ -260,15 +269,18 @@ async function openCourse(id) {
     menu.push(`<button onclick="formLesson()">Add content</button>`);
     menu.push(`<button onclick="formAnnouncement()">Post announcement</button>`);
     menu.push(`<button onclick="formAward()">Award bonus gems</button>`);
+    menu.push(`<button onclick="formIssueCert()">Issue certificate</button>`);
+    menu.push(`<button onclick="formIssueAllCerts()">Issue certificates (whole course)</button>`);
   }
   if (isAdmin) {
     menu.push(`<button onclick="formStudents()">Add students</button>`);
     menu.push(`<button onclick="formTeacher()">Add a teacher</button>`);
+    menu.push(`<button onclick="formCertSettings()">Certificate settings</button>`);
     menu.push(`<button class="danger" onclick="deleteBatch()">Delete this course</button>`);
   }
 
-  const tabs = ['Quest', 'Chat', 'Classes', 'Content', 'Leaderboard'];
-  if (isStaff()) tabs.push('People', 'Report');
+  const tabs = ['Quest', 'Live', 'Quizzes', 'Chat', 'Classes', 'Content', 'Leaderboard'];
+  if (isStaff()) tabs.push('People', 'At-risk', 'Report');
 
   $('view-course').innerHTML = `
     <button class="btn btn-ghost btn-sm" onclick="show('courses')" style="margin-bottom:14px">&larr; All courses</button>
@@ -295,8 +307,13 @@ function drawCourseTab(tab) {
   const d = CURRENT_BATCH; const body = $('courseTabBody');
   const canManage = d.can_manage;
   if (CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
+  if (typeof QUIZ_TICK !== 'undefined' && QUIZ_TICK) { clearInterval(QUIZ_TICK); QUIZ_TICK = null; }
+  if (typeof stopLiveHeartbeat === 'function' && tab !== 'Live') stopLiveHeartbeat();
 
   if (tab === 'Quest') { renderQuestTab(body); return; }
+  if (tab === 'Live') { renderLiveTab(body); return; }
+  if (tab === 'Quizzes') { renderQuizzesTab(body); return; }
+  if (tab === 'At-risk') { renderAtRiskTab(body); return; }
   if (tab === 'Chat') { renderChatTab(body); return; }
 
   if (tab === 'Classes') {
@@ -336,10 +353,14 @@ function drawCourseTab(tab) {
           <div class="list-row"><div class="grow"><div class="t">${esc(t.name)}</div></div>
           ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="removeTeacher(${t.id})">Remove</button>` : ''}</div>`).join('') : '<div class="empty">No teachers assigned yet.</div>'}</div></div>
       <div class="card"><div class="card-head"><h3>Students (${d.students.length})</h3>${isAdmin ? `<button class="btn btn-ghost btn-sm" onclick="formStudents()">Add students</button>` : ''}</div>
-        <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-          <tr><th>Name</th><th>Reg no</th><th>Username</th>${isAdmin ? '<th></th>' : ''}</tr>
-          ${d.students.map((s) => `<tr><td>${esc(s.name)}</td><td class="mono">${esc(s.reg_no || '—')}</td><td class="mono">${esc(s.username)}</td>
-            ${isAdmin ? `<td style="text-align:right"><button class="btn btn-danger btn-sm" onclick="removeStudent(${s.id})">Remove</button></td>` : ''}</tr>`).join('') || `<tr><td colspan="4" class="empty">No students enrolled yet.</td></tr>`}
+        <div class="card-body" style="padding-bottom:0"><input id="peopleSearch" class="search-input" placeholder="Search by registration number or name..." oninput="filterPeopleTable(this.value)"></div>
+        <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl" id="peopleTbl">
+          <tr><th></th><th>Name</th><th>Reg no</th><th>Username</th><th></th></tr>
+          ${d.students.map((s) => `<tr data-search="${esc((s.name + ' ' + (s.reg_no || '') + ' ' + (s.username || '')).toLowerCase())}">
+            <td style="width:44px">${avatarHtml(s.avatar, s.name, 30)}</td>
+            <td>${esc(s.name)}</td><td class="mono">${esc(s.reg_no || '—')}</td><td class="mono">${esc(s.username || '—')}</td>
+            <td style="text-align:right;white-space:nowrap"><button class="btn btn-teal btn-sm" onclick="openStudentProfile(${s.id})">View profile</button>
+            ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="removeStudent(${s.id})">Remove</button>` : ''}</td></tr>`).join('') || `<tr><td colspan="5" class="empty">No students enrolled yet.</td></tr>`}
         </table></div></div>`;
   }
 
@@ -559,36 +580,113 @@ function formGlobalAnnouncement() {
 async function renderProfile() {
   const el = $('view-profile');
   ME = await api('/api/auth/me');
+  drawAvatar();
   const p = ME.profile || {};
-  const rows = Object.keys(p).length ? Object.entries(p).map(([k, v]) => `<div class="kv"><span class="k">${esc(k.replace(/_/g, ' '))}</span><span>${esc(v)}</span></div>`).join('') : '<div class="s" style="color:var(--muted)">No profile details yet.</div>';
+  const fieldLabels = {
+    phone: 'Phone', dob: 'Date of birth', gender: 'Gender', cnic: 'CNIC / B-form', father_name: 'Father / guardian name',
+    address: 'Address', city: 'City', education: 'Education', institute: 'School / institute', emergency_contact: 'Emergency contact',
+    goal: 'Goal', links: 'LinkedIn / GitHub', designation: 'Designation', qualification: 'Qualification',
+    expertise: 'Expertise', experience_years: 'Experience (years)', joining_date: 'Joining date', office_hours: 'Office hours',
+  };
+  const rows = Object.keys(p).length
+    ? Object.entries(p).map(([k, v]) => `<div class="kv"><span class="k">${esc(fieldLabels[k] || k.replace(/_/g, ' '))}</span><span>${esc(v)}</span></div>`).join('')
+    : '<div class="s" style="color:var(--muted)">No details yet - open the &#8942; menu and choose Update profile.</div>';
+  const isTeacher = ['instructor', 'admin'].includes(ME.role);
   el.innerHTML = `
+    <div class="profile-top">
+      <div class="profile-id card"><div class="card-body" style="display:flex;gap:16px;align-items:center">
+        ${avatarHtml(ME.avatar, ME.name, 72)}
+        <div style="flex:1;min-width:0">
+          <h2 style="margin:0 0 2px">${esc(ME.name)}</h2>
+          <div class="s" style="color:var(--muted)">${roleLabel(ME.role)}${ME.reg_no ? ' &middot; Reg no <span class="mono">' + esc(ME.reg_no) + '</span>' : ''} &middot; ${esc(ME.email || ME.username || '')}</div>
+        </div>
+        <div class="dd">
+          <button class="kebab" onclick="this.nextElementSibling.classList.toggle('open')" title="Account menu" aria-label="Account menu">&#8942;</button>
+          <div class="dd-menu">
+            <button onclick="formChangePassword()">Change password</button>
+            <button onclick="openProfileForm()">Update profile</button>
+            <button onclick="formUploadAvatar()">Upload picture</button>
+            ${isTeacher ? '<button onclick="formUploadSignature()">Certificate signature</button>' : ''}
+            ${ME.reg_no ? '<button onclick="sharePublicProfile()">Copy public profile link</button>' : ''}
+            <button class="danger" onclick="logout()">Sign out</button>
+          </div>
+        </div>
+      </div></div>
+    </div>
     ${ME.gamify ? prismCard(ME.gamify) : ''}
     ${ME.gamify ? journeyRail(ME.gamify) : ''}
     ${ME.gamify ? badgesCard(ME.gamify) : ''}
+    <div id="myCerts"></div>
     <div id="myReports"></div>
-    <div class="card" style="max-width:640px"><div class="card-head"><h3>Your account</h3><span class="role-pill">${roleLabel(ME.role)}</span></div>
-      <div class="card-body">
-        <div class="kv"><span class="k">name</span><span>${esc(ME.name)}</span></div>
-        ${ME.reg_no ? `<div class="kv"><span class="k">registration no</span><span class="mono">${esc(ME.reg_no)}</span></div>` : ''}
-        <div class="kv"><span class="k">username</span><span class="mono">${esc(ME.username || '—')}</span></div>
-        <div class="kv"><span class="k">email</span><span>${esc(ME.email || 'No email on file')}</span></div>
-        ${ME.reg_no ? `<div style="margin-top:12px"><button class="btn btn-ghost btn-sm" onclick="sharePublicProfile()">Copy public profile link</button></div>` : ''}
-      </div></div>
-    <div class="card" style="max-width:640px"><div class="card-head"><h3>Profile details</h3><button class="btn btn-ghost btn-sm" onclick="openProfileForm()">Edit</button></div>
-      <div class="card-body">${rows}</div></div>
-    <div class="card" style="max-width:640px"><div class="card-head"><h3>Change password</h3></div>
-      <div class="card-body"><form id="pwForm">
-        <label class="field"><span>Current password</span><input name="current" type="password" required autocomplete="current-password"></label>
-        <label class="field"><span>New password</span><input name="next" type="password" required minlength="8" placeholder="At least 8 characters" autocomplete="new-password"></label>
-        <button class="btn btn-primary" type="submit">Update password</button></form></div></div>`;
+    <div class="card"><div class="card-head"><h3>Profile details</h3><button class="btn btn-ghost btn-sm" onclick="openProfileForm()">Edit</button></div>
+      <div class="card-body kv-grid">${rows}</div></div>`;
   requestAnimationFrame(() => { const f = el.querySelector('.prism-fill'); if (f) f.style.width = f.dataset.w + '%'; });
   loadMyReports();
-  $('pwForm').addEventListener('submit', async (e) => {
+  loadMyCerts();
+}
+function formChangePassword() {
+  openModal('Change password', `
+    <form id="f">
+      <label class="field"><span>Current password</span><input name="current" type="password" required autocomplete="current-password"></label>
+      <label class="field"><span>New password</span><input name="next" type="password" required minlength="8" placeholder="At least 8 characters" autocomplete="new-password"></label>
+      <button class="btn btn-primary btn-block">Update password</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
-    try { await api('/api/me/password', { method: 'POST', body: JSON.stringify({ current: f.current.value, next: f.next.value }) }); toast('Password updated.'); f.reset(); }
-    catch (err) { toast(err.message, true); }
-    btn.disabled = false;
+    try { await api('/api/me/password', { method: 'POST', body: JSON.stringify({ current: f.current.value, next: f.next.value }) }); toast('Password updated.'); closeModal(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
+}
+function formUploadAvatar() {
+  openModal('Upload profile picture', `
+    <form id="f">
+      <label class="field"><span>Your photo - PNG, JPG or WebP, under 3 MB</span><input name="file" type="file" accept=".png,.jpg,.jpeg,.webp" required></label>
+      <p class="hint">Your picture appears in the top bar, the course chat, and on your profile.</p>
+      <button class="btn btn-primary btn-block">Upload picture</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try { await api('/api/me/avatar', { method: 'POST', body: new FormData(f) }); toast('Picture updated.'); closeModal(); renderProfile(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+function formUploadSignature() {
+  openModal('Your certificate signature', `
+    <form id="f">
+      ${ME.signature ? `<div style="margin-bottom:10px"><span class="s" style="color:var(--muted)">Current signature:</span><br><img src="${esc(ME.signature)}" alt="signature" style="max-height:70px;border:1px solid var(--line);border-radius:8px;padding:6px;background:#fff"></div>` : ''}
+      <label class="field"><span>Signature image - PNG with transparent background looks best</span><input name="file" type="file" accept=".png,.jpg,.jpeg,.webp" required></label>
+      <p class="hint">This signature is printed on every certificate you issue as the course instructor.</p>
+      <button class="btn btn-primary btn-block">Save signature</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try { await api('/api/me/signature', { method: 'POST', body: new FormData(f) }); toast('Signature saved - it will appear on certificates you issue.'); closeModal(); renderProfile(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function loadMyCerts() {
+  const box = $('myCerts'); if (!box) return;
+  try {
+    const d = await api('/api/certificates/mine');
+    if (!d.certificates.length) { box.innerHTML = ''; return; }
+    box.innerHTML = `<div class="card"><div class="card-head"><h3>My certificates</h3><span class="s" style="color:var(--muted)">QR-verified &middot; share straight to LinkedIn</span></div>
+      <div class="card-body tight">${d.certificates.map((c) => `
+        <div class="list-row" style="padding:12px 4px">
+          <div class="grow">
+            <div class="t">&#127942; ${esc(c.title)}</div>
+            <div class="s" style="color:var(--muted)">${esc(c.kind)} &middot; completed ${fmtDate(c.completion_date)} &middot; serial <span class="mono">${esc(c.serial)}</span></div>
+          </div>
+          <a class="btn btn-teal btn-sm" href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">View &amp; download</a>
+          <button class="btn btn-ghost btn-sm" onclick="shareCertLinkedIn('${esc(c.serial)}','${esc(c.title).replace(/'/g, '&#39;')}','${esc(c.completion_date)}','${esc(c.org).replace(/'/g, '&#39;')}')">in&nbsp;Add to LinkedIn</button>
+        </div>`).join('')}</div></div>`;
+  } catch { box.innerHTML = ''; }
+}
+function shareCertLinkedIn(serial, title, date, org) {
+  const url = location.origin + '/cert?s=' + serial;
+  const y = (date || '').slice(0, 4), m = Number((date || '').slice(5, 7)) || 1;
+  const add = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'
+    + '&name=' + encodeURIComponent(title)
+    + '&organizationName=' + encodeURIComponent(org || 'EchoLens AI Academy')
+    + '&issueYear=' + y + '&issueMonth=' + m
+    + '&certUrl=' + encodeURIComponent(url) + '&certId=' + encodeURIComponent(serial);
+  window.open(add, '_blank');
 }
 function journeyRail(g) {
   const gems = g.gems;
@@ -604,15 +702,40 @@ function journeyRail(g) {
 }
 function openProfileForm() {
   const p = ME.profile || {};
-  openModal('Edit profile details', `
+  const isStaffRole = ['instructor', 'admin', 'coordinator'].includes(ME.role);
+  openModal('Update profile', `
     <form id="f">
-      <label class="field"><span>City</span><input name="city" value="${esc(p.city || '')}"></label>
-      <label class="field"><span>Education</span><input name="education" value="${esc(p.education || '')}"></label>
-      <label class="field"><span>Goal</span><input name="goal" value="${esc(p.goal || '')}" placeholder="What are you here to achieve?"></label>
-      <label class="field"><span>LinkedIn / GitHub</span><input name="links" value="${esc(p.links || '')}"></label>
-      <button class="btn btn-primary btn-block">Save</button></form>`);
+      <div class="form-grid">
+        <label class="field"><span>Phone / WhatsApp</span><input name="phone" value="${esc(p.phone || '')}" placeholder="03xx-xxxxxxx"></label>
+        <label class="field"><span>Date of birth</span><input name="dob" type="date" value="${esc(p.dob || '')}"></label>
+        <label class="field"><span>Gender</span><select name="gender"><option value="">—</option>${['Male', 'Female', 'Other'].map((g) => `<option${p.gender === g ? ' selected' : ''}>${g}</option>`).join('')}</select></label>
+        <label class="field"><span>CNIC / B-form</span><input name="cnic" value="${esc(p.cnic || '')}" placeholder="xxxxx-xxxxxxx-x"></label>
+        <label class="field"><span>Father / guardian name</span><input name="father_name" value="${esc(p.father_name || '')}"></label>
+        <label class="field"><span>City</span><input name="city" value="${esc(p.city || '')}"></label>
+      </div>
+      <label class="field"><span>Address</span><input name="address" value="${esc(p.address || '')}"></label>
+      <div class="form-grid">
+        <label class="field"><span>Education</span><input name="education" value="${esc(p.education || '')}" placeholder="e.g. BS Computer Science"></label>
+        <label class="field"><span>School / institute</span><input name="institute" value="${esc(p.institute || '')}"></label>
+      </div>
+      <label class="field"><span>Emergency contact - name &amp; phone</span><input name="emergency_contact" value="${esc(p.emergency_contact || '')}"></label>
+      ${isStaffRole ? `
+      <p class="hint" style="margin:6px 0 8px">Professional details (staff)</p>
+      <div class="form-grid">
+        <label class="field"><span>Designation</span><input name="designation" value="${esc(p.designation || '')}" placeholder="e.g. Senior Instructor"></label>
+        <label class="field"><span>Qualification</span><input name="qualification" value="${esc(p.qualification || '')}" placeholder="e.g. MS Data Science"></label>
+        <label class="field"><span>Expertise</span><input name="expertise" value="${esc(p.expertise || '')}" placeholder="e.g. Python, ML, GenAI"></label>
+        <label class="field"><span>Experience (years)</span><input name="experience_years" type="number" min="0" value="${esc(p.experience_years || '')}"></label>
+        <label class="field"><span>Joining date</span><input name="joining_date" type="date" value="${esc(p.joining_date || '')}"></label>
+        <label class="field"><span>Office hours</span><input name="office_hours" value="${esc(p.office_hours || '')}" placeholder="e.g. Mon-Fri 6-8pm"></label>
+      </div>` : ''}
+      <div class="form-grid">
+        <label class="field"><span>Goal</span><input name="goal" value="${esc(p.goal || '')}" placeholder="What are you here to achieve?"></label>
+        <label class="field"><span>LinkedIn / GitHub</span><input name="links" value="${esc(p.links || '')}"></label>
+      </div>
+      <button class="btn btn-primary btn-block">Save</button></form>`, true);
   $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const obj = {}; new FormData(f).forEach((v, k) => { if (v.trim()) obj[k] = v.trim(); });
+    e.preventDefault(); const f = e.target; const obj = {}; new FormData(f).forEach((v, k) => { obj[k] = String(v).trim(); });
     try { await api('/api/me/profile', { method: 'POST', body: JSON.stringify(obj) }); toast('Profile saved.'); closeModal(); renderProfile(); }
     catch (err) { modalMsg(err.message); }
   });
@@ -694,26 +817,34 @@ async function renderUsers() {
     ['Admins', d.users.filter((u) => u.role === 'admin')],
   ];
   el.innerHTML = `
+    <div class="card"><div class="card-head"><h3>Find a student</h3><span class="s" style="color:var(--muted)">Search by registration number or name - opens the complete profile</span></div>
+      <div class="card-body">
+        <input id="globalStudentSearch" class="search-input" placeholder="e.g. 4821736 or Ayesha Khan" autocomplete="off">
+        <div id="studentSearchOut" class="search-out"></div>
+      </div></div>
     ${isAdmin ? `<div class="card"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <span class="s" style="color:var(--muted)">Forgot passwords are fixed here - reset keeps the account, gems, and enrollments intact.</span>
       <span style="flex:1"></span>
+      <button class="btn btn-ghost btn-sm" onclick="formCertSettings()">Certificate settings</button>
       <button class="btn btn-ghost btn-sm" onclick="formCoordinator()">Add a coordinator</button>
     </div></div>` : ''}
     ${groups.map(([label, users]) => `
       <div class="card"><div class="card-head"><h3>${label} (${users.length})</h3></div>
         <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-          <tr><th>Name</th><th>Reg no</th><th>Username</th><th>Gems</th><th>Courses</th>${isAdmin ? '<th></th>' : ''}</tr>
+          <tr><th>Name</th><th>Reg no</th><th>Username</th><th>Gems</th><th>Courses</th><th></th></tr>
           ${users.map((u) => `<tr>
             <td>${esc(u.name)}</td>
             <td class="mono">${esc(u.reg_no || '—')}</td>
             <td class="mono">${esc(u.username || '—')}</td>
             <td>${u.gems != null ? gemChip(u.gems).replace('gem-chip', 'gem-chip') : '—'}</td>
             <td class="s">${u.courses.map(esc).join(', ') || '—'}</td>
-            ${isAdmin ? `<td style="text-align:right;white-space:nowrap">
-              <button class="btn btn-ghost btn-sm" onclick="formResetPassword(${u.id},'${esc(u.name).replace(/'/g, '&#39;')}')">Reset password</button>
-              ${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="delUser(${u.id},'${esc(u.name).replace(/'/g, '&#39;')}')">Delete</button>` : ''}
-            </td>` : ''}</tr>`).join('') || `<tr><td colspan="6" class="empty">None yet.</td></tr>`}
+            <td style="text-align:right;white-space:nowrap">
+              ${['student', 'free'].includes(u.role) ? `<button class="btn btn-teal btn-sm" onclick="openStudentProfile(${u.id})">View profile</button>` : ''}
+              ${isAdmin ? `<button class="btn btn-ghost btn-sm" onclick="formResetPassword(${u.id},'${esc(u.name).replace(/'/g, '&#39;')}')">Reset password</button>
+              ${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="delUser(${u.id},'${esc(u.name).replace(/'/g, '&#39;')}')">Delete</button>` : ''}` : ''}
+            </td></tr>`).join('') || `<tr><td colspan="6" class="empty">None yet.</td></tr>`}
         </table></div></div>`).join('')}`;
+  wireStudentSearch();
 }
 function formResetPassword(uid, name) {
   openModal(`Reset password: ${name}`, `
@@ -1205,7 +1336,11 @@ async function renderQuestTab(body) {
         <div class="prism-stat"><div class="n">${p.unlocked_up_to}</div><div class="l">Level</div></div>
       </div>` : ''}
       <span class="quest-title-chip"><span class="bd"></span>${p.track.titles.map((t) => esc(t.name)).join(' &rarr; ')}</span>
-    </div></div>`;
+    </div></div>
+    ${d.can_manage ? `<div class="ide-toggle-strip">
+      <span class="s">Built-in compiler for this course: <strong>${d.ide_enabled ? 'ON' : 'OFF'}</strong>${d.ide_enabled ? '' : ' - tasks use a clean written-answer workspace (right for UI/UX, graphics and no-code automation courses)'}</span>
+      <button class="btn btn-ghost btn-sm" onclick="toggleCourseIde(${!d.ide_enabled})">${d.ide_enabled ? 'Turn compiler off' : 'Turn compiler on'}</button>
+    </div>` : ''}`;
 
   QUEST_DATA = d; // cached for the task portal
 
@@ -1213,14 +1348,21 @@ async function renderQuestTab(body) {
     const q = l.quest;
     const state = l.passed ? 'passed' : (l.unlocked ? 'current' : 'locked');
     const mySubFor = (pid) => d.my_subs[`${q.id}:${pid}`];
+    const overdue = q.deadline && new Date() > new Date(q.deadline + 'T23:59:59');
+    const dueChip = q.deadline
+      ? `<span class="due-chip${overdue ? ' overdue' : ''}" title="Late submissions lose ${d.late_penalty_pct || 20}% of earned gems">&#9200; Due ${fmtDate(q.deadline)}${overdue ? ' &middot; past due' : ''}</span>`
+      : '';
     return `<div class="quest-node ${state}" id="qn${q.id}">
       <div class="qgem"><div class="stone"></div></div>
       <div class="qbody">
         <div class="qhead" onclick="document.getElementById('qn${q.id}').classList.toggle('open')">
           <span class="lvl">W${q.week} &middot; LVL ${q.no}</span>
           <span class="qt">${esc(q.title)}<div class="qs">${esc(q.topic)}</div></span>
+          ${dueChip}
           <span class="qstate ${state}">${l.passed ? 'Passed' : (l.unlocked ? 'Open' : 'Locked')}</span>
-          ${d.can_manage ? `<button class="btn btn-ghost btn-sm" style="margin-right:10px" onclick="event.stopPropagation();remindLevel(${q.id})" title="Email students who have not finished this level">&#128276; Remind</button>` : ''}
+          ${d.can_manage ? `<button class="btn btn-ghost btn-sm" style="margin-right:6px" onclick="event.stopPropagation();formLevelDeadline(${q.id},'${esc(q.deadline || '')}')" title="Set or change this level's deadline">&#128197; Deadline</button>
+          <button class="btn btn-ghost btn-sm" style="margin-right:6px" onclick="event.stopPropagation();formAddProblem(${q.id})" title="Add a coding or written problem to this level">+ Task</button>
+          <button class="btn btn-ghost btn-sm" style="margin-right:10px" onclick="event.stopPropagation();remindLevel(${q.id})" title="Email students who have not finished this level">&#128276;</button>` : ''}
         </div>
         <div class="qproblems">
           ${q.problems.map((pr) => {
@@ -1228,14 +1370,16 @@ async function renderQuestTab(body) {
             let chip = '';
             if (isStudent && sub) {
               chip = sub.grade != null
-                ? `<span class="s" style="color:var(--teal-deep);font-weight:700;white-space:nowrap">${sub.grade}% &middot; ${sub.gems} gems</span>`
-                : `<span class="s" style="color:var(--gold);font-weight:600;white-space:nowrap">Awaiting grade</span>`;
+                ? `<span class="grade-chip ok" title="${sub.late ? 'Submitted late: ' + sub.late_deduction + ' gems deducted' : 'Graded by your teacher'}">&#10003; Graded ${sub.grade}% &middot; ${sub.gems} gems${sub.late ? ' &#9203;' : ''}</span>`
+                : `<span class="grade-chip wait">&#9203; Submitted &middot; not graded yet${sub.late ? ' &middot; late' : ''}</span>`;
+            } else if (isStudent) {
+              chip = `<span class="grade-chip none">Not submitted</span>`;
             }
             return `<div class="qproblem qtopic" onclick="openTask(${q.id},${pr.pid})">
               <span class="qdiff ${esc(pr.difficulty)}">${esc(pr.difficulty)}</span>
               <div style="flex:1;min-width:0">
-                <div class="t" style="font-size:13.5px">${esc(pr.title)}</div>
-                <div class="s" style="color:var(--muted)">${pr.points} gems${sub && sub.shared_review ? ' &middot; <span style="color:var(--teal-deep)">&#10024; AI feedback shared</span>' : ''}</div>
+                <div class="t" style="font-size:13.5px">${pr.type === 'written' ? '<span class="type-badge written">&#128221; Written</span> ' : ''}${esc(pr.title)}</div>
+                <div class="s" style="color:var(--muted)">${pr.points} gems${q.deadline ? ` &middot; due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : ''}${sub && sub.shared_review ? ' &middot; <span style="color:var(--teal-deep)">&#10024; AI feedback shared</span>' : ''}</div>
               </div>
               ${chip}
               <button class="btn btn-teal btn-sm" onclick="event.stopPropagation();openTask(${q.id},${pr.pid})">Open</button>
@@ -1315,8 +1459,13 @@ function openTask(qid, pid) {
   const pr = q.problems.find((x) => x.pid === pid);
   if (!pr) return;
   const isStudent = ME.role === 'student';
+  const ideOn = d.ide_enabled !== false;
+  const isWritten = pr.type === 'written' || !ideOn; // no-compiler courses: written workspace everywhere
   const sub = isStudent ? d.my_subs[`${q.id}:${pid}`] : null;
   const canSubmit = isStudent && lvl.unlocked && !lvl.passed;
+  const taskFiles = (d.task_files || []).filter((f) => f.quest_id === q.id && f.pid === pid);
+  const overdue = q.deadline && new Date() > new Date(q.deadline + 'T23:59:59');
+  const penalty = d.late_penalty_pct || 20;
 
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   $('view-task').classList.add('active');
@@ -1328,53 +1477,90 @@ function openTask(qid, pid) {
   const solHtml = (!isStudent && pr.solution)
     ? `<details style="margin-top:12px"><summary class="s" style="cursor:pointer;color:var(--teal-deep);font-weight:600">Solution guideline (teachers only)</summary><div class="s" style="background:#FDF8EC;border:1px solid #F0E2BC;border-radius:9px;padding:9px 12px;margin-top:5px;white-space:pre-line">${esc(pr.solution)}</div></details>` : '';
 
+  // Deadline is stated on EVERY assignment, with the late rule spelled out.
+  const deadlineHtml = q.deadline
+    ? `<div class="deadline-box${overdue ? ' overdue' : ''}">&#9200; <strong>Deadline: ${fmtDate(q.deadline)}</strong> &middot; late submissions are accepted but lose <strong>${penalty}% of earned gems</strong>.${overdue ? ' <strong>This deadline has passed - submitting now counts as late.</strong>' : ''}</div>`
+    : '';
+
+  // Datasets attached to this task: students copy the file name straight
+  // into pd.read_csv(...); the compiler mounts the file automatically.
+  const filesHtml = ideOn && (taskFiles.length || d.can_manage) ? `
+    <div class="task-files">
+      <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:6px">&#128193; Datasets for this task</div>
+      ${taskFiles.length ? taskFiles.map((f) => `
+        <div class="tf-row">
+          <span class="mono s" style="font-weight:600">${esc(f.name)}</span>
+          <span class="s" style="color:var(--muted-2)">${f.size ? (f.size / 1024).toFixed(0) + ' KB' : ''}</span>
+          <span style="flex:1"></span>
+          <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${esc(f.name)}').then(()=>toast('Path copied - use pd.read_csv(&quot;${esc(f.name)}&quot;)'))">Copy path</button>
+          <a class="btn btn-ghost btn-sm" href="${esc(f.url)}" download="${esc(f.name)}">Download</a>
+          ${d.can_manage ? `<button class="btn btn-danger btn-sm" onclick="delTaskFile(${f.id},${q.id},${pid})">&times;</button>` : ''}
+        </div>`).join('') : '<div class="s" style="color:var(--muted)">No datasets attached yet.</div>'}
+      ${taskFiles.length ? `<p class="hint" style="margin:6px 0 0">These files are loaded into the compiler automatically - read them by name, e.g. <code>pd.read_csv('${esc(taskFiles[0].name)}')</code>.</p>` : ''}
+      ${d.can_manage ? `<form id="taskFileUp" style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <input name="file" type="file" accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.parquet,.zip" required style="flex:1">
+        <button class="btn btn-teal btn-sm">Attach dataset</button></form>` : ''}
+    </div>` : '';
+
   let statusHtml = '';
   if (isStudent && sub) {
     statusHtml = sub.grade != null
-      ? `<div class="task-status ok">Graded <strong>${sub.grade}%</strong> &middot; ${gemChip(sub.gems)} ${sub.remarks ? '&middot; &ldquo;' + esc(sub.remarks) + '&rdquo;' : ''}</div>`
-      : `<div class="task-status wait">Submitted ${esc((sub.submitted_at || '').slice(0, 16))} - awaiting grade</div>`;
+      ? `<div class="task-status ok">&#10003; Graded <strong>${sub.grade}%</strong> &middot; ${gemChip(sub.gems)}${sub.late ? ` &middot; <span style="color:var(--danger)">late: &minus;${sub.late_deduction} gems</span>` : ''} ${sub.remarks ? '&middot; &ldquo;' + esc(sub.remarks) + '&rdquo;' : ''}</div>`
+      : `<div class="task-status wait">&#9203; Submitted ${esc((sub.submitted_at || '').slice(0, 16))}${sub.late ? ' <strong>(late)</strong>' : ''} - awaiting grade</div>`;
     statusHtml += sharedReviewBox(sub.shared_review);
   }
   if (isStudent && !lvl.unlocked) statusHtml = `<div class="task-status lock">&#128274; This level is locked - pass the previous level first. You can read the task and practice in the editor, but not submit yet.</div>`;
 
+  const fileAccept = isWritten ? '.pdf,.doc,.docx,.txt' : '.pdf,.doc,.docx';
   const fileMode = canSubmit ? `
-    <details style="margin-top:14px"><summary class="s" style="cursor:pointer;color:var(--muted);font-weight:600">Submit a file instead (reports, screenshots, notebooks - PDF/Word)</summary>
+    <details style="margin-top:14px"${isWritten ? ' open' : ''}><summary class="s" style="cursor:pointer;color:var(--muted);font-weight:600">${isWritten ? 'Upload your answer as a file (PDF, Word or text)' : 'Submit a file instead (reports, screenshots, notebooks - PDF/Word)'}</summary>
       <form id="taskFileForm" style="margin-top:10px">
-        <label class="field"><span>Your file - PDF or Word only</span><input name="file" type="file" accept=".pdf,.doc,.docx" required></label>
+        <label class="field"><span>${isWritten ? 'Your written answer - PDF, Word or .txt' : 'Your file - PDF or Word only'}</span><input name="file" type="file" accept="${fileAccept}" required></label>
         <label class="field"><span>Note to your instructor (optional)</span><input name="note" value="${esc((sub && sub.note) || '')}"></label>
         <button class="btn btn-primary">${sub ? 'Resubmit file' : 'Submit file'}</button>
       </form></details>` : '';
 
   const prevCode = sub && sub.code ? sub.code : '';
-  const prevLang = (sub && sub.language) || 'python';
+  const prevLang = (sub && sub.language) || (isWritten ? 'text' : 'python');
+
+  // Written problems get a clean answer workspace; coding problems get the
+  // full-height IDE (Python or HTML/CSS/JS) beside a collapsible brief.
+  const langOptions = isWritten
+    ? `<option value="text" selected>Written answer</option>`
+    : `<option value="python"${prevLang === 'python' ? ' selected' : ''}>Python 3</option>
+       <option value="web"${prevLang === 'web' ? ' selected' : ''}>HTML / CSS / JS</option>
+       <option value="text"${prevLang === 'text' ? ' selected' : ''}>Written answer</option>`;
 
   $('view-task').innerHTML = `
-    <button class="btn btn-ghost btn-sm" onclick="backToQuest()" style="margin-bottom:14px">&larr; Back to quest</button>
+    <div class="task-topline">
+      <button class="btn btn-ghost btn-sm" onclick="backToQuest()">&larr; Back to quest</button>
+      <button class="btn btn-ghost btn-sm" id="focusBtn" onclick="toggleFocusMode()" title="Hide the brief and give the editor the whole screen">&#9974; Focus mode</button>
+    </div>
     <div class="task-head">
       <div>
-        <h2 style="margin-bottom:4px">${esc(pr.title)}</h2>
+        <h2 style="margin-bottom:4px">${isWritten ? '&#128221; ' : ''}${esc(pr.title)}</h2>
         <div class="task-meta">
           <span class="qdiff ${esc(pr.difficulty)}">${esc(pr.difficulty)}</span>
+          ${isWritten ? '<span class="type-badge written">Written problem - explain your logic, no code needed</span>' : ''}
           <span class="s"><strong>${pr.points}</strong> gems</span>
           <span class="s" style="color:var(--muted)">Level ${q.no} &middot; ${esc(q.topic)}</span>
         </div>
       </div>
     </div>
-    <div class="task-grid">
-      <div class="task-brief">
-        <div class="card"><div class="card-head"><h3>Assignment</h3></div>
+    ${deadlineHtml}
+    <div class="task-grid full" id="taskGrid">
+      <div class="task-brief" id="taskBrief">
+        <div class="card"><div class="card-head"><h3>${isWritten ? 'Problem statement' : 'Assignment'}</h3></div>
           <div class="card-body">
             <div class="s" style="white-space:pre-line;line-height:1.6;font-size:13.5px">${esc(pr.description)}</div>
-            ${refsHtml}${solHtml}${statusHtml}${fileMode}
+            ${isWritten ? '<p class="hint" style="margin-top:10px">This is a logic problem: write the reasoning, steps, or explanation in your own words - or upload it as a PDF/text file. Code is not required.</p>' : ''}
+            ${refsHtml}${solHtml}${statusHtml}${filesHtml}${fileMode}
           </div></div>
       </div>
       <div class="task-ide card">
         <div class="ide-toolbar">
-          <select id="taskLang" onchange="taskLangChanged()">
-            <option value="python"${prevLang !== 'text' ? ' selected' : ''}>Python 3</option>
-            <option value="text"${prevLang === 'text' ? ' selected' : ''}>Written answer</option>
-          </select>
-          <span class="ide-pkgs" id="idePkgs">numpy &middot; pandas &middot; matplotlib &middot; scikit-learn ready</span>
+          <select id="taskLang" onchange="taskLangChanged()"${isWritten ? ' disabled' : ''}>${langOptions}</select>
+          <span class="ide-pkgs" id="idePkgs">${ideOn ? `numpy &middot; pandas &middot; matplotlib &middot; scikit-learn ready${taskFiles.length ? ' &middot; ' + taskFiles.length + ' dataset' + (taskFiles.length > 1 ? 's' : '') + ' mounted' : ''}` : 'Answer workspace'}</span>
           <span style="flex:1"></span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="clearTaskTerm()">Clear output</button>
           <button type="button" class="btn btn-teal btn-sm" id="runBtn" onclick="runTaskCode()">&#9654; Run</button>
@@ -1382,17 +1568,21 @@ function openTask(qid, pid) {
         <textarea id="codeBox" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your Python solution here, then press Run.">${esc(prevCode)}</textarea>
         <div class="ide-status-row"><span class="s" id="runStatus" style="color:var(--muted-2)">Ready.</span></div>
         <div id="taskTerm"></div>
+        <div id="webWrap" style="display:none">
+          <iframe id="webFrame" class="web-frame" sandbox="allow-scripts" title="Live preview"></iframe>
+          <pre id="webLog" class="web-log"></pre>
+        </div>
         ${canSubmit ? `
         <div class="ide-submit">
           <input id="taskNote" placeholder="Note to your instructor (optional)" value="${esc((sub && sub.note) || '')}">
           <button class="btn btn-primary" id="taskSubmitBtn" onclick="submitTaskCode(${q.id},${pid})">${sub ? 'Resubmit solution' : 'Submit solution'}</button>
         </div>
-        <p class="hint" style="margin:8px 14px 14px">Submitting sends exactly what is in the editor. The level average must reach the pass mark to unlock the next level.</p>` : '<div style="height:14px"></div>'}
+        <p class="hint" style="margin:8px 14px 14px">Submitting sends exactly what is in the editor.${q.deadline ? ` Deadline ${fmtDate(q.deadline)} - late work loses ${penalty}% of its gems.` : ''} The level average must reach the pass mark to unlock the next level.</p>` : '<div style="height:14px"></div>'}
       </div>
     </div>`;
 
   const term = EchoTerm.mount($('taskTerm'));
-  TASK_CTX = { qid, pid, term };
+  TASK_CTX = { qid, pid, term, files: taskFiles.map((f) => ({ name: f.name, url: f.url })) };
   EchoRun.wireEditor($('codeBox'));
   taskLangChanged();
 
@@ -1404,24 +1594,75 @@ function openTask(qid, pid) {
       toast('Submitted - gems incoming once graded.'); backToQuest();
     } catch (err) { toast(err.message, true); btn.disabled = false; }
   });
+  const fu = $('taskFileUp');
+  if (fu) fu.addEventListener('submit', async (e) => {
+    e.preventDefault(); const btn = fu.querySelector('button'); btn.disabled = true;
+    try {
+      await api(`/api/quests/${q.id}/problems/${pid}/files`, { method: 'POST', body: new FormData(fu) });
+      toast('Dataset attached - students can read it by name in the compiler.');
+      const fresh = await api(`/api/batches/${bid()}/quest`); QUEST_DATA = fresh; openTask(qid, pid);
+    } catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+async function delTaskFile(fid, qid, pid) {
+  if (!confirm('Remove this dataset from the task?')) return;
+  try {
+    await api(`/api/task-files/${fid}`, { method: 'DELETE' });
+    const fresh = await api(`/api/batches/${bid()}/quest`); QUEST_DATA = fresh; openTask(qid, pid);
+  } catch (e) { toast(e.message, true); }
+}
+async function toggleCourseIde(enabled) {
+  if (!confirm(enabled
+    ? 'Turn the built-in compiler ON for this course? Coding tasks will show the Python / web IDE again.'
+    : 'Turn the built-in compiler OFF for this course? Every task will show a clean written-answer workspace instead - right for UI/UX, graphics, and no-code automation courses. You can turn it back on any time.')) return;
+  try {
+    await api(`/api/batches/${bid()}/ide`, { method: 'POST', body: JSON.stringify({ enabled }) });
+    toast(enabled ? 'Compiler is ON for this course.' : 'Compiler is OFF - tasks now use the written workspace.');
+    drawCourseTab('Quest');
+  } catch (e) { toast(e.message, true); }
+}
+function toggleFocusMode() {
+  const grid = $('taskGrid'); if (!grid) return;
+  grid.classList.toggle('focus');
+  $('focusBtn').innerHTML = grid.classList.contains('focus') ? '&#9974; Show brief' : '&#9974; Focus mode';
 }
 function taskLangChanged() {
-  const py = $('taskLang').value === 'python';
-  $('runBtn').style.display = py ? '' : 'none';
+  const lang = $('taskLang').value;
+  const py = lang === 'python', web = lang === 'web';
+  $('runBtn').style.display = (py || web) ? '' : 'none';
   $('taskTerm').style.display = py ? '' : 'none';
+  $('webWrap').style.display = web ? '' : 'none';
   $('idePkgs').style.display = py ? '' : 'none';
   $('codeBox').placeholder = py
     ? '# Write your Python solution here, then press Run.'
-    : 'Write your answer here, then press Submit.';
+    : web
+      ? '<!-- Write HTML, CSS (in <style>) and JavaScript (in <script>) here, then press Run for a live preview. -->'
+      : 'Write your answer here, then press Submit.';
 }
-function clearTaskTerm() { if (TASK_CTX) TASK_CTX.term.clear(); const s = $('runStatus'); if (s) s.textContent = 'Ready.'; }
+function clearTaskTerm() {
+  if (TASK_CTX) TASK_CTX.term.clear();
+  const wl = $('webLog'); if (wl) wl.textContent = '';
+  const wf = $('webFrame'); if (wf) wf.srcdoc = '';
+  const s = $('runStatus'); if (s) s.textContent = 'Ready.';
+}
 async function runTaskCode() {
   const btn = $('runBtn'); const status = $('runStatus');
   const code = $('codeBox').value;
   if (!code.trim()) { toast('Write some code first.', true); return; }
+  const lang = $('taskLang').value;
+  if (lang === 'web') {
+    // Instant live preview - console output and errors appear in the log.
+    const log = $('webLog'); log.textContent = '';
+    EchoWeb.preview($('webFrame'), code, (kind, text) => {
+      log.textContent += (kind === 'error' ? '✗ ' : kind === 'warn' ? '! ' : '› ') + text + '\n';
+      log.scrollTop = log.scrollHeight;
+    });
+    status.textContent = 'Preview updated.';
+    return;
+  }
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
   btn.innerHTML = '&#9632; Stop';
-  try { await EchoRun.execute(code, { term: TASK_CTX.term, onStatus: (t) => { status.textContent = t; } }); }
+  try { await EchoRun.execute(code, { term: TASK_CTX.term, files: TASK_CTX.files, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
   btn.innerHTML = '&#9654; Run';
 }
@@ -1456,16 +1697,19 @@ async function renderChatTab(body) {
   const isLearner = ['student', 'free'].includes(ME.role);
   body.innerHTML = `
     <div class="card"><div class="card-head"><h3>Course chat</h3>
-      <span class="s" style="color:var(--muted)">${isLearner ? `Ask anything - post with your name or as <strong>${esc(d.my_alias)}</strong>, your anonymous alias. Nobody can see who an alias is.` : 'Questions from your students - anonymous aliases stay anonymous, even to you.'}</span></div>
+      <span class="s" style="color:var(--muted)">${isLearner ? `Ask anything - post with your name or as <strong>${esc(d.my_alias)}</strong>, your anonymous alias. Type <strong>@</strong> to tag your teacher.` : 'Questions from your students - type <strong>@</strong> to tag any student for a task. Anonymous aliases stay anonymous, even to you.'}</span></div>
       <div class="card-body">
         <div id="chatList" class="chat-list"></div>
+        <div id="mentionPick" class="mention-pick" style="display:none"></div>
         <form id="chatForm" class="chat-composer">
           ${isLearner ? `<select id="chatAnon"><option value="0">As ${esc(ME.name.split(' ')[0])}</option><option value="1">As ${esc(d.my_alias)} (anonymous)</option></select>` : ''}
-          <input id="chatBody" maxlength="2000" placeholder="${isLearner ? 'Ask a question about this course...' : 'Reply to your students...'}" autocomplete="off">
+          <input id="chatBody" maxlength="2000" placeholder="${isLearner ? 'Ask a question... use @ to tag your teacher' : 'Reply or tag a student with @...'}" autocomplete="off">
           <button class="btn btn-primary btn-sm">Send</button>
         </form>
+        <p class="hint" style="margin:6px 2px 0">Messages are permanent${d.can_moderate ? ' - you can moderate as course staff' : ' and cannot be deleted'}. Tagging someone sends them an email${isLearner ? ' and posts with your real name' : ''}.</p>
       </div></div>`;
   drawChat_(d);
+  wireMentions(d.members || []);
   $('chatForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const inp = $('chatBody'); const text = inp.value.trim(); if (!text) return;
@@ -1484,21 +1728,56 @@ async function renderChatTab(body) {
 function drawChat_(d) {
   const list = $('chatList'); if (!list) return;
   const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+  const highlight = (m) => {
+    let html = esc(m.body);
+    for (const x of m.mentions || []) {
+      html = html.replace(new RegExp('@' + esc(x.name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), `<span class="mention${x.id === ME.id ? ' me' : ''}">@${esc(x.name)}</span>`);
+    }
+    return html;
+  };
   list.innerHTML = d.messages.length ? d.messages.map((m) => `
-    <div class="chat-msg${m.mine ? ' mine' : ''}${m.staff_role ? ' staff' : ''}">
+    <div class="chat-msg${m.mine ? ' mine' : ''}${m.staff_role ? ' staff' : ''}${m.mentions_me ? ' tagged-me' : ''}">
       <div class="cm-head">
+        ${!m.anonymous ? avatarHtml(m.avatar, m.display_name, 22) : ''}
         <span class="cm-name">${esc(m.display_name)}</span>
         ${m.staff_role ? `<span class="cm-role">${m.staff_role === 'admin' ? 'Admin' : m.staff_role === 'coordinator' ? 'Coordinator' : 'Teacher'}</span>` : (m.anonymous ? '<span class="cm-anon">anonymous</span>' : '')}
         <span class="cm-time">${esc((m.created_at || '').slice(5, 16))}</span>
-        ${(m.mine || d.can_moderate) ? `<button class="cm-del" title="Delete" onclick="delChatMsg(${m.id})">&times;</button>` : ''}
+        ${d.can_moderate ? `<button class="cm-del" title="Moderate: delete" onclick="delChatMsg(${m.id})">&times;</button>` : ''}
       </div>
-      <div class="cm-body">${esc(m.body)}</div>
+      <div class="cm-body">${highlight(m)}</div>
     </div>`).join('') : '<div class="empty">No questions yet - be the first to ask. Anonymous posting means nobody will know it was you.</div>';
   if (atBottom || !list.dataset.drawn) list.scrollTop = list.scrollHeight;
   list.dataset.drawn = '1';
 }
+// @-tagging: typing "@" opens a picker of real course members; students can
+// tag teachers, teachers can tag anyone.
+function wireMentions(members) {
+  const inp = $('chatBody'); const pick = $('mentionPick');
+  if (!inp || !pick) return;
+  const isLearner = ['student', 'free'].includes(ME.role);
+  const taggable = members.filter((m) => m.id !== ME.id && (!isLearner || m.role === 'instructor'));
+  function currentToken() {
+    const upto = inp.value.slice(0, inp.selectionStart);
+    const m = upto.match(/@([\w .-]{0,30})$/);
+    return m ? { text: m[1], start: upto.length - m[0].length } : null;
+  }
+  inp.addEventListener('input', () => {
+    const tok = currentToken();
+    if (!tok) { pick.style.display = 'none'; return; }
+    const hits = taggable.filter((x) => x.name.toLowerCase().startsWith(tok.text.toLowerCase())).slice(0, 6);
+    if (!hits.length) { pick.style.display = 'none'; return; }
+    pick.innerHTML = hits.map((x) => `<button type="button" data-name="${esc(x.name)}">${esc(x.name)} <span class="s" style="color:var(--muted-2)">${x.role === 'instructor' ? 'Teacher' : 'Student'}</span></button>`).join('');
+    pick.style.display = '';
+    pick.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+      const tok2 = currentToken(); if (!tok2) { pick.style.display = 'none'; return; }
+      inp.value = inp.value.slice(0, tok2.start) + '@' + b.dataset.name + ' ' + inp.value.slice(inp.selectionStart);
+      pick.style.display = 'none'; inp.focus();
+    }));
+  });
+  inp.addEventListener('blur', () => setTimeout(() => { pick.style.display = 'none'; }, 200));
+}
 async function delChatMsg(id) {
-  if (!confirm('Delete this message?')) return;
+  if (!confirm('Delete this message? (Moderation - students cannot delete messages.)')) return;
   try { await api(`/api/chat/${id}`, { method: 'DELETE' }); const fresh = await api(`/api/batches/${bid()}/chat`); drawChat_(fresh); }
   catch (e) { toast(e.message, true); }
 }
@@ -1508,17 +1787,19 @@ async function openQuestSubs(qid, pid) {
   const p = d.quest.problems.find((x) => x.pid === pid) || {};
   const subs = d.submissions.filter((s) => s.pid === pid);
   openModal(`${d.quest.title}: ${p.title}`, `
+    <p class="hint" style="margin-bottom:8px">Grading opens in its own tab, with the full submission, AI review and integrity check side by side.</p>
     <div class="card-body tight" style="max-height:56vh;overflow-y:auto">
       ${subs.length ? subs.map((s) => `
         <div class="list-row" style="padding:12px 4px">
           <div class="grow">
-            <div class="t">${esc(s.student_name)} <span class="mono s" style="color:var(--muted)">${esc(s.student_reg || '')}</span></div>
-            <div class="s">${esc((s.submitted_at || '').slice(0, 16))} &middot; ${s.code ? '&#9998; code submission' : '&#128206; file'} ${s.note ? '&middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
-            ${s.grade != null ? `<div class="s">Graded <strong>${s.grade}%</strong> &middot; ${s.gems} gems ${s.remarks ? '&middot; ' + esc(s.remarks) : ''}</div>` : '<div class="s" style="color:var(--gold)">Awaiting grade</div>'}
+            <div class="t">${esc(s.student_name)} <span class="mono s" style="color:var(--muted)">${esc(s.student_reg || '')}</span>${s.late ? ' <span class="late-flag">LATE</span>' : ''}</div>
+            <div class="s">${esc((s.submitted_at || '').slice(0, 16))} &middot; ${s.code ? (s.language === 'web' ? '&#127760; web code' : s.language === 'text' ? '&#128221; written answer' : '&#9998; code submission') : '&#128206; file'} ${s.note ? '&middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
+            ${s.grade != null ? `<div class="s"><span class="grade-chip ok">&#10003; Graded ${s.grade}%</span> ${s.gems} gems${s.late_deduction ? ` <span style="color:var(--danger)">(&minus;${s.late_deduction} late)</span>` : ''} ${s.remarks ? '&middot; ' + esc(s.remarks) : ''}</div>` : '<div class="s"><span class="grade-chip wait">&#9203; Not graded yet</span></div>'}
             ${s.ai_review ? `<div class="s" style="color:${s.review_shared ? 'var(--teal-deep)' : 'var(--muted-2)'}">&#10024; AI review ${s.review_shared ? 'shared with student' : 'ready (not shared)'}</div>` : ''}
+            ${s.integrity && (s.integrity.similarity?.matches?.length || (s.integrity.ai_check && s.integrity.ai_check.ai_likelihood >= 60)) ? '<div class="s" style="color:var(--danger);font-weight:600">&#9888; Integrity flags - open to review</div>' : ''}
           </div>
           ${s.file_url ? `<a class="btn btn-ghost btn-sm" href="${esc(s.file_url)}" target="_blank" rel="noopener">Open file</a>` : ''}
-          ${CURRENT_BATCH.can_manage ? `<button class="btn btn-teal btn-sm" onclick="formQuestGrade(${s.id},${qid},${pid})">${s.grade != null ? 'Regrade' : 'Grade'}</button>` : ''}
+          ${CURRENT_BATCH.can_manage ? `<button class="btn btn-teal btn-sm" onclick="window.open('/grade?sid=${s.id}','_blank')">${s.grade != null ? 'Regrade' : 'Grade'} &#8599;</button>` : ''}
         </div>`).join('') : '<div class="empty">No submissions for this problem yet.</div>'}
     </div>`);
 }
@@ -1622,6 +1903,7 @@ function formEditProblem(qid, pid) {
         <div class="form-grid">
           <label class="field"><span>Gems (points)</span><input name="points" type="number" min="10" max="1000" value="${p.points}"></label>
           <label class="field"><span>Difficulty</span><select name="difficulty">${['Basic', 'Core', 'Boss'].map((x) => `<option${p.difficulty === x ? ' selected' : ''}>${x}</option>`).join('')}</select></label>
+          <label class="field"><span>Task type</span><select name="type"><option value="code"${p.type !== 'written' ? ' selected' : ''}>Coding (built-in compiler)</option><option value="written"${p.type === 'written' ? ' selected' : ''}>Written (logic answer, PDF/text upload)</option></select></label>
         </div>
         <label class="field"><span>Solution guideline (teachers/admin only - students never see this)</span><textarea name="solution" style="min-height:90px">${esc(p.solution || '')}</textarea></label>
         <label class="field"><span>Reference links - one per line as "Label | https://url"</span><textarea name="refs">${(p.refs || []).map((r) => `${r[0]} | ${r[1]}`).join('\n')}</textarea></label>
@@ -1630,7 +1912,7 @@ function formEditProblem(qid, pid) {
       e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
       const refs = f.refs.value.split('\n').map((l) => l.split('|').map((x) => x.trim())).filter((r) => r.length === 2 && r[1].startsWith('http'));
       try {
-        await api(`/api/quests/${qid}/problems/${pid}`, { method: 'PATCH', body: JSON.stringify({ title: f.title.value, description: f.description.value, points: f.points.value, difficulty: f.difficulty.value, solution: f.solution.value, refs }) });
+        await api(`/api/quests/${qid}/problems/${pid}`, { method: 'PATCH', body: JSON.stringify({ title: f.title.value, description: f.description.value, points: f.points.value, difficulty: f.difficulty.value, type: f.type.value, solution: f.solution.value, refs }) });
         toast('Problem updated for this course.'); closeModal(); openCourse(bid());
       } catch (err) { modalMsg(err.message); btn.disabled = false; }
     });
@@ -1645,4 +1927,536 @@ async function loadOfficial() {
     toast(out.added ? `Added ${out.added} official courses.` : 'Catalogue already up to date.');
     renderCatalogue();
   } catch (e) { toast(e.message, true); }
+}
+
+/* ============================================================================
+   v11 FEATURES: live classes + attendance, pop quizzes, at-risk report,
+   student search + full profiles, QR certificates, level tools.
+   ============================================================================ */
+
+/* ------------------------------ LIVE CLASSES ------------------------------ */
+let LIVE_HEART = null;
+let LIVE_API = null;
+function stopLiveHeartbeat() {
+  if (LIVE_HEART) { clearInterval(LIVE_HEART); LIVE_HEART = null; }
+  if (LIVE_API) { try { LIVE_API.dispose(); } catch {} LIVE_API = null; }
+}
+async function renderLiveTab(body) {
+  stopLiveHeartbeat();
+  body.innerHTML = '<div class="empty">Loading live classes&hellip;</div>';
+  const d = await api(`/api/batches/${bid()}/live`);
+  const canManage = d.can_manage;
+  const isStudent = ME.role === 'student';
+
+  const activeCard = d.active ? `
+    <div class="card live-card"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <span class="live-dot"></span>
+      <div style="flex:1;min-width:200px">
+        <div class="t" style="font-size:16px;font-weight:700">${esc(d.active.title)}</div>
+        <div class="s" style="color:var(--muted)">Live now &middot; started ${esc((d.active.started_at || '').slice(11, 16))} &middot; runs inside the portal${isStudent ? ' &middot; joining marks your attendance' : ''}</div>
+      </div>
+      <button class="btn btn-primary" onclick="joinLiveClass(${d.active.id})">&#127909; Join class</button>
+      ${canManage ? `<button class="btn btn-danger btn-sm" onclick="endLiveClass(${d.active.id})">End class</button>` : ''}
+    </div>
+    ${canManage && d.live_attendance ? `<div class="card-body" style="border-top:1px solid var(--line)">
+      <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:6px">Live attendance &middot; ${d.live_attendance.filter((r) => r.present).length}/${d.live_attendance.length} present</div>
+      <div class="att-grid">${d.live_attendance.map((r) => `<span class="att-chip ${r.present ? 'in' : 'out'}">${esc(r.name)}${r.present ? ` &middot; ${r.minutes}m` : ''}</span>`).join('')}</div>
+      <p class="hint" style="margin:8px 0 0">Updates when you reopen this tab. Absent students are everyone enrolled who never joined.</p>
+    </div>` : ''}</div>` : `
+    <div class="card"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div class="t" style="font-weight:700">No class is live right now</div>
+        <div class="s" style="color:var(--muted)">${canManage ? 'Start one and every enrolled student is emailed instantly. The class runs inside EchoLens - no Zoom or Meet links needed.' : 'When your teacher starts a class, a Join button appears here - joining marks your attendance automatically.'}</div>
+      </div>
+      ${canManage ? `<button class="btn btn-primary" onclick="startLiveClass()">&#127909; Start live class</button>` : ''}
+    </div></div>`;
+
+  const rateCard = isStudent && d.my_rate ? `
+    <div class="card"><div class="card-body" style="display:flex;gap:16px;align-items:center">
+      <div class="att-ring${d.my_rate.pct >= 75 ? ' good' : d.my_rate.pct >= 50 ? ' mid' : ' low'}">${d.my_rate.pct}%</div>
+      <div><div class="t" style="font-weight:700">Your attendance</div>
+      <div class="s" style="color:var(--muted)">${d.my_rate.attended} of ${d.my_rate.total} classes attended</div></div>
+    </div></div>` : '';
+
+  const pastCard = `
+    <div class="card"><div class="card-head"><h3>Past classes</h3><span class="s" style="color:var(--muted)">${isStudent ? 'Your record per class' : 'Attendance per class - open any for the full sheet'}</span></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Date</th><th>Class</th>${isStudent ? '<th>You</th>' : '<th>Present</th><th>Absent</th><th></th>'}</tr>
+      ${d.past.length ? d.past.map((c) => `<tr>
+        <td>${fmtDate(c.date)}</td><td>${esc(c.title)}</td>
+        ${isStudent
+          ? `<td>${c.me_present ? '<span class="grade-chip ok">&#10003; Present</span>' : '<span class="grade-chip late">Absent</span>'}</td>`
+          : `<td><strong style="color:var(--ok)">${c.present}</strong>/${c.total}</td><td><strong style="color:var(--danger)">${c.absent}</strong></td>
+             <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="openAttendanceSheet(${c.id})">Attendance sheet</button></td>`}
+      </tr>`).join('') : `<tr><td colspan="5" class="empty">No classes held yet.</td></tr>`}
+    </table></div></div>`;
+
+  body.innerHTML = activeCard + rateCard + pastCard + '<div id="liveStage"></div>';
+}
+async function startLiveClass() {
+  const title = prompt('Class title (students see this):', 'Live class - ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+  if (title == null) return;
+  try {
+    await api(`/api/batches/${bid()}/live/start`, { method: 'POST', body: JSON.stringify({ title }) });
+    toast('Class is live - students have been emailed.');
+    drawCourseTab('Live');
+  } catch (e) { toast(e.message, true); }
+}
+async function endLiveClass(id) {
+  if (!confirm('End the live class for everyone? Attendance is saved.')) return;
+  try { await api(`/api/live/${id}/end`, { method: 'POST' }); stopLiveHeartbeat(); toast('Class ended - attendance saved.'); drawCourseTab('Live'); }
+  catch (e) { toast(e.message, true); }
+}
+// Joins the class INSIDE the portal: an embedded meeting room (Jitsi, open
+// source). Join/leave is detected via the room's events; a heartbeat counts
+// minutes for the attendance sheet.
+async function joinLiveClass(id) {
+  let info;
+  try { info = await api(`/api/live/${id}/join`, { method: 'POST' }); }
+  catch (e) { toast(e.message, true); return; }
+  const stage = $('liveStage');
+  stage.innerHTML = `
+    <div class="card live-stage"><div class="ide-toolbar">
+      <span class="live-dot"></span><strong>Live class</strong>
+      <span class="s" style="color:var(--muted)">You are in the room - attendance marked.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-danger btn-sm" onclick="leaveLiveClass()">Leave class</button>
+    </div><div id="jitsiBox" class="jitsi-box"><div class="empty">Loading the classroom&hellip;</div></div></div>`;
+  stage.scrollIntoView({ behavior: 'smooth' });
+  const boot = () => {
+    $('jitsiBox').innerHTML = '';
+    LIVE_API = new JitsiMeetExternalAPI('meet.jit.si', {
+      roomName: info.room,
+      parentNode: $('jitsiBox'),
+      userInfo: { displayName: info.display_name },
+      configOverwrite: { prejoinConfig: { enabled: false }, disableDeepLinking: true, startWithAudioMuted: ME.role === 'student' },
+      interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false, MOBILE_APP_PROMO: false },
+    });
+    LIVE_API.addListener('videoConferenceLeft', () => leaveLiveClass());
+  };
+  if (window.JitsiMeetExternalAPI) boot();
+  else {
+    const s = document.createElement('script');
+    s.src = 'https://meet.jit.si/external_api.js';
+    s.onload = boot;
+    s.onerror = () => { $('jitsiBox').innerHTML = '<div class="empty">Could not load the classroom - check your internet connection and try again.</div>'; };
+    document.head.appendChild(s);
+  }
+  // Attendance minutes: one heartbeat per minute while in the room.
+  LIVE_HEART = setInterval(() => { api(`/api/live/${id}/heartbeat`, { method: 'POST' }).catch(() => {}); }, 60000);
+}
+function leaveLiveClass() { stopLiveHeartbeat(); const s = $('liveStage'); if (s) s.innerHTML = ''; toast('You left the class.'); }
+async function openAttendanceSheet(classId) {
+  const d = await api(`/api/live/${classId}/attendance`);
+  const present = d.sheet.filter((r) => r.present);
+  openModal(`Attendance - ${d.class.title} (${fmtDate(d.class.date)})`, `
+    <div class="s" style="margin-bottom:10px"><strong style="color:var(--ok)">${present.length} present</strong> &middot; <strong style="color:var(--danger)">${d.sheet.length - present.length} absent</strong> of ${d.sheet.length} enrolled</div>
+    <div style="max-height:56vh;overflow-y:auto"><table class="tbl">
+      <tr><th>Student</th><th>Reg no</th><th>Status</th><th>Joined</th><th>Minutes</th></tr>
+      ${d.sheet.map((r) => `<tr>
+        <td>${esc(r.name)}</td><td class="mono">${esc(r.reg_no || '—')}</td>
+        <td>${r.present ? '<span class="grade-chip ok">Present</span>' : '<span class="grade-chip late">Absent</span>'}</td>
+        <td class="s">${r.joined_at ? esc(r.joined_at.slice(11, 16)) : '—'}</td><td>${r.present ? r.minutes + 'm' : '—'}</td></tr>`).join('')}
+    </table></div>`, true);
+}
+
+/* -------------------------------- QUIZZES -------------------------------- */
+let QUIZ_TICK = null;
+async function renderQuizzesTab(body) {
+  if (QUIZ_TICK) { clearInterval(QUIZ_TICK); QUIZ_TICK = null; }
+  body.innerHTML = '<div class="empty">Loading quizzes&hellip;</div>';
+  const d = await api(`/api/batches/${bid()}/quizzes`);
+
+  if (isStaff()) {
+    body.innerHTML = `
+      ${d.can_manage ? `<div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px"><div class="t" style="font-weight:700">Pop a quiz any time - even mid-class</div>
+        <div class="s" style="color:var(--muted)">A quiz is only takeable while its window is open. Close it, and nobody can access it until you reopen.</div></div>
+        <button class="btn btn-primary" onclick="formQuizBuilder()">+ New quiz</button>
+      </div></div>` : ''}
+      <div class="card"><div class="card-head"><h3>Quizzes (${d.quizzes.length})</h3></div>
+      <div class="card-body tight">${d.quizzes.length ? d.quizzes.map((q) => `
+        <div class="list-row" style="padding:12px 4px">
+          <div class="grow">
+            <div class="t">${esc(q.title)} ${q.open ? '<span class="live-pill">OPEN</span>' : '<span class="closed-pill">Closed</span>'}</div>
+            <div class="s" style="color:var(--muted)">${q.questions.length} questions &middot; ${q.duration_min} min window &middot; ${q.points} gems max${q.allow_ide ? ' &middot; &#128187; practice IDE on' : ''} &middot; ${q.attempts} attempt${q.attempts === 1 ? '' : 's'}${q.open ? ` &middot; closes ${esc(new Date(q.closes_at).toLocaleTimeString().slice(0, 5))}` : ''}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="openQuizResults(${q.id})">Results</button>
+          ${d.can_manage ? (q.open
+            ? `<button class="btn btn-danger btn-sm" onclick="quizAction(${q.id},'close')">Close now</button>`
+            : `<button class="btn btn-teal btn-sm" onclick="openQuizWindow(${q.id},${q.duration_min})">Open</button>
+               <button class="btn btn-danger btn-sm" onclick="delQuiz(${q.id})">&times;</button>`) : ''}
+        </div>`).join('') : '<div class="empty">No quizzes yet - create one and open it during class.</div>'}</div></div>`;
+    return;
+  }
+
+  // Student view: only open quizzes are visible; closed ones vanish.
+  const active = d.quizzes;
+  body.innerHTML = `
+    ${active.length ? active.map((q) => q.taken ? `
+      <div class="card"><div class="card-body" style="display:flex;gap:12px;align-items:center">
+        <span class="grade-chip ok">&#10003; Done</span>
+        <div class="grow"><div class="t" style="font-weight:700">${esc(q.title)}</div>
+        <div class="s" style="color:var(--muted)">You scored ${q.my_score}%</div></div>
+      </div></div>` : `
+      <div class="card quiz-live" id="quizCard${q.id}"><div class="card-head"><h3>&#9889; ${esc(q.title)}</h3>
+        <span class="quiz-timer" data-closes="${esc(q.closes_at)}">--:--</span></div>
+      <div class="card-body">
+        <p class="s" style="color:var(--muted);margin-bottom:12px">${q.questions.length} questions &middot; up to ${q.points} gems &middot; one attempt &middot; submits are locked when the timer hits zero.</p>
+        ${q.allow_ide ? `
+        <div class="quiz-ide" id="quizIde${q.id}">
+          <div class="ide-toolbar" style="border-radius:12px 12px 0 0">
+            <strong class="s">&#128187; Practice terminal</strong>
+            <span class="s" style="color:var(--muted-2)">Try code here while you answer - nothing is submitted from this box.</span>
+            <span style="flex:1"></span>
+            <button type="button" class="btn btn-teal btn-sm" onclick="runQuizIde(${q.id})" id="quizRun${q.id}">&#9654; Run</button>
+          </div>
+          <textarea id="quizCode${q.id}" class="code-editor ide-editor" style="min-height:120px" spellcheck="false" placeholder="# Scratchpad - run the snippets from the questions here."></textarea>
+          <div id="quizTerm${q.id}"></div>
+        </div>` : ''}
+        <form id="quizForm${q.id}">
+          ${q.questions.map((qq, i) => `
+            <div class="quiz-q">
+              <div class="t" style="margin-bottom:7px">${i + 1}. ${esc(qq.q)}</div>
+              ${qq.options.map((o, oi) => `<label class="quiz-opt"><input type="radio" name="q${i}" value="${oi}" required><span>${esc(o)}</span></label>`).join('')}
+            </div>`).join('')}
+          <button class="btn btn-primary btn-block">Submit quiz</button>
+        </form>
+      </div></div>`).join('') : '<div class="card"><div class="empty">No quiz is open right now. When your teacher opens one, it appears here for a short window - keep an eye on this tab during class.</div></div>'}
+    ${d.my_attempts && d.my_attempts.length ? `
+      <div class="card"><div class="card-head"><h3>My quiz history</h3></div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Quiz</th><th>Score</th><th>Correct</th><th>Gems</th><th>Taken</th></tr>
+        ${d.my_attempts.map((a) => `<tr><td>${esc(a.title || 'Quiz')}</td><td><strong>${a.score_pct}%</strong></td><td>${a.correct}/${a.total}</td><td>${gemChip(a.gems)}</td><td class="s">${esc((a.taken_at || '').slice(0, 16))}</td></tr>`).join('')}
+      </table></div></div>` : ''}`;
+
+  for (const q of active.filter((x) => !x.taken)) {
+    if (q.allow_ide) { const ed = $(`quizCode${q.id}`); if (ed && window.EchoRun) EchoRun.wireEditor(ed); }
+    const f = $(`quizForm${q.id}`);
+    if (f) f.addEventListener('submit', async (e) => {
+      e.preventDefault(); const btn = f.querySelector('button'); btn.disabled = true;
+      const answers = q.questions.map((_, i) => Number((f.querySelector(`input[name="q${i}"]:checked`) || {}).value));
+      try {
+        const out = await api(`/api/quizzes/${q.id}/attempt`, { method: 'POST', body: JSON.stringify({ answers }) });
+        toast(`Scored ${out.score_pct}% (${out.correct}/${out.total}) - ${out.gems} gems earned!`);
+        drawCourseTab('Quizzes');
+      } catch (err) { toast(err.message, true); btn.disabled = false; }
+    });
+  }
+  // Countdown timers; when one hits zero the tab refreshes and the quiz vanishes.
+  QUIZ_TICK = setInterval(() => {
+    let expired = false;
+    document.querySelectorAll('.quiz-timer').forEach((t) => {
+      const left = new Date(t.dataset.closes) - new Date();
+      if (left <= 0) { expired = true; return; }
+      const m = Math.floor(left / 60000), s2 = Math.floor((left % 60000) / 1000);
+      t.textContent = `${m}:${String(s2).padStart(2, '0')} left`;
+      if (left < 60000) t.classList.add('urgent');
+    });
+    if (expired) { clearInterval(QUIZ_TICK); QUIZ_TICK = null; if ($('courseTabBody')) drawCourseTab('Quizzes'); }
+  }, 1000);
+}
+// The quiz practice terminal: same Pyodide engine as the task IDE, but a
+// pure scratchpad - nothing from it is submitted or graded.
+async function runQuizIde(qid) {
+  const btn = $(`quizRun${qid}`);
+  const wrap = $(`quizTerm${qid}`);
+  if (!wrap._term) wrap._term = EchoTerm.mount(wrap);
+  const code = $(`quizCode${qid}`).value;
+  if (!code.trim()) { toast('Write some code first.', true); return; }
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
+  btn.innerHTML = '&#9632; Stop';
+  try { await EchoRun.execute(code, { term: wrap._term, onStatus: () => {} }); }
+  catch (e) { toast(e.message, true); }
+  btn.innerHTML = '&#9654; Run';
+}
+function formQuizBuilder(prefill) {
+  const qs = prefill || [{ q: '', options: ['', '', '', ''], answer: 0 }];
+  openModal('New quiz', `
+    <form id="f">
+      <div class="form-grid">
+        <label class="field"><span>Title</span><input name="title" required placeholder="e.g. Week 3 checkpoint"></label>
+        <label class="field"><span>Window (minutes)</span><input name="duration_min" type="number" min="1" max="180" value="10"></label>
+        <label class="field"><span>Max gems</span><input name="points" type="number" min="5" max="200" value="20"></label>
+      </div>
+      ${ME.ai_enabled ? `<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+        <input id="aiQuizTopic" placeholder="Topic, e.g. pandas groupby" style="flex:1;min-width:160px">
+        <input id="aiQuizCount" type="number" min="1" max="15" value="5" style="width:64px">
+        <button type="button" class="btn btn-ghost btn-sm" id="aiQuizBtn" onclick="aiFillQuiz()">&#10024; Generate with AI</button>
+      </div>` : ''}
+      <label class="field" style="flex-direction:row;gap:8px;align-items:center;margin:2px 0 10px"><input name="allow_ide" type="checkbox" style="width:auto"><span>Include a practice IDE terminal - students can run Python beside the questions (great for "what does this code print?" quizzes)</span></label>
+      <div id="quizQs"></div>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="addQuizQ()" style="margin:6px 0 12px">+ Add question</button>
+      <p class="hint">The quiz is created CLOSED. Open it whenever you want (even mid-class); it locks itself when the window ends.</p>
+      <button class="btn btn-primary btn-block">Create quiz</button>
+    </form>`, true);
+  window._quizQs = [];
+  qs.forEach((q) => addQuizQ(q));
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type="submit"],button:not([type])'); btn.disabled = true; modalMsg('');
+    const questions = collectQuizQs();
+    if (!questions.length) { modalMsg('Add at least one complete question.'); btn.disabled = false; return; }
+    try {
+      await api(`/api/batches/${bid()}/quizzes`, { method: 'POST', body: JSON.stringify({ title: f.title.value, duration_min: f.duration_min.value, points: f.points.value, allow_ide: f.allow_ide.checked, questions }) });
+      toast('Quiz created - open it when you are ready.'); closeModal(); drawCourseTab('Quizzes');
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+function addQuizQ(pre) {
+  const i = window._quizQs.length;
+  window._quizQs.push(true);
+  const box = document.createElement('div');
+  box.className = 'quiz-build';
+  box.innerHTML = `
+    <div style="display:flex;gap:8px;align-items:center">
+      <strong class="s">Q${i + 1}</strong>
+      <input class="qb-q" placeholder="Question text" value="${esc(pre ? pre.q : '')}" style="flex:1">
+    </div>
+    <div class="qb-opts">${[0, 1, 2, 3].map((oi) => `
+      <label class="qb-opt"><input type="radio" name="qbAns${i}" value="${oi}"${(pre ? pre.answer : 0) === oi ? ' checked' : ''} title="Correct answer">
+      <input class="qb-o" placeholder="Option ${oi + 1}" value="${esc(pre && pre.options[oi] != null ? pre.options[oi] : '')}"></label>`).join('')}</div>
+    <p class="hint" style="margin:2px 0 0">Tick the radio next to the correct option.</p>`;
+  $('quizQs').appendChild(box);
+}
+function collectQuizQs() {
+  return [...document.querySelectorAll('.quiz-build')].map((b, i) => {
+    const q = b.querySelector('.qb-q').value.trim();
+    const options = [...b.querySelectorAll('.qb-o')].map((o) => o.value.trim()).filter(Boolean);
+    const answer = Number((b.querySelector(`input[name="qbAns${i}"]:checked`) || {}).value) || 0;
+    return { q, options, answer };
+  }).filter((x) => x.q && x.options.length >= 2);
+}
+async function aiFillQuiz() {
+  const topic = $('aiQuizTopic').value.trim();
+  if (!topic) { toast('Give the AI a topic first.', true); return; }
+  const btn = $('aiQuizBtn'); btn.disabled = true; btn.textContent = 'Generating...';
+  try {
+    const out = await api(`/api/batches/${bid()}/quizzes/generate`, { method: 'POST', body: JSON.stringify({ topic, count: $('aiQuizCount').value }) });
+    $('quizQs').innerHTML = ''; window._quizQs = [];
+    out.questions.forEach((q) => addQuizQ(q));
+    modalMsg('AI questions loaded - review and fix anything before creating.', true);
+  } catch (e) { modalMsg(e.message); }
+  btn.disabled = false; btn.innerHTML = '&#10024; Generate with AI';
+}
+function openQuizWindow(id, def) {
+  const mins = prompt('Open this quiz for how many minutes?', def || 10);
+  if (mins == null) return;
+  quizAction(id, 'open', { minutes: Number(mins) || def });
+}
+async function quizAction(id, action, body) {
+  try {
+    await api(`/api/quizzes/${id}/${action}`, { method: 'POST', body: JSON.stringify(body || {}) });
+    toast(action === 'open' ? 'Quiz is OPEN - students see it right now and were emailed.' : 'Quiz closed - nobody can access it until you reopen.');
+    drawCourseTab('Quizzes');
+  } catch (e) { toast(e.message, true); }
+}
+async function delQuiz(id) {
+  if (!confirm('Delete this quiz and all its attempts?')) return;
+  try { await api(`/api/quizzes/${id}`, { method: 'DELETE' }); toast('Quiz deleted.'); drawCourseTab('Quizzes'); }
+  catch (e) { toast(e.message, true); }
+}
+async function openQuizResults(id) {
+  const d = await api(`/api/quizzes/${id}/results`);
+  openModal(`Results - ${d.quiz.title}`, `
+    <div style="max-height:56vh;overflow-y:auto"><table class="tbl">
+      <tr><th>#</th><th>Student</th><th>Reg no</th><th>Score</th><th>Correct</th><th>Gems</th><th>Taken</th></tr>
+      ${d.results.length ? d.results.map((r, i) => `<tr>
+        <td>${i + 1}</td><td>${esc(r.name)}</td><td class="mono">${esc(r.reg_no || '—')}</td>
+        <td><strong>${r.score_pct}%</strong></td><td>${r.correct}/${r.total}</td><td>${gemChip(r.gems)}</td><td class="s">${esc((r.taken_at || '').slice(5, 16))}</td></tr>`).join('') : '<tr><td colspan="7" class="empty">No attempts yet.</td></tr>'}
+    </table></div>`, true);
+}
+
+/* ------------------------------ AT-RISK TAB ------------------------------ */
+async function renderAtRiskTab(body) {
+  body.innerHTML = '<div class="empty">Analysing the class&hellip;</div>';
+  const d = await api(`/api/batches/${bid()}/at-risk`);
+  const high = d.report.filter((r) => r.risk === 'high');
+  const watch = d.report.filter((r) => r.risk === 'watch');
+  body.innerHTML = `
+    <div class="card"><div class="card-head"><h3>Students at risk</h3>
+      <span class="s" style="color:var(--muted)"><strong style="color:var(--danger)">${high.length} high risk</strong> &middot; <strong style="color:var(--gold)">${watch.length} to watch</strong> &middot; ${d.report.length - high.length - watch.length} on track</span></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Risk</th><th>Student</th><th>Reg no</th><th>Attendance</th><th>Tasks</th><th>Avg grade</th><th>Why flagged</th><th></th></tr>
+      ${d.report.map((r) => `<tr class="risk-${r.risk}">
+        <td>${r.risk === 'high' ? '<span class="risk-pill high">HIGH</span>' : r.risk === 'watch' ? '<span class="risk-pill watch">Watch</span>' : '<span class="risk-pill ok">OK</span>'}</td>
+        <td>${esc(r.name)}</td><td class="mono">${esc(r.reg_no || '—')}</td>
+        <td>${r.attendance ? `${r.attendance.attended}/${r.attendance.total} (${r.attendance.pct}%)` : '—'}</td>
+        <td>${r.submitted}/${r.total_tasks}</td>
+        <td>${r.avg_grade != null ? r.avg_grade + '%' : '—'}</td>
+        <td class="s" style="max-width:260px">${r.reasons.length ? r.reasons.map(esc).join('<br>') : '<span style="color:var(--ok)">On track</span>'}</td>
+        <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="openStudentProfile(${r.id})">Profile</button></td>
+      </tr>`).join('') || '<tr><td colspan="8" class="empty">No students enrolled yet.</td></tr>'}
+    </table></div></div>
+    <p class="hint" style="margin:10px 4px">Flags: attendance under 60%, more than 40% of tasks missing, average grade under 60%, or a week of inactivity. Two or more flags = high risk.</p>`;
+}
+
+/* --------------------- STUDENT SEARCH + FULL PROFILE --------------------- */
+function filterPeopleTable(q) {
+  q = q.trim().toLowerCase();
+  document.querySelectorAll('#peopleTbl tr[data-search]').forEach((tr) => {
+    tr.style.display = !q || tr.dataset.search.includes(q) ? '' : 'none';
+  });
+}
+function wireStudentSearch() {
+  const inp = $('globalStudentSearch'); const out = $('studentSearchOut');
+  if (!inp) return;
+  let t = null;
+  inp.addEventListener('input', () => {
+    clearTimeout(t);
+    const q = inp.value.trim();
+    if (q.length < 2) { out.innerHTML = ''; return; }
+    t = setTimeout(async () => {
+      try {
+        const d = await api('/api/students/search?q=' + encodeURIComponent(q));
+        out.innerHTML = d.students.length ? d.students.map((s) => `
+          <button class="search-hit" onclick="openStudentProfile(${s.id})">
+            ${avatarHtml(s.avatar, s.name, 30)}
+            <span style="flex:1;text-align:left"><strong>${esc(s.name)}</strong> <span class="mono s" style="color:var(--muted)">${esc(s.reg_no || '')}</span><br>
+            <span class="s" style="color:var(--muted-2)">${s.courses.map(esc).join(', ') || 'No courses'}</span></span>
+            <span class="s" style="color:var(--teal-deep);font-weight:600">Open profile &rarr;</span>
+          </button>`).join('') : '<div class="empty">No student matches that registration number or name.</div>';
+      } catch (e) { out.innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+    }, 250);
+  });
+}
+async function openStudentProfile(id) {
+  let d;
+  try { d = await api(`/api/students/${id}/full`); }
+  catch (e) { toast(e.message, true); return; }
+  const s = d.student; const p = s.profile || {};
+  const infoRows = Object.entries(p).map(([k, v]) => `<div class="kv"><span class="k">${esc(k.replace(/_/g, ' '))}</span><span>${esc(v)}</span></div>`).join('');
+  openModal(`Student profile - ${s.name}`, `
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px">
+      ${avatarHtml(s.avatar, s.name, 64)}
+      <div style="flex:1">
+        <div style="font-size:17px;font-weight:700">${esc(s.name)} ${stagePill(s.stage)}</div>
+        <div class="s" style="color:var(--muted)">Reg no <span class="mono">${esc(s.reg_no || '—')}</span> &middot; ${esc(s.email || s.username || 'no email')} &middot; member since ${esc(s.created_at)}</div>
+        <div class="s" style="margin-top:4px">${gemChip(s.gems)} &middot; &#128293; ${s.streak}d streak (best ${s.best_streak}d) &middot; last active ${esc(s.last_active || 'never')}</div>
+      </div>
+    </div>
+    <div class="pub-sec">Enrolled courses &amp; progress</div>
+    ${s.courses.length ? s.courses.map((c) => `
+      <div class="prof-course">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <strong>${esc(c.title)}</strong>
+          <span class="s" style="color:var(--muted)">${esc(c.cohort)} &middot; ${esc(c.code || '')}</span>
+        </div>
+        <div class="prof-bar"><div class="prof-fill" style="width:${c.levels_total ? Math.round((c.level - 1) / c.levels_total * 100) : 0}%"></div></div>
+        <div class="s" style="color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+          <span>${c.levels_total ? `Level ${c.level}/${c.levels_total}` : 'No quest'}${c.quest_title ? ' &middot; ' + esc(c.quest_title) : ''}${c.completed ? ' &middot; <strong style="color:var(--ok)">Completed &#10003;</strong>' : ''}</span>
+          <span>${gemChip(c.gems)}</span>
+          <span>Tasks: ${c.submitted} submitted, ${c.graded} graded${c.avg_grade != null ? ', avg ' + c.avg_grade + '%' : ''}</span>
+          <span>${c.attendance ? 'Attendance ' + c.attendance.pct + '% (' + c.attendance.attended + '/' + c.attendance.total + ')' : 'No classes yet'}</span>
+        </div>
+      </div>`).join('') : '<div class="empty">Not enrolled in any course.</div>'}
+    ${s.certificates.length ? `<div class="pub-sec">Certificates</div>${s.certificates.map((c) => `<div class="s" style="padding:4px 0">&#127942; ${esc(c.title)} <span class="mono" style="color:var(--muted)">${esc(c.serial)}</span> &middot; ${fmtDate(c.completion_date)} &middot; <a href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">view</a></div>`).join('')}` : ''}
+    ${s.badges && s.badges.length ? `<div class="pub-sec">Badges</div><div class="s">${s.badges.map((b) => esc(b.name || b)).join(' &middot; ')}</div>` : ''}
+    <div class="pub-sec">Personal information</div>
+    <div class="kv-grid">${infoRows || '<div class="s" style="color:var(--muted)">No details on file.</div>'}</div>`, true);
+}
+
+/* ------------------------------ CERTIFICATES ------------------------------ */
+function formIssueCert() {
+  const bd = CURRENT_BATCH.batch;
+  const students = (CURRENT_BATCH.students || []);
+  openModal('Issue a certificate', `
+    <form id="f">
+      <label class="field"><span>Student</span><select name="user_id" required>${students.map((s) => `<option value="${s.id}">${esc(s.name)} (${esc(s.reg_no || '')})</option>`).join('')}</select></label>
+      <div class="form-grid">
+        <label class="field"><span>Type</span><select name="kind"><option value="course">Course completion</option><option value="hackathon">Hackathon</option><option value="competition">Competition</option></select></label>
+        <label class="field"><span>Completion date</span><input name="completion_date" type="date" value="${new Date().toISOString().slice(0, 10)}"></label>
+      </div>
+      <label class="field"><span>Course / hackathon / competition name</span><input name="title" required value="${esc(bd.title || bd.name)}"></label>
+      <label class="field"><span>Detail line (optional)</span><input name="detail" placeholder="e.g. 8-week bootcamp &middot; Grade: A &middot; 94% attendance" value="Cohort: ${esc(bd.name)}"></label>
+      <p class="hint">The certificate carries a QR code that anyone can scan to verify it, your signature as instructor, the CEO signature, and a one-click Add-to-LinkedIn button for the student. The student is emailed their certificate link.</p>
+      <button class="btn btn-primary btn-block">Issue certificate</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      const out = await api('/api/certificates/issue', { method: 'POST', body: JSON.stringify({ user_id: f.user_id.value, batch_id: bid(), kind: f.kind.value, title: f.title.value, completion_date: f.completion_date.value, detail: f.detail.value }) });
+      modalMsg(`Issued - serial ${out.cert.serial}. The student was emailed.`, true);
+      window.open(out.url, '_blank');
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+function formIssueAllCerts() {
+  const bd = CURRENT_BATCH.batch;
+  openModal('Issue certificates for the whole course', `
+    <form id="f">
+      <label class="field"><span>Certificate title</span><input name="title" required value="${esc(bd.title || bd.name)}"></label>
+      <label class="field"><span>Completion date</span><input name="completion_date" type="date" value="${new Date().toISOString().slice(0, 10)}"></label>
+      <label class="field" style="flex-direction:row;gap:8px;align-items:center"><input name="only_completed" type="checkbox" checked style="width:auto"><span>Only students who completed the full quest track</span></label>
+      <p class="hint">Each student gets a QR-verified certificate and an email with their link. Untick the box to certify everyone enrolled.</p>
+      <button class="btn btn-primary btn-block">Issue certificates</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      const out = await api(`/api/batches/${bid()}/certificates/issue-all`, { method: 'POST', body: JSON.stringify({ title: f.title.value, completion_date: f.completion_date.value, only_completed: f.only_completed.checked }) });
+      modalMsg(`Issued ${out.issued} certificate${out.issued === 1 ? '' : 's'}${out.skipped ? ` - skipped ${out.skipped} who have not completed the track` : ''}.`, true);
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function formCertSettings() {
+  let s = { org: 'EchoLens AI Academy', ceo_name: '', tagline: '' };
+  try { s = (await api('/api/admin/cert-settings')).settings; } catch {}
+  openModal('Certificate settings', `
+    <form id="f">
+      <label class="field"><span>Official company / academy name</span><input name="org" required value="${esc(s.org || '')}"></label>
+      <label class="field"><span>Tagline (under the name)</span><input name="tagline" value="${esc(s.tagline || '')}"></label>
+      <label class="field"><span>CEO full name</span><input name="ceo_name" value="${esc(s.ceo_name || '')}" placeholder="Appears under the CEO signature"></label>
+      <button class="btn btn-primary btn-block">Save settings</button></form>
+    <form id="sigForm" style="margin-top:14px">
+      ${s.ceo_sig ? `<div style="margin-bottom:8px"><span class="s" style="color:var(--muted)">Current CEO signature:</span><br><img src="/api/public/cert-image/${esc(s.ceo_sig.split('/').pop())}" alt="CEO signature" style="max-height:64px;border:1px solid var(--line);border-radius:8px;padding:6px;background:#fff"></div>` : ''}
+      <label class="field"><span>CEO signature image (PNG, transparent background)</span><input name="file" type="file" accept=".png,.jpg,.jpeg,.webp" required></label>
+      <button class="btn btn-ghost btn-block">Upload CEO signature</button></form>
+    <p class="hint" style="margin-top:10px">Teachers upload their own signature from Profile &rarr; &#8942; &rarr; Certificate signature. Every certificate shows the instructor signature + the CEO signature + the official name set here.</p>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    try { await api('/api/admin/cert-settings', { method: 'POST', body: JSON.stringify({ org: f.org.value, tagline: f.tagline.value, ceo_name: f.ceo_name.value }) }); modalMsg('Settings saved.', true); }
+    catch (err) { modalMsg(err.message); }
+  });
+  $('sigForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try { await api('/api/admin/cert-settings/ceo-signature', { method: 'POST', body: new FormData(f) }); modalMsg('CEO signature uploaded.', true); }
+    catch (err) { modalMsg(err.message); }
+    btn.disabled = false;
+  });
+}
+
+/* --------------------------- LEVEL TOOLS (teacher) --------------------------- */
+function formLevelDeadline(qid, current) {
+  openModal('Level deadline', `
+    <form id="f">
+      <label class="field"><span>Deadline (end of day)</span><input name="deadline" type="date" value="${esc(current || '')}"></label>
+      <p class="hint">Deadlines are set automatically to the end of each level's week when the track is installed - change them freely here. Students can still submit after the deadline, but late work loses 20% of its earned gems. The rule is shown on every task.</p>
+      <button class="btn btn-primary btn-block">Save deadline</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try { await api(`/api/quests/${qid}`, { method: 'PATCH', body: JSON.stringify({ deadline: e.target.deadline.value }) }); toast('Deadline updated.'); closeModal(); openCourse(bid()); }
+    catch (err) { modalMsg(err.message); }
+  });
+}
+function formAddProblem(qid) {
+  openModal('Add a task to this level', `
+    <form id="f">
+      <label class="field"><span>Task type</span><select name="type" onchange="document.getElementById('addProbHint').textContent = this.value === 'written' ? 'Written: the student explains the LOGIC in words and submits text or a PDF/text file - the compiler is hidden.' : 'Coding: the student solves it in the built-in compiler.'">
+        <option value="code">Coding task (built-in compiler)</option>
+        <option value="written">Written / logic problem (text or PDF answer)</option>
+      </select></label>
+      <p class="hint" id="addProbHint">Coding: the student solves it in the built-in compiler.</p>
+      <label class="field"><span>Title</span><input name="title" required placeholder="e.g. Explain: why does this loop never end?"></label>
+      <label class="field"><span>Problem statement</span><textarea name="description" required style="min-height:120px" placeholder="Describe the problem. For written tasks, ask the student to reason step by step."></textarea></label>
+      <div class="form-grid">
+        <label class="field"><span>Gems (points)</span><input name="points" type="number" min="10" max="1000" value="100"></label>
+        <label class="field"><span>Difficulty</span><select name="difficulty"><option>Basic</option><option selected>Core</option><option>Boss</option></select></label>
+      </div>
+      <label class="field"><span>Solution guideline (teachers only)</span><textarea name="solution" style="min-height:70px"></textarea></label>
+      <button class="btn btn-primary btn-block">Add task</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      await api(`/api/quests/${qid}/problems`, { method: 'POST', body: JSON.stringify({ type: f.type.value, title: f.title.value, description: f.description.value, points: f.points.value, difficulty: f.difficulty.value, solution: f.solution.value }) });
+      toast('Task added to the level.'); closeModal(); openCourse(bid());
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
 }

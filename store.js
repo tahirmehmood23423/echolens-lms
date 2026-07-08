@@ -38,10 +38,12 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [],
+  live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
+  settings: { cert: { org: 'EchoLens AI Academy', ceo_name: '', ceo_sig: null, tagline: 'Gamified AI & Data Science Education' } },
 });
 
 let data = empty();
@@ -79,7 +81,43 @@ function migrate() {
     if (['student', 'free'].includes(u.role) && !u.reg_no) { u.reg_no = issueRegNo(); changed = true; }
     if (u.streak === undefined) { u.streak = 0; u.best_streak = 0; u.last_active = null; changed = true; }
   }
+  // v11: settings block + weekly deadlines on already-installed quests.
+  if (!data.settings) { data.settings = empty().settings; changed = true; }
+  if (!data.settings.cert) { data.settings.cert = empty().settings.cert; changed = true; }
+  for (const q of data.quests) {
+    if (q.deadline === undefined) { q.deadline = deadlineFromStart((data.batches.find((b) => b.id === q.batch_id) || {}).start_date, q.week); changed = true; }
+  }
   if (changed) save();
+}
+
+// Default deadline: end of the quest's week, counted from the cohort start date.
+function deadlineFromStart(startDate, week) {
+  if (!startDate) return null;
+  const d = new Date(startDate + 'T00:00:00');
+  if (isNaN(d)) return null;
+  d.setDate(d.getDate() + (Number(week) || 1) * 7);
+  return d.toISOString().slice(0, 10);
+}
+const LATE_PENALTY = 0.20; // late submissions lose 20% of earned gems
+
+// Tracks where the built-in compiler makes no sense: no-code automation,
+// prompting, design, WordPress, and BI-tool courses. The task portal shows a
+// clean written-answer workspace instead. Teachers can override per course.
+const NO_IDE_TRACKS = new Set([
+  'bc01-automation', 'bc02-prompting', 'bc03-everyday-ai',
+  'sc02-genai', 'sc03-sql-powerbi', 'sc05-ai-tools',
+  'st01-wordpress', 'st02-graphic-design', 'st03-uiux', 'st06-ai-agents',
+]);
+function ideEnabled(bid) {
+  const b = data.batches.find((x) => x.id === Number(bid));
+  if (b && b.ide !== undefined && b.ide !== null) return !!b.ide; // teacher override wins
+  const q = data.quests.find((x) => x.batch_id === Number(bid));
+  return q ? !NO_IDE_TRACKS.has(q.track_key) : true;
+}
+function setIde(bid, enabled) {
+  const b = data.batches.find((x) => x.id === Number(bid)); if (!b) return null;
+  b.ide = !!enabled; save();
+  return b.ide;
 }
 
 /* --------------------------- credential helpers --------------------------- */
@@ -173,11 +211,24 @@ const Users = {
     u.password_hash = bcrypt.hashSync(password, 10); save();
     return { user: u, password };
   },
+  // Institute-grade profile fields. Students and staff share the base set;
+  // staff get professional fields on top. Unknown keys are dropped.
+  PROFILE_FIELDS: {
+    base: ['phone', 'dob', 'gender', 'cnic', 'father_name', 'address', 'city', 'education', 'institute', 'emergency_contact', 'goal', 'links'],
+    staff: ['designation', 'qualification', 'expertise', 'experience_years', 'joining_date', 'office_hours'],
+  },
   updateProfile(id, profile) {
     const u = Users.byId(id); if (!u) return null;
-    u.profile = { ...(u.profile || {}), ...profile }; save();
+    const allowed = [...Users.PROFILE_FIELDS.base, ...(['instructor', 'admin', 'coordinator'].includes(u.role) ? Users.PROFILE_FIELDS.staff : [])];
+    const clean = {};
+    for (const k of allowed) if (profile[k] !== undefined) clean[k] = String(profile[k]).slice(0, 300);
+    u.profile = { ...(u.profile || {}), ...clean };
+    for (const k of Object.keys(u.profile)) if (u.profile[k] === '') delete u.profile[k];
+    save();
     return u;
   },
+  setAvatar(id, url) { const u = Users.byId(id); if (!u) return null; u.avatar = url; save(); return u; },
+  setSignature(id, url) { const u = Users.byId(id); if (!u) return null; u.signature = url; save(); return u; },
   remove(id) {
     const uid = Number(id);
     data.users = data.users.filter((u) => u.id !== uid);
@@ -705,11 +756,13 @@ const Quests = {
   install(bid, trackKey) {
     const t = TRACKS[trackKey]; if (!t) return { error: 'Unknown track.' };
     if (Quests.installed(bid)) return { error: 'A track is already installed on this course.' };
+    const batch = data.batches.find((b) => b.id === Number(bid)) || {};
     for (const lvl of t.levels) {
       data.quests.push({
         id: nextId('quests'), batch_id: Number(bid), track_key: t.key,
         no: lvl.no, week: lvl.week, session: lvl.session, title: lvl.title, topic: lvl.topic,
-        problems: lvl.problems.map((p, i) => ({ pid: i + 1, ...p })),
+        deadline: deadlineFromStart(batch.start_date, lvl.week), // end of that week; instructor can change it
+        problems: lvl.problems.map((p, i) => ({ pid: i + 1, type: p.type || 'code', ...p })),
         created_at: now(),
       });
     }
@@ -721,13 +774,38 @@ const Quests = {
     const p = q.problems.find((x) => x.pid === Number(pid)); if (!p) return null;
     const allowed = ['title', 'description', 'points', 'difficulty', 'solution'];
     for (const k of allowed) if (fields[k] !== undefined) p[k] = k === 'points' ? Math.max(10, Math.min(1000, Number(fields[k]) || p.points)) : String(fields[k]).slice(0, 4000);
+    if (fields.type !== undefined && ['code', 'written'].includes(fields.type)) p.type = fields.type;
     if (Array.isArray(fields.refs)) p.refs = fields.refs.filter((r) => Array.isArray(r) && r[1]).slice(0, 6);
     save();
     return p;
   },
+  // Teachers can add extra problems to a level - e.g. a written logic problem
+  // next to the coding tasks.
+  addProblem(qid, { title, description, points, difficulty, type, solution }) {
+    const q = Quests.byId(qid); if (!q) return null;
+    const pid = q.problems.reduce((m, p) => Math.max(m, p.pid), 0) + 1;
+    const p = {
+      pid, title: String(title).slice(0, 200), description: String(description || '').slice(0, 4000),
+      points: Math.max(10, Math.min(1000, Number(points) || 100)),
+      difficulty: ['Basic', 'Core', 'Boss'].includes(difficulty) ? difficulty : 'Core',
+      type: type === 'written' ? 'written' : 'code',
+      solution: solution ? String(solution).slice(0, 4000) : undefined,
+    };
+    q.problems.push(p); save();
+    return p;
+  },
+  removeProblem(qid, pid) {
+    const q = Quests.byId(qid); if (!q) return false;
+    const before = q.problems.length;
+    q.problems = q.problems.filter((p) => p.pid !== Number(pid));
+    data.quest_submissions = data.quest_submissions.filter((s) => !(s.quest_id === q.id && s.pid === Number(pid)));
+    save();
+    return q.problems.length < before;
+  },
   updateLevel(qid, fields) {
     const q = Quests.byId(qid); if (!q) return null;
     for (const k of ['title', 'topic']) if (fields[k]) q[k] = String(fields[k]).slice(0, 300);
+    if (fields.deadline !== undefined) q.deadline = /^\d{4}-\d{2}-\d{2}$/.test(String(fields.deadline)) ? String(fields.deadline) : null;
     save();
     return q;
   },
@@ -740,19 +818,22 @@ const Quests = {
   forBatch(bid) { return data.quests.filter((q) => q.batch_id === Number(bid)).sort((a, b) => a.no - b.no); },
   byId(id) { return data.quests.find((q) => q.id === Number(id)) || null; },
   submit({ quest_id, pid, user_id, file_url, code, language, note }) {
+    const q = Quests.byId(quest_id);
+    const isLate = !!(q && q.deadline && today() > q.deadline);
     let s = data.quest_submissions.find((x) => x.quest_id === Number(quest_id) && x.pid === Number(pid) && x.user_id === Number(user_id));
     if (s) {
       // Latest submission wins: switching mode replaces the previous one.
       if (code) { s.code = code; s.language = language || 'python'; s.file_url = null; }
       else if (file_url) { s.file_url = file_url; s.code = null; s.language = null; }
       s.note = note ?? s.note; s.submitted_at = now();
-      // The old AI review no longer matches the new work.
-      delete s.ai_review; delete s.review_shared; delete s.review_shared_at;
+      s.late = s.late || isLate; // once late, always late - resubmitting doesn't reset it
+      // The old AI review + integrity report no longer match the new work.
+      delete s.ai_review; delete s.review_shared; delete s.review_shared_at; delete s.integrity;
     } else {
       s = {
         id: nextId('quest_submissions'), quest_id: Number(quest_id), pid: Number(pid), user_id: Number(user_id),
         file_url: file_url || null, code: code || null, language: code ? (language || 'python') : null,
-        note: note || null, grade: null, gems: 0, remarks: null, submitted_at: now(),
+        note: note || null, grade: null, gems: 0, remarks: null, submitted_at: now(), late: isLate,
       };
       data.quest_submissions.push(s);
     }
@@ -764,7 +845,10 @@ const Quests = {
     const s = Quests.subById(sid); if (!s) return null;
     const q = Quests.byId(s.quest_id); const p = q ? q.problems.find((x) => x.pid === s.pid) : null;
     pct = Math.max(0, Math.min(100, Number(pct)));
-    s.grade = pct; s.gems = Math.round(((p && p.points) || 100) * pct / 100);
+    s.grade = pct;
+    const full = Math.round(((p && p.points) || 100) * pct / 100);
+    s.gems = s.late ? Math.round(full * (1 - LATE_PENALTY)) : full; // late = -20% gems, grade % untouched
+    s.late_deduction = s.late ? full - s.gems : 0;
     s.remarks = remarks || null; s.graded_at = now(); s.graded_by = by;
     save();
     return s;
@@ -848,13 +932,14 @@ function chatAlias(uid, bid) {
   return `${ALIAS_GEMS[h % ALIAS_GEMS.length]}-${(h % 900) + 100}`;
 }
 const Chat = {
-  post({ batch_id, user, body, anonymous }) {
+  post({ batch_id, user, body, anonymous, mentions }) {
     const staff = ['admin', 'instructor', 'coordinator'].includes(user.role);
     const m = {
       id: nextId('course_messages'), batch_id: Number(batch_id), user_id: user.id,
       body: String(body).slice(0, 2000),
       anonymous: staff ? false : !!anonymous, // staff always post with their name
       staff_role: staff ? user.role : null,
+      mentions: Array.isArray(mentions) ? mentions.slice(0, 10) : [], // [{id,name}] resolved server-side
       created_at: now(),
     };
     data.course_messages.push(m); save();
@@ -865,8 +950,11 @@ const Chat = {
     return {
       id: m.id, batch_id: m.batch_id, body: m.body, created_at: m.created_at,
       display_name: m.anonymous ? chatAlias(m.user_id, m.batch_id) : (u.name || 'Learner'),
+      avatar: m.anonymous ? null : (u.avatar || null),
       anonymous: !!m.anonymous,
       staff_role: m.staff_role || null,
+      mentions: m.mentions || [],
+      mentions_me: viewer ? (m.mentions || []).some((x) => x.id === viewer.id) : false,
       mine: viewer ? m.user_id === viewer.id : false,
     };
   },
@@ -1019,6 +1107,256 @@ function seed() {
   console.log('  student@echolens.digital     / ChangeMe!2026  (student, reg no: ' + student.reg_no + ')');
 }
 
+/* ============================== v11 features ============================== */
+
+/* ---------------------- live classes + attendance ---------------------- */
+// A live class runs inside the portal (embedded Jitsi room). Joining marks
+// attendance automatically; heartbeats accumulate minutes in the room.
+const LiveClasses = {
+  create({ batch_id, title, started_by }) {
+    // One active class per course at a time.
+    const already = LiveClasses.active(batch_id);
+    if (already) return { error: 'A live class is already running on this course. End it first.' };
+    const rand = crypto.randomBytes(6).toString('hex');
+    const c = {
+      id: nextId('live_classes'), batch_id: Number(batch_id),
+      title: String(title || 'Live class').slice(0, 200),
+      room: `EchoLens-${batch_id}-${rand}`, // unguessable Jitsi room name
+      started_by, started_at: now(), ended_at: null, date: today(),
+    };
+    data.live_classes.push(c); save();
+    return { ok: true, live: c };
+  },
+  byId(id) { return data.live_classes.find((c) => c.id === Number(id)) || null; },
+  active(bid) { return data.live_classes.find((c) => c.batch_id === Number(bid) && !c.ended_at) || null; },
+  end(id) { const c = LiveClasses.byId(id); if (!c) return null; c.ended_at = now(); save(); return c; },
+  forBatch(bid) { return data.live_classes.filter((c) => c.batch_id === Number(bid)).sort((a, b) => b.id - a.id); },
+};
+const Attendance = {
+  mark(classId, userId) {
+    let a = data.attendance.find((x) => x.class_id === Number(classId) && x.user_id === Number(userId));
+    if (!a) {
+      a = { id: nextId('attendance'), class_id: Number(classId), user_id: Number(userId), joined_at: now(), minutes: 0 };
+      data.attendance.push(a); save();
+    }
+    return a;
+  },
+  heartbeat(classId, userId) {
+    const a = Attendance.mark(classId, userId);
+    a.minutes = (a.minutes || 0) + 1; a.last_seen = now(); save();
+    return a;
+  },
+  forClass(classId) { return data.attendance.filter((a) => a.class_id === Number(classId)); },
+  // Attendance sheet for one class: every enrolled student, present or absent.
+  sheet(cls) {
+    const present = new Map(Attendance.forClass(cls.id).map((a) => [a.user_id, a]));
+    return Enrollments.studentsForBatch(cls.batch_id).map((u) => {
+      const a = present.get(u.id);
+      return { id: u.id, name: u.name, reg_no: u.reg_no, present: !!a, joined_at: a ? a.joined_at : null, minutes: a ? a.minutes : 0 };
+    }).sort((x, y) => Number(y.present) - Number(x.present) || x.name.localeCompare(y.name));
+  },
+  // % of this course's classes a student attended.
+  rate(uid, bid) {
+    const classes = LiveClasses.forBatch(bid);
+    if (!classes.length) return null;
+    const attended = classes.filter((c) => data.attendance.some((a) => a.class_id === c.id && a.user_id === Number(uid))).length;
+    return { attended, total: classes.length, pct: Math.round((attended / classes.length) * 100) };
+  },
+};
+
+/* ------------------------------ live quizzes ------------------------------ */
+// Teachers pop a quiz any time (even mid-class). It stays open for a short
+// window; outside the window nobody can take it until the teacher reopens.
+const Quizzes = {
+  create({ batch_id, title, questions, duration_min, points, created_by }) {
+    const qs = (Array.isArray(questions) ? questions : []).slice(0, 30).map((q, i) => ({
+      no: i + 1, q: String(q.q || '').slice(0, 500),
+      options: (Array.isArray(q.options) ? q.options : []).slice(0, 6).map((o) => String(o).slice(0, 200)),
+      answer: Number(q.answer) || 0, // index into options - never sent to students
+    })).filter((q) => q.q && q.options.length >= 2);
+    if (!qs.length) return { error: 'Add at least one question with two options.' };
+    const quiz = {
+      id: nextId('quizzes'), batch_id: Number(batch_id), title: String(title || 'Pop quiz').slice(0, 200),
+      questions: qs, duration_min: Math.max(1, Math.min(180, Number(duration_min) || 10)),
+      points: Math.max(5, Math.min(200, Number(points) || 20)),
+      allow_ide: !!arguments[0].allow_ide, // teacher choice: show a practice IDE terminal during the quiz
+      opened_at: null, closes_at: null, created_by, created_at: now(),
+    };
+    data.quizzes.push(quiz); save();
+    return { ok: true, quiz };
+  },
+  byId(id) { return data.quizzes.find((q) => q.id === Number(id)) || null; },
+  forBatch(bid) { return data.quizzes.filter((q) => q.batch_id === Number(bid)).sort((a, b) => b.id - a.id); },
+  open(id, minutes) {
+    const q = Quizzes.byId(id); if (!q) return null;
+    if (minutes) q.duration_min = Math.max(1, Math.min(180, Number(minutes)));
+    q.opened_at = now();
+    q.closes_at = new Date(Date.now() + q.duration_min * 60000).toISOString();
+    save();
+    return q;
+  },
+  close(id) { const q = Quizzes.byId(id); if (!q) return null; q.closes_at = new Date().toISOString(); save(); return q; },
+  isOpen(q) { return !!(q.opened_at && q.closes_at && new Date(q.closes_at) > new Date()); },
+  remove(id) {
+    data.quizzes = data.quizzes.filter((q) => q.id !== Number(id));
+    data.quiz_attempts = data.quiz_attempts.filter((a) => a.quiz_id !== Number(id));
+    save();
+  },
+  attempt(quizId, userId, answers) {
+    const q = Quizzes.byId(quizId); if (!q) return { error: 'Quiz not found.' };
+    if (!Quizzes.isOpen(q)) return { error: 'This quiz is closed. Your teacher has to reopen it.' };
+    if (data.quiz_attempts.some((a) => a.quiz_id === q.id && a.user_id === Number(userId))) return { error: 'You already took this quiz.' };
+    let correct = 0;
+    q.questions.forEach((qq, i) => { if (Number((answers || [])[i]) === qq.answer) correct += 1; });
+    const scorePct = Math.round((correct / q.questions.length) * 100);
+    const gems = Math.round(q.points * scorePct / 100);
+    const a = {
+      id: nextId('quiz_attempts'), quiz_id: q.id, user_id: Number(userId),
+      answers: (answers || []).slice(0, q.questions.length).map(Number),
+      correct, total: q.questions.length, score_pct: scorePct, gems, taken_at: now(),
+    };
+    data.quiz_attempts.push(a);
+    if (gems > 0) GemEvents.create({ user_id: Number(userId), batch_id: q.batch_id, amount: gems, source: 'quiz', note: `Quiz: ${q.title}` });
+    save();
+    return { ok: true, attempt: a };
+  },
+  myAttempt(quizId, userId) { return data.quiz_attempts.find((a) => a.quiz_id === Number(quizId) && a.user_id === Number(userId)) || null; },
+  results(quizId) {
+    return data.quiz_attempts.filter((a) => a.quiz_id === Number(quizId)).map((a) => {
+      const u = Users.byId(a.user_id) || {};
+      return { ...a, name: u.name, reg_no: u.reg_no };
+    }).sort((a, b) => b.score_pct - a.score_pct);
+  },
+};
+
+/* ------------------------- QR verified certificates ------------------------- */
+const Certificates = {
+  serial() {
+    let s;
+    do { s = `EL-${new Date().getFullYear()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`; }
+    while (data.certificates.some((c) => c.serial === s));
+    return s;
+  },
+  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by }) {
+    const u = Users.byId(user_id); if (!u) return { error: 'Student not found.' };
+    // One certificate per student per course/title - reissue replaces it.
+    data.certificates = data.certificates.filter((c) => !(c.user_id === u.id && c.title === title));
+    const instructor = instructor_id ? Users.byId(instructor_id) : null;
+    const cert = {
+      id: nextId('certificates'), serial: Certificates.serial(),
+      user_id: u.id, student_name: u.name, reg_no: u.reg_no,
+      batch_id: batch_id ? Number(batch_id) : null,
+      kind: ['course', 'hackathon', 'competition'].includes(kind) ? kind : 'course',
+      title: String(title).slice(0, 200),
+      detail: String(detail || '').slice(0, 400),
+      completion_date: /^\d{4}-\d{2}-\d{2}$/.test(String(completion_date)) ? completion_date : today(),
+      instructor_name: instructor ? instructor.name : null,
+      instructor_sig: instructor ? (instructor.signature || null) : null,
+      issued_by, issued_at: now(),
+    };
+    data.certificates.push(cert); save();
+    return { ok: true, cert };
+  },
+  bySerial(s) { return data.certificates.find((c) => c.serial === String(s).trim().toUpperCase()) || null; },
+  forUser(uid) { return data.certificates.filter((c) => c.user_id === Number(uid)).sort((a, b) => b.id - a.id); },
+  forBatch(bid) { return data.certificates.filter((c) => c.batch_id === Number(bid)); },
+  revoke(id) { data.certificates = data.certificates.filter((c) => c.id !== Number(id)); save(); },
+  // Public view: what the QR verification page shows. No emails, no ids.
+  publicView(c) {
+    const s = Settings.cert();
+    return {
+      serial: c.serial, student_name: c.student_name, reg_no: c.reg_no,
+      kind: c.kind, title: c.title, detail: c.detail, completion_date: c.completion_date,
+      instructor_name: c.instructor_name, instructor_sig: c.instructor_sig,
+      org: s.org, tagline: s.tagline, ceo_name: s.ceo_name, ceo_sig: s.ceo_sig,
+      issued_at: (c.issued_at || '').slice(0, 10),
+    };
+  },
+};
+const Settings = {
+  cert() { return data.settings && data.settings.cert ? data.settings.cert : empty().settings.cert; },
+  setCert(fields) {
+    if (!data.settings) data.settings = empty().settings;
+    const c = data.settings.cert;
+    for (const k of ['org', 'ceo_name', 'tagline']) if (fields[k] !== undefined) c[k] = String(fields[k]).slice(0, 200);
+    if (fields.ceo_sig !== undefined) c.ceo_sig = fields.ceo_sig;
+    save();
+    return c;
+  },
+};
+
+/* ------------------------- datasets attached to tasks ------------------------- */
+// Teachers attach CSVs (or any data file) to a quest problem; the built-in
+// compiler mounts them into Python's filesystem so pd.read_csv('name.csv')
+// works exactly like on a laptop.
+const TaskFiles = {
+  add({ quest_id, pid, name, url, size, by }) {
+    const f = { id: nextId('task_files'), quest_id: Number(quest_id), pid: Number(pid), name: String(name).slice(0, 200), url, size: Number(size) || 0, by, created_at: now() };
+    data.task_files.push(f); save();
+    return f;
+  },
+  byId(id) { return data.task_files.find((f) => f.id === Number(id)) || null; },
+  forProblem(qid, pid) { return data.task_files.filter((f) => f.quest_id === Number(qid) && f.pid === Number(pid)); },
+  forQuest(qid) { return data.task_files.filter((f) => f.quest_id === Number(qid)); },
+  remove(id) { data.task_files = data.task_files.filter((f) => f.id !== Number(id)); save(); },
+};
+
+/* ------------------------------ at-risk report ------------------------------ */
+// A student is flagged when attendance is low, assignments are missing, or
+// grades are below the pass mark. Staff see WHY, not just a score.
+function riskReport(bid) {
+  const quests = Quests.forBatch(bid);
+  const openQuests = quests; // staff view considers all published levels
+  const totalProblems = openQuests.reduce((s, q) => s + q.problems.length, 0);
+  return Enrollments.studentsForBatch(bid).map((u) => {
+    const subs = data.quest_submissions.filter((s) => s.user_id === u.id && openQuests.some((q) => q.id === s.quest_id));
+    const graded = subs.filter((s) => s.grade != null);
+    const avg = graded.length ? Math.round(graded.reduce((s, x) => s + x.grade, 0) / graded.length) : null;
+    const att = Attendance.rate(u.id, bid);
+    const missing = Math.max(0, totalProblems - subs.length);
+    const reasons = [];
+    if (att && att.pct < 60) reasons.push(`Attended ${att.attended}/${att.total} classes (${att.pct}%)`);
+    if (totalProblems > 0 && missing / totalProblems > 0.4) reasons.push(`${missing} of ${totalProblems} tasks not submitted`);
+    if (avg != null && avg < 60) reasons.push(`Average grade ${avg}%`);
+    const lastActive = u.last_active || null;
+    if (lastActive && (Date.now() - new Date(lastActive + 'T00:00:00')) > 7 * 86400000) reasons.push(`Inactive since ${lastActive}`);
+    const level = reasons.length >= 2 ? 'high' : reasons.length === 1 ? 'watch' : 'ok';
+    return {
+      id: u.id, name: u.name, reg_no: u.reg_no, email: u.email || null,
+      attendance: att, submitted: subs.length, total_tasks: totalProblems, avg_grade: avg,
+      last_active: lastActive, risk: level, reasons,
+    };
+  }).sort((a, b) => ({ high: 0, watch: 1, ok: 2 }[a.risk] - { high: 0, watch: 1, ok: 2 }[b.risk]) || a.name.localeCompare(b.name));
+}
+
+/* ------------------------- full student profile (staff) ------------------------- */
+function fullStudentProfile(uid) {
+  const u = Users.byId(uid); if (!u) return null;
+  const gems = totalGemsForStudent(u.id);
+  const courses = coursesForUser(u).map((b) => {
+    const bd = Batches.decorate(b);
+    const prog = Quests.installed(b.id) ? Quests.progress(u.id, b.id) : null;
+    const qids = Quests.forBatch(b.id).map((q) => q.id);
+    const subs = data.quest_submissions.filter((s) => s.user_id === u.id && qids.includes(s.quest_id));
+    return {
+      batch_id: b.id, title: bd.title || bd.name, cohort: bd.name, code: bd.code,
+      gems: gemsForStudentInBatch(u.id, b.id),
+      level: prog ? prog.unlocked_up_to : null, levels_total: prog ? prog.levels.length : null,
+      quest_title: prog ? prog.title : null, completed: prog ? prog.completed : null,
+      submitted: subs.length, graded: subs.filter((s) => s.grade != null).length,
+      avg_grade: subs.filter((s) => s.grade != null).length ? Math.round(subs.filter((s) => s.grade != null).reduce((x, s) => x + s.grade, 0) / subs.filter((s) => s.grade != null).length) : null,
+      attendance: Attendance.rate(u.id, b.id),
+    };
+  });
+  return {
+    id: u.id, name: u.name, role: u.role, reg_no: u.reg_no, username: u.username, email: u.email,
+    avatar: u.avatar || null, profile: u.profile || {}, created_at: (u.created_at || '').slice(0, 10),
+    gems, stage: stageFor(gems), streak: u.streak || 0, best_streak: u.best_streak || 0, last_active: u.last_active,
+    badges: badgesFor(u), courses,
+    certificates: Certificates.forUser(u.id).map((c) => ({ serial: c.serial, title: c.title, kind: c.kind, completion_date: c.completion_date })),
+  };
+}
+
 function backupNow() {
   try {
     if (!fs.existsSync(DB_PATH)) return null;
@@ -1040,6 +1378,7 @@ module.exports = {
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,
+  LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, ideEnabled, setIde,
   seed, DB_PATH, allData: () => data,
 };
 

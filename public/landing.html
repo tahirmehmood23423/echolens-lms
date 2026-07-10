@@ -56,7 +56,7 @@
   .play-ide{margin-top:22px;display:grid;grid-template-columns:2fr 3fr;gap:18px;align-items:start}
   @media (max-width:1020px){.play-ide{grid-template-columns:1fr}.hero{grid-template-columns:1fr}}
   .register-band{background:linear-gradient(120deg,#0E1630,#1D1450);border-radius:20px;color:#EAF2FF;padding:34px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:20px 0 48px}
-  .register-band h3{font-family:var(--font-display);font-size:24px;margin-bottom:8px}
+  .register-band h3{font-family:var(--font-display);font-size:24px;margin-bottom:8px;color:#FFFFFF}
   .register-band p{font-size:13.5px;color:#B9C6E4;max-width:560px;line-height:1.6}
   footer{border-top:1px solid var(--line);padding:26px 5vw;font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between}
 </style>
@@ -72,7 +72,7 @@
   <a class="lnk" href="#register">Register</a>
   <span style="flex:1"></span>
   <a class="btn btn-ghost btn-sm" href="/open">Solve free quests</a>
-  <a class="btn btn-primary btn-sm" id="signinBtn" href="/login">Sign in</a>
+  <a class="btn btn-primary btn-sm" id="signinBtn" href="/login">LMS Portal</a>
 </nav>
 
 <div class="land-wrap">
@@ -87,9 +87,9 @@
     </div>
     <div class="hero-side">
       <div style="font-family:var(--font-display);font-size:18px;margin-bottom:10px">How EchoLens works</div>
-      <div class="row"><span>1. Pick a course</span><strong>bootcamp &rarr; career track</strong></div>
-      <div class="row"><span>2. Attend live classes</span><strong>evenings, online</strong></div>
-      <div class="row"><span>3. Beat quest levels</span><strong>code in the browser</strong></div>
+      <div class="row"><span>1. Pick a course</span><strong>Bootcamp &rarr; Career track</strong></div>
+      <div class="row"><span>2. Attend live classes</span><strong>Evenings, online</strong></div>
+      <div class="row"><span>3. Beat quest levels</span><strong>Code in the browser</strong></div>
       <div class="row"><span>4. Get teacher feedback</span><strong>AI-assisted, human-decided</strong></div>
       <div class="row"><span>5. Collect gems &amp; rise</span><strong>Spark &rarr; Nova</strong></div>
     </div>
@@ -101,15 +101,15 @@
     <h2>What you get inside the portal</h2>
     <p class="sub">Everything a serious learner needs, wrapped in a system that makes you want to come back tomorrow.</p>
     <div class="feat-grid">
-      <div class="feat"><div class="ic">&#128142;</div><h4>Gems instead of grades</h4><p>Every task pays out gems. Gems move you through six stages - Spark, Glow, Beam, Prism, Aurora, Nova - with badges and a public profile you can share anywhere.</p></div>
-      <div class="feat"><div class="ic">&#128506;</div><h4>Quest-based assignments</h4><p>Courses ship as quest ladders. Pass a level to unlock the next - no skipping ahead, no falling through the cracks. Your progress is a map, not a spreadsheet.</p></div>
-      <div class="feat"><div class="ic">&#128187;</div><h4>Python in your browser</h4><p>A full editor and interactive terminal inside every task. input() works live, numpy, pandas, matplotlib and scikit-learn load automatically, and charts render on screen. Zero setup.</p></div>
-      <div class="feat"><div class="ic">&#127891;</div><h4>Live classes &amp; content</h4><p>Scheduled online classes with join links, plus slides, notebooks, and readings organised week by week inside each course.</p></div>
-      <div class="feat"><div class="ic">&#10024;</div><h4>Real teacher feedback, faster</h4><p>Instructors use AI to review your work in depth - then they decide your grade and choose what feedback to share. A human always makes the call.</p></div>
-      <div class="feat"><div class="ic">&#128172;</div><h4>Ask anything, anonymously</h4><p>Every course has a chat where you can post questions with your name - or as an anonymous alias nobody can trace. Shy is fine here; stuck is not.</p></div>
-      <div class="feat"><div class="ic">&#9889;</div><h4>Hackathons &amp; challenges</h4><p>Time-boxed build events with gem prizes, plus open challenges for extra gems. Solo or in teams.</p></div>
-      <div class="feat"><div class="ic">&#128293;</div><h4>Streaks &amp; leaderboards</h4><p>Daily activity streaks pay bonus gems. Course and academy-wide leaderboards keep the race friendly and visible.</p></div>
-      <div class="feat"><div class="ic">&#128200;</div><h4>Skill reports</h4><p>Per-course and across-all-courses reports on your strengths, gaps, and recommended direction - reviewed by your teacher, delivered to your profile.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 21L8 9l4-6 4 6-4 12"/></svg></div><h4>Gems instead of grades</h4><p>Every task pays out gems. Gems move you through six stages - Spark, Glow, Beam, Prism, Aurora, Nova - with badges and a public profile you can share anywhere.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg></div><h4>Quest-based assignments</h4><p>Courses ship as quest ladders. Pass a level to unlock the next - no skipping ahead, no falling through the cracks. Your progress is a map, not a spreadsheet.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h4>Python in your browser</h4><p>A full editor and interactive terminal inside every task. input() works live, numpy, pandas, matplotlib and scikit-learn load automatically, and charts render on screen. Zero setup.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 9L12 4 2 9l10 5 10-5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div><h4>Live classes &amp; content</h4><p>Scheduled online classes with join links, plus slides, notebooks, and readings organised week by week inside each course.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg></div><h4>Real teacher feedback, faster</h4><p>Instructors use AI to review your work in depth - then they decide your grade and choose what feedback to share. A human always makes the call.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.5-3A8 8 0 1 1 21 12z"/></svg></div><h4>Ask anything, anonymously</h4><p>Every course has a chat where you can post questions with your name - or as an anonymous alias nobody can trace. Shy is fine here; stuck is not.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><h4>Hackathons &amp; challenges</h4><p>Time-boxed build events with gem prizes, plus open challenges for extra gems. Solo or in teams.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 4-4 5.5-4 10a4 4 0 0 0 8 0c0-2-1-3-1-3s3 1.5 3 5a7 7 0 1 1-14 0C4 8 10 6.5 12 2z"/></svg></div><h4>Streaks &amp; leaderboards</h4><p>Daily activity streaks pay bonus gems. Course and academy-wide leaderboards keep the race friendly and visible.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 20V10M10 20V4M15 20v-8M20 20V7"/></svg></div><h4>Skill reports</h4><p>Per-course and across-all-courses reports on your strengths, gaps, and recommended direction - reviewed by your teacher, delivered to your profile.</p></div>
     </div>
   </section>
 
@@ -140,7 +140,7 @@
       </div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <a class="btn btn-primary" id="contactBtn" href="mailto:echolens816@gmail.com?subject=EchoLens%20Registration">Register - contact us</a>
-        <a class="btn btn-ghost" href="/login" style="color:#EAF2FF;border-color:rgba(255,255,255,.35)">Already registered? Sign in</a>
+        <a class="btn" href="/login" style="background:transparent;color:#EAF2FF;border:1.5px solid rgba(255,255,255,.45)">Already registered? Sign in</a>
       </div>
     </div>
   </section>

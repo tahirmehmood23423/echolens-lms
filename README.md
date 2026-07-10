@@ -1,3 +1,15 @@
+# EchoLens LMS v12.2 - Professional UI & Auth Fixes
+
+**Email sign-in fixed.** The "Create a free account with email" button on the open portal was wired to a function that did not exist, so email signup silently failed - now it opens the signup form correctly. Sign-in now also routes by role: open (free) accounts land on /open, portal accounts on /dashboard, both from the login page and the already-signed-in check.
+
+**Google sign-in requires environment configuration** (this is why it reports "not configured"): set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `APP_URL` (your deployed URL) on the server, and register `<APP_URL>/auth/google/callback` as an authorized redirect URI in the Google Cloud console. The Google button only appears once these are set.
+
+**People view completed.** Admin People now lists Open website users as their own group, and every group heading shows its total count - so the number of accounts in the live database is always visible at a glance. If the production count differs from a local data file, the deployed persistent disk holds its own database: the seed never overwrites an existing `echolens.json`.
+
+**Professional UI pass.** All decorative emoji removed from the open portal, compiler, landing page, and the v12 additions (landing feature icons are now clean SVG line icons); run/stop controls are plain text; status values are written out professionally (Pending verification, Not required, Open sign-up) with no raw machine-style text anywhere in the UI; sentence-case labels throughout; the landing registration band heading and secondary button are now readable on the dark background; the landing header button is renamed **LMS Portal**; the profile three-dot menu renders above surrounding cards on its own layer; and the task dataset box (upload controls) wraps cleanly inside its card with styled file inputs.
+
+---
+
 # EchoLens LMS v12.1 - August 2026 Catalogue Release
 
 **The full August 2026 catalogue is live: 31 programs, 31 quest tracks.** The official catalogue (8 bootcamps, 11 short courses, 12 specialist tracks) now drives the whole platform, with correct prices, NEW / HIGH DEMAND / FLAGSHIP / FREE badges, and the Web Developer Path bundle (BC-04 -> SC-06 -> SC-07 -> ST-09, PKR 43,500, save 7,500). **15 brand-new quest tracks** were built for the new programs (BC-04..08, SC-06..11, ST-09..12) - every task includes course-session links, key documentation/resource links (MDN, official docs, free tools), and teacher-only solution guidelines.

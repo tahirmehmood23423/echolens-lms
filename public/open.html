@@ -106,9 +106,9 @@
             <option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option>
           </select>
           <span style="flex:1"></span>
-          <label class="btn btn-ghost btn-sm" style="cursor:pointer">&#11014; Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer">Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>
           <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()">Clear</button>
-          <button type="button" class="btn lc-btn-solve" id="svRunBtn" onclick="runSolve()">&#9654; Run</button>
+          <button type="button" class="btn lc-btn-solve" id="svRunBtn" onclick="runSolve()">Run</button>
         </div>
         <textarea id="svCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your solution here, then press Run."></textarea>
         <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Ready - runs in your browser, nothing to install.</span></div>

@@ -57,6 +57,12 @@ let CUR_EVENT = null;
     $('gateWrap').style.display = '';
     $('userBox').innerHTML = `<a class="btn btn-primary btn-sm" href="/login">Sign in</a>`;
     try { const p = await api('/api/auth/providers'); if (p.google) $('gBtn').style.display = ''; } catch {}
+    window.showSignup = () => {
+      const c = $('signupCard');
+      c.style.display = '';
+      c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      c.querySelector('input[name="name"]').focus();
+    };
     $('suForm').addEventListener('submit', async (e) => {
       e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
       try {
@@ -75,7 +81,7 @@ let CUR_EVENT = null;
     <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
     ${ME.role !== 'free' ? '<a class="btn btn-teal btn-sm" href="/dashboard" style="margin-right:8px">My portal</a>' : ''}
     <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`;
-  if (ME.gamify) $('myGems').innerHTML = `<span class="prob-chip" style="cursor:default">&#128142; ${ME.gamify.gems} gems · ${esc(ME.gamify.stage.name)}</span>`;
+  if (ME.gamify) $('myGems').innerHTML = `<span class="prob-chip" style="cursor:default">${ME.gamify.gems} gems · ${esc(ME.gamify.stage.name)}</span>`;
   requireWhatsapp();
   loadProblems();
   loadEvents();
@@ -161,7 +167,7 @@ function drawProblems() {
           <td><strong>${esc(p.title)}</strong></td>
           <td class="s" style="color:var(--muted)">${p.track_free ? '<span class="kbadge quest" style="margin-right:6px">FREE</span>' : ''}${esc(p.track_title)} · L${p.level}</td>
           <td><span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span></td>
-          <td style="text-align:right">&#128142; ${p.points}</td>
+          <td style="text-align:right">${p.points}</td>
           <td style="text-align:right"><button class="lc-btn-solve" onclick="event.stopPropagation();openSolve('${esc(p.key)}')">Solve</button></td>
         </tr>`).join('')}
       </tbody></table>
@@ -205,13 +211,13 @@ async function runSolve() {
   const btn = $('svRunBtn'); const status = $('svStatus');
   const code = $('svCode').value;
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
-  btn.innerHTML = '&#9632; Stop';
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = 'Run'; return; }
+  btn.innerHTML = 'Stop';
   try {
     const out = await EchoRun.executeAny($('svLang').value, code, { term: SV_TERM, files: SV_FILES, onStatus: (t) => { status.textContent = t; } });
     if (out && out.ok && window.SV_KEY) { SOLVED[window.SV_KEY] = 'done'; localStorage.setItem('el_open_done', JSON.stringify(SOLVED)); }
   } catch (e) { status.textContent = e.message; }
-  btn.innerHTML = '&#9654; Run';
+  btn.innerHTML = 'Run';
 }
 
 /* ---------------------------- open quests & events ----------------------------
@@ -231,10 +237,10 @@ async function loadEvents() {
         <h4 style="font-size:15px;color:var(--ink)">${esc(ev.title)}</h4>
         <div class="s" style="color:var(--muted);font-size:12.5px">${esc((ev.description || '').slice(0, 140))}${(ev.description || '').length > 140 ? '…' : ''}</div>
         <div class="s" style="color:var(--muted)">${ev.entry === 'paid' ? '<strong>PKR ' + ev.fee_pkr + '</strong>' : '<strong style="color:var(--ok)">FREE</strong>'}
-          ${ev.duration_minutes ? ' · ~' + ev.duration_minutes + ' min' : ''}${(ev.problems || []).length ? ' · ' + ev.problems.length + ' tasks' : ''}
-          ${ev.auto_certificate ? ' · &#127942; certificate at ' + ev.pass_mark + '%+' : ''}${ev.auto_grade ? ' · AI graded (-10%)' : ''}</div>
+          ${ev.duration_minutes ? ' · About ' + ev.duration_minutes + ' minutes' : ''}${(ev.problems || []).length ? ' · ' + ev.problems.length + ' tasks' : ''}
+          ${ev.auto_certificate ? ' · Certificate at ' + ev.pass_mark + '%+' : ''}${ev.auto_grade ? ' · AI graded, 10% reduction' : ''}</div>
         ${ev.my_progress && ev.my_progress.avg != null ? `<div class="oq-prog"><div style="width:${Math.min(100, ev.my_progress.avg)}%"></div></div>
-          <div class="s" style="color:${ev.my_progress.passed ? 'var(--ok)' : 'var(--muted)'}">${ev.my_progress.passed ? '&#127942; Passed with ' + ev.my_progress.avg + '%' : 'Average so far: ' + ev.my_progress.avg + '%'}</div>` : ''}
+          <div class="s" style="color:${ev.my_progress.passed ? 'var(--ok)' : 'var(--muted)'}">${ev.my_progress.passed ? 'Passed with ' + ev.my_progress.avg + '%' : 'Average so far: ' + ev.my_progress.avg + '%'}</div>` : ''}
         <button class="lc-btn-solve" style="margin-top:6px" onclick="openOpenEvent(${ev.id})">${ev.my_entry ? 'Continue' : ev.kind === 'webinar' ? 'Register' : 'Start'}</button>
       </div>`).join('')
       : '<div class="empty">No open events right now - check back soon, or follow EchoLens for announcements.</div>';
@@ -244,7 +250,7 @@ async function loadCerts() {
   try {
     const d = await api('/api/certificates/mine');
     if (!d.certificates.length) { $('certBox').innerHTML = ''; return; }
-    $('certBox').innerHTML = `<div class="card"><div class="card-head"><h3>&#127942; My certificates</h3><span class="s" style="color:var(--muted)">QR-verified · share to LinkedIn</span></div>
+    $('certBox').innerHTML = `<div class="card"><div class="card-head"><h3>My certificates</h3><span class="s" style="color:var(--muted)">QR-verified · share to LinkedIn</span></div>
       <div class="card-body tight">${d.certificates.map((c) => `
         <div class="list-row" style="padding:10px 4px">
           <div class="grow"><div class="t">${esc(c.title)}</div>
@@ -259,17 +265,17 @@ async function openOpenEvent(id) {
   const ev = d.event;
   const probs = ev.problems || [];
   const regBtn = !d.my_entry && ['upcoming', 'live'].includes(ev.status)
-    ? `<button class="btn btn-teal" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' - PKR ' + ev.fee_pkr : ' - free'}</button>` : '';
+    ? `<button class="btn btn-teal" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' - PKR ' + ev.fee_pkr : ' - Free'}</button>` : '';
   openModal(ev.title, `
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind]}</span>
-      <span class="s" style="color:var(--muted)">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'free'} · pass mark ${ev.pass_mark}%${ev.duration_minutes ? ' · ~' + ev.duration_minutes + ' min' : ''}${ev.auto_grade ? ' · AI graded (-10%)' : ''}${ev.auto_certificate ? ' · automatic certificate' : ''}</span></div>
+      <span class="s" style="color:var(--muted)">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} · Pass mark ${ev.pass_mark}%${ev.duration_minutes ? ' · About ' + ev.duration_minutes + ' minutes' : ''}${ev.auto_grade ? ' · AI graded, 10% reduction' : ''}${ev.auto_certificate ? ' · automatic certificate' : ''}</span></div>
     ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
     ${(ev.files || []).length ? `<div class="s" style="margin-bottom:8px"><strong>Documents:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join(' · ')}</div>` : ''}
     ${regBtn}
-    ${d.my_entry && !d.can_participate ? `<div class="task-status wait">&#9203; ${esc(d.participate_msg)}</div>` : ''}
-    ${d.my_progress && d.my_progress.passed ? `<div class="task-status ok">&#127942; <strong>PASSED with ${d.my_progress.avg}%</strong> - your certificate is in "My certificates" above.</div>` : ''}
-    ${ev.kind === 'webinar' && ev.meeting_link ? `<div class="task-status ok">&#127909; You are registered - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : ''}
+    ${d.my_entry && !d.can_participate ? `<div class="task-status wait">${esc(d.participate_msg)}</div>` : ''}
+    ${d.my_progress && d.my_progress.passed ? `<div class="task-status ok"><strong>Passed with ${d.my_progress.avg}%</strong> - your certificate is in "My certificates" above.</div>` : ''}
+    ${ev.kind === 'webinar' && ev.meeting_link ? `<div class="task-status ok">You are registered - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : ''}
     ${d.can_participate && probs.length ? `
       <div class="pub-sec">Tasks - solve each one below</div>
       ${probs.map((p) => {
@@ -282,7 +288,7 @@ async function openOpenEvent(id) {
             ${s ? (s.score != null ? `<span class="grade-chip ok">${s.score}%${s.graded_by === 'ai' ? ' (AI)' : ''}</span>` : '<span class="grade-chip wait">grading…</span>') : ''}
             <button class="lc-btn-solve" onclick="openEventSolve(${ev.id},${p.pid})">${s ? 'Reopen' : 'Solve'}</button>
           </div>
-          ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">&#10024; ${esc(s.ai_feedback)}</div>` : ''}
+          ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">${esc(s.ai_feedback)}</div>` : ''}
         </div>`;
       }).join('')}` : ''}
     ${d.can_participate && !probs.length && ev.kind !== 'webinar' ? `
@@ -328,7 +334,7 @@ async function openEventSolve(eid, pid) {
   openModal(p.title, `
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span>
-      <span class="s" style="color:var(--muted)">${p.points} pts · ${EV_LANG_LABEL[ev.compiler] || 'file / link'}${ev.auto_grade ? ' · graded instantly by AI (-10%)' : ''}</span></div>
+      <span class="s" style="color:var(--muted)">${p.points} pts · ${EV_LANG_LABEL[ev.compiler] || 'file / link'}${ev.auto_grade ? ' · Graded instantly by AI with a 10% reduction' : ''}</span></div>
     <div class="s" style="white-space:pre-line;line-height:1.6;margin-bottom:12px">${esc(p.description)}</div>
     ${lang ? `
       <div class="task-ide card" style="margin-bottom:12px">
@@ -336,7 +342,7 @@ async function openEventSolve(eid, pid) {
           <span class="ide-pkgs">${EV_LANG_LABEL[lang]}${ev.dataset_url ? ' · dataset auto-loaded' : ''}</span>
           <span style="flex:1"></span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="EV_TERM2&&EV_TERM2.clear()">Clear</button>
-          <button type="button" class="btn lc-btn-solve" id="ev2Run" onclick="runEvent2('${lang}')">&#9654; Run</button>
+          <button type="button" class="btn lc-btn-solve" id="ev2Run" onclick="runEvent2('${lang}')">Run</button>
         </div>
         <textarea id="ev2Code" class="code-editor ide-editor" spellcheck="false">${esc(sub && sub.code || '')}</textarea>
         <div class="ide-status-row"><span class="s" id="ev2Status" style="color:var(--muted-2)">Ready.</span></div>
@@ -349,7 +355,7 @@ async function openEventSolve(eid, pid) {
         <label class="field"><span>Your work as a file</span><input name="file" type="file"></label>
         <label class="field"><span>Or a link</span><input name="link" type="url" placeholder="https://"></label>
         <button class="btn btn-primary btn-block">${sub ? 'Resubmit' : 'Submit'}</button></form>`}
-    ${sub && sub.ai_feedback ? `<div class="s" style="margin-top:10px;background:#F4FBF9;border:1px solid #B7E9DA;border-radius:10px;padding:10px 12px">&#10024; <strong>Feedback:</strong> ${esc(sub.ai_feedback)}</div>` : ''}`);
+    ${sub && sub.ai_feedback ? `<div class="s" style="margin-top:10px;background:#F4FBF9;border:1px solid #B7E9DA;border-radius:10px;padding:10px 12px"><strong>Feedback:</strong> ${esc(sub.ai_feedback)}</div>` : ''}`);
   if (lang) { EV_TERM2 = EchoTerm.mount($('ev2Term')); EchoRun.wireEditor($('ev2Code')); }
   $('ev2Submit').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
@@ -371,8 +377,8 @@ async function runEvent2(lang) {
   const btn = $('ev2Run'); const status = $('ev2Status');
   const code = $('ev2Code').value;
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
-  btn.innerHTML = '&#9632; Stop';
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = 'Run'; return; }
+  btn.innerHTML = 'Stop';
   const files = [];
   const ev = CUR_EVENT && CUR_EVENT.event;
   if (ev && ev.dataset_url) {
@@ -382,11 +388,11 @@ async function runEvent2(lang) {
   for (const f of (ev && ev.files || [])) if (/\.(csv|tsv|txt|json)$/i.test(f.name)) files.push({ name: f.name, url: f.url });
   try { await EchoRun.executeAny(lang, code, { term: EV_TERM2, files, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
-  btn.innerHTML = '&#9654; Run';
+  btn.innerHTML = 'Run';
 }
 function afterSubmitToast(out) {
-  if (out.cert) toast(`🏆 PASSED - certificate ${out.cert.serial} issued! Find it under "My certificates".`);
-  else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}% (AI score, 10% reduction applied).`);
+  if (out.cert) toast(`Passed - certificate ${out.cert.serial} issued. Find it under My certificates.`);
+  else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}% (AI score with the 10% reduction applied).`);
   else toast('Submitted - it will be graded soon.');
 }
 
@@ -407,14 +413,14 @@ async function loadCatalogue() {
     CAT_LINKS = d.links;
     if (d.cohort) $('cohortLine').textContent = `31 live, instructor-led programs · Registration deadline ${d.cohort.registration_deadline} · Batch starts ${d.cohort.batch_starts}. Every paid course opens its first level free in the problem set - try before you enrol.`;
     $('actionStrip').innerHTML = `
-      <a class="btn btn-primary" href="${esc(d.links.registration)}" target="_blank" rel="noopener">&#128221; Register for paid courses</a>
-      <a class="btn btn-teal" href="${esc(d.links.webinar)}" target="_blank" rel="noopener">&#127909; ${esc(d.links.webinar_label)} - free</a>
-      <a class="btn btn-ghost" href="${esc(d.links.ambassador)}" target="_blank" rel="noopener">&#127891; Campus Ambassador program - apply</a>`;
+      <a class="btn btn-primary" href="${esc(d.links.registration)}" target="_blank" rel="noopener">Register for paid courses</a>
+      <a class="btn btn-teal" href="${esc(d.links.webinar)}" target="_blank" rel="noopener">${esc(d.links.webinar_label)}</a>
+      <a class="btn btn-ghost" href="${esc(d.links.ambassador)}" target="_blank" rel="noopener">Campus Ambassador program</a>`;
     const p = (d.paths || [])[0];
     $('pathBox').innerHTML = p ? `
       <div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
         <div class="grow">
-          <div class="t" style="font-weight:700;color:var(--navy)">&#128640; ${esc(p.title)}</div>
+          <div class="t" style="font-weight:700;color:var(--navy)">${esc(p.title)}</div>
           <div class="s" style="color:var(--muted)">${esc(p.summary)}</div>
           <div class="s" style="margin-top:4px">${p.codes.map((c) => `<span class="prob-chip" style="cursor:default">${esc(c)}</span>`).join(' &rarr; ')}</div>
         </div>

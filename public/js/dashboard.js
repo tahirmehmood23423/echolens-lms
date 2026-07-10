@@ -400,7 +400,7 @@ function drawCourseTab(tab) {
       ${canManage && ME.ai_enabled ? `<div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <span class="s" style="color:var(--muted)">AI tools draft; you review before anything reaches a student.</span>
         <span style="flex:1"></span>
-        <button class="btn btn-ghost btn-sm" onclick="aiClassSummary()">&#10024; AI class summary</button>
+        <button class="btn btn-ghost btn-sm" onclick="aiClassSummary()">AI class summary</button>
         <button class="btn btn-ghost btn-sm" onclick="openBatchReports()">Skill reports</button>
       </div></div>` : ''}
       <div class="card"><div class="card-head"><h3>Progress report</h3><span class="s" style="color:var(--muted)">${r.assignments.length} quest task${r.assignments.length === 1 ? '' : 's'}${atRisk ? ` &middot; <strong style="color:var(--danger)">${atRisk} at risk</strong>` : ''}</span></div>
@@ -415,8 +415,8 @@ function drawCourseTab(tab) {
           <td>${s.streak ? '&#128293; ' + s.streak + 'd' : '—'}</td>
           <td>${s.at_risk ? `<span class="s" style="color:var(--danger);font-weight:700">At risk</span><div class="s" style="color:var(--muted-2)">${s.missing ? s.missing + ' missing' : ''}${s.missing && s.inactive_days != null ? ' &middot; ' : ''}${s.inactive_days != null ? s.inactive_days + 'd quiet' : 'never active'}</div>` : '<span class="s" style="color:var(--ok)">OK</span>'}</td>
           <td class="s" style="max-width:200px">${esc(s.last_remark || '—')}</td>
-          ${canManage && ME.ai_enabled ? `<td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="aiSkillReport(${s.id},'${esc(s.name).replace(/'/g, '&#39;')}')">&#10024; Course</button>
-            <button class="btn btn-ghost btn-sm" onclick="aiOverallReport(${s.id},'${esc(s.name).replace(/'/g, '&#39;')}')">&#10024; Overall</button></td>` : ''}</tr>`).join('') || `<tr><td colspan="12" class="empty">No students enrolled yet.</td></tr>`}
+          ${canManage && ME.ai_enabled ? `<td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="aiSkillReport(${s.id},'${esc(s.name).replace(/'/g, '&#39;')}')">Course</button>
+            <button class="btn btn-ghost btn-sm" onclick="aiOverallReport(${s.id},'${esc(s.name).replace(/'/g, '&#39;')}')">Overall</button></td>` : ''}</tr>`).join('') || `<tr><td colspan="12" class="empty">No students enrolled yet.</td></tr>`}
       </table></div></div>`;
   }
 }
@@ -699,7 +699,7 @@ async function loadMyCerts() {
       <div class="card-body tight">${d.certificates.map((c) => `
         <div class="list-row" style="padding:12px 4px">
           <div class="grow">
-            <div class="t">&#127942; ${esc(c.title)}</div>
+            <div class="t">${esc(c.title)}</div>
             <div class="s" style="color:var(--muted)">${esc(c.kind)} &middot; completed ${fmtDate(c.completion_date)} &middot; serial <span class="mono">${esc(c.serial)}</span></div>
           </div>
           <a class="btn btn-teal btn-sm" href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">View &amp; download</a>
@@ -841,6 +841,7 @@ async function renderUsers() {
   const isAdmin = ME.role === 'admin';
   const groups = [
     ['Students', d.users.filter((u) => u.role === 'student')],
+    ['Open website users', d.users.filter((u) => u.role === 'free')],
     ['Teachers', d.users.filter((u) => u.role === 'instructor')],
     ['Coordinators', d.users.filter((u) => u.role === 'coordinator')],
     ['Admins', d.users.filter((u) => u.role === 'admin')],
@@ -932,7 +933,7 @@ async function aiDraft(sid) {
     r.innerHTML = `<strong>AI rationale (only you see this):</strong> ${esc(out.draft.rationale || '—')}${out.readable ? '' : '<br><em>Note: the file was not readable as text, so this draft is based on the brief and note only - review carefully.</em>'}`;
     modalMsg('Draft filled in - edit anything, then save to publish.', true);
   } catch (e) { modalMsg(e.message); }
-  btn.disabled = false; btn.innerHTML = '&#10024; Draft with AI';
+  btn.disabled = false; btn.innerHTML = 'Draft with AI';
 }
 
 /* ============================== CHALLENGES ============================== */
@@ -1043,8 +1044,8 @@ async function renderCopilot() {
   }
   el.innerHTML = `
     <div class="card"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-ghost btn-sm" onclick="formQuiz()">&#10024; Generate a quiz</button>
-      <button class="btn btn-ghost btn-sm" onclick="formOutline()">&#10024; Draft a course outline</button>
+      <button class="btn btn-ghost btn-sm" onclick="formQuiz()">Generate a quiz</button>
+      <button class="btn btn-ghost btn-sm" onclick="formOutline()">Draft a course outline</button>
       <span style="flex:1"></span>
       <span class="s" style="color:var(--muted-2)">${esc(st.provider)} &middot; ${esc(st.model)} &middot; teachers only, students never see this</span>
     </div></div>
@@ -1408,7 +1409,7 @@ async function renderQuestTab(body) {
               <span class="qdiff ${esc(pr.difficulty)}">${esc(pr.difficulty)}</span>
               <div style="flex:1;min-width:0">
                 <div class="t" style="font-size:13.5px">${pr.type === 'written' ? '<span class="type-badge written">&#128221; Written</span> ' : ''}${esc(pr.title)}</div>
-                <div class="s" style="color:var(--muted)">${pr.points} gems${q.deadline ? ` &middot; due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : ''}${sub && sub.shared_review ? ' &middot; <span style="color:var(--teal-deep)">&#10024; AI feedback shared</span>' : ''}</div>
+                <div class="s" style="color:var(--muted)">${pr.points} gems${q.deadline ? ` &middot; due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : ''}${sub && sub.shared_review ? ' &middot; <span style="color:var(--teal-deep)">AI feedback shared</span>' : ''}</div>
               </div>
               ${chip}
               <button class="btn btn-teal btn-sm" onclick="event.stopPropagation();openTask(${q.id},${pr.pid})">Open</button>
@@ -1473,7 +1474,7 @@ function sharedReviewBox(sr) {
   const rows = [['Key concepts you showed', sr.key_concepts], ['Things to fix', sr.mistakes], ['A better approach', sr.better_approach]]
     .filter(([, v]) => v)
     .map(([k, v]) => `<div style="margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${k}:</span> <span style="white-space:pre-line">${esc(v)}</span></div>`).join('');
-  return `<div class="review-share-box"><div class="rsb-head">&#10024; AI feedback - shared by your teacher</div>${rows}
+  return `<div class="review-share-box"><div class="rsb-head">AI feedback - shared by your teacher</div>${rows}
     <div class="s" style="color:var(--muted-2)">Generated with AI and released by your instructor. Your grade always comes from your teacher.</div></div>`;
 }
 
@@ -1515,7 +1516,7 @@ function openTask(qid, pid) {
   // into pd.read_csv(...); the compiler mounts the file automatically.
   const filesHtml = ideOn ? `
     <div class="task-files">
-      <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:6px">&#128193; Datasets for this task</div>
+      <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:6px">Datasets for this task</div>
       ${taskFiles.length ? taskFiles.map((f) => `
         <div class="tf-row">
           <span class="mono s" style="font-weight:600">${esc(f.name)}</span>
@@ -1527,13 +1528,13 @@ function openTask(qid, pid) {
         </div>`).join('') : '<div class="s" style="color:var(--muted)">No datasets attached yet.</div>'}
       ${taskFiles.length ? `<p class="hint" style="margin:6px 0 0">These files are loaded into the compiler automatically - read them by name, e.g. <code>pd.read_csv('${esc(taskFiles[0].name)}')</code>.</p>` : ''}
       <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
-        <label class="btn btn-ghost btn-sm" style="cursor:pointer">&#11014; Upload your own dataset (CSV / JSON / TXT)
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer">Upload your own dataset (CSV / JSON / TXT)
           <input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="taskLocalDataset(this)"></label>
         <span class="s" style="color:var(--muted-2)">Loads straight into the compiler for pandas / matplotlib / SQL - it never leaves your browser.</span>
       </div>
       <div id="localDsChips" style="margin-top:6px"></div>
-      ${d.can_manage ? `<form id="taskFileUp" style="display:flex;gap:8px;margin-top:8px;align-items:center">
-        <input name="file" type="file" accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.parquet,.zip" required style="flex:1">
+      ${d.can_manage ? `<form id="taskFileUp">
+        <input name="file" type="file" accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.parquet,.zip" required>
         <button class="btn btn-teal btn-sm">Attach dataset for all students</button></form>` : ''}
     </div>` : '';
 
@@ -1601,7 +1602,7 @@ function openTask(qid, pid) {
           <span class="ide-pkgs" id="idePkgs">${ideOn ? `numpy &middot; pandas &middot; matplotlib &middot; scikit-learn ready${taskFiles.length ? ' &middot; ' + taskFiles.length + ' dataset' + (taskFiles.length > 1 ? 's' : '') + ' mounted' : ''}` : 'Answer workspace'}</span>
           <span style="flex:1"></span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="clearTaskTerm()">Clear output</button>
-          <button type="button" class="btn btn-teal btn-sm" id="runBtn" onclick="runTaskCode()">&#9654; Run</button>
+          <button type="button" class="btn btn-teal btn-sm" id="runBtn" onclick="runTaskCode()">Run</button>
         </div>
         <textarea id="codeBox" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your Python solution here, then press Run.">${esc(prevCode)}</textarea>
         <div class="ide-status-row"><span class="s" id="runStatus" style="color:var(--muted-2)">Ready.</span></div>
@@ -1710,12 +1711,12 @@ async function runTaskCode() {
     status.textContent = 'Preview updated.';
     return;
   }
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
-  btn.innerHTML = '&#9632; Stop';
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = 'Run'; return; }
+  btn.innerHTML = 'Stop';
   const files = [...TASK_CTX.files, ...(TASK_CTX.localFiles || [])];
   try { await EchoRun.executeAny(lang, code, { term: TASK_CTX.term, files, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
-  btn.innerHTML = '&#9654; Run';
+  btn.innerHTML = 'Run';
 }
 /* v12: students upload their OWN dataset (CSV/JSON/txt) into the compiler -
  * it is mounted locally in the browser (never uploaded to the server), so
@@ -1729,7 +1730,7 @@ function taskLocalDataset(input) {
     TASK_CTX.localFiles = (TASK_CTX.localFiles || []).filter((x) => x.name !== f.name);
     TASK_CTX.localFiles.push({ name: f.name, bytes: reader.result });
     const chip = $('localDsChips');
-    if (chip) chip.innerHTML = TASK_CTX.localFiles.map((x) => `<span class="prob-chip" title="Loaded into the compiler">&#128190; ${esc(x.name)}</span>`).join(' ');
+    if (chip) chip.innerHTML = TASK_CTX.localFiles.map((x) => `<span class="prob-chip" title="Loaded into the compiler">${esc(x.name)}</span>`).join(' ');
     toast(`${f.name} loaded - read it by name, e.g. pd.read_csv('${f.name}') or as SQL table "${f.name.replace(/\.[^.]+$/, '')}".`);
   };
   reader.readAsArrayBuffer(f);
@@ -1864,7 +1865,7 @@ async function openQuestSubs(qid, pid) {
             <div class="t">${esc(s.student_name)} <span class="mono s" style="color:var(--muted)">${esc(s.student_reg || '')}</span>${s.late ? ' <span class="late-flag">LATE</span>' : ''}</div>
             <div class="s">${esc((s.submitted_at || '').slice(0, 16))} &middot; ${s.code ? (s.language === 'web' ? '&#127760; web code' : s.language === 'text' ? '&#128221; written answer' : '&#9998; code submission') : '&#128206; file'} ${s.note ? '&middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
             ${s.grade != null ? `<div class="s"><span class="grade-chip ok">&#10003; Graded ${s.grade}%</span> ${s.gems} gems${s.late_deduction ? ` <span style="color:var(--danger)">(&minus;${s.late_deduction} late)</span>` : ''} ${s.remarks ? '&middot; ' + esc(s.remarks) : ''}</div>` : '<div class="s"><span class="grade-chip wait">&#9203; Not graded yet</span></div>'}
-            ${s.ai_review ? `<div class="s" style="color:${s.review_shared ? 'var(--teal-deep)' : 'var(--muted-2)'}">&#10024; AI review ${s.review_shared ? 'shared with student' : 'ready (not shared)'}</div>` : ''}
+            ${s.ai_review ? `<div class="s" style="color:${s.review_shared ? 'var(--teal-deep)' : 'var(--muted-2)'}">AI review ${s.review_shared ? 'shared with student' : 'ready (not shared)'}</div>` : ''}
             ${s.integrity && (s.integrity.similarity?.matches?.length || (s.integrity.ai_check && s.integrity.ai_check.ai_likelihood >= 60)) ? '<div class="s" style="color:var(--danger);font-weight:600">&#9888; Integrity flags - open to review</div>' : ''}
           </div>
           ${s.file_url ? `<a class="btn btn-ghost btn-sm" href="${esc(s.file_url)}" target="_blank" rel="noopener">Open file</a>` : ''}
@@ -1881,7 +1882,7 @@ function formQuestGrade(sid, qid, pid) {
         <span class="s" style="color:var(--muted-2)">${esc(s.language || 'python')}</span>
         <span style="flex:1"></span>
         <span class="s" id="runStatus" style="color:var(--muted-2)"></span>
-        ${s.language !== 'text' ? `<button type="button" class="btn btn-ghost btn-sm" id="runBtn" onclick="runGradeCode()">&#9654; Run</button>` : ''}
+        ${s.language !== 'text' ? `<button type="button" class="btn btn-ghost btn-sm" id="runBtn" onclick="runGradeCode()">Run</button>` : ''}
         <button type="button" class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('gradeCode').textContent).then(()=>toast('Code copied.'))">Copy</button>
       </div>
       <pre id="gradeCode" class="code-out" style="display:block;max-height:30vh">${esc(s.code)}</pre>
@@ -1889,7 +1890,7 @@ function formQuestGrade(sid, qid, pid) {
       : (s.file_url ? `<a class="btn btn-ghost btn-sm" href="${esc(s.file_url)}" target="_blank" rel="noopener" style="margin-bottom:12px">&#128206; Open submitted file</a>` : '');
     openModal('Grade quest submission', `
       ${codeBlock}
-      ${ME.ai_enabled ? `<button class="btn btn-ghost btn-sm" id="aiDraftBtn" onclick="aiReview(${sid})" style="margin:10px 0 12px">&#10024; AI Review</button>
+      ${ME.ai_enabled ? `<button class="btn btn-ghost btn-sm" id="aiDraftBtn" onclick="aiReview(${sid})" style="margin:10px 0 12px">AI Review</button>
         <div id="aiRationale" style="display:none"></div>` : ''}
       <form id="f">
         <label class="field"><span>Grade (0&ndash;100%)</span><input name="grade" type="number" min="0" max="100" ${s.grade != null ? `value="${s.grade}"` : ''} required></label>
@@ -1908,14 +1909,14 @@ function formQuestGrade(sid, qid, pid) {
 async function runGradeCode() {
   const btn = $('runBtn'); const status = $('runStatus');
   const code = $('gradeCode').textContent;
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = 'Run'; return; }
   const wrap = $('gradeTerm');
   wrap.style.display = '';
   if (!wrap._term) wrap._term = EchoTerm.mount(wrap);
-  btn.innerHTML = '&#9632; Stop';
+  btn.innerHTML = 'Stop';
   try { await EchoRun.execute(code, { term: wrap._term, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
-  btn.innerHTML = '&#9654; Run';
+  btn.innerHTML = 'Run';
 }
 /* ============================ AI REVIEW (teacher) ============================ */
 async function aiReview(sid, force) {
@@ -1944,7 +1945,7 @@ async function aiReview(sid, force) {
     </div>`;
     modalMsg('AI review ready - the final score is yours.', true);
   } catch (e) { modalMsg(e.message); }
-  if (btn) { btn.disabled = false; btn.innerHTML = '&#10024; AI Review'; }
+  if (btn) { btn.disabled = false; btn.innerHTML = 'AI Review'; }
 }
 async function shareReview(sid, share) {
   const btn = $('shareBtn'); if (btn) btn.disabled = true;
@@ -2178,7 +2179,7 @@ async function renderQuizzesTab(body) {
             <strong class="s">&#128187; Practice terminal</strong>
             <span class="s" style="color:var(--muted-2)">Try code here while you answer - nothing is submitted from this box.</span>
             <span style="flex:1"></span>
-            <button type="button" class="btn btn-teal btn-sm" onclick="runQuizIde(${q.id})" id="quizRun${q.id}">&#9654; Run</button>
+            <button type="button" class="btn btn-teal btn-sm" onclick="runQuizIde(${q.id})" id="quizRun${q.id}">Run</button>
           </div>
           <textarea id="quizCode${q.id}" class="code-editor ide-editor" style="min-height:120px" spellcheck="false" placeholder="# Scratchpad - run the snippets from the questions here."></textarea>
           <div id="quizTerm${q.id}"></div>
@@ -2233,11 +2234,11 @@ async function runQuizIde(qid) {
   if (!wrap._term) wrap._term = EchoTerm.mount(wrap);
   const code = $(`quizCode${qid}`).value;
   if (!code.trim()) { toast('Write some code first.', true); return; }
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
-  btn.innerHTML = '&#9632; Stop';
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = 'Run'; return; }
+  btn.innerHTML = 'Stop';
   try { await EchoRun.execute(code, { term: wrap._term, onStatus: () => {} }); }
   catch (e) { toast(e.message, true); }
-  btn.innerHTML = '&#9654; Run';
+  btn.innerHTML = 'Run';
 }
 function formQuizBuilder(prefill) {
   const qs = prefill || [{ q: '', options: ['', '', '', ''], answer: 0 }];
@@ -2251,7 +2252,7 @@ function formQuizBuilder(prefill) {
       ${ME.ai_enabled ? `<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
         <input id="aiQuizTopic" placeholder="Topic, e.g. pandas groupby" style="flex:1;min-width:160px">
         <input id="aiQuizCount" type="number" min="1" max="15" value="5" style="width:64px">
-        <button type="button" class="btn btn-ghost btn-sm" id="aiQuizBtn" onclick="aiFillQuiz()">&#10024; Generate with AI</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="aiQuizBtn" onclick="aiFillQuiz()">Generate with AI</button>
       </div>` : ''}
       <label class="field" style="flex-direction:row;gap:8px;align-items:center;margin:2px 0 10px"><input name="allow_ide" type="checkbox" style="width:auto"><span>Include a practice IDE terminal - students can run Python beside the questions (great for "what does this code print?" quizzes)</span></label>
       <div id="quizQs"></div>
@@ -2305,7 +2306,7 @@ async function aiFillQuiz() {
     out.questions.forEach((q) => addQuizQ(q));
     modalMsg('AI questions loaded - review and fix anything before creating.', true);
   } catch (e) { modalMsg(e.message); }
-  btn.disabled = false; btn.innerHTML = '&#10024; Generate with AI';
+  btn.disabled = false; btn.innerHTML = 'Generate with AI';
 }
 function openQuizWindow(id, def) {
   const mins = prompt('Open this quiz for how many minutes?', def || 10);
@@ -2418,7 +2419,7 @@ async function openStudentProfile(id) {
           <span>${c.attendance ? 'Attendance ' + c.attendance.pct + '% (' + c.attendance.attended + '/' + c.attendance.total + ')' : 'No classes yet'}</span>
         </div>
       </div>`).join('') : '<div class="empty">Not enrolled in any course.</div>'}
-    ${s.certificates.length ? `<div class="pub-sec">Certificates</div>${s.certificates.map((c) => `<div class="s" style="padding:4px 0">&#127942; ${esc(c.title)} <span class="mono" style="color:var(--muted)">${esc(c.serial)}</span> &middot; ${fmtDate(c.completion_date)} &middot; <a href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">view</a></div>`).join('')}` : ''}
+    ${s.certificates.length ? `<div class="pub-sec">Certificates</div>${s.certificates.map((c) => `<div class="s" style="padding:4px 0">${esc(c.title)} <span class="mono" style="color:var(--muted)">${esc(c.serial)}</span> &middot; ${fmtDate(c.completion_date)} &middot; <a href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">view</a></div>`).join('')}` : ''}
     ${s.badges && s.badges.length ? `<div class="pub-sec">Badges</div><div class="s">${s.badges.map((b) => esc(b.name || b)).join(' &middot; ')}</div>` : ''}
     <div class="pub-sec">Personal information</div>
     <div class="kv-grid">${infoRows || '<div class="s" style="color:var(--muted)">No details on file.</div>'}</div>`, true);
@@ -2556,11 +2557,11 @@ async function renderEvents() {
     <div class="card"><div class="card-head"><h3>All events</h3></div><div class="card-body tight">
       ${d.events.length ? d.events.map((ev) => `
         <div class="list-row">
-          <div class="when">${evStatusBadge(ev.status)}<small>${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) : (ev.duration_minutes ? '~' + ev.duration_minutes + ' min' : 'open-ended')}</small></div>
+          <div class="when">${evStatusBadge(ev.status)}<small>${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) : (ev.duration_minutes ? 'About ' + ev.duration_minutes + ' minutes' : 'open-ended')}</small></div>
           <div class="grow">
             <div class="t"><span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}</span> &nbsp;${esc(ev.title)}
-              <span class="s" style="font-weight:500;color:var(--muted)">&middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'free'} &middot; ${ev.scope === 'both' ? 'portal + open site' : ev.scope === 'open' ? 'open site' : 'portal only'}</span></div>
-            <div class="s" style="color:var(--muted)">${(ev.problems || []).length ? (ev.problems.length + ' task' + (ev.problems.length > 1 ? 's' : '') + ' &middot; ') : ''}${ev.compiler !== 'none' ? EV_LANG_LABEL[ev.compiler] + ' compiler &middot; ' : ''}${ev.auto_grade ? 'AI graded (-10%) &middot; ' : ''}${ev.auto_certificate ? 'auto certificate at ' + ev.pass_mark + '%+ &middot; ' : ''}${ev.entries_count} registered</div>
+              <span class="s" style="font-weight:500;color:var(--muted)">&middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; ${ev.scope === 'both' ? 'Portal + open site' : ev.scope === 'open' ? 'Open site' : 'Portal only'}</span></div>
+            <div class="s" style="color:var(--muted)">${(ev.problems || []).length ? (ev.problems.length + ' task' + (ev.problems.length > 1 ? 's' : '') + ' &middot; ') : ''}${ev.compiler !== 'none' ? EV_LANG_LABEL[ev.compiler] + ' compiler &middot; ' : ''}${ev.auto_grade ? 'AI graded &middot; ' : ''}${ev.auto_certificate ? 'Certificate at ' + ev.pass_mark + '%+ &middot; ' : ''}${ev.entries_count} registered</div>
             ${ev.my_entry ? `<div class="s" style="color:var(--ok)">Registered${ev.my_entry.payment_status === 'pending' ? ' - <span style="color:var(--gold)">payment being verified</span>' : ev.my_entry.payment_status === 'rejected' ? ' - <span style="color:var(--danger)">payment rejected, contact admin</span>' : ''}${ev.my_progress && ev.my_progress.passed ? ' &middot; <strong>PASSED ' + ev.my_progress.avg + '%</strong>' : ev.my_progress && ev.my_progress.avg != null ? ' &middot; avg ' + ev.my_progress.avg + '%' : ''}</div>` : ''}
           </div>
           <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
@@ -2695,15 +2696,15 @@ async function openEvent(id) {
     <div class="s" style="margin:8px 0"><strong>Documents &amp; datasets:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>${isAdmin ? ` <button class="btn btn-ghost btn-sm" onclick="evDelFile(${ev.id},'${esc(f.name).replace(/'/g, '&#39;')}')" title="Remove">&times;</button>` : ''}`).join(' &middot; ')}</div>` : '';
   const regBtn = !d.my_entry && ['upcoming', 'live'].includes(ev.status) && ['free', 'student'].includes(ME.role)
     ? `<button class="btn btn-teal" onclick="formEventRegister(${ev.id})">Register${ev.entry === 'paid' ? ' - PKR ' + ev.fee_pkr : ' - free'}</button>` : '';
-  const gateMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait">&#9203; ${esc(d.participate_msg)}</div>` : '';
+  const gateMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait">${esc(d.participate_msg)}</div>` : '';
   const passedMsg = d.my_progress && d.my_progress.passed
-    ? `<div class="task-status ok">&#127942; <strong>PASSED with ${d.my_progress.avg}%</strong>${ev.auto_certificate ? ' - your certificate is on your profile.' : ''}</div>` : '';
+    ? `<div class="task-status ok"><strong>Passed with ${d.my_progress.avg}%</strong>${ev.auto_certificate ? ' - your certificate is on your profile.' : ''}</div>` : '';
   const webinarHtml = ev.kind === 'webinar' && ev.meeting_link
-    ? `<div class="task-status ok">&#127909; You are in - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : '';
+    ? `<div class="task-status ok">You are in - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : '';
   openModal(ev.title, `
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}</span> ${evStatusBadge(ev.status)}
-      <span class="s" style="color:var(--muted)">${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) + ' &rarr; ' + esc(String(ev.ends_at || '').replace('T', ' ')) : ev.duration_minutes ? '~' + ev.duration_minutes + ' minutes' : ''} &middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'free'} &middot; pass mark ${ev.pass_mark}%${ev.auto_grade ? ' &middot; AI graded (-10%)' : ''}${ev.auto_certificate ? ' &middot; auto certificate' : ''}</span></div>
+      <span class="s" style="color:var(--muted)">${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) + ' &rarr; ' + esc(String(ev.ends_at || '').replace('T', ' ')) : ev.duration_minutes ? '~' + ev.duration_minutes + ' minutes' : ''} &middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; Pass mark ${ev.pass_mark}%${ev.auto_grade ? ' &middot; AI graded (-10%)' : ''}${ev.auto_certificate ? ' &middot; auto certificate' : ''}</span></div>
     ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
     ${filesHtml}
     ${regBtn}${gateMsg}${passedMsg}${webinarHtml}
@@ -2717,10 +2718,10 @@ async function openEvent(id) {
             <span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span>
             <span class="s" style="color:var(--muted)">${p.points} pts</span>
             <span style="flex:1"></span>
-            ${s ? (s.score != null ? `<span class="grade-chip ok">Scored ${s.score}%${s.graded_by === 'ai' ? ' (AI, -10% applied)' : ''}</span>` : '<span class="grade-chip wait">Submitted - grading</span>') : '<span class="grade-chip none">Not submitted</span>'}
+            ${s ? (s.score != null ? `<span class="grade-chip ok">Scored ${s.score}%${s.graded_by === 'ai' ? ' (AI graded)' : ''}</span>` : '<span class="grade-chip wait">Submitted - grading</span>') : '<span class="grade-chip none">Not submitted</span>'}
             <button class="btn btn-teal btn-sm" onclick="openEventTask(${ev.id},${p.pid})">${s ? 'Reopen' : 'Solve'}</button>
           </div>
-          ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">&#10024; ${esc(s.ai_feedback)}</div>` : ''}
+          ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">${esc(s.ai_feedback)}</div>` : ''}
         </div>`;
       }).join('')}` : ''}
     ${d.can_participate && !probs.length && ev.kind !== 'webinar' ? `
@@ -2731,7 +2732,7 @@ async function openEvent(id) {
       <div class="card-body tight" style="max-height:30vh;overflow-y:auto">
         ${d.board.map((b, i) => `<div class="lb-row" style="padding:9px 4px">
           <div class="lb-rank">${b.avg != null ? i + 1 : '·'}</div>
-          <div class="lb-name">${esc(b.name)}<small>${b.tier === 'open' ? 'open site' : 'portal'} &middot; ${b.graded}/${b.submissions} graded</small></div>
+          <div class="lb-name">${esc(b.name)}<small>${b.tier === 'open' ? 'Open site' : 'Portal'} &middot; ${b.graded}/${b.submissions} graded</small></div>
           ${b.passed ? '<span class="grade-chip ok">passed</span>' : ''}
           <strong style="min-width:44px;text-align:right">${b.avg != null ? b.avg + '%' : '—'}</strong>
         </div>`).join('')}
@@ -2767,7 +2768,7 @@ async function openEventTask(eid, pid) {
           <span class="ide-pkgs">${EV_LANG_LABEL[lang]}${ev.dataset_url ? ' &middot; dataset auto-loaded from URL' : ''}</span>
           <span style="flex:1"></span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="EV_TERM&&EV_TERM.clear()">Clear</button>
-          <button type="button" class="btn btn-teal btn-sm" id="evRunBtn" onclick="runEventCode('${lang}',${eid})">&#9654; Run</button>
+          <button type="button" class="btn btn-teal btn-sm" id="evRunBtn" onclick="runEventCode('${lang}',${eid})">Run</button>
         </div>
         <textarea id="evCode" class="code-editor ide-editor" spellcheck="false" placeholder="${lang === 'sql' ? '-- Write your SQL here. CSV datasets are loaded as tables automatically.' : lang === 'c' ? '// Write your C solution here.\n#include <stdio.h>\nint main(){\n    printf(&quot;Hello EchoLens\\n&quot;);\n    return 0;\n}' : lang === 'cpp' ? '// Write your C++ solution here.' : '# Write your Python solution here.'}">${esc(sub && sub.code || '')}</textarea>
         <div class="ide-status-row"><span class="s" id="evRunStatus" style="color:var(--muted-2)">Ready.</span></div>
@@ -2783,7 +2784,7 @@ async function openEventTask(eid, pid) {
           <button class="btn btn-primary">Submit file</button>
         </form></details>`
     : eventSubmitFormHtml(ev, pid, sub)}
-    ${sub && sub.ai_feedback ? `<div class="s" style="margin-top:10px;background:#F4FBF9;border:1px solid #B7E9DA;border-radius:10px;padding:10px 12px">&#10024; <strong>Feedback:</strong> ${esc(sub.ai_feedback)}</div>` : ''}`, true);
+    ${sub && sub.ai_feedback ? `<div class="s" style="margin-top:10px;background:#F4FBF9;border:1px solid #B7E9DA;border-radius:10px;padding:10px 12px"><strong>Feedback:</strong> ${esc(sub.ai_feedback)}</div>` : ''}`, true);
   if (lang && lang !== 'web') {
     window.EV_TERM = EchoTerm.mount($('evTerm'));
     EchoRun.wireEditor($('evCode'));
@@ -2794,8 +2795,8 @@ async function runEventCode(lang, eid) {
   const btn = $('evRunBtn'); const status = $('evRunStatus');
   const code = $('evCode').value;
   if (!code.trim()) { toast('Write some code first.', true); return; }
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
-  btn.innerHTML = '&#9632; Stop';
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = 'Run'; return; }
+  btn.innerHTML = 'Stop';
   const files = [];
   const ev = EV_CUR && EV_CUR.event.id === eid ? EV_CUR.event : null;
   if (ev && ev.dataset_url) {
@@ -2805,7 +2806,7 @@ async function runEventCode(lang, eid) {
   for (const f of (ev && ev.files || [])) if (/\.(csv|tsv|txt|json)$/i.test(f.name)) files.push({ name: f.name, url: f.url });
   try { await EchoRun.executeAny(lang, code, { term: window.EV_TERM, files, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
-  btn.innerHTML = '&#9654; Run';
+  btn.innerHTML = 'Run';
 }
 function wireEventSubForms(eid) {
   document.querySelectorAll('.evSubForm').forEach((f) => f.addEventListener('submit', async (e) => {
@@ -2820,8 +2821,8 @@ function wireEventSubForms(eid) {
     }
     try {
       const out = await api(`/api/events/${eid}/submit`, { method: 'POST', body: fd });
-      if (out.cert) toast(`🏆 PASSED - certificate ${out.cert.serial} issued! Find it on your profile.`);
-      else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}% (AI score with 10% reduction).`);
+      if (out.cert) toast(`Passed - certificate ${out.cert.serial} issued. Find it on your profile.`);
+      else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}% (AI score with the 10% reduction applied).`);
       else toast('Submitted - it will be graded soon.');
       openEvent(eid);
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
@@ -2857,9 +2858,9 @@ function adminEventPanel(d) {
       ${(d.entries || []).map((e) => `
         <div class="list-row" style="padding:10px 4px">
           <div class="grow">
-            <div class="t">${esc(e.name)} <span class="mono s" style="color:var(--muted)">${esc(e.reg_no || '')}</span> <span class="role-pill">${e.tier}</span></div>
+            <div class="t">${esc(e.name)} <span class="mono s" style="color:var(--muted)">${esc(e.reg_no || '')}</span> <span class="role-pill">${e.tier === 'open' ? 'Open site' : 'Portal'}</span></div>
             <div class="s" style="color:var(--muted)">${esc(e.email || 'no email')}${e.whatsapp ? ' &middot; WA ' + esc(e.whatsapp) : ''} &middot; ${esc((e.registered_at || '').slice(0, 16))}${e.progress && e.progress.avg != null ? ' &middot; avg ' + e.progress.avg + '%' + (e.progress.passed ? ' (passed)' : '') : ''}</div>
-            ${ev.entry === 'paid' ? `<div class="s" style="margin-top:4px">Payment: <span class="pay-badge ${esc(e.payment_status)}">${esc(e.payment_status)}</span>
+            ${ev.entry === 'paid' ? `<div class="s" style="margin-top:4px">Payment: <span class="pay-badge ${esc(e.payment_status)}">${{pending:'Pending verification',confirmed:'Confirmed',rejected:'Rejected',na:'Not required'}[e.payment_status] || esc(e.payment_status)}</span>
               ${e.payment_shot ? `<br><a href="${esc(e.payment_shot)}" target="_blank" rel="noopener"><img class="ev-shot" src="${esc(e.payment_shot)}" alt="payment screenshot"></a>` : ''}</div>` : ''}
           </div>
           ${ev.entry === 'paid' && e.payment_status === 'pending' ? `
@@ -2875,14 +2876,14 @@ function adminEventPanel(d) {
             <div class="t">${esc(s.user_name)}${s.pid ? ' &middot; task ' + s.pid : ''} ${s.score != null ? `<span class="grade-chip ok">${s.score}%${s.graded_by === 'ai' ? ' AI' : ''}</span>` : '<span class="grade-chip wait">ungraded</span>'}</div>
             <div class="s" style="color:var(--muted)">${esc((s.submitted_at || '').slice(0, 16))}${s.language ? ' &middot; ' + esc(s.language) : ''}${s.note ? ' &middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
             ${s.code ? `<details><summary class="s" style="cursor:pointer;color:var(--teal-deep)">View code</summary><pre class="cred-box" style="white-space:pre-wrap;max-height:200px;overflow:auto">${esc(s.code)}</pre></details>` : ''}
-            ${s.file_url ? `<a class="s" href="${esc(s.file_url)}" target="_blank" rel="noopener">&#128206; ${esc(s.file_name || 'file')}</a> ` : ''}
-            ${s.link ? `<a class="s" href="${esc(s.link)}" target="_blank" rel="noopener">&#128279; project link</a>` : ''}
+            ${s.file_url ? `<a class="s" href="${esc(s.file_url)}" target="_blank" rel="noopener">${esc(s.file_name || 'File')}</a> ` : ''}
+            ${s.link ? `<a class="s" href="${esc(s.link)}" target="_blank" rel="noopener">Project link</a>` : ''}
           </div>
           <button class="btn btn-ghost btn-sm" onclick="evScore(${s.id},${ev.id})">Score</button>
         </div>`).join('') || '<div class="empty">No submissions yet.</div>'}
     </div>
     <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-      <form id="evFileUp" style="display:flex;gap:8px;align-items:center">
+      <form id="evFileUp" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <input name="file" type="file" required style="font-size:12.5px">
         <button class="btn btn-teal btn-sm">Attach document / dataset</button>
       </form>
@@ -2980,7 +2981,7 @@ async function renderAnalytics() {
         </form>
       </div></div>
     <div class="card"><div class="card-head"><h3>Leads database</h3>
-      <a class="btn btn-teal btn-sm" href="/api/admin/leads.csv" download>&#11015; Download CSV</a></div>
+      <a class="btn btn-teal btn-sm" href="/api/admin/leads.csv" download>Download CSV</a></div>
       <div class="card-body" style="padding-bottom:0"><input class="search-input" placeholder="Filter by name, email, or number..." oninput="filterLeads(this.value)"></div>
       <div class="card-body tight" id="leadsBox"><div class="empty">Loading leads&hellip;</div></div>
     </div>`;
@@ -3008,7 +3009,7 @@ function drawLeads(list) {
     <table class="lc-table"><thead><tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Source</th><th>Tier</th><th>Since</th></tr></thead><tbody>
       ${list.slice(0, 400).map((l) => `<tr style="cursor:default">
         <td>${esc(l.name || '—')}</td><td>${esc(l.email)}</td><td>${esc(l.whatsapp || '—')}</td>
-        <td>${esc(l.source)}</td><td><span class="role-pill">${esc(l.tier)}</span></td><td class="s" style="color:var(--muted)">${esc((l.created_at || '').slice(0, 10))}</td>
+        <td>${{'open-signup':'Open sign-up',google:'Google sign-in',open:'Open site',portal:'Portal'}[l.source] || esc(l.source)}</td><td><span class="role-pill">${{open:'Open site',student:'Student',lead:'Lead'}[l.tier] || esc(l.tier)}</span></td><td class="s" style="color:var(--muted)">${esc((l.created_at || '').slice(0, 10))}</td>
       </tr>`).join('')}
     </tbody></table>${list.length > 400 ? `<p class="hint">Showing 400 of ${list.length} - download the CSV for the full list.</p>` : ''}`
     : '<div class="empty">No leads yet - they appear as soon as anyone signs in on the open website.</div>';

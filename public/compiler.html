@@ -57,11 +57,11 @@
       </select>
       <span class="ide-pkgs" id="pkgs">numpy · pandas · matplotlib · scikit-learn ready</span>
       <span style="flex:1"></span>
-      <label class="btn btn-ghost btn-sm" style="cursor:pointer">&#11014; Dataset file
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer">Dataset file
         <input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="localDataset(this)"></label>
-      <button class="btn btn-ghost btn-sm" onclick="urlDataset()">&#127760; Dataset from URL</button>
+      <button class="btn btn-ghost btn-sm" onclick="urlDataset()">Dataset from URL</button>
       <button class="btn btn-ghost btn-sm" onclick="TERM&&TERM.clear();document.getElementById('webLog').textContent=''">Clear</button>
-      <button class="btn lc-btn-solve" id="runBtn" onclick="run()">&#9654; Run</button>
+      <button class="btn lc-btn-solve" id="runBtn" onclick="run()">Run</button>
     </div>
     <div id="dsChips" style="padding:0 14px"></div>
     <textarea id="code" class="code-editor ide-editor" spellcheck="false" placeholder="# Write Python here, press Run.
@@ -120,7 +120,7 @@ function langChanged() {
     : '<!-- Write HTML, CSS (in <style>) and JS (in <script>) - Run shows a live preview. -->';
 }
 function drawChips() {
-  $('dsChips').innerHTML = FILES.map((f) => `<span class="prob-chip" style="cursor:default">&#128190; ${f.name}</span>`).join(' ');
+  $('dsChips').innerHTML = FILES.map((f) => `<span class="prob-chip" style="cursor:default">${f.name}</span>`).join(' ');
 }
 function localDataset(input) {
   const f = input.files && input.files[0];
@@ -160,11 +160,11 @@ async function run() {
     status.textContent = 'Preview updated.';
     return;
   }
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
-  btn.innerHTML = '&#9632; Stop';
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.textContent = 'Run'; return; }
+  btn.textContent = 'Stop';
   try { await EchoRun.executeAny(lang, code, { term: TERM, files: FILES, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
-  btn.innerHTML = '&#9654; Run';
+  btn.textContent = 'Run';
 }
 </script>
 </body>

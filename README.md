@@ -1,3 +1,25 @@
+# EchoLens LMS v12.3 - Open Platform Release
+
+**Course catalogue is fully public** - no sign-in needed to browse all 31 programs, prices, badges, and the Web Developer Path (`GET /api/public/catalogue`). Sign-in is now a modal that appears only where it matters: submitting work, joining events, earning certificates.
+
+**Quests live inside their course, exactly like the LMS portal.** The Quests tab lists every course as a quest ladder; opening one shows every level and every task - the first week is open on paid programs (bootcamps open both week-1 sessions), free courses are open end to end, and locked levels show all task titles, points and difficulty with a Register button to unlock. Difficulties display uniformly as Easy / Medium / Hard.
+
+**Free courses issue automatic certificates.** Open quests now have a real Submit button: submissions are AI-graded on the spot with the 10% reduction, gems are awarded by score and shown per task, progress bars track the course, and completing a fully free course (BC-03, BC-04, BC-06) above its pass mark issues a verified certificate automatically and emails it.
+
+**Compiler only where it belongs.** Courses are code-mode or file-mode: coding tracks get the built-in compiler with Run + Submit; non-coding tracks (Prompt Engineering, Graphic Design, Canva, Excel, Marketing, Freelancing, Content Writing, Flutter, Video Editing, and the v11 no-IDE set) take file submissions instead - PDF, Word, PNG, JPEG, ZIP - all AI-gradable.
+
+**In-site registration replaces the external form.** "Register" opens a short form (name, email, WhatsApp, city, course, note, honeypot-protected); submissions appear in the admin portal under Analytics and Leads as **New student registrations**, each with Contacted / Challan sent / Added to course checkmarks and an internal note - purely for the academy's records. Admin and student both receive confirmation email when SMTP is on.
+
+**Announcements.** A new Announcements tab on the open website (plus a Latest section on Home) shows admin-published announcements - new cohorts, hackathons, webinars, discounts - with optional action links and pinning. Admins publish from the Events tab ("Website announcements"), optionally emailing portal / open / all audiences.
+
+**Email addresses are actually checked.** Signup and registration verify the domain has MX records (fake domains are rejected), and when SMTP is configured a 6-digit code is emailed and must be entered before the account is created.
+
+**Home tab.** The open site now opens on a proper home page: hero, quick stats, cards for every section, and the latest announcements. Deep links work: /open#courses, #quests, #events, #announcements, #register, #signup.
+
+**Bug fixes.** Creating events from the admin portal was broken for every kind (an invalid CSS selector crashed the form handler) - hackathons, webinars, competitions and quests all create correctly now, and webinars no longer require tasks. Also fixed: stale problem rows leaking into webinar payloads.
+
+---
+
 # EchoLens LMS v12.2 - Professional UI & Auth Fixes
 
 **Email sign-in fixed.** The "Create a free account with email" button on the open portal was wired to a function that did not exist, so email signup silently failed - now it opens the signup form correctly. Sign-in now also routes by role: open (free) accounts land on /open, portal accounts on /dashboard, both from the login page and the already-signed-in check.

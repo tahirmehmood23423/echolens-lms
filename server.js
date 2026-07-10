@@ -20,7 +20,7 @@ const mailer = require('./mailer');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, officialCatalogue,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile,
-  Events, Leads, Analytics,
+  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -998,7 +998,11 @@ app.get('/api/public/tracks', (req, res) => res.json({ tracks: Quests.tracks(), 
 app.get('/api/public/tracks/:key', (req, res) => {
   const t = Quests.trackDef(req.params.key);
   if (!t) return res.status(404).json({ error: 'Track not found.' });
-  const openN = t.free ? t.levels.length : OPEN_LEVELS; // free programs: every level open
+  // Free programs open every level; paid programs open the whole first week
+  // (bootcamps have two sessions in week 1) - the rest is visible but locked.
+  const week1 = t.levels.filter((l) => (l.week || l.no) === 1).length;
+  const openN = t.free ? t.levels.length : Math.max(1, week1 || OPEN_LEVELS);
+  const mode = Quests.tracks().find((x) => x.key === t.key)?.submission_mode || 'code';
   const levels = t.levels.map((l) => {
     if (l.no <= openN) {
       return {
@@ -1006,9 +1010,14 @@ app.get('/api/public/tracks/:key', (req, res) => {
         problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [] })),
       };
     }
-    return { no: l.no, week: l.week, title: l.title, topic: l.topic, locked: true, problems_count: l.problems.length };
+    // Locked levels: every task is listed (title, points, difficulty) so the
+    // full course is visible - briefs and resources unlock on enrolment.
+    return {
+      no: l.no, week: l.week, title: l.title, topic: l.topic, locked: true, problems_count: l.problems.length,
+      problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
+    };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free }, levels, open_levels: openN });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode }, levels, open_levels: openN });
 });
 
 /* ================================ v11 routes ================================ */
@@ -1379,10 +1388,12 @@ app.get('/api/public/cert-image/:name', (req, res) => {
 // Anyone can create a FREE open account with name, email, WhatsApp, and a
 // password. Nothing on the open side is accessible without signing in (Google
 // or this form) - every open user becomes a lead the admin can download.
-app.post('/api/auth/register-open', (req, res) => {
-  const { name, email, whatsapp, password } = req.body || {};
+app.post('/api/auth/register-open', async (req, res) => {
+  const { name, email, whatsapp, password, code } = req.body || {};
   if (!name || String(name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
+  if (mailer.configured && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
   if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
   if (!password || String(password).length < 8) return res.status(400).json({ error: 'Choose a password of at least 8 characters.' });
   if (Users.byLogin(email)) return res.status(400).json({ error: 'An account with this email already exists - sign in instead.' });
@@ -1646,7 +1657,7 @@ const KEY_LINKS = {
   webinar: process.env.WEBINAR_URL || 'https://docs.google.com/spreadsheets/d/1fxvqOG5UJjfTiUwgRjN757OJIgADFP_PcL1pHjPZ92w/edit?resourcekey=&gid=1520673966#gid=1520673966',
   webinar_label: process.env.WEBINAR_LABEL || 'Free webinar - 18 July, 4-5 PM',
 };
-app.get('/api/catalogue', authRequired, (req, res) => {
+app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
   const trackByCode = {};
   for (const t of Quests.tracks()) if (t.course_code) trackByCode[t.course_code] = t;
   res.json({
@@ -1655,6 +1666,139 @@ app.get('/api/catalogue', authRequired, (req, res) => {
     links: KEY_LINKS,
     cohort: { name: 'August 2026', registration_deadline: '31 July 2026', batch_starts: '1 August 2026' },
   });
+});
+
+
+/* =============================== v12.3 routes =============================== */
+const dns = require('dns').promises;
+
+/* Real-world email checks (item 8): format, then an MX lookup so obviously
+ * fake domains are rejected at signup. When SMTP is configured, a 6-digit
+ * verification code is emailed and must be entered - proof the inbox exists. */
+async function emailDomainExists(email) {
+  try {
+    const domain = String(email).split('@')[1];
+    if (!domain) return false;
+    const mx = await Promise.race([
+      dns.resolveMx(domain),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000)),
+    ]);
+    return Array.isArray(mx) && mx.length > 0;
+  } catch (e) {
+    if (e.code === 'ENOTFOUND' || e.code === 'ENODATA') return false;
+    return true; // DNS unavailable: do not block signups on infrastructure hiccups
+  }
+}
+const EMAIL_CODES = new Map(); // email -> { code, expires, tries }
+app.post('/api/auth/email-code', async (req, res) => {
+  const { email } = req.body || {};
+  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
+  if (!mailer.configured) return res.json({ ok: true, verification: false }); // no SMTP: MX check is the gate
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  EMAIL_CODES.set(String(email).toLowerCase(), { code, expires: Date.now() + 10 * 60 * 1000, tries: 0 });
+  mailer.notify(email, 'Your EchoLens verification code', `Your EchoLens verification code is ${code}. It expires in 10 minutes. If you did not request this, ignore this email.`);
+  res.json({ ok: true, verification: true });
+});
+function emailCodeValid(email, code) {
+  const rec = EMAIL_CODES.get(String(email).toLowerCase());
+  if (!rec) return false;
+  if (Date.now() > rec.expires || rec.tries >= 5) { EMAIL_CODES.delete(String(email).toLowerCase()); return false; }
+  rec.tries += 1;
+  if (rec.code !== String(code)) return false;
+  EMAIL_CODES.delete(String(email).toLowerCase());
+  return true;
+}
+
+/* ------------------------- public announcements (item 7) ------------------------- */
+app.get('/api/public/announcements', (req, res) => res.json({ announcements: PublicAnnouncements.all() }));
+app.post('/api/admin/public-announcements', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  if (!b.title || !b.body) return res.status(400).json({ error: 'Give the announcement a title and a message.' });
+  const a = PublicAnnouncements.create(b, req.user.id);
+  if (['portal', 'open', 'all'].includes(b.notify)) {
+    const emails = Leads.emailsFor(b.notify);
+    if (emails.length) mailer.notify(emails, `EchoLens announcement: ${a.title}`, `${a.body}${a.link ? `\n\n${a.link_label || 'More details'}: ${a.link}` : ''}\n\nSee all announcements: ${APP_URL}/open`);
+  }
+  res.json({ ok: true, announcement: a });
+});
+app.patch('/api/admin/public-announcements/:id', authRequired, adminRequired, (req, res) => {
+  const a = PublicAnnouncements.update(req.params.id, req.body || {});
+  if (!a) return res.status(404).json({ error: 'Announcement not found.' });
+  res.json({ ok: true, announcement: a });
+});
+app.delete('/api/admin/public-announcements/:id', authRequired, adminRequired, (req, res) => { PublicAnnouncements.remove(req.params.id); res.json({ ok: true }); });
+
+/* ------------------- in-site course registration (item 6) ------------------- */
+app.post('/api/public/register-interest', async (req, res) => {
+  const b = req.body || {};
+  if (b.company) return res.json({ ok: true }); // honeypot field: bots fill it, humans never see it
+  if (!b.name || String(b.name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
+  if (!isEmail(b.email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  if (!(await emailDomainExists(b.email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
+  if (!b.whatsapp || String(b.whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
+  const r = Registrations.create(b);
+  Leads.upsert({ name: r.name, email: r.email, whatsapp: r.whatsapp, source: 'course-registration' });
+  const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
+  if (admins.length) mailer.notify(admins, `New course registration - ${r.name}`, `${r.name} registered interest${r.course_title ? ` in ${r.course_code} ${r.course_title}` : ''}.\nEmail: ${r.email}\nWhatsApp: ${r.whatsapp}${r.city ? `\nCity: ${r.city}` : ''}${r.note ? `\nNote: ${r.note}` : ''}\n\nFollow up from the admin portal (Analytics & Leads).`);
+  mailer.notify(r.email, 'EchoLens - registration received', `Assalam-o-Alaikum ${r.name},\n\nWe received your registration${r.course_title ? ` for ${r.course_title}` : ''}. Our team will contact you on WhatsApp (${r.whatsapp}) with the fee challan and next steps.\n\nEchoLens Digital`);
+  res.json({ ok: true });
+});
+app.get('/api/admin/registrations', authRequired, staffView, (req, res) => res.json({ registrations: Registrations.all(), pending: Registrations.pendingCount() }));
+app.patch('/api/admin/registrations/:id', authRequired, adminRequired, (req, res) => {
+  const r = Registrations.update(req.params.id, req.body || {});
+  if (!r) return res.status(404).json({ error: 'Registration not found.' });
+  res.json({ ok: true, registration: r });
+});
+app.delete('/api/admin/registrations/:id', authRequired, adminRequired, (req, res) => { Registrations.remove(req.params.id); res.json({ ok: true }); });
+
+/* -------------- open quest submissions + certificates (items 3, 10) --------------
+ * Submit code or a file (PDF, Word, PNG, JPEG) per problem. AI grades it on
+ * the spot with the 10% reduction; gems accrue per problem; completing a
+ * fully free course above its pass mark issues the certificate automatically.
+ */
+app.post('/api/open/submit', authRequired, upload.single('file'), async (req, res) => {
+  if (!['free', 'student'].includes(req.user.role)) return res.status(403).json({ error: 'Quests are for learners.' });
+  const b = req.body || {};
+  let file_url = null, file_name = null;
+  if (req.file) {
+    const ok = /\.(pdf|docx?|pptx?|txt|md|ipynb|png|jpe?g|zip)$/i.test(req.file.originalname);
+    if (!ok) return res.status(400).json({ error: 'Upload PDF, Word, text, notebook, PNG, JPEG, or ZIP files.' });
+    file_url = `/uploads/${req.file.filename}`; file_name = req.file.originalname;
+  }
+  const out = OpenQuest.submit({ user: req.user, track_key: String(b.track_key || ''), level: b.level, pid: b.pid, code: b.code || null, language: b.language || null, file_url, file_name });
+  if (out.error) return res.status(400).json({ error: out.error });
+  let graded = null, cert = null;
+  if (ai.enabled()) {
+    try {
+      let text = out.submission.code;
+      if (!text && file_url) { const ex = await extractText(file_url); text = ex.text; }
+      const g = await ai.autoGrade(req.user.id, {
+        eventTitle: out.track.title, problemTitle: out.problem.title, problemBrief: out.problem.description,
+        passMark: out.track.pass_mark || 60, code: out.submission.code, language: out.submission.language, text,
+      });
+      graded = OpenQuest.applyGrade(out.submission.id, g.score, g.feedback);
+      const c = OpenQuest.maybeCertify(req.user.id, out.track.key, out.track.created_by);
+      if (c && c.cert && !c.existing) {
+        cert = c.cert;
+        if (req.user.email) mailer.notify(req.user.email, `Certificate earned - ${out.track.title}`,
+          `Congratulations ${req.user.name}!\n\nYou completed the free course "${out.track.title}" and your verified certificate has been issued (serial ${cert.serial}).\n\nView, download and share it: ${APP_URL}/cert?s=${cert.serial}`);
+      }
+    } catch (e) { console.error('Open auto-grade failed:', e.message); }
+  }
+  res.json({
+    ok: true,
+    submission: graded || out.submission,
+    graded: !!graded,
+    cert: cert ? { serial: cert.serial, url: `${APP_URL}/cert?s=${cert.serial}` } : null,
+    note: graded ? null : 'Submission recorded. AI grading is not available right now - your score will appear once it is graded.',
+  });
+});
+app.get('/api/open/progress', authRequired, (req, res) => {
+  const track = String(req.query.track || '');
+  const prog = OpenQuest.progress(req.user.id, track);
+  if (!prog) return res.status(404).json({ error: 'Course not found.' });
+  res.json({ progress: prog });
 });
 
 /* --------------------------------- static --------------------------------- */
@@ -1675,4 +1819,4 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => console.log(`EchoLens LMS v12 running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`EchoLens LMS v12.3 running on http://localhost:${PORT}`));

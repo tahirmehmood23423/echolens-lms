@@ -38,12 +38,12 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, leads: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [],
   live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
-  events: [], event_entries: [], event_submissions: [], leads: [],
+  events: [], event_entries: [], event_submissions: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
   settings: { cert: { org: 'EchoLens AI Academy', ceo_name: '', ceo_sig: null, tagline: 'Gamified AI & Data Science Education' } },
 });
 
@@ -89,7 +89,7 @@ function migrate() {
     if (q.deadline === undefined) { q.deadline = deadlineFromStart((data.batches.find((b) => b.id === q.batch_id) || {}).start_date, q.week); changed = true; }
   }
   // v12: unified events, leads, and their sequence counters.
-  for (const t of ['events', 'event_entries', 'event_submissions', 'leads']) {
+  for (const t of ['events', 'event_entries', 'event_submissions', 'leads', 'open_submissions', 'registrations', 'public_announcements']) {
     if (!Array.isArray(data[t])) { data[t] = []; changed = true; }
     if (data.seq[t] === undefined) { data.seq[t] = 0; changed = true; }
   }
@@ -769,7 +769,7 @@ const TRACKS = {};
 })();
 
 const Quests = {
-  tracks() { return Object.values(TRACKS).map((t) => ({ key: t.key, title: t.title, description: t.description, levels: t.levels.length, course_code: t.course_code || null, total_points: t.total_points, free: !!t.free })); },
+  tracks() { return Object.values(TRACKS).map((t) => ({ key: t.key, title: t.title, description: t.description, levels: t.levels.length, course_code: t.course_code || null, total_points: t.total_points, free: !!t.free, submission_mode: NO_IDE_TRACKS.has(t.key) ? 'file' : 'code' })); },
   trackDef(key) { return TRACKS[key] || null; },
   installed(bid) { return data.quests.some((q) => q.batch_id === Number(bid)); },
   install(bid, trackKey) {
@@ -1808,6 +1808,156 @@ const Analytics = {
   },
 };
 
+/* ============================== v12.3: OPEN QUEST SUBMISSIONS ==============================
+ * Real submissions for the open problem set: signed-in learners submit code
+ * or files per problem, get AI-graded (10% reduction), earn gems, and - on
+ * completing a fully free track above its pass mark - receive an automatic
+ * verified certificate.
+ */
+const OpenQuest = {
+  key(track_key, level, pid) { return `${track_key}:${level}:${pid}`; },
+  find(uid, track_key, level, pid) {
+    return data.open_submissions.find((s) => s.user_id === Number(uid) && s.track_key === track_key && s.level === Number(level) && s.pid === Number(pid)) || null;
+  },
+  submit({ user, track_key, level, pid, code, language, file_url, file_name }) {
+    const t = TRACKS[track_key];
+    if (!t) return { error: 'Course not found.' };
+    const lvl = t.levels.find((l) => l.no === Number(level));
+    if (!lvl) return { error: 'Level not found.' };
+    const openN = t.free ? t.levels.length : Math.max(1, t.levels.filter((l) => (l.week || l.no) === 1).length);
+    if (Number(level) > openN) return { error: 'This level is locked - register for the course to unlock it.' };
+    const pr = lvl.problems.find((p) => p.pid === Number(pid) || lvl.problems.indexOf(p) + 1 === Number(pid));
+    if (!pr) return { error: 'Task not found.' };
+    if (!code && !file_url) return { error: 'Submit your code or upload your work as a file.' };
+    let s = OpenQuest.find(user.id, track_key, level, pid);
+    const fields = {
+      code: code ? String(code).slice(0, 60000) : null,
+      language: language ? String(language).slice(0, 20) : null,
+      file_url: file_url || null, file_name: file_name || null,
+      submitted_at: now(),
+    };
+    if (s) Object.assign(s, fields, { score: null, gems: 0, feedback: null, graded_at: null });
+    else {
+      s = { id: nextId('open_submissions'), user_id: user.id, track_key, level: Number(level), pid: Number(pid),
+            problem_title: pr.title, points: pr.points || 100, ...fields, score: null, gems: 0, feedback: null, graded_at: null };
+      data.open_submissions.push(s);
+    }
+    save();
+    return { submission: s, problem: pr, track: t };
+  },
+  applyGrade(sid, aiScore, feedback) {
+    const s = data.open_submissions.find((x) => x.id === Number(sid)); if (!s) return null;
+    const raw = Math.max(0, Math.min(100, Number(aiScore) || 0));
+    s.score = Math.round(raw * 0.9); // AI grading carries the standard 10% reduction
+    s.gems = Math.round((s.score / 100) * (s.points || 100));
+    s.feedback = String(feedback || '').slice(0, 1500) || null;
+    s.graded_at = now(); save();
+    return s;
+  },
+  progress(uid, track_key) {
+    const t = TRACKS[track_key]; if (!t) return null;
+    const mine = data.open_submissions.filter((s) => s.user_id === Number(uid) && s.track_key === track_key);
+    const byKey = {};
+    for (const s of mine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, file_name: s.file_name, has_code: !!s.code };
+    const totalProblems = t.levels.reduce((a, l) => a + l.problems.length, 0);
+    const graded = mine.filter((s) => s.score != null);
+    const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;
+    return {
+      submissions: byKey,
+      gems: mine.reduce((a, s) => a + (s.gems || 0), 0),
+      attempted: mine.length, graded: graded.length, total: totalProblems, avg,
+      complete: graded.length >= totalProblems,
+      passed: graded.length >= totalProblems && avg != null && avg >= (t.pass_mark || 60),
+    };
+  },
+  // Fully free tracks issue an automatic verified certificate on completion.
+  maybeCertify(uid, track_key, issuedBy) {
+    const t = TRACKS[track_key];
+    if (!t || !t.free) return null;
+    const prog = OpenQuest.progress(uid, track_key);
+    if (!prog || !prog.passed) return null;
+    const already = data.certificates.find((c) => c.user_id === Number(uid) && c.title === t.title);
+    if (already) return { cert: already, existing: true };
+    const out = Certificates.issue({
+      user_id: uid, batch_id: null, kind: 'course', title: t.title,
+      completion_date: today(), detail: `Free open course - score ${prog.avg}%, pass mark ${t.pass_mark || 60}% - AI graded`,
+      instructor_id: null, issued_by: issuedBy || 1,
+    });
+    return out.ok ? { cert: out.cert } : null;
+  },
+};
+
+/* ============================== v12.3: STUDENT REGISTRATIONS ==============================
+ * The in-site registration form for paid courses. Every submission lands in
+ * the admin portal with follow-up tracking: contacted, challan sent, added
+ * to a course - plus notes, purely for the academy's records.
+ */
+const Registrations = {
+  create(b) {
+    const r = {
+      id: nextId('registrations'),
+      name: String(b.name || '').slice(0, 120),
+      email: String(b.email || '').slice(0, 200).toLowerCase(),
+      whatsapp: String(b.whatsapp || '').slice(0, 40),
+      city: String(b.city || '').slice(0, 80) || null,
+      course_code: String(b.course_code || '').slice(0, 12) || null,
+      course_title: String(b.course_title || '').slice(0, 200) || null,
+      note: String(b.note || '').slice(0, 600) || null,
+      status: { contacted: false, challan_sent: false, added_to_course: false },
+      admin_note: null,
+      created_at: now(), updated_at: now(),
+    };
+    data.registrations.push(r); save();
+    return r;
+  },
+  all() { return data.registrations.slice().sort((a, b) => b.id - a.id); },
+  update(id, b) {
+    const r = data.registrations.find((x) => x.id === Number(id)); if (!r) return null;
+    if (b.status && typeof b.status === 'object') {
+      for (const k of ['contacted', 'challan_sent', 'added_to_course']) if (b.status[k] !== undefined) r.status[k] = !!b.status[k];
+    }
+    if (b.admin_note !== undefined) r.admin_note = String(b.admin_note || '').slice(0, 600) || null;
+    r.updated_at = now(); save();
+    return r;
+  },
+  remove(id) { data.registrations = data.registrations.filter((x) => x.id !== Number(id)); save(); },
+  pendingCount() { return data.registrations.filter((r) => !r.status.contacted).length; },
+};
+
+/* ============================== v12.3: PUBLIC ANNOUNCEMENTS ==============================
+ * Announcements the admin publishes to the open website: new cohorts,
+ * hackathons, webinars, discounts - with an optional action link.
+ */
+const PublicAnnouncements = {
+  create(b, by) {
+    const a = {
+      id: nextId('public_announcements'),
+      kind: ['cohort', 'hackathon', 'webinar', 'discount', 'info'].includes(b.kind) ? b.kind : 'info',
+      title: String(b.title || '').slice(0, 200),
+      body: String(b.body || '').slice(0, 4000),
+      link: /^https?:\/\//i.test(String(b.link || '')) ? String(b.link).slice(0, 400) : null,
+      link_label: String(b.link_label || '').slice(0, 60) || null,
+      pinned: !!b.pinned,
+      created_by: by, created_at: now(),
+    };
+    data.public_announcements.push(a); save();
+    return a;
+  },
+  all() {
+    return data.public_announcements.slice().sort((a, b) => (b.pinned - a.pinned) || (b.id - a.id));
+  },
+  remove(id) { data.public_announcements = data.public_announcements.filter((x) => x.id !== Number(id)); save(); },
+  update(id, b) {
+    const a = data.public_announcements.find((x) => x.id === Number(id)); if (!a) return null;
+    for (const k of ['title', 'body', 'link_label']) if (b[k] !== undefined) a[k] = String(b[k]).slice(0, 4000) || null;
+    if (b.link !== undefined) a.link = /^https?:\/\//i.test(String(b.link || '')) ? String(b.link).slice(0, 400) : null;
+    if (b.pinned !== undefined) a.pinned = !!b.pinned;
+    if (b.kind !== undefined && ['cohort', 'hackathon', 'webinar', 'discount', 'info'].includes(b.kind)) a.kind = b.kind;
+    save();
+    return a;
+  },
+};
+
 load();
 
 module.exports = {
@@ -1816,7 +1966,7 @@ module.exports = {
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, ideEnabled, setIde,
-  Events, Leads, Analytics,
+  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements,
   seed, DB_PATH, allData: () => data,
 };
 

@@ -2552,7 +2552,9 @@ async function renderEvents() {
   const d = await api('/api/events');
   const adminBar = d.is_admin ? `<div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <span class="s" style="color:var(--muted)">Create quests, hackathons, competitions and webinars from here - free or paid, inside the portal, on the open website, or both. Everything (fees, pass marks, AI grading, certificates, compiler, emails) is configured per event.</span>
-      <span style="flex:1"></span><button class="btn btn-primary btn-sm" onclick="formEvent()">+ New event</button></div></div>` : '';
+      <span style="flex:1"></span>
+      <button class="btn btn-ghost btn-sm" onclick="renderAnnouncementsAdmin()">Website announcements</button>
+      <button class="btn btn-primary btn-sm" onclick="formEvent()">+ New event</button></div></div>` : '';
   el.innerHTML = `${adminBar}
     <div class="card"><div class="card-head"><h3>All events</h3></div><div class="card-body tight">
       ${d.events.length ? d.events.map((ev) => `
@@ -2640,10 +2642,10 @@ function formEvent() {
     </form>`, true);
   evKindChanged('quest');
   $('evForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type!=button]') || f.querySelector('button:last-child');
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button:not([type="button"])') || f.querySelector('button');
     const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
     obj.auto_grade = f.auto_grade.checked; obj.auto_certificate = f.auto_certificate.checked;
-    obj.problems = evReadProbs();
+    obj.problems = obj.kind === 'webinar' ? [] : evReadProbs();
     if (['quest', 'competition'].includes(obj.kind) && !obj.problems.length) { modalMsg('Add at least one task for a quest or competition.'); return; }
     btn.disabled = true;
     try {
@@ -2966,7 +2968,10 @@ async function renderAnalytics() {
       </div>
       ${chartSvg(d.series)}
     </div>
-    <div class="card" style="margin-top:18px"><div class="card-head"><h3>Email everyone - announcements, enrollments, discounts</h3></div>
+    <div class="card" style="margin-top:18px"><div class="card-head"><h3>New student registrations</h3><span class="s" style="color:var(--muted)" id="regsCount"></span></div>
+      <div class="card-body tight" id="regsBox"><div class="empty">Loading registrations&hellip;</div></div>
+    </div>
+    <div class="card"><div class="card-head"><h3>Email everyone - announcements, enrollments, discounts</h3></div>
       <div class="card-body">
         <form id="blastForm">
           <div class="form-grid">
@@ -2994,6 +2999,7 @@ async function renderAnalytics() {
     } catch (err) { toast(err.message, true); btn.disabled = false; }
   });
   loadLeads();
+  loadRegistrations();
 }
 function anSet(k, v) { AN_STATE[k] = v; if (k === 'metric') { AN_STATE.batch_id = ''; AN_STATE.event_id = ''; } renderAnalytics(); }
 let LEADS_CACHE = [];
@@ -3034,4 +3040,110 @@ function chartSvg(series) {
   const step = Math.ceil(n / 10);
   const labels = series.labels.map((l, i) => i % step === 0 ? `<text x="${(P + i * bw + bw / 2).toFixed(1)}" y="${H - P + 16}" text-anchor="middle" font-size="9.5" fill="#98938A">${l.length > 7 ? l.slice(5) : l}</text>` : '').join('');
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="chart">${gridLines}${bars}<polyline points="${pts}" fill="none" stroke="#7C6CF5" stroke-width="2.2" stroke-linejoin="round"/>${labels}</svg>`;
+}
+
+
+/* ============================================================================
+ * v12.3: WEBSITE ANNOUNCEMENTS - published by the admin, shown on the open
+ * website's Announcements tab: new cohorts, hackathons, webinars, discounts.
+ * ========================================================================== */
+const ANN_KIND_LABEL = { cohort: 'New cohort', hackathon: 'Hackathon', webinar: 'Webinar', discount: 'Discount', info: 'Information' };
+async function renderAnnouncementsAdmin() {
+  const d = await api('/api/public/announcements');
+  openModal('Website announcements', `
+    <form id="annForm" style="margin-bottom:16px">
+      <div class="form-grid">
+        <label class="field"><span>Type</span><select name="kind">
+          <option value="cohort">New cohort / registration</option><option value="hackathon">Hackathon</option>
+          <option value="webinar">Webinar</option><option value="discount">Discount</option><option value="info">Information</option></select></label>
+        <label class="field" style="grid-column:span 2"><span>Title</span><input name="title" required placeholder="e.g. August 2026 cohort - registration open"></label>
+      </div>
+      <label class="field"><span>Message</span><textarea name="body" rows="3" required placeholder="Write the announcement exactly as visitors should read it."></textarea></label>
+      <div class="form-grid">
+        <label class="field" style="grid-column:span 2"><span>Action link (optional)</span><input name="link" type="url" placeholder="https://"></label>
+        <label class="field"><span>Link button label</span><input name="link_label" placeholder="e.g. Register now"></label>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="pinned"> Pin to the top</label>
+        <label class="s" style="display:flex;gap:7px;align-items:center">Email it to:
+          <select name="notify" style="padding:6px 10px;border:1.5px solid var(--line);border-radius:8px">
+            <option value="none">Nobody - website only</option><option value="portal">Portal students</option>
+            <option value="open">Open students</option><option value="all">Everyone incl. leads</option></select></label>
+      </div>
+      <button class="btn btn-primary">Publish announcement</button>
+    </form>
+    <div class="pub-sec">Published (${d.announcements.length})</div>
+    <div class="card-body tight" style="max-height:34vh;overflow-y:auto">
+      ${d.announcements.map((a) => `
+        <div class="list-row" style="padding:10px 4px">
+          <div class="grow">
+            <div class="t">${a.pinned ? '<span class="role-pill">Pinned</span> ' : ''}<span class="kbadge ${a.kind === 'webinar' ? 'webinar' : a.kind === 'hackathon' ? 'hackathon' : 'quest'}">${ANN_KIND_LABEL[a.kind] || a.kind}</span> ${esc(a.title)}</div>
+            <div class="s" style="color:var(--muted)">${esc(a.body.slice(0, 120))}${a.body.length > 120 ? '…' : ''} · ${esc((a.created_at || '').slice(0, 10))}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="annPin(${a.id}, ${a.pinned ? 'false' : 'true'})">${a.pinned ? 'Unpin' : 'Pin'}</button>
+          <button class="btn btn-danger btn-sm" onclick="annDelete(${a.id})">Delete</button>
+        </div>`).join('') || '<div class="empty">Nothing published yet.</div>'}
+    </div>`, true);
+  $('annForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button:not([type="button"])'); btn.disabled = true;
+    const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
+    obj.pinned = f.pinned.checked;
+    try {
+      await api('/api/admin/public-announcements', { method: 'POST', body: JSON.stringify(obj) });
+      toast('Published on the open website.');
+      renderAnnouncementsAdmin();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function annPin(id, pinned) {
+  try { await api(`/api/admin/public-announcements/${id}`, { method: 'PATCH', body: JSON.stringify({ pinned }) }); renderAnnouncementsAdmin(); }
+  catch (e) { toast(e.message, true); }
+}
+async function annDelete(id) {
+  if (!confirm('Delete this announcement from the website?')) return;
+  try { await api(`/api/admin/public-announcements/${id}`, { method: 'DELETE' }); renderAnnouncementsAdmin(); }
+  catch (e) { toast(e.message, true); }
+}
+
+/* ============================================================================
+ * v12.3: NEW STUDENT REGISTRATIONS - submitted from the open website's
+ * registration form; tracked here with contacted / challan sent / added to
+ * course checkmarks and a note, purely for the academy's records.
+ * ========================================================================== */
+async function loadRegistrations() {
+  const box = $('regsBox'); if (!box) return;
+  try {
+    const d = await api('/api/admin/registrations');
+    const head = $('regsCount'); if (head) head.textContent = `${d.registrations.length} total · ${d.pending} awaiting contact`;
+    box.innerHTML = d.registrations.length ? d.registrations.slice(0, 200).map((r) => `
+      <div class="list-row" style="padding:12px 4px;align-items:flex-start">
+        <div class="grow">
+          <div class="t">${esc(r.name)} ${r.course_code ? `<span class="prob-chip" style="cursor:default">${esc(r.course_code)} ${esc(r.course_title || '')}</span>` : ''}</div>
+          <div class="s" style="color:var(--muted)">${esc(r.email)} · WhatsApp ${esc(r.whatsapp)}${r.city ? ' · ' + esc(r.city) : ''} · ${esc((r.created_at || '').slice(0, 16))}</div>
+          ${r.note ? `<div class="s" style="color:var(--muted)">Student note: ${esc(r.note)}</div>` : ''}
+          <div class="s" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:6px">
+            <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" ${r.status.contacted ? 'checked' : ''} onchange="regStatus(${r.id},'contacted',this.checked)"> Contacted</label>
+            <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" ${r.status.challan_sent ? 'checked' : ''} onchange="regStatus(${r.id},'challan_sent',this.checked)"> Challan sent</label>
+            <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" ${r.status.added_to_course ? 'checked' : ''} onchange="regStatus(${r.id},'added_to_course',this.checked)"> Added to course</label>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+            <input class="search-input" style="flex:1;min-width:200px;margin:0" placeholder="Internal note (e.g. Paid via JazzCash, batch B2)" value="${esc(r.admin_note || '')}" onchange="regNote(${r.id}, this.value)">
+            <button class="btn btn-danger btn-sm" onclick="regDelete(${r.id})">Remove</button>
+          </div>
+        </div>
+      </div>`).join('') : '<div class="empty">No registrations yet - they arrive from the website registration form.</div>';
+  } catch (e) { box.innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+async function regStatus(id, key, val) {
+  try { await api(`/api/admin/registrations/${id}`, { method: 'PATCH', body: JSON.stringify({ status: { [key]: val } }) }); loadRegistrations(); }
+  catch (e) { toast(e.message, true); }
+}
+async function regNote(id, note) {
+  try { await api(`/api/admin/registrations/${id}`, { method: 'PATCH', body: JSON.stringify({ admin_note: note }) }); toast('Note saved.'); }
+  catch (e) { toast(e.message, true); }
+}
+async function regDelete(id) {
+  if (!confirm('Remove this registration from the records?')) return;
+  try { await api(`/api/admin/registrations/${id}`, { method: 'DELETE' }); loadRegistrations(); }
+  catch (e) { toast(e.message, true); }
 }

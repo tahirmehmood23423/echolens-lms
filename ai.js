@@ -288,4 +288,25 @@ JSON schema: [{"q":"question text","options":["A","B","C","D"],"answer":0}] wher
   return arr.filter((q) => q && q.q && Array.isArray(q.options) && q.options.length >= 2);
 }
 
-module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity };
+/* --------------------------- v12: automatic grading --------------------------- */
+// Grades an open-event submission WITHOUT a teacher in the loop. Returns
+// { score, feedback }. The caller applies the 10% AI-grading reduction.
+// The system user id 0 is exempt from the per-user rate limit budget being
+// tied to one person, but the same window still applies.
+async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passMark, code, language, text }) {
+  const system = 'You are an automatic grader for EchoLens, an AI education academy. '
+    + 'Grade the submission strictly against the task. '
+    + 'Reply with ONLY a JSON object, no markdown fences, in exactly this shape: '
+    + '{"score": <integer 0-100>, "feedback": "<2-3 sentences for the student>"} '
+    + 'Score 0 if the submission is empty, off-topic, or clearly not an attempt.';
+  const content = `Event: ${eventTitle}\nTask: ${problemTitle}\n\nTask brief:\n${String(problemBrief || '').slice(0, 4000)}\n\nPass mark: ${passMark}%\n\nSubmission${language ? ` (${language})` : ''}:\n${String(code || text || '').slice(0, 12000)}`;
+  const raw = await complete(userId, system, [{ role: 'user', content }]);
+  const cleaned = String(raw).replace(/```json|```/g, '').trim();
+  const m = cleaned.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('The AI grader returned an unreadable response.');
+  const parsed = JSON.parse(m[0]);
+  const score = Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 0)));
+  return { score, feedback: String(parsed.feedback || '').slice(0, 1500) };
+}
+
+module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade };

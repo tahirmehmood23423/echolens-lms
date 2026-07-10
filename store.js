@@ -38,11 +38,12 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, leads: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [],
   live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
+  events: [], event_entries: [], event_submissions: [], leads: [],
   settings: { cert: { org: 'EchoLens AI Academy', ceo_name: '', ceo_sig: null, tagline: 'Gamified AI & Data Science Education' } },
 });
 
@@ -87,6 +88,18 @@ function migrate() {
   for (const q of data.quests) {
     if (q.deadline === undefined) { q.deadline = deadlineFromStart((data.batches.find((b) => b.id === q.batch_id) || {}).start_date, q.week); changed = true; }
   }
+  // v12: unified events, leads, and their sequence counters.
+  for (const t of ['events', 'event_entries', 'event_submissions', 'leads']) {
+    if (!Array.isArray(data[t])) { data[t] = []; changed = true; }
+    if (data.seq[t] === undefined) { data.seq[t] = 0; changed = true; }
+  }
+  // v12: every existing user with an email becomes a lead so the list is complete.
+  for (const u of data.users) {
+    if (u.email && ['student', 'free'].includes(u.role) && !data.leads.some((l) => l.email === u.email.toLowerCase())) {
+      data.leads.push({ id: ++data.seq.leads, name: u.name, email: u.email.toLowerCase(), whatsapp: (u.profile || {}).phone || null, source: u.role === 'free' ? 'open' : 'portal', user_id: u.id, created_at: u.created_at || now(), updated_at: now() });
+      changed = true;
+    }
+  }
   if (changed) save();
 }
 
@@ -105,8 +118,14 @@ const LATE_PENALTY = 0.20; // late submissions lose 20% of earned gems
 // clean written-answer workspace instead. Teachers can override per course.
 const NO_IDE_TRACKS = new Set([
   'bc01-automation', 'bc02-prompting', 'bc03-everyday-ai',
-  'sc02-genai', 'sc03-sql-powerbi', 'sc05-ai-tools',
+  'sc02-genai', 'sc05-ai-tools',
   'st01-wordpress', 'st02-graphic-design', 'st03-uiux', 'st06-ai-agents',
+  // August 2026 additions without an in-browser coding component
+  // (teachers can still switch the IDE on per batch; SQL+Power BI now
+  // defaults ON because the compiler runs SQL natively):
+  'bc06-git-freelance', 'bc07-excel-ai', 'bc08-canva-ai',
+  'sc08-marketing-seo', 'sc09-freelancing', 'sc10-graphic-basics', 'sc11-content-ai',
+  'st11-flutter', 'st12-video-editing',
 ]);
 function ideEnabled(bid) {
   const b = data.batches.find((x) => x.id === Number(bid));
@@ -735,7 +754,7 @@ const AiReports = {
 // reach the track's pass mark, before the next level opens for that student.
 const TRACKS = {};
 (function loadTracks() {
-  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist')];
+  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026')];
   for (const t of all) {
     // Normalize: compute title thresholds from total points if only names given.
     const total = t.levels.reduce((s1, l) => s1 + l.problems.reduce((s2, p) => s2 + (p.points || 100), 0), 0);
@@ -750,7 +769,7 @@ const TRACKS = {};
 })();
 
 const Quests = {
-  tracks() { return Object.values(TRACKS).map((t) => ({ key: t.key, title: t.title, description: t.description, levels: t.levels.length, course_code: t.course_code || null, total_points: t.total_points })); },
+  tracks() { return Object.values(TRACKS).map((t) => ({ key: t.key, title: t.title, description: t.description, levels: t.levels.length, course_code: t.course_code || null, total_points: t.total_points, free: !!t.free })); },
   trackDef(key) { return TRACKS[key] || null; },
   installed(bid) { return data.quests.some((q) => q.batch_id === Number(bid)); },
   install(bid, trackKey) {
@@ -1047,27 +1066,47 @@ const Admin = {
 
 /* ---------------------------- official catalogue ---------------------------- */
 const OFFICIAL_CATALOGUE = [
-  { code: 'BC-01', title: 'AI Automation with n8n & Make.com', tier: 'Bootcamp', level: 'Beginner', weeks: 2, hours: 8, price_pkr: 5000, summary: 'Fast-paced, high-impact introduction to business automation.' },
-  { code: 'BC-02', title: 'Prompt Engineering & ChatGPT/Claude Mastery', tier: 'Bootcamp', level: 'Beginner', weeks: 2, hours: 8, price_pkr: 5000, summary: 'From casual chatting to engineered, reusable prompts.' },
-  { code: 'BC-03', title: 'Everyday AI: Smarter Study, Work & Content', tier: 'Bootcamp', level: 'Beginner', weeks: 2, hours: 8, price_pkr: 5000, summary: 'Make AI a daily advantage in study, work, and content.' },
-  { code: 'SC-01', title: 'Python for Data Science', tier: 'Short Course', level: 'Foundational', weeks: 6, hours: 24, price_pkr: 12500, summary: 'Core Python through NumPy, pandas, Matplotlib and first ML.' },
-  { code: 'SC-02', title: 'Generative AI Essentials', tier: 'Short Course', level: 'Foundational', weeks: 6, hours: 24, price_pkr: 14000, summary: 'Understand, use, and build with generative AI.' },
-  { code: 'SC-03', title: 'Data Analytics with SQL & Power BI', tier: 'Short Course', level: 'Foundational', weeks: 6, hours: 24, price_pkr: 13500, summary: 'End-to-end analytics: querying, dashboards & business reporting.' },
-  { code: 'SC-04', title: 'Introduction to Machine Learning', tier: 'Short Course', level: 'Foundational', weeks: 6, hours: 24, price_pkr: 13000, summary: 'From ML intuition to trained, honestly-evaluated models.' },
-  { code: 'SC-05', title: 'AI Automation Tools Track', tier: 'Short Course', level: 'Foundational', weeks: 6, hours: 24, price_pkr: 14000, summary: 'Modern productivity toolkits for business workflows.' },
-  { code: 'ST-01', title: 'WordPress Development', tier: 'Specialist Track', level: 'Intermediate', weeks: 8, hours: 32, price_pkr: 20000, summary: 'Themes, custom layouts & client-ready delivery.' },
-  { code: 'ST-02', title: 'Graphic Designing', tier: 'Specialist Track', level: 'Intermediate', weeks: 8, hours: 32, price_pkr: 20000, summary: 'Brand identity, marketing collateral & creative assets.' },
-  { code: 'ST-03', title: 'UI/UX Designing', tier: 'Specialist Track', level: 'Intermediate', weeks: 8, hours: 32, price_pkr: 21000, summary: 'Wireframing, prototyping, user journeys & Figma mastery.' },
-  { code: 'ST-04', title: 'Data Analytics Specialist Track', tier: 'Specialist Track', level: 'Intermediate', weeks: 8, hours: 32, price_pkr: 21500, summary: 'The full analyst workflow: Python, SQL, statistics, storytelling.' },
-  { code: 'ST-05', title: 'Generative AI Engineering', tier: 'Specialist Track', level: 'Intermediate', weeks: 8, hours: 32, price_pkr: 22500, summary: 'Engineering real LLM applications: RAG, evaluation, production.' },
-  { code: 'ST-06', title: 'AI Agents & Automation Engineering', tier: 'Specialist Track', level: 'Intermediate', weeks: 8, hours: 32, price_pkr: 23000, summary: 'From tool-calling to multi-step autonomous agents.' },
-  { code: 'ST-07', title: 'Machine Learning Fundamentals', tier: 'Specialist Track', level: 'Intermediate', weeks: 8, hours: 32, price_pkr: 21500, summary: 'The complete classical ML toolkit with rigor.' },
-  { code: 'ST-08', title: 'Deep Learning with PyTorch', tier: 'Specialist Track', level: 'Intermediate', weeks: 8, hours: 32, price_pkr: 23000, summary: 'Tensors to trained networks: vision, transfer learning, deployment.' },
-  { code: 'CT-01', title: 'Full-Stack Development (Laravel)', tier: 'Career Track', level: 'Advanced', weeks: 12, hours: 48, price_pkr: 40000, summary: 'Robust backend development, MVC patterns & database architectures.' },
-  { code: 'CT-02', title: 'Complete Data Science Bootcamp', tier: 'Career Track', level: 'Advanced', weeks: 12, hours: 48, price_pkr: 38000, summary: 'Flagship multi-project data science program.' },
-  { code: 'CT-03', title: 'Generative AI & LLM Engineering Mastery', tier: 'Career Track', level: 'Advanced', weeks: 12, hours: 48, price_pkr: 42000, summary: 'Flagship GenAI engineering program with portfolio.' },
-  { code: 'CT-04', title: 'AI Engineering Career Track', tier: 'Career Track', level: 'Advanced', weeks: 12, hours: 48, price_pkr: 45000, summary: 'The flagship for serious AI career-builders.' },
-  { code: 'CT-05', title: 'Machine Learning Engineer Track', tier: 'Career Track', level: 'Advanced', weeks: 12, hours: 48, price_pkr: 40000, summary: 'Multi-project ML engineering with interview prep.' },
+  // August 2026 cohort - 31 live, instructor-led programs.
+  // badges: free | new | high_demand | flagship. free_mode: 'open' (no account
+  // needed to watch) | 'signin' (free with sign-in) | undefined (paid; Level 1
+  // of the quest is free for signed-in community members).
+  { code: 'BC-01', title: 'AI Automation with n8n & Make.com', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 3000, badges: ['high_demand'], summary: 'Build real business automations that connect apps, data and AI - workflows agencies bill $30-70/hour for.' },
+  { code: 'BC-02', title: 'Prompt Engineering & ChatGPT/Claude Mastery', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 3000, badges: ['high_demand'], summary: 'Structured prompting, tool use and reusable prompt systems that make AI dependable daily.' },
+  { code: 'BC-03', title: 'Everyday AI: Smarter Study, Work & Content', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 0, badges: ['free'], free_mode: 'open', summary: 'Our fully open bootcamp: practical AI for studies, office work and content creation.' },
+  { code: 'BC-04', title: 'Web Dev Kickstart: HTML, CSS & JavaScript', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 0, badges: ['free', 'new', 'high_demand'], free_mode: 'signin', summary: 'Your first real webpage, built live in our in-browser compiler with quests, gems and a leaderboard.' },
+  { code: 'BC-05', title: 'AI-Assisted Coding with Cursor, Claude & Copilot', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 3000, badges: ['new', 'high_demand'], summary: 'Agentic IDEs, AI pair programming and review workflows that multiply what one developer can ship.' },
+  { code: 'BC-06', title: 'Git, GitHub & Freelance Profile Launch', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'Version control plus a polished GitHub and Upwork/Fiverr presence before your first client.' },
+  { code: 'BC-07', title: 'Excel + AI for Office Professionals', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 2500, badges: ['new'], summary: 'Clean data, build reports and automate repetitive office work by pairing Excel with AI assistants.' },
+  { code: 'BC-08', title: 'Canva & AI Content Creation', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 2500, badges: [], summary: 'Design social posts, brand kits and marketing visuals quickly with Canva + AI tools.' },
+  { code: 'SC-01', title: 'Python for Data Science', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 12500, badges: ['high_demand'], summary: 'Pandas, NumPy and Matplotlib applied to real datasets, ending with a portfolio analysis project.' },
+  { code: 'SC-02', title: 'Generative AI Essentials', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 14000, badges: ['high_demand'], summary: 'LLMs, embeddings, retrieval and building your first AI-powered features with today\'s APIs.' },
+  { code: 'SC-03', title: 'Data Analytics with SQL & Power BI', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 13500, badges: ['high_demand'], summary: 'Production-grade SQL queries turned into interactive Power BI dashboards decision-makers use.' },
+  { code: 'SC-04', title: 'Introduction to Machine Learning', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 13000, badges: [], summary: 'Train, evaluate and honestly interpret your first models - the foundation for every advanced AI track.' },
+  { code: 'SC-05', title: 'AI Automation Tools Track', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 14000, badges: [], summary: 'A deeper pass across n8n, Make, Zapier and AI agents wired into real business processes.' },
+  { code: 'SC-06', title: 'Frontend Web Development with HTML, CSS & JavaScript', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 13000, badges: ['new', 'high_demand'], summary: 'From blank file to responsive, deployed website - practiced quest by quest in the EchoLens compiler.' },
+  { code: 'SC-07', title: 'JavaScript Deep Dive: DOM, Async & APIs', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 13000, badges: ['new', 'high_demand'], summary: 'The bridge to React: master the DOM, asynchronous JavaScript and consuming real REST APIs.' },
+  { code: 'SC-08', title: 'Digital Marketing & SEO Fundamentals', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 12000, badges: ['new'], summary: 'Run real campaigns: search optimisation, paid social basics and analytics.' },
+  { code: 'SC-09', title: 'Freelancing & Client Acquisition Mastery', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 9000, badges: ['new'], summary: 'Positioning, proposals, pricing and client communication - turning skills into income.' },
+  { code: 'SC-10', title: 'Graphic Design Basics', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 10000, badges: [], summary: 'Core design principles, typography and brand assets - a solid visual foundation.' },
+  { code: 'SC-11', title: 'Content Writing with AI', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 9000, badges: [], summary: 'Professional writing workflows pairing human judgement with AI drafting, editing and research.' },
+  { code: 'ST-01', title: 'WordPress Development', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 20000, badges: [], summary: 'Custom themes, WooCommerce stores and performance hardening - a large, reliable freelance market.' },
+  { code: 'ST-02', title: 'Graphic Designing', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 20000, badges: [], summary: 'A full professional design track: brand identity, collateral and a portfolio built to client standards.' },
+  { code: 'ST-03', title: 'UI/UX Designing', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 21000, badges: ['high_demand'], summary: 'Research, wireframing and high-fidelity product design in Figma, closing with a shipped-quality case study.' },
+  { code: 'ST-04', title: 'Data Analytics Specialist Track', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 21500, badges: ['high_demand'], summary: 'Python, SQL, statistics and data storytelling - the complete analyst skill set employers hire for.' },
+  { code: 'ST-05', title: 'Generative AI Engineering', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22500, badges: ['high_demand'], summary: 'Production LLM systems: retrieval-augmented generation, evaluation and deployment.' },
+  { code: 'ST-06', title: 'AI Agents & Automation Engineering', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 23000, badges: ['high_demand'], summary: 'Multi-step, tool-calling AI agents that plan, act and integrate with real business systems.' },
+  { code: 'ST-07', title: 'Machine Learning Fundamentals', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 21500, badges: [], summary: 'Classical ML done rigorously: feature engineering, model selection and honest evaluation.' },
+  { code: 'ST-08', title: 'Deep Learning with PyTorch', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 23000, badges: [], summary: 'Neural networks, computer vision and transfer learning, through to deploying a trained model.' },
+  { code: 'ST-09', title: 'Full-Stack JavaScript: React, Node & PostgreSQL', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 25000, badges: ['new', 'flagship'], summary: 'Our premium flagship: build and deploy a complete production web application on the 2026 stack.' },
+  { code: 'ST-10', title: 'React + Next.js Frontend Specialist', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22000, badges: ['new', 'high_demand'], summary: 'Component architecture, state management and server-side rendering with Next.js.' },
+  { code: 'ST-11', title: 'Mobile Apps with Flutter', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22000, badges: ['new'], summary: 'One codebase, two app stores: build and publish real Android and iOS apps.' },
+  { code: 'ST-12', title: 'Video Editing', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 20000, badges: [], summary: 'Professional editing workflows, pacing and delivery for client and commercial work.' },
+];
+// The Web Developer Path bundle - the recommended beginner-to-job route.
+const LEARNING_PATHS = [
+  { key: 'web-dev-path', title: 'The Web Developer Path', codes: ['BC-04', 'SC-06', 'SC-07', 'ST-09'],
+    summary: 'Complete beginner to job-ready full-stack developer on the highest-demand 2026 stack: JavaScript foundations, React and PostgreSQL.',
+    bundle_pkr: 43500, full_pkr: 51000, save_pkr: 7500 },
 ];
 function loadOfficialCatalogue() {
   let added = 0;
@@ -1246,7 +1285,7 @@ const Certificates = {
       id: nextId('certificates'), serial: Certificates.serial(),
       user_id: u.id, student_name: u.name, reg_no: u.reg_no,
       batch_id: batch_id ? Number(batch_id) : null,
-      kind: ['course', 'hackathon', 'competition'].includes(kind) ? kind : 'course',
+      kind: ['course', 'hackathon', 'competition', 'quest', 'webinar'].includes(kind) ? kind : 'course',
       title: String(title).slice(0, 200),
       detail: String(detail || '').slice(0, 400),
       completion_date: /^\d{4}-\d{2}-\d{2}$/.test(String(completion_date)) ? completion_date : today(),
@@ -1371,14 +1410,413 @@ function backupNow() {
   } catch (e) { console.error('Backup failed:', e.message); return null; }
 }
 
+/* ============================== v12: EVENTS ==============================
+ * One unified system for admin-created quests, hackathons, competitions and
+ * webinars. Every event carries: scope (inside the portal / on the open site
+ * / both), entry (free or paid with a payment-screenshot flow), an optional
+ * built-in compiler (python/c/cpp/sql/web) with an optional dataset URL,
+ * admin-attached documents, problems (for quests & competitions), a pass
+ * mark, AI auto-grading (with a 10% reduction), and automatic certificates.
+ */
+const EVENT_KINDS = ['quest', 'hackathon', 'competition', 'webinar'];
+const EVENT_SCOPES = ['portal', 'open', 'both'];
+const EVENT_LANGS = ['none', 'python', 'c', 'cpp', 'sql', 'web'];
+
+const Events = {
+  byId(id) { return data.events.find((e) => e.id === Number(id)) || null; },
+  status(ev) {
+    if (ev.kind === 'quest' && !ev.starts_at) return ev.open ? 'live' : 'closed';
+    const t = new Date().toISOString().slice(0, 16).replace('T', ' ');
+    const st = String(ev.starts_at || '').replace('T', ' ');
+    const en = String(ev.ends_at || '').replace('T', ' ');
+    if (!ev.open) return 'closed';
+    if (st && t < st) return 'upcoming';
+    if (!en || t <= en) return 'live';
+    return 'ended';
+  },
+  decorate(ev) {
+    return {
+      ...ev,
+      status: Events.status(ev),
+      entries_count: data.event_entries.filter((x) => x.event_id === ev.id).length,
+      submissions_count: data.event_submissions.filter((x) => x.event_id === ev.id).length,
+    };
+  },
+  all() { return data.events.slice().sort((a, b) => b.id - a.id).map((e) => Events.decorate(e)); },
+  forScope(scope) { // 'portal' or 'open' - 'both' events show everywhere
+    return Events.all().filter((e) => e.scope === scope || e.scope === 'both');
+  },
+  create(b, by) {
+    const problems = Array.isArray(b.problems) ? b.problems.slice(0, 40).map((p, i) => ({
+      pid: i + 1,
+      title: String(p.title || `Task ${i + 1}`).slice(0, 200),
+      description: String(p.description || '').slice(0, 8000),
+      points: Math.max(5, Math.min(500, Number(p.points) || 100)),
+      difficulty: ['Easy', 'Medium', 'Hard'].includes(p.difficulty) ? p.difficulty : 'Easy',
+    })) : [];
+    const ev = {
+      id: nextId('events'),
+      kind: EVENT_KINDS.includes(b.kind) ? b.kind : 'quest',
+      title: String(b.title || '').slice(0, 200),
+      description: String(b.description || '').slice(0, 8000),
+      scope: EVENT_SCOPES.includes(b.scope) ? b.scope : 'both',
+      entry: b.entry === 'paid' ? 'paid' : 'free',
+      fee_pkr: Number(b.fee_pkr) || 0,
+      pay_instructions: String(b.pay_instructions || '').slice(0, 1000) || null,
+      starts_at: b.starts_at || null, ends_at: b.ends_at || null,
+      duration_minutes: Math.max(0, Math.min(600, Number(b.duration_minutes) || 0)) || null,
+      pass_mark: Math.max(0, Math.min(100, Number(b.pass_mark) || 0)),
+      auto_grade: !!b.auto_grade,
+      auto_certificate: !!b.auto_certificate,
+      compiler: EVENT_LANGS.includes(b.compiler) ? b.compiler : 'none',
+      dataset_url: String(b.dataset_url || '').slice(0, 500) || null,
+      files: [],
+      problems,
+      prizes: { first: Number(b.prize1) || 0, second: Number(b.prize2) || 0, third: Number(b.prize3) || 0 },
+      meeting_link: String(b.meeting_link || '').slice(0, 400) || null,
+      open: b.open !== false,
+      created_by: by, created_at: now(),
+    };
+    data.events.push(ev); save();
+    return ev;
+  },
+  update(id, b) {
+    const ev = Events.byId(id); if (!ev) return null;
+    for (const k of ['title', 'description', 'pay_instructions', 'dataset_url', 'meeting_link']) if (b[k] !== undefined) ev[k] = String(b[k]).slice(0, 8000) || null;
+    if (b.kind !== undefined && EVENT_KINDS.includes(b.kind)) ev.kind = b.kind;
+    if (b.scope !== undefined && EVENT_SCOPES.includes(b.scope)) ev.scope = b.scope;
+    if (b.entry !== undefined) ev.entry = b.entry === 'paid' ? 'paid' : 'free';
+    if (b.fee_pkr !== undefined) ev.fee_pkr = Number(b.fee_pkr) || 0;
+    if (b.starts_at !== undefined) ev.starts_at = b.starts_at || null;
+    if (b.ends_at !== undefined) ev.ends_at = b.ends_at || null;
+    if (b.duration_minutes !== undefined) ev.duration_minutes = Math.max(0, Math.min(600, Number(b.duration_minutes) || 0)) || null;
+    if (b.pass_mark !== undefined) ev.pass_mark = Math.max(0, Math.min(100, Number(b.pass_mark) || 0));
+    if (b.auto_grade !== undefined) ev.auto_grade = !!b.auto_grade;
+    if (b.auto_certificate !== undefined) ev.auto_certificate = !!b.auto_certificate;
+    if (b.compiler !== undefined && EVENT_LANGS.includes(b.compiler)) ev.compiler = b.compiler;
+    if (b.open !== undefined) ev.open = !!b.open;
+    if (Array.isArray(b.problems)) {
+      ev.problems = b.problems.slice(0, 40).map((p, i) => ({
+        pid: i + 1, title: String(p.title || `Task ${i + 1}`).slice(0, 200),
+        description: String(p.description || '').slice(0, 8000),
+        points: Math.max(5, Math.min(500, Number(p.points) || 100)),
+        difficulty: ['Easy', 'Medium', 'Hard'].includes(p.difficulty) ? p.difficulty : 'Easy',
+      }));
+    }
+    save();
+    return ev;
+  },
+  addFile(id, { name, url }) {
+    const ev = Events.byId(id); if (!ev) return null;
+    ev.files = ev.files || [];
+    ev.files.push({ name: String(name).slice(0, 200), url });
+    save();
+    return ev;
+  },
+  removeFile(id, name) {
+    const ev = Events.byId(id); if (!ev) return null;
+    ev.files = (ev.files || []).filter((f) => f.name !== name);
+    save();
+    return ev;
+  },
+  remove(id) {
+    const eid = Number(id);
+    data.events = data.events.filter((e) => e.id !== eid);
+    data.event_entries = data.event_entries.filter((e) => e.event_id !== eid);
+    data.event_submissions = data.event_submissions.filter((s) => s.event_id !== eid);
+    save();
+  },
+  entryFor(eid, uid) { return data.event_entries.find((e) => e.event_id === Number(eid) && e.user_id === Number(uid)) || null; },
+  register({ event_id, user, payment_shot }) {
+    const ev = Events.byId(event_id); if (!ev) return { error: 'Event not found.' };
+    const st = Events.status(ev);
+    if (st === 'ended' || st === 'closed') return { error: 'Registration is closed for this event.' };
+    if (Events.entryFor(ev.id, user.id)) return { error: 'You are already registered for this event.' };
+    if (ev.entry === 'paid' && !payment_shot) return { error: 'Upload a screenshot of your payment transaction to register.' };
+    const e = {
+      id: nextId('event_entries'), event_id: ev.id, user_id: user.id,
+      name: user.name, reg_no: user.reg_no || null, tier: user.role === 'free' ? 'open' : 'portal',
+      payment_status: ev.entry === 'paid' ? 'pending' : 'na',
+      payment_shot: ev.entry === 'paid' ? payment_shot : null,
+      registered_at: now(),
+    };
+    data.event_entries.push(e); save();
+    return { entry: e };
+  },
+  confirmPayment(entryId, ok, by) {
+    const e = data.event_entries.find((x) => x.id === Number(entryId)); if (!e) return null;
+    e.payment_status = ok ? 'confirmed' : 'rejected'; e.payment_by = by; e.payment_at = now(); save();
+    return e;
+  },
+  canParticipate(ev, uid) {
+    const e = Events.entryFor(ev.id, uid);
+    if (!e) return { ok: false, why: 'Register for this event first.' };
+    if (ev.entry === 'paid' && e.payment_status !== 'confirmed') {
+      return { ok: false, why: e.payment_status === 'rejected' ? 'Your payment was rejected - contact the admin.' : 'Your payment is being verified by the admin.' };
+    }
+    return { ok: true, entry: e };
+  },
+  submissionFor(eid, uid, pid) {
+    return data.event_submissions.find((s) => s.event_id === Number(eid) && s.user_id === Number(uid) && (s.pid || null) === (pid ? Number(pid) : null)) || null;
+  },
+  submit({ event_id, user, pid, code, language, file_url, file_name, link, note }) {
+    const ev = Events.byId(event_id); if (!ev) return { error: 'Event not found.' };
+    const st = Events.status(ev);
+    if (st !== 'live') return { error: st === 'upcoming' ? 'This event has not started yet.' : 'This event is over - submissions are closed.' };
+    const gate = Events.canParticipate(ev, user.id);
+    if (!gate.ok) return { error: gate.why };
+    if (pid && !(ev.problems || []).some((p) => p.pid === Number(pid))) return { error: 'Task not found on this event.' };
+    if (!code && !file_url && !link) return { error: 'Submit code, a file, or a link to your work.' };
+    let s = Events.submissionFor(ev.id, user.id, pid);
+    const fields = {
+      code: code ? String(code).slice(0, 60000) : null,
+      language: language ? String(language).slice(0, 20) : null,
+      file_url: file_url || null, file_name: file_name || null,
+      link: link ? String(link).slice(0, 400) : null,
+      note: note ? String(note).slice(0, 500) : null,
+      submitted_at: now(),
+    };
+    if (s) { Object.assign(s, fields, { ai_score: null, score: null, ai_feedback: null, graded_by: null, graded_at: null, certified: s.certified || false }); }
+    else {
+      s = { id: nextId('event_submissions'), event_id: ev.id, entry_id: gate.entry.id, user_id: user.id, pid: pid ? Number(pid) : null, ...fields, ai_score: null, score: null, ai_feedback: null, graded_by: null, graded_at: null, certified: false };
+      data.event_submissions.push(s);
+    }
+    save();
+    return { submission: s, event: ev };
+  },
+  // AI auto-grade: raw AI score gets a 10% reduction before it counts.
+  applyAiGrade(sid, aiScore, feedback) {
+    const s = data.event_submissions.find((x) => x.id === Number(sid)); if (!s) return null;
+    const raw = Math.max(0, Math.min(100, Number(aiScore) || 0));
+    s.ai_score = raw;
+    s.score = Math.round(raw * 0.9); // AI-graded work carries a 10% reduction
+    s.ai_feedback = String(feedback || '').slice(0, 2000) || null;
+    s.graded_by = 'ai'; s.graded_at = now(); save();
+    return s;
+  },
+  score(sid, score, remarks, by) {
+    const s = data.event_submissions.find((x) => x.id === Number(sid)); if (!s) return null;
+    s.score = Math.max(0, Math.min(100, Number(score)));
+    s.ai_feedback = remarks ? String(remarks).slice(0, 2000) : s.ai_feedback;
+    s.graded_by = by; s.graded_at = now(); save();
+    return s;
+  },
+  // A participant passes when every problem is graded (or the single
+  // submission for problem-less events) and the average score reaches the
+  // event's pass mark.
+  progressFor(ev, uid) {
+    const mine = data.event_submissions.filter((s) => s.event_id === ev.id && s.user_id === Number(uid));
+    const total = (ev.problems || []).length || 1;
+    const graded = mine.filter((s) => s.score != null);
+    const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;
+    const complete = graded.length >= total;
+    return { submitted: mine.length, graded: graded.length, total, avg, complete, passed: complete && avg != null && avg >= (ev.pass_mark || 0) };
+  },
+  maybeCertify(ev, uid, issuedBy) {
+    if (!ev.auto_certificate) return null;
+    const prog = Events.progressFor(ev, uid);
+    if (!prog.passed) return null;
+    const already = data.certificates.find((c) => c.user_id === Number(uid) && c.title === ev.title);
+    if (already) return { cert: already, existing: true };
+    const kindMap = { quest: 'quest', hackathon: 'hackathon', competition: 'competition', webinar: 'webinar' };
+    const out = Certificates.issue({
+      user_id: uid, batch_id: null, kind: kindMap[ev.kind] || 'course', title: ev.title,
+      completion_date: today(), detail: `Score ${prog.avg}% - pass mark ${ev.pass_mark}%${ev.auto_grade ? ' - AI graded' : ''}`,
+      instructor_id: null, issued_by: issuedBy || ev.created_by,
+    });
+    if (out.ok) {
+      const subs = data.event_submissions.filter((s) => s.event_id === ev.id && s.user_id === Number(uid));
+      for (const s of subs) s.certified = true;
+      save();
+      return { cert: out.cert };
+    }
+    return null;
+  },
+  entries(eid) {
+    return data.event_entries.filter((e) => e.event_id === Number(eid)).map((e) => {
+      const u = Users.byId(e.user_id) || {};
+      const ev = Events.byId(eid);
+      return { ...e, email: u.email || null, whatsapp: (u.profile || {}).phone || null, progress: ev ? Events.progressFor(ev, e.user_id) : null };
+    }).sort((a, b) => String(b.registered_at).localeCompare(a.registered_at));
+  },
+  board(eid) {
+    const ev = Events.byId(eid); if (!ev) return [];
+    const byUser = {};
+    for (const s of data.event_submissions.filter((x) => x.event_id === ev.id)) {
+      byUser[s.user_id] = byUser[s.user_id] || [];
+      byUser[s.user_id].push(s);
+    }
+    return Object.entries(byUser).map(([uid, subs]) => {
+      const u = Users.byId(uid) || {};
+      const graded = subs.filter((s) => s.score != null);
+      const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;
+      return { user_id: Number(uid), name: u.name || 'Learner', reg_no: u.reg_no || null, tier: u.role === 'free' ? 'open' : 'portal', submissions: subs.length, graded: graded.length, avg, passed: Events.progressFor(ev, uid).passed };
+    }).sort((a, b) => (b.avg ?? -1) - (a.avg ?? -1));
+  },
+  submissionsForAdmin(eid) {
+    return data.event_submissions.filter((s) => s.event_id === Number(eid)).map((s) => {
+      const u = Users.byId(s.user_id) || {};
+      return { ...s, user_name: u.name, reg_no: u.reg_no || null, tier: u.role === 'free' ? 'open' : 'portal' };
+    }).sort((a, b) => String(b.submitted_at).localeCompare(a.submitted_at));
+  },
+  publicView(ev) { // what the open site shows before registering
+    const d = Events.decorate(ev);
+    return {
+      id: d.id, kind: d.kind, title: d.title, description: d.description,
+      entry: d.entry, fee_pkr: d.fee_pkr, pay_instructions: d.pay_instructions,
+      starts_at: d.starts_at, ends_at: d.ends_at, duration_minutes: d.duration_minutes,
+      pass_mark: d.pass_mark, auto_grade: d.auto_grade, auto_certificate: d.auto_certificate,
+      compiler: d.compiler, status: d.status, entries_count: d.entries_count,
+      problems_count: (d.problems || []).length, prizes: d.prizes, meeting_link: null,
+    };
+  },
+};
+
+/* ============================== v12: LEADS ==============================
+ * Every open sign-in (Google or email) and every portal student becomes a
+ * lead: name, email, WhatsApp, source, and when they arrived. The admin can
+ * list, download (CSV), and email them.
+ */
+const Leads = {
+  upsert({ name, email, whatsapp, source, user_id }) {
+    if (!email) return null;
+    let l = data.leads.find((x) => x.email && x.email.toLowerCase() === String(email).toLowerCase());
+    if (l) {
+      if (name) l.name = String(name).slice(0, 120);
+      if (whatsapp) l.whatsapp = String(whatsapp).slice(0, 40);
+      if (user_id) l.user_id = Number(user_id);
+      if (source && !l.source) l.source = source;
+      l.updated_at = now(); save();
+      return l;
+    }
+    l = {
+      id: nextId('leads'), name: String(name || '').slice(0, 120), email: String(email).slice(0, 200).toLowerCase(),
+      whatsapp: String(whatsapp || '').slice(0, 40) || null,
+      source: String(source || 'open').slice(0, 30), user_id: user_id ? Number(user_id) : null,
+      created_at: now(), updated_at: now(),
+    };
+    data.leads.push(l); save();
+    return l;
+  },
+  all() {
+    return data.leads.slice().sort((a, b) => String(b.created_at).localeCompare(a.created_at)).map((l) => {
+      const u = l.user_id ? Users.byId(l.user_id) : null;
+      return { ...l, tier: u ? (u.role === 'free' ? 'open' : u.role) : 'lead' };
+    });
+  },
+  csv() {
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const rows = [['Name', 'Email', 'WhatsApp', 'Source', 'Tier', 'Created'].join(',')];
+    for (const l of Leads.all()) rows.push([esc(l.name), esc(l.email), esc(l.whatsapp), esc(l.source), esc(l.tier), esc(l.created_at)].join(','));
+    return rows.join('\n');
+  },
+  emailsFor(audience) {
+    // portal = enrolled/portal students; open = free-tier users; all = both + raw leads
+    const emails = new Set();
+    for (const u of data.users) {
+      if (!u.email) continue;
+      if (audience === 'portal' && u.role === 'student') emails.add(u.email.toLowerCase());
+      if (audience === 'open' && u.role === 'free') emails.add(u.email.toLowerCase());
+      if (audience === 'all' && ['student', 'free'].includes(u.role)) emails.add(u.email.toLowerCase());
+    }
+    if (audience === 'all') for (const l of data.leads) if (l.email) emails.add(l.email.toLowerCase());
+    return [...emails];
+  },
+};
+
+/* ============================== v12: ANALYTICS ==============================
+ * Time series and totals for the admin dashboard: sign-ups (portal / open /
+ * all), enrollments per batch, event registrations, submissions - bucketed
+ * daily, weekly, monthly, or yearly.
+ */
+function bucketKey(iso, granularity) {
+  const d = String(iso || '').slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+  if (granularity === 'yearly') return d.slice(0, 4);
+  if (granularity === 'monthly') return d.slice(0, 7);
+  if (granularity === 'weekly') {
+    const dt = new Date(d + 'T00:00:00Z');
+    const day = (dt.getUTCDay() + 6) % 7; // Monday start
+    dt.setUTCDate(dt.getUTCDate() - day);
+    return dt.toISOString().slice(0, 10);
+  }
+  return d; // daily
+}
+function bucketRange(granularity) {
+  const out = [];
+  const t = new Date();
+  const n = granularity === 'yearly' ? 5 : granularity === 'monthly' ? 12 : granularity === 'weekly' ? 12 : 30;
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(t);
+    if (granularity === 'yearly') { d.setFullYear(t.getFullYear() - i); out.push(String(d.getFullYear())); }
+    else if (granularity === 'monthly') { d.setMonth(t.getMonth() - i); out.push(d.toISOString().slice(0, 7)); }
+    else if (granularity === 'weekly') { d.setDate(t.getDate() - i * 7); out.push(bucketKey(d.toISOString(), 'weekly')); }
+    else { d.setDate(t.getDate() - i); out.push(d.toISOString().slice(0, 10)); }
+  }
+  return out;
+}
+function seriesFrom(items, dateField, granularity) {
+  const labels = bucketRange(granularity);
+  const counts = Object.fromEntries(labels.map((l) => [l, 0]));
+  for (const it of items) {
+    const k = bucketKey(it[dateField], granularity);
+    if (k != null && counts[k] !== undefined) counts[k] += 1;
+  }
+  return { labels, counts: labels.map((l) => counts[l]) };
+}
+const Analytics = {
+  overview() {
+    const students = data.users.filter((u) => u.role === 'student');
+    const openUsers = data.users.filter((u) => u.role === 'free');
+    return {
+      total_signups: students.length + openUsers.length,
+      portal_students: students.length,
+      open_users: openUsers.length,
+      leads: data.leads.length,
+      enrollments: data.enrollments.length,
+      events: data.events.length,
+      event_registrations: data.event_entries.length,
+      event_submissions: data.event_submissions.length,
+      certificates_issued: data.certificates.length,
+      running_courses: data.batches.length,
+    };
+  },
+  series({ metric = 'signups', segment = 'all', granularity = 'daily', batch_id = null, event_id = null }) {
+    let items = [];
+    let dateField = 'created_at';
+    if (metric === 'signups') {
+      items = data.users.filter((u) => (segment === 'portal' ? u.role === 'student' : segment === 'open' ? u.role === 'free' : ['student', 'free'].includes(u.role)));
+    } else if (metric === 'enrollments') {
+      items = data.enrollments.filter((e) => !batch_id || e.batch_id === Number(batch_id));
+    } else if (metric === 'event_registrations') {
+      items = data.event_entries.filter((e) => !event_id || e.event_id === Number(event_id));
+      dateField = 'registered_at';
+    } else if (metric === 'event_submissions') {
+      items = data.event_submissions.filter((s) => !event_id || s.event_id === Number(event_id));
+      dateField = 'submitted_at';
+    } else if (metric === 'quest_submissions') {
+      items = data.quest_submissions.filter((s) => {
+        if (!batch_id) return true;
+        const q = data.quests.find((x) => x.id === s.quest_id);
+        return q && q.batch_id === Number(batch_id);
+      });
+      dateField = 'submitted_at';
+    } else if (metric === 'leads') {
+      items = data.leads;
+    }
+    return seriesFrom(items, dateField, granularity);
+  },
+};
+
 load();
 
 module.exports = {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, persist: save,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, learningPaths: () => LEARNING_PATHS, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, ideEnabled, setIde,
+  Events, Leads, Analytics,
   seed, DB_PATH, allData: () => data,
 };
 

@@ -100,7 +100,7 @@ module.exports = [
   ],
 },
 {
-  key: 'bc03-everyday-ai', course_code: 'BC-03', title: 'Everyday AI: Smarter Study, Work & Content',
+  key: 'bc03-everyday-ai', course_code: 'BC-03', free: true, title: 'Everyday AI: Smarter Study, Work & Content',
   description: '2-week quest: make AI a daily advantage in study, work, and content creation.',
   pass_mark: 60, titleNames: ['AI Curious', 'Daily Driver', 'Productivity Pro', 'AI Power User'],
   levels: [

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens Open - Free quests, compiler & events</title>
+<meta name="description" content="Solve free coding quests in your browser, use the free Python/C/C++/SQL compiler, join hackathons and webinars, and earn verified certificates - EchoLens Open.">
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<style>body{background:#FBFAF7}</style>
+</head>
+<body>
+
+<nav class="open-nav">
+  <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
+  <a class="nlink active" data-tab="problems" onclick="openTab('problems')">Problems</a>
+  <a class="nlink" data-tab="events" onclick="openTab('events')">Quests &amp; Events</a>
+  <a class="nlink" data-tab="courses" onclick="openTab('courses')">Courses</a>
+  <a class="nlink" href="/compiler">Compiler</a>
+  <span style="flex:1"></span>
+  <span id="userBox"></span>
+</nav>
+
+<div class="open-wrap" id="gateWrap" style="display:none">
+  <div class="auth-gate-card">
+    <img src="/img/logo.png" alt="EchoLens" style="width:90px;margin-bottom:14px">
+    <h2 style="font-family:var(--font-display);margin-bottom:6px">Sign in to start solving</h2>
+    <p class="s" style="color:var(--muted);margin-bottom:18px">Everything here is free - the quests, the compiler, the certificates. We just need to know who you are.</p>
+    <div class="form-msg" id="gateMsg"></div>
+    <a class="btn btn-primary btn-block" id="gBtn" href="/auth/google?back=/open" style="display:none;margin-bottom:10px">
+      Continue with Google - free
+    </a>
+    <button class="btn btn-teal btn-block" onclick="showSignup()" style="margin-bottom:10px">Create a free account with email</button>
+    <a class="btn btn-ghost btn-block" href="/login">Already have an account? Sign in</a>
+  </div>
+  <div class="auth-gate-card" id="signupCard" style="display:none">
+    <h3 style="font-family:var(--font-display);margin-bottom:12px">Create your free account</h3>
+    <div class="form-msg" id="suMsg"></div>
+    <form id="suForm" style="text-align:left">
+      <label class="field"><span>Full name</span><input name="name" required></label>
+      <label class="field"><span>Email</span><input name="email" type="email" required></label>
+      <label class="field"><span>WhatsApp number (required)</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+      <label class="field"><span>Password (8+ characters)</span><input name="password" type="password" minlength="8" required></label>
+      <button class="btn btn-primary btn-block">Create account &amp; start solving</button>
+    </form>
+  </div>
+</div>
+
+<div class="open-wrap" id="appWrap" style="display:none">
+  <section id="tab-problems">
+    <div style="display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:16px">
+      <div>
+        <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink)">Problem set</h1>
+        <p class="s" style="color:var(--muted)">Free practice tasks from every EchoLens track - solve them in the browser compiler. The full ladders unlock with <a href="/#register">registration</a>.</p>
+      </div>
+      <span style="flex:1"></span>
+      <div id="myGems"></div>
+    </div>
+    <div class="lc-filterbar">
+      <select id="fTrack" onchange="drawProblems()"><option value="">All tracks</option></select>
+      <select id="fDiff" onchange="drawProblems()"><option value="">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
+      <input id="fSearch" placeholder="Search problems..." oninput="drawProblems()">
+    </div>
+    <div id="probTable"><div class="empty">Loading problems&hellip;</div></div>
+  </section>
+
+  <section id="tab-courses" style="display:none">
+    <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:6px">
+      <div>
+        <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink)">Course catalogue - August 2026 cohort</h1>
+        <p class="s" style="color:var(--muted)" id="cohortLine">31 live, instructor-led programs. Every paid course opens its first level free in the problem set - try before you enrol.</p>
+      </div>
+    </div>
+    <div id="actionStrip" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px"></div>
+    <div class="lc-filterbar">
+      <select id="cTier" onchange="drawCourses()"><option value="">All tiers</option><option>Bootcamp</option><option>Short Course</option><option>Specialist Track</option></select>
+      <select id="cFree" onchange="drawCourses()"><option value="">Free & paid</option><option value="free">Free only</option><option value="paid">Paid only</option></select>
+      <input id="cSearch" placeholder="Search courses..." oninput="drawCourses()">
+    </div>
+    <div id="pathBox"></div>
+    <div id="courseTable"><div class="empty">Loading catalogue&hellip;</div></div>
+  </section>
+
+  <section id="tab-events" style="display:none">
+    <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink);margin-bottom:4px">Open quests, hackathons &amp; webinars</h1>
+    <p class="s" style="color:var(--muted);margin-bottom:18px">Timed quests you can finish in 60-90 minutes, competitions with prizes, and live webinars. Pass the mark and a <strong>verified certificate is issued automatically</strong> - AI-graded events carry a 10% score reduction.</p>
+    <div id="certBox"></div>
+    <div class="track-grid" id="evGrid"><div class="empty">Loading events&hellip;</div></div>
+    <div id="evDetail"></div>
+  </section>
+
+  <section id="tab-solve" style="display:none">
+    <button class="btn btn-ghost btn-sm" onclick="backToList()" style="margin-bottom:12px">&larr; Back to problems</button>
+    <div class="open-split">
+      <div class="card"><div class="card-head"><h3 id="svTitle">Task</h3><span id="svDiff"></span></div>
+        <div class="card-body">
+          <div class="s" id="svDesc" style="white-space:pre-line;line-height:1.65;font-size:13.5px"></div>
+          <div class="s" id="svRefs" style="margin-top:10px"></div>
+        </div></div>
+      <div class="task-ide card">
+        <div class="ide-toolbar">
+          <select id="svLang" onchange="svLangChanged()">
+            <option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option>
+          </select>
+          <span style="flex:1"></span>
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer">&#11014; Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()">Clear</button>
+          <button type="button" class="btn lc-btn-solve" id="svRunBtn" onclick="runSolve()">&#9654; Run</button>
+        </div>
+        <textarea id="svCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your solution here, then press Run."></textarea>
+        <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Ready - runs in your browser, nothing to install.</span></div>
+        <div id="svTerm"></div>
+        <p class="hint" style="margin:10px 14px 14px">Practice mode: runs are real. To submit for gems and teacher feedback, <a href="/#register">register for the full course</a> - or head to <a onclick="openTab('events')" style="cursor:pointer">Quests &amp; Events</a> for certificates.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer style="border-top:1px solid var(--line);padding:22px 4vw;font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between">
+  <span>EchoLens Open - free learning, verified certificates</span>
+  <span><a href="/">Home</a> &middot; <a href="/compiler">Free compiler</a> &middot; <a href="/login">Portal sign in</a></span>
+</footer>
+
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true">
+  <div class="modal" id="modalBox">
+    <button class="close" onclick="closeModal()" aria-label="Close">&times;</button>
+    <h3 id="modalTitle"></h3>
+    <div class="form-msg" id="modalMsg"></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="/js/coderunner.js"></script>
+<script src="/js/open.js"></script>
+</body>
+</html>

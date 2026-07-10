@@ -64,7 +64,7 @@ function openModal(title, bodyHTML, wide) {
   $('modalBox').classList.toggle('wide', !!wide);
   $('modal').classList.add('open');
 }
-function closeModal() { $('modal').classList.remove('open'); }
+function closeModal() { if (window.MODAL_LOCK) return; $('modal').classList.remove('open'); }
 function modalMsg(text, ok) {
   const el = $('modalMsg');
   if (!text) { el.className = 'form-msg'; el.textContent = ''; return; }
@@ -81,6 +81,7 @@ const TITLES = {
   overview: 'Overview', courses: 'My courses', course: 'Course', schedule: 'Schedule',
   leaderboard: 'Leaderboard', announcements: 'Announcements', profile: 'Profile',
   challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'Hackathons',
+  events: 'Events', 'admin-analytics': 'Analytics & Leads',
   'admin-catalogue': 'Catalogue & new course', 'admin-users': 'People',
 };
 function show(view) {
@@ -94,6 +95,7 @@ function show(view) {
     overview: renderOverview, courses: renderCourses, schedule: renderSchedule,
     leaderboard: renderLeaderboard, announcements: renderAnnouncements, profile: renderProfile,
     challenges: renderChallenges, copilot: renderCopilot, hackathons: renderHackathons,
+    events: renderEvents, 'admin-analytics': renderAnalytics,
     'admin-catalogue': renderCatalogue, 'admin-users': renderUsers,
   }[view];
   if (render) render();
@@ -120,7 +122,33 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   $('gate').style.display = 'none';
   $('app').style.display = '';
   renderOverview();
+  requireWhatsapp(); // v12: contact details are mandatory for every learner
 })();
+
+/* v12: WhatsApp number is MANDATORY for students and open users - it feeds
+ * the leads database the admin uses for announcements. The modal cannot be
+ * dismissed until a number is saved. */
+function requireWhatsapp() {
+  if (!['student', 'free'].includes(ME.role)) return;
+  if (ME.profile && ME.profile.phone) return;
+  openModal('One last step - your WhatsApp number', `
+    <form id="waForm">
+      <p class="s" style="color:var(--muted);margin-bottom:12px">We use WhatsApp to share class updates, quest openings, and your certificates. This is required to continue.</p>
+      <label class="field"><span>WhatsApp number</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+      <button class="btn btn-primary btn-block">Save & continue</button></form>`);
+  window.MODAL_LOCK = true;
+  $('modalBox').querySelector('.close').style.display = 'none';
+  $('waForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try {
+      await api('/api/me/contact', { method: 'POST', body: JSON.stringify({ whatsapp: f.whatsapp.value.trim() }) });
+      ME.profile = ME.profile || {}; ME.profile.phone = f.whatsapp.value.trim();
+      window.MODAL_LOCK = false;
+      $('modalBox').querySelector('.close').style.display = '';
+      closeModal(); toast('Saved - welcome aboard!');
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
 
 /* ============================== OVERVIEW ============================== */
 async function renderOverview() {
@@ -271,6 +299,7 @@ async function openCourse(id) {
     menu.push(`<button onclick="formAward()">Award bonus gems</button>`);
     menu.push(`<button onclick="formIssueCert()">Issue certificate</button>`);
     menu.push(`<button onclick="formIssueAllCerts()">Issue certificates (whole course)</button>`);
+    if (['instructor', 'admin'].includes(ME.role)) menu.push(`<button onclick="formUploadSignature()">My certificate signature</button>`);
   }
   if (isAdmin) {
     menu.push(`<button onclick="formStudents()">Add students</button>`);
@@ -1484,7 +1513,7 @@ function openTask(qid, pid) {
 
   // Datasets attached to this task: students copy the file name straight
   // into pd.read_csv(...); the compiler mounts the file automatically.
-  const filesHtml = ideOn && (taskFiles.length || d.can_manage) ? `
+  const filesHtml = ideOn ? `
     <div class="task-files">
       <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:6px">&#128193; Datasets for this task</div>
       ${taskFiles.length ? taskFiles.map((f) => `
@@ -1497,9 +1526,15 @@ function openTask(qid, pid) {
           ${d.can_manage ? `<button class="btn btn-danger btn-sm" onclick="delTaskFile(${f.id},${q.id},${pid})">&times;</button>` : ''}
         </div>`).join('') : '<div class="s" style="color:var(--muted)">No datasets attached yet.</div>'}
       ${taskFiles.length ? `<p class="hint" style="margin:6px 0 0">These files are loaded into the compiler automatically - read them by name, e.g. <code>pd.read_csv('${esc(taskFiles[0].name)}')</code>.</p>` : ''}
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer">&#11014; Upload your own dataset (CSV / JSON / TXT)
+          <input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="taskLocalDataset(this)"></label>
+        <span class="s" style="color:var(--muted-2)">Loads straight into the compiler for pandas / matplotlib / SQL - it never leaves your browser.</span>
+      </div>
+      <div id="localDsChips" style="margin-top:6px"></div>
       ${d.can_manage ? `<form id="taskFileUp" style="display:flex;gap:8px;margin-top:8px;align-items:center">
         <input name="file" type="file" accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.parquet,.zip" required style="flex:1">
-        <button class="btn btn-teal btn-sm">Attach dataset</button></form>` : ''}
+        <button class="btn btn-teal btn-sm">Attach dataset for all students</button></form>` : ''}
     </div>` : '';
 
   let statusHtml = '';
@@ -1528,6 +1563,9 @@ function openTask(qid, pid) {
   const langOptions = isWritten
     ? `<option value="text" selected>Written answer</option>`
     : `<option value="python"${prevLang === 'python' ? ' selected' : ''}>Python 3</option>
+       <option value="c"${prevLang === 'c' ? ' selected' : ''}>C</option>
+       <option value="cpp"${prevLang === 'cpp' ? ' selected' : ''}>C++</option>
+       <option value="sql"${prevLang === 'sql' ? ' selected' : ''}>SQL</option>
        <option value="web"${prevLang === 'web' ? ' selected' : ''}>HTML / CSS / JS</option>
        <option value="text"${prevLang === 'text' ? ' selected' : ''}>Written answer</option>`;
 
@@ -1628,16 +1666,28 @@ function toggleFocusMode() {
 }
 function taskLangChanged() {
   const lang = $('taskLang').value;
-  const py = lang === 'python', web = lang === 'web';
-  $('runBtn').style.display = (py || web) ? '' : 'none';
-  $('taskTerm').style.display = py ? '' : 'none';
+  const term = ['python', 'c', 'cpp', 'sql'].includes(lang), web = lang === 'web';
+  $('runBtn').style.display = (term || web) ? '' : 'none';
+  $('taskTerm').style.display = term ? '' : 'none';
   $('webWrap').style.display = web ? '' : 'none';
-  $('idePkgs').style.display = py ? '' : 'none';
-  $('codeBox').placeholder = py
+  $('idePkgs').style.display = term ? '' : 'none';
+  const pk = $('idePkgs');
+  if (!pk.dataset.py) pk.dataset.py = pk.innerHTML; // remember the Python label
+  if (lang === 'python') pk.innerHTML = pk.dataset.py;
+  else if (lang === 'c') pk.textContent = 'C · gcc 10 · compiled & run in the cloud';
+  else if (lang === 'cpp') pk.textContent = 'C++ · g++ 10 · compiled & run in the cloud';
+  else if (lang === 'sql') pk.textContent = 'SQLite · CSV datasets load as tables automatically';
+  $('codeBox').placeholder = lang === 'python'
     ? '# Write your Python solution here, then press Run.'
-    : web
-      ? '<!-- Write HTML, CSS (in <style>) and JavaScript (in <script>) here, then press Run for a live preview. -->'
-      : 'Write your answer here, then press Submit.';
+    : lang === 'c'
+      ? '// Write your C solution here, then press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}'
+      : lang === 'cpp'
+        ? '// Write your C++ solution here, then press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}'
+        : lang === 'sql'
+          ? '-- Write SQL here, then press Run. Attached CSV datasets become tables automatically.\nSELECT 1 + 1 AS answer;'
+          : web
+            ? '<!-- Write HTML, CSS (in <style>) and JavaScript (in <script>) here, then press Run for a live preview. -->'
+            : 'Write your answer here, then press Submit.';
 }
 function clearTaskTerm() {
   if (TASK_CTX) TASK_CTX.term.clear();
@@ -1662,9 +1712,28 @@ async function runTaskCode() {
   }
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
   btn.innerHTML = '&#9632; Stop';
-  try { await EchoRun.execute(code, { term: TASK_CTX.term, files: TASK_CTX.files, onStatus: (t) => { status.textContent = t; } }); }
+  const files = [...TASK_CTX.files, ...(TASK_CTX.localFiles || [])];
+  try { await EchoRun.executeAny(lang, code, { term: TASK_CTX.term, files, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
   btn.innerHTML = '&#9654; Run';
+}
+/* v12: students upload their OWN dataset (CSV/JSON/txt) into the compiler -
+ * it is mounted locally in the browser (never uploaded to the server), so
+ * pd.read_csv('mydata.csv') and SQL tables work with the student's file. */
+function taskLocalDataset(input) {
+  const f = input.files && input.files[0];
+  if (!f) return;
+  if (f.size > 20 * 1024 * 1024) { toast('Keep datasets under 20 MB.', true); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    TASK_CTX.localFiles = (TASK_CTX.localFiles || []).filter((x) => x.name !== f.name);
+    TASK_CTX.localFiles.push({ name: f.name, bytes: reader.result });
+    const chip = $('localDsChips');
+    if (chip) chip.innerHTML = TASK_CTX.localFiles.map((x) => `<span class="prob-chip" title="Loaded into the compiler">&#128190; ${esc(x.name)}</span>`).join(' ');
+    toast(`${f.name} loaded - read it by name, e.g. pd.read_csv('${f.name}') or as SQL table "${f.name.replace(/\.[^.]+$/, '')}".`);
+  };
+  reader.readAsArrayBuffer(f);
+  input.value = '';
 }
 async function submitTaskCode(qid, pid) {
   const btn = $('taskSubmitBtn'); const code = $('codeBox').value;
@@ -2459,4 +2528,509 @@ function formAddProblem(qid) {
       toast('Task added to the level.'); closeModal(); openCourse(bid());
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
+}
+
+/* ============================================================================
+ * v12: EVENTS - the unified admin-generated system for quests, hackathons,
+ * competitions and webinars: free or paid (payment screenshot verified by
+ * the admin), inside the portal / on the open site / both, optional built-in
+ * compiler (Python, C, C++, SQL, web) with datasets from URL, admin
+ * documents, AI auto-grading (-10%), pass marks, automatic certificates,
+ * and email announcements to portal / open / all audiences.
+ * ========================================================================== */
+const EV_KIND_LABEL = { quest: 'Quest', hackathon: 'Hackathon', competition: 'Competition', webinar: 'Webinar' };
+const EV_LANG_LABEL = { none: 'No compiler', python: 'Python 3', c: 'C', cpp: 'C++', sql: 'SQL', web: 'HTML / CSS / JS' };
+function evStatusBadge(st) {
+  const map = { upcoming: ['Upcoming', 'var(--st-beam)'], live: ['LIVE', 'var(--danger)'], ended: ['Ended', 'var(--muted-2)'], closed: ['Closed', 'var(--muted-2)'] };
+  const [t, c] = map[st] || [st, 'var(--muted)'];
+  return `<span class="stage-pill" style="background:${c}">${t}</span>`;
+}
+async function renderEvents() {
+  const el = $('view-events');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/events');
+  const adminBar = d.is_admin ? `<div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span class="s" style="color:var(--muted)">Create quests, hackathons, competitions and webinars from here - free or paid, inside the portal, on the open website, or both. Everything (fees, pass marks, AI grading, certificates, compiler, emails) is configured per event.</span>
+      <span style="flex:1"></span><button class="btn btn-primary btn-sm" onclick="formEvent()">+ New event</button></div></div>` : '';
+  el.innerHTML = `${adminBar}
+    <div class="card"><div class="card-head"><h3>All events</h3></div><div class="card-body tight">
+      ${d.events.length ? d.events.map((ev) => `
+        <div class="list-row">
+          <div class="when">${evStatusBadge(ev.status)}<small>${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) : (ev.duration_minutes ? '~' + ev.duration_minutes + ' min' : 'open-ended')}</small></div>
+          <div class="grow">
+            <div class="t"><span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}</span> &nbsp;${esc(ev.title)}
+              <span class="s" style="font-weight:500;color:var(--muted)">&middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'free'} &middot; ${ev.scope === 'both' ? 'portal + open site' : ev.scope === 'open' ? 'open site' : 'portal only'}</span></div>
+            <div class="s" style="color:var(--muted)">${(ev.problems || []).length ? (ev.problems.length + ' task' + (ev.problems.length > 1 ? 's' : '') + ' &middot; ') : ''}${ev.compiler !== 'none' ? EV_LANG_LABEL[ev.compiler] + ' compiler &middot; ' : ''}${ev.auto_grade ? 'AI graded (-10%) &middot; ' : ''}${ev.auto_certificate ? 'auto certificate at ' + ev.pass_mark + '%+ &middot; ' : ''}${ev.entries_count} registered</div>
+            ${ev.my_entry ? `<div class="s" style="color:var(--ok)">Registered${ev.my_entry.payment_status === 'pending' ? ' - <span style="color:var(--gold)">payment being verified</span>' : ev.my_entry.payment_status === 'rejected' ? ' - <span style="color:var(--danger)">payment rejected, contact admin</span>' : ''}${ev.my_progress && ev.my_progress.passed ? ' &middot; <strong>PASSED ' + ev.my_progress.avg + '%</strong>' : ev.my_progress && ev.my_progress.avg != null ? ' &middot; avg ' + ev.my_progress.avg + '%' : ''}</div>` : ''}
+          </div>
+          <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
+          ${d.is_admin ? `<button class="btn btn-ghost btn-sm" onclick="toggleEvent(${ev.id},${ev.open ? 'false' : 'true'})">${ev.open ? 'Close' : 'Reopen'}</button>
+          <button class="btn btn-danger btn-sm" onclick="delEvent(${ev.id})">Delete</button>` : ''}
+        </div>`).join('') : '<div class="empty">No events yet' + (d.is_admin ? ' - create the first one.' : '. Watch this space.') + '</div>'}
+    </div></div>`;
+}
+async function toggleEvent(id, open) {
+  try { await api(`/api/admin/events/${id}`, { method: 'PATCH', body: JSON.stringify({ open }) }); renderEvents(); }
+  catch (e) { toast(e.message, true); }
+}
+async function delEvent(id) {
+  if (!confirm('Delete this event and all its registrations and submissions?')) return;
+  try { await api(`/api/admin/events/${id}`, { method: 'DELETE' }); toast('Event deleted.'); renderEvents(); }
+  catch (e) { toast(e.message, true); }
+}
+
+/* ------------------------------ create event ------------------------------ */
+let EV_PROBS = [];
+function formEvent() {
+  EV_PROBS = [];
+  openModal('New event', `
+    <form id="evForm">
+      <div class="form-grid">
+        <label class="field"><span>Kind</span><select name="kind" onchange="evKindChanged(this.value)">
+          <option value="quest">Quest (task ladder)</option><option value="hackathon">Hackathon</option>
+          <option value="competition">Competition</option><option value="webinar">Webinar</option></select></label>
+        <label class="field"><span>Where does it appear?</span><select name="scope">
+          <option value="both">Portal + open website</option><option value="portal">Inside the portal only</option>
+          <option value="open">Open website only</option></select></label>
+      </div>
+      <label class="field"><span>Title</span><input name="title" required placeholder="e.g. Python Basics Sprint Quest"></label>
+      <label class="field"><span>Description, rules &amp; what to expect</span><textarea name="description" rows="3"></textarea></label>
+      <div class="form-grid">
+        <label class="field"><span>Entry</span><select name="entry" onchange="$('evPaid').style.display=this.value==='paid'?'':'none'">
+          <option value="free">Free</option><option value="paid">Paid</option></select></label>
+        <label class="field ev-timed"><span>Starts</span><input name="starts_at" type="datetime-local"></label>
+        <label class="field ev-timed"><span>Ends</span><input name="ends_at" type="datetime-local"></label>
+        <label class="field ev-quest"><span>Time to solve (minutes)</span><input name="duration_minutes" type="number" min="0" max="600" value="90" title="Open quests should be solvable in 60-90 minutes"></label>
+      </div>
+      <div id="evPaid" style="display:none">
+        <div class="form-grid">
+          <label class="field"><span>Fee (PKR)</span><input name="fee_pkr" type="number" min="0" value="500"></label>
+        </div>
+        <label class="field"><span>Payment instructions (shown before the screenshot upload)</span><textarea name="pay_instructions" rows="2" placeholder="e.g. JazzCash 03XX-XXXXXXX (EchoLens). Send the fee, then upload a screenshot of the transaction - the admin verifies it before you can submit."></textarea></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Built-in compiler</span><select name="compiler">
+          <option value="none">None (file / link submissions)</option><option value="python">Python 3</option>
+          <option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option><option value="web">HTML / CSS / JS</option></select></label>
+        <label class="field"><span>Dataset URL (optional)</span><input name="dataset_url" type="url" placeholder="https://.../data.csv - mounted into the compiler"></label>
+        <label class="field"><span>Pass mark (%)</span><input name="pass_mark" type="number" min="0" max="100" value="60"></label>
+      </div>
+      <div class="form-grid ev-comp">
+        <label class="field"><span>1st prize gems</span><input name="prize1" type="number" min="0" value="300"></label>
+        <label class="field"><span>2nd prize gems</span><input name="prize2" type="number" min="0" value="150"></label>
+        <label class="field"><span>3rd prize gems</span><input name="prize3" type="number" min="0" value="75"></label>
+      </div>
+      <label class="field ev-webinar" style="display:none"><span>Meeting link (shown to registered participants)</span><input name="meeting_link" type="url" placeholder="https://meet.jit.si/echolens-webinar"></label>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 12px">
+        <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_grade" checked> AI auto-grading (score carries a 10% reduction)</label>
+        <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_certificate" checked> Automatic certificate at the pass mark</label>
+      </div>
+      <div class="ev-probs">
+        <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:6px">Tasks / problems</div>
+        <div id="evProbList"><div class="s" style="color:var(--muted)">No tasks yet - add at least one for quests and competitions.</div></div>
+        <button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="evAddProb()">+ Add task</button>
+      </div>
+      <label class="field" style="margin-top:14px"><span>Email announcement</span><select name="notify">
+        <option value="none">Don't send an email</option>
+        <option value="portal">Email portal students</option>
+        <option value="open">Email open (website) students</option>
+        <option value="all">Email everyone - portal + open + leads</option></select></label>
+      <button class="btn btn-primary btn-block">Create event</button>
+    </form>`, true);
+  evKindChanged('quest');
+  $('evForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button[type!=button]') || f.querySelector('button:last-child');
+    const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
+    obj.auto_grade = f.auto_grade.checked; obj.auto_certificate = f.auto_certificate.checked;
+    obj.problems = evReadProbs();
+    if (['quest', 'competition'].includes(obj.kind) && !obj.problems.length) { modalMsg('Add at least one task for a quest or competition.'); return; }
+    btn.disabled = true;
+    try {
+      const out = await api('/api/admin/events', { method: 'POST', body: JSON.stringify(obj) });
+      toast(out.notified ? `Event created - announcement emailed to ${out.notified} people.` : 'Event created.');
+      closeModal(); renderEvents();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+function evKindChanged(kind) {
+  document.querySelectorAll('.ev-timed').forEach((el) => el.style.display = kind === 'quest' ? 'none' : '');
+  document.querySelectorAll('.ev-quest').forEach((el) => el.style.display = kind === 'quest' ? '' : 'none');
+  document.querySelectorAll('.ev-comp').forEach((el) => el.style.display = ['hackathon', 'competition'].includes(kind) ? '' : 'none');
+  document.querySelectorAll('.ev-webinar').forEach((el) => el.style.display = kind === 'webinar' ? '' : 'none');
+  document.querySelectorAll('.ev-probs').forEach((el) => el.style.display = kind === 'webinar' ? 'none' : '');
+}
+function evAddProb() {
+  const list = $('evProbList');
+  if (list.querySelector('.s')) list.innerHTML = '';
+  const row = document.createElement('div');
+  row.className = 'ev-problem ev-prob-row';
+  row.innerHTML = `
+    <div class="form-grid" style="margin-bottom:6px">
+      <label class="field" style="grid-column:span 2"><span>Task title</span><input class="ep-title" required placeholder="e.g. FizzBuzz with a twist"></label>
+      <label class="field"><span>Difficulty</span><select class="ep-diff"><option>Easy</option><option>Medium</option><option>Hard</option></select></label>
+      <label class="field"><span>Points</span><input class="ep-pts" type="number" min="5" max="500" value="100"></label>
+    </div>
+    <label class="field"><span>Task brief (what to build / solve, what is graded)</span><textarea class="ep-desc" rows="3" required></textarea></label>
+    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove task</button>`;
+  list.appendChild(row);
+}
+function evReadProbs() {
+  return [...document.querySelectorAll('.ev-prob-row')].map((r) => ({
+    title: r.querySelector('.ep-title').value.trim(),
+    description: r.querySelector('.ep-desc').value.trim(),
+    difficulty: r.querySelector('.ep-diff').value,
+    points: r.querySelector('.ep-pts').value,
+  })).filter((p) => p.title);
+}
+
+/* ------------------------------ event detail ------------------------------ */
+let EV_CUR = null;
+async function openEvent(id) {
+  const d = await api(`/api/events/${id}`);
+  EV_CUR = d;
+  const ev = d.event;
+  const isAdmin = d.is_admin;
+  const probs = ev.problems || [];
+  const filesHtml = (ev.files || []).length ? `
+    <div class="s" style="margin:8px 0"><strong>Documents &amp; datasets:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>${isAdmin ? ` <button class="btn btn-ghost btn-sm" onclick="evDelFile(${ev.id},'${esc(f.name).replace(/'/g, '&#39;')}')" title="Remove">&times;</button>` : ''}`).join(' &middot; ')}</div>` : '';
+  const regBtn = !d.my_entry && ['upcoming', 'live'].includes(ev.status) && ['free', 'student'].includes(ME.role)
+    ? `<button class="btn btn-teal" onclick="formEventRegister(${ev.id})">Register${ev.entry === 'paid' ? ' - PKR ' + ev.fee_pkr : ' - free'}</button>` : '';
+  const gateMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait">&#9203; ${esc(d.participate_msg)}</div>` : '';
+  const passedMsg = d.my_progress && d.my_progress.passed
+    ? `<div class="task-status ok">&#127942; <strong>PASSED with ${d.my_progress.avg}%</strong>${ev.auto_certificate ? ' - your certificate is on your profile.' : ''}</div>` : '';
+  const webinarHtml = ev.kind === 'webinar' && ev.meeting_link
+    ? `<div class="task-status ok">&#127909; You are in - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : '';
+  openModal(ev.title, `
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}</span> ${evStatusBadge(ev.status)}
+      <span class="s" style="color:var(--muted)">${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) + ' &rarr; ' + esc(String(ev.ends_at || '').replace('T', ' ')) : ev.duration_minutes ? '~' + ev.duration_minutes + ' minutes' : ''} &middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'free'} &middot; pass mark ${ev.pass_mark}%${ev.auto_grade ? ' &middot; AI graded (-10%)' : ''}${ev.auto_certificate ? ' &middot; auto certificate' : ''}</span></div>
+    ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
+    ${filesHtml}
+    ${regBtn}${gateMsg}${passedMsg}${webinarHtml}
+    ${d.can_participate && probs.length ? `
+      <div class="pub-sec">Tasks</div>
+      ${probs.map((p) => {
+        const s = d.my_submissions[p.pid];
+        return `<div class="ev-problem">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <strong style="font-size:13.5px">${esc(p.title)}</strong>
+            <span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span>
+            <span class="s" style="color:var(--muted)">${p.points} pts</span>
+            <span style="flex:1"></span>
+            ${s ? (s.score != null ? `<span class="grade-chip ok">Scored ${s.score}%${s.graded_by === 'ai' ? ' (AI, -10% applied)' : ''}</span>` : '<span class="grade-chip wait">Submitted - grading</span>') : '<span class="grade-chip none">Not submitted</span>'}
+            <button class="btn btn-teal btn-sm" onclick="openEventTask(${ev.id},${p.pid})">${s ? 'Reopen' : 'Solve'}</button>
+          </div>
+          ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">&#10024; ${esc(s.ai_feedback)}</div>` : ''}
+        </div>`;
+      }).join('')}` : ''}
+    ${d.can_participate && !probs.length && ev.kind !== 'webinar' ? `
+      <div class="pub-sec">Your submission</div>
+      <div class="ev-problem">${eventSubmitFormHtml(ev, null, d.my_submissions[0])}</div>` : ''}
+    ${d.board && d.board.length ? `
+      <div class="pub-sec">Leaderboard</div>
+      <div class="card-body tight" style="max-height:30vh;overflow-y:auto">
+        ${d.board.map((b, i) => `<div class="lb-row" style="padding:9px 4px">
+          <div class="lb-rank">${b.avg != null ? i + 1 : '·'}</div>
+          <div class="lb-name">${esc(b.name)}<small>${b.tier === 'open' ? 'open site' : 'portal'} &middot; ${b.graded}/${b.submissions} graded</small></div>
+          ${b.passed ? '<span class="grade-chip ok">passed</span>' : ''}
+          <strong style="min-width:44px;text-align:right">${b.avg != null ? b.avg + '%' : '—'}</strong>
+        </div>`).join('')}
+      </div>` : ''}
+    ${isAdmin ? adminEventPanel(d) : ''}`, true);
+  wireAdminEventPanel(d);
+}
+function eventSubmitFormHtml(ev, pid, sub) {
+  const hasCompiler = ev.compiler && ev.compiler !== 'none';
+  return `
+    ${sub ? `<div class="s" style="color:var(--muted);margin-bottom:8px">Last submitted ${esc((sub.submitted_at || '').slice(0, 16))}${sub.score != null ? ` &middot; scored <strong>${sub.score}%</strong>` : ' &middot; awaiting grade'}</div>` : ''}
+    <form class="evSubForm" data-pid="${pid || ''}">
+      ${hasCompiler ? '' : `<label class="field"><span>Your work as a file (any document - PDF, Word, notebook, zip...)</span><input name="file" type="file"></label>`}
+      <label class="field"><span>Link to your project (optional${hasCompiler ? '' : ' if a file is attached'})</span><input name="link" type="url" placeholder="https://github.com/you/repo"></label>
+      <label class="field"><span>Note (optional)</span><input name="note" maxlength="500"></label>
+      <button class="btn btn-primary">${sub ? 'Resubmit' : 'Submit'}</button>
+    </form>`;
+}
+async function openEventTask(eid, pid) {
+  const d = EV_CUR && EV_CUR.event.id === eid ? EV_CUR : await api(`/api/events/${eid}`);
+  const ev = d.event;
+  const p = (ev.problems || []).find((x) => x.pid === pid) || { title: ev.title, description: ev.description, points: 100, difficulty: 'Easy' };
+  const sub = d.my_submissions[pid] || null;
+  const lang = ev.compiler && ev.compiler !== 'none' ? ev.compiler : null;
+  openModal(`${esc(p.title)}`, `
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span>
+      <span class="s" style="color:var(--muted)">${p.points} pts &middot; ${lang ? EV_LANG_LABEL[lang] : 'file / link submission'}${ev.auto_grade ? ' &middot; graded by AI instantly (-10%)' : ''}</span></div>
+    <div class="s" style="white-space:pre-line;line-height:1.6;margin-bottom:12px">${esc(p.description)}</div>
+    ${lang && lang !== 'web' ? `
+      <div class="task-ide card" style="margin-bottom:12px">
+        <div class="ide-toolbar">
+          <span class="ide-pkgs">${EV_LANG_LABEL[lang]}${ev.dataset_url ? ' &middot; dataset auto-loaded from URL' : ''}</span>
+          <span style="flex:1"></span>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="EV_TERM&&EV_TERM.clear()">Clear</button>
+          <button type="button" class="btn btn-teal btn-sm" id="evRunBtn" onclick="runEventCode('${lang}',${eid})">&#9654; Run</button>
+        </div>
+        <textarea id="evCode" class="code-editor ide-editor" spellcheck="false" placeholder="${lang === 'sql' ? '-- Write your SQL here. CSV datasets are loaded as tables automatically.' : lang === 'c' ? '// Write your C solution here.\n#include <stdio.h>\nint main(){\n    printf(&quot;Hello EchoLens\\n&quot;);\n    return 0;\n}' : lang === 'cpp' ? '// Write your C++ solution here.' : '# Write your Python solution here.'}">${esc(sub && sub.code || '')}</textarea>
+        <div class="ide-status-row"><span class="s" id="evRunStatus" style="color:var(--muted-2)">Ready.</span></div>
+        <div id="evTerm"></div>
+      </div>
+      <form class="evSubForm" data-pid="${pid}" data-code="1">
+        <label class="field"><span>Note (optional)</span><input name="note" maxlength="500"></label>
+        <button class="btn btn-primary btn-block">${sub ? 'Resubmit editor code' : 'Submit editor code'}</button>
+      </form>
+      <details style="margin-top:10px"><summary class="s" style="cursor:pointer;color:var(--muted);font-weight:600">Or upload a file instead</summary>
+        <form class="evSubForm" data-pid="${pid}" style="margin-top:8px">
+          <label class="field"><span>Your work as a file</span><input name="file" type="file" required></label>
+          <button class="btn btn-primary">Submit file</button>
+        </form></details>`
+    : eventSubmitFormHtml(ev, pid, sub)}
+    ${sub && sub.ai_feedback ? `<div class="s" style="margin-top:10px;background:#F4FBF9;border:1px solid #B7E9DA;border-radius:10px;padding:10px 12px">&#10024; <strong>Feedback:</strong> ${esc(sub.ai_feedback)}</div>` : ''}`, true);
+  if (lang && lang !== 'web') {
+    window.EV_TERM = EchoTerm.mount($('evTerm'));
+    EchoRun.wireEditor($('evCode'));
+  }
+  wireEventSubForms(eid);
+}
+async function runEventCode(lang, eid) {
+  const btn = $('evRunBtn'); const status = $('evRunStatus');
+  const code = $('evCode').value;
+  if (!code.trim()) { toast('Write some code first.', true); return; }
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
+  btn.innerHTML = '&#9632; Stop';
+  const files = [];
+  const ev = EV_CUR && EV_CUR.event.id === eid ? EV_CUR.event : null;
+  if (ev && ev.dataset_url) {
+    try { status.textContent = 'Fetching dataset from URL...'; files.push(await EchoRun.fetchDataset(ev.dataset_url)); }
+    catch (e) { window.EV_TERM.print('[Dataset: ' + e.message + ']\n'); }
+  }
+  for (const f of (ev && ev.files || [])) if (/\.(csv|tsv|txt|json)$/i.test(f.name)) files.push({ name: f.name, url: f.url });
+  try { await EchoRun.executeAny(lang, code, { term: window.EV_TERM, files, onStatus: (t) => { status.textContent = t; } }); }
+  catch (e) { status.textContent = e.message; }
+  btn.innerHTML = '&#9654; Run';
+}
+function wireEventSubForms(eid) {
+  document.querySelectorAll('.evSubForm').forEach((f) => f.addEventListener('submit', async (e) => {
+    e.preventDefault(); const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    const fd = new FormData(f);
+    if (f.dataset.pid) fd.set('pid', f.dataset.pid);
+    if (f.dataset.code) {
+      const code = $('evCode').value;
+      if (!code.trim()) { modalMsg('Write your solution in the editor first.'); btn.disabled = false; return; }
+      fd.set('code', code);
+      fd.set('language', (EV_CUR && EV_CUR.event.compiler) || 'python');
+    }
+    try {
+      const out = await api(`/api/events/${eid}/submit`, { method: 'POST', body: fd });
+      if (out.cert) toast(`🏆 PASSED - certificate ${out.cert.serial} issued! Find it on your profile.`);
+      else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}% (AI score with 10% reduction).`);
+      else toast('Submitted - it will be graded soon.');
+      openEvent(eid);
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  }));
+}
+function formEventRegister(eid) {
+  api(`/api/events/${eid}`).then((d) => {
+    const ev = d.event;
+    openModal(`Register: ${ev.title}`, `
+      <form id="evReg">
+        ${ev.entry === 'paid' ? `
+          <p class="hint" style="margin:0 0 10px">${esc(ev.pay_instructions || `Send PKR ${ev.fee_pkr} to the academy's JazzCash / Easypaisa / bank account, take a screenshot of the transaction, and upload it below. The admin verifies the picture before you can participate.`)}</p>
+          <label class="field"><span>Screenshot of your payment transaction (PNG / JPG)</span><input name="file" type="file" accept=".png,.jpg,.jpeg,.webp" required></label>` :
+        '<p class="s" style="color:var(--muted);margin-bottom:10px">This event is free - register and you are in.</p>'}
+        <button class="btn btn-primary btn-block">Register${ev.entry === 'paid' ? ' - upload payment proof' : ''}</button></form>`);
+    $('evReg').addEventListener('submit', async (e) => {
+      e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+      try {
+        await api(`/api/events/${eid}/register`, { method: 'POST', body: new FormData(f) });
+        toast(ev.entry === 'paid' ? 'Registered - your payment screenshot is being verified by the admin.' : 'Registered - good luck!');
+        closeModal(); openEvent(eid);
+      } catch (err) { modalMsg(err.message); btn.disabled = false; }
+    });
+  });
+}
+
+/* --------------------------- admin event panel --------------------------- */
+function adminEventPanel(d) {
+  const ev = d.event;
+  return `
+    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' ? ' &amp; payment verification' : ''}</div>
+    <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
+      ${(d.entries || []).map((e) => `
+        <div class="list-row" style="padding:10px 4px">
+          <div class="grow">
+            <div class="t">${esc(e.name)} <span class="mono s" style="color:var(--muted)">${esc(e.reg_no || '')}</span> <span class="role-pill">${e.tier}</span></div>
+            <div class="s" style="color:var(--muted)">${esc(e.email || 'no email')}${e.whatsapp ? ' &middot; WA ' + esc(e.whatsapp) : ''} &middot; ${esc((e.registered_at || '').slice(0, 16))}${e.progress && e.progress.avg != null ? ' &middot; avg ' + e.progress.avg + '%' + (e.progress.passed ? ' (passed)' : '') : ''}</div>
+            ${ev.entry === 'paid' ? `<div class="s" style="margin-top:4px">Payment: <span class="pay-badge ${esc(e.payment_status)}">${esc(e.payment_status)}</span>
+              ${e.payment_shot ? `<br><a href="${esc(e.payment_shot)}" target="_blank" rel="noopener"><img class="ev-shot" src="${esc(e.payment_shot)}" alt="payment screenshot"></a>` : ''}</div>` : ''}
+          </div>
+          ${ev.entry === 'paid' && e.payment_status === 'pending' ? `
+            <button class="btn btn-teal btn-sm" onclick="evPay(${e.id},${ev.id},true)">Confirm</button>
+            <button class="btn btn-danger btn-sm" onclick="evPay(${e.id},${ev.id},false)">Reject</button>` : ''}
+        </div>`).join('') || '<div class="empty">No registrations yet.</div>'}
+    </div>
+    <div class="pub-sec">Admin - submissions</div>
+    <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
+      ${(d.submissions || []).map((s) => `
+        <div class="list-row" style="padding:10px 4px">
+          <div class="grow">
+            <div class="t">${esc(s.user_name)}${s.pid ? ' &middot; task ' + s.pid : ''} ${s.score != null ? `<span class="grade-chip ok">${s.score}%${s.graded_by === 'ai' ? ' AI' : ''}</span>` : '<span class="grade-chip wait">ungraded</span>'}</div>
+            <div class="s" style="color:var(--muted)">${esc((s.submitted_at || '').slice(0, 16))}${s.language ? ' &middot; ' + esc(s.language) : ''}${s.note ? ' &middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
+            ${s.code ? `<details><summary class="s" style="cursor:pointer;color:var(--teal-deep)">View code</summary><pre class="cred-box" style="white-space:pre-wrap;max-height:200px;overflow:auto">${esc(s.code)}</pre></details>` : ''}
+            ${s.file_url ? `<a class="s" href="${esc(s.file_url)}" target="_blank" rel="noopener">&#128206; ${esc(s.file_name || 'file')}</a> ` : ''}
+            ${s.link ? `<a class="s" href="${esc(s.link)}" target="_blank" rel="noopener">&#128279; project link</a>` : ''}
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="evScore(${s.id},${ev.id})">Score</button>
+        </div>`).join('') || '<div class="empty">No submissions yet.</div>'}
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <form id="evFileUp" style="display:flex;gap:8px;align-items:center">
+        <input name="file" type="file" required style="font-size:12.5px">
+        <button class="btn btn-teal btn-sm">Attach document / dataset</button>
+      </form>
+    </div>`;
+}
+function wireAdminEventPanel(d) {
+  const fu = $('evFileUp');
+  if (fu) fu.addEventListener('submit', async (e) => {
+    e.preventDefault(); const btn = fu.querySelector('button'); btn.disabled = true;
+    try { await api(`/api/admin/events/${d.event.id}/files`, { method: 'POST', body: new FormData(fu) }); toast('Attached.'); openEvent(d.event.id); }
+    catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+async function evPay(entryId, eid, confirm) {
+  try { await api(`/api/admin/event-entries/${entryId}/payment`, { method: 'POST', body: JSON.stringify({ confirm }) }); toast(confirm ? 'Payment confirmed - the participant was emailed.' : 'Payment rejected - the participant was emailed.'); openEvent(eid); }
+  catch (e) { toast(e.message, true); }
+}
+async function evScore(sid, eid) {
+  const score = prompt('Score (0-100):'); if (score == null) return;
+  const remarks = prompt('Feedback for the participant (optional):') || '';
+  try {
+    const out = await api(`/api/admin/event-submissions/${sid}/score`, { method: 'POST', body: JSON.stringify({ score, remarks }) });
+    toast(out.cert ? `Scored - and certificate ${out.cert.serial} was issued automatically.` : 'Scored.');
+    openEvent(eid);
+  } catch (e) { toast(e.message, true); }
+}
+async function evDelFile(eid, name) {
+  if (!confirm('Remove this document from the event?')) return;
+  try { await api(`/api/admin/events/${eid}/files/${encodeURIComponent(name)}`, { method: 'DELETE' }); openEvent(eid); }
+  catch (e) { toast(e.message, true); }
+}
+
+/* ============================================================================
+ * v12: ANALYTICS & LEADS - complete stats to monitor progress: totals,
+ * sign-up graphs over time (daily / weekly / monthly / yearly), a segment
+ * dropdown (everyone / portal / open / a specific course, batch or event),
+ * the leads database (name, email, WhatsApp) with CSV download, and the
+ * email composer for announcements, enrollments and discounts.
+ * ========================================================================== */
+let AN_STATE = { metric: 'signups', segment: 'all', granularity: 'daily', batch_id: '', event_id: '' };
+async function renderAnalytics() {
+  const el = $('view-admin-analytics');
+  el.innerHTML = '<div class="empty">Loading analytics&hellip;</div>';
+  const q = new URLSearchParams({ metric: AN_STATE.metric, segment: AN_STATE.segment, granularity: AN_STATE.granularity });
+  if (AN_STATE.batch_id) q.set('batch_id', AN_STATE.batch_id);
+  if (AN_STATE.event_id) q.set('event_id', AN_STATE.event_id);
+  const d = await api('/api/admin/analytics?' + q.toString());
+  const t = d.totals;
+  el.innerHTML = `
+    <div class="an-cards">
+      ${[[t.total_signups, 'total sign-ups'], [t.portal_students, 'portal students'], [t.open_users, 'open (website) users'], [t.leads, 'leads collected'],
+        [t.enrollments, 'course enrollments'], [t.event_registrations, 'event registrations'], [t.event_submissions, 'event submissions'], [t.certificates_issued, 'certificates issued']]
+        .map(([n, l]) => `<div class="an-card"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('')}
+    </div>
+    <div class="an-chart">
+      <div class="an-controls">
+        <select id="anMetric" onchange="anSet('metric',this.value)">
+          <option value="signups"${AN_STATE.metric === 'signups' ? ' selected' : ''}>New sign-ups</option>
+          <option value="enrollments"${AN_STATE.metric === 'enrollments' ? ' selected' : ''}>Course enrollments</option>
+          <option value="event_registrations"${AN_STATE.metric === 'event_registrations' ? ' selected' : ''}>Event registrations</option>
+          <option value="event_submissions"${AN_STATE.metric === 'event_submissions' ? ' selected' : ''}>Event submissions</option>
+          <option value="quest_submissions"${AN_STATE.metric === 'quest_submissions' ? ' selected' : ''}>Quest submissions</option>
+          <option value="leads"${AN_STATE.metric === 'leads' ? ' selected' : ''}>New leads</option>
+        </select>
+        ${AN_STATE.metric === 'signups' ? `<select id="anSeg" onchange="anSet('segment',this.value)">
+          <option value="all"${AN_STATE.segment === 'all' ? ' selected' : ''}>Everyone</option>
+          <option value="portal"${AN_STATE.segment === 'portal' ? ' selected' : ''}>Portal students</option>
+          <option value="open"${AN_STATE.segment === 'open' ? ' selected' : ''}>Open (website) students</option>
+        </select>` : ''}
+        ${['enrollments', 'quest_submissions'].includes(AN_STATE.metric) ? `<select onchange="anSet('batch_id',this.value)">
+          <option value="">All courses</option>
+          ${d.batches.map((b) => `<option value="${b.id}"${String(AN_STATE.batch_id) === String(b.id) ? ' selected' : ''}>${esc(b.name)}</option>`).join('')}
+        </select>` : ''}
+        ${['event_registrations', 'event_submissions'].includes(AN_STATE.metric) ? `<select onchange="anSet('event_id',this.value)">
+          <option value="">All events</option>
+          ${d.events.map((e) => `<option value="${e.id}"${String(AN_STATE.event_id) === String(e.id) ? ' selected' : ''}>${esc(e.title)} (${e.kind})</option>`).join('')}
+        </select>` : ''}
+        <span style="flex:1"></span>
+        ${['daily', 'weekly', 'monthly', 'yearly'].map((g) => `<button class="gran-btn${AN_STATE.granularity === g ? ' active' : ''}" onclick="anSet('granularity','${g}')">${g[0].toUpperCase() + g.slice(1)}</button>`).join('')}
+      </div>
+      ${chartSvg(d.series)}
+    </div>
+    <div class="card" style="margin-top:18px"><div class="card-head"><h3>Email everyone - announcements, enrollments, discounts</h3></div>
+      <div class="card-body">
+        <form id="blastForm">
+          <div class="form-grid">
+            <label class="field"><span>Audience</span><select name="audience">
+              <option value="portal">Portal students</option>
+              <option value="open">Open (website) students</option>
+              <option value="all">Everyone - portal + open + leads</option></select></label>
+            <label class="field" style="grid-column:span 2"><span>Subject</span><input name="subject" required placeholder="e.g. 25% early-bird discount - Summer 2026 cohort"></label>
+          </div>
+          <label class="field"><span>Message</span><textarea name="body" rows="5" required placeholder="Write the announcement exactly as students should read it. It is sent from the company email address."></textarea></label>
+          <button class="btn btn-primary">Send email</button>
+        </form>
+      </div></div>
+    <div class="card"><div class="card-head"><h3>Leads database</h3>
+      <a class="btn btn-teal btn-sm" href="/api/admin/leads.csv" download>&#11015; Download CSV</a></div>
+      <div class="card-body" style="padding-bottom:0"><input class="search-input" placeholder="Filter by name, email, or number..." oninput="filterLeads(this.value)"></div>
+      <div class="card-body tight" id="leadsBox"><div class="empty">Loading leads&hellip;</div></div>
+    </div>`;
+  $('blastForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try {
+      const out = await api('/api/admin/email-blast', { method: 'POST', body: JSON.stringify({ subject: f.subject.value, body: f.body.value, audience: f.audience.value }) });
+      toast(out.smtp ? `Email sent to ${out.sent} people.` : `Queued for ${out.sent} people - configure SMTP_* in the environment to actually send.`);
+      f.reset(); btn.disabled = false;
+    } catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+  loadLeads();
+}
+function anSet(k, v) { AN_STATE[k] = v; if (k === 'metric') { AN_STATE.batch_id = ''; AN_STATE.event_id = ''; } renderAnalytics(); }
+let LEADS_CACHE = [];
+async function loadLeads() {
+  try {
+    const d = await api('/api/admin/leads');
+    LEADS_CACHE = d.leads;
+    drawLeads(LEADS_CACHE);
+  } catch (e) { $('leadsBox').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+function drawLeads(list) {
+  $('leadsBox').innerHTML = list.length ? `
+    <table class="lc-table"><thead><tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Source</th><th>Tier</th><th>Since</th></tr></thead><tbody>
+      ${list.slice(0, 400).map((l) => `<tr style="cursor:default">
+        <td>${esc(l.name || '—')}</td><td>${esc(l.email)}</td><td>${esc(l.whatsapp || '—')}</td>
+        <td>${esc(l.source)}</td><td><span class="role-pill">${esc(l.tier)}</span></td><td class="s" style="color:var(--muted)">${esc((l.created_at || '').slice(0, 10))}</td>
+      </tr>`).join('')}
+    </tbody></table>${list.length > 400 ? `<p class="hint">Showing 400 of ${list.length} - download the CSV for the full list.</p>` : ''}`
+    : '<div class="empty">No leads yet - they appear as soon as anyone signs in on the open website.</div>';
+}
+function filterLeads(q) {
+  const s = q.trim().toLowerCase();
+  drawLeads(!s ? LEADS_CACHE : LEADS_CACHE.filter((l) => [l.name, l.email, l.whatsapp].some((v) => String(v || '').toLowerCase().includes(s))));
+}
+/* Tiny dependency-free SVG line+bar chart. */
+function chartSvg(series) {
+  const W = 860, H = 260, P = 34;
+  const n = series.labels.length;
+  const max = Math.max(1, ...series.counts);
+  const bw = (W - P * 2) / n;
+  const y = (v) => H - P - (v / max) * (H - P * 2);
+  const bars = series.counts.map((v, i) => `<rect x="${(P + i * bw + bw * 0.18).toFixed(1)}" y="${y(v).toFixed(1)}" width="${(bw * 0.64).toFixed(1)}" height="${(H - P - y(v)).toFixed(1)}" rx="3" fill="#0FBFA8" opacity="0.85"><title>${series.labels[i]}: ${v}</title></rect>`).join('');
+  const pts = series.counts.map((v, i) => `${(P + i * bw + bw / 2).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const gridLines = [0, 0.25, 0.5, 0.75, 1].map((f) => {
+    const gy = y(max * f);
+    return `<line x1="${P}" y1="${gy}" x2="${W - P}" y2="${gy}" stroke="#E7E4DC" stroke-width="1"/><text x="${P - 6}" y="${gy + 4}" text-anchor="end" font-size="10" fill="#98938A">${Math.round(max * f)}</text>`;
+  }).join('');
+  const step = Math.ceil(n / 10);
+  const labels = series.labels.map((l, i) => i % step === 0 ? `<text x="${(P + i * bw + bw / 2).toFixed(1)}" y="${H - P + 16}" text-anchor="middle" font-size="9.5" fill="#98938A">${l.length > 7 ? l.slice(5) : l}</text>` : '').join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="chart">${gridLines}${bars}<polyline points="${pts}" fill="none" stroke="#7C6CF5" stroke-width="2.2" stroke-linejoin="round"/>${labels}</svg>`;
 }

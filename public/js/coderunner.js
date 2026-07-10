@@ -189,6 +189,7 @@
       status('Loading dataset' + (files.length > 1 ? 's' : '') + '...');
       try {
         fileBytes = await Promise.all(files.map(async (f) => {
+          if (f.bytes) return { name: f.name, bytes: f.bytes }; // v12: local uploads / URL datasets arrive pre-loaded
           const r = await fetch(f.url, { credentials: 'same-origin' });
           if (!r.ok) throw new Error('Could not load ' + f.name);
           return { name: f.name, bytes: await r.arrayBuffer() };
@@ -335,7 +336,176 @@
     iframe.srcdoc = isFullPage && !/<head/i.test(raw) ? bridge + raw : doc;
   }
 
+  /* ============================== v12: SQL ==============================
+   * SQLite compiled to WebAssembly (sql.js) - a full SQL engine in the
+   * browser, free for everyone, zero server load. CSV datasets (attached to
+   * a task, uploaded by the student, or pulled from a URL) are imported as
+   * tables automatically: data.csv -> table `data`.
+   */
+  const SQLJS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/';
+  let sqlModule = null;
+  async function loadSql(status) {
+    if (sqlModule) return sqlModule;
+    status && status('Loading SQL engine (first run only)...');
+    await new Promise((resolve, reject) => {
+      if (window.initSqlJs) return resolve();
+      const s = document.createElement('script');
+      s.src = SQLJS_URL + 'sql-wasm.js';
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Could not load the SQL engine - check your internet connection.'));
+      document.head.appendChild(s);
+    });
+    sqlModule = await window.initSqlJs({ locateFile: (f) => SQLJS_URL + f });
+    return sqlModule;
+  }
+  // Small dependency-free CSV parser (handles quoted fields and embedded commas).
+  function parseCsv(text) {
+    const rows = []; let row = [], cur = '', inQ = false;
+    const s = String(text).replace(/\r\n/g, '\n');
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (inQ) {
+        if (c === '"') { if (s[i + 1] === '"') { cur += '"'; i++; } else inQ = false; }
+        else cur += c;
+      } else if (c === '"') inQ = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+      else cur += c;
+    }
+    if (cur.length || row.length) { row.push(cur); rows.push(row); }
+    return rows.filter((r) => r.length > 1 || (r.length === 1 && r[0] !== ''));
+  }
+  function tableNameFor(fileName) {
+    return String(fileName).replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_]/g, '_').replace(/^(\d)/, 't$1') || 'data';
+  }
+  async function runSql(code, { term, onStatus, files }) {
+    const status = (t) => { try { onStatus && onStatus(t); } catch {} };
+    const SQL = await loadSql(status);
+    const db = new SQL.Database();
+    const dec = new TextDecoder();
+    const imported = [];
+    for (const f of files || []) {
+      try {
+        if (!/\.(csv|tsv|txt)$/i.test(f.name)) continue;
+        const text = f.bytes ? dec.decode(f.bytes) : await (await fetch(f.url, { credentials: 'same-origin' })).text();
+        const rows = parseCsv(/\.tsv$/i.test(f.name) ? text.replace(/\t/g, ',') : text);
+        if (rows.length < 2) continue;
+        const table = tableNameFor(f.name);
+        const cols = rows[0].map((c, i) => (String(c).trim().replace(/[^a-zA-Z0-9_]/g, '_') || 'col' + i));
+        db.run(`CREATE TABLE ${table} (${cols.map((c) => '"' + c + '"').join(', ')});`);
+        const stmt = db.prepare(`INSERT INTO ${table} VALUES (${cols.map(() => '?').join(',')})`);
+        for (const r of rows.slice(1)) stmt.run(cols.map((_, i) => (r[i] !== undefined ? r[i] : null)));
+        stmt.free();
+        imported.push(`${table} (${rows.length - 1} rows)`);
+      } catch (e) { term.print(`[Could not import ${f.name}: ${e.message}]\n`); }
+    }
+    if (imported.length) term.print(`-- Datasets loaded as tables: ${imported.join(', ')}\n\n`);
+    status('Running SQL...');
+    try {
+      const results = db.exec(String(code));
+      if (!results.length) term.print('Query OK (no rows returned).\n');
+      for (const r of results) {
+        const widths = r.columns.map((c, i) => Math.max(String(c).length, ...r.values.map((v) => String(v[i] ?? 'NULL').length)));
+        const line = (cells) => '| ' + cells.map((c, i) => String(c ?? 'NULL').padEnd(widths[i])).join(' | ') + ' |\n';
+        term.print(line(r.columns));
+        term.print('|' + widths.map((w) => '-'.repeat(w + 2)).join('|') + '|\n');
+        for (const v of r.values.slice(0, 200)) term.print(line(v));
+        if (r.values.length > 200) term.print(`... ${r.values.length - 200} more rows\n`);
+        term.print(`(${r.values.length} row${r.values.length === 1 ? '' : 's'})\n\n`);
+      }
+      status('Done.');
+      return { ok: true };
+    } catch (e) {
+      term.print('SQL error: ' + e.message + '\n');
+      status('Finished with an error - read the message above.');
+      return { ok: false };
+    } finally { db.close(); }
+  }
+
+  /* ============================== v12: C / C++ ==============================
+   * Compiled and run through the free public Piston execution API
+   * (emkc.org) - real gcc/g++, stdin supported, nothing installed on the
+   * EchoLens server. If the API is unreachable, the student gets a clear
+   * message instead of a hang.
+   */
+  const PISTON_URL = 'https://emkc.org/api/v2/piston/execute';
+  const PISTON_LANG = { c: { language: 'c', version: '10.2.0', file: 'main.c' }, cpp: { language: 'c++', version: '10.2.0', file: 'main.cpp' } };
+  async function runNative(lang, code, { term, onStatus }) {
+    const status = (t) => { try { onStatus && onStatus(t); } catch {} };
+    const cfg = PISTON_LANG[lang];
+    // If the program reads input, collect it up-front (compiled programs run
+    // remotely, so input is provided as stdin lines before the run).
+    let stdin = '';
+    if (/\b(scanf|cin\s*>>|getline|gets|fgets|getchar)\b/.test(code)) {
+      term.print('This program reads input. Type ALL input lines below (press Enter after each, empty line to finish):\n');
+      const lines = [];
+      for (let i = 0; i < 30; i++) {
+        const v = await term.askInput();
+        if (v == null || v === '') break;
+        lines.push(v);
+      }
+      stdin = lines.join('\n');
+      term.print('\n');
+    }
+    status(lang === 'c' ? 'Compiling & running C (gcc)...' : 'Compiling & running C++ (g++)...');
+    try {
+      const r = await fetch(PISTON_URL, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language: cfg.language, version: cfg.version, files: [{ name: cfg.file, content: String(code) }], stdin, compile_timeout: 10000, run_timeout: 8000 }),
+      });
+      if (!r.ok) throw new Error('The compile service answered ' + r.status + ' - try again in a minute.');
+      const d = await r.json();
+      if (d.compile && d.compile.stderr) term.print(d.compile.stderr + '\n');
+      if (d.compile && d.compile.code !== 0 && d.compile.code != null) { status('Compilation failed - read the errors above.'); return { ok: false }; }
+      if (d.run) {
+        if (d.run.stdout) term.print(d.run.stdout);
+        if (d.run.stderr) term.print(d.run.stderr);
+        if (d.run.signal === 'SIGKILL') term.print('\n[Stopped: the program ran too long. Check for infinite loops.]\n');
+        status(d.run.code === 0 ? 'Done.' : 'Finished with exit code ' + d.run.code + '.');
+        return { ok: d.run.code === 0 };
+      }
+      status('Done.');
+      return { ok: true };
+    } catch (e) {
+      term.print('[' + e.message + ']\n');
+      status('Could not reach the compiler service.');
+      return { ok: false };
+    }
+  }
+
+  /* ----------------------- v12: one runner, every language -----------------------
+   * EchoRun.executeAny('python'|'sql'|'c'|'cpp', code, opts) - opts.files may
+   * be {name, url} (fetched with the signed-in cookie) or {name, bytes}
+   * (already-loaded local uploads / URL datasets).
+   */
+  async function executeAny(lang, code, opts) {
+    const files = [];
+    for (const f of (opts.files || [])) {
+      if (f.bytes) files.push(f);
+      else if (f.url) {
+        try {
+          const r = await fetch(f.url, { credentials: 'same-origin' });
+          if (r.ok) files.push({ name: f.name, bytes: await r.arrayBuffer() });
+        } catch {}
+      }
+    }
+    if (lang === 'sql') return runSql(code, { ...opts, files });
+    if (lang === 'c' || lang === 'cpp') return runNative(lang, code, opts);
+    return execute(code, { ...opts, files });
+  }
+  // Pull a dataset from a URL through the server proxy (avoids CORS) and
+  // return { name, bytes } ready to mount into any language's run.
+  async function fetchDataset(url) {
+    const r = await fetch('/api/fetch-dataset?url=' + encodeURIComponent(url), { credentials: 'same-origin' });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      throw new Error(d.error || 'Could not fetch that URL.');
+    }
+    const name = r.headers.get('X-Dataset-Name') || (url.split('/').pop() || 'dataset.csv').split('?')[0];
+    return { name, bytes: await r.arrayBuffer() };
+  }
+
   window.EchoTerm = { mount };
-  window.EchoRun = { execute, cancel, isRunning: () => busy, wireEditor };
+  window.EchoRun = { execute, executeAny, fetchDataset, cancel, isRunning: () => busy, wireEditor };
   window.EchoWeb = { preview: webPreview };
 })();

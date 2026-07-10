@@ -1,3 +1,47 @@
+# EchoLens LMS v12.1 - August 2026 Catalogue Release
+
+**The full August 2026 catalogue is live: 31 programs, 31 quest tracks.** The official catalogue (8 bootcamps, 11 short courses, 12 specialist tracks) now drives the whole platform, with correct prices, NEW / HIGH DEMAND / FLAGSHIP / FREE badges, and the Web Developer Path bundle (BC-04 -> SC-06 -> SC-07 -> ST-09, PKR 43,500, save 7,500). **15 brand-new quest tracks** were built for the new programs (BC-04..08, SC-06..11, ST-09..12) - every task includes course-session links, key documentation/resource links (MDN, official docs, free tools), and teacher-only solution guidelines.
+
+**Free/paid split per the catalogue.** BC-03 (Everyday AI), BC-04 (Web Dev Kickstart) and BC-06 (Git & Freelance Launch) are fully free - every level open to signed-in members. Every paid program opens **Level 1 free** on the open problem set (OPEN_LEVELS env overrides). Free programs carry FREE badges in the problem set and catalogue.
+
+**Catalogue is not openly visible.** The public landing page now shows only a teaser; the full catalogue with prices lives behind sign-in: the **Courses tab at /open** (clean table format like the problem set: code, badges, tier, duration, fee, Register / Start free buttons) and `GET /api/catalogue` (auth required). `/api/public/info` no longer exposes the catalogue.
+
+**Key action buttons on the open portal (Courses tab + landing teaser):** Register for paid courses (Google Form), Campus Ambassador program application, and the **free webinar - 18 July, 4-5 PM**. Links are env-overridable: `REGISTRATION_FORM_URL`, `AMBASSADOR_FORM_URL`, `WEBINAR_URL`, `WEBINAR_LABEL`.
+
+**Third-party platform names scrubbed.** No competitor platform names appear anywhere in the product UI, code comments, or docs - everything is branded as the EchoLens problem set / EchoLens compiler.
+
+Also: SQL + Power BI (SC-03) batches now default the in-browser IDE ON (the compiler runs SQL natively); the new non-coding tracks default it OFF with per-batch teacher override.
+
+---
+
+# EchoLens LMS v12
+
+## New in v12: Unified admin-run Events (quests / hackathons / competitions / webinars), EchoLens problem-set portal (clean professional problem-table workspace), C/C++/SQL compilers + free public compiler, leads database with email blasts, full analytics dashboard, AI auto-grading with automatic certificates
+
+**One Events system, fully admin-controlled.** The new **Events** tab lets the admin create quests, hackathons, competitions, and webinars from a single form - choosing per event: **free or paid** (PKR fee + payment instructions), **inside the portal, on the open website, or both**, an optional **built-in compiler** (Python / C / C++ / SQL / web) with a **dataset URL** mounted into every run, admin-attached **documents**, tasks with difficulty and points, a **pass mark**, **AI auto-grading** on/off, **automatic certificates** on/off, prizes, and webinar meeting links. Creating an event can fire an **email announcement to portal students, open students, or everyone** in one click.
+
+**Paid events use payment screenshots, not references.** Participants in paid events upload a **picture of the transaction** while registering; the admin sees the screenshot inline in the event's registrations panel and confirms or rejects it - the participant is emailed either way and can only submit once confirmed.
+
+**Submissions: code, files, and links - graded by AI instantly.** Every event accepts **built-in-compiler code**, an **uploaded document** (any file), and/or a project link. With AI auto-grading on, submissions are scored on arrival with a **10% reduction applied to the AI's score**; when the average reaches the pass mark, a **QR-verified certificate is issued automatically** and emailed. Without an AI key (or auto-grading off), submissions wait for the admin's manual score - certificates still auto-issue at the pass mark.
+
+**EchoLens problem-set portal (clean professional problem-table workspace) at /open.** The public playground became a clean professional workspace: a filterable **problem table** (status ticks, colored Easy/Medium/Hard chips, gems, Solve buttons) built from the open levels of every track, a split-pane **solve view** with the multi-language compiler, plus a **Quests & Events** tab where open users take admin-created events and collect certificates. **Nothing is accessible without signing in** - Google or a free email account (name, email, and **mandatory WhatsApp number**).
+
+**Compilers grew again: C, C++, and SQL.** The task IDE, events, and the open portal now offer **C and C++** (compiled with real gcc/g++ through the free public Piston API, interactive stdin supported) and **SQL** (SQLite as WebAssembly, entirely in the browser - CSVs become tables automatically: sales.csv -> table sales). A standalone **free public compiler lives at /compiler** - sign in and use any language free of cost, with datasets **uploaded from your device or pulled from any URL** (a signed-in server proxy handles CORS).
+
+**Students bring their own datasets.** Inside every quest task (and the open compiler), students can **upload their own CSV/JSON/text file** - it is mounted into the compiler in the browser (never uploaded to the server), so pd.read_csv('mydata.csv'), matplotlib charts, and SQL tables work on the student's data.
+
+**Leads database + company email blasts.** Every open sign-in (Google or email) and every portal student becomes a **lead** (name, email, WhatsApp, source, date). WhatsApp is **mandatory** - a non-dismissable prompt collects it on first sign-in. The admin's new **Analytics & Leads** tab lists, filters, and **downloads leads as CSV**, and includes an **email composer**: write the announcement (enrollments, discounts, new batches), pick the audience (**portal / open / everyone incl. leads**), and it goes out from the company address (MAIL_FROM).
+
+**A real analytics dashboard.** Total sign-ups, portal vs open users, leads, enrollments, event registrations/submissions, and certificates at a glance - plus a chart with a **metric dropdown** (sign-ups, enrollments, event registrations, event submissions, quest submissions, leads), **segment filters** (everyone / portal / open / specific course / specific event), and **daily / weekly / monthly / yearly** buttons.
+
+**Fixes & polish.** The profile **... menu is no longer clipped** (Change password / Update profile / Upload picture / Sign out were hidden under the card - an overflow bug, fixed in CSS). Teachers can also upload their **certificate signature from inside any course** (course ... menu -> "My certificate signature"); the CEO signature stays a one-time admin setting. Certificate kinds now include quests and webinars.
+
+Migration: none. Deploy over v11 - databases, tracks, submissions, gems, hackathons and challenges carry forward; new collections (events, leads) are created automatically and existing students with emails are back-filled into the leads list.
+
+**Note:** the course catalogue / quest tracks were NOT changed in v12 - the updated catalogue PDF still needs to be provided so the tracks and the open-first-modules split can be built from it.
+
+---
+
 # EchoLens LMS v11
 
 ## New in v11: Live classes with attendance, AI/plagiarism integrity checks, QR-verified certificates, pop quizzes, deadlines with late penalties, at-risk radar, full-screen multi-language compiler with datasets, student search + complete profiles

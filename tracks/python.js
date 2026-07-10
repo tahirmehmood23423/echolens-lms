@@ -9,7 +9,7 @@
 
 module.exports = {
   key: 'python-6w', course_code: 'SC-01',
-  title: 'Python for Programming',
+  title: 'Python for Data Science',
   description: '6-week quest from your first print() to a working regression model. Pass each level to unlock the next.',
   pass_mark: 60, // average % across a level's graded problems to unlock the next
   titles: [

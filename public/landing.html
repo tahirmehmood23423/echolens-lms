@@ -67,9 +67,11 @@
   <img src="/img/logo.png" alt="EchoLens">
   <a class="lnk" href="#features">Features</a>
   <a class="lnk" href="#courses">Courses</a>
-  <a class="lnk" href="#quest">Try the quest</a>
+  <a class="lnk" href="/open">Problems</a>
+  <a class="lnk" href="/compiler">Free compiler</a>
   <a class="lnk" href="#register">Register</a>
   <span style="flex:1"></span>
+  <a class="btn btn-ghost btn-sm" href="/open">Solve free quests</a>
   <a class="btn btn-primary btn-sm" id="signinBtn" href="/login">Sign in</a>
 </nav>
 
@@ -112,31 +114,21 @@
   </section>
 
   <section class="sec" id="courses">
-    <h2>Course catalogue</h2>
-    <p class="sub">From 2-week bootcamps to 12-week career tracks. Prices in PKR; every running course includes live classes, the quest ladder, and teacher feedback.</p>
-    <div class="cat-grid" id="catGrid"><div class="empty">Loading courses&hellip;</div></div>
+    <h2>Course catalogue - August 2026 cohort</h2>
+    <p class="sub">31 live, instructor-led programs across AI, data and web development: 2-week bootcamps (three completely free), 6-week short courses, and 8-week specialist tracks. Every paid course opens its first level free - try before you enrol. Sign in free to browse the full catalogue with prices, free quests, and enrolment.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
+      <a class="btn btn-primary" href="/open">Browse the catalogue - sign in free</a>
+      <a class="btn btn-teal" href="/open">Free webinar - 18 July, 4-5 PM</a>
+      <a class="btn btn-ghost" href="/open">Campus Ambassador program</a>
+    </div>
   </section>
 
   <section class="sec" id="quest">
-    <h2>Try the quest - right here, free</h2>
-    <p class="sub">Pick any track and play its first <span id="openLvlN">3</span> levels in the open playground below. Write real Python, press Run, see real output. The rest of the ladder - plus submissions, gems, teacher feedback, live classes, and the leaderboard - unlocks when you register.</p>
-    <div class="track-grid" id="trackGrid"><div class="empty">Loading tracks&hellip;</div></div>
-    <div class="play-panel" id="playPanel"></div>
-    <div class="play-ide" id="playIde" style="display:none">
-      <div class="card"><div class="card-head"><h3 id="pbTitle">Task</h3></div>
-        <div class="card-body"><div class="s" id="pbDesc" style="white-space:pre-line;line-height:1.6;font-size:13.5px"></div><div class="s" id="pbRefs" style="margin-top:10px"></div></div></div>
-      <div class="task-ide card">
-        <div class="ide-toolbar">
-          <span class="ide-pkgs">Python 3 &middot; numpy &middot; pandas &middot; matplotlib &middot; scikit-learn</span>
-          <span style="flex:1"></span>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="clearPlayTerm()">Clear output</button>
-          <button type="button" class="btn btn-teal btn-sm" id="playRunBtn" onclick="runPlayCode()">&#9654; Run</button>
-        </div>
-        <textarea id="playCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your Python solution here, then press Run."></textarea>
-        <div class="ide-status-row"><span class="s" id="playStatus" style="color:var(--muted-2)">Ready - your code runs in your browser, nothing to install.</span></div>
-        <div id="playTerm"></div>
-        <p class="hint" style="margin:10px 14px 14px">Practice mode: runs are real, submissions need an account. <a href="#register">Register</a> to submit, earn gems, and unlock every level.</p>
-      </div>
+    <h2>Solve free quests in the EchoLens problem set</h2>
+    <p class="sub">A clean problem set from every EchoLens track, a free compiler for Python, C, C++ and SQL, plus open quests, hackathons and webinars with <strong>automatic verified certificates</strong>. Sign in free with Google or email - it takes ten seconds.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
+      <a class="btn btn-primary" href="/open">Open the problem set - free</a>
+      <a class="btn btn-ghost" href="/compiler">Use the free compiler</a>
     </div>
   </section>
 

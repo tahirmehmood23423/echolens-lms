@@ -20,6 +20,7 @@ const mailer = require('./mailer');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, officialCatalogue,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile,
+  Events, Leads, Analytics,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -450,6 +451,8 @@ app.get('/api/auth/providers', (req, res) => res.json({ google: !!(G_ID && G_SEC
 
 app.get('/auth/google', (req, res) => {
   if (!G_ID || !G_SECRET) return res.redirect('/login?err=' + encodeURIComponent('Google sign-in is not configured yet.'));
+  const back = String(req.query.back || '');
+  if (['/open', '/compiler'].includes(back)) res.cookie('el_back', back, { httpOnly: true, sameSite: 'lax', maxAge: 600000 });
   const state = jwt.sign({ n: Date.now() }, JWT_SECRET, { expiresIn: '10m' });
   const params = new URLSearchParams({
     client_id: G_ID, redirect_uri: G_REDIRECT, response_type: 'code',
@@ -474,8 +477,12 @@ app.get('/auth/google/callback', async (req, res) => {
     const info = await infoRes.json();
     if (!info.sub) throw new Error('Could not read your Google profile.');
     const u = Users.findOrCreateGoogle({ sub: info.sub, name: info.name, email: info.email });
+    if (u.email) Leads.upsert({ name: u.name, email: u.email, whatsapp: (u.profile || {}).phone || null, source: 'google', user_id: u.id });
     setAuthCookie(res, sign(u));
-    res.redirect('/dashboard');
+    // Google sign-ins from the open site go back to the open site.
+    const back = String(req.cookies.el_back || '');
+    res.clearCookie('el_back');
+    res.redirect(['/open', '/compiler'].includes(back) ? back : (u.role === 'free' ? '/open' : '/dashboard'));
   } catch (e) {
     res.redirect('/login?err=' + encodeURIComponent(e.message || 'Google sign-in failed.'));
   }
@@ -973,10 +980,11 @@ app.post('/api/admin/catalogue/load-official', authRequired, adminRequired, (req
 // The landing page shows what EchoLens offers and lets anyone try the first
 // levels of every quest track in the browser compiler. Everything beyond the
 // open levels requires an account (created by the academy after payment).
-const OPEN_LEVELS = 3;
+const OPEN_LEVELS = Number(process.env.OPEN_LEVELS || 1); // catalogue: Level 1 of every paid course is free; free tracks open fully
 app.get('/api/public/info', (req, res) => {
   res.json({
-    catalogue: officialCatalogue(),
+    // v12: the full catalogue is no longer openly visible - it lives behind
+    // sign-in at /open (Courses tab) and GET /api/catalogue.
     stats: {
       students: Users.countByRole('student') + Users.countByRole('free'),
       courses: officialCatalogue().length,
@@ -990,8 +998,9 @@ app.get('/api/public/tracks', (req, res) => res.json({ tracks: Quests.tracks(), 
 app.get('/api/public/tracks/:key', (req, res) => {
   const t = Quests.trackDef(req.params.key);
   if (!t) return res.status(404).json({ error: 'Track not found.' });
+  const openN = t.free ? t.levels.length : OPEN_LEVELS; // free programs: every level open
   const levels = t.levels.map((l) => {
-    if (l.no <= OPEN_LEVELS) {
+    if (l.no <= openN) {
       return {
         no: l.no, week: l.week, title: l.title, topic: l.topic, locked: false,
         problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [] })),
@@ -999,7 +1008,7 @@ app.get('/api/public/tracks/:key', (req, res) => {
     }
     return { no: l.no, week: l.week, title: l.title, topic: l.topic, locked: true, problems_count: l.problems.length };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null }, levels, open_levels: OPEN_LEVELS });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free }, levels, open_levels: openN });
 });
 
 /* ================================ v11 routes ================================ */
@@ -1364,11 +1373,297 @@ app.get('/api/public/cert-image/:name', (req, res) => {
   res.sendFile(full);
 });
 
+/* ================================ v12 routes ================================ */
+
+/* --------------------------- open sign-up + leads --------------------------- */
+// Anyone can create a FREE open account with name, email, WhatsApp, and a
+// password. Nothing on the open side is accessible without signing in (Google
+// or this form) - every open user becomes a lead the admin can download.
+app.post('/api/auth/register-open', (req, res) => {
+  const { name, email, whatsapp, password } = req.body || {};
+  if (!name || String(name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
+  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
+  if (!password || String(password).length < 8) return res.status(400).json({ error: 'Choose a password of at least 8 characters.' });
+  if (Users.byLogin(email)) return res.status(400).json({ error: 'An account with this email already exists - sign in instead.' });
+  const { user } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase() });
+  Users.setPassword(user.id, String(password));
+  Users.updateProfile(user.id, { phone: String(whatsapp).trim() });
+  Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
+  setAuthCookie(res, sign(Users.byId(user.id)));
+  mailer.notify(user.email, 'Welcome to EchoLens - your open account is ready',
+    `Hi ${user.name},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
+  res.json({ ok: true, role: 'free' });
+});
+
+// WhatsApp is MANDATORY for every learner. The dashboard and the open site
+// block until this is filled; it lands in the lead record too.
+app.post('/api/me/contact', authRequired, (req, res) => {
+  const { whatsapp } = req.body || {};
+  if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter a valid WhatsApp number (e.g. 03XX-XXXXXXX).' });
+  Users.updateProfile(req.user.id, { phone: String(whatsapp).trim() });
+  if (req.user.email) Leads.upsert({ name: req.user.name, email: req.user.email, whatsapp: String(whatsapp).trim(), source: req.user.role === 'free' ? 'open' : 'portal', user_id: req.user.id });
+  res.json({ ok: true });
+});
+
+/* --------------------------------- events ---------------------------------
+ * The unified admin-generated system: quests, hackathons, competitions and
+ * webinars - free or paid (payment screenshot verified by admin), inside the
+ * portal, on the open site, or both, with an optional built-in compiler,
+ * dataset URL, admin documents, AI auto-grading (-10%), pass marks, and
+ * automatic certificates.
+ */
+function eventNotify(ev, audience) {
+  if (!audience || audience === 'none') return 0;
+  const emails = Leads.emailsFor(audience);
+  if (!emails.length) return 0;
+  const kindLabel = { quest: 'quest', hackathon: 'hackathon', competition: 'competition', webinar: 'webinar' }[ev.kind] || 'event';
+  const when = ev.starts_at ? `\nStarts: ${String(ev.starts_at).replace('T', ' ')}${ev.ends_at ? '\nEnds: ' + String(ev.ends_at).replace('T', ' ') : ''}` : (ev.duration_minutes ? `\nDuration: about ${ev.duration_minutes} minutes` : '');
+  const feeLine = ev.entry === 'paid' ? `\nEntry fee: PKR ${ev.fee_pkr}` : '\nEntry: FREE';
+  const certLine = ev.auto_certificate ? `\nCertificate: automatic verified certificate at ${ev.pass_mark}%+ score` : '';
+  mailer.notify(emails, `New ${kindLabel} on EchoLens: ${ev.title}`,
+    `A new ${kindLabel} just went live on EchoLens.\n\n${ev.title}\n${String(ev.description || '').slice(0, 600)}${when}${feeLine}${certLine}\n\nJoin here: ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
+  return emails.length;
+}
+
+app.get('/api/events', authRequired, (req, res) => {
+  const isAdmin = req.user.role === 'admin';
+  const list = (isAdmin ? Events.all() : Events.forScope(req.user.role === 'free' ? 'open' : 'portal'))
+    .map((ev) => ({
+      ...ev,
+      my_entry: Events.entryFor(ev.id, req.user.id),
+      my_progress: Events.entryFor(ev.id, req.user.id) ? Events.progressFor(ev, req.user.id) : null,
+    }));
+  res.json({ events: list, is_admin: isAdmin, can_play: ['free', 'student'].includes(req.user.role) });
+});
+app.get('/api/public/events', (req, res) => {
+  res.json({ events: Events.forScope('open').filter((e) => e.open !== false).map((e) => Events.publicView(e)) });
+});
+app.get('/api/events/:id', authRequired, (req, res) => {
+  const ev = Events.byId(req.params.id);
+  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  const d = Events.decorate(ev);
+  const isAdmin = req.user.role === 'admin';
+  const entry = Events.entryFor(ev.id, req.user.id);
+  const gate = Events.canParticipate(ev, req.user.id);
+  const mySubs = {};
+  if (entry) for (const p of (ev.problems.length ? ev.problems : [{ pid: null }])) {
+    const s = Events.submissionFor(ev.id, req.user.id, p.pid);
+    if (s) mySubs[p.pid || 0] = { pid: s.pid, code: s.code, language: s.language, file_name: s.file_name, link: s.link, score: s.score, ai_feedback: s.ai_feedback, graded_by: s.graded_by === 'ai' ? 'ai' : (s.graded_by ? 'admin' : null), submitted_at: s.submitted_at, certified: s.certified };
+  }
+  // Meeting links (webinars) only for confirmed participants or staff.
+  const showLink = isAdmin || (entry && gate.ok);
+  res.json({
+    event: { ...d, meeting_link: showLink ? d.meeting_link : null },
+    my_entry: entry, can_participate: gate.ok, participate_msg: gate.ok ? null : gate.why,
+    my_submissions: mySubs,
+    my_progress: entry ? Events.progressFor(ev, req.user.id) : null,
+    board: Events.board(ev.id).slice(0, 50),
+    entries: isAdmin ? Events.entries(ev.id) : undefined,
+    submissions: isAdmin ? Events.submissionsForAdmin(ev.id) : undefined,
+    is_admin: isAdmin,
+  });
+});
+app.post('/api/admin/events', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  if (!b.title) return res.status(400).json({ error: 'Give the event a title.' });
+  if (['hackathon', 'competition', 'webinar'].includes(b.kind) && (!b.starts_at || !b.ends_at)) {
+    return res.status(400).json({ error: 'Start and end date-times are required for this kind of event.' });
+  }
+  const ev = Events.create(b, req.user.id);
+  const notified = eventNotify(ev, b.notify);
+  res.json({ ok: true, event: Events.decorate(ev), notified });
+});
+app.patch('/api/admin/events/:id', authRequired, adminRequired, (req, res) => {
+  const ev = Events.update(req.params.id, req.body || {});
+  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  res.json({ ok: true, event: Events.decorate(ev) });
+});
+app.delete('/api/admin/events/:id', authRequired, adminRequired, (req, res) => { Events.remove(req.params.id); res.json({ ok: true }); });
+// Admin attaches documents (rules PDF, datasets, briefs) to any event.
+app.post('/api/admin/events/:id/files', authRequired, adminRequired, upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Choose a file first.' });
+  const ev = Events.addFile(req.params.id, { name: req.file.originalname, url: `/uploads/${req.file.filename}` });
+  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  res.json({ ok: true, files: ev.files });
+});
+app.delete('/api/admin/events/:id/files/:name', authRequired, adminRequired, (req, res) => {
+  const ev = Events.removeFile(req.params.id, req.params.name);
+  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  res.json({ ok: true, files: ev.files });
+});
+// Registration. Paid events REQUIRE a payment screenshot (image) which the
+// admin verifies by eye before the participant can submit anything.
+app.post('/api/events/:id/register', authRequired, upload.single('file'), (req, res) => {
+  if (!['free', 'student'].includes(req.user.role)) return res.status(403).json({ error: 'Events are for learners.' });
+  const ev = Events.byId(req.params.id);
+  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  let shot = null;
+  if (ev.entry === 'paid') {
+    if (!requireImage(req, res, 5)) return;
+    shot = `/uploads/${req.file.filename}`;
+  }
+  const out = Events.register({ event_id: ev.id, user: req.user, payment_shot: shot });
+  if (out.error) return res.status(400).json({ error: out.error });
+  if (ev.entry === 'paid') {
+    const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
+    mailer.notify(admins, `Payment to verify - ${ev.title}`, `${req.user.name} registered for "${ev.title}" and uploaded a payment screenshot. Verify it from the Events tab in the admin portal.`);
+  }
+  res.json({ ok: true, ...out });
+});
+app.post('/api/admin/event-entries/:id/payment', authRequired, adminRequired, (req, res) => {
+  const e = Events.confirmPayment(req.params.id, !!(req.body || {}).confirm, req.user.id);
+  if (!e) return res.status(404).json({ error: 'Entry not found.' });
+  const u = Users.byId(e.user_id);
+  const ev = Events.byId(e.event_id);
+  if (u && u.email && ev) {
+    mailer.notify(u.email, `Payment ${e.payment_status} - ${ev.title}`,
+      e.payment_status === 'confirmed'
+        ? `Your payment for "${ev.title}" is confirmed - you can now participate and submit. Good luck!`
+        : `Your payment screenshot for "${ev.title}" could not be verified. Reply to this email or contact the academy to resolve it.`);
+  }
+  res.json({ ok: true, entry: e });
+});
+// Submissions: editor code, an uploaded file (any document), and/or a link -
+// per problem for quests/competitions, single for hackathons. When the event
+// has AI auto-grading on, the submission is graded immediately with a 10%
+// reduction, and a certificate is issued automatically at the pass mark.
+app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (req, res) => {
+  if (!['free', 'student'].includes(req.user.role)) return res.status(403).json({ error: 'Events are for learners.' });
+  const ev = Events.byId(req.params.id);
+  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  const body = req.body || {};
+  let file_url = null, file_name = null;
+  if (req.file) { file_url = `/uploads/${req.file.filename}`; file_name = req.file.originalname; }
+  if (body.link && !/^https?:\/\//i.test(String(body.link))) return res.status(400).json({ error: 'Links must start with http:// or https://' });
+  const out = Events.submit({
+    event_id: ev.id, user: req.user, pid: body.pid || null,
+    code: body.code || null, language: body.language || null,
+    file_url, file_name, link: body.link || null, note: body.note || null,
+  });
+  if (out.error) return res.status(400).json({ error: out.error });
+  let graded = null, cert = null;
+  if (ev.auto_grade && ai.enabled()) {
+    try {
+      const pr = (ev.problems || []).find((p) => p.pid === Number(body.pid)) || { title: ev.title, description: ev.description };
+      let text = out.submission.code;
+      if (!text && file_url) { const ex = await extractText(file_url); text = ex.text; }
+      if (!text && out.submission.link) text = `The participant submitted only a link: ${out.submission.link}. Grade conservatively based on the task; you cannot open links.`;
+      const g = await ai.autoGrade(req.user.id, {
+        eventTitle: ev.title, problemTitle: pr.title, problemBrief: pr.description,
+        passMark: ev.pass_mark, code: out.submission.code, language: out.submission.language, text,
+      });
+      graded = Events.applyAiGrade(out.submission.id, g.score, g.feedback);
+      const c = Events.maybeCertify(ev, req.user.id, ev.created_by);
+      if (c && c.cert && !c.existing) {
+        cert = c.cert;
+        if (req.user.email) mailer.notify(req.user.email, `Certificate earned - ${ev.title}`,
+          `Congratulations ${req.user.name}!\n\nYou passed "${ev.title}" and your verified certificate has been issued automatically (serial ${cert.serial}).\n\nView, download and share it: ${APP_URL}/cert?s=${cert.serial}`);
+      }
+    } catch (e) { console.error('Auto-grade failed:', e.message); /* stays pending for manual scoring */ }
+  }
+  res.json({ ok: true, submission: graded || out.submission, cert: cert ? { serial: cert.serial, url: `${APP_URL}/cert?s=${cert.serial}` } : null });
+});
+app.post('/api/admin/event-submissions/:id/score', authRequired, adminRequired, (req, res) => {
+  const { score, remarks } = req.body || {};
+  if (score == null || isNaN(Number(score))) return res.status(400).json({ error: 'Score 0-100 required.' });
+  const s = Events.score(req.params.id, score, remarks, req.user.id);
+  if (!s) return res.status(404).json({ error: 'Submission not found.' });
+  const ev = Events.byId(s.event_id);
+  const c = ev ? Events.maybeCertify(ev, s.user_id, req.user.id) : null;
+  if (c && c.cert && !c.existing) {
+    const u = Users.byId(s.user_id);
+    if (u && u.email) mailer.notify(u.email, `Certificate earned - ${ev.title}`, `Congratulations ${u.name}! You passed "${ev.title}" - your verified certificate: ${APP_URL}/cert?s=${c.cert.serial}`);
+  }
+  res.json({ ok: true, submission: s, cert: c && c.cert ? { serial: c.cert.serial } : null });
+});
+
+/* ------------------------------ leads & email ------------------------------ */
+app.get('/api/admin/leads', authRequired, adminRequired, (req, res) => res.json({ leads: Leads.all() }));
+app.get('/api/admin/leads.csv', authRequired, adminRequired, (req, res) => {
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="echolens-leads-${new Date().toISOString().slice(0, 10)}.csv"`);
+  res.send(Leads.csv());
+});
+// One composer for everything: announcements, enrollment openings, discounts,
+// new batches - the admin writes the mail, picks the audience, and it goes
+// out from the company address (MAIL_FROM).
+app.post('/api/admin/email-blast', authRequired, adminRequired, (req, res) => {
+  const { subject, body, audience } = req.body || {};
+  if (!subject || !body) return res.status(400).json({ error: 'Write a subject and a message.' });
+  if (!['portal', 'open', 'all'].includes(audience)) return res.status(400).json({ error: 'Pick an audience: portal students, open students, or everyone.' });
+  const emails = Leads.emailsFor(audience);
+  if (!emails.length) return res.status(400).json({ error: 'No email addresses found for that audience yet.' });
+  mailer.notify(emails, String(subject).slice(0, 200), String(body).slice(0, 8000));
+  res.json({ ok: true, sent: emails.length, smtp: mailer.configured });
+});
+
+/* -------------------------------- analytics -------------------------------- */
+// Complete stats to monitor progress: totals, plus time-series with segment
+// dropdowns (portal / open / a specific course, batch, or event) and daily /
+// weekly / monthly / yearly granularity.
+app.get('/api/admin/analytics', authRequired, staffView, (req, res) => {
+  const { metric, segment, granularity, batch_id, event_id } = req.query || {};
+  res.json({
+    totals: Analytics.overview(),
+    series: Analytics.series({
+      metric: String(metric || 'signups'), segment: String(segment || 'all'),
+      granularity: ['daily', 'weekly', 'monthly', 'yearly'].includes(String(granularity)) ? String(granularity) : 'daily',
+      batch_id: batch_id || null, event_id: event_id || null,
+    }),
+    batches: Batches.all().map((b) => ({ id: b.id, name: b.name })),
+    events: Events.all().map((e) => ({ id: e.id, title: e.title, kind: e.kind })),
+  });
+});
+
+/* ----------------------------- dataset URL proxy -----------------------------
+ * The compiler can read a dataset straight from a URL. Browsers block most
+ * cross-origin fetches (CORS), so this signed-in-only proxy pulls the file
+ * server-side: text/CSV/JSON only, 15 MB cap, http(s) only.
+ */
+app.get('/api/fetch-dataset', authRequired, async (req, res) => {
+  try {
+    const url = String(req.query.url || '');
+    if (!/^https?:\/\//i.test(url)) return res.status(400).json({ error: 'Give a full http(s) URL to the dataset.' });
+    const r = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(20000) });
+    if (!r.ok) return res.status(400).json({ error: `The dataset URL answered ${r.status}.` });
+    const buf = Buffer.from(await r.arrayBuffer());
+    if (buf.length > 15 * 1024 * 1024) return res.status(400).json({ error: 'Dataset too large - keep it under 15 MB.' });
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('X-Dataset-Name', path.basename(new URL(url).pathname) || 'dataset.csv');
+    res.send(buf);
+  } catch (e) { res.status(400).json({ error: 'Could not fetch that URL - check it opens in a browser and try again.' }); }
+});
+
+
+/* ------------------------- v12: catalogue & key links -------------------------
+ * The August 2026 catalogue - 31 programs with prices, badges, free modes and
+ * the enrolment links. Sign-in required: the catalogue is not openly visible.
+ */
+const KEY_LINKS = {
+  registration: process.env.REGISTRATION_FORM_URL || 'https://docs.google.com/forms/d/1tngMoAaGzyIRktzjmyNHu1vQ_osBMfi-BDAr1Ix8Xs0/viewform',
+  ambassador: process.env.AMBASSADOR_FORM_URL || 'https://docs.google.com/forms/d/124ra-RWFxxMUnO-xQHT8yxnTouvWZiJbWmvhWBYG5wE/viewform',
+  webinar: process.env.WEBINAR_URL || 'https://docs.google.com/spreadsheets/d/1fxvqOG5UJjfTiUwgRjN757OJIgADFP_PcL1pHjPZ92w/edit?resourcekey=&gid=1520673966#gid=1520673966',
+  webinar_label: process.env.WEBINAR_LABEL || 'Free webinar - 18 July, 4-5 PM',
+};
+app.get('/api/catalogue', authRequired, (req, res) => {
+  const trackByCode = {};
+  for (const t of Quests.tracks()) if (t.course_code) trackByCode[t.course_code] = t;
+  res.json({
+    catalogue: officialCatalogue().map((c) => ({ ...c, track_key: trackByCode[c.code] ? trackByCode[c.code].key : null })),
+    paths: store.learningPaths(),
+    links: KEY_LINKS,
+    cohort: { name: 'August 2026', registration_deadline: '31 July 2026', batch_starts: '1 August 2026' },
+  });
+});
+
 /* --------------------------------- static --------------------------------- */
 app.use('/uploads', authGate, express.static(UPLOAD_DIR));
 function authGate(req, res, next) { if (!currentUser(req)) return res.status(401).send('Sign in to view files.'); next(); }
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
+app.get('/open', (req, res) => res.sendFile(path.join(__dirname, 'public', 'open.html')));
+app.get('/compiler', (req, res) => res.sendFile(path.join(__dirname, 'public', 'compiler.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/grade', (req, res) => res.sendFile(path.join(__dirname, 'public', 'grade.html')));
@@ -1380,4 +1675,4 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => console.log(`EchoLens LMS v11 running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`EchoLens LMS v12 running on http://localhost:${PORT}`));

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens Compiler - free Python, C, C++ & SQL in your browser</title>
+<meta name="description" content="A free online compiler by EchoLens: Python (with numpy, pandas, matplotlib), C, C++, SQL and live HTML/CSS/JS - datasets from file or URL, nothing to install.">
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<style>
+  body{background:#FBFAF7}
+  .cmp-wrap{max-width:1180px;margin:0 auto;padding:22px 4vw 60px}
+  .cmp-ide{min-height:70vh}
+  .cmp-ide .ide-editor{min-height:38vh}
+</style>
+</head>
+<body>
+
+<nav class="open-nav">
+  <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
+  <a class="nlink" href="/open">Problems</a>
+  <a class="nlink active" href="/compiler">Compiler</a>
+  <a class="nlink" href="/#courses">Courses</a>
+  <span style="flex:1"></span>
+  <span id="userBox"></span>
+</nav>
+
+<div class="cmp-wrap" id="gateWrap" style="display:none">
+  <div class="auth-gate-card">
+    <img src="/img/logo.png" alt="EchoLens" style="width:90px;margin-bottom:14px">
+    <h2 style="font-family:var(--font-display);margin-bottom:6px">The EchoLens compiler is free</h2>
+    <p class="s" style="color:var(--muted);margin-bottom:18px">Python (with numpy, pandas, matplotlib), C, C++, SQL and live web preview - free for everyone, forever. Just sign in so we know who's coding.</p>
+    <a class="btn btn-primary btn-block" id="gBtn" href="/auth/google?back=/compiler" style="display:none;margin-bottom:10px">Continue with Google - free</a>
+    <a class="btn btn-teal btn-block" href="/open" style="margin-bottom:10px">Create a free account with email</a>
+    <a class="btn btn-ghost btn-block" href="/login">Already have an account? Sign in</a>
+  </div>
+</div>
+
+<div class="cmp-wrap" id="appWrap" style="display:none">
+  <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:14px">
+    <div>
+      <h1 style="font-family:var(--font-display);font-size:26px;color:var(--ink)">Free online compiler</h1>
+      <p class="s" style="color:var(--muted)">Python 3 · C · C++ · SQL · HTML/CSS/JS - with datasets from your files or straight from a URL. Free of cost, for everyone.</p>
+    </div>
+  </div>
+  <div class="task-ide card cmp-ide">
+    <div class="ide-toolbar">
+      <select id="lang" onchange="langChanged()">
+        <option value="python">Python 3</option>
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+        <option value="sql">SQL</option>
+        <option value="web">HTML / CSS / JS</option>
+      </select>
+      <span class="ide-pkgs" id="pkgs">numpy · pandas · matplotlib · scikit-learn ready</span>
+      <span style="flex:1"></span>
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer">&#11014; Dataset file
+        <input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="localDataset(this)"></label>
+      <button class="btn btn-ghost btn-sm" onclick="urlDataset()">&#127760; Dataset from URL</button>
+      <button class="btn btn-ghost btn-sm" onclick="TERM&&TERM.clear();document.getElementById('webLog').textContent=''">Clear</button>
+      <button class="btn lc-btn-solve" id="runBtn" onclick="run()">&#9654; Run</button>
+    </div>
+    <div id="dsChips" style="padding:0 14px"></div>
+    <textarea id="code" class="code-editor ide-editor" spellcheck="false" placeholder="# Write Python here, press Run.
+# numpy, pandas, matplotlib and scikit-learn load automatically.
+print('Hello EchoLens!')"></textarea>
+    <div class="ide-status-row"><span class="s" id="status" style="color:var(--muted-2)">Ready - everything runs free of cost, nothing to install.</span></div>
+    <div id="term"></div>
+    <div id="webWrap" style="display:none">
+      <iframe id="webFrame" class="web-frame" sandbox="allow-scripts" title="Live preview" style="width:100%;min-height:320px;border:none;background:#fff"></iframe>
+      <pre id="webLog" class="web-log"></pre>
+    </div>
+  </div>
+  <p class="hint">Want tasks to solve with this compiler? Head to the <a href="/open">open problem set</a> - free quests with automatic certificates.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/coderunner.js"></script>
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+let TERM = null, FILES = [], ME = null;
+function toast(t, err) { const el = $('toast'); el.textContent = t; el.className = 'toast show' + (err ? ' err' : ''); clearTimeout(el._h); el._h = setTimeout(() => el.className = 'toast', 3000); }
+(async () => {
+  try {
+    const r = await fetch('/api/auth/me', { credentials: 'same-origin' });
+    if (!r.ok) throw new Error();
+    ME = await r.json();
+  } catch { ME = null; }
+  if (!ME) {
+    // Sign-in required even for the free compiler - it feeds the leads list.
+    $('gateWrap').style.display = '';
+    $('userBox').innerHTML = '<a class="btn btn-primary btn-sm" href="/login">Sign in</a>';
+    try { const p = await (await fetch('/api/auth/providers')).json(); if (p.google) $('gBtn').style.display = ''; } catch {}
+    return;
+  }
+  $('appWrap').style.display = '';
+  $('userBox').innerHTML = `<span class="s" style="color:var(--muted);margin-right:10px">${ME.name}</span><a class="btn btn-ghost btn-sm" href="${ME.role === 'free' ? '/open' : '/dashboard'}">${ME.role === 'free' ? 'Open portal' : 'My portal'}</a>`;
+  TERM = EchoTerm.mount($('term'));
+  EchoRun.wireEditor($('code'));
+})();
+function langChanged() {
+  const l = $('lang').value;
+  const isWeb = l === 'web';
+  $('term').style.display = isWeb ? 'none' : '';
+  $('webWrap').style.display = isWeb ? '' : 'none';
+  $('pkgs').textContent = l === 'python' ? 'numpy · pandas · matplotlib · scikit-learn ready'
+    : l === 'c' ? 'gcc 10 · compiled & run in the cloud'
+    : l === 'cpp' ? 'g++ 10 · compiled & run in the cloud'
+    : l === 'sql' ? 'SQLite · CSV datasets become tables automatically'
+    : 'live preview with console output';
+  $('code').placeholder = l === 'python' ? "# Write Python here, press Run.\nprint('Hello EchoLens!')"
+    : l === 'c' ? '// Write C here, press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}'
+    : l === 'cpp' ? '// Write C++ here, press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}'
+    : l === 'sql' ? '-- Write SQL here, press Run. Loaded CSVs are tables.\nSELECT 1 + 1 AS answer;'
+    : '<!-- Write HTML, CSS (in <style>) and JS (in <script>) - Run shows a live preview. -->';
+}
+function drawChips() {
+  $('dsChips').innerHTML = FILES.map((f) => `<span class="prob-chip" style="cursor:default">&#128190; ${f.name}</span>`).join(' ');
+}
+function localDataset(input) {
+  const f = input.files && input.files[0];
+  if (!f) return;
+  if (f.size > 20 * 1024 * 1024) { toast('Keep datasets under 20 MB.', true); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    FILES = FILES.filter((x) => x.name !== f.name);
+    FILES.push({ name: f.name, bytes: reader.result });
+    drawChips();
+    toast(`${f.name} loaded - pd.read_csv('${f.name}') in Python, table "${f.name.replace(/\.[^.]+$/, '')}" in SQL.`);
+  };
+  reader.readAsArrayBuffer(f);
+  input.value = '';
+}
+async function urlDataset() {
+  const url = prompt('Paste the full URL of the dataset (CSV / JSON / text):');
+  if (!url) return;
+  $('status').textContent = 'Fetching dataset from URL...';
+  try {
+    const f = await EchoRun.fetchDataset(url.trim());
+    FILES = FILES.filter((x) => x.name !== f.name);
+    FILES.push(f);
+    drawChips();
+    $('status').textContent = 'Ready.';
+    toast(`${f.name} loaded from URL - read it by name in your code.`);
+  } catch (e) { $('status').textContent = 'Ready.'; toast(e.message, true); }
+}
+async function run() {
+  const btn = $('runBtn'); const status = $('status');
+  const code = $('code').value;
+  const lang = $('lang').value;
+  if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
+  if (lang === 'web') {
+    const log = $('webLog'); log.textContent = '';
+    EchoWeb.preview($('webFrame'), code, (kind, text) => { log.textContent += (kind === 'error' ? '\u2717 ' : '\u203a ') + text + '\n'; });
+    status.textContent = 'Preview updated.';
+    return;
+  }
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = '&#9654; Run'; return; }
+  btn.innerHTML = '&#9632; Stop';
+  try { await EchoRun.executeAny(lang, code, { term: TERM, files: FILES, onStatus: (t) => { status.textContent = t; } }); }
+  catch (e) { status.textContent = e.message; }
+  btn.innerHTML = '&#9654; Run';
+}
+</script>
+</body>
+</html>

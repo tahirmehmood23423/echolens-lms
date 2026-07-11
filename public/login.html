@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css?v1230">
 </head>
 <body class="auth-body">
   <div class="auth-wrap">
@@ -38,12 +38,12 @@
     <p class="auth-copy">EchoLens &middot; Empowering Pakistan through Artificial Intelligence</p>
   </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="/js/login3d.js"></script>
+<script src="/js/login3d.js?v1230"></script>
 <script>
   (async()=>{try{const r=await fetch('/api/auth/providers');const p=await r.json();if(p.google)document.getElementById('gWrap').style.display='';}catch{}
   const err=new URLSearchParams(location.search).get('err');
   if(err){const el=document.getElementById('msg');el.className='form-msg err';el.textContent=err;}})();
   </script>
-<script src="/js/login.js"></script>
+<script src="/js/login.js?v1230"></script>
 </body>
 </html>

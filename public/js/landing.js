@@ -16,7 +16,14 @@ let OPEN_LEVELS = 3;
 
 (async () => {
   // Signed in already? Turn the corner button into a dashboard shortcut.
-  try { await api('/api/auth/me'); const b = $('signinBtn'); b.textContent = 'Open dashboard'; b.href = '/dashboard'; } catch {}
+  try {
+    const me = await api('/api/auth/me');
+    const b = $('signinBtn');
+    // Signed-in visitors go straight to THEIR home: learners with free/open
+    // accounts to the open portal, portal accounts to the LMS.
+    if (me.role === 'free') { b.textContent = 'Open portal'; b.href = '/open'; }
+    else { b.textContent = 'Open LMS Portal'; b.href = '/dashboard'; }
+  } catch {}
 
   try {
     const info = await api('/api/public/info');

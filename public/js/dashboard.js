@@ -146,7 +146,10 @@ function requireWhatsapp() {
       window.MODAL_LOCK = false;
       $('modalBox').querySelector('.close').style.display = '';
       closeModal(); toast('Saved - welcome aboard!');
-    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+    } catch (err) {
+      if (err.message === 'Signed out.') { window.MODAL_LOCK = false; location.href = '/'; return; }
+      modalMsg(err.message); btn.disabled = false;
+    }
   });
 }
 

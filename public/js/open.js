@@ -20,6 +20,18 @@ async function api(path, opts = {}) {
   const isForm = opts.body instanceof FormData;
   const res = await fetch(path, { credentials: 'same-origin', headers: isForm ? {} : { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json().catch(() => ({}));
+  if (res.status === 401 && ME && path !== '/api/auth/me') {
+    // The session expired or was signed out in another tab: recover cleanly
+    // instead of leaving the person stuck behind a locked modal.
+    ME = null;
+    window.MODAL_LOCK = false;
+    const closeBtn = $('modalBox') && $('modalBox').querySelector('.close');
+    if (closeBtn) closeBtn.style.display = '';
+    closeModal();
+    drawUserBox();
+    gate('Your session expired - sign in again to continue where you left off.');
+    const e = new Error(data.error || 'Please sign in to continue.'); e.status = 401; e.handled = true; throw e;
+  }
   if (!res.ok) { const e = new Error(data.error || 'Something went wrong.'); e.status = res.status; throw e; }
   return data;
 }
@@ -148,6 +160,7 @@ function showSignup() {
   });
 }
 function requireWhatsapp() {
+  if (!['free', 'student'].includes(ME.role)) return; // learners only - staff never see this
   if (ME.profile && ME.profile.phone) return;
   openModal('One last step - your WhatsApp number', `
     <form id="waForm">
@@ -429,7 +442,27 @@ function drawSolveStatus() {
     : '';
 }
 function drawWorkArea() {
+  const isLearner = !ME || ['free', 'student'].includes(ME.role);
   const mode = CUR.track.submission_mode;
+  if (!isLearner) {
+    // Admins and teachers can read and run everything, but submissions are
+    // for learners - say so instead of offering a button that would fail.
+    $('svWorkArea').innerHTML = mode === 'code' ? `
+      <div class="task-ide card">
+        <div class="ide-toolbar">
+          <select id="svLang"><option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option></select>
+          <span style="flex:1"></span>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()">Clear</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="svRunBtn" onclick="runSolve()">Run</button>
+        </div>
+        <textarea id="svCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Staff preview - run code freely. Submissions are for learner accounts."></textarea>
+        <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Staff preview - submissions are for learner accounts.</span></div>
+        <div id="svTerm"></div>
+      </div>` : `
+      <div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview - this task takes file submissions from learner accounts.</p></div></div>`;
+    if (mode === 'code') { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); }
+    return;
+  }
   const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];
   if (mode === 'code') {
     $('svWorkArea').innerHTML = `
@@ -517,8 +550,7 @@ async function submitSolve(fileForm) {
     if (out.cert) loadCerts();
     if ($('svSubmitBtn')) { $('svSubmitBtn').disabled = false; $('svSubmitBtn').textContent = 'Resubmit'; }
   } catch (e) {
-    if (e.status === 401) gate('Sign in free to submit this task, earn gems, and collect certificates.');
-    else toast(e.message, true);
+    if (!e.handled) toast(e.message, true);
     if (btn) { btn.disabled = false; btn.textContent = 'Submit for grading'; }
   }
 }

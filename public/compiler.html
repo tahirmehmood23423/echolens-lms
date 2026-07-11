@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css?v1230">
 <style>
   body{background:#FBFAF7}
   .cmp-wrap{max-width:1180px;margin:0 auto;padding:22px 4vw 60px}
@@ -34,7 +34,7 @@
     <h2 style="font-family:var(--font-display);margin-bottom:6px">The EchoLens compiler is free</h2>
     <p class="s" style="color:var(--muted);margin-bottom:18px">Python (with numpy, pandas, matplotlib), C, C++, SQL and live web preview - free for everyone, forever. Just sign in so we know who's coding.</p>
     <a class="btn btn-primary btn-block" id="gBtn" href="/auth/google?back=/compiler" style="display:none;margin-bottom:10px">Continue with Google - free</a>
-    <a class="btn btn-teal btn-block" href="/open" style="margin-bottom:10px">Create a free account with email</a>
+    <a class="btn btn-teal btn-block" href="/open#signup" style="margin-bottom:10px">Create a free account with email</a>
     <a class="btn btn-ghost btn-block" href="/login">Already have an account? Sign in</a>
   </div>
 </div>
@@ -79,7 +79,7 @@ print('Hello EchoLens!')"></textarea>
 
 <div class="toast" id="toast"></div>
 
-<script src="/js/coderunner.js"></script>
+<script src="/js/coderunner.js?v1230"></script>
 <script>
 'use strict';
 const $ = (id) => document.getElementById(id);

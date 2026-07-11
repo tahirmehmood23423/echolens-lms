@@ -1,3 +1,25 @@
+# EchoLens LMS v12.3.1 - QA Release
+
+Full regression pass across every role (anonymous / open / student / teacher / admin) and every flow. Defects found and fixed:
+
+**P0 - Staff trapped by the WhatsApp modal on the open site.** The open portal showed the mandatory WhatsApp prompt to every signed-in account, including admins and teachers - and the modal is deliberately non-dismissable, so staff were stuck (the reported screenshot). It now appears only for learner accounts, exactly like the LMS portal version.
+
+**P0 - Expired sessions trapped users behind locked modals.** If a session expired (or was signed out in another tab) after a page loaded, any action returned "Please sign in to continue" inside a modal that could not be closed. All 401s on the open site now recover cleanly: the header updates to signed-out, any locked modal unlocks and closes, and the sign-in gate opens with "Your session expired - sign in again to continue where you left off."
+
+**P1 - Stale JavaScript after deploys.** Pages loaded /js and /css assets with no version marker, so returning visitors ran the previous release's frontend against the new backend - the likely cause of buttons "going somewhere else." All local assets are now version-stamped (?v1230); bump the stamp on future releases.
+
+**P1 - Compiler sign-up dead end.** The compiler's "Create a free account with email" button linked to the open home page instead of the signup flow; it now deep-links to /open#signup.
+
+**P1 - Landing button routed free accounts to the wrong home.** The signed-in header button now sends open (free) accounts to /open and portal accounts to /dashboard.
+
+**P1 - Staff hitting dead Submit buttons.** Admins and teachers browsing open quests saw Submit buttons that the server would reject. Staff now get a read-and-run preview with a clear note that submissions are for learner accounts.
+
+Verified in regression: the full role-by-endpoint matrix (public endpoints open to all; events, certificates and contact behind sign-in; open submissions accepted for learners and refused for staff), event creation/registration/submission with the exact UI payload shapes, expired-cookie behaviour, and a static audit proving every onclick handler and element id referenced by the open portal, compiler and dashboard actually exists.
+
+**Deployment note:** set a permanent `JWT_SECRET` in the Render environment. Without it, any change to the default can invalidate every signed-in session after a redeploy - the most likely trigger of the mid-session sign-out that surfaced the P0 modal trap.
+
+---
+
 # EchoLens LMS v12.3 - Open Platform Release
 
 **Course catalogue is fully public** - no sign-in needed to browse all 31 programs, prices, badges, and the Web Developer Path (`GET /api/public/catalogue`). Sign-in is now a modal that appears only where it matters: submitting work, joining events, earning certificates.

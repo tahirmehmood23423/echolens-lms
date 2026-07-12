@@ -251,6 +251,24 @@ ${fileText ? fileText.slice(0, 14000) : '[Content not readable as text.]'}`;
   };
 }
 
+/* --------------------------- compiler AI assistant (learners) --------------------------- */
+const CODE_BASE = 'You are the EchoLens compiler\'s AI coding assistant, helping learners at an AI education academy in Pakistan understand and improve their own code. Be concrete, practical, encouraging, and concise. Use short fenced code blocks when they help. Answer in clear English.';
+const CODE_ACTIONS = {
+  'Explain this code': 'Explain what this code does, step by step, in plain language a beginner can follow.',
+  'Fix errors': 'Find any bugs or errors in this code and explain how to fix them. If it already runs fine, say so and point out anything worth double-checking.',
+  'Optimize code': 'Suggest concrete ways to make this code more efficient, readable, or idiomatic. Show an improved version where it helps.',
+  'Generate code': 'Generate code for what the learner is asking for. If nothing specific was asked, suggest one small, useful example in the given language.',
+};
+async function codeHelp(userId, { action, code, language, question }) {
+  const instruction = CODE_ACTIONS[action] || 'Answer the learner\'s question about their code as helpfully as possible.';
+  const content = `Language: ${language || 'unknown'}
+${question ? 'Learner question: ' + String(question).slice(0, 1000) + '\n' : ''}Task: ${instruction}
+
+Code in the editor:
+${code && String(code).trim() ? String(code).slice(0, 8000) : '[No code written yet.]'}`;
+  return complete(userId, CODE_BASE, [{ role: 'user', content }]);
+}
+
 /* --------------------------- integrity (teacher-only) --------------------------- */
 // Estimates how likely a submission was AI-generated. This is a SIGNAL for
 // the teacher, never proof - the response says so explicitly. Combined
@@ -309,4 +327,4 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
   return { score, feedback: String(parsed.feedback || '').slice(0, 1500) };
 }
 
-module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade };
+module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, codeHelp };

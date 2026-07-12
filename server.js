@@ -515,6 +515,15 @@ app.post('/api/ai/outline', authRequired, teacherOrAdmin, async (req, res) => {
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
+/* ------------------------ AI compiler assistant (any signed-in learner) ------------------------ */
+app.post('/api/compiler/ai', authRequired, async (req, res) => {
+  try {
+    const { action, code, language, question } = req.body || {};
+    if (!question && !(code && String(code).trim())) return res.status(400).json({ error: 'Write some code or ask a question first.' });
+    res.json({ reply: await ai.codeHelp(req.user.id, { action, code, language, question }) });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
 const TEXT_EXT = ['.txt', '.md', '.py', '.js', '.ts', '.html', '.css', '.json', '.ipynb', '.csv', '.sql', '.java', '.c', '.cpp'];
 // Prefer the code a student wrote in the built-in editor; fall back to
 // extracting text from an uploaded file.

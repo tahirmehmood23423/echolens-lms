@@ -229,28 +229,44 @@ function toggleDark(forceOn) {
   localStorage.setItem('echolens_compiler_dark', isDark ? '1' : '0');
   $('darkBtn').textContent = isDark ? 'Light' : 'Dark';
 }
-function aiQuickAction(label) { appendAiExchange(label); }
+function aiQuickAction(label) { sendToAi(label, label); }
 function aiSend(e) {
   e.preventDefault();
   const v = $('aiInput').value.trim();
   if (!v) return;
   $('aiInput').value = '';
-  appendAiExchange(v);
+  sendToAi(v, null);
 }
-function appendAiExchange(text) {
+function appendAiBubble(text, mine) {
   const body = $('aiBody');
   const empty = body.querySelector('.cmp2-ai-empty');
   if (empty) empty.remove();
-  const you = document.createElement('div');
-  you.className = 'cmp2-ai-msg';
-  you.style.background = 'var(--violet-soft)';
-  you.textContent = text;
-  const reply = document.createElement('div');
-  reply.className = 'cmp2-ai-msg';
-  reply.textContent = "The AI Assistant is coming soon - this is a preview of the interface. In the meantime, the Run button executes your code and shows errors right in the terminal below.";
-  body.appendChild(you);
-  body.appendChild(reply);
+  const el = document.createElement('div');
+  el.className = 'cmp2-ai-msg';
+  if (mine) el.style.background = 'var(--violet-soft)';
+  el.textContent = text;
+  body.appendChild(el);
   body.scrollTop = body.scrollHeight;
+  return el;
+}
+async function sendToAi(displayText, action) {
+  appendAiBubble(displayText, true);
+  const reply = appendAiBubble('Thinking...');
+  try {
+    const r = await fetch('/api/compiler/ai', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, code: $('code').value, language: $('lang').value, question: action ? null : displayText }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || 'The AI assistant could not answer that - try again.');
+    reply.textContent = data.reply;
+  } catch (err) {
+    reply.textContent = err.message;
+    reply.style.color = 'var(--danger)';
+  }
+  $('aiBody').scrollTop = $('aiBody').scrollHeight;
 }
 async function run() {
   const btn = $('runBtn'); const status = $('status');

@@ -38,12 +38,12 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [],
   live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
-  events: [], event_entries: [], event_submissions: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
+  events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
   settings: { cert: { org: 'EchoLens AI Academy', ceo_name: '', ceo_sig: null, tagline: 'Gamified AI & Data Science Education' } },
 });
 
@@ -1445,6 +1445,7 @@ const Events = {
       status: Events.status(ev),
       entries_count: data.event_entries.filter((x) => x.event_id === ev.id).length,
       submissions_count: data.event_submissions.filter((x) => x.event_id === ev.id).length,
+      comments_count: data.event_comments.filter((x) => x.event_id === ev.id).length,
     };
   },
   all() { return data.events.slice().sort((a, b) => b.id - a.id).map((e) => Events.decorate(e)); },
@@ -1529,6 +1530,7 @@ const Events = {
     data.events = data.events.filter((e) => e.id !== eid);
     data.event_entries = data.event_entries.filter((e) => e.event_id !== eid);
     data.event_submissions = data.event_submissions.filter((s) => s.event_id !== eid);
+    data.event_comments = data.event_comments.filter((c) => c.event_id !== eid);
     save();
   },
   entryFor(eid, uid) { return data.event_entries.find((e) => e.event_id === Number(eid) && e.user_id === Number(uid)) || null; },
@@ -1663,6 +1665,38 @@ const Events = {
       const u = Users.byId(s.user_id) || {};
       return { ...s, user_name: u.name, reg_no: u.reg_no || null, tier: u.role === 'free' ? 'open' : 'portal' };
     }).sort((a, b) => String(b.submitted_at).localeCompare(a.submitted_at));
+  },
+  // Discussion: a lightweight comment thread on each event. Learners and staff
+  // can post; staff (or the author) can delete.
+  comments(eid) {
+    return data.event_comments
+      .filter((c) => c.event_id === Number(eid))
+      .sort((a, b) => String(a.created_at).localeCompare(b.created_at))
+      .map((c) => {
+        const u = Users.byId(c.user_id) || {};
+        return { ...c, avatar: (u.profile || {}).avatar || u.avatar || null, staff: ['admin', 'instructor'].includes(u.role) };
+      });
+  },
+  commentCount(eid) { return data.event_comments.filter((c) => c.event_id === Number(eid)).length; },
+  addComment({ event_id, user, body }) {
+    const ev = Events.byId(event_id); if (!ev) return { error: 'Event not found.' };
+    const text = String(body || '').trim();
+    if (!text) return { error: 'Write something before posting.' };
+    const c = {
+      id: nextId('event_comments'), event_id: ev.id, user_id: user.id,
+      name: user.name || 'Learner', role: user.role || 'free',
+      body: text.slice(0, 2000), created_at: now(),
+    };
+    data.event_comments.push(c); save();
+    const u = Users.byId(user.id) || {};
+    return { comment: { ...c, avatar: (u.profile || {}).avatar || u.avatar || null, staff: ['admin', 'instructor'].includes(u.role) } };
+  },
+  removeComment(cid, user) {
+    const c = data.event_comments.find((x) => x.id === Number(cid)); if (!c) return { error: 'Comment not found.' };
+    const isStaff = ['admin', 'instructor'].includes(user.role);
+    if (c.user_id !== user.id && !isStaff) return { error: 'You can only delete your own comments.' };
+    data.event_comments = data.event_comments.filter((x) => x.id !== c.id); save();
+    return { ok: true };
   },
   publicView(ev) { // what the open site shows before registering
     const d = Events.decorate(ev);

@@ -1488,6 +1488,7 @@ app.get('/api/events/:id', authRequired, (req, res) => {
     my_submissions: mySubs,
     my_progress: entry ? Events.progressFor(ev, req.user.id) : null,
     board: Events.board(ev.id).slice(0, 50),
+    comments: Events.comments(ev.id),
     entries: isAdmin ? Events.entries(ev.id) : undefined,
     submissions: isAdmin ? Events.submissionsForAdmin(ev.id) : undefined,
     is_admin: isAdmin,
@@ -1592,6 +1593,25 @@ app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (r
     } catch (e) { console.error('Auto-grade failed:', e.message); /* stays pending for manual scoring */ }
   }
   res.json({ ok: true, submission: graded || out.submission, cert: cert ? { serial: cert.serial, url: `${APP_URL}/cert?s=${cert.serial}` } : null });
+});
+// Discussion thread on an event - open to any signed-in user; staff or the
+// author can delete a comment.
+app.get('/api/events/:id/comments', authRequired, (req, res) => {
+  const ev = Events.byId(req.params.id);
+  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  res.json({ comments: Events.comments(ev.id) });
+});
+app.post('/api/events/:id/comments', authRequired, (req, res) => {
+  const ev = Events.byId(req.params.id);
+  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  const out = Events.addComment({ event_id: ev.id, user: req.user, body: (req.body || {}).body });
+  if (out.error) return res.status(400).json({ error: out.error });
+  res.json({ ok: true, comment: out.comment });
+});
+app.delete('/api/events/:id/comments/:cid', authRequired, (req, res) => {
+  const out = Events.removeComment(req.params.cid, req.user);
+  if (out.error) return res.status(400).json({ error: out.error });
+  res.json({ ok: true });
 });
 app.post('/api/admin/event-submissions/:id/score', authRequired, adminRequired, (req, res) => {
   const { score, remarks } = req.body || {};

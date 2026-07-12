@@ -115,7 +115,7 @@ let CUR_EVENT = null;
   loadTracks();
   loadAnnouncements();
   loadHomeStats();
-  if (ME) { loadEvents(); loadCerts(); } else { $('evGrid').innerHTML = gateCardHtml('Events are for signed-in members - creating a free account takes a minute.'); }
+  if (ME) { loadEvents(); loadCerts(); } else { $('evList').innerHTML = gateCardHtml('Events are for signed-in members - creating a free account takes a minute.'); }
   // Deep links: /open#courses, #quests, #events, #announcements, #register, #signup
   const h = (location.hash || '').replace('#', '');
   if (['courses', 'quests', 'events', 'announcements', 'home'].includes(h)) openTab(h);
@@ -219,11 +219,12 @@ function requireWhatsapp() {
 
 /* -------------------------------- tabs -------------------------------- */
 function openTab(tab) {
-  ['home', 'courses', 'quests', 'course', 'solve', 'events', 'announcements'].forEach((t) => {
+  ['home', 'courses', 'quests', 'course', 'solve', 'events', 'eventDetail', 'announcements'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
   document.querySelectorAll('.open-nav .nlink[data-tab]').forEach((n) =>
-    n.classList.toggle('active', n.dataset.tab === tab || (tab === 'course' && n.dataset.tab === 'quests') || (tab === 'solve' && n.dataset.tab === 'quests')));
+    n.classList.toggle('active', n.dataset.tab === tab || (tab === 'course' && n.dataset.tab === 'quests') || (tab === 'solve' && n.dataset.tab === 'quests') || (tab === 'eventDetail' && n.dataset.tab === 'events')));
+  if (tab !== 'eventDetail') stopEventCountdown();
   window.scrollTo({ top: 0 });
 }
 function backToCourse() { if (CUR) { openTab('course'); } else openTab('quests'); }
@@ -771,26 +772,154 @@ async function submitSolve(fileForm) {
 
 /* ---------------------------- events (signed in) ---------------------------- */
 const EV_KIND_LABEL = { quest: 'Quest', hackathon: 'Hackathon', competition: 'Competition', webinar: 'Webinar' };
+const EV_KIND_TAG = { quest: 'Open Quest', hackathon: 'Hackathon', competition: 'Competition', webinar: 'Webinar' };
 const EV_LANG_LABEL = { none: 'File or link submission', python: 'Python 3', c: 'C', cpp: 'C++', sql: 'SQL', web: 'HTML / CSS / JS' };
+const EV_LANG_SHORT = { none: 'Submission', python: 'Python 3', c: 'C', cpp: 'C++', sql: 'SQL', web: 'Web' };
+const EV_THUMB = {
+  quest: { g: 'linear-gradient(135deg,#0FBFA8,#38BDF8)', glyph: '&gt;_ code' },
+  hackathon: { g: 'linear-gradient(135deg,#7C3AED,#6366F1)', glyph: '{ } build' },
+  competition: { g: 'linear-gradient(135deg,#F59E0B,#F0A82A)', glyph: '&#9733; compete' },
+  webinar: { g: 'linear-gradient(135deg,#2A7BD1,#38BDF8)', glyph: '&#9673; live' },
+};
+const EV_LANG_GLYPH = { python: 'print(…)', c: '#include', cpp: 'std::cout', sql: 'SELECT *', web: '&lt;/&gt; html' };
+
+let EV_ALL = [];
+let EV_TAB = 'all';
+let EV_PAGE = 1;
+const EV_PER = 6;
+
+// event-level helpers derived from its problems
+function evPoints(ev) { const p = ev.problems || []; return p.length ? p.reduce((s, x) => s + (x.points || 0), 0) : 100; }
+function evDiff(ev) { const p = ev.problems || []; if (!p.length) return 'Easy'; const rank = { Easy: 1, Medium: 2, Hard: 3 }; return p.reduce((m, x) => rank[x.difficulty] > rank[m] ? x.difficulty : m, 'Easy'); }
+function evDurLabel(ev) { const m = ev.duration_minutes; if (!m) return null; return m < 60 ? `~${m} min` : `~${Math.round(m / 60)} hr`; }
+const DIFF_DOT = { Easy: '#1FA36B', Medium: '#D89A00', Hard: '#D14370' };
+
 async function loadEvents() {
   try {
     const d = await api('/api/events');
-    const list = d.events;
-    $('evGrid').innerHTML = list.length ? list.map((ev) => `
-      <div class="oq-card">
-        <span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}${ev.status === 'live' ? ' · LIVE' : ev.status === 'upcoming' ? ' · Upcoming' : ''}</span>
-        <h4 style="font-size:15px;color:var(--ink)">${esc(ev.title)}</h4>
-        <div class="s" style="color:var(--muted);font-size:12.5px">${esc((ev.description || '').slice(0, 140))}${(ev.description || '').length > 140 ? '…' : ''}</div>
-        <div class="s" style="color:var(--muted)">${ev.entry === 'paid' ? '<strong>PKR ' + ev.fee_pkr + '</strong>' : '<strong style="color:var(--ok)">FREE</strong>'}
-          ${ev.duration_minutes ? ' · About ' + ev.duration_minutes + ' minutes' : ''}${(ev.problems || []).length ? ' · ' + ev.problems.length + ' tasks' : ''}
-          ${ev.auto_certificate ? ' · Certificate at ' + ev.pass_mark + '%+' : ''}${ev.auto_grade ? ' · Graded instantly' : ''}</div>
-        ${ev.my_progress && ev.my_progress.avg != null ? `<div class="oq-prog"><div style="width:${Math.min(100, ev.my_progress.avg)}%"></div></div>
-          <div class="s" style="color:${ev.my_progress.passed ? 'var(--ok)' : 'var(--muted)'}">${ev.my_progress.passed ? 'Passed with ' + ev.my_progress.avg + '%' : 'Average so far: ' + ev.my_progress.avg + '%'}</div>` : ''}
-        <button class="lc-btn-solve" style="margin-top:6px" onclick="openOpenEvent(${ev.id})">${ev.my_entry ? 'Continue' : ev.kind === 'webinar' ? 'Register' : 'Start'}</button>
-      </div>`).join('')
-      : '<div class="empty">No open events right now - watch the Announcements tab.</div>';
-  } catch (e) { $('evGrid').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+    EV_ALL = d.events || [];
+    renderEvTabs();
+    renderEvStats();
+    drawEventList();
+  } catch (e) { $('evList').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
+
+function evTabFilter(tab, ev) {
+  if (tab === 'all') return true;
+  if (tab === 'quests') return ev.kind === 'quest';
+  if (tab === 'hackathons') return ev.kind === 'hackathon' || ev.kind === 'competition';
+  if (tab === 'live') return ev.status === 'live';
+  if (tab === 'webinars') return ev.kind === 'webinar';
+  return true;
+}
+function renderEvTabs() {
+  const defs = [
+    ['all', 'All Events'], ['quests', 'Open Quests'], ['hackathons', 'Hackathons'],
+    ['live', 'Live Events'], ['webinars', 'Webinars'],
+  ];
+  $('evTabs').innerHTML = defs.map(([k, label]) => {
+    const n = EV_ALL.filter((e) => evTabFilter(k, e)).length;
+    return `<button class="ev-tab ${EV_TAB === k ? 'active' : ''}" onclick="setEvTab('${k}')">${label}${n ? ` (${n})` : ''}</button>`;
+  }).join('');
+}
+function setEvTab(k) { EV_TAB = k; EV_PAGE = 1; renderEvTabs(); drawEventList(); }
+
+function renderEvStats() {
+  const quests = EV_ALL.filter((e) => e.kind === 'quest').length;
+  const hacks = EV_ALL.filter((e) => e.kind === 'hackathon' || e.kind === 'competition').length;
+  const live = EV_ALL.filter((e) => e.status === 'live').length;
+  const gems = (ME && ME.gamify && ME.gamify.gems) || 0;
+  const parts = EV_ALL.reduce((s, e) => s + (e.entries_count || 0), 0);
+  const ic = {
+    q: '<path d="M4 5h16M4 12h16M4 19h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    t: '<path d="M6 4h12v3a6 6 0 0 1-12 0V4zM9 15h6M12 15v4M8 21h8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    l: '<circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M6 6a8 8 0 0 0 0 12M18 6a8 8 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+    g: '<path d="M6 3h12l3.5 5.5L12 21 2.5 8.5 6 3z" fill="currentColor" opacity=".9"/>',
+    p: '<circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.5a3 3 0 0 1 0 5.5M21 20c0-2.4-1.4-4.5-3.5-5.4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+  };
+  const cell = (cls, icon, val, label) => `<div class="ev-stat ${cls}"><span class="ev-stat-ic"><svg viewBox="0 0 24 24" fill="none">${icon}</svg></span><div><b>${val}</b><span>${label}</span></div></div>`;
+  $('evStats').innerHTML =
+    cell('c1', ic.q, quests, 'Open Quests') +
+    cell('c2', ic.t, hacks, 'Hackathons') +
+    cell('c3', ic.l, live, 'Live Events') +
+    cell('c4', ic.g, gems.toLocaleString(), 'My Gems Earned') +
+    cell('c5', ic.p, parts.toLocaleString(), 'Participants');
+}
+
+function evThumb(ev) {
+  const base = EV_THUMB[ev.kind] || EV_THUMB.quest;
+  const glyph = (ev.compiler && EV_LANG_GLYPH[ev.compiler]) || base.glyph;
+  return `<div class="ev-thumb" style="background:${base.g}"><span class="glyph">${glyph}</span></div>`;
+}
+function evKindClass(ev) { return ev.status === 'live' && ev.kind !== 'quest' ? 'live' : ev.kind; }
+function evKindTag(ev) { return ev.status === 'live' && ev.kind === 'webinar' ? 'Live Event' : (EV_KIND_TAG[ev.kind] || ev.kind); }
+
+function drawEventList() {
+  const q = ($('evSearch').value || '').toLowerCase().trim();
+  const fd = $('evDiff').value, fl = $('evLang').value, fdur = $('evDur').value, sort = $('evSort').value;
+  let rows = EV_ALL.filter((e) => evTabFilter(EV_TAB, e));
+  if (q) rows = rows.filter((e) => (e.title + ' ' + (e.description || '')).toLowerCase().includes(q));
+  if (fd) rows = rows.filter((e) => (e.problems || []).some((p) => p.difficulty === fd) || (!( e.problems || []).length && fd === 'Easy'));
+  if (fl) rows = rows.filter((e) => (e.compiler || 'none') === fl);
+  if (fdur) rows = rows.filter((e) => { const m = e.duration_minutes || 0; return fdur === 'short' ? (m && m < 15) : fdur === 'mid' ? (m >= 15 && m <= 60) : m > 60; });
+  if (sort === 'old') rows.sort((a, b) => a.id - b.id);
+  else if (sort === 'points') rows.sort((a, b) => evPoints(b) - evPoints(a));
+  else rows.sort((a, b) => b.id - a.id);
+
+  const total = rows.length;
+  const pages = Math.max(1, Math.ceil(total / EV_PER));
+  if (EV_PAGE > pages) EV_PAGE = pages;
+  const slice = rows.slice((EV_PAGE - 1) * EV_PER, EV_PAGE * EV_PER);
+
+  if (!total) { $('evList').innerHTML = '<div class="empty">No events match your filters right now - try clearing them, or watch the Announcements tab.</div>'; $('evPager').innerHTML = ''; return; }
+
+  const clock = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  const star = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.2l1-5.8L3.5 9.2l5.9-.9L12 3z" stroke="currentColor" stroke-width="1.6"/></svg>';
+  const langI = '<svg viewBox="0 0 24 24" fill="none"><path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  $('evList').innerHTML = slice.map((ev) => {
+    const diff = evDiff(ev);
+    const durL = evDurLabel(ev);
+    const cta = ev.my_entry ? 'Continue' : ev.kind === 'webinar' ? 'Join Live' : ev.kind === 'quest' ? 'Open Quest' : 'View Details';
+    const pill = ev.my_entry ? '<span class="ev-pill reg">Registered</span>'
+      : ev.status === 'upcoming' ? '<span class="ev-pill up">Upcoming</span>'
+      : ev.entry === 'paid' ? `<span class="ev-pill paid">PKR ${ev.fee_pkr}</span>`
+      : '<span class="ev-pill free">Free</span>';
+    const avg = ev.my_progress && ev.my_progress.avg != null
+      ? `<span class="ev-avg">Average so far: ${ev.my_progress.avg}%</span>`
+      : ev.entries_count ? `<span class="ev-avg">${ev.entries_count} joined</span>` : '';
+    return `<div class="ev-row" onclick="openOpenEvent(${ev.id})" style="cursor:pointer">
+      ${evThumb(ev)}
+      <div class="ev-body">
+        <span class="ev-kind ${evKindClass(ev)}">${evKindTag(ev)}</span>
+        <h4>${esc(ev.title)}</h4>
+        <div class="desc">${esc(ev.description || 'Join this event and start earning gems.')}</div>
+        <div class="ev-meta">
+          <span class="m">${star} ${evPoints(ev)} pts</span>
+          <span class="m">${langI} ${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>
+          <span class="m"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>
+          ${durL ? `<span class="m">${clock} ${durL}</span>` : ''}
+        </div>
+      </div>
+      <div class="ev-aside" onclick="event.stopPropagation()">
+        ${pill}
+        <button class="ev-cta ${ev.my_entry ? 'solid' : ''}" onclick="openOpenEvent(${ev.id})">${cta}</button>
+        ${avg}
+      </div>
+    </div>`;
+  }).join('');
+
+  // pager
+  if (pages <= 1) { $('evPager').innerHTML = ''; return; }
+  let btns = `<button ${EV_PAGE === 1 ? 'disabled' : ''} onclick="evGoPage(${EV_PAGE - 1})">&lsaquo;</button>`;
+  for (let i = 1; i <= pages; i++) {
+    if (i === 1 || i === pages || Math.abs(i - EV_PAGE) <= 1) btns += `<button class="${i === EV_PAGE ? 'active' : ''}" onclick="evGoPage(${i})">${i}</button>`;
+    else if (i === EV_PAGE - 2 || i === EV_PAGE + 2) btns += '<button disabled>…</button>';
+  }
+  btns += `<button ${EV_PAGE === pages ? 'disabled' : ''} onclick="evGoPage(${EV_PAGE + 1})">&rsaquo;</button>`;
+  $('evPager').innerHTML = btns;
+}
+function evGoPage(p) { EV_PAGE = p; drawEventList(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 async function loadCerts() {
   try {
     const d = await api('/api/certificates/mine');
@@ -804,54 +933,401 @@ async function loadCerts() {
         </div>`).join('')}</div></div>`;
   } catch { $('certBox').innerHTML = ''; }
 }
+/* ---------------------- event detail (full page) ---------------------- */
+let CUR_EV_PID = null;   // selected problem on the detail page
+let EV_OUT_TERM = null;  // output terminal for the code editor
+let EV_CD_TIMER = null;  // countdown interval
+let EV_EDITOR_LIGHT = false;
+
+function evRunnableLang(ev) { return ['python', 'c', 'cpp', 'sql'].includes(ev.compiler) ? ev.compiler : null; }
+function evCurProblem() { const ps = (CUR_EVENT && CUR_EVENT.event.problems) || []; return ps.find((p) => p.pid === CUR_EV_PID) || ps[0] || null; }
+function evDraftKey(eid, pid) { return `echoev:${eid}:${pid || 0}:${(ME && ME.id) || 0}`; }
+
 async function openOpenEvent(id) {
   if (!ME) { gate('Sign in free to join events and earn certificates.'); return; }
-  const d = await api(`/api/events/${id}`);
-  CUR_EVENT = d;
-  const ev = d.event;
-  const probs = ev.problems || [];
+  try {
+    const d = await api(`/api/events/${id}`);
+    CUR_EVENT = d;
+    const ps = d.event.problems || [];
+    CUR_EV_PID = ps.length ? ps[0].pid : null;
+    renderEventDetail();
+    openTab('eventDetail');
+  } catch (e) { toast(e.message, true); }
+}
+
+function evCompact(dt) {
+  if (!dt) return null;
+  const d = new Date(String(dt).replace(' ', 'T'));
+  if (isNaN(d)) return null;
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+}
+function evPrettyDate(dt) {
+  const d = new Date(String(dt).replace(' ', 'T'));
+  if (isNaN(d)) return '';
+  const mon = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  let h = d.getHours(); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  return `${d.getDate()} ${mon[d.getMonth()]} ${d.getFullYear()} • ${h}:${String(d.getMinutes()).padStart(2, '0')} ${ap}`;
+}
+function evCalLink(ev) {
+  const s = evCompact(ev.starts_at || ev.ends_at), e = evCompact(ev.ends_at || ev.starts_at);
+  if (!s || !e) return null;
+  const q = new URLSearchParams({ action: 'TEMPLATE', text: ev.title, dates: `${s}/${e}`, details: (ev.description || '').slice(0, 400) });
+  return `https://calendar.google.com/calendar/render?${q.toString()}`;
+}
+
+function renderEventDetail() {
+  const d = CUR_EVENT, ev = d.event;
+  const p = evCurProblem();
+  const points = p ? p.points : (ev.problems || []).reduce((s, x) => s + (x.points || 0), 0) || 100;
+  const diff = p ? DIFF(p.difficulty) : evDiff(ev);
+  const durL = evDurLabel(ev);
+  const prog = d.my_progress;
+  const clock = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  const star = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.2l1-5.8L3.5 9.2l5.9-.9L12 3z" stroke="currentColor" stroke-width="1.6"/></svg>';
+  const langI = '<svg viewBox="0 0 24 24" fill="none"><path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const checkI = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>';
+
+  // ---- left sidebar: info card ----
+  const tags = [
+    `<span class="evd-tag"><span class="dot" style="width:7px;height:7px;border-radius:50%;background:${DIFF_DOT[diff]}"></span>${diff}</span>`,
+    `<span class="evd-tag">${points} pts</span>`,
+    `<span class="evd-tag">${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>`,
+    durL ? `<span class="evd-tag">${durL}</span>` : '',
+    ev.auto_certificate ? `<span class="evd-tag good">Certificate at ${ev.pass_mark}%+</span>` : '',
+  ].join('');
+  const card = `<div class="evd-card">
+    <span class="evd-badge">${evKindTag(ev)}</span>
+    <h3>${esc(ev.title)}</h3>
+    <div class="cdesc">${esc((ev.description || '').slice(0, 150))}${(ev.description || '').length > 150 ? '…' : ''}</div>
+    <div class="evd-tags">${tags}</div>
+    <div class="evd-parts">${(ev.entries_count || 0).toLocaleString()} participants</div>
+    <div class="evd-prog"><div style="width:${prog && prog.avg != null ? Math.min(100, prog.avg) : 4}%"></div></div>
+  </div>`;
+
+  // ---- nav ----
+  const navDefs = [
+    ['overview', 'Overview', '<circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/>'],
+    ['problem', 'Problem Statement', '<path d="M6 3h9l3 3v15H6z"/><path d="M9 9h6M9 13h6M9 17h4"/>'],
+    ['instructions', 'Instructions', '<path d="M9 6h9M9 12h9M9 18h9M4 6h.01M4 12h.01M4 18h.01"/>'],
+    ['submissions', 'Submissions', '<path d="M4 4h16v12H4z"/><path d="M8 20h8M12 16v4"/>'],
+    ['leaderboard', 'Leaderboard', '<path d="M8 21V9M16 21V5M4 21h16"/>'],
+    ['discussion', 'Discussion', '<path d="M5 5h14v10H9l-4 4z"/>'],
+  ];
+  const cCount = (d.comments || []).length;
+  const nav = `<div class="evd-nav">${navDefs.map(([k, label, path]) =>
+    `<a onclick="evNavGo('${k}')" data-sec="${k}"><svg class="ic" viewBox="0 0 24 24">${path}</svg>${label}${k === 'discussion' && cCount ? `<span class="cnt">${cCount}</span>` : ''}</a>`).join('')}</div>`;
+
+  // ---- countdown card ----
+  let countCard = '';
+  if (ev.ends_at) {
+    const cal = evCalLink(ev);
+    countCard = `<div class="evd-count">
+      <div class="lbl">Event ends in</div>
+      <div class="cd-grid">
+        <div class="cd-box"><b id="cd-d">--</b><span>Days</span></div>
+        <div class="cd-box"><b id="cd-h">--</b><span>Hours</span></div>
+        <div class="cd-box"><b id="cd-m">--</b><span>Mins</span></div>
+        <div class="cd-box"><b id="cd-s">--</b><span>Secs</span></div>
+      </div>
+      <div class="ends">${evPrettyDate(ev.ends_at)}</div>
+      ${cal ? `<a class="btn btn-ghost btn-sm btn-block cal" href="${esc(cal)}" target="_blank" rel="noopener">Add to calendar</a>` : ''}
+    </div>`;
+  } else if (ev.status === 'live') {
+    countCard = `<div class="evd-count"><div class="lbl">Status</div><div class="task-status ok" style="margin:0">Open now — no deadline. Solve any time.</div></div>`;
+  }
+
+  // ---- middle column sections ----
+  const banner = ev.auto_grade
+    ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly the moment you submit.</span></div>` : '';
   const regBtn = !d.my_entry && ['upcoming', 'live'].includes(ev.status)
-    ? `<button class="btn btn-teal" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' - PKR ' + ev.fee_pkr : ' - Free'}</button>` : '';
-  openModal(ev.title, `
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind]}</span>
-      <span class="s" style="color:var(--muted)">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} · Pass mark ${ev.pass_mark}%${ev.duration_minutes ? ' · About ' + ev.duration_minutes + ' minutes' : ''}${ev.auto_grade ? ' · Graded instantly' : ''}${ev.auto_certificate ? ' · Automatic certificate' : ''}</span></div>
-    ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
-    ${(ev.files || []).length ? `<div class="s" style="margin-bottom:8px"><strong>Documents:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join(' · ')}</div>` : ''}
-    ${regBtn}
-    ${d.my_entry && !d.can_participate ? `<div class="task-status wait">${esc(d.participate_msg)}</div>` : ''}
-    ${d.my_progress && d.my_progress.passed ? `<div class="task-status ok"><strong>Passed with ${d.my_progress.avg}%</strong> - your certificate is in My certificates above.</div>` : ''}
-    ${ev.kind === 'webinar' && ev.meeting_link ? `<div class="task-status ok">You are registered - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : ''}
-    ${d.can_participate && probs.length ? `
-      <div class="pub-sec">Tasks</div>
-      ${probs.map((p) => {
-        const s = d.my_submissions[p.pid];
-        return `<div class="ev-problem">
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <strong style="font-size:13.5px">${esc(p.title)}</strong>
-            <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
-            <span style="flex:1"></span>
-            ${s ? (s.score != null ? `<span class="grade-chip ok">${s.score}%</span>` : '<span class="grade-chip wait">Grading</span>') : ''}
-            <button class="lc-btn-solve" onclick="openEventSolve(${ev.id},${p.pid})">${s ? 'Reopen' : 'Solve'}</button>
-          </div>
-          ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">${esc(s.ai_feedback)}</div>` : ''}
-        </div>`;
-      }).join('')}` : ''}
-    ${d.can_participate && !probs.length && ev.kind !== 'webinar' ? `
-      <div class="pub-sec">Your submission</div>
-      <form id="evLinkForm">
+    ? `<button class="btn btn-primary" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' — PKR ' + ev.fee_pkr : ' — Free'}</button>` : '';
+  const statusMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait" style="margin-top:12px">${esc(d.participate_msg)}</div>`
+    : prog && prog.passed ? `<div class="task-status ok" style="margin-top:12px"><strong>Passed with ${prog.avg}%</strong> — your certificate is under Events › My certificates.</div>` : '';
+
+  const overview = `<div class="evd-sec" id="evdSec-overview">
+    <div class="evd-titlerow"><h2>${esc(ev.title)}</h2><span class="evd-star" title="Featured">${star}</span></div>
+    <div class="evd-chips" style="margin:12px 0">
+      <span class="evd-chip">${star} ${points} points</span>
+      <span class="evd-chip">${langI} ${EV_LANG_LABEL[ev.compiler] || 'File / link'}</span>
+      <span class="evd-chip"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>
+      ${durL ? `<span class="evd-chip">${clock} ${durL}</span>` : ''}
+      ${ev.auto_grade ? `<span class="evd-chip">${checkI} Instant grading</span>` : ''}
+    </div>
+    ${banner}
+    ${regBtn ? `<div style="margin-top:12px">${regBtn}</div>` : ''}
+    ${statusMsg}
+  </div>`;
+
+  // problem statement (selected problem, with optional selector)
+  const selector = (ev.problems || []).length > 1
+    ? `<div class="evd-chips" style="margin-bottom:12px">${ev.problems.map((x) =>
+        `<span class="evd-chip" style="cursor:pointer;${x.pid === CUR_EV_PID ? 'border-color:var(--primary);color:var(--primary)' : ''}" onclick="evSelectProblem(${x.pid})">${esc(x.title)}</span>`).join('')}</div>` : '';
+  const body = p ? esc(p.description || 'No description provided.') : esc(ev.description || 'See the instructions and documents for details.');
+  const problemSec = `<div class="evd-sec" id="evdSec-problem">
+    <h3>Problem Statement</h3>
+    ${selector}
+    <p>${body}</p>
+    <details class="evd-ex"><summary>▾ Examples</summary>
+      <div class="evd-ex-row"><div class="k">Input</div><div class="v">(see the problem statement)</div></div>
+      <div class="evd-ex-row"><div class="k">Output</div><div class="v">Produce the result described above.</div></div>
+    </details>
+  </div>`;
+
+  // instructions
+  const files = (ev.files || []).length
+    ? `<h4>Documents</h4><p>${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join(' &nbsp;·&nbsp; ')}</p>` : '';
+  const instructionsSec = `<div class="evd-sec" id="evdSec-instructions">
+    <h3>Instructions</h3>
+    <p class="muted">Reach the pass mark of <strong>${ev.pass_mark}%</strong> to clear this ${EV_KIND_LABEL[ev.kind].toLowerCase()}.${ev.auto_certificate ? ' A verified certificate is issued automatically when you pass.' : ''}${ev.entry === 'paid' ? ` Entry fee: PKR ${ev.fee_pkr}.` : ' This event is free to enter.'}</p>
+    ${ev.dataset_url ? '<h4>Dataset</h4><p class="muted">A dataset is loaded into the editor automatically when you run your code.</p>' : ''}
+    ${files}
+  </div>`;
+
+  // submissions
+  const subs = Object.values(d.my_submissions || {}).filter((s) => s && s.submitted_at)
+    .sort((a, b) => String(b.submitted_at).localeCompare(a.submitted_at));
+  const subRows = subs.length ? subs.map((s, i) => {
+    const passed = s.score != null && s.score >= ev.pass_mark;
+    const cls = s.score == null ? 'wait' : passed ? 'ok' : 'bad';
+    const label = s.score == null ? 'Grading' : passed ? 'Accepted' : 'Wrong Answer';
+    const icon = s.score == null ? '<path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>'
+      : passed ? '<path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>'
+      : '<path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>';
+    return `<div class="sub-row">
+      <span class="sub-ic ${cls}"><svg viewBox="0 0 24 24" fill="none">${icon}</svg></span>
+      <div class="grow"><div class="st">Submission #${subs.length - i}</div><div class="sub-when">Submitted ${esc(s.submitted_at)}</div></div>
+      <span class="sub-tag ${cls}">${label}</span>
+      ${s.score != null ? `<span class="sub-score">${s.score}/100 pts</span>` : ''}
+      ${s.pid ? `<button class="sub-link" onclick="evSelectProblem(${s.pid});evScrollWork()">View details ›</button>` : ''}
+    </div>`;
+  }).join('') : '<p class="muted">No submissions yet — write your solution and submit it from the editor.</p>';
+  const submissionsSec = `<div class="evd-sec" id="evdSec-submissions">
+    <h3>Your Submissions</h3>
+    ${subRows}
+    ${d.can_participate ? '<button class="btn btn-primary btn-block" style="margin-top:6px" onclick="evScrollWork()">+ New Submission</button>' : ''}
+  </div>`;
+
+  // leaderboard
+  const board = (d.board || []).slice(0, 12);
+  const boardRows = board.length ? board.map((b, i) => `<div class="sub-row" style="${b.user_id === (ME && ME.id) ? 'border-color:var(--primary);background:var(--violet-soft)' : ''}">
+      <span class="sub-ic ${i < 3 ? 'ok' : 'wait'}" style="font-weight:800">${i + 1}</span>
+      <div class="grow"><div class="st">${esc(b.name)}${b.user_id === (ME && ME.id) ? ' (you)' : ''}</div><div class="sub-when">${b.submissions} submission${b.submissions === 1 ? '' : 's'} · ${b.tier}</div></div>
+      ${b.avg != null ? `<span class="sub-score">${b.avg}%</span>` : '<span class="sub-tag wait">Pending</span>'}
+    </div>`).join('') : '<p class="muted">No scores on the board yet — be the first to submit.</p>';
+  const leaderboardSec = `<div class="evd-sec" id="evdSec-leaderboard"><h3>Leaderboard</h3>${boardRows}</div>`;
+
+  // discussion
+  const discussionSec = `<div class="evd-sec" id="evdSec-discussion"><h3>Discussion</h3><div id="evDisc"></div></div>`;
+
+  const main = `<div class="evd-main">${overview}${problemSec}${instructionsSec}${submissionsSec}${leaderboardSec}${discussionSec}</div>`;
+
+  // ---- right column: workspace ----
+  const work = renderEventWorkspace();
+
+  $('evDetail').innerHTML =
+    `<div class="evd-side">${card}${nav}${countCard}</div>${main}${work}`;
+
+  // wire editor + discussion + countdown
+  wireEventWorkspace();
+  renderDiscussion();
+  startEventCountdown();
+  evSetActiveNav('overview');
+}
+
+function renderEventWorkspace() {
+  const d = CUR_EVENT, ev = d.event;
+  const p = evCurProblem();
+  const lang = evRunnableLang(ev);
+  const sub = p ? (d.my_submissions[p.pid] || null) : (d.my_submissions[0] || null);
+
+  // not able to participate yet
+  if (!d.can_participate) {
+    const why = d.my_entry ? esc(d.participate_msg || 'Waiting for access.') : 'Register for this event to unlock the workspace and start submitting.';
+    return `<div class="evd-work"><div class="evd-sec"><h3>Workspace</h3><p class="muted">${why}</p>
+      ${!d.my_entry && ['upcoming', 'live'].includes(ev.status) ? `<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' — PKR ' + ev.fee_pkr : ' — Free'}</button>` : ''}
+    </div></div>`;
+  }
+
+  // webinar: join link
+  if (ev.kind === 'webinar') {
+    return `<div class="evd-work"><div class="evd-sec"><h3>Join the session</h3>
+      ${ev.meeting_link ? `<p class="muted" style="margin-bottom:12px">You are registered. Use the link below at the scheduled time.</p><a class="btn btn-primary btn-block" href="${esc(ev.meeting_link)}" target="_blank" rel="noopener">Join the webinar</a>`
+        : '<p class="muted">You are registered. The join link will appear here before the session starts.</p>'}
+    </div></div>`;
+  }
+
+  const feedback = renderFeedback(sub, ev);
+
+  // code editor
+  if (lang) {
+    const draft = localStorage.getItem(evDraftKey(ev.id, p && p.pid));
+    const code = (sub && sub.code) || draft || '';
+    return `<div class="evd-work">
+      <div class="ide2" id="ide2">
+        <div class="ide2-bar">
+          <span class="ttl">Code Editor</span><span class="sp"></span>
+          <span class="ide2-lang">${EV_LANG_LABEL[lang]}</span>
+          <span class="ide2-toggle" onclick="evToggleEditorTheme()">Dark<span class="ide2-sw" id="ide2Sw"></span></span>
+        </div>
+        <div class="ide2-editor">
+          <div class="ide2-gutter" id="evGutter"><span>1</span></div>
+          <textarea class="ide2-code" id="evCode" spellcheck="false" placeholder="# Write your code here"></textarea>
+        </div>
+        <div class="ide2-actions">
+          <button class="ide2-run" id="evRunBtn" onclick="evRunCode()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M7 5v14l11-7z"/></svg>Run Code</button>
+          <button class="ide2-ghost" onclick="evClearOutput()">Clear</button>
+          <span class="sp"></span>
+          <button class="ide2-ghost" onclick="evSaveDraft()">Save Draft</button>
+          <button class="ide2-submit" id="evSubmitBtn" onclick="evSubmitCode()">${sub ? 'Resubmit' : 'Submit for Grading'}</button>
+        </div>
+      </div>
+      <div class="ide2-out"><div class="oh">Output</div><div class="ob" id="evOutBody"><span class="ph">Run your code to see the output here...</span></div></div>
+      ${feedback}
+      <textarea id="evCodeSeed" style="display:none">${esc(code)}</textarea>
+    </div>`;
+  }
+
+  // file / link submission
+  return `<div class="evd-work">
+    <div class="evd-sec"><h3>Submit your work</h3>
+      <form id="evFileForm">
         <label class="field"><span>Your work as a file (any document)</span><input name="file" type="file"></label>
         <label class="field"><span>Or a link to your project</span><input name="link" type="url" placeholder="https://github.com/you/repo"></label>
-        <button class="btn btn-primary btn-block">Submit</button></form>` : ''}`);
-  const lf = $('evLinkForm');
-  if (lf) lf.addEventListener('submit', async (e) => {
-    e.preventDefault(); const btn = lf.querySelector('button'); btn.disabled = true;
-    try {
-      const out = await api(`/api/events/${ev.id}/submit`, { method: 'POST', body: new FormData(lf) });
-      afterSubmitToast(out); openOpenEvent(ev.id); loadEvents(); loadCerts();
-    } catch (err) { modalMsg(err.message); btn.disabled = false; }
-  });
+        <button class="ide2-submit btn-block" style="justify-content:center" id="evSubmitBtn">${sub ? 'Resubmit' : 'Submit for Grading'}</button>
+      </form>
+    </div>
+    ${feedback}
+  </div>`;
 }
+
+function renderFeedback(sub, ev) {
+  if (!sub || sub.score == null) {
+    if (sub) return `<div class="ide2-fb pending"><div><div class="fh">Feedback</div><div class="ftxt">Your submission is in the grading queue — check back shortly.</div></div></div>`;
+    return `<div class="ide2-fb empty"><div><div class="fh">Feedback</div><div class="ftxt">Submit your solution to see your score and feedback here.</div></div></div>`;
+  }
+  const passed = sub.score >= ev.pass_mark;
+  const ring = passed ? 'var(--ok)' : sub.score >= ev.pass_mark * 0.6 ? '#D89A00' : '#D14370';
+  return `<div class="ide2-fb${passed ? '' : ' pending'}">
+    <div><div class="fh">Feedback</div>
+      <div class="ftxt">${passed ? '<span class="ok">✓ Great job! Your solution meets the requirements.</span>' : 'Keep going — review the feedback and resubmit.'}<br>${esc(sub.ai_feedback || '')}</div>
+    </div>
+    <div class="score-ring" style="--pct:${sub.score};--ring-color:${ring}"><span class="val">${sub.score}<span style="font-size:12px;color:var(--muted)">/100</span></span></div>
+  </div>`;
+}
+
+function wireEventWorkspace() {
+  EV_OUT_TERM = null; // the previous output terminal's DOM was just replaced
+  const seed = $('evCodeSeed'), code = $('evCode');
+  if (code) {
+    if (seed) code.value = seed.value;
+    EchoRun.wireEditor(code);
+    code.addEventListener('input', evSyncGutter);
+    code.addEventListener('scroll', () => { const g = $('evGutter'); if (g) g.scrollTop = code.scrollTop; });
+    evSyncGutter();
+    if (EV_EDITOR_LIGHT) $('ide2').classList.add('light'), $('ide2Sw') && $('ide2Sw').classList.add('off');
+  }
+  const ff = $('evFileForm');
+  if (ff) ff.addEventListener('submit', (e) => { e.preventDefault(); evSubmitFile(ff); });
+}
+function evSyncGutter() {
+  const code = $('evCode'), g = $('evGutter'); if (!code || !g) return;
+  const n = code.value.split('\n').length || 1;
+  let h = ''; for (let i = 1; i <= n; i++) h += `<span>${i}</span>`;
+  g.innerHTML = h; g.scrollTop = code.scrollTop;
+}
+function evToggleEditorTheme() {
+  EV_EDITOR_LIGHT = !EV_EDITOR_LIGHT;
+  const ide = $('ide2'), sw = $('ide2Sw');
+  if (ide) ide.classList.toggle('light', EV_EDITOR_LIGHT);
+  if (sw) sw.classList.toggle('off', EV_EDITOR_LIGHT);
+}
+
+function evSelectProblem(pid) { CUR_EV_PID = pid; renderEventDetail(); }
+function evScrollWork() { const w = document.querySelector('.evd-work'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function evNavGo(sec) { const el = $('evdSec-' + sec); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); evSetActiveNav(sec); }
+function evSetActiveNav(sec) { document.querySelectorAll('.evd-nav a').forEach((a) => a.classList.toggle('active', a.dataset.sec === sec)); }
+
+function startEventCountdown() {
+  stopEventCountdown();
+  const ev = CUR_EVENT && CUR_EVENT.event;
+  if (!ev || !ev.ends_at || !$('cd-d')) return;
+  const end = new Date(String(ev.ends_at).replace(' ', 'T')).getTime();
+  const tick = () => {
+    if (!$('cd-d')) { stopEventCountdown(); return; }
+    let s = Math.max(0, Math.floor((end - Date.now()) / 1000));
+    const dd = Math.floor(s / 86400); s -= dd * 86400;
+    const hh = Math.floor(s / 3600); s -= hh * 3600;
+    const mm = Math.floor(s / 60); s -= mm * 60;
+    const p = (n) => String(n).padStart(2, '0');
+    $('cd-d').textContent = p(dd); $('cd-h').textContent = p(hh); $('cd-m').textContent = p(mm); $('cd-s').textContent = p(s);
+  };
+  tick(); EV_CD_TIMER = setInterval(tick, 1000);
+}
+function stopEventCountdown() { if (EV_CD_TIMER) { clearInterval(EV_CD_TIMER); EV_CD_TIMER = null; } }
+
+/* -------- run / submit / draft -------- */
+async function evRunCode() {
+  const ev = CUR_EVENT.event, lang = evRunnableLang(ev);
+  const btn = $('evRunBtn'), code = $('evCode');
+  if (!code.value.trim()) { evOutText('Write some code first.'); return; }
+  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = evRunLabel(); return; }
+  if (!EV_OUT_TERM) { $('evOutBody').innerHTML = ''; EV_OUT_TERM = EchoTerm.mount($('evOutBody')); }
+  EV_OUT_TERM.clear();
+  btn.innerHTML = '■ Stop';
+  const files = [];
+  if (ev.dataset_url) { try { files.push(await EchoRun.fetchDataset(ev.dataset_url)); } catch (e) { EV_OUT_TERM.print('[Dataset: ' + e.message + ']\n'); } }
+  for (const f of (ev.files || [])) if (/\.(csv|tsv|txt|json)$/i.test(f.name)) files.push({ name: f.name, url: f.url });
+  try { await EchoRun.executeAny(lang, code.value, { term: EV_OUT_TERM, files, onStatus: () => {} }); }
+  catch (e) { EV_OUT_TERM.print('\n[' + e.message + ']\n'); }
+  btn.innerHTML = evRunLabel();
+}
+function evRunLabel() { return '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M7 5v14l11-7z"></path></svg>Run Code'; }
+function evOutText(t) { const b = $('evOutBody'); if (b) b.innerHTML = `<span class="ph">${esc(t)}</span>`; }
+function evClearOutput() { if (EV_OUT_TERM) EV_OUT_TERM.clear(); else evOutText('Run your code to see the output here...'); }
+function evSaveDraft() {
+  const ev = CUR_EVENT.event, p = evCurProblem(), code = $('evCode');
+  if (!code) return;
+  localStorage.setItem(evDraftKey(ev.id, p && p.pid), code.value);
+  toast('Draft saved on this device.');
+}
+async function evSubmitCode() {
+  const ev = CUR_EVENT.event, p = evCurProblem(), lang = evRunnableLang(ev);
+  const code = $('evCode').value;
+  if (!code.trim()) { toast('Write your solution in the editor first.', true); return; }
+  const btn = $('evSubmitBtn'); btn.disabled = true; btn.textContent = 'Grading…';
+  const fd = new FormData();
+  if (p) fd.set('pid', p.pid);
+  fd.set('code', code); fd.set('language', lang);
+  try {
+    const out = await api(`/api/events/${ev.id}/submit`, { method: 'POST', body: fd });
+    localStorage.removeItem(evDraftKey(ev.id, p && p.pid));
+    afterSubmitToast(out);
+    await openOpenEvent(ev.id);
+  } catch (err) { toast(err.message, true); btn.disabled = false; btn.textContent = 'Submit for Grading'; }
+}
+async function evSubmitFile(form) {
+  const ev = CUR_EVENT.event, p = evCurProblem();
+  const fd = new FormData(form);
+  if (p) fd.set('pid', p.pid);
+  if (!fd.get('file') || !fd.get('file').size) fd.delete('file');
+  if (!fd.get('link')) fd.delete('link');
+  if (!fd.has('file') && !fd.get('link')) { toast('Attach a file or paste a link first.', true); return; }
+  const btn = $('evSubmitBtn'); btn.disabled = true; btn.textContent = 'Submitting…';
+  try {
+    const out = await api(`/api/events/${ev.id}/submit`, { method: 'POST', body: fd });
+    afterSubmitToast(out);
+    await openOpenEvent(ev.id);
+  } catch (err) { toast(err.message, true); btn.disabled = false; btn.textContent = 'Submit for Grading'; }
+}
+function afterSubmitToast(out) {
+  if (out.cert) toast(`Passed — certificate ${out.cert.serial} issued. Find it under Events › My certificates.`);
+  else if (out.submission && out.submission.score != null) toast(`Graded: ${out.submission.score}/100.`);
+  else toast('Submitted — it will be graded soon.');
+  loadEvents(); loadCerts();
+}
+
+/* -------- registration (modal) -------- */
 function regOpenEvent(eid) {
   const ev = CUR_EVENT.event;
   openModal(`Register: ${ev.title}`, `
@@ -866,78 +1342,56 @@ function regOpenEvent(eid) {
     try {
       await api(`/api/events/${eid}/register`, { method: 'POST', body: new FormData(f) });
       toast(ev.entry === 'paid' ? 'Registered - your payment screenshot is being verified.' : 'Registered - good luck.');
-      openOpenEvent(eid); loadEvents();
+      closeModal();
+      await openOpenEvent(eid); loadEvents();
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
-let EV_TERM2 = null;
-async function openEventSolve(eid, pid) {
-  const d = CUR_EVENT && CUR_EVENT.event.id === eid ? CUR_EVENT : await api(`/api/events/${eid}`);
-  const ev = d.event;
-  const p = (ev.problems || []).find((x) => x.pid === pid);
-  const sub = d.my_submissions[pid] || null;
-  const lang = ev.compiler && ev.compiler !== 'none' && ev.compiler !== 'web' ? ev.compiler : null;
-  openModal(p.title, `
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
-      <span class="s" style="color:var(--muted)">${p.points} pts · ${EV_LANG_LABEL[ev.compiler] || 'File or link'}${ev.auto_grade ? ' · Graded instantly' : ''}</span></div>
-    <div class="s" style="white-space:pre-line;line-height:1.6;margin-bottom:12px">${esc(p.description)}</div>
-    ${lang ? `
-      <div class="task-ide card" style="margin-bottom:12px">
-        <div class="ide-toolbar">
-          <span class="ide-pkgs">${EV_LANG_LABEL[lang]}${ev.dataset_url ? ' · Dataset auto-loaded' : ''}</span>
-          <span style="flex:1"></span>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="EV_TERM2&&EV_TERM2.clear()">Clear</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="ev2Run" onclick="runEvent2('${lang}')">Run</button>
-        </div>
-        <textarea id="ev2Code" class="code-editor ide-editor" spellcheck="false">${esc(sub && sub.code || '')}</textarea>
-        <div class="ide-status-row"><span class="s" id="ev2Status" style="color:var(--muted-2)">Ready.</span></div>
-        <div id="ev2Term"></div>
+
+/* -------- discussion -------- */
+function renderDiscussion() {
+  const d = CUR_EVENT, box = $('evDisc'); if (!box) return;
+  const comments = d.comments || [];
+  const form = `<form class="disc-form" id="discForm">
+      <textarea name="body" placeholder="Ask a question or share a tip…" required></textarea>
+      <button class="btn btn-primary" style="align-self:flex-start">Post</button>
+    </form>`;
+  const list = comments.length ? comments.map((c) => {
+    const init = (c.name || '?').charAt(0).toUpperCase();
+    const canDel = c.user_id === (ME && ME.id) || ['admin', 'instructor'].includes(ME && ME.role);
+    return `<div class="disc-item">
+      <div class="disc-av">${c.avatar ? `<img src="${esc(c.avatar)}" alt="">` : init}</div>
+      <div class="disc-main">
+        <div class="disc-head"><span class="disc-name">${esc(c.name)}</span>${c.staff ? '<span class="disc-staff">Staff</span>' : ''}<span class="disc-when">${esc(c.created_at)}</span>${canDel ? `<button class="disc-del" onclick="deleteEventComment(${c.id})">Delete</button>` : ''}</div>
+        <div class="disc-body">${esc(c.body)}</div>
       </div>
-      <form id="ev2Submit">
-        <button class="btn btn-primary btn-block">${sub ? 'Resubmit for grading' : 'Submit for grading'}</button>
-      </form>`
-    : `<form id="ev2Submit">
-        <label class="field"><span>Your work as a file</span><input name="file" type="file"></label>
-        <label class="field"><span>Or a link</span><input name="link" type="url" placeholder="https://"></label>
-        <button class="btn btn-primary btn-block">${sub ? 'Resubmit' : 'Submit'}</button></form>`}
-    ${sub && sub.ai_feedback ? `<div class="s" style="margin-top:10px;background:#F4FBF9;border:1px solid #B7E9DA;border-radius:10px;padding:10px 12px"><strong>Feedback:</strong> ${esc(sub.ai_feedback)}</div>` : ''}`);
-  if (lang) { EV_TERM2 = EchoTerm.mount($('ev2Term')); EchoRun.wireEditor($('ev2Code')); }
-  $('ev2Submit').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    const fd = new FormData(f);
-    fd.set('pid', pid);
-    if (lang) {
-      const code = $('ev2Code').value;
-      if (!code.trim()) { modalMsg('Write your solution in the editor first.'); btn.disabled = false; return; }
-      fd.set('code', code); fd.set('language', lang);
-    }
-    try {
-      const out = await api(`/api/events/${eid}/submit`, { method: 'POST', body: fd });
-      afterSubmitToast(out);
-      openOpenEvent(eid); loadEvents(); loadCerts();
-    } catch (err) { modalMsg(err.message); btn.disabled = false; }
-  });
+    </div>`;
+  }).join('') : '<p class="muted" style="color:var(--muted)">No comments yet — start the conversation.</p>';
+  box.innerHTML = form + list;
+  $('discForm').addEventListener('submit', postEventComment);
 }
-async function runEvent2(lang) {
-  const btn = $('ev2Run'); const status = $('ev2Status');
-  const code = $('ev2Code').value;
-  if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.textContent = 'Run'; return; }
-  btn.textContent = 'Stop';
-  const files = [];
-  const ev = CUR_EVENT && CUR_EVENT.event;
-  if (ev && ev.dataset_url) {
-    try { status.textContent = 'Fetching dataset from URL...'; files.push(await EchoRun.fetchDataset(ev.dataset_url)); }
-    catch (e) { EV_TERM2.print('[Dataset: ' + e.message + ']\n'); }
-  }
-  for (const f of (ev && ev.files || [])) if (/\.(csv|tsv|txt|json)$/i.test(f.name)) files.push({ name: f.name, url: f.url });
-  try { await EchoRun.executeAny(lang, code, { term: EV_TERM2, files, onStatus: (t) => { status.textContent = t; } }); }
-  catch (e) { status.textContent = e.message; }
-  btn.textContent = 'Run';
+async function postEventComment(e) {
+  e.preventDefault();
+  const f = e.target, btn = f.querySelector('button'), body = f.body.value.trim();
+  if (!body) return;
+  btn.disabled = true;
+  try {
+    const out = await api(`/api/events/${CUR_EVENT.event.id}/comments`, { method: 'POST', body: JSON.stringify({ body }) });
+    CUR_EVENT.comments = (CUR_EVENT.comments || []).concat(out.comment);
+    renderDiscussion(); evBumpCommentCount();
+  } catch (err) { toast(err.message, true); btn.disabled = false; }
 }
-function afterSubmitToast(out) {
-  if (out.cert) toast(`Passed - certificate ${out.cert.serial} issued. Find it under My certificates.`);
-  else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}%.`);
-  else toast('Submitted - it will be graded soon.');
+async function deleteEventComment(cid) {
+  try {
+    await api(`/api/events/${CUR_EVENT.event.id}/comments/${cid}`, { method: 'DELETE' });
+    CUR_EVENT.comments = (CUR_EVENT.comments || []).filter((c) => c.id !== cid);
+    renderDiscussion(); evBumpCommentCount();
+  } catch (err) { toast(err.message, true); }
+}
+function evBumpCommentCount() {
+  const link = document.querySelector('.evd-nav a[data-sec="discussion"]'); if (!link) return;
+  const n = (CUR_EVENT.comments || []).length;
+  let cnt = link.querySelector('.cnt');
+  if (!n && cnt) { cnt.remove(); return; }
+  if (n) { if (!cnt) { cnt = document.createElement('span'); cnt.className = 'cnt'; link.appendChild(cnt); } cnt.textContent = n; }
 }

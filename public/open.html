@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v1230">
+<link rel="stylesheet" href="/css/styles.css?v1310">
 <style>body{background:#FBFAF7}</style>
 </head>
 <body>
@@ -143,10 +143,49 @@
 
   <!-- ================================ EVENTS ================================ -->
   <section id="tab-events" style="display:none">
-    <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink);margin-bottom:4px">Open quests, hackathons and webinars</h1>
-    <p class="s" style="color:var(--muted);margin-bottom:18px">Timed events with pass marks and automatic verified certificates. AI-graded events carry a 10% score reduction.</p>
+    <div class="ev-hero">
+      <div>
+        <h1>Events <span class="grad">hub</span></h1>
+        <p>Explore open quests, hackathons, live events and webinars. Solve, earn gems, and get certified.</p>
+      </div>
+      <div class="ev-hero-art">
+        <svg viewBox="0 0 220 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="96" y="24" width="96" height="76" rx="10" fill="#6D5DF6"/>
+          <rect x="96" y="24" width="96" height="20" rx="10" fill="#5842D6"/>
+          <rect x="108" y="54" width="16" height="14" rx="3" fill="#fff" opacity=".85"/>
+          <rect x="132" y="54" width="16" height="14" rx="3" fill="#38BDF8"/>
+          <rect x="156" y="54" width="16" height="14" rx="3" fill="#fff" opacity=".85"/>
+          <rect x="108" y="74" width="16" height="14" rx="3" fill="#fff" opacity=".85"/>
+          <path d="M132 74h16v14h-16z" fill="#fff" opacity=".85"/>
+          <path d="M156 74h16v14h-16z" fill="#fff" opacity=".85"/>
+          <path d="M148 70l4.5 3.2-1.7 5.3 4.5-3.3 4.5 3.3-1.7-5.3 4.5-3.2h-5.6l-1.7-5.3-1.7 5.3z" fill="#38BDF8"/>
+          <path d="M40 96c0-14 10-24 24-24s24 10 24 24" stroke="#F0A82A" stroke-width="4" fill="none"/>
+          <rect x="52" y="40" width="24" height="30" rx="4" fill="#F0A82A"/>
+          <circle cx="64" cy="32" r="9" fill="#F0A82A"/>
+        </svg>
+      </div>
+    </div>
+    <div class="ev-tabs" id="evTabs"></div>
+    <div class="ev-stats" id="evStats"></div>
+    <div class="ev-filterbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="evSearch" placeholder="Search events..." oninput="drawEventList()">
+      </div>
+      <select id="evDiff" onchange="drawEventList()"><option value="">All Difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
+      <select id="evLang" onchange="drawEventList()"><option value="">All Languages</option><option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option><option value="web">HTML / CSS / JS</option><option value="none">File / link</option></select>
+      <select id="evDur" onchange="drawEventList()"><option value="">All Durations</option><option value="short">Under 15 min</option><option value="mid">15-60 min</option><option value="long">Over 60 min</option></select>
+      <select id="evSort" onchange="drawEventList()"><option value="new">Newest First</option><option value="old">Oldest First</option><option value="points">Most Points</option></select>
+    </div>
     <div id="certBox"></div>
-    <div class="track-grid" id="evGrid"><div class="empty">Loading events&hellip;</div></div>
+    <div class="ev-list" id="evList"><div class="empty">Loading events&hellip;</div></div>
+    <div class="ev-pager" id="evPager"></div>
+  </section>
+
+  <!-- ============================= EVENT DETAIL ============================= -->
+  <section id="tab-eventDetail" style="display:none">
+    <button class="btn btn-ghost btn-sm" onclick="openTab('events')" style="margin-bottom:14px">&larr; Back to events</button>
+    <div class="ev-detail" id="evDetail"></div>
   </section>
 
   <!-- ============================== ANNOUNCEMENTS ============================== -->
@@ -173,7 +212,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="/js/coderunner.js?v1230"></script>
-<script src="/js/open.js?v1230"></script>
+<script src="/js/coderunner.js?v1310"></script>
+<script src="/js/open.js?v1310"></script>
 </body>
 </html>

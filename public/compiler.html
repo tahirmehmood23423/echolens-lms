@@ -12,9 +12,18 @@
 <link rel="stylesheet" href="/css/styles.css?v1230">
 <style>
   body{background:#FBFAF7}
-  .cmp-wrap{max-width:1180px;margin:0 auto;padding:22px 4vw 60px}
-  .cmp-ide{min-height:70vh}
-  .cmp-ide .ide-editor{min-height:38vh}
+  .cmp-wrap{max-width:1320px;margin:0 auto;padding:22px 4vw 60px}
+  .cmp2-shell .cmp-ide{min-height:0}
+  .cmp-ide .ide-editor{min-height:36vh}
+  body.cmp-dark{background:#0B0F22}
+  body.cmp-dark .cmp2-panel,body.cmp-dark .ide-toolbar,body.cmp-dark .cmp2-files-head{background:#141A33;border-color:#232B52;color:#DCE6F5}
+  body.cmp-dark .cmp2-file{color:#AEB8DA}
+  body.cmp-dark .cmp2-file:hover{background:#1B2245}
+  body.cmp-dark .cmp2-file.active{background:rgba(124,58,237,.18);color:#C9B8FF}
+  body.cmp-dark .cmp2-ai-msg{background:#1B2245;color:#DCE6F5}
+  body.cmp-dark .cmp2-ai-chip{background:#141A33;border-color:#232B52;color:#DCE6F5}
+  body.cmp-dark .ide-status-row{background:#0B1128}
+  body.cmp-dark h1,body.cmp-dark .cmp2-files-head,body.cmp-dark .cmp2-ai-head{color:#EAF2FF}
 </style>
 </head>
 <body>
@@ -29,39 +38,90 @@
 </nav>
 
 <div class="cmp-wrap" id="appWrap" style="display:none">
-  <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:14px">
+  <div style="display:flex;gap:12px;align-items:end;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px">
     <div>
-      <h1 style="font-family:var(--font-display);font-size:26px;color:var(--ink)">Free online compiler</h1>
-      <p class="s" style="color:var(--muted)">Python 3 · C · C++ · SQL · HTML/CSS/JS - with datasets from your files or straight from a URL. Free of cost, for everyone.</p>
+      <h1 style="font-family:var(--font-display);font-size:26px;color:var(--ink)">Online Compiler</h1>
+      <p class="s" style="color:var(--muted)">Code, run and test in real-time. Free for everyone.</p>
     </div>
   </div>
-  <div class="task-ide card cmp-ide">
-    <div class="ide-toolbar">
-      <select id="lang" onchange="langChanged()">
-        <option value="python">Python 3</option>
-        <option value="c">C</option>
-        <option value="cpp">C++</option>
-        <option value="sql">SQL</option>
-        <option value="web">HTML / CSS / JS</option>
-      </select>
-      <span class="ide-pkgs" id="pkgs">numpy · pandas · matplotlib · scikit-learn ready</span>
-      <span style="flex:1"></span>
-      <label class="btn btn-ghost btn-sm" style="cursor:pointer">Dataset file
-        <input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="localDataset(this)"></label>
-      <button class="btn btn-ghost btn-sm" onclick="urlDataset()">Dataset from URL</button>
-      <button class="btn btn-ghost btn-sm" onclick="TERM&&TERM.clear();document.getElementById('webLog').textContent=''">Clear</button>
-      <button class="btn lc-btn-solve" id="runBtn" onclick="run()">Run</button>
+
+  <div class="cmp2-shell">
+
+    <!-- ------------------------------ Files ------------------------------ -->
+    <div class="cmp2-panel">
+      <div class="cmp2-files-head">Files<button type="button" onclick="notReady()" aria-label="New file">+</button></div>
+      <div class="cmp2-file active" id="fileMain">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>
+        main.py
+      </div>
+      <div class="cmp2-file" onclick="notReady()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>
+        dataset.csv
+      </div>
+      <div class="cmp2-file" onclick="notReady()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>
+        notes.txt
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm cmp2-newfile" style="width:calc(100% - 24px)" onclick="notReady()">+ New File</button>
     </div>
-    <div id="dsChips" style="padding:0 14px"></div>
-    <textarea id="code" class="code-editor ide-editor" spellcheck="false" placeholder="# Write Python here, press Run.
+
+    <!-- ------------------------------ Editor ------------------------------ -->
+    <div class="task-ide card cmp-ide">
+      <div class="ide-toolbar">
+        <select id="lang" onchange="langChanged()">
+          <option value="python">Python 3</option>
+          <option value="c">C</option>
+          <option value="cpp">C++</option>
+          <option value="sql">SQL</option>
+          <option value="web">HTML / CSS / JS</option>
+        </select>
+        <span class="ide-pkgs" id="pkgs">numpy · pandas · matplotlib · scikit-learn ready</span>
+        <span style="flex:1"></span>
+        <button class="btn btn-ghost btn-sm" onclick="saveCode()">Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="shareCode()">Share</button>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer">Dataset
+          <input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="localDataset(this)"></label>
+        <button class="btn btn-ghost btn-sm" onclick="urlDataset()">Dataset URL</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearAll()">Clear</button>
+        <button class="btn btn-ghost btn-sm" id="darkBtn" onclick="toggleDark()">Dark</button>
+        <button class="btn lc-btn-solve" id="runBtn" onclick="run()">Run</button>
+      </div>
+      <div id="dsChips" style="padding:0 14px"></div>
+      <textarea id="code" class="code-editor ide-editor" spellcheck="false" placeholder="# Write Python here, press Run.
 # numpy, pandas, matplotlib and scikit-learn load automatically.
 print('Hello EchoLens!')"></textarea>
-    <div class="ide-status-row"><span class="s" id="status" style="color:var(--muted-2)">Ready - everything runs free of cost, nothing to install.</span></div>
-    <div id="term"></div>
-    <div id="webWrap" style="display:none">
-      <iframe id="webFrame" class="web-frame" sandbox="allow-scripts" title="Live preview" style="width:100%;min-height:320px;border:none;background:#fff"></iframe>
-      <pre id="webLog" class="web-log"></pre>
+      <div class="ide-status-row"><span class="s" id="status" style="color:var(--muted-2)">Ready - everything runs free of cost, nothing to install.</span></div>
+      <div id="term"></div>
+      <div id="webWrap" style="display:none">
+        <iframe id="webFrame" class="web-frame" sandbox="allow-scripts" title="Live preview" style="width:100%;min-height:320px;border:none;background:#fff"></iframe>
+        <pre id="webLog" class="web-log"></pre>
+      </div>
     </div>
+
+    <!-- ------------------------------ AI Assistant (preview) ------------------------------ -->
+    <div class="cmp2-panel cmp2-ai">
+      <div class="cmp2-ai-head">AI Assistant <span class="cmp2-ai-beta">BETA</span></div>
+      <div class="cmp2-ai-body" id="aiBody">
+        <div class="cmp2-ai-empty">Ask a question about your code, or use a quick action below.</div>
+        <div class="cmp2-ai-chips">
+          <button type="button" class="cmp2-ai-chip" onclick="aiQuickAction('Explain this code')">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Explain this code</button>
+          <button type="button" class="cmp2-ai-chip" onclick="aiQuickAction('Fix errors')">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9 2.6 17a1.8 1.8 0 0 0 1.5 2.7h15.8a1.8 1.8 0 0 0 1.5-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Fix errors</button>
+          <button type="button" class="cmp2-ai-chip" onclick="aiQuickAction('Optimize code')">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Optimize code</button>
+          <button type="button" class="cmp2-ai-chip" onclick="aiQuickAction('Generate code')">
+            <svg viewBox="0 0 24 24" fill="none"><path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Generate code</button>
+        </div>
+      </div>
+      <form class="cmp2-ai-input" id="aiForm" onsubmit="aiSend(event)">
+        <input id="aiInput" placeholder="Ask anything about your code...">
+        <button class="cmp2-ai-send" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5 21 4l-7.5 18-2.5-8-8-2.5z" fill="#fff"/></svg>
+        </button>
+      </form>
+    </div>
+
   </div>
   <p class="hint">Want tasks to solve with this compiler? Head to the <a href="/open">open problem set</a> - free quests with automatic certificates.</p>
 </div>
@@ -74,6 +134,7 @@ print('Hello EchoLens!')"></textarea>
 const $ = (id) => document.getElementById(id);
 let TERM = null, FILES = [], ME = null;
 function toast(t, err) { const el = $('toast'); el.textContent = t; el.className = 'toast show' + (err ? ' err' : ''); clearTimeout(el._h); el._h = setTimeout(() => el.className = 'toast', 3000); }
+function notReady() { toast('Multi-file projects are coming soon - main.py is active for now.'); }
 (async () => {
   try {
     const r = await fetch('/api/auth/me', { credentials: 'same-origin' });
@@ -87,6 +148,9 @@ function toast(t, err) { const el = $('toast'); el.textContent = t; el.className
     : '<a class="btn btn-primary btn-sm" href="/open#signup">Sign in - free</a>';
   TERM = EchoTerm.mount($('term'));
   EchoRun.wireEditor($('code'));
+  const saved = localStorage.getItem('echolens_compiler_python');
+  if (saved) $('code').value = saved;
+  if (localStorage.getItem('echolens_compiler_dark') === '1') toggleDark(true);
 })();
 function langChanged() {
   const l = $('lang').value;
@@ -98,6 +162,8 @@ function langChanged() {
     : l === 'cpp' ? 'g++ 10 · compiled & run in the cloud'
     : l === 'sql' ? 'SQLite · CSV datasets become tables automatically'
     : 'live preview with console output';
+  const saved = localStorage.getItem('echolens_compiler_' + l);
+  if (saved) $('code').value = saved;
   $('code').placeholder = l === 'python' ? "# Write Python here, press Run.\nprint('Hello EchoLens!')"
     : l === 'c' ? '// Write C here, press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}'
     : l === 'cpp' ? '// Write C++ here, press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}'
@@ -134,6 +200,46 @@ async function urlDataset() {
     toast(`${f.name} loaded from URL - read it by name in your code.`);
   } catch (e) { $('status').textContent = 'Ready.'; toast(e.message, true); }
 }
+function clearAll() { TERM && TERM.clear(); $('webLog').textContent = ''; }
+function saveCode() {
+  localStorage.setItem('echolens_compiler_' + $('lang').value, $('code').value);
+  toast('Saved in this browser.');
+}
+function shareCode() {
+  navigator.clipboard.writeText($('code').value)
+    .then(() => toast('Code copied to clipboard.'))
+    .catch(() => toast('Could not copy - select and copy manually.', true));
+}
+function toggleDark(forceOn) {
+  if (forceOn === true) document.body.classList.add('cmp-dark');
+  else document.body.classList.toggle('cmp-dark');
+  const isDark = document.body.classList.contains('cmp-dark');
+  localStorage.setItem('echolens_compiler_dark', isDark ? '1' : '0');
+  $('darkBtn').textContent = isDark ? 'Light' : 'Dark';
+}
+function aiQuickAction(label) { appendAiExchange(label); }
+function aiSend(e) {
+  e.preventDefault();
+  const v = $('aiInput').value.trim();
+  if (!v) return;
+  $('aiInput').value = '';
+  appendAiExchange(v);
+}
+function appendAiExchange(text) {
+  const body = $('aiBody');
+  const empty = body.querySelector('.cmp2-ai-empty');
+  if (empty) empty.remove();
+  const you = document.createElement('div');
+  you.className = 'cmp2-ai-msg';
+  you.style.background = 'var(--violet-soft)';
+  you.textContent = text;
+  const reply = document.createElement('div');
+  reply.className = 'cmp2-ai-msg';
+  reply.textContent = "The AI Assistant is coming soon - this is a preview of the interface. In the meantime, the Run button executes your code and shows errors right in the terminal below.";
+  body.appendChild(you);
+  body.appendChild(reply);
+  body.scrollTop = body.scrollHeight;
+}
 async function run() {
   const btn = $('runBtn'); const status = $('status');
   const code = $('code').value;
@@ -141,7 +247,7 @@ async function run() {
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
   if (lang === 'web') {
     const log = $('webLog'); log.textContent = '';
-    EchoWeb.preview($('webFrame'), code, (kind, text) => { log.textContent += (kind === 'error' ? '\u2717 ' : '\u203a ') + text + '\n'; });
+    EchoWeb.preview($('webFrame'), code, (kind, text) => { log.textContent += (kind === 'error' ? '✗ ' : '› ') + text + '\n'; });
     status.textContent = 'Preview updated.';
     return;
   }

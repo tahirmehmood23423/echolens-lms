@@ -30,8 +30,8 @@
 
   <!-- ================================ HOME ================================ -->
   <section id="tab-home">
-    <div class="home-hero">
-      <div style="flex:1;min-width:280px">
+    <div class="home2-hero">
+      <div style="min-width:280px">
         <h1 style="font-family:var(--font-display);font-size:34px;line-height:1.15;color:var(--ink)">Skills the 2026 market actually pays for.</h1>
         <p class="s" style="color:var(--muted);font-size:15px;margin:12px 0 18px;max-width:560px">Thirty-one live, instructor-led programs across AI, data and web development. Solve real quests in the browser, earn gems, and collect verified certificates - three full courses are completely free.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -40,9 +40,12 @@
           <button class="btn btn-ghost" onclick="openRegister()">Register for a course</button>
         </div>
       </div>
-      <div class="home-stats" id="homeStats"></div>
+      <div id="homePreview"></div>
     </div>
-    <div class="home-grid">
+    <div class="stat-strip" id="homeStats"></div>
+    <h3 style="font-family:var(--font-display);font-size:20px;color:var(--ink);margin-bottom:12px">Your learning journey</h3>
+    <div class="journey" id="homeJourney"></div>
+    <div class="home-grid" style="margin-top:6px">
       <div class="home-card" onclick="openTab('courses')">
         <h4>Course catalogue</h4>
         <p>All 31 programs with prices, durations and free levels - bootcamps, short courses and specialist tracks for the August 2026 cohort.</p>
@@ -74,7 +77,8 @@
         <span class="home-link">Register now</span>
       </div>
     </div>
-    <div id="homeAnnouncements"></div>
+    <h3 style="font-family:var(--font-display);font-size:20px;color:var(--ink);margin:26px 0 12px">Latest updates</h3>
+    <div class="upd-grid" id="homeUpdates"></div>
   </section>
 
   <!-- ================================ COURSES ================================ -->
@@ -87,10 +91,14 @@
     </div>
     <div id="actionStrip" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px"></div>
     <div class="lc-filterbar">
-      <select id="cTier" onchange="drawCourses()"><option value="">All tiers</option><option>Bootcamp</option><option>Short Course</option><option>Specialist Track</option></select>
-      <select id="cFree" onchange="drawCourses()"><option value="">Free and paid</option><option value="free">Free only</option><option value="paid">Paid only</option></select>
-      <input id="cSearch" placeholder="Search courses..." oninput="drawCourses()">
+      <select id="cTier" onchange="syncCourseFilters();drawCourses()"><option value="">All tiers</option><option>Bootcamp</option><option>Short Course</option><option>Specialist Track</option></select>
+      <select id="cFree" onchange="syncCourseFilters();drawCourses()"><option value="">All types</option><option value="free">Free only</option><option value="paid">Paid only</option></select>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="cSearch" placeholder="Search courses..." oninput="drawCourses()">
+      </div>
     </div>
+    <div class="filt-row" id="cPills"></div>
     <div id="pathBox"></div>
     <div id="courseTable"><div class="empty">Loading catalogue&hellip;</div></div>
   </section>
@@ -106,11 +114,15 @@
       <div id="myGems"></div>
     </div>
     <div class="lc-filterbar">
-      <select id="qTier" onchange="drawTracks()"><option value="">All tiers</option><option value="BC">Bootcamps</option><option value="SC">Short Courses</option><option value="ST">Specialist Tracks</option></select>
-      <select id="qFree" onchange="drawTracks()"><option value="">Free and paid</option><option value="free">Fully free</option></select>
-      <input id="qSearch" placeholder="Search quests..." oninput="drawTracks()">
+      <select id="qTier" onchange="syncQuestFilters();drawTracks()"><option value="">All tiers</option><option value="BC">Bootcamps</option><option value="SC">Short Courses</option><option value="ST">Specialist Tracks</option></select>
+      <select id="qFree" onchange="syncQuestFilters();drawTracks()"><option value="">All types</option><option value="free">Fully free</option></select>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="qSearch" placeholder="Search quests..." oninput="drawTracks()">
+      </div>
     </div>
-    <div class="track-grid" id="trackGrid"><div class="empty">Loading quests&hellip;</div></div>
+    <div class="filt-row" id="qPills"></div>
+    <div class="qc-grid" id="trackGrid"><div class="empty">Loading quests&hellip;</div></div>
   </section>
 
   <!-- ============================ COURSE QUEST DETAIL ============================ -->

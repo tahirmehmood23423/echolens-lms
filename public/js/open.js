@@ -59,6 +59,32 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal
  * Basic / Core / Boss ladders display as Easy / Medium / Hard. */
 const DIFF = (d) => ({ Basic: 'Easy', Core: 'Medium', Boss: 'Hard', Easy: 'Easy', Medium: 'Medium', Hard: 'Hard' }[d] || 'Easy');
 
+/* ------------------------- card icons + stage data ------------------------- */
+const ICONS = {
+  chart: '<path d="M4 20V10M10 20V4M16 20v-8M22 20H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+  bot: '<rect x="4" y="8" width="16" height="11" rx="3" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="9" cy="13.5" r="1.3" fill="currentColor"/><circle cx="15" cy="13.5" r="1.3" fill="currentColor"/><path d="M12 8V4m-3 0h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  spark: '<path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.5 2.5M16.5 16.5 19 19M19 5l-2.5 2.5M7.5 16.5 5 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.8" fill="none"/>',
+  code: '<path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+  gear: '<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7M18.4 18.4l-1.7-1.7M7.3 7.3 5.6 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  gem: '<path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="currentColor" opacity=".92"/>',
+};
+function pickIcon(title) {
+  const t = (title || '').toLowerCase();
+  if (/automation|n8n|make\.com|workflow/.test(t)) return 'gear';
+  if (/prompt|chatgpt|generative|llm/.test(t)) return 'spark';
+  if (/agent/.test(t)) return 'bot';
+  if (/python|data|sql|analytics|power ?bi/.test(t)) return 'chart';
+  if (/javascript|web|react|node|html|css|full-?stack/.test(t)) return 'code';
+  return 'gem';
+}
+function tierBg(tier, isFree) {
+  if (isFree) return 'linear-gradient(135deg,#0FBFA8,#0A9384)';
+  if (tier === 'Specialist Track') return 'linear-gradient(135deg,#7C3AED,#4F46E5)';
+  if (tier === 'Short Course') return 'linear-gradient(135deg,#2563EB,#1D4ED8)';
+  return 'linear-gradient(135deg,#9333EA,#7C3AED)';
+}
+const STAGE_FALLBACK = [{ key: 'spark', name: 'Spark', min: 0 }, { key: 'glow', name: 'Glow', min: 250 }, { key: 'beam', name: 'Beam', min: 700 }, { key: 'prism', name: 'Prism', min: 1400 }, { key: 'aurora', name: 'Aurora', min: 2400 }, { key: 'nova', name: 'Nova', min: 4000 }];
+
 let ME = null;
 let GOOGLE_ON = false;
 let TRACKS = [];         // quest list (all courses)
@@ -194,12 +220,67 @@ function backToCourse() { if (CUR) { openTab('course'); } else openTab('quests')
 
 /* -------------------------------- home -------------------------------- */
 async function loadHomeStats() {
+  renderHomePreview();
+  renderJourney();
+  let courses = 31, students = null;
   try {
     const d = await api('/api/public/info');
-    $('homeStats').innerHTML = [
-      [d.stats.courses, 'Programs'], [d.stats.students, 'Students'], [3, 'Free courses'],
-    ].map(([n, l]) => `<div class="an-card" style="text-align:center;min-width:110px"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
-  } catch { $('homeStats').innerHTML = ''; }
+    courses = d.stats.courses || courses;
+    students = d.stats.students;
+  } catch {}
+  const items = [
+    ['#7C3AED', 'chart', String(courses) + '+', 'Live Courses'],
+    ['#10B981', 'code', '150+', 'Coding Quests'],
+    ['#3B82F6', 'gear', 'Built-in', 'Browser Compiler'],
+    ['#F59E0B', 'spark', 'Weekly', 'Hackathons'],
+    ['#EC4899', 'bot', 'Certificates', 'With QR Verify'],
+  ];
+  $('homeStats').innerHTML = items.map(([bg, ic, n, l]) =>
+    `<div class="si"><div class="si-ic" style="background:${bg}"><svg viewBox="0 0 24 24" fill="none">${ICONS[ic]}</svg></div><div><b>${n}</b><span>${esc(l)}</span></div></div>`
+  ).join('') + (students ? `<div class="si"><div class="si-ic" style="background:#0FBFA8"><svg viewBox="0 0 24 24" fill="none">${ICONS.bot}</svg></div><div><b>${students}+</b><span>Learners</span></div></div>` : '');
+}
+function renderHomePreview() {
+  const g = ME && ME.gamify;
+  const stages = STAGE_FALLBACK;
+  const stageName = g ? g.stage.name : 'Beam';
+  const level = stages.findIndex((s) => s.name === stageName) + 1 || 3;
+  const gems = g ? g.gems : 3240;
+  const pct = g ? g.stage.progress : 62;
+  const nextLine = g && g.stage.next ? `${g.stage.to_next} gems to <strong style="color:var(--ink)">${esc(g.stage.next.name)}</strong>` : (g ? 'Highest stage reached' : '760 gems to <strong style="color:var(--ink)">Prism</strong>');
+  const streak = g ? g.streak : 12;
+  $('homePreview').innerHTML = `
+    <div class="home2-preview">
+      <div class="home2-gems-pill"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="#7C3AED"/></svg><b>${gems.toLocaleString()}</b><span class="s" style="color:var(--muted);font-size:11px">gems earned</span></div>
+      <div class="home2-row">
+        <div class="home2-pcard" style="flex:1.4">
+          <div class="home2-label">Your progress</div>
+          <div class="home2-big">Level ${level} &middot; ${esc(stageName)}</div>
+          <div class="home2-sub">${nextLine}</div>
+          <div class="home2-bar"><div style="width:${pct}%"></div></div>
+        </div>
+      </div>
+      <div class="home2-row" style="margin-bottom:0">
+        <div class="home2-pcard home2-streak">
+          <div class="home2-flame"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2c1 3-3 4-3 8a3 3 0 0 0 6 0c0-1-.5-2-.5-2 1.5 1 2.5 3 2.5 5a5 5 0 0 1-10 0c0-4 3-6 3-9 0-1-.3-1.7-.3-1.7S11 2 12 2z" fill="#fff"/></svg></div>
+          <div><div class="home2-label" style="margin-bottom:1px">Weekly streak</div><div class="home2-big" style="font-size:17px">${streak} Days</div></div>
+        </div>
+        <div class="home2-pcard home2-quest">
+          <div class="home2-label">Keep learning</div>
+          <div class="s" style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Pick up your next quest</div>
+          <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="openTab('quests')">Continue</button>
+        </div>
+      </div>
+    </div>`;
+}
+function renderJourney() {
+  const g = ME && ME.gamify;
+  const stages = (g && g.stages) || STAGE_FALLBACK;
+  const curKey = g ? g.stage.key : null;
+  const idx = curKey ? stages.findIndex((s) => s.key === curKey) : -1;
+  $('homeJourney').innerHTML = stages.map((s, i) => {
+    const cls = idx < 0 ? '' : i < idx ? ' done' : i === idx ? ' now' : '';
+    return `<div class="step${cls}"><div class="dot"></div><div class="nm">${esc(s.name)}</div><div class="th">${s.min}+</div></div>`;
+  }).join('');
 }
 
 /* ---------------------------- announcements ---------------------------- */
@@ -221,11 +302,20 @@ async function loadAnnouncements() {
         ${a.link ? `<a class="btn btn-teal btn-sm" style="margin-top:10px" href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.link_label || 'More details')}</a>` : ''}
       </div></div>`;
     $('annList').innerHTML = ANNS.length ? ANNS.map(item).join('') : '<div class="empty">No announcements yet - check back soon.</div>';
-    $('homeAnnouncements').innerHTML = ANNS.length ? `
-      <h3 style="font-family:var(--font-display);font-size:20px;color:var(--ink);margin:26px 0 12px">Latest announcements</h3>
-      ${ANNS.slice(0, 2).map(item).join('')}
-      <button class="btn btn-ghost btn-sm" onclick="openTab('announcements')">All announcements</button>` : '';
-  } catch { $('annList').innerHTML = '<div class="empty">Announcements are unavailable right now.</div>'; }
+    const upd = (a) => {
+      const [label, kind] = ANN_KIND[a.kind] || ANN_KIND.info;
+      return `<div class="upd-card" onclick="openTab('announcements')">
+        <span class="upd-kind kbadge ${kind}">${esc(label)}</span>
+        <div class="upd-title">${esc(a.title)}</div>
+        <div class="upd-meta">${esc((a.created_at || '').slice(0, 10))}</div>
+        <span class="upd-link">Read more &rarr;</span>
+      </div>`;
+    };
+    $('homeUpdates').innerHTML = ANNS.length ? ANNS.slice(0, 4).map(upd).join('') : '<div class="empty">No updates yet - check back soon.</div>';
+  } catch {
+    $('annList').innerHTML = '<div class="empty">Announcements are unavailable right now.</div>';
+    $('homeUpdates').innerHTML = '<div class="empty">Updates are unavailable right now.</div>';
+  }
 }
 
 /* ------------------------------- catalogue ------------------------------- */
@@ -258,32 +348,54 @@ async function loadCatalogue() {
 }
 const BADGE_LABEL = { free: 'FREE', new: 'NEW', high_demand: 'HIGH DEMAND', flagship: 'FLAGSHIP' };
 const BADGE_CLASS = { free: 'quest', new: 'webinar', high_demand: 'competition', flagship: 'hackathon' };
+const COURSE_PILLS = [['all', 'All'], ['Bootcamp', 'Bootcamps'], ['Short Course', 'Short Courses'], ['Specialist Track', 'Specialist Tracks'], ['free', 'Free']];
+function setCoursePill(kind) {
+  if (kind === 'free') { $('cFree').value = 'free'; $('cTier').value = ''; }
+  else if (kind === 'all') { $('cFree').value = ''; $('cTier').value = ''; }
+  else { $('cTier').value = kind; $('cFree').value = ''; }
+  drawCourses();
+}
+function syncCourseFilters() { renderCoursePills(); }
+function renderCoursePills() {
+  const tier = $('cTier').value, free = $('cFree').value;
+  $('cPills').innerHTML = COURSE_PILLS.map(([k, label]) => {
+    const active = k === 'all' ? (!tier && !free) : k === 'free' ? free === 'free' : tier === k;
+    return `<button type="button" class="filt-pill${active ? ' active' : ''}" onclick="setCoursePill('${k}')">${esc(label)}</button>`;
+  }).join('');
+}
+function courseCardHtml(c) {
+  const isFree = c.price_pkr === 0;
+  const isDark = c.tier === 'Specialist Track';
+  const icon = pickIcon(c.title);
+  const demand = (c.badges || []).find((b) => ['high_demand', 'flagship', 'new'].includes(b));
+  return `
+    <div class="oc-card${isDark ? ' dark' : ''}${isFree ? ' teal' : ''}" onclick="courseAction('${esc(c.code)}')">
+      <div class="oc-top">
+        <div class="oc-icon" style="background:${tierBg(c.tier, isFree)}"><svg viewBox="0 0 24 24" fill="none">${ICONS[icon]}</svg></div>
+        ${demand ? `<span class="oc-demand">${BADGE_LABEL[demand]}</span>` : ''}
+      </div>
+      <div>
+        <div class="oc-tier">${esc(c.tier)}</div>
+        <h4 class="oc-title">${esc(c.title)}</h4>
+      </div>
+      <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${c.weeks} Weeks &middot; ${c.hours} Hours</div>
+      <div class="oc-foot">
+        <div class="oc-price${isFree ? ' free' : ''}">${isFree ? 'FREE' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
+        <button type="button" class="btn ${isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${isFree ? 'Start now' : 'Register'}</button>
+      </div>
+    </div>`;
+}
 function drawCourses() {
   if (!CATALOGUE.length) return;
+  renderCoursePills();
   const tier = $('cTier').value, mode = $('cFree').value, q = $('cSearch').value.trim().toLowerCase();
   const list = CATALOGUE.filter((c) =>
     (!tier || c.tier === tier) &&
     (!mode || (mode === 'free' ? c.price_pkr === 0 : c.price_pkr > 0)) &&
     (!q || c.title.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || (c.summary || '').toLowerCase().includes(q)));
   $('courseTable').innerHTML = list.length ? `
-    <table class="lc-table">
-      <thead><tr><th style="width:70px">Code</th><th>Program</th><th>Tier</th><th>Duration</th><th style="text-align:right">Fee</th><th></th></tr></thead>
-      <tbody>${list.map((c) => `
-        <tr onclick="courseAction('${esc(c.code)}')">
-          <td class="mono s" style="color:var(--muted)">${esc(c.code)}</td>
-          <td>
-            <strong>${esc(c.title)}</strong>
-            ${(c.badges || []).map((b) => ` <span class="kbadge ${BADGE_CLASS[b] || 'quest'}" style="font-size:9.5px">${BADGE_LABEL[b] || b}</span>`).join('')}
-            <div class="s" style="color:var(--muted);margin-top:2px">${esc(c.summary || '')}</div>
-            ${c.price_pkr === 0 ? '<div class="s" style="color:var(--ok)">Fully free - complete the quest and a verified certificate is issued automatically.</div>' : '<div class="s" style="color:var(--muted-2)">First week free in the quests - remaining levels unlock with enrolment.</div>'}
-          </td>
-          <td class="s" style="color:var(--muted)">${esc(c.tier)}</td>
-          <td class="s" style="color:var(--muted)">${c.weeks} wks · ${c.hours} hrs</td>
-          <td style="text-align:right">${c.price_pkr > 0 ? '<strong>PKR ' + c.price_pkr.toLocaleString() + '</strong>' : '<strong style="color:var(--ok)">FREE</strong>'}</td>
-          <td style="text-align:right"><button class="lc-btn-solve" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${c.price_pkr > 0 ? 'Register' : 'Start free'}</button></td>
-        </tr>`).join('')}
-      </tbody></table>
-    <p class="hint" style="margin-top:10px">Ambassador discounts: 10% off bootcamps and short courses, 15% off specialist tracks with a campus ambassador code. Pay via bank transfer per your fee challan, then share the receipt to confirm your seat.</p>`
+    <div class="oc-grid">${list.map(courseCardHtml).join('')}</div>
+    <p class="hint" style="margin-top:14px">Ambassador discounts: 10% off bootcamps and short courses, 15% off specialist tracks with a campus ambassador code. Pay via bank transfer per your fee challan, then share the receipt to confirm your seat.</p>`
     : '<div class="empty">No courses match those filters.</div>';
 }
 function courseAction(code) {
@@ -329,31 +441,66 @@ function openRegister(code, title) {
 }
 
 /* --------------------------- quests: course list --------------------------- */
+let TRACK_PROGRESS = {};
 async function loadTracks() {
   try {
     const d = await api('/api/public/tracks');
     TRACKS = d.tracks;
     if (ME && ME.gamify) $('myGems').innerHTML = `<span class="prob-chip" style="cursor:default">${ME.gamify.gems} gems · ${esc(ME.gamify.stage.name)}</span>`;
     drawTracks();
+    if (ME) {
+      const results = await Promise.allSettled(TRACKS.map((t) => api('/api/open/progress?track=' + encodeURIComponent(t.key))));
+      results.forEach((r, i) => { if (r.status === 'fulfilled') TRACK_PROGRESS[TRACKS[i].key] = r.value.progress; });
+      drawTracks();
+    }
   } catch (e) { $('trackGrid').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
+const QUEST_PILLS = [['all', 'All'], ['BC', 'Bootcamps'], ['SC', 'Short Courses'], ['ST', 'Specialist Tracks'], ['free', 'Free']];
+function setQuestPill(kind) {
+  if (kind === 'free') { $('qFree').value = 'free'; $('qTier').value = ''; }
+  else if (kind === 'all') { $('qFree').value = ''; $('qTier').value = ''; }
+  else { $('qTier').value = kind; $('qFree').value = ''; }
+  drawTracks();
+}
+function syncQuestFilters() { renderQuestPills(); }
+function renderQuestPills() {
+  const tier = $('qTier').value, free = $('qFree').value;
+  $('qPills').innerHTML = QUEST_PILLS.map(([k, label]) => {
+    const active = k === 'all' ? (!tier && !free) : k === 'free' ? free === 'free' : tier === k;
+    return `<button type="button" class="filt-pill${active ? ' active' : ''}" onclick="setQuestPill('${k}')">${esc(label)}</button>`;
+  }).join('');
+}
+function questCardHtml(t) {
+  const prog = TRACK_PROGRESS[t.key];
+  const icon = pickIcon(t.title);
+  const pct = prog && prog.total ? Math.round((prog.graded / prog.total) * 100) : 0;
+  const levelNow = prog ? Math.min(prog.graded, t.levels) : 0;
+  const gemsNow = prog ? prog.gems : 0;
+  const cta = t.free ? (prog ? 'Continue' : 'Start the free course') : (prog ? 'Continue' : 'Open Quest');
+  return `
+    <div class="qc-card${!t.free && !prog ? ' locked' : ''}">
+      <div class="qc-top">
+        <div class="qc-icon${t.free ? ' teal' : ''}"><svg viewBox="0 0 24 24" fill="none">${ICONS[icon]}</svg></div>
+        <div style="min-width:0">
+          <span class="qc-code">${esc(t.course_code || '')}</span>
+          <div class="qc-title">${esc(t.title)}</div>
+        </div>
+        ${!t.free ? `<span class="qc-lock" title="First week free - full course needs enrolment"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg></span>` : ''}
+      </div>
+      <div class="qc-desc">${esc(t.description || '')}</div>
+      <div class="qc-progress"><span>Level ${levelNow}/${t.levels}</span><span>${gemsNow.toLocaleString()}/${t.total_points.toLocaleString()} gems</span></div>
+      <div class="qc-bar"><div style="width:${pct}%"></div></div>
+      <button type="button" class="btn ${t.free ? 'btn-teal' : 'btn-primary'} qc-cta" onclick="openCourse('${esc(t.key)}')">${cta}</button>
+    </div>`;
+}
 function drawTracks() {
+  renderQuestPills();
   const tier = $('qTier').value, free = $('qFree').value, q = $('qSearch').value.trim().toLowerCase();
   const list = TRACKS.filter((t) =>
     (!tier || (t.course_code || '').startsWith(tier)) &&
     (!free || t.free) &&
     (!q || t.title.toLowerCase().includes(q) || (t.course_code || '').toLowerCase().includes(q)));
-  $('trackGrid').innerHTML = list.length ? list.map((t) => `
-    <div class="oq-card">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        ${t.free ? '<span class="kbadge quest">FREE</span>' : ''}
-        <span class="mono s" style="color:var(--muted-2)">${esc(t.course_code || '')}</span>
-      </div>
-      <h4 style="font-size:15px;color:var(--ink)">${esc(t.title)}</h4>
-      <div class="s" style="color:var(--muted);font-size:12.5px">${esc((t.description || '').slice(0, 120))}</div>
-      <div class="s" style="color:var(--muted)">${t.levels} levels · ${t.total_points} gems total${t.free ? ' · Certificate on completion' : ' · First week open'}</div>
-      <button class="lc-btn-solve" style="margin-top:6px" onclick="openCourse('${esc(t.key)}')">${t.free ? 'Start the free course' : 'Open the quest'}</button>
-    </div>`).join('') : '<div class="empty">No quests match those filters.</div>';
+  $('trackGrid').innerHTML = list.length ? list.map(questCardHtml).join('') : '<div class="empty">No quests match those filters.</div>';
 }
 
 /* -------------------- quests: course detail with locks -------------------- */

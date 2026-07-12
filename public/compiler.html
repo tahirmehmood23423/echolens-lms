@@ -59,17 +59,11 @@
     <!-- ------------------------------ Files ------------------------------ -->
     <div class="cmp2-panel">
       <div class="cmp2-files-head">Files<button type="button" onclick="notReady()" aria-label="New file">+</button></div>
-      <div class="cmp2-file active" id="fileMain">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>
-        main.py
-      </div>
-      <div class="cmp2-file" onclick="notReady()">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>
-        dataset.csv
-      </div>
-      <div class="cmp2-file" onclick="notReady()">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>
-        notes.txt
+      <div id="filesList">
+        <div class="cmp2-file active" id="fileMain">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>
+          main.py
+        </div>
       </div>
       <button type="button" class="btn btn-ghost btn-sm cmp2-newfile" style="width:calc(100% - 24px)" onclick="notReady()">+ New File</button>
     </div>
@@ -95,7 +89,6 @@
         <button class="btn btn-ghost btn-sm" id="darkBtn" onclick="toggleDark()">Dark</button>
         <button class="btn lc-btn-solve" id="runBtn" onclick="run()">Run</button>
       </div>
-      <div id="dsChips" style="padding:0 14px"></div>
       <textarea id="code" class="code-editor ide-editor" spellcheck="false" placeholder="# Write Python here, press Run.
 # numpy, pandas, matplotlib and scikit-learn load automatically.
 print('Hello EchoLens!')"></textarea>
@@ -141,6 +134,7 @@ print('Hello EchoLens!')"></textarea>
 <script>
 'use strict';
 const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let TERM = null, FILES = [], ME = null;
 function toast(t, err) { const el = $('toast'); el.textContent = t; el.className = 'toast show' + (err ? ' err' : ''); clearTimeout(el._h); el._h = setTimeout(() => el.className = 'toast', 3000); }
 function notReady() { toast('Multi-file projects are coming soon - main.py is active for now.'); }
@@ -181,7 +175,15 @@ function langChanged() {
     : '<!-- Write HTML, CSS (in <style>) and JS (in <script>) - Run shows a live preview. -->';
 }
 function drawChips() {
-  $('dsChips').innerHTML = FILES.map((f) => `<span class="prob-chip" style="cursor:default">${f.name}</span>`).join(' ');
+  const fileIcon = '<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>';
+  $('filesList').innerHTML = `
+    <div class="cmp2-file active" id="fileMain">${fileIcon}main.py</div>
+    ${FILES.map((f, i) => `<div class="cmp2-file" title="Loaded - read it in your code as '${esc(f.name)}'" onclick="datasetInfo(${i})">${fileIcon}${esc(f.name)}</div>`).join('')}`;
+}
+function datasetInfo(i) {
+  const f = FILES[i];
+  if (!f) return;
+  toast(`${f.name} is loaded - read it in code as '${f.name}', e.g. pd.read_csv('${f.name}') in Python.`);
 }
 function localDataset(input) {
   const f = input.files && input.files[0];

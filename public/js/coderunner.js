@@ -76,8 +76,11 @@
             errorCallback: () => {},
           });
         } catch (pkgErr) { /* unknown imports fail in Python with a clear error */ }
-        // Headless matplotlib inside the worker.
-        await py.runPythonAsync('import os as _os\n_os.environ.setdefault("MPLBACKEND","AGG")');
+        // Headless matplotlib inside the worker. Library DeprecationWarnings
+        // (e.g. pandas' pyarrow notice) are about future library versions,
+        // not the student's code - silence them so they don't look like
+        // errors in the terminal.
+        await py.runPythonAsync('import os as _os\n_os.environ.setdefault("MPLBACKEND","AGG")\nimport warnings as _warnings\n_warnings.filterwarnings("ignore", category=DeprecationWarning)\n_warnings.filterwarnings("ignore", category=PendingDeprecationWarning)');
         postMessage({ type: 'status', text: 'Running...' });
         await py.runPythonAsync(m.code);
         // Capture any matplotlib figures as PNGs.

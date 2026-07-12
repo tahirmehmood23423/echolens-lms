@@ -790,6 +790,9 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .cmp2-file:hover{background:var(--canvas)}
 .cmp2-file.active{background:var(--violet-soft);color:var(--primary);font-weight:700;border-left-color:var(--primary)}
 .cmp2-file svg{width:15px;height:15px;flex:none}
+.cmp2-file-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmp2-file-del{margin-left:auto;flex:none;border:none;background:none;color:var(--muted-2);font-size:15px;line-height:1;cursor:pointer;padding:2px 5px;border-radius:6px}
+.cmp2-file-del:hover{background:rgba(217,83,79,.12);color:var(--danger)}
 .cmp2-newfile{margin:6px 12px 12px}
 .cmp2-toolbar2{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .cmp2-toolbar2 select{border:1px solid var(--line-strong);border-radius:9px;padding:7px 10px;font-size:12.5px;font-family:inherit;background:#fff}

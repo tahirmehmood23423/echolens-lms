@@ -79,8 +79,10 @@
         // Headless matplotlib inside the worker. Library DeprecationWarnings
         // (e.g. pandas' pyarrow notice) are about future library versions,
         // not the student's code - silence them so they don't look like
-        // errors in the terminal.
-        await py.runPythonAsync('import os as _os\n_os.environ.setdefault("MPLBACKEND","AGG")\nimport warnings as _warnings\n_warnings.filterwarnings("ignore", category=DeprecationWarning)\n_warnings.filterwarnings("ignore", category=PendingDeprecationWarning)');
+        // errors in the terminal. sys.path gets the working directory so
+        // sibling .py files (other tabs in a multi-file project) are
+        // importable, exactly like separate files on a real machine.
+        await py.runPythonAsync('import os as _os\n_os.environ.setdefault("MPLBACKEND","AGG")\nimport warnings as _warnings\n_warnings.filterwarnings("ignore", category=DeprecationWarning)\n_warnings.filterwarnings("ignore", category=PendingDeprecationWarning)\nimport sys as _sys\nif "/home/pyodide" not in _sys.path: _sys.path.insert(0, "/home/pyodide")');
         postMessage({ type: 'status', text: 'Running...' });
         await py.runPythonAsync(m.code);
         // Capture any matplotlib figures as PNGs.
@@ -433,7 +435,7 @@
    */
   const PISTON_URL = 'https://emkc.org/api/v2/piston/execute';
   const PISTON_LANG = { c: { language: 'c', version: '10.2.0', file: 'main.c' }, cpp: { language: 'c++', version: '10.2.0', file: 'main.cpp' } };
-  async function runNative(lang, code, { term, onStatus }) {
+  async function runNative(lang, code, { term, onStatus, extraFiles }) {
     const status = (t) => { try { onStatus && onStatus(t); } catch {} };
     const cfg = PISTON_LANG[lang];
     // If the program reads input, collect it up-front (compiled programs run
@@ -452,9 +454,13 @@
     }
     status(lang === 'c' ? 'Compiling & running C (gcc)...' : 'Compiling & running C++ (g++)...');
     try {
+      // Sibling files (other tabs in the same project) compile alongside the
+      // active file, so a #include "helper.h" or extra .c/.cpp file works
+      // exactly like a real multi-file project - Piston already supports it.
+      const files = [{ name: cfg.file, content: String(code) }, ...(extraFiles || []).map((f) => ({ name: f.name, content: String(f.content) }))];
       const r = await fetch(PISTON_URL, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language: cfg.language, version: cfg.version, files: [{ name: cfg.file, content: String(code) }], stdin, compile_timeout: 10000, run_timeout: 8000 }),
+        body: JSON.stringify({ language: cfg.language, version: cfg.version, files, stdin, compile_timeout: 10000, run_timeout: 8000 }),
       });
       if (!r.ok) throw new Error('The compile service answered ' + r.status + ' - try again in a minute.');
       const d = await r.json();

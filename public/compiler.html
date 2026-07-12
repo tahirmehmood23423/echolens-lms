@@ -58,14 +58,9 @@
 
     <!-- ------------------------------ Files ------------------------------ -->
     <div class="cmp2-panel">
-      <div class="cmp2-files-head">Files<button type="button" onclick="notReady()" aria-label="New file">+</button></div>
-      <div id="filesList">
-        <div class="cmp2-file active" id="fileMain">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>
-          main.py
-        </div>
-      </div>
-      <button type="button" class="btn btn-ghost btn-sm cmp2-newfile" style="width:calc(100% - 24px)" onclick="notReady()">+ New File</button>
+      <div class="cmp2-files-head">Files<button type="button" onclick="newFile()" aria-label="New file">+</button></div>
+      <div id="filesList"></div>
+      <button type="button" class="btn btn-ghost btn-sm cmp2-newfile" style="width:calc(100% - 24px)" onclick="newFile()">+ New File</button>
     </div>
 
     <!-- ------------------------------ Editor ------------------------------ -->
@@ -137,7 +132,108 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let TERM = null, FILES = [], ME = null;
 function toast(t, err) { const el = $('toast'); el.textContent = t; el.className = 'toast show' + (err ? ' err' : ''); clearTimeout(el._h); el._h = setTimeout(() => el.className = 'toast', 3000); }
-function notReady() { toast('Multi-file projects are coming soon - main.py is active for now.'); }
+
+/* ------------------------------ multi-file projects ------------------------------
+ * Each language keeps its own little project: a list of {name, content} files
+ * plus which one is open. Python files can import each other (written into
+ * the same Pyodide filesystem before running), C/C++ files compile together
+ * through Piston's multi-file support, and HTML/CSS/JS files are assembled
+ * into one page for the live preview. Everything is saved per-browser.
+ */
+const DEFAULTS = {
+  python: { name: 'main.py', code: "# Write Python here, press Run.\n# numpy, pandas, matplotlib and scikit-learn load automatically.\nprint('Hello EchoLens!')" },
+  c: { name: 'main.c', code: '// Write C here, press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}' },
+  cpp: { name: 'main.cpp', code: '// Write C++ here, press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}' },
+  sql: { name: 'main.sql', code: '-- Write SQL here, press Run. Loaded CSVs are tables.\nSELECT 1 + 1 AS answer;' },
+  web: { name: 'index.html', code: '<!-- Write HTML, CSS (in <style>) and JS (in <script>) - Run shows a live preview. -->' },
+};
+const PKGS_TEXT = {
+  python: 'numpy · pandas · matplotlib · scikit-learn ready',
+  c: 'gcc 10 · compiled & run in the cloud',
+  cpp: 'g++ 10 · compiled & run in the cloud',
+  sql: 'SQLite · CSV datasets become tables automatically',
+  web: 'live preview with console output',
+};
+let ACTIVE_LANG = 'python';
+let PROJECT = {}; // lang -> { files: [{name, content}], active: name }
+function loadProject(lang) {
+  if (PROJECT[lang]) return PROJECT[lang];
+  const raw = localStorage.getItem('echolens_compiler_project_' + lang);
+  if (raw) {
+    try { const p = JSON.parse(raw); if (p && Array.isArray(p.files) && p.files.length) { PROJECT[lang] = p; return p; } } catch {}
+  }
+  const old = localStorage.getItem('echolens_compiler_' + lang); // migrate the old single-file save
+  const d = DEFAULTS[lang];
+  const p = { files: [{ name: d.name, content: old != null ? old : d.code }], active: d.name };
+  PROJECT[lang] = p;
+  return p;
+}
+function saveProject(lang) { if (PROJECT[lang]) localStorage.setItem('echolens_compiler_project_' + lang, JSON.stringify(PROJECT[lang])); }
+function currentProject() { return loadProject(ACTIVE_LANG); }
+function activeFile() { const p = currentProject(); return p.files.find((f) => f.name === p.active) || p.files[0]; }
+function siblingCodeFiles() { const p = currentProject(); return p.files.filter((f) => f.name !== p.active); }
+function fileIconSvg() { return '<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>'; }
+function renderFilesList() {
+  const p = currentProject();
+  const icon = fileIconSvg();
+  const codeRows = p.files.map((f, i) => `
+    <div class="cmp2-file${f.name === p.active ? ' active' : ''}" onclick="selectFile(${i})">
+      ${icon}<span class="cmp2-file-name">${esc(f.name)}</span>
+      ${p.files.length > 1 ? `<button type="button" class="cmp2-file-del" title="Delete file" onclick="event.stopPropagation();deleteFile(${i})">&times;</button>` : ''}
+    </div>`).join('');
+  const dataRows = FILES.map((f, i) => `<div class="cmp2-file" title="Loaded dataset - click for details" onclick="datasetInfo(${i})">${icon}<span class="cmp2-file-name">${esc(f.name)}</span></div>`).join('');
+  $('filesList').innerHTML = codeRows + dataRows;
+}
+function selectFile(i) {
+  const p = currentProject();
+  const cur = activeFile(); if (cur) cur.content = $('code').value;
+  const f = p.files[i]; if (!f) return;
+  p.active = f.name;
+  $('code').value = f.content;
+  saveProject(ACTIVE_LANG);
+  renderFilesList();
+}
+function newFile() {
+  const p = currentProject();
+  let name = prompt('New file name (e.g. helper.py):');
+  if (!name) return;
+  name = name.trim();
+  if (!name) return;
+  if (p.files.some((f) => f.name === name)) { toast(`A file named "${name}" already exists.`, true); return; }
+  const cur = activeFile(); if (cur) cur.content = $('code').value;
+  p.files.push({ name, content: '' });
+  p.active = name;
+  $('code').value = '';
+  saveProject(ACTIVE_LANG);
+  renderFilesList();
+  toast(`${name} created.`);
+}
+function deleteFile(i) {
+  const p = currentProject();
+  if (p.files.length <= 1) { toast('A project needs at least one file.', true); return; }
+  const f = p.files[i]; if (!f) return;
+  if (!confirm(`Delete ${f.name}? This cannot be undone.`)) return;
+  p.files.splice(i, 1);
+  if (p.active === f.name) { p.active = p.files[0].name; $('code').value = p.files[0].content; }
+  saveProject(ACTIVE_LANG);
+  renderFilesList();
+}
+// Combine sibling .css/.js files into whichever file looks like the HTML
+// page, so a real index.html + style.css + script.js project previews as
+// one page - not just the file currently open in the editor.
+function assembleWebCode() {
+  const p = currentProject();
+  const files = p.files.map((f) => (f.name === p.active ? { name: f.name, content: $('code').value } : f));
+  const htmlFile = files.find((f) => /\.html?$/i.test(f.name)) || files[0];
+  let out = htmlFile.content;
+  for (const f of files) {
+    if (f === htmlFile) continue;
+    if (/\.css$/i.test(f.name)) out += `\n<style>\n${f.content}\n</style>\n`;
+    else if (/\.js$/i.test(f.name)) out += `\n<script>\n${f.content}\n<\/script>\n`;
+  }
+  return out;
+}
+
 (async () => {
   try {
     const r = await fetch('/api/auth/me', { credentials: 'same-origin' });
@@ -152,33 +248,25 @@ function notReady() { toast('Multi-file projects are coming soon - main.py is ac
   $('appWrap').style.display = '';
   TERM = EchoTerm.mount($('term'));
   EchoRun.wireEditor($('code'));
-  const saved = localStorage.getItem('echolens_compiler_python');
-  if (saved) $('code').value = saved;
+  ACTIVE_LANG = 'python';
+  $('code').value = activeFile().content;
+  $('code').addEventListener('input', () => { const f = activeFile(); if (f) f.content = $('code').value; });
+  renderFilesList();
   if (localStorage.getItem('echolens_compiler_dark') === '1') toggleDark(true);
 })();
 function langChanged() {
-  const l = $('lang').value;
-  const isWeb = l === 'web';
+  const newLang = $('lang').value;
+  const outgoing = activeFile(); if (outgoing) outgoing.content = $('code').value;
+  saveProject(ACTIVE_LANG);
+  ACTIVE_LANG = newLang;
+
+  const isWeb = newLang === 'web';
   $('term').style.display = isWeb ? 'none' : '';
   $('webWrap').style.display = isWeb ? '' : 'none';
-  $('pkgs').textContent = l === 'python' ? 'numpy · pandas · matplotlib · scikit-learn ready'
-    : l === 'c' ? 'gcc 10 · compiled & run in the cloud'
-    : l === 'cpp' ? 'g++ 10 · compiled & run in the cloud'
-    : l === 'sql' ? 'SQLite · CSV datasets become tables automatically'
-    : 'live preview with console output';
-  const saved = localStorage.getItem('echolens_compiler_' + l);
-  if (saved) $('code').value = saved;
-  $('code').placeholder = l === 'python' ? "# Write Python here, press Run.\nprint('Hello EchoLens!')"
-    : l === 'c' ? '// Write C here, press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}'
-    : l === 'cpp' ? '// Write C++ here, press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}'
-    : l === 'sql' ? '-- Write SQL here, press Run. Loaded CSVs are tables.\nSELECT 1 + 1 AS answer;'
-    : '<!-- Write HTML, CSS (in <style>) and JS (in <script>) - Run shows a live preview. -->';
-}
-function drawChips() {
-  const fileIcon = '<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7z" stroke="currentColor" stroke-width="1.6"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.6"/></svg>';
-  $('filesList').innerHTML = `
-    <div class="cmp2-file active" id="fileMain">${fileIcon}main.py</div>
-    ${FILES.map((f, i) => `<div class="cmp2-file" title="Loaded - read it in your code as '${esc(f.name)}'" onclick="datasetInfo(${i})">${fileIcon}${esc(f.name)}</div>`).join('')}`;
+  $('pkgs').textContent = PKGS_TEXT[newLang];
+  $('code').placeholder = DEFAULTS[newLang].code;
+  $('code').value = activeFile().content;
+  renderFilesList();
 }
 function datasetInfo(i) {
   const f = FILES[i];
@@ -193,7 +281,7 @@ function localDataset(input) {
   reader.onload = () => {
     FILES = FILES.filter((x) => x.name !== f.name);
     FILES.push({ name: f.name, bytes: reader.result });
-    drawChips();
+    renderFilesList();
     toast(`${f.name} loaded - pd.read_csv('${f.name}') in Python, table "${f.name.replace(/\.[^.]+$/, '')}" in SQL.`);
   };
   reader.readAsArrayBuffer(f);
@@ -207,14 +295,15 @@ async function urlDataset() {
     const f = await EchoRun.fetchDataset(url.trim());
     FILES = FILES.filter((x) => x.name !== f.name);
     FILES.push(f);
-    drawChips();
+    renderFilesList();
     $('status').textContent = 'Ready.';
     toast(`${f.name} loaded from URL - read it by name in your code.`);
   } catch (e) { $('status').textContent = 'Ready.'; toast(e.message, true); }
 }
 function clearAll() { TERM && TERM.clear(); $('webLog').textContent = ''; }
 function saveCode() {
-  localStorage.setItem('echolens_compiler_' + $('lang').value, $('code').value);
+  const f = activeFile(); if (f) f.content = $('code').value;
+  saveProject(ACTIVE_LANG);
   toast('Saved in this browser.');
 }
 function shareCode() {
@@ -273,15 +362,30 @@ async function run() {
   const code = $('code').value;
   const lang = $('lang').value;
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
+  const active = activeFile(); if (active) active.content = code;
+  saveProject(ACTIVE_LANG);
+  const siblings = siblingCodeFiles();
+
   if (lang === 'web') {
     const log = $('webLog'); log.textContent = '';
-    EchoWeb.preview($('webFrame'), code, (kind, text) => { log.textContent += (kind === 'error' ? '✗ ' : '› ') + text + '\n'; });
+    EchoWeb.preview($('webFrame'), assembleWebCode(), (kind, text) => { log.textContent += (kind === 'error' ? '✗ ' : '› ') + text + '\n'; });
     status.textContent = 'Preview updated.';
     return;
   }
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.textContent = 'Run'; return; }
   btn.textContent = 'Stop';
-  try { await EchoRun.executeAny(lang, code, { term: TERM, files: FILES, onStatus: (t) => { status.textContent = t; } }); }
+  // Sibling files ride along so they can be imported (Python) or compiled
+  // together (C/C++) - not just organised in tabs.
+  const enc = new TextEncoder();
+  const siblingBytesFiles = siblings.map((f) => ({ name: f.name, bytes: enc.encode(f.content).buffer }));
+  try {
+    await EchoRun.executeAny(lang, code, {
+      term: TERM,
+      files: [...FILES, ...siblingBytesFiles],
+      extraFiles: siblings,
+      onStatus: (t) => { status.textContent = t; },
+    });
+  }
   catch (e) { status.textContent = e.message; }
   btn.textContent = 'Run';
 }

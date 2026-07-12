@@ -8,7 +8,7 @@
  *    everything is open on free courses, the rest shows locked.
  *  - Solving and submitting needs a free account (Google or email, with the
  *    email checked for a real domain and, when SMTP is on, a mailed code).
- *  - Submissions are AI-graded with a 10% reduction, pay out gems, and free
+ *  - Submissions are graded on the spot with a 10% reduction, pay out gems, and free
  *    courses issue an automatic verified certificate on completion.
  *  - Registration for paid courses is an in-site form that lands in the
  *    admin portal for follow-up.
@@ -597,18 +597,18 @@ function openSolve(levelNo, pid) {
       </div>
       <div class="s" id="svDesc" style="white-space:pre-line;line-height:1.65;font-size:13.5px;margin-top:8px">${esc(p.description || '')}</div>
       <div class="s" id="svRefs" style="margin-top:10px"></div>
-      ${(p.criteria || []).length ? `
-        <div class="slv-block">
-          <div class="slv-block-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.target}</svg>What we're looking for</div>
-          <ul class="slv-criteria">${p.criteria.map((c) => `<li><svg viewBox="0 0 24 24" fill="none">${ICONS.check}</svg>${esc(c)}</li>`).join('')}</ul>
-        </div>` : ''}
-      <div id="svStatusBox" style="margin-top:14px"></div>
-      ${p.hint ? `
-        <details class="slv-block slv-hint">
-          <summary><svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;color:var(--primary)">${ICONS.bulb}</svg><span class="slv-block-head" style="display:inline">Need a hint?</span><svg class="chev" viewBox="0 0 24 24" fill="none">${ICONS.chev}</svg></summary>
-          <div class="slv-hint-body">${esc(p.hint)}</div>
-        </details>` : ''}
-    </div></div>`;
+    </div></div>
+    ${(p.criteria || []).length ? `
+      <div class="slv-block">
+        <div class="slv-block-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.target}</svg>What we're looking for</div>
+        <ul class="slv-criteria">${p.criteria.map((c) => `<li><svg viewBox="0 0 24 24" fill="none">${ICONS.check}</svg>${esc(c)}</li>`).join('')}</ul>
+      </div>` : ''}
+    <div id="svGradedBox"></div>
+    ${p.hint ? `
+      <details class="slv-block slv-hint">
+        <summary><svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;color:var(--primary)">${ICONS.bulb}</svg><span class="slv-block-head" style="display:inline">Need a hint?</span><svg class="chev" viewBox="0 0 24 24" fill="none">${ICONS.chev}</svg></summary>
+        <div class="slv-hint-body">${esc(p.hint)}</div>
+      </details>` : ''}`;
   $('svRefs').innerHTML = (p.refs || []).length
     ? '<strong>Resources and documentation:</strong><br>' + p.refs.map((r) => `<a href="${esc(r[1])}" target="_blank" rel="noopener">${esc(r[0])}</a>`).join(' · ')
     : '';
@@ -621,79 +621,106 @@ function showFullFeedback() {
   openModal('Feedback', `<p class="s" style="white-space:pre-line;line-height:1.6">${esc(sub.feedback || '')}</p>`);
 }
 function drawSolveStatus() {
-  const box = $('svStatusBox'); if (!box) return;
   const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];
-  if (!sub) { box.innerHTML = ''; return; }
-  if (sub.score == null) { box.innerHTML = '<div class="task-status wait">Submitted - your grade will appear here once it is marked.</div>'; return; }
+  const gradedBox = $('svGradedBox');
+  const results = $('svResults');
+  if (!sub) { if (gradedBox) gradedBox.innerHTML = ''; if (results) results.innerHTML = ''; return; }
+
+  // pending (submitted, not yet graded)
+  if (sub.score == null) {
+    if (gradedBox) gradedBox.innerHTML = `<div class="slv-graded wait"><div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.clock}</svg>Submitted — your grade will appear here once it is marked.</div></div>`;
+    if (results) results.innerHTML = '';
+    return;
+  }
+
   const gems = sub.gems != null ? sub.gems : Math.round((sub.score / 100) * (CUR_PROBLEM.problem.points || 100));
   const feedback = sub.feedback || 'Nice work.';
   const short = feedback.length > 130 ? feedback.slice(0, 130) + '…' : feedback;
   const passMark = CUR.track.pass_mark || 60;
-  box.innerHTML = `
-    <div class="slv-results">
-      <div class="slv-rcard">
+
+  // left column: slim graded banner
+  if (gradedBox) gradedBox.innerHTML = `
+    <div class="slv-graded${sub.score >= passMark ? '' : ' wait'}">
+      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}% (10% reduction applied) &middot; <span class="g-gems">${gems} gems earned</span></div>
+      <p>${esc(short)}</p>
+    </div>`;
+
+  // right column: results card (under the output)
+  if (results) results.innerHTML = `
+    <div class="qresults">
+      <div class="qres">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.sparkle}</svg>Feedback</h5>
-        <p class="s" style="margin:2px 0 0">${esc(short)}</p>
+        <p>${esc(short)}</p>
         ${feedback.length > 130 ? `<button type="button" class="slv-link-btn" onclick="showFullFeedback()">View detailed feedback</button>` : ''}
       </div>
-      <div class="slv-rcard center">
+      <div class="qres center">
         <h5>Score</h5>
         <div class="score-ring" style="--pct:${sub.score};--ring-color:${sub.score >= passMark ? 'var(--ok)' : 'var(--gold)'}"><span class="val">${sub.score}%</span></div>
       </div>
-      <div class="slv-rcard center">
+      <div class="qres center">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Gems Earned</h5>
         <div class="slv-gem-big"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${gems}</div>
+        <div class="sub-note">awarded by score</div>
       </div>
-      <div class="slv-rcard">
+      <div class="qres">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.clock}</svg>Submission</h5>
         <div class="slv-sub-line">Submitted<strong>${esc(fmtSubDate(sub.submitted_at))}</strong></div>
         <div class="slv-sub-line" style="margin-top:6px">Attempts<strong>${sub.attempts || 1}</strong></div>
       </div>
     </div>`;
 }
+function svLangOptions() {
+  return `<option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option>`;
+}
+const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+function svCertNote() { return CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''; }
 function drawWorkArea() {
   const isLearner = !ME || ['free', 'student'].includes(ME.role);
   const mode = CUR.track.submission_mode;
-  if (!isLearner) {
-    // Admins and teachers can read and run everything, but submissions are
-    // for learners - say so instead of offering a button that would fail.
-    $('svWorkArea').innerHTML = mode === 'code' ? `
-      <div class="task-ide card">
-        <div class="ide-toolbar">
-          <select id="svLang"><option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option></select>
-          <span style="flex:1"></span>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.refresh}</svg>Clear</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="svRunBtn" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.play}</svg>Run</button>
+
+  // shared code-editor shell (dark, line-numbered) - staff omit Dataset/Submit
+  const codeIde = (opts) => `
+    <div class="qide">
+      <div class="qide-bar">
+        <select id="svLang" class="qide-lang">${svLangOptions()}</select>
+        <span class="sp"></span>
+        ${opts.dataset ? `<label class="qbtn" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none">${ICONS.database}</svg>Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>` : ''}
+        <button type="button" class="qbtn" onclick="SV_TERM&&SV_TERM.clear()"><svg viewBox="0 0 24 24" fill="none">${ICONS.refresh}</svg>Clear</button>
+        <button type="button" class="qbtn" id="svRunBtn" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg>Run</button>
+        ${opts.submit ? `<button type="button" class="qbtn primary" id="svSubmitBtn" onclick="submitSolve()">${opts.sub ? 'Resubmit' : 'Submit for grading'}</button>` : ''}
+      </div>
+      <div class="qide-box">
+        <div class="qide-editor">
+          <div class="ide2-gutter" id="svGutter"><span>1</span></div>
+          <textarea id="svCode" class="ide2-code" spellcheck="false" placeholder="${opts.placeholder}"></textarea>
         </div>
-        <textarea id="svCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Staff preview - run code freely. Submissions are for learner accounts."></textarea>
-        <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Staff preview - submissions are for learner accounts.</span><span style="flex:1"></span><span class="s" id="svExecTime" style="color:var(--muted-2)"></span></div>
-        <div id="svTerm"></div>
-      </div>` : `
-      <div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview - this task takes file submissions from learner accounts.</p></div></div>`;
-    if (mode === 'code') { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); }
+        <div class="qide-status">
+          <span id="svStatus">${opts.status}</span>
+          <span class="sp"></span>
+          <span id="svExecTime"></span>
+          <button class="qide-rerun" title="Run again" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg></button>
+        </div>
+      </div>
+      <div class="qide-out"><div id="svTerm"></div></div>
+      ${opts.submit ? '<div id="svResults"></div>' : ''}
+      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded on the spot with a 10% reduction, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
+    </div>`;
+
+  if (!isLearner) {
+    // Staff can read and run everything, but submissions are for learners.
+    $('svWorkArea').innerHTML = mode === 'code'
+      ? codeIde({ dataset: false, submit: false, placeholder: '# Staff preview — run code freely. Submissions are for learner accounts.', status: 'Staff preview — submissions are for learner accounts.' })
+      : `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview — this task takes file submissions from learner accounts.</p></div></div>`;
+    if (mode === 'code') { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); svSyncGutter(); }
     return;
   }
+
   const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];
   if (mode === 'code') {
-    $('svWorkArea').innerHTML = `
-      <div class="task-ide card">
-        <div class="ide-toolbar">
-          <select id="svLang">
-            <option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option>
-          </select>
-          <span style="flex:1"></span>
-          <label class="btn btn-ghost btn-sm" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.database}</svg>Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.refresh}</svg>Clear</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="svRunBtn" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.play}</svg>Run</button>
-          <button type="button" class="btn lc-btn-solve" id="svSubmitBtn" onclick="submitSolve()">${sub ? 'Resubmit' : 'Submit for grading'}</button>
-        </div>
-        <textarea id="svCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your solution here. Run to test, Submit for grading and gems."></textarea>
-        <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Ready - runs in your browser, nothing to install.</span><span style="flex:1"></span><span class="s" id="svExecTime" style="color:var(--muted-2)"></span></div>
-        <div id="svTerm"></div>
-        <p class="hint" style="margin:10px 14px 14px">Submissions are graded instantly, and gems are awarded by score.${CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''}</p>
-      </div>`;
+    $('svWorkArea').innerHTML = codeIde({ dataset: true, submit: true, sub, placeholder: '# Write your solution here. Run to test, submit for grading and gems.', status: 'Ready — runs in your browser, nothing to install.' });
     SV_TERM = EchoTerm.mount($('svTerm'));
     EchoRun.wireEditor($('svCode'));
+    svSyncGutter();
   } else {
     $('svWorkArea').innerHTML = `
       <div class="card"><div class="card-head"><h3>Submit your work</h3></div>
@@ -703,9 +730,22 @@ function drawWorkArea() {
             <label class="field"><span>Your work</span><input name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.png,.jpg,.jpeg,.zip" required></label>
             <button class="btn lc-btn-solve">${sub ? 'Resubmit for grading' : 'Submit for grading'}</button>
           </form>
-          <p class="hint" style="margin-top:10px">Submissions are graded instantly, and gems are awarded by score.${CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''}</p>
-        </div></div>`;
+          <p class="hint" style="margin-top:10px">Submissions are graded on the spot with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
+        </div></div>
+      <div id="svResults" style="margin-top:16px"></div>`;
     $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });
+  }
+  drawSolveStatus();
+}
+function svSyncGutter() {
+  const code = $('svCode'), g = $('svGutter'); if (!code || !g) return;
+  const n = code.value.split('\n').length || 1;
+  let h = ''; for (let i = 1; i <= n; i++) h += `<span>${i}</span>`;
+  g.innerHTML = h; g.scrollTop = code.scrollTop;
+  if (!code._gutterWired) {
+    code._gutterWired = true;
+    code.addEventListener('input', svSyncGutter);
+    code.addEventListener('scroll', () => { g.scrollTop = code.scrollTop; });
   }
 }
 function svLocalDataset(input) {
@@ -721,20 +761,27 @@ function svLocalDataset(input) {
   reader.readAsArrayBuffer(f);
   input.value = '';
 }
+function svRunLabel(running) {
+  return running
+    ? `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>Stop`
+    : `<svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg>Run`;
+}
 async function runSolve() {
   const btn = $('svRunBtn'); const status = $('svStatus'); const exec = $('svExecTime');
   const code = $('svCode').value;
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
-  if (EchoRun.isRunning()) { EchoRun.cancel(); btn.textContent = 'Run'; return; }
-  btn.textContent = 'Stop';
+  if (EchoRun.isRunning()) { EchoRun.cancel(); if (btn) btn.innerHTML = svRunLabel(false); return; }
+  if (btn) btn.innerHTML = svRunLabel(true);
   if (exec) exec.textContent = '';
+  status.textContent = 'Running…';
   const started = performance.now();
   try {
     await EchoRun.executeAny($('svLang').value, code, { term: SV_TERM, files: SV_FILES, onStatus: (t) => { status.textContent = t; } });
+    status.innerHTML = `<span class="done"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>Done.</span>`;
     if (exec) exec.textContent = 'Execution time: ' + ((performance.now() - started) / 1000).toFixed(2) + 's';
   }
   catch (e) { status.textContent = e.message; }
-  btn.textContent = 'Run';
+  if (btn) btn.innerHTML = svRunLabel(false);
 }
 async function submitSolve(fileForm) {
   if (!ME) { gate('Sign in free to submit this task, earn gems, and collect certificates.'); return; }

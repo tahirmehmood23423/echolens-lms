@@ -895,6 +895,50 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .slv-sub-line{font-size:12px;color:var(--muted)}
 .slv-sub-line strong{display:block;color:var(--ink);font-size:13.5px;font-weight:700;margin-top:1px}
 
+/* ---- quest solve redesign (v13): graded banner + line-numbered editor + results ---- */
+.slv-graded{background:linear-gradient(135deg,var(--violet-soft),#EAF3FE);border:1px solid #DFE2F5;border-radius:14px;padding:13px 16px;margin-top:14px}
+.slv-graded .g-head{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--ink);flex-wrap:wrap}
+.slv-graded .g-head svg{width:16px;height:16px;color:var(--primary);flex:none}
+.slv-graded .g-gems{color:var(--primary)}
+.slv-graded p{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+.slv-graded.wait{background:#FDF8EC;border-color:#F0E2BC}
+
+.qide{display:flex;flex-direction:column;gap:16px}
+.qide-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qide-lang{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;font:600 13px var(--font-body);background:#fff;color:var(--text);cursor:pointer}
+.qide-bar .sp{flex:1}
+.qbtn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-strong);background:#fff;color:var(--text);border-radius:10px;padding:9px 15px;font:600 13px var(--font-body);cursor:pointer;white-space:nowrap}
+.qbtn:hover{border-color:var(--muted-2)}
+.qbtn svg{width:15px;height:15px}
+.qbtn.primary{background:var(--primary-grad);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(var(--primary-shadow),.3)}
+.qbtn.primary:hover{filter:brightness(1.05)}
+.qbtn:disabled{opacity:.6;cursor:default}
+.qide-box{background:#0B1120;border:1px solid #1D2740;border-radius:16px;overflow:hidden}
+.qide-editor{display:flex;max-height:520px}
+.qide-status{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid #1D2740;background:#0E1526;color:#9BA8C7;font-size:12.5px}
+.qide-status .done{color:#4ADE80;display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.qide-status .done svg{width:15px;height:15px}
+.qide-status .sp{flex:1}
+.qide-rerun{width:28px;height:28px;border-radius:50%;border:1px solid #2A3653;background:transparent;color:#9BA8C7;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.qide-rerun:hover{color:#DCE6FA;border-color:#3A496E}
+.qide-rerun svg{width:15px;height:15px}
+.qide-out{background:#0B1120;border:1px solid #1D2740;border-radius:16px;overflow:hidden}
+.qide-out .term{border-top:none;background:transparent}
+.qide-out .term-body{min-height:84px}
+.qide-out .term-empty{padding:16px;color:#5A6A8F;font:12.5px var(--font-mono)}
+.qide-note{background:var(--violet-soft);border:1px solid #DFE2F5;border-radius:12px;padding:12px 15px;font-size:12.5px;color:var(--navy);display:flex;align-items:center;gap:9px}
+.qide-note svg{width:16px;height:16px;flex:none;color:var(--primary)}
+
+.qresults{background:#fff;border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:1.6fr 1fr 1fr 1.1fr;box-shadow:var(--shadow-sm);overflow:hidden}
+.qres{padding:18px 20px;border-left:1px solid var(--line);min-width:0}
+.qres:first-child{border-left:none}
+.qres h5{font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;margin:0 0 9px}
+.qres h5 svg{width:14px;height:14px;color:var(--primary)}
+.qres.center{text-align:center;display:flex;flex-direction:column;align-items:center}
+.qres p{font-size:12.5px;color:var(--text);line-height:1.5}
+.qres .sub-note{font-size:11px;color:var(--muted-2);margin-top:4px}
+@media(max-width:920px){.qresults{grid-template-columns:1fr 1fr}.qres{border-left:none;border-top:1px solid var(--line)}.qres:nth-child(-n+2){border-top:none}.qres:nth-child(2){border-left:1px solid var(--line)}}
+
 .score-ring{--pct:0;width:88px;height:88px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
   background:conic-gradient(var(--ring-color,var(--ok)) calc(var(--pct)*1%), var(--canvas) 0);margin:2px 0}
 .score-ring::before{content:'';position:absolute;inset:7px;background:#fff;border-radius:50%}

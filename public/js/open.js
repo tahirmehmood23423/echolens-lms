@@ -8,8 +8,8 @@
  *    everything is open on free courses, the rest shows locked.
  *  - Solving and submitting needs a free account (Google or email, with the
  *    email checked for a real domain and, when SMTP is on, a mailed code).
- *  - Submissions are graded on the spot with a 10% reduction, pay out gems, and free
- *    courses issue an automatic verified certificate on completion.
+ *  - Submissions are graded instantly, pay out gems, and free courses issue
+ *    an automatic verified certificate on completion.
  *  - Registration for paid courses is an in-site form that lands in the
  *    admin portal for follow-up.
  */
@@ -641,7 +641,7 @@ function drawSolveStatus() {
   // left column: slim graded banner
   if (gradedBox) gradedBox.innerHTML = `
     <div class="slv-graded${sub.score >= passMark ? '' : ' wait'}">
-      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}% (10% reduction applied) &middot; <span class="g-gems">${gems} gems earned</span></div>
+      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}% &middot; <span class="g-gems">${gems} gems earned</span></div>
       <p>${esc(short)}</p>
     </div>`;
 
@@ -703,7 +703,7 @@ function drawWorkArea() {
       </div>
       <div class="qide-out"><div id="svTerm"></div></div>
       ${opts.submit ? '<div id="svResults"></div>' : ''}
-      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded on the spot with a 10% reduction, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
+      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded instantly, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
     </div>`;
 
   if (!isLearner) {
@@ -730,7 +730,7 @@ function drawWorkArea() {
             <label class="field"><span>Your work</span><input name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.png,.jpg,.jpeg,.zip" required></label>
             <button class="btn lc-btn-solve">${sub ? 'Resubmit for grading' : 'Submit for grading'}</button>
           </form>
-          <p class="hint" style="margin-top:10px">Submissions are graded on the spot with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
+          <p class="hint" style="margin-top:10px">Submissions are graded instantly, and gems are awarded by score.${svCertNote()}</p>
         </div></div>
       <div id="svResults" style="margin-top:16px"></div>`;
     $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });

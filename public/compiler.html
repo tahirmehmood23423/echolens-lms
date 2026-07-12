@@ -37,11 +37,20 @@
   <span id="userBox"></span>
 </nav>
 
+<div class="cmp-wrap" id="gateWrap" style="display:none">
+  <div class="auth-gate-card">
+    <h3 style="font-family:var(--font-display);margin-bottom:6px">Sign in to use the compiler</h3>
+    <p class="s" style="color:var(--muted);margin-bottom:16px">Create a free account to write, run and save code in the EchoLens compiler - it takes a minute and stays free.</p>
+    <a class="btn btn-primary btn-block" href="/open#signup" style="margin-bottom:10px">Create a free account</a>
+    <a class="btn btn-ghost btn-block" href="/login">Already have an account? Sign in</a>
+  </div>
+</div>
+
 <div class="cmp-wrap" id="appWrap" style="display:none">
   <div style="display:flex;gap:12px;align-items:end;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px">
     <div>
       <h1 style="font-family:var(--font-display);font-size:26px;color:var(--ink)">Online Compiler</h1>
-      <p class="s" style="color:var(--muted)">Code, run and test in real-time. Free for everyone.</p>
+      <p class="s" style="color:var(--muted)">Code, run and test in real-time. Free with a free account.</p>
     </div>
   </div>
 
@@ -141,11 +150,12 @@ function notReady() { toast('Multi-file projects are coming soon - main.py is ac
     if (!r.ok) throw new Error();
     ME = await r.json();
   } catch { ME = null; }
-  // The compiler is fully open - no sign-in needed to write and run code.
-  $('appWrap').style.display = '';
   $('userBox').innerHTML = ME
     ? `<span class="s" style="color:var(--muted);margin-right:10px">${ME.name}</span><a class="btn btn-ghost btn-sm" href="${ME.role === 'free' ? '/open' : '/dashboard'}">${ME.role === 'free' ? 'Open portal' : 'My portal'}</a>`
     : '<a class="btn btn-primary btn-sm" href="/open#signup">Sign in - free</a>';
+  // Signing in is required to use the compiler - browsing in is not enough.
+  if (!ME) { $('gateWrap').style.display = ''; return; }
+  $('appWrap').style.display = '';
   TERM = EchoTerm.mount($('term'));
   EchoRun.wireEditor($('code'));
   const saved = localStorage.getItem('echolens_compiler_python');

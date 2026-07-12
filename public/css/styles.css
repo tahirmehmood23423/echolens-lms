@@ -195,6 +195,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 
 .badge-grid{display:flex;gap:9px;flex-wrap:wrap}
 .badge{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--navy)}
+.prob-chip{display:inline-flex;align-items:center;gap:5px;background:var(--canvas);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--navy);white-space:nowrap}
 .badge .bd{width:9px;height:9px;border-radius:3px;transform:rotate(45deg);background:var(--gem-grad)}
 .badge.streak .bd{background:var(--st-spark)}
 .badge.course .bd{background:var(--st-aurora)}

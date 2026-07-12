@@ -71,7 +71,7 @@ function friendly(providerName, status, rawMessage) {
 }
 
 /* ------------------------------- providers ------------------------------- */
-async function callGemini(system, messages, model) {
+async function callGemini(system, messages, model, maxTokens) {
   const useModel = model || (PROVIDER === 'gemini' ? MODEL : GEMINI_DEFAULT);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${useModel}:generateContent?key=${GEMINI_KEY}`;
   const contents = messages.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
@@ -81,7 +81,7 @@ async function callGemini(system, messages, model) {
     body: JSON.stringify({
       system_instruction: { parts: [{ text: system }] },
       contents,
-      generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
+      generationConfig: { temperature: 0.4, maxOutputTokens: maxTokens || 2048 },
     }),
   });
   const data = await res.json().catch(() => ({}));
@@ -96,7 +96,7 @@ async function callGemini(system, messages, model) {
   return text;
 }
 
-async function callGroq(system, messages, model) {
+async function callGroq(system, messages, model, maxTokens) {
   const useModel = model || (PROVIDER === 'groq' ? MODEL : GROQ_DEFAULT);
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -104,7 +104,7 @@ async function callGroq(system, messages, model) {
     body: JSON.stringify({
       model: useModel,
       messages: [{ role: 'system', content: system }, ...messages],
-      temperature: 0.4, max_tokens: 2048,
+      temperature: 0.4, max_tokens: maxTokens || 2048,
     }),
   });
   const data = await res.json().catch(() => ({}));
@@ -120,7 +120,7 @@ async function callGroq(system, messages, model) {
 }
 
 /* ------------------------- completion with fallback ------------------------- */
-async function complete(userId, system, messages) {
+async function complete(userId, system, messages, maxTokens) {
   if (!enabled()) { const e = new Error('AI is not configured. Set GEMINI_API_KEY or GROQ_API_KEY in the environment.'); e.status = 503; throw e; }
   checkLimit(userId);
 
@@ -128,14 +128,14 @@ async function complete(userId, system, messages) {
   const primary = primaryIsGroq ? { fn: callGroq, ok: !!GROQ_KEY, name: 'Groq' } : { fn: callGemini, ok: !!GEMINI_KEY, name: 'Gemini' };
   const backup = primaryIsGroq ? { fn: callGemini, ok: !!GEMINI_KEY, name: 'Gemini' } : { fn: callGroq, ok: !!GROQ_KEY, name: 'Groq' };
 
-  if (!primary.ok && backup.ok) return backup.fn(system, messages);
+  if (!primary.ok && backup.ok) return backup.fn(system, messages, undefined, maxTokens);
 
   try {
-    return await primary.fn(system, messages);
+    return await primary.fn(system, messages, undefined, maxTokens);
   } catch (err) {
     if (err.retryable && backup.ok) {
       console.warn(`[ai] ${primary.name} failed (${err.message}) - falling back to ${backup.name}.`);
-      return backup.fn(system, messages);
+      return backup.fn(system, messages, undefined, maxTokens);
     }
     throw err;
   }
@@ -252,21 +252,24 @@ ${fileText ? fileText.slice(0, 14000) : '[Content not readable as text.]'}`;
 }
 
 /* --------------------------- compiler AI assistant (learners) --------------------------- */
-const CODE_BASE = 'You are the EchoLens compiler\'s AI coding assistant, helping learners at an AI education academy in Pakistan understand and improve their own code. Be concrete, practical, encouraging, and concise. Use short fenced code blocks when they help. Answer in clear English.';
+const CODE_BASE = 'You are the EchoLens compiler\'s AI coding assistant, helping learners at an AI education academy in Pakistan understand and improve their own code. '
+  + 'Be extremely concise: 2-4 short sentences, plus a brief fenced code block only if code genuinely helps. '
+  + 'Never write multi-section breakdowns, numbered essays, or restate the code back at length - get straight to the point. '
+  + 'If the learner clearly wants more depth, you may go a little longer, but default to short. Answer in clear English.';
 const CODE_ACTIONS = {
-  'Explain this code': 'Explain what this code does, step by step, in plain language a beginner can follow.',
-  'Fix errors': 'Find any bugs or errors in this code and explain how to fix them. If it already runs fine, say so and point out anything worth double-checking.',
-  'Optimize code': 'Suggest concrete ways to make this code more efficient, readable, or idiomatic. Show an improved version where it helps.',
-  'Generate code': 'Generate code for what the learner is asking for. If nothing specific was asked, suggest one small, useful example in the given language.',
+  'Explain this code': 'In 2-4 sentences, explain what this code does. No line-by-line breakdown unless the code is genuinely complex.',
+  'Fix errors': 'Point out the single most important bug or error and how to fix it, in 2-3 sentences plus a short corrected snippet if needed. If it already runs fine, say so in one sentence.',
+  'Optimize code': 'Give at most ONE concrete, high-value improvement in 2-3 sentences, with a short snippet only if it helps. Do not list multiple options.',
+  'Generate code': 'Generate a short, focused snippet for what the learner asked. If nothing specific was asked, give one small useful example in the given language - no lengthy explanation around it.',
 };
 async function codeHelp(userId, { action, code, language, question }) {
-  const instruction = CODE_ACTIONS[action] || 'Answer the learner\'s question about their code as helpfully as possible.';
+  const instruction = CODE_ACTIONS[action] || 'Answer the learner\'s question about their code as briefly and directly as possible.';
   const content = `Language: ${language || 'unknown'}
 ${question ? 'Learner question: ' + String(question).slice(0, 1000) + '\n' : ''}Task: ${instruction}
 
 Code in the editor:
 ${code && String(code).trim() ? String(code).slice(0, 8000) : '[No code written yet.]'}`;
-  return complete(userId, CODE_BASE, [{ role: 'user', content }]);
+  return complete(userId, CODE_BASE, [{ role: 'user', content }], 350);
 }
 
 /* --------------------------- integrity (teacher-only) --------------------------- */

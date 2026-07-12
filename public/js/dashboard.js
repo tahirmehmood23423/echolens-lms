@@ -1980,12 +1980,17 @@ function formEditProblem(qid, pid) {
         </div>
         <label class="field"><span>Solution guideline (teachers/admin only - students never see this)</span><textarea name="solution" style="min-height:90px">${esc(p.solution || '')}</textarea></label>
         <label class="field"><span>Reference links - one per line as "Label | https://url"</span><textarea name="refs">${(p.refs || []).map((r) => `${r[0]} | ${r[1]}`).join('\n')}</textarea></label>
+        <label class="field"><span>What we're looking for - one short line per point (optional, shown to students)</span><textarea name="criteria" placeholder="Correct mapping for all score ranges
+Proper use of if/elif/else
+Clean and readable code">${(p.criteria || []).join('\n')}</textarea></label>
+        <label class="field"><span>Hint (optional, students reveal it themselves)</span><textarea name="hint" style="min-height:70px">${esc(p.hint || '')}</textarea></label>
         <button class="btn btn-primary btn-block">Save changes</button></form>`);
     $('f').addEventListener('submit', async (e) => {
       e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
       const refs = f.refs.value.split('\n').map((l) => l.split('|').map((x) => x.trim())).filter((r) => r.length === 2 && r[1].startsWith('http'));
+      const criteria = f.criteria.value.split('\n').map((l) => l.trim()).filter(Boolean);
       try {
-        await api(`/api/quests/${qid}/problems/${pid}`, { method: 'PATCH', body: JSON.stringify({ title: f.title.value, description: f.description.value, points: f.points.value, difficulty: f.difficulty.value, type: f.type.value, solution: f.solution.value, refs }) });
+        await api(`/api/quests/${qid}/problems/${pid}`, { method: 'PATCH', body: JSON.stringify({ title: f.title.value, description: f.description.value, points: f.points.value, difficulty: f.difficulty.value, type: f.type.value, solution: f.solution.value, refs, criteria, hint: f.hint.value }) });
         toast('Problem updated for this course.'); closeModal(); openCourse(bid());
       } catch (err) { modalMsg(err.message); btn.disabled = false; }
     });

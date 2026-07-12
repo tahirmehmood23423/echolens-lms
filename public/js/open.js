@@ -67,6 +67,15 @@ const ICONS = {
   code: '<path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
   gear: '<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7M18.4 18.4l-1.7-1.7M7.3 7.3 5.6 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
   gem: '<path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="currentColor" opacity=".92"/>',
+  check: '<path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+  target: '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
+  bulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.45.9 1.1.9 1.8v.3h5.2v-.3c0-.7.3-1.35.9-1.8A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" fill="none"/>',
+  chev: '<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+  database: '<ellipse cx="12" cy="5.5" rx="7" ry="2.5" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M5 5.5V18c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V5.5" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5" stroke="currentColor" stroke-width="1.7" fill="none"/>',
+  refresh: '<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M18 3v4h-4M6 21v-4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+  play: '<path d="M7 4.5v15l13-7.5-13-7.5z" fill="currentColor"/>',
+  sparkle: '<path d="M12 3v3M12 18v3M4.5 12h3M16.5 12h3M6.5 6.5l2 2M15.5 15.5l2 2M17.5 6.5l-2 2M8.5 15.5l-2 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7" fill="none"/>',
+  clock: '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>',
 };
 function pickIcon(title) {
   const t = (title || '').toLowerCase();
@@ -116,7 +125,8 @@ let CUR_EVENT = null;
 
 function drawUserBox() {
   $('userBox').innerHTML = ME
-    ? `<span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
+    ? `<span class="av-sm" style="width:30px;height:30px;margin-right:9px">${ME.avatar ? `<img src="${esc(ME.avatar)}" alt="">` : esc((ME.name || '?').charAt(0).toUpperCase())}</span>
+       <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
        ${ME.role !== 'free' ? '<a class="btn btn-teal btn-sm" href="/dashboard" style="margin-right:8px">LMS Portal</a>' : ''}
        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`
     : `<button class="btn btn-ghost btn-sm" onclick="openRegister()" style="margin-right:8px">Register</button>
@@ -565,28 +575,80 @@ function drawCourse() {
 }
 
 /* ------------------------------ solve + submit ------------------------------ */
+function fmtSubDate(iso) {
+  if (!iso) return '';
+  const d = new Date(String(iso).replace(' ', 'T'));
+  if (isNaN(d)) return String(iso).slice(0, 16);
+  return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
 function openSolve(levelNo, pid) {
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   const p = lvl && (lvl.problems || []).find((x) => x.pid === pid);
   if (!p || lvl.locked) return;
   CUR_PROBLEM = { level: levelNo, pid, problem: p };
   openTab('solve');
-  $('svTitle').textContent = p.title;
-  $('svDiff').innerHTML = `<span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>`;
-  $('svDesc').textContent = p.description || '';
+  $('svLeft').innerHTML = `
+    <div class="card slv-card"><div class="card-body">
+      <div class="slv-eyebrow">Level ${lvl.no} &middot; ${esc(lvl.title || '')}<span style="flex:1"></span><span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span></div>
+      <div class="slv-head">
+        <h2>${esc(p.title)}</h2>
+        <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} gems</span>
+      </div>
+      <div class="s" id="svDesc" style="white-space:pre-line;line-height:1.65;font-size:13.5px;margin-top:8px">${esc(p.description || '')}</div>
+      <div class="s" id="svRefs" style="margin-top:10px"></div>
+      ${(p.criteria || []).length ? `
+        <div class="slv-block">
+          <div class="slv-block-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.target}</svg>What we're looking for</div>
+          <ul class="slv-criteria">${p.criteria.map((c) => `<li><svg viewBox="0 0 24 24" fill="none">${ICONS.check}</svg>${esc(c)}</li>`).join('')}</ul>
+        </div>` : ''}
+      <div id="svStatusBox" style="margin-top:14px"></div>
+      ${p.hint ? `
+        <details class="slv-block slv-hint">
+          <summary><svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;color:var(--primary)">${ICONS.bulb}</svg><span class="slv-block-head" style="display:inline">Need a hint?</span><svg class="chev" viewBox="0 0 24 24" fill="none">${ICONS.chev}</svg></summary>
+          <div class="slv-hint-body">${esc(p.hint)}</div>
+        </details>` : ''}
+    </div></div>`;
   $('svRefs').innerHTML = (p.refs || []).length
     ? '<strong>Resources and documentation:</strong><br>' + p.refs.map((r) => `<a href="${esc(r[1])}" target="_blank" rel="noopener">${esc(r[0])}</a>`).join(' · ')
     : '';
   drawSolveStatus();
   drawWorkArea();
 }
-function drawSolveStatus() {
+function showFullFeedback() {
   const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];
-  $('svStatusBox').innerHTML = sub
-    ? (sub.score != null
-      ? `<div class="task-status ok">Graded ${sub.score}% · ${Math.round((sub.score / 100) * (CUR_PROBLEM.problem.points || 100))} gems earned${sub.feedback ? `<br><span class="s">${esc(sub.feedback)}</span>` : ''}</div>`
-      : '<div class="task-status wait">Submitted - your grade will appear here once it is marked.</div>')
-    : '';
+  if (!sub) return;
+  openModal('Feedback', `<p class="s" style="white-space:pre-line;line-height:1.6">${esc(sub.feedback || '')}</p>`);
+}
+function drawSolveStatus() {
+  const box = $('svStatusBox'); if (!box) return;
+  const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];
+  if (!sub) { box.innerHTML = ''; return; }
+  if (sub.score == null) { box.innerHTML = '<div class="task-status wait">Submitted - your grade will appear here once it is marked.</div>'; return; }
+  const gems = sub.gems != null ? sub.gems : Math.round((sub.score / 100) * (CUR_PROBLEM.problem.points || 100));
+  const feedback = sub.feedback || 'Nice work.';
+  const short = feedback.length > 130 ? feedback.slice(0, 130) + '…' : feedback;
+  const passMark = CUR.track.pass_mark || 60;
+  box.innerHTML = `
+    <div class="slv-results">
+      <div class="slv-rcard">
+        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.sparkle}</svg>Feedback</h5>
+        <p class="s" style="margin:2px 0 0">${esc(short)}</p>
+        ${feedback.length > 130 ? `<button type="button" class="slv-link-btn" onclick="showFullFeedback()">View detailed feedback</button>` : ''}
+      </div>
+      <div class="slv-rcard center">
+        <h5>Score</h5>
+        <div class="score-ring" style="--pct:${sub.score};--ring-color:${sub.score >= passMark ? 'var(--ok)' : 'var(--gold)'}"><span class="val">${sub.score}%</span></div>
+      </div>
+      <div class="slv-rcard center">
+        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Gems Earned</h5>
+        <div class="slv-gem-big"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${gems}</div>
+      </div>
+      <div class="slv-rcard">
+        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.clock}</svg>Submission</h5>
+        <div class="slv-sub-line">Submitted<strong>${esc(fmtSubDate(sub.submitted_at))}</strong></div>
+        <div class="slv-sub-line" style="margin-top:6px">Attempts<strong>${sub.attempts || 1}</strong></div>
+      </div>
+    </div>`;
 }
 function drawWorkArea() {
   const isLearner = !ME || ['free', 'student'].includes(ME.role);
@@ -599,11 +661,11 @@ function drawWorkArea() {
         <div class="ide-toolbar">
           <select id="svLang"><option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option></select>
           <span style="flex:1"></span>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()">Clear</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="svRunBtn" onclick="runSolve()">Run</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.refresh}</svg>Clear</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="svRunBtn" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.play}</svg>Run</button>
         </div>
         <textarea id="svCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Staff preview - run code freely. Submissions are for learner accounts."></textarea>
-        <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Staff preview - submissions are for learner accounts.</span></div>
+        <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Staff preview - submissions are for learner accounts.</span><span style="flex:1"></span><span class="s" id="svExecTime" style="color:var(--muted-2)"></span></div>
         <div id="svTerm"></div>
       </div>` : `
       <div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview - this task takes file submissions from learner accounts.</p></div></div>`;
@@ -619,13 +681,13 @@ function drawWorkArea() {
             <option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option>
           </select>
           <span style="flex:1"></span>
-          <label class="btn btn-ghost btn-sm" style="cursor:pointer">Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()">Clear</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="svRunBtn" onclick="runSolve()">Run</button>
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.database}</svg>Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="SV_TERM&&SV_TERM.clear()"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.refresh}</svg>Clear</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="svRunBtn" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px">${ICONS.play}</svg>Run</button>
           <button type="button" class="btn lc-btn-solve" id="svSubmitBtn" onclick="submitSolve()">${sub ? 'Resubmit' : 'Submit for grading'}</button>
         </div>
         <textarea id="svCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your solution here. Run to test, Submit for grading and gems."></textarea>
-        <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Ready - runs in your browser, nothing to install.</span></div>
+        <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Ready - runs in your browser, nothing to install.</span><span style="flex:1"></span><span class="s" id="svExecTime" style="color:var(--muted-2)"></span></div>
         <div id="svTerm"></div>
         <p class="hint" style="margin:10px 14px 14px">Submissions are graded instantly, and gems are awarded by score.${CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''}</p>
       </div>`;
@@ -659,12 +721,17 @@ function svLocalDataset(input) {
   input.value = '';
 }
 async function runSolve() {
-  const btn = $('svRunBtn'); const status = $('svStatus');
+  const btn = $('svRunBtn'); const status = $('svStatus'); const exec = $('svExecTime');
   const code = $('svCode').value;
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.textContent = 'Run'; return; }
   btn.textContent = 'Stop';
-  try { await EchoRun.executeAny($('svLang').value, code, { term: SV_TERM, files: SV_FILES, onStatus: (t) => { status.textContent = t; } }); }
+  if (exec) exec.textContent = '';
+  const started = performance.now();
+  try {
+    await EchoRun.executeAny($('svLang').value, code, { term: SV_TERM, files: SV_FILES, onStatus: (t) => { status.textContent = t; } });
+    if (exec) exec.textContent = 'Execution time: ' + ((performance.now() - started) / 1000).toFixed(2) + 's';
+  }
   catch (e) { status.textContent = e.message; }
   btn.textContent = 'Run';
 }

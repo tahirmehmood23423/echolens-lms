@@ -293,7 +293,8 @@
 
   /* ------------------------------ editor helper ------------------------------ */
   // Tab inserts 4 spaces; Enter keeps the current indentation (plus one level
-  // after a line ending in ':'), so Python editing feels natural.
+  // after a line ending in ':'), so Python editing feels natural. Every wired
+  // editor also gets a synced line-number gutter, like a real code editor.
   function wireEditor(box) {
     box.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') {
@@ -314,6 +315,27 @@
         }
       }
     });
+    addLineGutter(box);
+  }
+  function addLineGutter(box) {
+    if (box.dataset.gutterWired) return;
+    box.dataset.gutterWired = '1';
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-wrap' + (box.classList.contains('ide-editor') ? ' ide' : '');
+    box.parentNode.insertBefore(wrap, box);
+    const gutter = document.createElement('div');
+    gutter.className = 'editor-gutter';
+    wrap.appendChild(gutter);
+    wrap.appendChild(box);
+    const render = () => {
+      const n = box.value.split('\n').length;
+      let s = '';
+      for (let i = 1; i <= n; i++) s += i + '\n';
+      gutter.textContent = s;
+    };
+    box.addEventListener('input', render);
+    box.addEventListener('scroll', () => { gutter.scrollTop = box.scrollTop; });
+    render();
   }
 
   /* --------------------------- web runner (v11) --------------------------- */

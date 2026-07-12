@@ -32,7 +32,9 @@ module.exports = {
     {
       no: 2, week: 1, session: 2, title: 'Flow Control', topic: 'Conditionals and loops',
       problems: [
-        { title: 'Grade Gatekeeper', points: 50, difficulty: 'Basic', description: 'Read a score 0-100 and print the EchoLens stage it maps to: 0-49 Spark, 50-69 Glow, 70-84 Beam, 85-94 Prism, 95+ Nova. Use if/elif/else.' },
+        { title: 'Grade Gatekeeper', points: 50, difficulty: 'Basic', description: 'Read a score 0-100 and print the EchoLens stage it maps to: 0-49 Spark, 50-69 Glow, 70-84 Beam, 85-94 Prism, 95+ Nova. Use if/elif/else.',
+          criteria: ['Correct mapping for all score ranges', 'Proper use of if/elif/else', 'Clean and readable code'],
+          hint: 'Check the boundaries from the top down: is the score 95 or more first, then 85 or more, and so on - that way each elif only needs one comparison, and you never need to check a range twice.' },
         { title: 'FizzBuzz, Pakistan Edition', points: 70, difficulty: 'Core', description: 'Print 1 to 50. Multiples of 3 print "Chai", multiples of 5 print "Samosa", multiples of both print "ChaiSamosa". Then print how many of each appeared.' },
         { title: 'Prime Hunter', points: 90, difficulty: 'Boss', description: 'Ask for a number N and print all prime numbers up to N, plus the count. Your loop must skip even numbers greater than 2 for efficiency. Add a comment explaining why.' },
       ],

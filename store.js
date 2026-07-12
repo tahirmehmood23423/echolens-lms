@@ -791,16 +791,19 @@ const Quests = {
   updateProblem(qid, pid, fields) {
     const q = Quests.byId(qid); if (!q) return null;
     const p = q.problems.find((x) => x.pid === Number(pid)); if (!p) return null;
-    const allowed = ['title', 'description', 'points', 'difficulty', 'solution'];
+    const allowed = ['title', 'description', 'points', 'difficulty', 'solution', 'hint'];
     for (const k of allowed) if (fields[k] !== undefined) p[k] = k === 'points' ? Math.max(10, Math.min(1000, Number(fields[k]) || p.points)) : String(fields[k]).slice(0, 4000);
     if (fields.type !== undefined && ['code', 'written'].includes(fields.type)) p.type = fields.type;
     if (Array.isArray(fields.refs)) p.refs = fields.refs.filter((r) => Array.isArray(r) && r[1]).slice(0, 6);
+    // Grading criteria: a short checklist shown to students of what the task
+    // is looking for - optional, teacher-authored, never the solution itself.
+    if (Array.isArray(fields.criteria)) p.criteria = fields.criteria.map((c) => String(c).slice(0, 200)).filter(Boolean).slice(0, 8);
     save();
     return p;
   },
   // Teachers can add extra problems to a level - e.g. a written logic problem
   // next to the coding tasks.
-  addProblem(qid, { title, description, points, difficulty, type, solution }) {
+  addProblem(qid, { title, description, points, difficulty, type, solution, hint, criteria }) {
     const q = Quests.byId(qid); if (!q) return null;
     const pid = q.problems.reduce((m, p) => Math.max(m, p.pid), 0) + 1;
     const p = {
@@ -809,6 +812,8 @@ const Quests = {
       difficulty: ['Basic', 'Core', 'Boss'].includes(difficulty) ? difficulty : 'Core',
       type: type === 'written' ? 'written' : 'code',
       solution: solution ? String(solution).slice(0, 4000) : undefined,
+      hint: hint ? String(hint).slice(0, 4000) : undefined,
+      criteria: Array.isArray(criteria) ? criteria.map((c) => String(c).slice(0, 200)).filter(Boolean).slice(0, 8) : undefined,
     };
     q.problems.push(p); save();
     return p;
@@ -1836,10 +1841,10 @@ const OpenQuest = {
       file_url: file_url || null, file_name: file_name || null,
       submitted_at: now(),
     };
-    if (s) Object.assign(s, fields, { score: null, gems: 0, feedback: null, graded_at: null });
+    if (s) { s.attempts = (s.attempts || 1) + 1; Object.assign(s, fields, { score: null, gems: 0, feedback: null, graded_at: null }); }
     else {
       s = { id: nextId('open_submissions'), user_id: user.id, track_key, level: Number(level), pid: Number(pid),
-            problem_title: pr.title, points: pr.points || 100, ...fields, score: null, gems: 0, feedback: null, graded_at: null };
+            problem_title: pr.title, points: pr.points || 100, ...fields, score: null, gems: 0, feedback: null, graded_at: null, attempts: 1 };
       data.open_submissions.push(s);
     }
     save();
@@ -1858,7 +1863,7 @@ const OpenQuest = {
     const t = TRACKS[track_key]; if (!t) return null;
     const mine = data.open_submissions.filter((s) => s.user_id === Number(uid) && s.track_key === track_key);
     const byKey = {};
-    for (const s of mine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, file_name: s.file_name, has_code: !!s.code };
+    for (const s of mine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, file_name: s.file_name, has_code: !!s.code, attempts: s.attempts || 1 };
     const totalProblems = t.levels.reduce((a, l) => a + l.problems.length, 0);
     const graded = mine.filter((s) => s.score != null);
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;

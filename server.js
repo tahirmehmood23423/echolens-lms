@@ -1025,7 +1025,7 @@ app.get('/api/public/tracks/:key', (req, res) => {
     if (l.no <= openN) {
       return {
         no: l.no, week: l.week, title: l.title, topic: l.topic, locked: false,
-        problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [] })),
+        problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [], criteria: p.criteria || [], hint: p.hint || null })),
       };
     }
     // Locked levels: every task is listed (title, points, difficulty) so the
@@ -1809,7 +1809,7 @@ app.post('/api/open/submit', authRequired, upload.single('file'), async (req, re
     submission: graded || out.submission,
     graded: !!graded,
     cert: cert ? { serial: cert.serial, url: `${APP_URL}/cert?s=${cert.serial}` } : null,
-    note: graded ? null : 'Submission recorded. AI grading is not available right now - your score will appear once it is graded.',
+    note: graded ? null : 'Submission recorded. Grading is not available right now - your score will appear once it is graded.',
   });
 });
 app.get('/api/open/progress', authRequired, (req, res) => {

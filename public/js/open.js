@@ -829,6 +829,17 @@ const EV_THUMB = {
   webinar: { g: 'linear-gradient(135deg,#2A7BD1,#38BDF8)', glyph: '&#9673; live' },
 };
 const EV_LANG_GLYPH = { python: 'print(…)', c: '#include', cpp: 'std::cout', sql: 'SELECT *', web: '&lt;/&gt; html' };
+const EV_LANG_BADGE = {
+  python: { g: 'linear-gradient(135deg,#4B8BBE,#FFD43B)', t: 'Py' },
+  c: { g: 'linear-gradient(135deg,#5C6BC0,#3949AB)', t: 'C' },
+  cpp: { g: 'linear-gradient(135deg,#00599C,#004482)', t: 'C++' },
+  sql: { g: 'linear-gradient(135deg,#0FBFA8,#0C8F8F)', t: 'SQL' },
+  web: { g: 'linear-gradient(135deg,#F06529,#E44D26)', t: '{ }' },
+};
+function evLangBadgeHtml(lang) {
+  const b = EV_LANG_BADGE[lang]; if (!b) return '';
+  return `<span class="evd-lang-badge" style="background:${b.g}">${esc(b.t)}</span>`;
+}
 
 let EV_ALL = [];
 let EV_TAB = 'all';
@@ -838,7 +849,7 @@ const EV_PER = 6;
 // event-level helpers derived from its problems
 function evPoints(ev) { const p = ev.problems || []; return p.length ? p.reduce((s, x) => s + (x.points || 0), 0) : 100; }
 function evDiff(ev) { const p = ev.problems || []; if (!p.length) return 'Easy'; const rank = { Easy: 1, Medium: 2, Hard: 3 }; return p.reduce((m, x) => rank[x.difficulty] > rank[m] ? x.difficulty : m, 'Easy'); }
-function evDurLabel(ev) { const m = ev.duration_minutes; if (!m) return null; return m < 60 ? `~${m} min` : `~${Math.round(m / 60)} hr`; }
+function evDurLabel(ev) { const m = ev.duration_minutes; if (!m) return null; return m < 60 ? `~${m} minute${m === 1 ? '' : 's'}` : `~${Math.round(m / 60)} hour${Math.round(m / 60) === 1 ? '' : 's'}`; }
 const DIFF_DOT = { Easy: '#1FA36B', Medium: '#D89A00', Hard: '#D14370' };
 
 async function loadEvents() {
@@ -1044,7 +1055,10 @@ function renderEventDetail() {
     ev.auto_certificate ? `<span class="evd-tag good">Certificate at ${ev.pass_mark}%+</span>` : '',
   ].join('');
   const card = `<div class="evd-card">
-    <span class="evd-badge">${evKindTag(ev)}</span>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px">
+      <span class="evd-badge ${esc(ev.kind)}" style="margin-bottom:0">${evKindTag(ev)}</span>
+      ${evLangBadgeHtml(ev.compiler)}
+    </div>
     <h3>${esc(ev.title)}</h3>
     <div class="cdesc">${esc((ev.description || '').slice(0, 150))}${(ev.description || '').length > 150 ? '…' : ''}</div>
     <div class="evd-tags">${tags}</div>
@@ -1103,22 +1117,6 @@ function renderEventDetail() {
       <div class="evd-ex-row"><div class="k">Output</div><div class="v">Produce the result described above.</div></div>
     </details>`;
 
-  const overview = `<div class="evd-sec" id="evdSec-overview">
-    <div class="evd-titlerow"><h2>${esc(ev.title)}</h2><span class="evd-star" title="Featured">${star}</span></div>
-    <div class="evd-chips" style="margin:12px 0">
-      <span class="evd-chip">${star} ${points} points</span>
-      <span class="evd-chip">${langI} ${EV_LANG_LABEL[ev.compiler] || 'File / link'}</span>
-      <span class="evd-chip"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>
-      ${durL ? `<span class="evd-chip">${clock} ${durL}</span>` : ''}
-      ${ev.auto_grade ? `<span class="evd-chip">${checkI} Instant grading</span>` : ''}
-    </div>
-    ${banner}
-    ${regBtn ? `<div style="margin:12px 0">${regBtn}</div>` : ''}
-    ${statusMsg}
-    <h3 style="margin-top:16px">Problem Statement</h3>
-    ${problemBlock}
-  </div>`;
-
   const problemSec = `<div class="evd-sec" id="evdSec-problem">
     <h3>Problem Statement</h3>
     ${problemBlock}
@@ -1154,6 +1152,25 @@ function renderEventDetail() {
   }).join('') : '<p class="muted">No submissions yet — write your solution and submit it from the editor.</p>';
   const submissionsSec = `<div class="evd-sec" id="evdSec-submissions">
     <h3>Your Submissions</h3>
+    ${subRows}
+    ${d.can_participate ? '<button class="btn btn-primary btn-block" style="margin-top:6px" onclick="evScrollWork()">+ New Submission</button>' : ''}
+  </div>`;
+
+  const overview = `<div class="evd-sec" id="evdSec-overview">
+    <div class="evd-titlerow"><h2>${esc(ev.title)}</h2><span class="evd-star" title="Featured">${star}</span></div>
+    <div class="evd-chips" style="margin:12px 0">
+      <span class="evd-chip">${star} ${points} points</span>
+      <span class="evd-chip">${langI} ${EV_LANG_LABEL[ev.compiler] || 'File / link'}</span>
+      <span class="evd-chip"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>
+      ${durL ? `<span class="evd-chip">${clock} ${durL}</span>` : ''}
+      ${ev.auto_grade ? `<span class="evd-chip">${checkI} Instant grading</span>` : ''}
+    </div>
+    ${banner}
+    ${regBtn ? `<div style="margin:12px 0">${regBtn}</div>` : ''}
+    ${statusMsg}
+    <h3 style="margin-top:16px">Problem Statement</h3>
+    ${problemBlock}
+    <h3 style="margin-top:20px">Your Submissions</h3>
     ${subRows}
     ${d.can_participate ? '<button class="btn btn-primary btn-block" style="margin-top:6px" onclick="evScrollWork()">+ New Submission</button>' : ''}
   </div>`;

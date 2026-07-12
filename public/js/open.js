@@ -604,6 +604,11 @@ function openSolve(levelNo, pid) {
         <ul class="slv-criteria">${p.criteria.map((c) => `<li><svg viewBox="0 0 24 24" fill="none">${ICONS.check}</svg>${esc(c)}</li>`).join('')}</ul>
       </div>` : ''}
     <div id="svGradedBox"></div>
+    ${(p.reference && (p.reference.rows || []).length) ? `
+      <div class="slv-block">
+        <div class="slv-block-head">${esc(p.reference.title || 'Reference')}</div>
+        <div class="slv-refgrid">${p.reference.rows.map((r, i) => `<div class="slv-refcell c${i % 5}"><div class="rng">${esc(r.range)}</div><div class="lbl">${esc(r.label)}</div></div>`).join('')}</div>
+      </div>` : ''}
     ${p.hint ? `
       <details class="slv-block slv-hint">
         <summary><svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;color:var(--primary)">${ICONS.bulb}</svg><span class="slv-block-head" style="display:inline">Need a hint?</span><svg class="chev" viewBox="0 0 24 24" fill="none">${ICONS.chev}</svg></summary>
@@ -641,7 +646,7 @@ function drawSolveStatus() {
   // left column: slim graded banner
   if (gradedBox) gradedBox.innerHTML = `
     <div class="slv-graded${sub.score >= passMark ? '' : ' wait'}">
-      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}% &middot; <span class="g-gems">${gems} gems earned</span></div>
+      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}% <span class="s" style="font-weight:600;color:var(--muted)">(AI, 10% reduction applied)</span> &middot; <span class="g-gems">${gems} gems earned</span></div>
       <p>${esc(short)}</p>
     </div>`;
 
@@ -649,18 +654,19 @@ function drawSolveStatus() {
   if (results) results.innerHTML = `
     <div class="qresults">
       <div class="qres">
-        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.sparkle}</svg>Feedback</h5>
+        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.sparkle}</svg>AI Feedback</h5>
         <p>${esc(short)}</p>
         ${feedback.length > 130 ? `<button type="button" class="slv-link-btn" onclick="showFullFeedback()">View detailed feedback</button>` : ''}
       </div>
       <div class="qres center">
         <h5>Score</h5>
         <div class="score-ring" style="--pct:${sub.score};--ring-color:${sub.score >= passMark ? 'var(--ok)' : 'var(--gold)'}"><span class="val">${sub.score}%</span></div>
+        <div class="sub-note">(AI)</div>
       </div>
       <div class="qres center">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Gems Earned</h5>
         <div class="slv-gem-big"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${gems}</div>
-        <div class="sub-note">awarded by score</div>
+        <div class="sub-note">10% AI-grading reduction applied</div>
       </div>
       <div class="qres">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.clock}</svg>Submission</h5>
@@ -703,7 +709,7 @@ function drawWorkArea() {
       </div>
       <div class="qide-out"><div id="svTerm"></div></div>
       ${opts.submit ? '<div id="svResults"></div>' : ''}
-      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded instantly, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
+      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded by AI on the spot with a 10% reduction, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
     </div>`;
 
   if (!isLearner) {
@@ -730,7 +736,7 @@ function drawWorkArea() {
             <label class="field"><span>Your work</span><input name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.png,.jpg,.jpeg,.zip" required></label>
             <button class="btn lc-btn-solve">${sub ? 'Resubmit for grading' : 'Submit for grading'}</button>
           </form>
-          <p class="hint" style="margin-top:10px">Submissions are graded instantly, and gems are awarded by score.${svCertNote()}</p>
+          <p class="hint" style="margin-top:10px">Submissions are graded by AI on the spot with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
         </div></div>
       <div id="svResults" style="margin-top:16px"></div>`;
     $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });

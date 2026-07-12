@@ -882,6 +882,17 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .slv-hint[open] .chev{transform:rotate(180deg)}
 .slv-hint-body{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--text);line-height:1.55}
 
+.slv-refgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+@media (max-width:560px){.slv-refgrid{grid-template-columns:repeat(2,1fr)}}
+.slv-refcell{border-radius:11px;padding:10px 8px;text-align:center;border:1px solid transparent}
+.slv-refcell .rng{font-family:var(--font-mono);font-size:12px;font-weight:700}
+.slv-refcell .lbl{font-size:12.5px;font-weight:700;margin-top:3px}
+.slv-refcell.c0{background:#FFF4E8;border-color:#F6DFBB;color:#B5651D}
+.slv-refcell.c1{background:#EDFBF3;border-color:#BEE9DA;color:#178A5B}
+.slv-refcell.c2{background:#EAF3FE;border-color:#CBDFFB;color:#1D5FBF}
+.slv-refcell.c3{background:#F3EEFD;border-color:#DCD2F5;color:#6B3FB8}
+.slv-refcell.c4{background:#FDEEF6;border-color:#F6D3E6;color:#B8317F}
+
 .slv-results{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:12px;align-items:start}
 @media (max-width:920px){.slv-results{grid-template-columns:1fr 1fr}}
 .slv-rcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:6px;min-width:0}

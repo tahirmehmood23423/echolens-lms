@@ -28,17 +28,6 @@
   <span id="userBox"></span>
 </nav>
 
-<div class="cmp-wrap" id="gateWrap" style="display:none">
-  <div class="auth-gate-card">
-    <img src="/img/logo.png" alt="EchoLens" style="width:90px;margin-bottom:14px">
-    <h2 style="font-family:var(--font-display);margin-bottom:6px">The EchoLens compiler is free</h2>
-    <p class="s" style="color:var(--muted);margin-bottom:18px">Python (with numpy, pandas, matplotlib), C, C++, SQL and live web preview - free for everyone, forever. Just sign in so we know who's coding.</p>
-    <a class="btn btn-primary btn-block" id="gBtn" href="/auth/google?back=/compiler" style="display:none;margin-bottom:10px">Continue with Google - free</a>
-    <a class="btn btn-teal btn-block" href="/open#signup" style="margin-bottom:10px">Create a free account with email</a>
-    <a class="btn btn-ghost btn-block" href="/login">Already have an account? Sign in</a>
-  </div>
-</div>
-
 <div class="cmp-wrap" id="appWrap" style="display:none">
   <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:14px">
     <div>
@@ -91,15 +80,11 @@ function toast(t, err) { const el = $('toast'); el.textContent = t; el.className
     if (!r.ok) throw new Error();
     ME = await r.json();
   } catch { ME = null; }
-  if (!ME) {
-    // Sign-in required even for the free compiler - it feeds the leads list.
-    $('gateWrap').style.display = '';
-    $('userBox').innerHTML = '<a class="btn btn-primary btn-sm" href="/login">Sign in</a>';
-    try { const p = await (await fetch('/api/auth/providers')).json(); if (p.google) $('gBtn').style.display = ''; } catch {}
-    return;
-  }
+  // The compiler is fully open - no sign-in needed to write and run code.
   $('appWrap').style.display = '';
-  $('userBox').innerHTML = `<span class="s" style="color:var(--muted);margin-right:10px">${ME.name}</span><a class="btn btn-ghost btn-sm" href="${ME.role === 'free' ? '/open' : '/dashboard'}">${ME.role === 'free' ? 'Open portal' : 'My portal'}</a>`;
+  $('userBox').innerHTML = ME
+    ? `<span class="s" style="color:var(--muted);margin-right:10px">${ME.name}</span><a class="btn btn-ghost btn-sm" href="${ME.role === 'free' ? '/open' : '/dashboard'}">${ME.role === 'free' ? 'Open portal' : 'My portal'}</a>`
+    : '<a class="btn btn-primary btn-sm" href="/open#signup">Sign in - free</a>';
   TERM = EchoTerm.mount($('term'));
   EchoRun.wireEditor($('code'));
 })();

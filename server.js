@@ -981,6 +981,15 @@ app.post('/api/admin/catalogue/load-official', authRequired, adminRequired, (req
 // levels of every quest track in the browser compiler. Everything beyond the
 // open levels requires an account (created by the academy after payment).
 const OPEN_LEVELS = Number(process.env.OPEN_LEVELS || 1); // catalogue: Level 1 of every paid course is free; free tracks open fully
+// Newsletter sign-up from the landing page: every email becomes a lead the
+// admin can download. No account is created and nothing is emailed back.
+app.post('/api/public/subscribe', (req, res) => {
+  const email = String((req.body || {}).email || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  Leads.upsert({ name: email.split('@')[0], email, source: 'newsletter' });
+  res.json({ ok: true });
+});
+
 app.get('/api/public/info', (req, res) => {
   res.json({
     // v12: the full catalogue is no longer openly visible - it lives behind
@@ -991,7 +1000,7 @@ app.get('/api/public/info', (req, res) => {
       tracks: Quests.tracks().length,
     },
     open_levels: OPEN_LEVELS,
-    contact: 'echolens816@gmail.com',
+    contact: 'info@echolens.digital',
   });
 });
 app.get('/api/public/tracks', (req, res) => res.json({ tracks: Quests.tracks(), open_levels: OPEN_LEVELS }));

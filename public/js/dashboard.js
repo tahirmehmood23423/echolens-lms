@@ -166,7 +166,7 @@ async function renderOverview() {
     <div class="card"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
       <div style="flex:1;min-width:220px">
         <strong>You're on the free tier.</strong>
-        <div class="s" style="color:var(--muted)">${d.free.open_challenges} open challenge${d.free.open_challenges === 1 ? '' : 's'} &middot; ${d.free.solved} solved by you. Earn gems, climb stages, share your profile. Want full courses, live classes, and teacher feedback? <a href="mailto:echolens816@gmail.com">Ask about the portal</a>.</div>
+        <div class="s" style="color:var(--muted)">${d.free.open_challenges} open challenge${d.free.open_challenges === 1 ? '' : 's'} &middot; ${d.free.solved} solved by you. Earn gems, climb stages, share your profile. Want full courses, live classes, and teacher feedback? <a href="mailto:info@echolens.digital">Ask about the portal</a>.</div>
       </div>
       <button class="btn btn-teal" onclick="show('challenges')">Open challenges</button>
     </div></div>`;

@@ -1045,6 +1045,17 @@ function renderEventDetail() {
   const statusMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait" style="margin-top:12px">${esc(d.participate_msg)}</div>`
     : prog && prog.passed ? `<div class="task-status ok" style="margin-top:12px"><strong>Passed with ${prog.avg}%</strong> — your certificate is under Events › My certificates.</div>` : '';
 
+  // problem statement block (shared by Overview + Problem Statement)
+  const selector = (ev.problems || []).length > 1
+    ? `<div class="evd-chips" style="margin-bottom:12px">${ev.problems.map((x) =>
+        `<span class="evd-chip" style="cursor:pointer;${x.pid === CUR_EV_PID ? 'border-color:var(--primary);color:var(--primary)' : ''}" onclick="evSelectProblem(${x.pid})">${esc(x.title)}</span>`).join('')}</div>` : '';
+  const body = p ? esc(p.description || 'No description provided.') : esc(ev.description || 'See the instructions and documents for details.');
+  const problemBlock = `${selector}<p>${body}</p>
+    <details class="evd-ex"><summary>▾ Examples</summary>
+      <div class="evd-ex-row"><div class="k">Input</div><div class="v">(see the problem statement)</div></div>
+      <div class="evd-ex-row"><div class="k">Output</div><div class="v">Produce the result described above.</div></div>
+    </details>`;
+
   const overview = `<div class="evd-sec" id="evdSec-overview">
     <div class="evd-titlerow"><h2>${esc(ev.title)}</h2><span class="evd-star" title="Featured">${star}</span></div>
     <div class="evd-chips" style="margin:12px 0">
@@ -1055,23 +1066,15 @@ function renderEventDetail() {
       ${ev.auto_grade ? `<span class="evd-chip">${checkI} Instant grading</span>` : ''}
     </div>
     ${banner}
-    ${regBtn ? `<div style="margin-top:12px">${regBtn}</div>` : ''}
+    ${regBtn ? `<div style="margin:12px 0">${regBtn}</div>` : ''}
     ${statusMsg}
+    <h3 style="margin-top:16px">Problem Statement</h3>
+    ${problemBlock}
   </div>`;
 
-  // problem statement (selected problem, with optional selector)
-  const selector = (ev.problems || []).length > 1
-    ? `<div class="evd-chips" style="margin-bottom:12px">${ev.problems.map((x) =>
-        `<span class="evd-chip" style="cursor:pointer;${x.pid === CUR_EV_PID ? 'border-color:var(--primary);color:var(--primary)' : ''}" onclick="evSelectProblem(${x.pid})">${esc(x.title)}</span>`).join('')}</div>` : '';
-  const body = p ? esc(p.description || 'No description provided.') : esc(ev.description || 'See the instructions and documents for details.');
   const problemSec = `<div class="evd-sec" id="evdSec-problem">
     <h3>Problem Statement</h3>
-    ${selector}
-    <p>${body}</p>
-    <details class="evd-ex"><summary>▾ Examples</summary>
-      <div class="evd-ex-row"><div class="k">Input</div><div class="v">(see the problem statement)</div></div>
-      <div class="evd-ex-row"><div class="k">Output</div><div class="v">Produce the result described above.</div></div>
-    </details>
+    ${problemBlock}
   </div>`;
 
   // instructions
@@ -1132,7 +1135,7 @@ function renderEventDetail() {
   wireEventWorkspace();
   renderDiscussion();
   startEventCountdown();
-  evSetActiveNav('overview');
+  evNavGo('overview');
 }
 
 function renderEventWorkspace() {
@@ -1245,7 +1248,12 @@ function evToggleEditorTheme() {
 
 function evSelectProblem(pid) { CUR_EV_PID = pid; renderEventDetail(); }
 function evScrollWork() { const w = document.querySelector('.evd-work'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-function evNavGo(sec) { const el = $('evdSec-' + sec); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); evSetActiveNav(sec); }
+// The left nav switches the middle column between sections (one visible at a
+// time) so the page stays roughly one screen tall.
+function evNavGo(sec) {
+  document.querySelectorAll('.evd-main > .evd-sec').forEach((s) => { s.style.display = s.id === 'evdSec-' + sec ? '' : 'none'; });
+  evSetActiveNav(sec);
+}
 function evSetActiveNav(sec) { document.querySelectorAll('.evd-nav a').forEach((a) => a.classList.toggle('active', a.dataset.sec === sec)); }
 
 function startEventCountdown() {

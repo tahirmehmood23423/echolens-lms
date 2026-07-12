@@ -522,7 +522,7 @@ function drawCourse() {
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
         ${t.free ? '<span class="kbadge quest">FREE COURSE</span>' : ''}
         <span class="mono s" style="color:var(--muted-2)">${esc(t.course_code || '')}</span>
-        <span class="s" style="color:var(--muted)">Pass mark ${t.pass_mark || 60}% · ${t.submission_mode === 'file' ? 'File submissions (PDF, Word, PNG, JPEG)' : 'Code submissions in the built-in compiler'} · AI graded with a 10% reduction</span>
+        <span class="s" style="color:var(--muted)">Pass mark ${t.pass_mark || 60}% · ${t.submission_mode === 'file' ? 'File submissions (PDF, Word, PNG, JPEG)' : 'Code submissions in the built-in compiler'} · Graded instantly</span>
       </div>
       <h2 style="font-family:var(--font-display);font-size:24px;color:var(--ink)">${esc(t.title)}</h2>
       <p class="s" style="color:var(--muted);margin-top:4px">${esc(t.description || '')}</p>
@@ -584,7 +584,7 @@ function drawSolveStatus() {
   const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];
   $('svStatusBox').innerHTML = sub
     ? (sub.score != null
-      ? `<div class="task-status ok">Graded ${sub.score}% (AI, 10% reduction applied) · ${Math.round((sub.score / 100) * (CUR_PROBLEM.problem.points || 100))} gems earned${sub.feedback ? `<br><span class="s">${esc(sub.feedback)}</span>` : ''}</div>`
+      ? `<div class="task-status ok">Graded ${sub.score}% · ${Math.round((sub.score / 100) * (CUR_PROBLEM.problem.points || 100))} gems earned${sub.feedback ? `<br><span class="s">${esc(sub.feedback)}</span>` : ''}</div>`
       : '<div class="task-status wait">Submitted - your grade will appear here once it is marked.</div>')
     : '';
 }
@@ -627,7 +627,7 @@ function drawWorkArea() {
         <textarea id="svCode" class="code-editor ide-editor" spellcheck="false" placeholder="# Write your solution here. Run to test, Submit for grading and gems."></textarea>
         <div class="ide-status-row"><span class="s" id="svStatus" style="color:var(--muted-2)">Ready - runs in your browser, nothing to install.</span></div>
         <div id="svTerm"></div>
-        <p class="hint" style="margin:10px 14px 14px">Submissions are graded by AI on the spot with a 10% reduction, and gems are awarded by score.${CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''}</p>
+        <p class="hint" style="margin:10px 14px 14px">Submissions are graded instantly, and gems are awarded by score.${CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''}</p>
       </div>`;
     SV_TERM = EchoTerm.mount($('svTerm'));
     EchoRun.wireEditor($('svCode'));
@@ -640,7 +640,7 @@ function drawWorkArea() {
             <label class="field"><span>Your work</span><input name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.png,.jpg,.jpeg,.zip" required></label>
             <button class="btn lc-btn-solve">${sub ? 'Resubmit for grading' : 'Submit for grading'}</button>
           </form>
-          <p class="hint" style="margin-top:10px">Submissions are graded by AI on the spot with a 10% reduction, and gems are awarded by score.${CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''}</p>
+          <p class="hint" style="margin-top:10px">Submissions are graded instantly, and gems are awarded by score.${CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''}</p>
         </div></div>`;
     $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });
   }
@@ -716,7 +716,7 @@ async function loadEvents() {
         <div class="s" style="color:var(--muted);font-size:12.5px">${esc((ev.description || '').slice(0, 140))}${(ev.description || '').length > 140 ? '…' : ''}</div>
         <div class="s" style="color:var(--muted)">${ev.entry === 'paid' ? '<strong>PKR ' + ev.fee_pkr + '</strong>' : '<strong style="color:var(--ok)">FREE</strong>'}
           ${ev.duration_minutes ? ' · About ' + ev.duration_minutes + ' minutes' : ''}${(ev.problems || []).length ? ' · ' + ev.problems.length + ' tasks' : ''}
-          ${ev.auto_certificate ? ' · Certificate at ' + ev.pass_mark + '%+' : ''}${ev.auto_grade ? ' · AI graded' : ''}</div>
+          ${ev.auto_certificate ? ' · Certificate at ' + ev.pass_mark + '%+' : ''}${ev.auto_grade ? ' · Graded instantly' : ''}</div>
         ${ev.my_progress && ev.my_progress.avg != null ? `<div class="oq-prog"><div style="width:${Math.min(100, ev.my_progress.avg)}%"></div></div>
           <div class="s" style="color:${ev.my_progress.passed ? 'var(--ok)' : 'var(--muted)'}">${ev.my_progress.passed ? 'Passed with ' + ev.my_progress.avg + '%' : 'Average so far: ' + ev.my_progress.avg + '%'}</div>` : ''}
         <button class="lc-btn-solve" style="margin-top:6px" onclick="openOpenEvent(${ev.id})">${ev.my_entry ? 'Continue' : ev.kind === 'webinar' ? 'Register' : 'Start'}</button>
@@ -748,7 +748,7 @@ async function openOpenEvent(id) {
   openModal(ev.title, `
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind]}</span>
-      <span class="s" style="color:var(--muted)">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} · Pass mark ${ev.pass_mark}%${ev.duration_minutes ? ' · About ' + ev.duration_minutes + ' minutes' : ''}${ev.auto_grade ? ' · AI graded with a 10% reduction' : ''}${ev.auto_certificate ? ' · Automatic certificate' : ''}</span></div>
+      <span class="s" style="color:var(--muted)">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} · Pass mark ${ev.pass_mark}%${ev.duration_minutes ? ' · About ' + ev.duration_minutes + ' minutes' : ''}${ev.auto_grade ? ' · Graded instantly' : ''}${ev.auto_certificate ? ' · Automatic certificate' : ''}</span></div>
     ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
     ${(ev.files || []).length ? `<div class="s" style="margin-bottom:8px"><strong>Documents:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join(' · ')}</div>` : ''}
     ${regBtn}
@@ -764,7 +764,7 @@ async function openOpenEvent(id) {
             <strong style="font-size:13.5px">${esc(p.title)}</strong>
             <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
             <span style="flex:1"></span>
-            ${s ? (s.score != null ? `<span class="grade-chip ok">${s.score}%${s.graded_by === 'ai' ? ' (AI)' : ''}</span>` : '<span class="grade-chip wait">Grading</span>') : ''}
+            ${s ? (s.score != null ? `<span class="grade-chip ok">${s.score}%</span>` : '<span class="grade-chip wait">Grading</span>') : ''}
             <button class="lc-btn-solve" onclick="openEventSolve(${ev.id},${p.pid})">${s ? 'Reopen' : 'Solve'}</button>
           </div>
           ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">${esc(s.ai_feedback)}</div>` : ''}
@@ -813,7 +813,7 @@ async function openEventSolve(eid, pid) {
   openModal(p.title, `
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
-      <span class="s" style="color:var(--muted)">${p.points} pts · ${EV_LANG_LABEL[ev.compiler] || 'File or link'}${ev.auto_grade ? ' · Graded instantly by AI with a 10% reduction' : ''}</span></div>
+      <span class="s" style="color:var(--muted)">${p.points} pts · ${EV_LANG_LABEL[ev.compiler] || 'File or link'}${ev.auto_grade ? ' · Graded instantly' : ''}</span></div>
     <div class="s" style="white-space:pre-line;line-height:1.6;margin-bottom:12px">${esc(p.description)}</div>
     ${lang ? `
       <div class="task-ide card" style="margin-bottom:12px">
@@ -871,6 +871,6 @@ async function runEvent2(lang) {
 }
 function afterSubmitToast(out) {
   if (out.cert) toast(`Passed - certificate ${out.cert.serial} issued. Find it under My certificates.`);
-  else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}% (AI score with the 10% reduction applied).`);
+  else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}%.`);
   else toast('Submitted - it will be graded soon.');
 }

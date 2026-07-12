@@ -2566,7 +2566,7 @@ async function renderEvents() {
           <div class="grow">
             <div class="t"><span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}</span> &nbsp;${esc(ev.title)}
               <span class="s" style="font-weight:500;color:var(--muted)">&middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; ${ev.scope === 'both' ? 'Portal + open site' : ev.scope === 'open' ? 'Open site' : 'Portal only'}</span></div>
-            <div class="s" style="color:var(--muted)">${(ev.problems || []).length ? (ev.problems.length + ' task' + (ev.problems.length > 1 ? 's' : '') + ' &middot; ') : ''}${ev.compiler !== 'none' ? EV_LANG_LABEL[ev.compiler] + ' compiler &middot; ' : ''}${ev.auto_grade ? 'AI graded &middot; ' : ''}${ev.auto_certificate ? 'Certificate at ' + ev.pass_mark + '%+ &middot; ' : ''}${ev.entries_count} registered</div>
+            <div class="s" style="color:var(--muted)">${(ev.problems || []).length ? (ev.problems.length + ' task' + (ev.problems.length > 1 ? 's' : '') + ' &middot; ') : ''}${ev.compiler !== 'none' ? EV_LANG_LABEL[ev.compiler] + ' compiler &middot; ' : ''}${ev.auto_grade ? 'Graded instantly &middot; ' : ''}${ev.auto_certificate ? 'Certificate at ' + ev.pass_mark + '%+ &middot; ' : ''}${ev.entries_count} registered</div>
             ${ev.my_entry ? `<div class="s" style="color:var(--ok)">Registered${ev.my_entry.payment_status === 'pending' ? ' - <span style="color:var(--gold)">payment being verified</span>' : ev.my_entry.payment_status === 'rejected' ? ' - <span style="color:var(--danger)">payment rejected, contact admin</span>' : ''}${ev.my_progress && ev.my_progress.passed ? ' &middot; <strong>PASSED ' + ev.my_progress.avg + '%</strong>' : ev.my_progress && ev.my_progress.avg != null ? ' &middot; avg ' + ev.my_progress.avg + '%' : ''}</div>` : ''}
           </div>
           <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
@@ -2709,7 +2709,7 @@ async function openEvent(id) {
   openModal(ev.title, `
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}</span> ${evStatusBadge(ev.status)}
-      <span class="s" style="color:var(--muted)">${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) + ' &rarr; ' + esc(String(ev.ends_at || '').replace('T', ' ')) : ev.duration_minutes ? '~' + ev.duration_minutes + ' minutes' : ''} &middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; Pass mark ${ev.pass_mark}%${ev.auto_grade ? ' &middot; AI graded (-10%)' : ''}${ev.auto_certificate ? ' &middot; auto certificate' : ''}</span></div>
+      <span class="s" style="color:var(--muted)">${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) + ' &rarr; ' + esc(String(ev.ends_at || '').replace('T', ' ')) : ev.duration_minutes ? '~' + ev.duration_minutes + ' minutes' : ''} &middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; Pass mark ${ev.pass_mark}%${ev.auto_grade ? ' &middot; Graded instantly' : ''}${ev.auto_certificate ? ' &middot; auto certificate' : ''}</span></div>
     ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
     ${filesHtml}
     ${regBtn}${gateMsg}${passedMsg}${webinarHtml}
@@ -2723,7 +2723,7 @@ async function openEvent(id) {
             <span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span>
             <span class="s" style="color:var(--muted)">${p.points} pts</span>
             <span style="flex:1"></span>
-            ${s ? (s.score != null ? `<span class="grade-chip ok">Scored ${s.score}%${s.graded_by === 'ai' ? ' (AI graded)' : ''}</span>` : '<span class="grade-chip wait">Submitted - grading</span>') : '<span class="grade-chip none">Not submitted</span>'}
+            ${s ? (s.score != null ? `<span class="grade-chip ok">Scored ${s.score}%</span>` : '<span class="grade-chip wait">Submitted - grading</span>') : '<span class="grade-chip none">Not submitted</span>'}
             <button class="btn btn-teal btn-sm" onclick="openEventTask(${ev.id},${p.pid})">${s ? 'Reopen' : 'Solve'}</button>
           </div>
           ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">${esc(s.ai_feedback)}</div>` : ''}
@@ -2765,7 +2765,7 @@ async function openEventTask(eid, pid) {
   openModal(`${esc(p.title)}`, `
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span>
-      <span class="s" style="color:var(--muted)">${p.points} pts &middot; ${lang ? EV_LANG_LABEL[lang] : 'file / link submission'}${ev.auto_grade ? ' &middot; graded by AI instantly (-10%)' : ''}</span></div>
+      <span class="s" style="color:var(--muted)">${p.points} pts &middot; ${lang ? EV_LANG_LABEL[lang] : 'file / link submission'}${ev.auto_grade ? ' &middot; graded instantly' : ''}</span></div>
     <div class="s" style="white-space:pre-line;line-height:1.6;margin-bottom:12px">${esc(p.description)}</div>
     ${lang && lang !== 'web' ? `
       <div class="task-ide card" style="margin-bottom:12px">
@@ -2827,7 +2827,7 @@ function wireEventSubForms(eid) {
     try {
       const out = await api(`/api/events/${eid}/submit`, { method: 'POST', body: fd });
       if (out.cert) toast(`Passed - certificate ${out.cert.serial} issued. Find it on your profile.`);
-      else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}% (AI score with the 10% reduction applied).`);
+      else if (out.submission && out.submission.score != null) toast(`Graded instantly: ${out.submission.score}%.`);
       else toast('Submitted - it will be graded soon.');
       openEvent(eid);
     } catch (err) { modalMsg(err.message); btn.disabled = false; }

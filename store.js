@@ -939,6 +939,23 @@ const Quests = {
     const qids = Quests.forBatch(bid).map((q) => q.id);
     return data.quest_submissions.filter((s) => qids.includes(s.quest_id) && s.grade == null).length;
   },
+  // Ungraded submissions for a batch, with quest/problem/student details -
+  // powers the teacher portal's "Grades" page and Overview "to review" list.
+  pendingSubmissionsForBatch(bid) {
+    const out = [];
+    Quests.forBatch(bid).forEach((q) => {
+      data.quest_submissions.filter((s) => s.quest_id === q.id && s.grade == null).forEach((s) => {
+        const u = Users.byId(s.user_id) || {};
+        const p = q.problems.find((x) => x.pid === s.pid) || {};
+        out.push({
+          submission_id: s.id, quest_id: q.id, pid: s.pid, level: q.no, quest_title: q.title,
+          problem_title: p.title || '', student_id: u.id, student_name: u.name, student_reg: u.reg_no,
+          submitted_at: s.submitted_at, late: !!s.late,
+        });
+      });
+    });
+    return out.sort((a, b) => String(a.submitted_at).localeCompare(b.submitted_at));
+  },
 };
 
 // Quest gems count toward global stages and course totals.

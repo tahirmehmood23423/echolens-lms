@@ -85,6 +85,7 @@ const TITLES = {
   'admin-catalogue': 'Catalogue & new course', 'admin-users': 'People',
   assignments: 'Assignments', quizzes: 'Quizzes', progress: 'Progress',
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
+  students: 'Students', grades: 'Grades', attendance: 'Attendance', analytics: 'Analytics',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -101,6 +102,8 @@ function show(view) {
     'admin-catalogue': renderCatalogue, 'admin-users': renderUsers,
     assignments: renderAssignments, quizzes: renderQuizzesGlobal, progress: renderProgress,
     certificates: renderCertificates, messages: renderMessages, resources: renderResources,
+    students: renderTeacherStudents, grades: renderTeacherGrades, attendance: renderTeacherAttendance,
+    analytics: renderTeacherAnalytics,
   }[view];
   if (render) render();
 }
@@ -122,6 +125,12 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
     document.querySelectorAll('.student-only').forEach((el) => (el.style.display = ''));
     refreshMessageBadge();
     wireTopSearch();
+  }
+  if (ME.role === 'instructor') {
+    document.querySelectorAll('.instructor-only').forEach((el) => (el.style.display = ''));
+    document.querySelectorAll('.instructor-hide').forEach((el) => (el.style.display = 'none'));
+    $('bellBtn').style.display = '';
+    refreshMessageBadge();
   }
   if (ME.role === 'free') ['courses', 'schedule', 'announcements', 'assignments', 'quizzes', 'certificates', 'messages', 'resources'].forEach((v) => { const n = document.querySelector(`.nav-item[data-view="${v}"]`); if (n) n.style.display = 'none'; });
   if (ME.gamify && ME.gamify.streak > 0) {
@@ -217,6 +226,7 @@ async function renderOverview() {
   const d = await api('/api/overview');
 
   if (ME.role === 'student' && d.gamify) { renderStudentOverview(el, d); return; }
+  if (ME.role === 'instructor' && d.teaching) { renderInstructorOverview(el, d); return; }
 
   let top = '';
   if (ME.role === 'free' && d.gamify) {
@@ -244,14 +254,6 @@ async function renderOverview() {
     </div></div>` : ''}`;
     if (ME.role === 'coordinator') top = `<div class="card"><div class="card-body" style="font-size:13.5px;color:var(--muted)">You have view-only access: track progress across every course, but adding, editing, or grading is reserved for teachers and admins.</div></div>` + top;
   }
-  if (ME.role === 'instructor' && d.teaching) {
-    top = `<div class="stat-grid">
-      ${stat(d.courses.length, 'Courses you teach')}
-      ${stat(d.teaching.pending_to_grade, 'Submissions waiting for grades')}
-      ${stat(d.upcoming.length, 'Upcoming classes')}
-    </div>`;
-  }
-
   el.innerHTML = `
     ${top}
     <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start" class="ovr-grid">
@@ -283,6 +285,158 @@ function emptyScheduleHTML(sub) {
     <div class="empty-title">No upcoming activities</div>
     <div class="empty-sub">${esc(sub || "You're all caught up - check back soon.")}</div>
   </div>`;
+}
+
+/* -------------------------- teacher overview (v15) -------------------------- */
+const T_ICONS = {
+  book: '<svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 9h16"/></svg>',
+  clipboard: '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8.5 12l2 2 4-4.5"/></svg>',
+  people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 14.8c3 0 6 1.7 6 5.2"/></svg>',
+  trend: '<svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  megaphone: '<svg viewBox="0 0 24 24"><path d="M3 11l14-6v14L3 13z"/><path d="M7 12v5"/></svg>',
+  upload: '<svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>',
+  chart: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="M8 14l2.5 2.5L16 11"/></svg>',
+};
+const TC_PALETTE = ['#1F2937', '#6D5DF6', '#0FBFA8', '#38BDF8', '#F0A82A', '#7C3AED'];
+function courseColor(id) { return TC_PALETTE[Number(id) % TC_PALETTE.length]; }
+function tpStat(color, icon, n, label, sub, subCls) {
+  return `<div class="tp-stat"><div class="tp-ic ${color}">${icon}</div>
+    <div><div class="n">${n}</div><div class="l">${esc(label)}</div>${sub ? `<div class="sub ${subCls || 'info'}">${esc(sub)}</div>` : ''}</div></div>`;
+}
+function qaBtn(color, icon, label, onclick) {
+  return `<button type="button" class="qa-btn" onclick="${onclick}"><div class="tp-ic ${color}">${icon}</div><span class="lbl">${esc(label)}</span></button>`;
+}
+function classStatus(s) {
+  const mk = (t) => { if (!t) return null; const [h, m] = t.split(':').map(Number); const d = new Date(); d.setHours(h, m || 0, 0, 0); return d; };
+  const now = new Date(), start = mk(s.start_time), end = mk(s.end_time);
+  if (start && now >= start && (!end || now <= end)) return { cls: 'live', label: 'Live now' };
+  if (start && now < start) {
+    const diffMin = Math.round((start - now) / 60000);
+    return diffMin < 60 ? { cls: 'soon', label: `Starts in ${diffMin}m` } : { cls: 'later', label: `Starts in ${Math.round(diffMin / 60)}h` };
+  }
+  return { cls: 'later', label: 'Today' };
+}
+function tcRow(s) {
+  const st = classStatus(s);
+  const btn = st.cls === 'live'
+    ? (s.join_url ? `<a class="btn btn-primary btn-sm" href="${esc(s.join_url)}" target="_blank" rel="noopener">Join Class</a>` : `<button class="btn btn-primary btn-sm" onclick="show('schedule')">Join Class</button>`)
+    : `<button class="btn btn-ghost btn-sm" onclick="show('schedule')">View Details</button>`;
+  return `<div class="tc-row">
+    <div class="tc-ic" style="background:${courseColor(s.batch_id)}">${T_ICONS.book}</div>
+    <div class="tc-when">${s.start_time ? esc(s.start_time) : '&mdash;'}</div>
+    <div class="tc-main"><div class="t">${esc(s.title)}</div><div class="s">${esc(s.course_title || '')}${s.batch_name ? ' &middot; ' + esc(s.batch_name) : ''}</div></div>
+    <span class="tc-status ${st.cls}"><span class="dot"></span>${st.label}</span>
+    ${btn}
+  </div>`;
+}
+function rvRow(r) {
+  const pct = r.total ? Math.round((r.submitted / r.total) * 100) : 0;
+  return `<div class="rv-row">
+    <div class="rv-ic">${T_ICONS.clipboard}</div>
+    <div class="rv-main">
+      <div class="t">${esc(r.title)}</div>
+      <div class="s">Submitted: ${r.submitted}/${r.total}</div>
+      <div class="cl-bar" style="margin-top:6px"><div class="cl-fill rv-fill" data-w="${pct}"></div></div>
+    </div>
+    <span class="rv-badge" style="cursor:pointer" onclick="reviewSubmission(${r.batch_id},${r.quest_id},${r.pid})">${r.to_review} to review</span>
+  </div>`;
+}
+function timeAgo(ts) {
+  if (!ts) return '';
+  const diff = Math.max(0, (Date.now() - new Date(String(ts).replace(' ', 'T') + 'Z').getTime()) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  return Math.floor(diff / 86400) + 'd ago';
+}
+function msgRow(t) {
+  const m = t.last_message;
+  return `<div class="msg-row" style="cursor:pointer" onclick="openMessageThread(${t.batch_id})">
+    ${avatarHtml(m.avatar, m.display_name, 36)}
+    <div style="flex:1;min-width:0">
+      <div class="t">${esc(m.display_name)}${t.unread ? ` <span class="bell-badge" style="position:static;display:inline-flex">${t.unread}</span>` : ''}</div>
+      <div class="s">${esc(t.course_title)} &middot; ${esc(m.body).slice(0, 60)}${m.body.length > 60 ? '&hellip;' : ''}</div>
+    </div>
+    <span class="msg-when">${timeAgo(m.created_at)}</span>
+  </div>`;
+}
+async function loadTeacherRecentMessages() {
+  const box = $('tpMessages'); if (!box) return;
+  try {
+    const d = await api('/api/my/messages');
+    const withMsg = d.threads.filter((t) => t.last_message)
+      .sort((a, b) => String(b.last_message.created_at).localeCompare(String(a.last_message.created_at))).slice(0, 5);
+    box.innerHTML = withMsg.length ? withMsg.map(msgRow).join('') : '<div class="empty">No messages yet.</div>';
+  } catch { box.innerHTML = '<div class="empty">Could not load messages.</div>'; }
+}
+async function renderInstructorOverview(el, d) {
+  const t = d.teaching;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const firstName = esc((ME.name || '').split(' ')[0] || 'there');
+  const dateStr = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const liveCount = t.today_sessions.filter((s) => classStatus(s).cls === 'live').length;
+  const upcomingCount = t.today_sessions.length - liveCount;
+  const classesSub = t.today_sessions.length ? `${liveCount} live &middot; ${upcomingCount} upcoming` : 'Nothing scheduled';
+  const reviewSub = t.assignments_to_review.length ? `${t.assignments_to_review.length} assignment${t.assignments_to_review.length === 1 ? '' : 's'} waiting` : 'All caught up';
+
+  el.innerHTML = `
+    <div class="tp-head">
+      <div><h2>${greeting}, ${firstName} &#128075;</h2><div class="s">Here's what's happening in your classes today.</div></div>
+      <div class="tp-date"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>${esc(dateStr)}</div>
+    </div>
+    <div class="tp-stat-grid">
+      ${tpStat('violet', T_ICONS.book, t.today_sessions.length, 'Classes Today', classesSub, liveCount ? 'up' : 'info')}
+      ${tpStat('teal', T_ICONS.clipboard, t.pending_to_grade, 'Assignments to Review', reviewSub, t.pending_to_grade ? 'warn' : 'up')}
+      ${tpStat('sky', T_ICONS.people, t.active_students, 'Active Students', `Across ${d.courses.length} course${d.courses.length === 1 ? '' : 's'}`, 'info')}
+      ${tpStat('gold', T_ICONS.trend, t.avg_progress + '%', 'Avg. Class Progress', 'Quest completion', 'info')}
+    </div>
+    <div class="tp-grid">
+      <div>
+        <div class="card"><div class="card-head"><h3>Today's Classes</h3><button class="btn btn-ghost btn-sm" onclick="show('schedule')">View full schedule</button></div>
+          <div class="card-body tight">${t.today_sessions.length ? t.today_sessions.map(tcRow).join('') : emptyScheduleHTML('No classes scheduled for today.')}</div></div>
+        <div class="card"><div class="card-head"><h3>Assignments to Review</h3><button class="btn btn-ghost btn-sm" onclick="show('grades')">View all</button></div>
+          <div class="card-body tight">${t.assignments_to_review.length ? t.assignments_to_review.map(rvRow).join('') : '<div class="empty">Nothing waiting for grades - nice work.</div>'}</div></div>
+      </div>
+      <div>
+        <div class="card"><div class="card-head"><h3>Recent Messages</h3><button class="btn btn-ghost btn-sm" onclick="show('messages')">View all</button></div>
+          <div class="card-body tight" id="tpMessages"><div class="empty">Loading&hellip;</div></div></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-head"><h3>Quick Actions</h3></div>
+      <div class="card-body"><div class="qa-grid">
+        ${qaBtn('violet', T_ICONS.plus, 'Create Assignment', "teacherQuickAction('assignment')")}
+        ${qaBtn('teal', T_ICONS.people, 'Take Attendance', "show('attendance')")}
+        ${qaBtn('gold', T_ICONS.clipboard, 'Grade Submissions', "show('grades')")}
+        ${qaBtn('sky', T_ICONS.megaphone, 'Create Announcement', "teacherQuickAction('announcement')")}
+        ${qaBtn('violet', T_ICONS.upload, 'Upload Material', "teacherQuickAction('material')")}
+        ${qaBtn('teal', T_ICONS.chart, 'View Analytics', "show('analytics')")}
+      </div></div></div>`;
+  requestAnimationFrame(() => el.querySelectorAll('.rv-fill').forEach((f) => (f.style.width = f.dataset.w + '%')));
+  loadTeacherRecentMessages();
+}
+async function reviewSubmission(batchId, questId, pid) {
+  await openCourse(batchId);
+  if (typeof openQuestSubs === 'function') openQuestSubs(questId, pid);
+}
+async function teacherQuickAction(kind) {
+  const d = await api('/api/overview');
+  const courses = d.courses || [];
+  if (!courses.length) { toast('You are not assigned to any course yet.', true); return; }
+  if (courses.length === 1) return teacherQuickActionGo(kind, courses[0].id);
+  const label = { assignment: 'Create assignment - choose a course', announcement: 'Post announcement - choose a course', material: 'Upload material - choose a course' }[kind];
+  openModal(label, `
+    <form id="f">
+      <label class="field"><span>Course</span><select name="batch_id">${courses.map((c) => `<option value="${c.id}">${esc(c.title || c.name)}</option>`).join('')}</select></label>
+      <button class="btn btn-primary btn-block">Continue</button></form>`);
+  $('f').addEventListener('submit', (e) => { e.preventDefault(); closeModal(); teacherQuickActionGo(kind, Number(e.target.batch_id.value)); });
+}
+async function teacherQuickActionGo(kind, batchId) {
+  await openCourse(batchId);
+  if (kind === 'announcement') formAnnouncement();
+  else if (kind === 'material') formLesson();
 }
 
 /* -------------------------- student overview (v13) -------------------------- */
@@ -486,6 +640,15 @@ async function renderCourses() {
 async function renderAssignments() {
   const el = $('view-assignments');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  if (ME.role === 'instructor') {
+    const d = await api('/api/overview');
+    el.innerHTML = d.courses.length ? `<div class="card"><div class="card-head"><h3>Manage assignments</h3><span class="s" style="color:var(--muted)">Quest levels &amp; tasks live inside each course</span></div>
+      <div class="card-body tight">${d.courses.map((c) => `
+        <div class="list-row"><div class="grow"><div class="t">${esc(c.title || c.name)}</div><div class="s" style="color:var(--muted)">${c.students} student${c.students === 1 ? '' : 's'}</div></div>
+          <button class="btn btn-teal btn-sm" onclick="openCourse(${c.id})">Open</button></div>`).join('')}</div></div>`
+      : '<div class="card"><div class="card-body"><div class="empty">No courses assigned to you yet.</div></div></div>';
+    return;
+  }
   const d = await api('/api/my/quests');
   if (!d.courses.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">No assignments yet - they appear once a teacher installs a quest track on your course.</div></div></div>'; return; }
   el.innerHTML = d.courses.map((c) => `
@@ -499,6 +662,113 @@ async function renderAssignments() {
           <span class="grade-chip ${l.passed ? 'ok' : (l.unlocked ? 'wait' : 'none')}">${l.passed ? '&#10003; Passed' : (l.unlocked ? 'In progress' : 'Locked')}</span>
           ${l.unlocked ? `<button class="btn btn-teal btn-sm" onclick="openCourse(${c.batch_id})">Open</button>` : ''}
         </div>`).join('')}</div></div>`).join('');
+}
+
+/* ============================ TEACHER: STUDENTS ============================ */
+async function renderTeacherStudents() {
+  const el = $('view-students');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/teacher/students');
+  if (!d.students.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">No students enrolled in your courses yet.</div></div></div>'; return; }
+  const courseOpts = d.courses.map((c) => `<option value="${c.id}">${esc(c.title)}</option>`).join('');
+  el.innerHTML = `
+    <div class="card"><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <input id="tsSearch" class="search-input" style="flex:1;min-width:200px;border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;font-size:13.5px" placeholder="Search by name or reg no&hellip;" oninput="filterTeacherStudents()">
+      <select id="tsCourse" onchange="filterTeacherStudents()" style="border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;font-size:13.5px"><option value="">All courses</option>${courseOpts}</select>
+    </div></div>
+    <div class="card"><div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl" id="tsTbl">
+      <tr><th>Student</th><th>Course</th><th>Level</th><th>Submitted</th><th>Avg grade</th><th>Gems</th><th>Risk</th></tr>
+      ${d.students.map((s) => `<tr data-batch="${s.batch_id}" data-search="${esc((s.name + ' ' + (s.reg_no || '')).toLowerCase())}">
+        <td>${avatarHtml(null, s.name, 28)} ${esc(s.name)}</td>
+        <td class="s">${esc(s.course_title)}</td>
+        <td>${s.of_levels ? s.level + '/' + s.of_levels : '&mdash;'}</td>
+        <td>${s.submitted}/${s.total_assignments}</td>
+        <td>${s.avg != null ? s.avg + '%' : '&mdash;'}</td>
+        <td>${gemChip(s.gems)}</td>
+        <td>${s.at_risk ? '<span class="grade-chip late">At risk</span>' : '<span class="grade-chip ok">OK</span>'}</td>
+      </tr>`).join('')}
+    </table></div></div>`;
+}
+function filterTeacherStudents() {
+  const q = $('tsSearch').value.trim().toLowerCase();
+  const batch = $('tsCourse').value;
+  document.querySelectorAll('#tsTbl tr[data-search]').forEach((tr) => {
+    const matchQ = !q || tr.dataset.search.includes(q);
+    const matchB = !batch || tr.dataset.batch === batch;
+    tr.style.display = matchQ && matchB ? '' : 'none';
+  });
+}
+
+/* ============================= TEACHER: GRADES ============================= */
+async function renderTeacherGrades() {
+  const el = $('view-grades');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/teacher/grades');
+  if (!d.pending.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">Nothing waiting for grades - nice work.</div></div></div>'; return; }
+  el.innerHTML = `<div class="card"><div class="card-head"><h3>Pending submissions</h3><span class="s" style="color:var(--muted)">${d.pending.length} waiting</span></div>
+    <div class="card-body tight">${d.pending.map((s) => `
+      <div class="list-row">
+        <div class="grow">
+          <div class="t">${esc(s.student_name)} &middot; ${esc(s.problem_title || s.quest_title)}</div>
+          <div class="s" style="color:var(--muted)">${esc(s.course_title)} &middot; Level ${s.level}${s.late ? ' &middot; <span style="color:var(--danger)">late</span>' : ''} &middot; submitted ${esc((s.submitted_at || '').slice(0, 16).replace(' ', ' '))}</div>
+        </div>
+        <button class="btn btn-teal btn-sm" onclick="reviewSubmission(${s.batch_id},${s.quest_id},${s.pid})">Review</button>
+      </div>`).join('')}</div></div>`;
+}
+
+/* =========================== TEACHER: ATTENDANCE =========================== */
+async function renderTeacherAttendance() {
+  const el = $('view-attendance');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/teacher/attendance');
+  if (!d.courses.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">No courses assigned to you yet.</div></div></div>'; return; }
+  el.innerHTML = d.courses.map((c) => `
+    <div class="card"><div class="card-head"><h3>${esc(c.course_title)}</h3>
+      <span class="s" style="color:var(--muted)">${c.avg_rate != null ? c.avg_rate + '% average attendance' : 'No classes held yet'}</span></div>
+      <div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line)">
+        ${c.active ? `<span class="grade-chip ok">Live now: ${esc(c.active.title)}</span>` : `<span class="s" style="color:var(--muted)">No class live right now</span>`}
+        <span style="flex:1"></span>
+        <button class="btn btn-ghost btn-sm" onclick="openCourse(${c.batch_id})">Open course</button>
+      </div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Date</th><th>Class</th><th>Present</th><th>Absent</th><th></th></tr>
+        ${c.past.length ? c.past.map((cl) => `<tr>
+          <td>${fmtDate(cl.date)}</td><td>${esc(cl.title)}</td>
+          <td><strong style="color:var(--ok)">${cl.present}</strong>/${cl.total}</td>
+          <td><strong style="color:var(--danger)">${cl.absent}</strong></td>
+          <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="openAttendanceSheet(${cl.id})">Sheet</button></td>
+        </tr>`).join('') : `<tr><td colspan="5" class="empty">No classes held yet.</td></tr>`}
+      </table></div></div>`).join('');
+}
+
+/* =========================== TEACHER: ANALYTICS =========================== */
+async function renderTeacherAnalytics() {
+  const el = $('view-analytics');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/teacher/analytics');
+  if (!d.courses.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">No courses assigned to you yet.</div></div></div>'; return; }
+  const totalAtRisk = d.courses.reduce((s, c) => s + c.at_risk, 0);
+  const totalGems = d.courses.reduce((s, c) => s + c.total_gems, 0);
+  el.innerHTML = `
+    <div class="stat-grid">
+      ${stat(d.total_students, 'Students taught')}
+      ${stat(d.courses.length, 'Courses')}
+      ${stat(totalAtRisk, 'Students at risk')}
+      ${stat(totalGems, 'Gems awarded')}
+    </div>
+    <div class="card"><div class="card-head"><h3>Per-course breakdown</h3></div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Course</th><th>Students</th><th>Avg grade</th><th>Avg progress</th><th>At risk</th><th>Gems</th></tr>
+        ${d.courses.map((c) => `<tr>
+          <td>${esc(c.course_title)}</td><td>${c.students}</td>
+          <td>${c.avg_grade != null ? c.avg_grade + '%' : '&mdash;'}</td>
+          <td>${c.avg_progress}%</td>
+          <td>${c.at_risk ? `<span style="color:var(--danger);font-weight:700">${c.at_risk}</span>` : '0'}</td>
+          <td>${gemChip(c.total_gems)}</td>
+        </tr>`).join('')}
+      </table></div></div>
+    <div class="card"><div class="card-head"><h3>Top learners</h3><span class="s" style="color:var(--muted)">Across all courses site-wide</span></div>
+      <div class="card-body tight">${(d.top_learners || []).map(lbRow).join('') || '<div class="empty">No gems earned yet.</div>'}</div></div>`;
 }
 
 /* =============================== QUIZZES (global) =============================== */

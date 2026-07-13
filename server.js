@@ -161,8 +161,60 @@ app.get('/api/overview', authRequired, (req, res) => {
     return res.json({ ...base, admin: Admin.overview(), leaderboard: studentLeaderboard().slice(0, 10) });
   }
   if (u.role === 'instructor') {
-    const pending = base.courses.reduce((sum, b) => sum + Quests.pendingCount(b.id), 0);
-    return res.json({ ...base, teaching: { pending_to_grade: pending }, leaderboard: studentLeaderboard().slice(0, 10) });
+    const myBatches = base.courses;
+    const pending = myBatches.reduce((sum, b) => sum + Quests.pendingCount(b.id), 0);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todaySessions = Sessions.upcomingForUser(u).filter((s) => s.session_date === todayStr);
+
+    // Assignments to review: pending submissions grouped by quest level, across every course taught.
+    const reviewRows = [];
+    myBatches.forEach((b) => {
+      const pendingSubs = Quests.pendingSubmissionsForBatch(b.id);
+      if (!pendingSubs.length) return;
+      const byQuest = new Map();
+      pendingSubs.forEach((s) => {
+        if (!byQuest.has(s.quest_id)) byQuest.set(s.quest_id, { quest_id: s.quest_id, pid: s.pid, level: s.level, title: s.quest_title, to_review: 0, students: new Set() });
+        const row = byQuest.get(s.quest_id);
+        row.to_review += 1; row.students.add(s.student_id);
+      });
+      const totalStudents = Enrollments.studentsForBatch(b.id).length;
+      byQuest.forEach((row) => {
+        reviewRows.push({
+          batch_id: b.id, course_title: b.title || b.name, quest_id: row.quest_id, pid: row.pid,
+          title: `${b.title || b.name} · Level ${row.level}: ${row.title}`,
+          submitted: row.students.size, total: totalStudents, to_review: row.to_review,
+        });
+      });
+    });
+    reviewRows.sort((a, b) => b.to_review - a.to_review);
+
+    // Active students: everyone enrolled across every course this teacher teaches.
+    const studentIds = new Set();
+    myBatches.forEach((b) => Enrollments.studentsForBatch(b.id).forEach((s) => studentIds.add(s.id)));
+
+    // Avg class progress: mean of each enrolled student's quest completion %.
+    let progSum = 0, progCount = 0;
+    myBatches.forEach((b) => {
+      if (!Quests.installed(b.id)) return;
+      Enrollments.studentsForBatch(b.id).forEach((s) => {
+        const prog = Quests.progress(s.id, b.id);
+        if (!prog || !prog.levels.length) return;
+        progSum += (prog.levels.filter((l) => l.passed).length / prog.levels.length) * 100;
+        progCount += 1;
+      });
+    });
+
+    return res.json({
+      ...base,
+      teaching: {
+        pending_to_grade: pending,
+        today_sessions: todaySessions,
+        assignments_to_review: reviewRows.slice(0, 8),
+        active_students: studentIds.size,
+        avg_progress: progCount ? Math.round(progSum / progCount) : 0,
+      },
+      leaderboard: studentLeaderboard().slice(0, 10),
+    });
   }
   if (u.role === 'free') {
     const mine = Challenges.mine(u.id);
@@ -205,6 +257,68 @@ app.get('/api/my/recommended', authRequired, (req, res) => {
     .sort((a, b) => Math.min(...(a.badges || []).map((x) => rank[x] ?? 9), 9) - Math.min(...(b.badges || []).map((x) => rank[x] ?? 9), 9))
     .slice(0, 6);
   res.json({ courses: out });
+});
+
+/* v15: teacher portal - cross-course aggregators. The quest/attendance/report
+ * systems are all per-batch, so these merge them across every course a
+ * teacher teaches for the new Students/Grades/Attendance/Analytics pages. */
+function teacherBatches(req) {
+  if (!['instructor', 'admin', 'coordinator'].includes(req.user.role)) return null;
+  return coursesForUser(req.user);
+}
+app.get('/api/teacher/students', authRequired, (req, res) => {
+  const batches = teacherBatches(req);
+  if (!batches) return res.status(403).json({ error: 'Not available for your role.' });
+  const rows = [];
+  batches.forEach((b) => {
+    courseReport(b.id).students.forEach((s) => rows.push({ ...s, batch_id: b.id, course_title: b.title || b.name }));
+  });
+  rows.sort((a, b) => a.name.localeCompare(b.name));
+  res.json({ students: rows, courses: batches.map((b) => ({ id: b.id, title: b.title || b.name })) });
+});
+app.get('/api/teacher/grades', authRequired, (req, res) => {
+  const batches = teacherBatches(req);
+  if (!batches) return res.status(403).json({ error: 'Not available for your role.' });
+  const rows = [];
+  batches.forEach((b) => {
+    Quests.pendingSubmissionsForBatch(b.id).forEach((s) => rows.push({ ...s, batch_id: b.id, course_title: b.title || b.name }));
+  });
+  rows.sort((a, b) => String(a.submitted_at).localeCompare(b.submitted_at));
+  res.json({ pending: rows });
+});
+app.get('/api/teacher/attendance', authRequired, (req, res) => {
+  const batches = teacherBatches(req);
+  if (!batches) return res.status(403).json({ error: 'Not available for your role.' });
+  const courses = batches.map((b) => {
+    const active = LiveClasses.active(b.id);
+    const past = LiveClasses.forBatch(b.id).filter((c) => c.ended_at).slice(0, 15).map((c) => {
+      const sheet = Attendance.sheet(c);
+      const present = sheet.filter((r) => r.present).length;
+      return { id: c.id, title: c.title, date: c.date, present, absent: sheet.length - present, total: sheet.length };
+    });
+    const avg_rate = past.length ? Math.round((past.reduce((s, c) => s + (c.total ? c.present / c.total : 0), 0) / past.length) * 100) : null;
+    return { batch_id: b.id, course_title: b.title || b.name, total_students: Enrollments.studentsForBatch(b.id).length, active: active ? { id: active.id, title: active.title } : null, past, avg_rate };
+  });
+  res.json({ courses });
+});
+app.get('/api/teacher/analytics', authRequired, (req, res) => {
+  const batches = teacherBatches(req);
+  if (!batches) return res.status(403).json({ error: 'Not available for your role.' });
+  const courses = batches.map((b) => {
+    const rep = courseReport(b.id);
+    const graded = rep.students.filter((s) => s.avg != null);
+    const avg_grade = graded.length ? Math.round(graded.reduce((s, x) => s + x.avg, 0) / graded.length) : null;
+    const withLevels = rep.students.filter((s) => s.of_levels);
+    const avg_progress = withLevels.length ? Math.round(withLevels.reduce((s, x) => s + (x.level / x.of_levels) * 100, 0) / withLevels.length) : 0;
+    return {
+      batch_id: b.id, course_title: b.title || b.name, students: rep.students.length,
+      avg_grade, avg_progress, at_risk: rep.students.filter((s) => s.at_risk).length,
+      total_gems: rep.students.reduce((s, x) => s + x.gems, 0),
+    };
+  });
+  const studentIds = new Set();
+  batches.forEach((b) => Enrollments.studentsForBatch(b.id).forEach((s) => studentIds.add(s.id)));
+  res.json({ courses, total_students: studentIds.size, top_learners: studentLeaderboard().slice(0, 10) });
 });
 
 /* ------------------------------ leaderboards ------------------------------ */
@@ -451,7 +565,7 @@ app.delete('/api/chat/:id', authRequired, (req, res) => {
 // v13: "Messages" in the student portal is the existing per-course chat,
 // aggregated across every enrolled course with a real unread count.
 app.get('/api/my/messages', authRequired, (req, res) => {
-  if (req.user.role !== 'student') return res.json({ threads: [], total_unread: 0 });
+  if (!['student', 'instructor'].includes(req.user.role)) return res.json({ threads: [], total_unread: 0 });
   const threads = coursesForUser(req.user).map((b) => {
     const msgs = Chat.forBatch(b.id, req.user);
     const lastRead = ChatReads.lastRead(req.user.id, b.id);

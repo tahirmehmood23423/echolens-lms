@@ -137,6 +137,11 @@ async function run() {
       await page.click('.nav-item[data-view="courses"]');
       await page.waitForTimeout(500);
       await shot(page, 'teacher-courses');
+      for (const view of ['students', 'grades', 'attendance', 'analytics']) {
+        await page.click(`.nav-item[data-view="${view}"]`);
+        await page.waitForTimeout(600);
+        await shot(page, `teacher-${view}`);
+      }
     } else if (FLOW === 'admin') {
       await login(page, 'admin');
       await shot(page, 'admin-overview');

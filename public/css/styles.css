@@ -798,7 +798,7 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .qc-cta{margin-top:auto;width:100%;justify-content:center}
 
 /* --- compiler: 3-pane Files / Editor / AI Assistant --- */
-.cmp2-shell{display:grid;grid-template-columns:200px 1fr 300px;gap:14px;align-items:start}
+.cmp2-shell{display:grid;grid-template-columns:minmax(200px,1fr) minmax(0,3.1fr) minmax(280px,1.3fr);gap:16px;align-items:start}
 @media (max-width:1080px){.cmp2-shell{grid-template-columns:1fr}}
 .cmp2-panel{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm)}
 .cmp2-files-head{padding:13px 14px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center}

@@ -149,6 +149,30 @@ app.post('/api/me/profile', authRequired, (req, res) => {
   res.json({ ok: true });
 });
 
+/* v16: admin portal - real system health checks (no fake "all green"). Each
+ * check inspects an actual resource this process depends on. */
+function systemHealth() {
+  const checks = [{ name: 'Web Server', ok: true, detail: `Responding &middot; up ${Math.round(process.uptime() / 60)}m` }];
+  let dbOk = true; try { fs.accessSync(store.DB_PATH, fs.constants.R_OK | fs.constants.W_OK); } catch { dbOk = false; }
+  checks.push({ name: 'Database', ok: dbOk, detail: dbOk ? 'Read/write OK' : 'Database file not accessible' });
+  let storageOk = true; try { fs.accessSync(UPLOAD_DIR, fs.constants.R_OK | fs.constants.W_OK); } catch { storageOk = false; }
+  checks.push({ name: 'Storage', ok: storageOk, detail: storageOk ? 'Uploads folder writable' : 'Uploads folder not writable' });
+  checks.push({ name: 'Email Service', ok: mailer.configured, detail: mailer.configured ? 'SMTP configured' : 'SMTP not configured - emails are logged only' });
+  let backupOk = false, backupDetail = 'No backups yet', lastBackup = null;
+  try {
+    const dir = path.join(path.dirname(store.DB_PATH), 'backups');
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
+    if (files.length) {
+      const latest = files.map((f) => fs.statSync(path.join(dir, f)).mtimeMs).sort((a, b) => b - a)[0];
+      lastBackup = new Date(latest).toISOString();
+      backupOk = Date.now() - latest < 24 * 3600000;
+      backupDetail = backupOk ? 'Backed up within the last 24h' : 'Last backup was over 24h ago';
+    }
+  } catch { /* backups directory not created yet */ }
+  checks.push({ name: 'Backup Service', ok: backupOk, detail: backupDetail, last_backup: lastBackup });
+  return checks;
+}
+
 /* -------------------------------- overview -------------------------------- */
 app.get('/api/overview', authRequired, (req, res) => {
   const u = req.user;
@@ -158,7 +182,10 @@ app.get('/api/overview', authRequired, (req, res) => {
     announcements: Announcements.forUser(u).slice(0, 5),
   };
   if (u.role === 'admin' || u.role === 'coordinator') {
-    return res.json({ ...base, admin: Admin.overview(), leaderboard: studentLeaderboard().slice(0, 10) });
+    return res.json({
+      ...base, admin: Admin.overview(), dashboard: Admin.dashboard(), system_health: systemHealth(),
+      leaderboard: studentLeaderboard().slice(0, 10),
+    });
   }
   if (u.role === 'instructor') {
     const myBatches = base.courses;
@@ -455,6 +482,75 @@ app.post('/api/admin/coordinators', authRequired, adminRequired, (req, res) => {
 app.delete('/api/admin/users/:id', authRequired, adminRequired, (req, res) => {
   if (Number(req.params.id) === req.user.id) return res.status(400).json({ error: 'You cannot remove your own account.' });
   Users.remove(req.params.id); res.json({ ok: true });
+});
+
+/* --------------------------- v16: enrollments (admin) --------------------------- */
+app.get('/api/admin/enrollments', authRequired, staffView, (req, res) => {
+  const rows = Enrollments.all().map((e) => {
+    const student = Users.byId(e.user_id);
+    const b = Batches.byId(e.batch_id);
+    const c = b ? Courses.byId(b.course_id) : null;
+    return {
+      id: e.id, student_id: student ? student.id : null, student_name: student ? student.name : 'Unknown',
+      reg_no: student ? student.reg_no : null, batch_id: e.batch_id,
+      course_title: c ? c.title : (b ? b.name : 'Unknown'), batch_name: b ? b.name : null,
+      price_pkr: c ? c.price_pkr : null, created_at: e.created_at,
+    };
+  }).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  res.json({ enrollments: rows });
+});
+
+/* ----------------------------- v16: finance (admin) ----------------------------- */
+// No payment gateway exists in this app - revenue is estimated from each
+// course's list price x its enrollments, clearly labeled as an estimate.
+app.get('/api/admin/finance', authRequired, staffView, (req, res) => {
+  const enrollments = Enrollments.all();
+  const byCourse = new Map();
+  enrollments.forEach((e) => {
+    const b = Batches.byId(e.batch_id); if (!b) return;
+    const c = Courses.byId(b.course_id); if (!c) return;
+    const row = byCourse.get(c.id) || { course_id: c.id, title: c.title, price_pkr: c.price_pkr || 0, enrollments: 0, revenue: 0 };
+    row.enrollments += 1; row.revenue += c.price_pkr || 0;
+    byCourse.set(c.id, row);
+  });
+  const courses = [...byCourse.values()].sort((a, b) => b.revenue - a.revenue);
+  const total_revenue = courses.reduce((s, c) => s + c.revenue, 0);
+  const todayD = new Date();
+  const months = [];
+  // Build buckets in UTC throughout (matching the UTC-sourced created_at
+  // strings) - mixing a local Date with .toISOString() here would silently
+  // shift every bucket by the server's UTC offset.
+  for (let i = 5; i >= 0; i--) months.push(new Date(Date.UTC(todayD.getUTCFullYear(), todayD.getUTCMonth() - i, 1)).toISOString().slice(0, 7));
+  const byMonth = Object.fromEntries(months.map((m) => [m, 0]));
+  enrollments.forEach((e) => {
+    const m = String(e.created_at).slice(0, 7);
+    if (byMonth[m] === undefined) return;
+    const b = Batches.byId(e.batch_id); const c = b && Courses.byId(b.course_id);
+    if (c && c.price_pkr) byMonth[m] += c.price_pkr;
+  });
+  res.json({
+    total_revenue, revenue_this_month: byMonth[months[months.length - 1]],
+    revenue_month_label: todayD.toLocaleDateString('en-US', { month: 'long' }),
+    courses, trend: { labels: months, values: months.map((m) => byMonth[m]) },
+  });
+});
+
+/* ------------------------- v16: system health & logs (admin) ------------------------- */
+app.get('/api/admin/system-health', authRequired, staffView, (req, res) => {
+  const ROLE_LABEL = { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free-tier' };
+  const events = [];
+  Users.all().forEach((u) => events.push({ at: u.created_at, kind: 'user', text: `New ${ROLE_LABEL[u.role] || u.role} account: ${u.name}` }));
+  Courses.all().forEach((c) => events.push({ at: c.created_at, kind: 'course', text: `New course added to catalogue: ${c.title}` }));
+  Batches.all().forEach((b) => events.push({ at: b.created_at, kind: 'batch', text: `New cohort started: ${b.title || b.name} (${b.name})` }));
+  try {
+    const dir = path.join(path.dirname(store.DB_PATH), 'backups');
+    fs.readdirSync(dir).filter((f) => f.endsWith('.json')).forEach((f) => {
+      const st = fs.statSync(path.join(dir, f));
+      events.push({ at: st.mtime.toISOString().replace('T', ' ').slice(0, 19), kind: 'backup', text: 'Database backup created' });
+    });
+  } catch { /* backups directory not created yet */ }
+  events.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  res.json({ health: systemHealth(), events: events.slice(0, 30) });
 });
 
 /* ------------------------- sessions / lessons / work ------------------------- */

@@ -144,13 +144,13 @@ async function run() {
       }
     } else if (FLOW === 'admin') {
       await login(page, 'admin');
-      await shot(page, 'admin-overview');
-      await page.click('.nav-item[data-view="admin-users"]');
-      await page.waitForTimeout(500);
-      await shot(page, 'admin-people');
-      await page.click('.nav-item[data-view="admin-analytics"]');
       await page.waitForTimeout(800);
-      await shot(page, 'admin-analytics');
+      await shot(page, 'admin-overview');
+      for (const view of ['admin-users', 'admin-catalogue', 'admin-teachers', 'admin-students', 'admin-enrollments', 'admin-analytics', 'admin-finance', 'admin-announcements', 'admin-logs']) {
+        await page.click(`.nav-item[data-view="${view}"]`);
+        await page.waitForTimeout(700);
+        await shot(page, `admin-${view.replace('admin-', '')}`);
+      }
     } else if (FLOW === 'open') {
       await page.goto(`${BASE_URL}/open`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(800);

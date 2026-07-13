@@ -33,6 +33,13 @@ function fmtDate(d) {
   if (!d) return '—';
   try { return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); } catch { return d; }
 }
+// "YYYY-MM" -> local Date at day 1. Deliberately NOT `new Date(m+'-01')`: a
+// date-only string parses as UTC midnight, which rolls back a day (and often
+// a month) once formatted in any timezone behind UTC.
+function monthLabel(m, opts) {
+  const [y, mo] = m.split('-').map(Number);
+  return new Date(y, mo - 1, 1).toLocaleDateString('en-US', opts);
+}
 function gemIcon(color = 'url(#gemGrad)') {
   return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="gemGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0FBFA8"/><stop offset=".55" stop-color="#38BDF8"/><stop offset="1" stop-color="#7C6CF5"/></linearGradient></defs><polygon points="50,4 90,34 74,92 26,92 10,34" fill="${color}"/><polygon points="50,4 90,34 50,50" fill="#fff" opacity=".25"/><polygon points="10,34 50,50 26,92" fill="#000" opacity=".12"/></svg>`;
 }
@@ -81,11 +88,13 @@ const TITLES = {
   overview: 'Overview', courses: 'My courses', course: 'Course', schedule: 'Calendar',
   leaderboard: 'Leaderboard', announcements: 'Announcements', settings: 'Settings',
   challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'Hackathons',
-  events: 'Events', 'admin-analytics': 'Analytics & Leads',
-  'admin-catalogue': 'Catalogue & new course', 'admin-users': 'People',
+  events: 'Events', 'admin-analytics': 'Reports',
+  'admin-catalogue': 'Courses', 'admin-users': 'Users',
   assignments: 'Assignments', quizzes: 'Quizzes', progress: 'Progress',
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
   students: 'Students', grades: 'Grades', attendance: 'Attendance', analytics: 'Analytics',
+  'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
+  'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-logs': 'System Logs',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -104,6 +113,9 @@ function show(view) {
     certificates: renderCertificates, messages: renderMessages, resources: renderResources,
     students: renderTeacherStudents, grades: renderTeacherGrades, attendance: renderTeacherAttendance,
     analytics: renderTeacherAnalytics,
+    'admin-teachers': renderAdminTeachers, 'admin-students': renderAdminStudents,
+    'admin-enrollments': renderAdminEnrollments, 'admin-finance': renderAdminFinance,
+    'admin-announcements': renderAdminAnnouncementsPage, 'admin-logs': renderAdminLogs,
   }[view];
   if (render) render();
 }
@@ -131,6 +143,14 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
     document.querySelectorAll('.instructor-hide').forEach((el) => (el.style.display = 'none'));
     $('bellBtn').style.display = '';
     refreshMessageBadge();
+  }
+  if (ME.role === 'admin') {
+    document.querySelectorAll('.admin-hide').forEach((el) => (el.style.display = 'none'));
+    $('topSearchWrap').style.display = '';
+    $('topSearch').placeholder = 'Search for users, courses, reports...';
+    wireAdminTopSearch();
+    $('bellBtn').style.display = '';
+    $('bellBtn').onclick = () => show('admin-logs');
   }
   if (ME.role === 'free') ['courses', 'schedule', 'announcements', 'assignments', 'quizzes', 'certificates', 'messages', 'resources'].forEach((v) => { const n = document.querySelector(`.nav-item[data-view="${v}"]`); if (n) n.style.display = 'none'; });
   if (ME.gamify && ME.gamify.streak > 0) {
@@ -227,6 +247,7 @@ async function renderOverview() {
 
   if (ME.role === 'student' && d.gamify) { renderStudentOverview(el, d); return; }
   if (ME.role === 'instructor' && d.teaching) { renderInstructorOverview(el, d); return; }
+  if (ME.role === 'admin' && d.dashboard) { renderAdminOverview(el, d); return; }
 
   let top = '';
   if (ME.role === 'free' && d.gamify) {
@@ -441,6 +462,371 @@ async function teacherQuickActionGo(kind, batchId) {
   await openCourse(batchId);
   if (kind === 'announcement') formAnnouncement();
   else if (kind === 'material') formLesson();
+}
+
+/* -------------------------- admin overview (v16) -------------------------- */
+T_ICONS.finance = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 15c0 1.1 1.3 2 3 2s3-.9 3-2-1.3-1.7-3-2-3-.9-3-2 1.3-2 3-2 3 .9 3 2"/></svg>';
+T_ICONS.gear = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>';
+T_ICONS.check = '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>';
+T_ICONS.x = '<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+function fmtCompactMoney(n) {
+  n = Number(n) || 0;
+  if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+function pctSub(delta) {
+  return { text: `${delta > 0 ? '+' : ''}${delta}% this week`, cls: delta > 0 ? 'up' : (delta < 0 ? 'warn' : 'info') };
+}
+/* A single-hue line chart with a hover crosshair + tooltip - no legend needed
+ * for one series (the card title already names it). Coordinates are in SVG
+ * viewBox space; the tooltip is positioned in real pixels via the SVG's
+ * bounding rect so it lines up regardless of how the card is sized. */
+function growthLineChart(labels, counts) {
+  const W = 760, H = 260, PL = 40, PR = 12, PT = 16, PB = 28;
+  const n = Math.max(1, labels.length);
+  const max = Math.max(1, ...counts);
+  const niceMax = Math.ceil(max / 4) * 4 || 4;
+  const x = (i) => PL + (n > 1 ? (i * (W - PL - PR)) / (n - 1) : (W - PL - PR) / 2);
+  const y = (v) => H - PB - (v / niceMax) * (H - PT - PB);
+  const pts = counts.map((v, i) => [x(i), y(v)]);
+  const path = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const gridY = [0, 0.25, 0.5, 0.75, 1].map((f) => {
+    const gy = y(niceMax * f);
+    return `<line x1="${PL}" y1="${gy.toFixed(1)}" x2="${W - PR}" y2="${gy.toFixed(1)}" stroke="var(--line)" stroke-width="1"/><text x="${PL - 8}" y="${(gy + 3.5).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted-2)">${Math.round(niceMax * f)}</text>`;
+  }).join('');
+  const xLabels = labels.map((l, i) => `<text x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="var(--muted-2)">${esc(l)}</text>`).join('');
+  const dots = pts.map((p, i) => `<circle class="gc-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="var(--primary)" stroke="#fff" stroke-width="1.5"/>`).join('');
+  const hw = (W - PL - PR) / n;
+  const hits = pts.map((p, i) => `<rect class="gc-hit" data-i="${i}" x="${(p[0] - hw / 2).toFixed(1)}" y="0" width="${hw.toFixed(1)}" height="${H - PB}" fill="transparent"/>`).join('');
+  return `<div class="gc-wrap">
+    <svg class="gc-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Line chart">
+      ${gridY}
+      <path d="${path}" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}${xLabels}
+      <line class="gc-crosshair" x1="0" y1="0" x2="0" y2="${H - PB}" stroke="var(--muted-2)" stroke-width="1" stroke-dasharray="3,3" opacity="0"/>
+      ${hits}
+    </svg>
+    <div class="gc-tooltip" style="display:none"></div>
+  </div>`;
+}
+function wireGrowthChart(root, tipLabels, counts, fmtVal) {
+  const svg = root.querySelector('.gc-svg'); if (!svg) return;
+  const tip = root.querySelector('.gc-tooltip');
+  const crosshair = root.querySelector('.gc-crosshair');
+  const dots = root.querySelectorAll('.gc-dot');
+  const vb = svg.viewBox.baseVal;
+  const showAt = (i) => {
+    const rect = svg.getBoundingClientRect();
+    const sx = rect.width / vb.width, sy = rect.height / vb.height;
+    const cx = Number(dots[i].getAttribute('cx')), cy = Number(dots[i].getAttribute('cy'));
+    crosshair.setAttribute('x1', cx); crosshair.setAttribute('x2', cx); crosshair.setAttribute('opacity', '1');
+    dots.forEach((d, j) => d.setAttribute('r', j === i ? '5' : '3.5'));
+    tip.style.display = 'block';
+    tip.innerHTML = `<strong>${esc(tipLabels[i])}</strong><div>${esc(fmtVal(counts[i]))}</div>`;
+    let left = cx * sx - tip.offsetWidth / 2;
+    left = Math.max(4, Math.min(rect.width - tip.offsetWidth - 4, left));
+    tip.style.left = left + 'px';
+    tip.style.top = Math.max(0, cy * sy - tip.offsetHeight - 12) + 'px';
+  };
+  root.querySelectorAll('.gc-hit').forEach((h) => {
+    h.addEventListener('mouseenter', () => showAt(Number(h.dataset.i)));
+    h.addEventListener('mousemove', () => showAt(Number(h.dataset.i)));
+  });
+  root.addEventListener('mouseleave', () => {
+    tip.style.display = 'none'; crosshair.setAttribute('opacity', '0');
+    dots.forEach((d) => d.setAttribute('r', '3.5'));
+  });
+}
+async function reloadGrowthChart() {
+  const sel = $('gcGranularity').value;
+  const gran = sel === 'year' ? 'monthly' : 'daily';
+  const d = await api(`/api/admin/analytics?metric=signups&segment=all&granularity=${gran}`);
+  let labels = d.series.labels, counts = d.series.counts;
+  if (sel === 'week') { labels = labels.slice(-7); counts = counts.slice(-7); }
+  const axisLabels = labels.map((l) => gran === 'monthly' ? monthLabel(l, { month: 'short' }) : new Date(l + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short' }));
+  const tipLabels = labels.map((l) => gran === 'monthly' ? monthLabel(l, { month: 'long', year: 'numeric' }) : new Date(l + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }));
+  const wrap = $('growthChartWrap');
+  wrap.innerHTML = growthLineChart(axisLabels, counts);
+  wireGrowthChart(wrap, tipLabels, counts, (v) => `${v.toLocaleString()} sign-ups`);
+}
+function regRow(u) {
+  return `<div class="reg-row">
+    ${avatarHtml(u.avatar, u.name, 36)}
+    <div style="flex:1;min-width:0"><div class="t">${esc(u.name)}</div><div class="s">${esc(u.email || 'No email on file')}</div></div>
+    <span class="role-badge ${esc(u.role)}">${esc(roleLabel(u.role))}</span>
+    <span class="msg-when">${timeAgo(u.created_at)}</span>
+  </div>`;
+}
+function healthRow(h) {
+  return `<div class="health-row">
+    <div class="dot-ic ${h.ok ? 'ok' : 'bad'}">${h.ok ? T_ICONS.check : T_ICONS.x}</div>
+    <div class="t">${esc(h.name)}</div>
+    <div class="s" style="color:var(--muted);margin-right:10px">${esc(h.detail)}</div>
+    <span class="status ${h.ok ? 'ok' : 'bad'}">${h.ok ? 'Operational' : 'Attention needed'}</span>
+  </div>`;
+}
+function logRow(e) {
+  return `<div class="log-row ${esc(e.kind)}"><div class="log-dot"></div>
+    <div><div class="t">${esc(e.text)}</div><div class="s">${esc((e.at || '').slice(0, 16))}</div></div></div>`;
+}
+function topCourseRow(c) {
+  return `<div class="tc-row" style="padding:12px 20px">
+    <div class="tc-ic" style="background:${courseColor(c.course_id)}">${T_ICONS.book}</div>
+    <div class="tc-main"><div class="t">${esc(c.title)}</div></div>
+    <span class="s" style="color:var(--muted);white-space:nowrap">${c.students} Enrollment${c.students === 1 ? '' : 's'}</span>
+  </div>`;
+}
+function annRowAdmin(a) {
+  return `<div class="msg-row">
+    <div class="rv-ic">${T_ICONS.megaphone}</div>
+    <div style="flex:1;min-width:0"><div class="t">${esc(a.title)}</div>
+      <div class="s">${esc(a.body).slice(0, 90)}${a.body.length > 90 ? '&hellip;' : ''}</div>
+      <div class="s" style="color:var(--muted-2);margin-top:2px">${esc((a.created_at || '').slice(0, 10))} &middot; ${esc(a.author_name)}</div></div>
+  </div>`;
+}
+function adminQuickAddUser() {
+  openModal('Add a new user', `
+    <div class="s" style="color:var(--muted);margin-bottom:14px">Students and teachers are added directly on a course. Coordinators are global accounts and can be added here.</div>
+    <button class="btn btn-primary btn-block" style="margin-bottom:10px" onclick="closeModal();formCoordinator()">Add a coordinator</button>
+    <button class="btn btn-ghost btn-block" onclick="closeModal();show('admin-catalogue')">Go to Courses to add a student or teacher</button>`);
+}
+async function renderAdminOverview(el, d) {
+  const dash = d.dashboard, t = dash.totals;
+  const firstName = esc((ME.name || '').split(' ')[0] || 'there');
+  const dateStr = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const su = pctSub(t.total_users_delta), sc = pctSub(t.courses_delta), sst = pctSub(t.students_delta), se = pctSub(t.enrollments_delta);
+  const growthLabels = dash.growth.labels.map((l) => new Date(l + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short' }));
+  const growthTipLabels = dash.growth.labels.map((l) => new Date(l + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }));
+  const pendingReviews = (d.admin && d.admin.pending_challenge_reviews) || 0;
+  $('bellBadge').style.display = pendingReviews ? '' : 'none';
+  $('bellBadge').textContent = pendingReviews > 99 ? '99+' : String(pendingReviews);
+
+  el.innerHTML = `
+    <div class="tp-head">
+      <div><h2>Welcome back, ${firstName} &#128075;</h2><div class="s">Here's what's happening in EchoLens.</div></div>
+      <div class="tp-date"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>${esc(dateStr)}</div>
+    </div>
+    <div class="tp-stat-grid">
+      ${tpStat('violet', T_ICONS.people, t.total_users.toLocaleString(), 'Total Users', su.text, su.cls)}
+      ${tpStat('sky', T_ICONS.book, t.courses, 'Courses', sc.text, sc.cls)}
+      ${tpStat('teal', T_ICONS.trend, t.students.toLocaleString(), 'Active Students', sst.text, sst.cls)}
+      ${tpStat('gold', T_ICONS.clipboard, t.enrollments.toLocaleString(), 'Enrollments', se.text, se.cls)}
+      ${tpStat('violet', T_ICONS.finance, 'PKR ' + fmtCompactMoney(t.revenue_this_month), `Revenue (${esc(t.revenue_month_label)})`, 'Estimated', 'info')}
+    </div>
+    <div class="ap-3col wide-first">
+      <div class="card">
+        <div class="card-head"><h3>User Growth Overview</h3>
+          <div class="gc-toolbar"><select id="gcGranularity" onchange="reloadGrowthChart()">
+            <option value="week">This Week</option><option value="month">This Month</option><option value="year">This Year</option>
+          </select></div>
+        </div>
+        <div id="growthChartWrap">${growthLineChart(growthLabels, dash.growth.counts)}</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Recent Registrations</h3><button class="btn btn-ghost btn-sm" onclick="show('admin-users')">View all</button></div>
+        <div class="card-body tight">${dash.recent_registrations.length ? dash.recent_registrations.map(regRow).join('') : '<div class="empty">No registrations yet.</div>'}</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>System Health</h3></div>
+        <div class="card-body tight">${d.system_health.map(healthRow).join('')}</div>
+        <div class="card-body" style="border-top:1px solid var(--line)"><button class="btn btn-ghost btn-block btn-sm" onclick="show('admin-logs')">View System Logs</button></div>
+      </div>
+    </div>
+    <div class="ap-3col">
+      <div class="card">
+        <div class="card-head"><h3>Top Courses</h3><button class="btn btn-ghost btn-sm" onclick="show('admin-catalogue')">View all</button></div>
+        <div class="card-body tight">${dash.top_courses.length ? dash.top_courses.map(topCourseRow).join('') : '<div class="empty">No enrollments yet.</div>'}</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Recent Announcements</h3><button class="btn btn-ghost btn-sm" onclick="show('admin-announcements')">View all</button></div>
+        <div class="card-body tight">${dash.recent_announcements.length ? dash.recent_announcements.map(annRowAdmin).join('') : '<div class="empty">Nothing published yet.</div>'}</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Quick Actions</h3></div>
+        <div class="card-body"><div class="qa-grid">
+          ${qaBtn('violet', T_ICONS.book, 'Add New Course', 'formCourse()')}
+          ${qaBtn('teal', T_ICONS.people, 'Add New User', 'adminQuickAddUser()')}
+          ${qaBtn('sky', T_ICONS.megaphone, 'Create Announcement', "show('admin-announcements')")}
+          ${qaBtn('gold', T_ICONS.chart, 'Generate Report', "show('admin-analytics')")}
+          ${qaBtn('violet', T_ICONS.people, 'Manage Roles', "show('admin-users')")}
+          ${qaBtn('teal', T_ICONS.gear, 'System Settings', "show('settings')")}
+        </div></div>
+      </div>
+    </div>`;
+  wireGrowthChart($('growthChartWrap'), growthTipLabels, dash.growth.counts, (v) => `${v.toLocaleString()} Users`);
+}
+
+/* -------------------------- admin: teachers / students / enrollments / finance / announcements / logs -------------------------- */
+function userGroupTable(label, users, isAdmin) {
+  return `<div class="card"><div class="card-head"><h3>${esc(label)} (${users.length})</h3></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Reg no</th><th>Username</th><th>Gems</th><th>Courses</th><th></th></tr>
+      ${users.map((u) => `<tr>
+        <td>${esc(u.name)}</td>
+        <td class="mono">${esc(u.reg_no || '—')}</td>
+        <td class="mono">${esc(u.username || '—')}</td>
+        <td>${u.gems != null ? gemChip(u.gems) : '—'}</td>
+        <td class="s">${u.courses.map(esc).join(', ') || '—'}</td>
+        <td style="text-align:right;white-space:nowrap">
+          ${['student', 'free'].includes(u.role) ? `<button class="btn btn-teal btn-sm" onclick="openStudentProfile(${u.id})">View profile</button>` : ''}
+          ${isAdmin ? `<button class="btn btn-ghost btn-sm" onclick="formResetPassword(${u.id},'${esc(u.name).replace(/'/g, '&#39;')}')">Reset password</button>
+          ${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="delUser(${u.id},'${esc(u.name).replace(/'/g, '&#39;')}')">Delete</button>` : ''}` : ''}
+        </td></tr>`).join('') || `<tr><td colspan="6" class="empty">None yet.</td></tr>`}
+    </table></div></div>`;
+}
+async function renderAdminTeachers() {
+  const el = $('view-admin-teachers');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/admin/users');
+  el.innerHTML = userGroupTable('Teachers', d.users.filter((u) => u.role === 'instructor'), ME.role === 'admin');
+}
+async function renderAdminStudents() {
+  const el = $('view-admin-students');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/admin/users');
+  window._ADMIN_STUDENTS = d.users.filter((u) => u.role === 'student');
+  el.innerHTML = `
+    <div class="card"><div class="card-body">
+      <input id="asSearch" class="search-input" placeholder="Search by registration number or name&hellip;" oninput="filterAdminStudents()">
+    </div></div>
+    <div id="asTableWrap">${userGroupTable('Students', window._ADMIN_STUDENTS, ME.role === 'admin')}</div>`;
+}
+function filterAdminStudents() {
+  const q = $('asSearch').value.trim().toLowerCase();
+  const filtered = (window._ADMIN_STUDENTS || []).filter((u) => !q || (u.name + ' ' + (u.reg_no || '') + ' ' + (u.username || '')).toLowerCase().includes(q));
+  $('asTableWrap').innerHTML = userGroupTable('Students', filtered, ME.role === 'admin');
+}
+async function renderAdminEnrollments() {
+  const el = $('view-admin-enrollments');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/admin/enrollments');
+  el.innerHTML = `<div class="card"><div class="card-head"><h3>All enrollments</h3><span class="s" style="color:var(--muted)">${d.enrollments.length} total</span></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Student</th><th>Reg no</th><th>Course</th><th>Cohort</th><th>Price (PKR)</th><th>Enrolled</th></tr>
+      ${d.enrollments.map((e) => `<tr>
+        <td>${esc(e.student_name)}</td><td class="mono">${esc(e.reg_no || '—')}</td>
+        <td>${esc(e.course_title)}</td><td class="s">${esc(e.batch_name || '—')}</td>
+        <td>${e.price_pkr ? e.price_pkr.toLocaleString() : '—'}</td>
+        <td class="s">${esc((e.created_at || '').slice(0, 10))}</td>
+      </tr>`).join('') || '<tr><td colspan="6" class="empty">No enrollments yet.</td></tr>'}
+    </table></div></div>`;
+}
+async function renderAdminFinance() {
+  const el = $('view-admin-finance');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/admin/finance');
+  el.innerHTML = `
+    <div class="stat-grid">
+      ${stat('PKR ' + d.total_revenue.toLocaleString(), 'Total estimated revenue')}
+      ${stat('PKR ' + d.revenue_this_month.toLocaleString(), `Revenue (${esc(d.revenue_month_label)})`)}
+      ${stat(d.courses.length, 'Courses with enrollments')}
+    </div>
+    <div class="card"><div class="card-head"><h3>Revenue trend</h3><span class="s" style="color:var(--muted)">Last 6 months</span></div>
+      <div id="financeChart"></div></div>
+    <div class="card"><div class="card-head"><h3>Revenue by course</h3></div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Course</th><th>Price (PKR)</th><th>Enrollments</th><th>Revenue (PKR)</th></tr>
+        ${d.courses.map((c) => `<tr><td>${esc(c.title)}</td><td>${c.price_pkr.toLocaleString()}</td><td>${c.enrollments}</td><td><strong>${c.revenue.toLocaleString()}</strong></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No paid enrollments yet.</td></tr>'}
+      </table></div></div>
+    <p class="hint" style="padding:0 4px">Revenue is estimated from each course's catalogue list price &times; its enrollments &mdash; EchoLens has no payment gateway integration, so this is not a reconciled financial ledger.</p>`;
+  const monthLabels = d.trend.labels.map((m) => monthLabel(m, { month: 'short' }));
+  const monthTipLabels = d.trend.labels.map((m) => monthLabel(m, { month: 'long', year: 'numeric' }));
+  const chartEl = $('financeChart');
+  chartEl.innerHTML = growthLineChart(monthLabels, d.trend.values);
+  wireGrowthChart(chartEl, monthTipLabels, d.trend.values, (v) => 'PKR ' + v.toLocaleString());
+}
+async function renderAdminAnnouncementsPage() {
+  const el = $('view-admin-announcements');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/public/announcements');
+  el.innerHTML = `
+    <div class="card"><div class="card-head"><h3>Publish an announcement</h3></div>
+      <div class="card-body"><form id="aaForm">
+        <div class="form-grid">
+          <label class="field"><span>Type</span><select name="kind">
+            <option value="cohort">New cohort / registration</option><option value="hackathon">Hackathon</option>
+            <option value="webinar">Webinar</option><option value="discount">Discount</option><option value="info">Information</option></select></label>
+          <label class="field" style="grid-column:span 2"><span>Title</span><input name="title" required placeholder="e.g. August 2026 cohort - registration open"></label>
+        </div>
+        <label class="field"><span>Message</span><textarea name="body" rows="3" required placeholder="Write the announcement exactly as visitors should read it."></textarea></label>
+        <div class="form-grid">
+          <label class="field" style="grid-column:span 2"><span>Action link (optional)</span><input name="link" type="url" placeholder="https://"></label>
+          <label class="field"><span>Link button label</span><input name="link_label" placeholder="e.g. Register now"></label>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+          <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="pinned"> Pin to the top</label>
+          <label class="s" style="display:flex;gap:7px;align-items:center">Email it to:
+            <select name="notify" style="padding:6px 10px;border:1.5px solid var(--line);border-radius:8px">
+              <option value="none">Nobody - website only</option><option value="portal">Portal students</option>
+              <option value="open">Open students</option><option value="all">Everyone incl. leads</option></select></label>
+        </div>
+        <button class="btn btn-primary">Publish announcement</button></form></div></div>
+    <div class="card"><div class="card-head"><h3>Published (${d.announcements.length})</h3></div>
+      <div class="card-body tight">${d.announcements.map((a) => `
+        <div class="list-row">
+          <div class="grow">
+            <div class="t">${a.pinned ? '<span class="role-pill">Pinned</span> ' : ''}<span class="kbadge ${a.kind === 'webinar' ? 'webinar' : a.kind === 'hackathon' ? 'hackathon' : 'quest'}">${ANN_KIND_LABEL[a.kind] || a.kind}</span> ${esc(a.title)}</div>
+            <div class="s" style="color:var(--muted)">${esc(a.body.slice(0, 140))}${a.body.length > 140 ? '&hellip;' : ''} &middot; ${esc((a.created_at || '').slice(0, 10))}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="adminAnnPin(${a.id}, ${a.pinned ? 'false' : 'true'})">${a.pinned ? 'Unpin' : 'Pin'}</button>
+          <button class="btn btn-danger btn-sm" onclick="adminAnnDelete(${a.id})">Delete</button>
+        </div>`).join('') || '<div class="empty">Nothing published yet.</div>'}</div></div>`;
+  $('aaForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
+    obj.pinned = f.pinned.checked;
+    try { await api('/api/admin/public-announcements', { method: 'POST', body: JSON.stringify(obj) }); toast('Published on the open website.'); renderAdminAnnouncementsPage(); }
+    catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+async function adminAnnPin(id, pinned) {
+  try { await api(`/api/admin/public-announcements/${id}`, { method: 'PATCH', body: JSON.stringify({ pinned }) }); renderAdminAnnouncementsPage(); }
+  catch (e) { toast(e.message, true); }
+}
+async function adminAnnDelete(id) {
+  if (!confirm('Delete this announcement from the website?')) return;
+  try { await api(`/api/admin/public-announcements/${id}`, { method: 'DELETE' }); renderAdminAnnouncementsPage(); }
+  catch (e) { toast(e.message, true); }
+}
+async function renderAdminLogs() {
+  const el = $('view-admin-logs');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/admin/system-health');
+  el.innerHTML = `
+    <div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span class="s" style="color:var(--muted)">The database backs itself up automatically every 12 hours on the server disk. Download a copy off-server regularly.</span>
+      <span style="flex:1"></span>
+      <a class="btn btn-ghost btn-sm" href="/api/admin/backup">Download backup</a>
+    </div></div>
+    <div class="card"><div class="card-head"><h3>System health</h3></div>
+      <div class="card-body tight">${d.health.map(healthRow).join('')}</div></div>
+    <div class="card"><div class="card-head"><h3>Recent activity</h3><span class="s" style="color:var(--muted)">Computed from account, course and backup timestamps</span></div>
+      <div class="card-body tight">${d.events.length ? d.events.map(logRow).join('') : '<div class="empty">Nothing yet.</div>'}</div></div>`;
+}
+function wireAdminTopSearch() {
+  const inp = $('topSearch'); const out = $('topSearchResults');
+  if (!inp || !out) return;
+  let t = null;
+  inp.addEventListener('input', () => {
+    clearTimeout(t);
+    const q = inp.value.trim().toLowerCase();
+    if (q.length < 2) { out.classList.remove('open'); out.innerHTML = ''; return; }
+    t = setTimeout(async () => {
+      try {
+        const [users, cat] = await Promise.all([api('/api/admin/users'), api('/api/admin/catalogue')]);
+        const hits = [];
+        users.users.forEach((u) => { if (u.name.toLowerCase().includes(q)) hits.push({ label: u.name, sub: roleLabel(u.role), action: u.role === 'instructor' ? "show('admin-teachers')" : u.role === 'student' ? "show('admin-students')" : "show('admin-users')" }); });
+        cat.courses.forEach((c) => { if (c.title.toLowerCase().includes(q)) hits.push({ label: c.title, sub: 'Course', action: "show('admin-catalogue')" }); });
+        out.innerHTML = hits.length
+          ? hits.slice(0, 8).map((h) => `<button onclick="${h.action};closeTopSearch()">${esc(h.label)} <span class="s" style="color:var(--muted-2)">&middot; ${esc(h.sub)}</span></button>`).join('')
+          : '<div class="empty" style="padding:10px">No matches.</div>';
+        out.classList.add('open');
+      } catch { out.innerHTML = ''; }
+    }, 220);
+  });
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTopSearch(); });
+  document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); inp.focus(); } });
 }
 
 /* -------------------------- student overview (v13) -------------------------- */
@@ -1443,22 +1829,7 @@ async function renderUsers() {
       <button class="btn btn-ghost btn-sm" onclick="formCertSettings()">Certificate settings</button>
       <button class="btn btn-ghost btn-sm" onclick="formCoordinator()">Add a coordinator</button>
     </div></div>` : ''}
-    ${groups.map(([label, users]) => `
-      <div class="card"><div class="card-head"><h3>${label} (${users.length})</h3></div>
-        <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-          <tr><th>Name</th><th>Reg no</th><th>Username</th><th>Gems</th><th>Courses</th><th></th></tr>
-          ${users.map((u) => `<tr>
-            <td>${esc(u.name)}</td>
-            <td class="mono">${esc(u.reg_no || '—')}</td>
-            <td class="mono">${esc(u.username || '—')}</td>
-            <td>${u.gems != null ? gemChip(u.gems).replace('gem-chip', 'gem-chip') : '—'}</td>
-            <td class="s">${u.courses.map(esc).join(', ') || '—'}</td>
-            <td style="text-align:right;white-space:nowrap">
-              ${['student', 'free'].includes(u.role) ? `<button class="btn btn-teal btn-sm" onclick="openStudentProfile(${u.id})">View profile</button>` : ''}
-              ${isAdmin ? `<button class="btn btn-ghost btn-sm" onclick="formResetPassword(${u.id},'${esc(u.name).replace(/'/g, '&#39;')}')">Reset password</button>
-              ${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="delUser(${u.id},'${esc(u.name).replace(/'/g, '&#39;')}')">Delete</button>` : ''}` : ''}
-            </td></tr>`).join('') || `<tr><td colspan="6" class="empty">None yet.</td></tr>`}
-        </table></div></div>`).join('')}`;
+    ${groups.map(([label, users]) => userGroupTable(label, users, isAdmin)).join('')}`;
   wireStudentSearch();
 }
 function formResetPassword(uid, name) {

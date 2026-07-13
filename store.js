@@ -437,6 +437,7 @@ const Enrollments = {
       .sort((a, b) => a.name.localeCompare(b.name));
   },
   batchesForStudent(uid) { return data.enrollments.filter((e) => e.user_id === Number(uid)).map((e) => Batches.byId(e.batch_id)).filter(Boolean); },
+  all() { return data.enrollments.slice(); },
 };
 
 function coursesForUser(u) {
@@ -1097,6 +1098,68 @@ const Admin = {
       graded: data.submissions.filter((s) => s.grade != null).length + data.quest_submissions.filter((s) => s.grade != null).length,
       total_gems: data.users.filter((u) => u.role === 'student').reduce((s, u) => s + totalGemsForStudent(u.id), 0),
       batches: Batches.all(),
+    };
+  },
+  // v16: admin portal redesign - growth series, recent registrations, top
+  // courses, estimated revenue and announcements for the new Overview page.
+  dashboard() {
+    const users = Users.all();
+    const students = users.filter((u) => u.role === 'student');
+    const teachers = users.filter((u) => u.role === 'instructor');
+    const courses = Courses.all();
+    const batches = Batches.all();
+    const enrollments = Enrollments.all();
+
+    const weekOverWeek = (items, field) => {
+      const nowMs = Date.now(), week = 7 * 86400000;
+      const at = (it) => new Date(String(it[field] || '').replace(' ', 'T')).getTime();
+      const thisWeek = items.filter((it) => { const t = at(it); return t > nowMs - week && t <= nowMs; }).length;
+      const prevWeek = items.filter((it) => { const t = at(it); return t > nowMs - 2 * week && t <= nowMs - week; }).length;
+      return prevWeek ? Math.round(((thisWeek - prevWeek) / prevWeek) * 100) : (thisWeek ? 100 : 0);
+    };
+
+    const dailyUsers = seriesFrom(users, 'created_at', 'daily');
+    const growth = { labels: dailyUsers.labels.slice(-7), counts: dailyUsers.counts.slice(-7) };
+
+    const recent_registrations = users.slice()
+      .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+      .slice(0, 5)
+      .map((u) => ({ id: u.id, name: u.name, email: u.email, role: u.role, avatar: u.avatar || null, created_at: u.created_at }));
+
+    const byCourse = new Map();
+    batches.forEach((b) => {
+      if (!b.course_id) return;
+      const row = byCourse.get(b.course_id) || { course_id: b.course_id, title: b.title, students: 0 };
+      row.students += b.students || 0;
+      byCourse.set(b.course_id, row);
+    });
+    const top_courses = [...byCourse.values()].sort((a, b) => b.students - a.students).slice(0, 5);
+
+    const today = new Date();
+    const monthPrefix = today.toISOString().slice(0, 7);
+    let revenue_this_month = 0;
+    enrollments.forEach((e) => {
+      if (String(e.created_at).slice(0, 7) !== monthPrefix) return;
+      const b = Batches.byId(e.batch_id); if (!b) return;
+      const c = Courses.byId(b.course_id);
+      if (c && c.price_pkr) revenue_this_month += c.price_pkr;
+    });
+
+    const recent_announcements = PublicAnnouncements.all().slice(0, 3).map((a) => {
+      const author = a.created_by ? Users.byId(a.created_by) : null;
+      return { id: a.id, title: a.title, body: a.body, kind: a.kind, created_at: a.created_at, author_name: author ? author.name : 'Super Admin' };
+    });
+
+    return {
+      totals: {
+        total_users: users.length, total_users_delta: weekOverWeek(users, 'created_at'),
+        students: students.length, students_delta: weekOverWeek(students, 'created_at'),
+        courses: courses.length, courses_delta: weekOverWeek(courses, 'created_at'),
+        teachers: teachers.length,
+        enrollments: enrollments.length, enrollments_delta: weekOverWeek(enrollments, 'created_at'),
+        revenue_this_month, revenue_month_label: today.toLocaleDateString('en-US', { month: 'long' }),
+      },
+      growth, recent_registrations, top_courses, recent_announcements,
     };
   },
 };

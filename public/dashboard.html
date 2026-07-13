@@ -18,33 +18,38 @@
   <aside class="sidebar" id="sidebar">
     <div class="brand"><span class="logo-pill"><img src="/img/logo.png" alt="EchoLens"></span></div>
     <nav id="nav">
-      <div class="nav-group">Learning</div>
+      <div class="nav-group admin-hide">Learning</div>
       <a class="nav-item active" data-view="overview"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Overview</a>
-      <a class="nav-item" data-view="courses"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 9h16"/></svg>My courses</a>
+      <a class="nav-item admin-hide" data-view="courses"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 9h16"/></svg>My courses</a>
       <a class="nav-item instructor-only" data-view="students" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 14.8c3 0 6 1.7 6 5.2"/></svg>Students</a>
-      <a class="nav-item" data-view="assignments"><svg class="ic" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8.5 12l2 2 4-4.5M8.5 17h5"/></svg>Assignments</a>
+      <a class="nav-item admin-hide" data-view="assignments"><svg class="ic" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8.5 12l2 2 4-4.5M8.5 17h5"/></svg>Assignments</a>
       <a class="nav-item instructor-only" data-view="grades" style="display:none"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Grades</a>
       <a class="nav-item instructor-only" data-view="attendance" style="display:none"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="M8 14l2.5 2.5L16 11"/></svg>Attendance</a>
-      <a class="nav-item instructor-hide" data-view="quizzes"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Quizzes</a>
-      <a class="nav-item instructor-hide" data-view="progress"><svg class="ic" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Progress</a>
-      <a class="nav-item instructor-hide" data-view="certificates"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L6.5 21l5.5-3 5.5 3-2-8.5"/></svg>Certificates</a>
-      <a class="nav-item" data-view="schedule"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Calendar</a>
-      <div class="nav-group">Tools</div>
-      <a class="nav-item" data-view="messages"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 3V4z"/></svg>Messages<span class="bell-badge" id="navMsgBadge" style="display:none;position:static;margin-left:auto"></span></a>
-      <a class="nav-item instructor-hide" data-view="leaderboard"><svg class="ic" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg>Leaderboard</a>
-      <a class="nav-item" data-view="resources"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v10H4z"/></svg>Resources</a>
+      <a class="nav-item instructor-hide admin-hide" data-view="quizzes"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Quizzes</a>
+      <a class="nav-item instructor-hide admin-hide" data-view="progress"><svg class="ic" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Progress</a>
+      <a class="nav-item instructor-hide admin-hide" data-view="certificates"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L6.5 21l5.5-3 5.5 3-2-8.5"/></svg>Certificates</a>
+      <a class="nav-item admin-hide" data-view="schedule"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Calendar</a>
+      <div class="nav-group admin-hide">Tools</div>
+      <a class="nav-item admin-hide" data-view="messages"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 3V4z"/></svg>Messages<span class="bell-badge" id="navMsgBadge" style="display:none;position:static;margin-left:auto"></span></a>
+      <a class="nav-item instructor-hide admin-hide" data-view="leaderboard"><svg class="ic" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg>Leaderboard</a>
+      <a class="nav-item admin-hide" data-view="resources"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v10H4z"/></svg>Resources</a>
       <a class="nav-item instructor-only" data-view="analytics" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Analytics</a>
       <a class="nav-item" data-view="settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Settings</a>
       <div class="nav-group instructor-hide">More</div>
-      <a class="nav-item instructor-hide" data-view="announcements"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11l14-6v14L3 13z"/><path d="M7 12v5"/></svg>Announcements</a>
+      <a class="nav-item instructor-hide admin-hide" data-view="announcements"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11l14-6v14L3 13z"/><path d="M7 12v5"/></svg>Announcements</a>
       <a class="nav-item instructor-hide" data-view="challenges"><svg class="ic" viewBox="0 0 24 24"><path d="M6 3h12l-2 7a4 4 0 0 1-8 0z"/><path d="M12 14v4M8 21h8"/><circle cx="12" cy="8" r="1.6"/></svg>Challenges</a>
       <a class="nav-item instructor-hide" data-view="hackathons"><svg class="ic" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>Hackathons</a>
       <a class="nav-item instructor-hide" data-view="events"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l3 3 5-5"/></svg>Events</a>
-      <a class="nav-item teacher-only" data-view="copilot" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 15.6l-1.7-4.6L6 9.3l4.3-1.7z"/><path d="M18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>AI Copilot</a>
-      <div class="nav-group admin-only" style="display:none">Administration</div>
-      <a class="nav-item admin-only" data-view="admin-catalogue" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Catalogue &amp; new course</a>
-      <a class="nav-item staff-only" data-view="admin-users" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 14.8c3 0 6 1.7 6 5.2"/></svg>People</a>
-      <a class="nav-item staff-only" data-view="admin-analytics" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Analytics &amp; Leads</a>
+      <a class="nav-item teacher-only admin-hide" data-view="copilot" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 15.6l-1.7-4.6L6 9.3l4.3-1.7z"/><path d="M18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>AI Copilot</a>
+      <a class="nav-item staff-only" data-view="admin-users" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 14.8c3 0 6 1.7 6 5.2"/></svg>Users</a>
+      <a class="nav-item admin-only" data-view="admin-catalogue" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 9h16"/></svg>Courses</a>
+      <a class="nav-item staff-only" data-view="admin-teachers" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Teachers</a>
+      <a class="nav-item staff-only" data-view="admin-students" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 14.8c3 0 6 1.7 6 5.2"/></svg>Students</a>
+      <a class="nav-item staff-only" data-view="admin-enrollments" style="display:none"><svg class="ic" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8.5 12l2 2 4-4.5"/></svg>Enrollments</a>
+      <a class="nav-item staff-only" data-view="admin-analytics" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
+      <a class="nav-item admin-only" data-view="admin-finance" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 15c0 1.1 1.3 2 3 2s3-.9 3-2-1.3-1.7-3-2-3-.9-3-2 1.3-2 3-2 3 .9 3 2"/></svg>Finance</a>
+      <a class="nav-item admin-only" data-view="admin-announcements" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11l14-6v14L3 13z"/><path d="M7 12v5"/></svg>Announcements</a>
+      <a class="nav-item admin-only" data-view="admin-logs" style="display:none"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>System Logs</a>
     </nav>
   </aside>
 
@@ -107,7 +112,13 @@
       <section class="view" id="view-events"></section>
       <section class="view" id="view-admin-catalogue"></section>
       <section class="view" id="view-admin-users"></section>
+      <section class="view" id="view-admin-teachers"></section>
+      <section class="view" id="view-admin-students"></section>
+      <section class="view" id="view-admin-enrollments"></section>
       <section class="view" id="view-admin-analytics"></section>
+      <section class="view" id="view-admin-finance"></section>
+      <section class="view" id="view-admin-announcements"></section>
+      <section class="view" id="view-admin-logs"></section>
     </div>
   </div>
 </div>

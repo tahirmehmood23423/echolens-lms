@@ -387,7 +387,8 @@ async function renderStudentOverview(el, d) {
             </div>`).join('') : '<div class="empty">Earn gems to see them here.</div>'}</div></div>
         <div class="card"><div class="card-body" style="text-align:center">
           <div style="font-weight:650;margin-bottom:6px">Need help?</div>
-          <div class="s" style="color:var(--muted);margin-bottom:12px">Find answers, ask questions, and connect with peers.</div>
+          <div class="s" style="color:var(--muted);margin-bottom:8px">Find answers, ask questions, and connect with peers.</div>
+          <div class="s" style="color:var(--primary-deep);font-weight:600;margin-bottom:12px">info@echolens.digital</div>
           <a class="btn btn-ghost btn-block" href="mailto:info@echolens.digital">Contact support</a>
         </div></div>
       </div>

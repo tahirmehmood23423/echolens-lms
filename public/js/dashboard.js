@@ -114,12 +114,7 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   } catch { return; }
   $('userName').textContent = ME.name;
   $('rolePill').textContent = roleLabel(ME.role);
-  $('sideUserName').textContent = ME.name;
-  $('sideUserRole').textContent = roleLabel(ME.role);
   drawAvatar();
-  const sideAv = $('sideAvatar');
-  if (ME.avatar) sideAv.innerHTML = `<img src="${esc(ME.avatar)}" alt="">`;
-  else sideAv.textContent = (ME.name || 'E').trim()[0].toUpperCase();
   if (ME.role === 'admin') document.querySelectorAll('.admin-only').forEach((el) => (el.style.display = ''));
   if (['admin', 'coordinator'].includes(ME.role)) document.querySelectorAll('.staff-only').forEach((el) => (el.style.display = ''));
   if (ME.ai_enabled) document.querySelectorAll('.teacher-only').forEach((el) => (el.style.display = ''));
@@ -262,7 +257,7 @@ async function renderOverview() {
     <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start" class="ovr-grid">
       <div>
         <div class="card"><div class="card-head"><h3>Upcoming classes</h3><button class="btn btn-ghost btn-sm" onclick="show('schedule')">Full schedule</button></div>
-          <div class="card-body tight">${d.upcoming.length ? d.upcoming.map(sessionRow).join('') : '<div class="empty">No upcoming classes scheduled yet.</div>'}</div></div>
+          <div class="card-body tight">${d.upcoming.length ? d.upcoming.map(sessionRow).join('') : emptyScheduleHTML()}</div></div>
         <div class="card"><div class="card-head"><h3>Latest announcements</h3><button class="btn btn-ghost btn-sm" onclick="show('announcements')">All</button></div>
           <div class="card-body tight">${d.announcements.length ? d.announcements.map(annRow).join('') : '<div class="empty">Nothing yet.</div>'}</div></div>
       </div>
@@ -273,6 +268,21 @@ async function renderOverview() {
     </div>
     <style>@media (max-width:900px){.ovr-grid{grid-template-columns:1fr !important}}</style>`;
   requestAnimationFrame(() => { const f = el.querySelector('.prism-fill'); if (f) f.style.width = f.dataset.w + '%'; });
+}
+
+/* v14: a friendly illustration for empty schedule areas, instead of a bare line of text. */
+function emptyScheduleHTML(sub) {
+  return `<div class="empty-illustration">
+    <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
+      <circle cx="36" cy="36" r="36" fill="var(--violet-soft)"/>
+      <rect x="20" y="24" width="32" height="28" rx="4" fill="none" stroke="var(--primary)" stroke-width="2.2"/>
+      <path d="M20 32h32" stroke="var(--primary)" stroke-width="2.2"/>
+      <path d="M27 20v8M45 20v8" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M29 40l5 5 9-9" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="empty-title">No upcoming activities</div>
+    <div class="empty-sub">${esc(sub || "You're all caught up - check back soon.")}</div>
+  </div>`;
 }
 
 /* -------------------------- student overview (v13) -------------------------- */
@@ -311,7 +321,7 @@ async function renderStudentOverview(el, d) {
           <div class="cl-main">
             <div class="cl-eyebrow">Continue learning</div>
             <div class="cl-title">${esc(cont.title || cont.name)}</div>
-            <div class="cl-bar"><div class="cl-fill" style="width:${cont.progress_pct}%"></div></div>
+            <div class="cl-bar"><div class="cl-fill" data-w="${cont.progress_pct}"></div></div>
             <div class="cl-pct">${cont.progress_pct}% complete</div>
           </div>
           <div class="cl-next">
@@ -329,7 +339,7 @@ async function renderStudentOverview(el, d) {
                 <div class="t" style="font-weight:600;margin:4px 0">${esc(it.title)}</div>
                 <div class="s" style="color:var(--muted)">${esc(it.sub)}</div>
                 <div class="s" style="color:var(--muted-2);margin-top:6px">${fmtDate(it.date)}</div>
-              </div>`).join('') : '<div class="empty">Nothing scheduled right now.</div>'}
+              </div>`).join('') : emptyScheduleHTML('No classes, quizzes, or assignments due soon.')}
           </div></div>
 
         <div class="card"><div class="card-head"><h3>My courses</h3><button class="btn btn-ghost btn-sm" onclick="show('courses')">View all</button></div>
@@ -338,7 +348,7 @@ async function renderStudentOverview(el, d) {
               <div class="grow">
                 <div class="t">${esc(c.title || c.name)}</div>
                 <div class="s" style="color:var(--muted)">${c.lesson_count} lesson${c.lesson_count === 1 ? '' : 's'}</div>
-                <div class="mini-bar"><div class="mini-fill" style="width:${c.progress_pct}%"></div></div>
+                <div class="mini-bar"><div class="mini-fill" data-w="${c.progress_pct}"></div></div>
               </div>
               <div style="font-weight:700;color:var(--ink);min-width:36px;text-align:right">${c.progress_pct}%</div>
               <button class="btn btn-ghost btn-sm" onclick="openCourse(${c.id})">Continue</button>
@@ -383,7 +393,7 @@ async function renderStudentOverview(el, d) {
       </div>
     </div>
     <style>@media (max-width:900px){.ovr-grid{grid-template-columns:1fr !important}}</style>`;
-  requestAnimationFrame(() => { const f = el.querySelector('.prism-fill'); if (f) f.style.width = f.dataset.w + '%'; });
+  requestAnimationFrame(() => { el.querySelectorAll('.prism-fill,.mini-fill,.cl-fill').forEach((f) => (f.style.width = f.dataset.w + '%')); });
   if (featured && featured.due_date) startDailyChallengeCountdown(featured.due_date);
 }
 function startDailyChallengeCountdown(dueDate) {
@@ -834,7 +844,7 @@ async function renderSchedule() {
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
   const d = await api('/api/overview');
   el.innerHTML = `<div class="card"><div class="card-head"><h3>Upcoming classes</h3></div>
-    <div class="card-body tight">${d.upcoming.length ? d.upcoming.map(sessionRow).join('') : '<div class="empty">No upcoming classes. Enjoy the calm.</div>'}</div></div>`;
+    <div class="card-body tight">${d.upcoming.length ? d.upcoming.map(sessionRow).join('') : emptyScheduleHTML()}</div></div>`;
 }
 
 /* ============================= LEADERBOARD ============================= */
@@ -1015,7 +1025,7 @@ async function renderProgress() {
       <div class="grow">
         <div class="t">${esc(c.title || c.name)}</div>
         <div class="s">${c.next_level ? `Next: Level ${c.next_level.no} &middot; ${esc(c.next_level.title)}` : (c.progress_pct >= 100 ? 'Track completed' : 'Not started yet')}</div>
-        <div class="mini-bar"><div class="mini-fill" style="width:${c.progress_pct}%"></div></div>
+        <div class="mini-bar"><div class="mini-fill" data-w="${c.progress_pct}"></div></div>
       </div>
       <div style="font-weight:700;color:var(--ink);min-width:40px;text-align:right">${c.progress_pct}%</div>
     </div>`).join('') || '<div class="empty">Enroll in a course to start tracking progress.</div>';
@@ -1027,7 +1037,7 @@ async function renderProgress() {
     ${journeyRail(g)}
     <div class="card"><div class="card-head"><h3>Progress by course</h3></div><div class="card-body tight">${perCourse}</div></div>
     ${badgesCard(g)}`;
-  requestAnimationFrame(() => { el.querySelectorAll('.prism-fill').forEach((f) => (f.style.width = f.dataset.w + '%')); });
+  requestAnimationFrame(() => { el.querySelectorAll('.prism-fill,.mini-fill,.cl-fill').forEach((f) => (f.style.width = f.dataset.w + '%')); });
 }
 function openProfileForm() {
   const p = ME.profile || {};

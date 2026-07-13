@@ -10,6 +10,9 @@
  * Flows:
  *   smoke        - sign in as each seeded role, hit their landing view, screenshot (default)
  *   student      - sign in as the demo student, click through dashboard nav, screenshot each view
+ *   student-v2   - v13 student portal redesign: click every new nav item (Assignments,
+ *                  Quizzes, Progress, Certificates, Messages, Resources, Settings) and
+ *                  assert each renders real content, not just its empty state
  *   teacher      - sign in as the demo teacher, screenshot the dashboard
  *   admin        - sign in as admin, screenshot People + Analytics
  *   open         - screenshot the public /open portal (no auth)
@@ -102,9 +105,32 @@ async function run() {
       await page.click('.nav-item[data-view="challenges"]');
       await page.waitForTimeout(500);
       await shot(page, 'student-challenges');
-      await page.click('.nav-item[data-view="profile"]');
+      await page.click('.nav-item[data-view="settings"]');
       await page.waitForTimeout(500);
-      await shot(page, 'student-profile');
+      await shot(page, 'student-settings');
+    } else if (FLOW === 'student-v2') {
+      await login(page, 'student');
+      // Each assertion below requires the regression setup script's seeded
+      // data (installed quest track, open quiz, published challenge, chat
+      // message, issued certificate) - an empty DB would legitimately fail
+      // these, which is the point: prove real data renders, not a blank view.
+      const checks = [
+        { view: 'assignments', assert: async () => (await page.locator('#view-assignments .list-row').count()) > 0 },
+        { view: 'quizzes', assert: async () => (await page.locator('#view-quizzes').textContent()).includes('Pop Quiz') },
+        { view: 'progress', assert: async () => (await page.locator('#view-progress .prism-card').count()) > 0 },
+        { view: 'certificates', assert: async () => (await page.locator('#view-certificates').textContent()).includes('Python for Data Science') },
+        { view: 'messages', assert: async () => (await page.locator('#view-messages').textContent()).includes('Python for Data Science') },
+        { view: 'resources', assert: async () => (await page.locator('#view-resources .list-row').count()) > 0 },
+        { view: 'settings', assert: async () => (await page.locator('#view-settings').textContent()).includes('Demo Student') },
+      ];
+      for (const c of checks) {
+        await page.click(`.nav-item[data-view="${c.view}"]`);
+        await page.waitForTimeout(600);
+        await shot(page, `student-v2-${c.view}`);
+        const ok = await c.assert();
+        if (!ok) throw new Error(`${c.view}: expected real seeded content, view looks empty`);
+        console.log(`${c.view}: OK (real content present)`);
+      }
     } else if (FLOW === 'teacher') {
       await login(page, 'teacher');
       await shot(page, 'teacher-overview');
@@ -135,7 +161,7 @@ async function run() {
       await page.waitForSelector('text=Hello EchoLens!', { timeout: 30000 });
       await shot(page, 'compiler-ran');
     } else {
-      throw new Error(`Unknown flow "${FLOW}". Use one of: smoke, student, teacher, admin, open, compiler.`);
+      throw new Error(`Unknown flow "${FLOW}". Use one of: smoke, student, student-v2, teacher, admin, open, compiler.`);
     }
   } finally {
     await browser.close();

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v1231">
+<link rel="stylesheet" href="/css/styles.css?v1232">
 </head>
 <body>
 
@@ -20,34 +20,72 @@
     <nav id="nav">
       <a class="nav-item active" data-view="overview"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Overview</a>
       <a class="nav-item" data-view="courses"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 9h16"/></svg>My courses</a>
-      <a class="nav-item" data-view="schedule"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Schedule</a>
+      <a class="nav-item" data-view="assignments"><svg class="ic" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M8.5 12l2 2 4-4.5M8.5 17h5"/></svg>Assignments</a>
+      <a class="nav-item" data-view="quizzes"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Quizzes</a>
+      <a class="nav-item" data-view="progress"><svg class="ic" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Progress</a>
+      <a class="nav-item" data-view="certificates"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L6.5 21l5.5-3 5.5 3-2-8.5"/></svg>Certificates</a>
+      <a class="nav-item" data-view="schedule"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Calendar</a>
+      <a class="nav-item" data-view="messages"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 3V4z"/></svg>Messages<span class="bell-badge" id="navMsgBadge" style="display:none;position:static;margin-left:auto"></span></a>
+      <a class="nav-item" data-view="leaderboard"><svg class="ic" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg>Leaderboard</a>
+      <a class="nav-item" data-view="resources"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v10H4z"/></svg>Resources</a>
+      <a class="nav-item" data-view="settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Settings</a>
+      <div class="nav-group">More</div>
+      <a class="nav-item" data-view="announcements"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11l14-6v14L3 13z"/><path d="M7 12v5"/></svg>Announcements</a>
       <a class="nav-item" data-view="challenges"><svg class="ic" viewBox="0 0 24 24"><path d="M6 3h12l-2 7a4 4 0 0 1-8 0z"/><path d="M12 14v4M8 21h8"/><circle cx="12" cy="8" r="1.6"/></svg>Challenges</a>
       <a class="nav-item" data-view="hackathons"><svg class="ic" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>Hackathons</a>
       <a class="nav-item" data-view="events"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l3 3 5-5"/></svg>Events</a>
-      <a class="nav-item" data-view="leaderboard"><svg class="ic" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg>Leaderboard</a>
-      <a class="nav-item" data-view="announcements"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11l14-6v14L3 13z"/><path d="M7 12v5"/></svg>Announcements</a>
-      <a class="nav-item" data-view="profile"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</a>
       <a class="nav-item teacher-only" data-view="copilot" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 15.6l-1.7-4.6L6 9.3l4.3-1.7z"/><path d="M18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>AI Copilot</a>
       <div class="nav-group admin-only" style="display:none">Administration</div>
       <a class="nav-item admin-only" data-view="admin-catalogue" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Catalogue &amp; new course</a>
       <a class="nav-item staff-only" data-view="admin-users" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 14.8c3 0 6 1.7 6 5.2"/></svg>People</a>
       <a class="nav-item staff-only" data-view="admin-analytics" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Analytics &amp; Leads</a>
     </nav>
-    <div class="side-foot">EchoLens LMS &middot; v12.0</div>
+    <div class="promo-card student-only" id="promoCard" style="display:none">
+      <svg class="pc-icon" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="pcGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C3AED"/><stop offset="1" stop-color="#38BDF8"/></linearGradient></defs><polygon points="50,4 90,34 74,92 26,92 10,34" fill="url(#pcGrad)"/></svg>
+      <h4>Upgrade to Pro</h4>
+      <p>Unlock advanced features and exclusive learning content.</p>
+      <a class="btn btn-primary btn-sm btn-block" href="mailto:info@echolens.digital">Upgrade now</a>
+    </div>
+    <div class="side-user">
+      <div class="avatar" id="sideAvatar">E</div>
+      <div style="min-width:0">
+        <div class="n" id="sideUserName">&mdash;</div>
+        <div class="r" id="sideUserRole">Student</div>
+      </div>
+    </div>
   </aside>
 
   <div class="main">
     <header class="topbar">
-      <div style="display:flex;align-items:center;gap:14px">
+      <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
         <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">Menu</button>
         <span class="page-title" id="pageTitle">Overview</span>
+        <div class="search-box student-only" style="max-width:340px;position:relative;display:none" id="topSearchWrap">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="topSearch" placeholder="Search for courses, lessons, quizzes...">
+          <span class="kbd-hint">Ctrl+K</span>
+          <div class="dd-menu" id="topSearchResults" style="left:0;right:auto;width:100%;max-height:340px;overflow:auto"></div>
+        </div>
       </div>
       <div class="user">
         <span class="streak-chip" id="topStreak" style="display:none"></span>
-        <span class="role-pill" id="rolePill">student</span>
-        <div style="text-align:right"><div style="font-weight:600;font-size:14px" id="userName">&mdash;</div></div>
-        <div class="avatar" id="avatar">E</div>
-        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
+        <span class="streak-chip" id="topGems" style="display:none"></span>
+        <button class="bell-btn student-only" id="bellBtn" onclick="show('messages')" aria-label="Messages" style="display:none">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          <span class="bell-badge" id="bellBadge" style="display:none">0</span>
+        </button>
+        <div class="dd">
+          <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="this.nextElementSibling.classList.toggle('open')">
+            <span class="role-pill" id="rolePill">student</span>
+            <div style="text-align:right"><div style="font-weight:600;font-size:14px" id="userName">&mdash;</div></div>
+            <div class="avatar" id="avatar">E</div>
+            <svg width="13" height="13" viewBox="0 0 24 24" style="stroke:var(--muted);fill:none;stroke-width:2.2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="dd-menu">
+            <button onclick="show('settings')">Settings</button>
+            <button class="danger" onclick="logout()">Sign out</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -56,13 +94,19 @@
       <section class="view" id="view-courses"></section>
       <section class="view" id="view-course"></section>
       <section class="view" id="view-task"></section>
+      <section class="view" id="view-assignments"></section>
+      <section class="view" id="view-quizzes"></section>
+      <section class="view" id="view-progress"></section>
+      <section class="view" id="view-certificates"></section>
       <section class="view" id="view-schedule"></section>
+      <section class="view" id="view-messages"></section>
+      <section class="view" id="view-resources"></section>
+      <section class="view" id="view-settings"></section>
       <section class="view" id="view-challenges"></section>
       <section class="view" id="view-copilot"></section>
       <section class="view" id="view-hackathons"></section>
       <section class="view" id="view-leaderboard"></section>
       <section class="view" id="view-announcements"></section>
-      <section class="view" id="view-profile"></section>
       <section class="view" id="view-events"></section>
       <section class="view" id="view-admin-catalogue"></section>
       <section class="view" id="view-admin-users"></section>
@@ -81,10 +125,10 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="/js/coderunner.js?v1231"></script>
-<script src="/js/dashboard.js?v1231"></script>
+<script src="/js/coderunner.js?v1232"></script>
+<script src="/js/dashboard.js?v1232"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="/js/gem3d.js?v1231"></script>
-<script src="/js/tilt.js?v1231"></script>
+<script src="/js/gem3d.js?v1232"></script>
+<script src="/js/tilt.js?v1232"></script>
 </body>
 </html>

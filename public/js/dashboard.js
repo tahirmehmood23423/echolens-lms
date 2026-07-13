@@ -78,11 +78,13 @@ document.addEventListener('click', (e) => {
 
 /* ------------------------------ navigation ------------------------------ */
 const TITLES = {
-  overview: 'Overview', courses: 'My courses', course: 'Course', schedule: 'Schedule',
-  leaderboard: 'Leaderboard', announcements: 'Announcements', profile: 'Profile',
+  overview: 'Overview', courses: 'My courses', course: 'Course', schedule: 'Calendar',
+  leaderboard: 'Leaderboard', announcements: 'Announcements', settings: 'Settings',
   challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'Hackathons',
   events: 'Events', 'admin-analytics': 'Analytics & Leads',
   'admin-catalogue': 'Catalogue & new course', 'admin-users': 'People',
+  assignments: 'Assignments', quizzes: 'Quizzes', progress: 'Progress',
+  certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -93,10 +95,12 @@ function show(view) {
   $('sidebar').classList.remove('open');
   const render = {
     overview: renderOverview, courses: renderCourses, schedule: renderSchedule,
-    leaderboard: renderLeaderboard, announcements: renderAnnouncements, profile: renderProfile,
+    leaderboard: renderLeaderboard, announcements: renderAnnouncements, settings: renderSettings,
     challenges: renderChallenges, copilot: renderCopilot, hackathons: renderHackathons,
     events: renderEvents, 'admin-analytics': renderAnalytics,
     'admin-catalogue': renderCatalogue, 'admin-users': renderUsers,
+    assignments: renderAssignments, quizzes: renderQuizzesGlobal, progress: renderProgress,
+    certificates: renderCertificates, messages: renderMessages, resources: renderResources,
   }[view];
   if (render) render();
 }
@@ -110,20 +114,78 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   } catch { return; }
   $('userName').textContent = ME.name;
   $('rolePill').textContent = roleLabel(ME.role);
+  $('sideUserName').textContent = ME.name;
+  $('sideUserRole').textContent = roleLabel(ME.role);
   drawAvatar();
+  const sideAv = $('sideAvatar');
+  if (ME.avatar) sideAv.innerHTML = `<img src="${esc(ME.avatar)}" alt="">`;
+  else sideAv.textContent = (ME.name || 'E').trim()[0].toUpperCase();
   if (ME.role === 'admin') document.querySelectorAll('.admin-only').forEach((el) => (el.style.display = ''));
   if (['admin', 'coordinator'].includes(ME.role)) document.querySelectorAll('.staff-only').forEach((el) => (el.style.display = ''));
   if (ME.ai_enabled) document.querySelectorAll('.teacher-only').forEach((el) => (el.style.display = ''));
-  if (ME.role === 'free') ['courses', 'schedule', 'announcements'].forEach((v) => { const n = document.querySelector(`.nav-item[data-view="${v}"]`); if (n) n.style.display = 'none'; });
+  if (ME.role === 'student') {
+    document.querySelectorAll('.student-only').forEach((el) => (el.style.display = ''));
+    refreshMessageBadge();
+    wireTopSearch();
+  }
+  if (ME.role === 'free') ['courses', 'schedule', 'announcements', 'assignments', 'quizzes', 'certificates', 'messages', 'resources'].forEach((v) => { const n = document.querySelector(`.nav-item[data-view="${v}"]`); if (n) n.style.display = 'none'; });
   if (ME.gamify && ME.gamify.streak > 0) {
     $('topStreak').style.display = '';
     $('topStreak').innerHTML = `&#128293; ${ME.gamify.streak}-day streak`;
+  }
+  if (ME.gamify) {
+    $('topGems').style.display = '';
+    $('topGems').innerHTML = gemChip(ME.gamify.gems);
   }
   $('gate').style.display = 'none';
   $('app').style.display = '';
   renderOverview();
   requireWhatsapp(); // v12: contact details are mandatory for every learner
 })();
+async function refreshMessageBadge() {
+  try {
+    const d = await api('/api/my/messages');
+    const n = d.total_unread || 0;
+    ['bellBadge', 'navMsgBadge'].forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      el.style.display = n ? '' : 'none';
+      el.textContent = n > 99 ? '99+' : String(n);
+    });
+  } catch {}
+}
+// v13: topbar quick-search - filters the student's own courses, quest
+// levels, and open quizzes client-side (small data at this scale, so no
+// dedicated /api/search endpoint). Modeled on the debounced admin student
+// search at wireStudentSearch().
+function wireTopSearch() {
+  const inp = $('topSearch'); const out = $('topSearchResults');
+  if (!inp || !out) return;
+  let t = null;
+  inp.addEventListener('input', () => {
+    clearTimeout(t);
+    const q = inp.value.trim().toLowerCase();
+    if (q.length < 2) { out.classList.remove('open'); out.innerHTML = ''; return; }
+    t = setTimeout(async () => {
+      try {
+        const [courses, quests, quizzes] = await Promise.all([api('/api/my/courses'), api('/api/my/quests'), api('/api/my/quizzes')]);
+        const hits = [];
+        courses.courses.forEach((c) => { if ((c.title || c.name || '').toLowerCase().includes(q)) hits.push({ label: c.title || c.name, sub: 'Course', action: `openCourse(${c.id})` }); });
+        quests.courses.forEach((c) => c.levels.forEach((l) => { if (l.title.toLowerCase().includes(q)) hits.push({ label: `Level ${l.no}: ${l.title}`, sub: c.course_title, action: `show('assignments')` }); }));
+        quizzes.open.forEach((qz) => { if (qz.title.toLowerCase().includes(q)) hits.push({ label: qz.title, sub: qz.course_title, action: `show('quizzes')` }); });
+        out.innerHTML = hits.length
+          ? hits.slice(0, 8).map((h) => `<button onclick="${h.action};closeTopSearch()">${esc(h.label)} <span class="s" style="color:var(--muted-2)">&middot; ${esc(h.sub)}</span></button>`).join('')
+          : '<div class="empty" style="padding:10px">No matches.</div>';
+        out.classList.add('open');
+      } catch { out.innerHTML = ''; }
+    }, 220);
+  });
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTopSearch(); });
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); inp.focus(); }
+  });
+}
+function closeTopSearch() { const out = $('topSearchResults'); if (out) { out.classList.remove('open'); out.innerHTML = ''; } $('topSearch').blur(); }
 
 /* v12: WhatsApp number is MANDATORY for students and open users - it feeds
  * the leads database the admin uses for announcements. The modal cannot be
@@ -159,8 +221,9 @@ async function renderOverview() {
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
   const d = await api('/api/overview');
 
+  if (ME.role === 'student' && d.gamify) { renderStudentOverview(el, d); return; }
+
   let top = '';
-  if (ME.role === 'student' && d.gamify) top = prismCard(d.gamify);
   if (ME.role === 'free' && d.gamify) {
     top = prismCard(d.gamify) + `
     <div class="card"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
@@ -206,12 +269,138 @@ async function renderOverview() {
       <div>
         <div class="card"><div class="card-head"><h3>Top learners</h3></div>
           <div class="card-body tight">${(d.leaderboard || []).slice(0, 8).map(lbRow).join('') || '<div class="empty">No gems earned yet.</div>'}</div></div>
-        ${ME.role === 'student' && d.gamify ? badgesCard(d.gamify) : ''}
       </div>
     </div>
     <style>@media (max-width:900px){.ovr-grid{grid-template-columns:1fr !important}}</style>`;
   requestAnimationFrame(() => { const f = el.querySelector('.prism-fill'); if (f) f.style.width = f.dataset.w + '%'; });
 }
+
+/* -------------------------- student overview (v13) -------------------------- */
+let DC_CD_TIMER = null;
+async function renderStudentOverview(el, d) {
+  const [coursesR, questsR, quizzesR, recR, challR] = await Promise.all([
+    api('/api/my/courses'), api('/api/my/quests'), api('/api/my/quizzes'),
+    api('/api/my/recommended'), api('/api/challenges').catch(() => ({ challenges: [], mine: {} })),
+  ]);
+  const courses = coursesR.courses;
+  const cont = courses.find((c) => c.progress_pct > 0 && c.progress_pct < 100) || courses[0] || null;
+
+  // Merge live classes + nearest undone quest deadline per course + open quiz closes into one dated list.
+  const items = [];
+  d.upcoming.forEach((s) => items.push({ date: s.session_date, type: 'class', title: s.title, sub: s.course_title || s.batch_name || '' }));
+  questsR.courses.forEach((c) => {
+    const next = c.levels.find((l) => l.unlocked && !l.passed && l.deadline);
+    if (next) items.push({ date: next.deadline, type: 'assignment', title: `Level ${next.no}: ${next.title}`, sub: c.course_title });
+  });
+  quizzesR.open.forEach((q) => items.push({ date: (q.closes_at || '').slice(0, 10), type: 'quiz', title: q.title, sub: q.course_title }));
+  items.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const upcoming3 = items.slice(0, 3);
+  const TYPE_LABEL = { class: 'Live class', assignment: 'Assignment', quiz: 'Quiz' };
+
+  // Daily challenge: nearest-due open challenge, else the most recently published open one. Never a fabricated deadline.
+  const openChallenges = (challR.challenges || []).filter((c) => c.open);
+  const withDue = openChallenges.filter((c) => c.due_date).sort((a, b) => String(a.due_date).localeCompare(String(b.due_date)));
+  const featured = withDue[0] || openChallenges[openChallenges.length - 1] || null;
+  const mineChallenge = featured ? (challR.mine || {})[featured.id] : null;
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start" class="ovr-grid">
+      <div>
+        ${cont ? `<div class="card"><div class="cl-hero">
+          <div class="cl-thumb">&#128218;</div>
+          <div class="cl-main">
+            <div class="cl-eyebrow">Continue learning</div>
+            <div class="cl-title">${esc(cont.title || cont.name)}</div>
+            <div class="cl-bar"><div class="cl-fill" style="width:${cont.progress_pct}%"></div></div>
+            <div class="cl-pct">${cont.progress_pct}% complete</div>
+          </div>
+          <div class="cl-next">
+            <div class="l">Next</div>
+            <div class="t">${cont.next_level ? `Level ${cont.next_level.no}: ${esc(cont.next_level.title)}` : (cont.progress_pct >= 100 ? 'Track completed' : 'Not started yet')}</div>
+            <button class="btn btn-primary btn-sm btn-block" onclick="openCourse(${cont.id})">Resume learning</button>
+          </div>
+        </div></div>` : `<div class="card"><div class="card-body"><div class="empty">Enroll in a course to start learning.</div></div></div>`}
+
+        <div class="card"><div class="card-head"><h3>Upcoming schedule</h3><button class="btn btn-ghost btn-sm" onclick="show('schedule')">Full calendar</button></div>
+          <div class="card-body" style="display:flex;gap:14px;flex-wrap:wrap">
+            ${upcoming3.length ? upcoming3.map((it) => `
+              <div style="flex:1;min-width:170px;background:var(--canvas);border-radius:12px;padding:14px">
+                <div class="s" style="color:var(--primary);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.05em">${TYPE_LABEL[it.type]}</div>
+                <div class="t" style="font-weight:600;margin:4px 0">${esc(it.title)}</div>
+                <div class="s" style="color:var(--muted)">${esc(it.sub)}</div>
+                <div class="s" style="color:var(--muted-2);margin-top:6px">${fmtDate(it.date)}</div>
+              </div>`).join('') : '<div class="empty">Nothing scheduled right now.</div>'}
+          </div></div>
+
+        <div class="card"><div class="card-head"><h3>My courses</h3><button class="btn btn-ghost btn-sm" onclick="show('courses')">View all</button></div>
+          <div class="card-body tight">${courses.length ? courses.map((c) => `
+            <div class="list-row">
+              <div class="grow">
+                <div class="t">${esc(c.title || c.name)}</div>
+                <div class="s" style="color:var(--muted)">${c.lesson_count} lesson${c.lesson_count === 1 ? '' : 's'}</div>
+                <div class="mini-bar"><div class="mini-fill" style="width:${c.progress_pct}%"></div></div>
+              </div>
+              <div style="font-weight:700;color:var(--ink);min-width:36px;text-align:right">${c.progress_pct}%</div>
+              <button class="btn btn-ghost btn-sm" onclick="openCourse(${c.id})">Continue</button>
+            </div>`).join('') : '<div class="empty">No enrolled courses yet.</div>'}</div></div>
+
+        ${recR.courses.length ? `<div class="card"><div class="card-head"><h3>Recommended for you</h3></div>
+          <div class="card-body"><div class="course-grid">${recR.courses.map((c) => `
+            <a class="course-card" href="/open#courses" style="text-decoration:none;color:inherit">
+              <div class="course-band"></div>
+              <div class="cc-body">
+                <div class="tier">${esc(c.tier)} &middot; ${esc(c.code)}</div>
+                <h4>${esc(c.title)}</h4>
+                <div class="s" style="color:var(--muted)">${esc((c.summary || '').slice(0, 90))}</div>
+              </div>
+            </a>`).join('')}</div></div></div>` : ''}
+      </div>
+      <div>
+        ${prismCard(d.gamify)}
+        ${featured ? `<div class="card"><div class="card-head"><h3>Daily challenge</h3></div>
+          <div class="card-body">
+            <div class="t" style="font-weight:600;margin-bottom:4px">${esc(featured.title)}</div>
+            <div class="s" style="color:var(--muted);margin-bottom:10px">${esc((featured.description || '').slice(0, 120))}</div>
+            ${featured.due_date ? `<div class="cd-grid" id="dcCountdown">
+              <div class="cd-box"><b id="dc-d">--</b><span>Days</span></div>
+              <div class="cd-box"><b id="dc-h">--</b><span>Hours</span></div>
+              <div class="cd-box"><b id="dc-m">--</b><span>Mins</span></div>
+              <div class="cd-box"><b id="dc-s">--</b><span>Secs</span></div>
+            </div>` : '<div class="s" style="color:var(--muted-2);margin-bottom:8px">No deadline - work at your own pace.</div>'}
+            <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="formChallengeSubmit(${featured.id},'${esc(featured.title).replace(/'/g, '&#39;')}')">${mineChallenge ? 'Resubmit' : 'Start challenge'}</button>
+          </div></div>` : ''}
+        <div class="card"><div class="card-head"><h3>Recent achievements</h3></div>
+          <div class="card-body tight">${(d.gamify.recent_events || []).length ? d.gamify.recent_events.map((ev) => `
+            <div class="list-row">
+              <div class="grow"><div class="t">${esc(ev.note || (ev.source.charAt(0).toUpperCase() + ev.source.slice(1) + ' gems'))}</div><div class="s" style="color:var(--muted-2)">${esc((ev.at || '').slice(0, 16))}</div></div>
+              <span style="font-weight:700;color:var(--ok)">+${ev.amount}</span>
+            </div>`).join('') : '<div class="empty">Earn gems to see them here.</div>'}</div></div>
+        <div class="card"><div class="card-body" style="text-align:center">
+          <div style="font-weight:650;margin-bottom:6px">Need help?</div>
+          <div class="s" style="color:var(--muted);margin-bottom:12px">Find answers, ask questions, and connect with peers.</div>
+          <a class="btn btn-ghost btn-block" href="mailto:info@echolens.digital">Contact support</a>
+        </div></div>
+      </div>
+    </div>
+    <style>@media (max-width:900px){.ovr-grid{grid-template-columns:1fr !important}}</style>`;
+  requestAnimationFrame(() => { const f = el.querySelector('.prism-fill'); if (f) f.style.width = f.dataset.w + '%'; });
+  if (featured && featured.due_date) startDailyChallengeCountdown(featured.due_date);
+}
+function startDailyChallengeCountdown(dueDate) {
+  if (DC_CD_TIMER) clearInterval(DC_CD_TIMER);
+  const end = new Date(dueDate + 'T23:59:59').getTime();
+  const tick = () => {
+    if (!$('dc-d')) { clearInterval(DC_CD_TIMER); DC_CD_TIMER = null; return; }
+    let s = Math.max(0, Math.floor((end - Date.now()) / 1000));
+    const dd = Math.floor(s / 86400); s -= dd * 86400;
+    const hh = Math.floor(s / 3600); s -= hh * 3600;
+    const mm = Math.floor(s / 60); s -= mm * 60;
+    const p = (n) => String(n).padStart(2, '0');
+    $('dc-d').textContent = dd; $('dc-h').textContent = p(hh); $('dc-m').textContent = p(mm); $('dc-s').textContent = p(s);
+  };
+  tick(); DC_CD_TIMER = setInterval(tick, 1000);
+}
+
 function stat(n, l) { return `<div class="stat-card"><div class="n">${n ?? 0}</div><div class="l">${l}</div></div>`; }
 function prismCard(g) {
   const s = g.stage;
@@ -280,6 +469,86 @@ async function renderCourses() {
         </div>
       </div>
     </div>`).join('')}</div>`;
+}
+
+/* ============================= ASSIGNMENTS ============================= */
+async function renderAssignments() {
+  const el = $('view-assignments');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/my/quests');
+  if (!d.courses.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">No assignments yet - they appear once a teacher installs a quest track on your course.</div></div></div>'; return; }
+  el.innerHTML = d.courses.map((c) => `
+    <div class="card"><div class="card-head"><h3>${esc(c.course_title)}</h3><span class="s" style="color:var(--muted)">${c.unlocked_up_to - 1}/${c.total_levels} levels passed</span></div>
+      <div class="card-body tight">${c.levels.map((l) => `
+        <div class="list-row">
+          <div class="grow">
+            <div class="t">Level ${l.no}: ${esc(l.title)}</div>
+            <div class="s" style="color:var(--muted)">${l.deadline ? 'Due ' + fmtDate(l.deadline) : 'No deadline'}</div>
+          </div>
+          <span class="grade-chip ${l.passed ? 'ok' : (l.unlocked ? 'wait' : 'none')}">${l.passed ? '&#10003; Passed' : (l.unlocked ? 'In progress' : 'Locked')}</span>
+          ${l.unlocked ? `<button class="btn btn-teal btn-sm" onclick="openCourse(${c.batch_id})">Open</button>` : ''}
+        </div>`).join('')}</div></div>`).join('');
+}
+
+/* =============================== QUIZZES (global) =============================== */
+async function renderQuizzesGlobal() {
+  const el = $('view-quizzes');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/my/quizzes');
+  el.innerHTML = `
+    <div class="card"><div class="card-head"><h3>Open now</h3></div>
+      <div class="card-body tight">${d.open.length ? d.open.map((q) => `
+        <div class="list-row">
+          <div class="grow"><div class="t">${esc(q.title)}</div><div class="s" style="color:var(--muted)">${esc(q.course_title)} &middot; ${q.points} points &middot; closes ${esc((q.closes_at || '').slice(0, 16).replace('T', ' '))}</div></div>
+          <button class="btn btn-teal btn-sm" onclick="openCourse(${q.batch_id})">Take quiz</button>
+        </div>`).join('') : '<div class="empty">No quizzes open right now.</div>'}</div></div>
+    <div class="card"><div class="card-head"><h3>Past attempts</h3></div>
+      <div class="card-body tight">${d.mine.length ? d.mine.map((a) => `
+        <div class="list-row">
+          <div class="grow"><div class="t">${esc(a.title)}</div><div class="s" style="color:var(--muted)">${esc(a.course_title)} &middot; taken ${esc((a.taken_at || '').slice(0, 16))}</div></div>
+          <span class="grade-chip ok">${a.score_pct}%</span>
+        </div>`).join('') : '<div class="empty">No attempts yet.</div>'}</div></div>`;
+}
+
+/* ============================== RESOURCES ============================== */
+async function renderResources() {
+  const el = $('view-resources');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/my/resources');
+  const TYPE_ICON = { slides: '&#128196;', reading: '&#128218;', notebook: '&#129513;', video: '&#127909;', resource: '&#128206;' };
+  const withLessons = d.courses.filter((c) => c.lessons.length);
+  if (!withLessons.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">No course content posted yet.</div></div></div>'; return; }
+  el.innerHTML = withLessons.map((c) => `
+    <div class="card"><div class="card-head"><h3>${esc(c.course_title)}</h3></div>
+      <div class="card-body tight">${c.lessons.map((l) => `
+        <div class="list-row">
+          <div class="grow"><div class="t">${TYPE_ICON[l.type] || TYPE_ICON.resource} ${esc(l.title)}</div><div class="s" style="color:var(--muted)">${l.week_no ? 'Week ' + l.week_no : ''}</div></div>
+          <a class="btn btn-ghost btn-sm" href="${esc(l.url)}" target="_blank" rel="noopener">Open</a>
+        </div>`).join('')}</div></div>`).join('');
+}
+
+/* =============================== MESSAGES =============================== */
+async function renderMessages() {
+  const el = $('view-messages');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/my/messages');
+  if (!d.threads.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">No course chat yet - enroll in a course to start one.</div></div></div>'; return; }
+  el.innerHTML = `<div class="card"><div class="card-head"><h3>Course conversations</h3></div>
+    <div class="card-body tight">${d.threads.map((t) => `
+      <div class="list-row">
+        <div class="grow">
+          <div class="t">${esc(t.course_title)}${t.unread ? ` <span class="bell-badge" style="position:static;display:inline-flex">${t.unread}</span>` : ''}</div>
+          <div class="s" style="color:var(--muted)">${t.last_message ? esc(t.last_message.display_name) + ': ' + esc(t.last_message.body).slice(0, 90) : 'No messages yet'}</div>
+        </div>
+        <button class="btn btn-teal btn-sm" onclick="openMessageThread(${t.batch_id})">Open</button>
+      </div>`).join('')}</div></div>`;
+}
+async function openMessageThread(batchId) {
+  await openCourse(batchId);
+  const chatTab = Array.from(document.querySelectorAll('.tab')).find((t) => t.dataset.tab === 'Chat');
+  if (chatTab) courseTab(chatTab);
+  try { await api(`/api/batches/${batchId}/chat/read`, { method: 'POST' }); } catch {}
+  refreshMessageBadge();
 }
 
 /* ============================ COURSE DETAIL ============================ */
@@ -608,9 +877,12 @@ function formGlobalAnnouncement() {
   });
 }
 
-/* =============================== PROFILE =============================== */
-async function renderProfile() {
-  const el = $('view-profile');
+/* =============================== SETTINGS =============================== */
+// v13: this used to be "Profile" - gamification (stage/badges) moved to the
+// Progress view and certificates moved to their own Certificates view, so
+// Settings stays focused on account actions and profile details.
+async function renderSettings() {
+  const el = $('view-settings');
   ME = await api('/api/auth/me');
   drawAvatar();
   const p = ME.profile || {};
@@ -645,16 +917,10 @@ async function renderProfile() {
         </div>
       </div></div>
     </div>
-    ${ME.gamify ? prismCard(ME.gamify) : ''}
-    ${ME.gamify ? journeyRail(ME.gamify) : ''}
-    ${ME.gamify ? badgesCard(ME.gamify) : ''}
-    <div id="myCerts"></div>
     <div id="myReports"></div>
     <div class="card"><div class="card-head"><h3>Profile details</h3><button class="btn btn-ghost btn-sm" onclick="openProfileForm()">Edit</button></div>
       <div class="card-body kv-grid">${rows}</div></div>`;
-  requestAnimationFrame(() => { const f = el.querySelector('.prism-fill'); if (f) f.style.width = f.dataset.w + '%'; });
   loadMyReports();
-  loadMyCerts();
 }
 function formChangePassword() {
   openModal('Change password', `
@@ -676,7 +942,7 @@ function formUploadAvatar() {
       <button class="btn btn-primary btn-block">Upload picture</button></form>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
-    try { await api('/api/me/avatar', { method: 'POST', body: new FormData(f) }); toast('Picture updated.'); closeModal(); renderProfile(); }
+    try { await api('/api/me/avatar', { method: 'POST', body: new FormData(f) }); toast('Picture updated.'); closeModal(); renderSettings(); }
     catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
@@ -689,26 +955,29 @@ function formUploadSignature() {
       <button class="btn btn-primary btn-block">Save signature</button></form>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
-    try { await api('/api/me/signature', { method: 'POST', body: new FormData(f) }); toast('Signature saved - it will appear on certificates you issue.'); closeModal(); renderProfile(); }
+    try { await api('/api/me/signature', { method: 'POST', body: new FormData(f) }); toast('Signature saved - it will appear on certificates you issue.'); closeModal(); renderSettings(); }
     catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
-async function loadMyCerts() {
-  const box = $('myCerts'); if (!box) return;
-  try {
-    const d = await api('/api/certificates/mine');
-    if (!d.certificates.length) { box.innerHTML = ''; return; }
-    box.innerHTML = `<div class="card"><div class="card-head"><h3>My certificates</h3><span class="s" style="color:var(--muted)">QR-verified &middot; share straight to LinkedIn</span></div>
-      <div class="card-body tight">${d.certificates.map((c) => `
-        <div class="list-row" style="padding:12px 4px">
-          <div class="grow">
-            <div class="t">${esc(c.title)}</div>
-            <div class="s" style="color:var(--muted)">${esc(c.kind)} &middot; completed ${fmtDate(c.completion_date)} &middot; serial <span class="mono">${esc(c.serial)}</span></div>
-          </div>
-          <a class="btn btn-teal btn-sm" href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">View &amp; download</a>
-          <button class="btn btn-ghost btn-sm" onclick="shareCertLinkedIn('${esc(c.serial)}','${esc(c.title).replace(/'/g, '&#39;')}','${esc(c.completion_date)}','${esc(c.org).replace(/'/g, '&#39;')}')">in&nbsp;Add to LinkedIn</button>
-        </div>`).join('')}</div></div>`;
-  } catch { box.innerHTML = ''; }
+/* ============================= CERTIFICATES ============================= */
+async function renderCertificates() {
+  const el = $('view-certificates');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/certificates/mine');
+  if (!d.certificates.length) {
+    el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">No certificates yet - complete a course or quest to earn one.</div></div></div>';
+    return;
+  }
+  el.innerHTML = `<div class="card"><div class="card-head"><h3>My certificates</h3><span class="s" style="color:var(--muted)">QR-verified &middot; share straight to LinkedIn</span></div>
+    <div class="card-body tight">${d.certificates.map((c) => `
+      <div class="list-row" style="padding:12px 4px">
+        <div class="grow">
+          <div class="t">${esc(c.title)}</div>
+          <div class="s" style="color:var(--muted)">${esc(c.kind)} &middot; completed ${fmtDate(c.completion_date)} &middot; serial <span class="mono">${esc(c.serial)}</span></div>
+        </div>
+        <a class="btn btn-teal btn-sm" href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">View &amp; download</a>
+        <button class="btn btn-ghost btn-sm" onclick="shareCertLinkedIn('${esc(c.serial)}','${esc(c.title).replace(/'/g, '&#39;')}','${esc(c.completion_date)}','${esc(c.org).replace(/'/g, '&#39;')}')">in&nbsp;Add to LinkedIn</button>
+      </div>`).join('')}</div></div>`;
 }
 function shareCertLinkedIn(serial, title, date, org) {
   const url = location.origin + '/cert?s=' + serial;
@@ -731,6 +1000,34 @@ function journeyRail(g) {
           <div class="dot"></div><div class="nm">${esc(s.name)}</div><div class="th">${s.min}+</div></div>`;
       }).join('')}
     </div></div></div>`;
+}
+
+/* =============================== PROGRESS =============================== */
+async function renderProgress() {
+  const el = $('view-progress');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const [me, courses] = await Promise.all([api('/api/auth/me'), api('/api/my/courses')]);
+  ME.gamify = me.gamify;
+  const g = me.gamify;
+  if (!g) { el.innerHTML = '<div class="empty">Progress tracking is for student accounts.</div>'; return; }
+  const perCourse = courses.courses.map((c) => `
+    <div class="list-row">
+      <div class="grow">
+        <div class="t">${esc(c.title || c.name)}</div>
+        <div class="s">${c.next_level ? `Next: Level ${c.next_level.no} &middot; ${esc(c.next_level.title)}` : (c.progress_pct >= 100 ? 'Track completed' : 'Not started yet')}</div>
+        <div class="mini-bar"><div class="mini-fill" style="width:${c.progress_pct}%"></div></div>
+      </div>
+      <div style="font-weight:700;color:var(--ink);min-width:40px;text-align:right">${c.progress_pct}%</div>
+    </div>`).join('') || '<div class="empty">Enroll in a course to start tracking progress.</div>';
+  el.innerHTML = `
+    ${prismCard(g)}
+    <div class="stat-grid">
+      ${stat(g.streak, 'Day streak')}${stat(g.gems, 'Gems')}${stat(g.badges.length, 'Badges')}
+    </div>
+    ${journeyRail(g)}
+    <div class="card"><div class="card-head"><h3>Progress by course</h3></div><div class="card-body tight">${perCourse}</div></div>
+    ${badgesCard(g)}`;
+  requestAnimationFrame(() => { el.querySelectorAll('.prism-fill').forEach((f) => (f.style.width = f.dataset.w + '%')); });
 }
 function openProfileForm() {
   const p = ME.profile || {};
@@ -768,7 +1065,7 @@ function openProfileForm() {
       <button class="btn btn-primary btn-block">Save</button></form>`, true);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const obj = {}; new FormData(f).forEach((v, k) => { obj[k] = String(v).trim(); });
-    try { await api('/api/me/profile', { method: 'POST', body: JSON.stringify(obj) }); toast('Profile saved.'); closeModal(); renderProfile(); }
+    try { await api('/api/me/profile', { method: 'POST', body: JSON.stringify(obj) }); toast('Profile saved.'); closeModal(); renderSettings(); }
     catch (err) { modalMsg(err.message); }
   });
 }

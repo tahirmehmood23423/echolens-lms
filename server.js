@@ -18,7 +18,7 @@ const store = require('./store');
 const ai = require('./ai');
 const mailer = require('./mailer');
 const {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, officialCatalogue,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
@@ -173,6 +173,38 @@ app.get('/api/overview', authRequired, (req, res) => {
     });
   }
   res.json({ ...base, gamify: gamifyFor(u), leaderboard: studentLeaderboard().slice(0, 10) });
+});
+
+/* v13: cross-course aggregators for the student portal redesign - the quest/
+ * quiz/lesson systems are all strictly per-batch, so these merge them across
+ * every course a student is enrolled in for the new Overview/Assignments/
+ * Quizzes/Resources views. */
+app.get('/api/my/courses', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.json({ courses: [] });
+  const courses = coursesForUser(req.user).map((b) => {
+    const installed = Quests.installed(b.id);
+    const prog = installed ? Quests.progress(req.user.id, b.id) : null;
+    const total = prog ? prog.levels.length : 0;
+    const passed = prog ? prog.levels.filter((l) => l.passed).length : 0;
+    const nextLevel = prog ? (prog.levels.find((l) => !l.passed && l.unlocked) || null) : null;
+    return {
+      ...b,
+      progress_pct: total ? Math.round((passed / total) * 100) : 0,
+      next_level: nextLevel ? { no: nextLevel.quest.no, title: nextLevel.quest.title, deadline: nextLevel.quest.deadline } : null,
+      lesson_count: Lessons.forBatch(b.id).length,
+    };
+  });
+  res.json({ courses });
+});
+app.get('/api/my/recommended', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.json({ courses: [] });
+  const myCodes = new Set(coursesForUser(req.user).map((b) => Courses.byId(b.course_id)?.code).filter(Boolean));
+  const rank = { flagship: 0, high_demand: 1, new: 2, free: 3 };
+  const out = officialCatalogue()
+    .filter((c) => !myCodes.has(c.code))
+    .sort((a, b) => Math.min(...(a.badges || []).map((x) => rank[x] ?? 9), 9) - Math.min(...(b.badges || []).map((x) => rank[x] ?? 9), 9))
+    .slice(0, 6);
+  res.json({ courses: out });
 });
 
 /* ------------------------------ leaderboards ------------------------------ */
@@ -338,6 +370,13 @@ app.delete('/api/lessons/:id', authRequired, (req, res) => {
   if (!canManageBatch(req.user, Batches.byId(l.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
   Lessons.remove(l.id); res.json({ ok: true });
 });
+app.get('/api/my/resources', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.json({ courses: [] });
+  const courses = coursesForUser(req.user).map((b) => ({
+    batch_id: b.id, course_title: b.title || b.name, lessons: Lessons.forBatch(b.id),
+  }));
+  res.json({ courses });
+});
 /* -------------------------- assignments (removed) -------------------------- */
 // The quest system is the assignment system. Legacy assignment data stays in
 // the database (gems and history are preserved) but is no longer surfaced,
@@ -408,6 +447,22 @@ app.delete('/api/chat/:id', authRequired, (req, res) => {
   const b = Batches.byId(m.batch_id);
   if (!(canManageBatch(req.user, b) || req.user.role === 'admin')) return res.status(403).json({ error: 'Messages cannot be deleted. Only course staff can moderate the chat.' });
   Chat.remove(m.id); res.json({ ok: true });
+});
+// v13: "Messages" in the student portal is the existing per-course chat,
+// aggregated across every enrolled course with a real unread count.
+app.get('/api/my/messages', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.json({ threads: [], total_unread: 0 });
+  const threads = coursesForUser(req.user).map((b) => {
+    const msgs = Chat.forBatch(b.id, req.user);
+    const lastRead = ChatReads.lastRead(req.user.id, b.id);
+    const unread = msgs.filter((m) => !m.mine && (!lastRead || m.created_at > lastRead)).length;
+    return { batch_id: b.id, course_title: b.title || b.name, unread, last_message: msgs[msgs.length - 1] || null };
+  });
+  res.json({ threads, total_unread: threads.reduce((s, t) => s + t.unread, 0) });
+});
+app.post('/api/batches/:id/chat/read', authRequired, viewBatch, (req, res) => {
+  ChatReads.mark(req.user.id, req.batch.id);
+  res.json({ ok: true });
 });
 
 /* ------------------------------ announcements ------------------------------ */
@@ -806,6 +861,22 @@ app.get('/api/batches/:id/quest', authRequired, viewBatch, (req, res) => {
     me: isStudent ? { id: req.user.id } : null,
   });
 });
+// v13: "Assignments" in the student portal - quests are the real assignment
+// system (see the "assignments (removed)" note above), but only reachable
+// per-course today. This merges every enrolled course's quest levels into
+// one flat list.
+app.get('/api/my/quests', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.json({ courses: [] });
+  const courses = coursesForUser(req.user).filter((b) => Quests.installed(b.id)).map((b) => {
+    const prog = Quests.progress(req.user.id, b.id);
+    return {
+      batch_id: b.id, course_title: b.title || b.name, track_title: prog.track.title,
+      unlocked_up_to: prog.unlocked_up_to, total_levels: prog.levels.length, completed: prog.completed,
+      levels: prog.levels.map((l) => ({ no: l.quest.no, title: l.quest.title, deadline: l.quest.deadline, passed: l.passed, unlocked: l.unlocked })),
+    };
+  });
+  res.json({ courses });
+});
 app.post('/api/quests/:qid/problems/:pid/submit', authRequired, upload.single('file'), (req, res) => {
   if (req.user.role !== 'student') return res.status(403).json({ error: 'Only students submit quest problems.' });
   const q = Quests.byId(req.params.qid);
@@ -1148,6 +1219,24 @@ app.get('/api/batches/:id/quizzes', authRequired, viewBatch, (req, res) => {
     my_attempts: store.allData().quiz_attempts.filter((a) => a.user_id === req.user.id && all.some((q) => q.id === a.quiz_id))
       .map((a) => ({ quiz_id: a.quiz_id, title: (Quizzes.byId(a.quiz_id) || {}).title, score_pct: a.score_pct, correct: a.correct, total: a.total, gems: a.gems, taken_at: a.taken_at })),
   });
+});
+// v13: "Quizzes" in the student portal - quizzes are strictly per-course
+// today, this merges every enrolled course's open quizzes + past attempts.
+app.get('/api/my/quizzes', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.json({ open: [], mine: [] });
+  const open = [], mine = [];
+  for (const b of coursesForUser(req.user)) {
+    for (const q of Quizzes.forBatch(b.id)) {
+      const attempt = Quizzes.myAttempt(q.id, req.user.id);
+      if (Quizzes.isOpen(q) && !attempt) {
+        open.push({ id: q.id, title: q.title, batch_id: b.id, course_title: b.title || b.name, closes_at: q.closes_at, points: q.points });
+      }
+      if (attempt) {
+        mine.push({ quiz_id: q.id, title: q.title, batch_id: b.id, course_title: b.title || b.name, score_pct: attempt.score_pct, taken_at: attempt.taken_at });
+      }
+    }
+  }
+  res.json({ open, mine: mine.sort((a, b) => String(b.taken_at).localeCompare(String(a.taken_at))) });
 });
 app.post('/api/batches/:id/quizzes', authRequired, manageBatch, (req, res) => {
   const out = Quizzes.create({ batch_id: req.batch.id, ...req.body, created_by: req.user.id });

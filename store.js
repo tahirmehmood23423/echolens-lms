@@ -38,10 +38,10 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0 },
   issued_usernames: [],
   issued_regnos: [],
-  users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [],
+  users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
   live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
   events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
   settings: { cert: { org: 'EchoLens AI Academy', ceo_name: '', ceo_sig: null, tagline: 'Gamified AI & Data Science Education' } },
@@ -991,6 +991,21 @@ const Chat = {
   byId(id) { return data.course_messages.find((m) => m.id === Number(id)) || null; },
   remove(id) { data.course_messages = data.course_messages.filter((m) => m.id !== Number(id)); save(); },
   myAlias: chatAlias,
+};
+
+// Tracks when a user last read a course's chat, so a global "Messages" view
+// can show a real per-course unread count instead of faking one.
+const ChatReads = {
+  mark(uid, bid) {
+    let r = data.chat_reads.find((x) => x.user_id === Number(uid) && x.batch_id === Number(bid));
+    if (r) r.last_read_at = now();
+    else data.chat_reads.push({ id: nextId('chat_reads'), user_id: Number(uid), batch_id: Number(bid), last_read_at: now() });
+    save();
+  },
+  lastRead(uid, bid) {
+    const r = data.chat_reads.find((x) => x.user_id === Number(uid) && x.batch_id === Number(bid));
+    return r ? r.last_read_at : null;
+  },
 };
 
 /* ------------------------------ leaderboards ------------------------------ */
@@ -2008,7 +2023,7 @@ const PublicAnnouncements = {
 load();
 
 module.exports = {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, learningPaths: () => LEARNING_PATHS, persist: save,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, learningPaths: () => LEARNING_PATHS, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,

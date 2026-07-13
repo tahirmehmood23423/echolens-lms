@@ -1459,6 +1459,10 @@ const Events = {
       description: String(p.description || '').slice(0, 8000),
       points: Math.max(5, Math.min(500, Number(p.points) || 100)),
       difficulty: ['Easy', 'Medium', 'Hard'].includes(p.difficulty) ? p.difficulty : 'Easy',
+      input_spec: String(p.input_spec || '').slice(0, 1000) || null,
+      output_spec: String(p.output_spec || '').slice(0, 1000) || null,
+      example_input: String(p.example_input || '').slice(0, 1000) || null,
+      example_output: String(p.example_output || '').slice(0, 1000) || null,
     })) : [];
     const ev = {
       id: nextId('events'),
@@ -1507,6 +1511,10 @@ const Events = {
         description: String(p.description || '').slice(0, 8000),
         points: Math.max(5, Math.min(500, Number(p.points) || 100)),
         difficulty: ['Easy', 'Medium', 'Hard'].includes(p.difficulty) ? p.difficulty : 'Easy',
+        input_spec: String(p.input_spec || '').slice(0, 1000) || null,
+        output_spec: String(p.output_spec || '').slice(0, 1000) || null,
+        example_input: String(p.example_input || '').slice(0, 1000) || null,
+        example_output: String(p.example_output || '').slice(0, 1000) || null,
       }));
     }
     save();

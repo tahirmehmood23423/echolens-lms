@@ -2682,6 +2682,16 @@ function evAddProb() {
       <label class="field"><span>Points</span><input class="ep-pts" type="number" min="5" max="500" value="100"></label>
     </div>
     <label class="field"><span>Task brief (what to build / solve, what is graded)</span><textarea class="ep-desc" rows="3" required></textarea></label>
+    <details style="margin:6px 0 10px"><summary class="s" style="cursor:pointer;color:var(--muted);font-weight:600">Input / Output / Example (optional - shown on the task page)</summary>
+      <div class="form-grid" style="margin-top:8px">
+        <label class="field"><span>Input</span><textarea class="ep-input" rows="2" placeholder="e.g. A single integer N on one line."></textarea></label>
+        <label class="field"><span>Output</span><textarea class="ep-output" rows="2" placeholder="e.g. Print the sum of digits of N."></textarea></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Example input</span><textarea class="ep-ex-input" rows="2" placeholder="e.g. 123"></textarea></label>
+        <label class="field"><span>Example output</span><textarea class="ep-ex-output" rows="2" placeholder="e.g. 6"></textarea></label>
+      </div>
+    </details>
     <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove task</button>`;
   list.appendChild(row);
 }
@@ -2691,6 +2701,10 @@ function evReadProbs() {
     description: r.querySelector('.ep-desc').value.trim(),
     difficulty: r.querySelector('.ep-diff').value,
     points: r.querySelector('.ep-pts').value,
+    input_spec: r.querySelector('.ep-input').value.trim(),
+    output_spec: r.querySelector('.ep-output').value.trim(),
+    example_input: r.querySelector('.ep-ex-input').value.trim(),
+    example_output: r.querySelector('.ep-ex-output').value.trim(),
   })).filter((p) => p.title);
 }
 

@@ -1058,6 +1058,8 @@ function renderEventDetail() {
     `<span class="evd-tag">${points} pts</span>`,
     `<span class="evd-tag">${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>`,
     durL ? `<span class="evd-tag">${durL}</span>` : '',
+    ev.auto_grade ? `<span class="evd-tag">AI Graded</span>` : '',
+    ev.auto_grade ? `<span class="evd-tag">10% Reduction</span>` : '',
     ev.auto_certificate ? `<span class="evd-tag good">Certificate at ${ev.pass_mark}%+</span>` : '',
   ].join('');
   const card = `<div class="evd-card">
@@ -1106,7 +1108,7 @@ function renderEventDetail() {
 
   // ---- middle column sections ----
   const banner = ev.auto_grade
-    ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly the moment you submit.</span></div>` : '';
+    ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly by AI with a 10% reduction in score.</span></div>` : '';
   const regBtn = !d.my_entry && ['upcoming', 'live'].includes(ev.status)
     ? `<button class="btn btn-primary" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' — PKR ' + ev.fee_pkr : ' — Free'}</button>` : '';
   const statusMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait" style="margin-top:12px">${esc(d.participate_msg)}</div>`
@@ -1117,10 +1119,14 @@ function renderEventDetail() {
     ? `<div class="evd-chips" style="margin-bottom:12px">${ev.problems.map((x) =>
         `<span class="evd-chip" style="cursor:pointer;${x.pid === CUR_EV_PID ? 'border-color:var(--primary);color:var(--primary)' : ''}" onclick="evSelectProblem(${x.pid})">${esc(x.title)}</span>`).join('')}</div>` : '';
   const body = p ? esc(p.description || 'No description provided.') : esc(ev.description || 'See the instructions and documents for details.');
-  const problemBlock = `${selector}<p>${body}</p>
+  const ioBlock = p && (p.input_spec || p.output_spec) ? `
+    <h4>Input</h4><p>${esc(p.input_spec || 'No input is provided.')}</p>
+    <h4>Output</h4><p>${esc(p.output_spec || 'No output should be produced.')}</p>` : '';
+  const hasExample = p && (p.example_input || p.example_output);
+  const problemBlock = `${selector}<p>${body}</p>${ioBlock}
     <details class="evd-ex"><summary>▾ Examples</summary>
-      <div class="evd-ex-row"><div class="k">Input</div><div class="v">(see the problem statement)</div></div>
-      <div class="evd-ex-row"><div class="k">Output</div><div class="v">Produce the result described above.</div></div>
+      <div class="evd-ex-row"><div class="k">Input</div><div class="v">${hasExample ? esc(p.example_input || '(none)') : '(see the problem statement)'}</div></div>
+      <div class="evd-ex-row"><div class="k">Output</div><div class="v">${hasExample ? esc(p.example_output || '(none)') : 'Produce the result described above.'}</div></div>
     </details>`;
 
   const problemSec = `<div class="evd-sec" id="evdSec-problem">
@@ -1150,7 +1156,7 @@ function renderEventDetail() {
       : '<path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>';
     return `<div class="sub-row">
       <span class="sub-ic ${cls}"><svg viewBox="0 0 24 24" fill="none">${icon}</svg></span>
-      <div class="grow"><div class="st">Submission #${subs.length - i}</div><div class="sub-when">Submitted ${esc(s.submitted_at)}</div></div>
+      <div class="grow"><div class="st">Submission #${subs.length - i}${i === 0 ? ' (Latest)' : ''}</div><div class="sub-when">Submitted ${esc(s.submitted_at)}</div>${s.graded_by === 'ai' ? '<div class="sub-when">10% reduction applied</div>' : ''}</div>
       <span class="sub-tag ${cls}">${label}</span>
       ${s.score != null ? `<span class="sub-score">${s.score}/100 pts</span>` : ''}
       ${s.pid ? `<button class="sub-link" onclick="evSelectProblem(${s.pid});evScrollWork()">View details ›</button>` : ''}
@@ -1169,7 +1175,7 @@ function renderEventDetail() {
       <span class="evd-chip">${langI} ${EV_LANG_LABEL[ev.compiler] || 'File / link'}</span>
       <span class="evd-chip"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>
       ${durL ? `<span class="evd-chip">${clock} ${durL}</span>` : ''}
-      ${ev.auto_grade ? `<span class="evd-chip">${checkI} Instant grading</span>` : ''}
+      ${ev.auto_grade ? `<span class="evd-chip">${checkI} AI Graded</span>` : ''}
     </div>
     ${banner}
     ${regBtn ? `<div style="margin:12px 0">${regBtn}</div>` : ''}
@@ -1281,11 +1287,15 @@ function renderFeedback(sub, ev) {
   }
   const passed = sub.score >= ev.pass_mark;
   const ring = passed ? 'var(--ok)' : sub.score >= ev.pass_mark * 0.6 ? '#D89A00' : '#D14370';
+  const lead = passed ? '✓ Great job! Your solution is correct.' : '✗ Keep going — review the feedback and resubmit.';
   return `<div class="ide2-fb${passed ? '' : ' pending'}">
     <div><div class="fh">Feedback</div>
-      <div class="ftxt">${passed ? '<span class="ok">✓ Great job! Your solution meets the requirements.</span>' : 'Keep going — review the feedback and resubmit.'}<br>${esc(sub.ai_feedback || '')}</div>
+      <div class="ftxt"><span class="${passed ? 'ok' : 'bad'}">${lead}</span>${sub.ai_feedback ? '<br>' + esc(sub.ai_feedback) : ''}</div>
     </div>
-    <div class="score-ring" style="--pct:${sub.score};--ring-color:${ring}"><span class="val">${sub.score}<span style="font-size:12px;color:var(--muted)">/100</span></span></div>
+    <div style="text-align:center">
+      <div class="score-ring" style="--pct:${sub.score};--ring-color:${ring}"><span class="val">${sub.score}<span style="font-size:12px;color:var(--muted)">/100</span></span></div>
+      ${sub.graded_by === 'ai' ? '<div class="sub-note">10% reduction applied</div>' : ''}
+    </div>
   </div>`;
 }
 

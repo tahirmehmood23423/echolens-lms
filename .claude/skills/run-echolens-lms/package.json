@@ -1,0 +1,9 @@
+{
+  "name": "run-echolens-lms-driver",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Playwright driver used by the run-echolens-lms skill to drive the EchoLens LMS in a headless browser.",
+  "dependencies": {
+    "playwright": "^1.61.1"
+  }
+}

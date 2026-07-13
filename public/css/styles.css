@@ -1312,6 +1312,15 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .qa-btn .tp-ic svg{width:18px;height:18px}
 .qa-btn span.lbl{font-size:13px;font-weight:650;color:var(--text)}
 
+/* Quick actions - vertical list (sidebar placement) */
+.qa-list{display:flex;flex-direction:column;gap:9px}
+.qa-item{display:flex;align-items:center;gap:12px;background:var(--canvas);border:1px solid var(--line);border-radius:13px;padding:10px 12px;cursor:pointer;text-align:left;font-family:inherit;width:100%;transition:.15s}
+.qa-item:hover{border-color:var(--line-strong);background:#fff;box-shadow:var(--shadow-card)}
+.qa-item .tp-ic{width:36px;height:36px;border-radius:10px}
+.qa-item .tp-ic svg{width:17px;height:17px}
+.qa-item span.lbl{flex:1;font-size:13.5px;font-weight:650;color:var(--text)}
+.qa-arrow{width:15px;height:15px;flex:none;stroke:var(--muted-2)}
+
 @media (max-width:640px){
   .tc-row,.rv-row{flex-wrap:wrap}
   .tc-status{margin-left:58px}

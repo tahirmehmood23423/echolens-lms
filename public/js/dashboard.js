@@ -308,6 +308,10 @@ function tpStat(color, icon, n, label, sub, subCls) {
 function qaBtn(color, icon, label, onclick) {
   return `<button type="button" class="qa-btn" onclick="${onclick}"><div class="tp-ic ${color}">${icon}</div><span class="lbl">${esc(label)}</span></button>`;
 }
+function qaItem(color, icon, label, onclick) {
+  return `<button type="button" class="qa-item" onclick="${onclick}"><div class="tp-ic ${color}">${icon}</div><span class="lbl">${esc(label)}</span>
+    <svg class="qa-arrow" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>`;
+}
 function classStatus(s) {
   const mk = (t) => { if (!t) return null; const [h, m] = t.split(':').map(Number); const d = new Date(); d.setHours(h, m || 0, 0, 0); return d; };
   const now = new Date(), start = mk(s.start_time), end = mk(s.end_time);
@@ -403,17 +407,17 @@ async function renderInstructorOverview(el, d) {
       <div>
         <div class="card"><div class="card-head"><h3>Recent Messages</h3><button class="btn btn-ghost btn-sm" onclick="show('messages')">View all</button></div>
           <div class="card-body tight" id="tpMessages"><div class="empty">Loading&hellip;</div></div></div>
+        <div class="card"><div class="card-head"><h3>Quick Actions</h3></div>
+          <div class="card-body"><div class="qa-list">
+            ${qaItem('violet', T_ICONS.plus, 'Create Assignment', "teacherQuickAction('assignment')")}
+            ${qaItem('teal', T_ICONS.people, 'Take Attendance', "show('attendance')")}
+            ${qaItem('gold', T_ICONS.clipboard, 'Grade Submissions', "show('grades')")}
+            ${qaItem('sky', T_ICONS.megaphone, 'Create Announcement', "teacherQuickAction('announcement')")}
+            ${qaItem('violet', T_ICONS.upload, 'Upload Material', "teacherQuickAction('material')")}
+            ${qaItem('teal', T_ICONS.chart, 'View Analytics', "show('analytics')")}
+          </div></div></div>
       </div>
-    </div>
-    <div class="card"><div class="card-head"><h3>Quick Actions</h3></div>
-      <div class="card-body"><div class="qa-grid">
-        ${qaBtn('violet', T_ICONS.plus, 'Create Assignment', "teacherQuickAction('assignment')")}
-        ${qaBtn('teal', T_ICONS.people, 'Take Attendance', "show('attendance')")}
-        ${qaBtn('gold', T_ICONS.clipboard, 'Grade Submissions', "show('grades')")}
-        ${qaBtn('sky', T_ICONS.megaphone, 'Create Announcement', "teacherQuickAction('announcement')")}
-        ${qaBtn('violet', T_ICONS.upload, 'Upload Material', "teacherQuickAction('material')")}
-        ${qaBtn('teal', T_ICONS.chart, 'View Analytics', "show('analytics')")}
-      </div></div></div>`;
+    </div>`;
   requestAnimationFrame(() => el.querySelectorAll('.rv-fill').forEach((f) => (f.style.width = f.dataset.w + '%')));
   loadTeacherRecentMessages();
 }

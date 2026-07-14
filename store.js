@@ -316,7 +316,7 @@ function submissionGems(uid, aids = null) {
     .reduce((sum, s) => sum + (s.gems || 0), 0);
 }
 function totalGemsForStudent(uid) {
-  return submissionGems(uid) + GemEvents.forStudent(uid).reduce((s, e) => s + e.amount, 0) + questGemsGlobal(uid);
+  return submissionGems(uid) + GemEvents.forStudent(uid).reduce((s, e) => s + e.amount, 0) + questGemsGlobal(uid) + openQuestGemsGlobal(uid);
 }
 function gemsForStudentInBatch(uid, bid) {
   const aids = data.assignments.filter((a) => a.batch_id === Number(bid)).map((a) => a.id);
@@ -962,6 +962,10 @@ const Quests = {
 
 // Quest gems count toward global stages and course totals.
 function questGemsGlobal(uid) { return data.quest_submissions.filter((s) => s.user_id === Number(uid)).reduce((sum, s) => sum + (s.gems || 0), 0); }
+// Free/open quest (OpenQuest) gems count toward the same global total - an
+// open user's stage, badges and leaderboard rank should reflect their free
+// course work, not just challenges/portal courses.
+function openQuestGemsGlobal(uid) { return data.open_submissions.filter((s) => s.user_id === Number(uid)).reduce((sum, s) => sum + (s.gems || 0), 0); }
 
 /* ------------------------------ course chat ------------------------------ */
 // Anonymous-friendly Q&A inside each course. Students choose per message
@@ -1497,6 +1501,34 @@ function riskReport(bid) {
 }
 
 /* ------------------------- full student profile (staff) ------------------------- */
+// Open-web activity: free quest tracks (OpenQuest), hackathons and events
+// registered for (portal or open tier - membership is by user_id either
+// way), and community challenges. Shared by the admin's student profile
+// modal and the open user's own self-service profile page.
+function openActivity(uid) {
+  const trackKeys = [...new Set(data.open_submissions.filter((s) => s.user_id === Number(uid)).map((s) => s.track_key))];
+  const tracks = trackKeys.map((key) => {
+    const t = TRACKS[key]; if (!t) return null;
+    const prog = OpenQuest.progress(uid, key);
+    return { key, title: t.title, description: t.description, free: !!t.free, ...prog };
+  }).filter(Boolean);
+  const hackathons = data.hackathon_entries.filter((e) => (e.member_ids || []).includes(Number(uid))).map((e) => {
+    const h = Hackathons.byId(e.hackathon_id); if (!h) return null;
+    const sub = data.hackathon_submissions.find((s) => s.entry_id === e.id);
+    return { id: h.id, title: h.title, status: hackStatus(h), team_name: e.team_name, payment_status: e.payment_status, registered_at: e.registered_at, submitted: !!sub, score: sub ? sub.score : null };
+  }).filter(Boolean);
+  const events = data.event_entries.filter((e) => e.user_id === Number(uid)).map((e) => {
+    const ev = Events.byId(e.event_id); if (!ev) return null;
+    const sub = data.event_submissions.find((s) => s.event_id === ev.id && s.user_id === Number(uid));
+    return { id: ev.id, title: ev.title, kind: ev.kind, status: Events.status(ev), payment_status: e.payment_status, registered_at: e.registered_at, submitted: !!sub, score: sub ? sub.score : null };
+  }).filter(Boolean);
+  const mine = Challenges.mine(uid);
+  const challenges = Object.entries(mine).map(([cid, s]) => {
+    const c = Challenges.byId(cid); if (!c) return null;
+    return { id: c.id, title: c.title, status: s.status, gems: c.gems || 0 };
+  }).filter(Boolean);
+  return { tracks, hackathons, events, challenges };
+}
 function fullStudentProfile(uid) {
   const u = Users.byId(uid); if (!u) return null;
   const gems = totalGemsForStudent(u.id);
@@ -1519,7 +1551,20 @@ function fullStudentProfile(uid) {
     id: u.id, name: u.name, role: u.role, reg_no: u.reg_no, username: u.username, email: u.email,
     avatar: u.avatar || null, profile: u.profile || {}, created_at: (u.created_at || '').slice(0, 10),
     gems, stage: stageFor(gems), streak: u.streak || 0, best_streak: u.best_streak || 0, last_active: u.last_active,
-    badges: badgesFor(u), courses,
+    badges: badgesFor(u), courses, ...openActivity(u.id),
+    certificates: Certificates.forUser(u.id).map((c) => ({ serial: c.serial, title: c.title, kind: c.kind, completion_date: c.completion_date })),
+  };
+}
+// Self-service profile for an open (free) account - same shape of activity
+// data as the admin view above, plus whether a password is set at all
+// (Google-only accounts have none, so "change password" becomes "set one").
+function openUserProfile(u) {
+  const gems = totalGemsForStudent(u.id);
+  return {
+    id: u.id, name: u.name, reg_no: u.reg_no, email: u.email, avatar: u.avatar || null,
+    member_since: (u.created_at || '').slice(0, 10), gems, stage: stageFor(gems),
+    streak: u.streak || 0, best_streak: u.best_streak || 0, badges: badgesFor(u),
+    has_password: !!u.password_hash, ...openActivity(u.id),
     certificates: Certificates.forUser(u.id).map((c) => ({ serial: c.serial, title: c.title, kind: c.kind, completion_date: c.completion_date })),
   };
 }
@@ -2217,7 +2262,7 @@ module.exports = {
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,
-  LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, ideEnabled, setIde,
+  LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   seed, DB_PATH, allData: () => data,

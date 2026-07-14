@@ -6,10 +6,10 @@ async function api(path, opts = {}) {
   if (!res.ok) throw new Error(data.error || 'Something went wrong.');
   return data;
 }
-function msg(text) {
+function msg(text, ok) {
   const el = $('msg');
   if (!text) { el.className = 'form-msg'; el.textContent = ''; return; }
-  el.className = 'form-msg err'; el.textContent = text;
+  el.className = 'form-msg ' + (ok ? 'ok' : 'err'); el.textContent = text;
 }
 
 // Already signed in? Go straight to the dashboard.
@@ -24,4 +24,21 @@ $('loginForm').addEventListener('submit', async (e) => {
     const out = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ login: f.login.value.trim(), password: f.password.value }) });
     location.href = out.role === 'free' ? '/open' : '/dashboard';
   } catch (err) { msg(err.message); btn.disabled = false; }
+});
+
+function toggleForgot() {
+  const box = $('forgotBox');
+  const open = box.style.display === 'none';
+  box.style.display = open ? '' : 'none';
+  $('forgotLink').textContent = open ? 'Back to sign in' : 'Forgot your password?';
+  if (open) $('forgotForm').querySelector('input[name="email"]').focus();
+}
+$('forgotForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target; const btn = $('forgotSubmit'); btn.disabled = true; msg('');
+  try {
+    const out = await api('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email: f.email.value.trim() }) });
+    msg(out.dev_link ? `${out.message} ${out.dev_link}` : out.message, true);
+  } catch (err) { msg(err.message); }
+  btn.disabled = false;
 });

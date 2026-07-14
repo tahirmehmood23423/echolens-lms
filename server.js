@@ -9,6 +9,7 @@
 require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
@@ -20,7 +21,7 @@ const mailer = require('./mailer');
 const jaas = require('./jaas');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
-  LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile,
+  LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
@@ -117,7 +118,9 @@ const isEmail = (s) => typeof s === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.tes
 app.post('/api/auth/login', (req, res) => {
   const { login, password } = req.body || {};
   const u = login && Users.byLogin(login);
-  if (!u || !bcrypt.compareSync(String(password || ''), u.password_hash)) {
+  // Google-only accounts have no password_hash at all - bcrypt throws on a
+  // null hash rather than just returning false, so guard it explicitly.
+  if (!u || !u.password_hash || !bcrypt.compareSync(String(password || ''), u.password_hash)) {
     return res.status(401).json({ error: 'Incorrect username or password.' });
   }
   setAuthCookie(res, sign(u));
@@ -134,11 +137,56 @@ app.get('/api/auth/me', authRequired, (req, res) => {
   });
 });
 
+/* v18: self-service password reset for open (free) accounts - portal
+ * students/staff still go through the admin (see login.html), on purpose:
+ * paid-course accounts stay admin-supervised. Tokens are one-time, 30-minute,
+ * in-memory - the same lightweight pattern as EMAIL_CODES below. */
+const RESET_TOKENS = new Map(); // token -> { userId, expires }
+function pruneResetTokens() { const t = Date.now(); for (const [k, v] of RESET_TOKENS) if (v.expires < t) RESET_TOKENS.delete(k); }
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const { email } = req.body || {};
+  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  pruneResetTokens();
+  const genericMsg = "If that email has an account, we've sent a reset link - check your inbox.";
+  const u = Users.byLogin(String(email).trim());
+  // Only open accounts self-serve; anything else gets the same reply either
+  // way so a stranger can't use this to probe which emails have accounts.
+  if (!u || u.role !== 'free') return res.json({ ok: true, message: genericMsg });
+  const token = crypto.randomBytes(24).toString('hex');
+  RESET_TOKENS.set(token, { userId: u.id, expires: Date.now() + 30 * 60000 });
+  const link = `${APP_URL}/reset-password?token=${token}`;
+  if (mailer.configured) {
+    mailer.notify(u.email, 'Reset your EchoLens password',
+      `Hi ${u.name},\n\nReset your password here (this link expires in 30 minutes):\n${link}\n\nIf you didn't ask for this, you can ignore this email - your password is unchanged.`);
+    return res.json({ ok: true, message: genericMsg });
+  }
+  // Dev fallback: no SMTP configured on this server, so there's no inbox to
+  // check - hand back the link directly so the flow is still testable.
+  res.json({ ok: true, message: 'Email is not configured on this server - use this link directly:', dev_link: link });
+});
+app.post('/api/auth/reset-password', (req, res) => {
+  const { token, password } = req.body || {};
+  pruneResetTokens();
+  const rec = token && RESET_TOKENS.get(String(token));
+  if (!rec) return res.status(400).json({ error: 'This reset link is invalid or has expired - request a new one.' });
+  if (!password || String(password).length < 8) return res.status(400).json({ error: 'Choose a password of at least 8 characters.' });
+  const u = Users.byId(rec.userId);
+  if (!u) return res.status(404).json({ error: 'Account not found.' });
+  Users.setPassword(u.id, String(password));
+  RESET_TOKENS.delete(String(token));
+  setAuthCookie(res, sign(u));
+  res.json({ ok: true, role: u.role });
+});
+
 /* ---------------------------------- me ---------------------------------- */
 app.post('/api/me/password', authRequired, (req, res) => {
   const { current, next } = req.body || {};
-  if (!bcrypt.compareSync(String(current || ''), req.user.password_hash)) return res.status(400).json({ error: 'Current password is incorrect.' });
   if (!next || String(next).length < 8) return res.status(400).json({ error: 'New password must be at least 8 characters.' });
+  // Google-only accounts (no password_hash yet) have nothing to verify -
+  // this doubles as "set a password" for them, not just "change" it.
+  if (req.user.password_hash && !bcrypt.compareSync(String(current || ''), req.user.password_hash)) {
+    return res.status(400).json({ error: 'Current password is incorrect.' });
+  }
   Users.setPassword(req.user.id, String(next));
   res.json({ ok: true });
 });
@@ -457,7 +505,7 @@ app.get('/api/admin/users', authRequired, staffView, (req, res) => {
   res.json({
     users: Users.all().map((u) => ({
       id: u.id, name: u.name, role: u.role, username: u.username, email: u.email, reg_no: u.reg_no,
-      gems: u.role === 'student' ? totalGemsForStudent(u.id) : null,
+      gems: ['student', 'free'].includes(u.role) ? totalGemsForStudent(u.id) : null,
       courses: coursesForUser(u).map((b) => b.title || b.name).slice(0, 4),
     })),
   });
@@ -1692,6 +1740,14 @@ app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (
 app.get('/api/certificates/mine', authRequired, (req, res) => {
   res.json({ certificates: Certificates.forUser(req.user.id).map((c) => ({ ...Certificates.publicView(c), url: `${APP_URL}/cert?s=${c.serial}` })) });
 });
+// v18: the open (free) account's own profile/dashboard - tracks, hackathons,
+// events, challenges, certificates and gems, all in one place.
+app.get('/api/my/open-profile', authRequired, (req, res) => {
+  if (req.user.role !== 'free') return res.status(403).json({ error: 'This page is for open website accounts.' });
+  const p = openUserProfile(req.user);
+  p.certificates = p.certificates.map((c) => ({ ...c, url: `${APP_URL}/cert?s=${c.serial}` }));
+  res.json({ profile: p });
+});
 app.get('/api/batches/:id/certificates', authRequired, viewBatch, staffView, (req, res) => {
   res.json({ certificates: Certificates.forBatch(req.batch.id).map((c) => ({ serial: c.serial, student_name: c.student_name, reg_no: c.reg_no, title: c.title, completion_date: c.completion_date })) });
 });
@@ -2210,6 +2266,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.
 app.get('/open', (req, res) => res.sendFile(path.join(__dirname, 'public', 'open.html')));
 app.get('/compiler', (req, res) => res.sendFile(path.join(__dirname, 'public', 'compiler.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/grade', (req, res) => res.sendFile(path.join(__dirname, 'public', 'grade.html')));
 app.get('/cert', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cert.html')));

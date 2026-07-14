@@ -3583,9 +3583,17 @@ async function openStudentProfile(id) {
           <span>Tasks: ${c.submitted} submitted, ${c.graded} graded${c.avg_grade != null ? ', avg ' + c.avg_grade + '%' : ''}</span>
           <span>${c.attendance ? 'Attendance ' + c.attendance.pct + '% (' + c.attendance.attended + '/' + c.attendance.total + ')' : 'No classes yet'}</span>
         </div>
-      </div>`).join('') : '<div class="empty">Not enrolled in any course.</div>'}
+      </div>`).join('') : `<div class="empty">${s.role === 'free' ? 'Open (free) account - not enrolled in a paid course. See free courses, hackathons and events below.' : 'Not enrolled in any course.'}</div>`}
+    ${s.tracks && s.tracks.length ? `<div class="pub-sec">Free courses &amp; quests</div>${s.tracks.map((t) => `
+      <div class="s" style="padding:4px 0">${esc(t.title)} &middot; ${t.graded}/${t.total} tasks graded${t.avg != null ? ', avg ' + t.avg + '%' : ''} &middot; ${t.gems} gems${t.passed ? ' &middot; <strong style="color:var(--ok)">Passed</strong>' : ''}</div>`).join('')}` : ''}
+    ${s.hackathons && s.hackathons.length ? `<div class="pub-sec">Hackathons</div>${s.hackathons.map((h) => `
+      <div class="s" style="padding:4px 0">${esc(h.title)} &middot; ${esc(h.status)}${h.submitted ? ' &middot; submitted' : ''}${h.score != null ? ' &middot; score ' + h.score + '%' : ''}</div>`).join('')}` : ''}
+    ${s.events && s.events.length ? `<div class="pub-sec">Events</div>${s.events.map((e) => `
+      <div class="s" style="padding:4px 0">${esc(e.title)} (${esc(e.kind)}) &middot; ${esc(e.status)}${e.submitted ? ' &middot; submitted' : ''}${e.score != null ? ' &middot; score ' + e.score + '%' : ''}</div>`).join('')}` : ''}
+    ${s.challenges && s.challenges.length ? `<div class="pub-sec">Challenges</div>${s.challenges.map((c) => `
+      <div class="s" style="padding:4px 0">${esc(c.title)} &middot; ${c.status === 'approved' ? 'Solved &middot; ' + c.gems + ' gems' : esc(c.status)}</div>`).join('')}` : ''}
     ${s.certificates.length ? `<div class="pub-sec">Certificates</div>${s.certificates.map((c) => `<div class="s" style="padding:4px 0">${esc(c.title)} <span class="mono" style="color:var(--muted)">${esc(c.serial)}</span> &middot; ${fmtDate(c.completion_date)} &middot; <a href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">view</a></div>`).join('')}` : ''}
-    ${s.badges && s.badges.length ? `<div class="pub-sec">Badges</div><div class="s">${s.badges.map((b) => esc(b.name || b)).join(' &middot; ')}</div>` : ''}
+    ${s.badges && s.badges.length ? `<div class="pub-sec">Badges</div><div class="s">${s.badges.map((b) => esc(b.label || b.name || b)).join(' &middot; ')}</div>` : ''}
     <div class="pub-sec">Personal information</div>
     <div class="kv-grid">${infoRows || '<div class="s" style="color:var(--muted)">No details on file.</div>'}</div>`, true);
 }

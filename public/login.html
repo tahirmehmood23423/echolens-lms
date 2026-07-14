@@ -24,6 +24,14 @@
           <input type="password" name="password" autocomplete="current-password" required placeholder="Your password"></label>
         <button type="submit" class="btn btn-primary btn-block" id="submit">Sign in</button>
       </form>
+      <p style="text-align:center;margin-top:10px"><a href="javascript:void(0)" onclick="toggleForgot()" style="font-size:13px;color:var(--muted)" id="forgotLink">Forgot your password?</a></p>
+      <div id="forgotBox" style="display:none;border-top:1px solid var(--line);margin-top:6px;padding-top:14px">
+        <p class="s" style="color:var(--muted);margin-bottom:10px">Open (free) accounts can reset by email below. Portal students/teachers: ask your admin to reset it - your account and gems stay safe.</p>
+        <form id="forgotForm">
+          <label class="field"><span>Email on your account</span><input type="email" name="email" required placeholder="you@example.com"></label>
+          <button type="submit" class="btn btn-ghost btn-block" id="forgotSubmit">Send reset link</button>
+        </form>
+      </div>
       <div id="gWrap" style="display:none">
         <div style="display:flex;align-items:center;gap:10px;margin:16px 0 14px;color:var(--muted-2);font-size:12px">
           <span style="flex:1;height:1px;background:var(--line)"></span>or<span style="flex:1;height:1px;background:var(--line)"></span>
@@ -33,7 +41,7 @@
           Continue with Google - free challenges &amp; leaderboard
         </a>
       </div>
-      <p class="auth-foot">New here? <a href="/open#signup"><strong>Create a free account</strong></a> - solve open quests, use the free compiler, earn certificates.<br>Forgot your password? Ask your admin to reset it - your account and gems stay safe. <a href="mailto:info@echolens.digital">info@echolens.digital</a></p>
+      <p class="auth-foot">New here? <a href="/open#signup"><strong>Create a free account</strong></a> - solve open quests, use the free compiler, earn certificates.</p>
     </div>
     <p class="auth-copy">EchoLens &middot; Empowering Pakistan through Artificial Intelligence</p>
   </div>

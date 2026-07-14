@@ -119,13 +119,15 @@ let CUR_EVENT = null;
   // Deep links: /open#courses, #quests, #events, #announcements, #register, #signup
   const h = (location.hash || '').replace('#', '');
   if (['courses', 'quests', 'events', 'announcements', 'home'].includes(h)) openTab(h);
+  else if (h === 'profile') openProfileTab();
   else if (h === 'register') openRegister();
   else if (h === 'signup' && !ME) gate();
 })();
 
 function drawUserBox() {
+  const profLink = $('profileNavLink'); if (profLink) profLink.style.display = ME && ME.role === 'free' ? '' : 'none';
   $('userBox').innerHTML = ME
-    ? `<span class="av-sm" style="width:30px;height:30px;margin-right:9px">${ME.avatar ? `<img src="${esc(ME.avatar)}" alt="">` : esc((ME.name || '?').charAt(0).toUpperCase())}</span>
+    ? `<span class="av-sm" style="width:30px;height:30px;margin-right:9px;cursor:pointer" onclick="openProfileTab()">${ME.avatar ? `<img src="${esc(ME.avatar)}" alt="">` : esc((ME.name || '?').charAt(0).toUpperCase())}</span>
        <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
        ${ME.role !== 'free' ? '<a class="btn btn-teal btn-sm" href="/dashboard" style="margin-right:8px">LMS Portal</a>' : ''}
        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`
@@ -219,7 +221,7 @@ function requireWhatsapp() {
 
 /* -------------------------------- tabs -------------------------------- */
 function openTab(tab) {
-  ['home', 'courses', 'quests', 'course', 'solve', 'events', 'eventDetail', 'announcements'].forEach((t) => {
+  ['home', 'courses', 'quests', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
   document.querySelectorAll('.open-nav .nlink[data-tab]').forEach((n) =>
@@ -995,6 +997,116 @@ async function loadCerts() {
         </div>`).join('')}</div></div>`;
   } catch { $('certBox').innerHTML = ''; }
 }
+/* ------------------------------- my profile (v18) -------------------------------
+ * Open (free) accounts' own dashboard: gems/stage/streak, every free quest
+ * track attempted, hackathons and events joined, challenges, certificates,
+ * and self-service password change (or first-time set, for Google accounts).
+ */
+function openProfileTab() { openTab('profile'); loadProfile(); }
+function profFmtDate(d) {
+  if (!d) return '—';
+  try { return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return d; }
+}
+function profTrackRow(t) {
+  const pct = t.total ? Math.round((t.graded / t.total) * 100) : 0;
+  return `<div class="list-row">
+    <div class="grow">
+      <div class="t">${esc(t.title)}${t.free ? ' <span class="kbadge quest">Free course</span>' : ''}</div>
+      <div class="s" style="color:var(--muted)">${t.graded}/${t.total} tasks graded${t.avg != null ? ' &middot; avg ' + t.avg + '%' : ''} &middot; ${t.gems} gems earned</div>
+      <div class="cl-bar" style="margin-top:6px;max-width:280px"><div class="cl-fill" style="width:${pct}%"></div></div>
+    </div>
+    <span class="grade-chip ${t.passed ? 'ok' : (t.complete ? 'wait' : 'none')}">${t.passed ? 'Passed' : (t.complete ? 'Completed' : 'In progress')}</span>
+  </div>`;
+}
+function profHackRow(h) {
+  const cls = h.status === 'ended' ? (h.score != null ? 'ok' : 'none') : 'wait';
+  return `<div class="list-row">
+    <div class="grow"><div class="t">${esc(h.title)}</div>
+      <div class="s" style="color:var(--muted)">Team: ${esc(h.team_name)} &middot; registered ${profFmtDate((h.registered_at || '').slice(0, 10))}${h.submitted ? ' &middot; submitted' : ''}${h.score != null ? ' &middot; score ' + h.score + '%' : ''}</div></div>
+    <span class="grade-chip ${cls}">${esc(h.status)}</span>
+  </div>`;
+}
+function profEventRow(e) {
+  const cls = ['ended', 'closed'].includes(e.status) ? (e.score != null ? 'ok' : 'none') : 'wait';
+  return `<div class="list-row">
+    <div class="grow"><div class="t">${esc(e.title)} <span class="kbadge ${e.kind === 'webinar' ? 'webinar' : e.kind === 'hackathon' ? 'hackathon' : 'quest'}">${esc(e.kind)}</span></div>
+      <div class="s" style="color:var(--muted)">registered ${profFmtDate((e.registered_at || '').slice(0, 10))}${e.submitted ? ' &middot; submitted' : ''}${e.score != null ? ' &middot; score ' + e.score + '%' : ''}</div></div>
+    <span class="grade-chip ${cls}">${esc(e.status)}</span>
+  </div>`;
+}
+function profChallRow(c) {
+  const cls = { approved: 'ok', pending: 'wait', rejected: 'none' }[c.status] || 'none';
+  return `<div class="list-row">
+    <div class="grow"><div class="t">${esc(c.title)}</div></div>
+    <span class="grade-chip ${cls}">${c.status === 'approved' ? 'Solved &middot; ' + c.gems + ' gems' : esc(c.status)}</span>
+  </div>`;
+}
+function profCertRow(c) {
+  return `<div class="list-row">
+    <div class="grow"><div class="t">${esc(c.title)}</div>
+      <div class="s" style="color:var(--muted)">${esc(c.kind)} &middot; ${profFmtDate(c.completion_date)} &middot; Serial <span class="mono">${esc(c.serial)}</span></div></div>
+    <a class="btn btn-teal btn-sm" href="${esc(c.url)}" target="_blank" rel="noopener">View</a>
+  </div>`;
+}
+async function loadProfile() {
+  const box = $('profileBox');
+  if (!ME) { box.innerHTML = gateCardHtml('Sign in to see your profile.'); return; }
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  let d;
+  try { d = await api('/api/my/open-profile'); }
+  catch (e) { box.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  const p = d.profile;
+  box.innerHTML = `
+    <div class="card"><div class="card-body" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <span class="av-sm" style="width:64px;height:64px;font-size:24px;flex:none">${p.avatar ? `<img src="${esc(p.avatar)}" alt="">` : esc((p.name || '?').charAt(0).toUpperCase())}</span>
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:19px;font-weight:700;font-family:var(--font-display)">${esc(p.name)}</div>
+        <div class="s" style="color:var(--muted)">Reg no <span class="mono">${esc(p.reg_no || '—')}</span>${p.email ? ' &middot; ' + esc(p.email) : ''} &middot; member since ${profFmtDate(p.member_since)}</div>
+        <div class="s" style="margin-top:4px">${esc(p.stage.name)} stage</div>
+      </div>
+      <div style="display:flex;gap:22px;text-align:center">
+        <div><div style="font-family:var(--font-display);font-size:22px;color:var(--ink)">${p.gems.toLocaleString()}</div><div class="s" style="color:var(--muted-2);font-size:11px;text-transform:uppercase">Gems</div></div>
+        <div><div style="font-family:var(--font-display);font-size:22px;color:var(--ink)">${p.streak}</div><div class="s" style="color:var(--muted-2);font-size:11px;text-transform:uppercase">Streak</div></div>
+        <div><div style="font-family:var(--font-display);font-size:22px;color:var(--ink)">${p.best_streak}</div><div class="s" style="color:var(--muted-2);font-size:11px;text-transform:uppercase">Best</div></div>
+      </div>
+    </div></div>
+
+    <div class="card"><div class="card-head"><h3>Free courses &amp; quests</h3><span class="s" style="color:var(--muted)">${p.tracks.length} attempted</span></div>
+      <div class="card-body tight">${p.tracks.length ? p.tracks.map(profTrackRow).join('') : `<div class="empty">No free quests attempted yet - <a href="javascript:void(0)" onclick="openTab('quests')">start one</a>.</div>`}</div></div>
+
+    <div class="card"><div class="card-head"><h3>Hackathons</h3><span class="s" style="color:var(--muted)">${p.hackathons.length} joined</span></div>
+      <div class="card-body tight">${p.hackathons.length ? p.hackathons.map(profHackRow).join('') : '<div class="empty">No hackathons joined yet.</div>'}</div></div>
+
+    <div class="card"><div class="card-head"><h3>Events</h3><span class="s" style="color:var(--muted)">${p.events.length} joined</span></div>
+      <div class="card-body tight">${p.events.length ? p.events.map(profEventRow).join('') : '<div class="empty">No events joined yet.</div>'}</div></div>
+
+    <div class="card"><div class="card-head"><h3>Challenges</h3><span class="s" style="color:var(--muted)">${p.challenges.length} attempted</span></div>
+      <div class="card-body tight">${p.challenges.length ? p.challenges.map(profChallRow).join('') : '<div class="empty">No challenges attempted yet.</div>'}</div></div>
+
+    <div class="card"><div class="card-head"><h3>Certificates</h3><span class="s" style="color:var(--muted)">${p.certificates.length} earned</span></div>
+      <div class="card-body tight">${p.certificates.length ? p.certificates.map(profCertRow).join('') : '<div class="empty">Complete a free course to earn your first certificate.</div>'}</div></div>
+
+    <div class="card"><div class="card-head"><h3>Account</h3></div>
+      <div class="card-body">
+        <div class="form-msg" id="pwMsg"></div>
+        <form id="pwForm">
+          ${p.has_password ? `<label class="field"><span>Current password</span><input name="current" type="password" required></label>` : `<p class="s" style="color:var(--muted);margin-bottom:10px">You signed up with Google and don't have a password yet - set one below as a backup way to sign in.</p>`}
+          <label class="field"><span>New password</span><input name="next" type="password" minlength="8" required placeholder="At least 8 characters"></label>
+          <button class="btn btn-primary" id="pwBtn">${p.has_password ? 'Change password' : 'Set password'}</button>
+        </form>
+      </div></div>`;
+  $('pwForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = $('pwBtn'); btn.disabled = true;
+    const el = $('pwMsg'); el.className = 'form-msg'; el.textContent = '';
+    try {
+      await api('/api/me/password', { method: 'POST', body: JSON.stringify({ current: f.current ? f.current.value : undefined, next: f.next.value }) });
+      el.className = 'form-msg ok'; el.textContent = 'Saved.'; f.reset();
+      if (!p.has_password) loadProfile();
+    } catch (err) { el.className = 'form-msg err'; el.textContent = err.message; }
+    btn.disabled = false;
+  });
+}
+
 /* ---------------------- event detail (full page) ---------------------- */
 let CUR_EV_PID = null;   // selected problem on the detail page
 let EV_OUT_TERM = null;  // output terminal for the code editor

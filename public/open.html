@@ -22,6 +22,7 @@
   <a class="nlink" data-tab="events" onclick="openTab('events')">Events</a>
   <a class="nlink" data-tab="announcements" onclick="openTab('announcements')">Announcements</a>
   <a class="nlink" href="/compiler">Compiler</a>
+  <a class="nlink" data-tab="profile" onclick="openProfileTab()" id="profileNavLink" style="display:none">My Profile</a>
   <span style="flex:1"></span>
   <span id="userBox"></span>
 </nav>
@@ -186,6 +187,13 @@
   <section id="tab-eventDetail" style="display:none">
     <button class="btn btn-ghost btn-sm" onclick="openTab('events')" style="margin-bottom:14px">&larr; Back to events</button>
     <div class="ev-detail" id="evDetail"></div>
+  </section>
+
+  <!-- ================================ MY PROFILE ================================ -->
+  <section id="tab-profile" style="display:none">
+    <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink);margin-bottom:4px">My Profile</h1>
+    <p class="s" style="color:var(--muted);margin-bottom:18px">Your courses, hackathons, events, certificates and gems - all in one place.</p>
+    <div id="profileBox"><div class="empty">Loading&hellip;</div></div>
   </section>
 
   <!-- ============================== ANNOUNCEMENTS ============================== -->

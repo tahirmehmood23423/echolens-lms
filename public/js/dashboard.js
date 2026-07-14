@@ -95,6 +95,7 @@ const TITLES = {
   students: 'Students', grades: 'Grades', attendance: 'Attendance', analytics: 'Analytics',
   'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
   'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-logs': 'System Logs',
+  jobs: 'Jobs', job: 'Job',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -116,6 +117,7 @@ function show(view) {
     'admin-teachers': renderAdminTeachers, 'admin-students': renderAdminStudents,
     'admin-enrollments': renderAdminEnrollments, 'admin-finance': renderAdminFinance,
     'admin-announcements': renderAdminAnnouncementsPage, 'admin-logs': renderAdminLogs,
+    jobs: renderJobs,
   }[view];
   if (render) render();
 }
@@ -1196,6 +1198,202 @@ async function renderResources() {
           <div class="grow"><div class="t">${TYPE_ICON[l.type] || TYPE_ICON.resource} ${esc(l.title)}</div><div class="s" style="color:var(--muted)">${l.week_no ? 'Week ' + l.week_no : ''}</div></div>
           <a class="btn btn-ghost btn-sm" href="${esc(l.url)}" target="_blank" rel="noopener">Open</a>
         </div>`).join('')}</div></div>`).join('');
+}
+
+/* =============================== JOBS BOARD (v17) =============================== */
+const JOB_ICON = '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>';
+const JOB_TYPES = ['Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance'];
+async function renderJobs() {
+  const el = $('view-jobs');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/jobs');
+  const isAdmin = ME.role === 'admin';
+  const postBar = isAdmin ? `<div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span class="s" style="color:var(--muted)">Post jobs you've sourced from the market - students and teachers see them here and apply directly with the employer.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="formPostJob()">+ Post a job</button>
+    </div></div>` : '';
+  if (!d.jobs.length) {
+    el.innerHTML = postBar + '<div class="card"><div class="card-body"><div class="empty">No jobs posted yet' + (isAdmin ? ' - post the first one.' : '. Check back soon.') + '</div></div></div>';
+    return;
+  }
+  el.innerHTML = postBar + d.jobs.map(jobCardHtml).join('');
+}
+function jobCardHtml(j) {
+  return `<div class="job-card" onclick="openJob(${j.id})">
+    <div class="job-ic">${JOB_ICON}</div>
+    <div class="grow">
+      <h4>${esc(j.title)}${j.status === 'closed' ? ' <span class="job-chip closed">Closed</span>' : ''}</h4>
+      <div class="company">${esc(j.company)}</div>
+      <div class="job-meta">
+        <span class="job-chip type">${esc(j.job_type)}</span>
+        ${j.location ? `<span class="job-chip">${esc(j.location)}</span>` : ''}
+        ${j.salary_range ? `<span class="job-chip">${esc(j.salary_range)}</span>` : ''}
+        ${j.deadline ? `<span class="job-chip">Apply by ${fmtDate(j.deadline)}</span>` : ''}
+      </div>
+    </div>
+    <div class="job-side">
+      Posted ${timeAgo(j.created_at)}
+      <div class="cc"><svg viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 3V4z"/></svg>${j.comment_count}</div>
+    </div>
+  </div>`;
+}
+async function openJob(id) {
+  document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+  $('view-job').classList.add('active');
+  $('pageTitle').textContent = 'Job';
+  $('view-job').innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api(`/api/jobs/${id}`);
+  const j = d.job;
+  const isAdmin = ME.role === 'admin';
+  const applyBox = j.status === 'closed'
+    ? `<div class="job-apply-box" style="background:var(--canvas);color:var(--text)"><div><div class="t">This role is closed</div><div class="s" style="color:var(--muted)">The employer is no longer accepting applications.</div></div></div>`
+    : `<div class="job-apply-box">
+        <div class="grow"><div class="t">Ready to apply?</div><div class="s">Apply directly with ${esc(j.company)} - EchoLens does not handle the application.</div></div>
+        ${j.apply_url ? `<a class="btn btn-primary" href="${esc(j.apply_url)}" target="_blank" rel="noopener">Apply on their site &rarr;</a>` : ''}
+        ${j.apply_email ? `<a class="btn btn-ghost" href="mailto:${esc(j.apply_email)}?subject=${encodeURIComponent('Application: ' + j.title)}" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.35)">Email ${esc(j.apply_email)}</a>` : ''}
+      </div>`;
+  $('view-job').innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="show('jobs')" style="margin-bottom:14px">&larr; All jobs</button>
+    <div class="card"><div class="card-body">
+      <div class="job-head">
+        <div class="job-ic">${JOB_ICON}</div>
+        <div class="grow">
+          <h2>${esc(j.title)}${j.status === 'closed' ? ' <span class="job-chip closed">Closed</span>' : ''}</h2>
+          <div class="company">${esc(j.company)}</div>
+          <div class="job-meta">
+            <span class="job-chip type">${esc(j.job_type)}</span>
+            ${j.location ? `<span class="job-chip">${esc(j.location)}</span>` : ''}
+            ${j.experience_level ? `<span class="job-chip">${esc(j.experience_level)}</span>` : ''}
+            ${j.salary_range ? `<span class="job-chip">${esc(j.salary_range)}</span>` : ''}
+            ${j.deadline ? `<span class="job-chip">Apply by ${fmtDate(j.deadline)}</span>` : ''}
+          </div>
+        </div>
+        ${isAdmin ? `<div class="dd"><button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.classList.toggle('open')">Manage &#8942;</button>
+          <div class="dd-menu">
+            <button onclick="formEditJob(${j.id})">Edit job</button>
+            <button onclick="toggleJobStatus(${j.id},'${j.status === 'open' ? 'closed' : 'open'}')">${j.status === 'open' ? 'Mark as closed' : 'Reopen'}</button>
+            <button class="danger" onclick="deleteJob(${j.id})">Delete</button>
+          </div></div>` : ''}
+      </div>
+      ${applyBox}
+      <div class="s" style="color:var(--muted);white-space:pre-wrap;line-height:1.6">${esc(j.description)}</div>
+      ${j.requirements ? `<h3 style="margin:20px 0 8px;font-size:15px">Requirements</h3><div class="s" style="color:var(--muted);white-space:pre-wrap;line-height:1.6">${esc(j.requirements)}</div>` : ''}
+      <div class="s" style="color:var(--muted-2);margin-top:20px">Posted by ${esc(j.posted_by_name)} &middot; ${fmtDate((j.created_at || '').slice(0, 10))}</div>
+    </div></div>
+    <div class="card"><div class="card-head"><h3>Discussion (${d.comments.length})</h3></div>
+      <div class="card-body tight" id="jobComments">${d.comments.length ? d.comments.map(jobCommentHtml).join('') : '<div class="empty">No comments yet - ask a question about the role.</div>'}</div>
+      <div class="job-comment-form">
+        ${avatarHtml(ME.avatar, ME.name, 34)}
+        <textarea id="jobCommentInput" placeholder="Ask a question or share your thoughts..."></textarea>
+        <button class="btn btn-teal btn-sm" onclick="postJobComment(${j.id})">Post</button>
+      </div>
+    </div>`;
+}
+function jobCommentHtml(c) {
+  const canDelete = ME.role === 'admin' || c.user_id === ME.id;
+  return `<div class="job-comment-row" id="jc${c.id}">
+    ${avatarHtml(c.user_avatar, c.user_name, 34)}
+    <div class="grow">
+      <div class="t">${esc(c.user_name)} <span class="role-pill" style="margin-left:4px">${esc(roleLabel(c.user_role))}</span></div>
+      <div class="s">${esc(c.body)}</div>
+      <div class="when">${timeAgo(c.created_at)}${canDelete ? ` &middot; <a href="javascript:void(0)" onclick="deleteJobComment(${c.id})" style="color:var(--danger)">Delete</a>` : ''}</div>
+    </div>
+  </div>`;
+}
+async function postJobComment(jobId) {
+  const inp = $('jobCommentInput');
+  const body = inp.value.trim();
+  if (!body) return;
+  try {
+    await api(`/api/jobs/${jobId}/comments`, { method: 'POST', body: JSON.stringify({ body }) });
+    inp.value = '';
+    openJob(jobId);
+  } catch (e) { toast(e.message, true); }
+}
+async function deleteJobComment(id) {
+  if (!confirm('Delete this comment?')) return;
+  try {
+    await api(`/api/jobs/comments/${id}`, { method: 'DELETE' });
+    const row = $(`jc${id}`); if (row) row.remove();
+    toast('Comment deleted.');
+  } catch (e) { toast(e.message, true); }
+}
+function formPostJob() {
+  openModal('Post a job', `
+    <form id="f">
+      <div class="form-grid">
+        <label class="field"><span>Job title</span><input name="title" required placeholder="e.g. Junior Frontend Developer"></label>
+        <label class="field"><span>Company</span><input name="company" required placeholder="e.g. Systems Ltd"></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Location</span><input name="location" placeholder="e.g. Remote / Islamabad"></label>
+        <label class="field"><span>Type</span><select name="job_type">${JOB_TYPES.map((t) => `<option>${t}</option>`).join('')}</select></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Experience level (optional)</span><input name="experience_level" placeholder="e.g. Entry level / 1-3 years"></label>
+        <label class="field"><span>Salary range (optional)</span><input name="salary_range" placeholder="e.g. PKR 80,000 - 120,000"></label>
+      </div>
+      <label class="field"><span>Description</span><textarea name="description" required rows="5" placeholder="What the role involves..."></textarea></label>
+      <label class="field"><span>Requirements (optional)</span><textarea name="requirements" rows="3" placeholder="Skills, experience, qualifications..."></textarea></label>
+      <div class="form-grid">
+        <label class="field"><span>Application link</span><input name="apply_url" type="url" placeholder="https://"></label>
+        <label class="field"><span>Application email</span><input name="apply_email" type="email" placeholder="hr@company.com"></label>
+      </div>
+      <p class="hint">Add at least one of the two above - students apply directly with the employer.</p>
+      <label class="field"><span>Application deadline (optional)</span><input name="deadline" type="date"></label>
+      <button class="btn btn-primary btn-block">Post job</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
+    try {
+      await api('/api/admin/jobs', { method: 'POST', body: JSON.stringify(obj) });
+      toast('Job posted.'); closeModal(); renderJobs();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function formEditJob(id) {
+  const d = await api(`/api/jobs/${id}`);
+  const j = d.job;
+  openModal('Edit job', `
+    <form id="f">
+      <div class="form-grid">
+        <label class="field"><span>Job title</span><input name="title" required value="${esc(j.title)}"></label>
+        <label class="field"><span>Company</span><input name="company" required value="${esc(j.company)}"></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Location</span><input name="location" value="${esc(j.location || '')}"></label>
+        <label class="field"><span>Type</span><select name="job_type">${JOB_TYPES.map((t) => `<option${t === j.job_type ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Experience level</span><input name="experience_level" value="${esc(j.experience_level || '')}"></label>
+        <label class="field"><span>Salary range</span><input name="salary_range" value="${esc(j.salary_range || '')}"></label>
+      </div>
+      <label class="field"><span>Description</span><textarea name="description" required rows="5">${esc(j.description)}</textarea></label>
+      <label class="field"><span>Requirements</span><textarea name="requirements" rows="3">${esc(j.requirements || '')}</textarea></label>
+      <div class="form-grid">
+        <label class="field"><span>Application link</span><input name="apply_url" type="url" value="${esc(j.apply_url || '')}"></label>
+        <label class="field"><span>Application email</span><input name="apply_email" type="email" value="${esc(j.apply_email || '')}"></label>
+      </div>
+      <label class="field"><span>Application deadline</span><input name="deadline" type="date" value="${esc(j.deadline || '')}"></label>
+      <button class="btn btn-primary btn-block">Save changes</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    const obj = {}; new FormData(f).forEach((v, k) => { obj[k] = v; });
+    try {
+      await api(`/api/admin/jobs/${id}`, { method: 'PATCH', body: JSON.stringify(obj) });
+      toast('Job updated.'); closeModal(); openJob(id);
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function toggleJobStatus(id, status) {
+  try { await api(`/api/admin/jobs/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }); toast(status === 'open' ? 'Job reopened.' : 'Job marked as closed.'); openJob(id); }
+  catch (e) { toast(e.message, true); }
+}
+async function deleteJob(id) {
+  if (!confirm('Delete this job posting? Comments are removed too. This cannot be undone.')) return;
+  try { await api(`/api/admin/jobs/${id}`, { method: 'DELETE' }); toast('Job deleted.'); show('jobs'); }
+  catch (e) { toast(e.message, true); }
 }
 
 /* =============================== MESSAGES =============================== */

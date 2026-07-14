@@ -22,7 +22,7 @@ const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile,
   courseConcepts, finalProjectFor,
-  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements,
+  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -2081,6 +2081,54 @@ app.patch('/api/admin/public-announcements/:id', authRequired, adminRequired, (r
   res.json({ ok: true, announcement: a });
 });
 app.delete('/api/admin/public-announcements/:id', authRequired, adminRequired, (req, res) => { PublicAnnouncements.remove(req.params.id); res.json({ ok: true }); });
+
+/* ------------------------------- jobs board (v17) -------------------------------
+ * Admin sources and posts jobs; every signed-in student, teacher and
+ * coordinator can browse, discuss in comments, and apply directly with the
+ * employer via the link/email on the posting - EchoLens never brokers the
+ * application itself.
+ */
+app.get('/api/jobs', authRequired, (req, res) => {
+  res.json({ jobs: Jobs.all().map(Jobs.summary) });
+});
+app.get('/api/jobs/:id', authRequired, (req, res) => {
+  const j = Jobs.byId(req.params.id);
+  if (!j) return res.status(404).json({ error: 'Job not found.' });
+  res.json({ job: Jobs.detail(j), comments: JobComments.forJob(j.id) });
+});
+app.post('/api/admin/jobs', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  if (!b.title || !b.company || !b.description) return res.status(400).json({ error: 'Title, company and description are required.' });
+  if (!b.apply_url && !b.apply_email) return res.status(400).json({ error: 'Add an application link or an email so students can apply.' });
+  if (b.apply_url && !/^https?:\/\//i.test(String(b.apply_url))) return res.status(400).json({ error: 'The application link must start with http:// or https://.' });
+  const job = Jobs.create({ ...b, posted_by: req.user.id });
+  res.json({ ok: true, job: Jobs.detail(job) });
+});
+app.patch('/api/admin/jobs/:id', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  if (b.apply_url && !/^https?:\/\//i.test(String(b.apply_url))) return res.status(400).json({ error: 'The application link must start with http:// or https://.' });
+  const job = Jobs.update(req.params.id, b);
+  if (!job) return res.status(404).json({ error: 'Job not found.' });
+  res.json({ ok: true, job: Jobs.detail(job) });
+});
+app.delete('/api/admin/jobs/:id', authRequired, adminRequired, (req, res) => {
+  if (!Jobs.byId(req.params.id)) return res.status(404).json({ error: 'Job not found.' });
+  Jobs.remove(req.params.id); res.json({ ok: true });
+});
+app.post('/api/jobs/:id/comments', authRequired, (req, res) => {
+  const j = Jobs.byId(req.params.id);
+  if (!j) return res.status(404).json({ error: 'Job not found.' });
+  const body = String((req.body || {}).body || '').trim();
+  if (!body) return res.status(400).json({ error: 'Write a comment first.' });
+  const c = JobComments.create({ job_id: j.id, user: req.user, body });
+  res.json({ ok: true, comment: c });
+});
+app.delete('/api/jobs/comments/:id', authRequired, (req, res) => {
+  const c = JobComments.byId(req.params.id);
+  if (!c) return res.status(404).json({ error: 'Comment not found.' });
+  if (c.user_id !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'You can only delete your own comment.' });
+  JobComments.remove(c.id); res.json({ ok: true });
+});
 
 /* ------------------- in-site course registration (item 6) ------------------- */
 app.post('/api/public/register-interest', async (req, res) => {

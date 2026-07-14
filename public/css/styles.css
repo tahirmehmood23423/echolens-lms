@@ -1376,3 +1376,40 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .log-row.backup .log-dot{background:var(--gold)}
 .log-row .t{font-size:13.5px;color:var(--text)}
 .log-row .s{font-size:11.5px;color:var(--muted-2);margin-top:1px}
+
+/* ============================================================
+   v17: jobs board
+   ============================================================ */
+.job-card{display:flex;gap:16px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;box-shadow:var(--shadow-card)}
+.job-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-card-hover);border-color:var(--line-strong)}
+.job-ic{width:46px;height:46px;border-radius:13px;flex:none;background:var(--violet-soft);color:var(--primary);display:flex;align-items:center;justify-content:center}
+.job-ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.job-card .grow{flex:1;min-width:0}
+.job-card h4{font-size:16px;margin-bottom:2px}
+.job-card .company{font-size:13px;color:var(--muted);font-weight:600}
+.job-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.job-chip{font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 11px;background:var(--canvas);border:1px solid var(--line);color:var(--navy)}
+.job-chip.type{background:var(--violet-soft);color:var(--primary);border-color:transparent}
+.job-chip.closed{background:#FDEAEA;color:#9C3230;border-color:transparent}
+.job-side{text-align:right;flex:none;font-size:11.5px;color:var(--muted-2)}
+.job-side .cc{display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:6px;font-weight:600;color:var(--muted)}
+.job-side .cc svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+.job-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.job-head .job-ic{width:56px;height:56px;border-radius:15px}
+.job-head .job-ic svg{width:26px;height:26px}
+.job-head h2{font-size:24px;margin-bottom:2px}
+.job-head .company{font-size:14.5px;color:var(--muted);font-weight:650}
+
+.job-apply-box{background:linear-gradient(120deg,var(--ink) 0%,var(--ink-2) 100%);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px;color:#fff}
+.job-apply-box .t{font-weight:650;font-size:14.5px}
+.job-apply-box .s{font-size:12.5px;color:#AAB9DB;margin-top:2px}
+
+.job-comment-row{display:flex;gap:11px;padding:13px 20px;border-bottom:1px solid var(--line)}
+.job-comment-row:last-child{border-bottom:none}
+.job-comment-row .t{font-weight:650;font-size:13.5px}
+.job-comment-row .s{font-size:13px;color:var(--text);margin-top:2px;white-space:pre-wrap;word-break:break-word}
+.job-comment-row .when{font-size:11px;color:var(--muted-2)}
+.job-comment-form{display:flex;gap:10px;padding:16px 20px;border-top:1px solid var(--line);align-items:flex-start}
+.job-comment-form textarea{flex:1;min-height:44px;max-height:140px;resize:vertical;border:1px solid var(--line-strong);border-radius:11px;padding:10px 13px;font:inherit;font-size:13.5px}
+.job-comment-form textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,191,168,.15)}

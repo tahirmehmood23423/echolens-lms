@@ -38,12 +38,13 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
   live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
   events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
+  jobs: [], job_comments: [],
   settings: { cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' } },
 });
 
@@ -1841,6 +1842,88 @@ const Events = {
   },
 };
 
+/* ============================== v17: JOBS BOARD ==============================
+ * Admin posts jobs sourced from the market; every signed-in student, teacher
+ * and coordinator can browse them, discuss in a comment thread, and apply
+ * directly with the employer (a link and/or email on the posting) - EchoLens
+ * itself never handles the application.
+ */
+const JOB_TYPES = ['Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance'];
+const Jobs = {
+  create(j) {
+    const rec = {
+      id: nextId('jobs'),
+      title: String(j.title || '').slice(0, 200),
+      company: String(j.company || '').slice(0, 150),
+      location: j.location ? String(j.location).slice(0, 150) : null,
+      job_type: JOB_TYPES.includes(j.job_type) ? j.job_type : 'Full-time',
+      experience_level: j.experience_level ? String(j.experience_level).slice(0, 100) : null,
+      salary_range: j.salary_range ? String(j.salary_range).slice(0, 100) : null,
+      description: String(j.description || '').slice(0, 4000),
+      requirements: j.requirements ? String(j.requirements).slice(0, 2000) : null,
+      apply_url: /^https?:\/\//i.test(String(j.apply_url || '')) ? String(j.apply_url).slice(0, 400) : null,
+      apply_email: j.apply_email ? String(j.apply_email).slice(0, 200) : null,
+      deadline: /^\d{4}-\d{2}-\d{2}$/.test(String(j.deadline)) ? j.deadline : null,
+      status: 'open',
+      posted_by: j.posted_by, created_at: now(),
+    };
+    data.jobs.push(rec); save();
+    return rec;
+  },
+  byId(id) { return data.jobs.find((j) => j.id === Number(id)) || null; },
+  all() { return data.jobs.slice().sort((a, b) => b.id - a.id); },
+  update(id, fields) {
+    const j = Jobs.byId(id); if (!j) return null;
+    for (const k of ['title', 'company', 'location', 'experience_level', 'salary_range']) {
+      if (fields[k] !== undefined) j[k] = fields[k] ? String(fields[k]).slice(0, 200) : null;
+    }
+    for (const k of ['description', 'requirements']) {
+      if (fields[k] !== undefined) j[k] = fields[k] ? String(fields[k]).slice(0, 4000) : null;
+    }
+    if (fields.job_type !== undefined && JOB_TYPES.includes(fields.job_type)) j.job_type = fields.job_type;
+    if (fields.apply_url !== undefined) j.apply_url = /^https?:\/\//i.test(String(fields.apply_url || '')) ? String(fields.apply_url).slice(0, 400) : null;
+    if (fields.apply_email !== undefined) j.apply_email = fields.apply_email ? String(fields.apply_email).slice(0, 200) : null;
+    if (fields.deadline !== undefined) j.deadline = /^\d{4}-\d{2}-\d{2}$/.test(String(fields.deadline)) ? fields.deadline : null;
+    if (fields.status !== undefined && ['open', 'closed'].includes(fields.status)) j.status = fields.status;
+    save();
+    return j;
+  },
+  remove(id) {
+    const jid = Number(id);
+    data.jobs = data.jobs.filter((j) => j.id !== jid);
+    data.job_comments = data.job_comments.filter((c) => c.job_id !== jid);
+    save();
+  },
+  summary(j) {
+    const poster = Users.byId(j.posted_by);
+    return {
+      id: j.id, title: j.title, company: j.company, location: j.location, job_type: j.job_type,
+      experience_level: j.experience_level, salary_range: j.salary_range, deadline: j.deadline,
+      status: j.status, created_at: j.created_at,
+      comment_count: data.job_comments.filter((c) => c.job_id === j.id).length,
+      posted_by_name: poster ? poster.name : 'EchoLens',
+    };
+  },
+  detail(j) {
+    const poster = Users.byId(j.posted_by);
+    return { ...j, posted_by_name: poster ? poster.name : 'EchoLens' };
+  },
+};
+const JobComments = {
+  create({ job_id, user, body }) {
+    const c = {
+      id: nextId('job_comments'), job_id: Number(job_id),
+      user_id: user.id, user_name: user.name, user_role: user.role, user_avatar: user.avatar || null,
+      body: String(body).slice(0, 1000), created_at: now(),
+    };
+    data.job_comments.push(c); save();
+    return c;
+  },
+  byId(id) { return data.job_comments.find((c) => c.id === Number(id)) || null; },
+  forJob(jid) { return data.job_comments.filter((c) => c.job_id === Number(jid)).sort((a, b) => a.id - b.id); },
+  remove(id) { data.job_comments = data.job_comments.filter((c) => c.id !== Number(id)); save(); },
+};
+
 /* ============================== v12: LEADS ==============================
  * Every open sign-in (Google or email) and every portal student becomes a
  * lead: name, email, WhatsApp, source, and when they arrived. The admin can
@@ -2136,7 +2219,7 @@ module.exports = {
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
-  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements,
+  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   seed, DB_PATH, allData: () => data,
 };
 

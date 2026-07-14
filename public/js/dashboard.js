@@ -1655,7 +1655,7 @@ function shareCertLinkedIn(serial, title, date, org) {
   const y = (date || '').slice(0, 4), m = Number((date || '').slice(5, 7)) || 1;
   const add = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'
     + '&name=' + encodeURIComponent(title)
-    + '&organizationName=' + encodeURIComponent(org || 'EchoLens AI Academy')
+    + '&organizationName=' + encodeURIComponent(org || 'EchoLens Academy')
     + '&issueYear=' + y + '&issueMonth=' + m
     + '&certUrl=' + encodeURIComponent(url) + '&certId=' + encodeURIComponent(serial);
   window.open(add, '_blank');
@@ -2077,7 +2077,7 @@ async function loadMyReports() {
   try {
     const d = await api('/api/me/reports');
     if (!d.reports.length) { box.innerHTML = ''; return; }
-    box.innerHTML = `<div class="card"><div class="card-head"><h3>Your skill reports</h3><span class="s" style="color:var(--muted)">Written with AI, reviewed by your teacher</span></div>
+    box.innerHTML = `<div class="card"><div class="card-head"><h3>Your skill reports</h3><span class="s" style="color:var(--muted)">Reviewed by your teacher</span></div>
       <div class="card-body">${d.reports.map((r) => `
         <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:600">${esc(r.course_title)} &middot; ${esc((r.published_at || r.created_at || '').slice(0, 10))}</summary>
         <pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:14px;font-size:13px;font-family:var(--font-body);margin-top:8px">${esc(r.markdown)}</pre></details>`).join('')}</div></div>`;
@@ -2365,7 +2365,7 @@ async function renderQuestTab(body) {
               <span class="qdiff ${esc(pr.difficulty)}">${esc(pr.difficulty)}</span>
               <div style="flex:1;min-width:0">
                 <div class="t" style="font-size:13.5px">${pr.type === 'written' ? '<span class="type-badge written">&#128221; Written</span> ' : ''}${esc(pr.title)}</div>
-                <div class="s" style="color:var(--muted)">${pr.points} gems${q.deadline ? ` &middot; due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : ''}${sub && sub.shared_review ? ' &middot; <span style="color:var(--teal-deep)">AI feedback shared</span>' : ''}</div>
+                <div class="s" style="color:var(--muted)">${pr.points} gems${q.deadline ? ` &middot; due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : ''}${sub && sub.shared_review ? ' &middot; <span style="color:var(--teal-deep)">Feedback shared</span>' : ''}</div>
               </div>
               ${chip}
               <button class="btn btn-teal btn-sm" onclick="event.stopPropagation();openTask(${q.id},${pr.pid})">Open</button>
@@ -2430,8 +2430,8 @@ function sharedReviewBox(sr) {
   const rows = [['Key concepts you showed', sr.key_concepts], ['Things to fix', sr.mistakes], ['A better approach', sr.better_approach]]
     .filter(([, v]) => v)
     .map(([k, v]) => `<div style="margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${k}:</span> <span style="white-space:pre-line">${esc(v)}</span></div>`).join('');
-  return `<div class="review-share-box"><div class="rsb-head">AI feedback - shared by your teacher</div>${rows}
-    <div class="s" style="color:var(--muted-2)">Generated with AI and released by your instructor. Your grade always comes from your teacher.</div></div>`;
+  return `<div class="review-share-box"><div class="rsb-head">Feedback shared by your teacher</div>${rows}
+    <div class="s" style="color:var(--muted-2)">Released by your instructor. Your grade always comes from your teacher.</div></div>`;
 }
 
 function backToQuest() { openCourse(bid()); }
@@ -3434,7 +3434,7 @@ function formIssueAllCerts() {
   });
 }
 async function formCertSettings() {
-  let s = { org: 'EchoLens AI Academy', ceo_name: '', tagline: '' };
+  let s = { org: 'EchoLens Academy', ceo_name: '', tagline: '' };
   try { s = (await api('/api/admin/cert-settings')).settings; } catch {}
   openModal('Certificate settings', `
     <form id="f">

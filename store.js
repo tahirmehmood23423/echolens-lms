@@ -44,7 +44,7 @@ const empty = () => ({
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
   live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
   events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
-  settings: { cert: { org: 'EchoLens AI Academy', ceo_name: '', ceo_sig: null, tagline: 'Gamified AI & Data Science Education' } },
+  settings: { cert: { org: 'EchoLens Academy', ceo_name: '', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' } },
 });
 
 let data = empty();
@@ -1369,6 +1369,30 @@ const Quizzes = {
 };
 
 /* ------------------------- QR verified certificates ------------------------- */
+// Key concepts covered = each installed quest level's title/topic, in order.
+function courseConcepts(bid) {
+  return Quests.forBatch(bid).map((q) => ({ no: q.no, title: q.title, topic: q.topic || null }));
+}
+// Final/capstone project = the highest-numbered quest level's problems and
+// this student's submissions for them. Snapshotted onto the certificate at
+// issue time (not looked up live later) so it stays accurate even if the
+// course content or submissions change afterwards.
+function finalProjectFor(bid, uid) {
+  const quests = Quests.forBatch(bid); // sorted ascending by .no
+  if (!quests.length) return null;
+  const finalQuest = quests[quests.length - 1];
+  const items = finalQuest.problems.map((p) => {
+    const s = data.quest_submissions.find((x) => x.quest_id === finalQuest.id && x.pid === p.pid && x.user_id === Number(uid));
+    if (!s) return null;
+    return {
+      problem_title: p.title, problem_description: p.description || null,
+      file_url: s.file_url || null, code: s.code || null, language: s.language || null,
+      note: s.note || null, grade: s.grade,
+    };
+  }).filter(Boolean);
+  if (!items.length) return null;
+  return { level_no: finalQuest.no, level_title: finalQuest.title, level_topic: finalQuest.topic || null, items };
+}
 const Certificates = {
   serial() {
     let s;
@@ -1376,7 +1400,7 @@ const Certificates = {
     while (data.certificates.some((c) => c.serial === s));
     return s;
   },
-  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by }) {
+  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by, concepts, final_project }) {
     const u = Users.byId(user_id); if (!u) return { error: 'Student not found.' };
     // One certificate per student per course/title - reissue replaces it.
     data.certificates = data.certificates.filter((c) => !(c.user_id === u.id && c.title === title));
@@ -1391,6 +1415,8 @@ const Certificates = {
       completion_date: /^\d{4}-\d{2}-\d{2}$/.test(String(completion_date)) ? completion_date : today(),
       instructor_name: instructor ? instructor.name : null,
       instructor_sig: instructor ? (instructor.signature || null) : null,
+      concepts: Array.isArray(concepts) ? concepts.slice(0, 40) : [],
+      final_project: final_project || null,
       issued_by, issued_at: now(),
     };
     data.certificates.push(cert); save();
@@ -1408,6 +1434,7 @@ const Certificates = {
       kind: c.kind, title: c.title, detail: c.detail, completion_date: c.completion_date,
       instructor_name: c.instructor_name, instructor_sig: c.instructor_sig,
       org: s.org, tagline: s.tagline, ceo_name: s.ceo_name, ceo_sig: s.ceo_sig,
+      concepts: c.concepts || [], final_project: c.final_project || null,
       issued_at: (c.issued_at || '').slice(0, 10),
     };
   },
@@ -2108,6 +2135,7 @@ module.exports = {
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, ideEnabled, setIde,
+  courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements,
   seed, DB_PATH, allData: () => data,
 };

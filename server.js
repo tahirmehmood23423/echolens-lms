@@ -21,6 +21,7 @@ const jaas = require('./jaas');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile,
+  courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
@@ -1651,7 +1652,13 @@ app.post('/api/certificates/issue', authRequired, teacherOrAdmin, (req, res) => 
   if (!title) return res.status(400).json({ error: 'A course / hackathon / competition name is required.' });
   const instructorId = req.user.role === 'instructor' ? req.user.id
     : (batch_id ? ((Batches.byId(batch_id).instructor_ids || [])[0] || null) : null);
-  const out = Certificates.issue({ user_id: student.id, batch_id, kind, title, completion_date, detail, instructor_id: instructorId, issued_by: req.user.id });
+  // Snapshot the course's concepts and the student's final-level (capstone)
+  // work onto the certificate now, while the quest data is still fresh -
+  // this is what the QR verification page shows, so it must reflect the
+  // course as it stood at the moment the certificate was earned.
+  const concepts = batch_id && Quests.installed(batch_id) ? courseConcepts(batch_id) : [];
+  const finalProject = batch_id && Quests.installed(batch_id) ? finalProjectFor(batch_id, student.id) : null;
+  const out = Certificates.issue({ user_id: student.id, batch_id, kind, title, completion_date, detail, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject });
   if (out.error) return res.status(400).json({ error: out.error });
   const cert = out.cert;
   if (student.email) {
@@ -1667,11 +1674,14 @@ app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (
   const completion_date = (req.body || {}).completion_date;
   const onlyCompleted = (req.body || {}).only_completed !== false;
   const instructorId = req.user.role === 'instructor' ? req.user.id : ((req.batch.instructor_ids || [])[0] || null);
+  const installed = Quests.installed(req.batch.id);
+  const concepts = installed ? courseConcepts(req.batch.id) : [];
   const issued = [], skipped = [];
   for (const u of Enrollments.studentsForBatch(req.batch.id)) {
-    const prog = Quests.installed(req.batch.id) ? Quests.progress(u.id, req.batch.id) : null;
+    const prog = installed ? Quests.progress(u.id, req.batch.id) : null;
     if (onlyCompleted && prog && !prog.completed) { skipped.push(u.name); continue; }
-    const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id });
+    const finalProject = installed ? finalProjectFor(req.batch.id, u.id) : null;
+    const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject });
     if (out.ok) {
       issued.push(u.name);
       if (u.email) mailer.notify(u.email, `Your certificate is ready - ${title}`, `Congratulations ${u.name}! Your verified certificate for "${title}" is ready: ${APP_URL}/cert?s=${out.cert.serial}`);
@@ -1999,9 +2009,6 @@ app.get('/api/fetch-dataset', authRequired, async (req, res) => {
  */
 const KEY_LINKS = {
   registration: process.env.REGISTRATION_FORM_URL || 'https://docs.google.com/forms/d/1tngMoAaGzyIRktzjmyNHu1vQ_osBMfi-BDAr1Ix8Xs0/viewform',
-  ambassador: process.env.AMBASSADOR_FORM_URL || 'https://docs.google.com/forms/d/124ra-RWFxxMUnO-xQHT8yxnTouvWZiJbWmvhWBYG5wE/viewform',
-  webinar: process.env.WEBINAR_URL || 'https://docs.google.com/spreadsheets/d/1fxvqOG5UJjfTiUwgRjN757OJIgADFP_PcL1pHjPZ92w/edit?resourcekey=&gid=1520673966#gid=1520673966',
-  webinar_label: process.env.WEBINAR_LABEL || 'Free webinar - 18 July, 4-5 PM',
 };
 app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
   const trackByCode = {};

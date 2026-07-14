@@ -337,9 +337,7 @@ async function loadCatalogue() {
     CAT_LINKS = d.links;
     if (d.cohort) $('cohortLine').textContent = `31 live, instructor-led programs · Registration deadline ${d.cohort.registration_deadline} · Batch starts ${d.cohort.batch_starts}. Every paid course opens its first week free - try before you enrol.`;
     $('actionStrip').innerHTML = `
-      <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>
-      ${CAT_LINKS.webinar ? `<a class="btn btn-teal" href="${esc(CAT_LINKS.webinar)}" target="_blank" rel="noopener">${esc(CAT_LINKS.webinar_label || 'Free webinar')}</a>` : ''}
-      ${CAT_LINKS.ambassador ? `<a class="btn btn-ghost" href="${esc(CAT_LINKS.ambassador)}" target="_blank" rel="noopener">Campus Ambassador program</a>` : ''}`;
+      <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;
     const p = (d.paths || [])[0];
     $('pathBox').innerHTML = p ? `
       <div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
@@ -350,7 +348,7 @@ async function loadCatalogue() {
         </div>
         <div style="text-align:right">
           <div style="font-family:var(--font-display);font-size:22px;color:var(--teal-deep)">PKR ${p.bundle_pkr.toLocaleString()}</div>
-          <div class="s" style="color:var(--muted)"><s>PKR ${p.full_pkr.toLocaleString()}</s> · Save PKR ${p.save_pkr.toLocaleString()} (about 15%)</div>
+          <div class="s" style="color:var(--muted)"><s>PKR ${p.full_pkr.toLocaleString()}</s> · Save PKR ${p.save_pkr.toLocaleString()} (${Math.round((p.save_pkr / p.full_pkr) * 100)}%)</div>
           <button class="lc-btn-solve" style="margin-top:6px" onclick="openRegister('PATH', '${esc(p.title)}')">Register for the path</button>
         </div>
       </div></div>` : '';
@@ -406,7 +404,7 @@ function drawCourses() {
     (!q || c.title.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || (c.summary || '').toLowerCase().includes(q)));
   $('courseTable').innerHTML = list.length ? `
     <div class="oc-grid">${list.map(courseCardHtml).join('')}</div>
-    <p class="hint" style="margin-top:14px">Ambassador discounts: 10% off bootcamps and short courses, 15% off specialist tracks with a campus ambassador code. Pay via bank transfer per your fee challan, then share the receipt to confirm your seat.</p>`
+    <p class="hint" style="margin-top:14px">Pay via bank transfer per your fee challan, then share the receipt to confirm your seat.</p>`
     : '<div class="empty">No courses match those filters.</div>';
 }
 function courseAction(code) {
@@ -433,7 +431,7 @@ function openRegister(code, title) {
         <label class="field" style="grid-column:span 2"><span>Course</span><select name="course">${code === 'PATH' ? `<option value="PATH|${esc(title)}" selected>${esc(title)} (bundle - PKR 43,500)</option>` : ''}${options}</select></label>
         <label class="field"><span>City</span><input name="city" placeholder="e.g. Islamabad"></label>
       </div>
-      <label class="field"><span>Anything we should know? (optional)</span><input name="note" maxlength="600" placeholder="e.g. Preferred timing, ambassador code"></label>
+      <label class="field"><span>Anything we should know? (optional)</span><input name="note" maxlength="600" placeholder="e.g. Preferred timing"></label>
       <button class="btn btn-primary btn-block">Submit registration</button>
     </form>`);
   $('regInterest').addEventListener('submit', async (e) => {
@@ -646,7 +644,7 @@ function drawSolveStatus() {
   // left column: slim graded banner
   if (gradedBox) gradedBox.innerHTML = `
     <div class="slv-graded${sub.score >= passMark ? '' : ' wait'}">
-      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}% <span class="s" style="font-weight:600;color:var(--muted)">(AI, 10% reduction applied)</span> &middot; <span class="g-gems">${gems} gems earned</span></div>
+      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}% <span class="s" style="font-weight:600;color:var(--muted)">(instant grading, 10% reduction applied)</span> &middot; <span class="g-gems">${gems} gems earned</span></div>
       <p>${esc(short)}</p>
     </div>`;
 
@@ -654,19 +652,19 @@ function drawSolveStatus() {
   if (results) results.innerHTML = `
     <div class="qresults">
       <div class="qres">
-        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.sparkle}</svg>AI Feedback</h5>
+        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.sparkle}</svg>Feedback</h5>
         <p>${esc(short)}</p>
         ${feedback.length > 130 ? `<button type="button" class="slv-link-btn" onclick="showFullFeedback()">View detailed feedback</button>` : ''}
       </div>
       <div class="qres center">
         <h5>Score</h5>
         <div class="score-ring" style="--pct:${sub.score};--ring-color:${sub.score >= passMark ? 'var(--ok)' : 'var(--gold)'}"><span class="val">${sub.score}%</span></div>
-        <div class="sub-note">(AI)</div>
+        <div class="sub-note">(Instant)</div>
       </div>
       <div class="qres center">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Gems Earned</h5>
         <div class="slv-gem-big"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${gems}</div>
-        <div class="sub-note">10% AI-grading reduction applied</div>
+        <div class="sub-note">10% instant-grading reduction applied</div>
       </div>
       <div class="qres">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.clock}</svg>Submission</h5>
@@ -709,7 +707,7 @@ function drawWorkArea() {
       </div>
       <div class="qide-out"><div id="svTerm"></div></div>
       ${opts.submit ? '<div id="svResults"></div>' : ''}
-      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded by AI on the spot with a 10% reduction, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
+      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
     </div>`;
 
   if (!isLearner) {
@@ -736,7 +734,7 @@ function drawWorkArea() {
             <label class="field"><span>Your work</span><input name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.png,.jpg,.jpeg,.zip" required></label>
             <button class="btn lc-btn-solve">${sub ? 'Resubmit for grading' : 'Submit for grading'}</button>
           </form>
-          <p class="hint" style="margin-top:10px">Submissions are graded by AI on the spot with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
+          <p class="hint" style="margin-top:10px">Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
         </div></div>
       <div id="svResults" style="margin-top:16px"></div>`;
     $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });
@@ -1058,7 +1056,7 @@ function renderEventDetail() {
     `<span class="evd-tag">${points} pts</span>`,
     `<span class="evd-tag">${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>`,
     durL ? `<span class="evd-tag">${durL}</span>` : '',
-    ev.auto_grade ? `<span class="evd-tag">AI Graded</span>` : '',
+    ev.auto_grade ? `<span class="evd-tag">Instant Grading</span>` : '',
     ev.auto_grade ? `<span class="evd-tag">10% Reduction</span>` : '',
     ev.auto_certificate ? `<span class="evd-tag good">Certificate at ${ev.pass_mark}%+</span>` : '',
   ].join('');
@@ -1108,7 +1106,7 @@ function renderEventDetail() {
 
   // ---- middle column sections ----
   const banner = ev.auto_grade
-    ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly by AI with a 10% reduction in score.</span></div>` : '';
+    ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly, with a 10% reduction in score.</span></div>` : '';
   const regBtn = !d.my_entry && ['upcoming', 'live'].includes(ev.status)
     ? `<button class="btn btn-primary" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' — PKR ' + ev.fee_pkr : ' — Free'}</button>` : '';
   const statusMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait" style="margin-top:12px">${esc(d.participate_msg)}</div>`
@@ -1175,7 +1173,7 @@ function renderEventDetail() {
       <span class="evd-chip">${langI} ${EV_LANG_LABEL[ev.compiler] || 'File / link'}</span>
       <span class="evd-chip"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>
       ${durL ? `<span class="evd-chip">${clock} ${durL}</span>` : ''}
-      ${ev.auto_grade ? `<span class="evd-chip">${checkI} AI Graded</span>` : ''}
+      ${ev.auto_grade ? `<span class="evd-chip">${checkI} Instant Grading</span>` : ''}
     </div>
     ${banner}
     ${regBtn ? `<div style="margin:12px 0">${regBtn}</div>` : ''}

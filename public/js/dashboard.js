@@ -3054,22 +3054,28 @@ async function joinLiveClass(id) {
       <button class="btn btn-danger btn-sm" onclick="leaveLiveClass()">Leave class</button>
     </div><div id="jitsiBox" class="jitsi-box"><div class="empty">Loading the classroom&hellip;</div></div></div>`;
   stage.scrollIntoView({ behavior: 'smooth' });
+  // JaaS (8x8.vc) when the server has signed a room-scoped JWT for us -
+  // otherwise fall back to the free, unauthenticated meet.jit.si server.
+  const domain = info.provider === 'jaas' ? '8x8.vc' : 'meet.jit.si';
+  const scriptSrc = info.provider === 'jaas' ? `https://8x8.vc/${info.app_id}/external_api.js` : 'https://meet.jit.si/external_api.js';
   const boot = () => {
     $('jitsiBox').innerHTML = '';
-    LIVE_API = new JitsiMeetExternalAPI('meet.jit.si', {
-      roomName: info.room,
+    const opts = {
+      roomName: info.provider === 'jaas' ? `${info.app_id}/${info.room}` : info.room,
       parentNode: $('jitsiBox'),
       userInfo: { displayName: info.display_name },
       configOverwrite: { prejoinConfig: { enabled: false }, disableDeepLinking: true, startWithAudioMuted: ME.role === 'student' },
       interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false, MOBILE_APP_PROMO: false },
-    });
+    };
+    if (info.jwt) opts.jwt = info.jwt;
+    LIVE_API = new JitsiMeetExternalAPI(domain, opts);
     LIVE_API.addListener('videoConferenceLeft', () => leaveLiveClass());
   };
-  if (window.JitsiMeetExternalAPI) boot();
+  if (window.JitsiMeetExternalAPI && window.JITSI_SCRIPT_SRC === scriptSrc) boot();
   else {
     const s = document.createElement('script');
-    s.src = 'https://meet.jit.si/external_api.js';
-    s.onload = boot;
+    s.src = scriptSrc;
+    s.onload = () => { window.JITSI_SCRIPT_SRC = scriptSrc; boot(); };
     s.onerror = () => { $('jitsiBox').innerHTML = '<div class="empty">Could not load the classroom - check your internet connection and try again.</div>'; };
     document.head.appendChild(s);
   }

@@ -17,6 +17,7 @@ const multer = require('multer');
 const store = require('./store');
 const ai = require('./ai');
 const mailer = require('./mailer');
+const jaas = require('./jaas');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile,
@@ -1389,7 +1390,15 @@ app.post('/api/live/:id/join', authRequired, (req, res) => {
   const b = Batches.byId(c.batch_id);
   if (!canViewBatch(req.user, b)) return res.status(403).json({ error: 'You are not on this course.' });
   if (req.user.role === 'student') Attendance.mark(c.id, req.user.id); // attendance = actually joining the room
-  res.json({ ok: true, room: c.room, display_name: req.user.name });
+  const out = { ok: true, room: c.room, display_name: req.user.name, provider: jaas.configured ? 'jaas' : 'jitsi' };
+  // JaaS (8x8.vc): a fresh, room-scoped JWT signed server-side - the private
+  // key never reaches the client. Falls back to the free, unauthenticated
+  // meet.jit.si server when JaaS isn't configured.
+  if (jaas.configured) {
+    out.app_id = jaas.appId;
+    out.jwt = jaas.sign({ room: c.room, user: req.user, moderator: canManageBatch(req.user, b) });
+  }
+  res.json(out);
 });
 app.post('/api/live/:id/heartbeat', authRequired, (req, res) => {
   const c = LiveClasses.byId(req.params.id);

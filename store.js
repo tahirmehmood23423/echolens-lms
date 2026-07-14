@@ -44,7 +44,7 @@ const empty = () => ({
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
   live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
   events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
-  settings: { cert: { org: 'EchoLens Academy', ceo_name: '', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' } },
+  settings: { cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' } },
 });
 
 let data = empty();

@@ -3434,7 +3434,7 @@ function formIssueAllCerts() {
   });
 }
 async function formCertSettings() {
-  let s = { org: 'EchoLens Academy', ceo_name: '', tagline: '' };
+  let s = { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', tagline: '' };
   try { s = (await api('/api/admin/cert-settings')).settings; } catch {}
   openModal('Certificate settings', `
     <form id="f">

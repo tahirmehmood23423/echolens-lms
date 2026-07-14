@@ -40,10 +40,10 @@
   .c-course { text-align: center; font-size: 21px; font-weight: 700; margin: 14px auto 4px; max-width: 620px; }
   .c-detail { text-align: center; font-size: 13.5px; color: var(--muted); max-width: 600px; margin: 0 auto; }
   .c-date { text-align: center; font-size: 13.5px; margin-top: 10px; }
-  .c-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-top: 44px; flex-wrap: wrap; }
-  .sig { flex: 1; min-width: 150px; text-align: center; }
-  .sig img { max-height: 54px; max-width: 170px; }
-  .sig .line { border-top: 1.5px solid var(--navy); margin: 6px 18px 5px; }
+  .c-foot { display: flex; justify-content: center; align-items: flex-end; gap: 90px; margin-top: 44px; flex-wrap: wrap; }
+  .sig { min-width: 190px; max-width: 230px; text-align: center; }
+  .sig img { max-height: 68px; max-width: 200px; display: block; margin: 0 auto; }
+  .sig .line { border-top: 1.5px solid var(--navy); margin: 6px 6px 5px; }
   .sig .who { font-size: 13px; font-weight: 700; }
   .sig .role { font-size: 11.5px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
   .qr { text-align: center; min-width: 130px; }
@@ -135,20 +135,14 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
       ${c.detail ? '<div class="c-detail">' + esc(c.detail) + '</div>' : ''}
       <div class="c-date">Date of completion: <strong>${esc(fmt(c.completion_date))}</strong></div>
       <div class="c-foot">
-        <div class="sig">
-          ${sigSrc(c.instructor_sig) ? '<img src="' + sigSrc(c.instructor_sig) + '" alt="Instructor signature">' : '<div style="height:54px"></div>'}
-          <div class="line"></div>
-          <div class="who">${esc(c.instructor_name || 'Course Instructor')}</div>
-          <div class="role">Instructor</div>
-        </div>
         <div class="qr">
           <div id="qrbox"></div>
           <div class="s">Scan to verify</div>
         </div>
         <div class="sig">
-          ${sigSrc(c.ceo_sig) ? '<img src="' + sigSrc(c.ceo_sig) + '" alt="CEO signature">' : '<div style="height:54px"></div>'}
+          <img src="${sigSrc(c.ceo_sig) || '/img/ceo-signature.png'}" alt="CEO signature">
           <div class="line"></div>
-          <div class="who">${esc(c.ceo_name || 'Chief Executive Officer')}</div>
+          <div class="who">${esc(c.ceo_name || 'Tahir Mehmood')}</div>
           <div class="role">CEO, ${esc(c.org)}</div>
         </div>
       </div>

@@ -141,6 +141,22 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Lives outside every tab/view container so switching tabs, courses or
+     pages never tears down an in-progress call - only "Leave" does. -->
+<div class="live-call-widget" id="liveCallWidget" style="display:none">
+  <div class="live-call-bar">
+    <span class="live-dot"></span>
+    <div class="live-call-info">
+      <strong id="liveCallTitle">Live class</strong>
+      <span class="s" id="liveCallSub">Connecting&hellip;</span>
+    </div>
+    <button class="live-call-btn" onclick="toggleLiveCallSize()" title="Expand or minimize" id="liveCallToggleBtn">&#8599;</button>
+    <button class="live-call-btn danger" onclick="leaveSessionClass()" title="Leave call">&times;</button>
+  </div>
+  <div id="jitsiBox" class="jitsi-box"><div class="empty">Loading the classroom&hellip;</div></div>
+</div>
+
 <script src="/js/coderunner.js?v1234"></script>
 <script src="/js/dashboard.js?v1234"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

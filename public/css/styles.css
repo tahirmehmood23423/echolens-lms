@@ -299,6 +299,19 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
   .topbar{padding:0 16px}
   .pub-stats{grid-template-columns:repeat(3,1fr)}
 }
+/* Phone-width topbar: the search box, streak/gems chips and full name all
+ * fit fine down to ~900px, but together they no longer fit in the fixed
+ * 64px-tall bar on real phone screens and start overlapping each other.
+ * Drop the decorative/secondary pieces and let the bar grow instead of
+ * clipping, keeping just the essentials (menu, title, bell, avatar). */
+@media (max-width:560px){
+  .topbar{height:auto;min-height:64px;padding:10px 12px;flex-wrap:wrap;row-gap:8px}
+  .topbar .search-box{display:none !important}
+  .topbar .user{gap:8px}
+  .topbar .user #topStreak,.topbar .user #topGems{display:none !important}
+  .topbar .user #userName{display:none}
+  .page-title{font-size:16.5px}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
 :focus-visible{outline:2px solid var(--teal-deep);outline-offset:2px}
 
@@ -535,6 +548,28 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .jitsi-box{height:min(72vh,640px);background:#0B1530}
 .jitsi-box iframe{width:100%;height:100%;border:none}
 .live-stage{overflow:hidden;margin-top:16px}
+
+/* Floating call widget - fixed to the viewport so it survives tab, course
+ * and page navigation. Only "Leave" tears it down. */
+.live-call-widget{position:fixed;right:20px;bottom:20px;width:340px;background:#0B1530;border-radius:14px;
+  overflow:hidden;box-shadow:0 24px 60px -18px rgba(9,16,38,.55);border:1px solid rgba(255,255,255,.08);z-index:75}
+.live-call-widget.expanded{width:min(880px,calc(100vw - 40px))}
+.live-call-bar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#141A33}
+.live-call-info{flex:1;min-width:0;color:#fff}
+.live-call-info strong{display:block;font-size:12.5px;font-weight:700}
+.live-call-info .s{display:block;font-size:11px;color:#93A0C6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live-call-btn{background:rgba(255,255,255,.09);border:none;color:#fff;width:26px;height:26px;border-radius:8px;
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;line-height:1}
+.live-call-btn:hover{background:rgba(255,255,255,.18)}
+.live-call-btn.danger:hover{background:#D9534F}
+.live-call-widget .jitsi-box{height:200px}
+.live-call-widget.expanded .jitsi-box{height:min(64vh,540px)}
+.live-call-widget.flash{animation:liveCallFlash .3s ease 2}
+@keyframes liveCallFlash{0%,100%{box-shadow:0 24px 60px -18px rgba(9,16,38,.55)}50%{box-shadow:0 0 0 4px rgba(15,191,168,.55),0 24px 60px -18px rgba(9,16,38,.55)}}
+@media (max-width:560px){
+  .live-call-widget{right:10px;left:10px;bottom:10px;width:auto}
+  .live-call-widget.expanded{left:10px;right:10px;width:auto}
+}
 .att-grid{display:flex;flex-wrap:wrap;gap:7px}
 .att-chip{font-size:12px;font-weight:600;border-radius:999px;padding:4px 11px}
 .att-chip.in{color:#0A6E5F;background:#EAF9F4;border:1px solid #B7E9DA}
@@ -693,11 +728,21 @@ tr.risk-high td{background:#FFF7F7}
 .gran-btn.active{border-color:var(--teal);color:var(--teal-deep);background:#EFFBF8}
 
 /* open-site top nav (LeetCode-like) */
-.open-nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:6px;padding:10px 4vw;background:#fff;border-bottom:1px solid var(--line)}
+.open-nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;flex-wrap:wrap;row-gap:4px;gap:6px;padding:10px 4vw;background:#fff;border-bottom:1px solid var(--line)}
 .open-nav img{height:34px;margin-right:14px}
 .open-nav .nlink{font-size:13.5px;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:9px;cursor:pointer}
 .open-nav .nlink:hover{color:var(--ink);background:var(--canvas)}
 .open-nav .nlink.active{color:var(--primary);background:var(--violet-soft)}
+/* Without wrapping, this many links + the auth buttons don't fit on a phone
+ * screen and spill past the viewport instead of dropping to a new line -
+ * flex-wrap above fixes that; this just tightens spacing so the wrapped
+ * rows still look intentional rather than cramped. */
+@media (max-width:640px){
+  .open-nav{gap:2px;padding:8px 4vw}
+  .open-nav img{height:28px;margin-right:8px}
+  .open-nav .nlink{padding:6px 9px;font-size:12.5px}
+  .open-nav>span[style*="flex:1"]{flex-basis:100%;height:0}
+}
 .open-wrap{max-width:1140px;margin:0 auto;padding:26px 4vw 60px}
 /* The Solve view breaks out of the 1140px reading column - the code editor
  * benefits from the full viewport width, unlike the text-heavy tabs. */

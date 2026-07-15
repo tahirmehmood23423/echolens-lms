@@ -1479,7 +1479,8 @@ function drawCourseTab(tab) {
   const canManage = d.can_manage;
   if (CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
   if (typeof QUIZ_TICK !== 'undefined' && QUIZ_TICK) { clearInterval(QUIZ_TICK); QUIZ_TICK = null; }
-  if (typeof stopLiveHeartbeat === 'function' && tab !== 'Classes') stopLiveHeartbeat();
+  // Deliberately does NOT stop a live call here - the call widget lives
+  // outside this tab body so it keeps running no matter which tab is open.
 
   if (tab === 'Quest') { renderQuestTab(body); return; }
   if (tab === 'Quizzes') { renderQuizzesTab(body); return; }
@@ -3155,14 +3156,19 @@ async function loadOfficial() {
    ============================================================================ */
 
 /* ------------------------------ CLASSES (schedule + built-in room) ------------------------------ */
+// The call widget (#liveCallWidget) lives outside every tab/view container
+// in dashboard.html, so switching Quest/Quizzes/Chat/Classes tabs - or even
+// opening a different course entirely - never touches its DOM node and
+// never disconnects the room. Only leaveSessionClass() tears it down.
 let LIVE_HEART = null;
 let LIVE_API = null;
+let LIVE_SESSION_ID = null;
+let LIVE_EXPANDED = false;
 function stopLiveHeartbeat() {
   if (LIVE_HEART) { clearInterval(LIVE_HEART); LIVE_HEART = null; }
   if (LIVE_API) { try { LIVE_API.dispose(); } catch {} LIVE_API = null; }
 }
 function renderClassesTab(body) {
-  stopLiveHeartbeat();
   const d = CURRENT_BATCH;
   const canManage = d.can_manage;
   const isStudent = ME.role === 'student';
@@ -3179,15 +3185,18 @@ function renderClassesTab(body) {
     : `<div class="empty">No classes scheduled yet.${canManage ? ' Use Manage &rarr; Schedule a class.' : ''}</div>`;
 
   body.innerHTML = rateCard + `<div class="card"><div class="card-head"><h3>Classes</h3><span class="s" style="color:var(--muted)">Every scheduled class has a built-in join button - no Zoom or Meet link needed</span></div>
-    <div class="card-body tight">${rows}</div></div>` + '<div id="liveStage"></div>';
+    <div class="card-body tight">${rows}</div></div>`;
 }
 function classRowHtml(s, canManage, isStudent) {
   const live = s.started_at && !s.ended_at;
   const held = !!s.started_at;
+  const inThisCall = LIVE_SESSION_ID === s.id;
   let statusHtml, actions = '';
   if (live) {
     statusHtml = `<span class="live-dot" style="margin-right:6px"></span><span class="live-pill">LIVE</span>`;
-    actions += `<button class="btn btn-primary btn-sm" onclick="joinSessionClass(${s.id})">&#127909; Join</button>`;
+    actions += inThisCall
+      ? `<button class="btn btn-ghost btn-sm" onclick="focusLiveCallWidget()">&#10003; In call</button>`
+      : `<button class="btn btn-primary btn-sm" onclick="joinSessionClass(${s.id})">&#127909; Join</button>`;
     if (canManage) actions += `<button class="btn btn-danger btn-sm" onclick="endSessionClass(${s.id})">End</button>`;
   } else {
     statusHtml = held ? `<span class="grade-chip late">Ended</span>` : `<span class="s" style="color:var(--muted)">Scheduled</span>`;
@@ -3215,25 +3224,29 @@ async function startSessionClass(id) {
 }
 async function endSessionClass(id) {
   if (!confirm('End the class for everyone? Attendance is saved.')) return;
-  try { await api(`/api/sessions/${id}/end`, { method: 'POST' }); stopLiveHeartbeat(); toast('Class ended - attendance saved.'); openCourse(bid(), 'Classes'); }
-  catch (e) { toast(e.message, true); }
+  try {
+    await api(`/api/sessions/${id}/end`, { method: 'POST' });
+    if (LIVE_SESSION_ID === id) leaveSessionClass();
+    toast('Class ended - attendance saved.'); openCourse(bid(), 'Classes');
+  } catch (e) { toast(e.message, true); }
 }
 // Joins the class INSIDE the portal: an embedded meeting room (Jitsi, open
-// source). Join/leave is detected via the room's events; a heartbeat counts
-// minutes for the attendance sheet.
+// source), hosted in a floating widget that stays mounted across tab and
+// page navigation. Join/leave is detected via the room's events; a
+// heartbeat counts minutes for the attendance sheet.
 async function joinSessionClass(id) {
   let info;
   try { info = await api(`/api/sessions/${id}/join`, { method: 'POST' }); }
   catch (e) { toast(e.message, true); return; }
-  const stage = $('liveStage');
-  stage.innerHTML = `
-    <div class="card live-stage"><div class="ide-toolbar">
-      <span class="live-dot"></span><strong>Live class</strong>
-      <span class="s" style="color:var(--muted)">You are in the room - attendance marked.</span>
-      <span style="flex:1"></span>
-      <button class="btn btn-danger btn-sm" onclick="leaveSessionClass()">Leave class</button>
-    </div><div id="jitsiBox" class="jitsi-box"><div class="empty">Loading the classroom&hellip;</div></div></div>`;
-  stage.scrollIntoView({ behavior: 'smooth' });
+  stopLiveHeartbeat(); // in case a different call was already open
+  LIVE_SESSION_ID = id;
+  const widget = $('liveCallWidget');
+  const known = (CURRENT_BATCH && CURRENT_BATCH.sessions || []).find((s) => s.id === id);
+  $('liveCallTitle').textContent = known ? known.title : 'Live class';
+  $('liveCallSub').textContent = 'You are in the room - attendance marked.';
+  $('jitsiBox').innerHTML = '<div class="empty">Loading the classroom&hellip;</div>';
+  widget.style.display = '';
+  widget.classList.toggle('expanded', LIVE_EXPANDED);
   // JaaS (8x8.vc) when the server has signed a room-scoped JWT for us -
   // otherwise fall back to the free, unauthenticated meet.jit.si server.
   const domain = info.provider === 'jaas' ? '8x8.vc' : 'meet.jit.si';
@@ -3262,7 +3275,32 @@ async function joinSessionClass(id) {
   // Attendance minutes: one heartbeat per minute while in the room.
   LIVE_HEART = setInterval(() => { api(`/api/sessions/${id}/heartbeat`, { method: 'POST' }).catch(() => {}); }, 60000);
 }
-function leaveSessionClass() { stopLiveHeartbeat(); const s = $('liveStage'); if (s) s.innerHTML = ''; toast('You left the class.'); }
+// Brings the floating widget to the user's attention without rejoining -
+// used by the "In call" state on a class row when already connected.
+function focusLiveCallWidget() {
+  const widget = $('liveCallWidget');
+  if (!widget || widget.style.display === 'none') return;
+  widget.classList.add('flash');
+  widget.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  setTimeout(() => widget.classList.remove('flash'), 900);
+}
+function toggleLiveCallSize() {
+  LIVE_EXPANDED = !LIVE_EXPANDED;
+  $('liveCallWidget').classList.toggle('expanded', LIVE_EXPANDED);
+  $('liveCallToggleBtn').innerHTML = LIVE_EXPANDED ? '&#8600;' : '&#8599;';
+}
+function leaveSessionClass() {
+  stopLiveHeartbeat();
+  LIVE_SESSION_ID = null;
+  const widget = $('liveCallWidget');
+  if (widget) { widget.style.display = 'none'; widget.classList.remove('expanded'); }
+  const box = $('jitsiBox'); if (box) box.innerHTML = '<div class="empty">Loading the classroom&hellip;</div>';
+  toast('You left the class.');
+  // Refresh the Classes tab's buttons back to "Join" if it's on screen.
+  if (typeof CURRENT_BATCH !== 'undefined' && CURRENT_BATCH && document.querySelector('.tab.active')?.textContent === 'Classes') {
+    renderClassesTab($('courseTabBody'));
+  }
+}
 async function openAttendanceSheet(sessionId) {
   const d = await api(`/api/sessions/${sessionId}/attendance`);
   const present = d.sheet.filter((r) => r.present);

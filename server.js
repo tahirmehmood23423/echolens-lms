@@ -2263,8 +2263,59 @@ app.use('/uploads', authGate, express.static(UPLOAD_DIR));
 function authGate(req, res, next) { if (!currentUser(req)) return res.status(401).send('Sign in to view files.'); next(); }
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
-app.get('/open', (req, res) => res.sendFile(path.join(__dirname, 'public', 'open.html')));
+/* Server-rendered Course structured data for /open so search engines can index
+ * the catalogue (the visible list is drawn client-side from /api/public/catalogue).
+ * Built once and cached because the official catalogue is static. */
+let OPEN_HTML_CACHE = null;
+function buildOpenHtml() {
+  const file = path.join(__dirname, 'public', 'open.html');
+  let html = fs.readFileSync(file, 'utf8');
+  const items = officialCatalogue().map((c, i) => {
+    const isFree = !c.price_pkr;
+    const course = {
+      '@type': 'Course',
+      name: c.title,
+      description: c.summary || (c.title + ' - an EchoLens ' + (c.tier || 'course') + '.'),
+      url: 'https://www.echolens.digital/open',
+      provider: { '@type': 'EducationalOrganization', name: 'EchoLens Digital', url: 'https://www.echolens.digital/' },
+      offers: {
+        '@type': 'Offer',
+        category: isFree ? 'Free' : 'Paid',
+        price: isFree ? '0' : String(c.price_pkr),
+        priceCurrency: 'PKR',
+        availability: 'https://schema.org/InStock',
+      },
+      hasCourseInstance: {
+        '@type': 'CourseInstance',
+        courseMode: 'Online',
+        courseWorkload: c.hours ? ('PT' + c.hours + 'H') : undefined,
+        startDate: '2026-08-01',
+        location: { '@type': 'VirtualLocation', url: 'https://www.echolens.digital/open' },
+      },
+    };
+    return { '@type': 'ListItem', position: i + 1, item: course };
+  });
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'EchoLens Course Catalogue - August 2026',
+    numberOfItems: items.length,
+    itemListElement: items,
+  };
+  const json = JSON.stringify(ld).replace(/</g, '\\u003c');
+  const tag = '<script type="application/ld+json">\n' + json + '\n</script>\n</head>';
+  return html.replace('</head>', tag);
+}
+app.get('/open', (req, res) => {
+  try {
+    if (!OPEN_HTML_CACHE) OPEN_HTML_CACHE = buildOpenHtml();
+    res.type('html').send(OPEN_HTML_CACHE);
+  } catch (e) {
+    res.sendFile(path.join(__dirname, 'public', 'open.html'));
+  }
+});
 app.get('/compiler', (req, res) => res.sendFile(path.join(__dirname, 'public', 'compiler.html')));
+require('./coursepages').register(app); // SEO landing page per course: /courses and /courses/:slug
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));

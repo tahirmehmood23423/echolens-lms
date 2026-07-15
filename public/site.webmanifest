@@ -1,6 +1,10 @@
 {
-  "name": "EchoLens",
+  "name": "EchoLens Digital - AI & Tech Academy",
   "short_name": "EchoLens",
+  "description": "Pakistan's gamified AI and tech academy: live courses, coding quests, a free browser compiler and verified certificates.",
+  "start_url": "/",
+  "lang": "en",
+  "categories": ["education", "productivity"],
   "icons": [
     { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }

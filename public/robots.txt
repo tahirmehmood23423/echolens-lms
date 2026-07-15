@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Private / app pages - no SEO value, keep out of the index
+Disallow: /login
+Disallow: /reset-password
+Disallow: /dashboard
+Disallow: /grade
+Disallow: /cert
+Disallow: /verify
+Disallow: /u/
+Disallow: /uploads/
+Disallow: /api/
+Disallow: /auth/
+
+Sitemap: https://www.echolens.digital/sitemap.xml

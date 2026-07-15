@@ -6,9 +6,9 @@
     "enrollments": 1,
     "sessions": 3,
     "lessons": 1,
-    "assignments": 1,
+    "assignments": 0,
     "submissions": 0,
-    "announcements": 1,
+    "announcements": 0,
     "gem_events": 0,
     "challenges": 0,
     "challenge_submissions": 0,
@@ -28,7 +28,14 @@
     "events": 0,
     "event_entries": 0,
     "event_submissions": 0,
-    "leads": 1
+    "event_comments": 0,
+    "leads": 1,
+    "open_submissions": 0,
+    "registrations": 0,
+    "public_announcements": 0,
+    "chat_reads": 0,
+    "jobs": 0,
+    "job_comments": 0
   },
   "issued_usernames": [
     "admin@echolens.digital",
@@ -37,7 +44,7 @@
     "student@echolens.digital"
   ],
   "issued_regnos": [
-    "7806931"
+    "6033269"
   ],
   "users": [
     {
@@ -47,12 +54,12 @@
       "username": "admin@echolens.digital",
       "email": "admin@echolens.digital",
       "reg_no": null,
-      "password_hash": "$2a$10$hGzxwjY61c5mAgvEmDfymOHAm.wAKVG3wfpEauTH/0G2AjglvqBdy",
+      "password_hash": "$2a$10$nFDyJLDalm9sE7MaYY1Wy.IH/8O41scGlJrMdT/DneFNS9hRYbfCa",
       "profile": {},
       "streak": 0,
       "best_streak": 0,
       "last_active": null,
-      "created_at": "2026-07-10 12:09:16"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 2,
@@ -61,12 +68,12 @@
       "username": "teacher@echolens.digital",
       "email": "teacher@echolens.digital",
       "reg_no": null,
-      "password_hash": "$2a$10$mSuj.K4TiXFuZRKBPdb0cePC34quwWRlWteQPzoS72cx2nFG2/fBe",
+      "password_hash": "$2a$10$s.7qrc8q4oYzVkKgeqPyieZ9U3HLE23RffRW7YH.c0YfoLjMlbREm",
       "profile": {},
       "streak": 0,
       "best_streak": 0,
       "last_active": null,
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 3,
@@ -75,12 +82,12 @@
       "username": "coordinator@echolens.digital",
       "email": "coordinator@echolens.digital",
       "reg_no": null,
-      "password_hash": "$2a$10$owqWQ4CT6xxavwML6uZkRevG3RIYEdNE7pvQKGF3iHCmbIylUiOpu",
+      "password_hash": "$2a$10$kxZa/3Eqcjwx5gC9BCLVs.c5zH20Qj4IOn46a918h76O7mAh1j5Ze",
       "profile": {},
       "streak": 0,
       "best_streak": 0,
       "last_active": null,
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 4,
@@ -88,13 +95,13 @@
       "role": "student",
       "username": "student@echolens.digital",
       "email": "student@echolens.digital",
-      "reg_no": "7806931",
-      "password_hash": "$2a$10$Jmca0d6dtI2SqsH8OXaQXue58UwVfFKOpfWsIbzF54bop11MlfAp6",
+      "reg_no": "6033269",
+      "password_hash": "$2a$10$6coMKE6LwSYjVL3E8LWJxOXrPO94b4R5S4aMnbg8fYLqPkO/IlaDK",
       "profile": {},
       "streak": 0,
       "best_streak": 0,
       "last_active": null,
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     }
   ],
   "courses": [
@@ -105,12 +112,12 @@
       "tier": "Bootcamp",
       "weeks": 2,
       "hours": 8,
-      "price_pkr": 3000,
+      "price_pkr": 5000,
       "badges": [
         "high_demand"
       ],
       "summary": "Build real business automations that connect apps, data and AI - workflows agencies bill $30-70/hour for.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 2,
@@ -119,12 +126,12 @@
       "tier": "Bootcamp",
       "weeks": 2,
       "hours": 8,
-      "price_pkr": 3000,
+      "price_pkr": 5000,
       "badges": [
         "high_demand"
       ],
       "summary": "Structured prompting, tool use and reusable prompt systems that make AI dependable daily.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 3,
@@ -139,7 +146,7 @@
       ],
       "free_mode": "open",
       "summary": "Our fully open bootcamp: practical AI for studies, office work and content creation.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 4,
@@ -156,7 +163,7 @@
       ],
       "free_mode": "signin",
       "summary": "Your first real webpage, built live in our in-browser compiler with quests, gems and a leaderboard.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 5,
@@ -165,13 +172,13 @@
       "tier": "Bootcamp",
       "weeks": 2,
       "hours": 8,
-      "price_pkr": 3000,
+      "price_pkr": 5000,
       "badges": [
         "new",
         "high_demand"
       ],
       "summary": "Agentic IDEs, AI pair programming and review workflows that multiply what one developer can ship.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 6,
@@ -187,7 +194,7 @@
       ],
       "free_mode": "signin",
       "summary": "Version control plus a polished GitHub and Upwork/Fiverr presence before your first client.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 7,
@@ -196,12 +203,12 @@
       "tier": "Bootcamp",
       "weeks": 2,
       "hours": 8,
-      "price_pkr": 2500,
+      "price_pkr": 5000,
       "badges": [
         "new"
       ],
       "summary": "Clean data, build reports and automate repetitive office work by pairing Excel with AI assistants.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 8,
@@ -210,10 +217,10 @@
       "tier": "Bootcamp",
       "weeks": 2,
       "hours": 8,
-      "price_pkr": 2500,
+      "price_pkr": 5000,
       "badges": [],
       "summary": "Design social posts, brand kits and marketing visuals quickly with Canva + AI tools.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 9,
@@ -227,7 +234,7 @@
         "high_demand"
       ],
       "summary": "Pandas, NumPy and Matplotlib applied to real datasets, ending with a portfolio analysis project.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 10,
@@ -241,7 +248,7 @@
         "high_demand"
       ],
       "summary": "LLMs, embeddings, retrieval and building your first AI-powered features with today's APIs.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 11,
@@ -255,7 +262,7 @@
         "high_demand"
       ],
       "summary": "Production-grade SQL queries turned into interactive Power BI dashboards decision-makers use.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 12,
@@ -267,7 +274,7 @@
       "price_pkr": 13000,
       "badges": [],
       "summary": "Train, evaluate and honestly interpret your first models - the foundation for every advanced AI track.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 13,
@@ -279,7 +286,7 @@
       "price_pkr": 14000,
       "badges": [],
       "summary": "A deeper pass across n8n, Make, Zapier and AI agents wired into real business processes.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 14,
@@ -294,7 +301,7 @@
         "high_demand"
       ],
       "summary": "From blank file to responsive, deployed website - practiced quest by quest in the EchoLens compiler.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 15,
@@ -309,7 +316,7 @@
         "high_demand"
       ],
       "summary": "The bridge to React: master the DOM, asynchronous JavaScript and consuming real REST APIs.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 16,
@@ -323,7 +330,7 @@
         "new"
       ],
       "summary": "Run real campaigns: search optimisation, paid social basics and analytics.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 17,
@@ -337,7 +344,7 @@
         "new"
       ],
       "summary": "Positioning, proposals, pricing and client communication - turning skills into income.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 18,
@@ -349,7 +356,7 @@
       "price_pkr": 10000,
       "badges": [],
       "summary": "Core design principles, typography and brand assets - a solid visual foundation.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 19,
@@ -361,7 +368,7 @@
       "price_pkr": 9000,
       "badges": [],
       "summary": "Professional writing workflows pairing human judgement with AI drafting, editing and research.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 20,
@@ -373,7 +380,7 @@
       "price_pkr": 20000,
       "badges": [],
       "summary": "Custom themes, WooCommerce stores and performance hardening - a large, reliable freelance market.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 21,
@@ -385,7 +392,7 @@
       "price_pkr": 20000,
       "badges": [],
       "summary": "A full professional design track: brand identity, collateral and a portfolio built to client standards.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 22,
@@ -399,7 +406,7 @@
         "high_demand"
       ],
       "summary": "Research, wireframing and high-fidelity product design in Figma, closing with a shipped-quality case study.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 23,
@@ -413,7 +420,7 @@
         "high_demand"
       ],
       "summary": "Python, SQL, statistics and data storytelling - the complete analyst skill set employers hire for.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 24,
@@ -427,7 +434,7 @@
         "high_demand"
       ],
       "summary": "Production LLM systems: retrieval-augmented generation, evaluation and deployment.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 25,
@@ -441,7 +448,7 @@
         "high_demand"
       ],
       "summary": "Multi-step, tool-calling AI agents that plan, act and integrate with real business systems.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 26,
@@ -453,7 +460,7 @@
       "price_pkr": 21500,
       "badges": [],
       "summary": "Classical ML done rigorously: feature engineering, model selection and honest evaluation.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 27,
@@ -465,7 +472,7 @@
       "price_pkr": 23000,
       "badges": [],
       "summary": "Neural networks, computer vision and transfer learning, through to deploying a trained model.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 28,
@@ -480,7 +487,7 @@
         "flagship"
       ],
       "summary": "Our premium flagship: build and deploy a complete production web application on the 2026 stack.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 29,
@@ -495,7 +502,7 @@
         "high_demand"
       ],
       "summary": "Component architecture, state management and server-side rendering with Next.js.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 30,
@@ -509,7 +516,7 @@
         "new"
       ],
       "summary": "One codebase, two app stores: build and publish real Android and iOS apps.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 31,
@@ -521,21 +528,21 @@
       "price_pkr": 20000,
       "badges": [],
       "summary": "Professional editing workflows, pacing and delivery for client and commercial work.",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     }
   ],
   "batches": [
     {
       "id": 1,
       "course_id": 9,
-      "code": "EL-9930",
+      "code": "EL-3881",
       "name": "August 2026 Cohort",
       "start_date": "2026-08-01",
       "status": "running",
       "instructor_ids": [
         2
       ],
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     }
   ],
   "enrollments": [
@@ -543,7 +550,7 @@
       "id": 1,
       "user_id": 4,
       "batch_id": 1,
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     }
   ],
   "sessions": [
@@ -556,7 +563,7 @@
       "start_time": "20:00",
       "end_time": "22:00",
       "join_url": "https://meet.google.com/your-live-class-link",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 2,
@@ -567,7 +574,7 @@
       "start_time": "20:00",
       "end_time": "22:00",
       "join_url": "https://meet.google.com/your-live-class-link",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     },
     {
       "id": 3,
@@ -578,7 +585,7 @@
       "start_time": "20:00",
       "end_time": "22:00",
       "join_url": "https://meet.google.com/your-live-class-link",
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     }
   ],
   "lessons": [
@@ -591,32 +598,12 @@
       "type": "slides",
       "url": "#",
       "position": 1,
-      "created_at": "2026-07-10 12:09:17"
+      "created_at": "2026-07-15 08:30:53"
     }
   ],
-  "assignments": [
-    {
-      "id": 1,
-      "points": 100,
-      "batch_id": 1,
-      "title": "Setup proof: your first script",
-      "description": "Submit a PDF showing your Python setup and first program running.",
-      "due_date": "2026-08-10",
-      "created_by": 2,
-      "created_at": "2026-07-10 12:09:17"
-    }
-  ],
+  "assignments": [],
   "submissions": [],
-  "announcements": [
-    {
-      "id": 1,
-      "batch_id": null,
-      "author_id": 1,
-      "title": "Welcome to EchoLens",
-      "body": "Sign in to reach your courses, schedule, content and assignments.",
-      "created_at": "2026-07-10 12:09:17"
-    }
-  ],
+  "announcements": [],
   "gem_events": [],
   "challenges": [],
   "challenge_submissions": [],
@@ -627,6 +614,7 @@
   "quests": [],
   "quest_submissions": [],
   "course_messages": [],
+  "chat_reads": [],
   "live_classes": [],
   "attendance": [],
   "quizzes": [],
@@ -636,6 +624,7 @@
   "events": [],
   "event_entries": [],
   "event_submissions": [],
+  "event_comments": [],
   "leads": [
     {
       "id": 1,
@@ -644,16 +633,21 @@
       "whatsapp": null,
       "source": "portal",
       "user_id": 4,
-      "created_at": "2026-07-10 12:09:17",
-      "updated_at": "2026-07-10 12:09:26"
+      "created_at": "2026-07-15 08:30:53",
+      "updated_at": "2026-07-15 08:31:11"
     }
   ],
+  "open_submissions": [],
+  "registrations": [],
+  "public_announcements": [],
+  "jobs": [],
+  "job_comments": [],
   "settings": {
     "cert": {
-      "org": "EchoLens AI Academy",
-      "ceo_name": "",
+      "org": "EchoLens Academy",
+      "ceo_name": "Tahir Mehmood",
       "ceo_sig": null,
-      "tagline": "Gamified AI & Data Science Education"
+      "tagline": "Gamified Learning, Real Skills"
     }
   }
 }

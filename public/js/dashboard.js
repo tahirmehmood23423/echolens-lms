@@ -348,8 +348,8 @@ function classStatus(s) {
 function tcRow(s) {
   const st = classStatus(s);
   const btn = st.cls === 'live'
-    ? (s.join_url ? `<a class="btn btn-primary btn-sm" href="${esc(s.join_url)}" target="_blank" rel="noopener">Join Class</a>` : `<button class="btn btn-primary btn-sm" onclick="show('schedule')">Join Class</button>`)
-    : `<button class="btn btn-ghost btn-sm" onclick="show('schedule')">View Details</button>`;
+    ? `<button class="btn btn-primary btn-sm" onclick="openCourse(${s.batch_id},'Classes')">Join Class</button>`
+    : `<button class="btn btn-ghost btn-sm" onclick="openCourse(${s.batch_id},'Classes')">View Details</button>`;
   return `<div class="tc-row">
     <div class="tc-ic" style="background:${courseColor(s.batch_id)}">${T_ICONS.book}</div>
     <div class="tc-when">${s.start_time ? esc(s.start_time) : '&mdash;'}</div>
@@ -990,7 +990,7 @@ function sessionRow(s) {
   return `<div class="list-row">
     <div class="when">${fmtDate(s.session_date)}<small>${esc(s.start_time || '')}${s.end_time ? '&ndash;' + esc(s.end_time) : ''}</small></div>
     <div class="grow"><div class="t">${esc(s.title)}</div><div class="s">${esc(s.course_title || '')} ${s.batch_name ? '&middot; ' + esc(s.batch_name) : ''}</div></div>
-    ${s.join_url ? `<a class="btn btn-teal btn-sm" href="${esc(s.join_url)}" target="_blank" rel="noopener">Join</a>` : ''}</div>`;
+    <button class="btn btn-teal btn-sm" onclick="openCourse(${s.batch_id},'Classes')">Open class</button></div>`;
 }
 function annRow(a) {
   return `<div class="list-row"><div class="grow">
@@ -1421,7 +1421,7 @@ async function openMessageThread(batchId) {
 }
 
 /* ============================ COURSE DETAIL ============================ */
-async function openCourse(id) {
+async function openCourse(id, openTab) {
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   $('view-course').classList.add('active');
   $('pageTitle').textContent = 'Course';
@@ -1449,9 +1449,10 @@ async function openCourse(id) {
     menu.push(`<button class="danger" onclick="deleteBatch()">Delete this course</button>`);
   }
 
-  const tabs = ['Quest', 'Live', 'Quizzes', 'Chat', 'Classes', 'Content', 'Leaderboard'];
+  const tabs = ['Quest', 'Classes', 'Quizzes', 'Chat', 'Content', 'Leaderboard'];
   if (isStaff()) tabs.push('People', 'At-risk', 'Report');
 
+  const initialTab = tabs.includes(openTab) ? openTab : tabs[0];
   $('view-course').innerHTML = `
     <button class="btn btn-ghost btn-sm" onclick="show('courses')" style="margin-bottom:14px">&larr; All courses</button>
     <div class="course-head">
@@ -1464,9 +1465,9 @@ async function openCourse(id) {
       ${menu.length ? `<div class="dd"><button class="btn btn-ghost" onclick="this.nextElementSibling.classList.toggle('open')">Manage &#8942;</button>
         <div class="dd-menu">${menu.join('')}</div></div>` : ''}
     </div>
-    <div class="tabs">${tabs.map((t, i) => `<div class="tab${i === 0 ? ' active' : ''}" data-tab="${t}" onclick="courseTab(this)">${t}</div>`).join('')}</div>
+    <div class="tabs">${tabs.map((t) => `<div class="tab${t === initialTab ? ' active' : ''}" data-tab="${t}" onclick="courseTab(this)">${t}</div>`).join('')}</div>
     <div id="courseTabBody"></div>`;
-  drawCourseTab('Quest');
+  drawCourseTab(initialTab);
 }
 function courseTab(el) {
   document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
@@ -1478,25 +1479,13 @@ function drawCourseTab(tab) {
   const canManage = d.can_manage;
   if (CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
   if (typeof QUIZ_TICK !== 'undefined' && QUIZ_TICK) { clearInterval(QUIZ_TICK); QUIZ_TICK = null; }
-  if (typeof stopLiveHeartbeat === 'function' && tab !== 'Live') stopLiveHeartbeat();
+  if (typeof stopLiveHeartbeat === 'function' && tab !== 'Classes') stopLiveHeartbeat();
 
   if (tab === 'Quest') { renderQuestTab(body); return; }
-  if (tab === 'Live') { renderLiveTab(body); return; }
   if (tab === 'Quizzes') { renderQuizzesTab(body); return; }
   if (tab === 'At-risk') { renderAtRiskTab(body); return; }
   if (tab === 'Chat') { renderChatTab(body); return; }
-
-  if (tab === 'Classes') {
-    body.innerHTML = `<div class="card"><div class="card-body tight">
-      ${d.sessions.length ? d.sessions.map((s) => `
-        <div class="list-row">
-          <div class="when">${fmtDate(s.session_date)}<small>${esc(s.start_time || '')}${s.end_time ? '&ndash;' + esc(s.end_time) : ''}</small></div>
-          <div class="grow"><div class="t">${s.week_no ? `Week ${s.week_no}: ` : ''}${esc(s.title)}</div></div>
-          ${s.join_url ? `<a class="btn btn-teal btn-sm" href="${esc(s.join_url)}" target="_blank" rel="noopener">Join</a>` : ''}
-          ${canManage ? `<button class="btn btn-danger btn-sm" onclick="del('/api/sessions/${s.id}','class')">Remove</button>` : ''}
-        </div>`).join('') : '<div class="empty">No classes scheduled yet.</div>'}
-    </div></div>`;
-  }
+  if (tab === 'Classes') { renderClassesTab(body); return; }
 
   if (tab === 'Content') {
     body.innerHTML = `<div class="card"><div class="card-body tight">
@@ -1595,7 +1584,7 @@ function formSession() {
         <label class="field"><span>Starts</span><input name="start_time" type="time"></label>
         <label class="field"><span>Ends</span><input name="end_time" type="time"></label>
       </div>
-      <label class="field"><span>Join link (Zoom / Meet)</span><input name="join_url" type="url" placeholder="https://"></label>
+      <p class="hint">Every scheduled class gets a built-in join button and automatic attendance - no Zoom or Meet link needed.</p>
       <button class="btn btn-primary btn-block">Add to schedule</button></form>`);
   hookForm(`/api/batches/${bid()}/sessions`, 'Class scheduled.');
 }
@@ -3159,46 +3148,24 @@ async function loadOfficial() {
 }
 
 /* ============================================================================
-   v11 FEATURES: live classes + attendance, pop quizzes, at-risk report,
-   student search + full profiles, QR certificates, level tools.
+   v18 FEATURES: scheduled classes with a built-in join button + automatic
+   attendance, pop quizzes, at-risk report, student search + full profiles,
+   QR certificates, level tools.
    ============================================================================ */
 
-/* ------------------------------ LIVE CLASSES ------------------------------ */
+/* ------------------------------ CLASSES (schedule + built-in room) ------------------------------ */
 let LIVE_HEART = null;
 let LIVE_API = null;
 function stopLiveHeartbeat() {
   if (LIVE_HEART) { clearInterval(LIVE_HEART); LIVE_HEART = null; }
   if (LIVE_API) { try { LIVE_API.dispose(); } catch {} LIVE_API = null; }
 }
-async function renderLiveTab(body) {
+function renderClassesTab(body) {
   stopLiveHeartbeat();
-  body.innerHTML = '<div class="empty">Loading live classes&hellip;</div>';
-  const d = await api(`/api/batches/${bid()}/live`);
+  const d = CURRENT_BATCH;
   const canManage = d.can_manage;
   const isStudent = ME.role === 'student';
-
-  const activeCard = d.active ? `
-    <div class="card live-card"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-      <span class="live-dot"></span>
-      <div style="flex:1;min-width:200px">
-        <div class="t" style="font-size:16px;font-weight:700">${esc(d.active.title)}</div>
-        <div class="s" style="color:var(--muted)">Live now &middot; started ${esc((d.active.started_at || '').slice(11, 16))} &middot; runs inside the portal${isStudent ? ' &middot; joining marks your attendance' : ''}</div>
-      </div>
-      <button class="btn btn-primary" onclick="joinLiveClass(${d.active.id})">&#127909; Join class</button>
-      ${canManage ? `<button class="btn btn-danger btn-sm" onclick="endLiveClass(${d.active.id})">End class</button>` : ''}
-    </div>
-    ${canManage && d.live_attendance ? `<div class="card-body" style="border-top:1px solid var(--line)">
-      <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:6px">Live attendance &middot; ${d.live_attendance.filter((r) => r.present).length}/${d.live_attendance.length} present</div>
-      <div class="att-grid">${d.live_attendance.map((r) => `<span class="att-chip ${r.present ? 'in' : 'out'}">${esc(r.name)}${r.present ? ` &middot; ${r.minutes}m` : ''}</span>`).join('')}</div>
-      <p class="hint" style="margin:8px 0 0">Updates when you reopen this tab. Absent students are everyone enrolled who never joined.</p>
-    </div>` : ''}</div>` : `
-    <div class="card"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-      <div style="flex:1;min-width:200px">
-        <div class="t" style="font-weight:700">No class is live right now</div>
-        <div class="s" style="color:var(--muted)">${canManage ? 'Start one and every enrolled student is emailed instantly. The class runs inside EchoLens - no Zoom or Meet links needed.' : 'When your teacher starts a class, a Join button appears here - joining marks your attendance automatically.'}</div>
-      </div>
-      ${canManage ? `<button class="btn btn-primary" onclick="startLiveClass()">&#127909; Start live class</button>` : ''}
-    </div></div>`;
+  const sessions = d.sessions || [];
 
   const rateCard = isStudent && d.my_rate ? `
     <div class="card"><div class="card-body" style="display:flex;gap:16px;align-items:center">
@@ -3207,41 +3174,55 @@ async function renderLiveTab(body) {
       <div class="s" style="color:var(--muted)">${d.my_rate.attended} of ${d.my_rate.total} classes attended</div></div>
     </div></div>` : '';
 
-  const pastCard = `
-    <div class="card"><div class="card-head"><h3>Past classes</h3><span class="s" style="color:var(--muted)">${isStudent ? 'Your record per class' : 'Attendance per class - open any for the full sheet'}</span></div>
-    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-      <tr><th>Date</th><th>Class</th>${isStudent ? '<th>You</th>' : '<th>Present</th><th>Absent</th><th></th>'}</tr>
-      ${d.past.length ? d.past.map((c) => `<tr>
-        <td>${fmtDate(c.date)}</td><td>${esc(c.title)}</td>
-        ${isStudent
-          ? `<td>${c.me_present ? '<span class="grade-chip ok">&#10003; Present</span>' : '<span class="grade-chip late">Absent</span>'}</td>`
-          : `<td><strong style="color:var(--ok)">${c.present}</strong>/${c.total}</td><td><strong style="color:var(--danger)">${c.absent}</strong></td>
-             <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="openAttendanceSheet(${c.id})">Attendance sheet</button></td>`}
-      </tr>`).join('') : `<tr><td colspan="5" class="empty">No classes held yet.</td></tr>`}
-    </table></div></div>`;
+  const rows = sessions.length ? sessions.map((s) => classRowHtml(s, canManage, isStudent)).join('')
+    : `<div class="empty">No classes scheduled yet.${canManage ? ' Use Manage &rarr; Schedule a class.' : ''}</div>`;
 
-  body.innerHTML = activeCard + rateCard + pastCard + '<div id="liveStage"></div>';
+  body.innerHTML = rateCard + `<div class="card"><div class="card-head"><h3>Classes</h3><span class="s" style="color:var(--muted)">Every scheduled class has a built-in join button - no Zoom or Meet link needed</span></div>
+    <div class="card-body tight">${rows}</div></div>` + '<div id="liveStage"></div>';
 }
-async function startLiveClass() {
-  const title = prompt('Class title (students see this):', 'Live class - ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
-  if (title == null) return;
-  try {
-    await api(`/api/batches/${bid()}/live/start`, { method: 'POST', body: JSON.stringify({ title }) });
-    toast('Class is live - students have been emailed.');
-    drawCourseTab('Live');
-  } catch (e) { toast(e.message, true); }
+function classRowHtml(s, canManage, isStudent) {
+  const live = s.started_at && !s.ended_at;
+  const held = !!s.started_at;
+  let statusHtml, actions = '';
+  if (live) {
+    statusHtml = `<span class="live-dot" style="margin-right:6px"></span><span class="live-pill">LIVE</span>`;
+    actions += `<button class="btn btn-primary btn-sm" onclick="joinSessionClass(${s.id})">&#127909; Join</button>`;
+    if (canManage) actions += `<button class="btn btn-danger btn-sm" onclick="endSessionClass(${s.id})">End</button>`;
+  } else {
+    statusHtml = held ? `<span class="grade-chip late">Ended</span>` : `<span class="s" style="color:var(--muted)">Scheduled</span>`;
+    if (canManage) actions += `<button class="btn btn-teal btn-sm" onclick="startSessionClass(${s.id})">&#127909; ${held ? 'Restart' : 'Start'} class</button>`;
+  }
+  if (held && canManage) actions += `<button class="btn btn-ghost btn-sm" onclick="openAttendanceSheet(${s.id})">Attendance</button>`;
+  if (canManage) actions += `<button class="btn btn-danger btn-sm" onclick="del('/api/sessions/${s.id}','class')">Remove</button>`;
+
+  let attLine = '';
+  if (held) {
+    if (canManage && s.attendance_summary) attLine = `<div class="s" style="color:var(--muted)">${s.attendance_summary.present} present &middot; ${s.attendance_summary.absent} absent</div>`;
+    else if (isStudent) attLine = `<div class="s">${s.me_present ? '<span style="color:var(--ok)">&#10003; You attended</span>' : '<span style="color:var(--danger)">You were absent</span>'}</div>`;
+  }
+
+  return `<div class="list-row">
+    <div class="when">${fmtDate(s.session_date)}<small>${esc(s.start_time || '')}${s.end_time ? '&ndash;' + esc(s.end_time) : ''}</small></div>
+    <div class="grow"><div class="t">${s.week_no ? `Week ${s.week_no}: ` : ''}${esc(s.title)} ${statusHtml}</div>${attLine}</div>
+    ${actions}
+  </div>`;
 }
-async function endLiveClass(id) {
-  if (!confirm('End the live class for everyone? Attendance is saved.')) return;
-  try { await api(`/api/live/${id}/end`, { method: 'POST' }); stopLiveHeartbeat(); toast('Class ended - attendance saved.'); drawCourseTab('Live'); }
+async function startSessionClass(id) {
+  if (!confirm('Start this class now? Every enrolled student is emailed instantly and the class runs inside EchoLens.')) return;
+  try { await api(`/api/sessions/${id}/start`, { method: 'POST' }); toast('Class is live - students have been emailed.'); openCourse(bid(), 'Classes'); }
+  catch (e) { toast(e.message, true); }
+}
+async function endSessionClass(id) {
+  if (!confirm('End the class for everyone? Attendance is saved.')) return;
+  try { await api(`/api/sessions/${id}/end`, { method: 'POST' }); stopLiveHeartbeat(); toast('Class ended - attendance saved.'); openCourse(bid(), 'Classes'); }
   catch (e) { toast(e.message, true); }
 }
 // Joins the class INSIDE the portal: an embedded meeting room (Jitsi, open
 // source). Join/leave is detected via the room's events; a heartbeat counts
 // minutes for the attendance sheet.
-async function joinLiveClass(id) {
+async function joinSessionClass(id) {
   let info;
-  try { info = await api(`/api/live/${id}/join`, { method: 'POST' }); }
+  try { info = await api(`/api/sessions/${id}/join`, { method: 'POST' }); }
   catch (e) { toast(e.message, true); return; }
   const stage = $('liveStage');
   stage.innerHTML = `
@@ -3249,7 +3230,7 @@ async function joinLiveClass(id) {
       <span class="live-dot"></span><strong>Live class</strong>
       <span class="s" style="color:var(--muted)">You are in the room - attendance marked.</span>
       <span style="flex:1"></span>
-      <button class="btn btn-danger btn-sm" onclick="leaveLiveClass()">Leave class</button>
+      <button class="btn btn-danger btn-sm" onclick="leaveSessionClass()">Leave class</button>
     </div><div id="jitsiBox" class="jitsi-box"><div class="empty">Loading the classroom&hellip;</div></div></div>`;
   stage.scrollIntoView({ behavior: 'smooth' });
   // JaaS (8x8.vc) when the server has signed a room-scoped JWT for us -
@@ -3267,7 +3248,7 @@ async function joinLiveClass(id) {
     };
     if (info.jwt) opts.jwt = info.jwt;
     LIVE_API = new JitsiMeetExternalAPI(domain, opts);
-    LIVE_API.addListener('videoConferenceLeft', () => leaveLiveClass());
+    LIVE_API.addListener('videoConferenceLeft', () => leaveSessionClass());
   };
   if (window.JitsiMeetExternalAPI && window.JITSI_SCRIPT_SRC === scriptSrc) boot();
   else {
@@ -3278,11 +3259,11 @@ async function joinLiveClass(id) {
     document.head.appendChild(s);
   }
   // Attendance minutes: one heartbeat per minute while in the room.
-  LIVE_HEART = setInterval(() => { api(`/api/live/${id}/heartbeat`, { method: 'POST' }).catch(() => {}); }, 60000);
+  LIVE_HEART = setInterval(() => { api(`/api/sessions/${id}/heartbeat`, { method: 'POST' }).catch(() => {}); }, 60000);
 }
-function leaveLiveClass() { stopLiveHeartbeat(); const s = $('liveStage'); if (s) s.innerHTML = ''; toast('You left the class.'); }
-async function openAttendanceSheet(classId) {
-  const d = await api(`/api/live/${classId}/attendance`);
+function leaveSessionClass() { stopLiveHeartbeat(); const s = $('liveStage'); if (s) s.innerHTML = ''; toast('You left the class.'); }
+async function openAttendanceSheet(sessionId) {
+  const d = await api(`/api/sessions/${sessionId}/attendance`);
   const present = d.sheet.filter((r) => r.present);
   openModal(`Attendance - ${d.class.title} (${fmtDate(d.class.date)})`, `
     <div class="s" style="margin-bottom:10px"><strong style="color:var(--ok)">${present.length} present</strong> &middot; <strong style="color:var(--danger)">${d.sheet.length - present.length} absent</strong> of ${d.sheet.length} enrolled</div>

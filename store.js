@@ -38,11 +38,11 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, live_classes: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
-  live_classes: [], attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
+  attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
   events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
   jobs: [], job_comments: [],
   settings: { cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' } },
@@ -462,10 +462,30 @@ function canViewBatch(u, b) {
 }
 
 /* ------------------------------- sessions ------------------------------- */
+// A scheduled class. Each one carries its own built-in video room (embedded
+// Jitsi, open source) - no external Zoom/Meet link needed. A teacher/admin
+// "starts" the room when class begins, students "join" from that same
+// session, and attendance is tracked per session automatically.
 const Sessions = {
-  create(s) { const rec = { id: nextId('sessions'), ...s, batch_id: Number(s.batch_id), created_at: now() }; data.sessions.push(rec); save(); return rec; },
-  remove(id) { data.sessions = data.sessions.filter((s) => s.id !== Number(id)); save(); },
+  create(s) {
+    const rec = {
+      id: nextId('sessions'), ...s, batch_id: Number(s.batch_id),
+      room: `EchoLens-${s.batch_id}-${crypto.randomBytes(6).toString('hex')}`, // unguessable Jitsi room name
+      started_at: null, ended_at: null, started_by: null,
+      created_at: now(),
+    };
+    data.sessions.push(rec); save(); return rec;
+  },
+  byId(id) { return data.sessions.find((s) => s.id === Number(id)) || null; },
+  remove(id) {
+    const sid = Number(id);
+    data.sessions = data.sessions.filter((s) => s.id !== sid);
+    data.attendance = data.attendance.filter((a) => a.session_id !== sid);
+    save();
+  },
   forBatch(bid) { return data.sessions.filter((s) => s.batch_id === Number(bid)).sort((a, b) => String(a.session_date + a.start_time).localeCompare(b.session_date + b.start_time)); },
+  // Classes that have actually been started at least once, most recent first.
+  held(bid) { return data.sessions.filter((s) => s.batch_id === Number(bid) && s.started_at).sort((a, b) => String(b.started_at).localeCompare(a.started_at)); },
   upcomingForUser(u) {
     const bids = coursesForUser(u).map((b) => b.id);
     const t = today();
@@ -473,6 +493,15 @@ const Sessions = {
       .sort((a, b) => String(a.session_date + a.start_time).localeCompare(b.session_date + b.start_time))
       .map((s) => { const b = Batches.byId(s.batch_id); const c = b ? Courses.byId(b.course_id) : null; return { ...s, course_title: c ? c.title : '', batch_name: b ? b.name : '' }; });
   },
+  active(bid) { return data.sessions.find((s) => s.batch_id === Number(bid) && s.started_at && !s.ended_at) || null; },
+  start(id, userId) {
+    const s = Sessions.byId(id); if (!s) return { error: 'Class not found.' };
+    const already = Sessions.active(s.batch_id);
+    if (already && already.id !== s.id) return { error: 'Another class is already live on this course. End it first.' };
+    s.started_at = now(); s.started_by = userId; s.ended_at = null; save();
+    return { ok: true, session: s };
+  },
+  end(id) { const s = Sessions.byId(id); if (!s) return null; s.ended_at = now(); save(); return s; },
 };
 
 /* -------------------------------- lessons -------------------------------- */
@@ -1238,7 +1267,7 @@ function seed() {
     [1, 'Course kickoff and the RAG mental model', '2026-07-07', '20:00', '22:00'],
     [1, 'Variables, types and first programs', '2026-07-09', '20:00', '22:00'],
     [2, 'Control flow: conditionals and loops', '2026-07-14', '20:00', '22:00'],
-  ].forEach(([wk, title, d, st, et]) => Sessions.create({ batch_id: b1.id, week_no: wk, title, session_date: d, start_time: st, end_time: et, join_url: 'https://meet.google.com/your-live-class-link' }));
+  ].forEach(([wk, title, d, st, et]) => Sessions.create({ batch_id: b1.id, week_no: wk, title, session_date: d, start_time: st, end_time: et }));
   Lessons.create({ course_id: sc01.id, batch_id: b1.id, week_no: 1, title: 'Week 1 slides: Python foundations', type: 'slides', url: '#', position: 1 });
   Assignments.create({ batch_id: b1.id, title: 'Setup proof: your first script', description: 'Submit a PDF showing your Python setup and first program running.', due_date: '2026-08-10', points: 100, created_by: teacher.id });
   Announcements.create({ batch_id: null, title: 'Welcome to EchoLens', body: 'Sign in to reach your courses, schedule, content and assignments.' }, admin.id);
@@ -1253,58 +1282,38 @@ function seed() {
 
 /* ============================== v11 features ============================== */
 
-/* ---------------------- live classes + attendance ---------------------- */
-// A live class runs inside the portal (embedded Jitsi room). Joining marks
-// attendance automatically; heartbeats accumulate minutes in the room.
-const LiveClasses = {
-  create({ batch_id, title, started_by }) {
-    // One active class per course at a time.
-    const already = LiveClasses.active(batch_id);
-    if (already) return { error: 'A live class is already running on this course. End it first.' };
-    const rand = crypto.randomBytes(6).toString('hex');
-    const c = {
-      id: nextId('live_classes'), batch_id: Number(batch_id),
-      title: String(title || 'Live class').slice(0, 200),
-      room: `EchoLens-${batch_id}-${rand}`, // unguessable Jitsi room name
-      started_by, started_at: now(), ended_at: null, date: today(),
-    };
-    data.live_classes.push(c); save();
-    return { ok: true, live: c };
-  },
-  byId(id) { return data.live_classes.find((c) => c.id === Number(id)) || null; },
-  active(bid) { return data.live_classes.find((c) => c.batch_id === Number(bid) && !c.ended_at) || null; },
-  end(id) { const c = LiveClasses.byId(id); if (!c) return null; c.ended_at = now(); save(); return c; },
-  forBatch(bid) { return data.live_classes.filter((c) => c.batch_id === Number(bid)).sort((a, b) => b.id - a.id); },
-};
+/* ------------------------------ attendance ------------------------------ */
+// Joining a scheduled class's built-in room marks attendance automatically;
+// heartbeats accumulate minutes spent in the room.
 const Attendance = {
-  mark(classId, userId) {
-    let a = data.attendance.find((x) => x.class_id === Number(classId) && x.user_id === Number(userId));
+  mark(sessionId, userId) {
+    let a = data.attendance.find((x) => x.session_id === Number(sessionId) && x.user_id === Number(userId));
     if (!a) {
-      a = { id: nextId('attendance'), class_id: Number(classId), user_id: Number(userId), joined_at: now(), minutes: 0 };
+      a = { id: nextId('attendance'), session_id: Number(sessionId), user_id: Number(userId), joined_at: now(), minutes: 0 };
       data.attendance.push(a); save();
     }
     return a;
   },
-  heartbeat(classId, userId) {
-    const a = Attendance.mark(classId, userId);
+  heartbeat(sessionId, userId) {
+    const a = Attendance.mark(sessionId, userId);
     a.minutes = (a.minutes || 0) + 1; a.last_seen = now(); save();
     return a;
   },
-  forClass(classId) { return data.attendance.filter((a) => a.class_id === Number(classId)); },
+  forSession(sessionId) { return data.attendance.filter((a) => a.session_id === Number(sessionId)); },
   // Attendance sheet for one class: every enrolled student, present or absent.
-  sheet(cls) {
-    const present = new Map(Attendance.forClass(cls.id).map((a) => [a.user_id, a]));
-    return Enrollments.studentsForBatch(cls.batch_id).map((u) => {
+  sheet(session) {
+    const present = new Map(Attendance.forSession(session.id).map((a) => [a.user_id, a]));
+    return Enrollments.studentsForBatch(session.batch_id).map((u) => {
       const a = present.get(u.id);
       return { id: u.id, name: u.name, reg_no: u.reg_no, present: !!a, joined_at: a ? a.joined_at : null, minutes: a ? a.minutes : 0 };
     }).sort((x, y) => Number(y.present) - Number(x.present) || x.name.localeCompare(y.name));
   },
-  // % of this course's classes a student attended.
+  // % of this course's held classes a student attended.
   rate(uid, bid) {
-    const classes = LiveClasses.forBatch(bid);
-    if (!classes.length) return null;
-    const attended = classes.filter((c) => data.attendance.some((a) => a.class_id === c.id && a.user_id === Number(uid))).length;
-    return { attended, total: classes.length, pct: Math.round((attended / classes.length) * 100) };
+    const held = Sessions.held(bid);
+    if (!held.length) return null;
+    const attended = held.filter((s) => data.attendance.some((a) => a.session_id === s.id && a.user_id === Number(uid))).length;
+    return { attended, total: held.length, pct: Math.round((attended / held.length) * 100) };
   },
 };
 
@@ -2262,7 +2271,7 @@ module.exports = {
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, touchActivity, STAGES,
-  LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
+  Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   seed, DB_PATH, allData: () => data,

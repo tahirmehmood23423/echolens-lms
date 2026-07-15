@@ -21,7 +21,7 @@ const mailer = require('./mailer');
 const jaas = require('./jaas');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
-  LiveClasses, Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
+  Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
@@ -367,11 +367,11 @@ app.get('/api/teacher/attendance', authRequired, (req, res) => {
   const batches = teacherBatches(req);
   if (!batches) return res.status(403).json({ error: 'Not available for your role.' });
   const courses = batches.map((b) => {
-    const active = LiveClasses.active(b.id);
-    const past = LiveClasses.forBatch(b.id).filter((c) => c.ended_at).slice(0, 15).map((c) => {
-      const sheet = Attendance.sheet(c);
+    const active = Sessions.active(b.id);
+    const past = Sessions.held(b.id).slice(0, 15).map((s) => {
+      const sheet = Attendance.sheet(s);
       const present = sheet.filter((r) => r.present).length;
-      return { id: c.id, title: c.title, date: c.date, present, absent: sheet.length - present, total: sheet.length };
+      return { id: s.id, title: s.title, date: s.session_date, present, absent: sheet.length - present, total: sheet.length };
     });
     const avg_rate = past.length ? Math.round((past.reduce((s, c) => s + (c.total ? c.present / c.total : 0), 0) / past.length) * 100) : null;
     return { batch_id: b.id, course_title: b.title || b.name, total_students: Enrollments.studentsForBatch(b.id).length, active: active ? { id: active.id, title: active.title } : null, past, avg_rate };
@@ -410,9 +410,23 @@ app.get('/api/batches/:id/leaderboard', authRequired, viewBatch, (req, res) => {
 app.get('/api/batches/:id', authRequired, viewBatch, (req, res) => {
   const b = Batches.decorate(req.batch);
   const u = req.user;
+  const staff = ['admin', 'coordinator', 'instructor'].includes(u.role);
+  // Each session carries its own built-in class room; once it has been
+  // started at least once, attach an attendance summary so the Classes tab
+  // can show present/absent counts without a separate round trip.
+  const sessions = Sessions.forBatch(b.id).map((s) => {
+    const row = { ...s };
+    if (s.started_at) {
+      const sheet = Attendance.sheet(s);
+      const present = sheet.filter((r) => r.present).length;
+      row.attendance_summary = { present, absent: sheet.length - present, total: sheet.length };
+      if (!staff) row.me_present = sheet.some((r) => r.id === u.id && r.present);
+    }
+    return row;
+  });
   const out = {
     batch: b,
-    sessions: Sessions.forBatch(b.id),
+    sessions,
     lessons: Lessons.forBatch(b.id),
     announcements: Announcements.forUser(u).filter((a) => a.batch_id === b.id),
     can_manage: canManageBatch(u, req.batch),
@@ -420,6 +434,7 @@ app.get('/api/batches/:id', authRequired, viewBatch, (req, res) => {
   };
   if (u.role === 'student') {
     out.my_gems_here = gemsForStudentInBatch(u.id, b.id);
+    out.my_rate = Attendance.rate(u.id, b.id);
   }
   if (['admin', 'coordinator', 'instructor'].includes(u.role)) {
     out.students = Enrollments.studentsForBatch(b.id).map((s) => ({ id: s.id, name: s.name, username: s.username, reg_no: s.reg_no, email: s.email, avatar: s.avatar || null }));
@@ -605,13 +620,13 @@ app.get('/api/admin/system-health', authRequired, staffView, (req, res) => {
 
 /* ------------------------- sessions / lessons / work ------------------------- */
 app.post('/api/batches/:id/sessions', authRequired, manageBatch, (req, res) => {
-  const { week_no, title, session_date, start_time, end_time, join_url } = req.body || {};
+  const { week_no, title, session_date, start_time, end_time } = req.body || {};
   if (!title || !session_date) return res.status(400).json({ error: 'A title and date are required.' });
-  const s = Sessions.create({ batch_id: req.batch.id, week_no: Number(week_no) || null, title, session_date, start_time: start_time || null, end_time: end_time || null, join_url: join_url || null });
+  const s = Sessions.create({ batch_id: req.batch.id, week_no: Number(week_no) || null, title, session_date, start_time: start_time || null, end_time: end_time || null });
   res.json({ ok: true, session: s });
 });
 app.delete('/api/sessions/:id', authRequired, (req, res) => {
-  const s = store.allData().sessions.find((x) => x.id === Number(req.params.id));
+  const s = Sessions.byId(req.params.id);
   if (!s) return res.status(404).json({ error: 'Class not found.' });
   if (!canManageBatch(req.user, Batches.byId(s.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
   Sessions.remove(s.id); res.json({ ok: true });
@@ -1399,67 +1414,57 @@ app.post('/api/me/signature', authRequired, teacherOrAdmin, upload.single('file'
   res.json({ ok: true, signature: `/uploads/${req.file.filename}` });
 });
 
-/* ------------------------- live classes + attendance ------------------------- */
-// The class runs INSIDE the portal (embedded Jitsi room - open source, no
-// account needed). Joining marks attendance; a heartbeat counts minutes.
-app.post('/api/batches/:id/live/start', authRequired, manageBatch, (req, res) => {
-  const out = LiveClasses.create({ batch_id: req.batch.id, title: (req.body || {}).title, started_by: req.user.id });
+/* ------------------------- scheduled classes: live room + attendance ------------------------- */
+// Every scheduled class has a built-in room (embedded Jitsi - open source, no
+// account needed). A teacher/admin starts it when class begins; joining marks
+// attendance and a heartbeat counts minutes in the room.
+app.post('/api/sessions/:id/start', authRequired, (req, res) => {
+  const s = Sessions.byId(req.params.id);
+  if (!s) return res.status(404).json({ error: 'Class not found.' });
+  const b = Batches.byId(s.batch_id);
+  if (!canManageBatch(req.user, b)) return res.status(403).json({ error: 'You cannot manage this course.' });
+  const out = Sessions.start(s.id, req.user.id);
   if (out.error) return res.status(400).json({ error: out.error });
-  const bd = Batches.decorate(req.batch);
-  const mails = Enrollments.studentsForBatch(req.batch.id).map((u) => u.email).filter(Boolean);
-  mailer.notify(mails, `Live class started - ${bd.title || bd.name}`,
-    `${req.user.name} just started "${out.live.title}" live inside the portal.\n\nJoin from the Live tab of your course: ${APP_URL}/dashboard`);
-  res.json(out);
+  const bd = Batches.decorate(b);
+  const mails = Enrollments.studentsForBatch(b.id).map((u) => u.email).filter(Boolean);
+  mailer.notify(mails, `Class started - ${s.title}`,
+    `${req.user.name} just started "${s.title}" (${bd.title || bd.name}) live inside the portal.\n\nJoin from the Classes tab of your course: ${APP_URL}/dashboard`);
+  res.json({ ok: true, session: out.session });
 });
-app.post('/api/live/:id/end', authRequired, (req, res) => {
-  const c = LiveClasses.byId(req.params.id);
-  if (!c) return res.status(404).json({ error: 'Class not found.' });
-  if (!canManageBatch(req.user, Batches.byId(c.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
-  LiveClasses.end(c.id);
+app.post('/api/sessions/:id/end', authRequired, (req, res) => {
+  const s = Sessions.byId(req.params.id);
+  if (!s) return res.status(404).json({ error: 'Class not found.' });
+  if (!canManageBatch(req.user, Batches.byId(s.batch_id))) return res.status(403).json({ error: 'You cannot manage this course.' });
+  Sessions.end(s.id);
   res.json({ ok: true });
 });
-app.get('/api/batches/:id/live', authRequired, viewBatch, (req, res) => {
-  const active = LiveClasses.active(req.batch.id);
-  const staff = ['admin', 'coordinator', 'instructor'].includes(req.user.role);
-  const past = LiveClasses.forBatch(req.batch.id).filter((c) => c.ended_at).slice(0, 30).map((c) => {
-    const sheet = Attendance.sheet(c);
-    const present = sheet.filter((r) => r.present).length;
-    const row = { id: c.id, title: c.title, date: c.date, started_at: c.started_at, ended_at: c.ended_at, present, absent: sheet.length - present, total: sheet.length };
-    if (!staff) row.me_present = sheet.some((r) => r.id === req.user.id && r.present);
-    return row;
-  });
-  const out = { active: active ? { id: active.id, title: active.title, room: staff || req.user.role === 'student' ? active.room : null, started_at: active.started_at } : null, past, can_manage: canManageBatch(req.user, req.batch) };
-  if (active && staff) out.live_attendance = Attendance.sheet(active);
-  if (req.user.role === 'student') out.my_rate = Attendance.rate(req.user.id, req.batch.id);
-  res.json(out);
-});
-app.post('/api/live/:id/join', authRequired, (req, res) => {
-  const c = LiveClasses.byId(req.params.id);
-  if (!c || c.ended_at) return res.status(404).json({ error: 'This class has ended.' });
-  const b = Batches.byId(c.batch_id);
+app.post('/api/sessions/:id/join', authRequired, (req, res) => {
+  const s = Sessions.byId(req.params.id);
+  if (!s || !s.started_at || s.ended_at) return res.status(404).json({ error: 'This class is not live right now.' });
+  const b = Batches.byId(s.batch_id);
   if (!canViewBatch(req.user, b)) return res.status(403).json({ error: 'You are not on this course.' });
-  if (req.user.role === 'student') Attendance.mark(c.id, req.user.id); // attendance = actually joining the room
-  const out = { ok: true, room: c.room, display_name: req.user.name, provider: jaas.configured ? 'jaas' : 'jitsi' };
+  if (req.user.role === 'student') Attendance.mark(s.id, req.user.id); // attendance = actually joining the room
+  const out = { ok: true, room: s.room, display_name: req.user.name, provider: jaas.configured ? 'jaas' : 'jitsi' };
   // JaaS (8x8.vc): a fresh, room-scoped JWT signed server-side - the private
   // key never reaches the client. Falls back to the free, unauthenticated
   // meet.jit.si server when JaaS isn't configured.
   if (jaas.configured) {
     out.app_id = jaas.appId;
-    out.jwt = jaas.sign({ room: c.room, user: req.user, moderator: canManageBatch(req.user, b) });
+    out.jwt = jaas.sign({ room: s.room, user: req.user, moderator: canManageBatch(req.user, b) });
   }
   res.json(out);
 });
-app.post('/api/live/:id/heartbeat', authRequired, (req, res) => {
-  const c = LiveClasses.byId(req.params.id);
-  if (!c || c.ended_at) return res.json({ ok: true, ended: true });
-  if (req.user.role === 'student') Attendance.heartbeat(c.id, req.user.id);
+app.post('/api/sessions/:id/heartbeat', authRequired, (req, res) => {
+  const s = Sessions.byId(req.params.id);
+  if (!s || s.ended_at) return res.json({ ok: true, ended: true });
+  if (req.user.role === 'student') Attendance.heartbeat(s.id, req.user.id);
   res.json({ ok: true });
 });
-app.get('/api/live/:id/attendance', authRequired, staffView, (req, res) => {
-  const c = LiveClasses.byId(req.params.id);
-  if (!c) return res.status(404).json({ error: 'Class not found.' });
-  if (!canViewBatch(req.user, Batches.byId(c.batch_id))) return res.status(403).json({ error: 'You are not on this course.' });
-  res.json({ class: { id: c.id, title: c.title, date: c.date, started_at: c.started_at, ended_at: c.ended_at }, sheet: Attendance.sheet(c) });
+app.get('/api/sessions/:id/attendance', authRequired, staffView, (req, res) => {
+  const s = Sessions.byId(req.params.id);
+  if (!s) return res.status(404).json({ error: 'Class not found.' });
+  if (!canViewBatch(req.user, Batches.byId(s.batch_id))) return res.status(403).json({ error: 'You are not on this course.' });
+  res.json({ class: { id: s.id, title: s.title, date: s.session_date, started_at: s.started_at, ended_at: s.ended_at }, sheet: Attendance.sheet(s) });
 });
 
 /* ------------------------------ live quizzes ------------------------------ */

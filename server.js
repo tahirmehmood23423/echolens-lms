@@ -2328,4 +2328,13 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => console.log(`EchoLens LMS v12.3 running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`EchoLens LMS v12.3 running on http://localhost:${PORT}`);
+  // Live-class video provider: JaaS (8x8.vc, no time cap) vs the free public
+  // meet.jit.si server, which disconnects embedded calls after 5 minutes.
+  if (jaas.configured) {
+    console.log('Live classes: JaaS (8x8.vc) configured - no 5-minute cap.');
+  } else {
+    console.warn('Live classes: JaaS NOT configured - falling back to meet.jit.si, which DISCONNECTS embedded calls after 5 minutes. Set JAAS_APP_ID, JAAS_KID and JAAS_PRIVATE_KEY to fix.');
+  }
+});

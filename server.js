@@ -464,33 +464,37 @@ app.post('/api/admin/batches', authRequired, adminRequired, (req, res) => {
 app.delete('/api/admin/batches/:id', authRequired, adminRequired, (req, res) => { Batches.remove(req.params.id); res.json({ ok: true }); });
 
 /* ------------------------- people on a course (admin) ------------------------- */
-// Add students: new by name (credentials generated) or existing by reg no / username.
-app.post('/api/batches/:id/students', authRequired, adminRequired, (req, res) => {
+// Add students: new by name + real email (credentials generated and mailed
+// there - a candidate's login username is never a real inbox, so a genuine
+// email is required for every new account) or existing by reg no / username.
+app.post('/api/batches/:id/students', authRequired, adminRequired, async (req, res) => {
   const b = Batches.byId(req.params.id);
   if (!b) return res.status(404).json({ error: 'Course not found.' });
   const { names, existing } = req.body || {};
-  const created = [], added = [], missing = [];
+  const created = [], added = [], missing = [], invalid = [];
   for (const raw of Array.isArray(names) ? names : []) {
-    // Each line: "Full Name" or "Full Name, email@domain" - with an email,
-    // the credentials (username, password, registration number) are mailed.
+    // Each line: "Full Name, email@domain" - the email is mandatory so the
+    // generated password and registration number can always be mailed to
+    // the candidate directly.
     const parts = String(raw).split(',').map((x) => x.trim());
     const name = parts[0]; if (!name) continue;
-    const email = parts[1] && isEmail(parts[1]) ? parts[1] : null;
+    const email = (parts[1] || '').toLowerCase();
+    if (!isEmail(email)) { invalid.push(`${raw} - missing or invalid email`); continue; }
+    if (!(await emailDomainExists(email))) { invalid.push(`${raw} - that email domain does not receive mail`); continue; }
+    if (Users.byLogin(email)) { invalid.push(`${raw} - an account with this email already exists`); continue; }
     const { user, password } = Users.create({ name, role: 'student', email });
     Enrollments.create(user.id, b.id);
-    created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: !!(email && mailer.configured) });
-    if (email) {
-      const bd = Batches.decorate(b);
-      mailer.notify(email, 'Welcome to EchoLens - your account',
-        `Hi ${user.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
-    }
+    created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: mailer.configured });
+    const bd = Batches.decorate(b);
+    mailer.notify(email, 'Welcome to EchoLens - your account',
+      `Hi ${user.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
   }
   for (const raw of Array.isArray(existing) ? existing : []) {
     const u = Users.byLogin(String(raw).trim());
     if (u && u.role === 'student') { Enrollments.create(u.id, b.id); added.push({ name: u.name, reg_no: u.reg_no }); }
     else missing.push(String(raw).trim());
   }
-  res.json({ ok: true, created, added, missing });
+  res.json({ ok: true, created, added, missing, invalid });
 });
 app.delete('/api/batches/:id/students/:uid', authRequired, adminRequired, (req, res) => {
   Enrollments.remove(req.params.uid, req.params.id); res.json({ ok: true });
@@ -1782,26 +1786,30 @@ app.get('/api/public/cert-image/:name', (req, res) => {
 /* ================================ v12 routes ================================ */
 
 /* --------------------------- open sign-up + leads --------------------------- */
-// Anyone can create a FREE open account with name, email, WhatsApp, and a
-// password. Nothing on the open side is accessible without signing in (Google
-// or this form) - every open user becomes a lead the admin can download.
+// Anyone can create a FREE open account with just name, email and WhatsApp -
+// no chosen password. The email is verified up front (MX check, plus a
+// mailed 6-digit code when SMTP is configured - proof the inbox is real and
+// reachable) BEFORE the account exists. Once verified, the system generates
+// a password and emails it there, so the working inbox is confirmed for a
+// second time by the one place the credentials can ever be read from. Every
+// open user also becomes a lead the admin can download.
 app.post('/api/auth/register-open', async (req, res) => {
-  const { name, email, whatsapp, password, code } = req.body || {};
+  const { name, email, whatsapp, code } = req.body || {};
   if (!name || String(name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
   if (mailer.configured && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
   if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
-  if (!password || String(password).length < 8) return res.status(400).json({ error: 'Choose a password of at least 8 characters.' });
   if (Users.byLogin(email)) return res.status(400).json({ error: 'An account with this email already exists - sign in instead.' });
-  const { user } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase() });
-  Users.setPassword(user.id, String(password));
+  const { user, password } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase() });
   Users.updateProfile(user.id, { phone: String(whatsapp).trim() });
   Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
   setAuthCookie(res, sign(Users.byId(user.id)));
-  mailer.notify(user.email, 'Welcome to EchoLens - your open account is ready',
-    `Hi ${user.name},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
-  res.json({ ok: true, role: 'free' });
+  mailer.notify(user.email, 'Welcome to EchoLens - your password',
+    `Hi ${user.name},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSign in any time with:\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Profile after signing in.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
+  const out = { ok: true, role: 'free' };
+  if (!mailer.configured) out.password = password; // dev fallback: no SMTP to deliver it anywhere else
+  res.json(out);
 });
 
 // WhatsApp is MANDATORY for every learner. The dashboard and the open site

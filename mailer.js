@@ -19,7 +19,7 @@ const transport = configured
     })
   : null;
 
-const FROM = process.env.MAIL_FROM || 'EchoLens <no-reply@echolens.digital>';
+const FROM = process.env.MAIL_FROM || 'EchoLens <info@echolens.digital>';
 
 async function send({ to, subject, text }) {
   if (!configured) { console.log(`[mail skipped - SMTP not configured] to=${to} subject=${subject}`); return; }

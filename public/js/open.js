@@ -165,7 +165,7 @@ function showSignup() {
         <label class="field"><span>Verification code (check your inbox)</span><input name="code" inputmode="numeric" maxlength="6" placeholder="6-digit code"></label>
       </div>
       <label class="field"><span>WhatsApp number (required)</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
-      <label class="field"><span>Password (8+ characters)</span><input name="password" type="password" minlength="8" required></label>
+      <p class="hint">No password to choose - once your email is verified, we generate one and email it to you.</p>
       <button class="btn btn-primary btn-block" id="suBtn">Create account</button>
     </form>`;
   const f = $('suForm');
@@ -189,11 +189,20 @@ function showSignup() {
           return;
         }
       }
-      await api('/api/auth/register-open', {
+      // Step 2: code (if any) checked server-side, account created with a
+      // system-generated password mailed to the now-verified address.
+      const out = await api('/api/auth/register-open', {
         method: 'POST',
-        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, password: f.password.value, code: f.code ? f.code.value.trim() : undefined }),
+        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, code: f.code ? f.code.value.trim() : undefined }),
       });
-      location.reload();
+      if (out.password) {
+        // Dev fallback only: no SMTP configured to deliver the password anywhere else.
+        modalMsg('Account created. SMTP is not configured, so here is your password once: ' + out.password, true);
+        setTimeout(() => location.reload(), 4000);
+      } else {
+        modalMsg('Account created - we emailed your password to ' + f.email.value.trim() + '.', true);
+        setTimeout(() => location.reload(), 1800);
+      }
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }

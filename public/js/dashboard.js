@@ -1627,8 +1627,8 @@ function formAward() {
 function formStudents() {
   openModal('Add students', `
     <form id="f">
-      <label class="field"><span>New students - one per line as "Full Name" or "Full Name, email"</span><textarea name="names" placeholder="Ayesha Khan, ayesha@gmail.com&#10;Bilal Noor"></textarea></label>
-      <p class="hint">Each gets a generated username, password, and unique registration number - shown once below. With an email, the credentials and registration number are also mailed to the student automatically.</p>
+      <label class="field"><span>New students - one per line as "Full Name, email"</span><textarea name="names" placeholder="Ayesha Khan, ayesha@gmail.com&#10;Bilal Noor, bilal@gmail.com"></textarea></label>
+      <p class="hint">A real, working email is required for each candidate - their generated username is just a login handle, not an inbox. A password and registration number are generated and mailed to that email automatically.</p>
       <label class="field"><span>Existing students - one reg no or username per line</span><textarea name="existing" placeholder="4821736"></textarea></label>
       <p class="hint">Enrolls students who already have accounts, so one student can take several courses.</p>
       <button class="btn btn-primary btn-block">Add to course</button></form>
@@ -1641,8 +1641,9 @@ function formStudents() {
       const out = await api(`/api/batches/${bid()}/students`, { method: 'POST', body: JSON.stringify({ names, existing }) });
       let html = '';
       if (out.created.length) html += `<p style="margin:12px 0 4px;font-weight:600">New accounts - copy these now, passwords are shown once:</p>` +
-        out.created.map((c) => `<div class="cred-box">${esc(c.name)}<br>Reg no: <strong>${esc(c.reg_no)}</strong><br>Username: ${esc(c.username)}<br>Password: ${esc(c.password)}${c.emailed ? '<br><span style="color:var(--ok)">&#10003; credentials emailed to ' + esc(c.email) + '</span>' : ''}</div>`).join('');
+        out.created.map((c) => `<div class="cred-box">${esc(c.name)}<br>Reg no: <strong>${esc(c.reg_no)}</strong><br>Username: ${esc(c.username)}<br>Password: ${esc(c.password)}${c.emailed ? '<br><span style="color:var(--ok)">&#10003; credentials emailed to ' + esc(c.email) + '</span>' : '<br><span style="color:var(--muted)">SMTP not configured - share these credentials yourself</span>'}</div>`).join('');
       if (out.added.length) html += `<p style="margin:12px 0 4px;font-weight:600">Enrolled existing students:</p>` + out.added.map((a) => `<div class="cred-box">${esc(a.name)} (${esc(a.reg_no)})</div>`).join('');
+      if (out.invalid && out.invalid.length) html += `<p style="margin:12px 0 4px;color:var(--danger)">Skipped - needs a real email: ${out.invalid.map(esc).join('; ')}</p>`;
       if (out.missing.length) html += `<p style="margin:12px 0 4px;color:var(--danger)">Not found: ${out.missing.map(esc).join(', ')}</p>`;
       $('credOut').innerHTML = html || '';
       modalMsg('Done.', true); f.reset(); openCoursePreserveModal();

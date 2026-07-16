@@ -593,6 +593,23 @@ app.post('/api/admin/coordinators', authRequired, adminRequired, (req, res) => {
   const { user, password } = Users.create({ name: String(name).trim(), role: 'coordinator', email: isEmail(email) ? email : null });
   res.json({ ok: true, credentials: { name: user.name, username: user.username, password } });
 });
+// v17: department portals - HR, Finance, Student Coordinator. Distinct from
+// 'coordinator' (broad read-only academic oversight, unchanged above): each
+// of these roles is isolated to its own portal only, credentials issued by
+// name + email exactly like the coordinator flow.
+const DEPT_ROLE_ENDPOINTS = {
+  hr: '/api/admin/hr',
+  finance: '/api/admin/finance',
+  student_coordinator: '/api/admin/student-coordinators',
+};
+for (const [role, path_] of Object.entries(DEPT_ROLE_ENDPOINTS)) {
+  app.post(path_, authRequired, adminRequired, (req, res) => {
+    const { name, email } = req.body || {};
+    if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
+    const { user, password } = Users.create({ name: String(name).trim(), role, email: isEmail(email) ? email : null });
+    res.json({ ok: true, credentials: { name: user.name, username: user.username, password } });
+  });
+}
 app.delete('/api/admin/users/:id', authRequired, adminRequired, (req, res) => {
   if (Number(req.params.id) === req.user.id) return res.status(400).json({ error: 'You cannot remove your own account.' });
   Users.remove(req.params.id); res.json({ ok: true });
@@ -651,7 +668,7 @@ app.get('/api/admin/finance', authRequired, staffView, (req, res) => {
 
 /* ------------------------- v16: system health & logs (admin) ------------------------- */
 app.get('/api/admin/system-health', authRequired, staffView, (req, res) => {
-  const ROLE_LABEL = { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free-tier' };
+  const ROLE_LABEL = { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free-tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Student Coordinator' };
   const events = [];
   Users.all().forEach((u) => events.push({ at: u.created_at, kind: 'user', text: `New ${ROLE_LABEL[u.role] || u.role} account: ${u.name}` }));
   Courses.all().forEach((c) => events.push({ at: c.created_at, kind: 'course', text: `New course added to catalogue: ${c.title}` }));

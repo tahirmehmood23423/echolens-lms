@@ -27,8 +27,15 @@ function toast(text, isErr) {
   t.textContent = text; t.className = 'toast show' + (isErr ? ' err' : '');
   clearTimeout(t._h); t._h = setTimeout(() => (t.className = 'toast'), 2600);
 }
-function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier' }[r] || r; }
+function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Student Coordinator' }[r] || r; }
 function isStaff() { return ['admin', 'coordinator', 'instructor'].includes(ME.role); }
+// v17: isolated department portals - each role sees ONLY its own nav item
+// and view, nothing else in the app (not courses, messages, jobs, etc).
+const DEPT_ROLES = {
+  hr: { view: 'dept-hr', label: 'HR' },
+  finance: { view: 'dept-finance', label: 'Finance' },
+  student_coordinator: { view: 'dept-student-coordinator', label: 'Student Coordinator' },
+};
 function fmtDate(d) {
   if (!d) return '—';
   try { return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); } catch { return d; }
@@ -96,6 +103,7 @@ const TITLES = {
   'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
   'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-logs': 'System Logs',
   jobs: 'Jobs', job: 'Job',
+  'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Student Coordinator Portal',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -118,6 +126,7 @@ function show(view) {
     'admin-enrollments': renderAdminEnrollments, 'admin-finance': renderAdminFinance,
     'admin-announcements': renderAdminAnnouncementsPage, 'admin-logs': renderAdminLogs,
     jobs: renderJobs,
+    'dept-hr': renderDeptHR, 'dept-finance': renderDeptFinance, 'dept-student-coordinator': renderDeptStudentCoordinator,
   }[view];
   if (render) render();
 }
@@ -132,6 +141,20 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   $('userName').textContent = ME.name;
   $('rolePill').textContent = roleLabel(ME.role);
   drawAvatar();
+  // v17: department portals (HR, Finance, Student Coordinator) are fully
+  // isolated - hide every nav item and group except their own view and
+  // account settings, then jump straight there instead of the overview.
+  if (DEPT_ROLES[ME.role]) {
+    document.querySelectorAll('.nav-item, .nav-group').forEach((el) => (el.style.display = 'none'));
+    const own = document.querySelector(`.nav-item[data-view="${DEPT_ROLES[ME.role].view}"]`);
+    if (own) own.style.display = '';
+    const settingsNav = document.querySelector('.nav-item[data-view="settings"]');
+    if (settingsNav) settingsNav.style.display = '';
+    $('gate').style.display = 'none';
+    $('app').style.display = '';
+    show(DEPT_ROLES[ME.role].view);
+    return;
+  }
   if (ME.role === 'admin') document.querySelectorAll('.admin-only').forEach((el) => (el.style.display = ''));
   if (['admin', 'coordinator'].includes(ME.role)) document.querySelectorAll('.staff-only').forEach((el) => (el.style.display = ''));
   if (ME.ai_enabled) document.querySelectorAll('.teacher-only').forEach((el) => (el.style.display = ''));
@@ -2004,6 +2027,9 @@ async function renderUsers() {
     ['Open website users', d.users.filter((u) => u.role === 'free')],
     ['Teachers', d.users.filter((u) => u.role === 'instructor')],
     ['Coordinators', d.users.filter((u) => u.role === 'coordinator')],
+    ['HR', d.users.filter((u) => u.role === 'hr')],
+    ['Finance', d.users.filter((u) => u.role === 'finance')],
+    ['Student Coordinators', d.users.filter((u) => u.role === 'student_coordinator')],
     ['Admins', d.users.filter((u) => u.role === 'admin')],
   ];
   el.innerHTML = `
@@ -2017,9 +2043,40 @@ async function renderUsers() {
       <span style="flex:1"></span>
       <button class="btn btn-ghost btn-sm" onclick="formCertSettings()">Certificate settings</button>
       <button class="btn btn-ghost btn-sm" onclick="formCoordinator()">Add a coordinator</button>
+      <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('hr')">Add HR staff</button>
+      <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('finance')">Add finance staff</button>
+      <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('student_coordinator')">Add student coordinator</button>
     </div></div>` : ''}
     ${groups.map(([label, users]) => userGroupTable(label, users, isAdmin)).join('')}`;
   wireStudentSearch();
+}
+// v17: HR / Finance / Student Coordinator accounts - same name+email,
+// admin-issued-credentials flow as formCoordinator(), just a different
+// (fully isolated) role and endpoint per department.
+const DEPT_CREATE = {
+  hr: { path: '/api/admin/hr', title: 'Add HR staff', hint: 'HR staff see only their own portal - staff records, onboarding, and leave duties. No access to courses, grades, or finances.' },
+  finance: { path: '/api/admin/finance', title: 'Add finance staff', hint: 'Finance staff see only their own portal - fees, invoices, and expense duties. No access to courses, grades, or staff records.' },
+  student_coordinator: { path: '/api/admin/student-coordinators', title: 'Add a student coordinator', hint: 'Student coordinators see only their own portal - enrollments, schedules, and student follow-up duties. No access to grades, finances, or staff records.' },
+};
+function formDeptStaff(role) {
+  const cfg = DEPT_CREATE[role];
+  openModal(cfg.title, `
+    <form id="f">
+      <label class="field"><span>Full name</span><input name="name" required placeholder="e.g. Bilal Ahmed"></label>
+      <label class="field"><span>Email (optional)</span><input name="email" type="email"></label>
+      <p class="hint">${cfg.hint}</p>
+      <button class="btn btn-primary btn-block">Create account</button></form>
+    <div id="credOut"></div>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      const out = await api(cfg.path, { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value || undefined }) });
+      $('credOut').innerHTML = `<p style="margin:12px 0 4px;font-weight:600">Account created - copy now:</p>
+        <div class="cred-box">${esc(out.credentials.name)}<br>Username: ${esc(out.credentials.username)}<br>Password: ${esc(out.credentials.password)}</div>`;
+      modalMsg('Account created.', true); f.reset();
+    } catch (err) { modalMsg(err.message); }
+    btn.disabled = false;
+  });
 }
 function formResetPassword(uid, name) {
   openModal(`Reset password: ${name}`, `
@@ -2063,6 +2120,80 @@ async function delUser(uid, name) {
   try { await api(`/api/admin/users/${uid}`, { method: 'DELETE' }); toast('Account deleted.'); renderUsers(); }
   catch (e) { toast(e.message, true); }
 }
+
+/* ============================== v17: DEPARTMENT PORTALS ==============================
+ * HR, Finance, and Student Coordinator each get their own fully isolated
+ * portal - just an identity card and a duties checklist for now. Real tools
+ * per department land once the working list below is finalized.
+ */
+const DEPT_DUTIES = {
+  hr: {
+    title: 'HR Portal', tagline: 'Staff records, onboarding, and day-to-day people operations.',
+    duties: [
+      'Maintain staff and teacher records - personal details, contracts, and documents',
+      'Manage onboarding and offboarding of employees',
+      'Track attendance and leave requests for staff',
+      'Handle recruitment: job postings, screening, and interview coordination',
+      'Resolve employee queries and grievances',
+      'Ensure compliance with company policies and labor regulations',
+      'Organize staff training and development programs',
+      'Maintain confidentiality of employee data',
+    ],
+  },
+  finance: {
+    title: 'Finance Portal', tagline: 'Fees, invoices, and the academy\'s financial records.',
+    duties: [
+      'Track student fee payments, dues, and pending challans',
+      'Issue invoices and payment receipts',
+      'Reconcile payments received against enrollments',
+      'Manage refunds and fee adjustments',
+      'Monitor course/program revenue and prepare financial summaries',
+      'Track operational expenses and budgets',
+      'Coordinate with HR on payroll processing',
+      'Maintain accurate financial records for audits',
+    ],
+  },
+  student_coordinator: {
+    title: 'Student Coordinator Portal', tagline: 'Enrollments, schedules, and keeping students on track.',
+    duties: [
+      'Handle student enquiries, registrations, and follow-ups',
+      'Coordinate class schedules and batch timings with instructors',
+      'Track student attendance across batches and follow up on absentees',
+      'Communicate announcements, deadlines, and updates to students',
+      'Assist students with account or portal issues',
+      'Maintain and update student contact and lead records',
+      'Coordinate between students and admin/finance for fee or enrollment issues',
+      'Support onboarding of new students into their courses',
+    ],
+  },
+};
+function renderDeptPortal(role) {
+  const el = $(`view-${DEPT_ROLES[role].view}`);
+  const d = DEPT_DUTIES[role];
+  el.innerHTML = `
+    <div class="card"><div class="card-body" style="display:flex;gap:16px;align-items:center">
+      ${avatarHtml(ME.avatar, ME.name, 72)}
+      <div style="flex:1;min-width:0">
+        <h2 style="margin:0 0 2px">${esc(d.title)}</h2>
+        <div class="s" style="color:var(--muted)">${esc(d.tagline)}</div>
+        <div class="s" style="color:var(--muted);margin-top:6px">Signed in as <strong>${esc(ME.name)}</strong> &middot; ${esc(ME.email || ME.username || '')}</div>
+      </div>
+    </div></div>
+    <div class="card"><div class="card-head"><h3>Your duties</h3><span class="s" style="color:var(--muted)">Generic scope for now - tools for each item are being finalized</span></div>
+      <div class="card-body">
+        <ul style="list-style:none;padding:0;margin:0">
+          ${d.duties.map((x) => `<li style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.5">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;color:var(--primary)"><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg>
+            <span>${esc(x)}</span></li>`).join('')}
+        </ul>
+      </div></div>
+    <div class="card"><div class="card-body">
+      <p class="s" style="color:var(--muted)">This portal is scoped to ${esc(d.title.replace(' Portal', ''))} only - you will not see courses, grades, other departments, or admin tools. More features land here as the working list above is finalized.</p>
+    </div></div>`;
+}
+function renderDeptHR() { renderDeptPortal('hr'); }
+function renderDeptFinance() { renderDeptPortal('finance'); }
+function renderDeptStudentCoordinator() { renderDeptPortal('student_coordinator'); }
 
 
 /* ============================== AI DRAFT ============================== */

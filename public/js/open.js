@@ -534,6 +534,48 @@ async function openCourse(key) {
   CUR = { ...d, progress };
   drawCourse();
 }
+// How each course takes work: shown on the course page and drives the solve workspace.
+const MODE_LABEL = {
+  code: 'Code submissions in the built-in compiler',
+  'code-ai': 'Built-in compiler with an AI copilot beside it - code, get help, submit',
+  file: 'File submissions (PDF, Word, PNG, JPEG)',
+  doc: 'Report submissions - Word or PDF only',
+  prompt: 'AI Prompt Lab - write and run prompts like a compiler, submit the workbook directly',
+  'excel-ai': 'Workbook submissions (.xlsx / .csv) with an AI copilot linked to your sheet',
+  multi: 'PDF or image submissions - multiple files per quest',
+};
+function courseOutlineHtml(t) {
+  const isBootcamp = (t.course_code || '').startsWith('BC');
+  const unit = isBootcamp ? 'Class' : 'Level';
+  const rows = CUR.levels.map((l) => `
+    <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.5">
+      <span class="mono" style="color:var(--primary);font-weight:700;white-space:nowrap">${unit} ${l.no}</span>
+      <span><strong style="color:var(--ink)">${esc(l.title)}</strong>${l.topic ? ` <span style="color:var(--muted)">- ${esc(l.topic)}</span>` : ''}</span>
+    </li>`).join('');
+  const concepts = (t.key_concepts || []).map((k) => `<span style="display:inline-block;font-size:12px;font-weight:600;color:var(--primary);border:1px solid var(--line);border-radius:999px;padding:4px 11px;margin:3px 4px 0 0">${esc(k)}</span>`).join('');
+  const ep = t.end_project;
+  return `
+    ${concepts ? `<div class="card" style="margin-bottom:16px"><div class="card-body">
+      <h3 style="margin-bottom:6px">What you will learn</h3>${concepts}
+    </div></div>` : ''}
+    <div class="card" style="margin-bottom:16px"><div class="card-body">
+      <h3 style="margin-bottom:4px">Course outline</h3>
+      <p class="s" style="color:var(--muted);margin-bottom:8px">One line per ${unit.toLowerCase()} - every ${unit.toLowerCase()} ends in hands-on quests you clear below.</p>
+      <ul style="list-style:none;padding:0;margin:0">${rows}</ul>
+    </div></div>
+    ${ep ? `<div class="card" style="margin-bottom:16px;border:1.5px solid var(--primary)"><div class="card-body">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+        <span class="kbadge quest" style="background:var(--primary);color:#fff">END PROJECT</span>
+        <span class="s" style="color:var(--muted)">Your production build</span>
+      </div>
+      <h3 style="font-family:var(--font-display);font-size:19px;color:var(--ink)">${esc(ep.title)}</h3>
+      <p class="s" style="color:var(--primary);font-weight:600;margin-top:2px">${esc(ep.tagline || '')}</p>
+      <p class="s" style="color:var(--muted);margin-top:6px">${esc(ep.description || '')}</p>
+      ${(ep.includes || []).length ? `<div class="s" style="margin-top:10px;font-weight:700;color:var(--ink)">The finished product includes</div>
+      <ul style="list-style:none;padding:0;margin:6px 0 0">${ep.includes.map((i) => `<li style="padding:4px 0 4px 22px;position:relative;font-size:13px;color:var(--muted);line-height:1.5"><span style="position:absolute;left:2px;color:var(--ok);font-weight:700">&#10003;</span>${esc(i)}</li>`).join('')}</ul>` : ''}
+      ${ep.shipped_when ? `<p class="s" style="margin-top:10px;padding:9px 12px;border-left:3px solid var(--ok);background:var(--bg);border-radius:6px;color:var(--muted)"><strong style="color:var(--ink)">Shipped when:</strong> ${esc(ep.shipped_when)}</p>` : ''}
+    </div></div>` : ''}`;
+}
 function drawCourse() {
   const t = CUR.track, prog = CUR.progress;
   const cat = CATALOGUE.find((c) => c.code === t.course_code);
@@ -542,10 +584,11 @@ function drawCourse() {
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
         ${t.free ? '<span class="kbadge quest">FREE COURSE</span>' : ''}
         <span class="mono s" style="color:var(--muted-2)">${esc(t.course_code || '')}</span>
-        <span class="s" style="color:var(--muted)">Pass mark ${t.pass_mark || 60}% · ${t.submission_mode === 'file' ? 'File submissions (PDF, Word, PNG, JPEG)' : 'Code submissions in the built-in compiler'} · Graded instantly</span>
+        <span class="s" style="color:var(--muted)">Pass mark ${t.pass_mark || 60}% · ${MODE_LABEL[t.submission_mode] || MODE_LABEL.file} · Graded instantly</span>
       </div>
       <h2 style="font-family:var(--font-display);font-size:24px;color:var(--ink)">${esc(t.title)}</h2>
       <p class="s" style="color:var(--muted);margin-top:4px">${esc(t.description || '')}</p>
+      ${t.outcome ? `<p class="s" style="margin-top:6px;color:var(--ink)"><strong>Outcome:</strong> ${esc(t.outcome)}</p>` : ''}
       ${prog ? `
         <div class="oq-prog" style="margin-top:12px"><div style="width:${Math.round((prog.graded / Math.max(1, prog.total)) * 100)}%"></div></div>
         <div class="s" style="margin-top:6px;color:${prog.passed ? 'var(--ok)' : 'var(--muted)'}">
@@ -554,10 +597,11 @@ function drawCourse() {
         </div>` : (ME ? '' : `<div class="s" style="margin-top:10px;color:var(--muted)">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
       ${!t.free && cat ? `<button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register to unlock the full course - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}
     </div></div>`;
-  $('courseLevels').innerHTML = CUR.levels.map((l) => `
+  const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Level';
+  $('courseLevels').innerHTML = courseOutlineHtml(t) + CUR.levels.map((l) => `
     <div class="card" style="margin-bottom:12px">
       <div class="card-head">
-        <h3 style="display:flex;gap:10px;align-items:center">Level ${l.no} - ${esc(l.title)}
+        <h3 style="display:flex;gap:10px;align-items:center">${unitLabel} ${l.no} - ${esc(l.title)}
           ${l.locked ? '<span class="pay-badge na">Locked</span>' : '<span class="pay-badge confirmed">Open</span>'}</h3>
         <span class="s" style="color:var(--muted)">Week ${l.week || l.no}${l.topic ? ' · ' + esc(l.topic) : ''}</span>
       </div>
@@ -689,6 +733,13 @@ function svLangOptions() {
 }
 const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 function svCertNote() { return CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''; }
+// Per-problem Prompt Lab workbooks and the Excel copilot session live in
+// memory for the visit - the submitted artifact is what gets graded.
+let SV_LAB = {};
+let SV_SHEET = null;
+let SV_EXCEL_CHAT = [];
+function labKey() { return `${CUR.track.key}:${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`; }
+
 function drawWorkArea() {
   const isLearner = !ME || ['free', 'student'].includes(ME.role);
   const mode = CUR.track.submission_mode;
@@ -721,36 +772,221 @@ function drawWorkArea() {
       ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
     </div>`;
 
+  const codeLike = mode === 'code' || mode === 'code-ai';
   if (!isLearner) {
     // Staff can read and run everything, but submissions are for learners.
-    $('svWorkArea').innerHTML = mode === 'code'
-      ? codeIde({ dataset: false, submit: false, placeholder: '# Staff preview — run code freely. Submissions are for learner accounts.', status: 'Staff preview — submissions are for learner accounts.' })
-      : `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview — this task takes file submissions from learner accounts.</p></div></div>`;
-    if (mode === 'code') { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); svSyncGutter(); }
+    $('svWorkArea').innerHTML = codeLike
+      ? codeIde({ dataset: false, submit: false, placeholder: '# Staff preview — run code freely. Submissions are for learner accounts.', status: 'Staff preview — submissions are for learner accounts.' }) + (mode === 'code-ai' ? svAiPanelHtml() : '')
+      : `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview — this task takes ${mode === 'prompt' ? 'Prompt Lab workbook' : 'file'} submissions from learner accounts.</p></div></div>`;
+    if (codeLike) { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); svSyncGutter(); if (mode === 'code-ai') svWireAiPanel(); }
     return;
   }
 
   const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];
-  if (mode === 'code') {
-    $('svWorkArea').innerHTML = codeIde({ dataset: true, submit: true, sub, placeholder: '# Write your solution here. Run to test, submit for grading and gems.', status: 'Ready — runs in your browser, nothing to install.' });
+  if (codeLike) {
+    // BC-05 style: the compiler with the AI copilot right beside it - the
+    // same explain / fix / generate assistant as the free /compiler.
+    $('svWorkArea').innerHTML = codeIde({ dataset: true, submit: true, sub, placeholder: '# Write your solution here. Run to test, submit for grading and gems.', status: 'Ready — runs in your browser, nothing to install.' }) + (mode === 'code-ai' ? svAiPanelHtml() : '');
     SV_TERM = EchoTerm.mount($('svTerm'));
     EchoRun.wireEditor($('svCode'));
     svSyncGutter();
+    if (mode === 'code-ai') svWireAiPanel();
+  } else if (mode === 'prompt') {
+    svPromptLabArea(sub);
+  } else if (mode === 'excel-ai') {
+    svExcelArea(sub);
   } else {
+    const CFG = {
+      doc: { accept: '.pdf,.doc,.docx', multiple: false, label: 'Your report (Word or PDF)', blurb: 'This course takes report submissions - upload your work as a Word or PDF file only.' },
+      multi: { accept: '.pdf,.png,.jpg,.jpeg', multiple: true, label: 'Your designs (PDF / PNG / JPEG - select several at once)', blurb: 'This course takes design submissions - upload your exports as PDF or images. You can attach multiple files in one submission.' },
+      file: { accept: '.pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.png,.jpg,.jpeg,.zip', multiple: false, label: 'Your work', blurb: 'This course takes file submissions - upload your deliverable as PDF, Word, PNG, or JPEG (ZIP for multi-file work).' },
+    };
+    const cfg = CFG[mode] || CFG.file;
     $('svWorkArea').innerHTML = `
       <div class="card"><div class="card-head"><h3>Submit your work</h3></div>
         <div class="card-body">
-          <p class="s" style="color:var(--muted);margin-bottom:12px">This course takes file submissions - upload your deliverable as PDF, Word, PNG, or JPEG (ZIP for multi-file work).</p>
+          <p class="s" style="color:var(--muted);margin-bottom:12px">${cfg.blurb}</p>
           <form id="svFileForm">
-            <label class="field"><span>Your work</span><input name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.png,.jpg,.jpeg,.zip" required></label>
+            <label class="field"><span>${cfg.label}</span><input name="file" type="file" accept="${cfg.accept}" ${cfg.multiple ? 'multiple' : ''} required></label>
+            <div id="svFileList" class="hint" style="margin:4px 0 8px"></div>
             <button class="btn lc-btn-solve">${sub ? 'Resubmit for grading' : 'Submit for grading'}</button>
           </form>
           <p class="hint" style="margin-top:10px">Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
         </div></div>
       <div id="svResults" style="margin-top:16px"></div>`;
     $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });
+    $('svFileForm').file.addEventListener('change', (e) => {
+      const names = [...e.target.files].map((f) => f.name);
+      $('svFileList').textContent = names.length > 1 ? `${names.length} files attached: ${names.join(', ')}` : '';
+    });
   }
   drawSolveStatus();
+}
+
+/* ---------- AI copilot panel beside the compiler (code-ai courses) ---------- */
+function svAiPanelHtml() {
+  return `
+    <div class="card" style="margin-top:14px"><div class="card-head"><h3>AI copilot</h3><span class="s" style="color:var(--muted)">Explain, fix, improve - you review and own every line</span></div>
+      <div class="card-body">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          ${['Explain this code', 'Fix errors', 'Optimize code', 'Generate code'].map((a) => `<button type="button" class="btn btn-ghost btn-sm" onclick="svAiQuick('${a}')">${a}</button>`).join('')}
+        </div>
+        <div id="svAiBody" style="max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:8px">
+          <p class="s" style="color:var(--muted)">Ask the copilot about the code in your editor - it sees what you have written.</p>
+        </div>
+        <form id="svAiForm" style="display:flex;gap:8px;margin-top:10px">
+          <input id="svAiInput" class="field" style="flex:1;margin:0" placeholder="Ask anything about your code...">
+          <button class="btn btn-ghost">Ask</button>
+        </form>
+      </div></div>`;
+}
+function svWireAiPanel() {
+  const f = $('svAiForm'); if (!f) return;
+  f.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = $('svAiInput').value.trim(); if (!v) return;
+    $('svAiInput').value = '';
+    svAiSend(v, null);
+  });
+}
+function svAiQuick(action) { svAiSend(action, action); }
+function svAiBubble(text, mine) {
+  const body = $('svAiBody'); if (!body) return null;
+  const empty = body.querySelector('p'); if (empty && body.children.length === 1) empty.remove();
+  const el = document.createElement('div');
+  el.className = 's';
+  el.style.cssText = `padding:9px 12px;border-radius:10px;white-space:pre-wrap;line-height:1.55;background:${mine ? 'var(--primary-soft, rgba(124,58,237,.08))' : 'var(--bg)'};border:1px solid var(--line)`;
+  el.textContent = text;
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+  return el;
+}
+async function svAiSend(displayText, action) {
+  if (!ME) { gate('Sign in free to use the AI copilot.'); return; }
+  svAiBubble(displayText, true);
+  const reply = svAiBubble('Thinking...');
+  try {
+    const d = await api('/api/compiler/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, code: $('svCode') ? $('svCode').value : '', language: $('svLang') ? $('svLang').value : 'python', question: action ? null : displayText }) });
+    if (reply) reply.textContent = d.reply;
+  } catch (e) { if (reply) { reply.textContent = e.message; reply.style.color = 'var(--danger)'; } }
+}
+
+/* -------------- Prompt Lab workbook (prompt-engineering courses) -------------- */
+function svPromptLabArea(sub) {
+  $('svWorkArea').innerHTML = `
+    <div class="card"><div class="card-head"><h3>Prompt Lab - your workbook</h3><span class="s" style="color:var(--muted)">Write, run, refine - then submit the workbook</span></div>
+      <div class="card-body">
+        <p class="s" style="color:var(--muted);margin-bottom:10px">This course works like a compiler for prompts: run your prompt against a real model, refine it until the output is dependable, and submit the whole workbook (prompts + outputs) directly for grading.</p>
+        <div id="svLabBook" style="display:flex;flex-direction:column;gap:10px;max-height:340px;overflow:auto;margin-bottom:10px"></div>
+        <textarea id="svLabPrompt" class="field" rows="5" style="width:100%;font-family:var(--font-mono, monospace);font-size:13px" placeholder="Write your prompt here, exactly as you would give it to ChatGPT or Claude..."></textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="svLabClear()">Clear workbook</button>
+          <span style="flex:1"></span>
+          <button type="button" class="btn btn-ghost" id="svLabRun" onclick="svLabRun()">Run prompt</button>
+          <button type="button" class="btn lc-btn-solve" id="svSubmitBtn" onclick="submitSolve()">${sub ? 'Resubmit workbook' : 'Submit workbook for grading'}</button>
+        </div>
+        <p class="hint" style="margin-top:10px">Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
+      </div></div>
+    <div id="svResults" style="margin-top:16px"></div>`;
+  svDrawLabBook();
+}
+function svDrawLabBook() {
+  const box = $('svLabBook'); if (!box) return;
+  const entries = SV_LAB[labKey()] || [];
+  box.innerHTML = entries.length ? entries.map((e, i) => `
+    <div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">
+      <div class="s" style="padding:8px 12px;background:var(--bg);white-space:pre-wrap"><strong style="color:var(--primary)">Prompt ${i + 1}</strong><br>${esc(e.prompt)}</div>
+      <div class="s" style="padding:8px 12px;white-space:pre-wrap;border-top:1px solid var(--line)"><strong style="color:var(--ok)">Model output</strong><br>${esc(e.reply)}</div>
+    </div>`).join('')
+    : '<p class="s" style="color:var(--muted)">Your workbook is empty - run your first prompt below.</p>';
+  box.scrollTop = box.scrollHeight;
+}
+async function svLabRun() {
+  if (!ME) { gate('Sign in free to run prompts in the lab.'); return; }
+  const ta = $('svLabPrompt'); const prompt = ta.value.trim();
+  if (!prompt) { toast('Write your prompt first.', true); return; }
+  const btn = $('svLabRun'); btn.disabled = true; btn.textContent = 'Running...';
+  try {
+    const d = await api('/api/open/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'prompt', prompt }) });
+    (SV_LAB[labKey()] = SV_LAB[labKey()] || []).push({ prompt, reply: d.reply });
+    ta.value = '';
+    svDrawLabBook();
+  } catch (e) { if (!e.handled) toast(e.message, true); }
+  btn.disabled = false; btn.textContent = 'Run prompt';
+}
+function svLabClear() { delete SV_LAB[labKey()]; svDrawLabBook(); }
+
+/* ------------- Excel workbook + linked AI copilot (excel-ai courses) ------------- */
+function svExcelArea(sub) {
+  $('svWorkArea').innerHTML = `
+    <div class="card"><div class="card-head"><h3>Your workbook + AI copilot</h3><span class="s" style="color:var(--muted)">Upload, analyse with AI, submit</span></div>
+      <div class="card-body">
+        <p class="s" style="color:var(--muted);margin-bottom:10px">Upload your Excel workbook (.xlsx) or CSV, load it into the AI copilot to analyse, build formulas, or clean it in context - then submit the finished workbook for grading.</p>
+        <form id="svFileForm">
+          <label class="field"><span>Your workbook (.xlsx / .csv)</span><input name="file" type="file" accept=".xlsx,.csv" required></label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+            <button type="button" class="btn btn-ghost" onclick="svExcelLoad()">Load into AI copilot</button>
+            <button class="btn lc-btn-solve">${sub ? 'Resubmit workbook' : 'Submit workbook for grading'}</button>
+          </div>
+        </form>
+        <div id="svSheetInfo" class="hint" style="margin-top:8px">No sheet loaded into the copilot yet.</div>
+        <div style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+          <div class="s" style="font-weight:700;color:var(--ink);margin-bottom:8px">AI copilot - linked to your sheet</div>
+          <div id="svExcelBody" style="max-height:280px;overflow:auto;display:flex;flex-direction:column;gap:8px">
+            <p class="s" style="color:var(--muted)">Load your workbook above, then ask anything: "what are the top trends?", "write the XLOOKUP for prices", "standardise the city names".</p>
+          </div>
+          <form id="svExcelForm" style="display:flex;gap:8px;margin-top:10px">
+            <input id="svExcelQ" class="field" style="flex:1;margin:0" placeholder="Ask the copilot about your sheet...">
+            <button class="btn btn-ghost">Ask</button>
+          </form>
+        </div>
+        <p class="hint" style="margin-top:10px">Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
+      </div></div>
+    <div id="svResults" style="margin-top:16px"></div>`;
+  $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });
+  $('svExcelForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = $('svExcelQ').value.trim(); if (!q) return;
+    $('svExcelQ').value = '';
+    svExcelAsk(q);
+  });
+  if (SV_SHEET) $('svSheetInfo').textContent = `Loaded into the copilot: ${SV_SHEET.name}`;
+}
+function svExcelBubble(text, mine) {
+  const body = $('svExcelBody'); if (!body) return null;
+  const empty = body.querySelector('p'); if (empty && body.children.length === 1) empty.remove();
+  const el = document.createElement('div');
+  el.className = 's';
+  el.style.cssText = `padding:9px 12px;border-radius:10px;white-space:pre-wrap;line-height:1.55;background:${mine ? 'var(--primary-soft, rgba(124,58,237,.08))' : 'var(--bg)'};border:1px solid var(--line)`;
+  el.textContent = text;
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+  return el;
+}
+async function svExcelLoad() {
+  if (!ME) { gate('Sign in free to use the Excel copilot.'); return; }
+  const input = $('svFileForm').file;
+  const f = input.files && input.files[0];
+  if (!f) { toast('Choose your Excel or CSV file first.', true); return; }
+  $('svSheetInfo').textContent = 'Reading your workbook...';
+  try {
+    const fd = new FormData(); fd.set('file', f);
+    const d = await api('/api/open/excel-extract', { method: 'POST', body: fd });
+    SV_SHEET = { name: d.name, text: d.text };
+    SV_EXCEL_CHAT = [];
+    $('svSheetInfo').textContent = `Loaded into the copilot: ${d.name}`;
+    svExcelBubble(`Workbook loaded (${d.name}). Preview:\n${d.preview}`, false);
+  } catch (e) { $('svSheetInfo').textContent = 'Could not load that file.'; if (!e.handled) toast(e.message, true); }
+}
+async function svExcelAsk(question) {
+  svExcelBubble(question, true);
+  const reply = svExcelBubble('Thinking...');
+  try {
+    const d = await api('/api/open/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'excel', question, sheet: SV_SHEET ? SV_SHEET.text : null, sheet_name: SV_SHEET ? SV_SHEET.name : null, history: SV_EXCEL_CHAT }) });
+    if (reply) reply.textContent = d.reply;
+    SV_EXCEL_CHAT.push({ role: 'user', content: question }, { role: 'assistant', content: d.reply });
+    SV_EXCEL_CHAT = SV_EXCEL_CHAT.slice(-8);
+  } catch (e) { if (reply) { reply.textContent = e.message; reply.style.color = 'var(--danger)'; } }
 }
 function svSyncGutter() {
   const code = $('svCode'), g = $('svGutter'); if (!code || !g) return;
@@ -800,21 +1036,29 @@ async function runSolve() {
 }
 async function submitSolve(fileForm) {
   if (!ME) { gate('Sign in free to submit this task, earn gems, and collect certificates.'); return; }
+  const mode = CUR.track.submission_mode;
   const fd = new FormData();
   fd.set('track_key', CUR.track.key);
   fd.set('level', CUR_PROBLEM.level);
   fd.set('pid', CUR_PROBLEM.pid);
-  if (fileForm) {
-    const file = fileForm.file.files[0];
-    if (!file) { toast('Choose your file first.', true); return; }
-    fd.set('file', file);
+  if (mode === 'prompt') {
+    // The Prompt Lab workbook (every prompt + model output) is the submission.
+    const entries = SV_LAB[labKey()] || [];
+    if (!entries.length) { toast('Run at least one prompt in the lab first - the workbook is what gets graded.', true); return; }
+    fd.set('code', entries.map((e, i) => `PROMPT ${i + 1}:\n${e.prompt}\n\nMODEL OUTPUT ${i + 1}:\n${e.reply}`).join('\n\n----------------\n\n').slice(0, 60000));
+    fd.set('language', 'prompt');
+  } else if (fileForm) {
+    const files = [...fileForm.file.files];
+    if (!files.length) { toast('Choose your file first.', true); return; }
+    fd.set('file', files[0]);
+    for (const f of files.slice(1)) fd.append('files', f); // multi-file courses (PDF/image packs)
   } else {
     const code = $('svCode').value;
     if (!code.trim()) { toast('Write your solution first.', true); return; }
     fd.set('code', code);
     fd.set('language', $('svLang').value);
   }
-  const btn = $('svSubmitBtn') || (fileForm && fileForm.querySelector('button'));
+  const btn = $('svSubmitBtn') || (fileForm && fileForm.querySelector('button:not([type="button"])'));
   if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
   try {
     const out = await api('/api/open/submit', { method: 'POST', body: fd });

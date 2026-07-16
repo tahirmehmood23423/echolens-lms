@@ -272,6 +272,38 @@ ${code && String(code).trim() ? String(code).slice(0, 8000) : '[No code written 
   return complete(userId, CODE_BASE, [{ role: 'user', content }], 350);
 }
 
+/* --------------------------- Prompt Lab (learners) --------------------------- */
+// BC-02's workbook: the student writes a prompt and the lab runs it exactly as
+// a general-purpose model would - so they practice prompting against a real
+// model and submit the whole workbook (prompts + outputs) for grading.
+const PROMPT_LAB_BASE = 'You are the model inside the EchoLens Prompt Lab, where students practice prompt engineering. '
+  + 'Execute the student\'s prompt exactly as written, as a capable general-purpose assistant would - follow its role, format and constraints faithfully. '
+  + 'Do not add meta-commentary about the prompt\'s quality and do not mention the Prompt Lab; simply respond to the prompt. Keep answers reasonably compact.';
+async function promptLab(userId, { prompt }) {
+  const p = String(prompt || '').slice(0, 8000);
+  if (!p.trim()) { const e = new Error('Write a prompt first.'); e.status = 400; throw e; }
+  return complete(userId, PROMPT_LAB_BASE, [{ role: 'user', content: p }], 900);
+}
+
+/* --------------------------- Excel copilot (learners) --------------------------- */
+// BC-07's workbook copilot: the student's uploaded sheet is extracted to text
+// and every question is answered in the context of that data - formulas,
+// cleanups, analysis, edits - always with steps they can apply in Excel.
+const EXCEL_BASE = 'You are the EchoLens Excel copilot, helping office professionals in Pakistan work on the spreadsheet they uploaded. '
+  + 'Answer strictly in the context of the sheet data provided. Be concise and practical: give the exact formula, the precise steps, or the analysis asked for. '
+  + 'When asked to edit or transform data, show the result (as a small table or the corrected values) plus how to apply it in Excel. '
+  + 'If the data cannot support an answer, say so honestly. Answer in clear English.';
+async function excelCopilot(userId, { question, sheetText, fileName, history }) {
+  const q = String(question || '').slice(0, 2000);
+  if (!q.trim()) { const e = new Error('Ask the copilot something about your sheet.'); e.status = 400; throw e; }
+  const msgs = (Array.isArray(history) ? history.slice(-6) : []).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 2000) }));
+  const context = sheetText
+    ? `Workbook: ${fileName || 'uploaded sheet'}\nSheet data (extracted):\n${String(sheetText).slice(0, 14000)}\n\nQuestion: ${q}`
+    : `No sheet is loaded yet. Question: ${q}\n(If the question needs data, tell the student to upload their Excel/CSV file into the copilot first.)`;
+  msgs.push({ role: 'user', content: context });
+  return complete(userId, EXCEL_BASE, msgs, 900);
+}
+
 /* --------------------------- integrity (teacher-only) --------------------------- */
 // Estimates how likely a submission was AI-generated. This is a SIGNAL for
 // the teacher, never proof - the response says so explicitly. Combined
@@ -330,4 +362,4 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
   return { score, feedback: String(parsed.feedback || '').slice(0, 1500) };
 }
 
-module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, codeHelp };
+module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, codeHelp, promptLab, excelCopilot };

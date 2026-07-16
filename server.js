@@ -75,11 +75,56 @@ async function extractText(fileUrl) {
       const out = await mammoth.extractRawText({ path: full });
       return { text: (out.value || '').slice(0, 60000) || null, name };
     }
+    if (ext === '.xlsx') {
+      return { text: (await extractXlsxText(fs.readFileSync(full))).slice(0, 60000) || null, name };
+    }
     if (['.txt', '.md', '.py', '.js', '.ipynb', '.csv', '.html', '.sql'].includes(ext)) {
       return { text: fs.readFileSync(full, 'utf8').slice(0, 60000), name };
     }
   } catch (e) { console.error('extractText failed:', e.message); }
   return { text: null, name };
+}
+// Minimal .xlsx reader (an xlsx is a zip of XML): shared strings + every
+// worksheet's cells become CSV-ish text the AI layer can read - enough for
+// the Excel copilot and for grading BC-07 workbook submissions.
+async function extractXlsxText(buffer) {
+  const JSZip = require('jszip');
+  const zip = await JSZip.loadAsync(buffer);
+  const decode = (s) => String(s).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  let shared = [];
+  const ss = zip.file('xl/sharedStrings.xml');
+  if (ss) {
+    const xml = await ss.async('string');
+    shared = [...xml.matchAll(/<si(?:\s[^>]*)?>([\s\S]*?)<\/si>/g)]
+      .map((m) => decode([...m[1].matchAll(/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g)].map((t) => t[1]).join('')));
+  }
+  const colOf = (ref) => { let n = 0; for (const ch of String(ref).replace(/\d+/g, '')) n = n * 26 + (ch.charCodeAt(0) - 64); return n; };
+  const sheets = Object.keys(zip.files).filter((f) => /^xl\/worksheets\/sheet\d+\.xml$/.test(f)).sort();
+  const parts = [];
+  for (const name of sheets.slice(0, 5)) {
+    const xml = await zip.file(name).async('string');
+    const rows = [];
+    for (const rm of xml.matchAll(/<row[^>]*>([\s\S]*?)<\/row>/g)) {
+      const cells = [];
+      for (const cm of rm[1].matchAll(/<c\s([^>]*)>([\s\S]*?)<\/c>/g)) {
+        const attrs = cm[1], inner = cm[2];
+        const ref = (attrs.match(/r="([A-Z]+\d+)"/) || [])[1];
+        const type = (attrs.match(/t="(\w+)"/) || [])[1];
+        let v = (inner.match(/<v>([\s\S]*?)<\/v>/) || [])[1];
+        if (type === 's' && v != null) v = shared[Number(v)] ?? '';
+        else if (type === 'inlineStr') v = decode([...inner.matchAll(/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g)].map((t) => t[1]).join(''));
+        else if (v != null) v = decode(v);
+        if (v == null) continue;
+        const col = ref ? colOf(ref) : cells.length + 1;
+        while (cells.length < col - 1) cells.push('');
+        cells.push(String(v).replace(/\s+/g, ' ').trim());
+      }
+      if (cells.some((c) => c !== '')) rows.push(cells.join(', '));
+      if (rows.length >= 400) break; // enough context for the AI without flooding it
+    }
+    if (rows.length) parts.push(`--- Sheet: ${name.replace(/^xl\/worksheets\/|\.xml$/g, '')} ---\n` + rows.join('\n'));
+  }
+  return parts.join('\n\n');
 }
 
 app.use(express.json());
@@ -1385,7 +1430,7 @@ app.get('/api/public/tracks/:key', (req, res) => {
       problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
     };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode }, levels, open_levels: openN });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, key_concepts: t.key_concepts || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode }, levels, open_levels: openN });
 });
 
 /* ================================ v11 routes ================================ */
@@ -2227,22 +2272,46 @@ app.delete('/api/admin/registrations/:id', authRequired, adminRequired, (req, re
  * the spot with the 10% reduction; gems accrue per problem; completing a
  * fully free course above its pass mark issues the certificate automatically.
  */
-app.post('/api/open/submit', authRequired, upload.single('file'), async (req, res) => {
-  if (!['free', 'student'].includes(req.user.role)) return res.status(403).json({ error: 'Quests are for learners.' });
+// Per-course workspaces decide what a submission looks like:
+//   doc      -> one PDF/Word report            prompt   -> the Prompt Lab workbook (text)
+//   code-ai  -> compiler code                  excel-ai -> the Excel workbook (or copilot session)
+//   multi    -> several PDF/image files        file/code -> the classic defaults
+const OPEN_SUBMIT_RULES = {
+  doc: { pattern: /\.(pdf|docx?)$/i, error: 'This course takes Word or PDF submissions only - export your report and resubmit.' },
+  'excel-ai': { pattern: /\.(xlsx|csv)$/i, error: 'Upload your workbook as .xlsx or .csv (save modern Excel format, not the old .xls).' },
+  multi: { pattern: /\.(pdf|png|jpe?g)$/i, error: 'This course takes PDF or image (PNG/JPEG) submissions.', multiple: true },
+  file: { pattern: /\.(pdf|docx?|pptx?|txt|md|ipynb|png|jpe?g|zip)$/i, error: 'Upload PDF, Word, text, notebook, PNG, JPEG, or ZIP files.' },
+};
+app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 8 }]), async (req, res) => {
+  const cleanup = () => { for (const f of allFiles) { try { fs.unlinkSync(f.path); } catch {} } };
+  const allFiles = [...((req.files || {}).file || []), ...((req.files || {}).files || [])];
+  if (!['free', 'student'].includes(req.user.role)) { cleanup(); return res.status(403).json({ error: 'Quests are for learners.' }); }
   const b = req.body || {};
-  let file_url = null, file_name = null;
-  if (req.file) {
-    const ok = /\.(pdf|docx?|pptx?|txt|md|ipynb|png|jpe?g|zip)$/i.test(req.file.originalname);
-    if (!ok) return res.status(400).json({ error: 'Upload PDF, Word, text, notebook, PNG, JPEG, or ZIP files.' });
-    file_url = `/uploads/${req.file.filename}`; file_name = req.file.originalname;
+  const mode = (Quests.tracks().find((x) => x.key === String(b.track_key || '')) || {}).submission_mode || 'code';
+  const rule = OPEN_SUBMIT_RULES[mode] || OPEN_SUBMIT_RULES.file;
+  let file_url = null, file_name = null, extra_files = [];
+  if (allFiles.length) {
+    for (const f of allFiles) {
+      if (!rule.pattern.test(f.originalname)) { cleanup(); return res.status(400).json({ error: rule.error }); }
+    }
+    if (allFiles.length > 1 && !rule.multiple) { cleanup(); return res.status(400).json({ error: 'This course takes one file per submission.' }); }
+    file_url = `/uploads/${allFiles[0].filename}`; file_name = allFiles[0].originalname;
+    extra_files = allFiles.slice(1).map((f) => ({ url: `/uploads/${f.filename}`, name: f.originalname }));
   }
-  const out = OpenQuest.submit({ user: req.user, track_key: String(b.track_key || ''), level: b.level, pid: b.pid, code: b.code || null, language: b.language || null, file_url, file_name });
+  const out = OpenQuest.submit({ user: req.user, track_key: String(b.track_key || ''), level: b.level, pid: b.pid, code: b.code || null, language: b.language || null, file_url, file_name, files: extra_files });
   if (out.error) return res.status(400).json({ error: out.error });
   let graded = null, cert = null;
   if (ai.enabled()) {
     try {
       let text = out.submission.code;
-      if (!text && file_url) { const ex = await extractText(file_url); text = ex.text; }
+      if (!text && file_url) {
+        const parts = [];
+        for (const u of [file_url, ...extra_files.map((f) => f.url)]) {
+          const ex = await extractText(u);
+          if (ex.text) parts.push(extra_files.length ? `--- ${ex.name} ---\n${ex.text}` : ex.text);
+        }
+        text = parts.join('\n\n') || null;
+      }
       const g = await ai.autoGrade(req.user.id, {
         eventTitle: out.track.title, problemTitle: out.problem.title, problemBrief: out.problem.description,
         passMark: out.track.pass_mark || 60, code: out.submission.code, language: out.submission.language, text,
@@ -2269,6 +2338,39 @@ app.get('/api/open/progress', authRequired, (req, res) => {
   const prog = OpenQuest.progress(req.user.id, track);
   if (!prog) return res.status(404).json({ error: 'Course not found.' });
   res.json({ progress: prog });
+});
+
+/* ---------------- learner AI copilot for the quest workspaces ----------------
+ * kind 'prompt' -> BC-02's Prompt Lab: runs the student's prompt like a real
+ *                  model so they build a submit-ready workbook.
+ * kind 'excel'  -> BC-07's Excel copilot: answers/analyses/edits in the
+ *                  context of the sheet they loaded.
+ * (BC-05's coding copilot reuses POST /api/compiler/ai.)
+ */
+app.post('/api/open/ai', authRequired, async (req, res) => {
+  try {
+    const { kind, prompt, question, sheet, sheet_name, history } = req.body || {};
+    if (kind === 'prompt') return res.json({ reply: await ai.promptLab(req.user.id, { prompt }) });
+    if (kind === 'excel') return res.json({ reply: await ai.excelCopilot(req.user.id, { question, sheetText: sheet, fileName: sheet_name, history }) });
+    res.status(400).json({ error: 'Unknown copilot kind.' });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+// Load a workbook into the Excel copilot: the file is read server-side
+// (.xlsx via the zip reader, .csv as text), the extracted sheet text goes
+// back to the browser as copilot context, and the temp upload is removed.
+app.post('/api/open/excel-extract', authRequired, upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Choose your Excel or CSV file first.' });
+  const drop = () => { try { fs.unlinkSync(req.file.path); } catch {} };
+  try {
+    const name = req.file.originalname;
+    if (!/\.(xlsx|csv)$/i.test(name)) { drop(); return res.status(400).json({ error: 'Upload a .xlsx or .csv file (save modern Excel format, not the old .xls).' }); }
+    const text = /\.csv$/i.test(name)
+      ? fs.readFileSync(req.file.path, 'utf8').slice(0, 60000)
+      : (await extractXlsxText(fs.readFileSync(req.file.path))).slice(0, 60000);
+    drop();
+    if (!text) return res.status(400).json({ error: 'Could not read any data from that file - check it opens in Excel and try again.' });
+    res.json({ ok: true, name, text, preview: text.split('\n').slice(0, 8).join('\n') });
+  } catch (e) { drop(); res.status(500).json({ error: 'Could not read that workbook: ' + e.message }); }
 });
 
 /* --------------------------------- static --------------------------------- */

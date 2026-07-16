@@ -80,7 +80,7 @@ function pageHead(opts) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v1316">
+<link rel="stylesheet" href="/css/styles.css?v1317">
 ${jsonld.map(jsonScript).join('\n')}
 <style>
   body{background:#F7F8FD;color:#0F172A;font-family:'Inter',system-ui,sans-serif}
@@ -148,6 +148,50 @@ function pageFoot() {
 }
 
 /* -------------------------------- course page -------------------------------- */
+// The quest track behind a catalogue course carries the public outline (one
+// line per class), the key concepts, and the production end project.
+function trackForCourse(c) {
+  const row = store.Quests.tracks().find((x) => x.course_code === c.code);
+  return row ? { def: store.Quests.trackDef(row.key), mode: row.submission_mode } : null;
+}
+const CP_MODE_LABEL = {
+  code: 'Coding quests solved in the built-in EchoLens compiler.',
+  'code-ai': 'Coding quests in the built-in compiler with an AI copilot beside the editor - exactly the Cursor/Copilot workflow the course teaches.',
+  file: 'Quests submitted as files (PDF, Word, PNG, JPEG) and graded instantly.',
+  doc: 'Quests submitted as Word or PDF reports and graded instantly.',
+  prompt: 'Quests solved in the built-in AI Prompt Lab - write and run prompts like a compiler and submit the workbook directly.',
+  'excel-ai': 'Quests submitted as Excel workbooks, with an AI copilot linked to your uploaded sheet for in-context analysis and edits.',
+  multi: 'Quests submitted as PDF or image exports - multiple files per submission.',
+};
+function outlineSection(c) {
+  const t = trackForCourse(c);
+  if (!t || !t.def) return '';
+  const d = t.def;
+  const isBootcamp = c.tier === 'Bootcamp';
+  const unit = isBootcamp ? 'Class' : 'Level';
+  const concepts = (d.key_concepts || []).map((k) => `<span style="display:inline-block;font-size:12.5px;font-weight:600;color:#4F46E5;border:1px solid #D9DCEE;border-radius:999px;padding:5px 12px;margin:4px 6px 0 0">${esc(k)}</span>`).join('');
+  const rows = d.levels.map((l) => `
+    <li style="padding:8px 0;border-bottom:1px solid #F1F2F9;font-size:15px;line-height:1.55;color:#374151">
+      <b style="color:#4F46E5">${unit} ${l.no}.</b> <b>${esc(l.title)}</b>${l.topic ? ` <span style="color:#6B7280">- ${esc(l.topic)}</span>` : ''}
+    </li>`).join('');
+  const ep = d.end_project;
+  return `
+    ${concepts ? `<h2>What you will learn</h2><div>${concepts}</div>` : ''}
+    <h2>Course outline - ${unit.toLowerCase()} by ${unit.toLowerCase()}</h2>
+    <p>${d.levels.length} ${unit.toLowerCase()}${d.levels.length === 1 ? '' : 'es'}, each with hands-on quests you clear in the portal${isBootcamp ? ' - the whole first week is open free' : ''}.</p>
+    <ul style="list-style:none;padding:0;margin:8px 0 4px">${rows}</ul>
+    ${CP_MODE_LABEL[t.mode] ? `<p style="margin-top:10px"><b>How you submit:</b> ${esc(CP_MODE_LABEL[t.mode])}</p>` : ''}
+    ${ep ? `
+    <h2>Your production end project</h2>
+    <div style="border:1.5px solid #7C3AED;border-radius:14px;padding:18px 20px;margin-top:6px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#7C3AED;text-transform:uppercase;margin-bottom:6px">End project - your production build</div>
+      <p style="font-size:17px;font-weight:700;color:#0F172A;margin:0 0 4px">${esc(ep.title)}</p>
+      <p style="color:#7C3AED;font-weight:600;font-size:14px;margin:0 0 8px">${esc(ep.tagline || '')}</p>
+      <p style="margin:0 0 10px">${esc(ep.description || '')}</p>
+      ${(ep.includes || []).length ? `<ul style="list-style:none;padding:0;margin:0">${ep.includes.map((i) => `<li style="position:relative;padding:4px 0 4px 24px;font-size:14px;color:#374151;line-height:1.55"><span style="position:absolute;left:2px;color:#10B981;font-weight:700">&#10003;</span>${esc(i)}</li>`).join('')}</ul>` : ''}
+      ${ep.shipped_when ? `<p style="margin:10px 0 0;padding:10px 14px;border-left:3px solid #10B981;background:#F7F8FD;border-radius:8px;font-size:14px"><b>Shipped when:</b> ${esc(ep.shipped_when)}</p>` : ''}
+    </div>` : ''}`;
+}
 function renderCourse(c, all) {
   const slug = courseSlug(c);
   const url = `${BASE}/courses/${slug}`;
@@ -187,6 +231,7 @@ function renderCourse(c, all) {
     inLanguage: 'en',
     educationalLevel: level,
     courseCode: c.code,
+    teaches: (trackForCourse(c)?.def?.key_concepts || []).slice(0, 10),
     provider: { '@type': 'EducationalOrganization', name: 'EchoLens Digital', url: BASE + '/', sameAs: BASE + '/' },
     offers: {
       '@type': 'Offer',
@@ -247,6 +292,7 @@ function renderCourse(c, all) {
         <p>${esc(tierBlurb(c.tier))} It runs online in the ${esc(COHORT.name)} cohort (starting ${esc(COHORT.starts)}) and is taught the EchoLens way: you learn by doing real, gradeable work rather than just watching lectures.</p>
         <h2>What's included</h2>
         <ul class="cp-list">${included.map((i) => '<li>' + esc(i) + '</li>').join('')}</ul>
+        ${outlineSection(c)}
         <h2>Who it's for</h2>
         <p>${esc(c.title)} suits learners at a <b>${esc(level.toLowerCase())}</b> level who want a practical, project-based route into ${esc(c.title.split(/[:&,]/)[0].trim())}. You need only a browser and an internet connection - all coding runs inside the EchoLens compiler, so there is nothing to set up.</p>
         <h2>Certificate</h2>

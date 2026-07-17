@@ -35,7 +35,13 @@
     "public_announcements": 0,
     "chat_reads": 0,
     "jobs": 0,
-    "job_comments": 0
+    "job_comments": 0,
+    "discount_categories": 0,
+    "challans": 0,
+    "expenses": 0,
+    "coordinator_queries": 0,
+    "staff_groups": 0,
+    "staff_records": 0
   },
   "issued_usernames": [
     "admin@echolens.digital",
@@ -648,6 +654,19 @@
       "ceo_name": "Tahir Mehmood",
       "ceo_sig": null,
       "tagline": "Gamified Learning, Real Skills"
+    },
+    "bank": {
+      "bank_name": "",
+      "account_title": "",
+      "account_number": "",
+      "iban": "",
+      "branch": ""
     }
-  }
+  },
+  "discount_categories": [],
+  "challans": [],
+  "expenses": [],
+  "coordinator_queries": [],
+  "staff_groups": [],
+  "staff_records": []
 }

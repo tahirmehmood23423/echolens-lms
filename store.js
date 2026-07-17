@@ -38,14 +38,18 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
   attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
   events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
   jobs: [], job_comments: [],
-  settings: { cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' } },
+  discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [],
+  settings: {
+    cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' },
+    bank: { bank_name: '', account_title: '', account_number: '', iban: '', branch: '' },
+  },
 });
 
 let data = empty();
@@ -86,6 +90,11 @@ function migrate() {
   // v11: settings block + weekly deadlines on already-installed quests.
   if (!data.settings) { data.settings = empty().settings; changed = true; }
   if (!data.settings.cert) { data.settings.cert = empty().settings.cert; changed = true; }
+  if (!data.settings.bank) { data.settings.bank = empty().settings.bank; changed = true; }
+  // v17: registration/finance pipeline stage on pre-existing registrations.
+  for (const r of data.registrations) {
+    if (r.payment_stage === undefined) { r.payment_stage = r.status && r.status.added_to_course ? 'enrolled' : 'new'; changed = true; }
+  }
   for (const q of data.quests) {
     if (q.deadline === undefined) { q.deadline = deadlineFromStart((data.batches.find((b) => b.id === q.batch_id) || {}).start_date, q.week); changed = true; }
   }
@@ -365,6 +374,7 @@ function gamifyFor(u) {
 /* ------------------------------- courses ------------------------------- */
 const Courses = {
   byId(id) { return data.courses.find((c) => c.id === Number(id)) || null; },
+  byCode(code) { return data.courses.find((c) => c.code === String(code || '').toUpperCase()) || null; },
   all() { return data.courses.slice(); },
   create(c) { const id = nextId('courses'); data.courses.push({ id, ...c, created_at: now() }); save(); return id; },
   remove(id) { data.courses = data.courses.filter((c) => c.id !== Number(id)); save(); },
@@ -1466,6 +1476,16 @@ const Settings = {
     save();
     return c;
   },
+  // v17: bank details Finance sets once and every challan snapshots.
+  bank() { return data.settings && data.settings.bank ? data.settings.bank : empty().settings.bank; },
+  setBank(fields) {
+    if (!data.settings) data.settings = empty().settings;
+    if (!data.settings.bank) data.settings.bank = empty().settings.bank;
+    const b = data.settings.bank;
+    for (const k of ['bank_name', 'account_title', 'account_number', 'iban', 'branch']) if (fields[k] !== undefined) b[k] = String(fields[k]).slice(0, 200);
+    save();
+    return b;
+  },
 };
 
 /* ------------------------- datasets attached to tasks ------------------------- */
@@ -2215,12 +2235,16 @@ const Registrations = {
       note: String(b.note || '').slice(0, 600) || null,
       status: { contacted: false, challan_sent: false, added_to_course: false },
       admin_note: null,
+      // v17: registration -> challan -> payment -> enrollment pipeline.
+      discount_category_id: null, challan_serial: null, payment_stage: 'new',
+      enrolled_user_id: null, enrolled_batch_id: null, cleared_by: null, cleared_at: null,
       created_at: now(), updated_at: now(),
     };
     data.registrations.push(r); save();
     return r;
   },
   all() { return data.registrations.slice().sort((a, b) => b.id - a.id); },
+  byId(id) { return data.registrations.find((x) => x.id === Number(id)) || null; },
   update(id, b) {
     const r = data.registrations.find((x) => x.id === Number(id)); if (!r) return null;
     if (b.status && typeof b.status === 'object') {
@@ -2232,6 +2256,256 @@ const Registrations = {
   },
   remove(id) { data.registrations = data.registrations.filter((x) => x.id !== Number(id)); save(); },
   pendingCount() { return data.registrations.filter((r) => !r.status.contacted).length; },
+  // Internal - advances the pipeline stage; keeps the legacy status booleans
+  // (used by the existing admin widget) in sync as a courtesy.
+  _setStage(id, stage, fields = {}) {
+    const r = data.registrations.find((x) => x.id === Number(id)); if (!r) return null;
+    r.payment_stage = stage;
+    Object.assign(r, fields);
+    if (stage === 'challan_sent') r.status.challan_sent = true;
+    if (stage === 'enrolled') r.status.added_to_course = true;
+    r.updated_at = now(); save();
+    return r;
+  },
+};
+
+/* ============================== v17: DISCOUNT CATEGORIES ==============================
+ * Finance-managed fee discounts applied when a challan is generated. Snapshot
+ * onto the challan at generation time, so editing/deactivating a category
+ * later never rewrites history.
+ */
+const DiscountCategories = {
+  create({ name, type, value }, by) {
+    const d = {
+      id: nextId('discount_categories'),
+      name: String(name || '').slice(0, 100),
+      type: type === 'flat' ? 'flat' : 'percent',
+      value: Math.max(0, Number(value) || 0),
+      active: true, created_by: by, created_at: now(),
+    };
+    data.discount_categories.push(d); save();
+    return d;
+  },
+  all() { return data.discount_categories.slice().sort((a, b) => a.name.localeCompare(b.name)); },
+  byId(id) { return data.discount_categories.find((x) => x.id === Number(id)) || null; },
+  update(id, b) {
+    const d = DiscountCategories.byId(id); if (!d) return null;
+    if (b.name !== undefined) d.name = String(b.name).slice(0, 100);
+    if (b.type !== undefined) d.type = b.type === 'flat' ? 'flat' : 'percent';
+    if (b.value !== undefined) d.value = Math.max(0, Number(b.value) || 0);
+    if (b.active !== undefined) d.active = !!b.active;
+    save();
+    return d;
+  },
+  remove(id) { data.discount_categories = data.discount_categories.filter((x) => x.id !== Number(id)); save(); },
+  // Computed net fee for a gross amount, using this category if given.
+  apply(grossFee, categoryId) {
+    const gross = Number(grossFee) || 0;
+    if (!categoryId) return { label: null, amount: 0, net: gross };
+    const d = DiscountCategories.byId(categoryId);
+    if (!d) return { label: null, amount: 0, net: gross };
+    const amount = d.type === 'flat' ? Math.min(gross, d.value) : Math.round(gross * (d.value / 100));
+    return { label: `${d.name} (${d.type === 'flat' ? 'Rs ' + d.value.toLocaleString('en-US') : d.value + '%'})`, amount, net: Math.max(0, gross - amount) };
+  },
+};
+
+/* ============================== v17: CHALLANS ==============================
+ * QR-verified fee challans - mirrors the Certificates pattern exactly (same
+ * random-serial + collision-check + publicView whitelist shape).
+ */
+const Challans = {
+  serial() {
+    let s;
+    do { s = `EL-CH-${new Date().getFullYear()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`; }
+    while (data.challans.some((c) => c.serial === s));
+    return s;
+  },
+  generate({ registration_id, discount_category_id, deadline, generated_by }) {
+    const r = Registrations.byId(registration_id); if (!r) return { error: 'Registration not found.' };
+    const course = Courses.byCode(r.course_code);
+    const gross = course ? Number(course.price_pkr) || 0 : 0;
+    const disc = DiscountCategories.apply(gross, discount_category_id);
+    const bank = Settings.bank();
+    const ch = {
+      id: nextId('challans'), serial: Challans.serial(), registration_id: r.id,
+      course_code: r.course_code, course_title: r.course_title || (course ? course.title : ''),
+      student_name: r.name, student_email: r.email,
+      gross_fee: gross, discount_category_id: discount_category_id || null, discount_label: disc.label, discount_amount: disc.amount, net_fee: disc.net,
+      deadline: /^\d{4}-\d{2}-\d{2}$/.test(String(deadline)) ? deadline : null,
+      bank_snapshot: { ...bank },
+      status: 'issued',
+      generated_by, generated_at: now(), sent_at: null, paid_confirmed_by: null, paid_confirmed_at: null,
+    };
+    data.challans.push(ch); save();
+    r.discount_category_id = discount_category_id || null;
+    Registrations._setStage(r.id, 'challan_issued', { challan_serial: ch.serial });
+    return { ok: true, challan: ch };
+  },
+  all() { return data.challans.slice().sort((a, b) => b.id - a.id); },
+  bySerial(s) { return data.challans.find((c) => c.serial === String(s).trim().toUpperCase()) || null; },
+  forRegistration(rid) { return data.challans.filter((c) => c.registration_id === Number(rid)).sort((a, b) => b.id - a.id); },
+  markSent(serial) {
+    const c = Challans.bySerial(serial); if (!c) return null;
+    c.sent_at = now(); save();
+    Registrations._setStage(c.registration_id, 'challan_sent');
+    return c;
+  },
+  markPaid(serial, by) {
+    const c = Challans.bySerial(serial); if (!c) return null;
+    c.status = 'paid'; c.paid_confirmed_by = by; c.paid_confirmed_at = now(); save();
+    Registrations._setStage(c.registration_id, 'paid_cleared', { cleared_by: by, cleared_at: now() });
+    return c;
+  },
+  // Public view for the QR verification page - no internal ids.
+  publicView(c) {
+    return {
+      serial: c.serial, course_title: c.course_title, student_name: c.student_name,
+      gross_fee: c.gross_fee, discount_label: c.discount_label, discount_amount: c.discount_amount, net_fee: c.net_fee,
+      deadline: c.deadline, bank: c.bank_snapshot, status: c.status,
+      generated_at: (c.generated_at || '').slice(0, 10),
+    };
+  },
+};
+
+/* ============================== v17: EXPENSES ==============================
+ * Finance's operating-expense ledger, paired with cleared-challan income to
+ * form the balance sheet. Categories/format are a working default for now -
+ * to be refined once Finance shares their reference bookkeeping sheet.
+ */
+const Expenses = {
+  create({ date, category, description, amount }, by) {
+    const e = {
+      id: nextId('expenses'),
+      date: /^\d{4}-\d{2}-\d{2}$/.test(String(date)) ? date : today(),
+      category: String(category || 'General').slice(0, 80),
+      description: String(description || '').slice(0, 300),
+      amount: Math.max(0, Number(amount) || 0),
+      added_by: by, created_at: now(),
+    };
+    data.expenses.push(e); save();
+    return e;
+  },
+  all() { return data.expenses.slice().sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id); },
+  remove(id) { data.expenses = data.expenses.filter((x) => x.id !== Number(id)); save(); },
+  // Income = net fee of every cleared/paid challan (the money actually collected).
+  balanceSheet() {
+    const income = data.challans.filter((c) => c.status === 'paid').reduce((s, c) => s + c.net_fee, 0);
+    const expenseTotal = data.expenses.reduce((s, e) => s + e.amount, 0);
+    const byCategory = {};
+    for (const e of data.expenses) byCategory[e.category] = (byCategory[e.category] || 0) + e.amount;
+    return {
+      income, expenses: expenseTotal, balance: income - expenseTotal,
+      paid_challans: data.challans.filter((c) => c.status === 'paid').length,
+      expense_by_category: Object.entries(byCategory).map(([category, amount]) => ({ category, amount })).sort((a, b) => b.amount - a.amount),
+    };
+  },
+};
+
+/* ============================== v17: STUDENT COORDINATOR QUERIES ==============================
+ * A lightweight, course-agnostic query/ticket thread between a student and
+ * the Student Coordinator team (shared inbox - any coordinator can reply).
+ */
+const CoordinatorQueries = {
+  create({ student_id, student_name, subject, body }) {
+    const q = {
+      id: nextId('coordinator_queries'), student_id: Number(student_id), student_name,
+      subject: String(subject || 'Query').slice(0, 150),
+      messages: [{ from_role: 'student', from_name: student_name, body: String(body || '').slice(0, 2000), at: now() }],
+      status: 'open', created_at: now(), updated_at: now(),
+    };
+    data.coordinator_queries.push(q); save();
+    return q;
+  },
+  all() { return data.coordinator_queries.slice().sort((a, b) => b.id - a.id); },
+  byId(id) { return data.coordinator_queries.find((x) => x.id === Number(id)) || null; },
+  forStudent(uid) { return data.coordinator_queries.filter((q) => q.student_id === Number(uid)).sort((a, b) => b.id - a.id); },
+  reply(id, { from_role, from_name, body }) {
+    const q = CoordinatorQueries.byId(id); if (!q) return null;
+    q.messages.push({ from_role, from_name, body: String(body || '').slice(0, 2000), at: now() });
+    if (from_role === 'coordinator' && q.status === 'open') q.status = 'open'; // stays open until explicitly resolved
+    q.updated_at = now(); save();
+    return q;
+  },
+  setStatus(id, status) {
+    const q = CoordinatorQueries.byId(id); if (!q) return null;
+    q.status = status === 'resolved' ? 'resolved' : 'open';
+    q.updated_at = now(); save();
+    return q;
+  },
+};
+
+/* ============================== v17: HR - GROUPS & STAFF ==============================
+ * Paid staff and interns get their own isolated login (role 'staff'). HR
+ * organizes them into groups, posts one-way instructions, and runs a
+ * two-way follow-up log per person.
+ */
+const StaffGroups = {
+  create({ name, description }) {
+    const g = { id: nextId('staff_groups'), name: String(name || '').slice(0, 100), description: String(description || '').slice(0, 400), created_at: now() };
+    data.staff_groups.push(g); save();
+    return g;
+  },
+  all() { return data.staff_groups.slice().sort((a, b) => a.name.localeCompare(b.name)); },
+  byId(id) { return data.staff_groups.find((x) => x.id === Number(id)) || null; },
+  update(id, b) {
+    const g = StaffGroups.byId(id); if (!g) return null;
+    if (b.name !== undefined) g.name = String(b.name).slice(0, 100);
+    if (b.description !== undefined) g.description = String(b.description).slice(0, 400);
+    save();
+    return g;
+  },
+  remove(id) {
+    data.staff_groups = data.staff_groups.filter((x) => x.id !== Number(id));
+    for (const s of data.staff_records) if (s.group_id === Number(id)) s.group_id = null;
+    save();
+  },
+};
+const StaffRecords = {
+  create({ user_id, name, email, phone, position, employment_type, group_id }) {
+    const s = {
+      id: nextId('staff_records'), user_id: Number(user_id),
+      name: String(name || '').slice(0, 120), email: String(email || '').slice(0, 200).toLowerCase(),
+      phone: String(phone || '').slice(0, 40) || null, position: String(position || '').slice(0, 100) || null,
+      employment_type: employment_type === 'intern' ? 'intern' : 'paid_staff',
+      group_id: group_id ? Number(group_id) : null, status: 'active', joined_at: today(),
+      instructions: [], follow_ups: [], created_at: now(),
+    };
+    data.staff_records.push(s); save();
+    return s;
+  },
+  all() { return data.staff_records.slice().sort((a, b) => a.name.localeCompare(b.name)); },
+  byId(id) { return data.staff_records.find((x) => x.id === Number(id)) || null; },
+  byUserId(uid) { return data.staff_records.find((x) => x.user_id === Number(uid)) || null; },
+  update(id, b) {
+    const s = StaffRecords.byId(id); if (!s) return null;
+    if (b.phone !== undefined) s.phone = String(b.phone).slice(0, 40) || null;
+    if (b.position !== undefined) s.position = String(b.position).slice(0, 100) || null;
+    if (b.employment_type !== undefined) s.employment_type = b.employment_type === 'intern' ? 'intern' : 'paid_staff';
+    if (b.group_id !== undefined) s.group_id = b.group_id ? Number(b.group_id) : null;
+    if (b.status !== undefined) s.status = b.status === 'inactive' ? 'inactive' : 'active';
+    save();
+    return s;
+  },
+  remove(id) { data.staff_records = data.staff_records.filter((x) => x.id !== Number(id)); save(); },
+  addInstruction(id, { body, by }) {
+    const s = StaffRecords.byId(id); if (!s) return null;
+    s.instructions.push({ body: String(body || '').slice(0, 2000), by, at: now() });
+    save();
+    return s;
+  },
+  addFollowUp(id, { body, by }) {
+    const s = StaffRecords.byId(id); if (!s) return null;
+    s.follow_ups.push({ body: String(body || '').slice(0, 2000), by, at: now(), response: null, responded_at: null });
+    save();
+    return s;
+  },
+  respondFollowUp(id, followUpIndex, response) {
+    const s = StaffRecords.byId(id); if (!s) return null;
+    const f = s.follow_ups[Number(followUpIndex)]; if (!f) return null;
+    f.response = String(response || '').slice(0, 2000); f.responded_at = now();
+    save();
+    return s;
+  },
 };
 
 /* ============================== v12.3: PUBLIC ANNOUNCEMENTS ==============================
@@ -2278,6 +2552,7 @@ module.exports = {
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
+  DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords,
   seed, DB_PATH, allData: () => data,
 };
 

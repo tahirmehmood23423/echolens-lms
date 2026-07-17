@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens - Fee Challan</title>
+<meta name="robots" content="noindex, follow">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#16233A; --teal:#0FBFA8; --teal-deep:#0A8F7E; --gold:#D9A425;
+    --muted:#5B6B84; --line:#E3E9F2; --canvas:#F4F7FB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--canvas); color: var(--navy); min-height: 100vh; padding: 28px 14px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .verify-banner { display: flex; gap: 12px; align-items: center; background: #EAF9F4; border: 1.5px solid #B7E9DA; color: #0A6E5F; border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; font-size: 14px; }
+  .verify-banner.bad { background: #FDEEEE; border-color: #F2C6C6; color: #A33; }
+  .verify-banner .tick { font-size: 22px; }
+  .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 18px 0; }
+  .btn { border: 0; border-radius: 999px; padding: 10px 20px; font: 600 14px 'Inter', sans-serif; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-ghost { background: #fff; color: var(--navy); border: 1.5px solid var(--line); }
+
+  .ch { background: #fff; border-radius: 18px; padding: 44px 48px 36px; position: relative; box-shadow: 0 18px 50px rgba(22,35,58,.12); overflow: hidden; }
+  .ch::before { content: ''; position: absolute; inset: 14px; border: 2px solid var(--gold); border-radius: 12px; pointer-events: none; }
+  .ch::after { content: ''; position: absolute; inset: 20px; border: 1px solid #EAD9A6; border-radius: 9px; pointer-events: none; }
+  .c-band { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: linear-gradient(90deg, var(--teal), #38BDF8, #7C6CF5); }
+  .c-head { text-align: center; margin-bottom: 6px; }
+  .c-head img { height: 52px; }
+  .c-org { font-family: 'Fraunces', serif; font-size: 23px; font-weight: 650; margin-top: 8px; }
+  .c-title { text-align: center; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin: 22px 0 4px; }
+  .status-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 14px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; margin: 8px auto 0; }
+  .status-badge.issued { background: #FFF4DC; color: #8A5A00; }
+  .status-badge.paid { background: #E6F8F1; color: #0A6E5F; }
+  .c-name { text-align: center; font-family: 'Fraunces', serif; font-size: 30px; font-weight: 650; margin: 14px 0 4px; }
+  .c-course { text-align: center; font-size: 16px; color: var(--muted); margin-bottom: 22px; }
+
+  .fee-table { width: 100%; border-collapse: collapse; margin: 0 auto 20px; max-width: 480px; }
+  .fee-table td { padding: 9px 4px; font-size: 14.5px; border-bottom: 1px solid var(--line); }
+  .fee-table td:last-child { text-align: right; font-weight: 600; }
+  .fee-table tr.discount td { color: #A33; }
+  .fee-table tr.net td { font-size: 17px; font-weight: 800; color: var(--navy); border-bottom: none; padding-top: 12px; }
+  .deadline { text-align: center; font-size: 14px; margin-bottom: 24px; }
+  .deadline strong { color: #A33; }
+
+  .bank-card { background: var(--canvas); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; max-width: 480px; margin: 0 auto 24px; }
+  .bank-card h4 { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .bank-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 5px 0; }
+  .bank-row span:first-child { color: var(--muted); }
+  .bank-row span:last-child { font-weight: 600; font-family: ui-monospace, monospace; }
+
+  .c-foot { display: flex; justify-content: center; margin-top: 10px; }
+  .qr { text-align: center; }
+  .qr #qrbox { display: inline-block; padding: 8px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+  .qr .s { font-size: 10.5px; color: var(--muted); margin-top: 5px; }
+  .serial { text-align: center; font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--muted); margin-top: 20px; letter-spacing: .08em; }
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .issuer-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--navy); color: #fff; border-radius: 999px; padding: 5px 14px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; margin-top: 10px; }
+  .pay-note { max-width: 480px; margin: 0 auto; font-size: 13px; color: var(--muted); text-align: center; }
+
+  @media (max-width: 640px) { .ch { padding: 34px 20px 26px; } .c-name { font-size: 24px; } }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .verify-banner, .actions { display: none !important; }
+    .ch { box-shadow: none; border-radius: 0; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="banner"></div>
+  <div id="challanBox"><div class="empty">Loading challan&hellip;</div></div>
+  <div class="actions" id="actions" style="display:none">
+    <button class="btn btn-primary" onclick="window.print()">&#128424; Print / Save as PDF</button>
+    <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(location.href).then(()=>alert('Challan link copied.'))">Copy link</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+'use strict';
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const serial = new URLSearchParams(location.search).get('s');
+const money = (n) => 'Rs ' + Number(n || 0).toLocaleString('en-US');
+
+(async () => {
+  if (!serial) { document.getElementById('challanBox').innerHTML = '<div class="empty">No challan serial in the link.</div>'; return; }
+  let d;
+  try {
+    const res = await fetch('/api/verify-challan/' + encodeURIComponent(serial));
+    d = await res.json();
+  } catch { d = { valid: false, error: 'Could not reach the verification server.' }; }
+
+  if (!d.valid) {
+    document.getElementById('banner').innerHTML = '<div class="verify-banner bad"><span class="tick">&#10007;</span><div><strong>Not verified.</strong> ' + esc(d.error || 'This challan could not be verified.') + '</div></div>';
+    document.getElementById('challanBox').innerHTML = '<div class="empty">No valid challan for serial <strong>' + esc(serial) + '</strong>.</div>';
+    return;
+  }
+  const c = d.challan;
+  const fmt = (x) => { if (!x) return '&mdash;'; try { return new Date(x + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); } catch { return x; } };
+  const bank = c.bank || {};
+
+  document.getElementById('banner').innerHTML =
+    '<div class="verify-banner"><span class="tick">&#10003;</span><div><strong>Verified authentic.</strong> This fee challan was genuinely issued through the <strong>EchoLens</strong> platform, registered under serial <strong>' + esc(c.serial) + '</strong>. Scanning the QR code always returns to this official verification page.</div></div>';
+
+  document.getElementById('challanBox').innerHTML = `
+    <div class="ch">
+      <div class="c-band"></div>
+      <div class="c-head">
+        <img src="/img/logo.png" alt="logo">
+        <div class="c-org">EchoLens Digital</div>
+        <div><span class="issuer-badge">&#10003; Verified issuer &middot; EchoLens</span></div>
+      </div>
+      <div class="c-title">Fee Challan</div>
+      <div style="text-align:center"><span class="status-badge ${c.status === 'paid' ? 'paid' : 'issued'}">${c.status === 'paid' ? '&#10003; Paid' : 'Payment pending'}</span></div>
+      <div class="c-name">${esc(c.student_name)}</div>
+      <div class="c-course">${esc(c.course_title)}</div>
+
+      <table class="fee-table">
+        <tr><td>Course fee</td><td>${money(c.gross_fee)}</td></tr>
+        ${c.discount_label ? `<tr class="discount"><td>Discount &ndash; ${esc(c.discount_label)}</td><td>&minus; ${money(c.discount_amount)}</td></tr>` : ''}
+        <tr class="net"><td>Amount payable</td><td>${money(c.net_fee)}</td></tr>
+      </table>
+      <div class="deadline">Payment deadline: <strong>${fmt(c.deadline)}</strong></div>
+
+      <div class="bank-card">
+        <h4>Payment details</h4>
+        ${bank.bank_name ? `<div class="bank-row"><span>Bank</span><span>${esc(bank.bank_name)}</span></div>` : ''}
+        ${bank.account_title ? `<div class="bank-row"><span>Account title</span><span>${esc(bank.account_title)}</span></div>` : ''}
+        ${bank.account_number ? `<div class="bank-row"><span>Account number</span><span>${esc(bank.account_number)}</span></div>` : ''}
+        ${bank.iban ? `<div class="bank-row"><span>IBAN</span><span>${esc(bank.iban)}</span></div>` : ''}
+        ${bank.branch ? `<div class="bank-row"><span>Branch</span><span>${esc(bank.branch)}</span></div>` : ''}
+      </div>
+      <p class="pay-note">After paying, email your payment proof to <strong>info@echolens.digital</strong> and our finance team will confirm your enrollment.</p>
+
+      <div class="c-foot">
+        <div class="qr">
+          <div id="qrbox"></div>
+          <div class="s">Scan to verify</div>
+        </div>
+      </div>
+      <div class="serial">Serial: ${esc(c.serial)} &nbsp;&middot;&nbsp; Issued ${esc(c.generated_at)} &nbsp;&middot;&nbsp; Verify at ${esc(location.host)}/challan?s=${esc(c.serial)}</div>
+    </div>`;
+
+  new QRCode(document.getElementById('qrbox'), { text: location.origin + '/challan?s=' + c.serial, width: 96, height: 96, correctLevel: QRCode.CorrectLevel.M });
+  document.getElementById('actions').style.display = '';
+})();
+</script>
+</body>
+</html>

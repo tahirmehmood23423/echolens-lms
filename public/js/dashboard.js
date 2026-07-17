@@ -27,7 +27,7 @@ function toast(text, isErr) {
   t.textContent = text; t.className = 'toast show' + (isErr ? ' err' : '');
   clearTimeout(t._h); t._h = setTimeout(() => (t.className = 'toast'), 2600);
 }
-function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Student Coordinator' }[r] || r; }
+function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Student Coordinator', staff: 'Staff' }[r] || r; }
 function isStaff() { return ['admin', 'coordinator', 'instructor'].includes(ME.role); }
 // v17: isolated department portals - each role sees ONLY its own nav item
 // and view, nothing else in the app (not courses, messages, jobs, etc).
@@ -35,6 +35,7 @@ const DEPT_ROLES = {
   hr: { view: 'dept-hr', label: 'HR' },
   finance: { view: 'dept-finance', label: 'Finance' },
   student_coordinator: { view: 'dept-student-coordinator', label: 'Student Coordinator' },
+  staff: { view: 'dept-staff', label: 'Staff' },
 };
 function fmtDate(d) {
   if (!d) return '—';
@@ -103,7 +104,7 @@ const TITLES = {
   'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
   'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-logs': 'System Logs',
   jobs: 'Jobs', job: 'Job',
-  'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Student Coordinator Portal',
+  'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Student Coordinator Portal', 'dept-staff': 'Staff Portal',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -126,7 +127,7 @@ function show(view) {
     'admin-enrollments': renderAdminEnrollments, 'admin-finance': renderAdminFinance,
     'admin-announcements': renderAdminAnnouncementsPage, 'admin-logs': renderAdminLogs,
     jobs: renderJobs,
-    'dept-hr': renderDeptHR, 'dept-finance': renderDeptFinance, 'dept-student-coordinator': renderDeptStudentCoordinator,
+    'dept-hr': renderDeptHR, 'dept-finance': renderDeptFinance, 'dept-student-coordinator': renderDeptStudentCoordinator, 'dept-staff': renderDeptStaff,
   }[view];
   if (render) render();
 }
@@ -857,9 +858,10 @@ function wireAdminTopSearch() {
 /* -------------------------- student overview (v13) -------------------------- */
 let DC_CD_TIMER = null;
 async function renderStudentOverview(el, d) {
-  const [coursesR, questsR, quizzesR, recR, challR] = await Promise.all([
+  const [coursesR, questsR, quizzesR, recR, challR, queriesR] = await Promise.all([
     api('/api/my/courses'), api('/api/my/quests'), api('/api/my/quizzes'),
     api('/api/my/recommended'), api('/api/challenges').catch(() => ({ challenges: [], mine: {} })),
+    api('/api/my/queries').catch(() => ({ queries: [] })),
   ]);
   const courses = coursesR.courses;
   const cont = courses.find((c) => c.progress_pct > 0 && c.progress_pct < 100) || courses[0] || null;
@@ -954,6 +956,12 @@ async function renderStudentOverview(el, d) {
               <div class="grow"><div class="t">${esc(ev.note || (ev.source.charAt(0).toUpperCase() + ev.source.slice(1) + ' gems'))}</div><div class="s" style="color:var(--muted-2)">${esc((ev.at || '').slice(0, 16))}</div></div>
               <span style="font-weight:700;color:var(--ok)">+${ev.amount}</span>
             </div>`).join('') : '<div class="empty">Earn gems to see them here.</div>'}</div></div>
+        <div class="card"><div class="card-head"><h3>Contact my coordinator</h3><button class="btn btn-primary btn-sm" onclick="myNewQuery()">New query</button></div>
+          <div class="card-body tight">${queriesR.queries.length ? queriesR.queries.slice(0, 4).map((q) => `
+            <div class="list-row" style="cursor:pointer" onclick="myOpenQuery(${q.id})">
+              <div class="grow"><div class="t">${esc(q.subject)}</div><div class="s" style="color:var(--muted-2)">${esc((q.updated_at || '').slice(0, 16))}</div></div>
+              <span class="s" style="color:${q.status === 'resolved' ? 'var(--ok)' : 'var(--gold)'};font-weight:600">${q.status === 'resolved' ? 'Resolved' : 'Open'}</span>
+            </div>`).join('') : '<div class="empty">Any issue or question? Raise it here - the Student Coordinator team replies here directly.</div>'}</div></div>
         <div class="card"><div class="card-body" style="text-align:center">
           <div style="font-weight:650;margin-bottom:6px">Need help?</div>
           <div class="s" style="color:var(--muted);margin-bottom:8px">Find answers, ask questions, and connect with peers.</div>
@@ -979,6 +987,38 @@ function startDailyChallengeCountdown(dueDate) {
     $('dc-d').textContent = dd; $('dc-h').textContent = p(hh); $('dc-m').textContent = p(mm); $('dc-s').textContent = p(s);
   };
   tick(); DC_CD_TIMER = setInterval(tick, 1000);
+}
+
+/* -------------------------- student: contact my coordinator -------------------------- */
+function myNewQuery() {
+  openModal('New query to your Student Coordinator', `
+    <form id="f">
+      <label class="field"><span>Subject</span><input name="subject" required placeholder="e.g. Class timing conflict"></label>
+      <label class="field"><span>Details</span><textarea name="body" rows="4" required placeholder="Describe the issue or question..."></textarea></label>
+      <button class="btn btn-primary btn-block">Send</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api('/api/my/queries', { method: 'POST', body: JSON.stringify({ subject: f.subject.value, body: f.body.value }) }); toast('Sent to your Student Coordinator.'); closeModal(); renderOverview(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function myOpenQuery(id) {
+  const d = await api('/api/my/queries');
+  const q = d.queries.find((x) => x.id === id); if (!q) return;
+  openModal(q.subject, `
+    <div style="max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+      ${q.messages.map((m) => `<div class="s" style="padding:8px 12px;border-radius:10px;white-space:pre-wrap;background:${m.from_role === 'student' ? 'var(--primary-soft, rgba(124,58,237,.08))' : 'var(--bg)'};border:1px solid var(--line)"><strong>${esc(m.from_name)}</strong> &middot; ${esc((m.at || '').slice(0, 16))}<br>${esc(m.body)}</div>`).join('')}
+    </div>
+    ${q.status !== 'resolved' ? `<form id="f" style="display:flex;gap:8px">
+      <input name="body" class="field" style="flex:1;margin:0" placeholder="Write a reply..." required>
+      <button class="btn btn-ghost">Reply</button></form>` : '<p class="s" style="color:var(--ok)">This query is resolved.</p>'}`, true);
+  if (q.status !== 'resolved') {
+    $('f').addEventListener('submit', async (e) => {
+      e.preventDefault(); const body = e.target.body.value.trim(); if (!body) return;
+      try { await api(`/api/my/queries/${id}/reply`, { method: 'POST', body: JSON.stringify({ body }) }); myOpenQuery(id); }
+      catch (err) { toast(err.message, true); }
+    });
+  }
 }
 
 function stat(n, l) { return `<div class="stat-card"><div class="n">${n ?? 0}</div><div class="l">${l}</div></div>`; }
@@ -2122,78 +2162,455 @@ async function delUser(uid, name) {
 }
 
 /* ============================== v17: DEPARTMENT PORTALS ==============================
- * HR, Finance, and Student Coordinator each get their own fully isolated
- * portal - just an identity card and a duties checklist for now. Real tools
- * per department land once the working list below is finalized.
+ * HR, Finance, Student Coordinator, and Staff each get their own fully
+ * isolated portal wired to the real registration -> challan -> payment ->
+ * enrollment pipeline, plus HR's staff/group directory.
  */
-const DEPT_DUTIES = {
-  hr: {
-    title: 'HR Portal', tagline: 'Staff records, onboarding, and day-to-day people operations.',
-    duties: [
-      'Maintain staff and teacher records - personal details, contracts, and documents',
-      'Manage onboarding and offboarding of employees',
-      'Track attendance and leave requests for staff',
-      'Handle recruitment: job postings, screening, and interview coordination',
-      'Resolve employee queries and grievances',
-      'Ensure compliance with company policies and labor regulations',
-      'Organize staff training and development programs',
-      'Maintain confidentiality of employee data',
-    ],
-  },
-  finance: {
-    title: 'Finance Portal', tagline: 'Fees, invoices, and the academy\'s financial records.',
-    duties: [
-      'Track student fee payments, dues, and pending challans',
-      'Issue invoices and payment receipts',
-      'Reconcile payments received against enrollments',
-      'Manage refunds and fee adjustments',
-      'Monitor course/program revenue and prepare financial summaries',
-      'Track operational expenses and budgets',
-      'Coordinate with HR on payroll processing',
-      'Maintain accurate financial records for audits',
-    ],
-  },
-  student_coordinator: {
-    title: 'Student Coordinator Portal', tagline: 'Enrollments, schedules, and keeping students on track.',
-    duties: [
-      'Handle student enquiries, registrations, and follow-ups',
-      'Coordinate class schedules and batch timings with instructors',
-      'Track student attendance across batches and follow up on absentees',
-      'Communicate announcements, deadlines, and updates to students',
-      'Assist students with account or portal issues',
-      'Maintain and update student contact and lead records',
-      'Coordinate between students and admin/finance for fee or enrollment issues',
-      'Support onboarding of new students into their courses',
-    ],
-  },
-};
-function renderDeptPortal(role) {
-  const el = $(`view-${DEPT_ROLES[role].view}`);
-  const d = DEPT_DUTIES[role];
-  el.innerHTML = `
-    <div class="card"><div class="card-body" style="display:flex;gap:16px;align-items:center">
-      ${avatarHtml(ME.avatar, ME.name, 72)}
-      <div style="flex:1;min-width:0">
-        <h2 style="margin:0 0 2px">${esc(d.title)}</h2>
-        <div class="s" style="color:var(--muted)">${esc(d.tagline)}</div>
-        <div class="s" style="color:var(--muted);margin-top:6px">Signed in as <strong>${esc(ME.name)}</strong> &middot; ${esc(ME.email || ME.username || '')}</div>
-      </div>
+function money(n) { return 'Rs ' + Number(n || 0).toLocaleString('en-US'); }
+const PIPELINE_LABEL = { new: 'New', challan_issued: 'Challan issued', challan_sent: 'Challan sent', paid_cleared: 'Paid - awaiting enrollment', enrolled: 'Enrolled' };
+const PIPELINE_COLOR = { new: '#6B7280', challan_issued: '#D89A00', challan_sent: '#2A7BD1', paid_cleared: '#0FBFA8', enrolled: '#1FA36B' };
+function pipelineBadge(stage) {
+  const label = PIPELINE_LABEL[stage] || stage, color = PIPELINE_COLOR[stage] || '#6B7280';
+  return `<span style="display:inline-block;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:${color}1a;color:${color}">${esc(label)}</span>`;
+}
+function deptHeaderHtml(title) {
+  return `<div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:16px;align-items:center">
+    ${avatarHtml(ME.avatar, ME.name, 56)}
+    <div><h2 style="margin:0 0 2px;font-size:19px">${esc(title)}</h2><div class="s" style="color:var(--muted)">Signed in as ${esc(ME.name)} &middot; ${esc(ME.email || ME.username || '')}</div></div>
+  </div></div>`;
+}
+function deptTabBarHtml(tabs, active, switchFn) {
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    ${tabs.map(([k, l]) => `<button type="button" class="btn ${k === active ? 'btn-primary' : 'btn-ghost'} btn-sm" onclick="${switchFn}('${k}')">${esc(l)}</button>`).join('')}
+  </div>`;
+}
+
+/* -------------------------------- Finance portal -------------------------------- */
+let FIN_TAB = 'registrations';
+function finTab(tab) { FIN_TAB = tab; renderDeptFinance(); }
+async function renderDeptFinance() {
+  const el = $('view-dept-finance');
+  const tabs = [['registrations', 'Registrations'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['expenses', 'Expenses & balance sheet']];
+  el.innerHTML = deptHeaderHtml('Finance Portal') + deptTabBarHtml(tabs, FIN_TAB, 'finTab') + '<div id="finTabBody"><div class="empty">Loading&hellip;</div></div>';
+  if (FIN_TAB === 'registrations') renderFinRegistrations();
+  else if (FIN_TAB === 'discounts') renderFinDiscounts();
+  else if (FIN_TAB === 'bank') renderFinBank();
+  else renderFinExpenses();
+}
+async function renderFinRegistrations() {
+  const box = $('finTabBody');
+  const d = await api('/api/finance/registrations');
+  box.innerHTML = d.registrations.length ? d.registrations.map(finRegRow).join('') : '<div class="empty">No registrations yet.</div>';
+}
+function finRegRow(r) {
+  const latest = r.challans[0];
+  let action = '<span class="s" style="color:var(--muted)">New registration</span>';
+  if (r.payment_stage === 'new') {
+    action = `<button class="btn btn-primary btn-sm" onclick="finOpenChallanForm(${r.id})">Generate challan</button>`;
+  } else if (r.payment_stage === 'challan_issued') {
+    action = `<span class="s" style="color:var(--muted)">Net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
+      <button class="btn btn-primary btn-sm" onclick="finSendChallan('${latest.serial}')">Send challan</button>
+      <button class="btn btn-ghost btn-sm" onclick="finOpenChallanForm(${r.id})">Re-issue</button>`;
+  } else if (r.payment_stage === 'challan_sent') {
+    action = `<span class="s" style="color:var(--muted)">Sent &middot; net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
+      <button class="btn btn-primary btn-sm" onclick="finClearPayment(${r.id})">Mark paid / cleared</button>
+      <button class="btn btn-ghost btn-sm" onclick="finSendChallan('${latest.serial}')">Resend</button>`;
+  } else if (r.payment_stage === 'paid_cleared') {
+    action = `<span class="s" style="color:var(--ok)">Cleared - awaiting Student Coordinator to enroll</span>`;
+  } else if (r.payment_stage === 'enrolled') {
+    action = `<span class="s" style="color:var(--ok)">Enrolled</span>`;
+  }
+  return `<div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <div>
+      <div style="font-weight:700">${esc(r.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(r.email)}</span></div>
+      <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')} &nbsp;${pipelineBadge(r.payment_stage)}</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}</div>
+  </div></div>`;
+}
+async function finOpenChallanForm(regId) {
+  let cats = [];
+  try { cats = (await api('/api/finance/discount-categories')).categories.filter((c) => c.active); } catch {}
+  const opts = ['<option value="">No discount</option>', ...cats.map((c) => `<option value="${c.id}">${esc(c.name)} (${c.type === 'flat' ? money(c.value) : c.value + '%'})</option>`)].join('');
+  openModal('Generate challan', `
+    <form id="f">
+      <label class="field"><span>Discount category</span><select name="discount_category_id">${opts}</select></label>
+      <label class="field"><span>Payment deadline</span><input name="deadline" type="date" required></label>
+      <button class="btn btn-primary btn-block">Generate challan</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      await api(`/api/finance/registrations/${regId}/challan`, { method: 'POST', body: JSON.stringify({ discount_category_id: f.discount_category_id.value || null, deadline: f.deadline.value }) });
+      toast('Challan generated.'); closeModal(); renderFinRegistrations();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function finSendChallan(serial) {
+  try { await api(`/api/finance/challans/${encodeURIComponent(serial)}/send`, { method: 'POST' }); toast('Challan emailed to the student.'); renderFinRegistrations(); }
+  catch (e) { toast(e.message, true); }
+}
+async function finClearPayment(regId) {
+  if (!confirm('Confirm you have verified the payment proof and want to clear this student?')) return;
+  try { await api(`/api/finance/registrations/${regId}/clear`, { method: 'POST' }); toast('Marked paid - Student Coordinator can now enroll them.'); renderFinRegistrations(); }
+  catch (e) { toast(e.message, true); }
+}
+async function renderFinDiscounts() {
+  const box = $('finTabBody');
+  const d = await api('/api/finance/discount-categories');
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="s" style="color:var(--muted)">Discounts are snapshotted onto each challan when generated - editing one later never changes past challans.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="finAddDiscount()">Add discount category</button>
     </div></div>
-    <div class="card"><div class="card-head"><h3>Your duties</h3><span class="s" style="color:var(--muted)">Generic scope for now - tools for each item are being finalized</span></div>
+    <div class="card"><div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Type</th><th>Value</th><th>Status</th><th></th></tr>
+      ${d.categories.map((c) => `<tr>
+        <td>${esc(c.name)}</td><td>${c.type === 'flat' ? 'Flat' : 'Percent'}</td><td>${c.type === 'flat' ? money(c.value) : c.value + '%'}</td>
+        <td>${c.active ? '<span class="s" style="color:var(--ok)">Active</span>' : '<span class="s" style="color:var(--muted)">Inactive</span>'}</td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="btn btn-ghost btn-sm" onclick="finToggleDiscount(${c.id},${!c.active})">${c.active ? 'Deactivate' : 'Activate'}</button>
+          <button class="btn btn-danger btn-sm" onclick="finDeleteDiscount(${c.id})">Delete</button>
+        </td></tr>`).join('') || '<tr><td colspan="5" class="empty">No discount categories yet.</td></tr>'}
+    </table></div></div>`;
+}
+function finAddDiscount() {
+  openModal('Add discount category', `
+    <form id="f">
+      <label class="field"><span>Name</span><input name="name" required placeholder="e.g. Early bird, Sibling discount"></label>
+      <label class="field"><span>Type</span><select name="type"><option value="percent">Percent off</option><option value="flat">Flat amount off</option></select></label>
+      <label class="field"><span>Value</span><input name="value" type="number" min="0" required placeholder="e.g. 10 for 10%, or 1000 for Rs 1000"></label>
+      <button class="btn btn-primary btn-block">Add category</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api('/api/finance/discount-categories', { method: 'POST', body: JSON.stringify({ name: f.name.value, type: f.type.value, value: f.value.value }) }); toast('Discount category added.'); closeModal(); renderFinDiscounts(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function finToggleDiscount(id, active) {
+  try { await api(`/api/finance/discount-categories/${id}`, { method: 'PATCH', body: JSON.stringify({ active }) }); renderFinDiscounts(); } catch (e) { toast(e.message, true); }
+}
+async function finDeleteDiscount(id) {
+  if (!confirm('Delete this discount category?')) return;
+  try { await api(`/api/finance/discount-categories/${id}`, { method: 'DELETE' }); toast('Deleted.'); renderFinDiscounts(); } catch (e) { toast(e.message, true); }
+}
+async function renderFinBank() {
+  const box = $('finTabBody');
+  const d = await api('/api/finance/bank-details');
+  const b = d.bank || {};
+  box.innerHTML = `
+    <div class="card"><div class="card-head"><h3>Bank details</h3><span class="s" style="color:var(--muted)">Snapshotted onto every new challan you generate</span></div>
       <div class="card-body">
-        <ul style="list-style:none;padding:0;margin:0">
-          ${d.duties.map((x) => `<li style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.5">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px;color:var(--primary)"><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg>
-            <span>${esc(x)}</span></li>`).join('')}
-        </ul>
+        <form id="f">
+          <div class="form-grid">
+            <label class="field"><span>Bank name</span><input name="bank_name" value="${esc(b.bank_name || '')}"></label>
+            <label class="field"><span>Account title</span><input name="account_title" value="${esc(b.account_title || '')}"></label>
+          </div>
+          <div class="form-grid">
+            <label class="field"><span>Account number</span><input name="account_number" value="${esc(b.account_number || '')}"></label>
+            <label class="field"><span>IBAN</span><input name="iban" value="${esc(b.iban || '')}"></label>
+          </div>
+          <label class="field"><span>Branch</span><input name="branch" value="${esc(b.branch || '')}"></label>
+          <button class="btn btn-primary">Save bank details</button>
+        </form>
+      </div></div>`;
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try { await api('/api/finance/bank-details', { method: 'POST', body: JSON.stringify({ bank_name: f.bank_name.value, account_title: f.account_title.value, account_number: f.account_number.value, iban: f.iban.value, branch: f.branch.value }) }); toast('Bank details saved.'); }
+    catch (err) { toast(err.message, true); }
+    btn.disabled = false;
+  });
+}
+async function renderFinExpenses() {
+  const box = $('finTabBody');
+  const [bs, ex] = await Promise.all([api('/api/finance/balance-sheet'), api('/api/finance/expenses')]);
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-head"><h3>Balance sheet</h3><span class="s" style="color:var(--muted)">Income from cleared challans, minus logged expenses</span></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+          <div><div class="s" style="color:var(--muted)">Income (paid challans)</div><div style="font-size:22px;font-weight:800;color:var(--ok)">${money(bs.income)}</div></div>
+          <div><div class="s" style="color:var(--muted)">Expenses</div><div style="font-size:22px;font-weight:800;color:var(--danger)">${money(bs.expenses)}</div></div>
+          <div><div class="s" style="color:var(--muted)">Balance</div><div style="font-size:22px;font-weight:800">${money(bs.balance)}</div></div>
+        </div>
+        ${bs.expense_by_category.length ? `<div class="s" style="margin-top:14px;font-weight:700;color:var(--ink)">Expenses by category</div>
+        <ul style="list-style:none;padding:0;margin:6px 0 0">${bs.expense_by_category.map((c) => `<li style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px"><span>${esc(c.category)}</span><span>${money(c.amount)}</span></li>`).join('')}</ul>` : ''}
       </div></div>
-    <div class="card"><div class="card-body">
-      <p class="s" style="color:var(--muted)">This portal is scoped to ${esc(d.title.replace(' Portal', ''))} only - you will not see courses, grades, other departments, or admin tools. More features land here as the working list above is finalized.</p>
+    <div class="card"><div class="card-head"><h3>Expenses</h3><button class="btn btn-primary btn-sm" onclick="finAddExpense()">Add expense</button></div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr>
+        ${ex.expenses.map((e) => `<tr><td>${esc(e.date)}</td><td>${esc(e.category)}</td><td class="s">${esc(e.description || '-')}</td><td>${money(e.amount)}</td>
+          <td style="text-align:right"><button class="btn btn-danger btn-sm" onclick="finDeleteExpense(${e.id})">Delete</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">No expenses logged yet.</td></tr>'}
+      </table></div></div>`;
+}
+function finAddExpense() {
+  openModal('Add expense', `
+    <form id="f">
+      <label class="field"><span>Date</span><input name="date" type="date" value="${new Date().toISOString().slice(0, 10)}" required></label>
+      <label class="field"><span>Category</span><input name="category" required placeholder="e.g. Rent, Salaries, Marketing"></label>
+      <label class="field"><span>Description</span><input name="description" placeholder="Optional note"></label>
+      <label class="field"><span>Amount (PKR)</span><input name="amount" type="number" min="1" required></label>
+      <button class="btn btn-primary btn-block">Add expense</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api('/api/finance/expenses', { method: 'POST', body: JSON.stringify({ date: f.date.value, category: f.category.value, description: f.description.value, amount: f.amount.value }) }); toast('Expense added.'); closeModal(); renderFinExpenses(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function finDeleteExpense(id) {
+  if (!confirm('Delete this expense?')) return;
+  try { await api(`/api/finance/expenses/${id}`, { method: 'DELETE' }); toast('Deleted.'); renderFinExpenses(); } catch (e) { toast(e.message, true); }
+}
+
+/* -------------------------------- Student Coordinator portal -------------------------------- */
+let COORD_TAB = 'registrations';
+function coordTab(tab) { COORD_TAB = tab; renderDeptStudentCoordinator(); }
+async function renderDeptStudentCoordinator() {
+  const el = $('view-dept-student-coordinator');
+  const tabs = [['registrations', 'Registrations & Enrollments'], ['queries', 'Student queries']];
+  el.innerHTML = deptHeaderHtml('Student Coordinator Portal') + deptTabBarHtml(tabs, COORD_TAB, 'coordTab') + '<div id="coordTabBody"><div class="empty">Loading&hellip;</div></div>';
+  if (COORD_TAB === 'registrations') renderCoordRegistrations();
+  else renderCoordQueries();
+}
+async function renderCoordRegistrations() {
+  const box = $('coordTabBody');
+  const d = await api('/api/coordinator/registrations');
+  box.innerHTML = d.registrations.length ? d.registrations.map(coordRegRow).join('') : '<div class="empty">No registrations yet.</div>';
+}
+function coordRegRow(r) {
+  let action = `<span class="s" style="color:var(--muted)">Waiting on Finance</span>`;
+  if (r.payment_stage === 'paid_cleared') {
+    action = r.available_batches.length
+      ? `<select id="batchSel${r.id}" class="field" style="margin:0;min-width:200px">${r.available_batches.map((b) => `<option value="${b.id}">${esc(b.name)} &middot; starts ${esc(b.start_date || '-')}</option>`).join('')}</select>
+         <button class="btn btn-primary btn-sm" onclick="coordEnroll(${r.id})">Enroll student</button>`
+      : `<span class="s" style="color:var(--danger)">No batches open for this course yet - ask admin to open one.</span>`;
+  } else if (r.payment_stage === 'enrolled') {
+    action = `<span class="s" style="color:var(--ok)">Enrolled</span>`;
+  }
+  return `<div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <div>
+      <div style="font-weight:700">${esc(r.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(r.email)}</span></div>
+      <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')} &nbsp;${pipelineBadge(r.payment_stage)}</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}</div>
+  </div></div>`;
+}
+async function coordEnroll(regId) {
+  const sel = $('batchSel' + regId);
+  if (!sel || !sel.value) { toast('Choose a batch first.', true); return; }
+  try {
+    const out = await api(`/api/coordinator/registrations/${regId}/enroll`, { method: 'POST', body: JSON.stringify({ batch_id: sel.value }) });
+    toast(out.credentials ? 'Enrolled - new account credentials emailed.' : 'Enrolled - added to their existing account.');
+    renderCoordRegistrations();
+  } catch (e) { toast(e.message, true); }
+}
+async function renderCoordQueries() {
+  const box = $('coordTabBody');
+  const d = await api('/api/coordinator/queries');
+  box.innerHTML = d.queries.length ? d.queries.map(coordQueryCard).join('') : '<div class="empty">No student queries yet.</div>';
+}
+function coordQueryCard(q) {
+  return `<div class="card" style="margin-bottom:10px"><div class="card-head">
+      <h3 style="font-size:15px">${esc(q.subject)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(q.student_name)}</span></h3>
+      <span class="s" style="color:${q.status === 'resolved' ? 'var(--ok)' : 'var(--gold)'}">${q.status === 'resolved' ? 'Resolved' : 'Open'}</span>
+    </div>
+    <div class="card-body">
+      <div style="max-height:220px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+        ${q.messages.map((m) => `<div class="s" style="padding:8px 12px;border-radius:10px;white-space:pre-wrap;background:${m.from_role === 'student' ? 'var(--bg)' : 'var(--primary-soft, rgba(124,58,237,.08))'};border:1px solid var(--line)"><strong>${esc(m.from_name)}</strong> &middot; ${esc((m.at || '').slice(0, 16))}<br>${esc(m.body)}</div>`).join('')}
+      </div>
+      ${q.status !== 'resolved' ? `
+      <form onsubmit="return coordReplyQuery(event,${q.id})" style="display:flex;gap:8px;margin-bottom:8px">
+        <input name="body" class="field" style="flex:1;margin:0" placeholder="Write a reply..." required>
+        <button class="btn btn-ghost">Reply</button>
+      </form>
+      <button class="btn btn-primary btn-sm" onclick="coordResolveQuery(${q.id})">Mark resolved</button>` : ''}
     </div></div>`;
 }
-function renderDeptHR() { renderDeptPortal('hr'); }
-function renderDeptFinance() { renderDeptPortal('finance'); }
-function renderDeptStudentCoordinator() { renderDeptPortal('student_coordinator'); }
+async function coordReplyQuery(e, id) {
+  e.preventDefault();
+  const body = e.target.body.value.trim(); if (!body) return false;
+  try { await api(`/api/coordinator/queries/${id}/reply`, { method: 'POST', body: JSON.stringify({ body }) }); renderCoordQueries(); }
+  catch (err) { toast(err.message, true); }
+  return false;
+}
+async function coordResolveQuery(id) {
+  try { await api(`/api/coordinator/queries/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'resolved' }) }); toast('Marked resolved.'); renderCoordQueries(); }
+  catch (e) { toast(e.message, true); }
+}
+
+/* -------------------------------- HR portal -------------------------------- */
+let HR_TAB = 'staff';
+let HR_GROUPS_CACHE = [];
+function hrTab(tab) { HR_TAB = tab; renderDeptHR(); }
+async function renderDeptHR() {
+  const el = $('view-dept-hr');
+  const tabs = [['staff', 'Staff & interns'], ['groups', 'Groups']];
+  el.innerHTML = deptHeaderHtml('HR Portal') + deptTabBarHtml(tabs, HR_TAB, 'hrTab') + '<div id="hrTabBody"><div class="empty">Loading&hellip;</div></div>';
+  if (HR_TAB === 'staff') renderHrStaff();
+  else renderHrGroups();
+}
+async function renderHrStaff() {
+  const box = $('hrTabBody');
+  const [staffD, groupsD] = await Promise.all([api('/api/hr/staff'), api('/api/hr/groups')]);
+  HR_GROUPS_CACHE = groupsD.groups;
+  const groupName = (gid) => (HR_GROUPS_CACHE.find((g) => g.id === gid) || {}).name || 'Unassigned';
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="s" style="color:var(--muted)">Staff and interns sign in to their own portal to see instructions and follow-ups.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="hrAddStaff()">Add staff / intern</button>
+    </div></div>
+    ${staffD.staff.length ? staffD.staff.map((s) => `
+      <div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:700">${esc(s.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(s.position || (s.employment_type === 'intern' ? 'Intern' : 'Staff'))}</span></div>
+          <div class="s" style="color:var(--muted)">${esc(groupName(s.group_id))} &middot; ${esc(s.email)} &middot; ${s.status === 'active' ? 'Active' : 'Inactive'}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="hrOpenStaffDetail(${s.id})">Instructions &amp; follow-ups</button>
+      </div></div>`).join('') : '<div class="empty">No staff or interns added yet.</div>'}`;
+}
+function hrAddStaff() {
+  const opts = ['<option value="">Unassigned</option>', ...HR_GROUPS_CACHE.map((g) => `<option value="${g.id}">${esc(g.name)}</option>`)].join('');
+  openModal('Add staff / intern', `
+    <form id="f">
+      <label class="field"><span>Full name</span><input name="name" required></label>
+      <label class="field"><span>Email</span><input name="email" type="email" required></label>
+      <div class="form-grid">
+        <label class="field"><span>Phone</span><input name="phone"></label>
+        <label class="field"><span>Position</span><input name="position" placeholder="e.g. Video Editor"></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Employment type</span><select name="employment_type"><option value="paid_staff">Paid staff</option><option value="intern">Intern</option></select></label>
+        <label class="field"><span>Group</span><select name="group_id">${opts}</select></label>
+      </div>
+      <button class="btn btn-primary btn-block">Create account</button></form>
+    <div id="credOut"></div>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      const out = await api('/api/hr/staff', { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value, phone: f.phone.value, position: f.position.value, employment_type: f.employment_type.value, group_id: f.group_id.value || null }) });
+      $('credOut').innerHTML = `<p style="margin:12px 0 4px;font-weight:600">Account created - copy now:</p>
+        <div class="cred-box">${esc(out.credentials.name)}<br>Username: ${esc(out.credentials.username)}<br>Password: ${esc(out.credentials.password)}</div>`;
+      modalMsg('Account created.', true); f.reset();
+      renderHrStaff();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function hrOpenStaffDetail(id) {
+  const d = await api('/api/hr/staff');
+  const s = d.staff.find((x) => x.id === id); if (!s) return;
+  openModal(`${s.name} - instructions & follow-ups`, hrStaffDetailHtml(s), true);
+  wireHrStaffDetailForms(s.id);
+}
+function hrStaffDetailHtml(s) {
+  return `
+    <div style="margin-bottom:16px">
+      <div class="s" style="font-weight:700;color:var(--ink);margin-bottom:6px">Instructions</div>
+      <div style="max-height:160px;overflow:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+        ${s.instructions.length ? s.instructions.map((i) => `<div class="s" style="padding:8px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--line)"><strong>${esc(i.by)}</strong> &middot; ${esc((i.at || '').slice(0, 16))}<br>${esc(i.body)}</div>`).join('') : '<div class="s" style="color:var(--muted)">None yet.</div>'}
+      </div>
+      <form id="instrForm" style="display:flex;gap:8px">
+        <input name="body" class="field" style="flex:1;margin:0" placeholder="Add an instruction..." required>
+        <button class="btn btn-ghost">Add</button>
+      </form>
+    </div>
+    <div>
+      <div class="s" style="font-weight:700;color:var(--ink);margin-bottom:6px">Follow-ups</div>
+      <div style="max-height:160px;overflow:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+        ${s.follow_ups.length ? s.follow_ups.map((f) => `<div class="s" style="padding:8px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--line)">
+          <strong>${esc(f.by)}</strong> &middot; ${esc((f.at || '').slice(0, 16))}<br>${esc(f.body)}
+          ${f.response ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--line)"><strong>${esc(s.name)}:</strong> ${esc(f.response)}</div>` : '<div class="s" style="color:var(--muted);margin-top:4px">No response yet.</div>'}
+        </div>`).join('') : '<div class="s" style="color:var(--muted)">None yet.</div>'}
+      </div>
+      <form id="fuForm" style="display:flex;gap:8px">
+        <input name="body" class="field" style="flex:1;margin:0" placeholder="Ask for a check-in / update..." required>
+        <button class="btn btn-ghost">Add</button>
+      </form>
+    </div>`;
+}
+function wireHrStaffDetailForms(sid) {
+  $('instrForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const body = e.target.body.value.trim(); if (!body) return;
+    try { await api(`/api/hr/staff/${sid}/instructions`, { method: 'POST', body: JSON.stringify({ body }) }); hrOpenStaffDetail(sid); renderHrStaff(); }
+    catch (err) { toast(err.message, true); }
+  });
+  $('fuForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const body = e.target.body.value.trim(); if (!body) return;
+    try { await api(`/api/hr/staff/${sid}/follow-ups`, { method: 'POST', body: JSON.stringify({ body }) }); hrOpenStaffDetail(sid); renderHrStaff(); }
+    catch (err) { toast(err.message, true); }
+  });
+}
+async function renderHrGroups() {
+  const box = $('hrTabBody');
+  const d = await api('/api/hr/groups');
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="s" style="color:var(--muted)">Groups organize staff and interns into teams.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="hrAddGroup()">Add group</button>
+    </div></div>
+    ${d.groups.length ? d.groups.map((g) => `
+      <div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div><div style="font-weight:700">${esc(g.name)}</div>${g.description ? `<div class="s" style="color:var(--muted)">${esc(g.description)}</div>` : ''}</div>
+        <button class="btn btn-danger btn-sm" onclick="hrDeleteGroup(${g.id})">Delete</button>
+      </div></div>`).join('') : '<div class="empty">No groups yet.</div>'}`;
+}
+function hrAddGroup() {
+  openModal('Add group', `
+    <form id="f">
+      <label class="field"><span>Group name</span><input name="name" required placeholder="e.g. Content Team"></label>
+      <label class="field"><span>Description (optional)</span><input name="description"></label>
+      <button class="btn btn-primary btn-block">Add group</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api('/api/hr/groups', { method: 'POST', body: JSON.stringify({ name: f.name.value, description: f.description.value }) }); toast('Group added.'); closeModal(); renderHrGroups(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function hrDeleteGroup(id) {
+  if (!confirm('Delete this group? Staff in it become Unassigned.')) return;
+  try { await api(`/api/hr/groups/${id}`, { method: 'DELETE' }); toast('Deleted.'); renderHrGroups(); } catch (e) { toast(e.message, true); }
+}
+
+/* -------------------------------- Staff portal -------------------------------- */
+async function renderDeptStaff() {
+  const el = $('view-dept-staff');
+  try {
+    const d = await api('/api/staff/me');
+    const s = d.staff;
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:16px;align-items:center">
+        ${avatarHtml(ME.avatar, ME.name, 56)}
+        <div><h2 style="margin:0 0 2px;font-size:19px">Staff Portal</h2>
+          <div class="s" style="color:var(--muted)">${d.group ? esc(d.group.name) : 'Unassigned'} &middot; ${esc(s.position || (s.employment_type === 'intern' ? 'Intern' : 'Staff'))}</div>
+        </div>
+      </div></div>
+      <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Instructions from HR</h3></div>
+        <div class="card-body">
+          ${s.instructions.length ? s.instructions.map((i) => `<div class="s" style="padding:9px 0;border-bottom:1px solid var(--line)"><strong>${esc(i.by)}</strong> &middot; ${esc((i.at || '').slice(0, 16))}<br>${esc(i.body)}</div>`).join('') : '<div class="s" style="color:var(--muted)">Nothing yet.</div>'}
+        </div></div>
+      <div class="card"><div class="card-head"><h3>Follow-ups</h3></div>
+        <div class="card-body">
+          ${s.follow_ups.length ? s.follow_ups.map((f, i) => `
+            <div style="padding:10px 0;border-bottom:1px solid var(--line)">
+              <div class="s"><strong>${esc(f.by)}</strong> &middot; ${esc((f.at || '').slice(0, 16))}</div>
+              <div class="s" style="margin:4px 0">${esc(f.body)}</div>
+              ${f.response ? `<div class="s" style="padding:8px 10px;border-radius:8px;background:var(--bg);margin-top:6px"><strong>Your response:</strong> ${esc(f.response)}</div>`
+                : `<form onsubmit="return staffRespondFollowUp(event,${i})" style="display:flex;gap:8px;margin-top:6px">
+                     <input name="response" class="field" style="flex:1;margin:0" placeholder="Write your response..." required>
+                     <button class="btn btn-ghost btn-sm">Respond</button></form>`}
+            </div>`).join('') : '<div class="s" style="color:var(--muted)">Nothing yet.</div>'}
+        </div></div>`;
+  } catch (e) {
+    el.innerHTML = `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">${esc(e.message)}</p></div></div>`;
+  }
+}
+async function staffRespondFollowUp(e, idx) {
+  e.preventDefault();
+  const response = e.target.response.value.trim(); if (!response) return false;
+  try { await api(`/api/staff/follow-ups/${idx}/respond`, { method: 'POST', body: JSON.stringify({ response }) }); renderDeptStaff(); }
+  catch (err) { toast(err.message, true); }
+  return false;
+}
 
 
 /* ============================== AI DRAFT ============================== */

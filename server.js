@@ -24,6 +24,7 @@ const {
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
+  DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -145,6 +146,11 @@ function staffView(req, res, next) { // admin, coordinator, or the course's teac
   if (['admin', 'coordinator', 'instructor'].includes(req.user.role)) return next();
   return res.status(403).json({ error: 'Not available for your role.' });
 }
+// v17: narrow department gates - each isolated role plus admin, nothing else.
+function financeOnly(req, res, next) { if (['admin', 'finance'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
+function studentCoordinatorOnly(req, res, next) { if (['admin', 'student_coordinator'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
+function hrOnly(req, res, next) { if (['admin', 'hr'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
+function staffOnly(req, res, next) { if (['admin', 'staff'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function manageBatch(req, res, next) { // WRITE access: admin or an assigned teacher
   const b = Batches.byId(req.params.id);
   if (!b) return res.status(404).json({ error: 'Course not found.' });
@@ -1835,6 +1841,12 @@ app.get('/api/verify/:serial', (req, res) => {
   if (!c) return res.status(404).json({ valid: false, error: 'No certificate exists for this serial. It may have been revoked.' });
   res.json({ valid: true, certificate: Certificates.publicView(c), verify_url: `${APP_URL}/cert?s=${c.serial}` });
 });
+// PUBLIC verification for a fee challan - what its QR code opens.
+app.get('/api/verify-challan/:serial', (req, res) => {
+  const c = Challans.bySerial(req.params.serial);
+  if (!c) return res.status(404).json({ valid: false, error: 'No challan exists for this serial.' });
+  res.json({ valid: true, challan: Challans.publicView(c), verify_url: `${APP_URL}/challan?s=${c.serial}` });
+});
 // Signature images must be publicly visible on the certificate page.
 app.get('/api/public/cert-image/:name', (req, res) => {
   const name = path.basename(String(req.params.name));
@@ -2284,6 +2296,210 @@ app.patch('/api/admin/registrations/:id', authRequired, adminRequired, (req, res
 });
 app.delete('/api/admin/registrations/:id', authRequired, adminRequired, (req, res) => { Registrations.remove(req.params.id); res.json({ ok: true }); });
 
+/* ============================== v17: FINANCE PORTAL ==============================
+ * A registration flows: new -> challan_issued -> challan_sent -> paid_cleared
+ * -> enrolled. Finance owns everything up to "paid_cleared" (money); the
+ * Student Coordinator owns "enrolled" (course logistics/schedule) below.
+ */
+app.get('/api/finance/discount-categories', authRequired, financeOnly, (req, res) => res.json({ categories: DiscountCategories.all() }));
+app.post('/api/finance/discount-categories', authRequired, financeOnly, (req, res) => {
+  const { name, type, value } = req.body || {};
+  if (!name || !String(name).trim()) return res.status(400).json({ error: 'Give the discount a name.' });
+  res.json({ ok: true, category: DiscountCategories.create({ name, type, value }, req.user.id) });
+});
+app.patch('/api/finance/discount-categories/:id', authRequired, financeOnly, (req, res) => {
+  const c = DiscountCategories.update(req.params.id, req.body || {});
+  if (!c) return res.status(404).json({ error: 'Discount category not found.' });
+  res.json({ ok: true, category: c });
+});
+app.delete('/api/finance/discount-categories/:id', authRequired, financeOnly, (req, res) => { DiscountCategories.remove(req.params.id); res.json({ ok: true }); });
+
+app.get('/api/finance/bank-details', authRequired, financeOnly, (req, res) => res.json({ bank: Settings.bank() }));
+app.post('/api/finance/bank-details', authRequired, financeOnly, (req, res) => res.json({ ok: true, bank: Settings.setBank(req.body || {}) }));
+
+app.get('/api/finance/registrations', authRequired, financeOnly, (req, res) => {
+  const rows = Registrations.all().map((r) => ({ ...r, challans: Challans.forRegistration(r.id) }));
+  res.json({ registrations: rows });
+});
+app.post('/api/finance/registrations/:id/challan', authRequired, financeOnly, (req, res) => {
+  const { discount_category_id, deadline } = req.body || {};
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(deadline || ''))) return res.status(400).json({ error: 'Set a deadline date for this challan.' });
+  const out = Challans.generate({ registration_id: req.params.id, discount_category_id: discount_category_id || null, deadline, generated_by: req.user.id });
+  if (out.error) return res.status(400).json({ error: out.error });
+  res.json({ ok: true, challan: out.challan });
+});
+app.post('/api/finance/challans/:serial/send', authRequired, financeOnly, (req, res) => {
+  const c = Challans.bySerial(req.params.serial);
+  if (!c) return res.status(404).json({ error: 'Challan not found.' });
+  const bank = c.bank_snapshot || {};
+  const bankLines = [bank.bank_name && `Bank: ${bank.bank_name}`, bank.account_title && `Account title: ${bank.account_title}`, bank.account_number && `Account number: ${bank.account_number}`, bank.iban && `IBAN: ${bank.iban}`, bank.branch && `Branch: ${bank.branch}`].filter(Boolean).join('\n');
+  mailer.notify(c.student_email, `EchoLens - fee challan for ${c.course_title}`,
+    `Assalam-o-Alaikum ${c.student_name},\n\nHere is your fee challan for ${c.course_title}.\n\nCourse fee: Rs ${c.gross_fee.toLocaleString('en-US')}${c.discount_label ? `\nDiscount: ${c.discount_label} (-Rs ${c.discount_amount.toLocaleString('en-US')})` : ''}\nAmount payable: Rs ${c.net_fee.toLocaleString('en-US')}\nDeadline: ${c.deadline}\n\nPayment details:\n${bankLines}\n\nAfter paying, email your payment proof to info@echolens.digital and our finance team will confirm your enrollment.\n\nView and verify this challan: ${APP_URL}/challan?s=${c.serial}`);
+  Challans.markSent(c.serial);
+  res.json({ ok: true });
+});
+app.post('/api/finance/registrations/:id/clear', authRequired, financeOnly, (req, res) => {
+  const r = Registrations.byId(req.params.id);
+  if (!r || !r.challan_serial) return res.status(400).json({ error: 'Generate a challan for this registration first.' });
+  const c = Challans.markPaid(r.challan_serial, req.user.id);
+  if (!c) return res.status(404).json({ error: 'Challan not found.' });
+  res.json({ ok: true, registration: Registrations.byId(r.id) });
+});
+
+app.get('/api/finance/expenses', authRequired, financeOnly, (req, res) => res.json({ expenses: Expenses.all() }));
+app.post('/api/finance/expenses', authRequired, financeOnly, (req, res) => {
+  const { date, category, description, amount } = req.body || {};
+  if (!amount || Number(amount) <= 0) return res.status(400).json({ error: 'Enter a valid amount.' });
+  res.json({ ok: true, expense: Expenses.create({ date, category, description, amount }, req.user.id) });
+});
+app.delete('/api/finance/expenses/:id', authRequired, financeOnly, (req, res) => { Expenses.remove(req.params.id); res.json({ ok: true }); });
+app.get('/api/finance/balance-sheet', authRequired, financeOnly, (req, res) => res.json(Expenses.balanceSheet()));
+
+/* ============================== v17: STUDENT COORDINATOR PORTAL ============================== */
+app.get('/api/coordinator/registrations', authRequired, studentCoordinatorOnly, (req, res) => {
+  const rows = Registrations.all().map((r) => {
+    const course = Courses.byCode(r.course_code);
+    const available_batches = course ? Batches.all().filter((b) => b.course_id === course.id).map((b) => ({ id: b.id, name: b.name, start_date: b.start_date, status: b.status })) : [];
+    return { ...r, available_batches };
+  });
+  res.json({ registrations: rows });
+});
+app.post('/api/coordinator/registrations/:id/enroll', authRequired, studentCoordinatorOnly, async (req, res) => {
+  const r = Registrations.byId(req.params.id);
+  if (!r) return res.status(404).json({ error: 'Registration not found.' });
+  if (r.payment_stage !== 'paid_cleared') return res.status(400).json({ error: 'This registration is not yet cleared by Finance.' });
+  const { batch_id } = req.body || {};
+  const b = Batches.byId(batch_id);
+  const course = Courses.byCode(r.course_code);
+  if (!b || !course || b.course_id !== course.id) return res.status(400).json({ error: 'Choose a valid batch for this course.' });
+  let u = Users.byLogin(r.email);
+  let password = null, freshAccount = false;
+  if (u) {
+    if (!['student', 'free'].includes(u.role)) return res.status(400).json({ error: 'This email already belongs to a non-student account - resolve manually.' });
+    if (u.role === 'free') u.role = 'student'; // now a paying student, not a free-tier account
+  } else {
+    if (!(await emailDomainExists(r.email))) return res.status(400).json({ error: 'That email domain does not receive mail - check with the student before enrolling.' });
+    const created = Users.create({ name: r.name, role: 'student', email: r.email });
+    u = created.user; password = created.password; freshAccount = true;
+  }
+  Enrollments.create(u.id, b.id);
+  const bd = Batches.decorate(b);
+  if (freshAccount) {
+    mailer.notify(r.email, 'Welcome to EchoLens - your account',
+      `Hi ${u.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nUsername: ${u.username}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
+  } else {
+    mailer.notify(r.email, `You've been added to ${bd.title || bd.name}`,
+      `Hi ${u.name},\n\nYou have been enrolled in ${bd.title || bd.name}. Sign in to your existing EchoLens account at ${APP_URL} to get started.`);
+  }
+  const updated = Registrations._setStage(r.id, 'enrolled', { enrolled_user_id: u.id, enrolled_batch_id: b.id });
+  res.json({ ok: true, registration: updated, credentials: freshAccount ? { username: u.username, password } : null });
+});
+app.get('/api/coordinator/queries', authRequired, studentCoordinatorOnly, (req, res) => res.json({ queries: CoordinatorQueries.all() }));
+app.post('/api/coordinator/queries/:id/reply', authRequired, studentCoordinatorOnly, (req, res) => {
+  const { body } = req.body || {};
+  if (!body || !String(body).trim()) return res.status(400).json({ error: 'Write a reply first.' });
+  const q = CoordinatorQueries.reply(req.params.id, { from_role: 'coordinator', from_name: req.user.name, body });
+  if (!q) return res.status(404).json({ error: 'Query not found.' });
+  res.json({ ok: true, query: q });
+});
+app.patch('/api/coordinator/queries/:id', authRequired, studentCoordinatorOnly, (req, res) => {
+  const q = CoordinatorQueries.setStatus(req.params.id, (req.body || {}).status);
+  if (!q) return res.status(404).json({ error: 'Query not found.' });
+  res.json({ ok: true, query: q });
+});
+
+/* ------------------------- student-side: contact my coordinator ------------------------- */
+app.get('/api/my/queries', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.json({ queries: [] });
+  res.json({ queries: CoordinatorQueries.forStudent(req.user.id) });
+});
+app.post('/api/my/queries', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.status(403).json({ error: 'Queries are for enrolled students.' });
+  const { subject, body } = req.body || {};
+  if (!body || !String(body).trim()) return res.status(400).json({ error: 'Write your question or issue first.' });
+  const q = CoordinatorQueries.create({ student_id: req.user.id, student_name: req.user.name, subject, body });
+  res.json({ ok: true, query: q });
+});
+app.post('/api/my/queries/:id/reply', authRequired, (req, res) => {
+  if (req.user.role !== 'student') return res.status(403).json({ error: 'Queries are for enrolled students.' });
+  const q = CoordinatorQueries.byId(req.params.id);
+  if (!q || q.student_id !== req.user.id) return res.status(404).json({ error: 'Query not found.' });
+  const { body } = req.body || {};
+  if (!body || !String(body).trim()) return res.status(400).json({ error: 'Write a message first.' });
+  res.json({ ok: true, query: CoordinatorQueries.reply(req.params.id, { from_role: 'student', from_name: req.user.name, body }) });
+});
+
+/* ============================== v17: HR PORTAL ==============================
+ * HR creates 'staff' accounts directly (unlike the other department roles,
+ * which admin creates) - this is HR's own onboarding function.
+ */
+app.get('/api/hr/groups', authRequired, hrOnly, (req, res) => res.json({ groups: StaffGroups.all() }));
+app.post('/api/hr/groups', authRequired, hrOnly, (req, res) => {
+  const { name } = req.body || {};
+  if (!name || !String(name).trim()) return res.status(400).json({ error: 'Give the group a name.' });
+  res.json({ ok: true, group: StaffGroups.create(req.body || {}) });
+});
+app.patch('/api/hr/groups/:id', authRequired, hrOnly, (req, res) => {
+  const g = StaffGroups.update(req.params.id, req.body || {});
+  if (!g) return res.status(404).json({ error: 'Group not found.' });
+  res.json({ ok: true, group: g });
+});
+app.delete('/api/hr/groups/:id', authRequired, hrOnly, (req, res) => { StaffGroups.remove(req.params.id); res.json({ ok: true }); });
+
+app.get('/api/hr/staff', authRequired, hrOnly, (req, res) => res.json({ staff: StaffRecords.all() }));
+app.post('/api/hr/staff', authRequired, hrOnly, async (req, res) => {
+  const { name, email, phone, position, employment_type, group_id } = req.body || {};
+  if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
+  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address - credentials are emailed there.' });
+  if (Users.byLogin(email)) return res.status(400).json({ error: 'An account with this email already exists.' });
+  if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
+  const { user, password } = Users.create({ name: String(name).trim(), role: 'staff', email });
+  const record = StaffRecords.create({ user_id: user.id, name: user.name, email, phone, position, employment_type, group_id });
+  mailer.notify(email, 'Welcome to EchoLens - your staff account',
+    `Hi ${user.name},\n\nYour EchoLens staff account is ready.\n\nUsername: ${user.username}\nPassword: ${password}\n\nSign in at ${APP_URL} to see your team, instructions, and follow-ups.`);
+  res.json({ ok: true, staff: record, credentials: { name: user.name, username: user.username, password } });
+});
+app.patch('/api/hr/staff/:id', authRequired, hrOnly, (req, res) => {
+  const s = StaffRecords.update(req.params.id, req.body || {});
+  if (!s) return res.status(404).json({ error: 'Staff record not found.' });
+  res.json({ ok: true, staff: s });
+});
+app.delete('/api/hr/staff/:id', authRequired, hrOnly, (req, res) => {
+  const s = StaffRecords.byId(req.params.id);
+  if (s) Users.remove(s.user_id);
+  StaffRecords.remove(req.params.id);
+  res.json({ ok: true });
+});
+app.post('/api/hr/staff/:id/instructions', authRequired, hrOnly, (req, res) => {
+  const { body } = req.body || {};
+  if (!body || !String(body).trim()) return res.status(400).json({ error: 'Write the instruction first.' });
+  const s = StaffRecords.addInstruction(req.params.id, { body, by: req.user.name });
+  if (!s) return res.status(404).json({ error: 'Staff record not found.' });
+  res.json({ ok: true, staff: s });
+});
+app.post('/api/hr/staff/:id/follow-ups', authRequired, hrOnly, (req, res) => {
+  const { body } = req.body || {};
+  if (!body || !String(body).trim()) return res.status(400).json({ error: 'Write the follow-up first.' });
+  const s = StaffRecords.addFollowUp(req.params.id, { body, by: req.user.name });
+  if (!s) return res.status(404).json({ error: 'Staff record not found.' });
+  res.json({ ok: true, staff: s });
+});
+
+/* ============================== v17: STAFF PORTAL ============================== */
+app.get('/api/staff/me', authRequired, staffOnly, (req, res) => {
+  const s = StaffRecords.byUserId(req.user.id);
+  if (!s) return res.status(404).json({ error: 'No staff record found for this account yet - ask HR.' });
+  res.json({ staff: s, group: s.group_id ? StaffGroups.byId(s.group_id) : null });
+});
+app.post('/api/staff/follow-ups/:idx/respond', authRequired, staffOnly, (req, res) => {
+  const s = StaffRecords.byUserId(req.user.id);
+  if (!s) return res.status(404).json({ error: 'No staff record found for this account.' });
+  const { response } = req.body || {};
+  if (!response || !String(response).trim()) return res.status(400).json({ error: 'Write your response first.' });
+  const updated = StaffRecords.respondFollowUp(s.id, req.params.idx, response);
+  res.json({ ok: true, staff: updated });
+});
+
 /* -------------- open quest submissions + certificates (items 3, 10) --------------
  * Submit code or a file (PDF, Word, PNG, JPEG) per problem. AI grades it on
  * the spot with the 10% reduction; gems accrue per problem; completing a
@@ -2454,6 +2670,7 @@ app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 
 app.get('/grade', (req, res) => res.sendFile(path.join(__dirname, 'public', 'grade.html')));
 app.get('/cert', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cert.html')));
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cert.html')));
+app.get('/challan', (req, res) => res.sendFile(path.join(__dirname, 'public', 'challan.html')));
 
 app.use((err, req, res, next) => {
   if (err) return res.status(400).json({ error: err.message || 'Something went wrong.' });

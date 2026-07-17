@@ -163,7 +163,14 @@ img{display:block}
 .hero h1{font-size:clamp(34px,4.6vw,54px);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:18px}
 .hero h1 .hl{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-sub{color:var(--muted);font-size:16px;max-width:480px;margin-bottom:26px}
-.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:26px;align-items:center}
+.deadline-strip{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(94deg,#FFF1F2,#FFF7ED);border:1px solid #FECDD3;color:#9F1239;border-radius:30px;padding:8px 16px;font-size:13px;font-weight:700;margin-bottom:18px;box-shadow:0 4px 14px rgba(244,63,94,.12)}
+.deadline-strip .pulse{width:9px;height:9px;border-radius:50%;background:#F43F5E;flex:none;animation:pulseDot 1.6s infinite}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(244,63,94,.55)}70%{box-shadow:0 0 0 10px rgba(244,63,94,0)}100%{box-shadow:0 0 0 0 rgba(244,63,94,0)}}
+.btn-book{background:linear-gradient(94deg,#F43F5E,#F97316);color:#fff;font-size:16px;font-weight:800;padding:15px 30px;border-radius:12px;box-shadow:0 8px 22px rgba(244,63,94,.34);letter-spacing:.01em;animation:bookPulse 2.4s ease-in-out infinite}
+.btn-book:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(244,63,94,.46)}
+@keyframes bookPulse{0%,100%{box-shadow:0 8px 22px rgba(244,63,94,.34)}50%{box-shadow:0 8px 30px rgba(244,63,94,.56)}}
+@media (prefers-reduced-motion:reduce){.btn-book,.deadline-strip .pulse{animation:none}}
 .hero-proof{display:flex;align-items:center;gap:12px}
 .avatars{display:flex}
 .avatars span{width:34px;height:34px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;margin-left:-8px}
@@ -415,11 +422,11 @@ footer{background:var(--navy);color:#B9C1E4}
     </span>
     <h1>Become an <span class="hl">AI Engineer,</span><br>Not Just Another Student.</h1>
     <p class="hero-sub">Learn AI through real projects, interactive coding quests, live bootcamps, and a built-in browser compiler.</p>
+    <div class="deadline-strip"><span class="pulse"></span>August 2026 cohort &middot; registration closes 31 July &middot; seats filling fast</div>
     <div class="hero-btns">
-      <a class="btn btn-grad" href="/open#signup">
-        Start Free
-      </a>
-      <a class="btn btn-outline" href="#courses">Explore Courses &nbsp;&rarr;</a>
+      <a class="btn btn-book" href="https://docs.google.com/forms/d/1tngMoAaGzyIRktzjmyNHu1vQ_osBMfi-BDAr1Ix8Xs0/viewform" target="_blank" rel="noopener">Book Your Seat &nbsp;&rarr;</a>
+      <a class="btn btn-grad" href="/open#signup">Start Free</a>
+      <a class="btn btn-outline" href="#courses">Explore Courses</a>
     </div>
     <div class="hero-proof">
       <div class="avatars">

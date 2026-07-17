@@ -21,18 +21,6 @@ async function api(path, opts) {
     else { b.textContent = 'My Portal'; b.href = '/dashboard'; }
   } catch {}
 
-  // When Google OAuth is configured, the three Start Free buttons go straight
-  // to Google. Otherwise they open the email sign-up on the open portal.
-  try {
-    const p = await api('/api/auth/providers');
-    if (p.google) {
-      ['heroGoogle', 'bandGoogle', 'ctaGoogle'].forEach((id) => {
-        const el = $(id);
-        if (el) el.href = '/auth/google?back=/open';
-      });
-    }
-  } catch {}
-
   // Live counts, so the page never shows stale numbers.
   try {
     const info = await api('/api/public/info');

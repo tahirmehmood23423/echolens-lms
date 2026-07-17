@@ -95,7 +95,6 @@ function tierBg(tier, isFree) {
 const STAGE_FALLBACK = [{ key: 'spark', name: 'Spark', min: 0 }, { key: 'glow', name: 'Glow', min: 250 }, { key: 'beam', name: 'Beam', min: 700 }, { key: 'prism', name: 'Prism', min: 1400 }, { key: 'aurora', name: 'Aurora', min: 2400 }, { key: 'nova', name: 'Nova', min: 4000 }];
 
 let ME = null;
-let GOOGLE_ON = false;
 let TRACKS = [];         // quest list (all courses)
 let CATALOGUE = [];
 let CAT_LINKS = null;
@@ -108,7 +107,6 @@ let CUR_EVENT = null;
 /* -------------------------------- boot -------------------------------- */
 (async () => {
   try { ME = await api('/api/auth/me'); } catch { ME = null; }
-  try { const p = await api('/api/auth/providers'); GOOGLE_ON = !!p.google; } catch {}
   drawUserBox();
   if (ME) requireWhatsapp();
   loadCatalogue();
@@ -151,8 +149,7 @@ function gateCardHtml(msg) {
 function gate(afterMsg) {
   openModal('Sign in to EchoLens - free', `
     <p class="s" style="color:var(--muted);margin-bottom:14px">${esc(afterMsg || 'Everything here is free - the quests, the compiler, the certificates. We just need to know who is learning.')}</p>
-    ${GOOGLE_ON ? `<a class="btn btn-primary btn-block" href="/auth/google?back=/open" style="margin-bottom:10px">Continue with Google</a>` : ''}
-    <button class="btn btn-teal btn-block" style="margin-bottom:10px" onclick="showSignup()">Create a free account with email</button>
+    <button class="btn btn-primary btn-block" style="margin-bottom:10px" onclick="showSignup()">Create a free account with email</button>
     <a class="btn btn-ghost btn-block" href="/login">Already have an account? Sign in</a>
     <div id="signupArea" style="margin-top:14px"></div>`);
 }

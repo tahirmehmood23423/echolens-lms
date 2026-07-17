@@ -3,3 +3,18 @@
 .env.local
 *.pem
 *.key
+
+# Runtime data - contains password hashes and personal data; never commit
+echolens.json
+echolens-lms/echolens.json
+*.json.tmp
+
+# User uploads (submissions, payment screenshots, avatars, signatures)
+uploads/
+!uploads/.gitkeep
+
+# Local database backups
+backups/
+
+# Dependencies
+node_modules/

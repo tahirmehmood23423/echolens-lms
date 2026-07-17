@@ -32,9 +32,25 @@ const {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'echolens-dev-secret-change-in-production';
+const DEFAULT_JWT_SECRET = 'echolens-dev-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || DEFAULT_JWT_SECRET;
 const COOKIE = 'el_token';
 const isProd = process.env.NODE_ENV === 'production';
+
+// Auth cookies are signed with JWT_SECRET. If it falls back to the public
+// default, anyone can forge an admin session - so refuse to boot in
+// production, and warn loudly in development.
+if (JWT_SECRET === DEFAULT_JWT_SECRET) {
+  if (isProd) {
+    console.error('FATAL: JWT_SECRET is not set. Set a long random JWT_SECRET in the environment before starting in production.');
+    process.exit(1);
+  }
+  console.warn('WARNING: JWT_SECRET is not set - using the insecure default. Set JWT_SECRET before deploying.');
+}
+
+// Behind a hosting proxy (Render, Nginx) the app must trust it so that
+// secure cookies and req.ip (used for login rate limiting) work correctly.
+if (isProd) app.set('trust proxy', 1);
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -128,7 +144,18 @@ async function extractXlsxText(buffer) {
   return parts.join('\n\n');
 }
 
-app.use(express.json());
+// Baseline security headers on every response. No CSP here on purpose - the
+// pages rely on inline scripts and embed the Jitsi iframe, so a strict CSP
+// would need per-page work; these headers are the safe, high-value subset.
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (isProd) res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
+
+app.use(express.json({ limit: '1mb' })); // cap request bodies to blunt large-payload DoS
 app.use(cookieParser());
 
 /* ------------------------------ auth helpers ------------------------------ */
@@ -166,14 +193,41 @@ function viewBatch(req, res, next) { // READ access: manage roles + coordinator 
 const isEmail = (s) => typeof s === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 
 /* --------------------------------- auth --------------------------------- */
-app.post('/api/auth/login', (req, res) => {
+// Simple in-memory brute-force throttle: after too many failed attempts from
+// one IP within the window, further attempts are refused until it cools down.
+// Successful logins reset the counter. No external dependency needed.
+const LOGIN_ATTEMPTS = new Map(); // ip -> { count, first, blockedUntil }
+const LOGIN_MAX = 10;             // failures allowed per window
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+function loginThrottle(req, res, next) {
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const rec = LOGIN_ATTEMPTS.get(ip);
+  if (rec && rec.blockedUntil && rec.blockedUntil > now) {
+    const mins = Math.ceil((rec.blockedUntil - now) / 60000);
+    return res.status(429).json({ error: `Too many sign-in attempts. Try again in about ${mins} minute${mins === 1 ? '' : 's'}.` });
+  }
+  req._loginIp = ip;
+  next();
+}
+function noteLoginFail(ip) {
+  const now = Date.now();
+  let rec = LOGIN_ATTEMPTS.get(ip);
+  if (!rec || now - rec.first > LOGIN_WINDOW_MS) rec = { count: 0, first: now, blockedUntil: 0 };
+  rec.count += 1;
+  if (rec.count >= LOGIN_MAX) rec.blockedUntil = now + LOGIN_WINDOW_MS;
+  LOGIN_ATTEMPTS.set(ip, rec);
+}
+app.post('/api/auth/login', loginThrottle, (req, res) => {
   const { login, password } = req.body || {};
   const u = login && Users.byLogin(login);
   // Google-only accounts have no password_hash at all - bcrypt throws on a
   // null hash rather than just returning false, so guard it explicitly.
   if (!u || !u.password_hash || !bcrypt.compareSync(String(password || ''), u.password_hash)) {
+    noteLoginFail(req._loginIp);
     return res.status(401).json({ error: 'Incorrect username or password.' });
   }
+  LOGIN_ATTEMPTS.delete(req._loginIp); // successful sign-in clears the counter
   setAuthCookie(res, sign(u));
   res.json({ ok: true, role: u.role });
 });
@@ -2131,10 +2185,39 @@ app.get('/api/admin/analytics', authRequired, staffView, (req, res) => {
  * cross-origin fetches (CORS), so this signed-in-only proxy pulls the file
  * server-side: text/CSV/JSON only, 15 MB cap, http(s) only.
  */
+// SSRF guard: a signed-in user must not be able to point this proxy at the
+// server's own network - cloud metadata endpoints, localhost, or private
+// LAN ranges. Resolve the host and reject anything that isn't a public IP.
+function isPrivateIp(ip) {
+  if (!ip) return true;
+  if (ip.includes(':')) { // IPv6
+    const l = ip.toLowerCase();
+    return l === '::1' || l.startsWith('fc') || l.startsWith('fd') || l.startsWith('fe80') || l.startsWith('::ffff:127.') || l.startsWith('::ffff:10.') || l.startsWith('::ffff:192.168.') || l.startsWith('::ffff:169.254.');
+  }
+  const p = ip.split('.').map(Number);
+  if (p.length !== 4 || p.some((n) => Number.isNaN(n))) return true;
+  return p[0] === 127 || p[0] === 10 || p[0] === 0 ||
+    (p[0] === 169 && p[1] === 254) ||                 // link-local + cloud metadata (169.254.169.254)
+    (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
+    (p[0] === 192 && p[1] === 168) ||
+    (p[0] === 100 && p[1] >= 64 && p[1] <= 127) ||    // carrier-grade NAT
+    p[0] >= 224;                                      // multicast / reserved
+}
+async function assertPublicHost(hostname) {
+  // A bare IP literal is checked directly; a name is resolved and every
+  // returned address must be public (defends against DNS that maps a public
+  // name to a private address).
+  const net = require('net');
+  if (net.isIP(hostname)) { if (isPrivateIp(hostname)) throw new Error('private'); return; }
+  const addrs = await dns.lookup(hostname, { all: true });
+  if (!addrs.length || addrs.some((a) => isPrivateIp(a.address))) throw new Error('private');
+}
 app.get('/api/fetch-dataset', authRequired, async (req, res) => {
   try {
     const url = String(req.query.url || '');
     if (!/^https?:\/\//i.test(url)) return res.status(400).json({ error: 'Give a full http(s) URL to the dataset.' });
+    try { await assertPublicHost(new URL(url).hostname); }
+    catch { return res.status(400).json({ error: 'That URL points to a private or internal address and cannot be fetched.' }); }
     const r = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(20000) });
     if (!r.ok) return res.status(400).json({ error: `The dataset URL answered ${r.status}.` });
     const buf = Buffer.from(await r.arrayBuffer());
@@ -2607,8 +2690,55 @@ app.post('/api/open/excel-extract', authRequired, upload.single('file'), async (
 });
 
 /* --------------------------------- static --------------------------------- */
+// Decide whether a signed-in user may read one uploaded file. Sensitive
+// categories (payment screenshots and submitted work) are restricted to the
+// owner and the relevant course staff/admin; everything else (avatars,
+// signatures, course resources, datasets, event documents) stays viewable by
+// any signed-in user, as before - so legitimate sharing is unaffected.
+function canAccessUpload(user, name) {
+  if (!name) return false;
+  if (user.role === 'admin') return true;
+  const d = store.allData();
+  const isFile = (url) => url && path.basename(url) === name;
+
+  // Payment screenshots: the uploader only.
+  if (d.event_entries.some((e) => isFile(e.payment_shot))) {
+    return d.event_entries.some((e) => isFile(e.payment_shot) && e.user_id === user.id);
+  }
+  // Quest submission files: owner, a teacher who manages the course, or a coordinator.
+  const qs = d.quest_submissions.find((s) => isFile(s.file_url));
+  if (qs) {
+    if (qs.user_id === user.id) return true;
+    const q = d.quests.find((x) => x.id === qs.quest_id);
+    const b = q && Batches.byId(q.batch_id);
+    return !!(b && (canManageBatch(user, b) || user.role === 'coordinator'));
+  }
+  // Legacy assignment submissions (assignment -> batch).
+  const ls = d.submissions.find((s) => isFile(s.file_url));
+  if (ls) {
+    if (ls.user_id === user.id) return true;
+    const a = d.assignments.find((x) => x.id === ls.assignment_id);
+    const b = a && Batches.byId(a.batch_id);
+    return !!(b && (canManageBatch(user, b) || user.role === 'coordinator'));
+  }
+  // Event submissions and open-track submissions: the owner only.
+  if (d.event_submissions.some((s) => isFile(s.file_url))) {
+    return d.event_submissions.some((s) => isFile(s.file_url) && s.user_id === user.id);
+  }
+  const os = d.open_submissions.find((s) => isFile(s.file_url) || (Array.isArray(s.files) && s.files.some((f) => isFile(f.url))));
+  if (os) return os.user_id === user.id;
+
+  return true; // shareable content (avatars, signatures, resources, datasets, event docs)
+}
+function authGate(req, res, next) {
+  const u = currentUser(req);
+  if (!u) return res.status(401).send('Sign in to view files.');
+  let name;
+  try { name = path.basename(decodeURIComponent(req.path)); } catch { name = path.basename(req.path); }
+  if (!canAccessUpload(u, name)) return res.status(403).send('You do not have access to this file.');
+  next();
+}
 app.use('/uploads', authGate, express.static(UPLOAD_DIR));
-function authGate(req, res, next) { if (!currentUser(req)) return res.status(401).send('Sign in to view files.'); next(); }
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
 /* Server-rendered Course structured data for /open so search engines can index
@@ -2673,7 +2803,12 @@ app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'ce
 app.get('/challan', (req, res) => res.sendFile(path.join(__dirname, 'public', 'challan.html')));
 
 app.use((err, req, res, next) => {
-  if (err) return res.status(400).json({ error: err.message || 'Something went wrong.' });
+  if (err) {
+    // Preserve a meaningful status when the error carries one (e.g. 413 for an
+    // over-limit body, 400 for malformed JSON); default to 400 otherwise.
+    const status = err.status || err.statusCode || 400;
+    return res.status(status >= 400 && status < 600 ? status : 400).json({ error: err.message || 'Something went wrong.' });
+  }
   next();
 });
 

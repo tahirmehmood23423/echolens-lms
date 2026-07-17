@@ -95,7 +95,6 @@ function tierBg(tier, isFree) {
 const STAGE_FALLBACK = [{ key: 'spark', name: 'Spark', min: 0 }, { key: 'glow', name: 'Glow', min: 250 }, { key: 'beam', name: 'Beam', min: 700 }, { key: 'prism', name: 'Prism', min: 1400 }, { key: 'aurora', name: 'Aurora', min: 2400 }, { key: 'nova', name: 'Nova', min: 4000 }];
 
 let ME = null;
-let TRACKS = [];         // quest list (all courses)
 let CATALOGUE = [];
 let CAT_LINKS = null;
 let CUR = null;          // { track, levels, progress } for the open course
@@ -110,13 +109,13 @@ let CUR_EVENT = null;
   drawUserBox();
   if (ME) requireWhatsapp();
   loadCatalogue();
-  loadTracks();
   loadAnnouncements();
   loadHomeStats();
   if (ME) { loadEvents(); loadCerts(); } else { $('evList').innerHTML = gateCardHtml('Events are for signed-in members - creating a free account takes a minute.'); }
-  // Deep links: /open#courses, #quests, #events, #announcements, #register, #signup
+  // Deep links: /open#courses, #events, #announcements, #register, #signup
   const h = (location.hash || '').replace('#', '');
-  if (['courses', 'quests', 'events', 'announcements', 'home'].includes(h)) openTab(h);
+  if (['courses', 'events', 'announcements', 'home'].includes(h)) openTab(h);
+  else if (h === 'quests') openTab('courses'); // quests now live inside each course
   else if (h === 'profile') openProfileTab();
   else if (h === 'register') openRegister();
   else if (h === 'signup' && !ME) gate();
@@ -227,15 +226,15 @@ function requireWhatsapp() {
 
 /* -------------------------------- tabs -------------------------------- */
 function openTab(tab) {
-  ['home', 'courses', 'quests', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile'].forEach((t) => {
+  ['home', 'courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
   document.querySelectorAll('.open-nav .nlink[data-tab]').forEach((n) =>
-    n.classList.toggle('active', n.dataset.tab === tab || (tab === 'course' && n.dataset.tab === 'quests') || (tab === 'solve' && n.dataset.tab === 'quests') || (tab === 'eventDetail' && n.dataset.tab === 'events')));
+    n.classList.toggle('active', n.dataset.tab === tab || (tab === 'course' && n.dataset.tab === 'courses') || (tab === 'solve' && n.dataset.tab === 'courses') || (tab === 'eventDetail' && n.dataset.tab === 'events')));
   if (tab !== 'eventDetail') stopEventCountdown();
   window.scrollTo({ top: 0 });
 }
-function backToCourse() { if (CUR) { openTab('course'); } else openTab('quests'); }
+function backToCourse() { if (CUR) { openTab('course'); } else openTab('courses'); }
 
 /* -------------------------------- home -------------------------------- */
 async function loadHomeStats() {
@@ -285,8 +284,8 @@ function renderHomePreview() {
         </div>
         <div class="home2-pcard home2-quest">
           <div class="home2-label">Keep learning</div>
-          <div class="s" style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Pick up your next quest</div>
-          <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="openTab('quests')">Continue</button>
+          <div class="s" style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Pick up your next course</div>
+          <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="openTab('courses')">Continue</button>
         </div>
       </div>
     </div>`;
@@ -398,7 +397,7 @@ function courseCardHtml(c) {
       <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${c.weeks} Weeks &middot; ${c.hours} Hours</div>
       <div class="oc-foot">
         <div class="oc-price${isFree ? ' free' : ''}">${isFree ? 'FREE' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
-        <button type="button" class="btn ${isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${isFree ? 'Start now' : 'Register'}</button>
+        <button type="button" class="btn ${isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${isFree ? 'Start now' : 'View course'}</button>
       </div>
     </div>`;
 }
@@ -418,8 +417,11 @@ function drawCourses() {
 function courseAction(code) {
   const c = CATALOGUE.find((x) => x.code === code);
   if (!c) return;
-  if (c.price_pkr > 0) { openRegister(c.code, c.title); return; }
-  if (c.track_key) openCourse(c.track_key);
+  // Every course opens its full detail page (price, outline, key concepts,
+  // final project, and its quests - first week open, the rest locked). Paid
+  // courses carry a "Register to unlock" call to action inside that page.
+  if (c.track_key) { openCourse(c.track_key); return; }
+  if (c.price_pkr > 0) openRegister(c.code, c.title); // fallback: course without a quest track
 }
 
 /* ------------------- in-site registration form (item 6) ------------------- */
@@ -457,70 +459,7 @@ function openRegister(code, title) {
   });
 }
 
-/* --------------------------- quests: course list --------------------------- */
-let TRACK_PROGRESS = {};
-async function loadTracks() {
-  try {
-    const d = await api('/api/public/tracks');
-    TRACKS = d.tracks;
-    if (ME && ME.gamify) $('myGems').innerHTML = `<span class="prob-chip" style="cursor:default">${ME.gamify.gems} gems · ${esc(ME.gamify.stage.name)}</span>`;
-    drawTracks();
-    if (ME) {
-      const results = await Promise.allSettled(TRACKS.map((t) => api('/api/open/progress?track=' + encodeURIComponent(t.key))));
-      results.forEach((r, i) => { if (r.status === 'fulfilled') TRACK_PROGRESS[TRACKS[i].key] = r.value.progress; });
-      drawTracks();
-    }
-  } catch (e) { $('trackGrid').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
-}
-const QUEST_PILLS = [['all', 'All'], ['BC', 'Bootcamps'], ['SC', 'Short Courses'], ['ST', 'Specialist Tracks'], ['free', 'Free']];
-function setQuestPill(kind) {
-  if (kind === 'free') { $('qFree').value = 'free'; $('qTier').value = ''; }
-  else if (kind === 'all') { $('qFree').value = ''; $('qTier').value = ''; }
-  else { $('qTier').value = kind; $('qFree').value = ''; }
-  drawTracks();
-}
-function syncQuestFilters() { renderQuestPills(); }
-function renderQuestPills() {
-  const tier = $('qTier').value, free = $('qFree').value;
-  $('qPills').innerHTML = QUEST_PILLS.map(([k, label]) => {
-    const active = k === 'all' ? (!tier && !free) : k === 'free' ? free === 'free' : tier === k;
-    return `<button type="button" class="filt-pill${active ? ' active' : ''}" onclick="setQuestPill('${k}')">${esc(label)}</button>`;
-  }).join('');
-}
-function questCardHtml(t) {
-  const prog = TRACK_PROGRESS[t.key];
-  const icon = pickIcon(t.title);
-  const pct = prog && prog.total ? Math.round((prog.graded / prog.total) * 100) : 0;
-  const levelNow = prog ? Math.min(prog.graded, t.levels) : 0;
-  const gemsNow = prog ? prog.gems : 0;
-  const cta = t.free ? (prog ? 'Continue' : 'Start the free course') : (prog ? 'Continue' : 'Open Quest');
-  return `
-    <div class="qc-card${!t.free && !prog ? ' locked' : ''}">
-      <div class="qc-top">
-        <div class="qc-icon${t.free ? ' teal' : ''}"><svg viewBox="0 0 24 24" fill="none">${ICONS[icon]}</svg></div>
-        <div style="min-width:0">
-          <span class="qc-code">${esc(t.course_code || '')}</span>
-          <div class="qc-title">${esc(t.title)}</div>
-        </div>
-        ${!t.free ? `<span class="qc-lock" title="First week free - full course needs enrolment"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg></span>` : ''}
-      </div>
-      <div class="qc-desc">${esc(t.description || '')}</div>
-      <div class="qc-progress"><span>Level ${levelNow}/${t.levels}</span><span>${gemsNow.toLocaleString()}/${t.total_points.toLocaleString()} gems</span></div>
-      <div class="qc-bar"><div style="width:${pct}%"></div></div>
-      <button type="button" class="btn ${t.free ? 'btn-teal' : 'btn-primary'} qc-cta" onclick="openCourse('${esc(t.key)}')">${cta}</button>
-    </div>`;
-}
-function drawTracks() {
-  renderQuestPills();
-  const tier = $('qTier').value, free = $('qFree').value, q = $('qSearch').value.trim().toLowerCase();
-  const list = TRACKS.filter((t) =>
-    (!tier || (t.course_code || '').startsWith(tier)) &&
-    (!free || t.free) &&
-    (!q || t.title.toLowerCase().includes(q) || (t.course_code || '').toLowerCase().includes(q)));
-  $('trackGrid').innerHTML = list.length ? list.map(questCardHtml).join('') : '<div class="empty">No quests match those filters.</div>';
-}
-
-/* -------------------- quests: course detail with locks -------------------- */
+/* -------------------- course detail with quest locks -------------------- */
 async function openCourse(key) {
   openTab('course');
   $('courseHead').innerHTML = '<div class="empty">Loading course&hellip;</div>';
@@ -586,13 +525,26 @@ function drawCourse() {
       <h2 style="font-family:var(--font-display);font-size:24px;color:var(--ink)">${esc(t.title)}</h2>
       <p class="s" style="color:var(--muted);margin-top:4px">${esc(t.description || '')}</p>
       ${t.outcome ? `<p class="s" style="margin-top:6px;color:var(--ink)"><strong>Outcome:</strong> ${esc(t.outcome)}</p>` : ''}
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:14px;padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:var(--bg)">
+        <div>
+          <div class="s" style="color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em">${t.free ? 'Price' : 'Course fee'}</div>
+          <div style="font-family:var(--font-display);font-size:23px;font-weight:700;color:${t.free ? 'var(--teal-deep)' : 'var(--ink)'}">${t.free || !(cat && cat.price_pkr) ? 'Free' : 'PKR ' + cat.price_pkr.toLocaleString()}</div>
+        </div>
+        ${cat ? `<div style="border-left:1px solid var(--line);padding-left:16px">
+          <div class="s" style="color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em">Duration</div>
+          <div style="font-weight:600;color:var(--ink)">${cat.weeks} weeks · ${cat.hours} hours</div></div>` : ''}
+        <div style="border-left:1px solid var(--line);padding-left:16px">
+          <div class="s" style="color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em">Access</div>
+          <div style="font-weight:600;color:var(--ink)">${t.free ? 'All levels open free' : 'First week free · rest unlocks on enrolment'}</div></div>
+        <span style="flex:1"></span>
+        ${!t.free && cat ? `<button class="btn btn-primary" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register &amp; unlock - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}
+      </div>
       ${prog ? `
         <div class="oq-prog" style="margin-top:12px"><div style="width:${Math.round((prog.graded / Math.max(1, prog.total)) * 100)}%"></div></div>
         <div class="s" style="margin-top:6px;color:${prog.passed ? 'var(--ok)' : 'var(--muted)'}">
           ${prog.graded}/${prog.total} tasks graded · ${prog.gems} gems earned${prog.avg != null ? ' · Average ' + prog.avg + '%' : ''}
           ${prog.passed ? ' · <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' · Complete every task at ' + (t.pass_mark || 60) + '%+ average for the automatic certificate.' : '')}
         </div>` : (ME ? '' : `<div class="s" style="margin-top:10px;color:var(--muted)">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
-      ${!t.free && cat ? `<button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register to unlock the full course - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}
     </div></div>`;
   const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Level';
   $('courseLevels').innerHTML = courseOutlineHtml(t) + CUR.levels.map((l) => `
@@ -1322,7 +1274,7 @@ async function loadProfile() {
     </div></div>
 
     <div class="card"><div class="card-head"><h3>Free courses &amp; quests</h3><span class="s" style="color:var(--muted)">${p.tracks.length} attempted</span></div>
-      <div class="card-body tight">${p.tracks.length ? p.tracks.map(profTrackRow).join('') : `<div class="empty">No free quests attempted yet - <a href="javascript:void(0)" onclick="openTab('quests')">start one</a>.</div>`}</div></div>
+      <div class="card-body tight">${p.tracks.length ? p.tracks.map(profTrackRow).join('') : `<div class="empty">No free quests attempted yet - <a href="javascript:void(0)" onclick="openTab('courses')">open a course</a>.</div>`}</div></div>
 
     <div class="card"><div class="card-head"><h3>Hackathons</h3><span class="s" style="color:var(--muted)">${p.hackathons.length} joined</span></div>
       <div class="card-body tight">${p.hackathons.length ? p.hackathons.map(profHackRow).join('') : '<div class="empty">No hackathons joined yet.</div>'}</div></div>

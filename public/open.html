@@ -36,7 +36,6 @@
   <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
   <a class="nlink active" data-tab="home" onclick="openTab('home')">Home</a>
   <a class="nlink" data-tab="courses" onclick="openTab('courses')">Courses</a>
-  <a class="nlink" data-tab="quests" onclick="openTab('quests')">Quests</a>
   <a class="nlink" data-tab="events" onclick="openTab('events')">Events</a>
   <a class="nlink" data-tab="announcements" onclick="openTab('announcements')">Announcements</a>
   <a class="nlink" href="/compiler">Compiler</a>
@@ -55,7 +54,7 @@
         <p class="s" style="color:var(--muted);font-size:15px;margin:12px 0 18px;max-width:560px">Thirty-one live, instructor-led programs across AI, data and web development. Solve real quests in the browser, earn gems, and collect verified certificates - three full courses are completely free.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-primary" onclick="openTab('courses')">Browse the catalogue</button>
-          <button class="btn btn-teal" onclick="openTab('quests')">Start a free quest</button>
+          <button class="btn btn-teal" onclick="openTab('courses');setCoursePill('free')">Try a free course</button>
           <button class="btn btn-ghost" onclick="openRegister()">Register for a course</button>
         </div>
       </div>
@@ -70,10 +69,10 @@
         <p>All 31 programs with prices, durations and free levels - bootcamps, short courses and specialist tracks for the August 2026 cohort.</p>
         <span class="home-link">View courses</span>
       </div>
-      <div class="home-card" onclick="openTab('quests')">
-        <h4>Free quests</h4>
-        <p>Every course opens its first week free. Three courses are fully free - complete them and a verified certificate is issued automatically.</p>
-        <span class="home-link">Open the quests</span>
+      <div class="home-card" onclick="openTab('courses');setCoursePill('free')">
+        <h4>Free first week</h4>
+        <p>Every course opens its first week free - open a course to see its outline, key concepts, final project and quests. Three courses are fully free with an automatic certificate.</p>
+        <span class="home-link">Try a free course</span>
       </div>
       <div class="home-card" onclick="location.href='/compiler'">
         <h4>Free compiler</h4>
@@ -122,31 +121,9 @@
     <div id="courseTable"><div class="empty">Loading catalogue&hellip;</div></div>
   </section>
 
-  <!-- ================================ QUESTS ================================ -->
-  <section id="tab-quests" style="display:none">
-    <div style="display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:14px">
-      <div>
-        <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink)">Quests</h1>
-        <p class="s" style="color:var(--muted)">Every course is a quest ladder. The first week is open on every program; free courses are open end to end and issue a verified certificate on completion.</p>
-      </div>
-      <span style="flex:1"></span>
-      <div id="myGems"></div>
-    </div>
-    <div class="lc-filterbar">
-      <select id="qTier" onchange="syncQuestFilters();drawTracks()"><option value="">All tiers</option><option value="BC">Bootcamps</option><option value="SC">Short Courses</option><option value="ST">Specialist Tracks</option></select>
-      <select id="qFree" onchange="syncQuestFilters();drawTracks()"><option value="">All types</option><option value="free">Fully free</option></select>
-      <div class="search-box">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input id="qSearch" placeholder="Search quests..." oninput="drawTracks()">
-      </div>
-    </div>
-    <div class="filt-row" id="qPills"></div>
-    <div class="qc-grid" id="trackGrid"><div class="empty">Loading quests&hellip;</div></div>
-  </section>
-
-  <!-- ============================ COURSE QUEST DETAIL ============================ -->
+  <!-- ============================ COURSE DETAIL ============================ -->
   <section id="tab-course" style="display:none">
-    <button class="btn btn-ghost btn-sm" onclick="openTab('quests')" style="margin-bottom:12px">Back to all quests</button>
+    <button class="btn btn-ghost btn-sm" onclick="openTab('courses')" style="margin-bottom:12px">&larr; Back to courses</button>
     <div id="courseHead"></div>
     <div id="courseLevels"></div>
   </section>

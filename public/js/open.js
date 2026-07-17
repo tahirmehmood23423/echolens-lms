@@ -342,7 +342,7 @@ async function loadCatalogue() {
     const d = await api('/api/public/catalogue');
     CATALOGUE = d.catalogue;
     CAT_LINKS = d.links;
-    if (d.cohort) $('cohortLine').textContent = `31 live, instructor-led programs · Registration deadline ${d.cohort.registration_deadline} · Batch starts ${d.cohort.batch_starts}. Every paid course opens its first week free - try before you enrol.`;
+    if (d.cohort) $('cohortLine').textContent = `31 live, instructor-led programs · Registration deadline ${d.cohort.registration_deadline} · Batch starts ${d.cohort.batch_starts}. Every paid course opens its first quest free - try before you enrol.`;
     $('actionStrip').innerHTML = `
       <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;
     const p = (d.paths || [])[0];
@@ -364,7 +364,7 @@ async function loadCatalogue() {
 }
 const BADGE_LABEL = { free: 'FREE', new: 'NEW', high_demand: 'HIGH DEMAND', flagship: 'FLAGSHIP' };
 const BADGE_CLASS = { free: 'quest', new: 'webinar', high_demand: 'competition', flagship: 'hackathon' };
-const COURSE_PILLS = [['all', 'All'], ['Bootcamp', 'Bootcamps'], ['Short Course', 'Short Courses'], ['Specialist Track', 'Specialist Tracks'], ['free', 'Free']];
+const COURSE_PILLS = [['all', 'All'], ['Bootcamp', 'Bootcamps'], ['Short Course', 'Short Courses'], ['Specialist Track', 'Specialist Tracks'], ['free', 'Free courses']];
 function setCoursePill(kind) {
   if (kind === 'free') { $('cFree').value = 'free'; $('cTier').value = ''; }
   else if (kind === 'all') { $('cFree').value = ''; $('cTier').value = ''; }
@@ -396,7 +396,7 @@ function courseCardHtml(c) {
       </div>
       <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${c.weeks} Weeks &middot; ${c.hours} Hours</div>
       <div class="oc-foot">
-        <div class="oc-price${isFree ? ' free' : ''}">${isFree ? 'FREE' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
+        <div class="oc-price${isFree ? ' free' : ''}">${isFree ? 'Free course' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
         <button type="button" class="btn ${isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${isFree ? 'Start now' : 'View course'}</button>
       </div>
     </div>`;
@@ -535,7 +535,7 @@ function drawCourse() {
           <div style="font-weight:600;color:var(--ink)">${cat.weeks} weeks · ${cat.hours} hours</div></div>` : ''}
         <div style="border-left:1px solid var(--line);padding-left:16px">
           <div class="s" style="color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em">Access</div>
-          <div style="font-weight:600;color:var(--ink)">${t.free ? 'All levels open free' : 'First week free · rest unlocks on enrolment'}</div></div>
+          <div style="font-weight:600;color:var(--ink)">${t.free ? 'All levels open free' : 'First quest free · rest unlocks on enrolment'}</div></div>
         <span style="flex:1"></span>
         ${!t.free && cat ? `<button class="btn btn-primary" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register &amp; unlock - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}
       </div>

@@ -265,7 +265,7 @@ function renderCourse(c, all) {
     : `<a class="btn btn-grad" href="${ENROLL_FORM}" target="_blank" rel="noopener">Enrol in this course</a>`;
   const ctaSecondary = free
     ? `<a class="btn btn-light" href="/open">Browse all free quests</a>`
-    : `<a class="btn btn-light" href="/open#signup">Try the first week free</a>`;
+    : `<a class="btn btn-light" href="/open#signup">Try the first quest free</a>`;
 
   return pageHead({ title, description: metaDesc, canonical: url, keywords: kw, jsonld: [courseLd, crumbLd] }) + `
 <div class="cp-wrap">

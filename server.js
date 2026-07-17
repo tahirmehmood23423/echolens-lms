@@ -1488,10 +1488,10 @@ app.get('/api/public/tracks', (req, res) => res.json({ tracks: Quests.tracks(), 
 app.get('/api/public/tracks/:key', (req, res) => {
   const t = Quests.trackDef(req.params.key);
   if (!t) return res.status(404).json({ error: 'Track not found.' });
-  // Free programs open every level; paid programs open the whole first week
-  // (bootcamps have two sessions in week 1) - the rest is visible but locked.
-  const week1 = t.levels.filter((l) => (l.week || l.no) === 1).length;
-  const openN = t.free ? t.levels.length : Math.max(1, week1 || OPEN_LEVELS);
+  // Free programs open every level; paid programs open just the first quest
+  // (a single level) so every course - bootcamps included - offers the same
+  // one-quest taste, and the rest is visible but locked until enrolment.
+  const openN = t.free ? t.levels.length : OPEN_LEVELS;
   const mode = Quests.tracks().find((x) => x.key === t.key)?.submission_mode || 'code';
   const levels = t.levels.map((l) => {
     if (l.no <= openN) {

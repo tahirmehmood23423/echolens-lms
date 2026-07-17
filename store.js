@@ -2153,7 +2153,8 @@ const OpenQuest = {
     if (!t) return { error: 'Course not found.' };
     const lvl = t.levels.find((l) => l.no === Number(level));
     if (!lvl) return { error: 'Level not found.' };
-    const openN = t.free ? t.levels.length : Math.max(1, t.levels.filter((l) => (l.week || l.no) === 1).length);
+    // Paid programs open only the first quest (one level); free programs open all.
+    const openN = t.free ? t.levels.length : Number(process.env.OPEN_LEVELS || 1);
     if (Number(level) > openN) return { error: 'This level is locked - register for the course to unlock it.' };
     const pr = lvl.problems.find((p) => p.pid === Number(pid) || lvl.problems.indexOf(p) + 1 === Number(pid));
     if (!pr) return { error: 'Task not found.' };

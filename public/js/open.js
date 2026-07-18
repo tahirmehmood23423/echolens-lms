@@ -116,6 +116,7 @@ let CUR_EVENT = null;
   const h = (location.hash || '').replace('#', '');
   if (['courses', 'events', 'announcements', 'home'].includes(h)) openTab(h);
   else if (h === 'quests') openTab('courses'); // quests now live inside each course
+  else if (h === 'free') { openTab('courses'); setCoursePill('free'); if (!ME) gate(); } // straight to the free certified courses
   else if (h === 'profile') openProfileTab();
   else if (h === 'register') openRegister();
   else if (h === 'signup' && !ME) gate();

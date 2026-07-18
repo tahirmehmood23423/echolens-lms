@@ -1219,14 +1219,14 @@ const OFFICIAL_CATALOGUE = [
   // badges: free | new | high_demand | flagship. free_mode: 'open' (no account
   // needed to watch) | 'signin' (free with sign-in) | undefined (paid; Level 1
   // of the quest is free for signed-in community members).
-  { code: 'BC-01', title: 'AI Automation with n8n & Make.com', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 3000, badges: ['high_demand'], summary: 'Build real business automations that connect apps, data and AI - workflows agencies bill $30-70/hour for.' },
-  { code: 'BC-02', title: 'Prompt Engineering & ChatGPT/Claude Mastery', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 3000, badges: ['high_demand'], summary: 'Structured prompting, tool use and reusable prompt systems that make AI dependable daily.' },
+  { code: 'BC-01', title: 'AI Automation with n8n & Make.com', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['high_demand'], summary: 'Build real business automations that connect apps, data and AI - workflows agencies bill $30-70/hour for.' },
+  { code: 'BC-02', title: 'Prompt Engineering & ChatGPT/Claude Mastery', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['high_demand'], summary: 'Structured prompting, tool use and reusable prompt systems that make AI dependable daily.' },
   { code: 'BC-03', title: 'Everyday AI: Smarter Study, Work & Content', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 0, badges: ['free'], free_mode: 'open', summary: 'Our fully open bootcamp: practical AI for studies, office work and content creation.' },
   { code: 'BC-04', title: 'Web Dev Kickstart: HTML, CSS & JavaScript', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 0, badges: ['free', 'new', 'high_demand'], free_mode: 'signin', summary: 'Your first real webpage, built live in our in-browser compiler with quests, gems and a leaderboard.' },
-  { code: 'BC-05', title: 'AI-Assisted Coding with Cursor, Claude & Copilot', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 3000, badges: ['new', 'high_demand'], summary: 'Agentic IDEs, AI pair programming and review workflows that multiply what one developer can ship.' },
+  { code: 'BC-05', title: 'AI-Assisted Coding with Cursor, Claude & Copilot', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['new', 'high_demand'], summary: 'Agentic IDEs, AI pair programming and review workflows that multiply what one developer can ship.' },
   { code: 'BC-06', title: 'Git, GitHub & Freelance Profile Launch', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'Version control plus a polished GitHub and Upwork/Fiverr presence before your first client.' },
-  { code: 'BC-07', title: 'Excel + AI for Office Professionals', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 2500, badges: ['new'], summary: 'Clean data, build reports and automate repetitive office work by pairing Excel with AI assistants.' },
-  { code: 'BC-08', title: 'Canva & AI Content Creation', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 2500, badges: [], summary: 'Design social posts, brand kits and marketing visuals quickly with Canva + AI tools.' },
+  { code: 'BC-07', title: 'Excel + AI for Office Professionals', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['new'], summary: 'Clean data, build reports and automate repetitive office work by pairing Excel with AI assistants.' },
+  { code: 'BC-08', title: 'Canva & AI Content Creation', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: [], summary: 'Design social posts, brand kits and marketing visuals quickly with Canva + AI tools.' },
   { code: 'SC-01', title: 'Python for Data Science', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 12500, badges: ['high_demand'], summary: 'Pandas, NumPy and Matplotlib applied to real datasets, ending with a portfolio analysis project.' },
   { code: 'SC-02', title: 'Generative AI Essentials', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 14000, badges: ['high_demand'], summary: 'LLMs, embeddings, retrieval and building your first AI-powered features with today\'s APIs.' },
   { code: 'SC-03', title: 'Data Analytics with SQL & Power BI', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 13500, badges: ['high_demand'], summary: 'Production-grade SQL queries turned into interactive Power BI dashboards decision-makers use.' },
@@ -1260,7 +1260,11 @@ const LEARNING_PATHS = [
 function loadOfficialCatalogue() {
   let added = 0;
   for (const c of OFFICIAL_CATALOGUE) {
-    if (!data.courses.some((x) => x.code === c.code)) { Courses.create(c); added += 1; }
+    const existing = data.courses.find((x) => x.code === c.code);
+    if (!existing) { Courses.create(c); added += 1; }
+    // Keep the stored copy's price in step with the official catalogue, so a
+    // price change in code reaches databases that already hold the course.
+    else if (existing.price_pkr !== c.price_pkr) { existing.price_pkr = c.price_pkr; save(); }
   }
   return { added, total: OFFICIAL_CATALOGUE.length };
 }

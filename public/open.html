@@ -34,10 +34,12 @@
 
 <nav class="open-nav">
   <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
-  <a class="nlink active" data-tab="courses" onclick="openTab('courses')">Courses</a>
+  <a class="nlink active" data-tab="courses" onclick="openTab('courses')">Live Tech Courses</a>
+  <a class="nlink" onclick="openTab('courses');setCoursePill('free')">Free Certified Courses</a>
   <a class="nlink" data-tab="events" onclick="openTab('events')">Events</a>
   <a class="nlink" data-tab="announcements" onclick="openTab('announcements')">Announcements</a>
   <a class="nlink" href="/compiler">Compiler</a>
+  <a class="nlink" href="/#faq">FAQ</a>
   <a class="nlink" data-tab="profile" onclick="openProfileTab()" id="profileNavLink" style="display:none">My Profile</a>
   <span style="flex:1"></span>
   <span id="userBox"></span>
@@ -166,6 +168,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="/js/coderunner.js?v1317"></script>
-<script src="/js/open.js?v1318"></script>
+<script src="/js/open.js?v1320"></script>
 </body>
 </html>

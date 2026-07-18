@@ -87,10 +87,10 @@ function pickIcon(title) {
   return 'gem';
 }
 function tierBg(tier, isFree) {
-  if (isFree) return 'linear-gradient(135deg,#0FBFA8,#0A9384)';
-  if (tier === 'Specialist Track') return 'linear-gradient(135deg,#7C3AED,#4F46E5)';
-  if (tier === 'Short Course') return 'linear-gradient(135deg,#2563EB,#1D4ED8)';
-  return 'linear-gradient(135deg,#9333EA,#7C3AED)';
+  if (isFree) return 'linear-gradient(135deg,#0FBFA8,#0A9384)';       // free - teal
+  if (tier === 'Specialist Track') return 'linear-gradient(135deg,#F59E0B,#EA580C)'; // specialist - amber/orange
+  if (tier === 'Short Course') return 'linear-gradient(135deg,#2563EB,#0EA5E9)';     // short course - blue/sky
+  return 'linear-gradient(135deg,#9333EA,#6D28D9)';                   // bootcamp - violet
 }
 const STAGE_FALLBACK = [{ key: 'spark', name: 'Spark', min: 0 }, { key: 'glow', name: 'Glow', min: 250 }, { key: 'beam', name: 'Beam', min: 700 }, { key: 'prism', name: 'Prism', min: 1400 }, { key: 'aurora', name: 'Aurora', min: 2400 }, { key: 'nova', name: 'Nova', min: 4000 }];
 
@@ -130,8 +130,8 @@ function drawUserBox() {
        <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
        ${ME.role !== 'free' ? '<a class="btn btn-teal btn-sm" href="/dashboard" style="margin-right:8px">LMS Portal</a>' : ''}
        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`
-    : `<button class="btn btn-ghost btn-sm" onclick="openRegister()" style="margin-right:8px">Register</button>
-       <button class="btn btn-primary btn-sm" onclick="gate()">Sign in - free</button>`;
+    : `<a class="btn btn-ghost btn-sm" href="/login" style="margin-right:8px">Login</a>
+       <button class="btn btn-primary btn-sm" onclick="gate()">Get Started</button>`;
 }
 async function logout() { try { await api('/api/auth/logout', { method: 'POST' }); } catch {} location.reload(); }
 
@@ -389,11 +389,10 @@ function renderCoursePills() {
 }
 function courseCardHtml(c) {
   const isFree = c.price_pkr === 0;
-  const isDark = c.tier === 'Specialist Track';
   const icon = pickIcon(c.title);
   const demand = (c.badges || []).find((b) => ['high_demand', 'flagship', 'new'].includes(b));
   return `
-    <div class="oc-card${isDark ? ' dark' : ''}${isFree ? ' teal' : ''}" onclick="courseAction('${esc(c.code)}')">
+    <div class="oc-card${isFree ? ' teal' : ''}" onclick="courseAction('${esc(c.code)}')">
       <div class="oc-top">
         <div class="oc-icon" style="background:${tierBg(c.tier, isFree)}"><svg viewBox="0 0 24 24" fill="none">${ICONS[icon]}</svg></div>
         ${demand ? `<span class="oc-demand">${BADGE_LABEL[demand]}</span>` : ''}

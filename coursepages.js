@@ -131,11 +131,15 @@ ${jsonld.map(jsonScript).join('\n')}
 <body>
 <nav class="open-nav">
   <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
-  <a class="nlink" href="/courses">Courses</a>
-  <a class="nlink" href="/open">Quests &amp; Events</a>
+  <a class="nlink" href="/courses">Live Tech Courses</a>
+  <a class="nlink" href="/open#free">Free Certified Courses</a>
+  <a class="nlink" href="/open#events">Events</a>
+  <a class="nlink" href="/open#announcements">Announcements</a>
   <a class="nlink" href="/compiler">Compiler</a>
+  <a class="nlink" href="/#faq">FAQ</a>
   <span style="flex:1"></span>
-  <a class="nlink" href="/login">Sign in</a>
+  <a class="btn-light" style="padding:8px 16px;font-size:13.5px;margin-right:8px;text-decoration:none" href="/login">Login</a>
+  <a class="btn-grad" style="padding:8px 16px;font-size:13.5px;text-decoration:none" href="/open">Get Started</a>
 </nav>`;
 }
 function pageFoot() {

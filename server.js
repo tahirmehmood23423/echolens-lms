@@ -252,10 +252,12 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body || {};
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   pruneResetTokens();
-  const genericMsg = "If that email has an account, we've sent a reset link - check your inbox.";
+  // One reply for every outcome so this endpoint can't be used to probe which
+  // emails have accounts. Self-service covers free open-website accounts only;
+  // LMS portal passwords are reset by the academy - and the message says so
+  // instead of pretending an email went out.
+  const genericMsg = 'If that email has a free EchoLens account, a reset link is on its way - check your inbox and spam folder. LMS portal passwords are reset by the academy: WhatsApp 0314 1479109 or info@echolens.digital.';
   const u = Users.byLogin(String(email).trim());
-  // Only open accounts self-serve; anything else gets the same reply either
-  // way so a stranger can't use this to probe which emails have accounts.
   if (!u || u.role !== 'free') return res.json({ ok: true, message: genericMsg });
   const token = crypto.randomBytes(24).toString('hex');
   RESET_TOKENS.set(token, { userId: u.id, expires: Date.now() + 30 * 60000 });
@@ -265,8 +267,13 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       `Hi ${u.name},\n\nReset your password here (this link expires in 30 minutes):\n${link}\n\nIf you didn't ask for this, you can ignore this email - your password is unchanged.`);
     return res.json({ ok: true, message: genericMsg });
   }
-  // Dev fallback: no SMTP configured on this server, so there's no inbox to
-  // check - hand back the link directly so the flow is still testable.
+  // No SMTP on this server. In development, hand the link back so the flow is
+  // testable; in production NEVER leak it - returning it would let anyone
+  // take over any free account - just log the gap loudly for the operator.
+  if (isProd) {
+    console.error(`forgot-password: SMTP is not configured - reset email NOT sent for user #${u.id}. Set SMTP_HOST/SMTP_USER/SMTP_PASS.`);
+    return res.json({ ok: true, message: genericMsg });
+  }
   res.json({ ok: true, message: 'Email is not configured on this server - use this link directly:', dev_link: link });
 });
 app.post('/api/auth/reset-password', (req, res) => {

@@ -124,7 +124,7 @@ let CUR_EVENT = null;
 })();
 
 function drawUserBox() {
-  const profLink = $('profileNavLink'); if (profLink) profLink.style.display = ME && ME.role === 'free' ? '' : 'none';
+  const profLink = $('profileNavLink'); if (profLink) profLink.style.display = ME ? '' : 'none'; // one login: portal accounts get their open-web profile too
   $('userBox').innerHTML = ME
     ? `<span class="av-sm" style="width:30px;height:30px;margin-right:9px;cursor:pointer" onclick="openProfileTab()">${ME.avatar ? `<img src="${esc(ME.avatar)}" alt="">` : esc((ME.name || '?').charAt(0).toUpperCase())}</span>
        <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>

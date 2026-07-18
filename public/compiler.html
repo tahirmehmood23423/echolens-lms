@@ -71,9 +71,12 @@
 
 <nav class="open-nav">
   <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
-  <a class="nlink" href="/open">Problems</a>
+  <a class="nlink" href="/courses">Live Tech Courses</a>
+  <a class="nlink" href="/open#free">Free Certified Courses</a>
+  <a class="nlink" href="/open#events">Events</a>
+  <a class="nlink" href="/open#announcements">Announcements</a>
   <a class="nlink active" href="/compiler">Compiler</a>
-  <a class="nlink" href="/#courses">Courses</a>
+  <a class="nlink" href="/#faq">FAQ</a>
   <span style="flex:1"></span>
   <span id="userBox"></span>
 </nav>
@@ -283,7 +286,7 @@ function assembleWebCode() {
   } catch { ME = null; }
   $('userBox').innerHTML = ME
     ? `<span class="s" style="color:var(--muted);margin-right:10px">${ME.name}</span><a class="btn btn-ghost btn-sm" href="${ME.role === 'free' ? '/open' : '/dashboard'}">${ME.role === 'free' ? 'Open portal' : 'My portal'}</a>`
-    : '<a class="btn btn-primary btn-sm" href="/open#signup">Sign in - free</a>';
+    : '<a class="btn btn-ghost btn-sm" href="/login" style="margin-right:8px">Login</a><a class="btn btn-primary btn-sm" href="/open#signup">Get Started</a>';
   // Signing in is required to use the compiler - browsing in is not enough.
   if (!ME) { $('gateWrap').style.display = ''; return; }
   $('appWrap').style.display = '';

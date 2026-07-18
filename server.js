@@ -1878,10 +1878,10 @@ app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (
 app.get('/api/certificates/mine', authRequired, (req, res) => {
   res.json({ certificates: Certificates.forUser(req.user.id).map((c) => ({ ...Certificates.publicView(c), url: `${APP_URL}/cert?s=${c.serial}` })) });
 });
-// v18: the open (free) account's own profile/dashboard - tracks, hackathons,
-// events, challenges, certificates and gems, all in one place.
+// v18: the signed-in account's open-web profile/dashboard - tracks, hackathons,
+// events, challenges, certificates and gems, all in one place. One login works
+// everywhere: portal accounts see their open-web activity here too.
 app.get('/api/my/open-profile', authRequired, (req, res) => {
-  if (req.user.role !== 'free') return res.status(403).json({ error: 'This page is for open website accounts.' });
   const p = openUserProfile(req.user);
   p.certificates = p.certificates.map((c) => ({ ...c, url: `${APP_URL}/cert?s=${c.serial}` }));
   res.json({ profile: p });
@@ -1979,7 +1979,12 @@ function eventNotify(ev, audience) {
 
 app.get('/api/events', authRequired, (req, res) => {
   const isAdmin = req.user.role === 'admin';
-  const list = (isAdmin ? Events.all() : Events.forScope(req.user.role === 'free' ? 'open' : 'portal'))
+  // One login, everything included: free accounts see open-web events only;
+  // portal accounts see their portal events PLUS all open-web events.
+  const visible = isAdmin ? Events.all()
+    : req.user.role === 'free' ? Events.forScope('open')
+    : [...new Map([...Events.forScope('portal'), ...Events.forScope('open')].map((e) => [e.id, e])).values()].sort((a, b) => b.id - a.id);
+  const list = visible
     .map((ev) => ({
       ...ev,
       my_entry: Events.entryFor(ev.id, req.user.id),

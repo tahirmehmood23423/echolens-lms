@@ -114,7 +114,8 @@ let CUR_EVENT = null;
   if (ME) { loadEvents(); loadCerts(); } else { $('evList').innerHTML = gateCardHtml('Events are for signed-in members - creating a free account takes a minute.'); }
   // Deep links: /open#courses, #events, #announcements, #register, #signup
   const h = (location.hash || '').replace('#', '');
-  if (['courses', 'events', 'announcements', 'home'].includes(h)) openTab(h);
+  if (['courses', 'events', 'announcements'].includes(h)) openTab(h);
+  else if (h === 'home') openTab('courses'); // the old portal home page merged into Courses
   else if (h === 'quests') openTab('courses'); // quests now live inside each course
   else if (h === 'free') { openTab('courses'); setCoursePill('free'); if (!ME) gate(); } // straight to the free certified courses
   else if (h === 'profile') openProfileTab();
@@ -227,7 +228,7 @@ function requireWhatsapp() {
 
 /* -------------------------------- tabs -------------------------------- */
 function openTab(tab) {
-  ['home', 'courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile'].forEach((t) => {
+  ['courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
   document.querySelectorAll('.open-nav .nlink[data-tab]').forEach((n) =>
@@ -254,20 +255,25 @@ async function loadHomeStats() {
     ['#F59E0B', 'spark', 'Weekly', 'Hackathons'],
     ['#EC4899', 'bot', 'Certificates', 'With QR Verify'],
   ];
-  $('homeStats').innerHTML = items.map(([bg, ic, n, l]) =>
+  const statsEl = $('homeStats'); if (!statsEl) return;
+  statsEl.innerHTML = items.map(([bg, ic, n, l]) =>
     `<div class="si"><div class="si-ic" style="background:${bg}"><svg viewBox="0 0 24 24" fill="none">${ICONS[ic]}</svg></div><div><b>${n}</b><span>${esc(l)}</span></div></div>`
   ).join('') + (students ? `<div class="si"><div class="si-ic" style="background:#0FBFA8"><svg viewBox="0 0 24 24" fill="none">${ICONS.bot}</svg></div><div><b>${students}+</b><span>Learners</span></div></div>` : '');
 }
 function renderHomePreview() {
+  // Real progress for signed-in members only - guests get the marketing
+  // version of this card on the landing page, not a fake one here.
+  const box = $('homePreview'); if (!box) return;
   const g = ME && ME.gamify;
-  const stages = STAGE_FALLBACK;
-  const stageName = g ? g.stage.name : 'Beam';
-  const level = stages.findIndex((s) => s.name === stageName) + 1 || 3;
-  const gems = g ? g.gems : 3240;
-  const pct = g ? g.stage.progress : 62;
-  const nextLine = g && g.stage.next ? `${g.stage.to_next} gems to <strong style="color:var(--ink)">${esc(g.stage.next.name)}</strong>` : (g ? 'Highest stage reached' : '760 gems to <strong style="color:var(--ink)">Prism</strong>');
-  const streak = g ? g.streak : 12;
-  $('homePreview').innerHTML = `
+  if (!g) { box.innerHTML = ''; return; }
+  const stages = (g && g.stages) || STAGE_FALLBACK;
+  const stageName = g.stage.name;
+  const level = stages.findIndex((s) => s.name === stageName) + 1 || 1;
+  const gems = g.gems;
+  const pct = g.stage.progress;
+  const nextLine = g.stage.next ? `${g.stage.to_next} gems to <strong style="color:var(--ink)">${esc(g.stage.next.name)}</strong>` : 'Highest stage reached';
+  const streak = g.streak;
+  box.innerHTML = `
     <div class="home2-preview">
       <div class="home2-gems-pill"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="#7C3AED"/></svg><b>${gems.toLocaleString()}</b><span class="s" style="color:var(--muted);font-size:11px">gems earned</span></div>
       <div class="home2-row">
@@ -296,7 +302,8 @@ function renderJourney() {
   const stages = (g && g.stages) || STAGE_FALLBACK;
   const curKey = g ? g.stage.key : null;
   const idx = curKey ? stages.findIndex((s) => s.key === curKey) : -1;
-  $('homeJourney').innerHTML = stages.map((s, i) => {
+  const jEl = $('homeJourney'); if (!jEl) return;
+  jEl.innerHTML = stages.map((s, i) => {
     const cls = idx < 0 ? '' : i < idx ? ' done' : i === idx ? ' now' : '';
     return `<div class="step${cls}"><div class="dot"></div><div class="nm">${esc(s.name)}</div><div class="th">${s.min}+</div></div>`;
   }).join('');
@@ -330,10 +337,10 @@ async function loadAnnouncements() {
         <span class="upd-link">Read more &rarr;</span>
       </div>`;
     };
-    $('homeUpdates').innerHTML = ANNS.length ? ANNS.slice(0, 4).map(upd).join('') : '<div class="empty">No updates yet - check back soon.</div>';
+    const hu = $('homeUpdates'); if (hu) hu.innerHTML = ANNS.length ? ANNS.slice(0, 4).map(upd).join('') : '<div class="empty">No updates yet - check back soon.</div>';
   } catch {
     $('annList').innerHTML = '<div class="empty">Announcements are unavailable right now.</div>';
-    $('homeUpdates').innerHTML = '<div class="empty">Updates are unavailable right now.</div>';
+    const hu = $('homeUpdates'); if (hu) hu.innerHTML = '<div class="empty">Updates are unavailable right now.</div>';
   }
 }
 

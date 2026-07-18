@@ -34,8 +34,7 @@
 
 <nav class="open-nav">
   <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
-  <a class="nlink active" data-tab="home" onclick="openTab('home')">Home</a>
-  <a class="nlink" data-tab="courses" onclick="openTab('courses')">Courses</a>
+  <a class="nlink active" data-tab="courses" onclick="openTab('courses')">Courses</a>
   <a class="nlink" data-tab="events" onclick="openTab('events')">Events</a>
   <a class="nlink" data-tab="announcements" onclick="openTab('announcements')">Announcements</a>
   <a class="nlink" href="/compiler">Compiler</a>
@@ -46,67 +45,16 @@
 
 <div class="open-wrap" id="appWrap">
 
-  <!-- ================================ HOME ================================ -->
-  <section id="tab-home">
-    <div class="home2-hero">
-      <div style="min-width:280px">
-        <h1 style="font-family:var(--font-display);font-size:34px;line-height:1.15;color:var(--ink)">Skills the 2026 market actually pays for.</h1>
-        <p class="s" style="color:var(--muted);font-size:15px;margin:12px 0 18px;max-width:560px">Thirty-one live, instructor-led programs across AI, data and web development. Solve real quests in the browser, earn gems, and collect verified certificates - three full courses are completely free.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="openTab('courses')">Browse the catalogue</button>
-          <button class="btn btn-teal" onclick="openTab('courses');setCoursePill('free')">Try a free course</button>
-          <button class="btn btn-ghost" onclick="openRegister()">Register for a course</button>
-        </div>
-      </div>
-      <div id="homePreview"></div>
-    </div>
-    <div class="stat-strip" id="homeStats"></div>
-    <h3 style="font-family:var(--font-display);font-size:20px;color:var(--ink);margin-bottom:12px">Your learning journey</h3>
-    <div class="journey" id="homeJourney"></div>
-    <div class="home-grid" style="margin-top:6px">
-      <div class="home-card" onclick="openTab('courses')">
-        <h4>Course catalogue</h4>
-        <p>All 31 programs with prices, durations and free levels - bootcamps, short courses and specialist tracks for the August 2026 cohort.</p>
-        <span class="home-link">View courses</span>
-      </div>
-      <div class="home-card" onclick="openTab('courses');setCoursePill('free')">
-        <h4>Free first week</h4>
-        <p>Every course opens its first quest free - open a course to see its outline, key concepts, final project and quests. Three courses are fully free with an automatic certificate.</p>
-        <span class="home-link">Try a free course</span>
-      </div>
-      <div class="home-card" onclick="location.href='/compiler'">
-        <h4>Free compiler</h4>
-        <p>Python with pandas and matplotlib, C, C++, SQL and live web preview - in your browser, free of cost, with datasets from files or URLs.</p>
-        <span class="home-link">Open the compiler</span>
-      </div>
-      <div class="home-card" onclick="openTab('events')">
-        <h4>Hackathons and webinars</h4>
-        <p>Timed quests, competitions with prizes, and live webinars - graded instantly with automatic certificates at the pass mark.</p>
-        <span class="home-link">See events</span>
-      </div>
-      <div class="home-card" onclick="openTab('announcements')">
-        <h4>Announcements</h4>
-        <p>New cohorts, registration deadlines, hackathons and webinars - everything important, straight from the academy.</p>
-        <span class="home-link">Read announcements</span>
-      </div>
-      <div class="home-card" onclick="openRegister()">
-        <h4>Register</h4>
-        <p>Pick your program, share your details, and the team contacts you on WhatsApp with the fee challan and next steps.</p>
-        <span class="home-link">Register now</span>
-      </div>
-    </div>
-    <h3 style="font-family:var(--font-display);font-size:20px;color:var(--ink);margin:26px 0 12px">Latest updates</h3>
-    <div class="upd-grid" id="homeUpdates"></div>
-  </section>
-
-  <!-- ================================ COURSES ================================ -->
-  <section id="tab-courses" style="display:none">
+  <!-- ================== COURSES (the portal's main page) ================== -->
+  <section id="tab-courses">
     <div style="display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:6px">
       <div>
         <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink)">Course catalogue - August 2026 cohort</h1>
         <p class="s" style="color:var(--muted)" id="cohortLine">31 live, instructor-led programs. Every paid course opens its first quest free - try before you enrol.</p>
       </div>
+      <div id="homePreview" style="margin-left:auto"></div>
     </div>
+    <div class="stat-strip" id="homeStats" style="margin:12px 0 6px"></div>
     <div id="actionStrip" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px"></div>
     <div class="lc-filterbar">
       <select id="cTier" onchange="syncCourseFilters();drawCourses()"><option value="">All tiers</option><option>Bootcamp</option><option>Short Course</option><option>Specialist Track</option></select>
@@ -119,6 +67,8 @@
     <div class="filt-row" id="cPills"></div>
     <div id="pathBox"></div>
     <div id="courseTable"><div class="empty">Loading catalogue&hellip;</div></div>
+    <h3 style="font-family:var(--font-display);font-size:20px;color:var(--ink);margin:26px 0 12px">Your learning journey</h3>
+    <div class="journey" id="homeJourney"></div>
   </section>
 
   <!-- ============================ COURSE DETAIL ============================ -->
@@ -216,6 +166,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="/js/coderunner.js?v1317"></script>
-<script src="/js/open.js?v1317"></script>
+<script src="/js/open.js?v1318"></script>
 </body>
 </html>

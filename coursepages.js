@@ -197,7 +197,10 @@ function renderCourse(c, all) {
   const url = `${BASE}/courses/${slug}`;
   const free = isFree(c);
   const level = levelFor(c.tier);
-  const kw = [c.title, c.tier, 'course', 'online course Pakistan', free ? 'free ' + c.title.toLowerCase() : c.title.toLowerCase() + ' fee', 'EchoLens', 'learn ' + c.title.split(/[:&,]/)[0].trim().toLowerCase() + ' online'].join(', ');
+  // Prefer the course's own SEO search keywords (from its quest track) when
+  // present, then top up with the generic catalogue keywords.
+  const trackKw = trackForCourse(c)?.def?.keywords || [];
+  const kw = [...trackKw, c.title, c.tier, 'course', 'online course Pakistan', free ? 'free ' + c.title.toLowerCase() : c.title.toLowerCase() + ' fee', 'EchoLens', 'learn ' + c.title.split(/[:&,]/)[0].trim().toLowerCase() + ' online'].join(', ');
   const metaDesc = `${c.summary} ${free ? 'Free, ' : ''}${c.weeks}-week ${c.tier.toLowerCase()}, ${c.hours} hours of live instructor-led learning with coding quests, a browser compiler and a verified certificate. ${COHORT.name} cohort - enrol at EchoLens.`.slice(0, 300);
   const title = `${c.title} ${free ? '(Free) ' : ''}| ${c.tier} - EchoLens Digital`;
 

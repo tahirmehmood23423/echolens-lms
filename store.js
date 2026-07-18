@@ -795,7 +795,9 @@ const AiReports = {
 // reach the track's pass mark, before the next level opens for that student.
 const TRACKS = {};
 (function loadTracks() {
-  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026')];
+  // short-courses-full is loaded LAST so its complete builds override the
+  // earlier thin stubs for the same keys (python-6w, sc02/sc03/sc06/sc07).
+  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full')];
   for (const t of all) {
     // Normalize: compute title thresholds from total points if only names given.
     const total = t.levels.reduce((s1, l) => s1 + l.problems.reduce((s2, p) => s2 + (p.points || 100), 0), 0);

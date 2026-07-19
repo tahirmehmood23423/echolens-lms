@@ -208,6 +208,12 @@ const Users = {
     const s = String(login).trim().toLowerCase();
     return data.users.find((u) => (u.username && u.username.toLowerCase() === s) || (u.email && u.email.toLowerCase() === s) || (u.reg_no && u.reg_no === s)) || null;
   },
+  // v18: one email can back accounts in several portals (each with its own
+  // category username), so email lookups can match more than one account.
+  allByLogin(login) {
+    const s = String(login).trim().toLowerCase();
+    return data.users.filter((u) => (u.username && u.username.toLowerCase() === s) || (u.email && u.email.toLowerCase() === s) || (u.reg_no && u.reg_no === s));
+  },
   byReg(reg) { return data.users.find((u) => u.reg_no === String(reg).trim()) || null; },
   all() { return data.users.slice().sort((a, b) => a.name.localeCompare(b.name)); },
   countByRole(role) { return data.users.filter((u) => u.role === role).length; },
@@ -232,9 +238,11 @@ const Users = {
   findOrCreateGoogle({ sub, name, email }) {
     let u = Users.byGoogleSub(sub);
     if (u) return u;
-    // If an email matches an existing portal account, link Google to it instead
-    // of creating a duplicate free account.
-    u = email ? data.users.find((x) => x.email && x.email.toLowerCase() === email.toLowerCase()) : null;
+    // If the email matches an existing LEARNER account, link Google to it
+    // instead of creating a duplicate. Staff/department accounts sharing the
+    // email are left alone - the person gets a separate free account, in line
+    // with one-email-many-portals.
+    u = email ? data.users.find((x) => ['free', 'student'].includes(x.role) && x.email && x.email.toLowerCase() === email.toLowerCase()) : null;
     if (u) { u.google_sub = String(sub); save(); return u; }
     u = {
       id: nextId('users'), name: String(name || 'Learner').trim(), role: 'free',

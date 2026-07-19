@@ -226,13 +226,24 @@ function noteLoginFail(ip) {
 }
 app.post('/api/auth/login', loginThrottle, (req, res) => {
   const { login, password } = req.body || {};
-  const u = login && Users.byLogin(login);
+  // v18: one email can back accounts in several portals, each with its own
+  // category username (tahir@finance.echolens, tahir@hr.echolens, ...).
+  // Signing in by email tries the password against every matching account;
+  // usernames are unique so they always resolve to exactly one.
   // Google-only accounts have no password_hash at all - bcrypt throws on a
   // null hash rather than just returning false, so guard it explicitly.
-  if (!u || !u.password_hash || !bcrypt.compareSync(String(password || ''), u.password_hash)) {
+  const matches = (login ? Users.allByLogin(login) : [])
+    .filter((u) => u.password_hash && bcrypt.compareSync(String(password || ''), u.password_hash));
+  if (!matches.length) {
     noteLoginFail(req._loginIp);
     return res.status(401).json({ error: 'Incorrect username or password.' });
   }
+  if (matches.length > 1) {
+    // Correct password for more than one portal account on this email - the
+    // person has proven ownership, so naming their own usernames is safe.
+    return res.status(400).json({ error: `This email is linked to accounts in more than one portal. Sign in with the username of the one you want: ${matches.map((u) => u.username).join(', ')}.` });
+  }
+  const u = matches[0];
   LOGIN_ATTEMPTS.delete(req._loginIp); // successful sign-in clears the counter
   setAuthCookie(res, sign(u));
   res.json({ ok: true, role: u.role });
@@ -263,8 +274,8 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   // LMS portal passwords are reset by the academy - and the message says so
   // instead of pretending an email went out.
   const genericMsg = 'If that email has a free EchoLens account, a reset link is on its way - check your inbox and spam folder. LMS portal passwords are reset by the academy: WhatsApp 0314 1479109 or info@echolens.digital.';
-  const u = Users.byLogin(String(email).trim());
-  if (!u || u.role !== 'free') return res.json({ ok: true, message: genericMsg });
+  const u = Users.allByLogin(String(email).trim()).find((x) => x.role === 'free') || null;
+  if (!u) return res.json({ ok: true, message: genericMsg });
   const token = crypto.randomBytes(24).toString('hex');
   RESET_TOKENS.set(token, { userId: u.id, expires: Date.now() + 30 * 60000 });
   const link = `${APP_URL}/reset-password?token=${token}`;
@@ -599,7 +610,7 @@ app.post('/api/batches/:id/students', authRequired, adminRequired, async (req, r
     const email = (parts[1] || '').toLowerCase();
     if (!isEmail(email)) { invalid.push(`${raw} - missing or invalid email`); continue; }
     if (!(await emailDomainExists(email))) { invalid.push(`${raw} - that email domain does not receive mail`); continue; }
-    if (Users.byLogin(email)) { invalid.push(`${raw} - an account with this email already exists`); continue; }
+    if (Users.allByLogin(email).some((u) => ['student', 'free'].includes(u.role))) { invalid.push(`${raw} - a learner account with this email already exists (add them as an existing student instead)`); continue; }
     const { user, password } = Users.create({ name, role: 'student', email, username: email });
     Enrollments.create(user.id, b.id);
     created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: mailer.configured });
@@ -669,18 +680,20 @@ function mailStaffCredentials(user, password, role) {
     `Hi ${user.name},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login with your username or email, and change your password from Settings after your first login.`);
 }
 // The email is mandatory and must be exact: the account is generated FROM it
-// (username = email) and the credentials are mailed to that same address.
-async function validateStaffEmail(email, res) {
+// (username = local part @ department domain) and the credentials are mailed
+// to that same address. One email may hold accounts in several portals, so
+// only a duplicate within the SAME role is refused.
+async function validateStaffEmail(email, res, role) {
   const em = String(email || '').trim().toLowerCase();
   if (!isEmail(em)) { res.status(400).json({ error: 'A valid email is required - the account is generated from it and the username and password are mailed there.' }); return null; }
   if (!(await emailDomainExists(em))) { res.status(400).json({ error: 'That email domain does not receive mail - check the spelling, the credentials must reach this inbox.' }); return null; }
-  if (Users.byLogin(em)) { res.status(400).json({ error: 'An account with this email already exists.' }); return null; }
+  if (Users.allByLogin(em).some((u) => u.role === role)) { res.status(400).json({ error: `This email already has an account in this portal (${STAFF_ROLE_LABEL[role] || role}). The same email can be added to other portals, but only once per portal.` }); return null; }
   return em;
 }
 app.post('/api/admin/coordinators', authRequired, adminRequired, async (req, res) => {
   const { name, email } = req.body || {};
   if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
-  const em = await validateStaffEmail(email, res); if (!em) return;
+  const em = await validateStaffEmail(email, res, 'coordinator'); if (!em) return;
   const { user, password } = Users.create({ name: String(name).trim(), role: 'coordinator', email: em, username: em });
   mailStaffCredentials(user, password, 'coordinator');
   res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: true });
@@ -698,7 +711,7 @@ for (const [role, path_] of Object.entries(DEPT_ROLE_ENDPOINTS)) {
   app.post(path_, authRequired, adminRequired, async (req, res) => {
     const { name, email } = req.body || {};
     if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
-    const em = await validateStaffEmail(email, res); if (!em) return;
+    const em = await validateStaffEmail(email, res, role); if (!em) return;
     const { user, password } = Users.create({ name: String(name).trim(), role, email: em, username: em });
     mailStaffCredentials(user, password, role);
     res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: true });
@@ -1990,7 +2003,7 @@ app.post('/api/auth/register-open', async (req, res) => {
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
   if (mailer.configured && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
   if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
-  if (Users.byLogin(email)) return res.status(400).json({ error: 'An account with this email already exists - sign in instead.' });
+  if (Users.allByLogin(email).some((u) => ['student', 'free'].includes(u.role))) return res.status(400).json({ error: 'A learner account with this email already exists - sign in instead.' });
   const { user, password } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase(), username: String(email).trim().toLowerCase() });
   Users.updateProfile(user.id, { phone: String(whatsapp).trim() });
   Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
@@ -2584,10 +2597,12 @@ app.get('/api/finance/balance-sheet', authRequired, financeOnly, (req, res) => r
 // pipeline to "enrolled". Shared by Finance's payment confirmation
 // (auto-enroll) and the Admissions Office's manual fallback.
 async function enrollRegistrationIntoBatch(r, b) {
-  let u = Users.byLogin(r.email);
+  // One email can hold accounts in several portals: enroll into the LEARNER
+  // account when one exists; staff accounts on the same email are ignored
+  // and a separate student account is created alongside them.
+  let u = Users.allByLogin(r.email).find((x) => ['student', 'free'].includes(x.role)) || null;
   let password = null, freshAccount = false;
   if (u) {
-    if (!['student', 'free'].includes(u.role)) return { error: 'This email already belongs to a non-student account - resolve manually.' };
     if (u.role === 'free') {
       u.role = 'student'; // now a paying student, not a free-tier account
       Users.deriveUsername(u.id); // @open.echolens -> @student.echolens
@@ -2687,7 +2702,7 @@ app.post('/api/hr/staff', authRequired, hrOnly, async (req, res) => {
   const { name, email, phone, position, employment_type, group_id } = req.body || {};
   if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address - credentials are emailed there.' });
-  if (Users.byLogin(email)) return res.status(400).json({ error: 'An account with this email already exists.' });
+  if (Users.allByLogin(email).some((u) => u.role === 'staff')) return res.status(400).json({ error: 'This email already has a staff account. The same email can be added to other portals, but only once per portal.' });
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
   const em = String(email).trim().toLowerCase();
   const { user, password } = Users.create({ name: String(name).trim(), role: 'staff', email: em, username: em });

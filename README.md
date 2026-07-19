@@ -8,6 +8,8 @@
 
 **Finance verifies, and enrollment is automatic.** The Finance portal now shows exactly the students whose challans were generated and mailed; the finance officer manually verifies the emailed proof and clicks **Verify & confirm payment** - the challan is marked paid and the student is **auto-enrolled** into the newest batch of the course (account created or upgraded, credentials emailed, admissions notified). If no batch is open yet, the registration waits at "Payment verified" and the Admissions Office can enroll manually once one opens.
 
+**Category usernames.** Every account registered with an email now gets a username derived from it: the part before the @ stays, the domain becomes the department's own - `tahir@gmail.com` as a student becomes **tahir@student.echolens**. Domains per category: student.echolens, open.echolens (free tier), admin.echolens, teacher.echolens, coordinator.echolens, hr.echolens, finance.echolens, admissions.echolens (Admissions Office), staff.echolens. Duplicate name parts get a number (tahir2@student.echolens). Sign-in accepts username, email, or reg no as before; credential emails state the username. When a free open account becomes a paying student, its username moves from @open.echolens to @student.echolens automatically. Existing accounts keep their current usernames.
+
 Migration: none. Role key `student_coordinator` is unchanged in the database; only labels, duties and endpoints moved. New env (optional): `ADMISSIONS_EMAIL`, `FINANCE_EMAIL`.
 
 ---

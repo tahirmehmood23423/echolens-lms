@@ -2119,7 +2119,7 @@ function formDeptStaff(role) {
     <form id="f">
       <label class="field"><span>Full name</span><input name="name" required placeholder="e.g. Bilal Ahmed"></label>
       <label class="field"><span>Email - the account is generated from it</span><input name="email" type="email" required placeholder="name@company.com"></label>
-      <p class="hint">Enter the exact email: it becomes their username, and the password is mailed to that inbox automatically. ${cfg.hint}</p>
+      <p class="hint">Enter the exact email: the account is generated from it (the username keeps the same name with the department's own domain, e.g. tahir@finance.echolens) and the password is mailed to that inbox automatically. ${cfg.hint}</p>
       <button class="btn btn-primary btn-block">Create account</button></form>
     <div id="credOut"></div>`);
   $('f').addEventListener('submit', async (e) => {
@@ -2127,7 +2127,7 @@ function formDeptStaff(role) {
     try {
       const out = await api(cfg.path, { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value.trim() }) });
       $('credOut').innerHTML = `<p style="margin:12px 0 4px;font-weight:600">Account created - credentials were emailed to ${esc(f.email.value.trim())}:</p>
-        <div class="cred-box">${esc(out.credentials.name)}<br>Signs in with their email: ${esc(out.credentials.username)}<br>Password: ${esc(out.credentials.password)}</div>`;
+        <div class="cred-box">${esc(out.credentials.name)}<br>Username: ${esc(out.credentials.username)}<br>Password: ${esc(out.credentials.password)}<br><span class="s">Signs in with the username above or their email.</span></div>`;
       modalMsg('Account created and credentials emailed.', true); f.reset();
     } catch (err) { modalMsg(err.message); }
     btn.disabled = false;
@@ -2156,7 +2156,7 @@ function formCoordinator() {
     <form id="f">
       <label class="field"><span>Full name</span><input name="name" required placeholder="e.g. Hina Raza"></label>
       <label class="field"><span>Email - the account is generated from it</span><input name="email" type="email" required placeholder="name@company.com"></label>
-      <p class="hint">Enter the exact email: it becomes their username, and the password is mailed to that inbox automatically. Coordinators see every course, report, and leaderboard - but cannot add, remove, grade, or change anything.</p>
+      <p class="hint">Enter the exact email: the account is generated from it (the username keeps the same name at coordinator.echolens) and the password is mailed to that inbox automatically. Coordinators see every course, report, and leaderboard - but cannot add, remove, grade, or change anything.</p>
       <button class="btn btn-primary btn-block">Create coordinator account</button></form>
     <div id="credOut"></div>`);
   $('f').addEventListener('submit', async (e) => {
@@ -2164,7 +2164,7 @@ function formCoordinator() {
     try {
       const out = await api('/api/admin/coordinators', { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value.trim() }) });
       $('credOut').innerHTML = `<p style="margin:12px 0 4px;font-weight:600">Coordinator account - credentials were emailed to ${esc(f.email.value.trim())}:</p>
-        <div class="cred-box">${esc(out.credentials.name)}<br>Signs in with their email: ${esc(out.credentials.username)}<br>Password: ${esc(out.credentials.password)}</div>`;
+        <div class="cred-box">${esc(out.credentials.name)}<br>Username: ${esc(out.credentials.username)}<br>Password: ${esc(out.credentials.password)}<br><span class="s">Signs in with the username above or their email.</span></div>`;
       modalMsg('Coordinator created and credentials emailed.', true); f.reset();
     } catch (err) { modalMsg(err.message); }
     btn.disabled = false;

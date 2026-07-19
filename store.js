@@ -155,12 +155,31 @@ function slugify(name) {
 }
 function uniqueUsername(name) {
   // Plain handle (e.g. "bilal.ahmed"), deliberately NOT email-shaped: a
-  // username is not an inbox. Accounts created with a real email are keyed
-  // to that email instead (username = email), so the two never get confused.
+  // username is not an inbox. Used only for accounts created without an
+  // email; everyone else gets a derived category username (below).
   const base = slugify(name);
   let candidate = base, i = 1;
   const taken = new Set([...data.issued_usernames, ...data.users.map((u) => u.username)]);
   while (taken.has(candidate)) { i += 1; candidate = `${base}${i}`; }
+  data.issued_usernames.push(candidate);
+  return candidate;
+}
+// v18: accounts registered with an email get a category username - the same
+// local part, with the domain swapped for the department's own namespace:
+// tahir@gmail.com as a student -> tahir@student.echolens. Sign-in continues
+// to accept username, email, or reg no interchangeably.
+const ROLE_USERNAME_DOMAIN = {
+  student: 'student.echolens', free: 'open.echolens', admin: 'admin.echolens',
+  instructor: 'teacher.echolens', coordinator: 'coordinator.echolens',
+  hr: 'hr.echolens', finance: 'finance.echolens',
+  student_coordinator: 'admissions.echolens', staff: 'staff.echolens',
+};
+function usernameFromEmail(email, role) {
+  const local = String(email || '').split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, '') || 'user';
+  const domain = ROLE_USERNAME_DOMAIN[role] || 'echolens';
+  const taken = new Set([...data.issued_usernames, ...data.users.map((u) => u.username).filter(Boolean)].map((s) => String(s).toLowerCase()));
+  let candidate = `${local}@${domain}`, i = 1;
+  while (taken.has(candidate)) { i += 1; candidate = `${local}${i}@${domain}`; }
   data.issued_usernames.push(candidate);
   return candidate;
 }
@@ -193,9 +212,12 @@ const Users = {
   all() { return data.users.slice().sort((a, b) => a.name.localeCompare(b.name)); },
   countByRole(role) { return data.users.filter((u) => u.role === role).length; },
   create({ name, role, email = null, username = null }) {
-    // Staff portal accounts are keyed to the email they provide (username =
-    // email); other flows fall back to a generated username from the name.
-    username = username || uniqueUsername(name);
+    // v18: any account registered with an email gets a derived category
+    // username (tahir@gmail.com + student -> tahir@student.echolens),
+    // regardless of what the caller passed. Email-less flows keep the
+    // name-based handle.
+    if (email) username = usernameFromEmail(email, role);
+    else username = username || uniqueUsername(name);
     const password = randomPassword();
     const u = {
       id: nextId('users'), name: String(name).trim(), role, username, email,
@@ -216,7 +238,7 @@ const Users = {
     if (u) { u.google_sub = String(sub); save(); return u; }
     u = {
       id: nextId('users'), name: String(name || 'Learner').trim(), role: 'free',
-      username: null, email: email || null, google_sub: String(sub),
+      username: email ? usernameFromEmail(email, 'free') : null, email: email || null, google_sub: String(sub),
       reg_no: issueRegNo(), password_hash: null,
       profile: {}, streak: 0, best_streak: 0, last_active: null, created_at: now(),
     };
@@ -231,6 +253,14 @@ const Users = {
       profile: {}, streak: 0, best_streak: 0, last_active: null, created_at: now(),
     };
     data.users.push(u); data.issued_usernames.push(username); save();
+    return u;
+  },
+  // Re-derives the category username after a role change (e.g. a free open
+  // account becoming a paying student moves from @open.echolens to
+  // @student.echolens). No-op for accounts without an email.
+  deriveUsername(id) {
+    const u = Users.byId(id); if (!u || !u.email) return u;
+    u.username = usernameFromEmail(u.email, u.role); save();
     return u;
   },
   setPassword(id, plain) {

@@ -605,7 +605,7 @@ app.post('/api/batches/:id/students', authRequired, adminRequired, async (req, r
     created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: mailer.configured });
     const bd = Batches.decorate(b);
     mailer.notify(email, 'Welcome to EchoLens - your account',
-      `Hi ${user.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nSign in with your email: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
+      `Hi ${user.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);
   }
   for (const raw of Array.isArray(existing) ? existing : []) {
     const u = Users.byLogin(String(raw).trim());
@@ -666,7 +666,7 @@ const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finan
 function mailStaffCredentials(user, password, role) {
   if (!user.email) return;
   mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
-    `Hi ${user.name},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nSign in with your email: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login and change your password from Settings after your first login.`);
+    `Hi ${user.name},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login with your username or email, and change your password from Settings after your first login.`);
 }
 // The email is mandatory and must be exact: the account is generated FROM it
 // (username = email) and the credentials are mailed to that same address.
@@ -1996,7 +1996,7 @@ app.post('/api/auth/register-open', async (req, res) => {
   Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
   setAuthCookie(res, sign(Users.byId(user.id)));
   mailer.notify(user.email, 'Welcome to EchoLens - your password',
-    `Hi ${user.name},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSign in any time with:\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Profile after signing in.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
+    `Hi ${user.name},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Profile after signing in.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
   const out = { ok: true, role: 'free' };
   if (!mailer.configured) out.password = password; // dev fallback: no SMTP to deliver it anywhere else
   res.json(out);
@@ -2588,20 +2588,23 @@ async function enrollRegistrationIntoBatch(r, b) {
   let password = null, freshAccount = false;
   if (u) {
     if (!['student', 'free'].includes(u.role)) return { error: 'This email already belongs to a non-student account - resolve manually.' };
-    if (u.role === 'free') u.role = 'student'; // now a paying student, not a free-tier account
+    if (u.role === 'free') {
+      u.role = 'student'; // now a paying student, not a free-tier account
+      Users.deriveUsername(u.id); // @open.echolens -> @student.echolens
+    }
   } else {
     if (!(await emailDomainExists(r.email))) return { error: 'That email domain does not receive mail - check with the student before enrolling.' };
-    const created = Users.create({ name: r.name, role: 'student', email: r.email, username: r.email });
+    const created = Users.create({ name: r.name, role: 'student', email: r.email });
     u = created.user; password = created.password; freshAccount = true;
   }
   Enrollments.create(u.id, b.id);
   const bd = Batches.decorate(b);
   if (freshAccount) {
     mailer.notify(r.email, 'Welcome to EchoLens - payment confirmed, your account is ready',
-      `Hi ${u.name},\n\nYour payment has been verified and you are now enrolled in ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nSign in with your email: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
+      `Hi ${u.name},\n\nYour payment has been verified and you are now enrolled in ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nUsername: ${u.username}\nEmail: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);
   } else {
     mailer.notify(r.email, `Payment confirmed - you're enrolled in ${bd.title || bd.name}`,
-      `Hi ${u.name},\n\nYour payment has been verified and you have been enrolled in ${bd.title || bd.name}. Sign in to your existing EchoLens account at ${APP_URL} to get started.`);
+      `Hi ${u.name},\n\nYour payment has been verified and you have been enrolled in ${bd.title || bd.name}. Your student username is ${u.username} - sign in at ${APP_URL} with it (or your email) to get started.`);
   }
   const updated = Registrations._setStage(r.id, 'enrolled', { enrolled_user_id: u.id, enrolled_batch_id: b.id });
   return { registration: updated, credentials: freshAccount ? { username: u.username, password } : null };
@@ -2690,7 +2693,7 @@ app.post('/api/hr/staff', authRequired, hrOnly, async (req, res) => {
   const { user, password } = Users.create({ name: String(name).trim(), role: 'staff', email: em, username: em });
   const record = StaffRecords.create({ user_id: user.id, name: user.name, email: em, phone, position, employment_type, group_id });
   mailer.notify(em, 'Welcome to EchoLens - your staff account',
-    `Hi ${user.name},\n\nYour EchoLens staff account is ready.\n\nSign in with your email: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} to see your team, instructions, and follow-ups.`);
+    `Hi ${user.name},\n\nYour EchoLens staff account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email to see your team, instructions, and follow-ups.`);
   res.json({ ok: true, staff: record, credentials: { name: user.name, username: user.username, password } });
 });
 app.patch('/api/hr/staff/:id', authRequired, hrOnly, (req, res) => {

@@ -39,7 +39,8 @@ function notify(to, subject, text, attachments) {
 
 async function sendAnnouncement(recipients, title, body) {
   for (const r of recipients || []) {
-    try { await send({ to: r.email, subject: `EchoLens: ${title}`, text: `Hi ${r.name},\n\n${body}\n\n- EchoLens` }); }
+    const first = String(r.name || '').trim().split(/\s+/)[0] || 'there';
+    try { await send({ to: r.email, subject: `EchoLens: ${title}`, text: `Hi ${first},\n\n${body}\n\n- EchoLens` }); }
     catch (e) { console.error('Mail failed for', r.email, e.message); }
   }
 }

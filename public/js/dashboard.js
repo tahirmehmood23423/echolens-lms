@@ -2218,7 +2218,7 @@ async function renderFinRegistrations() {
   const d = await api('/api/finance/registrations');
   const rows = d.registrations.filter((r) => r.payment_stage !== 'new');
   box.innerHTML = `
-    <div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Students appear here once the Admissions Office generates and mails their challan. Match the payment screenshot and record the student emailed to <strong>${esc(d.finance_email || 'finance@echolens.digital')}</strong> against the challan, then confirm - the student is enrolled in the course automatically and emailed their account.</span></div></div>`
+    <div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Students appear here once the Admissions Office generates and mails their challan. Match the payment screenshot and record the student emailed to <strong>${esc(d.finance_email || 'finance@echolens.digital')}</strong> against the challan, then confirm - the student moves to the Admissions Office's "Ready to enroll" folder, where they are placed in the right batch.</span></div></div>`
     + (rows.length ? rows.map(finRegRow).join('') : '<div class="empty">No challans generated yet - waiting on the Admissions Office.</div>');
 }
 function finRegRow(r) {
@@ -2232,7 +2232,7 @@ function finRegRow(r) {
       <a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>
       <button class="btn btn-primary btn-sm" onclick="finClearPayment(${r.id})">Verify &amp; confirm payment</button>`;
   } else if (r.payment_stage === 'paid_cleared') {
-    action = `<span class="s" style="color:var(--ok)">Payment confirmed - enrollment pending (no batch open yet)</span>`;
+    action = `<span class="s" style="color:var(--ok)">Payment confirmed - with the Admissions Office for batch enrollment</span>`;
   } else if (r.payment_stage === 'enrolled') {
     action = `<span class="s" style="color:var(--ok)">Payment confirmed &middot; Enrolled</span>`;
   }
@@ -2245,10 +2245,10 @@ function finRegRow(r) {
   </div></div>`;
 }
 async function finClearPayment(regId) {
-  if (!confirm('Confirm you have verified the payment screenshot and payment record against this challan? The student will be enrolled automatically.')) return;
+  if (!confirm('Confirm you have verified the payment screenshot and payment record against this challan?')) return;
   try {
-    const out = await api(`/api/finance/registrations/${regId}/clear`, { method: 'POST' });
-    toast(out.enroll_note ? 'Payment confirmed. ' + out.enroll_note : 'Payment confirmed - student enrolled and emailed.');
+    await api(`/api/finance/registrations/${regId}/clear`, { method: 'POST' });
+    toast('Payment confirmed - the student moved to the Admissions Office for batch enrollment.');
     renderFinRegistrations();
   } catch (e) { toast(e.message, true); }
 }
@@ -2309,13 +2309,30 @@ async function renderDeptStudentCoordinator() {
   else if (COORD_TAB === 'bank') renderCoordBank();
   else renderCoordQueries();
 }
+// Sub-folders: every registration sits in exactly one folder for its
+// pipeline stage, so bundles of students stay organized as cohorts grow.
+let COORD_FOLDER = 'new';
+const COORD_FOLDERS = [
+  ['new', 'New enrollments'],
+  ['challan_issued', 'Challan generated'],
+  ['challan_sent', 'Challan mailed - with Finance'],
+  ['paid_cleared', 'Ready to enroll'],
+  ['enrolled', 'Enrolled'],
+];
+function coordFolder(f) { COORD_FOLDER = f; renderCoordRegistrations(); }
 async function renderCoordRegistrations() {
   const box = $('coordTabBody');
   const d = await api('/api/admissions/registrations');
   COORD_REGS = d.registrations;
+  const count = (k) => d.registrations.filter((r) => r.payment_stage === k).length;
+  const chips = COORD_FOLDERS.map(([k, l]) =>
+    `<button type="button" class="btn ${k === COORD_FOLDER ? 'btn-primary' : 'btn-ghost'} btn-sm" onclick="coordFolder('${k}')">${esc(l)}${count(k) ? ` (${count(k)})` : ''}</button>`).join('');
+  const rows = d.registrations.filter((r) => r.payment_stage === COORD_FOLDER);
+  const folderLabel = (COORD_FOLDERS.find(([k]) => k === COORD_FOLDER) || [])[1] || '';
   box.innerHTML = `
-    <div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Every registration from the website lands here (you are also emailed at <strong>${esc(d.admissions_email || 'admissions@echolens.digital')}</strong>). Generate the fee challan, review it, and mail it to the student - they pay and send proof to <strong>${esc(d.finance_email || 'finance@echolens.digital')}</strong>, Finance verifies, and the student is enrolled automatically.</span></div></div>`
-    + (d.registrations.length ? d.registrations.map(coordRegRow).join('') : '<div class="empty">No registrations yet.</div>');
+    <div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Every registration from the website lands here (you are also emailed at <strong>${esc(d.admissions_email || 'admissions@echolens.digital')}</strong>). Generate the fee challan, review it, and mail it to the student - they pay and send proof to <strong>${esc(d.finance_email || 'finance@echolens.digital')}</strong>. Once Finance confirms the payment, the student appears in your <strong>Ready to enroll</strong> folder, where you place them in the right batch.</span></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${chips}</div>`
+    + (rows.length ? rows.map(coordRegRow).join('') : `<div class="empty">Nothing in "${esc(folderLabel)}" right now.</div>`);
 }
 function coordRegRow(r) {
   const latest = r.challans && r.challans[0];

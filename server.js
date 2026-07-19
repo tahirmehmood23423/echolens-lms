@@ -197,6 +197,8 @@ function viewBatch(req, res, next) { // READ access: manage roles + coordinator 
   req.batch = b; next();
 }
 const isEmail = (s) => typeof s === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+// v18: every outgoing email greets with just the first name - "Hi Tahir".
+const hi = (name) => `Hi ${String(name || '').trim().split(/\s+/)[0] || 'there'}`;
 
 /* --------------------------------- auth --------------------------------- */
 // Simple in-memory brute-force throttle: after too many failed attempts from
@@ -281,7 +283,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   const link = `${APP_URL}/reset-password?token=${token}`;
   if (mailer.configured) {
     mailer.notify(u.email, 'Reset your EchoLens password',
-      `Hi ${u.name},\n\nReset your password here (this link expires in 30 minutes):\n${link}\n\nIf you didn't ask for this, you can ignore this email - your password is unchanged.`);
+      `${hi(u.name)},\n\nReset your password here (this link expires in 30 minutes):\n${link}\n\nIf you didn't ask for this, you can ignore this email - your password is unchanged.`);
     return res.json({ ok: true, message: genericMsg });
   }
   // No SMTP on this server. In development, hand the link back so the flow is
@@ -616,7 +618,7 @@ app.post('/api/batches/:id/students', authRequired, adminRequired, async (req, r
     created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: mailer.configured });
     const bd = Batches.decorate(b);
     mailer.notify(email, 'Welcome to EchoLens - your account',
-      `Hi ${user.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);
+      `${hi(user.name)},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);
   }
   for (const raw of Array.isArray(existing) ? existing : []) {
     const u = Users.byLogin(String(raw).trim());
@@ -677,7 +679,7 @@ const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finan
 function mailStaffCredentials(user, password, role) {
   if (!user.email) return;
   mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
-    `Hi ${user.name},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login with your username or email, and change your password from Settings after your first login.`);
+    `${hi(user.name)},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login with your username or email, and change your password from Settings after your first login.`);
 }
 // The email is mandatory and must be exact: the account is generated FROM it
 // (username = local part @ department domain) and the credentials are mailed
@@ -732,7 +734,7 @@ app.post('/api/hr/ambassadors', authRequired, hrOnly, async (req, res) => {
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
   const a = Ambassadors.create({ name, email }, req.user.id);
   mailer.notify(a.email, 'Your EchoLens ambassador code',
-    `Hi ${a.name},\n\nWelcome aboard - you are now an EchoLens ambassador. Your personal referral code is:\n\n    ${a.code}\n\nShare it with students: anyone who enters this code in the course registration form at ${APP_URL} gets 10% off their course fee, and the registration is credited to you.\n\nEchoLens Digital`);
+    `${hi(a.name)},\n\nWelcome aboard - you are now an EchoLens ambassador. Your personal referral code is:\n\n    ${a.code}\n\nShare it with students: anyone who enters this code in the course registration form at ${APP_URL} gets 10% off their course fee, and the registration is credited to you.\n\nEchoLens Digital`);
   res.json({ ok: true, ambassador: a });
 });
 app.delete('/api/hr/ambassadors/:id', authRequired, hrOnly, (req, res) => { Ambassadors.remove(req.params.id); res.json({ ok: true }); });
@@ -1136,7 +1138,7 @@ app.post('/api/hackathons/:id/register', authRequired, (req, res) => {
     `${req.user.name} registered for the hackathon "${h ? h.title : req.params.id}"${team_name ? ` (team: ${team_name})` : ''}.\nEmail: ${req.user.email || '-'}`);
   if (req.user.email) {
     mailer.notify(req.user.email, `EchoLens - you're registered${h ? ` for ${h.title}` : ''}`,
-      `Hi ${req.user.name},\n\nWe received your hackathon registration${h ? ` for "${h.title}"` : ''}${team_name ? ` with team "${team_name}"` : ''}.\n\nEchoLens Digital`);
+      `${hi(req.user.name)},\n\nWe received your hackathon registration${h ? ` for "${h.title}"` : ''}${team_name ? ` with team "${team_name}"` : ''}.\n\nEchoLens Digital`);
   }
   res.json({ ok: true, ...out });
 });
@@ -1425,7 +1427,7 @@ app.post('/api/quest-submissions/:id/grade', authRequired, (req, res) => {
   const p = q.problems.find((x) => x.pid === s.pid) || {};
   if (student && student.email) {
     mailer.notify(student.email, `Your task was graded - ${p.title || 'quest task'}`,
-      `Hi ${student.name},\n\nYour submission for "${p.title}" (Level ${q.no}) was graded: ${graded.grade}% - you earned ${graded.gems} gems.${graded.remarks ? '\n\nYour teacher says: ' + graded.remarks : ''}\n\nSee your progress: ${APP_URL}/dashboard`);
+      `${hi(student.name)},\n\nYour submission for "${p.title}" (Level ${q.no}) was graded: ${graded.grade}% - you earned ${graded.gems} gems.${graded.remarks ? '\n\nYour teacher says: ' + graded.remarks : ''}\n\nSee your progress: ${APP_URL}/dashboard`);
   }
   res.json({ ok: true, submission: graded });
 });
@@ -2009,7 +2011,7 @@ app.post('/api/auth/register-open', async (req, res) => {
   Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
   setAuthCookie(res, sign(Users.byId(user.id)));
   mailer.notify(user.email, 'Welcome to EchoLens - your password',
-    `Hi ${user.name},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Profile after signing in.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
+    `${hi(user.name)},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Profile after signing in.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
   const out = { ok: true, role: 'free' };
   if (!mailer.configured) out.password = password; // dev fallback: no SMTP to deliver it anywhere else
   res.json(out);
@@ -2137,7 +2139,7 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), (req, 
     `${req.user.name} registered for the ${evKind} "${ev.title}".\nEmail: ${req.user.email || '-'}${ev.entry === 'paid' ? '\nEntry: paid - a payment screenshot was uploaded for verification.' : '\nEntry: free'}\n\nDetails are in the Admissions Office portal (Event registrations) and the admin Events tab.`);
   if (req.user.email) {
     mailer.notify(req.user.email, `EchoLens - you're registered for ${ev.title}`,
-      `Hi ${req.user.name},\n\nWe received your registration for the ${evKind} "${ev.title}".${ev.entry === 'paid' ? ' Your payment screenshot is being verified - you will get a confirmation email once it is cleared.' : ' You are all set - see the event page for dates and details.'}\n\nEchoLens Digital`);
+      `${hi(req.user.name)},\n\nWe received your registration for the ${evKind} "${ev.title}".${ev.entry === 'paid' ? ' Your payment screenshot is being verified - you will get a confirmation email once it is cleared.' : ' You are all set - see the event page for dates and details.'}\n\nEchoLens Digital`);
   }
   if (ev.entry === 'paid') {
     const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
@@ -2473,7 +2475,7 @@ app.post('/api/public/register-interest', async (req, res) => {
   // so admissions can generate and send the fee challan from their portal.
   const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
   mailer.notify([ADMISSIONS_EMAIL, ...admins], `New course registration - ${r.name}`, `${r.name} registered${r.course_title ? ` for ${r.course_code} ${r.course_title}` : ''}.\nEmail: ${r.email}\nWhatsApp: ${r.whatsapp}${r.city ? `\nCity: ${r.city}` : ''}${r.note ? `\nNote: ${r.note}` : ''}${r.ambassador_code ? `\n\nAMBASSADOR REFERRAL: code ${r.ambassador_code} from ambassador ${r.ambassador_name} was verified automatically - a straight 10% discount applies to this student's challan.` : ''}\n\nGenerate and send the fee challan from the Admissions Office portal.`);
-  mailer.notify(r.email, 'EchoLens - registration received', `Assalam-o-Alaikum ${r.name},\n\nWe received your registration${r.course_title ? ` for ${r.course_title}` : ''}.${r.ambassador_code ? ' Your ambassador code was accepted - a 10% discount will be applied to your fee challan.' : ''} Our Admissions Office will email you the fee challan with the payment details and next steps shortly.\n\nEchoLens Digital`);
+  mailer.notify(r.email, 'EchoLens - registration received', `${hi(r.name)},\n\nWe received your registration${r.course_title ? ` for ${r.course_title}` : ''}.${r.ambassador_code ? ' Your ambassador code was accepted - a 10% discount will be applied to your fee challan.' : ''} Our Admissions Office will email you the fee challan with the payment details and next steps shortly.\n\nEchoLens Digital`);
   res.json({ ok: true });
 });
 app.get('/api/admin/registrations', authRequired, staffView, (req, res) => res.json({ registrations: Registrations.all(), pending: Registrations.pendingCount() }));
@@ -2528,7 +2530,7 @@ app.post('/api/admissions/challans/:serial/send', authRequired, admissionsOnly, 
     return res.status(500).json({ error: 'Could not generate the challan PDF - try again.' });
   }
   mailer.notify(c.student_email, `EchoLens - fee challan for ${c.course_title}`,
-    `Assalam-o-Alaikum ${c.student_name},\n\nYour fee challan for ${c.course_title} is attached as a PDF.\n\nStudent ID: ${c.student_id || '-'}\nChallan serial: ${c.serial}\nAmount payable: Rs ${c.net_fee.toLocaleString('en-US')}\nDeadline: ${c.deadline}\n\nAfter paying, email a screenshot of your payment along with the payment record (transaction ID, date, and amount) to ${FINANCE_EMAIL}. Our finance team will verify it and confirm your enrollment by email.\n\nYou can also view and verify this challan online: ${APP_URL}/challan?s=${c.serial}`,
+    `${hi(c.student_name)},\n\nYour fee challan for ${c.course_title} is attached as a PDF.\n\nStudent ID: ${c.student_id || '-'}\nChallan serial: ${c.serial}\nAmount payable: Rs ${c.net_fee.toLocaleString('en-US')}\nDeadline: ${c.deadline}\n\nAfter paying, email a screenshot of your payment along with the payment record (transaction ID, date, and amount) to ${FINANCE_EMAIL}. Our finance team will verify it and confirm your enrollment by email.\n\nYou can also view and verify this challan online: ${APP_URL}/challan?s=${c.serial}`,
     attachments);
   Challans.markSent(c.serial);
   res.json({ ok: true });
@@ -2557,29 +2559,19 @@ app.get('/api/finance/registrations', authRequired, financeOnly, (req, res) => {
   const rows = Registrations.all().map((r) => ({ ...r, challans: Challans.forRegistration(r.id) }));
   res.json({ registrations: rows, finance_email: FINANCE_EMAIL });
 });
-app.post('/api/finance/registrations/:id/clear', authRequired, financeOnly, async (req, res) => {
+app.post('/api/finance/registrations/:id/clear', authRequired, financeOnly, (req, res) => {
   const r = Registrations.byId(req.params.id);
   if (!r || !r.challan_serial) return res.status(400).json({ error: 'The Admissions Office has not generated a challan for this registration yet.' });
   const c = Challans.markPaid(r.challan_serial, req.user.id);
   if (!c) return res.status(404).json({ error: 'Challan not found.' });
-  // Payment confirmed - enroll the student automatically into the newest
-  // batch of the course. If no batch is open yet, the registration stays
-  // "paid_cleared" and the Admissions Office can enroll manually later.
-  const course = Courses.byCode(r.course_code);
-  const batch = course ? Batches.all().filter((b) => b.course_id === course.id).sort((a, b) => b.id - a.id)[0] : null;
-  let enrollNote = null, credentials = null;
-  if (batch) {
-    const out = await enrollRegistrationIntoBatch(r, batch);
-    if (out.error) enrollNote = out.error;
-    else credentials = out.credentials;
-  } else {
-    enrollNote = 'No batch is open for this course yet - the Admissions Office can enroll the student once one opens.';
-  }
-  if (!enrollNote) {
-    mailer.notify(ADMISSIONS_EMAIL, `Payment confirmed & enrolled - ${r.name}`,
-      `Finance verified the payment for ${r.name} (${r.email}) against challan ${c.serial} and the student was enrolled in ${r.course_title || r.course_code} automatically.`);
-  }
-  res.json({ ok: true, registration: Registrations.byId(r.id), enroll_note: enrollNote, credentials });
+  // Payment confirmed. Enrollment stays a human step: several batches of the
+  // same course can run at once, so the student moves to the Admissions
+  // Office's "Ready to enroll" folder where a coordinator picks the batch.
+  mailer.notify(ADMISSIONS_EMAIL, `Payment confirmed - enroll ${r.name}`,
+    `Finance verified the payment for ${r.name} (${r.email}) against challan ${c.serial} for ${r.course_title || r.course_code}. Enroll them into their batch from the Admissions Office portal ("Ready to enroll" folder).`);
+  mailer.notify(r.email, 'EchoLens - payment confirmed',
+    `${hi(r.name)},\n\nYour payment for ${r.course_title || r.course_code} has been verified by our finance team. Our admissions team is now placing you in your batch - your account details and course access will arrive in a separate email shortly.`);
+  res.json({ ok: true, registration: Registrations.byId(r.id) });
 });
 
 app.get('/api/finance/expenses', authRequired, financeOnly, (req, res) => res.json({ expenses: Expenses.all() }));
@@ -2616,10 +2608,10 @@ async function enrollRegistrationIntoBatch(r, b) {
   const bd = Batches.decorate(b);
   if (freshAccount) {
     mailer.notify(r.email, 'Welcome to EchoLens - payment confirmed, your account is ready',
-      `Hi ${u.name},\n\nYour payment has been verified and you are now enrolled in ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nUsername: ${u.username}\nEmail: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);
+      `${hi(u.name)},\n\nYour payment has been verified and you are now enrolled in ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nUsername: ${u.username}\nEmail: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);
   } else {
     mailer.notify(r.email, `Payment confirmed - you're enrolled in ${bd.title || bd.name}`,
-      `Hi ${u.name},\n\nYour payment has been verified and you have been enrolled in ${bd.title || bd.name}. Your student username is ${u.username} - sign in at ${APP_URL} with it (or your email) to get started.`);
+      `${hi(u.name)},\n\nYour payment has been verified and you have been enrolled in ${bd.title || bd.name}. Your student username is ${u.username} - sign in at ${APP_URL} with it (or your email) to get started.`);
   }
   const updated = Registrations._setStage(r.id, 'enrolled', { enrolled_user_id: u.id, enrolled_batch_id: b.id });
   return { registration: updated, credentials: freshAccount ? { username: u.username, password } : null };
@@ -2708,7 +2700,7 @@ app.post('/api/hr/staff', authRequired, hrOnly, async (req, res) => {
   const { user, password } = Users.create({ name: String(name).trim(), role: 'staff', email: em, username: em });
   const record = StaffRecords.create({ user_id: user.id, name: user.name, email: em, phone, position, employment_type, group_id });
   mailer.notify(em, 'Welcome to EchoLens - your staff account',
-    `Hi ${user.name},\n\nYour EchoLens staff account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email to see your team, instructions, and follow-ups.`);
+    `${hi(user.name)},\n\nYour EchoLens staff account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email to see your team, instructions, and follow-ups.`);
   res.json({ ok: true, staff: record, credentials: { name: user.name, username: user.username, password } });
 });
 app.patch('/api/hr/staff/:id', authRequired, hrOnly, (req, res) => {

@@ -726,8 +726,22 @@ function filterAdminStudents() {
 async function renderAdminEnrollments() {
   const el = $('view-admin-enrollments');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
-  const d = await api('/api/admin/enrollments');
-  el.innerHTML = `<div class="card"><div class="card-head"><h3>All enrollments</h3><span class="s" style="color:var(--muted)">${d.enrollments.length} total</span></div>
+  const [d, rg] = await Promise.all([api('/api/admin/enrollments'), api('/api/admin/registrations').catch(() => ({ registrations: [] }))]);
+  // Website enrolment requests (the open-web registration form) surface here
+  // too, so admin sees every new student the moment they register.
+  const regs = (rg.registrations || []).filter((r) => r.payment_stage !== 'enrolled');
+  el.innerHTML = `<div class="card" style="margin-bottom:14px"><div class="card-head"><h3>Enrollment requests - website form</h3><span class="s" style="color:var(--muted)">${regs.length} awaiting enrollment</span></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Course</th><th>Stage</th><th>Received</th></tr>
+      ${regs.map((r) => `<tr>
+        <td>${esc(r.name)}</td><td class="s">${esc(r.email)}</td><td class="mono">${esc(r.whatsapp || '—')}</td>
+        <td>${esc(r.course_title || r.course_code || '—')}</td>
+        <td>${pipelineBadge(r.payment_stage)}</td>
+        <td class="s">${esc((r.created_at || '').slice(0, 10))}</td>
+      </tr>`).join('') || '<tr><td colspan="6" class="empty">No pending enrollment requests - new website registrations appear here.</td></tr>'}
+    </table></div>
+    <p class="hint" style="padding:0 14px 12px">Follow up (challan, payment, enrolment) from Analytics &amp; Leads or the Student Coordinator portal - once enrolled, the student moves to the list below.</p></div>
+  <div class="card"><div class="card-head"><h3>All enrollments</h3><span class="s" style="color:var(--muted)">${d.enrollments.length} total</span></div>
     <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
       <tr><th>Student</th><th>Reg no</th><th>Course</th><th>Cohort</th><th>Price (PKR)</th><th>Enrolled</th></tr>
       ${d.enrollments.map((e) => `<tr>

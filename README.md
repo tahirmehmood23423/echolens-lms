@@ -1,3 +1,17 @@
+# EchoLens LMS v18 - Admissions Office Release
+
+**The Student Coordinator portal is now the Admissions Office** (existing accounts keep working - only the name and duties changed). Every registration from the website - courses, hackathons, events, competitions - lands in the Admissions Office portal, and an email goes to **admissions@echolens.digital** (override with `ADMISSIONS_EMAIL`) plus a confirmation email to the student.
+
+**Admissions owns the fee challan.** For each registration a short form (like certificate generation) asks only for an optional extra discount and the payment deadline, then auto-generates a QR-verified challan. **Ambassador codes are cross-checked automatically**: the portal shows "Ambassador referral - NAME (code) verified" and a straight 10% is applied on its own; any other discount picked by admissions stacks on top. **Discount categories are now managed by the Admissions Office** (add / edit / deactivate any time - challans snapshot their discount, so history never changes). Bank details also moved to admissions and ship with **dummy placeholder details** (Meezan Bank / EchoLens Digital (Pvt) Ltd) until the real account is saved.
+
+**The challan splits the catalogue fee into three parts** - Tuition fee (70%), Portal & LMS fee (20%), Examination & certification fee (10%) - and carries the student's name, Student ID, course, discounts, net payable, deadline, bank details and verification QR. After review, admissions clicks **Send to student**: the challan is emailed with instructions to pay and send the **payment screenshot + payment record to finance@echolens.digital** (override with `FINANCE_EMAIL`).
+
+**Finance verifies, and enrollment is automatic.** The Finance portal now shows exactly the students whose challans were generated and mailed; the finance officer manually verifies the emailed proof and clicks **Verify & confirm payment** - the challan is marked paid and the student is **auto-enrolled** into the newest batch of the course (account created or upgraded, credentials emailed, admissions notified). If no batch is open yet, the registration waits at "Payment verified" and the Admissions Office can enroll manually once one opens.
+
+Migration: none. Role key `student_coordinator` is unchanged in the database; only labels, duties and endpoints moved. New env (optional): `ADMISSIONS_EMAIL`, `FINANCE_EMAIL`.
+
+---
+
 # EchoLens LMS v12.3.1 - QA Release
 
 Full regression pass across every role (anonymous / open / student / teacher / admin) and every flow. Defects found and fixed:

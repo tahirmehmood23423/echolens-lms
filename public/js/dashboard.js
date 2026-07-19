@@ -27,14 +27,14 @@ function toast(text, isErr) {
   t.textContent = text; t.className = 'toast show' + (isErr ? ' err' : '');
   clearTimeout(t._h); t._h = setTimeout(() => (t.className = 'toast'), 2600);
 }
-function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Student Coordinator', staff: 'Staff' }[r] || r; }
+function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', staff: 'Staff' }[r] || r; }
 function isStaff() { return ['admin', 'coordinator', 'instructor'].includes(ME.role); }
 // v17: isolated department portals - each role sees ONLY its own nav item
 // and view, nothing else in the app (not courses, messages, jobs, etc).
 const DEPT_ROLES = {
   hr: { view: 'dept-hr', label: 'HR' },
   finance: { view: 'dept-finance', label: 'Finance' },
-  student_coordinator: { view: 'dept-student-coordinator', label: 'Student Coordinator' },
+  student_coordinator: { view: 'dept-student-coordinator', label: 'Admissions Office' },
   staff: { view: 'dept-staff', label: 'Staff' },
 };
 function fmtDate(d) {
@@ -105,7 +105,7 @@ const TITLES = {
   'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
   'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-logs': 'System Logs',
   jobs: 'Jobs', job: 'Job',
-  'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Student Coordinator Portal', 'dept-staff': 'Staff Portal',
+  'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -741,7 +741,7 @@ async function renderAdminEnrollments() {
         <td class="s">${esc((r.created_at || '').slice(0, 10))}</td>
       </tr>`).join('') || '<tr><td colspan="6" class="empty">No pending enrollment requests - new website registrations appear here.</td></tr>'}
     </table></div>
-    <p class="hint" style="padding:0 14px 12px">Follow up (challan, payment, enrolment) from Analytics &amp; Leads or the Student Coordinator portal - once enrolled, the student moves to the list below.</p></div>
+    <p class="hint" style="padding:0 14px 12px">Follow up (challan, payment, enrolment) from Analytics &amp; Leads or the Admissions Office portal - once enrolled, the student moves to the list below.</p></div>
   <div class="card"><div class="card-head"><h3>All enrollments</h3><span class="s" style="color:var(--muted)">${d.enrollments.length} total</span></div>
     <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
       <tr><th>Student</th><th>Reg no</th><th>Course</th><th>Cohort</th><th>Price (PKR)</th><th>Enrolled</th></tr>
@@ -976,7 +976,7 @@ async function renderStudentOverview(el, d) {
             <div class="list-row" style="cursor:pointer" onclick="myOpenQuery(${q.id})">
               <div class="grow"><div class="t">${esc(q.subject)}</div><div class="s" style="color:var(--muted-2)">${esc((q.updated_at || '').slice(0, 16))}</div></div>
               <span class="s" style="color:${q.status === 'resolved' ? 'var(--ok)' : 'var(--gold)'};font-weight:600">${q.status === 'resolved' ? 'Resolved' : 'Open'}</span>
-            </div>`).join('') : '<div class="empty">Any issue or question? Raise it here - the Student Coordinator team replies here directly.</div>'}</div></div>
+            </div>`).join('') : '<div class="empty">Any issue or question? Raise it here - the Admissions Office team replies here directly.</div>'}</div></div>
         <div class="card"><div class="card-body" style="text-align:center">
           <div style="font-weight:650;margin-bottom:6px">Need help?</div>
           <div class="s" style="color:var(--muted);margin-bottom:8px">Find answers, ask questions, and connect with peers.</div>
@@ -1006,14 +1006,14 @@ function startDailyChallengeCountdown(dueDate) {
 
 /* -------------------------- student: contact my coordinator -------------------------- */
 function myNewQuery() {
-  openModal('New query to your Student Coordinator', `
+  openModal('New query to the Admissions Office', `
     <form id="f">
       <label class="field"><span>Subject</span><input name="subject" required placeholder="e.g. Class timing conflict"></label>
       <label class="field"><span>Details</span><textarea name="body" rows="4" required placeholder="Describe the issue or question..."></textarea></label>
       <button class="btn btn-primary btn-block">Send</button></form>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    try { await api('/api/my/queries', { method: 'POST', body: JSON.stringify({ subject: f.subject.value, body: f.body.value }) }); toast('Sent to your Student Coordinator.'); closeModal(); renderOverview(); }
+    try { await api('/api/my/queries', { method: 'POST', body: JSON.stringify({ subject: f.subject.value, body: f.body.value }) }); toast('Sent to the Admissions Office.'); closeModal(); renderOverview(); }
     catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
@@ -2084,7 +2084,7 @@ async function renderUsers() {
     ['Coordinators', d.users.filter((u) => u.role === 'coordinator')],
     ['HR', d.users.filter((u) => u.role === 'hr')],
     ['Finance', d.users.filter((u) => u.role === 'finance')],
-    ['Student Coordinators', d.users.filter((u) => u.role === 'student_coordinator')],
+    ['Admissions Office', d.users.filter((u) => u.role === 'student_coordinator')],
     ['Admins', d.users.filter((u) => u.role === 'admin')],
   ];
   el.innerHTML = `
@@ -2100,7 +2100,7 @@ async function renderUsers() {
       <button class="btn btn-ghost btn-sm" onclick="formCoordinator()">Add a coordinator</button>
       <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('hr')">Add HR staff</button>
       <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('finance')">Add finance staff</button>
-      <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('student_coordinator')">Add student coordinator</button>
+      <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('student_coordinator')">Add admissions officer</button>
     </div></div>` : ''}
     ${groups.map(([label, users]) => userGroupTable(label, users, isAdmin)).join('')}`;
   wireStudentSearch();
@@ -2111,7 +2111,7 @@ async function renderUsers() {
 const DEPT_CREATE = {
   hr: { path: '/api/admin/hr', title: 'Add HR staff', hint: 'HR staff see only their own portal - staff records, onboarding, and leave duties. No access to courses, grades, or finances.' },
   finance: { path: '/api/admin/finance', title: 'Add finance staff', hint: 'Finance staff see only their own portal - fees, invoices, and expense duties. No access to courses, grades, or staff records.' },
-  student_coordinator: { path: '/api/admin/student-coordinators', title: 'Add a student coordinator', hint: 'Student coordinators see only their own portal - enrollments, schedules, and student follow-up duties. No access to grades, finances, or staff records.' },
+  student_coordinator: { path: '/api/admin/student-coordinators', title: 'Add an admissions officer', hint: 'Admissions officers see only their own portal - student registrations, fee challans, discount categories, and enrollment follow-up. No access to grades, expenses, or staff records.' },
 };
 function formDeptStaff(role) {
   const cfg = DEPT_CREATE[role];
@@ -2152,7 +2152,7 @@ function formResetPassword(uid, name) {
   });
 }
 function formCoordinator() {
-  openModal('Add a student coordinator', `
+  openModal('Add a coordinator', `
     <form id="f">
       <label class="field"><span>Full name</span><input name="name" required placeholder="e.g. Hina Raza"></label>
       <label class="field"><span>Email - the account is generated from it</span><input name="email" type="email" required placeholder="name@company.com"></label>
@@ -2182,7 +2182,7 @@ async function delUser(uid, name) {
  * enrollment pipeline, plus HR's staff/group directory.
  */
 function money(n) { return 'Rs ' + Number(n || 0).toLocaleString('en-US'); }
-const PIPELINE_LABEL = { new: 'New', challan_issued: 'Challan issued', challan_sent: 'Challan sent', paid_cleared: 'Paid - awaiting enrollment', enrolled: 'Enrolled' };
+const PIPELINE_LABEL = { new: 'New', challan_issued: 'Challan issued', challan_sent: 'Challan sent', paid_cleared: 'Payment verified', enrolled: 'Enrolled' };
 const PIPELINE_COLOR = { new: '#6B7280', challan_issued: '#D89A00', challan_sent: '#2A7BD1', paid_cleared: '#0FBFA8', enrolled: '#1FA36B' };
 function pipelineBadge(stage) {
   const label = PIPELINE_LABEL[stage] || stage, color = PIPELINE_COLOR[stage] || '#6B7280';
@@ -2201,39 +2201,40 @@ function deptTabBarHtml(tabs, active, switchFn) {
 }
 
 /* -------------------------------- Finance portal -------------------------------- */
-let FIN_TAB = 'registrations';
+// v18: Finance verifies payments and confirms them - the student is then
+// enrolled automatically. Challans, discounts, and bank details moved to the
+// Admissions Office portal.
+let FIN_TAB = 'verify';
 function finTab(tab) { FIN_TAB = tab; renderDeptFinance(); }
 async function renderDeptFinance() {
   const el = $('view-dept-finance');
-  const tabs = [['registrations', 'Registrations'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['expenses', 'Expenses & balance sheet']];
+  const tabs = [['verify', 'Payment verification'], ['expenses', 'Expenses & balance sheet']];
   el.innerHTML = deptHeaderHtml('Finance Portal') + deptTabBarHtml(tabs, FIN_TAB, 'finTab') + '<div id="finTabBody"><div class="empty">Loading&hellip;</div></div>';
-  if (FIN_TAB === 'registrations') renderFinRegistrations();
-  else if (FIN_TAB === 'discounts') renderFinDiscounts();
-  else if (FIN_TAB === 'bank') renderFinBank();
+  if (FIN_TAB === 'verify') renderFinRegistrations();
   else renderFinExpenses();
 }
 async function renderFinRegistrations() {
   const box = $('finTabBody');
   const d = await api('/api/finance/registrations');
-  box.innerHTML = d.registrations.length ? d.registrations.map(finRegRow).join('') : '<div class="empty">No registrations yet.</div>';
+  const rows = d.registrations.filter((r) => r.payment_stage !== 'new');
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Students appear here once the Admissions Office generates and mails their challan. Match the payment screenshot and record the student emailed to <strong>${esc(d.finance_email || 'finance@echolens.digital')}</strong> against the challan, then confirm - the student is enrolled in the course automatically and emailed their account.</span></div></div>`
+    + (rows.length ? rows.map(finRegRow).join('') : '<div class="empty">No challans generated yet - waiting on the Admissions Office.</div>');
 }
 function finRegRow(r) {
   const latest = r.challans[0];
-  let action = '<span class="s" style="color:var(--muted)">New registration</span>';
-  if (r.payment_stage === 'new') {
-    action = `<button class="btn btn-primary btn-sm" onclick="finOpenChallanForm(${r.id})">Generate challan</button>`;
-  } else if (r.payment_stage === 'challan_issued') {
-    action = `<span class="s" style="color:var(--muted)">Net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
-      <button class="btn btn-primary btn-sm" onclick="finSendChallan('${latest.serial}')">Send challan</button>
-      <button class="btn btn-ghost btn-sm" onclick="finOpenChallanForm(${r.id})">Re-issue</button>`;
+  let action = `<span class="s" style="color:var(--muted)">Waiting on the Admissions Office</span>`;
+  if (r.payment_stage === 'challan_issued') {
+    action = `<span class="s" style="color:var(--muted)">Challan generated (net ${money(latest.net_fee)}) - not yet mailed to the student</span>
+      <a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>`;
   } else if (r.payment_stage === 'challan_sent') {
-    action = `<span class="s" style="color:var(--muted)">Sent &middot; net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
-      <button class="btn btn-primary btn-sm" onclick="finClearPayment(${r.id})">Mark paid / cleared</button>
-      <button class="btn btn-ghost btn-sm" onclick="finSendChallan('${latest.serial}')">Resend</button>`;
+    action = `<span class="s" style="color:var(--muted)">Mailed &middot; net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
+      <a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>
+      <button class="btn btn-primary btn-sm" onclick="finClearPayment(${r.id})">Verify &amp; confirm payment</button>`;
   } else if (r.payment_stage === 'paid_cleared') {
-    action = `<span class="s" style="color:var(--ok)">Cleared - awaiting Student Coordinator to enroll</span>`;
+    action = `<span class="s" style="color:var(--ok)">Payment confirmed - enrollment pending (no batch open yet)</span>`;
   } else if (r.payment_stage === 'enrolled') {
-    action = `<span class="s" style="color:var(--ok)">Enrolled</span>`;
+    action = `<span class="s" style="color:var(--ok)">Payment confirmed &middot; Enrolled</span>`;
   }
   return `<div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div>
@@ -2243,98 +2244,13 @@ function finRegRow(r) {
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}</div>
   </div></div>`;
 }
-async function finOpenChallanForm(regId) {
-  let cats = [];
-  try { cats = (await api('/api/finance/discount-categories')).categories.filter((c) => c.active); } catch {}
-  const opts = ['<option value="">No discount</option>', ...cats.map((c) => `<option value="${c.id}">${esc(c.name)} (${c.type === 'flat' ? money(c.value) : c.value + '%'})</option>`)].join('');
-  openModal('Generate challan', `
-    <form id="f">
-      <label class="field"><span>Discount category</span><select name="discount_category_id">${opts}</select></label>
-      <label class="field"><span>Payment deadline</span><input name="deadline" type="date" required></label>
-      <button class="btn btn-primary btn-block">Generate challan</button></form>`);
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    try {
-      await api(`/api/finance/registrations/${regId}/challan`, { method: 'POST', body: JSON.stringify({ discount_category_id: f.discount_category_id.value || null, deadline: f.deadline.value }) });
-      toast('Challan generated.'); closeModal(); renderFinRegistrations();
-    } catch (err) { modalMsg(err.message); btn.disabled = false; }
-  });
-}
-async function finSendChallan(serial) {
-  try { await api(`/api/finance/challans/${encodeURIComponent(serial)}/send`, { method: 'POST' }); toast('Challan emailed to the student.'); renderFinRegistrations(); }
-  catch (e) { toast(e.message, true); }
-}
 async function finClearPayment(regId) {
-  if (!confirm('Confirm you have verified the payment proof and want to clear this student?')) return;
-  try { await api(`/api/finance/registrations/${regId}/clear`, { method: 'POST' }); toast('Marked paid - Student Coordinator can now enroll them.'); renderFinRegistrations(); }
-  catch (e) { toast(e.message, true); }
-}
-async function renderFinDiscounts() {
-  const box = $('finTabBody');
-  const d = await api('/api/finance/discount-categories');
-  box.innerHTML = `
-    <div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <span class="s" style="color:var(--muted)">Discounts are snapshotted onto each challan when generated - editing one later never changes past challans.</span>
-      <span style="flex:1"></span>
-      <button class="btn btn-primary btn-sm" onclick="finAddDiscount()">Add discount category</button>
-    </div></div>
-    <div class="card"><div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-      <tr><th>Name</th><th>Type</th><th>Value</th><th>Status</th><th></th></tr>
-      ${d.categories.map((c) => `<tr>
-        <td>${esc(c.name)}</td><td>${c.type === 'flat' ? 'Flat' : 'Percent'}</td><td>${c.type === 'flat' ? money(c.value) : c.value + '%'}</td>
-        <td>${c.active ? '<span class="s" style="color:var(--ok)">Active</span>' : '<span class="s" style="color:var(--muted)">Inactive</span>'}</td>
-        <td style="text-align:right;white-space:nowrap">
-          <button class="btn btn-ghost btn-sm" onclick="finToggleDiscount(${c.id},${!c.active})">${c.active ? 'Deactivate' : 'Activate'}</button>
-          <button class="btn btn-danger btn-sm" onclick="finDeleteDiscount(${c.id})">Delete</button>
-        </td></tr>`).join('') || '<tr><td colspan="5" class="empty">No discount categories yet.</td></tr>'}
-    </table></div></div>`;
-}
-function finAddDiscount() {
-  openModal('Add discount category', `
-    <form id="f">
-      <label class="field"><span>Name</span><input name="name" required placeholder="e.g. Early bird, Sibling discount"></label>
-      <label class="field"><span>Type</span><select name="type"><option value="percent">Percent off</option><option value="flat">Flat amount off</option></select></label>
-      <label class="field"><span>Value</span><input name="value" type="number" min="0" required placeholder="e.g. 10 for 10%, or 1000 for Rs 1000"></label>
-      <button class="btn btn-primary btn-block">Add category</button></form>`);
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    try { await api('/api/finance/discount-categories', { method: 'POST', body: JSON.stringify({ name: f.name.value, type: f.type.value, value: f.value.value }) }); toast('Discount category added.'); closeModal(); renderFinDiscounts(); }
-    catch (err) { modalMsg(err.message); btn.disabled = false; }
-  });
-}
-async function finToggleDiscount(id, active) {
-  try { await api(`/api/finance/discount-categories/${id}`, { method: 'PATCH', body: JSON.stringify({ active }) }); renderFinDiscounts(); } catch (e) { toast(e.message, true); }
-}
-async function finDeleteDiscount(id) {
-  if (!confirm('Delete this discount category?')) return;
-  try { await api(`/api/finance/discount-categories/${id}`, { method: 'DELETE' }); toast('Deleted.'); renderFinDiscounts(); } catch (e) { toast(e.message, true); }
-}
-async function renderFinBank() {
-  const box = $('finTabBody');
-  const d = await api('/api/finance/bank-details');
-  const b = d.bank || {};
-  box.innerHTML = `
-    <div class="card"><div class="card-head"><h3>Bank details</h3><span class="s" style="color:var(--muted)">Snapshotted onto every new challan you generate</span></div>
-      <div class="card-body">
-        <form id="f">
-          <div class="form-grid">
-            <label class="field"><span>Bank name</span><input name="bank_name" value="${esc(b.bank_name || '')}"></label>
-            <label class="field"><span>Account title</span><input name="account_title" value="${esc(b.account_title || '')}"></label>
-          </div>
-          <div class="form-grid">
-            <label class="field"><span>Account number</span><input name="account_number" value="${esc(b.account_number || '')}"></label>
-            <label class="field"><span>IBAN</span><input name="iban" value="${esc(b.iban || '')}"></label>
-          </div>
-          <label class="field"><span>Branch</span><input name="branch" value="${esc(b.branch || '')}"></label>
-          <button class="btn btn-primary">Save bank details</button>
-        </form>
-      </div></div>`;
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
-    try { await api('/api/finance/bank-details', { method: 'POST', body: JSON.stringify({ bank_name: f.bank_name.value, account_title: f.account_title.value, account_number: f.account_number.value, iban: f.iban.value, branch: f.branch.value }) }); toast('Bank details saved.'); }
-    catch (err) { toast(err.message, true); }
-    btn.disabled = false;
-  });
+  if (!confirm('Confirm you have verified the payment screenshot and payment record against this challan? The student will be enrolled automatically.')) return;
+  try {
+    const out = await api(`/api/finance/registrations/${regId}/clear`, { method: 'POST' });
+    toast(out.enroll_note ? 'Payment confirmed. ' + out.enroll_note : 'Payment confirmed - student enrolled and emailed.');
+    renderFinRegistrations();
+  } catch (e) { toast(e.message, true); }
 }
 async function renderFinExpenses() {
   const box = $('finTabBody');
@@ -2376,47 +2292,185 @@ async function finDeleteExpense(id) {
   try { await api(`/api/finance/expenses/${id}`, { method: 'DELETE' }); toast('Deleted.'); renderFinExpenses(); } catch (e) { toast(e.message, true); }
 }
 
-/* -------------------------------- Student Coordinator portal -------------------------------- */
+/* -------------------------------- Admissions Office portal --------------------------------
+ * v18: formerly the Student Coordinator portal. Every registration lands
+ * here; admissions generates the fee challan (ambassador 10% auto-applied,
+ * any other discount picked here), mails it to the student, and manages the
+ * discount categories and bank details printed on every challan. */
 let COORD_TAB = 'registrations';
+let COORD_REGS = [];
 function coordTab(tab) { COORD_TAB = tab; renderDeptStudentCoordinator(); }
 async function renderDeptStudentCoordinator() {
   const el = $('view-dept-student-coordinator');
-  const tabs = [['registrations', 'Registrations & Enrollments'], ['queries', 'Student queries']];
-  el.innerHTML = deptHeaderHtml('Student Coordinator Portal') + deptTabBarHtml(tabs, COORD_TAB, 'coordTab') + '<div id="coordTabBody"><div class="empty">Loading&hellip;</div></div>';
+  const tabs = [['registrations', 'Registrations & challans'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['queries', 'Student queries']];
+  el.innerHTML = deptHeaderHtml('Admissions Office Portal') + deptTabBarHtml(tabs, COORD_TAB, 'coordTab') + '<div id="coordTabBody"><div class="empty">Loading&hellip;</div></div>';
   if (COORD_TAB === 'registrations') renderCoordRegistrations();
+  else if (COORD_TAB === 'discounts') renderCoordDiscounts();
+  else if (COORD_TAB === 'bank') renderCoordBank();
   else renderCoordQueries();
 }
 async function renderCoordRegistrations() {
   const box = $('coordTabBody');
-  const d = await api('/api/coordinator/registrations');
-  box.innerHTML = d.registrations.length ? d.registrations.map(coordRegRow).join('') : '<div class="empty">No registrations yet.</div>';
+  const d = await api('/api/admissions/registrations');
+  COORD_REGS = d.registrations;
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Every registration from the website lands here (you are also emailed at <strong>${esc(d.admissions_email || 'admissions@echolens.digital')}</strong>). Generate the fee challan, review it, and mail it to the student - they pay and send proof to <strong>${esc(d.finance_email || 'finance@echolens.digital')}</strong>, Finance verifies, and the student is enrolled automatically.</span></div></div>`
+    + (d.registrations.length ? d.registrations.map(coordRegRow).join('') : '<div class="empty">No registrations yet.</div>');
 }
 function coordRegRow(r) {
-  let action = `<span class="s" style="color:var(--muted)">Waiting on Finance</span>`;
-  if (r.payment_stage === 'paid_cleared') {
+  const latest = r.challans && r.challans[0];
+  const viewBtn = latest ? `<a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>` : '';
+  let action = `<button class="btn btn-primary btn-sm" onclick="coordOpenChallanForm(${r.id})">Generate challan</button>`;
+  if (r.payment_stage === 'challan_issued') {
+    action = `<span class="s" style="color:var(--muted)">Net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
+      ${viewBtn}
+      <button class="btn btn-primary btn-sm" onclick="coordSendChallan('${latest.serial}')">Send to student</button>
+      <button class="btn btn-ghost btn-sm" onclick="coordOpenChallanForm(${r.id})">Re-issue</button>`;
+  } else if (r.payment_stage === 'challan_sent') {
+    action = `<span class="s" style="color:var(--muted)">Mailed &middot; net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')} &middot; awaiting Finance verification</span>
+      ${viewBtn}
+      <button class="btn btn-ghost btn-sm" onclick="coordSendChallan('${latest.serial}')">Resend</button>`;
+  } else if (r.payment_stage === 'paid_cleared') {
     action = r.available_batches.length
       ? `<select id="batchSel${r.id}" class="field" style="margin:0;min-width:200px">${r.available_batches.map((b) => `<option value="${b.id}">${esc(b.name)} &middot; starts ${esc(b.start_date || '-')}</option>`).join('')}</select>
          <button class="btn btn-primary btn-sm" onclick="coordEnroll(${r.id})">Enroll student</button>`
-      : `<span class="s" style="color:var(--danger)">No batches open for this course yet - ask admin to open one.</span>`;
+      : `<span class="s" style="color:var(--danger)">Payment verified, but no batch is open for this course yet - ask admin to open one.</span>`;
   } else if (r.payment_stage === 'enrolled') {
     action = `<span class="s" style="color:var(--ok)">Enrolled</span>`;
   }
+  const amb = r.ambassador_code
+    ? `<div class="s" style="margin-top:4px;color:var(--ok);font-weight:600">Ambassador referral - ${esc(r.ambassador_name || 'ambassador')} (code ${esc(r.ambassador_code)}) verified automatically: a straight 10% discount is applied to the challan.</div>`
+    : '';
   return `<div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div>
-      <div style="font-weight:700">${esc(r.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(r.email)}</span></div>
-      <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')}${r.ambassador_code ? ` &middot; <span style="color:var(--ok);font-weight:700">10% ambassador (${esc(r.ambassador_code)})</span>` : ''} &nbsp;${pipelineBadge(r.payment_stage)}</div>
+      <div style="font-weight:700">${esc(r.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(r.email)}${r.whatsapp ? ' &middot; ' + esc(r.whatsapp) : ''}</span></div>
+      <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')}${r.course_fee ? ` &middot; ${money(r.course_fee)}` : ''} &nbsp;${pipelineBadge(r.payment_stage)}</div>
+      ${amb}
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}</div>
   </div></div>`;
+}
+async function coordOpenChallanForm(regId) {
+  const r = COORD_REGS.find((x) => x.id === regId) || {};
+  let cats = [];
+  try { cats = (await api('/api/admissions/discount-categories')).categories.filter((c) => c.active); } catch { /* list still opens without discounts */ }
+  const opts = ['<option value="">No other discount</option>', ...cats.map((c) => `<option value="${c.id}">${esc(c.name)} (${c.type === 'flat' ? money(c.value) : c.value + '%'})</option>`)].join('');
+  openModal('Generate fee challan', `
+    <form id="f">
+      <div class="s" style="margin-bottom:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)">
+        <strong>${esc(r.name || '')}</strong> &middot; ${esc(r.course_title || r.course_code || '-')}<br>
+        Course fee: <strong>${money(r.course_fee)}</strong> (split into tuition, portal &amp; LMS, and examination &amp; certification fees on the challan)
+        ${r.ambassador_code ? `<br><span style="color:var(--ok);font-weight:600">Ambassador referral (${esc(r.ambassador_name || '')}, code ${esc(r.ambassador_code)}): 10% off is applied automatically.</span>` : ''}
+      </div>
+      <label class="field"><span>Any other discount</span><select name="discount_category_id">${opts}</select></label>
+      <label class="field"><span>Payment deadline</span><input name="deadline" type="date" required></label>
+      <button class="btn btn-primary btn-block">Generate challan</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      await api(`/api/admissions/registrations/${regId}/challan`, { method: 'POST', body: JSON.stringify({ discount_category_id: f.discount_category_id.value || null, deadline: f.deadline.value }) });
+      toast('Challan generated - review it, then send it to the student.'); closeModal(); renderCoordRegistrations();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function coordSendChallan(serial) {
+  try {
+    await api(`/api/admissions/challans/${encodeURIComponent(serial)}/send`, { method: 'POST' });
+    toast('Challan emailed - the student was asked to send payment proof to finance@echolens.digital.');
+    renderCoordRegistrations();
+  } catch (e) { toast(e.message, true); }
 }
 async function coordEnroll(regId) {
   const sel = $('batchSel' + regId);
   if (!sel || !sel.value) { toast('Choose a batch first.', true); return; }
   try {
-    const out = await api(`/api/coordinator/registrations/${regId}/enroll`, { method: 'POST', body: JSON.stringify({ batch_id: sel.value }) });
+    const out = await api(`/api/admissions/registrations/${regId}/enroll`, { method: 'POST', body: JSON.stringify({ batch_id: sel.value }) });
     toast(out.credentials ? 'Enrolled - new account credentials emailed.' : 'Enrolled - added to their existing account.');
     renderCoordRegistrations();
   } catch (e) { toast(e.message, true); }
+}
+async function renderCoordDiscounts() {
+  const box = $('coordTabBody');
+  const d = await api('/api/admissions/discount-categories');
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="s" style="color:var(--muted)">Discount categories change over time - add or edit them here any time. Each challan snapshots its discount when generated, so editing a category later never changes past challans.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="coordAddDiscount()">Add discount category</button>
+    </div></div>
+    <div class="card"><div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Type</th><th>Value</th><th>Status</th><th></th></tr>
+      ${d.categories.map((c) => `<tr>
+        <td>${esc(c.name)}</td><td>${c.type === 'flat' ? 'Flat' : 'Percent'}</td><td>${c.type === 'flat' ? money(c.value) : c.value + '%'}</td>
+        <td>${c.active ? '<span class="s" style="color:var(--ok)">Active</span>' : '<span class="s" style="color:var(--muted)">Inactive</span>'}</td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="btn btn-ghost btn-sm" onclick="coordEditDiscount(${c.id})">Edit</button>
+          <button class="btn btn-ghost btn-sm" onclick="coordToggleDiscount(${c.id},${!c.active})">${c.active ? 'Deactivate' : 'Activate'}</button>
+          <button class="btn btn-danger btn-sm" onclick="coordDeleteDiscount(${c.id})">Delete</button>
+        </td></tr>`).join('') || '<tr><td colspan="5" class="empty">No discount categories yet.</td></tr>'}
+    </table></div></div>`;
+  COORD_DISCOUNTS = d.categories;
+}
+let COORD_DISCOUNTS = [];
+function coordDiscountForm(title, c, onSubmit) {
+  openModal(title, `
+    <form id="f">
+      <label class="field"><span>Name</span><input name="name" required value="${esc(c.name || '')}" placeholder="e.g. Early bird, Sibling discount"></label>
+      <label class="field"><span>Type</span><select name="type"><option value="percent" ${c.type !== 'flat' ? 'selected' : ''}>Percent off</option><option value="flat" ${c.type === 'flat' ? 'selected' : ''}>Flat amount off</option></select></label>
+      <label class="field"><span>Value</span><input name="value" type="number" min="0" required value="${c.value !== undefined ? c.value : ''}" placeholder="e.g. 10 for 10%, or 1000 for Rs 1000"></label>
+      <button class="btn btn-primary btn-block">Save</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await onSubmit({ name: f.name.value, type: f.type.value, value: f.value.value }); closeModal(); renderCoordDiscounts(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+function coordAddDiscount() {
+  coordDiscountForm('Add discount category', {}, async (body) => {
+    await api('/api/admissions/discount-categories', { method: 'POST', body: JSON.stringify(body) });
+    toast('Discount category added.');
+  });
+}
+function coordEditDiscount(id) {
+  const c = COORD_DISCOUNTS.find((x) => x.id === id) || {};
+  coordDiscountForm('Edit discount category', c, async (body) => {
+    await api(`/api/admissions/discount-categories/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+    toast('Discount category updated.');
+  });
+}
+async function coordToggleDiscount(id, active) {
+  try { await api(`/api/admissions/discount-categories/${id}`, { method: 'PATCH', body: JSON.stringify({ active }) }); renderCoordDiscounts(); } catch (e) { toast(e.message, true); }
+}
+async function coordDeleteDiscount(id) {
+  if (!confirm('Delete this discount category?')) return;
+  try { await api(`/api/admissions/discount-categories/${id}`, { method: 'DELETE' }); toast('Deleted.'); renderCoordDiscounts(); } catch (e) { toast(e.message, true); }
+}
+async function renderCoordBank() {
+  const box = $('coordTabBody');
+  const d = await api('/api/admissions/bank-details');
+  const b = d.bank || {};
+  box.innerHTML = `
+    <div class="card"><div class="card-head"><h3>Bank details</h3><span class="s" style="color:var(--muted)">Printed on every new challan you generate (placeholder details are pre-filled until the real account is set)</span></div>
+      <div class="card-body">
+        <form id="f">
+          <div class="form-grid">
+            <label class="field"><span>Bank name</span><input name="bank_name" value="${esc(b.bank_name || '')}"></label>
+            <label class="field"><span>Account title</span><input name="account_title" value="${esc(b.account_title || '')}"></label>
+          </div>
+          <div class="form-grid">
+            <label class="field"><span>Account number</span><input name="account_number" value="${esc(b.account_number || '')}"></label>
+            <label class="field"><span>IBAN</span><input name="iban" value="${esc(b.iban || '')}"></label>
+          </div>
+          <label class="field"><span>Branch</span><input name="branch" value="${esc(b.branch || '')}"></label>
+          <button class="btn btn-primary">Save bank details</button>
+        </form>
+      </div></div>`;
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try { await api('/api/admissions/bank-details', { method: 'POST', body: JSON.stringify({ bank_name: f.bank_name.value, account_title: f.account_title.value, account_number: f.account_number.value, iban: f.iban.value, branch: f.branch.value }) }); toast('Bank details saved.'); }
+    catch (err) { toast(err.message, true); }
+    btn.disabled = false;
+  });
 }
 async function renderCoordQueries() {
   const box = $('coordTabBody');

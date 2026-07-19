@@ -439,7 +439,7 @@ function openRegister(code, title) {
   const options = CATALOGUE.filter((c) => c.price_pkr > 0).map((c) =>
     `<option value="${esc(c.code)}|${esc(c.title)}"${c.code === code ? ' selected' : ''}>${esc(c.code)} - ${esc(c.title)} (PKR ${c.price_pkr.toLocaleString()})</option>`).join('');
   openModal('Register for a course', `
-    <p class="s" style="color:var(--muted);margin-bottom:12px">Share your details and the EchoLens team will contact you on WhatsApp with the fee challan and next steps. Registration deadline: 31 July 2026 · Batch starts 1 August 2026.</p>
+    <p class="s" style="color:var(--muted);margin-bottom:12px">Share your details and our Admissions Office will email you the fee challan with payment details and next steps. Registration deadline: 31 July 2026 · Batch starts 1 August 2026.</p>
     <form id="regInterest">
       <input name="company" style="display:none" tabindex="-1" autocomplete="off">
       <label class="field"><span>Full name</span><input name="name" required value="${ME ? esc(ME.name) : ''}"></label>
@@ -460,7 +460,7 @@ function openRegister(code, title) {
         body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, course_code, course_title, ambassador_code: f.ambassador_code.value.trim(), company: f.company.value }),
       });
       openModal('Registration received', `
-        <p class="s" style="line-height:1.6">Thank you - your registration for <strong>${esc(course_title)}</strong> is with the team.${f.ambassador_code.value.trim() ? ' Your ambassador code was accepted - a <strong>10% discount</strong> will be applied to your fee challan.' : ''} We will contact you on WhatsApp with the fee challan and next steps.</p>
+        <p class="s" style="line-height:1.6">Thank you - your registration for <strong>${esc(course_title)}</strong> is with our Admissions Office.${f.ambassador_code.value.trim() ? ' Your ambassador code was accepted - a <strong>10% discount</strong> will be applied to your fee challan.' : ''} A confirmation email is on its way, and the Admissions Office will email you the fee challan with payment details. After paying, send your payment screenshot and record to <strong>finance@echolens.digital</strong> to confirm your enrollment.</p>
         <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal()">Done</button>`);
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });

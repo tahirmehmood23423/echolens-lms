@@ -122,11 +122,12 @@ const money = (n) => 'Rs ' + Number(n || 0).toLocaleString('en-US');
       <div class="c-title">Fee Challan</div>
       <div style="text-align:center"><span class="status-badge ${c.status === 'paid' ? 'paid' : 'issued'}">${c.status === 'paid' ? '&#10003; Paid' : 'Payment pending'}</span></div>
       <div class="c-name">${esc(c.student_name)}</div>
-      <div class="c-course">${esc(c.course_title)}</div>
+      <div class="c-course">${esc(c.course_title)}${c.student_id ? ` &middot; Student ID: <strong>${esc(c.student_id)}</strong>` : ''}</div>
 
       <table class="fee-table">
-        <tr><td>Course fee</td><td>${money(c.gross_fee)}</td></tr>
-        ${c.discount_label ? `<tr class="discount"><td>Discount &ndash; ${esc(c.discount_label)}</td><td>&minus; ${money(c.discount_amount)}</td></tr>` : ''}
+        ${(c.fee_parts || []).map((p) => `<tr><td>${esc(p.label)}</td><td>${money(p.amount)}</td></tr>`).join('')}
+        <tr><td><strong>Course fee (total)</strong></td><td>${money(c.gross_fee)}</td></tr>
+        ${(c.discounts && c.discounts.length ? c.discounts : (c.discount_label ? [{ label: c.discount_label, amount: c.discount_amount }] : [])).map((d) => `<tr class="discount"><td>Discount &ndash; ${esc(d.label)}</td><td>&minus; ${money(d.amount)}</td></tr>`).join('')}
         <tr class="net"><td>Amount payable</td><td>${money(c.net_fee)}</td></tr>
       </table>
       <div class="deadline">Payment deadline: <strong>${fmt(c.deadline)}</strong></div>
@@ -139,7 +140,7 @@ const money = (n) => 'Rs ' + Number(n || 0).toLocaleString('en-US');
         ${bank.iban ? `<div class="bank-row"><span>IBAN</span><span>${esc(bank.iban)}</span></div>` : ''}
         ${bank.branch ? `<div class="bank-row"><span>Branch</span><span>${esc(bank.branch)}</span></div>` : ''}
       </div>
-      <p class="pay-note">After paying, email your payment proof to <strong>info@echolens.digital</strong> and our finance team will confirm your enrollment.</p>
+      <p class="pay-note">After paying, email a screenshot of your payment and the payment record (transaction ID, date, amount) to <strong>finance@echolens.digital</strong>. Our finance team will verify it and confirm your enrollment by email.</p>
 
       <div class="c-foot">
         <div class="qr">

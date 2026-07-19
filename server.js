@@ -176,6 +176,11 @@ function staffView(req, res, next) { // admin, coordinator, or the course's teac
 // v17: narrow department gates - each isolated role plus admin, nothing else.
 function financeOnly(req, res, next) { if (['admin', 'finance'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function studentCoordinatorOnly(req, res, next) { if (['admin', 'student_coordinator'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
+// v18: the Student Coordinator portal is now the Admissions Office. The role
+// key stays 'student_coordinator' so existing accounts keep working.
+const admissionsOnly = studentCoordinatorOnly;
+const ADMISSIONS_EMAIL = process.env.ADMISSIONS_EMAIL || 'admissions@echolens.digital';
+const FINANCE_EMAIL = process.env.FINANCE_EMAIL || 'finance@echolens.digital';
 function hrOnly(req, res, next) { if (['admin', 'hr'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function staffOnly(req, res, next) { if (['admin', 'staff'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function manageBatch(req, res, next) { // WRITE access: admin or an assigned teacher
@@ -656,7 +661,7 @@ app.post('/api/admin/users/:id/password', authRequired, adminRequired, (req, res
 });
 // Portal staff accounts are generated from a name + email; the credentials
 // (username, password, sign-in link) are emailed to that address directly.
-const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finance', student_coordinator: 'Student Coordinator' };
+const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office' };
 function mailStaffCredentials(user, password, role) {
   if (!user.email) return;
   mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
@@ -775,7 +780,7 @@ app.get('/api/admin/finance', authRequired, staffView, (req, res) => {
 
 /* ------------------------- v16: system health & logs (admin) ------------------------- */
 app.get('/api/admin/system-health', authRequired, staffView, (req, res) => {
-  const ROLE_LABEL = { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free-tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Student Coordinator' };
+  const ROLE_LABEL = { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free-tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office' };
   const events = [];
   Users.all().forEach((u) => events.push({ at: u.created_at, kind: 'user', text: `New ${ROLE_LABEL[u.role] || u.role} account: ${u.name}` }));
   Courses.all().forEach((c) => events.push({ at: c.created_at, kind: 'course', text: `New course added to catalogue: ${c.title}` }));
@@ -1112,6 +1117,13 @@ app.post('/api/hackathons/:id/register', authRequired, (req, res) => {
   const { team_name, member_regs, payment_ref } = req.body || {};
   const out = Hackathons.register({ hackathon_id: req.params.id, user: req.user, team_name, member_regs: Array.isArray(member_regs) ? member_regs : [], payment_ref });
   if (out.error) return res.status(400).json({ error: out.error });
+  const h = Hackathons.byId(req.params.id);
+  mailer.notify(ADMISSIONS_EMAIL, `New hackathon registration - ${req.user.name}`,
+    `${req.user.name} registered for the hackathon "${h ? h.title : req.params.id}"${team_name ? ` (team: ${team_name})` : ''}.\nEmail: ${req.user.email || '-'}`);
+  if (req.user.email) {
+    mailer.notify(req.user.email, `EchoLens - you're registered${h ? ` for ${h.title}` : ''}`,
+      `Hi ${req.user.name},\n\nWe received your hackathon registration${h ? ` for "${h.title}"` : ''}${team_name ? ` with team "${team_name}"` : ''}.\n\nEchoLens Digital`);
+  }
   res.json({ ok: true, ...out });
 });
 app.post('/api/hackathons/:id/submit', authRequired, (req, res) => {
@@ -2104,6 +2116,15 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), (req, 
   }
   const out = Events.register({ event_id: ev.id, user: req.user, payment_shot: shot });
   if (out.error) return res.status(400).json({ error: out.error });
+  // Every event / hackathon / competition / webinar registration is reported
+  // to the Admissions Office, and the participant gets a confirmation email.
+  const evKind = ev.kind || 'event';
+  mailer.notify(ADMISSIONS_EMAIL, `New ${evKind} registration - ${req.user.name}`,
+    `${req.user.name} registered for the ${evKind} "${ev.title}".\nEmail: ${req.user.email || '-'}${ev.entry === 'paid' ? '\nEntry: paid - a payment screenshot was uploaded for verification.' : '\nEntry: free'}\n\nDetails are in the Admissions Office portal (Event registrations) and the admin Events tab.`);
+  if (req.user.email) {
+    mailer.notify(req.user.email, `EchoLens - you're registered for ${ev.title}`,
+      `Hi ${req.user.name},\n\nWe received your registration for the ${evKind} "${ev.title}".${ev.entry === 'paid' ? ' Your payment screenshot is being verified - you will get a confirmation email once it is cleared.' : ' You are all set - see the event page for dates and details.'}\n\nEchoLens Digital`);
+  }
   if (ev.entry === 'paid') {
     const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
     mailer.notify(admins, `Payment to verify - ${ev.title}`, `${req.user.name} registered for "${ev.title}" and uploaded a payment screenshot. Verify it from the Events tab in the admin portal.`);
@@ -2434,9 +2455,11 @@ app.post('/api/public/register-interest', async (req, res) => {
   } else { delete b.ambassador_code; }
   const r = Registrations.create(b);
   Leads.upsert({ name: r.name, email: r.email, whatsapp: r.whatsapp, source: 'course-registration' });
+  // Every registration lands in the Admissions Office inbox (plus the admins)
+  // so admissions can generate and send the fee challan from their portal.
   const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
-  if (admins.length) mailer.notify(admins, `New course registration - ${r.name}`, `${r.name} registered interest${r.course_title ? ` in ${r.course_code} ${r.course_title}` : ''}.\nEmail: ${r.email}\nWhatsApp: ${r.whatsapp}${r.city ? `\nCity: ${r.city}` : ''}${r.note ? `\nNote: ${r.note}` : ''}${r.ambassador_code ? `\nAmbassador code: ${r.ambassador_code} (${r.ambassador_name}) - 10% discount applies` : ''}\n\nFollow up from the admin portal (Analytics & Leads).`);
-  mailer.notify(r.email, 'EchoLens - registration received', `Assalam-o-Alaikum ${r.name},\n\nWe received your registration${r.course_title ? ` for ${r.course_title}` : ''}.${r.ambassador_code ? ' Your ambassador code was accepted - a 10% discount will be applied to your fee challan.' : ''} Our team will contact you on WhatsApp (${r.whatsapp}) with the fee challan and next steps.\n\nEchoLens Digital`);
+  mailer.notify([ADMISSIONS_EMAIL, ...admins], `New course registration - ${r.name}`, `${r.name} registered${r.course_title ? ` for ${r.course_code} ${r.course_title}` : ''}.\nEmail: ${r.email}\nWhatsApp: ${r.whatsapp}${r.city ? `\nCity: ${r.city}` : ''}${r.note ? `\nNote: ${r.note}` : ''}${r.ambassador_code ? `\n\nAMBASSADOR REFERRAL: code ${r.ambassador_code} from ambassador ${r.ambassador_name} was verified automatically - a straight 10% discount applies to this student's challan.` : ''}\n\nGenerate and send the fee challan from the Admissions Office portal.`);
+  mailer.notify(r.email, 'EchoLens - registration received', `Assalam-o-Alaikum ${r.name},\n\nWe received your registration${r.course_title ? ` for ${r.course_title}` : ''}.${r.ambassador_code ? ' Your ambassador code was accepted - a 10% discount will be applied to your fee challan.' : ''} Our Admissions Office will email you the fee challan with the payment details and next steps shortly.\n\nEchoLens Digital`);
   res.json({ ok: true });
 });
 app.get('/api/admin/registrations', authRequired, staffView, (req, res) => res.json({ registrations: Registrations.all(), pending: Registrations.pendingCount() }));
@@ -2447,54 +2470,81 @@ app.patch('/api/admin/registrations/:id', authRequired, adminRequired, (req, res
 });
 app.delete('/api/admin/registrations/:id', authRequired, adminRequired, (req, res) => { Registrations.remove(req.params.id); res.json({ ok: true }); });
 
-/* ============================== v17: FINANCE PORTAL ==============================
+/* ============================== v18: ADMISSIONS OFFICE ==============================
  * A registration flows: new -> challan_issued -> challan_sent -> paid_cleared
- * -> enrolled. Finance owns everything up to "paid_cleared" (money); the
- * Student Coordinator owns "enrolled" (course logistics/schedule) below.
+ * -> enrolled. The Admissions Office (formerly the Student Coordinator) owns
+ * the challan: discount categories, bank details, generating and mailing it.
+ * Finance owns verification: once they confirm the payment proof the student
+ * is enrolled automatically.
  */
-app.get('/api/finance/discount-categories', authRequired, financeOnly, (req, res) => res.json({ categories: DiscountCategories.all() }));
-app.post('/api/finance/discount-categories', authRequired, financeOnly, (req, res) => {
+app.get('/api/admissions/discount-categories', authRequired, admissionsOnly, (req, res) => res.json({ categories: DiscountCategories.all() }));
+app.post('/api/admissions/discount-categories', authRequired, admissionsOnly, (req, res) => {
   const { name, type, value } = req.body || {};
   if (!name || !String(name).trim()) return res.status(400).json({ error: 'Give the discount a name.' });
   res.json({ ok: true, category: DiscountCategories.create({ name, type, value }, req.user.id) });
 });
-app.patch('/api/finance/discount-categories/:id', authRequired, financeOnly, (req, res) => {
+app.patch('/api/admissions/discount-categories/:id', authRequired, admissionsOnly, (req, res) => {
   const c = DiscountCategories.update(req.params.id, req.body || {});
   if (!c) return res.status(404).json({ error: 'Discount category not found.' });
   res.json({ ok: true, category: c });
 });
-app.delete('/api/finance/discount-categories/:id', authRequired, financeOnly, (req, res) => { DiscountCategories.remove(req.params.id); res.json({ ok: true }); });
+app.delete('/api/admissions/discount-categories/:id', authRequired, admissionsOnly, (req, res) => { DiscountCategories.remove(req.params.id); res.json({ ok: true }); });
 
-app.get('/api/finance/bank-details', authRequired, financeOnly, (req, res) => res.json({ bank: Settings.bank() }));
-app.post('/api/finance/bank-details', authRequired, financeOnly, (req, res) => res.json({ ok: true, bank: Settings.setBank(req.body || {}) }));
+app.get('/api/admissions/bank-details', authRequired, admissionsOnly, (req, res) => res.json({ bank: Settings.bank() }));
+app.post('/api/admissions/bank-details', authRequired, admissionsOnly, (req, res) => res.json({ ok: true, bank: Settings.setBank(req.body || {}) }));
 
-app.get('/api/finance/registrations', authRequired, financeOnly, (req, res) => {
-  const rows = Registrations.all().map((r) => ({ ...r, challans: Challans.forRegistration(r.id) }));
-  res.json({ registrations: rows });
-});
-app.post('/api/finance/registrations/:id/challan', authRequired, financeOnly, (req, res) => {
+app.post('/api/admissions/registrations/:id/challan', authRequired, admissionsOnly, (req, res) => {
   const { discount_category_id, deadline } = req.body || {};
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(deadline || ''))) return res.status(400).json({ error: 'Set a deadline date for this challan.' });
   const out = Challans.generate({ registration_id: req.params.id, discount_category_id: discount_category_id || null, deadline, generated_by: req.user.id });
   if (out.error) return res.status(400).json({ error: out.error });
   res.json({ ok: true, challan: out.challan });
 });
-app.post('/api/finance/challans/:serial/send', authRequired, financeOnly, (req, res) => {
+app.post('/api/admissions/challans/:serial/send', authRequired, admissionsOnly, (req, res) => {
   const c = Challans.bySerial(req.params.serial);
   if (!c) return res.status(404).json({ error: 'Challan not found.' });
   const bank = c.bank_snapshot || {};
   const bankLines = [bank.bank_name && `Bank: ${bank.bank_name}`, bank.account_title && `Account title: ${bank.account_title}`, bank.account_number && `Account number: ${bank.account_number}`, bank.iban && `IBAN: ${bank.iban}`, bank.branch && `Branch: ${bank.branch}`].filter(Boolean).join('\n');
+  const feeLines = (c.fee_parts || []).map((p) => `${p.label}: Rs ${Number(p.amount).toLocaleString('en-US')}`).join('\n');
+  const discountLines = (c.discounts || []).map((d) => `Discount - ${d.label}: -Rs ${Number(d.amount).toLocaleString('en-US')}`).join('\n');
   mailer.notify(c.student_email, `EchoLens - fee challan for ${c.course_title}`,
-    `Assalam-o-Alaikum ${c.student_name},\n\nHere is your fee challan for ${c.course_title}.\n\nCourse fee: Rs ${c.gross_fee.toLocaleString('en-US')}${c.discount_label ? `\nDiscount: ${c.discount_label} (-Rs ${c.discount_amount.toLocaleString('en-US')})` : ''}\nAmount payable: Rs ${c.net_fee.toLocaleString('en-US')}\nDeadline: ${c.deadline}\n\nPayment details:\n${bankLines}\n\nAfter paying, email your payment proof to info@echolens.digital and our finance team will confirm your enrollment.\n\nView and verify this challan: ${APP_URL}/challan?s=${c.serial}`);
+    `Assalam-o-Alaikum ${c.student_name},\n\nHere is your fee challan for ${c.course_title}.\n\nStudent ID: ${c.student_id || '-'}\nChallan serial: ${c.serial}\n\n${feeLines}\nCourse fee (total): Rs ${c.gross_fee.toLocaleString('en-US')}${discountLines ? `\n${discountLines}` : ''}\nAmount payable: Rs ${c.net_fee.toLocaleString('en-US')}\nDeadline: ${c.deadline}\n\nPayment details:\n${bankLines}\n\nAfter paying, email a screenshot of your payment along with the payment record (transaction ID, date, and amount) to ${FINANCE_EMAIL}. Our finance team will verify it and confirm your enrollment by email.\n\nView and verify this challan: ${APP_URL}/challan?s=${c.serial}`);
   Challans.markSent(c.serial);
   res.json({ ok: true });
 });
-app.post('/api/finance/registrations/:id/clear', authRequired, financeOnly, (req, res) => {
+
+/* ============================== v18: FINANCE PORTAL ==============================
+ * Finance sees every registration whose challan was generated and mailed,
+ * verifies the payment proof sent to the finance inbox, and confirms it -
+ * which marks the challan paid and auto-enrolls the student.
+ */
+app.get('/api/finance/registrations', authRequired, financeOnly, (req, res) => {
+  const rows = Registrations.all().map((r) => ({ ...r, challans: Challans.forRegistration(r.id) }));
+  res.json({ registrations: rows, finance_email: FINANCE_EMAIL });
+});
+app.post('/api/finance/registrations/:id/clear', authRequired, financeOnly, async (req, res) => {
   const r = Registrations.byId(req.params.id);
-  if (!r || !r.challan_serial) return res.status(400).json({ error: 'Generate a challan for this registration first.' });
+  if (!r || !r.challan_serial) return res.status(400).json({ error: 'The Admissions Office has not generated a challan for this registration yet.' });
   const c = Challans.markPaid(r.challan_serial, req.user.id);
   if (!c) return res.status(404).json({ error: 'Challan not found.' });
-  res.json({ ok: true, registration: Registrations.byId(r.id) });
+  // Payment confirmed - enroll the student automatically into the newest
+  // batch of the course. If no batch is open yet, the registration stays
+  // "paid_cleared" and the Admissions Office can enroll manually later.
+  const course = Courses.byCode(r.course_code);
+  const batch = course ? Batches.all().filter((b) => b.course_id === course.id).sort((a, b) => b.id - a.id)[0] : null;
+  let enrollNote = null, credentials = null;
+  if (batch) {
+    const out = await enrollRegistrationIntoBatch(r, batch);
+    if (out.error) enrollNote = out.error;
+    else credentials = out.credentials;
+  } else {
+    enrollNote = 'No batch is open for this course yet - the Admissions Office can enroll the student once one opens.';
+  }
+  if (!enrollNote) {
+    mailer.notify(ADMISSIONS_EMAIL, `Payment confirmed & enrolled - ${r.name}`,
+      `Finance verified the payment for ${r.name} (${r.email}) against challan ${c.serial} and the student was enrolled in ${r.course_title || r.course_code} automatically.`);
+  }
+  res.json({ ok: true, registration: Registrations.byId(r.id), enroll_note: enrollNote, credentials });
 });
 
 app.get('/api/finance/expenses', authRequired, financeOnly, (req, res) => res.json({ expenses: Expenses.all() }));
@@ -2506,44 +2556,54 @@ app.post('/api/finance/expenses', authRequired, financeOnly, (req, res) => {
 app.delete('/api/finance/expenses/:id', authRequired, financeOnly, (req, res) => { Expenses.remove(req.params.id); res.json({ ok: true }); });
 app.get('/api/finance/balance-sheet', authRequired, financeOnly, (req, res) => res.json(Expenses.balanceSheet()));
 
-/* ============================== v17: STUDENT COORDINATOR PORTAL ============================== */
-app.get('/api/coordinator/registrations', authRequired, studentCoordinatorOnly, (req, res) => {
-  const rows = Registrations.all().map((r) => {
-    const course = Courses.byCode(r.course_code);
-    const available_batches = course ? Batches.all().filter((b) => b.course_id === course.id).map((b) => ({ id: b.id, name: b.name, start_date: b.start_date, status: b.status })) : [];
-    return { ...r, available_batches };
-  });
-  res.json({ registrations: rows });
-});
-app.post('/api/coordinator/registrations/:id/enroll', authRequired, studentCoordinatorOnly, async (req, res) => {
-  const r = Registrations.byId(req.params.id);
-  if (!r) return res.status(404).json({ error: 'Registration not found.' });
-  if (r.payment_stage !== 'paid_cleared') return res.status(400).json({ error: 'This registration is not yet cleared by Finance.' });
-  const { batch_id } = req.body || {};
-  const b = Batches.byId(batch_id);
-  const course = Courses.byCode(r.course_code);
-  if (!b || !course || b.course_id !== course.id) return res.status(400).json({ error: 'Choose a valid batch for this course.' });
+/* -------- Admissions Office portal: registrations, challans, enrollment fallback -------- */
+// Enrolls the registered student into a batch: creates (or upgrades) the
+// account, records the enrollment, emails the student, and advances the
+// pipeline to "enrolled". Shared by Finance's payment confirmation
+// (auto-enroll) and the Admissions Office's manual fallback.
+async function enrollRegistrationIntoBatch(r, b) {
   let u = Users.byLogin(r.email);
   let password = null, freshAccount = false;
   if (u) {
-    if (!['student', 'free'].includes(u.role)) return res.status(400).json({ error: 'This email already belongs to a non-student account - resolve manually.' });
+    if (!['student', 'free'].includes(u.role)) return { error: 'This email already belongs to a non-student account - resolve manually.' };
     if (u.role === 'free') u.role = 'student'; // now a paying student, not a free-tier account
   } else {
-    if (!(await emailDomainExists(r.email))) return res.status(400).json({ error: 'That email domain does not receive mail - check with the student before enrolling.' });
+    if (!(await emailDomainExists(r.email))) return { error: 'That email domain does not receive mail - check with the student before enrolling.' };
     const created = Users.create({ name: r.name, role: 'student', email: r.email, username: r.email });
     u = created.user; password = created.password; freshAccount = true;
   }
   Enrollments.create(u.id, b.id);
   const bd = Batches.decorate(b);
   if (freshAccount) {
-    mailer.notify(r.email, 'Welcome to EchoLens - your account',
-      `Hi ${u.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nSign in with your email: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
+    mailer.notify(r.email, 'Welcome to EchoLens - payment confirmed, your account is ready',
+      `Hi ${u.name},\n\nYour payment has been verified and you are now enrolled in ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nSign in with your email: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
   } else {
-    mailer.notify(r.email, `You've been added to ${bd.title || bd.name}`,
-      `Hi ${u.name},\n\nYou have been enrolled in ${bd.title || bd.name}. Sign in to your existing EchoLens account at ${APP_URL} to get started.`);
+    mailer.notify(r.email, `Payment confirmed - you're enrolled in ${bd.title || bd.name}`,
+      `Hi ${u.name},\n\nYour payment has been verified and you have been enrolled in ${bd.title || bd.name}. Sign in to your existing EchoLens account at ${APP_URL} to get started.`);
   }
   const updated = Registrations._setStage(r.id, 'enrolled', { enrolled_user_id: u.id, enrolled_batch_id: b.id });
-  res.json({ ok: true, registration: updated, credentials: freshAccount ? { username: u.username, password } : null });
+  return { registration: updated, credentials: freshAccount ? { username: u.username, password } : null };
+}
+app.get('/api/admissions/registrations', authRequired, admissionsOnly, (req, res) => {
+  const rows = Registrations.all().map((r) => {
+    const course = Courses.byCode(r.course_code);
+    const available_batches = course ? Batches.all().filter((b) => b.course_id === course.id).map((b) => ({ id: b.id, name: b.name, start_date: b.start_date, status: b.status })) : [];
+    return { ...r, course_fee: course ? Number(course.price_pkr) || 0 : 0, challans: Challans.forRegistration(r.id), available_batches };
+  });
+  res.json({ registrations: rows, admissions_email: ADMISSIONS_EMAIL, finance_email: FINANCE_EMAIL });
+});
+// Manual fallback for cleared payments that could not auto-enroll (e.g. no
+// batch was open when Finance confirmed).
+app.post('/api/admissions/registrations/:id/enroll', authRequired, admissionsOnly, async (req, res) => {
+  const r = Registrations.byId(req.params.id);
+  if (!r) return res.status(404).json({ error: 'Registration not found.' });
+  if (r.payment_stage !== 'paid_cleared') return res.status(400).json({ error: 'This registration is not yet cleared by Finance.' });
+  const b = Batches.byId((req.body || {}).batch_id);
+  const course = Courses.byCode(r.course_code);
+  if (!b || !course || b.course_id !== course.id) return res.status(400).json({ error: 'Choose a valid batch for this course.' });
+  const out = await enrollRegistrationIntoBatch(r, b);
+  if (out.error) return res.status(400).json({ error: out.error });
+  res.json({ ok: true, ...out });
 });
 app.get('/api/coordinator/queries', authRequired, studentCoordinatorOnly, (req, res) => res.json({ queries: CoordinatorQueries.all() }));
 app.post('/api/coordinator/queries/:id/reply', authRequired, studentCoordinatorOnly, (req, res) => {

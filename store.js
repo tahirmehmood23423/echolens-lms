@@ -48,7 +48,7 @@ const empty = () => ({
   discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [], ambassadors: [],
   settings: {
     cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' },
-    bank: { bank_name: '', account_title: '', account_number: '', iban: '', branch: '' },
+    bank: { bank_name: 'Meezan Bank', account_title: 'EchoLens Digital (Pvt) Ltd', account_number: '0123-4567890-123', iban: 'PK36 MEZN 0000 0123 4567 8901', branch: 'Gulberg Branch, Lahore' },
   },
 });
 
@@ -1487,8 +1487,14 @@ const Settings = {
     save();
     return c;
   },
-  // v17: bank details Finance sets once and every challan snapshots.
-  bank() { return data.settings && data.settings.bank ? data.settings.bank : empty().settings.bank; },
+  // v18: bank details the Admissions Office sets once and every challan
+  // snapshots. Databases saved before the dummy defaults existed hold all-empty
+  // strings, so an effectively blank record also falls back to the defaults.
+  bank() {
+    const b = data.settings && data.settings.bank;
+    if (!b || !Object.values(b).some((v) => String(v || '').trim())) return empty().settings.bank;
+    return b;
+  },
   setBank(fields) {
     if (!data.settings) data.settings = empty().settings;
     if (!data.settings.bank) data.settings.bank = empty().settings.bank;
@@ -2361,27 +2367,54 @@ const Challans = {
     while (data.challans.some((c) => c.serial === s));
     return s;
   },
+  // The catalogue fee is presented on the challan split into three heads;
+  // the last head absorbs rounding so the parts always sum to the gross fee.
+  splitFee(gross) {
+    const tuition = Math.round(gross * 0.7), portal = Math.round(gross * 0.2);
+    return [
+      { label: 'Tuition fee', amount: tuition },
+      { label: 'Portal & LMS fee', amount: portal },
+      { label: 'Examination & certification fee', amount: Math.max(0, gross - tuition - portal) },
+    ];
+  },
   generate({ registration_id, discount_category_id, deadline, generated_by }) {
     const r = Registrations.byId(registration_id); if (!r) return { error: 'Registration not found.' };
     const course = Courses.byCode(r.course_code);
     const gross = course ? Number(course.price_pkr) || 0 : 0;
-    // Fall back to a discount already attached to the registration (e.g. a
-    // valid ambassador code = 10%) when finance does not pick one explicitly.
-    const catId = discount_category_id || r.discount_category_id || null;
-    const disc = DiscountCategories.apply(gross, catId);
+    // An ambassador referral attached at registration always applies on its
+    // own; any other discount the Admissions Office picks stacks on top.
+    // Both are computed on the gross fee and snapshotted onto the challan.
+    const discounts = [];
+    const addDiscount = (catId) => {
+      if (!catId || discounts.some((d) => d.category_id === Number(catId))) return;
+      const applied = DiscountCategories.apply(gross, catId);
+      if (applied.label) discounts.push({ category_id: Number(catId), label: applied.label, amount: applied.amount });
+    };
+    if (r.ambassador_code) addDiscount(r.discount_category_id);
+    addDiscount(discount_category_id);
+    if (!r.ambassador_code) addDiscount(r.discount_category_id);
+    const discount_amount = Math.min(gross, discounts.reduce((s, d) => s + d.amount, 0));
+    const student = Users.byLogin(r.email);
     const bank = Settings.bank();
     const ch = {
       id: nextId('challans'), serial: Challans.serial(), registration_id: r.id,
       course_code: r.course_code, course_title: r.course_title || (course ? course.title : ''),
       student_name: r.name, student_email: r.email,
-      gross_fee: gross, discount_category_id: catId, discount_label: disc.label, discount_amount: disc.amount, net_fee: disc.net,
+      student_id: student && student.reg_no ? String(student.reg_no) : 'REG-' + String(r.id).padStart(5, '0'),
+      gross_fee: gross, fee_parts: Challans.splitFee(gross),
+      discount_category_id: discounts.length ? discounts[0].category_id : null,
+      discounts,
+      discount_label: discounts.map((d) => d.label).join(' + ') || null,
+      discount_amount, net_fee: Math.max(0, gross - discount_amount),
       deadline: /^\d{4}-\d{2}-\d{2}$/.test(String(deadline)) ? deadline : null,
       bank_snapshot: { ...bank },
       status: 'issued',
       generated_by, generated_at: now(), sent_at: null, paid_confirmed_by: null, paid_confirmed_at: null,
     };
     data.challans.push(ch); save();
-    r.discount_category_id = discount_category_id || null;
+    // Keep the ambassador linkage on the registration intact for re-issues;
+    // only remember an explicitly chosen extra discount otherwise.
+    if (!r.ambassador_code && discount_category_id) r.discount_category_id = Number(discount_category_id);
     Registrations._setStage(r.id, 'challan_issued', { challan_serial: ch.serial });
     return { ok: true, challan: ch };
   },
@@ -2404,7 +2437,10 @@ const Challans = {
   publicView(c) {
     return {
       serial: c.serial, course_title: c.course_title, student_name: c.student_name,
-      gross_fee: c.gross_fee, discount_label: c.discount_label, discount_amount: c.discount_amount, net_fee: c.net_fee,
+      student_id: c.student_id || null,
+      gross_fee: c.gross_fee, fee_parts: c.fee_parts || Challans.splitFee(c.gross_fee),
+      discounts: c.discounts || (c.discount_label ? [{ label: c.discount_label, amount: c.discount_amount }] : []),
+      discount_label: c.discount_label, discount_amount: c.discount_amount, net_fee: c.net_fee,
       deadline: c.deadline, bank: c.bank_snapshot, status: c.status,
       generated_at: (c.generated_at || '').slice(0, 10),
     };

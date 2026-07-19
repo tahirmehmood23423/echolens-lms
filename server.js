@@ -19,6 +19,7 @@ const store = require('./store');
 const ai = require('./ai');
 const mailer = require('./mailer');
 const jaas = require('./jaas');
+const { challanPdf } = require('./challan-pdf');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
@@ -2500,17 +2501,38 @@ app.post('/api/admissions/registrations/:id/challan', authRequired, admissionsOn
   if (out.error) return res.status(400).json({ error: out.error });
   res.json({ ok: true, challan: out.challan });
 });
-app.post('/api/admissions/challans/:serial/send', authRequired, admissionsOnly, (req, res) => {
+app.post('/api/admissions/challans/:serial/send', authRequired, admissionsOnly, async (req, res) => {
   const c = Challans.bySerial(req.params.serial);
   if (!c) return res.status(404).json({ error: 'Challan not found.' });
-  const bank = c.bank_snapshot || {};
-  const bankLines = [bank.bank_name && `Bank: ${bank.bank_name}`, bank.account_title && `Account title: ${bank.account_title}`, bank.account_number && `Account number: ${bank.account_number}`, bank.iban && `IBAN: ${bank.iban}`, bank.branch && `Branch: ${bank.branch}`].filter(Boolean).join('\n');
-  const feeLines = (c.fee_parts || []).map((p) => `${p.label}: Rs ${Number(p.amount).toLocaleString('en-US')}`).join('\n');
-  const discountLines = (c.discounts || []).map((d) => `Discount - ${d.label}: -Rs ${Number(d.amount).toLocaleString('en-US')}`).join('\n');
+  // The challan itself travels as a PDF attachment; the email body carries a
+  // short summary plus the payment-proof instructions.
+  let attachments;
+  try {
+    const pdf = await challanPdf(c, `${APP_URL}/challan?s=${c.serial}`);
+    attachments = [{ filename: `EchoLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' }];
+  } catch (e) {
+    console.error('Challan PDF generation failed:', e.message);
+    return res.status(500).json({ error: 'Could not generate the challan PDF - try again.' });
+  }
   mailer.notify(c.student_email, `EchoLens - fee challan for ${c.course_title}`,
-    `Assalam-o-Alaikum ${c.student_name},\n\nHere is your fee challan for ${c.course_title}.\n\nStudent ID: ${c.student_id || '-'}\nChallan serial: ${c.serial}\n\n${feeLines}\nCourse fee (total): Rs ${c.gross_fee.toLocaleString('en-US')}${discountLines ? `\n${discountLines}` : ''}\nAmount payable: Rs ${c.net_fee.toLocaleString('en-US')}\nDeadline: ${c.deadline}\n\nPayment details:\n${bankLines}\n\nAfter paying, email a screenshot of your payment along with the payment record (transaction ID, date, and amount) to ${FINANCE_EMAIL}. Our finance team will verify it and confirm your enrollment by email.\n\nView and verify this challan: ${APP_URL}/challan?s=${c.serial}`);
+    `Assalam-o-Alaikum ${c.student_name},\n\nYour fee challan for ${c.course_title} is attached as a PDF.\n\nStudent ID: ${c.student_id || '-'}\nChallan serial: ${c.serial}\nAmount payable: Rs ${c.net_fee.toLocaleString('en-US')}\nDeadline: ${c.deadline}\n\nAfter paying, email a screenshot of your payment along with the payment record (transaction ID, date, and amount) to ${FINANCE_EMAIL}. Our finance team will verify it and confirm your enrollment by email.\n\nYou can also view and verify this challan online: ${APP_URL}/challan?s=${c.serial}`,
+    attachments);
   Challans.markSent(c.serial);
   res.json({ ok: true });
+});
+// Lets the Admissions Office download the exact PDF the student receives.
+app.get('/api/admissions/challans/:serial/pdf', authRequired, admissionsOnly, async (req, res) => {
+  const c = Challans.bySerial(req.params.serial);
+  if (!c) return res.status(404).json({ error: 'Challan not found.' });
+  try {
+    const pdf = await challanPdf(c, `${APP_URL}/challan?s=${c.serial}`);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="EchoLens-Challan-${c.serial}.pdf"`);
+    res.send(pdf);
+  } catch (e) {
+    console.error('Challan PDF generation failed:', e.message);
+    res.status(500).json({ error: 'Could not generate the challan PDF - try again.' });
+  }
 });
 
 /* ============================== v18: FINANCE PORTAL ==============================

@@ -21,17 +21,19 @@ const transport = configured
 
 const FROM = process.env.MAIL_FROM || 'EchoLens <info@echolens.digital>';
 
-async function send({ to, subject, text }) {
-  if (!configured) { console.log(`[mail skipped - SMTP not configured] to=${to} subject=${subject}`); return; }
-  await transport.sendMail({ from: FROM, to, subject, text });
+async function send({ to, subject, text, attachments }) {
+  if (!configured) { console.log(`[mail skipped - SMTP not configured] to=${to} subject=${subject}${attachments && attachments.length ? ` attachments=${attachments.map((a) => a.filename).join(',')}` : ''}`); return; }
+  await transport.sendMail({ from: FROM, to, subject, text, attachments });
 }
 
 // Fire-and-forget notify: never throws, never blocks the request.
 // `to` is one address or an array; empty/missing addresses are skipped.
-function notify(to, subject, text) {
+// `attachments` (optional) is a nodemailer attachments array, e.g.
+// [{ filename: 'challan.pdf', content: <Buffer> }].
+function notify(to, subject, text, attachments) {
   const list = (Array.isArray(to) ? to : [to]).filter(Boolean);
   for (const addr of list) {
-    send({ to: addr, subject, text: text + '\n\n- EchoLens' }).catch((e) => console.error('Mail failed for', addr, e.message));
+    send({ to: addr, subject, text: text + '\n\n- EchoLens', attachments }).catch((e) => console.error('Mail failed for', addr, e.message));
   }
 }
 

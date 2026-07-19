@@ -2319,7 +2319,8 @@ async function renderCoordRegistrations() {
 }
 function coordRegRow(r) {
   const latest = r.challans && r.challans[0];
-  const viewBtn = latest ? `<a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>` : '';
+  const viewBtn = latest ? `<a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>
+    <a class="btn btn-ghost btn-sm" href="/api/admissions/challans/${encodeURIComponent(latest.serial)}/pdf">Download PDF</a>` : '';
   let action = `<button class="btn btn-primary btn-sm" onclick="coordOpenChallanForm(${r.id})">Generate challan</button>`;
   if (r.payment_stage === 'challan_issued') {
     action = `<span class="s" style="color:var(--muted)">Net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
@@ -2376,7 +2377,7 @@ async function coordOpenChallanForm(regId) {
 async function coordSendChallan(serial) {
   try {
     await api(`/api/admissions/challans/${encodeURIComponent(serial)}/send`, { method: 'POST' });
-    toast('Challan emailed - the student was asked to send payment proof to finance@echolens.digital.');
+    toast('Challan PDF emailed - the student was asked to send payment proof to finance@echolens.digital.');
     renderCoordRegistrations();
   } catch (e) { toast(e.message, true); }
 }

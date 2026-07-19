@@ -22,7 +22,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'echolens.json');
-const USERNAME_DOMAIN = '@echolens.digital';
+// (usernames are plain handles now - see uniqueUsername; no fake email domain)
 
 /* ------------------------------ stages ------------------------------- */
 // Named progression stages. Thresholds assume ~100-point assignments.
@@ -154,10 +154,13 @@ function slugify(name) {
   return String(name).toLowerCase().trim().replace(/[^a-z0-9\s.]/g, '').replace(/\s+/g, '.').replace(/\.+/g, '.') || 'user';
 }
 function uniqueUsername(name) {
+  // Plain handle (e.g. "bilal.ahmed"), deliberately NOT email-shaped: a
+  // username is not an inbox. Accounts created with a real email are keyed
+  // to that email instead (username = email), so the two never get confused.
   const base = slugify(name);
-  let candidate = base + USERNAME_DOMAIN, i = 1;
+  let candidate = base, i = 1;
   const taken = new Set([...data.issued_usernames, ...data.users.map((u) => u.username)]);
-  while (taken.has(candidate)) { i += 1; candidate = `${base}${i}${USERNAME_DOMAIN}`; }
+  while (taken.has(candidate)) { i += 1; candidate = `${base}${i}`; }
   data.issued_usernames.push(candidate);
   return candidate;
 }
@@ -189,8 +192,10 @@ const Users = {
   byReg(reg) { return data.users.find((u) => u.reg_no === String(reg).trim()) || null; },
   all() { return data.users.slice().sort((a, b) => a.name.localeCompare(b.name)); },
   countByRole(role) { return data.users.filter((u) => u.role === role).length; },
-  create({ name, role, email = null }) {
-    const username = uniqueUsername(name);
+  create({ name, role, email = null, username = null }) {
+    // Staff portal accounts are keyed to the email they provide (username =
+    // email); other flows fall back to a generated username from the name.
+    username = username || uniqueUsername(name);
     const password = randomPassword();
     const u = {
       id: nextId('users'), name: String(name).trim(), role, username, email,

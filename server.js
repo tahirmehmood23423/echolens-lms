@@ -594,12 +594,12 @@ app.post('/api/batches/:id/students', authRequired, adminRequired, async (req, r
     if (!isEmail(email)) { invalid.push(`${raw} - missing or invalid email`); continue; }
     if (!(await emailDomainExists(email))) { invalid.push(`${raw} - that email domain does not receive mail`); continue; }
     if (Users.byLogin(email)) { invalid.push(`${raw} - an account with this email already exists`); continue; }
-    const { user, password } = Users.create({ name, role: 'student', email });
+    const { user, password } = Users.create({ name, role: 'student', email, username: email });
     Enrollments.create(user.id, b.id);
     created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: mailer.configured });
     const bd = Batches.decorate(b);
     mailer.notify(email, 'Welcome to EchoLens - your account',
-      `Hi ${user.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
+      `Hi ${user.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nSign in with your email: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
   }
   for (const raw of Array.isArray(existing) ? existing : []) {
     const u = Users.byLogin(String(raw).trim());
@@ -660,14 +660,24 @@ const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finan
 function mailStaffCredentials(user, password, role) {
   if (!user.email) return;
   mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
-    `Hi ${user.name},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nUsername: ${user.username}\nPassword: ${password}\n\nSign in at ${APP_URL}/login and change your password from Settings after your first login.`);
+    `Hi ${user.name},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nSign in with your email: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login and change your password from Settings after your first login.`);
 }
-app.post('/api/admin/coordinators', authRequired, adminRequired, (req, res) => {
+// The email is mandatory and must be exact: the account is generated FROM it
+// (username = email) and the credentials are mailed to that same address.
+async function validateStaffEmail(email, res) {
+  const em = String(email || '').trim().toLowerCase();
+  if (!isEmail(em)) { res.status(400).json({ error: 'A valid email is required - the account is generated from it and the username and password are mailed there.' }); return null; }
+  if (!(await emailDomainExists(em))) { res.status(400).json({ error: 'That email domain does not receive mail - check the spelling, the credentials must reach this inbox.' }); return null; }
+  if (Users.byLogin(em)) { res.status(400).json({ error: 'An account with this email already exists.' }); return null; }
+  return em;
+}
+app.post('/api/admin/coordinators', authRequired, adminRequired, async (req, res) => {
   const { name, email } = req.body || {};
   if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
-  const { user, password } = Users.create({ name: String(name).trim(), role: 'coordinator', email: isEmail(email) ? email : null });
+  const em = await validateStaffEmail(email, res); if (!em) return;
+  const { user, password } = Users.create({ name: String(name).trim(), role: 'coordinator', email: em, username: em });
   mailStaffCredentials(user, password, 'coordinator');
-  res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: !!user.email });
+  res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: true });
 });
 // v17: department portals - HR, Finance, Student Coordinator. Distinct from
 // 'coordinator' (broad read-only academic oversight, unchanged above): each
@@ -679,12 +689,13 @@ const DEPT_ROLE_ENDPOINTS = {
   student_coordinator: '/api/admin/student-coordinators',
 };
 for (const [role, path_] of Object.entries(DEPT_ROLE_ENDPOINTS)) {
-  app.post(path_, authRequired, adminRequired, (req, res) => {
+  app.post(path_, authRequired, adminRequired, async (req, res) => {
     const { name, email } = req.body || {};
     if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
-    const { user, password } = Users.create({ name: String(name).trim(), role, email: isEmail(email) ? email : null });
+    const em = await validateStaffEmail(email, res); if (!em) return;
+    const { user, password } = Users.create({ name: String(name).trim(), role, email: em, username: em });
     mailStaffCredentials(user, password, role);
-    res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: !!user.email });
+    res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: true });
   });
 }
 
@@ -936,7 +947,9 @@ app.get('/u/:reg', (req, res) => res.sendFile(path.join(__dirname, 'public', 'pr
 // Google Cloud console.
 const G_ID = process.env.GOOGLE_CLIENT_ID || '';
 const G_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-const APP_URL = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+// Links in outgoing emails always point at the live site - never localhost.
+// Override with APP_URL only when deliberately testing against another host.
+const APP_URL = (process.env.APP_URL || 'https://www.echolens.digital').replace(/\/$/, '');
 const G_REDIRECT = `${APP_URL}/auth/google/callback`;
 
 app.get('/api/auth/providers', (req, res) => res.json({ google: !!(G_ID && G_SECRET) }));
@@ -1965,7 +1978,7 @@ app.post('/api/auth/register-open', async (req, res) => {
   if (mailer.configured && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
   if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
   if (Users.byLogin(email)) return res.status(400).json({ error: 'An account with this email already exists - sign in instead.' });
-  const { user, password } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase() });
+  const { user, password } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase(), username: String(email).trim().toLowerCase() });
   Users.updateProfile(user.id, { phone: String(whatsapp).trim() });
   Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
   setAuthCookie(res, sign(Users.byId(user.id)));
@@ -2517,14 +2530,14 @@ app.post('/api/coordinator/registrations/:id/enroll', authRequired, studentCoord
     if (u.role === 'free') u.role = 'student'; // now a paying student, not a free-tier account
   } else {
     if (!(await emailDomainExists(r.email))) return res.status(400).json({ error: 'That email domain does not receive mail - check with the student before enrolling.' });
-    const created = Users.create({ name: r.name, role: 'student', email: r.email });
+    const created = Users.create({ name: r.name, role: 'student', email: r.email, username: r.email });
     u = created.user; password = created.password; freshAccount = true;
   }
   Enrollments.create(u.id, b.id);
   const bd = Batches.decorate(b);
   if (freshAccount) {
     mailer.notify(r.email, 'Welcome to EchoLens - your account',
-      `Hi ${u.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nUsername: ${u.username}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
+      `Hi ${u.name},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nSign in with your email: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} and change your password from Profile after your first login.`);
   } else {
     mailer.notify(r.email, `You've been added to ${bd.title || bd.name}`,
       `Hi ${u.name},\n\nYou have been enrolled in ${bd.title || bd.name}. Sign in to your existing EchoLens account at ${APP_URL} to get started.`);
@@ -2591,10 +2604,11 @@ app.post('/api/hr/staff', authRequired, hrOnly, async (req, res) => {
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address - credentials are emailed there.' });
   if (Users.byLogin(email)) return res.status(400).json({ error: 'An account with this email already exists.' });
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
-  const { user, password } = Users.create({ name: String(name).trim(), role: 'staff', email });
-  const record = StaffRecords.create({ user_id: user.id, name: user.name, email, phone, position, employment_type, group_id });
-  mailer.notify(email, 'Welcome to EchoLens - your staff account',
-    `Hi ${user.name},\n\nYour EchoLens staff account is ready.\n\nUsername: ${user.username}\nPassword: ${password}\n\nSign in at ${APP_URL} to see your team, instructions, and follow-ups.`);
+  const em = String(email).trim().toLowerCase();
+  const { user, password } = Users.create({ name: String(name).trim(), role: 'staff', email: em, username: em });
+  const record = StaffRecords.create({ user_id: user.id, name: user.name, email: em, phone, position, employment_type, group_id });
+  mailer.notify(em, 'Welcome to EchoLens - your staff account',
+    `Hi ${user.name},\n\nYour EchoLens staff account is ready.\n\nSign in with your email: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} to see your team, instructions, and follow-ups.`);
   res.json({ ok: true, staff: record, credentials: { name: user.name, username: user.username, password } });
 });
 app.patch('/api/hr/staff/:id', authRequired, hrOnly, (req, res) => {

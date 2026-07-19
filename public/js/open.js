@@ -448,6 +448,7 @@ function openRegister(code, title) {
         <label class="field"><span>WhatsApp</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel" value="${ME && ME.profile && ME.profile.phone ? esc(ME.profile.phone) : ''}"></label>
       </div>
       <label class="field"><span>Course you want to enrol in</span><select name="course">${code === 'PATH' ? `<option value="PATH|${esc(title)}" selected>${esc(title)} (bundle - PKR 43,500)</option>` : ''}${options}</select></label>
+      <label class="field"><span>Ambassador code (optional) - a valid 4-digit code gets you 10% off</span><input name="ambassador_code" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="e.g. 4821"></label>
       <button class="btn btn-primary btn-block">Submit registration</button>
     </form>`);
   $('regInterest').addEventListener('submit', async (e) => {
@@ -456,10 +457,10 @@ function openRegister(code, title) {
     try {
       await api('/api/public/register-interest', {
         method: 'POST',
-        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, course_code, course_title, company: f.company.value }),
+        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, course_code, course_title, ambassador_code: f.ambassador_code.value.trim(), company: f.company.value }),
       });
       openModal('Registration received', `
-        <p class="s" style="line-height:1.6">Thank you - your registration for <strong>${esc(course_title)}</strong> is with the team. We will contact you on WhatsApp with the fee challan and next steps.</p>
+        <p class="s" style="line-height:1.6">Thank you - your registration for <strong>${esc(course_title)}</strong> is with the team.${f.ambassador_code.value.trim() ? ' Your ambassador code was accepted - a <strong>10% discount</strong> will be applied to your fee challan.' : ''} We will contact you on WhatsApp with the fee challan and next steps.</p>
         <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal()">Done</button>`);
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });

@@ -24,7 +24,7 @@ const {
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
-  DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords,
+  DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -654,11 +654,20 @@ app.post('/api/admin/users/:id/password', authRequired, adminRequired, (req, res
   const out = Users.resetPassword(target.id);
   res.json({ ok: true, username: out.user.username, password: out.password });
 });
+// Portal staff accounts are generated from a name + email; the credentials
+// (username, password, sign-in link) are emailed to that address directly.
+const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finance', student_coordinator: 'Student Coordinator' };
+function mailStaffCredentials(user, password, role) {
+  if (!user.email) return;
+  mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
+    `Hi ${user.name},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nUsername: ${user.username}\nPassword: ${password}\n\nSign in at ${APP_URL}/login and change your password from Settings after your first login.`);
+}
 app.post('/api/admin/coordinators', authRequired, adminRequired, (req, res) => {
   const { name, email } = req.body || {};
   if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
   const { user, password } = Users.create({ name: String(name).trim(), role: 'coordinator', email: isEmail(email) ? email : null });
-  res.json({ ok: true, credentials: { name: user.name, username: user.username, password } });
+  mailStaffCredentials(user, password, 'coordinator');
+  res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: !!user.email });
 });
 // v17: department portals - HR, Finance, Student Coordinator. Distinct from
 // 'coordinator' (broad read-only academic oversight, unchanged above): each
@@ -674,9 +683,29 @@ for (const [role, path_] of Object.entries(DEPT_ROLE_ENDPOINTS)) {
     const { name, email } = req.body || {};
     if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
     const { user, password } = Users.create({ name: String(name).trim(), role, email: isEmail(email) ? email : null });
-    res.json({ ok: true, credentials: { name: user.name, username: user.username, password } });
+    mailStaffCredentials(user, password, role);
+    res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: !!user.email });
   });
 }
+
+/* ------------------------------- ambassadors -------------------------------
+ * HR creates ambassadors from a name + email; a unique 4-digit referral code
+ * is generated and emailed to them. Students entering the code on the open-web
+ * registration form get 10% off, verified automatically. */
+app.get('/api/hr/ambassadors', authRequired, hrOnly, (req, res) => {
+  res.json({ ambassadors: Ambassadors.all().map((a) => ({ ...a, uses: Ambassadors.usesFor(a.code) })) });
+});
+app.post('/api/hr/ambassadors', authRequired, hrOnly, async (req, res) => {
+  const { name, email } = req.body || {};
+  if (!name || String(name).trim().length < 2) return res.status(400).json({ error: "Enter the ambassador's full name." });
+  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
+  const a = Ambassadors.create({ name, email }, req.user.id);
+  mailer.notify(a.email, 'Your EchoLens ambassador code',
+    `Hi ${a.name},\n\nWelcome aboard - you are now an EchoLens ambassador. Your personal referral code is:\n\n    ${a.code}\n\nShare it with students: anyone who enters this code in the course registration form at ${APP_URL} gets 10% off their course fee, and the registration is credited to you.\n\nEchoLens Digital`);
+  res.json({ ok: true, ambassador: a });
+});
+app.delete('/api/hr/ambassadors/:id', authRequired, hrOnly, (req, res) => { Ambassadors.remove(req.params.id); res.json({ ok: true }); });
 app.delete('/api/admin/users/:id', authRequired, adminRequired, (req, res) => {
   if (Number(req.params.id) === req.user.id) return res.status(400).json({ error: 'You cannot remove your own account.' });
   Users.remove(req.params.id); res.json({ ok: true });
@@ -2376,11 +2405,25 @@ app.post('/api/public/register-interest', async (req, res) => {
   if (!isEmail(b.email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!(await emailDomainExists(b.email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
   if (!b.whatsapp || String(b.whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
+  // Optional ambassador referral code: 4 digits, checked automatically. A
+  // valid code attaches the ambassador plus the 10% discount category, which
+  // then flows through to the fee challan on its own.
+  const rawCode = String(b.ambassador_code || '').trim();
+  if (rawCode) {
+    if (!/^\d{4}$/.test(rawCode)) return res.status(400).json({ error: 'Ambassador codes are 4 digits - check the code or leave the field empty.' });
+    const amb = Ambassadors.byCode(rawCode);
+    if (!amb) return res.status(400).json({ error: 'That ambassador code is not recognised - check it with your ambassador or leave the field empty.' });
+    b.ambassador_code = amb.code;
+    b.ambassador_name = amb.name;
+    let cat = DiscountCategories.all().find((c) => c.active && c.type === 'percent' && c.value === 10 && /ambassador/i.test(c.name));
+    if (!cat) cat = DiscountCategories.create({ name: 'Ambassador referral', type: 'percent', value: 10 }, null);
+    b.discount_category_id = cat.id;
+  } else { delete b.ambassador_code; }
   const r = Registrations.create(b);
   Leads.upsert({ name: r.name, email: r.email, whatsapp: r.whatsapp, source: 'course-registration' });
   const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
-  if (admins.length) mailer.notify(admins, `New course registration - ${r.name}`, `${r.name} registered interest${r.course_title ? ` in ${r.course_code} ${r.course_title}` : ''}.\nEmail: ${r.email}\nWhatsApp: ${r.whatsapp}${r.city ? `\nCity: ${r.city}` : ''}${r.note ? `\nNote: ${r.note}` : ''}\n\nFollow up from the admin portal (Analytics & Leads).`);
-  mailer.notify(r.email, 'EchoLens - registration received', `Assalam-o-Alaikum ${r.name},\n\nWe received your registration${r.course_title ? ` for ${r.course_title}` : ''}. Our team will contact you on WhatsApp (${r.whatsapp}) with the fee challan and next steps.\n\nEchoLens Digital`);
+  if (admins.length) mailer.notify(admins, `New course registration - ${r.name}`, `${r.name} registered interest${r.course_title ? ` in ${r.course_code} ${r.course_title}` : ''}.\nEmail: ${r.email}\nWhatsApp: ${r.whatsapp}${r.city ? `\nCity: ${r.city}` : ''}${r.note ? `\nNote: ${r.note}` : ''}${r.ambassador_code ? `\nAmbassador code: ${r.ambassador_code} (${r.ambassador_name}) - 10% discount applies` : ''}\n\nFollow up from the admin portal (Analytics & Leads).`);
+  mailer.notify(r.email, 'EchoLens - registration received', `Assalam-o-Alaikum ${r.name},\n\nWe received your registration${r.course_title ? ` for ${r.course_title}` : ''}.${r.ambassador_code ? ' Your ambassador code was accepted - a 10% discount will be applied to your fee challan.' : ''} Our team will contact you on WhatsApp (${r.whatsapp}) with the fee challan and next steps.\n\nEchoLens Digital`);
   res.json({ ok: true });
 });
 app.get('/api/admin/registrations', authRequired, staffView, (req, res) => res.json({ registrations: Registrations.all(), pending: Registrations.pendingCount() }));

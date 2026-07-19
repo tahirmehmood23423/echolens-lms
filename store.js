@@ -38,14 +38,14 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
   attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
   events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
   jobs: [], job_comments: [],
-  discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [],
+  discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [], ambassadors: [],
   settings: {
     cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' },
     bank: { bank_name: '', account_title: '', account_number: '', iban: '', branch: '' },
@@ -1607,6 +1607,31 @@ function openUserProfile(u) {
   };
 }
 
+/* ------------------------------- ambassadors -------------------------------
+ * HR-created referral partners. Each carries a unique 4-digit code; students
+ * who enter it on the open-web registration form get 10% off automatically. */
+const Ambassadors = {
+  all() { return data.ambassadors.slice().sort((a, b) => b.id - a.id); },
+  byId(id) { return data.ambassadors.find((a) => a.id === Number(id)) || null; },
+  byCode(code) {
+    const c = String(code || '').trim();
+    return c ? data.ambassadors.find((a) => a.active && a.code === c) || null : null;
+  },
+  create({ name, email }, by) {
+    let code;
+    do { code = String(Math.floor(1000 + Math.random() * 9000)); } while (data.ambassadors.some((a) => a.code === code));
+    const a = {
+      id: nextId('ambassadors'), name: String(name || '').trim().slice(0, 120),
+      email: String(email || '').trim().toLowerCase().slice(0, 200),
+      code, active: true, created_by: by || null, created_at: now(),
+    };
+    data.ambassadors.push(a); save();
+    return a;
+  },
+  remove(id) { data.ambassadors = data.ambassadors.filter((a) => a.id !== Number(id)); save(); },
+  usesFor(code) { return data.registrations.filter((r) => r.ambassador_code === code).length; },
+};
+
 function backupNow() {
   try {
     if (!fs.existsSync(DB_PATH)) return null;
@@ -2240,10 +2265,14 @@ const Registrations = {
       course_code: String(b.course_code || '').slice(0, 12) || null,
       course_title: String(b.course_title || '').slice(0, 200) || null,
       note: String(b.note || '').slice(0, 600) || null,
+      // Ambassador referral: a valid 4-digit code (validated by the server)
+      // records who referred the student and pre-attaches the 10% discount.
+      ambassador_code: String(b.ambassador_code || '').slice(0, 4) || null,
+      ambassador_name: b.ambassador_name ? String(b.ambassador_name).slice(0, 120) : null,
       status: { contacted: false, challan_sent: false, added_to_course: false },
       admin_note: null,
       // v17: registration -> challan -> payment -> enrollment pipeline.
-      discount_category_id: null, challan_serial: null, payment_stage: 'new',
+      discount_category_id: b.discount_category_id || null, challan_serial: null, payment_stage: 'new',
       enrolled_user_id: null, enrolled_batch_id: null, cleared_by: null, cleared_at: null,
       created_at: now(), updated_at: now(),
     };
@@ -2331,13 +2360,16 @@ const Challans = {
     const r = Registrations.byId(registration_id); if (!r) return { error: 'Registration not found.' };
     const course = Courses.byCode(r.course_code);
     const gross = course ? Number(course.price_pkr) || 0 : 0;
-    const disc = DiscountCategories.apply(gross, discount_category_id);
+    // Fall back to a discount already attached to the registration (e.g. a
+    // valid ambassador code = 10%) when finance does not pick one explicitly.
+    const catId = discount_category_id || r.discount_category_id || null;
+    const disc = DiscountCategories.apply(gross, catId);
     const bank = Settings.bank();
     const ch = {
       id: nextId('challans'), serial: Challans.serial(), registration_id: r.id,
       course_code: r.course_code, course_title: r.course_title || (course ? course.title : ''),
       student_name: r.name, student_email: r.email,
-      gross_fee: gross, discount_category_id: discount_category_id || null, discount_label: disc.label, discount_amount: disc.amount, net_fee: disc.net,
+      gross_fee: gross, discount_category_id: catId, discount_label: disc.label, discount_amount: disc.amount, net_fee: disc.net,
       deadline: /^\d{4}-\d{2}-\d{2}$/.test(String(deadline)) ? deadline : null,
       bank_snapshot: { ...bank },
       status: 'issued',
@@ -2559,7 +2591,7 @@ module.exports = {
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
-  DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords,
+  DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   seed, DB_PATH, allData: () => data,
 };
 

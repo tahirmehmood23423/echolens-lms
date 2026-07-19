@@ -736,7 +736,7 @@ async function renderAdminEnrollments() {
       <tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Course</th><th>Stage</th><th>Received</th></tr>
       ${regs.map((r) => `<tr>
         <td>${esc(r.name)}</td><td class="s">${esc(r.email)}</td><td class="mono">${esc(r.whatsapp || '—')}</td>
-        <td>${esc(r.course_title || r.course_code || '—')}</td>
+        <td>${esc(r.course_title || r.course_code || '—')}${r.ambassador_code ? ` <span class="s" style="color:var(--ok);font-weight:700">10% off · amb ${esc(r.ambassador_code)}</span>` : ''}</td>
         <td>${pipelineBadge(r.payment_stage)}</td>
         <td class="s">${esc((r.created_at || '').slice(0, 10))}</td>
       </tr>`).join('') || '<tr><td colspan="6" class="empty">No pending enrollment requests - new website registrations appear here.</td></tr>'}
@@ -2238,7 +2238,7 @@ function finRegRow(r) {
   return `<div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div>
       <div style="font-weight:700">${esc(r.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(r.email)}</span></div>
-      <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')} &nbsp;${pipelineBadge(r.payment_stage)}</div>
+      <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')}${r.ambassador_code ? ` &middot; <span style="color:var(--ok);font-weight:700">10% ambassador (${esc(r.ambassador_code)})</span>` : ''} &nbsp;${pipelineBadge(r.payment_stage)}</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}</div>
   </div></div>`;
@@ -2404,7 +2404,7 @@ function coordRegRow(r) {
   return `<div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div>
       <div style="font-weight:700">${esc(r.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(r.email)}</span></div>
-      <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')} &nbsp;${pipelineBadge(r.payment_stage)}</div>
+      <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')}${r.ambassador_code ? ` &middot; <span style="color:var(--ok);font-weight:700">10% ambassador (${esc(r.ambassador_code)})</span>` : ''} &nbsp;${pipelineBadge(r.payment_stage)}</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}</div>
   </div></div>`;
@@ -2458,10 +2458,49 @@ let HR_GROUPS_CACHE = [];
 function hrTab(tab) { HR_TAB = tab; renderDeptHR(); }
 async function renderDeptHR() {
   const el = $('view-dept-hr');
-  const tabs = [['staff', 'Staff & interns'], ['groups', 'Groups']];
+  const tabs = [['staff', 'Staff & interns'], ['groups', 'Groups'], ['ambassadors', 'Ambassadors']];
   el.innerHTML = deptHeaderHtml('HR Portal') + deptTabBarHtml(tabs, HR_TAB, 'hrTab') + '<div id="hrTabBody"><div class="empty">Loading&hellip;</div></div>';
   if (HR_TAB === 'staff') renderHrStaff();
+  else if (HR_TAB === 'ambassadors') renderHrAmbassadors();
   else renderHrGroups();
+}
+/* -------- HR: ambassadors (4-digit referral codes, 10% student discount) -------- */
+async function renderHrAmbassadors() {
+  const box = $('hrTabBody');
+  const d = await api('/api/hr/ambassadors');
+  box.innerHTML = `<div class="card"><div class="card-head"><h3>Ambassadors</h3>
+      <button class="btn btn-primary btn-sm" onclick="formAmbassador()">Add ambassador</button></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Email</th><th>Code</th><th>Registrations referred</th><th>Added</th><th></th></tr>
+      ${d.ambassadors.map((a) => `<tr>
+        <td>${esc(a.name)}</td><td class="s">${esc(a.email)}</td>
+        <td class="mono" style="font-weight:700;letter-spacing:2px">${esc(a.code)}</td>
+        <td>${a.uses}</td><td class="s">${esc((a.created_at || '').slice(0, 10))}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="delAmbassador(${a.id}, '${esc(a.name)}')">Remove</button></td>
+      </tr>`).join('') || '<tr><td colspan="6" class="empty">No ambassadors yet - add one and their unique 4-digit code is generated and emailed to them.</td></tr>'}
+    </table></div>
+    <p class="hint" style="padding:0 14px 12px">Students who enter a valid code in the website registration form automatically get 10% off - the discount is applied on their fee challan and each referral is counted here.</p></div>`;
+}
+function formAmbassador() {
+  openModal('Add an ambassador', `<form id="f">
+    <label class="field"><span>Full name</span><input name="name" required></label>
+    <label class="field"><span>Email</span><input name="email" type="email" required></label>
+    <p class="hint">A unique 4-digit referral code is generated and emailed to this address automatically.</p>
+    <button class="btn btn-primary btn-block">Create ambassador</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
+    try {
+      const d = await api('/api/hr/ambassadors', { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value.trim() }) });
+      openModal('Ambassador created', `<p class="s" style="line-height:1.8">${esc(d.ambassador.name)} is now an EchoLens ambassador.<br>
+        Referral code: <strong class="mono" style="font-size:20px;letter-spacing:3px">${esc(d.ambassador.code)}</strong><br>
+        The code has been emailed to ${esc(d.ambassador.email)}.</p>
+        <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="closeModal();renderHrAmbassadors()">Done</button>`);
+    } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
+  });
+}
+async function delAmbassador(id, name) {
+  if (!confirm(`Remove ambassador ${name}? Their referral code stops working immediately.`)) return;
+  try { await api('/api/hr/ambassadors/' + id, { method: 'DELETE' }); toast('Removed.'); renderHrAmbassadors(); } catch (e) { toast(e.message, true); }
 }
 async function renderHrStaff() {
   const box = $('hrTabBody');

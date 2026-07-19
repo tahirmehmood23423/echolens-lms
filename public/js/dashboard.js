@@ -85,7 +85,8 @@ function modalMsg(text, ok) {
   if (!text) { el.className = 'form-msg'; el.textContent = ''; return; }
   el.className = 'form-msg ' + (ok ? 'ok' : 'err'); el.textContent = text;
 }
-$('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeModal(); });
+// Clicking outside a popup does NOT close it - forms stay open until the
+// user closes them deliberately (the X button or Escape).
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 document.addEventListener('click', (e) => {
   document.querySelectorAll('.dd-menu.open').forEach((m) => { if (!m.parentElement.contains(e.target)) m.classList.remove('open'); });

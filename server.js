@@ -2246,7 +2246,7 @@ app.get('/api/fetch-dataset', authRequired, async (req, res) => {
  * the enrolment links. Sign-in required: the catalogue is not openly visible.
  */
 const KEY_LINKS = {
-  registration: process.env.REGISTRATION_FORM_URL || 'https://docs.google.com/forms/d/1tngMoAaGzyIRktzjmyNHu1vQ_osBMfi-BDAr1Ix8Xs0/viewform',
+  registration: process.env.REGISTRATION_FORM_URL || '/open#register',
 };
 app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
   const trackByCode = {};

@@ -10,7 +10,8 @@
 const store = require('./store');
 
 const BASE = 'https://www.echolens.digital';
-const ENROLL_FORM = 'https://docs.google.com/forms/d/1tngMoAaGzyIRktzjmyNHu1vQ_osBMfi-BDAr1Ix8Xs0/viewform';
+// All enrolment goes through the in-site registration form (lands in the
+// admin portal): /open#register, optionally /open#register-<CODE> to preselect.
 const WHATSAPP = 'https://wa.me/923141479109';
 const EMAIL = 'info@echolens.digital';
 const COHORT = { name: 'August 2026', starts: '1 August 2026', startDate: '2026-08-01', deadline: '31 July 2026' };
@@ -269,7 +270,7 @@ function renderCourse(c, all) {
 
   const ctaPrimary = free
     ? `<a class="btn btn-grad" href="/open#signup">Start this course free</a>`
-    : `<a class="btn btn-grad" href="${ENROLL_FORM}" target="_blank" rel="noopener">Enrol in this course</a>`;
+    : `<a class="btn btn-grad" href="/open#register-${esc(c.code)}">Enrol in this course</a>`;
   const ctaSecondary = free
     ? `<a class="btn btn-light" href="/open">Browse all free quests</a>`
     : `<a class="btn btn-light" href="/open#signup">Try the first quest free</a>`;

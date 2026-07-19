@@ -108,7 +108,7 @@ let CUR_EVENT = null;
   try { ME = await api('/api/auth/me'); } catch { ME = null; }
   drawUserBox();
   if (ME) requireWhatsapp();
-  loadCatalogue();
+  const catReady = loadCatalogue();
   loadAnnouncements();
   loadHomeStats();
   if (ME) { loadEvents(); loadCerts(); } else { $('evList').innerHTML = gateCardHtml('Events are for signed-in members - creating a free account takes a minute.'); }
@@ -119,7 +119,9 @@ let CUR_EVENT = null;
   else if (h === 'quests') openTab('courses'); // quests now live inside each course
   else if (h === 'free') { openTab('courses'); setCoursePill('free'); if (!ME) gate(); } // straight to the free certified courses
   else if (h === 'profile') openProfileTab();
-  else if (h === 'register') openRegister();
+  // #register opens the in-site enrolment form; #register-<CODE> preselects
+  // that course. Wait for the catalogue so the course dropdown is populated.
+  else if (h === 'register' || h.startsWith('register-')) catReady.then(() => openRegister(h.startsWith('register-') ? h.slice('register-'.length) : undefined));
   else if (h === 'signup' && !ME) gate();
 })();
 
@@ -444,11 +446,7 @@ function openRegister(code, title) {
         <label class="field" style="grid-column:span 2"><span>Email</span><input name="email" type="email" required value="${ME && ME.email ? esc(ME.email) : ''}"></label>
         <label class="field"><span>WhatsApp</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel" value="${ME && ME.profile && ME.profile.phone ? esc(ME.profile.phone) : ''}"></label>
       </div>
-      <div class="form-grid">
-        <label class="field" style="grid-column:span 2"><span>Course</span><select name="course">${code === 'PATH' ? `<option value="PATH|${esc(title)}" selected>${esc(title)} (bundle - PKR 43,500)</option>` : ''}${options}</select></label>
-        <label class="field"><span>City</span><input name="city" placeholder="e.g. Islamabad"></label>
-      </div>
-      <label class="field"><span>Anything we should know? (optional)</span><input name="note" maxlength="600" placeholder="e.g. Preferred timing"></label>
+      <label class="field"><span>Course you want to enrol in</span><select name="course">${code === 'PATH' ? `<option value="PATH|${esc(title)}" selected>${esc(title)} (bundle - PKR 43,500)</option>` : ''}${options}</select></label>
       <button class="btn btn-primary btn-block">Submit registration</button>
     </form>`);
   $('regInterest').addEventListener('submit', async (e) => {
@@ -457,7 +455,7 @@ function openRegister(code, title) {
     try {
       await api('/api/public/register-interest', {
         method: 'POST',
-        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, city: f.city.value, note: f.note.value, course_code, course_title, company: f.company.value }),
+        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, course_code, course_title, company: f.company.value }),
       });
       openModal('Registration received', `
         <p class="s" style="line-height:1.6">Thank you - your registration for <strong>${esc(course_title)}</strong> is with the team. We will contact you on WhatsApp with the fee challan and next steps.</p>

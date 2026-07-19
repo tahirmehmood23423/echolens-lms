@@ -110,6 +110,11 @@ function migrate() {
       changed = true;
     }
   }
+  // v18: the Free Micro Courses (FC-01..FC-10) join existing databases on
+  // boot - additive only, exactly like "Load official catalogue".
+  for (const c of OFFICIAL_CATALOGUE) {
+    if (c.code.startsWith('FC-') && !data.courses.some((x) => x.code === c.code)) { Courses.create(c); changed = true; }
+  }
   if (changed) save();
 }
 
@@ -840,7 +845,7 @@ const TRACKS = {};
 (function loadTracks() {
   // short-courses-full is loaded LAST so its complete builds override the
   // earlier thin stubs for the same keys (python-6w, sc02/sc03/sc06/sc07).
-  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full')];
+  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro')];
   for (const t of all) {
     // Normalize: compute title thresholds from total points if only names given.
     const total = t.levels.reduce((s1, l) => s1 + l.problems.reduce((s2, p) => s2 + (p.points || 100), 0), 0);
@@ -1293,6 +1298,18 @@ const OFFICIAL_CATALOGUE = [
   { code: 'ST-10', title: 'React + Next.js Frontend Specialist', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22000, badges: ['new', 'high_demand'], summary: 'Component architecture, state management and server-side rendering with Next.js.' },
   { code: 'ST-11', title: 'Mobile Apps with Flutter', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22000, badges: ['new'], summary: 'One codebase, two app stores: build and publish real Android and iOS apps.' },
   { code: 'ST-12', title: 'Video Editing', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 20000, badges: [], summary: 'Professional editing workflows, pacing and delivery for client and commercial work.' },
+  // Free Micro Courses - one 60-90 minute slot, purely quest based, 8 quests
+  // each, automatic certificate. Deliberately outside the paid catalogue.
+  { code: 'FC-01', title: 'Basics of C Programming', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language everything else was built on - your first compiling, running C programs in one slot.' },
+  { code: 'FC-02', title: 'Basics of C++ and Objects', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Your first taste of object oriented thinking - cout, cin, functions, and a working class.' },
+  { code: 'FC-03', title: 'Basics of Java', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language of enterprise and Android - one running program removes the setup barrier.' },
+  { code: 'FC-04', title: 'Basics of Linux and the Command Line', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Stop being scared of the black screen - an hour of real terminal commands.' },
+  { code: 'FC-05', title: 'Basics of Data Structures', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'How programs actually store things - arrays, stacks, and queues in plain English.' },
+  { code: 'FC-06', title: 'Basics of Algorithms and Flowcharts', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Think like a programmer before you write code - no programming language at all.' },
+  { code: 'FC-07', title: 'Basics of Computer Networking', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'What actually happens when you open a website - IPs, DNS, and your home network.' },
+  { code: 'FC-08', title: 'Basics of Cybersecurity and Online Safety', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Protect your accounts, your money, and your data - useful to every single person.' },
+  { code: 'FC-09', title: 'Basics of Cloud Computing', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Where every modern app actually lives - nothing to install, nothing to pay for.' },
+  { code: 'FC-10', title: 'Basics of Regex and Text Patterns', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Find any pattern in any text, instantly - a small skill with an outsized payoff.' },
 ];
 // The Web Developer Path bundle - the recommended beginner-to-job route.
 const LEARNING_PATHS = [

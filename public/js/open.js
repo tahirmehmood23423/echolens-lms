@@ -685,7 +685,7 @@ function drawSolveStatus() {
     </div>`;
 }
 function svLangOptions() {
-  return `<option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option>`;
+  return `<option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="java">Java</option><option value="sql">SQL</option>`;
 }
 const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 function svCertNote() { return CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''; }

@@ -456,14 +456,16 @@
    * message instead of a hang.
    */
   const PISTON_URL = 'https://emkc.org/api/v2/piston/execute';
-  const PISTON_LANG = { c: { language: 'c', version: '10.2.0', file: 'main.c' }, cpp: { language: 'c++', version: '10.2.0', file: 'main.cpp' } };
+  // v18: Java joins C/C++ on Piston (real OpenJDK). The file must be
+  // Main.java, so the student's public class must be called Main.
+  const PISTON_LANG = { c: { language: 'c', version: '10.2.0', file: 'main.c' }, cpp: { language: 'c++', version: '10.2.0', file: 'main.cpp' }, java: { language: 'java', version: '15.0.2', file: 'Main.java' } };
   async function runNative(lang, code, { term, onStatus, extraFiles }) {
     const status = (t) => { try { onStatus && onStatus(t); } catch {} };
     const cfg = PISTON_LANG[lang];
     // If the program reads input, collect it up-front (compiled programs run
     // remotely, so input is provided as stdin lines before the run).
     let stdin = '';
-    if (/\b(scanf|cin\s*>>|getline|gets|fgets|getchar)\b/.test(code)) {
+    if (/\b(scanf|cin\s*>>|getline|gets|fgets|getchar|Scanner|nextInt|nextLine|nextDouble)\b/.test(code)) {
       term.print('This program reads input. Type ALL input lines below (press Enter after each, empty line to finish):\n');
       const lines = [];
       for (let i = 0; i < 30; i++) {
@@ -474,7 +476,7 @@
       stdin = lines.join('\n');
       term.print('\n');
     }
-    status(lang === 'c' ? 'Compiling & running C (gcc)...' : 'Compiling & running C++ (g++)...');
+    status(lang === 'c' ? 'Compiling & running C (gcc)...' : lang === 'java' ? 'Compiling & running Java (OpenJDK)...' : 'Compiling & running C++ (g++)...');
     try {
       // Sibling files (other tabs in the same project) compile alongside the
       // active file, so a #include "helper.h" or extra .c/.cpp file works
@@ -521,7 +523,7 @@
       }
     }
     if (lang === 'sql') return runSql(code, { ...opts, files });
-    if (lang === 'c' || lang === 'cpp') return runNative(lang, code, opts);
+    if (lang === 'c' || lang === 'cpp' || lang === 'java') return runNative(lang, code, opts);
     return execute(code, { ...opts, files });
   }
   // Pull a dataset from a URL through the server proxy (avoids CORS) and

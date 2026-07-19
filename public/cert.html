@@ -90,9 +90,12 @@
   <div id="extra"></div>
   <div class="actions" id="actions" style="display:none">
     <button class="btn btn-primary" onclick="window.print()">&#128424; Print / Save as PDF</button>
-    <a class="btn btn-linkedin" id="liBtn" target="_blank" rel="noopener">in&nbsp; Add to LinkedIn</a>
+    <a class="btn btn-linkedin" id="liShareBtn" target="_blank" rel="noopener">in&nbsp; Share as post on LinkedIn</a>
+    <a class="btn btn-linkedin" id="liBtn" target="_blank" rel="noopener" style="background:#084c94">in&nbsp; Add to LinkedIn profile</a>
+    <a class="btn btn-ghost" id="imgBtn" target="_blank" rel="noopener">Download certificate image</a>
     <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(location.href).then(()=>alert('Certificate link copied - share it anywhere.'))">Copy link</button>
   </div>
+  <p id="shareHint" style="display:none;text-align:center;font-size:12.5px;color:var(--muted);margin-top:-8px">The post opens pre-written with your certificate link - LinkedIn turns the link into your certificate picture. Before posting, type <strong>@EchoLens Digital</strong> and pick the company from the dropdown so we are tagged.</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -183,13 +186,26 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
 
   document.getElementById('extra').innerHTML = conceptsHtml + finalProjectHtml;
 
+  const certUrl = location.origin + '/cert?s=' + c.serial;
   const y = (c.completion_date || '').slice(0, 4), m = Number((c.completion_date || '').slice(5, 7)) || 1;
   document.getElementById('liBtn').href = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'
     + '&name=' + encodeURIComponent(c.title)
     + '&organizationName=' + encodeURIComponent(c.org)
     + '&issueYear=' + y + '&issueMonth=' + m
-    + '&certUrl=' + encodeURIComponent(location.origin + '/cert?s=' + c.serial)
+    + '&certUrl=' + encodeURIComponent(certUrl)
     + '&certId=' + encodeURIComponent(c.serial);
+  // Share as a POST: opens LinkedIn's composer pre-filled with the
+  // announcement and the certificate link - the link unfurls into the
+  // certificate picture (og:image is served by /cert). True company tagging
+  // needs one manual "@" pick in the composer; the hint below explains it.
+  const postText = 'I’m proud to share that I’ve earned the verified certificate "' + c.title + '" from ' + c.org + '! 🎓\n\n'
+    + 'Completed as a hands-on, quest-based course on the EchoLens platform.\n\n'
+    + 'Verify my certificate: ' + certUrl + '\n\n'
+    + 'Thank you @EchoLens Digital — Innovate · Educate · Elevate\n'
+    + '#EchoLens #EchoLensDigital #Certificate #NeverStopLearning';
+  document.getElementById('liShareBtn').href = 'https://www.linkedin.com/feed/?shareActive=true&text=' + encodeURIComponent(postText);
+  document.getElementById('imgBtn').href = '/api/cert-og/' + encodeURIComponent(c.serial) + '.png';
+  document.getElementById('shareHint').style.display = '';
   document.getElementById('actions').style.display = '';
 })();
 </script>

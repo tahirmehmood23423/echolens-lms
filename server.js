@@ -20,6 +20,7 @@ const ai = require('./ai');
 const mailer = require('./mailer');
 const jaas = require('./jaas');
 const { challanPdf } = require('./challan-pdf');
+const { certificatePng } = require('./cert-image');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
@@ -2959,8 +2960,48 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'log
 app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/grade', (req, res) => res.sendFile(path.join(__dirname, 'public', 'grade.html')));
-app.get('/cert', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cert.html')));
-app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cert.html')));
+// v18: /cert carries OpenGraph tags for the specific certificate, so pasting
+// (or prefilling) the link on LinkedIn/WhatsApp shows the certificate as a
+// PICTURE in the post - social crawlers never run JavaScript, so the tags
+// must be injected server-side.
+function certPageWithOg(req, res) {
+  let html = fs.readFileSync(path.join(__dirname, 'public', 'cert.html'), 'utf8');
+  const c = req.query.s ? Certificates.bySerial(String(req.query.s)) : null;
+  if (c) {
+    const url = `${APP_URL}/cert?s=${encodeURIComponent(c.serial)}`;
+    const escA = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    const og = `
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EchoLens Digital">
+<meta property="og:title" content="${escA(c.student_name)} - ${escA(c.title)} | Verified Certificate">
+<meta property="og:description" content="${escA(c.student_name)} earned the verified certificate &quot;${escA(c.title)}&quot; from EchoLens Digital. Serial ${escA(c.serial)} - scan or open to verify authenticity.">
+<meta property="og:url" content="${escA(url)}">
+<meta property="og:image" content="${escA(APP_URL)}/api/cert-og/${encodeURIComponent(c.serial)}.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${escA(APP_URL)}/api/cert-og/${encodeURIComponent(c.serial)}.png">`;
+    html = html.replace('</title>', '</title>' + og);
+  }
+  res.type('html').send(html);
+}
+app.get('/cert', certPageWithOg);
+app.get('/verify', certPageWithOg);
+// The certificate as a shareable 1200x630 PNG - used as the og:image and
+// downloadable for posting anywhere.
+app.get('/api/cert-og/:serial.png', async (req, res) => {
+  const c = Certificates.bySerial(req.params.serial);
+  if (!c) return res.status(404).json({ error: 'No certificate exists for this serial.' });
+  try {
+    const png = await certificatePng(Certificates.publicView(c), `${APP_URL}/cert?s=${c.serial}`);
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(png);
+  } catch (e) {
+    console.error('Certificate image failed:', e.message);
+    res.status(500).json({ error: 'Could not render the certificate image.' });
+  }
+});
 app.get('/challan', (req, res) => res.sendFile(path.join(__dirname, 'public', 'challan.html')));
 
 app.use((err, req, res, next) => {

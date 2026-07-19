@@ -3385,6 +3385,7 @@ function openTask(qid, pid) {
     : `<option value="python"${prevLang === 'python' ? ' selected' : ''}>Python 3</option>
        <option value="c"${prevLang === 'c' ? ' selected' : ''}>C</option>
        <option value="cpp"${prevLang === 'cpp' ? ' selected' : ''}>C++</option>
+       <option value="java"${prevLang === 'java' ? ' selected' : ''}>Java</option>
        <option value="sql"${prevLang === 'sql' ? ' selected' : ''}>SQL</option>
        <option value="web"${prevLang === 'web' ? ' selected' : ''}>HTML / CSS / JS</option>
        <option value="text"${prevLang === 'text' ? ' selected' : ''}>Written answer</option>`;
@@ -4481,7 +4482,7 @@ function formEvent() {
       <div class="form-grid">
         <label class="field"><span>Built-in compiler</span><select name="compiler">
           <option value="none">None (file / link submissions)</option><option value="python">Python 3</option>
-          <option value="c">C</option><option value="cpp">C++</option><option value="sql">SQL</option><option value="web">HTML / CSS / JS</option></select></label>
+          <option value="c">C</option><option value="cpp">C++</option><option value="java">Java</option><option value="sql">SQL</option><option value="web">HTML / CSS / JS</option></select></label>
         <label class="field"><span>Dataset URL (optional)</span><input name="dataset_url" type="url" placeholder="https://.../data.csv - mounted into the compiler"></label>
         <label class="field"><span>Pass mark (%)</span><input name="pass_mark" type="number" min="0" max="100" value="60"></label>
       </div>

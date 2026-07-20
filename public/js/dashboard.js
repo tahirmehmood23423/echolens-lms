@@ -4500,10 +4500,11 @@ function formEvent() {
         <label class="field"><span>3rd prize gems</span><input name="prize3" type="number" min="0" value="75"></label>
       </div>
       <label class="field ev-webinar" style="display:none"><span>Meeting link (shown to registered participants)</span><input name="meeting_link" type="url" placeholder="https://meet.jit.si/echolens-webinar"></label>
-      <div style="display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 12px">
-        <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_grade" checked> AI auto-grading (score carries a 10% reduction)</label>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 4px">
+        <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_grade"> AI auto-grading (score carries a 10% reduction)</label>
         <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_certificate" checked> Automatic certificate at the pass mark</label>
       </div>
+      <p class="hint" style="margin:0 0 12px">Off by default - submissions wait for an admin to check and score them by hand from Events &rarr; Submissions. Turn AI auto-grading on only if you want scores generated instantly instead.</p>
       <div class="ev-probs">
         <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:6px">Tasks / problems</div>
         <div id="evProbList"><div class="s" style="color:var(--muted)">No tasks yet - add at least one for quests and competitions.</div></div>

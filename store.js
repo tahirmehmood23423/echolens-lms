@@ -1499,10 +1499,19 @@ const Certificates = {
     while (data.certificates.some((c) => c.serial === s));
     return s;
   },
-  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by, concepts, final_project }) {
+  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by, concepts, final_project, source_kind, source_id }) {
     const u = Users.byId(user_id); if (!u) return { error: 'Student not found.' };
-    // One certificate per student per course/title - reissue replaces it.
-    data.certificates = data.certificates.filter((c) => !(c.user_id === u.id && c.title === title));
+    // v18: when the caller knows the exact source (a specific event id or
+    // track key), replace-on-reissue is scoped to THAT source - so a new
+    // event that merely shares a title with an old one gets its own fresh
+    // certificate instead of silently colliding with the old one. Manual
+    // issuance (no source given, e.g. a batch course certificate) keeps the
+    // original one-per-title-per-student behaviour.
+    if (source_kind && source_id != null) {
+      data.certificates = data.certificates.filter((c) => !(c.user_id === u.id && c.source_kind === source_kind && String(c.source_id) === String(source_id)));
+    } else {
+      data.certificates = data.certificates.filter((c) => !(c.user_id === u.id && c.title === title));
+    }
     const instructor = instructor_id ? Users.byId(instructor_id) : null;
     const cert = {
       id: nextId('certificates'), serial: Certificates.serial(),
@@ -1516,6 +1525,7 @@ const Certificates = {
       instructor_sig: instructor ? (instructor.signature || null) : null,
       concepts: Array.isArray(concepts) ? concepts.slice(0, 40) : [],
       final_project: final_project || null,
+      source_kind: source_kind || null, source_id: source_id != null ? source_id : null,
       issued_by, issued_at: now(),
     };
     data.certificates.push(cert); save();
@@ -1942,7 +1952,11 @@ const Events = {
     if (!ev.auto_certificate) return null;
     const prog = Events.progressFor(ev, uid);
     if (!prog.passed) return null;
-    const already = data.certificates.find((c) => c.user_id === Number(uid) && c.title === ev.title);
+    // v18: dedup by THIS event's id, not by title - two different events
+    // that happen to share a title (e.g. two test runs) must each issue and
+    // email their own certificate instead of the second one silently
+    // colliding with the first and going quiet.
+    const already = data.certificates.find((c) => c.user_id === Number(uid) && c.source_kind === 'event' && String(c.source_id) === String(ev.id));
     if (already) return { cert: already, existing: true };
     const kindMap = { quest: 'quest', hackathon: 'hackathon', competition: 'competition', webinar: 'webinar' };
     const out = Certificates.issue({
@@ -1951,6 +1965,7 @@ const Events = {
       user_id: uid, batch_id: null, kind: kindMap[ev.kind] || 'course', title: ev.title,
       completion_date: today(), detail: null,
       instructor_id: null, issued_by: issuedBy || ev.created_by,
+      source_kind: 'event', source_id: ev.id,
     });
     if (out.ok) {
       const subs = data.event_submissions.filter((s) => s.event_id === ev.id && s.user_id === Number(uid));
@@ -2320,7 +2335,8 @@ const OpenQuest = {
     if (!t || !t.free) return null;
     const prog = OpenQuest.progress(uid, track_key);
     if (!prog || !prog.passed) return null;
-    const already = data.certificates.find((c) => c.user_id === Number(uid) && c.title === t.title);
+    // v18: dedup by THIS track's key, not by title.
+    const already = data.certificates.find((c) => c.user_id === Number(uid) && c.source_kind === 'track' && c.source_id === track_key);
     if (already) return { cert: already, existing: true };
     const out = Certificates.issue({
       // v18: certificates never carry grade, pass-mark or grading-method
@@ -2328,6 +2344,7 @@ const OpenQuest = {
       user_id: uid, batch_id: null, kind: 'course', title: t.title,
       completion_date: today(), detail: null,
       instructor_id: null, issued_by: issuedBy || 1,
+      source_kind: 'track', source_id: track_key,
     });
     return out.ok ? { cert: out.cert } : null;
   },

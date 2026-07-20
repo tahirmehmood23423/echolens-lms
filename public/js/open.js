@@ -112,13 +112,16 @@ let CUR_EVENT = null;
   const catReady = loadCatalogue();
   loadAnnouncements();
   loadHomeStats();
-  if (ME) { loadEvents(); loadCerts(); } else { $('evList').innerHTML = gateCardHtml('Events are for signed-in members - creating a free account takes a minute.'); }
+  // v18: browsing is public. Events and hackathons are always LISTED (the
+  // public endpoint when signed out); joining them is what needs an account.
+  loadEvents();
+  if (ME) loadCerts();
   // Deep links: /open#courses, #events, #announcements, #register, #signup
   const h = (location.hash || '').replace('#', '');
   if (['courses', 'events', 'announcements'].includes(h)) openTab(h);
   else if (h === 'home') openTab('courses'); // the old portal home page merged into Courses
   else if (h === 'quests') openTab('courses'); // quests now live inside each course
-  else if (h === 'free') { openTab('courses'); setCoursePill('free'); if (!ME) gate(); } // straight to the free certified courses
+  else if (h === 'free') { openTab('courses'); setCoursePill('free'); } // browse the free courses openly; signing in is asked only on solving
   else if (h === 'profile') openProfileTab();
   // #register opens the in-site enrolment form; #register-<CODE> preselects
   // that course. Wait for the catalogue so the course dropdown is populated.
@@ -133,8 +136,9 @@ function drawUserBox() {
        <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
        ${ME.role !== 'free' ? '<a class="btn btn-teal btn-sm" href="/dashboard" style="margin-right:8px">LMS Portal</a>' : ''}
        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`
-    : `<a class="btn btn-ghost btn-sm" href="/login" style="margin-right:8px">Login</a>
-       <button class="btn btn-primary btn-sm" onclick="gate()">Get Started</button>`;
+    : `<a class="btn btn-ghost btn-sm" href="/login" style="margin-right:8px" title="For enrolled students and staff">LMS Portal</a>
+       <button class="btn btn-ghost btn-sm" style="margin-right:8px" onclick="gate()" title="Free account - for the compiler, free courses, events and hackathons">Sign in free</button>
+       <button class="btn btn-primary btn-sm" onclick="openRegister()" title="Join a paid course - no account needed to register">Register for a course</button>`;
 }
 async function logout() { try { await api('/api/auth/logout', { method: 'POST' }); } catch {} location.reload(); }
 
@@ -151,10 +155,17 @@ function gateCardHtml(msg) {
   </div>`;
 }
 function gate(afterMsg) {
+  // Three different doors, spelled out so nobody knocks on the wrong one:
+  // free account (this modal), LMS Portal login (enrolled/staff), and
+  // course registration (no account needed at all).
   openModal('Sign in to EchoLens - free', `
-    <p class="s" style="color:var(--muted);margin-bottom:14px">${esc(afterMsg || 'Everything here is free - the quests, the compiler, the certificates. We just need to know who is learning.')}</p>
+    <p class="s" style="color:var(--muted);margin-bottom:14px">${esc(afterMsg || 'A free account is only needed to USE things: the compiler, the free courses, and joining events or hackathons. Browsing courses, outlines and projects needs no account at all.')}</p>
     <button class="btn btn-primary btn-block" style="margin-bottom:10px" onclick="showSignup()">Create a free account with email</button>
     <a class="btn btn-ghost btn-block" href="/login">Already have an account? Sign in</a>
+    <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px;font-size:12.5px;color:var(--muted);text-align:left">
+      <div style="margin-bottom:6px"><strong>Enrolled in a paid course, or staff?</strong> Use the same <a href="/login">sign-in page</a> with your LMS Portal account.</div>
+      <div><strong>Just want to join a paid course?</strong> <a href="#" onclick="closeModal();openRegister();return false">Register here</a> - no account needed; our Admissions Office emails you the fee challan.</div>
+    </div>
     <div id="signupArea" style="margin-top:14px"></div>`);
 }
 function showSignup() {
@@ -974,6 +985,7 @@ function svRunLabel(running) {
     : `<svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg>Run`;
 }
 async function runSolve() {
+  if (!ME) { gate('The compiler needs a free account - the course outline and every task stay open to read without one.'); return; }
   const btn = $('svRunBtn'); const status = $('svStatus'); const exec = $('svExecTime');
   const code = $('svCode').value;
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
@@ -1069,8 +1081,10 @@ const DIFF_DOT = { Easy: '#1FA36B', Medium: '#D89A00', Hard: '#D14370' };
 
 async function loadEvents() {
   try {
-    const d = await api('/api/events');
-    EV_ALL = d.events || [];
+    // Signed out: the public list (titles, kind, fee, dates, joined count) so
+    // anyone can SEE what is running; opening one asks for the free sign-in.
+    const d = ME ? await api('/api/events') : await api('/api/public/events');
+    EV_ALL = (d.events || []).map((e) => ({ problems: [], ...e }));
     renderEvTabs();
     renderEvStats();
     drawEventList();
@@ -1153,7 +1167,7 @@ function drawEventList() {
   $('evList').innerHTML = slice.map((ev) => {
     const diff = evDiff(ev);
     const durL = evDurLabel(ev);
-    const cta = ev.my_entry ? 'Continue' : ev.kind === 'webinar' ? 'Join Live' : ev.kind === 'quest' ? 'Open Quest' : 'View Details';
+    const cta = !ME ? 'Sign in to join' : ev.my_entry ? 'Continue' : ev.kind === 'webinar' ? 'Join Live' : ev.kind === 'quest' ? 'Open Quest' : 'View Details';
     const pill = ev.my_entry ? '<span class="ev-pill reg">Registered</span>'
       : ev.status === 'upcoming' ? '<span class="ev-pill up">Upcoming</span>'
       : ev.entry === 'paid' ? `<span class="ev-pill paid">PKR ${ev.fee_pkr}</span>`
@@ -1327,7 +1341,7 @@ function evCurProblem() { const ps = (CUR_EVENT && CUR_EVENT.event.problems) || 
 function evDraftKey(eid, pid) { return `echoev:${eid}:${pid || 0}:${(ME && ME.id) || 0}`; }
 
 async function openOpenEvent(id) {
-  if (!ME) { gate('Sign in free to join events and earn certificates.'); return; }
+  if (!ME) { gate('You can browse every event and hackathon freely - joining one needs a free account, so your submissions, gems and certificates have somewhere to live.'); return; }
   try {
     const d = await api(`/api/events/${id}`);
     CUR_EVENT = d;

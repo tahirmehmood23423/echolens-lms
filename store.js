@@ -115,6 +115,12 @@ function migrate() {
   for (const c of OFFICIAL_CATALOGUE) {
     if (c.code.startsWith('FC-') && !data.courses.some((x) => x.code === c.code)) { Courses.create(c); changed = true; }
   }
+  // v18: certificates issued before this release carried grade/pass-mark/
+  // AI-graded wording in `detail` - strip it from every already-issued
+  // certificate so old ones match the new grade-free design too.
+  for (const c of data.certificates) {
+    if (c.detail && /score \d|pass mark|ai graded/i.test(c.detail)) { c.detail = null; changed = true; }
+  }
   if (changed) save();
 }
 

@@ -1755,10 +1755,20 @@ async function evSubmitFile(form) {
   } catch (err) { toast(err.message, true); btn.disabled = false; btn.textContent = 'Submit for Grading'; }
 }
 function afterSubmitToast(out) {
+  const ev = CUR_EVENT && CUR_EVENT.event;
   if (out.cert) toast(`Passed — certificate ${out.cert.serial} issued. Find it under Events › My certificates.`);
-  else if (out.submission && out.submission.score != null) toast(`Graded: ${out.submission.score}/100.`);
+  else if (out.submission && out.submission.score != null) toast(`Graded: ${out.submission.score}/100. ${certGapMsg(out.progress, ev)}`);
   else toast('Submitted — it will be graded soon.');
   loadEvents(); loadCerts();
+}
+// Explains, in one line, exactly why a graded submission did NOT issue a
+// certificate yet - so "graded but no certificate" is never a mystery.
+function certGapMsg(prog, ev) {
+  if (!prog || !ev) return '';
+  if (!ev.auto_certificate) return 'This event does not auto-issue certificates.';
+  if (prog.graded < prog.total) return `${prog.graded}/${prog.total} tasks graded so far - your certificate issues once every task is graded and passing.`;
+  if (prog.avg != null && prog.avg < ev.pass_mark) return `Average ${prog.avg}% is below the ${ev.pass_mark}% pass mark needed.`;
+  return '';
 }
 
 /* -------- registration (modal) -------- */

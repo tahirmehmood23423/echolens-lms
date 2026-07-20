@@ -4798,9 +4798,18 @@ async function evScore(sid, eid) {
   const remarks = prompt('Feedback for the participant (optional):') || '';
   try {
     const out = await api(`/api/admin/event-submissions/${sid}/score`, { method: 'POST', body: JSON.stringify({ score, remarks }) });
-    toast(out.cert ? `Scored - and certificate ${out.cert.serial} was issued automatically.` : 'Scored.');
+    toast(out.cert ? `Scored - and certificate ${out.cert.serial} was issued automatically.` : `Scored. ${certGapMsg(out.progress, EV_CUR && EV_CUR.event)}`);
     openEvent(eid);
   } catch (e) { toast(e.message, true); }
+}
+// Explains, in one line, exactly why a graded submission did NOT issue a
+// certificate yet - so "graded but no certificate" is never a mystery.
+function certGapMsg(prog, ev) {
+  if (!prog || !ev) return '';
+  if (!ev.auto_certificate) return 'Automatic certificates are off for this event - turn them on when creating an event to auto-issue.';
+  if (prog.graded < prog.total) return `${prog.graded}/${prog.total} tasks graded so far - the certificate issues once every task is graded.`;
+  if (prog.avg != null && prog.avg < ev.pass_mark) return `Average ${prog.avg}% is below the ${ev.pass_mark}% pass mark needed for a certificate.`;
+  return '';
 }
 async function evDelFile(eid, name) {
   if (!confirm('Remove this document from the event?')) return;

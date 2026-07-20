@@ -2199,7 +2199,7 @@ app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (r
       }
     } catch (e) { console.error('Auto-grade failed:', e.message); /* stays pending for manual scoring */ }
   }
-  res.json({ ok: true, submission: graded || out.submission, cert: cert ? { serial: cert.serial, url: `${APP_URL}/cert?s=${cert.serial}` } : null });
+  res.json({ ok: true, submission: graded || out.submission, cert: cert ? { serial: cert.serial, url: `${APP_URL}/cert?s=${cert.serial}` } : null, progress: Events.progressFor(ev, req.user.id) });
 });
 // Discussion thread on an event - open to any signed-in user; staff or the
 // author can delete a comment.
@@ -2231,7 +2231,7 @@ app.post('/api/admin/event-submissions/:id/score', authRequired, adminRequired, 
     const u = Users.byId(s.user_id);
     if (u && u.email) mailer.notify(u.email, `Certificate earned - ${ev.title}`, `Congratulations ${u.name}! You passed "${ev.title}" - your verified certificate: ${APP_URL}/cert?s=${c.cert.serial}`);
   }
-  res.json({ ok: true, submission: s, cert: c && c.cert ? { serial: c.cert.serial } : null });
+  res.json({ ok: true, submission: s, cert: c && c.cert ? { serial: c.cert.serial } : null, progress: ev ? Events.progressFor(ev, s.user_id) : null });
 });
 
 /* ------------------------------ leads & email ------------------------------ */

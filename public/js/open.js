@@ -507,10 +507,20 @@ function courseOutlineHtml(t) {
       <span><strong style="color:var(--ink)">${esc(l.title)}</strong>${l.topic ? ` <span style="color:var(--muted)">- ${esc(l.topic)}</span>` : ''}</span>
     </li>`).join('');
   const concepts = (t.key_concepts || []).map((k) => `<span style="display:inline-block;font-size:12px;font-weight:600;color:var(--primary);border:1px solid var(--line);border-radius:999px;padding:4px 11px;margin:3px 4px 0 0">${esc(k)}</span>`).join('');
+  const clos = (t.clos || []).map((c, i) => `
+    <li style="display:flex;gap:10px;padding:6px 0;font-size:13.5px;line-height:1.5">
+      <span class="mono" style="color:var(--primary);font-weight:700;white-space:nowrap">CLO ${i + 1}</span>
+      <span>${esc(c.replace(/^CLO\s*\d+:\s*/i, ''))}</span>
+    </li>`).join('');
   const ep = t.end_project;
   return `
     ${concepts ? `<div class="card" style="margin-bottom:16px"><div class="card-body">
       <h3 style="margin-bottom:6px">What you will learn</h3>${concepts}
+    </div></div>` : ''}
+    ${clos ? `<div class="card" style="margin-bottom:16px"><div class="card-body">
+      <h3 style="margin-bottom:4px">Course learning outcomes</h3>
+      <p class="s" style="color:var(--muted);margin-bottom:4px">By the end of this course, you will be able to:</p>
+      <ul style="list-style:none;padding:0;margin:0">${clos}</ul>
     </div></div>` : ''}
     <div class="card" style="margin-bottom:16px"><div class="card-body">
       <h3 style="margin-bottom:4px">Course outline</h3>
@@ -1142,6 +1152,7 @@ function evKindClass(ev) { return ev.status === 'live' && ev.kind !== 'quest' ? 
 function evKindTag(ev) { return ev.status === 'live' && ev.kind === 'webinar' ? 'Live Event' : (EV_KIND_TAG[ev.kind] || ev.kind); }
 
 function drawEventList() {
+  const fmtDeadline = (d) => { try { return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return d; } };
   const q = ($('evSearch').value || '').toLowerCase().trim();
   const fd = $('evDiff').value, fl = $('evLang').value, fdur = $('evDur').value, sort = $('evSort').value;
   let rows = EV_ALL.filter((e) => evTabFilter(EV_TAB, e));
@@ -1186,6 +1197,7 @@ function drawEventList() {
           <span class="m">${langI} ${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>
           <span class="m"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>
           ${durL ? `<span class="m">${clock} ${durL}</span>` : ''}
+          ${ev.deadline ? `<span class="m" style="color:var(--danger)">${clock} Due ${fmtDeadline(ev.deadline)}</span>` : ''}
         </div>
       </div>
       <div class="ev-aside" onclick="event.stopPropagation()">
@@ -1394,6 +1406,7 @@ function renderEventDetail() {
     ev.auto_grade ? `<span class="evd-tag">Instant Grading</span>` : '',
     ev.auto_grade ? `<span class="evd-tag">10% Reduction</span>` : '',
     ev.auto_certificate ? `<span class="evd-tag good">Certificate at ${ev.pass_mark}%+</span>` : '',
+    ev.deadline ? `<span class="evd-tag" style="color:#B23A3A">Due ${esc(new Date(ev.deadline + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))}</span>` : '',
   ].join('');
   const card = `<div class="evd-card">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px">

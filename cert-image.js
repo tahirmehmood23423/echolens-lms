@@ -8,6 +8,7 @@
  */
 
 const sharp = require('sharp');
+const QRCode = require('qrcode');
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -27,9 +28,14 @@ async function certificatePng(c, verifyUrl) {
   const kindTitle = c.kind === 'hackathon' ? 'CERTIFICATE OF PARTICIPATION' : c.kind === 'competition' ? 'CERTIFICATE OF ACHIEVEMENT' : 'CERTIFICATE OF COMPLETION';
   const t = titleLines(c.title);
   const titleSvg = t.lines.length === 1
-    ? `<text x="600" y="382" text-anchor="middle" font-family="Georgia, serif" font-size="${t.size}" font-weight="bold" fill="#16233A">${esc(t.lines[0])}</text>`
-    : `<text x="600" y="368" text-anchor="middle" font-family="Georgia, serif" font-size="${t.size}" font-weight="bold" fill="#16233A">${esc(t.lines[0])}</text>
-       <text x="600" y="368" dy="${t.size + 8}" text-anchor="middle" font-family="Georgia, serif" font-size="${t.size}" font-weight="bold" fill="#16233A">${esc(t.lines[1])}</text>`;
+    ? `<text x="600" y="368" text-anchor="middle" font-family="Georgia, serif" font-size="${t.size}" font-weight="bold" fill="#16233A">${esc(t.lines[0])}</text>`
+    : `<text x="600" y="354" text-anchor="middle" font-family="Georgia, serif" font-size="${t.size}" font-weight="bold" fill="#16233A">${esc(t.lines[0])}</text>
+       <text x="600" y="354" dy="${t.size + 8}" text-anchor="middle" font-family="Georgia, serif" font-size="${t.size}" font-weight="bold" fill="#16233A">${esc(t.lines[1])}</text>`;
+
+  // Every downloadable/shareable certificate carries the same QR the web
+  // page shows, embedded as a raster image so it survives outside a browser.
+  const qrDataUrl = await QRCode.toDataURL(verifyUrl, { width: 168, margin: 0, color: { dark: '#16233A', light: '#00000000' } });
+  const ceoName = c.ceo_name || 'Tahir Mehmood';
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <defs>
@@ -43,21 +49,32 @@ async function certificatePng(c, verifyUrl) {
   <rect x="44" y="52" width="1112" height="534" rx="12" fill="none" stroke="#D9A425" stroke-width="3"/>
   <rect x="54" y="62" width="1092" height="514" rx="9" fill="none" stroke="#EAD9A6" stroke-width="1.5"/>
 
-  <text x="600" y="126" text-anchor="middle" font-family="Georgia, serif" font-size="40" font-weight="bold" fill="#16233A">${esc(c.org || 'EchoLens Digital')}</text>
-  <text x="600" y="156" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" letter-spacing="4" fill="#5B6B84">${esc((c.tagline || 'Innovate · Educate · Elevate').toUpperCase())}</text>
-  <text x="600" y="212" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="bold" letter-spacing="7" fill="#D9A425">${esc(kindTitle)}</text>
+  <text x="600" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="36" font-weight="bold" fill="#16233A">${esc(c.org || 'EchoLens Digital')}</text>
+  <text x="600" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" letter-spacing="4" fill="#5B6B84">${esc((c.tagline || 'Innovate · Educate · Elevate').toUpperCase())}</text>
+  <text x="600" y="192" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="bold" letter-spacing="6" fill="#D9A425">${esc(kindTitle)}</text>
 
-  <text x="600" y="252" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#5B6B84">This is to certify that</text>
-  <text x="600" y="312" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="bold" fill="#16233A">${esc(c.student_name)}</text>
-  <text x="600" y="344" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#5B6B84">has successfully completed</text>
+  <text x="600" y="230" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#5B6B84">This is to certify that</text>
+  <text x="600" y="288" text-anchor="middle" font-family="Georgia, serif" font-size="48" font-weight="bold" fill="#16233A">${esc(c.student_name)}</text>
+  <text x="600" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#5B6B84">has successfully completed</text>
   ${titleSvg}
 
-  <text x="600" y="452" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#16233A">Date of completion: <tspan font-weight="bold">${esc(fmt(c.completion_date))}</tspan></text>
+  <text x="600" y="432" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#16233A">Date of completion: <tspan font-weight="bold">${esc(fmt(c.completion_date))}</tspan></text>
 
+  <!-- QR (left) - the same verification code the web certificate shows. -->
+  <image x="120" y="466" width="88" height="88" href="${qrDataUrl}"/>
+  <text x="164" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#5B6B84">Scan to verify</text>
+
+  <!-- Verified-issuer badge (centre). -->
   <rect x="420" y="486" width="360" height="42" rx="21" fill="#16233A"/>
   <text x="600" y="513" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">&#10003; Verified issuer &#183; EchoLens</text>
 
-  <text x="600" y="560" text-anchor="middle" font-family="Courier New, monospace" font-size="14" fill="#5B6B84">Serial ${esc(c.serial)} &#183; Verify at ${esc(verifyUrl)}</text>
+  <!-- Typed CEO signature (right) - the name itself is the digital signature, no scanned image. -->
+  <text x="1030" y="510" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="26" fill="#16233A">${esc(ceoName)}</text>
+  <line x1="960" y1="524" x2="1100" y2="524" stroke="#16233A" stroke-width="1.5"/>
+  <text x="1030" y="540" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#16233A">${esc(ceoName)}</text>
+  <text x="1030" y="554" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" letter-spacing="1" fill="#5B6B84">CEO, ${esc((c.org || 'ECHOLENS').toUpperCase())}</text>
+
+  <text x="600" y="590" text-anchor="middle" font-family="Courier New, monospace" font-size="13" fill="#5B6B84">Serial ${esc(c.serial)}</text>
 </svg>`;
 
   return sharp(Buffer.from(svg)).png().toBuffer();

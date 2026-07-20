@@ -7,6 +7,11 @@ module.exports = [
 {
   key: 'st01-wordpress', course_code: 'ST-01', title: 'WordPress Development',
   description: '2-month quest: from local install to a client-ready website delivery.',
+  clos: [
+    'CLO1: Install and configure WordPress locally and build custom themes and page layouts.',
+    'CLO2: Extend site functionality with plugins and WooCommerce for a working online store.',
+    'CLO3: Deliver a polished, client-ready WordPress site through a real client-delivery workflow.',
+  ],
   pass_mark: 60, titleNames: ['Site Starter', 'Theme Tamer', 'Plugin Pro', 'Client Builder', 'WP Developer'],
   levels: [
     { no: 1, week: 1, session: 2, title: 'Local Foundations', topic: 'Install, dashboard, posts vs pages, media',
@@ -83,6 +88,11 @@ module.exports = [
 {
   key: 'st02-graphic-design', course_code: 'ST-02', title: 'Graphic Designing',
   description: '2-month quest: from design fundamentals to a client-ready brand identity system.',
+  clos: [
+    'CLO1: Apply core design fundamentals - colour, type, composition - to produce professional visual work.',
+    'CLO2: Build a complete brand identity system including logo, guidelines and collateral.',
+    'CLO3: Deliver a client-ready brand package matching real agency delivery standards.',
+  ],
   pass_mark: 60, titleNames: ['Pixel Novice', 'Layout Learner', 'Color Crafter', 'Brand Builder', 'Visual Designer'],
   levels: [
     { no: 1, week: 1, session: 2, title: 'Eyes Before Hands', topic: 'Design principles: hierarchy, contrast, alignment',
@@ -159,6 +169,11 @@ module.exports = [
 {
   key: 'st03-uiux', course_code: 'ST-03', title: 'UI/UX Designing',
   description: '2-month quest: from user research to a tested, developer-ready Figma prototype.',
+  clos: [
+    'CLO1: Conduct user research and translate findings into information architecture and user flows.',
+    'CLO2: Design high-fidelity interfaces in Figma with a consistent, reusable design system.',
+    'CLO3: Build and usability-test a developer-ready prototype, documented as a product case study.',
+  ],
   pass_mark: 60, titleNames: ['UX Explorer', 'Wireframe Weaver', 'Flow Designer', 'Prototype Pro', 'Product Designer'],
   levels: [
     { no: 1, week: 1, session: 2, title: 'Users First', topic: 'UX research: interviews, personas, journeys',
@@ -235,6 +250,11 @@ module.exports = [
 {
   key: 'st04-data-analytics', course_code: 'ST-04', title: 'Data Analytics Specialist Track',
   description: '2-month quest: the full analyst workflow - Python, SQL, statistics, and executive storytelling.',
+  clos: [
+    'CLO1: Use Python and SQL together to extract, clean and analyse real-world datasets.',
+    'CLO2: Apply statistical methods correctly to draw honest, defensible conclusions from data.',
+    'CLO3: Communicate analysis results to a non-technical, executive audience in a portfolio project.',
+  ],
   pass_mark: 60, titleNames: ['Data Rookie', 'Query Analyst', 'Stat Sleuth', 'Insight Lead', 'Analytics Specialist'],
   levels: [
     { no: 1, week: 1, session: 2, title: 'Analyst Python', topic: 'pandas mastery for analysis',
@@ -311,6 +331,11 @@ module.exports = [
 {
   key: 'st05-genai-eng', course_code: 'ST-05', title: 'Generative AI Engineering',
   description: '2-month quest: engineering real LLM applications - RAG, evaluation, and production thinking.',
+  clos: [
+    'CLO1: Engineer LLM API calls with structured prompts and output for production use.',
+    'CLO2: Build a retrieval-augmented generation (RAG) system grounded on real data.',
+    'CLO3: Evaluate and productionise an LLM application with proper testing and deployment thinking.',
+  ],
   pass_mark: 60, titleNames: ['API Cadet', 'Prompt Engineer', 'RAG Builder', 'Eval Master', 'GenAI Engineer'],
   levels: [
     { no: 1, week: 1, session: 2, title: 'LLM API Engineering', topic: 'APIs, streaming, error handling, cost control',
@@ -387,6 +412,11 @@ module.exports = [
 {
   key: 'st06-ai-agents', course_code: 'ST-06', title: 'AI Agents & Automation Engineering',
   description: '2-month quest: from tool-calling basics to multi-step autonomous agents with guardrails.',
+  clos: [
+    'CLO1: Implement tool-calling so an AI agent can take real actions, not just respond with text.',
+    'CLO2: Build a multi-step agent loop that plans, acts and adapts across steps.',
+    'CLO3: Orchestrate multiple agents with guardrails into a working autonomous assistant.',
+  ],
   pass_mark: 60, titleNames: ['Tool Caller', 'Loop Runner', 'Agent Smith', 'Orchestrator', 'Agent Engineer'],
   levels: [
     { no: 1, week: 1, session: 2, title: 'Tools in Hand', topic: 'Function calling fundamentals',
@@ -463,6 +493,11 @@ module.exports = [
 {
   key: 'st07-ml-fundamentals', course_code: 'ST-07', title: 'Machine Learning Fundamentals',
   description: '2-month quest: the complete classical ML toolkit with mathematical intuition and rigorous practice.',
+  clos: [
+    'CLO1: Apply classical ML algorithms - regression, trees, ensembles - with correct mathematical intuition.',
+    'CLO2: Engineer features and tune hyperparameters using rigorous cross-validation.',
+    'CLO3: Build and honestly evaluate a complete ML system end to end.',
+  ],
   pass_mark: 60, titleNames: ['Gradient Novice', 'Model Mechanic', 'Ensemble Rider', 'Tuning Expert', 'ML Engineer'],
   levels: [
     { no: 1, week: 1, session: 2, title: 'Under the Hood', topic: 'Gradient descent and linear models from scratch',
@@ -539,6 +574,11 @@ module.exports = [
 {
   key: 'st08-pytorch-dl', course_code: 'ST-08', title: 'Deep Learning with PyTorch',
   description: '2-month quest: tensors to trained networks - vision, transfer learning, and a deployed model.',
+  clos: [
+    'CLO1: Build neural networks in PyTorch using tensors and autograd from first principles.',
+    'CLO2: Train convolutional networks and apply transfer learning for computer vision tasks.',
+    'CLO3: Deploy a trained deep learning model as a working applied product.',
+  ],
   pass_mark: 60, titleNames: ['Tensor Trainee', 'Backprop Believer', 'Network Builder', 'Vision Voyager', 'DL Engineer'],
   levels: [
     { no: 1, week: 1, session: 2, title: 'Tensors and Autograd', topic: 'PyTorch fundamentals',

@@ -4341,23 +4341,14 @@ async function formCertSettings() {
     <form id="f">
       <label class="field"><span>Official company / academy name</span><input name="org" required value="${esc(s.org || '')}"></label>
       <label class="field"><span>Tagline (under the name)</span><input name="tagline" value="${esc(s.tagline || '')}"></label>
-      <label class="field"><span>CEO full name</span><input name="ceo_name" value="${esc(s.ceo_name || '')}" placeholder="Appears under the CEO signature"></label>
+      <label class="field"><span>CEO full name</span><input name="ceo_name" value="${esc(s.ceo_name || '')}" placeholder="Appears as the typed signature on every certificate"></label>
+      <p class="hint" style="margin:-4px 0 4px">The CEO signature is the name above, rendered in a script font on the certificate - no signature image is uploaded or used.</p>
       <button class="btn btn-primary btn-block">Save settings</button></form>
-    <form id="sigForm" style="margin-top:14px">
-      ${s.ceo_sig ? `<div style="margin-bottom:8px"><span class="s" style="color:var(--muted)">Current CEO signature:</span><br><img src="/api/public/cert-image/${esc(s.ceo_sig.split('/').pop())}" alt="CEO signature" style="max-height:64px;border:1px solid var(--line);border-radius:8px;padding:6px;background:#fff"></div>` : ''}
-      <label class="field"><span>CEO signature image (PNG, transparent background)</span><input name="file" type="file" accept=".png,.jpg,.jpeg,.webp" required></label>
-      <button class="btn btn-ghost btn-block">Upload CEO signature</button></form>
-    <p class="hint" style="margin-top:10px">Teachers upload their own signature from Profile &rarr; &#8942; &rarr; Certificate signature. Every certificate shows the instructor signature + the CEO signature + the official name set here.</p>`);
+    <p class="hint" style="margin-top:14px">Teachers upload their own signature from Profile &rarr; &#8942; &rarr; Certificate signature.</p>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target;
     try { await api('/api/admin/cert-settings', { method: 'POST', body: JSON.stringify({ org: f.org.value, tagline: f.tagline.value, ceo_name: f.ceo_name.value }) }); modalMsg('Settings saved.', true); }
     catch (err) { modalMsg(err.message); }
-  });
-  $('sigForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
-    try { await api('/api/admin/cert-settings/ceo-signature', { method: 'POST', body: new FormData(f) }); modalMsg('CEO signature uploaded.', true); }
-    catch (err) { modalMsg(err.message); }
-    btn.disabled = false;
   });
 }
 
@@ -4427,7 +4418,7 @@ async function renderEvents() {
     <div class="card"><div class="card-head"><h3>All events</h3></div><div class="card-body tight">
       ${d.events.length ? d.events.map((ev) => `
         <div class="list-row">
-          <div class="when">${evStatusBadge(ev.status)}<small>${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) : (ev.duration_minutes ? 'About ' + ev.duration_minutes + ' minutes' : 'open-ended')}</small></div>
+          <div class="when">${evStatusBadge(ev.status)}<small>${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) : (ev.duration_minutes ? 'About ' + ev.duration_minutes + ' minutes' : 'open-ended')}</small>${ev.deadline ? `<small style="color:var(--danger)">Due ${esc(evFmtDeadline(ev.deadline))}</small>` : ''}</div>
           <div class="grow">
             <div class="t"><span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}</span> &nbsp;${esc(ev.title)}
               <span class="s" style="font-weight:500;color:var(--muted)">&middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; ${ev.scope === 'both' ? 'Portal + open site' : ev.scope === 'open' ? 'Open site' : 'Portal only'}</span></div>
@@ -4435,7 +4426,8 @@ async function renderEvents() {
             ${ev.my_entry ? `<div class="s" style="color:var(--ok)">Registered${ev.my_entry.payment_status === 'pending' ? ' - <span style="color:var(--gold)">payment being verified</span>' : ev.my_entry.payment_status === 'rejected' ? ' - <span style="color:var(--danger)">payment rejected, contact admin</span>' : ''}${ev.my_progress && ev.my_progress.passed ? ' &middot; <strong>PASSED ' + ev.my_progress.avg + '%</strong>' : ev.my_progress && ev.my_progress.avg != null ? ' &middot; avg ' + ev.my_progress.avg + '%' : ''}</div>` : ''}
           </div>
           <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
-          ${d.is_admin ? `<button class="btn btn-ghost btn-sm" onclick="toggleEvent(${ev.id},${ev.open ? 'false' : 'true'})">${ev.open ? 'Close' : 'Reopen'}</button>
+          ${d.is_admin ? `<button class="btn btn-ghost btn-sm" onclick="formEventDeadline(${ev.id},'${esc(ev.deadline || '')}')">${ev.deadline ? 'Change deadline' : 'Set deadline'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleEvent(${ev.id},${ev.open ? 'false' : 'true'})">${ev.open ? 'Close' : 'Reopen'}</button>
           <button class="btn btn-danger btn-sm" onclick="delEvent(${ev.id})">Delete</button>` : ''}
         </div>`).join('') : '<div class="empty">No events yet' + (d.is_admin ? ' - create the first one.' : '. Watch this space.') + '</div>'}
     </div></div>`;
@@ -4443,6 +4435,21 @@ async function renderEvents() {
 async function toggleEvent(id, open) {
   try { await api(`/api/admin/events/${id}`, { method: 'PATCH', body: JSON.stringify({ open }) }); renderEvents(); }
   catch (e) { toast(e.message, true); }
+}
+function evFmtDeadline(d) {
+  try { return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return d; }
+}
+function formEventDeadline(id, current) {
+  openModal('Set deadline', `
+    <form id="f">
+      <label class="field"><span>Deadline</span><input name="deadline" type="date" value="${esc(current || '')}"></label>
+      <p class="hint">Registration and submissions for this event close at the end of this date. Leave blank and save to remove the deadline.</p>
+      <button class="btn btn-primary btn-block">Save deadline</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api(`/api/admin/events/${id}`, { method: 'PATCH', body: JSON.stringify({ deadline: f.deadline.value || null }) }); toast('Deadline saved.'); closeModal(); renderEvents(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
 }
 async function delEvent(id) {
   if (!confirm('Delete this event and all its registrations and submissions?')) return;
@@ -4472,6 +4479,7 @@ function formEvent() {
         <label class="field ev-timed"><span>Starts</span><input name="starts_at" type="datetime-local"></label>
         <label class="field ev-timed"><span>Ends</span><input name="ends_at" type="datetime-local"></label>
         <label class="field ev-quest"><span>Time to solve (minutes)</span><input name="duration_minutes" type="number" min="0" max="600" value="90" title="Open quests should be solvable in 60-90 minutes"></label>
+        <label class="field"><span>Deadline (optional)</span><input name="deadline" type="date" title="Registration and submissions close at the end of this date - leave blank for no deadline"></label>
       </div>
       <div id="evPaid" style="display:none">
         <div class="form-grid">

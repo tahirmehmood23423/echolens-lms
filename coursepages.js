@@ -175,6 +175,8 @@ function outlineSection(c) {
   const isBootcamp = c.tier === 'Bootcamp';
   const unit = isBootcamp ? 'Class' : 'Level';
   const concepts = (d.key_concepts || []).map((k) => `<span style="display:inline-block;font-size:12.5px;font-weight:600;color:#4F46E5;border:1px solid #D9DCEE;border-radius:999px;padding:5px 12px;margin:4px 6px 0 0">${esc(k)}</span>`).join('');
+  const clos = (d.clos || []).map((c, i) => `
+    <li style="padding:6px 0;font-size:15px;line-height:1.55;color:#374151"><b style="color:#4F46E5">CLO ${i + 1}.</b> ${esc(c.replace(/^CLO\s*\d+:\s*/i, ''))}</li>`).join('');
   const rows = d.levels.map((l) => `
     <li style="padding:8px 0;border-bottom:1px solid #F1F2F9;font-size:15px;line-height:1.55;color:#374151">
       <b style="color:#4F46E5">${unit} ${l.no}.</b> <b>${esc(l.title)}</b>${l.topic ? ` <span style="color:#6B7280">- ${esc(l.topic)}</span>` : ''}
@@ -182,6 +184,7 @@ function outlineSection(c) {
   const ep = d.end_project;
   return `
     ${concepts ? `<h2>What you will learn</h2><div>${concepts}</div>` : ''}
+    ${clos ? `<h2>Course learning outcomes</h2><p>By the end of this course, you will be able to:</p><ul style="list-style:none;padding:0;margin:8px 0 4px">${clos}</ul>` : ''}
     <h2>Course outline - ${unit.toLowerCase()} by ${unit.toLowerCase()}</h2>
     <p>${d.levels.length} ${unit.toLowerCase()}${d.levels.length === 1 ? '' : 'es'}, each with hands-on quests you clear in the portal${isBootcamp ? ' - the whole first week is open free' : ''}.</p>
     <ul style="list-style:none;padding:0;margin:8px 0 4px">${rows}</ul>

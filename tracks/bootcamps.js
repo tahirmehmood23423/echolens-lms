@@ -39,6 +39,11 @@ module.exports = [
     ],
     shipped_when: 'It runs end to end on live test accounts, handles a batch of ten sample leads correctly, and exports as a workflow file a client could import and deploy.',
   },
+  clos: [
+    'CLO1: Build multi-step automations in n8n or Make that connect real apps (Sheets, Gmail, Slack, Calendar) using triggers, data mapping, filters and conditional routing.',
+    'CLO2: Integrate AI model steps (Claude, GPT or Gemini) into a workflow to classify, summarise, translate and generate content from live data.',
+    'CLO3: Design, document and price a client-ready automation with error handling and deduplication that a business could deploy and pay for.',
+  ],
   pass_mark: 60, titleNames: ['Flow Rookie', 'Node Wrangler', 'Automation Architect', 'Workflow Wizard'],
   levels: [
     { no: 1, week: 1, session: 1, title: 'Your first working automation', topic: 'What a workflow really is: the trigger-then-action shape, nodes, testing, and when to pick n8n vs Make',
@@ -293,6 +298,11 @@ module.exports = [
     ],
     shipped_when: 'The assistant is live and shareable by link, behaves consistently across test inputs, stays on topic and refuses off-topic asks, and the pack is a clean document a buyer could use with no editing.',
   },
+  clos: [
+    'CLO1: Write structured, reliable prompts using the role-task-context-format-constraints method to get consistent professional output from an LLM.',
+    'CLO2: Apply the five core prompt patterns - rewrite, extract, summarise, classify, generate - and chain prompts into multi-step workflows.',
+    'CLO3: Build and package a custom assistant with guardrails into a reusable, sellable prompt product.',
+  ],
   pass_mark: 60, titleNames: ['Prompt Rookie', 'Context Crafter', 'Instruction Designer', 'Prompt Engineer'],
   levels: [
     { no: 1, week: 1, session: 1, title: 'The anatomy of a strong prompt', topic: 'Role, task, context, format, constraints - the five parts that separate a vague ask from a reliable one',
@@ -549,6 +559,11 @@ module.exports = [
     ],
     shipped_when: 'You run all three workflows on a real task in front of the class, the output is good enough to use as it is, and you can show the time you saved.',
   },
+  clos: [
+    'CLO1: Apply the five-part prompt structure to get AI to reliably help with studying, everyday work tasks and content creation.',
+    'CLO2: Evaluate AI-generated output for accuracy and mistakes before using it in real study, work or content decisions.',
+    'CLO3: Build a custom AI helper suited to one\'s own most frequent task and use it safely and honestly.',
+  ],
   pass_mark: 60, titleNames: ['AI Curious', 'Daily Driver', 'Productivity Pro', 'AI Power User'],
   levels: [
     { no: 1, week: 1, session: 1, title: 'Meeting AI properly', topic: 'What ChatGPT, Claude and Gemini actually do, choosing the right tool for the job, and the five parts of a strong prompt: role, task, context, format, limits',

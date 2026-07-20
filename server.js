@@ -1585,7 +1585,7 @@ app.get('/api/public/tracks/:key', (req, res) => {
       problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
     };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, key_concepts: t.key_concepts || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode }, levels, open_levels: openN });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode }, levels, open_levels: openN });
 });
 
 /* ================================ v11 routes ================================ */

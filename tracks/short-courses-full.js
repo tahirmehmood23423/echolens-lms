@@ -39,6 +39,11 @@ const python6w = {
     'Grouping, aggregation, and joins', 'Visualisation with Matplotlib and Seaborn',
     'Exploratory data analysis and statistics', 'First steps in scikit-learn',
   ],
+  clos: [
+    'CLO1: Write Python programs using core control flow, data structures and NumPy arrays to process data.',
+    'CLO2: Load, clean, transform, group and visualise real datasets using pandas, Matplotlib and Seaborn.',
+    'CLO3: Perform exploratory data analysis and build a first scikit-learn model into a portfolio-ready analysis notebook.',
+  ],
   pass_mark: 60, titleNames: ['Data Rookie', 'Frame Wrangler', 'Insight Analyst', 'Data Storyteller'],
   end_project: {
     title: 'An End-to-End Data Analysis Report',
@@ -169,6 +174,11 @@ const sc02 = {
     'Image generation and multimodal AI', 'Custom assistants and system prompts',
     'The LLM API and structured output', 'Retrieval and grounding on your data',
     'Building small GenAI features', 'Responsible, cost aware, ethical use',
+  ],
+  clos: [
+    'CLO1: Explain how LLMs and diffusion models work and prompt them reliably for text and image generation.',
+    'CLO2: Call an LLM API to build structured-output features and ground responses on custom data with retrieval.',
+    'CLO3: Ship a working chatbot or content tool that performs a genuine task, used responsibly and cost-consciously.',
   ],
   pass_mark: 60, titleNames: ['Prompt Rookie', 'Model Wrangler', 'GenAI Builder', 'AI Solution Architect'],
   end_project: {
@@ -301,6 +311,11 @@ const sc03 = {
     'Data modelling and relationships', 'DAX measures and time intelligence',
     'Dashboard design and interactivity', 'Publishing and data storytelling',
   ],
+  clos: [
+    'CLO1: Write real analytical SQL queries using joins, CTEs and window functions to clean and shape data.',
+    'CLO2: Build a Power BI data model with Power Query ETL and DAX measures for time-based analysis.',
+    'CLO3: Design and publish an interactive, stakeholder-ready dashboard that tells a clear data story.',
+  ],
   pass_mark: 60, titleNames: ['Query Rookie', 'Join Wrangler', 'BI Analyst', 'Dashboard Architect'],
   end_project: {
     title: 'A Stakeholder-Ready Analytics Dashboard',
@@ -431,6 +446,11 @@ const sc06 = {
     'Responsive, mobile first design', 'JavaScript and the DOM',
     'Fetch, APIs, and async JS', 'State and local storage',
     'Git, deployment, and tooling', 'Building and shipping a responsive site',
+  ],
+  clos: [
+    'CLO1: Build a responsive, accessible layout using semantic HTML, modern CSS, Flexbox and Grid.',
+    'CLO2: Use JavaScript and the DOM to add interactivity, fetch data from APIs and manage local state.',
+    'CLO3: Deploy a complete, responsive website with live data using Git and modern tooling.',
   ],
   pass_mark: 60, titleNames: ['Markup Rookie', 'Layout Wrangler', 'Frontend Builder', 'Portfolio Architect'],
   end_project: {
@@ -563,6 +583,11 @@ const sc07 = {
     'DOM manipulation and events', 'HTTP, REST, and fetch',
     'State, persistence, code organisation', 'The React mental model as a bridge',
   ],
+  clos: [
+    'CLO1: Apply closures, higher-order functions and modern ES6+ syntax to write clean, modular JavaScript.',
+    'CLO2: Use promises, async/await and fetch to build API-driven features with proper error handling.',
+    'CLO3: Manage application state and persistence to ship a complete, organised JavaScript app without a framework.',
+  ],
   pass_mark: 60, titleNames: ['Script Rookie', 'Async Wrangler', 'JS Engineer', 'App Architect'],
   end_project: {
     title: 'An API-Driven JavaScript App, Framework-Ready',
@@ -693,6 +718,11 @@ const sc04 = {
     'Classification and the confusion matrix', 'Trees, KNN, and Naive Bayes',
     'Feature engineering and encoding', 'Cross validation and hyperparameter tuning',
     'Ensembles, clustering, and PCA', 'Honest evaluation and avoiding leakage',
+  ],
+  clos: [
+    'CLO1: Frame a prediction problem and prepare data with feature engineering and encoding for modelling.',
+    'CLO2: Train and tune regression, classification and ensemble models using cross-validation.',
+    'CLO3: Evaluate a model honestly, avoiding overfitting and leakage, and defend the result in plain English.',
   ],
   pass_mark: 60, titleNames: ['Model Rookie', 'Feature Wrangler', 'Validation Analyst', 'ML Engineer'],
   end_project: {
@@ -826,6 +856,11 @@ const sc05 = {
     'Adding LLM steps to workflows', 'AI classification and content pipelines',
     'AI agents with memory and tools', 'Designing and delivering client automations',
   ],
+  clos: [
+    'CLO1: Design multi-app automations in n8n or Make with correct triggers, data mapping, error handling and scheduling.',
+    'CLO2: Add AI steps to automations for classification, content generation and document extraction.',
+    'CLO3: Deliver and document a connected automation suite a client could monitor and maintain.',
+  ],
   pass_mark: 60, titleNames: ['Flow Rookie', 'Integration Wrangler', 'AI Automator', 'Automation Architect'],
   end_project: {
     title: 'A Connected Business Automation Suite',
@@ -957,6 +992,11 @@ const sc08 = {
     'SEO and keyword research', 'SEO in the AI search era',
     'Meta and Google paid advertising', 'Email marketing and funnels',
     'Landing pages and conversion', 'Analytics, testing, and reporting',
+  ],
+  clos: [
+    'CLO1: Plan a marketing campaign with clear audience positioning, content strategy and keyword-researched SEO.',
+    'CLO2: Launch paid campaigns on Meta and Google Ads and build email funnels with landing pages.',
+    'CLO3: Track and report campaign performance using analytics and testing to show what actually worked.',
   ],
   pass_mark: 60, titleNames: ['Marketing Rookie', 'Channel Wrangler', 'Campaign Builder', 'Growth Strategist'],
   end_project: {
@@ -1090,6 +1130,11 @@ const sc09 = {
     'Discovery calls and negotiation', 'Contracts and getting paid safely',
     'Delivery, retention, and upsells', 'Systems, rates, and scaling',
   ],
+  clos: [
+    'CLO1: Define a positioned, priced service offer and build a portfolio and marketplace profiles that win clients.',
+    'CLO2: Write proposals and cold outreach that get replies, and run discovery calls that close work.',
+    'CLO3: Manage contracts, delivery and upsells, and build a 90-day plan to scale rates and income.',
+  ],
   pass_mark: 60, titleNames: ['Pitch Rookie', 'Proposal Wrangler', 'Client Closer', 'Freelance Pro'],
   end_project: {
     title: 'A Live Client Acquisition System',
@@ -1222,6 +1267,11 @@ const sc10 = {
     'Social graphics and collateral', 'Presentations and infographics',
     'AI image generation and editing', 'Export, handover, and portfolio',
   ],
+  clos: [
+    'CLO1: Apply design principles, colour theory and typography to build a consistent visual system.',
+    'CLO2: Design logos, brand kits and social/marketing collateral using Canva and Figma workflows.',
+    'CLO3: Use AI image generation and editing tools to assemble a client-ready brand identity portfolio.',
+  ],
   pass_mark: 60, titleNames: ['Design Rookie', 'Layout Wrangler', 'Brand Builder', 'Visual Designer'],
   end_project: {
     title: 'A Complete Brand Identity Package',
@@ -1353,6 +1403,11 @@ const sc11 = {
     'AI as a drafting partner', 'Humanising and fact checking AI text',
     'SEO and keyword led writing', 'Writing for AI search answers',
     'Copywriting frameworks and storytelling', 'Client work and a writing portfolio',
+  ],
+  clos: [
+    'CLO1: Write structured, on-voice content across formats - blog, social, email - with clear self-editing.',
+    'CLO2: Use AI as a drafting partner while fact-checking and humanising the output so it never reads as AI.',
+    'CLO3: Produce a keyword-led, multi-format content package ready for a client or employer portfolio.',
   ],
   pass_mark: 60, titleNames: ['Draft Rookie', 'Voice Wrangler', 'Content Crafter', 'Conversion Writer'],
   end_project: {

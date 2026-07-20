@@ -40,6 +40,11 @@ module.exports = [
     ],
     shipped_when: 'The link opens on someone else\'s phone, the layout does not break, the interactive feature works when they tap it, and you are willing to send it to a friend.',
   },
+  clos: [
+    'CLO1: Build a semantically correct, accessible web page using proper HTML structure, headings, links, images, lists and forms.',
+    'CLO2: Style a responsive layout with CSS and Flexbox that adapts cleanly between desktop and mobile.',
+    'CLO3: Add interactive JavaScript behaviour with DOM manipulation and click events to ship a working, deployed web page.',
+  ],
   pass_mark: 60, titleNames: ['Tag Beginner', 'Style Cadet', 'Script Starter', 'Page Builder'],
   levels: [
     { no: 1, week: 1, session: 1, title: 'The skeleton of a website', topic: 'How a browser reads an HTML file, semantic tags, heading hierarchy, links and images, and the lists and forms behind content that converts',
@@ -184,6 +189,11 @@ module.exports = [
     ],
     shipped_when: 'The live URL works, the tests pass, the code sits in a public repo with clean history, and you can open any file and explain it.',
   },
+  clos: [
+    'CLO1: Use an AI coding tool\'s tab, chat and agent modes to generate, edit and refactor real code with clear prompts and project context.',
+    'CLO2: Debug AI-assisted code for root cause rather than surface patches, and critically review AI-written tests, code and documentation.',
+    'CLO3: Ship a multi-file feature built in agent mode inside a real git repository while owning and reviewing every line.',
+  ],
   pass_mark: 60, titleNames: ['Prompt Coder', 'Pair Pilot', 'Review Captain', 'AI-Native Dev'],
   levels: [
     { no: 1, week: 1, session: 1, title: 'Setup and the mental model', topic: 'The three modes - tab to finish a line, chat to understand, agent to build - and the golden rule: you own the code',
@@ -442,6 +452,11 @@ module.exports = [
     ],
     shipped_when: 'A stranger can find your profile, click through to a live working project, understand what you do within ten seconds, and you have already sent your first real proposal.',
   },
+  clos: [
+    'CLO1: Use Git and GitHub to commit, branch, merge and resolve conflicts on a real, published project.',
+    'CLO2: Publish a live project with GitHub Pages and write a README that presents it professionally.',
+    'CLO3: Build optimised Upwork, Fiverr and LinkedIn profiles and send a first proposal that gets a reply.',
+  ],
   pass_mark: 60, titleNames: ['Commit Rookie', 'Branch Manager', 'Repo Publisher', 'Profile Pro'],
   levels: [
     { no: 1, week: 1, session: 1, title: 'Why version control, and Git basics', topic: 'What version control solves and why every team uses it, installing and configuring Git, init, add and commit, commit messages that mean something, and reading history with log and status',
@@ -585,6 +600,11 @@ module.exports = [
     ],
     shipped_when: 'A finished workbook a manager could read in two minutes, that regenerates when new data is added, delivered with the send-ready email.',
   },
+  clos: [
+    'CLO1: Clean, sort, filter and analyse data in Excel using core formulas, PivotTables and dashboard charts.',
+    'CLO2: Use AI to write, fix and explain formulas, and to accelerate data cleanup and text tasks.',
+    'CLO3: Build a repeatable, AI-assisted monthly reporting workflow that replaces a full day of manual work.',
+  ],
   pass_mark: 60, titleNames: ['Cell Starter', 'Formula Fixer', 'Report Builder', 'Office Automator'],
   levels: [
     { no: 1, week: 1, session: 1, title: 'Taming your data', topic: 'Raw data into a clean table: sorting, filtering, freezing panes and conditional formatting',
@@ -840,6 +860,11 @@ module.exports = [
     ],
     shipped_when: 'A client could post the whole week as it is: the pack is consistent, correctly sized, neatly organised, and presented as a finished deliverable.',
   },
+  clos: [
+    'CLO1: Design on-brand social posts, carousels and short-form video assets in Canva using a consistent brand kit.',
+    'CLO2: Use Canva\'s AI tools - Magic Design, Magic Write, Magic Media - to generate and edit content faster.',
+    'CLO3: Produce a full week of consistent, on-brand content for a brand in about an hour.',
+  ],
   pass_mark: 60, titleNames: ['Canvas Newbie', 'Brand Stylist', 'Content Machine', 'Visual Marketer'],
   levels: [
     { no: 1, week: 1, session: 1, title: 'Basics and a brand kit', topic: 'Templates, elements and text, setting up a brand kit, and why consistency is what looks professional',
@@ -1628,6 +1653,11 @@ module.exports = [
   key: 'st09-fullstack-js', course_code: 'ST-09',
   title: 'Full-Stack JavaScript: React, Node & PostgreSQL',
   description: '8-week flagship quest: build and deploy a complete production web application.',
+  clos: [
+    'CLO1: Build component-based React interfaces with correct state management and data fetching.',
+    'CLO2: Build a Node and Express API backed by PostgreSQL with proper data modelling.',
+    'CLO3: Integrate a frontend and backend into a complete application deployed to production.',
+  ],
   pass_mark: 65, titleNames: ['Stack Cadet', 'Component Dev', 'State Manager', 'API Builder', 'Data Modeler', 'Integrator', 'Deployer', 'Full-Stack Developer'],
   levels: [
     { no: 1, week: 1, title: 'Modern JS & Tooling', topic: 'ES modules, npm, Vite project anatomy',
@@ -1744,6 +1774,11 @@ module.exports = [
   key: 'st10-react-next', course_code: 'ST-10',
   title: 'React + Next.js Frontend Specialist',
   description: '8-week quest: component architecture, state management and server-side rendering.',
+  clos: [
+    'CLO1: Architect React applications using hooks and a clear state-management strategy.',
+    'CLO2: Build server-rendered pages and data fetching workflows with Next.js.',
+    'CLO3: Ship a performant, production-quality frontend with a consistent styling and UI system.',
+  ],
   pass_mark: 65, titleNames: ['React Rookie', 'Hook Handler', 'State Architect', 'Router Ranger', 'Next Navigator', 'Data Streamer', 'Performance Tuner', 'Frontend Specialist'],
   levels: [
     { no: 1, week: 1, title: 'React, Properly', topic: 'Components, props, composition patterns',
@@ -1860,6 +1895,11 @@ module.exports = [
   key: 'st11-flutter', course_code: 'ST-11',
   title: 'Mobile Apps with Flutter',
   description: '8-week quest: one codebase, two app stores - build and publish real Android & iOS apps.',
+  clos: [
+    'CLO1: Build mobile UIs in Dart and Flutter using widgets, layout and state management.',
+    'CLO2: Implement navigation, architecture and API/data integration in a real app.',
+    'CLO3: Publish a working Android and iOS app from one codebase to both app stores.',
+  ],
   pass_mark: 65, titleNames: ['Widget Novice', 'Layout Composer', 'State Keeper', 'Navigator', 'Data Binder', 'Native Bridger', 'Polisher', 'App Publisher'],
   levels: [
     { no: 1, week: 1, title: 'Dart Essentials', topic: 'Dart syntax, null safety, classes',
@@ -1970,6 +2010,11 @@ module.exports = [
   key: 'st12-video-editing', course_code: 'ST-12',
   title: 'Video Editing',
   description: '8-week quest: professional editing workflows, pacing and delivery for client work.',
+  clos: [
+    'CLO1: Edit footage for pacing, story and sound design using professional editing tools.',
+    'CLO2: Apply colour grading and motion graphics/titles to produce a polished final cut.',
+    'CLO3: Deliver a client-ready video in the correct formats for the intended platform.',
+  ],
   pass_mark: 60, titleNames: ['Cut Cadet', 'Timeline Tamer', 'Rhythm Editor', 'Sound Shaper', 'Color Grader', 'Motion Maker', 'Deliverable Pro', 'Professional Editor'],
   levels: [
     { no: 1, week: 1, title: 'The Editor Mindset', topic: 'Project setup, organization, the rough cut',

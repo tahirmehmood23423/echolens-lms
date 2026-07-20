@@ -1727,6 +1727,10 @@ const EVENT_LANGS = ['none', 'python', 'c', 'cpp', 'sql', 'web'];
 const Events = {
   byId(id) { return data.events.find((e) => e.id === Number(id)) || null; },
   status(ev) {
+    // v18: an admin-set deadline (a plain date) wins over everything else -
+    // once it has passed, the event is over for submissions no matter its
+    // kind or open flag. Open quests use this as their specific cutoff.
+    if (ev.deadline && today() > ev.deadline) return 'ended';
     if (ev.kind === 'quest' && !ev.starts_at) return ev.open ? 'live' : 'closed';
     const t = new Date().toISOString().slice(0, 16).replace('T', ' ');
     const st = String(ev.starts_at || '').replace('T', ' ');
@@ -1771,6 +1775,9 @@ const Events = {
       fee_pkr: Number(b.fee_pkr) || 0,
       pay_instructions: String(b.pay_instructions || '').slice(0, 1000) || null,
       starts_at: b.starts_at || null, ends_at: b.ends_at || null,
+      // Admin-set cutoff date for open quests (and any event): submissions
+      // and certificate eligibility close after this date.
+      deadline: /^\d{4}-\d{2}-\d{2}$/.test(String(b.deadline || '')) ? b.deadline : null,
       duration_minutes: Math.max(0, Math.min(600, Number(b.duration_minutes) || 0)) || null,
       pass_mark: Math.max(0, Math.min(100, Number(b.pass_mark) || 0)),
       auto_grade: !!b.auto_grade,
@@ -1796,6 +1803,7 @@ const Events = {
     if (b.fee_pkr !== undefined) ev.fee_pkr = Number(b.fee_pkr) || 0;
     if (b.starts_at !== undefined) ev.starts_at = b.starts_at || null;
     if (b.ends_at !== undefined) ev.ends_at = b.ends_at || null;
+    if (b.deadline !== undefined) ev.deadline = /^\d{4}-\d{2}-\d{2}$/.test(String(b.deadline || '')) ? b.deadline : null;
     if (b.duration_minutes !== undefined) ev.duration_minutes = Math.max(0, Math.min(600, Number(b.duration_minutes) || 0)) || null;
     if (b.pass_mark !== undefined) ev.pass_mark = Math.max(0, Math.min(100, Number(b.pass_mark) || 0));
     if (b.auto_grade !== undefined) ev.auto_grade = !!b.auto_grade;
@@ -1932,8 +1940,10 @@ const Events = {
     if (already) return { cert: already, existing: true };
     const kindMap = { quest: 'quest', hackathon: 'hackathon', competition: 'competition', webinar: 'webinar' };
     const out = Certificates.issue({
+      // v18: certificates never carry grade, pass-mark or grading-method
+      // info - just proof of completion.
       user_id: uid, batch_id: null, kind: kindMap[ev.kind] || 'course', title: ev.title,
-      completion_date: today(), detail: `Score ${prog.avg}% - pass mark ${ev.pass_mark}%${ev.auto_grade ? ' - AI graded' : ''}`,
+      completion_date: today(), detail: null,
       instructor_id: null, issued_by: issuedBy || ev.created_by,
     });
     if (out.ok) {
@@ -2008,7 +2018,7 @@ const Events = {
     return {
       id: d.id, kind: d.kind, title: d.title, description: d.description,
       entry: d.entry, fee_pkr: d.fee_pkr, pay_instructions: d.pay_instructions,
-      starts_at: d.starts_at, ends_at: d.ends_at, duration_minutes: d.duration_minutes,
+      starts_at: d.starts_at, ends_at: d.ends_at, deadline: d.deadline, duration_minutes: d.duration_minutes,
       pass_mark: d.pass_mark, auto_grade: d.auto_grade, auto_certificate: d.auto_certificate,
       compiler: d.compiler, status: d.status, entries_count: d.entries_count,
       problems_count: (d.problems || []).length, prizes: d.prizes, meeting_link: null,
@@ -2307,8 +2317,10 @@ const OpenQuest = {
     const already = data.certificates.find((c) => c.user_id === Number(uid) && c.title === t.title);
     if (already) return { cert: already, existing: true };
     const out = Certificates.issue({
+      // v18: certificates never carry grade, pass-mark or grading-method
+      // info - just proof of completion.
       user_id: uid, batch_id: null, kind: 'course', title: t.title,
-      completion_date: today(), detail: `Free open course - score ${prog.avg}%, pass mark ${t.pass_mark || 60}% - AI graded`,
+      completion_date: today(), detail: null,
       instructor_id: null, issued_by: issuedBy || 1,
     });
     return out.ok ? { cert: out.cert } : null;

@@ -24,13 +24,15 @@ const jaas = require('./jaas');
 const { challanPdf } = require('./challan-pdf');
 const { certificatePng } = require('./cert-image');
 const { ambassadorReportPdf } = require('./ambassador-report-pdf');
+const { generateContractPdf } = require('./contract-pdf');
+const { generateOfferLetterPdf } = require('./offer-letter-pdf');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
-  AmbassadorGemEvents, AmbassadorReports,
+  AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
@@ -63,6 +65,8 @@ const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 const AMBASSADOR_REPORTS_DIR = path.join(UPLOAD_DIR, 'ambassador-reports');
 fs.mkdirSync(AMBASSADOR_REPORTS_DIR, { recursive: true });
+const CONTRACTS_DIR = path.join(UPLOAD_DIR, 'contracts');
+fs.mkdirSync(CONTRACTS_DIR, { recursive: true });
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => cb(null, UPLOAD_DIR),
@@ -662,7 +666,10 @@ app.delete('/api/batches/:id/students/:uid', authRequired, adminRequired, (req, 
   Enrollments.remove(req.params.uid, req.params.id); res.json({ ok: true });
 });
 // Teachers: several per course. Add a new teacher by name, or an existing one by id/username.
-app.post('/api/batches/:id/teachers', authRequired, adminRequired, (req, res) => {
+// Assigning (not managing content/grading) is also open to student_coordinator,
+// so one instructor can be put on multiple courses by admin or Admissions Office.
+function canAssignInstructors(req, res, next) { if (['admin', 'student_coordinator'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
+app.post('/api/batches/:id/teachers', authRequired, canAssignInstructors, (req, res) => {
   const b = Batches.byId(req.params.id);
   if (!b) return res.status(404).json({ error: 'Course not found.' });
   const { name, existing } = req.body || {};
@@ -677,7 +684,7 @@ app.post('/api/batches/:id/teachers', authRequired, adminRequired, (req, res) =>
   Batches.addTeacher(b.id, user.id);
   res.json({ ok: true, teacher: { id: user.id, name: user.name }, credentials: { username: user.username, password } });
 });
-app.delete('/api/batches/:id/teachers/:uid', authRequired, adminRequired, (req, res) => {
+app.delete('/api/batches/:id/teachers/:uid', authRequired, canAssignInstructors, (req, res) => {
   Batches.removeTeacher(req.params.id, req.params.uid); res.json({ ok: true });
 });
 
@@ -706,7 +713,7 @@ app.post('/api/admin/users/:id/password', authRequired, adminRequired, (req, res
 });
 // Portal staff accounts are generated from a name + email; the credentials
 // (username, password, sign-in link) are emailed to that address directly.
-const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', ambassador: 'Ambassador' };
+const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', ambassador: 'Ambassador', instructor: 'Instructor', staff: 'Staff' };
 function mailStaffCredentials(user, password, role) {
   if (!user.email) return;
   mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
@@ -792,6 +799,54 @@ app.put('/api/hr/ambassadors/gem-rates', authRequired, hrOnly, (req, res) => res
 // Ambassador duty/task assignment now lives in the generic Departments
 // system (see below) - the "Ambassadors" department is auto-seeded and
 // every ambassador is auto-added to it in POST /api/hr/ambassadors above.
+
+/* ------------------------------- instructors (HR hire) -------------------------------
+ * HR creates instructors from a name + email, exactly like ambassadors: a
+ * portal login is issued and auto-added to the "Teachers" department. This
+ * is distinct from the older quick teacher-picker at
+ * POST /api/batches/:id/teachers (admin-only, no email/onboarding/contract) -
+ * that endpoint stays as a fast in-course fallback. An instructor hired here
+ * goes through onboarding (POST /api/me/onboarding) with mandatory
+ * qualification documents, which auto-generates and emails their contract. */
+function instructorLite(u) {
+  const batches = Batches.all().filter((b) => (b.instructor_ids || []).includes(u.id))
+    .map((b) => ({ id: b.id, code: b.code, name: b.name, title: b.title, status: b.status }));
+  return { id: u.id, name: u.name, email: u.email, instructor_tag: (u.profile || {}).instructor_tag || null, batches };
+}
+app.get('/api/hr/instructors', authRequired, hrOnly, (req, res) => {
+  res.json({ instructors: Users.all().filter((u) => u.role === 'instructor').map(instructorLite) });
+});
+app.post('/api/hr/instructors', authRequired, hrOnly, async (req, res) => {
+  const { name, email } = req.body || {};
+  if (!name || String(name).trim().length < 2) return res.status(400).json({ error: "Enter the instructor's full name." });
+  const em = await validateStaffEmail(email, res, 'instructor'); if (!em) return;
+  const { user, password } = Users.create({ name: String(name).trim(), role: 'instructor', email: em, username: em });
+  const teachers = Departments.byName('Teachers');
+  if (teachers) DepartmentMembers.add(teachers.id, user.id, req.user.id);
+  mailStaffCredentials(user, password, 'instructor');
+  res.json({ ok: true, credentials: { name: user.name, username: user.username, password }, emailed: true });
+});
+// HR-set short specialization highlight (e.g. "AI Automation Instructor",
+// "Web Developer") - shown to admin/student_coordinator when assigning
+// instructors to courses.
+app.put('/api/hr/instructors/:userId/tag', authRequired, hrOnly, (req, res) => {
+  const target = Users.byId(req.params.userId);
+  if (!target || target.role !== 'instructor') return res.status(404).json({ error: 'Instructor not found.' });
+  Users.setInstructorTag(target.id, (req.body || {}).tag);
+  res.json({ ok: true, instructor: instructorLite(target) });
+});
+// Read-only instructor directory + a lightweight batch list, for the
+// "assign instructor to course" picker - open to admin/hr/student_coordinator
+// without exposing the full course-management surface (grading, lessons,
+// content stay admin+assigned-instructor only, per canManageBatch).
+app.get('/api/instructors-lite', authRequired, (req, res) => {
+  if (!['admin', 'hr', 'student_coordinator'].includes(req.user.role)) return res.status(403).json({ error: 'Not available for your role.' });
+  res.json({ instructors: Users.all().filter((u) => u.role === 'instructor').map(instructorLite) });
+});
+app.get('/api/course-batches-lite', authRequired, (req, res) => {
+  if (!['admin', 'hr', 'student_coordinator'].includes(req.user.role)) return res.status(403).json({ error: 'Not available for your role.' });
+  res.json({ batches: Batches.all().map((b) => ({ id: b.id, code: b.code, title: b.title, name: b.name, status: b.status, teachers: b.teachers })) });
+});
 
 /* --------------------- ambassador monthly commission reports ---------------------
  * On the 5th of every month, one PDF per active ambassador is generated on
@@ -882,9 +937,14 @@ function departmentDetail(d) {
     ...d,
     members: DepartmentMembers.forDepartment(d.id).map((m) => {
       const amb = Ambassadors.byUserId(m.user_id);
+      const staffRecord = m.user.role === 'staff' ? StaffRecords.byUserId(m.user_id) : null;
+      const contract = ['ambassador', 'instructor'].includes(m.user.role) ? Contracts.byUserId(m.user_id) : null;
       return {
         user_id: m.user_id, name: m.user.name, role: m.user.role, email: m.user.email,
         ambassador: amb ? { id: amb.id, code: amb.code, gems: amb.gems, university: amb.university } : null,
+        instructor_tag: m.user.role === 'instructor' ? ((m.user.profile || {}).instructor_tag || null) : undefined,
+        employment_type: staffRecord ? staffRecord.employment_type : undefined,
+        contract_status: contract ? contract.status : undefined,
       };
     }),
     tasks: DepartmentTasks.forDepartment(d.id),
@@ -1002,18 +1062,146 @@ app.post('/api/my-departments/tasks/:taskId/complete', authRequired, upload.sing
 });
 
 /* ------------------------------- onboarding -------------------------------
- * Instructors, staff and ambassadors must complete a first-login profile
- * (contact/address/qualifications/experience) before using their portal -
- * see requireOnboarding() in dashboard.js. */
-app.post('/api/me/onboarding', authRequired, (req, res) => {
-  if (!['instructor', 'staff', 'ambassador'].includes(req.user.role)) return res.status(403).json({ error: 'Not applicable for your role.' });
-  const { phone, address, education, experience_years } = req.body || {};
-  if (!phone || !String(phone).trim()) return res.status(400).json({ error: 'Phone number is required.' });
-  if (!address || !String(address).trim()) return res.status(400).json({ error: 'Address is required.' });
-  if (!education || !String(education).trim()) return res.status(400).json({ error: 'Education/qualification is required.' });
+ * Instructors, staff, ambassadors and HR must complete a first-login profile
+ * (contact/address/qualifications, plus mandatory documents for instructors)
+ * before using their portal - see requireOnboarding() in dashboard.js. For
+ * ambassador/instructor specifically, a successful submission auto-generates
+ * and emails their contract (see issueContract below). */
+const CONTRACT_DEADLINE_MS = 2 * 24 * 3600 * 1000; // 2 days to sign & submit
+async function writeContractPdf(user) {
+  const settings = Settings.cert();
+  const profile = user.profile || {};
+  const ambassador = user.role === 'ambassador' ? Ambassadors.byUserId(user.id) : null;
+  const pdfBuffer = await generateContractPdf({ role: user.role, user, profile, ambassador, settings });
+  const filename = `contract-${user.role}-${user.id}-${Date.now()}.pdf`;
+  fs.writeFileSync(path.join(CONTRACTS_DIR, filename), pdfBuffer);
+  return { filename, pdfBuffer };
+}
+function mailContract(user, pdfBuffer, deadline_at) {
+  mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[user.role]} contract`,
+    `${hi(user.name)},\n\nCongratulations - your details have been received. Attached is your ${STAFF_ROLE_LABEL[user.role]} contract.\n\nPlease print it, sign it, gather any documents it asks for, and upload everything as a single .zip file from your portal within 2 days (by ${new Date(deadline_at).toLocaleString('en-GB')}). Once we receive it, your official offer letter will follow by email.\n\nSign in at ${APP_URL}/login to submit.\n\nEchoLens Digital`,
+    [{ filename: `EchoLens-${STAFF_ROLE_LABEL[user.role]}-Contract.pdf`, content: pdfBuffer }]);
+}
+async function issueContract(user) {
+  const { filename, pdfBuffer } = await writeContractPdf(user);
+  const deadline_at = new Date(Date.now() + CONTRACT_DEADLINE_MS).toISOString();
+  const contract = Contracts.create({ user_id: user.id, role: user.role, pdf_filename: filename, deadline_at });
+  mailContract(user, pdfBuffer, deadline_at);
+  return contract;
+}
+function ceoSignatureBytes() {
+  const s = Settings.cert();
+  if (!s.ceo_sig) return null;
+  try { return fs.readFileSync(path.join(UPLOAD_DIR, path.basename(s.ceo_sig))); } catch { return null; }
+}
+async function issueOfferLetter(user, contract) {
+  const settings = { ...Settings.cert(), ceo_sig_bytes: ceoSignatureBytes() };
+  const profile = user.profile || {};
+  const ambassador = user.role === 'ambassador' ? Ambassadors.byUserId(user.id) : null;
+  const pdfBuffer = await generateOfferLetterPdf({ role: user.role, user, profile, ambassador, settings });
+  const filename = `offer-${user.role}-${user.id}-${Date.now()}.pdf`;
+  fs.writeFileSync(path.join(CONTRACTS_DIR, filename), pdfBuffer);
+  Contracts.markOfferLetterSent(contract.id, { offer_letter_filename: filename });
+  mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[user.role]} offer letter`,
+    `${hi(user.name)},\n\nThank you for returning your signed contract. Attached is your official EchoLens offer letter, confirming your appointment.\n\nWelcome aboard!\n\nEchoLens Digital`,
+    [{ filename: `EchoLens-${STAFF_ROLE_LABEL[user.role]}-Offer-Letter.pdf`, content: pdfBuffer }]);
+}
+const ONBOARDING_DOC_FIELDS = [{ name: 'degree_files', maxCount: 5 }, { name: 'transcript_files', maxCount: 5 }, { name: 'certification_files', maxCount: 5 }];
+app.post('/api/me/onboarding', authRequired, upload.fields(ONBOARDING_DOC_FIELDS), async (req, res) => {
+  const files = req.files || {};
+  const cleanup = () => { for (const key of Object.keys(files)) for (const f of files[key]) { try { fs.unlinkSync(f.path); } catch {} } };
+  if (!ONBOARDING_ROLES.includes(req.user.role)) { cleanup(); return res.status(403).json({ error: 'Not applicable for your role.' }); }
+  const { phone, whatsapp, father_name, address, education } = req.body || {};
+  const experience_years = req.body ? req.body.experience_years : undefined;
+  if (!phone || !String(phone).trim()) { cleanup(); return res.status(400).json({ error: 'Phone number is required.' }); }
+  if (!whatsapp || !String(whatsapp).trim()) { cleanup(); return res.status(400).json({ error: 'WhatsApp number is required.' }); }
+  if (!father_name || !String(father_name).trim()) { cleanup(); return res.status(400).json({ error: "Father's name is required." }); }
+  if (!address || !String(address).trim()) { cleanup(); return res.status(400).json({ error: 'Address is required.' }); }
+  if (!education || !String(education).trim()) { cleanup(); return res.status(400).json({ error: 'Highest qualification is required.' }); }
+  const docFields = {};
+  if (req.user.role === 'instructor') {
+    for (const [key, label, required] of [['degree_files', 'degree', true], ['transcript_files', 'transcript', true], ['certification_files', 'certification', false]]) {
+      const list = files[key] || [];
+      if (required && !list.length) { cleanup(); return res.status(400).json({ error: `Upload at least one ${label} document.` }); }
+      for (const f of list) {
+        const ext = path.extname(f.originalname).toLowerCase();
+        if (!DUTY_ATTACH_EXT.includes(ext)) { cleanup(); return res.status(400).json({ error: 'Only PDF, Word or image files (jpg/png/gif/webp) are accepted for documents.' }); }
+      }
+      docFields[key] = list.map((f) => ({ filename: f.filename, original_name: f.originalname }));
+    }
+  } else {
+    cleanup(); // documents are instructor-only; nothing else is expected/kept
+  }
   Users.updateProfile(req.user.id, { ...req.body, experience_years: experience_years === undefined ? '0' : experience_years });
+  if (req.user.role === 'instructor') Users.setInstructorDocs(req.user.id, docFields);
   Users.setOnboarded(req.user.id);
+  const freshUser = Users.byId(req.user.id);
+  if (CONTRACT_ROLES.includes(req.user.role) && freshUser.email) {
+    try {
+      const contract = await issueContract(freshUser);
+      return res.json({ ok: true, contract: { status: contract.status, deadline_at: contract.deadline_at } });
+    } catch (e) {
+      console.error('Contract generation failed:', e.message);
+      return res.json({ ok: true, contract_error: 'Your profile was saved, but the contract could not be generated automatically - contact HR.' });
+    }
+  }
   res.json({ ok: true });
+});
+
+/* --------------------------- contract sign & submit ---------------------------
+ * Ambassador/instructor only: after onboarding auto-emails the contract
+ * (issueContract above), the hire has 2 days to sign it by hand, gather any
+ * required documents, and upload everything as one .zip - which immediately
+ * triggers the offer letter (issueOfferLetter above). */
+app.get('/api/me/contract', authRequired, (req, res) => {
+  if (!CONTRACT_ROLES.includes(req.user.role)) return res.json({ contract: null });
+  res.json({ contract: Contracts.byUserId(req.user.id) });
+});
+app.post('/api/contract/submit', authRequired, upload.single('file'), (req, res) => {
+  const drop = () => { if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} } };
+  if (!CONTRACT_ROLES.includes(req.user.role)) { drop(); return res.status(403).json({ error: 'Not applicable for your role.' }); }
+  const contract = Contracts.byUserId(req.user.id);
+  if (!contract || contract.status !== 'sent') {
+    drop();
+    return res.status(400).json({ error: contract && contract.status === 'submitted' ? 'You have already submitted your signed contract.' : 'No contract is currently awaiting your signature.' });
+  }
+  if (!req.file) return res.status(400).json({ error: 'Attach your signed contract and documents as a single .zip file.' });
+  if (path.extname(req.file.originalname).toLowerCase() !== '.zip') { drop(); return res.status(400).json({ error: 'Only a .zip file is accepted - package your signed contract and documents together.' }); }
+  if (contract.deadline_at && new Date() > new Date(contract.deadline_at)) { drop(); return res.status(400).json({ error: 'The 2-day signing window has passed - contact HR to have your contract resent.' }); }
+  // Move the zip into the contracts dir (multer already dropped it in UPLOAD_DIR).
+  const dest = path.join(CONTRACTS_DIR, req.file.filename);
+  try { fs.renameSync(req.file.path, dest); } catch {}
+  const updated = Contracts.markSubmitted(contract.id, { submission_zip_filename: req.file.filename });
+  for (const h of Users.all().filter((u) => u.role === 'hr' && u.email)) {
+    mailer.notify(h.email, `Contract submitted: ${req.user.name}`,
+      `${hi(h.name)},\n\n${req.user.name} (${STAFF_ROLE_LABEL[req.user.role]}) has submitted their signed contract and documents. Their offer letter has been emailed automatically.\n\nSign in at ${APP_URL}/login to view the HR contract tracker.\n\nEchoLens Digital`);
+  }
+  issueOfferLetter(req.user, updated).catch((e) => console.error('Offer letter generation failed:', e.message));
+  res.json({ ok: true });
+});
+/* HR visibility into every contract, and a "resend" action that resets the
+ * 2-day deadline (the soft way this deadline is enforced - it flags overdue
+ * hires to HR rather than silently locking their account). */
+app.get('/api/hr/contracts', authRequired, hrOnly, (req, res) => {
+  res.json({
+    contracts: Contracts.all().map((c) => {
+      const u = Users.byId(c.user_id);
+      return { ...c, name: u ? u.name : 'Removed account', email: u ? u.email : null };
+    }),
+  });
+});
+app.post('/api/hr/contracts/:id/resend', authRequired, hrOnly, async (req, res) => {
+  const c = Contracts.byId(req.params.id);
+  if (!c) return res.status(404).json({ error: 'Contract not found.' });
+  const user = Users.byId(c.user_id);
+  if (!user) return res.status(404).json({ error: 'That account no longer exists.' });
+  try {
+    const { filename, pdfBuffer } = await writeContractPdf(user);
+    const deadline_at = new Date(Date.now() + CONTRACT_DEADLINE_MS).toISOString();
+    const fresh = Contracts.resend(c.id, { pdf_filename: filename, deadline_at });
+    mailContract(user, pdfBuffer, deadline_at);
+    res.json({ ok: true, contract: fresh });
+  } catch (e) { res.status(500).json({ error: 'Could not regenerate the contract: ' + e.message }); }
 });
 
 /* --------------------------- ambassador self-service --------------------------- */
@@ -3040,6 +3228,8 @@ app.post('/api/hr/staff', authRequired, hrOnly, async (req, res) => {
   const em = String(email).trim().toLowerCase();
   const { user, password } = Users.create({ name: String(name).trim(), role: 'staff', email: em, username: em });
   const record = StaffRecords.create({ user_id: user.id, name: user.name, email: em, phone, position, employment_type, group_id });
+  const dept = Departments.byName(record.employment_type === 'intern' ? 'Interns' : 'Staff');
+  if (dept) DepartmentMembers.add(dept.id, user.id, req.user.id);
   mailer.notify(em, 'Welcome to EchoLens - your staff account',
     `${hi(user.name)},\n\nYour EchoLens staff account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email to see your team, instructions, and follow-ups.`);
   res.json({ ok: true, staff: record, credentials: { name: user.name, username: user.username, password } });
@@ -3229,6 +3419,13 @@ function canAccessUpload(user, name) {
   }
   const os = d.open_submissions.find((s) => isFile(s.file_url) || (Array.isArray(s.files) && s.files.some((f) => isFile(f.url))));
   if (os) return os.user_id === user.id;
+  // Contracts, signed submissions and offer letters carry CNIC/personal legal
+  // data: the account they belong to, or HR.
+  const contract = d.contracts.find((c) => isFile(c.pdf_filename) || isFile(c.submission_zip_filename) || isFile(c.offer_letter_filename));
+  if (contract) return user.role === 'hr' || contract.user_id === user.id;
+  // Instructor onboarding documents (degree/transcript/certification).
+  const docOwner = d.users.find((u) => ['degree_files', 'transcript_files', 'certification_files'].some((k) => Array.isArray((u.profile || {})[k]) && u.profile[k].some((f) => isFile(f.filename))));
+  if (docOwner) return user.role === 'hr' || docOwner.id === user.id;
 
   return true; // shareable content (avatars, signatures, resources, datasets, event docs)
 }

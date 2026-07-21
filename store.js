@@ -38,7 +38,7 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
@@ -48,8 +48,9 @@ const empty = () => ({
   discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [], ambassadors: [],
   ambassador_gem_events: [], ambassador_duties: [], ambassador_duty_status: [], ambassador_reports: [],
   departments: [], department_members: [], department_tasks: [], department_task_status: [], department_announcements: [],
+  contracts: [],
   settings: {
-    cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' },
+    cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills', ntn: 'J372619', cuin: '0342802' },
     bank: { bank_name: 'Meezan Bank', account_title: 'EchoLens Digital (Pvt) Ltd', account_number: '0123-4567890-123', iban: 'PK36 MEZN 0000 0123 4567 8901', branch: 'Gulberg Branch, Lahore' },
     // Gems awarded to an ambassador when a student they referred is actually
     // enrolled into a batch (not just at interest-registration), weighted by
@@ -107,6 +108,10 @@ function migrate() {
   if (!data.settings.cert) { data.settings.cert = empty().settings.cert; changed = true; }
   if (!data.settings.bank) { data.settings.bank = empty().settings.bank; changed = true; }
   if (!data.settings.ambassador_gem_rates) { data.settings.ambassador_gem_rates = empty().settings.ambassador_gem_rates; changed = true; }
+  if (data.settings.cert && data.settings.cert.ntn === undefined) { data.settings.cert.ntn = empty().settings.cert.ntn; changed = true; }
+  if (data.settings.cert && data.settings.cert.cuin === undefined) { data.settings.cert.cuin = empty().settings.cert.cuin; changed = true; }
+  if (!Array.isArray(data.contracts)) { data.contracts = []; changed = true; }
+  if (data.seq.contracts === undefined) { data.seq.contracts = 0; changed = true; }
   // Ambassadors Portal: existing referral-only ambassador rows get a gems
   // total and the new collections are backfilled in.
   for (const t of ['ambassador_gem_events', 'ambassador_duties', 'ambassador_duty_status', 'ambassador_reports']) {
@@ -248,6 +253,16 @@ const ROLE_USERNAME_DOMAIN = {
   student_coordinator: 'admissions.echolens', staff: 'staff.echolens',
   ambassador: 'ambassador.echolens',
 };
+// Roles that must complete a first-login profile form (contact/address/
+// qualifications, plus documents for instructors) before using their portal
+// - see requireOnboarding() in dashboard.js and POST /api/me/onboarding.
+// Single source of truth, reused in Users.create, updateProfile and the
+// server-side gate instead of four separately-typed copies of this list.
+const ONBOARDING_ROLES = ['instructor', 'staff', 'ambassador', 'hr'];
+// Of the onboarding roles, which ones go on to a contract + offer-letter
+// pipeline after onboarding (see Contracts below and POST /api/me/onboarding
+// in server.js). Staff/intern stop at onboarding; hr has no contract either.
+const CONTRACT_ROLES = ['ambassador', 'instructor'];
 function usernameFromEmail(email, role) {
   const local = String(email || '').split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, '') || 'user';
   const domain = ROLE_USERNAME_DOMAIN[role] || 'echolens';
@@ -304,10 +319,10 @@ const Users = {
       reg_no: ['student', 'free'].includes(role) ? issueRegNo() : null,
       password_hash: bcrypt.hashSync(password, 10),
       profile: {}, streak: 0, best_streak: 0, last_active: null, created_at: now(),
-      // Instructors, staff and ambassadors must complete a first-login
+      // Instructors, staff, ambassadors and HR must complete a first-login
       // profile (contact/address/qualifications) before using their portal -
       // see requireOnboarding() in dashboard.js and POST /api/me/onboarding.
-      onboarding_complete: !['instructor', 'staff', 'ambassador'].includes(role),
+      onboarding_complete: !ONBOARDING_ROLES.includes(role),
     };
     data.users.push(u); save();
     return { user: u, password };
@@ -364,12 +379,12 @@ const Users = {
   // Institute-grade profile fields. Students and staff share the base set;
   // staff get professional fields on top. Unknown keys are dropped.
   PROFILE_FIELDS: {
-    base: ['phone', 'dob', 'gender', 'cnic', 'father_name', 'address', 'city', 'education', 'institute', 'emergency_contact', 'goal', 'links'],
+    base: ['phone', 'whatsapp', 'dob', 'gender', 'cnic', 'father_name', 'address', 'city', 'education', 'institute', 'university_reg_no', 'emergency_contact', 'goal', 'links'],
     staff: ['designation', 'qualification', 'expertise', 'experience_years', 'joining_date', 'office_hours'],
   },
   updateProfile(id, profile) {
     const u = Users.byId(id); if (!u) return null;
-    const allowed = [...Users.PROFILE_FIELDS.base, ...(['instructor', 'admin', 'coordinator', 'staff', 'ambassador'].includes(u.role) ? Users.PROFILE_FIELDS.staff : [])];
+    const allowed = [...Users.PROFILE_FIELDS.base, ...(['instructor', 'admin', 'coordinator', 'staff', 'ambassador', 'hr'].includes(u.role) ? Users.PROFILE_FIELDS.staff : [])];
     const clean = {};
     for (const k of allowed) if (profile[k] !== undefined) clean[k] = String(profile[k]).slice(0, 300);
     u.profile = { ...(u.profile || {}), ...clean };
@@ -378,6 +393,30 @@ const Users = {
     return u;
   },
   setOnboarded(id) { const u = Users.byId(id); if (!u) return null; u.onboarding_complete = true; save(); return u; },
+  // HR-set short specialization highlight shown on the instructor's record
+  // (e.g. "AI Automation Instructor", "Web Developer") - not self-editable,
+  // and not part of the generic profile whitelist above.
+  setInstructorTag(id, tag) {
+    const u = Users.byId(id); if (!u) return null;
+    u.profile = { ...(u.profile || {}) };
+    const t = String(tag || '').trim().slice(0, 80);
+    if (t) u.profile.instructor_tag = t; else delete u.profile.instructor_tag;
+    save();
+    return u;
+  },
+  // Instructor-only mandatory document uploads (degree/transcript/
+  // certification), collected at onboarding - see POST /api/me/onboarding.
+  // Stored as arrays of {filename, original_name}, separate from the
+  // string-only profile whitelist in updateProfile.
+  setInstructorDocs(id, { degree_files, transcript_files, certification_files }) {
+    const u = Users.byId(id); if (!u) return null;
+    u.profile = { ...(u.profile || {}) };
+    if (degree_files) u.profile.degree_files = degree_files;
+    if (transcript_files) u.profile.transcript_files = transcript_files;
+    if (certification_files) u.profile.certification_files = certification_files;
+    save();
+    return u;
+  },
   setAvatar(id, url) { const u = Users.byId(id); if (!u) return null; u.avatar = url; save(); return u; },
   setSignature(id, url) { const u = Users.byId(id); if (!u) return null; u.signature = url; save(); return u; },
   remove(id) {
@@ -1621,7 +1660,7 @@ const Settings = {
   setCert(fields) {
     if (!data.settings) data.settings = empty().settings;
     const c = data.settings.cert;
-    for (const k of ['org', 'ceo_name', 'tagline']) if (fields[k] !== undefined) c[k] = String(fields[k]).slice(0, 200);
+    for (const k of ['org', 'ceo_name', 'tagline', 'ntn', 'cuin']) if (fields[k] !== undefined) c[k] = String(fields[k]).slice(0, 200);
     if (fields.ceo_sig !== undefined) c.ceo_sig = fields.ceo_sig;
     save();
     return c;
@@ -1879,6 +1918,46 @@ const AmbassadorReports = {
 
 const AmbassadorGemEvents = {
   forAmbassador(id) { return data.ambassador_gem_events.filter((e) => e.ambassador_id === Number(id)).sort((a, b) => b.id - a.id); },
+};
+
+/* --------------------------------- contracts ---------------------------------
+ * Ambassador/Instructor-only pipeline: onboarding auto-generates and emails a
+ * contract PDF (status 'sent') with a 2-day signing deadline; the hire signs
+ * it by hand, zips it with any supporting documents, and uploads that single
+ * zip through the portal (status -> 'submitted'), which immediately triggers
+ * the offer letter. See CONTRACT_ROLES above and POST /api/me/onboarding +
+ * POST /api/contract/submit in server.js. */
+const Contracts = {
+  create({ user_id, role, pdf_filename, deadline_at }) {
+    const c = {
+      id: nextId('contracts'), user_id: Number(user_id), role,
+      status: 'sent', pdf_filename, sent_at: now(), deadline_at,
+      submitted_at: null, submission_zip_filename: null,
+      offer_letter_filename: null, offer_letter_sent_at: null,
+    };
+    data.contracts.push(c); save();
+    return c;
+  },
+  all() { return data.contracts.slice().sort((a, b) => b.id - a.id); },
+  byId(id) { return data.contracts.find((c) => c.id === Number(id)) || null; },
+  byUserId(uid) { return data.contracts.filter((c) => c.user_id === Number(uid)).sort((a, b) => b.id - a.id)[0] || null; },
+  markSubmitted(id, { submission_zip_filename }) {
+    const c = Contracts.byId(id); if (!c) return null;
+    c.status = 'submitted'; c.submitted_at = now(); c.submission_zip_filename = submission_zip_filename; save();
+    return c;
+  },
+  markOfferLetterSent(id, { offer_letter_filename }) {
+    const c = Contracts.byId(id); if (!c) return null;
+    c.offer_letter_filename = offer_letter_filename; c.offer_letter_sent_at = now(); save();
+    return c;
+  },
+  // HR "resend": resets the deadline (and re-attaches a freshly generated
+  // contract file) without touching a submission already on file.
+  resend(id, { pdf_filename, deadline_at }) {
+    const c = Contracts.byId(id); if (!c) return null;
+    c.status = 'sent'; c.pdf_filename = pdf_filename; c.sent_at = now(); c.deadline_at = deadline_at; save();
+    return c;
+  },
 };
 
 /* ============================== departments ==============================
@@ -3023,7 +3102,7 @@ module.exports = {
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
-  AmbassadorGemEvents, AmbassadorReports,
+  AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
   seed, DB_PATH, allData: () => data,
 };

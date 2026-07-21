@@ -161,6 +161,7 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
     $('app').style.display = '';
     show(DEPT_ROLES[ME.role].view);
     requireOnboarding();
+    requireContractSubmission(false);
     return;
   }
   if (ME.role === 'admin') document.querySelectorAll('.admin-only').forEach((el) => (el.style.display = ''));
@@ -199,6 +200,7 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   renderOverview();
   requireWhatsapp(); // v12: contact details are mandatory for every learner
   requireOnboarding(); // instructors must complete their first-login profile
+  requireContractSubmission(false);
 })();
 async function refreshMessageBadge() {
   try {
@@ -273,36 +275,91 @@ function requireWhatsapp() {
   });
 }
 
-/* Instructors, staff and ambassadors must complete a first-login profile
- * (contact/address/qualifications/experience) before using their portal -
- * same non-dismissable pattern as requireWhatsapp() above. */
+/* Instructors, staff, ambassadors and HR must complete a first-login profile
+ * (contact/address/qualifications, plus mandatory documents for instructors)
+ * before using their portal - same non-dismissable pattern as
+ * requireWhatsapp() above. Submitting auto-issues a contract by email for
+ * ambassador/instructor - see requireContractSubmission() below. */
 function requireOnboarding() {
-  if (!['instructor', 'staff', 'ambassador'].includes(ME.role)) return;
+  if (!['instructor', 'staff', 'ambassador', 'hr'].includes(ME.role)) return;
   if (ME.onboarding_complete) return;
+  const isInstructor = ME.role === 'instructor';
   openModal('Complete your profile', `
     <form id="onboardForm">
       <p class="s" style="color:var(--muted);margin-bottom:12px">A few details for HR's records before you get started.</p>
-      <label class="field"><span>Phone</span><input name="phone" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+      <div class="form-grid">
+        <label class="field"><span>Phone</span><input name="phone" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+        <label class="field"><span>WhatsApp number</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+      </div>
+      <label class="field"><span>Father's name</span><input name="father_name" required></label>
       <label class="field"><span>Address</span><input name="address" required></label>
       <div class="form-grid">
-        <label class="field"><span>Education / qualification</span><input name="education" required placeholder="e.g. BS Computer Science"></label>
+        <label class="field"><span>Highest qualification</span><input name="education" required placeholder="e.g. BS Computer Science"></label>
         <label class="field"><span>Years of experience</span><input name="experience_years" type="number" min="0" placeholder="0 if none"></label>
       </div>
+      ${isInstructor ? `
+      <p class="hint" style="margin-top:12px">Instructor accounts require verification documents - these are mandatory to proceed.</p>
+      <label class="field"><span>Degree(s) - PDF, Word or image</span><input name="degree_files" type="file" multiple required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"></label>
+      <label class="field"><span>Transcript(s)</span><input name="transcript_files" type="file" multiple required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"></label>
+      <label class="field"><span>Certification(s) - if any</span><input name="certification_files" type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"></label>` : ''}
       <button class="btn btn-primary btn-block">Save & continue</button></form>`);
   window.MODAL_LOCK = true;
   $('modalBox').querySelector('.close').style.display = 'none';
   $('onboardForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
     try {
-      await api('/api/me/onboarding', { method: 'POST', body: JSON.stringify({ phone: f.phone.value.trim(), address: f.address.value.trim(), education: f.education.value.trim(), experience_years: f.experience_years.value }) });
+      const d = await api('/api/me/onboarding', { method: 'POST', body: new FormData(f) });
       ME.onboarding_complete = true;
       window.MODAL_LOCK = false;
       $('modalBox').querySelector('.close').style.display = '';
-      closeModal(); toast('Saved - welcome aboard!');
+      closeModal();
+      toast(d.contract ? 'Saved - your contract has been emailed to you.' : 'Saved - welcome aboard!');
+      if (d.contract) requireContractSubmission(true);
     } catch (err) {
       if (err.message === 'Signed out.') { window.MODAL_LOCK = false; location.href = '/'; return; }
       modalMsg(err.message); btn.disabled = false;
     }
+  });
+}
+
+/* -------- Ambassador/Instructor contract: sign & submit -------- *
+ * Shown as a dismissable banner (not a MODAL_LOCK gate - unlike onboarding,
+ * the portal itself is still usable while a contract is pending) with a live
+ * 2-day countdown and a single .zip upload. Refreshed on login and again
+ * right after onboarding issues a fresh contract. */
+let MY_CONTRACT = null;
+async function requireContractSubmission(fromOnboarding) {
+  if (!['ambassador', 'instructor'].includes(ME.role)) return;
+  try { MY_CONTRACT = (await api('/api/me/contract')).contract; } catch { return; }
+  renderContractBanner();
+  if (fromOnboarding && MY_CONTRACT && MY_CONTRACT.status === 'sent') formSubmitContract();
+}
+function renderContractBanner() {
+  const host = $('contractBanner'); if (!host) return;
+  if (!MY_CONTRACT || MY_CONTRACT.status === 'submitted') { host.innerHTML = ''; return; }
+  const overdue = MY_CONTRACT.deadline_at && new Date(MY_CONTRACT.deadline_at).getTime() < Date.now();
+  host.innerHTML = `<div class="card" style="margin-bottom:16px;border-color:${overdue ? 'var(--danger)' : 'var(--primary)'}"><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:220px">
+      <strong>${overdue ? 'Your contract signing window has passed' : 'Sign & submit your contract'}</strong>
+      <div class="s" style="color:var(--muted)">${overdue ? 'Contact HR to have it resent.' : `Print, sign, attach any required documents, and upload one .zip file by ${esc(new Date(MY_CONTRACT.deadline_at).toLocaleString('en-GB'))}.`}</div>
+    </div>
+    <a class="btn btn-ghost btn-sm" href="/uploads/contracts/${esc(MY_CONTRACT.pdf_filename)}" target="_blank">Download contract</a>
+    ${overdue ? '' : '<button class="btn btn-primary btn-sm" onclick="formSubmitContract()">Upload signed zip</button>'}
+  </div></div>`;
+}
+function formSubmitContract() {
+  if (!MY_CONTRACT) return;
+  openModal('Submit your signed contract', `<form id="f">
+    <p class="s" style="color:var(--muted);margin-bottom:12px">Package your signed contract (and any supporting documents) into a single .zip file and upload it here.</p>
+    <label class="field"><span>Signed contract + documents (.zip)</span><input name="file" type="file" accept=".zip" required></label>
+    <button class="btn btn-primary btn-block">Submit</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      await api('/api/contract/submit', { method: 'POST', body: new FormData(f) });
+      closeModal(); toast('Submitted - your offer letter is on its way by email.');
+      requireContractSubmission(false);
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
 
@@ -746,7 +803,57 @@ async function renderAdminTeachers() {
   const el = $('view-admin-teachers');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
   const d = await api('/api/admin/users');
-  el.innerHTML = userGroupTable('Teachers', d.users.filter((u) => u.role === 'instructor'), ME.role === 'admin');
+  el.innerHTML = userGroupTable('Teachers', d.users.filter((u) => u.role === 'instructor'), ME.role === 'admin')
+    + '<div id="teacherAssignWrap" style="margin-top:16px"></div>';
+  renderInstructorAssignmentPanel('teacherAssignWrap', { canEditTag: true, canAssign: true });
+}
+/* -------- Instructor directory: HR/admin-set specialization tag, and
+ * "assign to course" (an instructor can teach several courses at once) -
+ * shared by the admin Teachers view, the HR Portal, and the Admissions
+ * Office (student_coordinator can assign but not edit the tag). -------- */
+async function renderInstructorAssignmentPanel(containerId, { canEditTag = false, canAssign = false } = {}) {
+  const box = $(containerId); if (!box) return;
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/instructors-lite');
+  box.innerHTML = `<div class="card"><div class="card-head"><h3>Instructor directory</h3><span class="s" style="color:var(--muted)">One instructor can be assigned to several courses at once.</span></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Email</th><th>Specialization</th><th>Assigned courses</th><th></th></tr>
+      ${d.instructors.map((i) => `<tr>
+        <td>${esc(i.name)}</td><td class="s">${esc(i.email || '—')}</td>
+        <td class="s">${esc(i.instructor_tag || '—')}${canEditTag ? ` <button class="btn btn-ghost btn-sm" onclick="formSetInstructorTag(${i.id}, '${esc(i.name).replace(/'/g, '&#39;')}', '${esc(i.instructor_tag || '').replace(/'/g, '&#39;')}', '${containerId}', ${canEditTag}, ${canAssign})">Edit</button>` : ''}</td>
+        <td class="s">${i.batches.map((b) => esc(b.title || b.name)).join(', ') || '—'}</td>
+        <td>${canAssign ? `<button class="btn btn-ghost btn-sm" onclick="formAssignInstructor(${i.id}, '${esc(i.name).replace(/'/g, '&#39;')}', '${containerId}', ${canEditTag}, ${canAssign})">Assign to course</button>` : ''}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="empty">No instructors yet.</td></tr>'}
+    </table></div></div>`;
+}
+function formSetInstructorTag(id, name, current, containerId, canEditTag, canAssign) {
+  openModal(`Specialization: ${name}`, `<form id="f">
+    <label class="field"><span>Short highlight</span><input name="tag" value="${esc(current)}" placeholder="e.g. AI Automation Instructor, Web Developer, Graphic Design Instructor"></label>
+    <p class="hint">Shown to Admin and the Admissions Office when assigning instructors to courses.</p>
+    <button class="btn btn-primary btn-block">Save</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    try {
+      await api(`/api/hr/instructors/${id}/tag`, { method: 'PUT', body: JSON.stringify({ tag: f.tag.value.trim() }) });
+      toast('Saved.'); closeModal(); renderInstructorAssignmentPanel(containerId, { canEditTag, canAssign });
+    } catch (err) { toast(err.message, true); }
+  });
+}
+async function formAssignInstructor(id, name, containerId, canEditTag, canAssign) {
+  let d;
+  try { d = await api('/api/course-batches-lite'); } catch (err) { toast(err.message, true); return; }
+  openModal(`Assign ${name} to a course`, `<form id="f">
+    <label class="field"><span>Course / batch</span><select name="batch_id" required>
+      ${d.batches.map((b) => `<option value="${b.id}">${esc(b.title || b.name)} &middot; ${esc(b.code)} (${esc(b.status)})</option>`).join('') || '<option disabled>No courses yet</option>'}
+    </select></label>
+    <button class="btn btn-primary btn-block">Assign</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    try {
+      await api(`/api/batches/${f.batch_id.value}/teachers`, { method: 'POST', body: JSON.stringify({ existing: id }) });
+      toast('Assigned.'); closeModal(); renderInstructorAssignmentPanel(containerId, { canEditTag, canAssign });
+    } catch (err) { toast(err.message, true); }
+  });
 }
 async function renderAdminStudents() {
   const el = $('view-admin-students');
@@ -2124,6 +2231,8 @@ async function renderUsers() {
     ['Students', d.users.filter((u) => u.role === 'student')],
     ['Open website users', d.users.filter((u) => u.role === 'free')],
     ['Teachers', d.users.filter((u) => u.role === 'instructor')],
+    ['Ambassadors', d.users.filter((u) => u.role === 'ambassador')],
+    ['Staff & Interns', d.users.filter((u) => u.role === 'staff')],
     ['Coordinators', d.users.filter((u) => u.role === 'coordinator')],
     ['HR', d.users.filter((u) => u.role === 'hr')],
     ['Finance', d.users.filter((u) => u.role === 'finance')],
@@ -2144,6 +2253,10 @@ async function renderUsers() {
       <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('hr')">Add HR staff</button>
       <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('finance')">Add finance staff</button>
       <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('student_coordinator')">Add admissions officer</button>
+      <button class="btn btn-ghost btn-sm" onclick="formNewAmbassador()">Add an ambassador</button>
+      <button class="btn btn-ghost btn-sm" onclick="formDeptStaff('instructor')">Add an instructor</button>
+      <button class="btn btn-ghost btn-sm" onclick="formStaffOrIntern('staff')">Add staff</button>
+      <button class="btn btn-ghost btn-sm" onclick="formStaffOrIntern('intern')">Add an intern</button>
     </div></div>` : ''}
     ${groups.map(([label, users]) => userGroupTable(label, users, isAdmin)).join('')}`;
   wireStudentSearch();
@@ -2155,7 +2268,34 @@ const DEPT_CREATE = {
   hr: { path: '/api/admin/hr', title: 'Add HR staff', hint: 'HR staff see only their own portal - staff records, onboarding, and leave duties. No access to courses, grades, or finances.' },
   finance: { path: '/api/admin/finance', title: 'Add finance staff', hint: 'Finance staff see only their own portal - fees, invoices, and expense duties. No access to courses, grades, or staff records.' },
   student_coordinator: { path: '/api/admin/student-coordinators', title: 'Add an admissions officer', hint: 'Admissions officers see only their own portal - student registrations, fee challans, discount categories, and enrollment follow-up. No access to grades, expenses, or staff records.' },
+  instructor: { path: '/api/hr/instructors', title: 'Add an instructor', hint: 'Added to the Teachers department automatically. On first login they complete a profile with mandatory qualification documents, which auto-emails their contract - sign, attach documents and upload as a zip within 2 days to receive the offer letter.' },
 };
+// Staff and Interns share one HR record type (StaffRecords.employment_type)
+// and one creation endpoint - only the "Employment type" field differs.
+function formStaffOrIntern(kind) {
+  const isIntern = kind === 'intern';
+  openModal(isIntern ? 'Add an intern' : 'Add a staff member', `
+    <form id="f">
+      <label class="field"><span>Full name</span><input name="name" required placeholder="e.g. Sara Nadeem"></label>
+      <label class="field"><span>Email - the account is generated from it</span><input name="email" type="email" required placeholder="name@company.com"></label>
+      <div class="form-grid">
+        <label class="field"><span>Phone (optional)</span><input name="phone"></label>
+        <label class="field"><span>Position (optional)</span><input name="position" placeholder="e.g. Video Editor"></label>
+      </div>
+      <p class="hint">The username is generated from the email (at staff.echolens) and the password is mailed there automatically. On first login they complete a short profile - no contract is issued for ${isIntern ? 'interns' : 'staff'}.</p>
+      <button class="btn btn-primary btn-block">Create ${isIntern ? 'intern' : 'staff'} account</button></form>
+    <div id="credOut"></div>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      const out = await api('/api/hr/staff', { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), phone: f.phone.value.trim(), position: f.position.value.trim(), employment_type: isIntern ? 'intern' : 'paid_staff' }) });
+      $('credOut').innerHTML = `<p style="margin:12px 0 4px;font-weight:600">Account created - credentials were emailed to ${esc(f.email.value.trim())}:</p>
+        <div class="cred-box">${esc(out.credentials.name)}<br>Username: ${esc(out.credentials.username)}<br>Password: ${esc(out.credentials.password)}<br><span class="s">Signs in with the username above or their email.</span></div>`;
+      modalMsg('Account created and credentials emailed.', true); f.reset();
+    } catch (err) { modalMsg(err.message); }
+    btn.disabled = false;
+  });
+}
 function formDeptStaff(role) {
   const cfg = DEPT_CREATE[role];
   openModal(cfg.title, `
@@ -2346,11 +2486,12 @@ let COORD_REGS = [];
 function coordTab(tab) { COORD_TAB = tab; renderDeptStudentCoordinator(); }
 async function renderDeptStudentCoordinator() {
   const el = $('view-dept-student-coordinator');
-  const tabs = [['registrations', 'Registrations & challans'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['queries', 'Student queries'], ['ambassador-reports', 'Ambassador reports']];
+  const tabs = [['registrations', 'Registrations & challans'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['queries', 'Student queries'], ['instructors', 'Instructors'], ['ambassador-reports', 'Ambassador reports']];
   el.innerHTML = deptHeaderHtml('Admissions Office Portal') + deptTabBarHtml(tabs, COORD_TAB, 'coordTab') + '<div id="coordTabBody"><div class="empty">Loading&hellip;</div></div>';
   if (COORD_TAB === 'registrations') renderCoordRegistrations();
   else if (COORD_TAB === 'discounts') renderCoordDiscounts();
   else if (COORD_TAB === 'bank') renderCoordBank();
+  else if (COORD_TAB === 'instructors') renderInstructorAssignmentPanel('coordTabBody', { canEditTag: false, canAssign: true });
   else if (COORD_TAB === 'ambassador-reports') renderAmbassadorReportsPanel('coordTabBody');
   else renderCoordQueries();
 }
@@ -2574,9 +2715,20 @@ async function coordResolveQuery(id) {
 let HR_ACTIVE_DEPT = null; // null = landing state, 'ambassador-reports' = reports panel, else a department id
 async function renderDeptHR() {
   const el = $('view-dept-hr');
-  el.innerHTML = deptHeaderHtml('HR Portal') + '<div id="hrDeptBody"><div class="empty">Loading&hellip;</div></div>';
+  el.innerHTML = deptHeaderHtml('HR Portal') + `
+    <div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="s" style="color:var(--muted)">Hire anyone directly - a portal login is emailed immediately.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="formNewAmbassador()">Add an ambassador</button>
+      <button class="btn btn-primary btn-sm" onclick="formDeptStaff('instructor')">Add an instructor</button>
+      <button class="btn btn-ghost btn-sm" onclick="formStaffOrIntern('staff')">Add staff</button>
+      <button class="btn btn-ghost btn-sm" onclick="formStaffOrIntern('intern')">Add an intern</button>
+    </div></div>
+    <div id="hrDeptBody"><div class="empty">Loading&hellip;</div></div>`;
   await populateHrDeptNav();
   if (HR_ACTIVE_DEPT === 'ambassador-reports') renderAmbassadorReportsPanel('hrDeptBody', { withSignoff: true });
+  else if (HR_ACTIVE_DEPT === 'contracts') renderHrContractsPanel('hrDeptBody');
+  else if (HR_ACTIVE_DEPT === 'instructors') renderInstructorAssignmentPanel('hrDeptBody', { canEditTag: true, canAssign: false });
   else if (HR_ACTIVE_DEPT != null) renderDepartmentDetail('hrDeptBody', HR_ACTIVE_DEPT, { hrView: true });
   else $('hrDeptBody').innerHTML = '<div class="empty">Pick a department from the sidebar, or add a new one.</div>';
 }
@@ -2585,10 +2737,14 @@ async function populateHrDeptNav() {
   const d = await api('/api/hr/departments');
   nav.innerHTML = d.departments.map((dep) => `<a class="nav-item" style="padding-left:34px;font-size:13.5px" onclick="hrShowDepartment(${dep.id})">${esc(dep.name)} <span class="s" style="color:var(--muted-2);margin-left:auto">${dep.member_count}</span></a>`).join('')
     + `<a class="nav-item" style="padding-left:34px;font-size:13.5px" onclick="hrShowAmbassadorReports()">Ambassador reports</a>`
+    + `<a class="nav-item" style="padding-left:34px;font-size:13.5px" onclick="hrShowContracts()">Contracts</a>`
+    + `<a class="nav-item" style="padding-left:34px;font-size:13.5px" onclick="hrShowInstructors()">Instructors</a>`
     + `<a class="nav-item" style="padding-left:34px;font-size:13.5px;color:var(--primary)" onclick="formNewDepartment()">+ New department</a>`;
 }
 function hrShowDepartment(id) { HR_ACTIVE_DEPT = id; renderDeptHR(); }
 function hrShowAmbassadorReports() { HR_ACTIVE_DEPT = 'ambassador-reports'; renderDeptHR(); }
+function hrShowContracts() { HR_ACTIVE_DEPT = 'contracts'; renderDeptHR(); }
+function hrShowInstructors() { HR_ACTIVE_DEPT = 'instructors'; renderDeptHR(); }
 function formNewDepartment(context) {
   openModal('New department', `<form id="f">
     <label class="field"><span>Name</span><input name="name" required placeholder="e.g. Video Editors"></label>
@@ -2716,7 +2872,7 @@ function formNewAmbassador(containerId) {
       openModal('Ambassador created', `<p class="s" style="line-height:1.8">${esc(d.ambassador.name)} is now an EchoLens ambassador.<br>
         Referral code: <strong class="mono" style="font-size:20px;letter-spacing:3px">${esc(d.ambassador.code)}</strong><br>
         Their login and referral code (plus a QR code) have been emailed to ${esc(d.ambassador.email)}.</p>
-        <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="closeModal();refreshDeptDetail('${containerId}')">Done</button>`);
+        <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="closeModal();${containerId ? `refreshDeptDetail('${containerId}')` : ''}">Done</button>`);
     } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
   });
 }
@@ -2904,6 +3060,40 @@ function emailAmbassadorReport(id) {
       toast('Report emailed.'); closeModal();
     } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
   });
+}
+
+/* -------- HR: contract tracker --------
+ * Every ambassador/instructor contract auto-emailed at onboarding, with its
+ * 2-day signing deadline and submission status - "Resend" regenerates the
+ * PDF and resets the deadline, for anyone who runs past it. */
+const CONTRACT_STATUS_LABEL = { sent: 'Awaiting signature', submitted: 'Signed & submitted' };
+async function renderHrContractsPanel(containerId) {
+  const box = $(containerId);
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/hr/contracts');
+  const now = Date.now();
+  box.innerHTML = `<div class="card"><div class="card-head"><h3>Contracts</h3>
+    <span class="s" style="color:var(--muted)">Auto-emailed after onboarding to every new ambassador/instructor - they have 2 days to sign, attach documents, and upload a zip.</span></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Role</th><th>Status</th><th>Deadline</th><th>Contract</th><th>Submission</th><th>Offer letter</th><th></th></tr>
+      ${d.contracts.map((c) => {
+        const overdue = c.status === 'sent' && c.deadline_at && new Date(c.deadline_at).getTime() < now;
+        return `<tr>
+          <td>${esc(c.name)}</td><td class="s">${esc(roleLabel(c.role))}</td>
+          <td>${overdue ? '<span class="s" style="color:var(--danger);font-weight:700">Overdue</span>' : `<span class="s">${esc(CONTRACT_STATUS_LABEL[c.status] || c.status)}</span>`}</td>
+          <td class="s">${c.deadline_at ? esc(new Date(c.deadline_at).toLocaleString('en-GB')) : '—'}</td>
+          <td>${c.pdf_filename ? `<a href="/uploads/contracts/${esc(c.pdf_filename)}" target="_blank">Download</a>` : '—'}</td>
+          <td>${c.submission_zip_filename ? `<a href="/uploads/contracts/${esc(c.submission_zip_filename)}" target="_blank">zip</a>` : '—'}</td>
+          <td>${c.offer_letter_filename ? `<a href="/uploads/contracts/${esc(c.offer_letter_filename)}" target="_blank">Download</a>` : '—'}</td>
+          <td><button class="btn btn-ghost btn-sm" onclick="resendContract(${c.id}, '${containerId}')">Resend</button></td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="8" class="empty">No contracts issued yet.</td></tr>'}
+    </table></div></div>`;
+}
+async function resendContract(id, containerId) {
+  if (!confirm('Regenerate this contract and reset the 2-day signing deadline? A fresh copy is emailed immediately.')) return;
+  try { await api(`/api/hr/contracts/${id}/resend`, { method: 'POST', body: JSON.stringify({}) }); toast('Contract resent.'); renderHrContractsPanel(containerId); }
+  catch (e) { toast(e.message, true); }
 }
 
 /* -------------------------------- Staff portal -------------------------------- */
@@ -4678,19 +4868,23 @@ function formIssueAllCerts() {
   });
 }
 async function formCertSettings() {
-  let s = { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', tagline: '' };
+  let s = { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', tagline: '', ntn: '', cuin: '' };
   try { s = (await api('/api/admin/cert-settings')).settings; } catch {}
   openModal('Certificate settings', `
     <form id="f">
       <label class="field"><span>Official company / academy name</span><input name="org" required value="${esc(s.org || '')}"></label>
       <label class="field"><span>Tagline (under the name)</span><input name="tagline" value="${esc(s.tagline || '')}"></label>
-      <label class="field"><span>CEO full name</span><input name="ceo_name" value="${esc(s.ceo_name || '')}" placeholder="Appears as the typed signature on every certificate"></label>
-      <p class="hint" style="margin:-4px 0 4px">The CEO signature is the name above, rendered in a script font on the certificate - no signature image is uploaded or used.</p>
+      <label class="field"><span>CEO full name</span><input name="ceo_name" value="${esc(s.ceo_name || '')}" placeholder="Appears as the typed signature on every certificate, contract and offer letter"></label>
+      <div class="form-grid">
+        <label class="field"><span>NTN</span><input name="ntn" value="${esc(s.ntn || '')}" placeholder="e.g. J372619"></label>
+        <label class="field"><span>CUIN</span><input name="cuin" value="${esc(s.cuin || '')}" placeholder="e.g. 0342802"></label>
+      </div>
+      <p class="hint" style="margin:-4px 0 4px">The CEO signature is the name above, rendered in a script font on certificates, contracts and offer letters - no signature image is uploaded or used. NTN/CUIN print on every ambassador/instructor contract and offer letter.</p>
       <button class="btn btn-primary btn-block">Save settings</button></form>
     <p class="hint" style="margin-top:14px">Teachers upload their own signature from Profile &rarr; &#8942; &rarr; Certificate signature.</p>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target;
-    try { await api('/api/admin/cert-settings', { method: 'POST', body: JSON.stringify({ org: f.org.value, tagline: f.tagline.value, ceo_name: f.ceo_name.value }) }); modalMsg('Settings saved.', true); }
+    try { await api('/api/admin/cert-settings', { method: 'POST', body: JSON.stringify({ org: f.org.value, tagline: f.tagline.value, ceo_name: f.ceo_name.value, ntn: f.ntn.value, cuin: f.cuin.value }) }); modalMsg('Settings saved.', true); }
     catch (err) { modalMsg(err.message); }
   });
 }

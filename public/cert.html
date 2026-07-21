@@ -20,7 +20,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Inter', system-ui, sans-serif; background: var(--canvas); color: var(--navy); min-height: 100vh; padding: 28px 14px; }
-  .wrap { max-width: 900px; margin: 0 auto; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
   .verify-banner { display: flex; gap: 12px; align-items: center; background: #EAF9F4; border: 1.5px solid #B7E9DA; color: #0A6E5F; border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; font-size: 14px; }
   .verify-banner.bad { background: #FDEEEE; border-color: #F2C6C6; color: #A33; }
   .verify-banner .tick { font-size: 22px; }
@@ -30,34 +30,37 @@
   .btn-linkedin { background: #0A66C2; color: #fff; }
   .btn-ghost { background: #fff; color: var(--navy); border: 1.5px solid var(--line); }
 
-  .cert { background: #fff; border-radius: 18px; padding: 52px 56px 40px; position: relative; box-shadow: 0 18px 50px rgba(22,35,58,.12); overflow: hidden; }
+  /* v18: wider, shorter proportions - the standard shape for a certificate,
+     and the fix for a tall portrait card stranding blank space beneath it
+     on a portrait printed page. */
+  .cert { background: #fff; border-radius: 18px; padding: 36px 64px 30px; position: relative; box-shadow: 0 18px 50px rgba(22,35,58,.12); overflow: hidden; }
   .cert::before { content: ''; position: absolute; inset: 14px; border: 2px solid var(--gold); border-radius: 12px; pointer-events: none; }
   .cert::after { content: ''; position: absolute; inset: 20px; border: 1px solid #EAD9A6; border-radius: 9px; pointer-events: none; }
   .c-band { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: linear-gradient(90deg, var(--teal), #38BDF8, #7C6CF5); }
-  .c-head { text-align: center; margin-bottom: 6px; }
-  .c-head img { height: 58px; }
-  .c-org { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 650; margin-top: 8px; }
-  .c-tag { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
-  .c-title { text-align: center; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin: 26px 0 6px; }
-  .c-line { text-align: center; color: var(--muted); font-size: 14px; }
-  .c-name { text-align: center; font-family: 'Fraunces', serif; font-size: 42px; font-weight: 650; margin: 12px 0 4px; }
-  .c-reg { text-align: center; font-size: 12.5px; color: var(--muted); font-family: ui-monospace, monospace; }
-  .c-course { text-align: center; font-size: 21px; font-weight: 700; margin: 14px auto 4px; max-width: 620px; }
-  .c-detail { text-align: center; font-size: 13.5px; color: var(--muted); max-width: 600px; margin: 0 auto; }
-  .c-date { text-align: center; font-size: 13.5px; margin-top: 10px; }
-  .c-foot { display: flex; justify-content: center; align-items: flex-end; gap: 90px; margin-top: 44px; flex-wrap: wrap; }
-  .sig { min-width: 190px; max-width: 230px; text-align: center; }
-  .sig img { max-height: 68px; max-width: 200px; display: block; margin: 0 auto; }
-  .sig .typed { font-family: 'Alex Brush', cursive; font-size: 40px; line-height: 1; color: var(--navy); height: 68px; display: flex; align-items: flex-end; justify-content: center; }
+  .c-head { text-align: center; margin-bottom: 4px; }
+  .c-head img { height: 46px; }
+  .c-org { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 650; margin-top: 6px; }
+  .c-tag { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .c-title { text-align: center; font-size: 12.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin: 16px 0 5px; }
+  .c-line { text-align: center; color: var(--muted); font-size: 13.5px; }
+  .c-name { text-align: center; font-family: 'Fraunces', serif; font-size: 38px; font-weight: 650; margin: 8px 0 3px; }
+  .c-reg { text-align: center; font-size: 12px; color: var(--muted); font-family: ui-monospace, monospace; }
+  .c-course { text-align: center; font-size: 19px; font-weight: 700; margin: 10px auto 4px; max-width: 640px; }
+  .c-detail { text-align: center; font-size: 13px; color: var(--muted); max-width: 600px; margin: 0 auto; }
+  .c-date { text-align: center; font-size: 13px; margin-top: 8px; }
+  .c-foot { display: flex; justify-content: center; align-items: flex-end; gap: 110px; margin-top: 26px; flex-wrap: wrap; }
+  .sig { min-width: 180px; max-width: 220px; text-align: center; }
+  .sig img { max-height: 56px; max-width: 180px; display: block; margin: 0 auto; }
+  .sig .typed { font-family: 'Alex Brush', cursive; font-size: 34px; line-height: 1; color: var(--navy); height: 54px; display: flex; align-items: flex-end; justify-content: center; }
   .sig .line { border-top: 1.5px solid var(--navy); margin: 6px 6px 5px; }
-  .sig .who { font-size: 13px; font-weight: 700; }
-  .sig .role { font-size: 11.5px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
-  .qr { text-align: center; min-width: 130px; }
-  .qr #qrbox { display: inline-block; padding: 8px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
-  .qr .s { font-size: 10.5px; color: var(--muted); margin-top: 5px; }
-  .serial { text-align: center; font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--muted); margin-top: 20px; letter-spacing: .08em; }
+  .sig .who { font-size: 12.5px; font-weight: 700; }
+  .sig .role { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  .qr { text-align: center; min-width: 120px; }
+  .qr #qrbox { display: inline-block; padding: 7px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+  .qr .s { font-size: 10px; color: var(--muted); margin-top: 5px; }
+  .serial { text-align: center; font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); margin-top: 14px; letter-spacing: .08em; }
   .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
-  .issuer-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--navy); color: #fff; border-radius: 999px; padding: 5px 14px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; margin-top: 10px; }
+  .issuer-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--navy); color: #fff; border-radius: 999px; padding: 4px 13px; font-size: 11px; font-weight: 700; letter-spacing: .04em; margin-top: 8px; }
 
   .ve-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px 26px; margin-top: 18px; }
   .ve-card h3 { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 650; margin-bottom: 4px; }
@@ -76,11 +79,14 @@
   .fp-code { margin-top: 8px; background: var(--navy); color: #dce6f5; font-family: ui-monospace, monospace; font-size: 11.5px; padding: 12px 14px; border-radius: 10px; max-height: 220px; overflow: auto; white-space: pre-wrap; }
   .fp-note { font-size: 12.5px; color: var(--muted); font-style: italic; margin-top: 7px; }
 
-  @media (max-width: 640px) { .cert { padding: 40px 20px 30px; } .c-name { font-size: 30px; } }
+  @media (max-width: 640px) { .cert { padding: 32px 20px 26px; } .c-name { font-size: 28px; } .c-foot { gap: 30px; } }
   @media print {
-    body { background: #fff; padding: 0; }
-    .verify-banner, .actions, .ve-card { display: none !important; }
-    .cert { box-shadow: none; border-radius: 0; page-break-inside: avoid; }
+    @page { size: landscape; margin: 10mm; }
+    html, body { background: #fff; height: auto; }
+    body { padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .wrap { max-width: 100%; width: 100%; }
+    .verify-banner, .actions, #shareHint, .ve-card { display: none !important; }
+    .cert { box-shadow: none; border-radius: 0; page-break-inside: avoid; margin: 0 auto; }
   }
 </style>
 </head>
@@ -159,7 +165,7 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
       <div class="serial">Serial: ${esc(c.serial)} &nbsp;&middot;&nbsp; Issued ${esc(c.issued_at)}</div>
     </div>`;
 
-  new QRCode(document.getElementById('qrbox'), { text: location.origin + '/cert?s=' + c.serial, width: 96, height: 96, correctLevel: QRCode.CorrectLevel.M });
+  new QRCode(document.getElementById('qrbox'), { text: location.origin + '/cert?s=' + c.serial, width: 78, height: 78, correctLevel: QRCode.CorrectLevel.M });
 
   const conceptsHtml = (c.concepts && c.concepts.length) ? `
     <div class="ve-card">

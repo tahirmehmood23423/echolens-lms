@@ -29,7 +29,8 @@ const {
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
-  AmbassadorGemEvents, AmbassadorDuties, AmbassadorReports,
+  AmbassadorGemEvents, AmbassadorReports,
+  Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -199,6 +200,18 @@ function ambassadorReportsAccess(req, res, next) {
   if (['admin', 'hr', 'finance', 'student_coordinator'].includes(req.user.role)) return next();
   return res.status(403).json({ error: 'Not available for your role.' });
 }
+// Departments: HR/admin can manage any department; once a head is named,
+// that head can manage their own department end-to-end (roster, tasks,
+// announcements) the same way. Loads req.department for the route handler.
+function departmentManage(req, res, next) {
+  const d = Departments.byId(req.params.id);
+  if (!d) return res.status(404).json({ error: 'Department not found.' });
+  if (!['admin', 'hr'].includes(req.user.role) && d.head_user_id !== req.user.id) {
+    return res.status(403).json({ error: 'Only HR/admin or this department’s head can do that.' });
+  }
+  req.department = d;
+  next();
+}
 function staffOnly(req, res, next) { if (['admin', 'staff'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function manageBatch(req, res, next) { // WRITE access: admin or an assigned teacher
   const b = Batches.byId(req.params.id);
@@ -274,6 +287,7 @@ app.get('/api/auth/me', authRequired, (req, res) => {
     avatar: u.avatar || null, signature: u.signature || null,
     profile: u.profile || {}, gamify: ['student', 'free'].includes(u.role) ? gamifyFor(u) : null,
     ai_enabled: ['admin', 'instructor'].includes(u.role) && ai.enabled(),
+    onboarding_complete: u.onboarding_complete !== false,
   });
 });
 
@@ -757,6 +771,8 @@ app.post('/api/hr/ambassadors', authRequired, hrOnly, async (req, res) => {
   const em = await validateStaffEmail(email, res, 'ambassador'); if (!em) return;
   const { user, password } = Users.create({ name: String(name).trim(), role: 'ambassador', email: em, username: em });
   const a = Ambassadors.create({ name, email: em, university, user_id: user.id }, req.user.id);
+  const ambassadorsDept = Departments.byName('Ambassadors');
+  if (ambassadorsDept) DepartmentMembers.add(ambassadorsDept.id, user.id, req.user.id);
   let attachments;
   try { attachments = [await ambassadorQrAttachment(a.code)]; } catch { attachments = undefined; }
   mailer.notify(a.email, 'Your EchoLens ambassador account',
@@ -772,33 +788,9 @@ app.delete('/api/hr/ambassadors/:id', authRequired, hrOnly, (req, res) => {
 });
 app.get('/api/hr/ambassadors/gem-rates', authRequired, hrOnly, (req, res) => res.json({ rates: Settings.ambassadorGemRates() }));
 app.put('/api/hr/ambassadors/gem-rates', authRequired, hrOnly, (req, res) => res.json({ ok: true, rates: Settings.setAmbassadorGemRates(req.body || {}) }));
-app.get('/api/hr/ambassadors/duties', authRequired, hrOnly, (req, res) => res.json({ duties: AmbassadorDuties.all() }));
-app.post('/api/hr/ambassadors/duties', authRequired, hrOnly, upload.single('file'), (req, res) => {
-  const { title, description, scope, ambassador_id } = req.body || {};
-  if (!title || !String(title).trim()) {
-    if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} }
-    return res.status(400).json({ error: 'A title is required.' });
-  }
-  if (scope === 'one' && !Ambassadors.byId(ambassador_id)) {
-    if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} }
-    return res.status(400).json({ error: 'Pick which ambassador this duty is for.' });
-  }
-  let attachment = null;
-  if (req.file) {
-    const ext = path.extname(req.file.originalname).toLowerCase();
-    if (!DUTY_ATTACH_EXT.includes(ext)) {
-      try { fs.unlinkSync(req.file.path); } catch {}
-      return res.status(400).json({ error: 'Only PDF, Word or image files (jpg/png/gif/webp) are accepted.' });
-    }
-    attachment = { filename: req.file.filename, original_name: req.file.originalname };
-  }
-  const { duty, recipients } = AmbassadorDuties.create({ title, description, scope, ambassador_id, attachment }, req.user.id);
-  for (const a of recipients) {
-    mailer.notify(a.email, `New duty assigned: ${duty.title}`,
-      `${hi(a.name)},\n\nA new duty has been assigned to you.\n\n${duty.title}\n${duty.description ? '\n' + duty.description + '\n' : ''}${attachment ? '\nAn attachment is included - view it from your ambassador portal.\n' : ''}\nSign in at ${APP_URL}/login to view it and mark it done.\n\nEchoLens Digital`);
-  }
-  res.json({ ok: true, duty });
-});
+// Ambassador duty/task assignment now lives in the generic Departments
+// system (see below) - the "Ambassadors" department is auto-seeded and
+// every ambassador is auto-added to it in POST /api/hr/ambassadors above.
 
 /* --------------------- ambassador monthly commission reports ---------------------
  * On the 5th of every month, one PDF per active ambassador is generated on
@@ -878,6 +870,151 @@ app.post('/api/ambassador-reports/:id/email', authRequired, ambassadorReportsAcc
 app.get('/api/ambassador-reports/signoff', authRequired, ambassadorReportsAccess, (req, res) => res.json({ signoff: Settings.ambassadorReportSignoff(), ceo_name: Settings.cert().ceo_name }));
 app.put('/api/ambassador-reports/signoff', authRequired, hrOnly, (req, res) => res.json({ ok: true, signoff: Settings.setAmbassadorReportSignoff(req.body || {}) }));
 
+/* ============================== departments ==============================
+ * Generic org-structure layer: HR/admin create departments (Ambassadors,
+ * Teachers, Interns, Staff are seeded by default - see migrate() in
+ * store.js - plus any custom ones), add/remove members, and name a head.
+ * Once named, the head manages their own department (roster, tasks,
+ * announcements) exactly like HR can - see departmentManage above. */
+function departmentDetail(d) {
+  return {
+    ...d,
+    members: DepartmentMembers.forDepartment(d.id).map((m) => {
+      const amb = Ambassadors.byUserId(m.user_id);
+      return {
+        user_id: m.user_id, name: m.user.name, role: m.user.role, email: m.user.email,
+        ambassador: amb ? { id: amb.id, code: amb.code, gems: amb.gems, university: amb.university } : null,
+      };
+    }),
+    tasks: DepartmentTasks.forDepartment(d.id),
+    announcements: DepartmentAnnouncements.forDepartment(d.id),
+  };
+}
+app.get('/api/hr/departments', authRequired, hrOnly, (req, res) => {
+  res.json({ departments: Departments.all().map((d) => ({ ...d, member_count: DepartmentMembers.forDepartment(d.id).length })) });
+});
+app.post('/api/hr/departments', authRequired, hrOnly, (req, res) => {
+  const { name } = req.body || {};
+  if (!name || !String(name).trim()) return res.status(400).json({ error: 'A name is required.' });
+  if (Departments.byName(name)) return res.status(400).json({ error: 'A department with this name already exists.' });
+  res.json({ ok: true, department: Departments.create({ name }, req.user.id) });
+});
+app.put('/api/hr/departments/:id', authRequired, hrOnly, (req, res) => {
+  const d = Departments.rename(req.params.id, (req.body || {}).name);
+  if (!d) return res.status(404).json({ error: 'Department not found.' });
+  res.json({ ok: true, department: d });
+});
+app.put('/api/hr/departments/:id/head', authRequired, hrOnly, (req, res) => {
+  const { user_id } = req.body || {};
+  if (user_id && !DepartmentMembers.isMember(req.params.id, user_id)) return res.status(400).json({ error: 'The head must already be a member of this department.' });
+  const d = Departments.setHead(req.params.id, user_id || null);
+  if (!d) return res.status(404).json({ error: 'Department not found.' });
+  res.json({ ok: true, department: d });
+});
+app.delete('/api/hr/departments/:id', authRequired, hrOnly, (req, res) => { Departments.remove(req.params.id); res.json({ ok: true }); });
+// Small people-search for the "Add member" / "Set head" pickers - open to
+// any internal (non-student/free) role since it only returns name/email/role.
+app.get('/api/hr/users-lite', authRequired, (req, res) => {
+  if (['student', 'free'].includes(req.user.role)) return res.status(403).json({ error: 'Not available for your role.' });
+  const q = String(req.query.q || '').trim().toLowerCase();
+  const rows = Users.all()
+    .filter((u) => !['student', 'free'].includes(u.role))
+    .filter((u) => !q || u.name.toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q))
+    .slice(0, 20)
+    .map((u) => ({ id: u.id, name: u.name, role: u.role, email: u.email }));
+  res.json({ users: rows });
+});
+app.get('/api/department/:id', authRequired, departmentManage, (req, res) => res.json({ department: departmentDetail(req.department) }));
+app.post('/api/department/:id/members', authRequired, departmentManage, (req, res) => {
+  const target = Users.byId((req.body || {}).user_id);
+  if (!target) return res.status(404).json({ error: 'User not found.' });
+  DepartmentMembers.add(req.department.id, target.id, req.user.id);
+  res.json({ ok: true, department: departmentDetail(req.department) });
+});
+app.delete('/api/department/:id/members/:userId', authRequired, departmentManage, (req, res) => {
+  DepartmentMembers.remove(req.department.id, req.params.userId);
+  if (req.department.head_user_id === Number(req.params.userId)) Departments.setHead(req.department.id, null);
+  res.json({ ok: true, department: departmentDetail(req.department) });
+});
+app.post('/api/department/:id/tasks', authRequired, departmentManage, upload.single('file'), (req, res) => {
+  const { title, description, scope, member_user_id } = req.body || {};
+  if (!title || !String(title).trim()) {
+    if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} }
+    return res.status(400).json({ error: 'A title is required.' });
+  }
+  if (scope === 'member' && !DepartmentMembers.isMember(req.department.id, member_user_id)) {
+    if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} }
+    return res.status(400).json({ error: 'Pick which member this task is for.' });
+  }
+  let attachment = null;
+  if (req.file) {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    if (!DUTY_ATTACH_EXT.includes(ext)) {
+      try { fs.unlinkSync(req.file.path); } catch {}
+      return res.status(400).json({ error: 'Only PDF, Word or image files (jpg/png/gif/webp) are accepted.' });
+    }
+    attachment = { filename: req.file.filename, original_name: req.file.originalname };
+  }
+  const { task, recipients } = DepartmentTasks.create({ department_id: req.department.id, title, description, scope, member_user_id, attachment }, req.user.id);
+  for (const u of recipients) {
+    if (!u.email) continue;
+    mailer.notify(u.email, `New task assigned: ${task.title}`,
+      `${hi(u.name)},\n\nA new task has been assigned to you in ${req.department.name}.\n\n${task.title}\n${task.description ? '\n' + task.description + '\n' : ''}${attachment ? '\nAn attachment is included - view it from your portal.\n' : ''}\nSign in at ${APP_URL}/login to view it and mark it done.\n\nEchoLens Digital`);
+  }
+  res.json({ ok: true, task });
+});
+app.post('/api/department/:id/announcements', authRequired, departmentManage, (req, res) => {
+  const { title, body } = req.body || {};
+  if (!title || !String(title).trim()) return res.status(400).json({ error: 'A title is required.' });
+  const a = DepartmentAnnouncements.create({ department_id: req.department.id, title, body }, req.user.id);
+  for (const m of DepartmentMembers.forDepartment(req.department.id)) {
+    if (!m.user.email) continue;
+    mailer.notify(m.user.email, `${req.department.name}: ${a.title}`, `${hi(m.user.name)},\n\n${a.body}\n\nSign in at ${APP_URL}/login to see it in your portal.\n\nEchoLens Digital`);
+  }
+  res.json({ ok: true, announcement: a });
+});
+app.get('/api/my-departments', authRequired, (req, res) => {
+  const memberships = DepartmentMembers.forUser(req.user.id);
+  const out = memberships.map((m) => {
+    const tasks = DepartmentTasks.forUser(req.user.id).filter((t) => t.task.department_id === m.department_id);
+    return {
+      id: m.department.id, name: m.department.name, is_head: m.department.head_user_id === req.user.id,
+      tasks, progress: { done: tasks.filter((t) => t.status === 'done').length, total: tasks.length },
+      announcements: DepartmentAnnouncements.forDepartment(m.department_id),
+    };
+  });
+  res.json({ departments: out });
+});
+app.post('/api/my-departments/tasks/:taskId/complete', authRequired, upload.single('file'), (req, res) => {
+  let proof_attachment = null;
+  if (req.file) {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    if (!DUTY_ATTACH_EXT.includes(ext)) {
+      try { fs.unlinkSync(req.file.path); } catch {}
+      return res.status(400).json({ error: 'Only PDF, Word or image files (jpg/png/gif/webp) are accepted.' });
+    }
+    proof_attachment = { filename: req.file.filename, original_name: req.file.originalname };
+  }
+  const s = DepartmentTasks.markDone(req.params.taskId, req.user.id, { note: (req.body || {}).note, proof_attachment });
+  if (!s) { if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} } return res.status(404).json({ error: 'Task not found for you.' }); }
+  res.json({ ok: true });
+});
+
+/* ------------------------------- onboarding -------------------------------
+ * Instructors, staff and ambassadors must complete a first-login profile
+ * (contact/address/qualifications/experience) before using their portal -
+ * see requireOnboarding() in dashboard.js. */
+app.post('/api/me/onboarding', authRequired, (req, res) => {
+  if (!['instructor', 'staff', 'ambassador'].includes(req.user.role)) return res.status(403).json({ error: 'Not applicable for your role.' });
+  const { phone, address, education, experience_years } = req.body || {};
+  if (!phone || !String(phone).trim()) return res.status(400).json({ error: 'Phone number is required.' });
+  if (!address || !String(address).trim()) return res.status(400).json({ error: 'Address is required.' });
+  if (!education || !String(education).trim()) return res.status(400).json({ error: 'Education/qualification is required.' });
+  Users.updateProfile(req.user.id, { ...req.body, experience_years: experience_years === undefined ? '0' : experience_years });
+  Users.setOnboarded(req.user.id);
+  res.json({ ok: true });
+});
+
 /* --------------------------- ambassador self-service --------------------------- */
 app.get('/api/ambassador/me', authRequired, ambassadorOnly, (req, res) => {
   const a = Ambassadors.byUserId(req.user.id);
@@ -893,27 +1030,7 @@ app.get('/api/ambassador/qr', authRequired, ambassadorOnly, async (req, res) => 
     res.json({ qr: dataUrl, url: `${APP_URL}/open?amb=${a.code}` });
   } catch { res.status(500).json({ error: 'Could not generate the QR code - try again.' }); }
 });
-app.get('/api/ambassador/duties', authRequired, ambassadorOnly, (req, res) => {
-  const a = Ambassadors.byUserId(req.user.id);
-  if (!a) return res.status(404).json({ error: 'Ambassador record not found.' });
-  res.json({ duties: AmbassadorDuties.forAmbassador(a.id) });
-});
-app.post('/api/ambassador/duties/:id/complete', authRequired, ambassadorOnly, upload.single('file'), (req, res) => {
-  const a = Ambassadors.byUserId(req.user.id);
-  if (!a) { if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} } return res.status(404).json({ error: 'Ambassador record not found.' }); }
-  let proof_attachment = null;
-  if (req.file) {
-    const ext = path.extname(req.file.originalname).toLowerCase();
-    if (!DUTY_ATTACH_EXT.includes(ext)) {
-      try { fs.unlinkSync(req.file.path); } catch {}
-      return res.status(400).json({ error: 'Only PDF, Word or image files (jpg/png/gif/webp) are accepted.' });
-    }
-    proof_attachment = { filename: req.file.filename, original_name: req.file.originalname };
-  }
-  const s = AmbassadorDuties.markDone(req.params.id, a.id, { note: (req.body || {}).note, proof_attachment });
-  if (!s) return res.status(404).json({ error: 'Duty not found for you.' });
-  res.json({ ok: true });
-});
+// Ambassador tasks now come from /api/my-departments (the "Ambassadors" department).
 app.get('/api/ambassador/referrals', authRequired, ambassadorOnly, (req, res) => {
   const a = Ambassadors.byUserId(req.user.id);
   if (!a) return res.status(404).json({ error: 'Ambassador record not found.' });

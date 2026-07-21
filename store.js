@@ -38,7 +38,7 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
@@ -47,6 +47,7 @@ const empty = () => ({
   jobs: [], job_comments: [],
   discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [], ambassadors: [],
   ambassador_gem_events: [], ambassador_duties: [], ambassador_duty_status: [], ambassador_reports: [],
+  departments: [], department_members: [], department_tasks: [], department_task_status: [], department_announcements: [],
   settings: {
     cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' },
     bank: { bank_name: 'Meezan Bank', account_title: 'EchoLens Digital (Pvt) Ltd', account_number: '0123-4567890-123', iban: 'PK36 MEZN 0000 0123 4567 8901', branch: 'Gulberg Branch, Lahore' },
@@ -118,6 +119,39 @@ function migrate() {
     if (a.gems === undefined) { a.gems = 0; changed = true; }
     if (a.university === undefined) { a.university = null; changed = true; }
     if (a.user_id === undefined) { a.user_id = null; changed = true; }
+  }
+  // Departments: generic org layer superseding the ambassador-only duty
+  // system. Collections backfilled first, then (once, only if no department
+  // exists yet - so HR's later edits are never overwritten on restart) four
+  // defaults are seeded and auto-populated from existing data.
+  for (const t of ['departments', 'department_members', 'department_tasks', 'department_task_status', 'department_announcements']) {
+    if (!Array.isArray(data[t])) { data[t] = []; changed = true; }
+    if (data.seq[t] === undefined) { data.seq[t] = 0; changed = true; }
+  }
+  // Accounts created before onboarding existed are grandfathered in; only
+  // new instructor/staff/ambassador accounts are gated going forward.
+  for (const u of data.users) {
+    if (u.onboarding_complete === undefined) { u.onboarding_complete = true; changed = true; }
+  }
+  if (data.departments.length === 0) {
+    const mkDept = (name) => {
+      const d = { id: ++data.seq.departments, name, head_user_id: null, created_by: null, created_at: now() };
+      data.departments.push(d);
+      return d;
+    };
+    const addMember = (dept, userId) => {
+      if (userId == null) return;
+      if (data.department_members.some((m) => m.department_id === dept.id && m.user_id === Number(userId))) return;
+      data.department_members.push({ id: ++data.seq.department_members, department_id: dept.id, user_id: Number(userId), added_by: null, added_at: now() });
+    };
+    const teachers = mkDept('Teachers');
+    for (const u of data.users) if (u.role === 'instructor') addMember(teachers, u.id);
+    const ambassadorsDept = mkDept('Ambassadors');
+    for (const a of data.ambassadors) if (a.user_id) addMember(ambassadorsDept, a.user_id);
+    const interns = mkDept('Interns');
+    const staffDept = mkDept('Staff');
+    for (const s of data.staff_records) addMember(s.employment_type === 'intern' ? interns : staffDept, s.user_id);
+    changed = true;
   }
   // v17: registration/finance pipeline stage on pre-existing registrations.
   for (const r of data.registrations) {
@@ -270,6 +304,10 @@ const Users = {
       reg_no: ['student', 'free'].includes(role) ? issueRegNo() : null,
       password_hash: bcrypt.hashSync(password, 10),
       profile: {}, streak: 0, best_streak: 0, last_active: null, created_at: now(),
+      // Instructors, staff and ambassadors must complete a first-login
+      // profile (contact/address/qualifications) before using their portal -
+      // see requireOnboarding() in dashboard.js and POST /api/me/onboarding.
+      onboarding_complete: !['instructor', 'staff', 'ambassador'].includes(role),
     };
     data.users.push(u); save();
     return { user: u, password };
@@ -331,7 +369,7 @@ const Users = {
   },
   updateProfile(id, profile) {
     const u = Users.byId(id); if (!u) return null;
-    const allowed = [...Users.PROFILE_FIELDS.base, ...(['instructor', 'admin', 'coordinator'].includes(u.role) ? Users.PROFILE_FIELDS.staff : [])];
+    const allowed = [...Users.PROFILE_FIELDS.base, ...(['instructor', 'admin', 'coordinator', 'staff', 'ambassador'].includes(u.role) ? Users.PROFILE_FIELDS.staff : [])];
     const clean = {};
     for (const k of allowed) if (profile[k] !== undefined) clean[k] = String(profile[k]).slice(0, 300);
     u.profile = { ...(u.profile || {}), ...clean };
@@ -339,6 +377,7 @@ const Users = {
     save();
     return u;
   },
+  setOnboarded(id) { const u = Users.byId(id); if (!u) return null; u.onboarding_complete = true; save(); return u; },
   setAvatar(id, url) { const u = Users.byId(id); if (!u) return null; u.avatar = url; save(); return u; },
   setSignature(id, url) { const u = Users.byId(id); if (!u) return null; u.signature = url; save(); return u; },
   remove(id) {
@@ -1842,53 +1881,136 @@ const AmbassadorGemEvents = {
   forAmbassador(id) { return data.ambassador_gem_events.filter((e) => e.ambassador_id === Number(id)).sort((a, b) => b.id - a.id); },
 };
 
-/* --------------------------- ambassador duties ---------------------------
- * HR-assigned tasks, either broadcast to every current ambassador ('all') or
- * targeted at one ('one'). Completion is tracked per-ambassador so a group
- * duty's progress can be seen at a glance. */
-const AmbassadorDuties = {
-  create({ title, description, scope, ambassador_id, attachment }, by) {
+/* ============================== departments ==============================
+ * Generic org-structure layer: HR/Admin create a department (Ambassadors,
+ * Teachers, Interns, Staff, or any custom one), add/remove members (any
+ * Users row, regardless of login role), and optionally name a head. Once
+ * named, that head can manage their own department's roster, tasks and
+ * announcements exactly like HR can - see departmentManage in server.js.
+ * This supersedes the ambassador-only duty system: "Ambassadors" is just
+ * one department among others, auto-seeded and auto-grown as HR creates
+ * ambassadors (see POST /api/hr/ambassadors in server.js). */
+const Departments = {
+  create({ name }, by) {
     const d = {
-      id: nextId('ambassador_duties'),
+      id: nextId('departments'), name: String(name || '').trim().slice(0, 100) || 'Department',
+      head_user_id: null, created_by: by || null, created_at: now(),
+    };
+    data.departments.push(d); save();
+    return d;
+  },
+  all() { return data.departments.slice().sort((a, b) => a.name.localeCompare(b.name)); },
+  byId(id) { return data.departments.find((d) => d.id === Number(id)) || null; },
+  byName(name) { return data.departments.find((d) => d.name.toLowerCase() === String(name || '').toLowerCase()) || null; },
+  rename(id, name) {
+    const d = Departments.byId(id); if (!d) return null;
+    d.name = String(name || '').trim().slice(0, 100) || d.name; save();
+    return d;
+  },
+  setHead(id, userId) {
+    const d = Departments.byId(id); if (!d) return null;
+    d.head_user_id = userId ? Number(userId) : null; save();
+    return d;
+  },
+  remove(id) {
+    const did = Number(id);
+    const removedTaskIds = data.department_tasks.filter((t) => t.department_id === did).map((t) => t.id);
+    data.departments = data.departments.filter((d) => d.id !== did);
+    data.department_members = data.department_members.filter((m) => m.department_id !== did);
+    data.department_tasks = data.department_tasks.filter((t) => t.department_id !== did);
+    data.department_task_status = data.department_task_status.filter((s) => !removedTaskIds.includes(s.task_id));
+    data.department_announcements = data.department_announcements.filter((a) => a.department_id !== did);
+    save();
+  },
+  isHead(departmentId, userId) {
+    const d = Departments.byId(departmentId);
+    return !!d && d.head_user_id === Number(userId);
+  },
+};
+const DepartmentMembers = {
+  add(departmentId, userId, by) {
+    if (DepartmentMembers.isMember(departmentId, userId)) return DepartmentMembers.forDepartment(departmentId).find((m) => m.user_id === Number(userId));
+    const m = { id: nextId('department_members'), department_id: Number(departmentId), user_id: Number(userId), added_by: by || null, added_at: now() };
+    data.department_members.push(m); save();
+    return m;
+  },
+  remove(departmentId, userId) {
+    data.department_members = data.department_members.filter((m) => !(m.department_id === Number(departmentId) && m.user_id === Number(userId)));
+    save();
+  },
+  isMember(departmentId, userId) { return data.department_members.some((m) => m.department_id === Number(departmentId) && m.user_id === Number(userId)); },
+  forDepartment(departmentId) {
+    return data.department_members.filter((m) => m.department_id === Number(departmentId))
+      .map((m) => ({ ...m, user: Users.byId(m.user_id) }))
+      .filter((m) => m.user)
+      .sort((a, b) => a.user.name.localeCompare(b.user.name));
+  },
+  forUser(userId) {
+    return data.department_members.filter((m) => m.user_id === Number(userId))
+      .map((m) => ({ ...m, department: Departments.byId(m.department_id) }))
+      .filter((m) => m.department);
+  },
+};
+/* Tasks: broadcast to every current member ('all') or targeted at one
+ * ('member'). Completion is tracked per-member so a group task's progress
+ * can be seen at a glance - same shape as the ambassador duty system this
+ * replaces. */
+const DepartmentTasks = {
+  create({ department_id, title, description, scope, member_user_id, attachment }, by) {
+    const t = {
+      id: nextId('department_tasks'), department_id: Number(department_id),
       title: String(title || '').trim().slice(0, 150),
       description: String(description || '').trim().slice(0, 2000),
-      scope: scope === 'one' ? 'one' : 'all',
+      scope: scope === 'member' ? 'member' : 'all',
       attachment: attachment || null, // { filename, original_name }
       created_by: by || null, created_at: now(),
     };
-    data.ambassador_duties.push(d);
-    const targets = d.scope === 'one'
-      ? Ambassadors.all().filter((a) => a.active && a.id === Number(ambassador_id))
-      : Ambassadors.all().filter((a) => a.active);
-    for (const a of targets) {
-      data.ambassador_duty_status.push({
-        id: nextId('ambassador_duty_status'), duty_id: d.id, ambassador_id: a.id,
+    data.department_tasks.push(t);
+    const members = DepartmentMembers.forDepartment(t.department_id);
+    const targets = t.scope === 'member' ? members.filter((m) => m.user_id === Number(member_user_id)) : members;
+    for (const m of targets) {
+      data.department_task_status.push({
+        id: nextId('department_task_status'), task_id: t.id, user_id: m.user_id,
         status: 'pending', note: null, proof_attachment: null, completed_at: null,
       });
     }
     save();
-    return { duty: d, recipients: targets };
+    return { task: t, recipients: targets.map((m) => m.user) };
   },
-  all() {
-    return data.ambassador_duties.slice().sort((a, b) => b.id - a.id).map((d) => {
-      const rows = data.ambassador_duty_status.filter((s) => s.duty_id === d.id);
-      return { ...d, total: rows.length, done: rows.filter((s) => s.status === 'done').length };
+  forDepartment(departmentId) {
+    return data.department_tasks.filter((t) => t.department_id === Number(departmentId)).sort((a, b) => b.id - a.id).map((t) => {
+      const rows = data.department_task_status.filter((s) => s.task_id === t.id);
+      return { ...t, total: rows.length, done: rows.filter((s) => s.status === 'done').length };
     });
   },
-  byId(id) { return data.ambassador_duties.find((d) => d.id === Number(id)) || null; },
-  forAmbassador(ambassadorId) {
-    const rows = data.ambassador_duty_status.filter((s) => s.ambassador_id === Number(ambassadorId));
-    return rows.map((s) => ({ ...s, duty: AmbassadorDuties.byId(s.duty_id) }))
-      .filter((r) => r.duty)
-      .sort((a, b) => b.duty.id - a.duty.id);
+  byId(id) { return data.department_tasks.find((t) => t.id === Number(id)) || null; },
+  forUser(userId) {
+    const rows = data.department_task_status.filter((s) => s.user_id === Number(userId));
+    return rows.map((s) => ({ ...s, task: DepartmentTasks.byId(s.task_id) })).filter((r) => r.task).sort((a, b) => b.task.id - a.task.id);
   },
-  markDone(dutyId, ambassadorId, { note, proof_attachment } = {}) {
-    const s = data.ambassador_duty_status.find((x) => x.duty_id === Number(dutyId) && x.ambassador_id === Number(ambassadorId));
+  markDone(taskId, userId, { note, proof_attachment } = {}) {
+    const s = data.department_task_status.find((x) => x.task_id === Number(taskId) && x.user_id === Number(userId));
     if (!s) return null;
     s.status = 'done'; s.note = String(note || '').trim().slice(0, 600) || null;
     s.proof_attachment = proof_attachment || null; s.completed_at = now();
     save();
     return s;
+  },
+};
+const DepartmentAnnouncements = {
+  create({ department_id, title, body }, by) {
+    const a = {
+      id: nextId('department_announcements'), department_id: Number(department_id),
+      title: String(title || '').trim().slice(0, 150), body: String(body || '').trim().slice(0, 2000),
+      created_by: by || null, created_at: now(),
+    };
+    data.department_announcements.push(a); save();
+    return a;
+  },
+  forDepartment(departmentId) { return data.department_announcements.filter((a) => a.department_id === Number(departmentId)).sort((a, b) => b.id - a.id); },
+  forUser(userId) {
+    const depIds = DepartmentMembers.forUser(userId).map((m) => m.department_id);
+    return data.department_announcements.filter((a) => depIds.includes(a.department_id)).sort((a, b) => b.id - a.id);
   },
 };
 
@@ -2901,7 +3023,8 @@ module.exports = {
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
-  AmbassadorGemEvents, AmbassadorDuties, AmbassadorReports,
+  AmbassadorGemEvents, AmbassadorReports,
+  Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
   seed, DB_PATH, allData: () => data,
 };
 

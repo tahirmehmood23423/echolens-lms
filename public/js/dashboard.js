@@ -107,6 +107,7 @@ const TITLES = {
   'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-logs': 'System Logs',
   jobs: 'Jobs', job: 'Job',
   'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal', 'dept-ambassador': 'Ambassadors Portal',
+  'my-department': 'My Department', 'admin-departments': 'Departments',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -131,6 +132,8 @@ function show(view) {
     jobs: renderJobs,
     'dept-hr': renderDeptHR, 'dept-finance': renderDeptFinance, 'dept-student-coordinator': renderDeptStudentCoordinator, 'dept-staff': renderDeptStaff,
     'dept-ambassador': renderDeptAmbassador,
+    'my-department': () => renderMyDepartments('view-my-department'),
+    'admin-departments': renderAdminDepartments,
   }[view];
   if (render) render();
 }
@@ -157,6 +160,7 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
     $('gate').style.display = 'none';
     $('app').style.display = '';
     show(DEPT_ROLES[ME.role].view);
+    requireOnboarding();
     return;
   }
   if (ME.role === 'admin') document.querySelectorAll('.admin-only').forEach((el) => (el.style.display = ''));
@@ -194,6 +198,7 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   $('app').style.display = '';
   renderOverview();
   requireWhatsapp(); // v12: contact details are mandatory for every learner
+  requireOnboarding(); // instructors must complete their first-login profile
 })();
 async function refreshMessageBadge() {
   try {
@@ -258,6 +263,39 @@ function requireWhatsapp() {
     try {
       await api('/api/me/contact', { method: 'POST', body: JSON.stringify({ whatsapp: f.whatsapp.value.trim() }) });
       ME.profile = ME.profile || {}; ME.profile.phone = f.whatsapp.value.trim();
+      window.MODAL_LOCK = false;
+      $('modalBox').querySelector('.close').style.display = '';
+      closeModal(); toast('Saved - welcome aboard!');
+    } catch (err) {
+      if (err.message === 'Signed out.') { window.MODAL_LOCK = false; location.href = '/'; return; }
+      modalMsg(err.message); btn.disabled = false;
+    }
+  });
+}
+
+/* Instructors, staff and ambassadors must complete a first-login profile
+ * (contact/address/qualifications/experience) before using their portal -
+ * same non-dismissable pattern as requireWhatsapp() above. */
+function requireOnboarding() {
+  if (!['instructor', 'staff', 'ambassador'].includes(ME.role)) return;
+  if (ME.onboarding_complete) return;
+  openModal('Complete your profile', `
+    <form id="onboardForm">
+      <p class="s" style="color:var(--muted);margin-bottom:12px">A few details for HR's records before you get started.</p>
+      <label class="field"><span>Phone</span><input name="phone" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+      <label class="field"><span>Address</span><input name="address" required></label>
+      <div class="form-grid">
+        <label class="field"><span>Education / qualification</span><input name="education" required placeholder="e.g. BS Computer Science"></label>
+        <label class="field"><span>Years of experience</span><input name="experience_years" type="number" min="0" placeholder="0 if none"></label>
+      </div>
+      <button class="btn btn-primary btn-block">Save & continue</button></form>`);
+  window.MODAL_LOCK = true;
+  $('modalBox').querySelector('.close').style.display = 'none';
+  $('onboardForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try {
+      await api('/api/me/onboarding', { method: 'POST', body: JSON.stringify({ phone: f.phone.value.trim(), address: f.address.value.trim(), education: f.education.value.trim(), experience_years: f.experience_years.value }) });
+      ME.onboarding_complete = true;
       window.MODAL_LOCK = false;
       $('modalBox').querySelector('.close').style.display = '';
       closeModal(); toast('Saved - welcome aboard!');
@@ -2531,53 +2569,139 @@ async function coordResolveQuery(id) {
 }
 
 /* -------------------------------- HR portal -------------------------------- */
-let HR_TAB = 'staff';
-let HR_GROUPS_CACHE = [];
-function hrTab(tab) { HR_TAB = tab; renderDeptHR(); }
+/* -------- HR Portal: sidebar buttons, one per department + Ambassador reports -------- */
+let HR_ACTIVE_DEPT = null; // null = landing state, 'ambassador-reports' = reports panel, else a department id
 async function renderDeptHR() {
   const el = $('view-dept-hr');
-  const tabs = [['staff', 'Staff & interns'], ['groups', 'Groups'], ['ambassadors', 'Ambassadors'], ['ambassador-duties', 'Ambassador duties'], ['ambassador-reports', 'Ambassador reports']];
-  el.innerHTML = deptHeaderHtml('HR Portal') + deptTabBarHtml(tabs, HR_TAB, 'hrTab') + '<div id="hrTabBody"><div class="empty">Loading&hellip;</div></div>';
-  if (HR_TAB === 'staff') renderHrStaff();
-  else if (HR_TAB === 'ambassadors') renderHrAmbassadors();
-  else if (HR_TAB === 'ambassador-duties') renderHrAmbassadorDuties();
-  else if (HR_TAB === 'ambassador-reports') renderAmbassadorReportsPanel('hrTabBody', { withSignoff: true });
-  else renderHrGroups();
+  el.innerHTML = deptHeaderHtml('HR Portal') + '<div id="hrDeptBody"><div class="empty">Loading&hellip;</div></div>';
+  await populateHrDeptNav();
+  if (HR_ACTIVE_DEPT === 'ambassador-reports') renderAmbassadorReportsPanel('hrDeptBody', { withSignoff: true });
+  else if (HR_ACTIVE_DEPT != null) renderDepartmentDetail('hrDeptBody', HR_ACTIVE_DEPT, { hrView: true });
+  else $('hrDeptBody').innerHTML = '<div class="empty">Pick a department from the sidebar, or add a new one.</div>';
 }
-/* -------- HR: ambassadors (portal login + 4-digit referral code + gems) -------- */
+async function populateHrDeptNav() {
+  const nav = $('hrDeptNav'); if (!nav) return;
+  const d = await api('/api/hr/departments');
+  nav.innerHTML = d.departments.map((dep) => `<a class="nav-item" style="padding-left:34px;font-size:13.5px" onclick="hrShowDepartment(${dep.id})">${esc(dep.name)} <span class="s" style="color:var(--muted-2);margin-left:auto">${dep.member_count}</span></a>`).join('')
+    + `<a class="nav-item" style="padding-left:34px;font-size:13.5px" onclick="hrShowAmbassadorReports()">Ambassador reports</a>`
+    + `<a class="nav-item" style="padding-left:34px;font-size:13.5px;color:var(--primary)" onclick="formNewDepartment()">+ New department</a>`;
+}
+function hrShowDepartment(id) { HR_ACTIVE_DEPT = id; renderDeptHR(); }
+function hrShowAmbassadorReports() { HR_ACTIVE_DEPT = 'ambassador-reports'; renderDeptHR(); }
+function formNewDepartment(context) {
+  openModal('New department', `<form id="f">
+    <label class="field"><span>Name</span><input name="name" required placeholder="e.g. Video Editors"></label>
+    <button class="btn btn-primary btn-block">Create department</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
+    try {
+      const d = await api('/api/hr/departments', { method: 'POST', body: JSON.stringify({ name: f.name.value.trim() }) });
+      toast('Department created.'); closeModal();
+      if (context === 'admin') renderAdminDepartments().then(() => adminShowDepartment(d.department.id));
+      else hrShowDepartment(d.department.id);
+    } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
+  });
+}
+/* -------- Admin: Departments (same detail view as HR, own entry point) -------- */
+async function renderAdminDepartments() {
+  const el = $('view-admin-departments');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/hr/departments');
+  el.innerHTML = `<div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="s" style="color:var(--muted)">Manage every department's roster, head, tasks and announcements.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="formNewDepartment('admin')">+ New department</button>
+    </div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      ${d.departments.map((dep) => `<button class="btn btn-ghost btn-sm" onclick="adminShowDepartment(${dep.id})">${esc(dep.name)} (${dep.member_count})</button>`).join('') || '<span class="s" style="color:var(--muted)">No departments yet.</span>'}
+    </div>
+    <div id="adminDeptBody"></div>`;
+}
+function adminShowDepartment(id) { renderDepartmentDetail('adminDeptBody', id, { hrView: true }); }
+/* -------- Department detail: roster, tasks, announcements -------- *
+ * Shared by HR (any department) and a department head viewing their own -
+ * hrView also unlocks rename/delete/head-picker, which only HR/admin can
+ * actually call server-side regardless of what's shown here. Every action
+ * refreshes via refreshDeptDetail(containerId), which reads the department
+ * id and hrView flag back off the container - so modals stay simple
+ * (id, name) onclick calls instead of threading closures through HTML strings. */
+async function renderDepartmentDetail(containerId, deptId, { hrView = false } = {}) {
+  const box = $(containerId);
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  box.dataset.deptId = deptId; box.dataset.hrView = hrView ? '1' : '';
+  const d = await api(`/api/department/${deptId}`);
+  const dep = d.department;
+  const headName = dep.members.find((m) => m.user_id === dep.head_user_id);
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div>
+        <h2 style="margin:0 0 4px;font-size:19px">${esc(dep.name)}</h2>
+        <div class="s" style="color:var(--muted)">Head: ${headName ? esc(headName.name) : 'Unassigned'}</div>
+      </div>
+      <span style="flex:1"></span>
+      ${hrView ? `<button class="btn btn-ghost btn-sm" onclick="formSetDepartmentHead('${containerId}')">Set head</button>
+        <button class="btn btn-ghost btn-sm" onclick="renameDepartment('${containerId}')">Rename</button>
+        <button class="btn btn-danger btn-sm" onclick="delDepartment('${containerId}')">Delete</button>` : ''}
+    </div></div>
+    ${dep.name === 'Ambassadors' && hrView ? `<div id="ambGemRatesWrap" style="margin-bottom:16px"></div>` : ''}
+    <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Members</h3>
+      <div style="display:flex;gap:8px">
+        ${dep.name === 'Ambassadors' && hrView ? `<button class="btn btn-primary btn-sm" onclick="formNewAmbassador('${containerId}')">Add ambassador</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="formAddDepartmentMember('${containerId}')">Add existing member</button>
+      </div></div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Name</th><th>Role</th><th>Email</th>${dep.name === 'Ambassadors' ? '<th>Code</th><th>Gems</th><th>University</th>' : ''}<th></th></tr>
+        ${dep.members.map((m) => `<tr>
+          <td>${esc(m.name)}${m.user_id === dep.head_user_id ? ' <span class="s" style="color:var(--ok);font-weight:700">(Head)</span>' : ''}</td>
+          <td class="s">${esc(roleLabel(m.role))}</td><td class="s">${esc(m.email || '—')}</td>
+          ${dep.name === 'Ambassadors' ? (m.ambassador
+            ? `<td class="mono">${esc(m.ambassador.code)}</td><td>${gemChip(m.ambassador.gems || 0)}</td><td class="s">${esc(m.ambassador.university || '—')}</td>`
+            : '<td class="s">—</td><td class="s">—</td><td class="s">—</td>') : ''}
+          <td>${hrView && m.ambassador
+            ? `<button class="btn btn-ghost btn-sm" onclick="delAmbassadorFromDept('${containerId}', ${m.ambassador.id}, '${esc(m.name)}')">Remove ambassador</button>`
+            : `<button class="btn btn-ghost btn-sm" onclick="delDepartmentMember('${containerId}', ${m.user_id}, '${esc(m.name)}')">Remove</button>`}</td>
+        </tr>`).join('') || `<tr><td colspan="${dep.name === 'Ambassadors' ? 7 : 4}" class="empty">No members yet.</td></tr>`}
+      </table></div></div>
+    <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Tasks</h3>
+      <button class="btn btn-primary btn-sm" onclick="formDepartmentTask('${containerId}')">Assign a task</button></div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Title</th><th>Assigned to</th><th>Attachment</th><th>Progress</th><th>Assigned</th></tr>
+        ${dep.tasks.map((t) => `<tr>
+          <td>${esc(t.title)}</td><td class="s">${t.scope === 'all' ? 'Whole department' : 'One member'}</td>
+          <td class="s">${t.attachment ? `<a href="/uploads/${esc(t.attachment.filename)}" target="_blank">${esc(t.attachment.original_name)}</a>` : '—'}</td>
+          <td>${t.done}/${t.total} done</td><td class="s">${esc((t.created_at || '').slice(0, 10))}</td>
+        </tr>`).join('') || '<tr><td colspan="5" class="empty">No tasks assigned yet.</td></tr>'}
+      </table></div></div>
+    <div class="card"><div class="card-head"><h3>Announcements</h3>
+      <button class="btn btn-primary btn-sm" onclick="formDepartmentAnnouncement('${containerId}')">Post announcement</button></div>
+      <div class="card-body">
+        ${dep.announcements.map((a) => `<div class="s" style="padding:9px 0;border-bottom:1px solid var(--line)"><strong>${esc(a.title)}</strong> &middot; ${esc((a.created_at || '').slice(0, 10))}<br>${esc(a.body)}</div>`).join('') || '<div class="s" style="color:var(--muted)">Nothing posted yet.</div>'}
+      </div></div>`;
+  if (dep.name === 'Ambassadors' && hrView) renderAmbGemRates();
+}
+/* -------- Ambassadors are a department too, but creating one issues a real
+ * portal login + 4-digit referral code + QR (not just roster membership),
+ * and gem rates are a setting of their own - both live here as a special
+ * case of the Ambassadors department view. -------- */
 const AMBASSADOR_TIERS = ['Micro Course', 'Bootcamp', 'Short Course', 'Specialist Track'];
-async function renderHrAmbassadors() {
-  const box = $('hrTabBody');
-  const [d, ratesD] = await Promise.all([api('/api/hr/ambassadors'), api('/api/hr/ambassadors/gem-rates')]);
-  const ranked = d.ambassadors.slice().sort((a, b) => (b.gems || 0) - (a.gems || 0));
-  box.innerHTML = `<div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Gems per enrollment, by course category</h3></div>
+async function renderAmbGemRates() {
+  const box = $('ambGemRatesWrap'); if (!box) return;
+  const ratesD = await api('/api/hr/ambassadors/gem-rates');
+  box.innerHTML = `<div class="card"><div class="card-head"><h3>Gems per enrollment, by course category</h3></div>
     <div class="card-body">
       <p class="hint" style="margin-top:0">An ambassador earns these gems once a student they referred is actually enrolled (not just registered interest) - harder-to-sell categories are worth more.</p>
       <form id="rateForm" class="form-grid">
         ${AMBASSADOR_TIERS.map((t) => `<label class="field"><span>${esc(t)}</span><input name="${esc(t)}" type="number" min="0" value="${Number(ratesD.rates[t]) || 0}"></label>`).join('')}
         <button class="btn btn-primary btn-sm" style="grid-column:1/-1;justify-self:start">Save gem rates</button>
       </form>
-    </div></div>
-    <div class="card"><div class="card-head"><h3>Ambassadors</h3>
-      <button class="btn btn-primary btn-sm" onclick="formAmbassador()">Add ambassador</button></div>
-    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-      <tr><th>#</th><th>Name</th><th>Email</th><th>University</th><th>Code</th><th>Gems</th><th>Registrations referred</th><th></th></tr>
-      ${ranked.map((a, i) => `<tr>
-        <td>${i + 1}</td><td>${esc(a.name)}</td><td class="s">${esc(a.email)}</td><td class="s">${esc(a.university || '—')}</td>
-        <td class="mono" style="font-weight:700;letter-spacing:2px">${esc(a.code)}</td>
-        <td>${gemChip(a.gems || 0)}</td>
-        <td>${a.uses}</td>
-        <td><button class="btn btn-ghost btn-sm" onclick="delAmbassador(${a.id}, '${esc(a.name)}')">Remove</button></td>
-      </tr>`).join('') || '<tr><td colspan="8" class="empty">No ambassadors yet - add one and their portal login, unique 4-digit code and QR are emailed to them.</td></tr>'}
-    </table></div>
-    <p class="hint" style="padding:0 14px 12px">Students who enter a valid code (or scan the ambassador's QR) on the website registration form automatically get 10% off - the discount applies to their fee challan, and gems are credited to the ambassador once the student is enrolled.</p></div>`;
+    </div></div>`;
   $('rateForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target;
     const body = {}; for (const t of AMBASSADOR_TIERS) body[t] = f[t].value;
     try { await api('/api/hr/ambassadors/gem-rates', { method: 'PUT', body: JSON.stringify(body) }); toast('Gem rates saved.'); } catch (err) { toast(err.message, true); }
   });
 }
-function formAmbassador() {
+function formNewAmbassador(containerId) {
   openModal('Add an ambassador', `<form id="f">
     <label class="field"><span>Full name</span><input name="name" required></label>
     <label class="field"><span>Email</span><input name="email" type="email" required></label>
@@ -2591,53 +2715,124 @@ function formAmbassador() {
       openModal('Ambassador created', `<p class="s" style="line-height:1.8">${esc(d.ambassador.name)} is now an EchoLens ambassador.<br>
         Referral code: <strong class="mono" style="font-size:20px;letter-spacing:3px">${esc(d.ambassador.code)}</strong><br>
         Their login and referral code (plus a QR code) have been emailed to ${esc(d.ambassador.email)}.</p>
-        <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="closeModal();renderHrAmbassadors()">Done</button>`);
+        <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="closeModal();refreshDeptDetail('${containerId}')">Done</button>`);
     } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
   });
 }
-async function delAmbassador(id, name) {
+async function delAmbassadorFromDept(containerId, ambassadorId, name) {
   if (!confirm(`Remove ambassador ${name}? Their referral code and portal login stop working immediately.`)) return;
-  try { await api('/api/hr/ambassadors/' + id, { method: 'DELETE' }); toast('Removed.'); renderHrAmbassadors(); } catch (e) { toast(e.message, true); }
+  try { await api('/api/hr/ambassadors/' + ambassadorId, { method: 'DELETE' }); toast('Removed.'); refreshDeptDetail(containerId); } catch (e) { toast(e.message, true); }
 }
-/* -------- HR: ambassador duties -------- */
-async function renderHrAmbassadorDuties() {
-  const box = $('hrTabBody');
-  const [dutiesD, ambD] = await Promise.all([api('/api/hr/ambassadors/duties'), api('/api/hr/ambassadors')]);
-  box.innerHTML = `<div class="card"><div class="card-head"><h3>Duties</h3>
-      <button class="btn btn-primary btn-sm" onclick="formDuty()">Assign a duty</button></div>
-    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-      <tr><th>Title</th><th>Assigned to</th><th>Attachment</th><th>Progress</th><th>Assigned</th></tr>
-      ${dutiesD.duties.map((d) => `<tr>
-        <td>${esc(d.title)}</td>
-        <td class="s">${d.scope === 'all' ? 'All ambassadors' : 'One ambassador'}</td>
-        <td class="s">${d.attachment ? `<a href="/uploads/${esc(d.attachment.filename)}" target="_blank">${esc(d.attachment.original_name)}</a>` : '—'}</td>
-        <td>${d.done}/${d.total} done</td>
-        <td class="s">${esc((d.created_at || '').slice(0, 10))}</td>
-      </tr>`).join('') || '<tr><td colspan="5" class="empty">No duties assigned yet.</td></tr>'}
-    </table></div></div>`;
-  box.dataset.ambassadors = JSON.stringify(ambD.ambassadors);
+function refreshDeptDetail(containerId) {
+  const box = $(containerId);
+  // "My Department" head cards set data-kind="my" instead of being a full
+  // renderDepartmentDetail container - refresh the whole shared panel then.
+  if (box.dataset.kind === 'my') { refreshMyDepartments(); return; }
+  renderDepartmentDetail(containerId, box.dataset.deptId, { hrView: box.dataset.hrView === '1' });
 }
-function formDuty() {
-  const ambassadors = JSON.parse($('hrTabBody').dataset.ambassadors || '[]');
-  openModal('Assign a duty', `<form id="f" enctype="multipart/form-data">
+function formAddDepartmentMember(containerId) {
+  const deptId = $(containerId).dataset.deptId;
+  openModal('Add member', `<form id="f">
+    <label class="field"><span>Search by name or email</span><input name="q" placeholder="Start typing..." autocomplete="off"></label>
+    <div id="pickResults" class="s" style="max-height:220px;overflow:auto"></div>
+    <input type="hidden" name="user_id">
+    <button class="btn btn-primary btn-block" disabled>Add member</button></form>`);
+  const f = $('f'); const btn = f.querySelector('button');
+  let t = null;
+  f.q.addEventListener('input', () => {
+    clearTimeout(t); btn.disabled = true; f.user_id.value = '';
+    t = setTimeout(async () => {
+      const q = f.q.value.trim(); if (q.length < 2) { $('pickResults').innerHTML = ''; return; }
+      try {
+        const d = await api('/api/hr/users-lite?q=' + encodeURIComponent(q));
+        $('pickResults').innerHTML = d.users.map((u) => `<div style="padding:8px;border-bottom:1px solid var(--line);cursor:pointer" onclick="selectDeptMemberPick(${u.id}, '${esc(u.name)}')">${esc(u.name)} <span style="color:var(--muted)">&middot; ${esc(roleLabel(u.role))} &middot; ${esc(u.email || '')}</span></div>`).join('') || '<div class="s" style="color:var(--muted);padding:8px">No matches.</div>';
+      } catch {}
+    }, 250);
+  });
+  window.selectDeptMemberPick = (id, name) => {
+    f.user_id.value = id; $('pickResults').innerHTML = `<div class="s" style="padding:8px;color:var(--ok)">Selected: ${esc(name)}</div>`; btn.disabled = false;
+  };
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault(); btn.disabled = true;
+    try {
+      await api(`/api/department/${deptId}/members`, { method: 'POST', body: JSON.stringify({ user_id: f.user_id.value }) });
+      toast('Member added.'); closeModal(); refreshDeptDetail(containerId);
+    } catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+async function delDepartmentMember(containerId, userId, name) {
+  if (!confirm(`Remove ${name} from this department?`)) return;
+  const deptId = $(containerId).dataset.deptId;
+  try { await api(`/api/department/${deptId}/members/${userId}`, { method: 'DELETE' }); toast('Removed.'); refreshDeptDetail(containerId); } catch (e) { toast(e.message, true); }
+}
+async function formSetDepartmentHead(containerId) {
+  const deptId = $(containerId).dataset.deptId;
+  const d = await api(`/api/department/${deptId}`);
+  const dep = d.department;
+  openModal('Set department head', `<form id="f">
+    <label class="field"><span>Head</span><select name="user_id">
+      <option value="">Unassigned</option>
+      ${dep.members.map((m) => `<option value="${m.user_id}" ${m.user_id === dep.head_user_id ? 'selected' : ''}>${esc(m.name)}</option>`).join('')}
+    </select></label>
+    <p class="hint">Only HR/Admin can change this. Once set, the head can manage their own department's roster, tasks and announcements.</p>
+    <button class="btn btn-primary btn-block">Save</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
+    try { await api(`/api/hr/departments/${deptId}/head`, { method: 'PUT', body: JSON.stringify({ user_id: f.user_id.value || null }) }); toast('Head updated.'); closeModal(); refreshDeptDetail(containerId); }
+    catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
+  });
+}
+async function renameDepartment(containerId) {
+  const box = $(containerId); const deptId = box.dataset.deptId;
+  const d = await api(`/api/department/${deptId}`);
+  const name = prompt('New department name:', d.department.name);
+  if (!name || !name.trim() || name.trim() === d.department.name) return;
+  try { await api(`/api/hr/departments/${deptId}`, { method: 'PUT', body: JSON.stringify({ name: name.trim() }) }); toast('Renamed.'); refreshDeptDetail(containerId); populateHrDeptNav(); } catch (e) { toast(e.message, true); }
+}
+async function delDepartment(containerId) {
+  const box = $(containerId); const deptId = box.dataset.deptId;
+  const d = await api(`/api/department/${deptId}`);
+  if (!confirm(`Delete "${d.department.name}"? Its members, tasks and announcements are removed too.`)) return;
+  try { await api(`/api/hr/departments/${deptId}`, { method: 'DELETE' }); toast('Deleted.'); HR_ACTIVE_DEPT = null; renderDeptHR(); } catch (e) { toast(e.message, true); }
+}
+async function formDepartmentTask(containerId) {
+  const deptId = $(containerId).dataset.deptId;
+  const d = await api(`/api/department/${deptId}`);
+  const dep = d.department;
+  openModal('Assign a task', `<form id="f" enctype="multipart/form-data">
     <label class="field"><span>Title</span><input name="title" required></label>
     <label class="field"><span>Description</span><textarea name="description" rows="3"></textarea></label>
     <label class="field"><span>Assign to</span><select name="scope">
-      <option value="all">Whole group (all ambassadors)</option>
-      <option value="one">One ambassador</option>
+      <option value="all">Whole department</option>
+      <option value="member">One member</option>
     </select></label>
-    <label class="field" id="ambPickWrap" style="display:none"><span>Ambassador</span><select name="ambassador_id">
-      ${ambassadors.map((a) => `<option value="${a.id}">${esc(a.name)}${a.university ? ` (${esc(a.university)})` : ''}</option>`).join('')}
+    <label class="field" id="memberPickWrap" style="display:none"><span>Member</span><select name="member_user_id">
+      ${(dep.members || []).map((m) => `<option value="${m.user_id}">${esc(m.name)}</option>`).join('')}
     </select></label>
     <label class="field"><span>Attachment (optional) - document or picture</span><input name="file" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"></label>
-    <p class="hint">Every ambassador in scope gets an email the moment this is assigned.</p>
-    <button class="btn btn-primary btn-block">Assign duty</button></form>`);
-  $('f').scope.addEventListener('change', (e) => { $('ambPickWrap').style.display = e.target.value === 'one' ? '' : 'none'; });
+    <p class="hint">Every member in scope gets an email the moment this is assigned.</p>
+    <button class="btn btn-primary btn-block">Assign task</button></form>`);
+  $('f').scope.addEventListener('change', (e) => { $('memberPickWrap').style.display = e.target.value === 'member' ? '' : 'none'; });
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
     try {
-      await api('/api/hr/ambassadors/duties', { method: 'POST', body: new FormData(f) });
-      toast('Duty assigned.'); closeModal(); renderHrAmbassadorDuties();
+      await api(`/api/department/${deptId}/tasks`, { method: 'POST', body: new FormData(f) });
+      toast('Task assigned.'); closeModal(); refreshDeptDetail(containerId);
+    } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
+  });
+}
+function formDepartmentAnnouncement(containerId) {
+  const deptId = $(containerId).dataset.deptId;
+  openModal('Post an announcement', `<form id="f">
+    <label class="field"><span>Title</span><input name="title" required></label>
+    <label class="field"><span>Message</span><textarea name="body" rows="4" required></textarea></label>
+    <p class="hint">Every member of this department gets an email.</p>
+    <button class="btn btn-primary btn-block">Post</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
+    try {
+      await api(`/api/department/${deptId}/announcements`, { method: 'POST', body: JSON.stringify({ title: f.title.value, body: f.body.value }) });
+      toast('Announcement posted.'); closeModal(); refreshDeptDetail(containerId);
     } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
   });
 }
@@ -2709,128 +2904,6 @@ function emailAmbassadorReport(id) {
     } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
   });
 }
-async function renderHrStaff() {
-  const box = $('hrTabBody');
-  const [staffD, groupsD] = await Promise.all([api('/api/hr/staff'), api('/api/hr/groups')]);
-  HR_GROUPS_CACHE = groupsD.groups;
-  const groupName = (gid) => (HR_GROUPS_CACHE.find((g) => g.id === gid) || {}).name || 'Unassigned';
-  box.innerHTML = `
-    <div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <span class="s" style="color:var(--muted)">Staff and interns sign in to their own portal to see instructions and follow-ups.</span>
-      <span style="flex:1"></span>
-      <button class="btn btn-primary btn-sm" onclick="hrAddStaff()">Add staff / intern</button>
-    </div></div>
-    ${staffD.staff.length ? staffD.staff.map((s) => `
-      <div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div>
-          <div style="font-weight:700">${esc(s.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(s.position || (s.employment_type === 'intern' ? 'Intern' : 'Staff'))}</span></div>
-          <div class="s" style="color:var(--muted)">${esc(groupName(s.group_id))} &middot; ${esc(s.email)} &middot; ${s.status === 'active' ? 'Active' : 'Inactive'}</div>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="hrOpenStaffDetail(${s.id})">Instructions &amp; follow-ups</button>
-      </div></div>`).join('') : '<div class="empty">No staff or interns added yet.</div>'}`;
-}
-function hrAddStaff() {
-  const opts = ['<option value="">Unassigned</option>', ...HR_GROUPS_CACHE.map((g) => `<option value="${g.id}">${esc(g.name)}</option>`)].join('');
-  openModal('Add staff / intern', `
-    <form id="f">
-      <label class="field"><span>Full name</span><input name="name" required></label>
-      <label class="field"><span>Email</span><input name="email" type="email" required></label>
-      <div class="form-grid">
-        <label class="field"><span>Phone</span><input name="phone"></label>
-        <label class="field"><span>Position</span><input name="position" placeholder="e.g. Video Editor"></label>
-      </div>
-      <div class="form-grid">
-        <label class="field"><span>Employment type</span><select name="employment_type"><option value="paid_staff">Paid staff</option><option value="intern">Intern</option></select></label>
-        <label class="field"><span>Group</span><select name="group_id">${opts}</select></label>
-      </div>
-      <button class="btn btn-primary btn-block">Create account</button></form>
-    <div id="credOut"></div>`);
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    try {
-      const out = await api('/api/hr/staff', { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value, phone: f.phone.value, position: f.position.value, employment_type: f.employment_type.value, group_id: f.group_id.value || null }) });
-      $('credOut').innerHTML = `<p style="margin:12px 0 4px;font-weight:600">Account created - copy now:</p>
-        <div class="cred-box">${esc(out.credentials.name)}<br>Username: ${esc(out.credentials.username)}<br>Password: ${esc(out.credentials.password)}</div>`;
-      modalMsg('Account created.', true); f.reset();
-      renderHrStaff();
-    } catch (err) { modalMsg(err.message); btn.disabled = false; }
-  });
-}
-async function hrOpenStaffDetail(id) {
-  const d = await api('/api/hr/staff');
-  const s = d.staff.find((x) => x.id === id); if (!s) return;
-  openModal(`${s.name} - instructions & follow-ups`, hrStaffDetailHtml(s), true);
-  wireHrStaffDetailForms(s.id);
-}
-function hrStaffDetailHtml(s) {
-  return `
-    <div style="margin-bottom:16px">
-      <div class="s" style="font-weight:700;color:var(--ink);margin-bottom:6px">Instructions</div>
-      <div style="max-height:160px;overflow:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
-        ${s.instructions.length ? s.instructions.map((i) => `<div class="s" style="padding:8px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--line)"><strong>${esc(i.by)}</strong> &middot; ${esc((i.at || '').slice(0, 16))}<br>${esc(i.body)}</div>`).join('') : '<div class="s" style="color:var(--muted)">None yet.</div>'}
-      </div>
-      <form id="instrForm" style="display:flex;gap:8px">
-        <input name="body" class="field" style="flex:1;margin:0" placeholder="Add an instruction..." required>
-        <button class="btn btn-ghost">Add</button>
-      </form>
-    </div>
-    <div>
-      <div class="s" style="font-weight:700;color:var(--ink);margin-bottom:6px">Follow-ups</div>
-      <div style="max-height:160px;overflow:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
-        ${s.follow_ups.length ? s.follow_ups.map((f) => `<div class="s" style="padding:8px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--line)">
-          <strong>${esc(f.by)}</strong> &middot; ${esc((f.at || '').slice(0, 16))}<br>${esc(f.body)}
-          ${f.response ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--line)"><strong>${esc(s.name)}:</strong> ${esc(f.response)}</div>` : '<div class="s" style="color:var(--muted);margin-top:4px">No response yet.</div>'}
-        </div>`).join('') : '<div class="s" style="color:var(--muted)">None yet.</div>'}
-      </div>
-      <form id="fuForm" style="display:flex;gap:8px">
-        <input name="body" class="field" style="flex:1;margin:0" placeholder="Ask for a check-in / update..." required>
-        <button class="btn btn-ghost">Add</button>
-      </form>
-    </div>`;
-}
-function wireHrStaffDetailForms(sid) {
-  $('instrForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); const body = e.target.body.value.trim(); if (!body) return;
-    try { await api(`/api/hr/staff/${sid}/instructions`, { method: 'POST', body: JSON.stringify({ body }) }); hrOpenStaffDetail(sid); renderHrStaff(); }
-    catch (err) { toast(err.message, true); }
-  });
-  $('fuForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); const body = e.target.body.value.trim(); if (!body) return;
-    try { await api(`/api/hr/staff/${sid}/follow-ups`, { method: 'POST', body: JSON.stringify({ body }) }); hrOpenStaffDetail(sid); renderHrStaff(); }
-    catch (err) { toast(err.message, true); }
-  });
-}
-async function renderHrGroups() {
-  const box = $('hrTabBody');
-  const d = await api('/api/hr/groups');
-  box.innerHTML = `
-    <div class="card" style="margin-bottom:12px"><div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <span class="s" style="color:var(--muted)">Groups organize staff and interns into teams.</span>
-      <span style="flex:1"></span>
-      <button class="btn btn-primary btn-sm" onclick="hrAddGroup()">Add group</button>
-    </div></div>
-    ${d.groups.length ? d.groups.map((g) => `
-      <div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div><div style="font-weight:700">${esc(g.name)}</div>${g.description ? `<div class="s" style="color:var(--muted)">${esc(g.description)}</div>` : ''}</div>
-        <button class="btn btn-danger btn-sm" onclick="hrDeleteGroup(${g.id})">Delete</button>
-      </div></div>`).join('') : '<div class="empty">No groups yet.</div>'}`;
-}
-function hrAddGroup() {
-  openModal('Add group', `
-    <form id="f">
-      <label class="field"><span>Group name</span><input name="name" required placeholder="e.g. Content Team"></label>
-      <label class="field"><span>Description (optional)</span><input name="description"></label>
-      <button class="btn btn-primary btn-block">Add group</button></form>`);
-  $('f').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
-    try { await api('/api/hr/groups', { method: 'POST', body: JSON.stringify({ name: f.name.value, description: f.description.value }) }); toast('Group added.'); closeModal(); renderHrGroups(); }
-    catch (err) { modalMsg(err.message); btn.disabled = false; }
-  });
-}
-async function hrDeleteGroup(id) {
-  if (!confirm('Delete this group? Staff in it become Unassigned.')) return;
-  try { await api(`/api/hr/groups/${id}`, { method: 'DELETE' }); toast('Deleted.'); renderHrGroups(); } catch (e) { toast(e.message, true); }
-}
 
 /* -------------------------------- Staff portal -------------------------------- */
 async function renderDeptStaff() {
@@ -2860,7 +2933,9 @@ async function renderDeptStaff() {
                      <input name="response" class="field" style="flex:1;margin:0" placeholder="Write your response..." required>
                      <button class="btn btn-ghost btn-sm">Respond</button></form>`}
             </div>`).join('') : '<div class="s" style="color:var(--muted)">Nothing yet.</div>'}
-        </div></div>`;
+        </div></div>
+      <div id="myDeptWrap" style="margin-top:16px"></div>`;
+    renderMyDepartments('myDeptWrap');
   } catch (e) {
     el.innerHTML = `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">${esc(e.message)}</p></div></div>`;
   }
@@ -2878,10 +2953,10 @@ let AMB_TAB = 'overview';
 function ambTab(tab) { AMB_TAB = tab; renderDeptAmbassador(); }
 async function renderDeptAmbassador() {
   const el = $('view-dept-ambassador');
-  const tabs = [['overview', 'Overview'], ['duties', 'Duties'], ['referrals', 'My referrals'], ['leaderboard', 'Leaderboard'], ['reports', 'Reports']];
+  const tabs = [['overview', 'Overview'], ['my-department', 'My Department'], ['referrals', 'My referrals'], ['leaderboard', 'Leaderboard'], ['reports', 'Reports']];
   el.innerHTML = deptHeaderHtml('Ambassadors Portal') + deptTabBarHtml(tabs, AMB_TAB, 'ambTab') + '<div id="ambTabBody"><div class="empty">Loading&hellip;</div></div>';
   if (AMB_TAB === 'overview') renderAmbOverview();
-  else if (AMB_TAB === 'duties') renderAmbDuties();
+  else if (AMB_TAB === 'my-department') renderMyDepartments('ambTabBody');
   else if (AMB_TAB === 'referrals') renderAmbReferrals();
   else if (AMB_TAB === 'reports') renderAmbReports();
   else renderAmbLeaderboard();
@@ -2912,29 +2987,51 @@ async function renderAmbOverview() {
         ${meD.gem_events.length ? meD.gem_events.map((e) => `<div class="s" style="padding:8px 0;border-bottom:1px solid var(--line)">${gemChip('+' + e.amount)} ${esc(e.note || e.source)} <span style="color:var(--muted)">&middot; ${esc((e.created_at || '').slice(0, 16))}</span></div>`).join('') : '<div class="s" style="color:var(--muted)">No gems yet - share your code or QR to get your first referral enrolled.</div>'}
       </div></div>`;
 }
-async function renderAmbDuties() {
-  const box = $('ambTabBody');
-  const d = await api('/api/ambassador/duties');
-  const pending = d.duties.filter((x) => x.status === 'pending');
-  const done = d.duties.filter((x) => x.status === 'done');
-  const dutyCard = (r) => `<div class="card" style="margin-bottom:12px"><div class="card-body">
-      <h3 style="margin:0 0 4px;font-size:15px">${esc(r.duty.title)}</h3>
-      ${r.duty.description ? `<p class="s" style="white-space:pre-wrap">${esc(r.duty.description)}</p>` : ''}
-      ${r.duty.attachment ? `<p class="s"><a href="/uploads/${esc(r.duty.attachment.filename)}" target="_blank">${esc(r.duty.attachment.original_name)}</a></p>` : ''}
+/* -------- "My Department" - shared by any member (ambassador/staff/instructor
+ * portals all point here). If the member heads a department, they also get
+ * "Assign a task"/"Post announcement" for it, reusing the same modals HR
+ * uses (see refreshDeptDetail's data-kind="my" branch above). -------- */
+let MY_DEPT_CONTAINER = null;
+function refreshMyDepartments() { if (MY_DEPT_CONTAINER) renderMyDepartments(MY_DEPT_CONTAINER); }
+async function renderMyDepartments(containerId) {
+  MY_DEPT_CONTAINER = containerId;
+  const box = $(containerId);
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/my-departments');
+  if (!d.departments.length) { box.innerHTML = '<div class="empty">You are not part of any department yet.</div>'; return; }
+  const taskCard = (dep, r) => `<div class="card" style="margin-bottom:10px"><div class="card-body">
+      <h3 style="margin:0 0 4px;font-size:14.5px">${esc(r.task.title)}</h3>
+      ${r.task.description ? `<p class="s" style="white-space:pre-wrap">${esc(r.task.description)}</p>` : ''}
+      ${r.task.attachment ? `<p class="s"><a href="/uploads/${esc(r.task.attachment.filename)}" target="_blank">${esc(r.task.attachment.original_name)}</a></p>` : ''}
       ${r.status === 'done'
         ? `<p class="s" style="color:var(--ok)">Marked done ${esc((r.completed_at || '').slice(0, 16))}${r.note ? ' &middot; ' + esc(r.note) : ''}</p>`
-        : `<form onsubmit="return ambCompleteDuty(event, ${r.duty.id})" enctype="multipart/form-data" style="margin-top:8px">
-             <label class="field"><span>Note (optional)</span><input name="note" placeholder="e.g. Posted flyers in 3 hostels"></label>
+        : `<form onsubmit="return myDeptCompleteTask(event, ${r.task.id})" enctype="multipart/form-data" style="margin-top:8px">
+             <label class="field"><span>Note (optional)</span><input name="note"></label>
              <label class="field"><span>Proof (optional) - document or picture</span><input name="file" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"></label>
              <button class="btn btn-primary btn-sm">Mark done</button>
            </form>`}
     </div></div>`;
-  box.innerHTML = `${pending.length ? `<h3 style="margin:0 0 10px">Pending</h3>${pending.map(dutyCard).join('')}` : '<div class="empty">No pending duties - nice work.</div>'}
-    ${done.length ? `<h3 style="margin:16px 0 10px">Done</h3>${done.map(dutyCard).join('')}` : ''}`;
+  box.innerHTML = d.departments.map((dep) => {
+    const pending = dep.tasks.filter((r) => r.status === 'pending');
+    const done = dep.tasks.filter((r) => r.status === 'done');
+    return `<div class="card" style="margin-bottom:16px" id="myDeptCard-${dep.id}" data-dept-id="${dep.id}" data-kind="my">
+      <div class="card-head"><h3>${esc(dep.name)}${dep.is_head ? ' <span class="s" style="color:var(--ok);font-weight:700">(Head)</span>' : ''}</h3>
+        <span class="s" style="color:var(--muted)">${dep.progress.done}/${dep.progress.total} tasks done</span></div>
+      <div class="card-body">
+        ${dep.is_head ? `<div style="display:flex;gap:8px;margin-bottom:14px">
+          <button class="btn btn-primary btn-sm" onclick="formDepartmentTask('myDeptCard-${dep.id}')">Assign a task</button>
+          <button class="btn btn-ghost btn-sm" onclick="formDepartmentAnnouncement('myDeptCard-${dep.id}')">Post announcement</button>
+        </div>` : ''}
+        ${pending.length ? `<div class="s" style="font-weight:700;margin-bottom:6px">Pending</div>${pending.map((r) => taskCard(dep, r)).join('')}` : '<div class="s" style="color:var(--muted)">No pending tasks.</div>'}
+        ${done.length ? `<div class="s" style="font-weight:700;margin:12px 0 6px">Done</div>${done.map((r) => taskCard(dep, r)).join('')}` : ''}
+        ${dep.announcements.length ? `<div class="s" style="font-weight:700;margin:14px 0 6px">Announcements</div>
+          ${dep.announcements.map((a) => `<div class="s" style="padding:8px 0;border-bottom:1px solid var(--line)"><strong>${esc(a.title)}</strong> &middot; ${esc((a.created_at || '').slice(0, 10))}<br>${esc(a.body)}</div>`).join('')}` : ''}
+      </div></div>`;
+  }).join('');
 }
-async function ambCompleteDuty(e, dutyId) {
+async function myDeptCompleteTask(e, taskId) {
   e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
-  try { await api(`/api/ambassador/duties/${dutyId}/complete`, { method: 'POST', body: new FormData(f) }); toast('Marked done.'); renderAmbDuties(); }
+  try { await api(`/api/my-departments/tasks/${taskId}/complete`, { method: 'POST', body: new FormData(f) }); toast('Marked done.'); refreshMyDepartments(); }
   catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
   return false;
 }

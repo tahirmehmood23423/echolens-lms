@@ -16,6 +16,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const QRCode = require('qrcode');
+const archiver = require('archiver');
 const store = require('./store');
 const ai = require('./ai');
 const mailer = require('./mailer');
@@ -1578,6 +1579,20 @@ app.post('/api/ai/class-summary', authRequired, teacherOrAdmin, async (req, res)
 app.get('/api/admin/backup', authRequired, adminRequired, (req, res) => {
   store.backupNow();
   res.download(store.DB_PATH, `echolens-backup-${new Date().toISOString().slice(0, 10)}.json`);
+});
+// Same data, plus every uploaded file (certificates, submissions, payment
+// screenshots, ambassador reports) - streamed as a zip so nothing is
+// buffered fully in memory even if uploads/ is large.
+app.get('/api/admin/backup.zip', authRequired, adminRequired, (req, res) => {
+  store.backupNow();
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', `attachment; filename="echolens-full-backup-${new Date().toISOString().slice(0, 10)}.zip"`);
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  archive.on('error', (err) => { console.error('Backup zip failed:', err.message); res.destroy(err); });
+  archive.pipe(res);
+  archive.file(store.DB_PATH, { name: 'echolens.json' });
+  if (fs.existsSync(UPLOAD_DIR)) archive.directory(UPLOAD_DIR, 'uploads');
+  archive.finalize();
 });
 store.backupNow(); // one on boot
 setInterval(() => store.backupNow(), 12 * 3600 * 1000); // and every 12 hours

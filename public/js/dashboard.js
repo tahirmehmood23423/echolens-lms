@@ -880,7 +880,8 @@ async function renderAdminLogs() {
     <div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <span class="s" style="color:var(--muted)">The database backs itself up automatically every 12 hours on the server disk. Download a copy off-server regularly.</span>
       <span style="flex:1"></span>
-      <a class="btn btn-ghost btn-sm" href="/api/admin/backup">Download backup</a>
+      <a class="btn btn-ghost btn-sm" href="/api/admin/backup">Database only</a>
+      <a class="btn btn-ghost btn-sm" href="/api/admin/backup.zip">Full backup (with files)</a>
     </div></div>
     <div class="card"><div class="card-head"><h3>System health</h3></div>
       <div class="card-body tight">${d.health.map(healthRow).join('')}</div></div>

@@ -15,18 +15,21 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
+const QRCode = require('qrcode');
 const store = require('./store');
 const ai = require('./ai');
 const mailer = require('./mailer');
 const jaas = require('./jaas');
 const { challanPdf } = require('./challan-pdf');
 const { certificatePng } = require('./cert-image');
+const { ambassadorReportPdf } = require('./ambassador-report-pdf');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
+  AmbassadorGemEvents, AmbassadorDuties, AmbassadorReports,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -56,6 +59,8 @@ if (isProd) app.set('trust proxy', 1);
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+const AMBASSADOR_REPORTS_DIR = path.join(UPLOAD_DIR, 'ambassador-reports');
+fs.mkdirSync(AMBASSADOR_REPORTS_DIR, { recursive: true });
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => cb(null, UPLOAD_DIR),
@@ -66,6 +71,8 @@ const upload = multer({
 
 // Students may submit only Word or PDF files.
 const DOC_EXT = ['.pdf', '.doc', '.docx'];
+// Ambassador duties may carry a document OR a picture (flyer, poster, photo proof).
+const DUTY_ATTACH_EXT = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.gif', '.webp'];
 function requireDocFile(req, res) {
   if (!req.file) { res.status(400).json({ error: 'Attach your work as a PDF or Word file.' }); return false; }
   const ext = path.extname(req.file.originalname).toLowerCase();
@@ -184,6 +191,14 @@ const admissionsOnly = studentCoordinatorOnly;
 const ADMISSIONS_EMAIL = process.env.ADMISSIONS_EMAIL || 'admissions@echolens.digital';
 const FINANCE_EMAIL = process.env.FINANCE_EMAIL || 'finance@echolens.digital';
 function hrOnly(req, res, next) { if (['admin', 'hr'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
+function ambassadorOnly(req, res, next) { if (req.user.role !== 'ambassador') return res.status(403).json({ error: 'Not available for your role.' }); next(); }
+// Ambassador commission reports are shared reading across four departments -
+// HR manages the program, Finance and the Admissions Office handle the money
+// and enrollments behind the numbers, and admin sees everything.
+function ambassadorReportsAccess(req, res, next) {
+  if (['admin', 'hr', 'finance', 'student_coordinator'].includes(req.user.role)) return next();
+  return res.status(403).json({ error: 'Not available for your role.' });
+}
 function staffOnly(req, res, next) { if (['admin', 'staff'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function manageBatch(req, res, next) { // WRITE access: admin or an assigned teacher
   const b = Batches.byId(req.params.id);
@@ -676,7 +691,7 @@ app.post('/api/admin/users/:id/password', authRequired, adminRequired, (req, res
 });
 // Portal staff accounts are generated from a name + email; the credentials
 // (username, password, sign-in link) are emailed to that address directly.
-const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office' };
+const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', ambassador: 'Ambassador' };
 function mailStaffCredentials(user, password, role) {
   if (!user.email) return;
   mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
@@ -722,23 +737,204 @@ for (const [role, path_] of Object.entries(DEPT_ROLE_ENDPOINTS)) {
 }
 
 /* ------------------------------- ambassadors -------------------------------
- * HR creates ambassadors from a name + email; a unique 4-digit referral code
- * is generated and emailed to them. Students entering the code on the open-web
- * registration form get 10% off, verified automatically. */
+ * HR creates ambassadors from a name + email (+ their university); a real
+ * portal login is issued alongside a unique 4-digit referral code, and both
+ * are emailed together with a QR code that pre-fills the code on the
+ * open-web registration form. Students entering the code get 10% off,
+ * verified automatically, and the ambassador earns gems once that student is
+ * actually enrolled (see enrollRegistrationIntoBatch), weighted by how hard
+ * that course category is to sell (Settings.ambassadorGemRates). */
+async function ambassadorQrAttachment(code) {
+  const buf = await QRCode.toBuffer(`${APP_URL}/open?amb=${code}`, { width: 320, margin: 1 });
+  return { filename: `ambassador-${code}-qr.png`, content: buf };
+}
 app.get('/api/hr/ambassadors', authRequired, hrOnly, (req, res) => {
   res.json({ ambassadors: Ambassadors.all().map((a) => ({ ...a, uses: Ambassadors.usesFor(a.code) })) });
 });
 app.post('/api/hr/ambassadors', authRequired, hrOnly, async (req, res) => {
-  const { name, email } = req.body || {};
+  const { name, email, university } = req.body || {};
   if (!name || String(name).trim().length < 2) return res.status(400).json({ error: "Enter the ambassador's full name." });
-  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
-  if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
-  const a = Ambassadors.create({ name, email }, req.user.id);
-  mailer.notify(a.email, 'Your EchoLens ambassador code',
-    `${hi(a.name)},\n\nWelcome aboard - you are now an EchoLens ambassador. Your personal referral code is:\n\n    ${a.code}\n\nShare it with students: anyone who enters this code in the course registration form at ${APP_URL} gets 10% off their course fee, and the registration is credited to you.\n\nEchoLens Digital`);
-  res.json({ ok: true, ambassador: a });
+  const em = await validateStaffEmail(email, res, 'ambassador'); if (!em) return;
+  const { user, password } = Users.create({ name: String(name).trim(), role: 'ambassador', email: em, username: em });
+  const a = Ambassadors.create({ name, email: em, university, user_id: user.id }, req.user.id);
+  let attachments;
+  try { attachments = [await ambassadorQrAttachment(a.code)]; } catch { attachments = undefined; }
+  mailer.notify(a.email, 'Your EchoLens ambassador account',
+    `${hi(a.name)},\n\nWelcome aboard - you are now an EchoLens ambassador. Your portal account is ready:\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login to see your duties, referrals and leaderboard rank.\n\nYour personal referral code is:\n\n    ${a.code}\n\nShare it (or the attached QR code, which opens the registration form with your code already filled in) with students: anyone who registers with it gets 10% off their course fee, and once they're enrolled you earn gems.\n\nEchoLens Digital`,
+    attachments);
+  res.json({ ok: true, ambassador: a, credentials: { name: user.name, username: user.username, password } });
 });
-app.delete('/api/hr/ambassadors/:id', authRequired, hrOnly, (req, res) => { Ambassadors.remove(req.params.id); res.json({ ok: true }); });
+app.delete('/api/hr/ambassadors/:id', authRequired, hrOnly, (req, res) => {
+  const a = Ambassadors.byId(req.params.id);
+  if (a && a.user_id) Users.remove(a.user_id);
+  Ambassadors.remove(req.params.id);
+  res.json({ ok: true });
+});
+app.get('/api/hr/ambassadors/gem-rates', authRequired, hrOnly, (req, res) => res.json({ rates: Settings.ambassadorGemRates() }));
+app.put('/api/hr/ambassadors/gem-rates', authRequired, hrOnly, (req, res) => res.json({ ok: true, rates: Settings.setAmbassadorGemRates(req.body || {}) }));
+app.get('/api/hr/ambassadors/duties', authRequired, hrOnly, (req, res) => res.json({ duties: AmbassadorDuties.all() }));
+app.post('/api/hr/ambassadors/duties', authRequired, hrOnly, upload.single('file'), (req, res) => {
+  const { title, description, scope, ambassador_id } = req.body || {};
+  if (!title || !String(title).trim()) {
+    if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} }
+    return res.status(400).json({ error: 'A title is required.' });
+  }
+  if (scope === 'one' && !Ambassadors.byId(ambassador_id)) {
+    if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} }
+    return res.status(400).json({ error: 'Pick which ambassador this duty is for.' });
+  }
+  let attachment = null;
+  if (req.file) {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    if (!DUTY_ATTACH_EXT.includes(ext)) {
+      try { fs.unlinkSync(req.file.path); } catch {}
+      return res.status(400).json({ error: 'Only PDF, Word or image files (jpg/png/gif/webp) are accepted.' });
+    }
+    attachment = { filename: req.file.filename, original_name: req.file.originalname };
+  }
+  const { duty, recipients } = AmbassadorDuties.create({ title, description, scope, ambassador_id, attachment }, req.user.id);
+  for (const a of recipients) {
+    mailer.notify(a.email, `New duty assigned: ${duty.title}`,
+      `${hi(a.name)},\n\nA new duty has been assigned to you.\n\n${duty.title}\n${duty.description ? '\n' + duty.description + '\n' : ''}${attachment ? '\nAn attachment is included - view it from your ambassador portal.\n' : ''}\nSign in at ${APP_URL}/login to view it and mark it done.\n\nEchoLens Digital`);
+  }
+  res.json({ ok: true, duty });
+});
+
+/* --------------------- ambassador monthly commission reports ---------------------
+ * On the 5th of every month, one PDF per active ambassador is generated on
+ * the real company letterhead, covering the previous calendar month's
+ * confirmed payments, and emailed to them. HR can also trigger this on
+ * demand (e.g. to backfill a missed month or regenerate one). */
+function previousPeriod(d) {
+  const y = d.getFullYear(), m = d.getMonth(); // month is 0-based; m-1 with y rollover via Date
+  const prev = new Date(y, m - 1, 1);
+  return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
+}
+async function generateAmbassadorReports(period, { force = false } = {}) {
+  let generated = 0;
+  const signoff = { ...Settings.ambassadorReportSignoff(), ceo_name: Settings.cert().ceo_name };
+  for (const a of Ambassadors.all().filter((x) => x.active)) {
+    if (!force && AmbassadorReports.existsFor(a.id, period)) continue;
+    const rows = Ambassadors.monthlyRows(a.code, period);
+    const buf = await ambassadorReportPdf({ ambassador: a, period, rows, signoff });
+    const filename = `ambassador-${a.id}-${period}.pdf`;
+    fs.writeFileSync(path.join(AMBASSADOR_REPORTS_DIR, filename), buf);
+    if (force) AmbassadorReports.removeExisting(a.id, period);
+    const total_paid = rows.reduce((s, r) => s + r.amount_paid, 0);
+    const total_commission = rows.reduce((s, r) => s + r.commission, 0);
+    AmbassadorReports.create({ ambassador_id: a.id, period, filename, student_count: rows.length, total_paid, total_commission });
+    generated += 1;
+    mailer.notify(a.email, `Your EchoLens commission report - ${period}`,
+      `${hi(a.name)},\n\nYour ambassador commission report for ${period} is attached: ${rows.length} referral${rows.length === 1 ? '' : 's'} paid, totalling ${total_commission.toLocaleString('en-US')} PKR in commission.\n\nSign in at ${APP_URL}/login to view or re-download it any time from your portal.\n\nEchoLens Digital`,
+      [{ filename, content: buf }]);
+  }
+  return { generated, period };
+}
+// Runs hourly; only acts on the 5th, and only once per calendar month
+// (Settings.ambassadorReportLastRun guards against a restart re-triggering
+// it the same day).
+function checkAmbassadorReportSchedule() {
+  const now = new Date();
+  if (now.getDate() !== 5) return;
+  const runKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  if (Settings.ambassadorReportLastRun() === runKey) return;
+  generateAmbassadorReports(previousPeriod(now))
+    .then(({ generated, period }) => { Settings.setAmbassadorReportLastRun(runKey); console.log(`Ambassador reports: generated ${generated} for ${period}.`); })
+    .catch((e) => console.error('Ambassador report generation failed:', e.message));
+}
+setTimeout(checkAmbassadorReportSchedule, 10 * 1000);
+setInterval(checkAmbassadorReportSchedule, 60 * 60 * 1000);
+
+// Shared across HR, Finance, the Admissions Office and admin - see
+// ambassadorReportsAccess. Only the sign-off names (below) stay HR-only.
+app.get('/api/ambassador-reports', authRequired, ambassadorReportsAccess, (req, res) => {
+  const rows = AmbassadorReports.all().map((r) => ({ ...r, ambassador: (Ambassadors.byId(r.ambassador_id) || {}).name || 'Removed ambassador' }));
+  res.json({ reports: rows });
+});
+app.post('/api/ambassador-reports/generate', authRequired, ambassadorReportsAccess, async (req, res) => {
+  const period = /^\d{4}-\d{2}$/.test((req.body || {}).period) ? req.body.period : previousPeriod(new Date());
+  try { res.json({ ok: true, ...(await generateAmbassadorReports(period, { force: true })) }); }
+  catch (e) { res.status(500).json({ error: 'Could not generate reports - try again.' }); }
+});
+app.get('/api/ambassador-reports/:id/download', authRequired, ambassadorReportsAccess, (req, res) => {
+  const r = AmbassadorReports.byId(req.params.id);
+  if (!r) return res.status(404).json({ error: 'Report not found.' });
+  res.download(path.join(AMBASSADOR_REPORTS_DIR, r.filename), r.filename);
+});
+app.post('/api/ambassador-reports/:id/email', authRequired, ambassadorReportsAccess, (req, res) => {
+  const r = AmbassadorReports.byId(req.params.id);
+  if (!r) return res.status(404).json({ error: 'Report not found.' });
+  const to = String((req.body || {}).to || '').trim();
+  if (!isEmail(to)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  const amb = Ambassadors.byId(r.ambassador_id);
+  let buf;
+  try { buf = fs.readFileSync(path.join(AMBASSADOR_REPORTS_DIR, r.filename)); }
+  catch { return res.status(404).json({ error: 'The report file is missing - try regenerating it.' }); }
+  mailer.notify(to, `EchoLens ambassador commission report - ${amb ? amb.name : 'ambassador'} - ${r.period}`,
+    `Attached: the commission report for ${amb ? amb.name : 'this ambassador'} covering ${r.period} - ${r.student_count} referral${r.student_count === 1 ? '' : 's'} paid, PKR ${Number(r.total_commission).toLocaleString('en-US')} commission due.\n\nShared by ${req.user.name} (${req.user.email || req.user.username}) from the EchoLens portal.\n\nEchoLens Digital`,
+    [{ filename: r.filename, content: buf }]);
+  res.json({ ok: true });
+});
+app.get('/api/ambassador-reports/signoff', authRequired, ambassadorReportsAccess, (req, res) => res.json({ signoff: Settings.ambassadorReportSignoff(), ceo_name: Settings.cert().ceo_name }));
+app.put('/api/ambassador-reports/signoff', authRequired, hrOnly, (req, res) => res.json({ ok: true, signoff: Settings.setAmbassadorReportSignoff(req.body || {}) }));
+
+/* --------------------------- ambassador self-service --------------------------- */
+app.get('/api/ambassador/me', authRequired, ambassadorOnly, (req, res) => {
+  const a = Ambassadors.byUserId(req.user.id);
+  if (!a) return res.status(404).json({ error: 'Ambassador record not found.' });
+  const rank = Ambassadors.leaderboard().find((x) => x.id === a.id);
+  res.json({ ambassador: { ...a, uses: Ambassadors.usesFor(a.code), rank: rank ? rank.rank : null }, gem_events: AmbassadorGemEvents.forAmbassador(a.id).slice(0, 20) });
+});
+app.get('/api/ambassador/qr', authRequired, ambassadorOnly, async (req, res) => {
+  const a = Ambassadors.byUserId(req.user.id);
+  if (!a) return res.status(404).json({ error: 'Ambassador record not found.' });
+  try {
+    const dataUrl = await QRCode.toDataURL(`${APP_URL}/open?amb=${a.code}`, { width: 320, margin: 1 });
+    res.json({ qr: dataUrl, url: `${APP_URL}/open?amb=${a.code}` });
+  } catch { res.status(500).json({ error: 'Could not generate the QR code - try again.' }); }
+});
+app.get('/api/ambassador/duties', authRequired, ambassadorOnly, (req, res) => {
+  const a = Ambassadors.byUserId(req.user.id);
+  if (!a) return res.status(404).json({ error: 'Ambassador record not found.' });
+  res.json({ duties: AmbassadorDuties.forAmbassador(a.id) });
+});
+app.post('/api/ambassador/duties/:id/complete', authRequired, ambassadorOnly, upload.single('file'), (req, res) => {
+  const a = Ambassadors.byUserId(req.user.id);
+  if (!a) { if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} } return res.status(404).json({ error: 'Ambassador record not found.' }); }
+  let proof_attachment = null;
+  if (req.file) {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    if (!DUTY_ATTACH_EXT.includes(ext)) {
+      try { fs.unlinkSync(req.file.path); } catch {}
+      return res.status(400).json({ error: 'Only PDF, Word or image files (jpg/png/gif/webp) are accepted.' });
+    }
+    proof_attachment = { filename: req.file.filename, original_name: req.file.originalname };
+  }
+  const s = AmbassadorDuties.markDone(req.params.id, a.id, { note: (req.body || {}).note, proof_attachment });
+  if (!s) return res.status(404).json({ error: 'Duty not found for you.' });
+  res.json({ ok: true });
+});
+app.get('/api/ambassador/referrals', authRequired, ambassadorOnly, (req, res) => {
+  const a = Ambassadors.byUserId(req.user.id);
+  if (!a) return res.status(404).json({ error: 'Ambassador record not found.' });
+  const rows = Registrations.all().filter((r) => r.ambassador_code === a.code)
+    .map((r) => ({ name: r.name, email: r.email, course_title: r.course_title, payment_stage: r.payment_stage, created_at: r.created_at }));
+  res.json({ referrals: rows });
+});
+app.get('/api/ambassador/leaderboard', authRequired, ambassadorOnly, (req, res) => res.json({ leaderboard: Ambassadors.leaderboard() }));
+app.get('/api/ambassador/leaderboard/universities', authRequired, ambassadorOnly, (req, res) => res.json({ leaderboard: Ambassadors.universityLeaderboard() }));
+app.get('/api/ambassador/reports', authRequired, ambassadorOnly, (req, res) => {
+  const a = Ambassadors.byUserId(req.user.id);
+  if (!a) return res.status(404).json({ error: 'Ambassador record not found.' });
+  res.json({ reports: AmbassadorReports.forAmbassador(a.id) });
+});
+app.get('/api/ambassador/reports/:id/download', authRequired, ambassadorOnly, (req, res) => {
+  const a = Ambassadors.byUserId(req.user.id);
+  if (!a) return res.status(404).json({ error: 'Ambassador record not found.' });
+  const r = AmbassadorReports.byId(req.params.id);
+  if (!r || r.ambassador_id !== a.id) return res.status(404).json({ error: 'Report not found.' });
+  res.download(path.join(AMBASSADOR_REPORTS_DIR, r.filename), r.filename);
+});
 app.delete('/api/admin/users/:id', authRequired, adminRequired, (req, res) => {
   if (Number(req.params.id) === req.user.id) return res.status(400).json({ error: 'You cannot remove your own account.' });
   Users.remove(req.params.id); res.json({ ok: true });
@@ -2607,6 +2803,18 @@ async function enrollRegistrationIntoBatch(r, b) {
   }
   Enrollments.create(u.id, b.id);
   const bd = Batches.decorate(b);
+  // Ambassador referral payout: only now, at real paid enrollment (not the
+  // earlier interest-registration step), weighted by how hard this course
+  // category is to sell (Settings.ambassadorGemRates).
+  if (r.ambassador_code) {
+    const amb = Ambassadors.byCode(r.ambassador_code);
+    const rate = Settings.ambassadorGemRates()[bd.tier];
+    if (amb && rate) {
+      Ambassadors.addGems(amb.id, rate, { source: 'enrollment', course_tier: bd.tier, registration_id: r.id, batch_id: b.id, note: `${u.name} enrolled in ${bd.title || bd.name}` });
+      mailer.notify(amb.email, `+${rate} gems - your referral just enrolled`,
+        `${hi(amb.name)},\n\nGreat news - ${u.name} just enrolled in ${bd.title || bd.name} using your referral code (${amb.code}). You've earned ${rate} gems.\n\nSign in at ${APP_URL}/login to see your updated total and leaderboard rank.\n\nEchoLens Digital`);
+    }
+  }
   if (freshAccount) {
     mailer.notify(r.email, 'Welcome to EchoLens - payment confirmed, your account is ready',
       `${hi(u.name)},\n\nYour payment has been verified and you are now enrolled in ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nUsername: ${u.username}\nEmail: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);

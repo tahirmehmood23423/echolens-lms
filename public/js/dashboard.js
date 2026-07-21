@@ -27,7 +27,7 @@ function toast(text, isErr) {
   t.textContent = text; t.className = 'toast show' + (isErr ? ' err' : '');
   clearTimeout(t._h); t._h = setTimeout(() => (t.className = 'toast'), 2600);
 }
-function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', staff: 'Staff' }[r] || r; }
+function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', staff: 'Staff', ambassador: 'Ambassador' }[r] || r; }
 function isStaff() { return ['admin', 'coordinator', 'instructor'].includes(ME.role); }
 // v17: isolated department portals - each role sees ONLY its own nav item
 // and view, nothing else in the app (not courses, messages, jobs, etc).
@@ -36,6 +36,7 @@ const DEPT_ROLES = {
   finance: { view: 'dept-finance', label: 'Finance' },
   student_coordinator: { view: 'dept-student-coordinator', label: 'Admissions Office' },
   staff: { view: 'dept-staff', label: 'Staff' },
+  ambassador: { view: 'dept-ambassador', label: 'Ambassador' },
 };
 function fmtDate(d) {
   if (!d) return '—';
@@ -105,7 +106,7 @@ const TITLES = {
   'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
   'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-logs': 'System Logs',
   jobs: 'Jobs', job: 'Job',
-  'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal',
+  'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal', 'dept-ambassador': 'Ambassadors Portal',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -129,6 +130,7 @@ function show(view) {
     'admin-announcements': renderAdminAnnouncementsPage, 'admin-logs': renderAdminLogs,
     jobs: renderJobs,
     'dept-hr': renderDeptHR, 'dept-finance': renderDeptFinance, 'dept-student-coordinator': renderDeptStudentCoordinator, 'dept-staff': renderDeptStaff,
+    'dept-ambassador': renderDeptAmbassador,
   }[view];
   if (render) render();
 }
@@ -770,12 +772,14 @@ async function renderAdminFinance() {
         <tr><th>Course</th><th>Price (PKR)</th><th>Enrollments</th><th>Revenue (PKR)</th></tr>
         ${d.courses.map((c) => `<tr><td>${esc(c.title)}</td><td>${c.price_pkr.toLocaleString()}</td><td>${c.enrollments}</td><td><strong>${c.revenue.toLocaleString()}</strong></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No paid enrollments yet.</td></tr>'}
       </table></div></div>
-    <p class="hint" style="padding:0 4px">Revenue is estimated from each course's catalogue list price &times; its enrollments &mdash; EchoLens has no payment gateway integration, so this is not a reconciled financial ledger.</p>`;
+    <p class="hint" style="padding:0 4px">Revenue is estimated from each course's catalogue list price &times; its enrollments &mdash; EchoLens has no payment gateway integration, so this is not a reconciled financial ledger.</p>
+    <div id="adminAmbReportsWrap" style="margin-top:16px"></div>`;
   const monthLabels = d.trend.labels.map((m) => monthLabel(m, { month: 'short' }));
   const monthTipLabels = d.trend.labels.map((m) => monthLabel(m, { month: 'long', year: 'numeric' }));
   const chartEl = $('financeChart');
   chartEl.innerHTML = growthLineChart(monthLabels, d.trend.values);
   wireGrowthChart(chartEl, monthTipLabels, d.trend.values, (v) => 'PKR ' + v.toLocaleString());
+  renderAmbassadorReportsPanel('adminAmbReportsWrap');
 }
 async function renderAdminAnnouncementsPage() {
   const el = $('view-admin-announcements');
@@ -2208,9 +2212,10 @@ let FIN_TAB = 'verify';
 function finTab(tab) { FIN_TAB = tab; renderDeptFinance(); }
 async function renderDeptFinance() {
   const el = $('view-dept-finance');
-  const tabs = [['verify', 'Payment verification'], ['expenses', 'Expenses & balance sheet']];
+  const tabs = [['verify', 'Payment verification'], ['expenses', 'Expenses & balance sheet'], ['ambassador-reports', 'Ambassador reports']];
   el.innerHTML = deptHeaderHtml('Finance Portal') + deptTabBarHtml(tabs, FIN_TAB, 'finTab') + '<div id="finTabBody"><div class="empty">Loading&hellip;</div></div>';
   if (FIN_TAB === 'verify') renderFinRegistrations();
+  else if (FIN_TAB === 'ambassador-reports') renderAmbassadorReportsPanel('finTabBody');
   else renderFinExpenses();
 }
 async function renderFinRegistrations() {
@@ -2302,11 +2307,12 @@ let COORD_REGS = [];
 function coordTab(tab) { COORD_TAB = tab; renderDeptStudentCoordinator(); }
 async function renderDeptStudentCoordinator() {
   const el = $('view-dept-student-coordinator');
-  const tabs = [['registrations', 'Registrations & challans'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['queries', 'Student queries']];
+  const tabs = [['registrations', 'Registrations & challans'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['queries', 'Student queries'], ['ambassador-reports', 'Ambassador reports']];
   el.innerHTML = deptHeaderHtml('Admissions Office Portal') + deptTabBarHtml(tabs, COORD_TAB, 'coordTab') + '<div id="coordTabBody"><div class="empty">Loading&hellip;</div></div>';
   if (COORD_TAB === 'registrations') renderCoordRegistrations();
   else if (COORD_TAB === 'discounts') renderCoordDiscounts();
   else if (COORD_TAB === 'bank') renderCoordBank();
+  else if (COORD_TAB === 'ambassador-reports') renderAmbassadorReportsPanel('coordTabBody');
   else renderCoordQueries();
 }
 // Sub-folders: every registration sits in exactly one folder for its
@@ -2530,49 +2536,178 @@ let HR_GROUPS_CACHE = [];
 function hrTab(tab) { HR_TAB = tab; renderDeptHR(); }
 async function renderDeptHR() {
   const el = $('view-dept-hr');
-  const tabs = [['staff', 'Staff & interns'], ['groups', 'Groups'], ['ambassadors', 'Ambassadors']];
+  const tabs = [['staff', 'Staff & interns'], ['groups', 'Groups'], ['ambassadors', 'Ambassadors'], ['ambassador-duties', 'Ambassador duties'], ['ambassador-reports', 'Ambassador reports']];
   el.innerHTML = deptHeaderHtml('HR Portal') + deptTabBarHtml(tabs, HR_TAB, 'hrTab') + '<div id="hrTabBody"><div class="empty">Loading&hellip;</div></div>';
   if (HR_TAB === 'staff') renderHrStaff();
   else if (HR_TAB === 'ambassadors') renderHrAmbassadors();
+  else if (HR_TAB === 'ambassador-duties') renderHrAmbassadorDuties();
+  else if (HR_TAB === 'ambassador-reports') renderAmbassadorReportsPanel('hrTabBody', { withSignoff: true });
   else renderHrGroups();
 }
-/* -------- HR: ambassadors (4-digit referral codes, 10% student discount) -------- */
+/* -------- HR: ambassadors (portal login + 4-digit referral code + gems) -------- */
+const AMBASSADOR_TIERS = ['Micro Course', 'Bootcamp', 'Short Course', 'Specialist Track'];
 async function renderHrAmbassadors() {
   const box = $('hrTabBody');
-  const d = await api('/api/hr/ambassadors');
-  box.innerHTML = `<div class="card"><div class="card-head"><h3>Ambassadors</h3>
+  const [d, ratesD] = await Promise.all([api('/api/hr/ambassadors'), api('/api/hr/ambassadors/gem-rates')]);
+  const ranked = d.ambassadors.slice().sort((a, b) => (b.gems || 0) - (a.gems || 0));
+  box.innerHTML = `<div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Gems per enrollment, by course category</h3></div>
+    <div class="card-body">
+      <p class="hint" style="margin-top:0">An ambassador earns these gems once a student they referred is actually enrolled (not just registered interest) - harder-to-sell categories are worth more.</p>
+      <form id="rateForm" class="form-grid">
+        ${AMBASSADOR_TIERS.map((t) => `<label class="field"><span>${esc(t)}</span><input name="${esc(t)}" type="number" min="0" value="${Number(ratesD.rates[t]) || 0}"></label>`).join('')}
+        <button class="btn btn-primary btn-sm" style="grid-column:1/-1;justify-self:start">Save gem rates</button>
+      </form>
+    </div></div>
+    <div class="card"><div class="card-head"><h3>Ambassadors</h3>
       <button class="btn btn-primary btn-sm" onclick="formAmbassador()">Add ambassador</button></div>
     <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-      <tr><th>Name</th><th>Email</th><th>Code</th><th>Registrations referred</th><th>Added</th><th></th></tr>
-      ${d.ambassadors.map((a) => `<tr>
-        <td>${esc(a.name)}</td><td class="s">${esc(a.email)}</td>
+      <tr><th>#</th><th>Name</th><th>Email</th><th>University</th><th>Code</th><th>Gems</th><th>Registrations referred</th><th></th></tr>
+      ${ranked.map((a, i) => `<tr>
+        <td>${i + 1}</td><td>${esc(a.name)}</td><td class="s">${esc(a.email)}</td><td class="s">${esc(a.university || '—')}</td>
         <td class="mono" style="font-weight:700;letter-spacing:2px">${esc(a.code)}</td>
-        <td>${a.uses}</td><td class="s">${esc((a.created_at || '').slice(0, 10))}</td>
+        <td>${gemChip(a.gems || 0)}</td>
+        <td>${a.uses}</td>
         <td><button class="btn btn-ghost btn-sm" onclick="delAmbassador(${a.id}, '${esc(a.name)}')">Remove</button></td>
-      </tr>`).join('') || '<tr><td colspan="6" class="empty">No ambassadors yet - add one and their unique 4-digit code is generated and emailed to them.</td></tr>'}
+      </tr>`).join('') || '<tr><td colspan="8" class="empty">No ambassadors yet - add one and their portal login, unique 4-digit code and QR are emailed to them.</td></tr>'}
     </table></div>
-    <p class="hint" style="padding:0 14px 12px">Students who enter a valid code in the website registration form automatically get 10% off - the discount is applied on their fee challan and each referral is counted here.</p></div>`;
+    <p class="hint" style="padding:0 14px 12px">Students who enter a valid code (or scan the ambassador's QR) on the website registration form automatically get 10% off - the discount applies to their fee challan, and gems are credited to the ambassador once the student is enrolled.</p></div>`;
+  $('rateForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    const body = {}; for (const t of AMBASSADOR_TIERS) body[t] = f[t].value;
+    try { await api('/api/hr/ambassadors/gem-rates', { method: 'PUT', body: JSON.stringify(body) }); toast('Gem rates saved.'); } catch (err) { toast(err.message, true); }
+  });
 }
 function formAmbassador() {
   openModal('Add an ambassador', `<form id="f">
     <label class="field"><span>Full name</span><input name="name" required></label>
     <label class="field"><span>Email</span><input name="email" type="email" required></label>
-    <p class="hint">A unique 4-digit referral code is generated and emailed to this address automatically.</p>
+    <label class="field"><span>University</span><input name="university" placeholder="e.g. LUMS"></label>
+    <p class="hint">A portal login, a unique 4-digit referral code and a QR code are generated and emailed to this address automatically.</p>
     <button class="btn btn-primary btn-block">Create ambassador</button></form>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
     try {
-      const d = await api('/api/hr/ambassadors', { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value.trim() }) });
+      const d = await api('/api/hr/ambassadors', { method: 'POST', body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), university: f.university.value.trim() }) });
       openModal('Ambassador created', `<p class="s" style="line-height:1.8">${esc(d.ambassador.name)} is now an EchoLens ambassador.<br>
         Referral code: <strong class="mono" style="font-size:20px;letter-spacing:3px">${esc(d.ambassador.code)}</strong><br>
-        The code has been emailed to ${esc(d.ambassador.email)}.</p>
+        Their login and referral code (plus a QR code) have been emailed to ${esc(d.ambassador.email)}.</p>
         <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="closeModal();renderHrAmbassadors()">Done</button>`);
     } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
   });
 }
 async function delAmbassador(id, name) {
-  if (!confirm(`Remove ambassador ${name}? Their referral code stops working immediately.`)) return;
+  if (!confirm(`Remove ambassador ${name}? Their referral code and portal login stop working immediately.`)) return;
   try { await api('/api/hr/ambassadors/' + id, { method: 'DELETE' }); toast('Removed.'); renderHrAmbassadors(); } catch (e) { toast(e.message, true); }
+}
+/* -------- HR: ambassador duties -------- */
+async function renderHrAmbassadorDuties() {
+  const box = $('hrTabBody');
+  const [dutiesD, ambD] = await Promise.all([api('/api/hr/ambassadors/duties'), api('/api/hr/ambassadors')]);
+  box.innerHTML = `<div class="card"><div class="card-head"><h3>Duties</h3>
+      <button class="btn btn-primary btn-sm" onclick="formDuty()">Assign a duty</button></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Title</th><th>Assigned to</th><th>Attachment</th><th>Progress</th><th>Assigned</th></tr>
+      ${dutiesD.duties.map((d) => `<tr>
+        <td>${esc(d.title)}</td>
+        <td class="s">${d.scope === 'all' ? 'All ambassadors' : 'One ambassador'}</td>
+        <td class="s">${d.attachment ? `<a href="/uploads/${esc(d.attachment.filename)}" target="_blank">${esc(d.attachment.original_name)}</a>` : '—'}</td>
+        <td>${d.done}/${d.total} done</td>
+        <td class="s">${esc((d.created_at || '').slice(0, 10))}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="empty">No duties assigned yet.</td></tr>'}
+    </table></div></div>`;
+  box.dataset.ambassadors = JSON.stringify(ambD.ambassadors);
+}
+function formDuty() {
+  const ambassadors = JSON.parse($('hrTabBody').dataset.ambassadors || '[]');
+  openModal('Assign a duty', `<form id="f" enctype="multipart/form-data">
+    <label class="field"><span>Title</span><input name="title" required></label>
+    <label class="field"><span>Description</span><textarea name="description" rows="3"></textarea></label>
+    <label class="field"><span>Assign to</span><select name="scope">
+      <option value="all">Whole group (all ambassadors)</option>
+      <option value="one">One ambassador</option>
+    </select></label>
+    <label class="field" id="ambPickWrap" style="display:none"><span>Ambassador</span><select name="ambassador_id">
+      ${ambassadors.map((a) => `<option value="${a.id}">${esc(a.name)}${a.university ? ` (${esc(a.university)})` : ''}</option>`).join('')}
+    </select></label>
+    <label class="field"><span>Attachment (optional) - document or picture</span><input name="file" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"></label>
+    <p class="hint">Every ambassador in scope gets an email the moment this is assigned.</p>
+    <button class="btn btn-primary btn-block">Assign duty</button></form>`);
+  $('f').scope.addEventListener('change', (e) => { $('ambPickWrap').style.display = e.target.value === 'one' ? '' : 'none'; });
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
+    try {
+      await api('/api/hr/ambassadors/duties', { method: 'POST', body: new FormData(f) });
+      toast('Duty assigned.'); closeModal(); renderHrAmbassadorDuties();
+    } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
+  });
+}
+/* -------- Ambassador monthly commission reports (real company letterhead) --------
+ * Shared read/download/email/generate access across HR, Finance, the
+ * Admissions Office and admin - each portal just points this at its own tab
+ * body element id. Editing the sign-off names stays HR-only. */
+async function renderAmbassadorReportsPanel(containerId, { withSignoff = false } = {}) {
+  const box = $(containerId);
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const [d, signoffD] = await Promise.all([api('/api/ambassador-reports'), withSignoff ? api('/api/ambassador-reports/signoff') : Promise.resolve(null)]);
+  box.innerHTML = `
+    ${withSignoff ? `<div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Report sign-off</h3></div>
+      <div class="card-body">
+        <p class="hint" style="margin-top:0">Printed as the two digital signatures on every report: the department head first, then the CEO (${esc(signoffD.ceo_name)}, from certificate settings).</p>
+        <form id="signoffForm" class="form-grid">
+          <label class="field"><span>Department head name</span><input name="department_head_name" value="${esc(signoffD.signoff.department_head_name)}" required></label>
+          <label class="field"><span>Department head title</span><input name="department_head_title" value="${esc(signoffD.signoff.department_head_title || '')}" placeholder="e.g. Head of HR, EchoLens Digital"></label>
+          <button class="btn btn-primary btn-sm" style="grid-column:1/-1;justify-self:start">Save sign-off</button>
+        </form>
+      </div></div>` : ''}
+    <div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <span class="s" style="color:var(--muted)">Reports auto-generate on the 5th of every month, covering the previous month's confirmed payments, on EchoLens' official letterhead, and are emailed to each ambassador. Generating now covers last month and re-sends it.</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary btn-sm" onclick="generateAmbassadorReportsNow('${containerId}', ${withSignoff})">Generate this month's reports now</button>
+    </div></div>
+    <div class="card"><div class="card-head"><h3>Reports</h3></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Ambassador</th><th>Period</th><th>Referrals paid</th><th>Total paid</th><th>Commission</th><th>Generated</th><th></th></tr>
+      ${d.reports.map((r) => `<tr>
+        <td>${esc(r.ambassador)}</td><td>${esc(r.period)}</td><td>${r.student_count}</td>
+        <td>PKR ${Number(r.total_paid).toLocaleString('en-US')}</td>
+        <td style="font-weight:700">PKR ${Number(r.total_commission).toLocaleString('en-US')}</td>
+        <td class="s">${esc((r.generated_at || '').slice(0, 10))}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <a class="btn btn-ghost btn-sm" href="/api/ambassador-reports/${r.id}/download">Download</a>
+          <button class="btn btn-ghost btn-sm" onclick="emailAmbassadorReport(${r.id})">Email</button>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="7" class="empty">No reports generated yet.</td></tr>'}
+    </table></div></div>`;
+  if (withSignoff) {
+    $('signoffForm').addEventListener('submit', async (e) => {
+      e.preventDefault(); const f = e.target;
+      try {
+        await api('/api/ambassador-reports/signoff', { method: 'PUT', body: JSON.stringify({ department_head_name: f.department_head_name.value, department_head_title: f.department_head_title.value }) });
+        toast('Sign-off saved - it applies to reports generated from now on.');
+      } catch (err) { toast(err.message, true); }
+    });
+  }
+}
+async function generateAmbassadorReportsNow(containerId, withSignoff) {
+  if (!confirm("Generate (and re-email) every ambassador's report for last month now?")) return;
+  try {
+    const d = await api('/api/ambassador-reports/generate', { method: 'POST', body: JSON.stringify({}) });
+    toast(`Generated ${d.generated} report(s) for ${d.period}.`);
+    renderAmbassadorReportsPanel(containerId, { withSignoff });
+  } catch (e) { toast(e.message, true); }
+}
+function emailAmbassadorReport(id) {
+  openModal('Email this report', `<form id="f">
+    <label class="field"><span>Send to</span><input name="to" type="email" required value="ceo@echolens.digital"></label>
+    <p class="hint">The report PDF is attached exactly as downloaded.</p>
+    <button class="btn btn-primary btn-block">Send</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
+    try {
+      await api(`/api/ambassador-reports/${id}/email`, { method: 'POST', body: JSON.stringify({ to: f.to.value.trim() }) });
+      toast('Report emailed.'); closeModal();
+    } catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
+  });
 }
 async function renderHrStaff() {
   const box = $('hrTabBody');
@@ -2736,6 +2871,116 @@ async function staffRespondFollowUp(e, idx) {
   try { await api(`/api/staff/follow-ups/${idx}/respond`, { method: 'POST', body: JSON.stringify({ response }) }); renderDeptStaff(); }
   catch (err) { toast(err.message, true); }
   return false;
+}
+
+/* -------------------------------- Ambassadors portal -------------------------------- */
+let AMB_TAB = 'overview';
+function ambTab(tab) { AMB_TAB = tab; renderDeptAmbassador(); }
+async function renderDeptAmbassador() {
+  const el = $('view-dept-ambassador');
+  const tabs = [['overview', 'Overview'], ['duties', 'Duties'], ['referrals', 'My referrals'], ['leaderboard', 'Leaderboard'], ['reports', 'Reports']];
+  el.innerHTML = deptHeaderHtml('Ambassadors Portal') + deptTabBarHtml(tabs, AMB_TAB, 'ambTab') + '<div id="ambTabBody"><div class="empty">Loading&hellip;</div></div>';
+  if (AMB_TAB === 'overview') renderAmbOverview();
+  else if (AMB_TAB === 'duties') renderAmbDuties();
+  else if (AMB_TAB === 'referrals') renderAmbReferrals();
+  else if (AMB_TAB === 'reports') renderAmbReports();
+  else renderAmbLeaderboard();
+}
+async function renderAmbOverview() {
+  const box = $('ambTabBody');
+  const [meD, qrD] = await Promise.all([api('/api/ambassador/me'), api('/api/ambassador/qr')]);
+  const a = meD.ambassador;
+  box.innerHTML = `<div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+      <div style="text-align:center">
+        <img src="${qrD.qr}" alt="Your referral QR code" style="width:160px;height:160px;border-radius:12px;border:1px solid var(--line)">
+        <div class="s" style="margin-top:6px"><a href="${qrD.qr}" download="ambassador-${esc(a.code)}-qr.png">Download QR</a></div>
+      </div>
+      <div style="flex:1;min-width:220px">
+        <div class="s" style="color:var(--muted)">Referral code</div>
+        <div class="mono" style="font-size:26px;font-weight:700;letter-spacing:4px;margin-bottom:10px">${esc(a.code)}</div>
+        <div class="s" style="color:var(--muted)">University</div>
+        <div style="margin-bottom:10px">${esc(a.university || '—')}</div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div><div class="s" style="color:var(--muted)">Gems</div>${gemChip(a.gems || 0)}</div>
+          <div><div class="s" style="color:var(--muted)">Leaderboard rank</div><div style="font-weight:700">${a.rank ? '#' + a.rank : '—'}</div></div>
+          <div><div class="s" style="color:var(--muted)">Students referred</div><div style="font-weight:700">${a.uses}</div></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="card"><div class="card-head"><h3>Recent gem activity</h3></div>
+      <div class="card-body">
+        ${meD.gem_events.length ? meD.gem_events.map((e) => `<div class="s" style="padding:8px 0;border-bottom:1px solid var(--line)">${gemChip('+' + e.amount)} ${esc(e.note || e.source)} <span style="color:var(--muted)">&middot; ${esc((e.created_at || '').slice(0, 16))}</span></div>`).join('') : '<div class="s" style="color:var(--muted)">No gems yet - share your code or QR to get your first referral enrolled.</div>'}
+      </div></div>`;
+}
+async function renderAmbDuties() {
+  const box = $('ambTabBody');
+  const d = await api('/api/ambassador/duties');
+  const pending = d.duties.filter((x) => x.status === 'pending');
+  const done = d.duties.filter((x) => x.status === 'done');
+  const dutyCard = (r) => `<div class="card" style="margin-bottom:12px"><div class="card-body">
+      <h3 style="margin:0 0 4px;font-size:15px">${esc(r.duty.title)}</h3>
+      ${r.duty.description ? `<p class="s" style="white-space:pre-wrap">${esc(r.duty.description)}</p>` : ''}
+      ${r.duty.attachment ? `<p class="s"><a href="/uploads/${esc(r.duty.attachment.filename)}" target="_blank">${esc(r.duty.attachment.original_name)}</a></p>` : ''}
+      ${r.status === 'done'
+        ? `<p class="s" style="color:var(--ok)">Marked done ${esc((r.completed_at || '').slice(0, 16))}${r.note ? ' &middot; ' + esc(r.note) : ''}</p>`
+        : `<form onsubmit="return ambCompleteDuty(event, ${r.duty.id})" enctype="multipart/form-data" style="margin-top:8px">
+             <label class="field"><span>Note (optional)</span><input name="note" placeholder="e.g. Posted flyers in 3 hostels"></label>
+             <label class="field"><span>Proof (optional) - document or picture</span><input name="file" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"></label>
+             <button class="btn btn-primary btn-sm">Mark done</button>
+           </form>`}
+    </div></div>`;
+  box.innerHTML = `${pending.length ? `<h3 style="margin:0 0 10px">Pending</h3>${pending.map(dutyCard).join('')}` : '<div class="empty">No pending duties - nice work.</div>'}
+    ${done.length ? `<h3 style="margin:16px 0 10px">Done</h3>${done.map(dutyCard).join('')}` : ''}`;
+}
+async function ambCompleteDuty(e, dutyId) {
+  e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
+  try { await api(`/api/ambassador/duties/${dutyId}/complete`, { method: 'POST', body: new FormData(f) }); toast('Marked done.'); renderAmbDuties(); }
+  catch (err) { toast(err.message, true); f.querySelector('button').disabled = false; }
+  return false;
+}
+async function renderAmbReferrals() {
+  const box = $('ambTabBody');
+  const d = await api('/api/ambassador/referrals');
+  const stageLabel = { new: 'New', challan_issued: 'Challan issued', challan_sent: 'Challan sent', paid_cleared: 'Payment cleared', enrolled: 'Enrolled' };
+  box.innerHTML = `<div class="card"><div class="card-head"><h3>Students you referred</h3></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Email</th><th>Course</th><th>Stage</th><th>Registered</th></tr>
+      ${d.referrals.map((r) => `<tr>
+        <td>${esc(r.name)}</td><td class="s">${esc(r.email)}</td><td class="s">${esc(r.course_title || '—')}</td>
+        <td>${esc(stageLabel[r.payment_stage] || r.payment_stage)}</td><td class="s">${esc((r.created_at || '').slice(0, 10))}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="empty">No referrals yet - share your code or QR to get started.</td></tr>'}
+    </table></div>
+    <p class="hint" style="padding:0 14px 12px">You earn gems once a referral reaches "Enrolled" - weighted by the course category.</p></div>`;
+}
+async function renderAmbReports() {
+  const box = $('ambTabBody');
+  const d = await api('/api/ambassador/reports');
+  box.innerHTML = `<div class="card"><div class="card-head"><h3>Monthly commission reports</h3></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Period</th><th>Referrals paid</th><th>Total paid</th><th>Commission</th><th>Generated</th><th></th></tr>
+      ${d.reports.map((r) => `<tr>
+        <td>${esc(r.period)}</td><td>${r.student_count}</td>
+        <td>PKR ${Number(r.total_paid).toLocaleString('en-US')}</td>
+        <td style="font-weight:700">PKR ${Number(r.total_commission).toLocaleString('en-US')}</td>
+        <td class="s">${esc((r.generated_at || '').slice(0, 10))}</td>
+        <td><a class="btn btn-ghost btn-sm" href="/api/ambassador/reports/${r.id}/download">Download</a></td>
+      </tr>`).join('') || '<tr><td colspan="6" class="empty">No reports yet - your first one lands on the 5th of next month, on EchoLens\' official letterhead.</td></tr>'}
+    </table></div>
+    <p class="hint" style="padding:0 14px 12px">Each report covers the previous month's confirmed payments and pays 10% commission on the amount your referrals actually paid.</p></div>`;
+}
+async function renderAmbLeaderboard() {
+  const box = $('ambTabBody');
+  const [indD, uniD] = await Promise.all([api('/api/ambassador/leaderboard'), api('/api/ambassador/leaderboard/universities')]);
+  box.innerHTML = `<div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Ambassadors</h3></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>#</th><th>Name</th><th>University</th><th>Gems</th></tr>
+      ${indD.leaderboard.map((a) => `<tr><td>${a.rank}</td><td>${esc(a.name)}</td><td class="s">${esc(a.university || '—')}</td><td>${gemChip(a.gems)}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No ambassadors yet.</td></tr>'}
+    </table></div></div>
+    <div class="card"><div class="card-head"><h3>By university</h3></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>#</th><th>University</th><th>Ambassadors</th><th>Total gems</th></tr>
+      ${uniD.leaderboard.map((u) => `<tr><td>${u.rank}</td><td>${esc(u.university)}</td><td>${u.ambassadors}</td><td>${gemChip(u.gems)}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No universities on record yet.</td></tr>'}
+    </table></div></div>`;
 }
 
 

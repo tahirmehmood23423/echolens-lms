@@ -446,6 +446,13 @@ function courseAction(code) {
 }
 
 /* ------------------- in-site registration form (item 6) ------------------- */
+// Scanning an ambassador's QR code lands here with ?amb=<4-digit code>; carry
+// it into the registration form pre-filled (and locked, since it came from a
+// trusted link rather than being typed).
+const AMBASSADOR_REF_CODE = (() => {
+  const v = new URLSearchParams(location.search).get('amb');
+  return v && /^\d{4}$/.test(v) ? v : null;
+})();
 function openRegister(code, title) {
   const options = CATALOGUE.filter((c) => c.price_pkr > 0).map((c) =>
     `<option value="${esc(c.code)}|${esc(c.title)}"${c.code === code ? ' selected' : ''}>${esc(c.code)} - ${esc(c.title)} (PKR ${c.price_pkr.toLocaleString()})</option>`).join('');
@@ -459,7 +466,7 @@ function openRegister(code, title) {
         <label class="field"><span>WhatsApp</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel" value="${ME && ME.profile && ME.profile.phone ? esc(ME.profile.phone) : ''}"></label>
       </div>
       <label class="field"><span>Course you want to enrol in</span><select name="course">${code === 'PATH' ? `<option value="PATH|${esc(title)}" selected>${esc(title)} (bundle - PKR 43,500)</option>` : ''}${options}</select></label>
-      <label class="field"><span>Ambassador code (optional) - a valid 4-digit code gets you 10% off</span><input name="ambassador_code" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="e.g. 4821"></label>
+      <label class="field"><span>Ambassador code (optional) - a valid 4-digit code gets you 10% off</span><input name="ambassador_code" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="e.g. 4821" value="${esc(AMBASSADOR_REF_CODE || '')}"${AMBASSADOR_REF_CODE ? ' readonly' : ''}></label>
       <button class="btn btn-primary btn-block">Submit registration</button>
     </form>`);
   $('regInterest').addEventListener('submit', async (e) => {

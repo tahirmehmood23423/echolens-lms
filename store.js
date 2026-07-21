@@ -38,7 +38,7 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
@@ -46,9 +46,23 @@ const empty = () => ({
   events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
   jobs: [], job_comments: [],
   discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [], ambassadors: [],
+  ambassador_gem_events: [], ambassador_duties: [], ambassador_duty_status: [], ambassador_reports: [],
   settings: {
     cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills' },
     bank: { bank_name: 'Meezan Bank', account_title: 'EchoLens Digital (Pvt) Ltd', account_number: '0123-4567890-123', iban: 'PK36 MEZN 0000 0123 4567 8901', branch: 'Gulberg Branch, Lahore' },
+    // Gems awarded to an ambassador when a student they referred is actually
+    // enrolled into a batch (not just at interest-registration), weighted by
+    // how hard that course category is to sell.
+    ambassador_gem_rates: { Bootcamp: 6, 'Short Course': 10, 'Specialist Track': 15, 'Micro Course': 3 },
+    // 'YYYY-MM' of the calendar month in which monthly ambassador commission
+    // reports were last auto-generated - guards against generating twice if
+    // the server restarts more than once on the 5th.
+    ambassador_report_last_run: null,
+    // The two names/titles printed as digital signatures at the bottom of
+    // every ambassador commission report - department head first, CEO
+    // second. The CEO's own name comes from settings.cert.ceo_name (the
+    // same single source of truth certificates already use).
+    ambassador_report_signoff: { department_head_name: 'Department Head', department_head_title: 'HR Department, EchoLens Digital' },
   },
 });
 
@@ -91,6 +105,20 @@ function migrate() {
   if (!data.settings) { data.settings = empty().settings; changed = true; }
   if (!data.settings.cert) { data.settings.cert = empty().settings.cert; changed = true; }
   if (!data.settings.bank) { data.settings.bank = empty().settings.bank; changed = true; }
+  if (!data.settings.ambassador_gem_rates) { data.settings.ambassador_gem_rates = empty().settings.ambassador_gem_rates; changed = true; }
+  // Ambassadors Portal: existing referral-only ambassador rows get a gems
+  // total and the new collections are backfilled in.
+  for (const t of ['ambassador_gem_events', 'ambassador_duties', 'ambassador_duty_status', 'ambassador_reports']) {
+    if (!Array.isArray(data[t])) { data[t] = []; changed = true; }
+    if (data.seq[t] === undefined) { data.seq[t] = 0; changed = true; }
+  }
+  if (data.settings && data.settings.ambassador_report_last_run === undefined) { data.settings.ambassador_report_last_run = null; changed = true; }
+  if (data.settings && !data.settings.ambassador_report_signoff) { data.settings.ambassador_report_signoff = empty().settings.ambassador_report_signoff; changed = true; }
+  for (const a of data.ambassadors) {
+    if (a.gems === undefined) { a.gems = 0; changed = true; }
+    if (a.university === undefined) { a.university = null; changed = true; }
+    if (a.user_id === undefined) { a.user_id = null; changed = true; }
+  }
   // v17: registration/finance pipeline stage on pre-existing registrations.
   for (const r of data.registrations) {
     if (r.payment_stage === undefined) { r.payment_stage = r.status && r.status.added_to_course ? 'enrolled' : 'new'; changed = true; }
@@ -184,6 +212,7 @@ const ROLE_USERNAME_DOMAIN = {
   instructor: 'teacher.echolens', coordinator: 'coordinator.echolens',
   hr: 'hr.echolens', finance: 'finance.echolens',
   student_coordinator: 'admissions.echolens', staff: 'staff.echolens',
+  ambassador: 'ambassador.echolens',
 };
 function usernameFromEmail(email, role) {
   const local = String(email || '').split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, '') || 'user';
@@ -1574,6 +1603,35 @@ const Settings = {
     save();
     return b;
   },
+  // Gems an ambassador earns per paid enrollment, by course tier - harder
+  // categories (longer, pricier tracks) are worth more.
+  ambassadorGemRates() {
+    return data.settings && data.settings.ambassador_gem_rates ? data.settings.ambassador_gem_rates : empty().settings.ambassador_gem_rates;
+  },
+  setAmbassadorGemRates(fields) {
+    if (!data.settings) data.settings = empty().settings;
+    if (!data.settings.ambassador_gem_rates) data.settings.ambassador_gem_rates = empty().settings.ambassador_gem_rates;
+    const r = data.settings.ambassador_gem_rates;
+    for (const k of Object.keys(r)) if (fields[k] !== undefined) r[k] = Math.max(0, Number(fields[k]) || 0);
+    save();
+    return r;
+  },
+  ambassadorReportLastRun() { return (data.settings && data.settings.ambassador_report_last_run) || null; },
+  setAmbassadorReportLastRun(ym) {
+    if (!data.settings) data.settings = empty().settings;
+    data.settings.ambassador_report_last_run = ym; save();
+  },
+  ambassadorReportSignoff() {
+    return (data.settings && data.settings.ambassador_report_signoff) || empty().settings.ambassador_report_signoff;
+  },
+  setAmbassadorReportSignoff(fields) {
+    if (!data.settings) data.settings = empty().settings;
+    if (!data.settings.ambassador_report_signoff) data.settings.ambassador_report_signoff = empty().settings.ambassador_report_signoff;
+    const s = data.settings.ambassador_report_signoff;
+    for (const k of ['department_head_name', 'department_head_title']) if (fields[k] !== undefined) s[k] = String(fields[k]).slice(0, 150);
+    save();
+    return s;
+  },
 };
 
 /* ------------------------- datasets attached to tasks ------------------------- */
@@ -1690,21 +1748,26 @@ function openUserProfile(u) {
 }
 
 /* ------------------------------- ambassadors -------------------------------
- * HR-created referral partners. Each carries a unique 4-digit code; students
- * who enter it on the open-web registration form get 10% off automatically. */
+ * HR-created referral partners with their own portal login. Each carries a
+ * unique 4-digit code; students who enter it (directly, or via a QR that
+ * pre-fills it) on the open-web registration form get 10% off automatically,
+ * and the ambassador earns gems once that student is actually enrolled. */
 const Ambassadors = {
   all() { return data.ambassadors.slice().sort((a, b) => b.id - a.id); },
   byId(id) { return data.ambassadors.find((a) => a.id === Number(id)) || null; },
+  byUserId(uid) { return data.ambassadors.find((a) => a.user_id === Number(uid)) || null; },
   byCode(code) {
     const c = String(code || '').trim();
     return c ? data.ambassadors.find((a) => a.active && a.code === c) || null : null;
   },
-  create({ name, email }, by) {
+  create({ name, email, university, user_id }, by) {
     let code;
     do { code = String(Math.floor(1000 + Math.random() * 9000)); } while (data.ambassadors.some((a) => a.code === code));
     const a = {
       id: nextId('ambassadors'), name: String(name || '').trim().slice(0, 120),
       email: String(email || '').trim().toLowerCase().slice(0, 200),
+      university: String(university || '').trim().slice(0, 150) || null,
+      user_id: user_id || null, gems: 0,
       code, active: true, created_by: by || null, created_at: now(),
     };
     data.ambassadors.push(a); save();
@@ -1712,6 +1775,121 @@ const Ambassadors = {
   },
   remove(id) { data.ambassadors = data.ambassadors.filter((a) => a.id !== Number(id)); save(); },
   usesFor(code) { return data.registrations.filter((r) => r.ambassador_code === code).length; },
+  addGems(id, amount, meta = {}) {
+    const a = Ambassadors.byId(id); if (!a || !amount) return a;
+    a.gems = (a.gems || 0) + amount;
+    data.ambassador_gem_events.push({
+      id: nextId('ambassador_gem_events'), ambassador_id: a.id, amount,
+      source: meta.source || 'enrollment', course_tier: meta.course_tier || null,
+      registration_id: meta.registration_id || null, batch_id: meta.batch_id || null,
+      note: meta.note || null, created_at: now(),
+    });
+    save();
+    return a;
+  },
+  leaderboard() {
+    return Ambassadors.all().filter((a) => a.active).sort((a, b) => (b.gems || 0) - (a.gems || 0))
+      .map((a, i) => ({ id: a.id, name: a.name, university: a.university, code: a.code, gems: a.gems || 0, uses: Ambassadors.usesFor(a.code), rank: i + 1 }));
+  },
+  universityLeaderboard() {
+    const byUni = {};
+    for (const a of data.ambassadors) {
+      if (!a.active || !a.university) continue;
+      if (!byUni[a.university]) byUni[a.university] = { university: a.university, gems: 0, ambassadors: 0 };
+      byUni[a.university].gems += a.gems || 0;
+      byUni[a.university].ambassadors += 1;
+    }
+    return Object.values(byUni).sort((a, b) => b.gems - a.gems).map((u, i) => ({ ...u, rank: i + 1 }));
+  },
+  // Every paid challan for a student this ambassador referred, whose payment
+  // was confirmed within the given 'YYYY-MM' period - the factual basis for
+  // the monthly commission report (10% of what the student actually paid).
+  monthlyRows(code, period) {
+    return data.challans
+      .filter((c) => c.status === 'paid' && String(c.paid_confirmed_at || '').slice(0, 7) === period)
+      .map((c) => ({ c, r: data.registrations.find((x) => x.id === c.registration_id) }))
+      .filter(({ r }) => r && r.ambassador_code === code)
+      .map(({ c, r }) => ({
+        student_name: c.student_name, course_title: c.course_title,
+        enrolled: r.payment_stage === 'enrolled', amount_paid: c.net_fee,
+        commission: Math.round(c.net_fee * 0.10), paid_at: c.paid_confirmed_at,
+      }))
+      .sort((a, b) => String(a.paid_at).localeCompare(String(b.paid_at)));
+  },
+};
+
+/* --------------------------- ambassador monthly reports ---------------------------
+ * Generated on the 5th of every month (see checkAmbassadorReportSchedule in
+ * server.js), one PDF per active ambassador, covering the previous calendar
+ * month's confirmed payments. Files live on disk; this is just the index. */
+const AmbassadorReports = {
+  create({ ambassador_id, period, filename, student_count, total_paid, total_commission }) {
+    const r = {
+      id: nextId('ambassador_reports'), ambassador_id, period, filename,
+      student_count, total_paid, total_commission, generated_at: now(),
+    };
+    data.ambassador_reports.push(r); save();
+    return r;
+  },
+  all() { return data.ambassador_reports.slice().sort((a, b) => b.id - a.id); },
+  byId(id) { return data.ambassador_reports.find((r) => r.id === Number(id)) || null; },
+  forAmbassador(id) { return data.ambassador_reports.filter((r) => r.ambassador_id === Number(id)).sort((a, b) => b.id - a.id); },
+  existsFor(ambassador_id, period) { return data.ambassador_reports.some((r) => r.ambassador_id === ambassador_id && r.period === period); },
+  removeExisting(ambassador_id, period) { data.ambassador_reports = data.ambassador_reports.filter((r) => !(r.ambassador_id === ambassador_id && r.period === period)); save(); },
+};
+
+const AmbassadorGemEvents = {
+  forAmbassador(id) { return data.ambassador_gem_events.filter((e) => e.ambassador_id === Number(id)).sort((a, b) => b.id - a.id); },
+};
+
+/* --------------------------- ambassador duties ---------------------------
+ * HR-assigned tasks, either broadcast to every current ambassador ('all') or
+ * targeted at one ('one'). Completion is tracked per-ambassador so a group
+ * duty's progress can be seen at a glance. */
+const AmbassadorDuties = {
+  create({ title, description, scope, ambassador_id, attachment }, by) {
+    const d = {
+      id: nextId('ambassador_duties'),
+      title: String(title || '').trim().slice(0, 150),
+      description: String(description || '').trim().slice(0, 2000),
+      scope: scope === 'one' ? 'one' : 'all',
+      attachment: attachment || null, // { filename, original_name }
+      created_by: by || null, created_at: now(),
+    };
+    data.ambassador_duties.push(d);
+    const targets = d.scope === 'one'
+      ? Ambassadors.all().filter((a) => a.active && a.id === Number(ambassador_id))
+      : Ambassadors.all().filter((a) => a.active);
+    for (const a of targets) {
+      data.ambassador_duty_status.push({
+        id: nextId('ambassador_duty_status'), duty_id: d.id, ambassador_id: a.id,
+        status: 'pending', note: null, proof_attachment: null, completed_at: null,
+      });
+    }
+    save();
+    return { duty: d, recipients: targets };
+  },
+  all() {
+    return data.ambassador_duties.slice().sort((a, b) => b.id - a.id).map((d) => {
+      const rows = data.ambassador_duty_status.filter((s) => s.duty_id === d.id);
+      return { ...d, total: rows.length, done: rows.filter((s) => s.status === 'done').length };
+    });
+  },
+  byId(id) { return data.ambassador_duties.find((d) => d.id === Number(id)) || null; },
+  forAmbassador(ambassadorId) {
+    const rows = data.ambassador_duty_status.filter((s) => s.ambassador_id === Number(ambassadorId));
+    return rows.map((s) => ({ ...s, duty: AmbassadorDuties.byId(s.duty_id) }))
+      .filter((r) => r.duty)
+      .sort((a, b) => b.duty.id - a.duty.id);
+  },
+  markDone(dutyId, ambassadorId, { note, proof_attachment } = {}) {
+    const s = data.ambassador_duty_status.find((x) => x.duty_id === Number(dutyId) && x.ambassador_id === Number(ambassadorId));
+    if (!s) return null;
+    s.status = 'done'; s.note = String(note || '').trim().slice(0, 600) || null;
+    s.proof_attachment = proof_attachment || null; s.completed_at = now();
+    save();
+    return s;
+  },
 };
 
 function backupNow() {
@@ -2723,6 +2901,7 @@ module.exports = {
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
+  AmbassadorGemEvents, AmbassadorDuties, AmbassadorReports,
   seed, DB_PATH, allData: () => data,
 };
 

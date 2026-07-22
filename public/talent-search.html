@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens Talent Search</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v1230">
+</head>
+<body>
+<div id="gate" class="gate"><img src="/img/logo.png" alt="EchoLens" style="width:120px"><div>Loading talent search</div></div>
+<div class="content" id="app" style="display:none;max-width:1100px;margin:0 auto;padding:24px 16px 60px">
+  <h1 style="margin-bottom:4px">Talent Search</h1>
+  <div class="s" style="color:var(--muted);margin-bottom:18px">Search verified EchoLens student profiles.</div>
+
+  <div class="card" style="margin-bottom:16px"><div class="card-body">
+    <form id="searchForm">
+      <label class="field"><span>Search</span><input name="q" placeholder="Skills, headline, about, project titles..."></label>
+      <div class="form-grid">
+        <label class="field"><span>Skills (comma separated)</span><input name="skills_text" placeholder="Python, SQL"></label>
+        <label class="field"><span>Skills match</span><select name="skills_mode"><option value="and">All of these</option><option value="or">Any of these</option></select></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>City</span><input name="city"></label>
+        <label class="field"><span>Minimum gems</span><input name="min_gems" type="number" min="0"></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Courses completed (comma separated titles)</span><input name="courses"></label>
+        <label class="field"><span>Certificates held (comma separated titles)</span><input name="certificates"></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Graduation year from</span><input name="grad_year_min" type="number"></label>
+        <label class="field"><span>Graduation year to</span><input name="grad_year_max" type="number"></label>
+      </div>
+      <label class="field"><span>Remote willingness</span>
+        <div style="display:flex;gap:14px;flex-wrap:wrap" id="remoteBox"></div></label>
+      <label class="field"><span>Availability</span>
+        <div style="display:flex;gap:14px;flex-wrap:wrap" id="availBox"></div></label>
+      <label class="field"><span>Work type sought</span>
+        <div style="display:flex;gap:14px;flex-wrap:wrap" id="workBox"></div></label>
+      <label class="field"><span style="display:flex;align-items:center;gap:8px;font-weight:400"><input type="checkbox" name="has_verified_projects" style="width:auto"> Has verified projects only</span></label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" type="submit">Search</button>
+        <button class="btn btn-ghost" type="button" onclick="saveThisSearch()">Save this search</button>
+      </div>
+    </form>
+  </div></div>
+
+  <div id="results"></div>
+  <div style="text-align:center;margin-top:16px"><button class="btn btn-ghost" id="loadMoreBtn" style="display:none" onclick="loadMore()">Load more</button></div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/js/talent-search.js?v1"></script>
+</body>
+</html>

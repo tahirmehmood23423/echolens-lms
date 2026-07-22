@@ -1,3 +1,86 @@
+# EchoLens LMS - Talent Marketplace, Phases 4-6 and cross-cutting
+
+**Phase 4: search.** Recruiter search lives at `/talent/search` (`GET /api/talent/search`, `requireRecruiter`). Every filter in the spec (free text, skills AND/OR, city, remote, availability, work type, verified projects, courses completed, certificates held, minimum gems, graduation year range) runs as one real, keyset-paginated SQL query - see `migrations/0004_talent_search.sql`:
+- Free text uses a generated `tsvector` + GIN index on `talent_profiles` (headline/about) and `projects` (title/summary/tech stack) separately - Postgres generated columns can't span two tables, so the query unions both rather than faking one. `websearch_to_tsquery` is used, never `LIKE '%term%'`.
+- Skills use `talent_profiles.skill_ids`, a denormalised `BIGINT[]` mirror of the `student_skills` join table, kept in sync by a Postgres trigger (not application code, so it can't drift) with a GIN index for `@>` (AND) / `&&` (OR) containment queries.
+- Courses completed, certificates held, gems and level live in the *legacy* store (JSON file or JSONB-blob tables, never plain relational Postgres), which can't be joined in one SQL query or keyset-paginated over. `talent.js`'s `refreshSearchCache()` mirrors exactly these fields into cache columns on `talent_profiles` whenever they plausibly changed (profile save/publish, course-project publish) and on a 30-minute sweep - the trade-off is these specific fields in search results can be up to 30 minutes stale relative to the live gamification data. Every other filter is always live.
+- Ranking combines text rank, a freshness signal, and a completeness signal with weights in `search-config.js` (tunable in one place, per the spec). Completeness is computed as a SQL expression matching `computeCompleteness()` in `talent.js` field-for-field - the two are kept in sync by hand since Postgres can't call JS.
+- Pagination is real keyset (`WHERE (score, id) < (cursor_score, cursor_id) ORDER BY score DESC, id DESC LIMIT 20`), never `OFFSET`.
+- Saved searches (`saved_searches` table) with an optional weekly email digest, checked hourly via the same `setInterval` pattern `server.js` already uses for the ambassador report schedule and 12-hourly backups - it only actually sends once 7 days have passed per saved search.
+- Every search is logged to `search_log` (recruiter id, filters, result count) - this is what Phase 6's analytics tiles read.
+
+**Phase 5: contact gating, shortlists, messaging.** New module `talent-hiring.js`, same registration pattern, migration `0005_talent_hiring.sql` (`contact_requests`, `contact_reveals`, `shortlists`, `shortlist_candidates`, `messages`, `blocked_companies`).
+- A recruiter never sees a student's email, phone or resume until that specific student accepts that specific recruiter's request - verified in `test/talent.test.js` and manually (a `GET` on a pending request returns no `email` key at all; messaging 403s until accepted).
+- Accepting writes a permanent `contact_reveals` row (recruiter id, student id, timestamp, message) that is never deleted, even if the profile is later unpublished.
+- Rate limiting: `CONTACT_REQUESTS_DAILY_LIMIT` (default 25/day, `.env.example`) plus a general burst limiter (10/5min) on top, matching the cross-cutting "rate limit search and contact endpoints" requirement together with search's own 60/5min limiter.
+- Blocking a company auto-declines that company's outstanding pending requests and blocks future ones; CSV export of a shortlist only populates email/phone for candidates with an actual `contact_reveals` row for that recruiter.
+- Student side: "Hiring Interest" nav item in the dashboard (accept/decline/block/message). Recruiter side: `/talent/interest` (requests sent, shortlists, messaging).
+
+**Phase 6: admin, safety, analytics.** Migration `0006_talent_admin_safety.sql` adds `unpublished_reason`/`hidden_reason` columns and a `reports` table.
+- Admin can unpublish any profile or project with a reason from the existing "Recruiters" admin view (now tabbed: Verification / Talent analytics / Reports) - the student sees the reason on their Talent Profile page and it clears automatically when they republish.
+- Report button on every public profile and project page, feeding the admin Reports tab (unpublish-and-resolve in one click, or dismiss).
+- Analytics tiles: published profiles, active recruiters, searches run, contact requests sent, acceptance rate, revealed contacts, and top searched skills (parsed out of `search_log.filters`, the most commercially useful number per the spec - it says which courses to build next).
+- Every recruiter approval, contact reveal-adjacent action, and unpublish writes to the `audit_log` table added in Phase 1.
+- **Cross-cutting privacy, verified concretely, not just designed:** unpublishing a profile immediately 404s its public URL, drops it from search results, and drops it from every recruiter's shortlist *view* (the shortlist entry itself isn't deleted - it just doesn't render while the profile is hidden) - while `contact_reveals` rows from before the unpublish are kept, exactly as specified.
+
+**Cross-cutting.**
+- **Security:** authorization middleware on every route (`authRequired` + `requireRecruiter`/`requireStudent`/`adminRequired`), 100% parameterized queries, rate limiting on search and contact endpoints (above). CSRF: this app has no CSRF token system anywhere (SameSite=lax cookies are the existing mitigation) - the Talent Marketplace routes were kept consistent with that rather than introducing a second, inconsistent protection model just for new routes.
+- **Privacy:** `/privacy` is a new page (no terms/privacy page existed in this codebase before) with a plain-English Talent Marketplace section - what's public, what a recruiter sees and when, how to withdraw. It is explicitly *not* a substitute for a real Terms of Service; that needs actual legal drafting, which is out of scope here and flagged on the page itself.
+- **Design:** existing brand palette and component classes throughout (`.card`, `.field`, `.btn-*`, `.badge`, `.pub-*`), no new CSS framework; one small `.talent-md` block added for rendered Markdown typography.
+- **Copy:** checked - no em dashes, no exclamation marks, no emoji in any new interface text.
+- **SEO:** `/talent/:handle` and `/talent/:handle/projects/:id` are server-rendered for crawlers - real `<title>`/`<meta description>`/canonical, Open Graph tags, and JSON-LD `Person`/`CreativeWork` schema, injected server-side the same way `/cert` already injects its Open Graph tags, only unpublished/missing profiles fall back to the generic client-rendered shell. `/sitemap.xml` is now a dynamic route (registered ahead of `express.static`) that appends every currently published profile to the existing static entries.
+- **Testing:** `npm test` (`test/talent.test.js`, Node's built-in test runner, no new dependency) covers the four specified integration scenarios against a real, fully isolated scratch Postgres database created and dropped by the test run itself - it never touches whatever database `DATABASE_URL` itself points at. Requires `CREATEDB` on the connecting role.
+
+---
+
+# EchoLens LMS - Student profiles and projects (Talent Marketplace Phases 2-3)
+
+**Students opt in to a hireable profile at `/talent/:handle`, built from real course data.** New code, own module (`talent.js`, registered in `server.js` the same way `coursepages.js` is), new Postgres tables (`migrations/0003_talent_profiles.sql`: `talent_profiles`, `student_skills`, `skills`, `projects`) - genuinely relational this time (not the JSONB-per-row pattern legacy tables use), since this data has no JSON-file history to translate and later phases need real search over it. **This feature requires `DATABASE_URL`** - every `/api/talent/*` route 503s with a clear message if Postgres isn't configured; there is no JSON-file fallback.
+
+- **Student side** (`dashboard.js`, new "Talent Profile" nav item): headline, about, city/remote/availability/work type, optional salary (hidden unless the student shows it), links, education/experience lists, a skills tag-picker (autocompleted from a 45-entry catalogue-derived vocabulary, free-text additions allowed but flagged `needs_review` for later admin moderation), and a PDF resume upload (magic-byte checked, 5 MB cap, random filename, never served publicly - only the owning student can fetch it back).
+- **Nothing publishes by default.** A completeness meter (10 weighted checklist items) blocks publishing below 60%; publishing/unpublishing are separate explicit actions.
+- **The verified block is computed live, not stored** - courses completed, per-course completion % (rolled up from instructor-graded task scores), current level/gems, and certificates (linking to the existing QR verification page) all come straight from `store.fullStudentProfile()`, the same data the rest of the LMS already uses. It's visually separated from the self-reported fields on the public page.
+- **Projects, two sources:** a one-click "Publish as project" action appears on any graded quest submission that belongs to the *final (capstone) level* of its track - reusing the curriculum's own existing "this is the portfolio piece" signal (see `finalProjectFor` in `store.js`) rather than inventing new curriculum metadata. These snapshot course name, task title, instructor grade and submission date as an immutable `verified: true` record; only the surrounding presentation (description, images, links) stays editable. Self-added projects are `verified: false` and fully editable.
+- **Project images** (cover + up to 6 gallery) go through `multer` memory storage, are validated by magic bytes (not extension), and are piped through `sharp` (auto-orient, resize to max width 1600, re-encoded to JPEG - which strips EXIF as a side effect of not calling `.withMetadata()`).
+- **Project descriptions are Markdown**, rendered with `marked` - the raw source is HTML-entity-escaped *before* parsing, so any `<script>`/raw HTML a student types can never survive as real markup on the public page (verified with a literal `<script>alert(1)</script>` in testing - it renders as inert escaped text).
+- **Public pages** (no auth, no JSON-file fallback either): `/talent/:handle` (profile - resume and any contact detail are never rendered here, regardless of viewer, since that's Phase 5's contact-reveal flow to build), `/talent/:handle/projects/:id` (project detail), `/talent/projects` (a project gallery independent of profiles, with basic text search - Phase 4 owns the full filter/ranking/pagination spec).
+
+---
+
+# EchoLens LMS - Recruiter role and verification (Talent Marketplace Phase 1)
+
+**A fourth role, `recruiter`, on top of the Postgres data layer below.** A recruiter is a `users` row like any other role (same login, same JWT cookie) - Phase 1 adds the account fields, company linkage, and admin verification workflow around it, but no marketplace to search yet (that's later phases).
+
+- **Sign up** at `/recruiter-signup` (linked from `/login`): full name, work email, company name/website, designation, city, company size band, and a hiring note. A work email from a blocked free-mail domain (gmail, yahoo, hotmail, outlook, live, proton - configurable via `RECRUITER_BLOCKED_EMAIL_DOMAINS`, see `.env.example`) is refused unless the recruiter checks the small-company override box and explains why.
+- New accounts start `status: 'pending'` and, signed in, see nothing but a status screen (waiting / needs more information / rejected reason / verified) at `/dashboard` - the same nav-isolation pattern the HR/Finance/Admissions/Staff/Ambassador portals already use.
+- **Admin verification queue** at `/admin/recruiters`: approve, reject (with a reason shown to the recruiter), or request more information (recruiter can then edit their details and resubmit) - each action emails the recruiter and writes a row to the new `audit_log` table.
+- **Companies** are matched by normalised work-email domain (`companies` table): every recruiter from the same domain shares one company record - the "recruiter seats" concept - rather than creating a duplicate per signup.
+- `requireRecruiter` middleware (role must be `recruiter` AND `status === 'approved'`) is in place in `server.js` for later phases to gate the actual marketplace; nothing uses it yet since there is nothing to search or contact until Phase 2+.
+- Both new tables follow the same JSONB-per-table pattern as Phase 0's legacy tables (see `migrations/0002_recruiters.sql`) - this is a pragmatic Phase 1 choice for a two-table, non-search-heavy feature; the search-heavy tables in later phases (student skills, full-text project search) will use real relational columns and indexes as the spec calls for.
+
+---
+
+# EchoLens LMS - Postgres data layer (Talent Marketplace Phase 0)
+
+**Persistence moved from a JSON file to Postgres, with no behaviour change.** Every route, every business-logic function in `store.js`, and the in-memory `data` object it has always worked with are unchanged - what changed is where that `data` object is loaded from and saved to.
+
+- Set `DATABASE_URL` and the app runs entirely on Postgres: on boot it runs any pending migrations (`/migrations`, tracked in `schema_migrations`) and loads `data` from Postgres instead of `echolens.json`.
+- Leave `DATABASE_URL` unset and nothing changes - the app still reads and writes `echolens.json` exactly as before. This keeps `npm start` working with zero setup for local development.
+- There is one Postgres table per existing JSON collection (`users`, `courses`, `submissions`, `certificates`, and so on - 53 in total), each holding `id` plus the record as a `JSONB` payload. This is a deliberate, low-risk translation of the existing whole-file-snapshot model - not a fresh relational redesign - so that ~250 existing routes and ~150 call sites in `store.js` did not need to change. New Talent Marketplace tables added in later phases use ordinary relational columns and indexes.
+- **One-time move to Postgres** (per environment): after setting `DATABASE_URL`,
+  ```bash
+  npm run migrate          # creates the schema (safe to run any time; skips what's already applied)
+  npm run migrate:import   # reads echolens.json once and loads it into Postgres, preserving every id
+  npm start                # now runs on Postgres
+  ```
+  `migrate:import` refuses to run if Postgres already has rows (pass `--force` to truncate and re-import - only do this if you mean it). It never modifies `echolens.json` - the file stays exactly where it is, untouched, as a backup.
+- The server will not boot against an empty Postgres database if `echolens.json` has existing users - that combination almost always means `migrate:import` hasn't been run yet, and it fails loudly instead of silently serving an empty portal.
+- Responses now wait for their write to actually land in Postgres before the client gets a 200 (see the middleware in `server.js` right after `cookieParser()`), so a successful response still means "durably saved," the same guarantee the old synchronous file write gave.
+
+See `.env.example` for `DATABASE_URL` / `PGSSLMODE`, and `migrations/` for the schema and scripts.
+
+---
+
 # EchoLens LMS v18 - Admissions Office Release
 
 **Certificates are stripped down to proof of completion.** No certificate - course, quest, hackathon, competition, issued from the open site or the portal - shows a score, a pass mark, or "AI graded" anymore; the plain-text verification URL at the bottom is gone too (the QR code is the only verification path now, and it's still there). The CEO signature is never an uploaded image again: it is always the CEO's name (default "Tahir Mehmood") typed in a script font, on the web certificate *and* on the downloadable certificate picture and PDF. The admin "Certificate settings" panel dropped the signature-image upload accordingly. The shareable certificate PNG (`/api/cert-og/<serial>.png`, also the LinkedIn preview image) now embeds the same QR code and typed signature as the web page, so every format - on-screen, downloaded picture, printed/saved PDF - carries a working QR.
@@ -353,7 +436,9 @@ Demo accounts (change after first sign-in): `admin@` / `teacher@` / `coordinator
 
 ## Deploying on Render
 
-Same as v3: web service with `npm install` build and `npm start` start command, persistent disk mounted (e.g. at `/data`), and env vars `DB_PATH=/data/echolens.json`, `UPLOAD_DIR=/data/uploads`, a strong `JWT_SECRET`, `NODE_ENV=production`. Push this code to your GitHub repo and Render redeploys; the database migrates itself on boot. Remember: after running the seed on a fresh server, restart the service.
+Web service with `npm install` build and `npm start` start command, persistent disk mounted (e.g. at `/data`), and env vars `DB_PATH=/data/echolens.json`, `UPLOAD_DIR=/data/uploads`, a strong `JWT_SECRET`, `NODE_ENV=production`. Push this code to your GitHub repo and Render redeploys.
+
+**Postgres (`DATABASE_URL`).** Add a Render Postgres instance and set `DATABASE_URL` to its connection string (Render's managed Postgres needs TLS, which is on by default here - only set `PGSSLMODE=disable` for a local/dev database with no TLS). The app then runs on Postgres instead of `DB_PATH`; see the Postgres data layer section at the top of this file for the one-time `npm run migrate` / `npm run migrate:import` steps to move an existing `echolens.json` over. Do this once per environment, not on every deploy - `migrate:import` refuses to run again against a database that already has data.
 
 Optional email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` and announcements are emailed to everyone on the course.
 
@@ -363,6 +448,8 @@ Optional email: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FR
 echolens-lms/
   server.js              Express app: auth + API (v4)
   store.js               Data store, gamification engine, v3->v4 migration
+  db.js                  Postgres pool (no-op helpers when DATABASE_URL is unset)
+  migrations/            Numbered SQL schema, migration runner, one-time JSON import script
   mailer.js              Email (console-logs until SMTP is configured)
   package.json
   public/

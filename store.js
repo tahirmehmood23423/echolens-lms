@@ -20,6 +20,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const db = require('./db');
+const { COLLECTIONS } = require('./migrations/collections');
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'echolens.json');
 // (usernames are plain handles now - see uniqueUsername; no fake email domain)
@@ -38,7 +40,7 @@ const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gem
 const DEFAULT_ASSIGNMENT_POINTS = 100;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0, companies: 0, audit_log: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
@@ -49,6 +51,8 @@ const empty = () => ({
   ambassador_gem_events: [], ambassador_duties: [], ambassador_duty_status: [], ambassador_reports: [],
   departments: [], department_members: [], department_tasks: [], department_task_status: [], department_announcements: [],
   contracts: [],
+  // Talent Marketplace (Phase 1+)
+  companies: [], audit_log: [],
   settings: {
     cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills', ntn: 'J372619', cuin: '0342802' },
     bank: { bank_name: 'Meezan Bank', account_title: 'EchoLens Digital (Pvt) Ltd', account_number: '0123-4567890-123', iban: 'PK36 MEZN 0000 0123 4567 8901', branch: 'Gulberg Branch, Lahore' },
@@ -74,12 +78,153 @@ function load() {
   if (fs.existsSync(DB_PATH)) {
     try { data = JSON.parse(fs.readFileSync(DB_PATH, 'utf8')); } catch { data = empty(); }
   }
+  fillDefaultsAndMigrate();
+}
+function fillDefaultsAndMigrate() {
   const base = empty();
   for (const k of Object.keys(base)) if (data[k] === undefined) data[k] = base[k];
   for (const k of Object.keys(base.seq)) if (data.seq[k] === undefined) data.seq[k] = 0;
   migrate();
 }
+
+/*
+ * ------------------------- Postgres persistence -------------------------
+ * `load()`/`save()` above are the original file-backed store, kept exactly
+ * as they were - they still run unchanged (and are all `data` ever uses)
+ * when DATABASE_URL is not set, which keeps zero-setup local development
+ * working. When DATABASE_URL is set, server.js calls `initFromPostgres()`
+ * once at boot (after `load()` has already run synchronously as a
+ * harmless scaffold) to replace `data` with what's in Postgres, and every
+ * `save()` call below persists there instead of to the JSON file.
+ *
+ * Every one of store.js's ~150 internal `save()` call sites, and the
+ * handful of external `store.persist()` calls in server.js, are
+ * unchanged - they still just mutate the in-memory `data` object
+ * synchronously and then call save()/persist(). That is deliberate: it is
+ * the only way to move persistence to Postgres (whose driver is
+ * inherently async) without touching business logic in ~250 routes. See
+ * the Phase 0 summary for the durability trade-off and how it's closed
+ * (server.js awaits pendingPersist() before actually sending each
+ * response, so a client never sees a 200 for a write that didn't durably
+ * land in Postgres).
+ */
+let pgQueueTail = Promise.resolve();
+let pendingPersistPromise = Promise.resolve();
+let lastPersistedSnapshot = null; // { [collection]: JSON string } - what Postgres currently holds, so save() only rewrites collections that actually changed
+
+function chunkRows(rows, size) {
+  const out = [];
+  for (let i = 0; i < rows.length; i += size) out.push(rows.slice(i, i + size));
+  return out;
+}
+
+async function persistAllToPostgres(snapshot) {
+  await db.withTransaction(async (client) => {
+    const prevSnapshot = lastPersistedSnapshot || {};
+    const nextSnapshot = {};
+    for (const name of COLLECTIONS) {
+      const records = snapshot[name] || [];
+      const json = JSON.stringify(records);
+      nextSnapshot[name] = json;
+      if (prevSnapshot[name] === json) continue; // unchanged since the last successful persist - skip the round trip
+      await client.query(`DELETE FROM ${name}`);
+      for (const batch of chunkRows(records, 2000)) {
+        if (!batch.length) continue;
+        const values = [];
+        const params = [];
+        batch.forEach((rec, i) => {
+          const p = i * 2;
+          values.push(`($${p + 1}, $${p + 2})`);
+          params.push(rec.id, JSON.stringify(rec));
+        });
+        await client.query(`INSERT INTO ${name} (id, data) VALUES ${values.join(', ')}`, params);
+      }
+    }
+    await client.query(
+      `INSERT INTO store_meta (id, seq, issued_usernames, issued_regnos, settings)
+       VALUES (1, $1, $2, $3, $4)
+       ON CONFLICT (id) DO UPDATE SET seq = EXCLUDED.seq, issued_usernames = EXCLUDED.issued_usernames,
+         issued_regnos = EXCLUDED.issued_regnos, settings = EXCLUDED.settings, updated_at = now()`,
+      [JSON.stringify(snapshot.seq), JSON.stringify(snapshot.issued_usernames), JSON.stringify(snapshot.issued_regnos), JSON.stringify(snapshot.settings)]
+    );
+    lastPersistedSnapshot = nextSnapshot;
+  });
+}
+
+/** Queues a Postgres persist of the current `data`, serialized after any persist already in flight. Returns a promise for *this* persist specifically (resolves/rejects on its own outcome), even though execution waits its turn in line. */
+function queuePersistToPostgres() {
+  const thisOp = pgQueueTail.then(() => persistAllToPostgres(data));
+  pgQueueTail = thisOp.catch(() => {}); // keep the queue alive after a failure so later saves still get their turn
+  return thisOp;
+}
+
+/** Reads every collection and store_meta back out of Postgres into `data`, replacing whatever load() populated from the JSON file. Call once at boot, before the server accepts requests. */
+async function loadFromPostgres() {
+  const pool = db.getPool();
+  const next = empty();
+  for (const name of COLLECTIONS) {
+    const { rows } = await pool.query(`SELECT data FROM ${name} ORDER BY id`);
+    next[name] = rows.map((r) => r.data);
+  }
+  const metaRes = await pool.query('SELECT seq, issued_usernames, issued_regnos, settings FROM store_meta WHERE id = 1');
+  if (metaRes.rows[0]) {
+    const meta = metaRes.rows[0];
+    next.seq = { ...next.seq, ...(meta.seq || {}) };
+    next.issued_usernames = meta.issued_usernames || [];
+    next.issued_regnos = meta.issued_regnos || [];
+    next.settings = { ...next.settings, ...(meta.settings || {}) };
+  }
+  data = next;
+  fillDefaultsAndMigrate();
+  lastPersistedSnapshot = {};
+  for (const name of COLLECTIONS) lastPersistedSnapshot[name] = JSON.stringify(data[name] || []);
+}
+
+/**
+ * Boot entry point. No-op (JSON file store, unchanged) when DATABASE_URL
+ * isn't set. Otherwise runs any pending schema migrations, then refuses
+ * to boot against an empty Postgres database if the JSON file has
+ * existing records - that combination almost always means the one-time
+ * import (`npm run migrate:import`) hasn't been run yet, and booting
+ * anyway would silently serve an empty portal instead of failing loudly.
+ */
+async function initFromPostgres() {
+  if (!db.enabled()) {
+    console.log('[store] DATABASE_URL not set - using the JSON file store at', DB_PATH);
+    return;
+  }
+  const { runMigrations } = require('./migrations/run');
+  await runMigrations(db.getPool());
+
+  const { rows } = await db.query('SELECT count(*)::int AS n FROM users');
+  const pgUserCount = rows[0].n;
+  let jsonHasData = false;
+  if (fs.existsSync(DB_PATH)) {
+    try { jsonHasData = (JSON.parse(fs.readFileSync(DB_PATH, 'utf8')).users || []).length > 0; } catch { /* unreadable/corrupt - treat as no data */ }
+  }
+  if (pgUserCount === 0 && jsonHasData) {
+    throw new Error(
+      `DATABASE_URL is set and the schema is ready, but Postgres has no users while ${DB_PATH} does. ` +
+      `Run "npm run migrate:import" before starting the server - refusing to boot against an empty database ` +
+      `when a populated JSON store exists, to avoid silently serving an empty portal.`
+    );
+  }
+
+  await loadFromPostgres();
+  console.log(`[store] loaded from Postgres: ${data.users.length} users, ${data.courses.length} courses, ${data.submissions.length} submissions`);
+}
+
+/** Awaited by server.js before sending each response, so a client only ever sees a successful response once that response's writes are durably in Postgres (or, in JSON-file mode, this resolves immediately since save() already wrote synchronously). */
+function pendingPersist() { return pendingPersistPromise; }
+
 function save() {
+  if (db.enabled()) {
+    pendingPersistPromise = queuePersistToPostgres().catch((err) => {
+      console.error('[store] Postgres persist failed:', err.message);
+      throw err;
+    });
+    return;
+  }
   const tmp = DB_PATH + '.tmp';
   fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
   fs.renameSync(tmp, DB_PATH);
@@ -251,8 +396,13 @@ const ROLE_USERNAME_DOMAIN = {
   instructor: 'teacher.echolens', coordinator: 'coordinator.echolens',
   hr: 'hr.echolens', finance: 'finance.echolens',
   student_coordinator: 'admissions.echolens', staff: 'staff.echolens',
-  ambassador: 'ambassador.echolens',
+  ambassador: 'ambassador.echolens', recruiter: 'recruiter.echolens',
 };
+// Recruiter accounts (Talent Marketplace) go through this instead of
+// ONBOARDING_ROLES/CONTRACT_ROLES - their equivalent gate is admin
+// verification (status: pending/needs_info/rejected/approved), checked by
+// requireRecruiter in server.js, not a first-login profile form.
+const RECRUITER_STATUSES = ['pending', 'approved', 'rejected', 'needs_info'];
 // Roles that must complete a first-login profile form (contact/address/
 // qualifications, plus documents for instructors) before using their portal
 // - see requireOnboarding() in dashboard.js and POST /api/me/onboarding.
@@ -435,6 +585,85 @@ const Users = {
       badges: badgesFor(u), courses: coursesForUser(u).map((c) => ({ title: c.title, name: c.name })),
       member_since: (u.created_at || '').slice(0, 10),
     };
+  },
+  // Talent Marketplace: a recruiter is a `users` row like any other role -
+  // same auth, same login endpoint - with these extra fields layered on
+  // top. New accounts always start `pending`; only an admin action (see
+  // server.js's /api/admin/recruiters/:id/* routes) moves them on.
+  createRecruiter({ name, email, company_id, designation, city, hiring_note, override_requested, override_reason }) {
+    const { user, password } = Users.create({ name, role: 'recruiter', email, username: null });
+    user.company_id = Number(company_id);
+    user.designation = designation || null;
+    user.city = city || null;
+    user.hiring_note = hiring_note || null;
+    user.status = 'pending';
+    user.status_reason = null;
+    user.override_requested = !!override_requested;
+    user.override_reason = override_requested ? (override_reason || null) : null;
+    user.approved_by = null;
+    user.approved_at = null;
+    save();
+    return { user, password };
+  },
+  setRecruiterStatus(id, status, { reason = null, by = null } = {}) {
+    const u = Users.byId(id);
+    if (!u || u.role !== 'recruiter') return null;
+    if (!RECRUITER_STATUSES.includes(status)) return null;
+    u.status = status;
+    u.status_reason = reason;
+    if (status === 'approved') { u.approved_by = by; u.approved_at = now(); }
+    else { u.approved_by = null; u.approved_at = null; }
+    save();
+    return u;
+  },
+  resubmitRecruiter(id, { company_id, designation, city, hiring_note } = {}) {
+    const u = Users.byId(id);
+    if (!u || u.role !== 'recruiter' || u.status !== 'needs_info') return null;
+    if (company_id != null) u.company_id = Number(company_id);
+    if (designation !== undefined) u.designation = designation || null;
+    if (city !== undefined) u.city = city || null;
+    if (hiring_note !== undefined) u.hiring_note = hiring_note || null;
+    u.status = 'pending';
+    u.status_reason = null;
+    save();
+    return u;
+  },
+};
+
+/* ------------------------- Talent Marketplace: companies ------------------------- */
+// Keyed by normalised work-email domain - every recruiter whose email
+// shares a domain links to the same company row ("recruiter_seats").
+function normalizeDomain(email) {
+  return String(email || '').trim().toLowerCase().split('@')[1] || '';
+}
+const Companies = {
+  all() { return data.companies.slice(); },
+  byId(id) { return data.companies.find((c) => c.id === Number(id)) || null; },
+  findByDomain(domain) { return data.companies.find((c) => c.domain === domain) || null; },
+  create({ domain, name, website = null, size_band = null }) {
+    const c = { id: nextId('companies'), domain, name: String(name).trim(), website: website || null, size_band: size_band || null, created_at: now() };
+    data.companies.push(c); save();
+    return c;
+  },
+  // Signup always finds-or-creates by domain, so seats never duplicate a
+  // company row - only the FIRST recruiter from a domain sets its profile.
+  findOrCreateByEmail(email, { name, website, size_band }) {
+    const domain = normalizeDomain(email);
+    return Companies.findByDomain(domain) || Companies.create({ domain, name, website, size_band });
+  },
+};
+
+/* --------------------------- Talent Marketplace: audit log --------------------------- */
+// Generic append-only trail - Phase 1 uses it for recruiter verification
+// decisions; later phases add contact reveals, unpublish actions, and
+// other admin overrides onto the same table.
+const AuditLog = {
+  all() { return data.audit_log.slice().sort((a, b) => b.id - a.id); },
+  forTarget(target_type, target_id) { return AuditLog.all().filter((a) => a.target_type === target_type && a.target_id === Number(target_id)); },
+  record({ actor_id = null, action, target_type, target_id = null, detail = null }) {
+    const e = { id: nextId('audit_log'), actor_id: actor_id != null ? Number(actor_id) : null, action, target_type, target_id: target_id != null ? Number(target_id) : null, detail, at: now() };
+    data.audit_log.push(e); save();
+    return e;
   },
 };
 
@@ -3104,7 +3333,9 @@ module.exports = {
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
+  Companies, AuditLog,
   seed, DB_PATH, allData: () => data,
+  initFromPostgres, pendingPersist,
 };
 
 if (require.main === module && process.argv.includes('--seed')) seed();

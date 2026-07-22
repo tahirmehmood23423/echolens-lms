@@ -18,6 +18,7 @@ const multer = require('multer');
 const QRCode = require('qrcode');
 const archiver = require('archiver');
 const store = require('./store');
+const db = require('./db');
 const ai = require('./ai');
 const mailer = require('./mailer');
 const jaas = require('./jaas');
@@ -34,6 +35,7 @@ const {
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
+  Companies, AuditLog,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gamifyFor, touchActivity,
@@ -173,6 +175,39 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '1mb' })); // cap request bodies to blunt large-payload DoS
 app.use(cookieParser());
 
+// In JSON-file mode, store.save() writes to disk synchronously, so by the
+// time a route handler calls res.json()/res.send() any mutation it just
+// made is already durable - store.pendingPersist() resolves immediately.
+// In Postgres mode, store.save() only *queues* the write (pg has no sync
+// API), so without this, a client could get a 200 for a write that then
+// failed to reach Postgres. This wrapper holds the actual response bytes
+// back until that write settles, restoring the same "response means
+// durable" guarantee, without touching any of the ~250 route handlers
+// that call res.json()/res.send() today.
+app.use((req, res, next) => {
+  const origJson = res.json.bind(res);
+  const origSend = res.send.bind(res);
+  // Both guards report failure via origJson specifically (never through
+  // `send`) - origSend forwards plain-object bodies to `this.json(...)`
+  // internally, which by then would resolve to the guarded res.json and
+  // wait on pendingPersist a second time. Harmless in practice (the
+  // promise has already settled) but confusing, so it's avoided outright.
+  const guard = (send) => (body) => {
+    store.pendingPersist().then(
+      () => send(body),
+      (err) => {
+        console.error('Request not acknowledged - a pending write failed to save:', err.message);
+        res.status(500);
+        origJson({ error: 'Something went wrong while saving. Please try again.' });
+      }
+    );
+    return res;
+  };
+  res.json = guard(origJson);
+  res.send = guard(origSend);
+  next();
+});
+
 /* ------------------------------ auth helpers ------------------------------ */
 const sign = (u) => jwt.sign({ id: u.id, role: u.role, name: u.name }, JWT_SECRET, { expiresIn: '7d' });
 function setAuthCookie(res, token) { res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: isProd, maxAge: 7 * 24 * 60 * 60 * 1000 }); }
@@ -183,6 +218,14 @@ function authRequired(req, res, next) {
   req.user = u; touchActivity(u); next();
 }
 function adminRequired(req, res, next) { if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin access only.' }); next(); }
+// Talent Marketplace: a recruiter must be BOTH the right role AND verified
+// by an admin - a pending or rejected recruiter account exists (so they
+// can sign in and see their status) but is otherwise not a recruiter yet.
+function requireRecruiter(req, res, next) {
+  if (req.user.role !== 'recruiter') return res.status(403).json({ error: 'Recruiter access only.' });
+  if (req.user.status !== 'approved') return res.status(403).json({ error: 'Your recruiter account has not been verified yet.' });
+  next();
+}
 function teacherOrAdmin(req, res, next) { if (!['admin', 'instructor'].includes(req.user.role)) return res.status(403).json({ error: 'Teachers and admins only.' }); next(); }
 function staffView(req, res, next) { // admin, coordinator, or the course's teachers may VIEW oversight data
   if (['admin', 'coordinator', 'instructor'].includes(req.user.role)) return next();
@@ -293,6 +336,7 @@ app.get('/api/auth/me', authRequired, (req, res) => {
     profile: u.profile || {}, gamify: ['student', 'free'].includes(u.role) ? gamifyFor(u) : null,
     ai_enabled: ['admin', 'instructor'].includes(u.role) && ai.enabled(),
     onboarding_complete: u.onboarding_complete !== false,
+    recruiter: u.role === 'recruiter' ? recruiterView(u) : null,
   });
 });
 
@@ -2544,6 +2588,146 @@ app.post('/api/me/contact', authRequired, (req, res) => {
   res.json({ ok: true });
 });
 
+/* ------------------------- Talent Marketplace: recruiters (Phase 1) -------------------------
+ * A recruiter is a `users` row (role: 'recruiter') like any other account -
+ * same JWT cookie, same /api/auth/login, same /api/auth/me - with
+ * verification state layered on top (see Users.createRecruiter and
+ * Users.setRecruiterStatus in store.js). requireRecruiter (auth helpers,
+ * above) is what later phases use to gate the actual marketplace once it
+ * exists; nothing in this phase needs to be approved to be *seen*, only to
+ * search or contact students, so no route uses it yet.
+ */
+const DEFAULT_BLOCKED_RECRUITER_DOMAINS = ['gmail.com', 'googlemail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com', 'protonmail.com', 'proton.me'];
+const BLOCKED_RECRUITER_DOMAINS = process.env.RECRUITER_BLOCKED_EMAIL_DOMAINS
+  ? process.env.RECRUITER_BLOCKED_EMAIL_DOMAINS.split(',').map((d) => d.trim().toLowerCase()).filter(Boolean)
+  : DEFAULT_BLOCKED_RECRUITER_DOMAINS;
+function recruiterView(u) {
+  const c = u.company_id ? Companies.byId(u.company_id) : null;
+  return {
+    status: u.status, status_reason: u.status_reason || null,
+    designation: u.designation || null, city: u.city || null, hiring_note: u.hiring_note || null,
+    override_requested: !!u.override_requested, override_reason: u.override_reason || null,
+    company: c ? { id: c.id, name: c.name, website: c.website, domain: c.domain, size_band: c.size_band } : null,
+  };
+}
+function isOptionalUrl(s) {
+  if (!s) return true;
+  try { return ['http:', 'https:'].includes(new URL(String(s)).protocol); } catch { return false; }
+}
+
+app.post('/api/recruiters/signup', async (req, res) => {
+  const { full_name, work_email, company_name, company_website, designation, city, company_size_band, hiring_note, override_requested, override_reason } = req.body || {};
+  if (!full_name || String(full_name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
+  if (!isEmail(work_email)) return res.status(400).json({ error: 'Enter a valid work email address.' });
+  if (!company_name || !String(company_name).trim()) return res.status(400).json({ error: 'Enter your company name.' });
+  if (!designation || !String(designation).trim()) return res.status(400).json({ error: 'Enter your designation.' });
+  if (!city || !String(city).trim()) return res.status(400).json({ error: 'Enter your city.' });
+  if (!company_size_band || !String(company_size_band).trim()) return res.status(400).json({ error: 'Choose a company size.' });
+  if (!hiring_note || !String(hiring_note).trim()) return res.status(400).json({ error: 'Tell us what you typically hire for.' });
+  if (!isOptionalUrl(company_website)) return res.status(400).json({ error: 'Enter a valid company website (starting with http:// or https://), or leave it blank.' });
+
+  const email = String(work_email).trim().toLowerCase();
+  const domain = email.split('@')[1] || '';
+  const overrideRequested = !!override_requested;
+  if (BLOCKED_RECRUITER_DOMAINS.includes(domain) && !overrideRequested) {
+    return res.status(400).json({
+      needs_override: true,
+      error: `Please sign up with your company email address, not a personal ${domain} address. If your company is too small to have its own domain email, check the box below and tell us a little more - we review these by hand.`,
+    });
+  }
+  if (overrideRequested && (!override_reason || !String(override_reason).trim())) {
+    return res.status(400).json({ error: 'Tell us briefly why you do not have a company domain email.' });
+  }
+  if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
+  if (Users.allByLogin(email).some((u) => u.role === 'recruiter')) return res.status(400).json({ error: 'A recruiter account with this work email already exists - sign in instead.' });
+
+  const company = Companies.findOrCreateByEmail(email, { name: company_name, website: company_website || null, size_band: company_size_band });
+  const { user, password } = Users.createRecruiter({
+    name: String(full_name).trim(), email, company_id: company.id,
+    designation: String(designation).trim().slice(0, 150), city: String(city).trim().slice(0, 100),
+    hiring_note: String(hiring_note).trim().slice(0, 1000),
+    override_requested: overrideRequested, override_reason: overrideRequested ? String(override_reason).trim().slice(0, 500) : null,
+  });
+  setAuthCookie(res, sign(user));
+  mailer.notify(user.email, 'Your EchoLens recruiter account is pending review',
+    `${hi(user.name)},\n\nThanks for signing up to search verified student talent on EchoLens. Your account is now pending review by our team - we will email you as soon as a decision is made, usually within one business day.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Settings after signing in.`);
+  const adminEmails = Users.all().filter((a) => a.role === 'admin' && a.email).map((a) => a.email);
+  mailer.notify(adminEmails, 'New recruiter awaiting verification',
+    `A new recruiter signed up and is waiting for review: ${user.name} (${user.email}), ${company.name} - ${user.designation}.` +
+    (overrideRequested ? `\n\nThey requested review without a company domain email: ${user.override_reason}` : '') +
+    `\n\nReview: ${APP_URL}/admin/recruiters`);
+  const out = { ok: true };
+  if (!mailer.configured) out.password = password; // dev fallback: no SMTP to deliver it anywhere else
+  res.json(out);
+});
+
+// A recruiter asked for more information (status 'needs_info') updates
+// their own details and puts themselves back in the review queue.
+app.post('/api/recruiter/resubmit', authRequired, (req, res) => {
+  if (req.user.role !== 'recruiter') return res.status(403).json({ error: 'Recruiter access only.' });
+  if (req.user.status !== 'needs_info') return res.status(400).json({ error: 'Your account is not awaiting more information.' });
+  const { company_name, company_website, designation, city, hiring_note } = req.body || {};
+  if (company_website !== undefined && !isOptionalUrl(company_website)) return res.status(400).json({ error: 'Enter a valid company website, or leave it blank.' });
+  if (company_name && String(company_name).trim()) {
+    const c = Companies.byId(req.user.company_id);
+    if (c) {
+      c.name = String(company_name).trim();
+      if (company_website !== undefined) c.website = company_website || null;
+      store.persist();
+    }
+  }
+  const u = Users.resubmitRecruiter(req.user.id, { designation, city, hiring_note });
+  if (!u) return res.status(400).json({ error: 'Could not update your account.' });
+  AuditLog.record({ actor_id: req.user.id, action: 'recruiter_resubmit', target_type: 'user', target_id: u.id });
+  res.json({ ok: true, recruiter: recruiterView(u) });
+});
+
+/* -------------------------- admin: recruiter verification queue -------------------------- */
+app.get('/api/admin/recruiters', authRequired, adminRequired, (req, res) => {
+  const status = req.query.status;
+  const all = Users.all().filter((u) => u.role === 'recruiter');
+  const list = status ? all.filter((u) => u.status === status) : all;
+  const counts = { pending: 0, approved: 0, rejected: 0, needs_info: 0 };
+  for (const u of all) if (counts[u.status] !== undefined) counts[u.status] += 1;
+  res.json({
+    recruiters: list
+      .slice().sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+      .map((u) => ({ id: u.id, name: u.name, email: u.email, created_at: u.created_at, ...recruiterView(u) })),
+    counts,
+  });
+});
+app.post('/api/admin/recruiters/:id/approve', authRequired, adminRequired, (req, res) => {
+  const u = Users.byId(req.params.id);
+  if (!u || u.role !== 'recruiter') return res.status(404).json({ error: 'Recruiter not found.' });
+  Users.setRecruiterStatus(u.id, 'approved', { by: req.user.id });
+  AuditLog.record({ actor_id: req.user.id, action: 'recruiter_approve', target_type: 'user', target_id: u.id });
+  if (u.email) mailer.notify(u.email, 'Welcome to the EchoLens Talent Marketplace',
+    `${hi(u.name)},\n\nYour EchoLens recruiter account is verified. You can now sign in to the Talent Marketplace.\n\nSign in: ${APP_URL}/login`);
+  res.json({ ok: true, recruiter: recruiterView(Users.byId(u.id)) });
+});
+app.post('/api/admin/recruiters/:id/reject', authRequired, adminRequired, (req, res) => {
+  const u = Users.byId(req.params.id);
+  if (!u || u.role !== 'recruiter') return res.status(404).json({ error: 'Recruiter not found.' });
+  const { reason } = req.body || {};
+  if (!reason || !String(reason).trim()) return res.status(400).json({ error: 'Enter a reason - it is shown to the recruiter.' });
+  Users.setRecruiterStatus(u.id, 'rejected', { reason: String(reason).trim().slice(0, 1000) });
+  AuditLog.record({ actor_id: req.user.id, action: 'recruiter_reject', target_type: 'user', target_id: u.id, detail: reason });
+  if (u.email) mailer.notify(u.email, 'Your EchoLens recruiter application',
+    `${hi(u.name)},\n\nWe are not able to verify your EchoLens recruiter account at this time.\n\nReason: ${reason}\n\nIf you believe this is a mistake, reply to this email.`);
+  res.json({ ok: true, recruiter: recruiterView(Users.byId(u.id)) });
+});
+app.post('/api/admin/recruiters/:id/request-info', authRequired, adminRequired, (req, res) => {
+  const u = Users.byId(req.params.id);
+  if (!u || u.role !== 'recruiter') return res.status(404).json({ error: 'Recruiter not found.' });
+  const { message } = req.body || {};
+  if (!message || !String(message).trim()) return res.status(400).json({ error: 'Enter what you need from the recruiter.' });
+  Users.setRecruiterStatus(u.id, 'needs_info', { reason: String(message).trim().slice(0, 1000) });
+  AuditLog.record({ actor_id: req.user.id, action: 'recruiter_request_info', target_type: 'user', target_id: u.id, detail: message });
+  if (u.email) mailer.notify(u.email, 'More information needed for your EchoLens recruiter account',
+    `${hi(u.name)},\n\nWe need a bit more information before we can verify your EchoLens recruiter account.\n\n${message}\n\nSign in to update your details: ${APP_URL}/login`);
+  res.json({ ok: true, recruiter: recruiterView(Users.byId(u.id)) });
+});
+
 /* --------------------------------- events ---------------------------------
  * The unified admin-generated system: quests, hackathons, competitions and
  * webinars - free or paid (payment screenshot verified by admin), inside the
@@ -3437,6 +3621,25 @@ function authGate(req, res, next) {
   if (!canAccessUpload(u, name)) return res.status(403).send('You do not have access to this file.');
   next();
 }
+// Dynamic sitemap: the static entries below (courses, landing, etc.) are
+// read straight from the committed public/sitemap.xml file, then every
+// currently-published talent profile is appended - registered ahead of
+// express.static so this route wins instead of that file being served
+// as-is. "Add profiles to the sitemap only when published" means this
+// has to be generated per-request, not a static file.
+app.get('/sitemap.xml', async (req, res) => {
+  let base = '';
+  try { base = fs.readFileSync(path.join(__dirname, 'public', 'sitemap.xml'), 'utf8'); } catch { base = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</urlset>'; }
+  let profileUrls = '';
+  if (db.enabled()) {
+    try {
+      const { rows } = await db.query('SELECT handle, updated_at FROM talent_profiles WHERE published = true');
+      profileUrls = rows.map((r) => `  <url>\n    <loc>${APP_URL}/talent/${r.handle}</loc>\n    <lastmod>${new Date(r.updated_at).toISOString().slice(0, 10)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>`).join('\n');
+    } catch (e) { console.error('[sitemap] could not list published talent profiles:', e.message); }
+  }
+  const xml = profileUrls ? base.replace('</urlset>', profileUrls + '\n</urlset>') : base;
+  res.type('application/xml').send(xml);
+});
 app.use('/uploads', authGate, express.static(UPLOAD_DIR));
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
@@ -3493,9 +3696,21 @@ app.get('/open', (req, res) => {
 });
 app.get('/compiler', (req, res) => res.sendFile(path.join(__dirname, 'public', 'compiler.html')));
 require('./coursepages').register(app); // SEO landing page per course: /courses and /courses/:slug
+require('./talent').register(app, { authRequired, requireRecruiter, APP_URL, UPLOAD_DIR }); // Talent Marketplace: student profiles, projects, search (Phases 2-4)
+require('./talent-hiring').register(app, { authRequired, requireRecruiter, adminRequired, APP_URL, UPLOAD_DIR }); // Talent Marketplace: contact gating, shortlists, messaging, admin safety/analytics (Phases 5-6)
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
+app.get('/recruiter-signup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'recruiter-signup.html')));
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+// Same single-page app as /dashboard, unauthenticated at the HTML level
+// exactly like every other page here (see the api() helper's 401 handler
+// in dashboard.js) - dashboard.js reads location.pathname and jumps
+// straight to the admin recruiter queue when it's this path (redirecting
+// away if the signed-in user isn't an admin), so admins get the literal
+// /admin/recruiters URL Phase 1 asks for without a second HTML file to
+// keep in sync with the rest of the admin shell.
+app.get('/admin/recruiters', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/grade', (req, res) => res.sendFile(path.join(__dirname, 'public', 'grade.html')));
 // v18: /cert carries OpenGraph tags for the specific certificate, so pasting
 // (or prefilling) the link on LinkedIn/WhatsApp shows the certificate as a
@@ -3551,13 +3766,27 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => {
-  console.log(`EchoLens LMS v12.3 running on http://localhost:${PORT}`);
-  // Live-class video provider: JaaS (8x8.vc, no time cap) vs the free public
-  // meet.jit.si server, which disconnects embedded calls after 5 minutes.
-  if (jaas.configured) {
-    console.log('Live classes: JaaS (8x8.vc) configured - no 5-minute cap.');
-  } else {
-    console.warn('Live classes: JaaS NOT configured - falling back to meet.jit.si, which DISCONNECTS embedded calls after 5 minutes. Set JAAS_APP_ID, JAAS_KID and JAAS_PRIVATE_KEY to fix.');
+// store.initFromPostgres() is a no-op when DATABASE_URL isn't set (the
+// synchronous JSON-file load that already ran when `./store` was required
+// stands as-is). When it is set, this runs pending migrations and loads
+// `data` from Postgres before the app accepts any traffic.
+(async () => {
+  try {
+    await store.initFromPostgres();
+  } catch (err) {
+    console.error('FATAL: could not start against Postgres:', err.message);
+    process.exit(1);
   }
-});
+
+  app.listen(PORT, () => {
+    console.log(`EchoLens LMS v12.3 running on http://localhost:${PORT}`);
+    console.log(`Data store: ${require('./db').enabled() ? 'Postgres (DATABASE_URL)' : `JSON file (${store.DB_PATH})`}`);
+    // Live-class video provider: JaaS (8x8.vc, no time cap) vs the free public
+    // meet.jit.si server, which disconnects embedded calls after 5 minutes.
+    if (jaas.configured) {
+      console.log('Live classes: JaaS (8x8.vc) configured - no 5-minute cap.');
+    } else {
+      console.warn('Live classes: JaaS NOT configured - falling back to meet.jit.si, which DISCONNECTS embedded calls after 5 minutes. Set JAAS_APP_ID, JAAS_KID and JAAS_PRIVATE_KEY to fix.');
+    }
+  });
+})();

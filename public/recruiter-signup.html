@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens - Recruiter sign up</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Sign up as a recruiter to search verified student talent on EchoLens.">
+<link rel="canonical" href="https://www.echolens.digital/recruiter-signup">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v1230">
+</head>
+<body class="auth-body">
+  <div class="auth-wrap" style="max-width:480px">
+    <div class="auth-card">
+      <img src="/img/logo.png" alt="EchoLens" class="auth-logo">
+      <h1 class="auth-title">Recruiter sign up</h1>
+      <p class="auth-sub">Search verified student talent - real course projects, certificates and grades, confirmed by EchoLens.</p>
+      <div class="form-msg" id="msg"></div>
+      <form id="signupForm" autocomplete="on">
+        <label class="field"><span>Full name</span>
+          <input type="text" name="full_name" required autofocus placeholder="Your full name"></label>
+        <label class="field"><span>Work email</span>
+          <input type="email" name="work_email" autocomplete="username" required placeholder="you@yourcompany.com"></label>
+        <label class="field"><span>Company name</span>
+          <input type="text" name="company_name" required placeholder="Your company"></label>
+        <label class="field"><span>Company website</span>
+          <input type="url" name="company_website" placeholder="https://yourcompany.com (optional)"></label>
+        <label class="field"><span>Your designation</span>
+          <input type="text" name="designation" required placeholder="e.g. Talent Acquisition Lead"></label>
+        <label class="field"><span>City</span>
+          <input type="text" name="city" required placeholder="e.g. Lahore"></label>
+        <label class="field"><span>Company size</span>
+          <select name="company_size_band" required>
+            <option value="">Choose one</option>
+            <option>1-10</option>
+            <option>11-50</option>
+            <option>51-200</option>
+            <option>201-500</option>
+            <option>500+</option>
+          </select></label>
+        <label class="field"><span>What do you typically hire for?</span>
+          <textarea name="hiring_note" required rows="3" placeholder="e.g. Frontend interns and junior data analysts"></textarea></label>
+        <label class="field" id="overrideBox" style="display:none">
+          <span style="display:flex;align-items:center;gap:8px;font-weight:400">
+            <input type="checkbox" name="override_requested" style="width:auto">
+            This is a small company without a dedicated work email domain
+          </span>
+        </label>
+        <label class="field" id="overrideReasonBox" style="display:none"><span>Tell us a little more</span>
+          <textarea name="override_reason" rows="2" placeholder="e.g. We are a 4-person startup and use a shared Gmail inbox"></textarea></label>
+        <button type="submit" class="btn btn-primary btn-block" id="submit">Create recruiter account</button>
+      </form>
+      <p class="auth-foot">Already signed up? <a href="/login"><strong>Sign in</strong></a></p>
+      <p class="auth-foot">See how student data is handled in the <a href="/privacy">Talent Marketplace privacy notes</a>.</p>
+    </div>
+    <p class="auth-copy">EchoLens &middot; Empowering Pakistan through Artificial Intelligence</p>
+  </div>
+<script src="/js/recruiter-signup.js?v1"></script>
+</body>
+</html>

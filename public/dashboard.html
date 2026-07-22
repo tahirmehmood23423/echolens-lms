@@ -33,6 +33,8 @@
       <a class="nav-item instructor-hide admin-hide" data-view="quizzes"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Quizzes</a>
       <a class="nav-item instructor-hide admin-hide" data-view="progress"><svg class="ic" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Progress</a>
       <a class="nav-item instructor-hide admin-hide" data-view="certificates"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L6.5 21l5.5-3 5.5 3-2-8.5"/></svg>Certificates</a>
+      <a class="nav-item student-only" data-view="talent-profile" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Talent Profile</a>
+      <a class="nav-item student-only" data-view="hiring-interest" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 3V4z"/></svg>Hiring Interest</a>
       <a class="nav-item admin-hide" data-view="schedule"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Calendar</a>
       <div class="nav-group admin-hide">Tools</div>
       <a class="nav-item admin-hide" data-view="messages"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 3V4z"/></svg>Messages<span class="bell-badge" id="navMsgBadge" style="display:none;position:static;margin-left:auto"></span></a>
@@ -58,6 +60,8 @@
       <a class="nav-item admin-only" data-view="admin-announcements" style="display:none"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11l14-6v14L3 13z"/><path d="M7 12v5"/></svg>Announcements</a>
       <a class="nav-item admin-only" data-view="admin-logs" style="display:none"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>System Logs</a>
       <a class="nav-item admin-only" data-view="admin-departments" style="display:none"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>Departments</a>
+      <a class="nav-item admin-only" data-view="admin-recruiters" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Recruiters</a>
+      <a class="nav-item" data-view="recruiter" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Recruiter Portal</a>
       <a class="nav-item" data-view="dept-hr" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M17 4v6M20 7h-6"/></svg>HR Portal</a>
       <div id="hrDeptNav"></div>
       <a class="nav-item" data-view="dept-finance" style="display:none"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 15c0 1.1 1.3 2 3 2s3-.9 3-2-1.3-1.7-3-2-3-.9-3-2 1.3-2 3-2 3 .9 3 2"/></svg>Finance Portal</a>
@@ -115,6 +119,8 @@
       <section class="view" id="view-quizzes"></section>
       <section class="view" id="view-progress"></section>
       <section class="view" id="view-certificates"></section>
+      <section class="view" id="view-talent-profile"></section>
+      <section class="view" id="view-hiring-interest"></section>
       <section class="view" id="view-schedule"></section>
       <section class="view" id="view-messages"></section>
       <section class="view" id="view-resources"></section>
@@ -137,6 +143,8 @@
       <section class="view" id="view-admin-announcements"></section>
       <section class="view" id="view-admin-logs"></section>
       <section class="view" id="view-admin-departments"></section>
+      <section class="view" id="view-admin-recruiters"></section>
+      <section class="view" id="view-recruiter"></section>
       <section class="view" id="view-my-department"></section>
       <section class="view" id="view-dept-hr"></section>
       <section class="view" id="view-dept-finance"></section>
@@ -174,7 +182,7 @@
 </div>
 
 <script src="/js/coderunner.js?v1234"></script>
-<script src="/js/dashboard.js?v1250"></script>
+<script src="/js/dashboard.js?v1253"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="/js/gem3d.js?v1234"></script>
 <script src="/js/tilt.js?v1234"></script>

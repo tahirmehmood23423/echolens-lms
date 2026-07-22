@@ -27,16 +27,19 @@ function toast(text, isErr) {
   t.textContent = text; t.className = 'toast show' + (isErr ? ' err' : '');
   clearTimeout(t._h); t._h = setTimeout(() => (t.className = 'toast'), 2600);
 }
-function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', staff: 'Staff', ambassador: 'Ambassador' }[r] || r; }
+function roleLabel(r) { return { admin: 'Admin', instructor: 'Teacher', coordinator: 'Coordinator', student: 'Student', free: 'Free tier', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', staff: 'Staff', ambassador: 'Ambassador', recruiter: 'Recruiter' }[r] || r; }
 function isStaff() { return ['admin', 'coordinator', 'instructor'].includes(ME.role); }
 // v17: isolated department portals - each role sees ONLY its own nav item
 // and view, nothing else in the app (not courses, messages, jobs, etc).
+// Recruiters (Talent Marketplace, Phase 1) work the same way: a pending
+// account must see nothing but its own status screen.
 const DEPT_ROLES = {
   hr: { view: 'dept-hr', label: 'HR' },
   finance: { view: 'dept-finance', label: 'Finance' },
   student_coordinator: { view: 'dept-student-coordinator', label: 'Admissions Office' },
   staff: { view: 'dept-staff', label: 'Staff' },
   ambassador: { view: 'dept-ambassador', label: 'Ambassador' },
+  recruiter: { view: 'recruiter', label: 'Recruiter' },
 };
 function fmtDate(d) {
   if (!d) return '—';
@@ -108,6 +111,8 @@ const TITLES = {
   jobs: 'Jobs', job: 'Job',
   'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal', 'dept-ambassador': 'Ambassadors Portal',
   'my-department': 'My Department', 'admin-departments': 'Departments',
+  'admin-recruiters': 'Recruiters', recruiter: 'Recruiter Portal',
+  'talent-profile': 'Talent Profile', 'hiring-interest': 'Hiring Interest',
 };
 function show(view) {
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
@@ -134,6 +139,8 @@ function show(view) {
     'dept-ambassador': renderDeptAmbassador,
     'my-department': () => renderMyDepartments('view-my-department'),
     'admin-departments': renderAdminDepartments,
+    'admin-recruiters': renderAdminRecruiters, recruiter: renderRecruiterPortal,
+    'talent-profile': renderTalentProfile, 'hiring-interest': renderHiringInterest,
   }[view];
   if (render) render();
 }
@@ -197,6 +204,10 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   }
   $('gate').style.display = 'none';
   $('app').style.display = '';
+  // /admin/recruiters is a real URL (Phase 1 asks for it specifically) into
+  // this same single-page app - jump straight to the queue for an admin who
+  // lands here directly; anyone else just gets the normal overview.
+  if (location.pathname === '/admin/recruiters' && ME.role === 'admin') { show('admin-recruiters'); return; }
   renderOverview();
   requireWhatsapp(); // v12: contact details are mandatory for every learner
   requireOnboarding(); // instructors must complete their first-login profile
@@ -2381,6 +2392,602 @@ function deptTabBarHtml(tabs, active, switchFn) {
   return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
     ${tabs.map(([k, l]) => `<button type="button" class="btn ${k === active ? 'btn-primary' : 'btn-ghost'} btn-sm" onclick="${switchFn}('${k}')">${esc(l)}</button>`).join('')}
   </div>`;
+}
+
+/* -------------------------- Talent Marketplace: recruiter portal (Phase 1) --------------------------
+ * A recruiter sees nothing but this single status screen until an admin
+ * approves them (see DEPT_ROLES above, which isolates the whole nav down
+ * to just this view + Settings). Its content branches on ME.recruiter.status.
+ */
+async function renderRecruiterPortal() {
+  const el = $('view-recruiter');
+  const r = ME.recruiter || {};
+  const body = r.status === 'needs_info' ? recruiterNeedsInfoHtml(r)
+    : r.status === 'rejected' ? recruiterRejectedHtml(r)
+    : r.status === 'approved' ? recruiterApprovedHtml(r)
+    : recruiterPendingHtml(r);
+  el.innerHTML = deptHeaderHtml('Recruiter Portal') + body;
+  if (r.status === 'needs_info') wireRecruiterResubmitForm();
+}
+function recruiterPendingHtml(r) {
+  return `<div class="card"><div class="card-body">
+    <h3 style="margin-top:0">Your account is being reviewed</h3>
+    <p class="s" style="color:var(--muted)">Our team verifies every recruiter before they can search EchoLens student profiles. This is usually done within one business day - we will email you at ${esc(ME.email || '')} as soon as a decision is made.</p>
+    ${r.company ? `<p class="s" style="color:var(--muted)">Company on file: <strong>${esc(r.company.name)}</strong> (${esc(r.company.domain)})</p>` : ''}
+    ${r.override_requested ? `<p class="s" style="color:var(--muted)">Your account is flagged for manual review as a small company without a dedicated work email domain.</p>` : ''}
+  </div></div>`;
+}
+function recruiterRejectedHtml(r) {
+  return `<div class="card"><div class="card-body">
+    <h3 style="margin-top:0">We could not verify your account</h3>
+    <p class="s" style="color:var(--muted)">${esc(r.status_reason || 'No reason was given.')}</p>
+    <p class="s" style="color:var(--muted)">If you believe this is a mistake, contact info@echolens.digital.</p>
+  </div></div>`;
+}
+function recruiterApprovedHtml() {
+  return `<div class="card"><div class="card-body">
+    <h3 style="margin-top:0">You&rsquo;re verified</h3>
+    <p class="s" style="color:var(--muted)">Search verified EchoLens student profiles and reach out to candidates.</p>
+    <a class="btn btn-primary" href="/talent/search">Open Talent Search</a>
+    <a class="btn btn-ghost" href="/talent/interest" style="margin-left:8px">My contact requests</a>
+  </div></div>`;
+}
+function recruiterNeedsInfoHtml(r) {
+  const c = r.company || {};
+  return `<div class="card" style="margin-bottom:12px"><div class="card-body">
+    <h3 style="margin-top:0">We need a bit more information</h3>
+    <p class="s" style="color:var(--muted)">${esc(r.status_reason || '')}</p>
+  </div></div>
+  <div class="card"><div class="card-body">
+    <form id="recruiterResubmitForm">
+      <label class="field"><span>Company name</span><input name="company_name" value="${esc(c.name || '')}" required></label>
+      <label class="field"><span>Company website</span><input type="url" name="company_website" value="${esc(c.website || '')}" placeholder="https://yourcompany.com"></label>
+      <label class="field"><span>Your designation</span><input name="designation" value="${esc(r.designation || '')}" required></label>
+      <label class="field"><span>City</span><input name="city" value="${esc(r.city || '')}" required></label>
+      <label class="field"><span>What do you typically hire for?</span><textarea name="hiring_note" rows="3" required>${esc(r.hiring_note || '')}</textarea></label>
+      <button class="btn btn-primary" type="submit">Resubmit for review</button>
+    </form>
+  </div></div>`;
+}
+function wireRecruiterResubmitForm() {
+  const f = $('recruiterResubmitForm'); if (!f) return;
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = f.querySelector('button'); btn.disabled = true;
+    try {
+      const out = await api('/api/recruiter/resubmit', {
+        method: 'POST',
+        body: JSON.stringify({
+          company_name: f.company_name.value.trim(), company_website: f.company_website.value.trim(),
+          designation: f.designation.value.trim(), city: f.city.value.trim(), hiring_note: f.hiring_note.value.trim(),
+        }),
+      });
+      ME.recruiter = out.recruiter;
+      toast('Resubmitted for review.');
+      renderRecruiterPortal();
+    } catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+
+/* -------------------------- admin: recruiter verification queue -------------------------- */
+let ADMIN_RECRUITERS = [];
+let ADMIN_RECRUITER_FOLDER = 'pending';
+const ADMIN_RECRUITER_FOLDERS = [['pending', 'Pending'], ['needs_info', 'Needs info'], ['approved', 'Approved'], ['rejected', 'Rejected']];
+function adminRecruiterFolder(f) { ADMIN_RECRUITER_FOLDER = f; renderAdminRecruiters(); }
+let ADMIN_RECRUITERS_TAB = 'verification';
+function adminRecruitersTab(tab) { ADMIN_RECRUITERS_TAB = tab; renderAdminRecruiters(); }
+async function renderAdminRecruiters() {
+  const el = $('view-admin-recruiters');
+  const tabs = [['verification', 'Verification'], ['analytics', 'Talent analytics'], ['reports', 'Reports']];
+  el.innerHTML = deptTabBarHtmlFor(tabs, ADMIN_RECRUITERS_TAB, 'adminRecruitersTab') + '<div id="adminRecruitersBody"><div class="empty">Loading&hellip;</div></div>';
+  if (ADMIN_RECRUITERS_TAB === 'analytics') renderTalentAnalytics();
+  else if (ADMIN_RECRUITERS_TAB === 'reports') renderTalentReports();
+  else renderRecruiterVerificationQueue();
+}
+// Same look as deptTabBarHtml but usable outside a department portal header.
+function deptTabBarHtmlFor(tabs, active, switchFn) {
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    ${tabs.map(([k, l]) => `<button type="button" class="btn ${k === active ? 'btn-primary' : 'btn-ghost'} btn-sm" onclick="${switchFn}('${k}')">${esc(l)}</button>`).join('')}
+  </div>`;
+}
+async function renderRecruiterVerificationQueue() {
+  const box = $('adminRecruitersBody');
+  const d = await api('/api/admin/recruiters');
+  ADMIN_RECRUITERS = d.recruiters;
+  const chips = ADMIN_RECRUITER_FOLDERS.map(([k, l]) =>
+    `<button type="button" class="btn ${k === ADMIN_RECRUITER_FOLDER ? 'btn-primary' : 'btn-ghost'} btn-sm" onclick="adminRecruiterFolder('${k}')">${esc(l)}${d.counts[k] ? ` (${d.counts[k]})` : ''}</button>`).join('');
+  const rows = d.recruiters.filter((r) => r.status === ADMIN_RECRUITER_FOLDER);
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Every recruiter signup lands here for review before they can search student profiles.</span></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${chips}</div>
+    ${rows.length ? rows.map(adminRecruiterRow).join('') : '<div class="empty">Nothing here right now.</div>'}`;
+}
+async function renderTalentAnalytics() {
+  const box = $('adminRecruitersBody');
+  const d = await api('/api/admin/talent/analytics');
+  const tile = (n, l) => `<div class="pub-stat"><div class="n">${n ?? '-'}</div><div class="l">${esc(l)}</div></div>`;
+  box.innerHTML = `
+    <div class="pub-stats" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px">
+      ${tile(d.published_profiles, 'Published profiles')}
+      ${tile(d.active_recruiters, 'Active recruiters')}
+      ${tile(d.searches_run, 'Searches run')}
+      ${tile(d.contact_requests_sent, 'Contact requests sent')}
+      ${tile(d.acceptance_rate != null ? d.acceptance_rate + '%' : '-', 'Acceptance rate')}
+      ${tile(d.revealed_contacts, 'Revealed contacts')}
+    </div>
+    <div class="card"><div class="card-head"><h3>Top searched skills</h3></div>
+      <div class="card-body tight">${d.top_searched_skills.length ? d.top_searched_skills.map((s) => `<div class="kv"><span class="k">${esc(s.name)}</span><span>${s.n}</span></div>`).join('') : '<div class="empty">No searches with skill filters yet.</div>'}</div></div>`;
+}
+async function renderTalentReports() {
+  const box = $('adminRecruitersBody');
+  const d = await api('/api/admin/talent/reports?status=open');
+  box.innerHTML = d.reports.length ? d.reports.map((r) => `<div class="card" style="margin-bottom:10px"><div class="card-body">
+    <div style="font-weight:700">${esc(r.target_type)} #${r.target_id}</div>
+    <div class="s" style="color:var(--muted)">Reported by ${esc(r.reporter_name)} &middot; ${esc((r.created_at || '').slice(0, 10))}</div>
+    <div class="s" style="margin-top:4px">${esc(r.reason)}</div>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn btn-danger btn-sm" onclick="adminUnpublishReported('${r.target_type}',${r.target_id},${r.id})">Unpublish</button>
+      <button class="btn btn-ghost btn-sm" onclick="adminResolveReport(${r.id})">Mark resolved</button>
+      <button class="btn btn-ghost btn-sm" onclick="adminDismissReport(${r.id})">Dismiss</button>
+    </div>
+  </div></div>`).join('') : '<div class="empty">No open reports.</div>';
+}
+async function adminUnpublishReported(targetType, targetId, reportId) {
+  const reason = prompt('Reason (shown to the student):');
+  if (!reason || !reason.trim()) return;
+  try {
+    const endpoint = targetType === 'profile' ? `/api/admin/talent/profiles/${targetId}/unpublish` : `/api/admin/talent/projects/${targetId}/unpublish`;
+    await api(endpoint, { method: 'POST', body: JSON.stringify({ reason: reason.trim() }) });
+    await api(`/api/admin/talent/reports/${reportId}/resolve`, { method: 'POST' });
+    toast('Unpublished and report resolved.'); renderTalentReports();
+  } catch (e) { toast(e.message, true); }
+}
+async function adminResolveReport(id) {
+  try { await api(`/api/admin/talent/reports/${id}/resolve`, { method: 'POST' }); renderTalentReports(); }
+  catch (e) { toast(e.message, true); }
+}
+async function adminDismissReport(id) {
+  try { await api(`/api/admin/talent/reports/${id}/dismiss`, { method: 'POST' }); renderTalentReports(); }
+  catch (e) { toast(e.message, true); }
+}
+function adminRecruiterRow(r) {
+  const c = r.company || {};
+  let actions;
+  if (r.status === 'rejected') actions = `<span class="s" style="color:var(--danger)">Rejected</span>`;
+  else if (r.status === 'approved') actions = `<span class="s" style="color:var(--ok)">Approved</span>`;
+  else actions = `<button class="btn btn-primary btn-sm" onclick="adminRecruiterApprove(${r.id})">Approve</button>
+    <button class="btn btn-ghost btn-sm" onclick="adminRecruiterRequestInfo(${r.id})">Request more information</button>
+    <button class="btn btn-danger btn-sm" onclick="adminRecruiterReject(${r.id})">Reject</button>`;
+  const overrideNote = r.override_requested ? `<div class="s" style="margin-top:4px;color:var(--danger);font-weight:600">Small-company override requested: ${esc(r.override_reason || '')}</div>` : '';
+  const statusNote = r.status === 'needs_info' ? `<div class="s" style="margin-top:4px;color:var(--muted)">Asked: ${esc(r.status_reason || '')}</div>`
+    : r.status === 'rejected' ? `<div class="s" style="margin-top:4px;color:var(--muted)">Reason: ${esc(r.status_reason || '')}</div>` : '';
+  return `<div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <div>
+      <div style="font-weight:700">${esc(r.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(r.email)}</span></div>
+      <div class="s" style="color:var(--muted)">${esc(c.name || '-')} (${esc(c.domain || '-')}) &middot; ${esc(r.designation || '-')} &middot; ${esc(r.city || '-')} &middot; ${esc(c.size_band || '-')}</div>
+      <div class="s" style="color:var(--muted)">${esc(r.hiring_note || '')}</div>
+      ${overrideNote}${statusNote}
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${actions}</div>
+  </div></div>`;
+}
+async function adminRecruiterApprove(id) {
+  try { await api(`/api/admin/recruiters/${id}/approve`, { method: 'POST' }); toast('Recruiter approved.'); renderAdminRecruiters(); }
+  catch (e) { toast(e.message, true); }
+}
+function adminRecruiterReject(id) {
+  openModal('Reject recruiter', `
+    <form id="f">
+      <label class="field"><span>Reason (shown to the recruiter)</span><textarea name="reason" rows="3" required></textarea></label>
+      <button class="btn btn-danger btn-block">Reject</button>
+    </form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      await api(`/api/admin/recruiters/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason: f.reason.value.trim() }) });
+      toast('Recruiter rejected.'); closeModal(); renderAdminRecruiters();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+function adminRecruiterRequestInfo(id) {
+  openModal('Request more information', `
+    <form id="f">
+      <label class="field"><span>What do you need from them? (shown to the recruiter)</span><textarea name="message" rows="3" required></textarea></label>
+      <button class="btn btn-primary btn-block">Send request</button>
+    </form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try {
+      await api(`/api/admin/recruiters/${id}/request-info`, { method: 'POST', body: JSON.stringify({ message: f.message.value.trim() }) });
+      toast('Request sent to the recruiter.'); closeModal(); renderAdminRecruiters();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+
+/* -------------------------- Talent Marketplace: student profile (Phases 2-3) -------------------------- */
+let TALENT_STATE = null;
+let TALENT_PROJECTS = [];
+const REMOTE_PREF_LABELS = { remote: 'Remote', onsite: 'Onsite', hybrid: 'Hybrid' };
+const AVAILABILITY_LABELS = { immediately: 'Immediately', within_month: 'Within a month', after_graduation: 'After graduation', not_looking: 'Not looking' };
+const WORK_TYPE_LABELS = { internship: 'Internship', part_time: 'Part time', full_time: 'Full time', freelance: 'Freelance' };
+function selectOptionsHtml(labels, current) {
+  return '<option value="">Choose one</option>' + Object.entries(labels).map(([k, l]) => `<option value="${k}" ${current === k ? 'selected' : ''}>${l}</option>`).join('');
+}
+async function renderTalentProfile() {
+  const el = $('view-talent-profile');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  TALENT_STATE = await api('/api/talent/me');
+  el.innerHTML = talentCompletenessHtml() + talentProfileFormHtml() + talentSkillsHtml() + talentResumeHtml() + '<div id="talentProjectsBox"></div>';
+  wireTalentProfileForm();
+  wireTalentSkills();
+  wireTalentResume();
+  renderTalentProjects();
+}
+function talentCompletenessHtml() {
+  const c = TALENT_STATE.completeness;
+  const p = TALENT_STATE.profile;
+  const bar = `<div style="height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:10px 0"><div style="height:100%;width:${c.pct}%;background:linear-gradient(90deg,#0FBFA8,#38BDF8)"></div></div>`;
+  const checklist = c.checklist.map((item) => `<div class="s" style="color:${item.done ? 'var(--ok)' : 'var(--muted)'};margin-bottom:2px">${item.done ? '&#10003;' : '&#9675;'} ${esc(item.label)}</div>`).join('');
+  const publishBtn = p && p.published
+    ? `<button class="btn btn-ghost btn-sm" onclick="talentUnpublish()">Unpublish</button> <a class="btn btn-ghost btn-sm" href="${esc(TALENT_STATE.public_url)}" target="_blank" rel="noopener">View public profile</a>`
+    : `<button class="btn btn-primary btn-sm" onclick="talentPublish()" ${c.can_publish ? '' : 'disabled'}>Publish profile</button>`;
+  const unpublishedNotice = p && !p.published && p.unpublished_reason
+    ? `<div class="s" style="color:var(--danger);background:#E5484D14;border-radius:8px;padding:8px 10px;margin-bottom:10px">An admin unpublished your profile: ${esc(p.unpublished_reason)}. Fix the issue and publish again once ready.</div>`
+    : '';
+  return `<div class="card" style="margin-bottom:14px"><div class="card-body">
+    ${unpublishedNotice}
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <h3 style="margin:0">Profile completeness: ${c.pct}%</h3>
+      <div>${publishBtn}</div>
+    </div>
+    ${bar}
+    <div class="s" style="color:var(--muted)">${c.can_publish ? 'Your profile can be published.' : 'Reach 60% to publish your profile.'}</div>
+    <div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px">${checklist}</div>
+  </div></div>`;
+}
+async function talentPublish() {
+  try { await api('/api/talent/me/publish', { method: 'POST' }); toast('Profile published.'); renderTalentProfile(); }
+  catch (e) { toast(e.message, true); }
+}
+async function talentUnpublish() {
+  try { await api('/api/talent/me/unpublish', { method: 'POST' }); toast('Profile unpublished.'); renderTalentProfile(); }
+  catch (e) { toast(e.message, true); }
+}
+function talentProfileFormHtml() {
+  const p = TALENT_STATE.profile || {};
+  const links = p.links || {};
+  const edu = (p.education || []).map(talentEduRowHtml).join('');
+  const exp = (p.experience || []).map(talentExpRowHtml).join('');
+  return `<div class="card" style="margin-bottom:14px"><div class="card-head"><h3>Profile</h3></div>
+    <div class="card-body">
+    <form id="talentForm">
+      <label class="field"><span>Handle (your public URL)</span>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="s" style="color:var(--muted);white-space:nowrap">${esc(location.origin)}/talent/</span>
+          <input name="handle" value="${esc(p.handle || '')}" placeholder="your-name" style="flex:1;min-width:140px">
+        </div></label>
+      <label class="field"><span>Headline</span><input name="headline" maxlength="150" value="${esc(p.headline || '')}" placeholder="e.g. Aspiring data analyst"></label>
+      <label class="field"><span>About (up to 1200 characters)</span><textarea name="about" rows="4" maxlength="1200">${esc(p.about || '')}</textarea></label>
+      <div class="form-grid">
+        <label class="field"><span>City</span><input name="city" value="${esc(p.city || '')}"></label>
+        <label class="field"><span>Remote preference</span><select name="remote_pref">${selectOptionsHtml(REMOTE_PREF_LABELS, p.remote_pref)}</select></label>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>Availability</span><select name="availability">${selectOptionsHtml(AVAILABILITY_LABELS, p.availability)}</select></label>
+        <label class="field"><span>Expected salary (optional)</span><input name="salary_band" value="${esc(p.salary_band || '')}" placeholder="e.g. PKR 60-90k"></label>
+      </div>
+      <label class="field"><span style="display:flex;align-items:center;gap:8px;font-weight:400"><input type="checkbox" name="salary_visible" style="width:auto" ${p.salary_visible ? 'checked' : ''}> Show my expected salary on my public profile</span></label>
+      <label class="field"><span>Work type sought</span>
+        <div style="display:flex;gap:14px;flex-wrap:wrap">${Object.entries(WORK_TYPE_LABELS).map(([k, l]) => `<label style="display:flex;gap:6px;align-items:center;font-weight:400"><input type="checkbox" name="work_type" value="${k}" style="width:auto" ${(p.work_type || []).includes(k) ? 'checked' : ''}>${l}</label>`).join('')}</div>
+      </label>
+      <div class="form-grid">
+        <label class="field"><span>GitHub</span><input name="link_github" type="url" value="${esc(links.github || '')}" placeholder="https://github.com/you"></label>
+        <label class="field"><span>LinkedIn</span><input name="link_linkedin" type="url" value="${esc(links.linkedin || '')}" placeholder="https://linkedin.com/in/you"></label>
+        <label class="field"><span>Personal site</span><input name="link_website" type="url" value="${esc(links.website || '')}" placeholder="https://yoursite.com"></label>
+      </div>
+      <h4 style="margin:18px 0 6px">Education</h4>
+      <div id="talentEduRows">${edu}</div>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="talentAddEduRow()">Add education</button>
+      <h4 style="margin:18px 0 6px">Experience</h4>
+      <div id="talentExpRows">${exp}</div>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="talentAddExpRow()">Add experience</button>
+      <div style="margin-top:16px"><button class="btn btn-primary" type="submit">Save profile</button></div>
+    </form>
+    </div></div>`;
+}
+function talentEduRowHtml(e = {}) {
+  return `<div class="edu-row" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px">
+    <div class="form-grid">
+      <label class="field"><span>School</span><input class="edu-school" value="${esc(e.school || '')}"></label>
+      <label class="field"><span>Degree</span><input class="edu-degree" value="${esc(e.degree || '')}"></label>
+      <label class="field"><span>Field of study</span><input class="edu-field" value="${esc(e.field || '')}"></label>
+      <label class="field"><span>Start year</span><input class="edu-start" type="number" value="${e.start_year || ''}"></label>
+      <label class="field"><span>End year (or expected)</span><input class="edu-end" type="number" value="${e.end_year || ''}"></label>
+    </div>
+    <button type="button" class="btn btn-ghost btn-sm" onclick="this.closest('.edu-row').remove()">Remove</button>
+  </div>`;
+}
+function talentAddEduRow() { $('talentEduRows').insertAdjacentHTML('beforeend', talentEduRowHtml()); }
+function talentExpRowHtml(e = {}) {
+  return `<div class="exp-row" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px">
+    <div class="form-grid">
+      <label class="field"><span>Company</span><input class="exp-company" value="${esc(e.company || '')}"></label>
+      <label class="field"><span>Role</span><input class="exp-role" value="${esc(e.role || '')}"></label>
+      <label class="field"><span>Start date</span><input class="exp-start" placeholder="e.g. Jun 2025" value="${esc(e.start_date || '')}"></label>
+      <label class="field"><span>End date</span><input class="exp-end" placeholder="e.g. Present" value="${esc(e.end_date || '')}"></label>
+    </div>
+    <label class="field"><span>Description</span><textarea class="exp-desc" rows="2">${esc(e.description || '')}</textarea></label>
+    <button type="button" class="btn btn-ghost btn-sm" onclick="this.closest('.exp-row').remove()">Remove</button>
+  </div>`;
+}
+function talentAddExpRow() { $('talentExpRows').insertAdjacentHTML('beforeend', talentExpRowHtml()); }
+function wireTalentProfileForm() {
+  $('talentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target; const btn = f.querySelector('button[type="submit"]'); btn.disabled = true;
+    const education = [...document.querySelectorAll('#talentEduRows .edu-row')].map((row) => ({
+      school: row.querySelector('.edu-school').value.trim(), degree: row.querySelector('.edu-degree').value.trim(),
+      field: row.querySelector('.edu-field').value.trim(),
+      start_year: row.querySelector('.edu-start').value ? Number(row.querySelector('.edu-start').value) : null,
+      end_year: row.querySelector('.edu-end').value ? Number(row.querySelector('.edu-end').value) : null,
+    })).filter((r) => r.school);
+    const experience = [...document.querySelectorAll('#talentExpRows .exp-row')].map((row) => ({
+      company: row.querySelector('.exp-company').value.trim(), role: row.querySelector('.exp-role').value.trim(),
+      start_date: row.querySelector('.exp-start').value.trim(), end_date: row.querySelector('.exp-end').value.trim(),
+      description: row.querySelector('.exp-desc').value.trim(),
+    })).filter((r) => r.company);
+    const workType = [...f.querySelectorAll('input[name="work_type"]:checked')].map((c) => c.value);
+    try {
+      await api('/api/talent/me', {
+        method: 'PUT', body: JSON.stringify({
+          headline: f.headline.value.trim(), about: f.about.value.trim(), city: f.city.value.trim(),
+          remote_pref: f.remote_pref.value || null, availability: f.availability.value || null, work_type: workType,
+          salary_band: f.salary_band.value.trim(), salary_visible: f.salary_visible.checked,
+          links: { github: f.link_github.value.trim(), linkedin: f.link_linkedin.value.trim(), website: f.link_website.value.trim() },
+          education, experience,
+        }),
+      });
+      const handle = f.handle.value.trim();
+      if (handle && handle !== (TALENT_STATE.profile || {}).handle) {
+        try { await api('/api/talent/me/handle', { method: 'POST', body: JSON.stringify({ handle }) }); }
+        catch (err) { toast(err.message, true); }
+      }
+      toast('Profile saved.');
+      renderTalentProfile();
+    } catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+function talentSkillsHtml() {
+  const skills = TALENT_STATE.skills || [];
+  const chips = skills.map((s) => `<span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 10px;margin:0 6px 6px 0;font-size:13px">${esc(s.name)}${s.needs_review ? ' <span class="s" style="color:var(--muted)">(pending review)</span>' : ''}<button type="button" onclick="talentRemoveSkill(${s.id})" style="border:none;background:none;cursor:pointer;color:var(--muted);font-weight:700">&times;</button></span>`).join('');
+  return `<div class="card" style="margin-bottom:14px"><div class="card-head"><h3>Skills</h3></div>
+    <div class="card-body">
+      <div style="margin-bottom:10px">${chips || '<span class="s" style="color:var(--muted)">No skills added yet.</span>'}</div>
+      <div style="position:relative;max-width:360px">
+        <input id="talentSkillInput" placeholder="Type a skill and press Enter" autocomplete="off">
+        <div class="dd-menu" id="talentSkillResults" style="left:0;right:auto;width:100%;max-height:220px;overflow:auto"></div>
+      </div>
+    </div></div>`;
+}
+function wireTalentSkills() {
+  const inp = $('talentSkillInput'); const out = $('talentSkillResults');
+  let t = null;
+  inp.addEventListener('input', () => {
+    clearTimeout(t);
+    const q = inp.value.trim();
+    if (q.length < 2) { out.classList.remove('open'); out.innerHTML = ''; return; }
+    t = setTimeout(async () => {
+      try {
+        const d = await api('/api/talent/skills?q=' + encodeURIComponent(q));
+        out.innerHTML = d.skills.map((s) => `<button onclick="talentAddSkill(${s.id})">${esc(s.name)}</button>`).join('')
+          + `<button onclick="talentAddSkill(null, '${esc(q)}')">Add &quot;${esc(q)}&quot; as a new skill</button>`;
+        out.classList.add('open');
+      } catch { out.innerHTML = ''; }
+    }, 200);
+  });
+  inp.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); if (inp.value.trim()) talentAddSkill(null, inp.value.trim()); }
+    if (e.key === 'Escape') { out.classList.remove('open'); out.innerHTML = ''; }
+  });
+}
+async function talentAddSkill(skillId, name) {
+  try { await api('/api/talent/me/skills', { method: 'POST', body: JSON.stringify({ skill_id: skillId, name }) }); renderTalentProfile(); }
+  catch (e) { toast(e.message, true); }
+}
+async function talentRemoveSkill(skillId) {
+  try { await api('/api/talent/me/skills/' + skillId, { method: 'DELETE' }); renderTalentProfile(); }
+  catch (e) { toast(e.message, true); }
+}
+function talentResumeHtml() {
+  const p = TALENT_STATE.profile || {};
+  return `<div class="card" style="margin-bottom:14px"><div class="card-head"><h3>Resume</h3></div>
+    <div class="card-body">
+      <div class="s" style="color:var(--muted);margin-bottom:10px">${p.has_resume ? 'A resume is on file. Uploading a new one replaces it. Never shown publicly.' : 'No resume uploaded yet. PDF only, up to 5 MB. Never shown publicly.'}</div>
+      <form id="talentResumeForm" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="file" name="file" accept=".pdf" required>
+        <button class="btn btn-primary btn-sm" type="submit">Upload</button>
+      </form>
+    </div></div>`;
+}
+function wireTalentResume() {
+  $('talentResumeForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try { await api('/api/talent/me/resume', { method: 'POST', body: new FormData(f) }); toast('Resume uploaded.'); renderTalentProfile(); }
+    catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+async function renderTalentProjects() {
+  const box = $('talentProjectsBox');
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const [eligibleR, projectsR] = await Promise.all([api('/api/talent/me/portfolio-eligible'), api('/api/talent/me/projects')]);
+  TALENT_PROJECTS = projectsR.projects;
+  const eligibleHtml = eligibleR.eligible.length ? `<div class="card" style="margin-bottom:12px"><div class="card-body">
+    <h3 style="margin-top:0">Graded coursework ready to publish</h3>
+    ${eligibleR.eligible.map((e) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)">
+      <div><strong>${esc(e.task_title)}</strong><div class="s" style="color:var(--muted)">${esc(e.course_title)} &middot; graded ${e.grade}%</div></div>
+      <button class="btn btn-primary btn-sm" onclick="talentPublishFromSubmission(${e.submission_id})">Publish as project</button>
+    </div>`).join('')}
+  </div></div>` : '';
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px"><div class="card-head"><h3>My Projects</h3><button class="btn btn-primary btn-sm" onclick="talentAddProjectForm()">Add project</button></div></div>
+    ${eligibleHtml}
+    ${TALENT_PROJECTS.length ? TALENT_PROJECTS.map(talentProjectCardHtml).join('') : '<div class="empty">No projects yet.</div>'}`;
+}
+function talentProjectCardHtml(p) {
+  const handle = (TALENT_STATE.profile || {}).handle || '';
+  return `<div class="card" style="margin-bottom:10px"><div class="card-body" style="display:flex;gap:14px;flex-wrap:wrap">
+    ${p.cover_image ? `<img src="${esc(p.cover_image)}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line)">` : `<div style="width:120px;height:80px;border-radius:8px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center" class="s">No cover</div>`}
+    <div style="flex:1;min-width:200px">
+      <div style="font-weight:700">${esc(p.title)} ${p.verified ? '<span class="s" style="color:var(--ok);font-weight:700">&middot; Verified by EchoLens</span>' : '<span class="s" style="color:var(--muted)">&middot; Self-added</span>'}${p.visible === false ? ' <span class="s" style="color:var(--danger)">&middot; Hidden</span>' : ''}</div>
+      ${p.visible === false && p.hidden_reason ? `<div class="s" style="color:var(--danger)">An admin hid this project: ${esc(p.hidden_reason)}</div>` : ''}
+      <div class="s" style="color:var(--muted)">${esc((p.tech_stack || []).join(', '))}</div>
+      <div class="s" style="color:var(--muted)">${esc(p.summary || '')}</div>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="talentEditProjectForm(${p.id})">Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="talentUploadCover(${p.id})">Cover image</button>
+        <button class="btn btn-ghost btn-sm" onclick="talentUploadGalleryImage(${p.id})">Add gallery image</button>
+        <a class="btn btn-ghost btn-sm" href="/talent/${esc(handle)}/projects/${p.id}" target="_blank" rel="noopener">View</a>
+        <button class="btn btn-danger btn-sm" onclick="talentDeleteProject(${p.id})">Delete</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+async function talentPublishFromSubmission(submissionId) {
+  try { await api('/api/talent/me/projects/from-submission', { method: 'POST', body: JSON.stringify({ submission_id: submissionId }) }); toast('Published as a project.'); renderTalentProjects(); }
+  catch (e) { toast(e.message, true); }
+}
+function talentProjectFormFields(p = {}, lockTitle) {
+  return `<form id="f">
+    ${lockTitle ? `<div class="s" style="color:var(--muted);margin-bottom:10px">Title, course, grade and date come from your graded coursework and can&rsquo;t be changed here.</div>` : `<label class="field"><span>Title</span><input name="title" value="${esc(p.title || '')}" required></label>`}
+    <label class="field"><span>Summary</span><input name="summary" maxlength="300" value="${esc(p.summary || '')}"></label>
+    <label class="field"><span>Description (Markdown supported)</span><textarea name="description_markdown" rows="5">${esc(p.description_markdown || '')}</textarea></label>
+    <label class="field"><span>Tech stack (comma separated)</span><input name="tech_stack" value="${esc((p.tech_stack || []).join(', '))}" placeholder="Python, Pandas, SQL"></label>
+    <div class="form-grid">
+      <label class="field"><span>Repository URL</span><input name="repo_url" type="url" value="${esc(p.repo_url || '')}"></label>
+      <label class="field"><span>Live demo URL</span><input name="demo_url" type="url" value="${esc(p.demo_url || '')}"></label>
+    </div>
+    <div class="form-grid">
+      <label class="field"><span>Your role</span><input name="role_played" value="${esc(p.role_played || '')}"></label>
+      <label class="field"><span>Team size</span><input name="team_size" type="number" min="1" value="${p.team_size || ''}"></label>
+    </div>
+    <div class="form-grid">
+      <label class="field"><span>Month completed</span><input name="completed_month" type="number" min="1" max="12" value="${p.completed_month || ''}"></label>
+      <label class="field"><span>Year completed</span><input name="completed_year" type="number" value="${p.completed_year || ''}"></label>
+    </div>
+    <label class="field"><span style="display:flex;align-items:center;gap:8px;font-weight:400"><input type="checkbox" name="visible" style="width:auto" ${p.visible !== false ? 'checked' : ''}> Visible on my public profile</span></label>
+    <button class="btn btn-primary btn-block" type="submit">Save project</button>
+  </form>`;
+}
+function talentProjectFormValues(f) {
+  const out = {
+    summary: f.summary.value.trim(), description_markdown: f.description_markdown.value.trim(),
+    tech_stack: f.tech_stack.value.split(',').map((t) => t.trim()).filter(Boolean),
+    repo_url: f.repo_url.value.trim(), demo_url: f.demo_url.value.trim(),
+    role_played: f.role_played.value.trim(), team_size: f.team_size.value || null,
+    completed_month: f.completed_month.value || null, completed_year: f.completed_year.value || null,
+    visible: f.visible.checked,
+  };
+  if (f.title) out.title = f.title.value.trim();
+  return out;
+}
+function talentAddProjectForm() {
+  openModal('Add project', talentProjectFormFields());
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api('/api/talent/me/projects', { method: 'POST', body: JSON.stringify(talentProjectFormValues(f)) }); toast('Project added.'); closeModal(); renderTalentProjects(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+function talentEditProjectForm(id) {
+  const p = TALENT_PROJECTS.find((x) => x.id === id); if (!p) return;
+  openModal('Edit project', talentProjectFormFields(p, p.verified));
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api(`/api/talent/me/projects/${id}`, { method: 'PUT', body: JSON.stringify(talentProjectFormValues(f)) }); toast('Project updated.'); closeModal(); renderTalentProjects(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function talentDeleteProject(id) {
+  if (!confirm('Delete this project? This cannot be undone.')) return;
+  try { await api(`/api/talent/me/projects/${id}`, { method: 'DELETE' }); toast('Project deleted.'); renderTalentProjects(); }
+  catch (e) { toast(e.message, true); }
+}
+function talentUploadCover(id) {
+  openModal('Upload cover image', `<form id="f"><label class="field"><span>Image - JPEG, PNG or WEBP</span><input type="file" name="file" accept=".jpg,.jpeg,.png,.webp" required></label><button class="btn btn-primary btn-block" type="submit">Upload</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api(`/api/talent/me/projects/${id}/cover`, { method: 'POST', body: new FormData(f) }); toast('Cover image updated.'); closeModal(); renderTalentProjects(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+function talentUploadGalleryImage(id) {
+  openModal('Add gallery image', `<form id="f"><label class="field"><span>Image - JPEG, PNG or WEBP (up to 6 per project)</span><input type="file" name="file" accept=".jpg,.jpeg,.png,.webp" required></label><button class="btn btn-primary btn-block" type="submit">Upload</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    try { await api(`/api/talent/me/projects/${id}/gallery`, { method: 'POST', body: new FormData(f) }); toast('Gallery image added.'); closeModal(); renderTalentProjects(); }
+    catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+
+/* -------------------------- Talent Marketplace: student Hiring Interest (Phase 5) -------------------------- */
+async function renderHiringInterest() {
+  const el = $('view-hiring-interest');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/talent/me/contact-requests');
+  el.innerHTML = `<div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Recruiters who want to contact you appear here. Accepting shares your email, phone and resume with that recruiter only.</span></div></div>`
+    + (d.requests.length ? d.requests.map(hiringInterestRow).join('') : '<div class="empty">No contact requests yet.</div>');
+}
+function hiringInterestRow(r) {
+  const statusColor = r.status === 'accepted' ? 'var(--ok)' : r.status === 'declined' ? 'var(--danger)' : 'var(--muted)';
+  const actions = r.status === 'pending'
+    ? `<button class="btn btn-primary btn-sm" onclick="hiringAccept(${r.id})">Accept</button>
+       <button class="btn btn-ghost btn-sm" onclick="hiringDecline(${r.id})">Decline</button>`
+    : '';
+  const blockBtn = r.company_id ? `<button class="btn btn-ghost btn-sm" onclick="hiringBlockCompany(${r.company_id})">Block ${esc(r.company || 'this company')}</button>` : '';
+  return `<div class="card" style="margin-bottom:10px"><div class="card-body">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div><strong>${esc(r.recruiter_name)}</strong>${r.company ? ` <span class="s" style="color:var(--muted)">&middot; ${esc(r.company)}</span>` : ''}</div>
+      <span class="s" style="color:${statusColor};font-weight:700;text-transform:capitalize">${esc(r.status)}</span>
+    </div>
+    <div class="s" style="color:var(--muted);margin-top:4px">${esc(r.message)}</div>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">${actions}${blockBtn}
+      ${r.status === 'accepted' ? `<button class="btn btn-ghost btn-sm" onclick="hiringOpenThread(${r.id})">Messages</button>` : ''}
+    </div>
+    <div id="hiringThread-${r.id}"></div>
+  </div></div>`;
+}
+async function hiringAccept(id) {
+  try { await api(`/api/talent/me/contact-requests/${id}/accept`, { method: 'POST' }); toast('Accepted - your contact details are now visible to this recruiter.'); renderHiringInterest(); }
+  catch (e) { toast(e.message, true); }
+}
+async function hiringDecline(id) {
+  try { await api(`/api/talent/me/contact-requests/${id}/decline`, { method: 'POST' }); toast('Declined.'); renderHiringInterest(); }
+  catch (e) { toast(e.message, true); }
+}
+async function hiringBlockCompany(companyId) {
+  if (!confirm('Block this company? Any pending requests from them will be declined, and they cannot contact you again.')) return;
+  try { await api('/api/talent/me/block-company', { method: 'POST', body: JSON.stringify({ company_id: companyId }) }); toast('Company blocked.'); renderHiringInterest(); }
+  catch (e) { toast(e.message, true); }
+}
+async function hiringOpenThread(id) {
+  const box = $('hiringThread-' + id);
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api(`/api/talent/contact-requests/${id}/messages`);
+  box.innerHTML = `
+    <div style="max-height:200px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px;margin:8px 0">
+      ${d.messages.length ? d.messages.map((m) => `<div style="margin-bottom:6px"><strong>${m.sender_role === 'student' ? 'You' : 'Recruiter'}:</strong> ${esc(m.body)}</div>`).join('') : '<div class="s" style="color:var(--muted)">No messages yet.</div>'}
+    </div>
+    <form onsubmit="return hiringSendMessage(event, ${id})" style="display:flex;gap:8px">
+      <input name="body" placeholder="Write a message" style="flex:1" required>
+      <button class="btn btn-primary btn-sm" type="submit">Send</button>
+    </form>`;
+}
+async function hiringSendMessage(e, id) {
+  e.preventDefault();
+  const f = e.target;
+  try { await api(`/api/talent/contact-requests/${id}/messages`, { method: 'POST', body: JSON.stringify({ body: f.body.value.trim() }) }); f.body.value = ''; hiringOpenThread(id); }
+  catch (err) { toast(err.message, true); }
+  return false;
 }
 
 /* -------------------------------- Finance portal -------------------------------- */

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens - My Contact Requests</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v1230">
+</head>
+<body>
+<div id="gate" class="gate"><img src="/img/logo.png" alt="EchoLens" style="width:120px"><div>Loading</div></div>
+<div class="content" id="app" style="display:none;max-width:900px;margin:0 auto;padding:24px 16px 60px">
+  <h1 style="margin-bottom:4px">My Contact Requests</h1>
+  <div class="s" style="color:var(--muted);margin-bottom:18px">Requests you have sent to students, and your shortlists.</div>
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <button class="btn btn-primary btn-sm" id="tabRequestsBtn" onclick="showTab('requests')">Contact requests</button>
+    <button class="btn btn-ghost btn-sm" id="tabShortlistsBtn" onclick="showTab('shortlists')">Shortlists</button>
+  </div>
+  <div id="tab-requests"></div>
+  <div id="tab-shortlists" style="display:none"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/js/talent-interest.js?v1"></script>
+</body>
+</html>

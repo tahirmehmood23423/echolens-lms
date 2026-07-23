@@ -23,7 +23,10 @@ const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit',
 
 function refNo(role, user) {
   const tag = role === 'ambassador' ? 'AMB' : 'INS';
-  return `EL/${tag}/${new Date().getFullYear()}/${String(user.id).padStart(3, '0')}`;
+  // A missing id must never render as "undefined" on an official letter.
+  const id = Number(user && user.id);
+  const seq = Number.isFinite(id) && id > 0 ? String(id).padStart(3, '0') : '000';
+  return `EL/${tag}/${new Date().getFullYear()}/${seq}`;
 }
 
 function bodyParagraphs({ role, user, profile, ambassador }) {

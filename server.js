@@ -770,7 +770,9 @@ app.post('/api/batches/:id/teachers', authRequired, canAssignInstructors, (req, 
   res.json({ ok: true, teacher: { id: user.id, name: user.name }, credentials: { username: user.username, password } });
 });
 app.delete('/api/batches/:id/teachers/:uid', authRequired, canAssignInstructors, (req, res) => {
-  Batches.removeTeacher(req.params.id, req.params.uid); res.json({ ok: true });
+  const b = Batches.byId(req.params.id);
+  if (!b) return res.status(404).json({ error: 'Course not found.' });
+  Batches.removeTeacher(b.id, req.params.uid); res.json({ ok: true });
 });
 
 /* ------------------------------ users (admin) ------------------------------ */

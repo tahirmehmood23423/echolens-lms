@@ -1,0 +1,1294 @@
+// EchoLens LMS — Postgres schema (VERIFIED against app code, 2026-07-23)
+//
+// STATUS: this is a FUTURE normalized-schema design, not what's currently
+// deployed. The app already has a working, already-migrated Postgres layer
+// (see migrations/0001_legacy_store_schema.sql + migrations/import-json.js)
+// that stores every collection as `(id BIGINT, data JSONB)` — a deliberate,
+// non-normalized translation of store.js's JSON file, chosen specifically so
+// ~150 call sites across store.js/server.js would not need rewriting (see
+// store.js's "Postgres persistence" comment block). store.js reads/writes
+// that JSONB store today; it does NOT use Prisma, and Prisma is not even a
+// dependency of this app (see package.json). This file is a design document
+// for a possible future relational rewrite. Table names below intentionally
+// reuse the same @@map names as the legacy JSONB tables (users, courses,
+// etc.) for readability — DO NOT ever run `prisma migrate`/`db push` against
+// the database the legacy JSONB store uses. Point it only at an isolated
+// database (see migrations/import-normalized.js's NORMALIZED_DB_URL).
+//
+// VERIFICATION METHOD: every model below was checked against the real
+// creation/mutation code in store.js and server.js (grep + line-level
+// reading), not just the field names a data backup happened to show. Where a
+// field's actual JS shape differs from what the original inferred-from-data
+// draft assumed, it's corrected here with a comment citing the evidence.
+// Models the original draft marked UNVERIFIED (zero rows in that team's
+// backup) are rebuilt from their real writer code below, or flagged
+// CONFIRMED DEAD when no writer exists anywhere in the repo.
+//
+// NOTE ON THE SOURCE BACKUP: the schema this file supersedes claimed to be
+// derived from `echolens-full-backup-2026-07-21.json` (78 users, 53
+// collections, incl. 8 users and 1 batch deleted-but-referenced). That exact
+// file is not present anywhere in this environment/repo — every JSON file
+// here (root echolens.json, echolens-lms/echolens.json, backups/*.json) has
+// only 4 seed users and batch 1 intact, none deleted. The tombstone strategy
+// in migrations/import-normalized.js is therefore written to DISCOVER
+// dangling foreign-key references dynamically (scan every relation field,
+// tombstone whatever's actually missing) rather than hardcode specific ids —
+// it will correctly produce tombstones for users 5/8/21/25/27/30/31/42 and
+// batch 1 when pointed at the real backup, without depending on that exact
+// list being right forever.
+//
+// DATE-TYPE CONVENTION (verified from store.js):
+//   now()   -> `new Date().toISOString().replace('T',' ').slice(0,19)`
+//              a full UTC timestamp string ("2026-07-21 14:30:00") -> DateTime
+//   today() -> `new Date().toISOString().slice(0,10)`
+//              a date-only string ("2026-07-21") -> stays String
+// Every DateTime field below is backed by now(); every date-only String
+// field is backed by today()/a raw date string. Checked individually, not
+// assumed — see per-field comments for anything that deviates (Event/Quest
+// .deadline, Hackathon.starts_at/ends_at, Event.startsAt/endsAt, etc).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("NORMALIZED_DATABASE_URL") // deliberately NOT DATABASE_URL — see header
+}
+
+// ─────────────────────────────────────────────────────────────────
+// IDENTITY & ACCESS
+// ─────────────────────────────────────────────────────────────────
+
+model User {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  role                String // admin|instructor|coordinator|student|free|hr|staff|student_coordinator|finance|ambassador|recruiter
+  // VERIFIED nullable: findOrCreateGoogle() sets username: null when there's
+  // no email (store.js:492). Still unique when present.
+  username            String?  @unique
+  email               String? // intentionally NOT unique — see header note in original doc
+  regNo               String?  @unique @map("reg_no")
+  // VERIFIED nullable: Google-sign-in-only accounts get password_hash: null
+  // (store.js:493; checked at server.js login flow).
+  passwordHash        String?  @map("password_hash")
+  profile             Json     @default("{}")
+  streak              Int      @default(0)
+  bestStreak          Int      @default(0) @map("best_streak")
+  lastActive          DateTime? @map("last_active")
+  createdAt           DateTime @map("created_at")
+  onboardingComplete  Boolean  @default(false) @map("onboarding_complete")
+  avatar              String?
+  // MISSING from original draft: Users.setSignature() writes this (store.js:571).
+  signature           String?
+  // MISSING from original draft: Google sign-in identity (store.js:480,489,492).
+  googleSub           String?  @unique @map("google_sub")
+  // Migration-only tombstone flag — NOT read by any current app code. Added
+  // solely so import-normalized.js can insert placeholder rows for users
+  // referenced by a real FK (e.g. a certificate's user_id) whose original
+  // account was deleted, without violating the FK constraint.
+  isDeletedPlaceholder Boolean @default(false) @map("is_deleted_placeholder")
+
+  // --- Talent Marketplace recruiter fields (role='recruiter' only; null otherwise) ---
+  // Users.createRecruiter/setRecruiterStatus/resubmitRecruiter (store.js:593-630).
+  // Not present in the original draft at all (that backup predates this feature).
+  companyId          Int?     @map("company_id")
+  designation        String?
+  city               String?
+  hiringNote         String?  @map("hiring_note")
+  status             String?  // pending|approved|rejected|needs_info (recruiter verification)
+  statusReason       String?  @map("status_reason")
+  overrideRequested  Boolean  @default(false) @map("override_requested")
+  overrideReason     String?  @map("override_reason")
+  approvedBy         Int?     @map("approved_by")
+  approvedAt         DateTime? @map("approved_at")
+
+  company             Company? @relation(fields: [companyId], references: [id])
+  enrollments         Enrollment[]
+  questSubmissions    QuestSubmission[]  @relation("SubmissionAuthor")
+  gradedSubmissions   QuestSubmission[]  @relation("SubmissionGrader")
+  gemEvents           GemEvent[]
+  certificates        Certificate[]      @relation("CertificateHolder")
+  attendance          Attendance[]
+  openSubmissions     OpenSubmission[]
+  courseMessages      CourseMessage[]
+  eventEntries        EventEntry[]
+  eventSubmissions    EventSubmission[]
+  eventComments       EventComment[]
+  chatReads           ChatRead[]
+  aiReports           AiReport[]         @relation("ReportSubject")
+  leads               Lead[]
+  departmentMembers   DepartmentMember[] @relation("DeptMember")
+  ambassadorProfile   Ambassador?
+  staffRecord         StaffRecord?
+  legacySubmissions   Submission[]
+  challengeSubmissions ChallengeSubmission[]
+  quizAttempts        QuizAttempt[]
+  jobComments         JobComment[]
+
+  @@index([role])
+  @@map("users")
+}
+
+// Registries preventing reuse of retired usernames / reg numbers.
+model IssuedUsername {
+  value String @id
+  @@map("issued_usernames")
+}
+model IssuedRegno {
+  value String @id
+  @@map("issued_regnos")
+}
+model Seq {
+  name  String @id
+  value Int
+  @@map("seq")
+}
+model Setting {
+  key   String @id
+  value Json
+  @@map("settings")
+}
+
+// Talent Marketplace: keyed by normalized work-email domain (store.js:634-654).
+// MISSING from the original draft entirely (that backup predates Phase 1).
+model Company {
+  id        Int      @id @default(autoincrement())
+  domain    String   @unique
+  name      String
+  website   String?
+  sizeBand  String?  @map("size_band")
+  createdAt DateTime @map("created_at")
+
+  recruiters User[]
+  @@map("companies")
+}
+
+// Talent Marketplace: generic append-only audit trail (store.js:660-668).
+// MISSING from the original draft entirely.
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  actorId    Int?     @map("actor_id")
+  action     String
+  targetType String   @map("target_type")
+  targetId   Int?     @map("target_id")
+  detail     Json?
+  at         DateTime
+
+  @@map("audit_log")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// CATALOGUE & COHORTS
+// ─────────────────────────────────────────────────────────────────
+
+model Course {
+  id        Int      @id @default(autoincrement())
+  // VERIFIED nullable: admin create route only enforces `title` — every
+  // other field falls back to `|| null` (server.js:660-663).
+  code      String?  @unique
+  title     String
+  tier      String?
+  level     String?
+  weeks     Int?
+  hours     Float?
+  pricePkr  Int?     @map("price_pkr")
+  summary   String?
+  createdAt DateTime @map("created_at")
+  badges    Json?
+  freeMode  String?  @map("free_mode")
+
+  batches   Batch[]
+  lessons   Lesson[]
+  @@map("courses")
+}
+
+model Batch {
+  id            Int      @id @default(autoincrement())
+  courseId      Int      @map("course_id")
+  code          String   @unique
+  name          String
+  startDate     String   @map("start_date") // date-only
+  status        String
+  instructorIds Json     @map("instructor_ids") // Int[]
+  createdAt     DateTime @map("created_at")
+  // Migration-only tombstone flag (batch 1 in the source backup is deleted
+  // but still referenced by 12 quest rows) — not read by any app code.
+  isDeletedPlaceholder Boolean @default(false) @map("is_deleted_placeholder")
+
+  course        Course   @relation(fields: [courseId], references: [id])
+  enrollments   Enrollment[]
+  quests        Quest[]
+  sessions      Session[]
+  liveClasses   LiveClass[]
+  courseMessages CourseMessage[]
+  chatReads     ChatRead[]
+  certificates  Certificate[]
+  announcements Announcement[]
+  gemEvents     GemEvent[]
+  aiReports     AiReport[]
+  lessons       Lesson[]
+  assignments   Assignment[]
+  quizzes       Quiz[]
+  ambassadorGemEvents AmbassadorGemEvent[]
+
+  @@index([courseId])
+  @@map("batches")
+}
+
+model Enrollment {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  batchId   Int      @map("batch_id")
+  createdAt DateTime @map("created_at")
+
+  user      User  @relation(fields: [userId], references: [id])
+  batch     Batch @relation(fields: [batchId], references: [id])
+
+  @@unique([userId, batchId])
+  @@map("enrollments")
+}
+
+model Session {
+  id          Int      @id @default(autoincrement())
+  batchId     Int      @map("batch_id")
+  // VERIFIED nullable: server.js:1366 `Number(week_no) || null` / `start_time
+  // || null` / `end_time || null`.
+  weekNo      Int?     @map("week_no")
+  title       String
+  sessionDate String   @map("session_date")
+  startTime   String?  @map("start_time")
+  endTime     String?  @map("end_time")
+  room        String
+  startedAt   DateTime? @map("started_at")
+  endedAt     DateTime? @map("ended_at")
+  // VERIFIED nullable: created as null (store.js:874), only set once the
+  // session is actually started (store.js:901).
+  startedBy   Int?     @map("started_by")
+  createdAt   DateTime @map("created_at")
+
+  batch       Batch @relation(fields: [batchId], references: [id])
+  attendance  Attendance[]
+
+  @@map("sessions")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// QUESTS & SUBMISSIONS
+// ─────────────────────────────────────────────────────────────────
+
+model Quest {
+  id        Int      @id @default(autoincrement())
+  batchId   Int      @map("batch_id") // 12 rows reference deleted batch 1 in the source backup — tombstone required
+  trackKey  String   @map("track_key")
+  no        Int
+  week      Int
+  session   Int
+  title     String
+  topic     String
+  // VERIFIED shape is actually {pid, type, title, description, difficulty,
+  // points, criteria?, hint?, solution?, refs?} (store.js:1220-1235,
+  // tracks/bootcamps.js:51-55) — richer than originally guessed, but since
+  // this is stored as Json it's a documentation note, not a schema change.
+  // `points` per-problem is genuinely optional: grading code falls back to
+  // DEFAULT_ASSIGNMENT_POINTS when absent (store.js:802,1500,1309).
+  problems  Json
+  createdAt DateTime @map("created_at")
+  // VERIFIED date-only, confirmed via deadlineFromStart() (store.js:340-346):
+  // `.toISOString().slice(0,10)`, returns null if the batch has no start date.
+  deadline  String?
+
+  batch       Batch @relation(fields: [batchId], references: [id])
+  submissions QuestSubmission[]
+  taskFiles   TaskFile[]
+
+  @@index([batchId, trackKey])
+  @@map("quests")
+}
+
+model QuestSubmission {
+  id             Int      @id @default(autoincrement())
+  questId        Int      @map("quest_id")
+  pid            Int
+  userId         Int      @map("user_id") // 3 rows reference deleted user 5 in the source backup
+  fileUrl        String?  @map("file_url")
+  note           String?
+  grade          Int?
+  gems           Int      @default(0)
+  remarks        String?
+  submittedAt    DateTime @map("submitted_at")
+  gradedAt       DateTime? @map("graded_at")
+  gradedBy       Int?     @map("graded_by") // 13 rows reference deleted user 8 in the source backup
+  code           String?
+  language       String?
+  aiReview       Json?    @map("ai_review")
+  reviewShared   Boolean? @map("review_shared")
+  reviewSharedAt DateTime? @map("review_shared_at")
+  late           Boolean?
+  integrity      Json?
+  lateDeduction  Int?     @map("late_deduction")
+
+  quest  Quest @relation(fields: [questId], references: [id])
+  user   User  @relation("SubmissionAuthor", fields: [userId], references: [id])
+  grader User? @relation("SubmissionGrader", fields: [gradedBy], references: [id])
+
+  @@index([userId])
+  @@index([questId, pid])
+  @@map("quest_submissions")
+}
+
+// Public playground submissions (no enrolment required)
+model OpenSubmission {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  trackKey     String   @map("track_key")
+  level        Int
+  pid          Int
+  problemTitle String   @map("problem_title")
+  points       Int
+  // VERIFIED nullable: a submission can arrive via file_url only
+  // (store.js:2897-2901,2909) — code/language are null in that path.
+  code         String?
+  language     String?
+  fileUrl      String?  @map("file_url")
+  fileName     String?  @map("file_name")
+  submittedAt  DateTime @map("submitted_at")
+  score        Int?
+  gems         Int      @default(0)
+  feedback     String?
+  gradedAt     DateTime? @map("graded_at")
+  attempts     Int?
+  files        Json?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, trackKey])
+  @@map("open_submissions")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// GEMS
+// ─────────────────────────────────────────────────────────────────
+
+model GemEvent {
+  id      Int      @id @default(autoincrement())
+  userId  Int      @map("user_id")
+  batchId Int?     @map("batch_id")
+  amount  Int
+  source  String
+  // VERIFIED nullable: system-awarded events (streak bonus store.js:681,
+  // quiz auto-award store.js:1793) omit `by`; instructor awards pass it.
+  note    String?
+  by      Int?
+  at      DateTime
+
+  user  User   @relation(fields: [userId], references: [id])
+  batch Batch? @relation(fields: [batchId], references: [id])
+
+  @@index([userId])
+  @@map("gem_events")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// CERTIFICATES
+// ─────────────────────────────────────────────────────────────────
+
+model Certificate {
+  id              Int      @id @default(autoincrement())
+  serial          String   @unique
+  userId          Int      @map("user_id") // 1 row references deleted user 5 in the source backup
+  studentName     String   @map("student_name")
+  regNo           String   @map("reg_no")
+  batchId         Int?     @map("batch_id") // confirmed nullable: hackathon/webinar/quest/track/event auto-certs pass batch_id: null (store.js:2573,2952)
+  kind            String // course|hackathon|competition|quest|webinar
+  title           String
+  // VERIFIED always a string (never null; slice(0,400) of '' at worst) —
+  // store.js:1858.
+  detail          String   @default("")
+  completionDate  String   @map("completion_date") // VERIFIED date-only, enforced by regex else falls back to today() (store.js:1859)
+  instructorName  String?  @map("instructor_name")
+  instructorSig   String?  @map("instructor_sig")
+  issuedBy        Int      @map("issued_by")
+  issuedAt        DateTime @map("issued_at")
+  // VERIFIED always an array, defaults to [] (store.js:1862) — never null.
+  concepts        Json     @default("[]")
+  finalProject    String?  @map("final_project")
+  sourceKind      String?  @map("source_kind")
+  // VERIFIED polymorphic, NOT an Int: event-sourced certs store an Int event
+  // id (store.js:2576) but track-sourced certs store a String track-key slug
+  // (store.js:2955, "bc01-python" etc) — must be a String column.
+  sourceId        String?  @map("source_id")
+
+  user  User   @relation("CertificateHolder", fields: [userId], references: [id])
+  batch Batch? @relation(fields: [batchId], references: [id])
+
+  @@index([regNo])
+  @@map("certificates")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// LIVE CLASSES & ATTENDANCE
+// ─────────────────────────────────────────────────────────────────
+
+// CONFIRMED DEAD: store.js's empty() has no `live_classes` array and no
+// `seq.live_classes` counter at all (checked directly) — nothing in this
+// codebase ever creates a LiveClass row. All real "live class" functionality
+// (built-in Jitsi room, start/join, attendance) lives entirely on `Session`
+// (room, started_at, started_by, ended_at — see Session above). This model
+// is kept only because migrations/0001_legacy_store_schema.sql and
+// migrations/collections.js still declare a live_classes table; it will
+// always be empty in practice. Fields below are the original unverified
+// guess and are NOT independently confirmed (there is no writer to check
+// them against).
+model LiveClass {
+  id        Int      @id @default(autoincrement())
+  batchId   Int      @map("batch_id")
+  title     String
+  room      String
+  startedBy Int      @map("started_by")
+  startedAt DateTime @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+  date      String
+
+  batch      Batch @relation(fields: [batchId], references: [id])
+
+  @@map("live_classes")
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  // VERIFIED: there is no `class_id`/`classId` anywhere in the codebase
+  // (repo-wide grep). Only `session_id` is used (store.js:1709-1723), and
+  // it is always present — Attendance.mark(sessionId, userId) requires it.
+  // The original draft's `classId Int?` is dropped entirely.
+  sessionId Int      @map("session_id")
+  userId    Int      @map("user_id")
+  joinedAt  DateTime @map("joined_at")
+  minutes   Int      @default(0)
+  lastSeen  DateTime? @map("last_seen")
+
+  session   Session @relation(fields: [sessionId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("attendance")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// COMMUNICATION
+// ─────────────────────────────────────────────────────────────────
+
+model CourseMessage {
+  id         Int      @id @default(autoincrement())
+  batchId    Int      @map("batch_id")
+  userId     Int      @map("user_id")
+  body       String
+  anonymous  Boolean  @default(false)
+  staffRole  String?  @map("staff_role")
+  createdAt  DateTime @map("created_at")
+  // VERIFIED always an array, defaults to [] (store.js:1423) — never null.
+  mentions   Json     @default("[]")
+
+  batch Batch @relation(fields: [batchId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@index([batchId, createdAt])
+  @@map("course_messages")
+}
+
+model ChatRead {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  batchId    Int      @map("batch_id")
+  lastReadAt DateTime @map("last_read_at")
+
+  user  User  @relation(fields: [userId], references: [id])
+  batch Batch @relation(fields: [batchId], references: [id])
+
+  @@unique([userId, batchId])
+  @@map("chat_reads")
+}
+
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  batchId   Int?     @map("batch_id") // null = platform-wide
+  authorId  Int      @map("author_id")
+  title     String
+  body      String
+  createdAt DateTime @map("created_at")
+
+  batch Batch? @relation(fields: [batchId], references: [id])
+  @@map("announcements")
+}
+
+model PublicAnnouncement {
+  id        Int      @id @default(autoincrement())
+  kind      String
+  title     String
+  body      String
+  link      String?
+  linkLabel String?  @map("link_label")
+  pinned    Boolean  @default(false)
+  createdBy Int      @map("created_by")
+  createdAt DateTime @map("created_at")
+
+  @@map("public_announcements")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// AI REPORTS
+// ─────────────────────────────────────────────────────────────────
+
+model AiReport {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  batchId     Int?     @map("batch_id")
+  scope       String
+  markdown    String
+  status      String // draft|published|deleted
+  createdAt   DateTime @map("created_at")
+  // MISSING from original draft: AiReports.publish() sets this (store.js:1164).
+  publishedAt DateTime? @map("published_at")
+  by          Int
+
+  user  User   @relation("ReportSubject", fields: [userId], references: [id])
+  batch Batch? @relation(fields: [batchId], references: [id])
+
+  @@map("ai_reports")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// EVENTS (webinars / competitions)
+// ─────────────────────────────────────────────────────────────────
+
+model Event {
+  id              Int      @id @default(autoincrement())
+  kind            String
+  title           String
+  description     String
+  scope           String
+  entry           String
+  feePkr          Int      @map("fee_pkr")
+  payInstructions String?  @map("pay_instructions")
+  // Raw pass-through from an <input type="datetime-local"> ("YYYY-MM-DDTHH:MM",
+  // no seconds/offset) — NOT built via now(), no reformatting (store.js:2401,
+  // 2428). Nullability confirmed correct; format differs from the now()
+  // convention, so the import script must not assume seconds are present.
+  startsAt        DateTime? @map("starts_at")
+  endsAt          DateTime? @map("ends_at")
+  // VERIFIED date-only, same regex convention as Quest.deadline (store.js:2404,2430).
+  deadline        String?
+  durationMinutes Int?     @map("duration_minutes")
+  // VERIFIED never null: `Math.max(0,Math.min(100,Number(b.pass_mark)||0))` (store.js:2406,2432).
+  passMark        Int      @default(0) @map("pass_mark")
+  autoGrade       Boolean  @default(false) @map("auto_grade")
+  autoCertificate Boolean  @default(false) @map("auto_certificate")
+  compiler        String?
+  datasetUrl      String?  @map("dataset_url")
+  // VERIFIED always an array (possibly empty), never null (store.js:2411,2454-2461).
+  files           Json     @default("[]")
+  // VERIFIED always an array (possibly empty), never null (store.js:2381-2391).
+  problems        Json     @default("[]")
+  // VERIFIED always an object {first,second,third}, never null (store.js:2413).
+  prizes          Json     @default("{}")
+  meetingLink     String?  @map("meeting_link")
+  open            Boolean  @default(true)
+  createdBy       Int      @map("created_by")
+  createdAt       DateTime @map("created_at")
+
+  entries     EventEntry[]
+  submissions EventSubmission[]
+  comments    EventComment[]
+
+  @@map("events")
+}
+
+model EventEntry {
+  id            Int      @id @default(autoincrement())
+  eventId       Int      @map("event_id")
+  userId        Int      @map("user_id")
+  name          String
+  // VERIFIED nullable: `reg_no: user.reg_no || null` (store.js:2482).
+  regNo         String?  @map("reg_no")
+  tier          String
+  paymentStatus String   @map("payment_status")
+  paymentShot   String?  @map("payment_shot")
+  registeredAt  DateTime @map("registered_at")
+
+  event       Event @relation(fields: [eventId], references: [id])
+  user        User  @relation(fields: [userId], references: [id])
+  submissions EventSubmission[]
+
+  @@index([eventId])
+  @@map("event_entries")
+}
+
+model EventSubmission {
+  id          Int      @id @default(autoincrement())
+  eventId     Int      @map("event_id")
+  entryId     Int      @map("entry_id")
+  userId      Int      @map("user_id")
+  // VERIFIED nullable: `pid: pid ? Number(pid) : null` (store.js:2525).
+  pid         Int?
+  code        String?
+  language    String?
+  fileUrl     String?  @map("file_url")
+  fileName    String?  @map("file_name")
+  link        String?
+  note        String?
+  submittedAt DateTime @map("submitted_at")
+  aiScore     Int?     @map("ai_score")
+  score       Int?
+  aiFeedback  String?  @map("ai_feedback")
+  // VERIFIED polymorphic, NOT an Int: literal string 'ai' for AI auto-grading
+  // (store.js:2538) or a numeric admin user id (server.js:2926, store.js:2545).
+  gradedBy    String?  @map("graded_by")
+  gradedAt    DateTime? @map("graded_at")
+  certified   Boolean  @default(false)
+
+  event Event      @relation(fields: [eventId], references: [id])
+  entry EventEntry @relation(fields: [entryId], references: [id])
+  user  User       @relation(fields: [userId], references: [id])
+
+  @@map("event_submissions")
+}
+
+// CONFIRMED LIVE (was marked UNVERIFIED in the original draft — that's just
+// stale backup data, not dead code). Writer: Events.addComment (store.js:
+// 2625-2637), wired at server.js:2914/2789/2909. Real shape has two extra
+// snapshotted fields the original draft didn't have.
+model EventComment {
+  id        Int      @id @default(autoincrement())
+  eventId   Int      @map("event_id")
+  userId    Int      @map("user_id")
+  name      String // poster's name, snapshotted at post time
+  role      String // poster's role, snapshotted at post time
+  body      String
+  createdAt DateTime @map("created_at")
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  @@map("event_comments")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// ADMISSIONS, LEADS & FINANCE
+// ─────────────────────────────────────────────────────────────────
+
+model Lead {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  whatsapp  String?
+  source    String
+  userId    Int?     @map("user_id")
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @map("updated_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([email])
+  @@map("leads")
+}
+
+model Registration {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  email              String
+  whatsapp           String
+  city               String?
+  // VERIFIED nullable: `String(b.course_code||'').slice(0,12) || null` (store.js:2974-2975).
+  courseCode         String?  @map("course_code")
+  courseTitle        String?  @map("course_title")
+  note               String?
+  status             Json
+  adminNote          String?  @map("admin_note")
+  createdAt          DateTime @map("created_at")
+  updatedAt          DateTime @map("updated_at")
+  paymentStage       String   @map("payment_stage")
+  discountCategoryId Int?     @map("discount_category_id")
+  challanSerial      String?  @map("challan_serial")
+  enrolledUserId     Int?     @map("enrolled_user_id")
+  enrolledBatchId    Int?     @map("enrolled_batch_id")
+  clearedBy          Int?     @map("cleared_by")
+  clearedAt          DateTime? @map("cleared_at")
+  ambassadorCode     String?  @map("ambassador_code")
+  ambassadorName     String?  @map("ambassador_name")
+
+  discountCategory DiscountCategory? @relation(fields: [discountCategoryId], references: [id])
+  challans         Challan[]
+  ambassadorGemEvents AmbassadorGemEvent[]
+
+  @@index([email])
+  @@map("registrations")
+}
+
+model DiscountCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String // percent|flat
+  value     Int
+  active    Boolean  @default(true)
+  createdBy Int?     @map("created_by") // confirmed genuinely nullable: auto-created "Ambassador referral" category passes by=null (server.js:3170)
+  createdAt DateTime @map("created_at")
+
+  registrations Registration[]
+  challans      Challan[]
+
+  @@map("discount_categories")
+}
+
+model Challan {
+  id                 Int      @id @default(autoincrement())
+  serial             String   @unique
+  registrationId     Int      @map("registration_id")
+  // VERIFIED nullable: copied straight from Registration.courseCode, which is nullable (store.js:3099).
+  courseCode         String?  @map("course_code")
+  courseTitle        String   @map("course_title") // stays non-null in practice via `|| ''` fallback
+  studentName        String   @map("student_name")
+  studentEmail       String   @map("student_email")
+  studentId          String   @map("student_id")
+  grossFee           Int      @map("gross_fee")
+  feeParts           Json     @map("fee_parts")
+  discountCategoryId Int?     @map("discount_category_id")
+  discounts          Json
+  discountLabel      String?  @map("discount_label")
+  discountAmount     Int      @map("discount_amount")
+  netFee             Int      @map("net_fee")
+  // VERIFIED nullable: `/^\d{4}-\d{2}-\d{2}$/.test(...) ? deadline : null` (store.js:3107).
+  deadline           String?
+  bankSnapshot       Json     @map("bank_snapshot")
+  status             String
+  generatedBy        Int      @map("generated_by")
+  generatedAt        DateTime @map("generated_at")
+  sentAt             DateTime? @map("sent_at")
+  paidConfirmedBy    Int?     @map("paid_confirmed_by")
+  paidConfirmedAt    DateTime? @map("paid_confirmed_at")
+
+  registration     Registration      @relation(fields: [registrationId], references: [id])
+  discountCategory DiscountCategory? @relation(fields: [discountCategoryId], references: [id])
+
+  @@map("challans")
+}
+
+// CONFIRMED LIVE (was marked UNVERIFIED — the guessed field list was wrong).
+// Writer: Expenses.create (store.js:3153-3164), wired at server.js:3279-3282
+// (POST /api/finance/expenses, financeOnly). Completely different shape than
+// the original guess — no title/note/incurredOn/amountPkr/createdBy.
+model Expense {
+  id          Int      @id @default(autoincrement())
+  date        String // date-only; defaults to today() if not a valid YYYY-MM-DD (store.js:3157)
+  category    String   @default("General") // defaults to 'General', never null (store.js:3158)
+  description String // always a string, possibly '' (store.js:3159)
+  amount      Int
+  addedBy     Int      @map("added_by")
+  createdAt   DateTime @map("created_at")
+
+  @@map("expenses")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// PEOPLE OPS
+// ─────────────────────────────────────────────────────────────────
+
+model StaffRecord {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique @map("user_id")
+  name           String
+  email          String
+  phone          String?
+  // VERIFIED nullable: `String(position||'').slice(0,100) || null` (store.js:3241-3253).
+  position       String?
+  employmentType String   @map("employment_type")
+  groupId        Int?     @map("group_id")
+  status         String
+  joinedAt       String   @map("joined_at")
+  instructions   Json
+  followUps      Json     @map("follow_ups")
+  createdAt      DateTime @map("created_at")
+
+  user  User        @relation(fields: [userId], references: [id])
+  group StaffGroup? @relation(fields: [groupId], references: [id])
+
+  @@map("staff_records")
+}
+
+// CONFIRMED LIVE, rebuilt (was marked UNVERIFIED, original guess was wrong).
+// Writer: StaffGroups.create (store.js:3220-3224). No createdBy field exists.
+model StaffGroup {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime @map("created_at")
+
+  records StaffRecord[]
+  @@map("staff_groups")
+}
+
+model Department {
+  id         Int      @id @default(autoincrement())
+  name       String
+  headUserId Int?     @map("head_user_id")
+  createdBy  Int?     @map("created_by")
+  createdAt  DateTime @map("created_at")
+
+  members       DepartmentMember[]
+  tasks         DepartmentTask[]
+  announcements DepartmentAnnouncement[]
+
+  @@map("departments")
+}
+
+model DepartmentMember {
+  id           Int      @id @default(autoincrement())
+  departmentId Int      @map("department_id")
+  userId       Int      @map("user_id")
+  addedBy      Int?     @map("added_by")
+  addedAt      DateTime @map("added_at")
+
+  department Department @relation(fields: [departmentId], references: [id])
+  user       User       @relation("DeptMember", fields: [userId], references: [id])
+
+  @@unique([departmentId, userId])
+  @@map("department_members")
+}
+
+// CONFIRMED LIVE, rebuilt (was marked UNVERIFIED, original guess was wrong —
+// no dueAt field exists; real field is `description`, not `detail`).
+// Writer: DepartmentTasks.create (store.js:2266-2287).
+model DepartmentTask {
+  id           Int      @id @default(autoincrement())
+  departmentId Int      @map("department_id")
+  title        String
+  description  String
+  scope        String // 'all' | 'member'
+  attachment   Json? // { filename, original_name }
+  createdBy    Int?     @map("created_by")
+  createdAt    DateTime @map("created_at")
+
+  department Department             @relation(fields: [departmentId], references: [id])
+  statuses   DepartmentTaskStatus[]
+
+  @@map("department_tasks")
+}
+
+// CONFIRMED LIVE, rebuilt (was marked UNVERIFIED). Writer: DepartmentTasks.create
+// (per-recipient rows, store.js:2280-2284) / markDone (store.js:2299-2306).
+// No updatedAt field exists; real field is proof_attachment + completed_at.
+model DepartmentTaskStatus {
+  id              Int      @id @default(autoincrement())
+  taskId          Int      @map("task_id")
+  userId          Int      @map("user_id")
+  status          String
+  note            String?
+  proofAttachment Json?    @map("proof_attachment")
+  completedAt     DateTime? @map("completed_at")
+
+  task DepartmentTask @relation(fields: [taskId], references: [id])
+  @@map("department_task_status")
+}
+
+model DepartmentAnnouncement {
+  id           Int      @id @default(autoincrement())
+  departmentId Int      @map("department_id")
+  title        String
+  body         String
+  // VERIFIED nullable, contradicting the original required guess: `by || null` (store.js:2313).
+  createdBy    Int?     @map("created_by")
+  createdAt    DateTime @map("created_at")
+
+  department Department @relation(fields: [departmentId], references: [id])
+  @@map("department_announcements")
+}
+
+// CONFIRMED LIVE, rebuilt (was marked UNVERIFIED, original guess was wrong
+// throughout). Writer: CoordinatorQueries.create/reply (store.js:3186-3213).
+model CoordinatorQuery {
+  id          Int      @id @default(autoincrement())
+  studentId   Int      @map("student_id")
+  studentName String   @map("student_name")
+  subject     String
+  // Array of {from_role, from_name, body, at} — replaces the single `body`
+  // scalar the original draft guessed.
+  messages    Json
+  status      String // 'open' | 'resolved'
+  createdAt   DateTime @map("created_at")
+  updatedAt   DateTime @map("updated_at")
+
+  @@map("coordinator_queries")
+}
+
+// CONFIRMED LIVE, rebuilt completely (was marked UNVERIFIED, original guess
+// bore no resemblance to the real record). Writer: Contracts.create/
+// markSubmitted/markOfferLetterSent/resend (store.js:2159-2190). Powers the
+// ambassador/instructor onboarding contract + offer-letter pipeline
+// (CONTRACT_ROLES in store.js, contract-pdf.js, offer-letter-pdf.js).
+model Contract {
+  id                    Int      @id @default(autoincrement())
+  userId                Int      @map("user_id")
+  role                  String
+  status                String // 'sent' | 'submitted'
+  pdfFilename           String   @map("pdf_filename")
+  sentAt                DateTime @map("sent_at")
+  deadlineAt            String   @map("deadline_at") // date-only
+  submittedAt           DateTime? @map("submitted_at")
+  submissionZipFilename String?  @map("submission_zip_filename")
+  offerLetterFilename   String?  @map("offer_letter_filename")
+  offerLetterSentAt     DateTime? @map("offer_letter_sent_at")
+
+  @@map("contracts")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// AMBASSADOR PROGRAMME
+// ─────────────────────────────────────────────────────────────────
+
+model Ambassador {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     @unique @map("user_id")
+  name       String
+  email      String
+  code       String   @unique
+  university String?
+  active     Boolean  @default(true)
+  gems       Int      @default(0)
+  createdBy  Int      @map("created_by")
+  createdAt  DateTime @map("created_at")
+
+  user       User?  @relation(fields: [userId], references: [id])
+  gemEvents  AmbassadorGemEvent[]
+  duties     AmbassadorDuty[]
+  reports    AmbassadorReport[]
+
+  @@map("ambassadors")
+}
+
+// CONFIRMED LIVE, rebuilt (was marked UNVERIFIED — missing course_tier,
+// registration_id, batch_id; field is `created_at`, not `at`). Writer:
+// Ambassadors.addGems (store.js:2085-2093).
+model AmbassadorGemEvent {
+  id             Int      @id @default(autoincrement())
+  ambassadorId   Int      @map("ambassador_id")
+  amount         Int
+  source         String
+  courseTier     String?  @map("course_tier")
+  registrationId Int?     @map("registration_id")
+  batchId        Int?     @map("batch_id")
+  note           String?
+  createdAt      DateTime @map("created_at")
+
+  ambassador   Ambassador    @relation(fields: [ambassadorId], references: [id])
+  registration Registration? @relation(fields: [registrationId], references: [id])
+  batch        Batch?        @relation(fields: [batchId], references: [id])
+  @@map("ambassador_gem_events")
+}
+
+// CONFIRMED DEAD: only initialized as empty arrays (store.js:51,262) and
+// referenced in the legacy SQL migration table list; no `.push`/create code
+// anywhere in the repo. Explicitly superseded by the generic Department/
+// DepartmentTask system (store.js:2192-2200: "This supersedes the
+// ambassador-only duty system"). Fields below are the unconfirmed original
+// guess, kept only for the (empty, forever) legacy table.
+model AmbassadorDuty {
+  id           Int      @id @default(autoincrement())
+  ambassadorId Int?     @map("ambassador_id")
+  title        String
+  detail       String?
+  dueAt        String?  @map("due_at")
+  createdBy    Int      @map("created_by")
+  createdAt    DateTime @map("created_at")
+
+  ambassador Ambassador?            @relation(fields: [ambassadorId], references: [id])
+  statuses   AmbassadorDutyStatus[]
+
+  @@map("ambassador_duties")
+}
+// CONFIRMED DEAD — see AmbassadorDuty above.
+model AmbassadorDutyStatus {
+  id        Int      @id @default(autoincrement())
+  dutyId    Int      @map("duty_id")
+  status    String
+  note      String?
+  updatedAt DateTime @map("updated_at")
+
+  duty AmbassadorDuty @relation(fields: [dutyId], references: [id])
+  @@map("ambassador_duty_status")
+}
+
+// CONFIRMED LIVE, rebuilt (was marked UNVERIFIED, original guess bore no
+// resemblance — no status/body fields; real fields are filename/
+// student_count/total_paid/total_commission/generated_at). Writer:
+// AmbassadorReports.create (store.js:2132-2145), generated by
+// ambassador-report-pdf.js on the monthly schedule.
+model AmbassadorReport {
+  id              Int      @id @default(autoincrement())
+  ambassadorId    Int      @map("ambassador_id")
+  period          String // 'YYYY-MM'
+  filename        String
+  studentCount    Int      @map("student_count")
+  totalPaid       Int      @map("total_paid") // PKR, whole rupees
+  totalCommission Int      @map("total_commission")
+  generatedAt     DateTime @map("generated_at")
+
+  ambassador Ambassador @relation(fields: [ambassadorId], references: [id])
+  @@map("ambassador_reports")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// CAREERS
+// ─────────────────────────────────────────────────────────────────
+
+model Job {
+  id              Int      @id @default(autoincrement())
+  title           String
+  company         String
+  // VERIFIED nullable, contradicting the original required guess (store.js:2665-2684).
+  location        String?
+  jobType         String   @map("job_type")
+  experienceLevel String?  @map("experience_level")
+  salaryRange     String?  @map("salary_range")
+  description     String
+  requirements    String?
+  applyUrl        String?  @map("apply_url")
+  applyEmail      String?  @map("apply_email")
+  deadline        String?
+  status          String
+  postedBy        Int      @map("posted_by")
+  createdAt       DateTime @map("created_at")
+
+  comments JobComment[]
+  @@map("jobs")
+}
+
+// CONFIRMED LIVE, rebuilt (was marked UNVERIFIED — missing the denormalized
+// user_name/user_role/user_avatar snapshot fields). Writer: JobComments.create
+// (store.js:2725-2733).
+model JobComment {
+  id         Int      @id @default(autoincrement())
+  jobId      Int      @map("job_id")
+  userId     Int      @map("user_id")
+  userName   String   @map("user_name")
+  userRole   String   @map("user_role")
+  userAvatar String?  @map("user_avatar")
+  body       String
+  createdAt  DateTime @map("created_at")
+
+  job  Job  @relation(fields: [jobId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  @@map("job_comments")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// "DORMANT" LMS FEATURES — CONFIRMED LIVE, not dormant. Every model in this
+// section was marked UNVERIFIED/dormant in the original draft; all ten have
+// real writers and are actively used (Submission specifically still feeds
+// gamification via submissionGems()/badgesFor() in store.js). Field lists
+// below are rebuilt from the real create-site code, not the original guess.
+// ─────────────────────────────────────────────────────────────────
+
+// Writer: Lessons.create (store.js:908-912), route server.js:1380.
+model Lesson {
+  id        Int      @id @default(autoincrement())
+  courseId  Int      @map("course_id")
+  batchId   Int      @map("batch_id")
+  weekNo    Int?     @map("week_no")
+  title     String
+  type      String   @default("resource") // e.g. slides|video|resource
+  url       String?
+  position  Int      @default(0)
+  createdAt DateTime @map("created_at")
+
+  course Course @relation(fields: [courseId], references: [id])
+  batch  Batch  @relation(fields: [batchId], references: [id])
+  @@map("lessons")
+}
+
+// Writer: Assignments.create (store.js:915-924). NOTE: no server.js route
+// calls Assignments.create — the only creation site in the whole repo is the
+// one-time dev seed() (store.js:1693). Genuinely legacy/inert going forward,
+// but existing rows and their shape are real and must be preserved.
+model Assignment {
+  id          Int      @id @default(autoincrement())
+  batchId     Int      @map("batch_id")
+  title       String
+  description String?
+  dueDate     String?  @map("due_date") // date-only
+  points      Int      @default(100)
+  createdBy   Int      @map("created_by")
+  createdAt   DateTime @map("created_at")
+
+  batch       Batch        @relation(fields: [batchId], references: [id])
+  submissions Submission[]
+  @@map("assignments")
+}
+
+// "Legacy — superseded by quest_submissions, but still actively read for
+// gamification (submissionGems()/badgesFor() in store.js)." Writer:
+// Submissions.upsert (store.js:927-957). No `code` field exists.
+model Submission {
+  id           Int      @id @default(autoincrement())
+  assignmentId Int      @map("assignment_id")
+  userId       Int      @map("user_id")
+  fileUrl      String?  @map("file_url")
+  note         String?
+  grade        Int?
+  gems         Int      @default(0)
+  remarks      String?
+  submittedAt  DateTime @map("submitted_at")
+  gradedAt     DateTime? @map("graded_at")
+  gradedBy     Int?     @map("graded_by")
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  @@map("submissions")
+}
+
+// Writer: Challenges.create (store.js:990-998), route server.js:1630-1634.
+model Challenge {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  difficulty  String   @default("Beginner")
+  gems        Int // clamped 5-500, default 50
+  dueDate     String?  @map("due_date")
+  open        Boolean  @default(true)
+  createdBy   Int      @map("created_by")
+  createdAt   DateTime @map("created_at")
+
+  submissions ChallengeSubmission[]
+  @@map("challenges")
+}
+
+// Writer: Challenges.submit/review (store.js:1005-1024). No code/fileUrl/
+// numeric score fields exist — submissions are a link + a pending/approved/
+// rejected status; gems are awarded via a separate GemEvent row.
+model ChallengeSubmission {
+  id          Int      @id @default(autoincrement())
+  challengeId Int      @map("challenge_id")
+  userId      Int      @map("user_id")
+  link        String
+  note        String?
+  status      String   @default("pending") // pending|approved|rejected
+  remarks     String?
+  submittedAt DateTime @map("submitted_at")
+  reviewedAt  DateTime? @map("reviewed_at")
+  reviewedBy  Int?     @map("reviewed_by")
+
+  challenge Challenge @relation(fields: [challengeId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  @@map("challenge_submissions")
+}
+
+// Writer: Hackathons.create (store.js:1044-1059).
+model Hackathon {
+  id              Int      @id @default(autoincrement())
+  title           String
+  theme           String?
+  startsAt        String   @map("starts_at") // free-text/date-time string, not a now()-built DateTime
+  endsAt          String   @map("ends_at")
+  mode            String   @default("solo") // solo|team
+  teamMax         Int      @default(4) @map("team_max")
+  entry           String   @default("free") // free|paid
+  feePkr          Int      @default(0) @map("fee_pkr")
+  payInstructions String?  @map("pay_instructions")
+  prizes          Json // {first,second,third} — always an object, never null
+  finalized       Boolean  @default(false)
+  createdBy       Int      @map("created_by")
+  createdAt       DateTime @map("created_at")
+
+  entries     HackathonEntry[]
+  submissions HackathonSubmission[]
+  @@map("hackathons")
+}
+
+// Writer: Hackathons.register (store.js:1071-1097). member_ids is a team
+// roster (Int[]) — there is no single userId field; a team can have several
+// members, the original draft's single `userId` guess was wrong.
+model HackathonEntry {
+  id            Int      @id @default(autoincrement())
+  hackathonId   Int      @map("hackathon_id")
+  teamName      String   @map("team_name")
+  memberIds     Json     @map("member_ids") // Int[]
+  registeredBy  Int      @map("registered_by")
+  paymentStatus String   @map("payment_status") // na|pending|confirmed|rejected
+  paymentRef    String?  @map("payment_ref")
+  paymentBy     Int?     @map("payment_by")
+  registeredAt  DateTime @map("registered_at")
+
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id])
+  submissions HackathonSubmission[]
+  @@map("hackathon_entries")
+}
+
+// Writer: Hackathons.submit/score (store.js:1103-1119). Keyed by entry, not
+// user directly (a team's single submission covers every member).
+model HackathonSubmission {
+  id          Int      @id @default(autoincrement())
+  hackathonId Int      @map("hackathon_id")
+  entryId     Int      @map("entry_id")
+  link        String
+  note        String?
+  score       Int?
+  remarks     String?
+  judgedBy    Int?     @map("judged_by")
+  judgedAt    DateTime? @map("judged_at")
+  submittedAt DateTime @map("submitted_at")
+
+  hackathon Hackathon      @relation(fields: [hackathonId], references: [id])
+  entry     HackathonEntry @relation(fields: [entryId], references: [id])
+  @@map("hackathon_submissions")
+}
+
+// Writer: Quizzes.create/open/close (store.js:1752-1773).
+model Quiz {
+  id          Int      @id @default(autoincrement())
+  batchId     Int      @map("batch_id")
+  title       String
+  questions   Json // [{q, options[], answer}]
+  durationMin Int      @map("duration_min")
+  points      Int
+  allowIde    Boolean  @default(false) @map("allow_ide")
+  openedAt    DateTime? @map("opened_at")
+  closesAt    DateTime? @map("closes_at")
+  createdBy   Int      @map("created_by")
+  createdAt   DateTime @map("created_at")
+
+  batch    Batch @relation(fields: [batchId], references: [id])
+  attempts QuizAttempt[]
+  @@map("quizzes")
+}
+
+// Writer: Quizzes.attempt (store.js:1779-1795). Field is `score_pct`, not
+// `score`; there is no separate startedAt — only `taken_at`.
+model QuizAttempt {
+  id        Int      @id @default(autoincrement())
+  quizId    Int      @map("quiz_id")
+  userId    Int      @map("user_id")
+  answers   Json // Int[]
+  correct   Int
+  total     Int
+  scorePct  Int      @map("score_pct")
+  gems      Int
+  takenAt   DateTime @map("taken_at")
+
+  quiz Quiz @relation(fields: [quizId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  @@map("quiz_attempts")
+}
+
+// Writer: TaskFiles.add (store.js:1948-1951). questId is always required
+// (Number(quest_id)), contradicting the original nullable guess; `pid` was
+// entirely missing from the original draft.
+model TaskFile {
+  id        Int      @id @default(autoincrement())
+  questId   Int      @map("quest_id")
+  pid       Int
+  name      String
+  url       String
+  size      Int      @default(0)
+  by        Int
+  createdAt DateTime @map("created_at")
+
+  quest Quest @relation(fields: [questId], references: [id])
+  @@map("task_files")
+}

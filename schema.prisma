@@ -1,19 +1,18 @@
 // EchoLens LMS — Postgres schema (VERIFIED against app code, 2026-07-23)
 //
-// STATUS: this is a FUTURE normalized-schema design, not what's currently
-// deployed. The app already has a working, already-migrated Postgres layer
-// (see migrations/0001_legacy_store_schema.sql + migrations/import-json.js)
-// that stores every collection as `(id BIGINT, data JSONB)` — a deliberate,
-// non-normalized translation of store.js's JSON file, chosen specifically so
-// ~150 call sites across store.js/server.js would not need rewriting (see
-// store.js's "Postgres persistence" comment block). store.js reads/writes
-// that JSONB store today; it does NOT use Prisma, and Prisma is not even a
-// dependency of this app (see package.json). This file is a design document
-// for a possible future relational rewrite. Table names below intentionally
-// reuse the same @@map names as the legacy JSONB tables (users, courses,
-// etc.) for readability — DO NOT ever run `prisma migrate`/`db push` against
-// the database the legacy JSONB store uses. Point it only at an isolated
-// database (see migrations/import-normalized.js's NORMALIZED_DB_URL).
+// STATUS (updated 2026-07-23): this normalized schema is now migrated into a
+// real Supabase Postgres database via DATABASE_URL/DIRECT_URL and is intended
+// to become the app's actual persistence going forward. IMPORTANT: store.js
+// has NOT been rewritten yet — it still only knows how to read/write the old
+// JSONB-blob shape (`(id BIGINT, data JSONB)` per collection, see
+// migrations/0001_legacy_store_schema.sql + migrations/import-json.js) via
+// db.js/store.js's "Postgres persistence" block, and does not use Prisma at
+// all. Do NOT run `migrations/run.js` (the legacy JSONB migration) or
+// `migrations/import-json.js` against this same DATABASE_URL — they would
+// create/expect a `(id, data)` shape that collides with the relational
+// tables Prisma now manages here under the same table names. The app will
+// not function against this database until store.js's persistence layer is
+// rewritten to query these normalized tables directly instead of JSON blobs.
 //
 // VERIFICATION METHOD: every model below was checked against the real
 // creation/mutation code in store.js and server.js (grep + line-level
@@ -52,8 +51,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("NORMALIZED_DATABASE_URL") // deliberately NOT DATABASE_URL — see header
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─────────────────────────────────────────────────────────────────

@@ -14,6 +14,10 @@
 
 const { LetterheadFlow, NAVY, MUTED } = require('./letterhead-flow');
 
+// Same constant as contract-pdf.js (same env var) so the named party can
+// never drift between a contract and the letter confirming it.
+const LEGAL_ENTITY = process.env.LEGAL_ENTITY_NAME || 'EchoLens (SMC-Private) Limited';
+
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
 function refNo(role, user) {

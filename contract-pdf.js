@@ -15,6 +15,12 @@ const { LetterheadFlow, NAVY, MUTED, GOLD } = require('./letterhead-flow');
 
 const val = (v) => (v && String(v).trim()) || '_______________________';
 
+// The registered legal entity name. Deliberately NOT derived from
+// settings.org: that field is an editable display name for certificates, and
+// renaming it must never silently alter the named party on a binding
+// contract. Override only via LEGAL_ENTITY_NAME if the registration changes.
+const LEGAL_ENTITY = process.env.LEGAL_ENTITY_NAME || 'EchoLens (SMC-Private) Limited';
+
 async function renderCover(flow, { tagline, settings, docTitle, docSubtitle }) {
   flow.page.drawText('E C H O L E N S   D I G I T A L', { x: 60, y: 620, size: 22, font: flow.bold, color: NAVY });
   flow.page.drawText(tagline, { x: 60, y: 598, size: 11, font: flow.italic, color: MUTED });
@@ -22,7 +28,7 @@ async function renderCover(flow, { tagline, settings, docTitle, docSubtitle }) {
   flow.y = 500;
   await flow.heading(docTitle, { size: 22, gapAfter: 8 });
   await flow.paragraph(docSubtitle, { size: 13, italic: true, gapAfter: 40 });
-  await flow.paragraph(`${settings.org || 'EchoLens Digital'} (SMC-Private) Limited`, { size: 12, bold: true, gapAfter: 2 });
+  await flow.paragraph(LEGAL_ENTITY, { size: 12, bold: true, gapAfter: 2 });
   await flow.paragraph(`SECP Registered  |  CUIN ${settings.cuin || '0342802'}  |  NTN ${settings.ntn || 'J372619'}`, { size: 9.5, color: MUTED, gapAfter: 2 });
   await flow.paragraph('Registered Office: Pakistan  |  echolens.digital', { size: 9.5, color: MUTED, gapAfter: 40 });
   await flow.paragraph('Document Version 2.0  |  Effective from date of signature', { size: 9, italic: true });
@@ -32,7 +38,7 @@ async function renderCover(flow, { tagline, settings, docTitle, docSubtitle }) {
 async function renderPartiesAndRecitals(flow, { role, user, profile, ambassador, settings, roleLabel }) {
   await flow.heading('PARTIES TO THIS AGREEMENT', { size: 13, gapAfter: 8 });
   await flow.paragraph(`This ${roleLabel} Agreement ("Agreement") is made and entered into by and between:`, { gapAfter: 8 });
-  await flow.paragraph(`(A) ECHOLENS DIGITAL (SMC-PRIVATE) LIMITED, a Single-Member Private Limited Company duly incorporated under the Companies Act, 2017 of the Islamic Republic of Pakistan, bearing Company Registration Number (CUIN) ${settings.cuin || '0342802'} and National Tax Number (NTN) ${settings.ntn || 'J372619'}, having its registered office in Pakistan (hereinafter referred to as "EchoLens", which expression shall, unless repugnant to the context, include its successors-in-interest, permitted assigns, and authorised representatives), of the FIRST PART;`, { gapAfter: 8 });
+  await flow.paragraph(`(A) ${LEGAL_ENTITY.toUpperCase()}, a Single-Member Private Limited Company duly incorporated under the Companies Act, 2017 of the Islamic Republic of Pakistan, bearing Company Registration Number (CUIN) ${settings.cuin || '0342802'} and National Tax Number (NTN) ${settings.ntn || 'J372619'}, having its registered office in Pakistan (hereinafter referred to as "EchoLens", which expression shall, unless repugnant to the context, include its successors-in-interest, permitted assigns, and authorised representatives), of the FIRST PART;`, { gapAfter: 8 });
   await flow.paragraph('AND', { bold: true, gapAfter: 8 });
   const role2 = role === 'ambassador' ? 'Ambassador' : 'Instructor';
   const extra = role === 'ambassador'

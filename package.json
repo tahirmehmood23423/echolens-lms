@@ -31,5 +31,8 @@
     "pg": "^8.22.0",
     "qrcode": "^1.5.4",
     "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "prisma": "^7.9.0"
   }
 }

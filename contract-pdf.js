@@ -360,14 +360,17 @@ async function renderAnnexures(flow, { role, settings }) {
   }
 }
 
-async function renderExecution(flow, { role, user, profile }) {
+async function renderExecution(flow, { role, user, profile, settings }) {
+  const ceoName = (settings && settings.ceo_name) || 'Tahir Mehmood';
   await flow.newPage();
   await flow.heading('EXECUTION', { size: 13, gapAfter: 8 });
   await flow.paragraph('IN WITNESS WHEREOF, the Parties have executed this Agreement on the dates set out below.', { gapAfter: 30 });
+  // The EchoLens side is executed digitally (typed authorised name above the
+  // rule); the counterparty signs their own column by hand.
   await flow.signatureBlock([
-    { x: 60, w: 210, name: 'Mr. Tahir Mehmood', title: 'Founder & Chief Executive Officer, EchoLens Digital' },
+    { x: 60, w: 210, name: ceoName, title: `Founder & Chief Executive Officer, ${LEGAL_ENTITY}`, signed: true },
     { x: 325, w: 210, name: val(user.name), title: role === 'ambassador' ? 'Ambassador' : 'Instructor' },
-  ]);
+  ], { height: 84 });
   flow.y -= 30;
   await flow.paragraph(`CNIC: ${val(profile.cnic)}          Date: _______________          Place: _______________`, { size: 9, gapAfter: 30 });
   await flow.heading('Witness (optional):', { size: 10, gapAfter: 20 });
@@ -391,7 +394,7 @@ async function generateContractPdf({ role, user, profile, ambassador, settings }
   const sections = isAmb ? ambassadorClauses({ user, profile, ambassador, settings }) : instructorClauses({ user, profile, settings });
   await renderSections(flow, sections);
   await renderAnnexures(flow, { role, settings });
-  await renderExecution(flow, { role, user, profile });
+  await renderExecution(flow, { role, user, profile, settings });
   return flow.save();
 }
 

@@ -132,32 +132,32 @@ class LetterheadFlow {
     }
     this.y -= gapAfter;
   }
-  // Two-column signature block (blank lines + printed names/titles).
+  // Two-column signature block. A column marked { signed: true } renders the
+  // EchoLens digital signature (typed name, no image) plus a note; unmarked
+  // columns stay blank for the counterparty to sign by hand.
   async signatureBlock(cols, { height = 70 } = {}) {
     await this.ensureSpace(height);
     const lineY = this.y;
     for (const c of cols) {
+      if (c.signed && c.name) this.signatureName(c.x, lineY, c.name);
       this.page.drawLine({ start: { x: c.x, y: lineY }, end: { x: c.x + c.w, y: lineY }, thickness: 1, color: NAVY });
       if (c.name) this.page.drawText(c.name, { x: c.x, y: lineY - 13, size: 9.5, font: this.bold, color: NAVY });
       if (c.title) this.page.drawText(c.title, { x: c.x, y: lineY - 25, size: 8.5, font: this.font, color: MUTED });
+      if (c.signed && c.name) {
+        this.page.drawText('Digitally signed - no wet-ink signature required', {
+          x: c.x, y: lineY - 36, size: 7, font: this.italic, color: MUTED,
+        });
+      }
     }
     this.y -= height;
     return lineY;
   }
-  // Draws a digital signature (an uploaded image if available, else an
-  // italic typed name - the same fallback certificates already use) sitting
-  // just above a signature line at (x, lineY).
-  async signatureImage(x, lineY, { imageBytes, name, width = 120, height = 34 } = {}) {
-    if (imageBytes) {
-      try {
-        const isPng = imageBytes[0] === 0x89;
-        const img = isPng ? await this.outDoc.embedPng(imageBytes) : await this.outDoc.embedJpg(imageBytes);
-        const dims = img.scaleToFit(width, height);
-        this.page.drawImage(img, { x, y: lineY + 2, width: dims.width, height: dims.height });
-        return;
-      } catch { /* fall through to typed name */ }
-    }
-    this.page.drawText(name || '', { x, y: lineY + 8, size: 22, font: this.italic, color: NAVY });
+  // The EchoLens digital signature: the authorised name itself, set in an
+  // italic script-style face just above the signature rule at (x, lineY).
+  // There is deliberately no image path - no scanned or hand signature is
+  // ever embedded in an EchoLens document.
+  signatureName(x, lineY, name, { size = 22 } = {}) {
+    this.page.drawText(String(name || ''), { x, y: lineY + 8, size, font: this.italic, color: NAVY });
   }
   async save() { return Buffer.from(await this.outDoc.save()); }
 }

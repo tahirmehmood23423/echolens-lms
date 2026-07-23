@@ -1891,7 +1891,7 @@ const Certificates = {
       serial: c.serial, student_name: c.student_name, reg_no: c.reg_no,
       kind: c.kind, title: c.title, detail: c.detail, completion_date: c.completion_date,
       instructor_name: c.instructor_name, instructor_sig: c.instructor_sig,
-      org: s.org, tagline: s.tagline, ceo_name: s.ceo_name, ceo_sig: s.ceo_sig,
+      org: s.org, tagline: s.tagline, ceo_name: s.ceo_name,
       concepts: c.concepts || [], final_project: c.final_project || null,
       issued_at: (c.issued_at || '').slice(0, 10),
     };
@@ -1903,7 +1903,7 @@ const Settings = {
     if (!data.settings) data.settings = empty().settings;
     const c = data.settings.cert;
     for (const k of ['org', 'ceo_name', 'tagline', 'ntn', 'cuin']) if (fields[k] !== undefined) c[k] = String(fields[k]).slice(0, 200);
-    if (fields.ceo_sig !== undefined) c.ceo_sig = fields.ceo_sig;
+    delete c.ceo_sig; // legacy signature-image field - never written again
     save();
     return c;
   },

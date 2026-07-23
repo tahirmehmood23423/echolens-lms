@@ -1133,13 +1133,10 @@ async function issueContract(user) {
   mailContract(user, pdfBuffer, deadline_at);
   return contract;
 }
-function ceoSignatureBytes() {
-  const s = Settings.cert();
-  if (!s.ceo_sig) return null;
-  try { return fs.readFileSync(path.join(UPLOAD_DIR, path.basename(s.ceo_sig))); } catch { return null; }
-}
 async function issueOfferLetter(user, contract) {
-  const settings = { ...Settings.cert(), ceo_sig_bytes: ceoSignatureBytes() };
+  // The CEO signature is always the typed authorised name (see
+  // letterhead-flow.signatureName) - never an uploaded image.
+  const settings = Settings.cert();
   const profile = user.profile || {};
   const ambassador = user.role === 'ambassador' ? Ambassadors.byUserId(user.id) : null;
   const pdfBuffer = await generateOfferLetterPdf({ role: user.role, user, profile, ambassador, settings });
@@ -2443,16 +2440,12 @@ app.get('/api/batches/:id/at-risk', authRequired, viewBatch, staffView, (req, re
 });
 
 /* --------------------------- QR verified certificates --------------------------- */
-// Certificate settings: official organisation name, tagline, CEO name and
-// CEO signature image. Admin-only.
+// Certificate settings: official organisation name, tagline and CEO name.
+// The CEO signature is always the typed name, never an uploaded image -
+// there is deliberately no signature-upload route.
 app.get('/api/admin/cert-settings', authRequired, teacherOrAdmin, (req, res) => res.json({ settings: Settings.cert() }));
 app.post('/api/admin/cert-settings', authRequired, adminRequired, (req, res) => {
   res.json({ ok: true, settings: Settings.setCert(req.body || {}) });
-});
-app.post('/api/admin/cert-settings/ceo-signature', authRequired, adminRequired, upload.single('file'), (req, res) => {
-  if (!requireImage(req, res, 1)) return;
-  const settings = Settings.setCert({ ceo_sig: `/uploads/${req.file.filename}` });
-  res.json({ ok: true, settings });
 });
 // Issue one certificate (course completion / hackathon / competition).
 app.post('/api/certificates/issue', authRequired, teacherOrAdmin, (req, res) => {
@@ -2539,12 +2532,13 @@ app.get('/api/verify-challan/:serial', (req, res) => {
   if (!c) return res.status(404).json({ valid: false, error: 'No challan exists for this serial.' });
   res.json({ valid: true, challan: Challans.publicView(c), verify_url: `${APP_URL}/challan?s=${c.serial}` });
 });
-// Signature images must be publicly visible on the certificate page.
+// Instructor signature images must be publicly visible on the certificate
+// page. The CEO signature is never an image (always the typed name), so it
+// is deliberately not in this allow-list.
 app.get('/api/public/cert-image/:name', (req, res) => {
   const name = path.basename(String(req.params.name));
   const full = path.join(UPLOAD_DIR, name);
-  const c = Settings.cert();
-  const allowed = new Set([c.ceo_sig, ...store.allData().certificates.map((x) => x.instructor_sig)].filter(Boolean).map((u) => path.basename(u)));
+  const allowed = new Set(store.allData().certificates.map((x) => x.instructor_sig).filter(Boolean).map((u) => path.basename(u)));
   if (!allowed.has(name) || !fs.existsSync(full)) return res.status(404).send('Not found');
   res.sendFile(full);
 });

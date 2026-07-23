@@ -6,8 +6,9 @@
  * (assets/letterhead.pdf), modeled on the Ref No/Date -> TO/Subject ->
  * greeting -> body -> signature -> verification-footer structure EchoLens
  * already uses for its internship offer letters, but with the CEO's
- * signature applied digitally (an uploaded signature image, falling back to
- * an italic typed name) rather than requiring a wet-ink signature each time.
+ * signature applied digitally (the typed authorised name in an italic face)
+ * rather than requiring a wet-ink signature each time. No scanned or hand
+ * signature image is ever embedded in this document.
  * Auto-generated the moment a signed contract zip is submitted - see
  * issueOfferLetter() in server.js.
  */
@@ -73,14 +74,15 @@ async function generateOfferLetterPdf({ role, user, profile, ambassador, setting
   await flow.paragraph('Yours sincerely,', { gapAfter: 46 });
   const sigX = 60;
   const lineY = flow.y;
-  await flow.signatureImage(sigX, lineY + 4, { imageBytes: settings.ceo_sig_bytes, name: settings.ceo_name || 'Tahir Mehmood', width: 130, height: 36 });
+  flow.signatureName(sigX, lineY, settings.ceo_name || 'Tahir Mehmood');
   flow.page.drawLine({ start: { x: sigX, y: lineY }, end: { x: sigX + 200, y: lineY }, thickness: 1, color: NAVY });
   flow.page.drawText(settings.ceo_name || 'Tahir Mehmood', { x: sigX, y: lineY - 13, size: 10, font: flow.bold, color: NAVY });
-  flow.page.drawText(`Founder & Chief Executive Officer, ${settings.org || 'EchoLens Digital'}`, { x: sigX, y: lineY - 26, size: 9, font: flow.font, color: MUTED });
-  flow.y = lineY - 50;
+  flow.page.drawText(`Founder & Chief Executive Officer, ${LEGAL_ENTITY}`, { x: sigX, y: lineY - 26, size: 9, font: flow.font, color: MUTED });
+  flow.page.drawText('Digitally signed - no wet-ink signature required', { x: sigX, y: lineY - 37, size: 7, font: flow.italic, color: MUTED });
+  flow.y = lineY - 58;
 
   await flow.rule({ gapAfter: 10 });
-  await flow.paragraph(`This is an officially issued document by EchoLens Digital (SMC-Private) Limited - CUIN ${settings.cuin || '0342802'}, NTN ${settings.ntn || 'J372619'}. For verification, contact ceo@echolens.digital.`, { size: 8, italic: true, color: MUTED, gapAfter: 0 });
+  await flow.paragraph(`This is an officially issued document by ${LEGAL_ENTITY} - CUIN ${settings.cuin || '0342802'}, NTN ${settings.ntn || 'J372619'}. For verification, contact ceo@echolens.digital.`, { size: 8, italic: true, color: MUTED, gapAfter: 0 });
 
   return flow.save();
 }

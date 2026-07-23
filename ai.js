@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * EchoLens AI copilot - provider layer (v9)
+ * EchoLens Digital - AI copilot - provider layer (v9)
  *
  * Teacher-facing only. Free-tier friendly by design:
  *  - Providers: Google Gemini (default) or Groq. Swap with one env var.

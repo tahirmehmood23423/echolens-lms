@@ -1,7 +1,7 @@
 {
   "name": "echolens-lms",
   "version": "11.0.0",
-  "description": "EchoLens Learning Management System - gamified learning portal",
+  "description": "EchoLens Digital LMS - gamified learning portal",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

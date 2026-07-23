@@ -2083,7 +2083,7 @@ function shareCertLinkedIn(serial, title, date, org) {
   const y = (date || '').slice(0, 4), m = Number((date || '').slice(5, 7)) || 1;
   const add = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'
     + '&name=' + encodeURIComponent(title)
-    + '&organizationName=' + encodeURIComponent(org || 'EchoLens Academy')
+    + '&organizationName=' + encodeURIComponent(org || 'EchoLens Digital')
     + '&issueYear=' + y + '&issueMonth=' + m
     + '&certUrl=' + encodeURIComponent(url) + '&certId=' + encodeURIComponent(serial);
   window.open(add, '_blank');
@@ -4242,7 +4242,7 @@ function formHackRegister(hid) {
 function formHackathon() {
   openModal('New hackathon', `
     <form id="f">
-      <label class="field"><span>Title</span><input name="title" required placeholder="e.g. EchoLens AI Build Night"></label>
+      <label class="field"><span>Title</span><input name="title" required placeholder="e.g. EchoLens Build Night"></label>
       <label class="field"><span>Theme &amp; rules</span><textarea name="theme"></textarea></label>
       <div class="form-grid">
         <label class="field"><span>Starts</span><input name="starts_at" type="datetime-local" required></label>
@@ -5475,11 +5475,11 @@ function formIssueAllCerts() {
   });
 }
 async function formCertSettings() {
-  let s = { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', tagline: '', ntn: '', cuin: '' };
+  let s = { org: 'EchoLens Digital', ceo_name: 'Tahir Mehmood', tagline: '', ntn: '', cuin: '' };
   try { s = (await api('/api/admin/cert-settings')).settings; } catch {}
   openModal('Certificate settings', `
     <form id="f">
-      <label class="field"><span>Official company / academy name</span><input name="org" required value="${esc(s.org || '')}"></label>
+      <label class="field"><span>Official company name</span><input name="org" required value="${esc(s.org || '')}"></label>
       <label class="field"><span>Tagline (under the name)</span><input name="tagline" value="${esc(s.tagline || '')}"></label>
       <label class="field"><span>CEO full name</span><input name="ceo_name" value="${esc(s.ceo_name || '')}" placeholder="Appears as the typed signature on every certificate, contract and offer letter"></label>
       <div class="form-grid">

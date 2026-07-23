@@ -54,8 +54,11 @@ const empty = () => ({
   // Talent Marketplace (Phase 1+)
   companies: [], audit_log: [],
   settings: {
-    cert: { org: 'EchoLens Academy', ceo_name: 'Tahir Mehmood', ceo_sig: null, tagline: 'Gamified Learning, Real Skills', ntn: 'J372619', cuin: '0342802' },
-    bank: { bank_name: 'Meezan Bank', account_title: 'EchoLens Digital (Pvt) Ltd', account_number: '0123-4567890-123', iban: 'PK36 MEZN 0000 0123 4567 8901', branch: 'Gulberg Branch, Lahore' },
+    // The CEO signature is always rendered as the typed name (see cert-image.js
+    // and letterhead-flow.signatureName) - there is deliberately no signature
+    // image field here, so no scanned/hand signature can ever be attached.
+    cert: { org: 'EchoLens Digital', ceo_name: 'Tahir Mehmood', tagline: 'Innovate · Educate · Elevate', ntn: 'J372619', cuin: '0342802' },
+    bank: { bank_name: 'Meezan Bank', account_title: 'EchoLens (SMC-Private) Limited', account_number: '0123-4567890-123', iban: 'PK36 MEZN 0000 0123 4567 8901', branch: 'Gulberg Branch, Lahore' },
     // Gems awarded to an ambassador when a student they referred is actually
     // enrolled into a batch (not just at interest-registration), weighted by
     // how hard that course category is to sell.
@@ -255,6 +258,16 @@ function migrate() {
   if (!data.settings.ambassador_gem_rates) { data.settings.ambassador_gem_rates = empty().settings.ambassador_gem_rates; changed = true; }
   if (data.settings.cert && data.settings.cert.ntn === undefined) { data.settings.cert.ntn = empty().settings.cert.ntn; changed = true; }
   if (data.settings.cert && data.settings.cert.cuin === undefined) { data.settings.cert.cuin = empty().settings.cert.cuin; changed = true; }
+  // v19: single brand name. Databases seeded before this carry legacy org
+  // names ("EchoLens Academy", "EchoLens AI Academy") that print on every
+  // certificate, contract and offer letter - rewrite them once, in place.
+  if (data.settings.cert) {
+    const LEGACY_ORG = /^echolens\s*(ai\s*)?(academy|lms|learning)?$/i;
+    const org = String(data.settings.cert.org || '').trim();
+    if (!org || LEGACY_ORG.test(org)) { data.settings.cert.org = 'EchoLens Digital'; changed = true; }
+    // v19: the CEO signature is the typed name only - drop any stored image.
+    if (data.settings.cert.ceo_sig !== undefined) { delete data.settings.cert.ceo_sig; changed = true; }
+  }
   if (!Array.isArray(data.contracts)) { data.contracts = []; changed = true; }
   if (data.seq.contracts === undefined) { data.seq.contracts = 0; changed = true; }
   // Ambassadors Portal: existing referral-only ambassador rows get a gems

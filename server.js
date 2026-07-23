@@ -278,6 +278,47 @@ const isEmail = (s) => typeof s === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.tes
 const hi = (name) => `Hi ${String(name || '').trim().split(/\s+/)[0] || 'there'}`;
 
 /* --------------------------------- auth --------------------------------- */
+// Generic in-memory IP rate limiter for unauthenticated endpoints. Public
+// POST routes are the whole abuse surface of this app: two of them send an
+// email on every call, and the rest write a row. Without a cap, a single
+// script can burn the SMTP quota (and the sending domain's reputation) or
+// flood the leads table.
+const RATE_BUCKETS = new Map(); // name -> Map(ip -> { count, first })
+function rateLimit(name, { max, windowMs, message }) {
+  if (!RATE_BUCKETS.has(name)) RATE_BUCKETS.set(name, new Map());
+  const bucket = RATE_BUCKETS.get(name);
+  return function limiter(req, res, next) {
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    const now = Date.now();
+    let rec = bucket.get(ip);
+    if (!rec || now - rec.first > windowMs) rec = { count: 0, first: now };
+    rec.count += 1;
+    bucket.set(ip, rec);
+    if (rec.count > max) {
+      const mins = Math.max(1, Math.ceil((rec.first + windowMs - now) / 60000));
+      res.setHeader('Retry-After', String(mins * 60));
+      return res.status(429).json({ error: message || `Too many requests. Please try again in about ${mins} minute${mins === 1 ? '' : 's'}.` });
+    }
+    next();
+  };
+}
+// Deliberately generous: these must never block a real person filling in a
+// form twice, only a script hammering the endpoint.
+const limitEmailSend = rateLimit('email-send', { max: 5, windowMs: 15 * 60 * 1000, message: 'Too many verification emails requested. Please wait a few minutes and try again.' });
+const limitSignup = rateLimit('signup', { max: 10, windowMs: 60 * 60 * 1000, message: 'Too many sign-up attempts from this network. Please try again later.' });
+const limitLead = rateLimit('lead', { max: 20, windowMs: 60 * 60 * 1000, message: 'Too many submissions from this network. Please try again later.' });
+
+// Drop expired entries from every throttle map every 10 minutes.
+setInterval(() => {
+  const now = Date.now();
+  for (const [, bucket] of RATE_BUCKETS) {
+    for (const [ip, rec] of bucket) if (now - rec.first > 60 * 60 * 1000) bucket.delete(ip);
+  }
+  for (const [ip, rec] of LOGIN_ATTEMPTS) {
+    if (now - rec.first > LOGIN_WINDOW_MS && (!rec.blockedUntil || rec.blockedUntil < now)) LOGIN_ATTEMPTS.delete(ip);
+  }
+}, 10 * 60 * 1000).unref();
+
 // Simple in-memory brute-force throttle: after too many failed attempts from
 // one IP within the window, further attempts are refused until it cools down.
 // Successful logins reset the counter. No external dependency needed.
@@ -346,7 +387,7 @@ app.get('/api/auth/me', authRequired, (req, res) => {
  * in-memory - the same lightweight pattern as EMAIL_CODES below. */
 const RESET_TOKENS = new Map(); // token -> { userId, expires }
 function pruneResetTokens() { const t = Date.now(); for (const [k, v] of RESET_TOKENS) if (v.expires < t) RESET_TOKENS.delete(k); }
-app.post('/api/auth/forgot-password', async (req, res) => {
+app.post('/api/auth/forgot-password', limitEmailSend, async (req, res) => {
   const { email } = req.body || {};
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   pruneResetTokens();
@@ -2099,7 +2140,8 @@ app.post('/api/admin/catalogue/load-official', authRequired, adminRequired, (req
 const OPEN_LEVELS = Number(process.env.OPEN_LEVELS || 1); // catalogue: Level 1 of every paid course is free; free tracks open fully
 // Newsletter sign-up from the landing page: every email becomes a lead the
 // admin can download. No account is created and nothing is emailed back.
-app.post('/api/public/subscribe', (req, res) => {
+app.post('/api/public/subscribe', limitLead, (req, res) => {
+  if ((req.body || {}).company) return res.json({ ok: true }); // honeypot: bots fill it, humans never see it
   const email = String((req.body || {}).email || '').trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   Leads.upsert({ name: email.split('@')[0], email, source: 'newsletter' });
@@ -2553,7 +2595,7 @@ app.get('/api/public/cert-image/:name', (req, res) => {
 // a password and emails it there, so the working inbox is confirmed for a
 // second time by the one place the credentials can ever be read from. Every
 // open user also becomes a lead the admin can download.
-app.post('/api/auth/register-open', async (req, res) => {
+app.post('/api/auth/register-open', limitSignup, async (req, res) => {
   const { name, email, whatsapp, code } = req.body || {};
   if (!name || String(name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
@@ -2609,7 +2651,7 @@ function isOptionalUrl(s) {
   try { return ['http:', 'https:'].includes(new URL(String(s)).protocol); } catch { return false; }
 }
 
-app.post('/api/recruiters/signup', async (req, res) => {
+app.post('/api/recruiters/signup', limitSignup, async (req, res) => {
   const { full_name, work_email, company_name, company_website, designation, city, company_size_band, hiring_note, override_requested, override_reason } = req.body || {};
   if (!full_name || String(full_name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
   if (!isEmail(work_email)) return res.status(400).json({ error: 'Enter a valid work email address.' });
@@ -3055,7 +3097,7 @@ async function emailDomainExists(email) {
   }
 }
 const EMAIL_CODES = new Map(); // email -> { code, expires, tries }
-app.post('/api/auth/email-code', async (req, res) => {
+app.post('/api/auth/email-code', limitEmailSend, async (req, res) => {
   const { email } = req.body || {};
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
@@ -3143,7 +3185,7 @@ app.delete('/api/jobs/comments/:id', authRequired, (req, res) => {
 });
 
 /* ------------------- in-site course registration (item 6) ------------------- */
-app.post('/api/public/register-interest', async (req, res) => {
+app.post('/api/public/register-interest', limitLead, async (req, res) => {
   const b = req.body || {};
   if (b.company) return res.json({ ok: true }); // honeypot field: bots fill it, humans never see it
   if (!b.name || String(b.name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });

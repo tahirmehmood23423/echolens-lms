@@ -18,3 +18,7 @@ backups/
 
 # Dependencies
 node_modules/
+
+# Build/QA scratch
+_gendocs.js
+_verify.js

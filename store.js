@@ -765,12 +765,52 @@ function badgesFor(u) {
   }
   return out;
 }
+// The gem ledger the student sees. Gems are earned from four places, but
+// only manual awards and streak bonuses were ever written to gem_events - so
+// a student could be graded 90% on a quest, watch their total jump, and see
+// an empty activity feed. This merges all four sources into one time-ordered
+// view.
+//
+// IMPORTANT: this is a read-only projection. It must never write gem_events
+// for quest/assignment gems, because totalGemsForStudent() already counts
+// those from their own tables - recording them again would double every
+// student's balance.
+function gemLedger(uid) {
+  const id = Number(uid);
+  const out = GemEvents.forStudent(id).map((e) => ({
+    at: e.at, amount: e.amount, source: e.source, note: e.note, batch_id: e.batch_id || null,
+  }));
+  for (const s of data.quest_submissions) {
+    if (s.user_id !== id || !s.gems || s.graded_at == null) continue;
+    const q = data.quests.find((x) => x.id === s.quest_id);
+    const p = q && q.problems ? q.problems.find((x) => x.pid === s.pid) : null;
+    out.push({
+      at: s.graded_at, amount: s.gems, source: 'quest',
+      note: p && p.title ? `${p.title}${q ? ` (Level ${q.no})` : ''} - graded ${s.grade}%` : `Quest task graded ${s.grade}%`,
+      batch_id: q ? q.batch_id : null,
+    });
+  }
+  for (const s of data.open_submissions) {
+    if (s.user_id !== id || !s.gems || s.graded_at == null) continue;
+    out.push({ at: s.graded_at, amount: s.gems, source: 'open_quest', note: `Free course task graded ${s.grade}%`, batch_id: null });
+  }
+  for (const s of data.submissions) {
+    if (s.user_id !== id || !s.gems || s.graded_at == null) continue;
+    const a = data.assignments.find((x) => x.id === s.assignment_id);
+    out.push({
+      at: s.graded_at, amount: s.gems, source: 'assignment',
+      note: a && a.title ? `${a.title} - graded ${s.grade}%` : `Assignment graded ${s.grade}%`,
+      batch_id: a ? a.batch_id : null,
+    });
+  }
+  return out.sort((x, y) => String(x.at).localeCompare(String(y.at)));
+}
 function gamifyFor(u) {
   const gems = totalGemsForStudent(u.id);
   return {
     gems, stage: stageFor(gems), streak: u.streak || 0, best_streak: u.best_streak || 0,
     badges: badgesFor(u), stages: STAGES,
-    recent_events: GemEvents.forStudent(u.id).slice(-6).reverse(),
+    recent_events: gemLedger(u.id).slice(-6).reverse(),
   };
 }
 
@@ -3339,7 +3379,7 @@ module.exports = {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, learningPaths: () => LEARNING_PATHS, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
-  stageFor, gemLevel, gamifyFor, touchActivity, STAGES,
+  stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,

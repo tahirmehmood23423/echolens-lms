@@ -14,15 +14,30 @@
  * This script does NOT fix anything and does NOT write anything (no file,
  * no database write — it doesn't even open a Postgres connection). It
  * only reads the JSON file and schema.prisma, computes per-field presence
- * statistics for every collection, and prints:
+ * AND type statistics for every collection, and prints:
  *   1. A human-readable report per collection: which fields are present
  *      in every record (safe to keep required) vs. only some (must be
  *      optional in the schema) vs. present in the data but not modeled
- *      in schema.prisma at all (must be added as a new field).
+ *      in schema.prisma at all (must be added as a new field); PLUS which
+ *      fields hold a JS value type that doesn't match their declared
+ *      Prisma type (e.g. a String? column that actually holds numbers on
+ *      some rows) — presence/nullability and type are independent axes,
+ *      a field can be "always present" and still be wrongly typed.
  *   2. The same information as a single machine-readable JSON blob at the
  *      end, wrapped in ===JSON REPORT START/END=== markers, so it can be
  *      pasted back and parsed programmatically rather than re-derived by
  *      hand from prose.
+ *
+ * Type mismatches come in two flavors, reported separately:
+ *   - Single mismatch: every real value is consistently ONE type, and it
+ *     doesn't match the schema (e.g. always a number, declared String?) -
+ *     safe to correct the schema's declared type.
+ *   - Mixed: real values are genuinely a MIX of types across rows (e.g.
+ *     some numeric, some string) - this is NOT auto-corrected to anything.
+ *     It's flagged as needing a human decision (could mean two logically
+ *     different things got stored under one field name over the app's
+ *     history), same as schema.prisma's own certificates.source_id
+ *     comment already describes.
  *
  * MUST RUN ON RENDER, VIA SHELL: the real data only exists on the web
  * service's persistent Disk (/data/echolens.json), and — like
@@ -119,6 +134,30 @@ function parseSchema(text) {
   return byTable;
 }
 
+/** Classifies one non-null JS value into the category used for type-mismatch checking. */
+function jsCategory(v) {
+  if (Array.isArray(v) || typeof v === 'object') return 'json';
+  if (typeof v === 'number') return Number.isInteger(v) ? 'int' : 'float';
+  if (typeof v === 'boolean') return 'boolean';
+  if (typeof v === 'string') return 'string';
+  return typeof v;
+}
+
+// Which observed categories are considered a MATCH for a given declared
+// Prisma type. Int accepts a float observation too (still numeric - a
+// under-inference risk, not a real mismatch); Float accepts int (a whole
+// number is still a valid float). Json accepts everything - any JS value
+// is legal in a Json column, so it's never flagged as a type mismatch here
+// (the presence/optionality check already covers it separately).
+const TYPE_MATCH = {
+  String: new Set(['string']),
+  Int: new Set(['int', 'float']),
+  Float: new Set(['int', 'float']),
+  Boolean: new Set(['boolean']),
+  DateTime: new Set(['string']), // dates arrive as strings in the JSON store; actual parseability is checked separately at import time
+  Json: new Set(['json', 'string', 'int', 'float', 'boolean']),
+};
+
 function inferType(values) {
   const types = new Set();
   let allIntegers = true;
@@ -169,14 +208,20 @@ function main() {
     const schemaDef = schemaByTable[key];
     const schemaColumns = schemaDef ? schemaDef.columns : {};
 
-    const stats = {}; // column -> { present, nonNull, values: [] (sampled) }
+    const stats = {}; // column -> { present, nonNull, sample: [] (capped, for type inference), typeCounts: {category: n}, typeSamples: {category: [examples]} }
     for (const rec of records) {
       for (const col of Object.keys(rec)) {
-        if (!stats[col]) stats[col] = { present: 0, nonNull: 0, sample: [] };
-        stats[col].present += 1;
+        if (!stats[col]) stats[col] = { present: 0, nonNull: 0, sample: [], typeCounts: {}, typeSamples: {} };
+        const st = stats[col];
+        st.present += 1;
         if (rec[col] !== null) {
-          stats[col].nonNull += 1;
-          if (stats[col].sample.length < 20) stats[col].sample.push(rec[col]);
+          st.nonNull += 1;
+          if (st.sample.length < 20) st.sample.push(rec[col]);
+          // Full sweep, not sampled - a mismatch on even 1 row out of thousands still breaks that row's import.
+          const cat = jsCategory(rec[col]);
+          st.typeCounts[cat] = (st.typeCounts[cat] || 0) + 1;
+          if (!st.typeSamples[cat]) st.typeSamples[cat] = [];
+          if (st.typeSamples[cat].length < 3) st.typeSamples[cat].push(rec[col]);
         }
       }
     }
@@ -187,6 +232,8 @@ function main() {
     const alreadyOptionalOk = [];
     const missingFromSchema = [];
     const neverPresentInData = [];
+    const typeMismatches = []; // consistently one wrong type - safe to correct
+    const mixedTypeFields = []; // genuinely more than one type across rows - needs a human decision
 
     const colReport = {};
     for (const col of allColumns) {
@@ -197,6 +244,23 @@ function main() {
       const fullyPresent = total > 0 && nonNull === total;
 
       const entry = { present, nonNull, total, percent: pct(nonNull, total), inSchema };
+
+      // Type check runs independently of the presence/optionality branch below -
+      // a field can be fully present AND wrongly typed at the same time.
+      if (st && inSchema) {
+        const declaredType = schemaColumns[col].type;
+        const acceptable = TYPE_MATCH[declaredType] || new Set();
+        const observedCats = Object.keys(st.typeCounts);
+        const badCats = observedCats.filter((c) => !acceptable.has(c));
+        if (badCats.length) {
+          const distribution = observedCats.map((c) => ({ category: c, count: st.typeCounts[c], samples: st.typeSamples[c] }));
+          const mixed = observedCats.length > 1;
+          entry.typeCheck = { declaredType, distribution, mixed };
+          const rec = { col, field: schemaColumns[col].field, declaredType, distribution };
+          if (mixed) mixedTypeFields.push(rec);
+          else typeMismatches.push({ ...rec, observedCategory: badCats[0] });
+        }
+      }
 
       if (!st) {
         // In schema, never appears in any real record.
@@ -227,10 +291,24 @@ function main() {
     jsonReport.collections[key] = { total, modelName: schemaDef ? schemaDef.modelName : null, columns: colReport };
 
     // Only print collections that actually need attention, or have no schema match, to keep the report scannable.
-    const needsAttention = mustBecomeOptional.length || missingFromSchema.length || !schemaDef;
+    const needsAttention = mustBecomeOptional.length || missingFromSchema.length || typeMismatches.length || mixedTypeFields.length || !schemaDef;
     if (!needsAttention) continue;
 
     console.log(`\n--- ${key} (${total} records)${schemaDef ? ` -> model ${schemaDef.modelName}` : ' -- NO MATCHING MODEL'} ---`);
+    if (typeMismatches.length) {
+      console.log(`  TYPE MISMATCH (every value is consistently one type, but it doesn't match the schema - safe to correct):`);
+      for (const f of typeMismatches) {
+        const d = f.distribution[0];
+        console.log(`    ${f.field} (${f.col})  declared ${f.declaredType}  ->  actual values are all ${f.observedCategory} (${d.count})   e.g. ${JSON.stringify(d.samples)}`);
+      }
+    }
+    if (mixedTypeFields.length) {
+      console.log(`  !! MIXED TYPES (needs a human decision, NOT auto-converted):`);
+      for (const f of mixedTypeFields) {
+        console.log(`    ${f.field} (${f.col})  declared ${f.declaredType}:`);
+        for (const d of f.distribution) console.log(`        ${d.category}: ${d.count} row(s), e.g. ${JSON.stringify(d.samples)}`);
+      }
+    }
     if (mustBecomeOptional.length) {
       console.log(`  MUST become optional (required in schema, but missing/null on some real rows):`);
       for (const f of mustBecomeOptional) {
@@ -257,16 +335,21 @@ function main() {
   console.log('='.repeat(78));
   let totalMakeOptional = 0;
   let totalAddField = 0;
+  let totalTypeMismatch = 0;
+  let totalMixedType = 0;
   for (const [key, c] of Object.entries(jsonReport.collections)) {
     for (const col of Object.values(c.columns)) {
       if (col.action === 'make_optional') totalMakeOptional += 1;
       if (col.action === 'add_field') totalAddField += 1;
+      if (col.typeCheck) { if (col.typeCheck.mixed) totalMixedType += 1; else totalTypeMismatch += 1; }
     }
   }
   console.log(`Fields that must become optional: ${totalMakeOptional}`);
   console.log(`Fields missing from schema entirely: ${totalAddField}`);
+  console.log(`Fields with a single wrong type (safe to correct): ${totalTypeMismatch}`);
+  console.log(`Fields with genuinely mixed types (needs a decision): ${totalMixedType}`);
   console.log(`Unknown collections (no model at all): ${unknownCollections.length}`);
-  if (!totalMakeOptional && !totalAddField && !unknownCollections.length) {
+  if (!totalMakeOptional && !totalAddField && !totalTypeMismatch && !totalMixedType && !unknownCollections.length) {
     console.log('No drift found - schema.prisma already matches the real data.');
   }
 

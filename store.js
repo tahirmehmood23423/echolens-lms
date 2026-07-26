@@ -200,6 +200,58 @@ async function loadFromPostgres() {
 }
 
 /**
+ * NORMALIZED read path (2026-07-26) - reads the real Prisma-managed schema
+ * (schema.prisma / the 58 normalized tables migrations/import-prisma.js
+ * populated), NOT the old `(id, data)` JSONB-blob shape loadFromPostgres()
+ * above targets. Converts every row back into the exact snake_case,
+ * string-dated shape store.js's `data.<collection>` entries have always had
+ * (see schema-map.js's rowFromPrisma - the formal inverse of
+ * migrations/import-prisma.js's buildRow), so every read-side function in
+ * this file (gem sums, leaderboards, badge computation, N+1 joins, all of
+ * it) keeps running completely unchanged against the result.
+ *
+ * NOT YET WIRED IN: initFromPostgres() below still takes the JSON-file
+ * path unconditionally. This function is built and independently tested
+ * (see the test harness used during Batch 1 review) but deliberately not
+ * called from the real boot sequence yet - wiring it in without the write
+ * path (save() still only knows how to write the JSON file) would mean
+ * every boot re-pulls from Postgres and silently discards any write made
+ * since the last restart. It gets wired in together with the write engine.
+ */
+async function loadFromPostgresNormalized() {
+  const schemaMap = require('./schema-map');
+  const { getPrismaClient } = require('./prisma-client');
+  const prisma = getPrismaClient();
+
+  const next = empty();
+  for (const [key, table, model, columns] of schemaMap.COLLECTIONS) {
+    const rows = await prisma[model].findMany({ orderBy: { id: 'asc' } });
+    next[key] = rows.map((r) => schemaMap.rowFromPrisma(table, columns, r));
+    // The highest id EVER issued, not just the highest currently present -
+    // matches nextId()'s own invariant (a deleted row's id is never
+    // reissued). Postgres's own serial sequence is the authoritative source
+    // for this once the write path generates ids there instead of via
+    // nextId() (a later batch's decision); for a pure read/boot load, the
+    // max of what's actually present is the closest available proxy and is
+    // never wrong in the only direction that matters (it never UNDERcounts
+    // a live id, since nothing has been deleted between import and boot).
+    next.seq[key] = next[key].reduce((max, r) => Math.max(max, r.id), 0);
+  }
+
+  const seqRows = await prisma.seq.findMany();
+  for (const r of seqRows) next.seq[r.name] = Math.max(next.seq[r.name] || 0, r.value);
+  const issuedUsernameRows = await prisma.issuedUsername.findMany();
+  next.issued_usernames = issuedUsernameRows.map((r) => r.value);
+  const issuedRegnoRows = await prisma.issuedRegno.findMany();
+  next.issued_regnos = issuedRegnoRows.map((r) => r.value);
+  const settingRows = await prisma.setting.findMany();
+  for (const r of settingRows) next.settings[r.key] = r.value;
+
+  data = next;
+  fillDefaultsAndMigrate();
+}
+
+/**
  * Boot entry point. No-op (JSON file store, unchanged) when DATABASE_URL
  * isn't set. Otherwise runs any pending schema migrations, then refuses
  * to boot against an empty Postgres database if the JSON file has
@@ -3410,6 +3462,10 @@ module.exports = {
   seed, DB_PATH, allData: () => data,
   initFromPostgres, pendingPersist,
   isUsingPostgres: () => db.enabled() && LEGACY_STORE_ON_POSTGRES,
+  // Not yet called from initFromPostgres (see that function's Batch 1 note
+  // above) - exported so it can be exercised directly for testing/manual
+  // reload ahead of being wired into the real boot path in a later batch.
+  loadFromPostgresNormalized,
 };
 
 if (require.main === module && process.argv.includes('--seed')) seed();

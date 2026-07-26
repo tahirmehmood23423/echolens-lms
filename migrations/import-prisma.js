@@ -275,13 +275,25 @@ const JSON_COLUMNS_BY_TABLE = {
 // now()-style full-timestamp columns ("YYYY-MM-DD HH:MM:SS" -> DateTime).
 // Columns not in this set that still look like dates (deadline, due_date,
 // start_date, session_date, starts_at/ends_at on hackathons) are left as
-// plain strings, matching their String columns in schema.prisma.
+// plain strings, matching their String columns in schema.prisma. Verified
+// against schema.prisma + store.js by a full cross-check of every column
+// this script touches against every column's declared type (2026-07-26) -
+// caught staff_records.joined_at (below) and added offer_letter_sent_at,
+// which was simply missing from this list despite being a real now()
+// column (Contracts.markOfferLetterSent, store.js:2253).
 const TIMESTAMP_COLUMNS = new Set([
   'created_at', 'updated_at', 'last_active', 'submitted_at', 'graded_at', 'review_shared_at', 'at', 'issued_at',
   'joined_at', 'last_seen', 'last_read_at', 'registered_at', 'added_at', 'started_at', 'ended_at', 'generated_at',
   'sent_at', 'paid_confirmed_at', 'cleared_at', 'completed_at', 'approved_at', 'published_at', 'taken_at',
-  'judged_at', 'reviewed_at', 'opened_at', 'closes_at',
+  'judged_at', 'reviewed_at', 'opened_at', 'closes_at', 'offer_letter_sent_at',
 ]);
+// Column-name collisions: the same JSON key means something different on a
+// different table. `joined_at` is a real now()-built timestamp on
+// Attendance (store.js:1786) but a date-only today()-built string on
+// StaffRecord (store.js:3321, StaffRecord.joinedAt is declared String, not
+// DateTime) - TIMESTAMP_COLUMNS can't represent "convert on this table,
+// not that one" on its own, so carve the exception out here instead.
+const TIMESTAMP_COLUMN_EXCLUSIONS_BY_TABLE = { staff_records: new Set(['joined_at']) };
 // Event.starts_at/ends_at are a raw "YYYY-MM-DDTHH:MM" datetime-local string
 // (no seconds/offset) straight from the browser's <input type="datetime-local">
 // — store.js never attached a timezone to it (schema.prisma's header confirms
@@ -351,6 +363,7 @@ function buildRow(table, columns, rec, idx, collKey) {
   const row = {};
   const jsonCols = JSON_COLUMNS_BY_TABLE[table];
   const localDateCols = LOCAL_DATETIME_COLUMNS_BY_TABLE[table];
+  const timestampExclusions = TIMESTAMP_COLUMN_EXCLUSIONS_BY_TABLE[table];
   for (const col of columns) {
     const raw = rec[col];
     if (raw === undefined) continue; // omit -> let Prisma apply the schema default / NULL
@@ -363,7 +376,7 @@ function buildRow(table, columns, rec, idx, collKey) {
       // explicitly rather than trust system-local parsing (see
       // LOCAL_DATETIME_OFFSET comment above).
       row[field] = raw == null ? null : assertValidDate(new Date(`${raw}:00${LOCAL_DATETIME_OFFSET}`), `${collKey}[${idx}].${col}="${raw}"`);
-    } else if (TIMESTAMP_COLUMNS.has(col) && raw != null) {
+    } else if (TIMESTAMP_COLUMNS.has(col) && !(timestampExclusions && timestampExclusions.has(col)) && raw != null) {
       row[field] = assertValidDate(isoFromNowString(raw), `${collKey}[${idx}].${col}="${raw}"`);
     } else {
       row[field] = raw;

@@ -418,10 +418,15 @@ model Certificate {
   concepts        Json?
   finalProject    String?  @map("final_project")
   sourceKind      String?  @map("source_kind")
-  // VERIFIED polymorphic, NOT an Int: event-sourced certs store an Int event
-  // id (store.js:2576) but track-sourced certs store a String track-key slug
-  // (store.js:2955, "bc01-python" etc) — must be a String column.
-  sourceId        String?  @map("source_id")
+  // Re-typed Int? (audited against /data/echolens.json 2026-07-26): all 27
+  // real non-null values are numeric event ids, none are a track-key slug
+  // string. The comment this replaced claimed track-sourced certs store a
+  // String slug ("bc01-python" etc, store.js:2955) - either that path
+  // currently produces no certificates in this dataset, or the comment
+  // predates what's actually live. If a String source_id shows up later,
+  // this column will need to go back to String (or split into two fields)
+  // - don't assume Int is permanently safe without re-checking.
+  sourceId        Int?     @map("source_id")
 
   user  User   @relation("CertificateHolder", fields: [userId], references: [id])
   batch Batch? @relation(fields: [batchId], references: [id])
@@ -653,9 +658,16 @@ model EventSubmission {
   aiScore     Int?     @map("ai_score")
   score       Int?
   aiFeedback  String?  @map("ai_feedback")
-  // VERIFIED polymorphic, NOT an Int: literal string 'ai' for AI auto-grading
-  // (store.js:2538) or a numeric admin user id (server.js:2926, store.js:2545).
-  gradedBy    String?  @map("graded_by")
+  // Re-typed Int? (audited against /data/echolens.json 2026-07-26): all 27
+  // real non-null values are numeric admin user ids. FORWARD-COMPATIBILITY
+  // TRAP: store.js:2611 still actively writes the literal string 'ai' here
+  // for AI-graded submissions - none of today's rows happen to hold it, but
+  // the next AI-graded submission will, and it won't fit an Int column.
+  // This is fine for THIS import (store.js doesn't write to Postgres yet),
+  // but whoever rewrites store.js to write here directly must either keep
+  // 'ai' out of this column (e.g. a separate gradedByAi Boolean) or revert
+  // this to String.
+  gradedBy    Int?     @map("graded_by")
   gradedAt    DateTime? @map("graded_at")
   certified   Boolean  @default(false)
 

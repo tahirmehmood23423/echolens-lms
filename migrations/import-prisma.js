@@ -21,11 +21,23 @@ process.env.TZ = 'UTC';
  * refuses to touch anything but a throwaway staging database), this script
  * is meant to be run exactly once, for real, against DATABASE_URL.
  *
- * MUST RUN ON RENDER: Supabase is only reachable from Render's network, not
- * from a local dev machine, so this reads DATABASE_URL from the environment
- * (same variable the app itself uses) rather than taking a connection string
- * on the command line. Run it as a Render one-off Job — see the usage note
- * at the bottom of this file / the operator's runbook.
+ * MUST RUN ON RENDER, VIA SHELL (NOT a one-off Job): Supabase is only
+ * reachable from Render's network, not a local dev machine, so this reads
+ * DATABASE_URL from the environment (same variable the app itself uses)
+ * rather than taking a connection string on the command line. The JSON
+ * source file also only exists on the web service's persistent Disk — and
+ * Render one-off Jobs run on separate compute with NO access to a
+ * service's Disk (confirmed in Render's docs: "You can't access a
+ * service's disk from a one-off job you run for the service"). Use the
+ * Render Shell instead (Dashboard -> service -> Shell tab, or `render
+ * ssh`) — it connects into the actual running instance: same container,
+ * same Disk mount, same env vars. See the usage note at the bottom of this
+ * file.
+ *
+ * SANITY FLOOR: aborts immediately (before touching Postgres at all) if
+ * the JSON file has fewer than MIN_EXPECTED_USERS users — guards against
+ * accidentally pointing --db-path at a stale/dev fixture instead of the
+ * real backup.
  *
  * TOMBSTONES
  *   Some rows reference a user or batch that was later deleted (e.g. a
@@ -87,13 +99,16 @@ process.env.TZ = 'UTC';
  *   - A row-count mismatch between the JSON file and Postgres after import.
  *   - Any Postgres constraint violation (foreign key, unique, not-null) —
  *     these are never caught/skipped, they abort the whole transaction.
+ *   - Fewer than MIN_EXPECTED_USERS (default 50) users in the source file.
  *
- * USAGE (as a Render one-off Job; DATABASE_URL is already set in the
- * service's environment, so nothing extra needs passing):
- *   node migrations/import-prisma.js
+ * USAGE (from a Render Shell session — see the file-header note above on
+ * why it can't be a one-off Job; DATABASE_URL is already set in the
+ * service's environment, so nothing extra needs passing for that part):
+ *   node migrations/import-prisma.js --db-path=/data/echolens.json
  *
- * Optional: --db-path=/path/to/echolens.json (defaults to DB_PATH env var,
- * then ./echolens.json next to this repo — same convention as store.js).
+ * --db-path defaults to the DB_PATH env var, then ./echolens.json next to
+ * this repo (same convention as store.js) — pass it explicitly whenever
+ * the real file isn't at the default location, e.g. on a mounted Disk.
  */
 
 const fs = require('fs');
@@ -105,6 +120,11 @@ const dbPathArg = process.argv.find((a) => a.startsWith('--db-path='));
 const DB_PATH = dbPathArg ? dbPathArg.slice('--db-path='.length) : (process.env.DB_PATH || path.join(__dirname, '..', 'echolens.json'));
 const DATABASE_URL = process.env.DATABASE_URL;
 const ANCHOR_COURSE_ID = -1; // placeholder course tombstone batches point at; chosen not to collide with any real course id
+// Sanity floor against pointing this at the wrong file (e.g. the gitignored
+// repo-root echolens.json, which is a stale ~4-user dev fixture, not the
+// real backup). The real dataset has 78 users; 50 gives comfortable margin
+// below that while still being well above any dev/test fixture.
+const MIN_EXPECTED_USERS = Number(process.env.MIN_EXPECTED_USERS) || 50;
 
 function log(msg) { console.log(`[import-prisma] ${msg}`); }
 
@@ -462,6 +482,17 @@ function assertKnownTopLevelKeys(json) {
 async function main() {
   log(`Reading JSON store from ${DB_PATH}`);
   const json = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+
+  const userCount = Array.isArray(json.users) ? json.users.length : 0;
+  if (userCount < MIN_EXPECTED_USERS) {
+    throw new Error(
+      `Refusing to import: only ${userCount} user(s) found in ${DB_PATH} (expected at least ${MIN_EXPECTED_USERS}) - wrong JSON file? ` +
+      `This guards against silently importing a stale/dev fixture instead of the real backup. Pass --db-path=... to point at the correct ` +
+      `file, or set MIN_EXPECTED_USERS to override this floor if ${userCount} is genuinely correct.`
+    );
+  }
+  log(`Sanity check passed: ${userCount} users found (>= ${MIN_EXPECTED_USERS} floor).`);
+
   assertKnownTopLevelKeys(json);
 
   const adapter = new PrismaPg({

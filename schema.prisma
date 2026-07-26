@@ -96,7 +96,10 @@ model User {
   hiringNote         String?  @map("hiring_note")
   status             String?  // pending|approved|rejected|needs_info (recruiter verification)
   statusReason       String?  @map("status_reason")
-  overrideRequested  Boolean  @default(false) @map("override_requested")
+  // Not always present: recruiter-only field (Users.createRecruiter), absent
+  // on every non-recruiter row (78/79 real users). No @default(false) - a
+  // false default would misrepresent "not a recruiter" as "opted out".
+  overrideRequested  Boolean? @map("override_requested")
   overrideReason     String?  @map("override_reason")
   approvedBy         Int?     @map("approved_by")
   approvedAt         DateTime? @map("approved_at")
@@ -400,16 +403,19 @@ model Certificate {
   batchId         Int?     @map("batch_id") // confirmed nullable: hackathon/webinar/quest/track/event auto-certs pass batch_id: null (store.js:2573,2952)
   kind            String // course|hackathon|competition|quest|webinar
   title           String
-  // VERIFIED always a string (never null; slice(0,400) of '' at worst) —
-  // store.js:1858.
-  detail          String   @default("")
+  // NOT always non-null despite the comment below (kept for context: it's
+  // accurate for what CURRENT store.js code writes, store.js:1858) - 3 of
+  // 32 real certificates hold an explicit null, from before whatever
+  // change guarantees the '' fallback today. @default("") never rescues an
+  // explicit null (only a missing key), which is what broke the import.
+  detail          String?
   completionDate  String   @map("completion_date") // VERIFIED date-only, enforced by regex else falls back to today() (store.js:1859)
   instructorName  String?  @map("instructor_name")
   instructorSig   String?  @map("instructor_sig")
   issuedBy        Int      @map("issued_by")
   issuedAt        DateTime @map("issued_at")
-  // VERIFIED always an array, defaults to [] (store.js:1862) — never null.
-  concepts        Json     @default("[]")
+  // Not always present: missing entirely on 1/32 real certificates.
+  concepts        Json?
   finalProject    String?  @map("final_project")
   sourceKind      String?  @map("source_kind")
   // VERIFIED polymorphic, NOT an Int: event-sourced certs store an Int event
@@ -455,18 +461,26 @@ model LiveClass {
 
 model Attendance {
   id        Int      @id @default(autoincrement())
-  // VERIFIED: there is no `class_id`/`classId` anywhere in the codebase
-  // (repo-wide grep). Only `session_id` is used (store.js:1709-1723), and
-  // it is always present — Attendance.mark(sessionId, userId) requires it.
-  // The original draft's `classId Int?` is dropped entirely.
-  sessionId Int      @map("session_id")
+  // Not always present: missing on 4/7 real rows, which carry class_id
+  // instead (see classId below) - store.js's current writer
+  // (Attendance.mark, store.js:1709-1723) always sets this, but older rows
+  // don't have it.
+  sessionId Int?     @map("session_id")
+  // Re-added: absent from current app code (a prior schema draft's
+  // `classId Int?` was dropped on that basis - see git history), but
+  // genuinely present on 4/7 real rows, disjoint from the ones that have
+  // sessionId. Likely this table's field name before a rename to
+  // session_id. Kept separate from sessionId rather than merged/backfilled
+  // - there's no confirmed proof they're interchangeable, and preserving
+  // the real historical value as-is is safer than guessing.
+  classId   Int?     @map("class_id")
   userId    Int      @map("user_id")
   joinedAt  DateTime @map("joined_at")
   minutes   Int      @default(0)
   lastSeen  DateTime? @map("last_seen")
 
-  session   Session @relation(fields: [sessionId], references: [id])
-  user      User    @relation(fields: [userId], references: [id])
+  session   Session? @relation(fields: [sessionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@map("attendance")
@@ -484,8 +498,9 @@ model CourseMessage {
   anonymous  Boolean  @default(false)
   staffRole  String?  @map("staff_role")
   createdAt  DateTime @map("created_at")
-  // VERIFIED always an array, defaults to [] (store.js:1423) — never null.
-  mentions   Json     @default("[]")
+  // Not always present: missing entirely on 3/6 real messages, which predate
+  // the @mentions feature (audited against /data/echolens.json 2026-07-26).
+  mentions   Json?
 
   batch Batch @relation(fields: [batchId], references: [id])
   user  User  @relation(fields: [userId], references: [id])

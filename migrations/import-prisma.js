@@ -176,7 +176,7 @@ const COLLECTIONS = [
     'id', 'serial', 'user_id', 'student_name', 'reg_no', 'batch_id', 'kind', 'title', 'detail', 'completion_date',
     'instructor_name', 'instructor_sig', 'issued_by', 'issued_at', 'concepts', 'final_project', 'source_kind', 'source_id',
   ]],
-  ['attendance', 'attendance', 'attendance', ['id', 'session_id', 'user_id', 'joined_at', 'minutes', 'last_seen']],
+  ['attendance', 'attendance', 'attendance', ['id', 'session_id', 'class_id', 'user_id', 'joined_at', 'minutes', 'last_seen']],
   ['course_messages', 'course_messages', 'courseMessage', ['id', 'batch_id', 'user_id', 'body', 'anonymous', 'staff_role', 'created_at', 'mentions']],
   ['chat_reads', 'chat_reads', 'chatRead', ['id', 'user_id', 'batch_id', 'last_read_at']],
   ['announcements', 'announcements', 'announcement', ['id', 'batch_id', 'author_id', 'title', 'body', 'created_at']],

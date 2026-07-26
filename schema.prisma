@@ -420,13 +420,19 @@ model Certificate {
   sourceKind      String?  @map("source_kind")
   // Re-typed Int? (audited against /data/echolens.json 2026-07-26): all 27
   // real non-null values are numeric event ids, none are a track-key slug
-  // string. The comment this replaced claimed track-sourced certs store a
-  // String slug ("bc01-python" etc, store.js:2955) - either that path
-  // currently produces no certificates in this dataset, or the comment
-  // predates what's actually live. If a String source_id shows up later,
-  // this column will need to go back to String (or split into two fields)
-  // - don't assume Int is permanently safe without re-checking.
+  // string - RESOLVED 2026-07-26 (Phase 3 batch 2): confirmed by reading
+  // the live code, not just the historical data. OpenQuest.maybeCertify()
+  // (store.js:3080) still sets source_id to a String track_key
+  // ("bc01-python" etc) whenever a free track's completion auto-certifies
+  // - that code path is fully live, it just hasn't fired for any of the
+  // 32 certificates imported so far. Split into two fields (below) rather
+  // than reverting to String, so the common numeric case stays a real Int.
   sourceId        Int?     @map("source_id")
+  // Holds source_id's String form (source_kind = 'track') instead of
+  // sourceId; store.js's in-memory shape is untouched - source_id there
+  // stays polymorphic Int-or-String exactly as before. Only the Postgres
+  // write/read boundary (schema-map.js) knows about this split.
+  sourceTrackKey  String?  @map("source_track_key")
 
   user  User   @relation("CertificateHolder", fields: [userId], references: [id])
   batch Batch? @relation(fields: [batchId], references: [id])
@@ -668,6 +674,13 @@ model EventSubmission {
   // 'ai' out of this column (e.g. a separate gradedByAi Boolean) or revert
   // this to String.
   gradedBy    Int?     @map("graded_by")
+  // Added 2026-07-26 (Phase 3 batch 2, write engine): the fix the comment
+  // above called for. store.js's in-memory shape is untouched - graded_by
+  // stays 'ai' there, unlike anywhere else. Only the Postgres write/read
+  // boundary (schema-map.js) knows about this column: true here + gradedBy
+  // left null when the JS value is the literal string 'ai'; gradedBy holds
+  // the real admin user id otherwise.
+  gradedByAi  Boolean  @default(false) @map("graded_by_ai")
   gradedAt    DateTime? @map("graded_at")
   certified   Boolean  @default(false)
 

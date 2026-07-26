@@ -190,6 +190,31 @@ const TIMESTAMP_COLUMN_EXCLUSIONS_BY_TABLE = { staff_records: new Set(['joined_a
 const LOCAL_DATETIME_COLUMNS_BY_TABLE = { events: new Set(['starts_at', 'ends_at']) };
 const LOCAL_DATETIME_OFFSET_MINUTES = 5 * 60;
 
+// Columns where store.js's in-memory JS value is genuinely one of two
+// incompatible types (found via live-code read-throughs, not just data
+// audits - the historical data never happened to exercise either path).
+// store.js's in-memory shape is deliberately left untouched for both - the
+// JS value stays exactly as it always was (the literal string 'ai', or a
+// String track-key slug); only the Postgres write/read boundary here knows
+// the DB schema splits each into two real columns instead of one loosely
+// typed one. Not folded into JSON_COLUMNS_BY_TABLE/toCamel-driven mapping
+// since each entry maps ONE JS column onto TWO Postgres columns.
+const POLYMORPHIC_COLUMNS_BY_TABLE = {
+  // event_submissions.graded_by (Int?): a real admin user id, OR the
+  // literal string 'ai' for AI-graded submissions (store.js:2663) - 'ai'
+  // goes to graded_by_ai instead, since it can never fit an Int column.
+  event_submissions: { graded_by: { companionColumn: 'graded_by_ai', sentinel: 'ai' } },
+  // certificates.source_id (Int?): a real event id, OR a String track-key
+  // slug like "bc01-python" for free-track auto-certs
+  // (OpenQuest.maybeCertify, store.js:3080) - the string form goes to
+  // source_track_key instead.
+  certificates: { source_id: { companionColumn: 'source_track_key' } },
+};
+function polymorphicColumnInfo(table, col) {
+  const cols = POLYMORPHIC_COLUMNS_BY_TABLE[table];
+  return cols && cols[col];
+}
+
 function toCamel(col) { return col.replace(/_([a-z0-9])/g, (_, c) => c.toUpperCase()); }
 
 function isTimestampColumn(table, col) {
@@ -228,6 +253,61 @@ function assertValidDate(d, ctx) {
   return d;
 }
 
+/**
+ * Converts one store.js JS record (snake_case fields, now()/today()-style
+ * date strings, plain JS values for Json columns) into the shape Prisma's
+ * create()/update() expect (camelCase fields, real Date objects,
+ * Prisma.DbNull/JsonNull where a plain `null` would be ambiguous for a Json
+ * column). Shared by migrations/import-prisma.js (bulk historical import)
+ * and store.js's live write engine (schema-map.js's own callers) - both
+ * need the exact same column/type rules, and duplicating them is how the
+ * staff_records.joined_at and offer_letter_sent_at bugs happened in the
+ * first place.
+ *
+ * `undefined` on `rec[col]` (the key is genuinely absent) is skipped
+ * entirely rather than passed through - for a create() that lets Prisma
+ * apply the schema default; for an update() it means "don't touch this
+ * column", which matches every real call site (store.js's write methods
+ * only ever set a field to a new value or leave it alone, never delete a
+ * property to "unset" it).
+ */
+function buildPrismaRow(table, columns, rec, context) {
+  const row = {};
+  for (const col of columns) {
+    const raw = rec[col];
+    if (raw === undefined) continue;
+    const field = toCamel(col);
+    const poly = polymorphicColumnInfo(table, col);
+    const jsonInfo = jsonColumnInfo(table, col);
+    if (poly) {
+      const companionField = toCamel(poly.companionColumn);
+      if (raw === null) {
+        row[field] = null;
+        if (poly.sentinel) row[companionField] = false;
+      } else if (poly.sentinel && raw === poly.sentinel) {
+        row[field] = null;
+        row[companionField] = true;
+      } else if (typeof raw === 'string') {
+        // Non-sentinel string (e.g. a track-key slug) - goes to the string companion column.
+        row[field] = null;
+        row[companionField] = raw;
+      } else {
+        row[field] = raw;
+        if (poly.sentinel) row[companionField] = false;
+      }
+    } else if (jsonInfo) {
+      row[field] = raw === null ? (jsonInfo.nullable ? Prisma.DbNull : Prisma.JsonNull) : raw;
+    } else if (isLocalDatetimeColumn(table, col)) {
+      row[field] = raw == null ? null : assertValidDate(localDatetimeStringToDate(raw), `${context}.${col}="${raw}"`);
+    } else if (isTimestampColumn(table, col) && raw != null) {
+      row[field] = assertValidDate(isoFromNowString(raw), `${context}.${col}="${raw}"`);
+    } else {
+      row[field] = raw;
+    }
+  }
+  return row;
+}
+
 /* -------------------------- Postgres -> JS (read) ------------------------- */
 
 /** Inverse of isoFromNowString: a DateTime read back from Postgres -> store.js's "YYYY-MM-DD HH:MM:SS" now()-format string. */
@@ -254,6 +334,14 @@ function rowFromPrisma(table, columns, prismaRow) {
   const row = {};
   for (const col of columns) {
     const field = toCamel(col);
+    const poly = polymorphicColumnInfo(table, col);
+    if (poly) {
+      const companionValue = prismaRow[toCamel(poly.companionColumn)];
+      if (poly.sentinel && companionValue === true) row[col] = poly.sentinel;
+      else if (!poly.sentinel && companionValue != null) row[col] = companionValue;
+      else row[col] = prismaRow[field];
+      continue;
+    }
     const value = prismaRow[field];
     if (value == null) {
       row[col] = null;
@@ -271,9 +359,9 @@ function rowFromPrisma(table, columns, prismaRow) {
 module.exports = {
   COLLECTIONS, FRONT_LOADED_KEYS,
   JSON_COLUMNS_BY_TABLE, TIMESTAMP_COLUMNS, TIMESTAMP_COLUMN_EXCLUSIONS_BY_TABLE,
-  LOCAL_DATETIME_COLUMNS_BY_TABLE, LOCAL_DATETIME_OFFSET_MINUTES,
-  toCamel, isTimestampColumn, isLocalDatetimeColumn, jsonColumnInfo,
-  isoFromNowString, localDatetimeStringToDate, assertValidDate,
+  LOCAL_DATETIME_COLUMNS_BY_TABLE, LOCAL_DATETIME_OFFSET_MINUTES, POLYMORPHIC_COLUMNS_BY_TABLE,
+  toCamel, isTimestampColumn, isLocalDatetimeColumn, jsonColumnInfo, polymorphicColumnInfo,
+  isoFromNowString, localDatetimeStringToDate, assertValidDate, buildPrismaRow,
   dateToNowString, dateToLocalDatetimeString, rowFromPrisma,
   Prisma,
 };

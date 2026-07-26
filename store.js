@@ -112,24 +112,32 @@ function fillDefaultsAndMigrate() {
  * land in Postgres).
  */
 
-// TEMPORARILY DISABLED (2026-07-26): Prisma now owns the schema (57
-// normalized tables via schema.prisma), and the legacy migration this
-// block used to apply at boot (migrations/0001_legacy_store_schema.sql)
-// creates the OLD `(id BIGINT, data JSONB)` per-collection shape, which
-// collides with and no longer matches the real tables Prisma manages.
-// Until store.js is rewritten to read/write the normalized tables
-// directly, this whole "sync data to Postgres as JSON blobs" pathway
-// must stay off - both loadFromPostgres() on boot and
-// persistAllToPostgres() on every save() would otherwise fail with
-// "column data does not exist" the moment they touch a real table.
-// db.enabled() itself is left alone: talent.js/talent-hiring.js query the
-// normalized tables directly and still need it to report true whenever
-// DATABASE_URL is set.
-const LEGACY_STORE_ON_POSTGRES = false;
-
+// LEGACY (kept only for reference/rollback - superseded below): targeted
+// the pre-Prisma `(id BIGINT, data JSONB)` per-collection blob schema.
+// Never call this against the real normalized schema - it does
+// `DELETE FROM <table>` on every changed collection, which would violate
+// FK constraints or silently orphan rows the moment anything in the
+// normalized tables references what it deletes.
 let pgQueueTail = Promise.resolve();
 let pendingPersistPromise = Promise.resolve();
-let lastPersistedSnapshot = null; // { [collection]: JSON string } - what Postgres currently holds, so save() only rewrites collections that actually changed
+let lastPersistedSnapshot = null; // { [collection]: Map<id, JSON string of that one row> } - what Postgres currently holds, so a flush only touches rows that actually changed
+// Guards against a real, subtle race, found via local testing (not
+// hypothetical): `load()` runs unconditionally at module-require time,
+// synchronously, even when DATABASE_URL is set - it's supposed to be a
+// harmless scaffold, immediately replaced by initFromPostgres(). But
+// db.enabled() is already true at that point (DATABASE_URL is read from
+// env before store.js ever loads), so if migrate() finds anything to
+// backfill on that empty/JSON-derived `data` (near-certain on a first
+// boot) and calls save(), save() would try to flush THAT scaffold data to
+// Postgres using a still-null lastPersistedSnapshot - every row looks
+// "new", so it attempts to CREATE rows that already exist for real,
+// exactly the "duplicate key on courses" failure this flag closes.
+// save() only takes the Postgres branch once loadFromPostgresNormalized()
+// has actually populated `data` and lastPersistedSnapshot for real; until
+// then (including during the harmless JSON scaffold load) it falls back
+// to the JSON-file write, which is discarded the moment the real load
+// replaces `data` anyway.
+let postgresReady = false;
 
 function chunkRows(rows, size) {
   const out = [];
@@ -170,9 +178,98 @@ async function persistAllToPostgres(snapshot) {
   });
 }
 
+/**
+ * NORMALIZED write path (Phase 3 batch 2, 2026-07-26) - flushes `data` to
+ * the real Prisma-managed schema. Diffs PER ROW (by id), not per whole
+ * collection like persistAllToPostgres() above: the normalized tables have
+ * real FK constraints, so a blanket `DELETE FROM table` the moment
+ * anything in a collection changes would either violate those constraints
+ * or (for a table nothing references) silently blow away every unrelated
+ * row that happened not to change in this particular save() call.
+ *
+ * Wrapped in exactly one prisma.$transaction - this is what makes every
+ * one of store.js's multi-mutation write functions (touchActivity,
+ * Challenges.review, Hackathons.finalize, Quizzes.attempt,
+ * Ambassadors.addGems, DepartmentTasks.create, Certificates.issue,
+ * Events.maybeCertify, OpenQuest.maybeCertify, Challans.generate/
+ * markSent/markPaid, migrate()) atomic, INCLUDING the ones that call
+ * save() more than once for one logical operation (Events.maybeCertify,
+ * Challans.generate/markSent/markPaid all call save() twice via
+ * Registrations._setStage()). This works because every one of those
+ * functions is 100% synchronous internally (verified: no `await` appears
+ * anywhere in store.js outside this persistence/boot-load machinery) - all
+ * of a function's `data` mutations complete before the JS event loop ever
+ * gets around to running the async work a `save()` call queues, so by the
+ * time this function actually executes, `data` already reflects the
+ * FULL logical operation regardless of how many save() calls fired during
+ * it. A second, redundant save() call just becomes a no-op diff (nothing
+ * changed since the first flush already captured everything) rather than
+ * a second, separately-committed write - the crash-mid-operation risk the
+ * old 2-save()-calls pattern had under a naive per-call-site persist is
+ * closed by construction, not by touching those 12 functions individually.
+ */
+async function persistAllToPostgresNormalized(snapshot) {
+  const schemaMap = require('./schema-map');
+  const { getPrismaClient } = require('./prisma-client');
+  const prisma = getPrismaClient();
+  const prevSnapshot = lastPersistedSnapshot || {};
+  const nextSnapshot = {};
+
+  await prisma.$transaction(async (tx) => {
+    // Inserts/updates in FK-safe order (parents before children).
+    for (const [key, table, model, columns] of schemaMap.COLLECTIONS) {
+      const records = snapshot[key] || [];
+      const prevRows = prevSnapshot[key] || new Map();
+      const nextRows = new Map();
+      for (const rec of records) {
+        const json = JSON.stringify(rec);
+        nextRows.set(rec.id, json);
+        if (prevRows.get(rec.id) === json) continue; // unchanged since the last successful flush
+        const row = schemaMap.buildPrismaRow(table, columns, rec, `${key}#${rec.id}`);
+        if (prevRows.has(rec.id)) await tx[model].update({ where: { id: rec.id }, data: row });
+        else await tx[model].create({ data: row });
+      }
+      nextSnapshot[key] = nextRows;
+    }
+    // Deletes in REVERSE FK-safe order (children before parents), so a
+    // parent row's delete never runs while a child row still references it.
+    for (const [key, , model] of [...schemaMap.COLLECTIONS].reverse()) {
+      const prevRows = prevSnapshot[key] || new Map();
+      const nextRows = nextSnapshot[key] || new Map();
+      for (const id of prevRows.keys()) {
+        if (!nextRows.has(id)) await tx[model].delete({ where: { id } });
+      }
+    }
+
+    // Registries: seq/settings use upsert (small, always-present keyed
+    // rows); issued_usernames/issued_regnos are append-only sets.
+    for (const [name, value] of Object.entries(snapshot.seq || {})) {
+      await tx.seq.upsert({ where: { name }, create: { name, value }, update: { value } });
+    }
+    const prevUsernames = new Set(prevSnapshot.issued_usernames || []);
+    const newUsernames = (snapshot.issued_usernames || []).filter((v) => !prevUsernames.has(v));
+    if (newUsernames.length) {
+      await tx.issuedUsername.createMany({ data: newUsernames.map((value) => ({ value })), skipDuplicates: true });
+    }
+    const prevRegnos = new Set(prevSnapshot.issued_regnos || []);
+    const newRegnos = (snapshot.issued_regnos || []).filter((v) => !prevRegnos.has(v));
+    if (newRegnos.length) {
+      await tx.issuedRegno.createMany({ data: newRegnos.map((value) => ({ value })), skipDuplicates: true });
+    }
+    for (const [key, value] of Object.entries(snapshot.settings || {})) {
+      const v = value === null ? schemaMap.Prisma.JsonNull : value;
+      await tx.setting.upsert({ where: { key }, create: { key, value: v }, update: { value: v } });
+    }
+  }, { maxWait: 10000, timeout: 60000 });
+
+  nextSnapshot.issued_usernames = (snapshot.issued_usernames || []).slice();
+  nextSnapshot.issued_regnos = (snapshot.issued_regnos || []).slice();
+  lastPersistedSnapshot = nextSnapshot;
+}
+
 /** Queues a Postgres persist of the current `data`, serialized after any persist already in flight. Returns a promise for *this* persist specifically (resolves/rejects on its own outcome), even though execution waits its turn in line. */
 function queuePersistToPostgres() {
-  const thisOp = pgQueueTail.then(() => persistAllToPostgres(data));
+  const thisOp = pgQueueTail.then(() => persistAllToPostgresNormalized(data));
   pgQueueTail = thisOp.catch(() => {}); // keep the queue alive after a failure so later saves still get their turn
   return thisOp;
 }
@@ -210,13 +307,15 @@ async function loadFromPostgres() {
  * this file (gem sums, leaderboards, badge computation, N+1 joins, all of
  * it) keeps running completely unchanged against the result.
  *
- * NOT YET WIRED IN: initFromPostgres() below still takes the JSON-file
- * path unconditionally. This function is built and independently tested
- * (see the test harness used during Batch 1 review) but deliberately not
- * called from the real boot sequence yet - wiring it in without the write
- * path (save() still only knows how to write the JSON file) would mean
- * every boot re-pulls from Postgres and silently discards any write made
- * since the last restart. It gets wired in together with the write engine.
+ * WIRED IN (Phase 3 batch 2, 2026-07-26): called from initFromPostgres()
+ * below together with the write engine (persistAllToPostgresNormalized) -
+ * the two ship together, never independently, since a boot-time load with
+ * no matching write path would silently discard any write made since the
+ * last restart (see this function's batch 1 history in git log for why
+ * that half-wired state was deliberately avoided for one whole batch).
+ * Also populates lastPersistedSnapshot (per-row, by id) so the write
+ * engine's first flush only sends rows that actually changed since boot,
+ * not a full re-write of everything just loaded.
  */
 async function loadFromPostgresNormalized() {
   const schemaMap = require('./schema-map');
@@ -224,6 +323,7 @@ async function loadFromPostgresNormalized() {
   const prisma = getPrismaClient();
 
   const next = empty();
+  const snapshot = {};
   for (const [key, table, model, columns] of schemaMap.COLLECTIONS) {
     const rows = await prisma[model].findMany({ orderBy: { id: 'asc' } });
     next[key] = rows.map((r) => schemaMap.rowFromPrisma(table, columns, r));
@@ -236,6 +336,7 @@ async function loadFromPostgresNormalized() {
     // never wrong in the only direction that matters (it never UNDERcounts
     // a live id, since nothing has been deleted between import and boot).
     next.seq[key] = next[key].reduce((max, r) => Math.max(max, r.id), 0);
+    snapshot[key] = new Map(next[key].map((r) => [r.id, JSON.stringify(r)]));
   }
 
   const seqRows = await prisma.seq.findMany();
@@ -246,30 +347,37 @@ async function loadFromPostgresNormalized() {
   next.issued_regnos = issuedRegnoRows.map((r) => r.value);
   const settingRows = await prisma.setting.findMany();
   for (const r of settingRows) next.settings[r.key] = r.value;
+  snapshot.issued_usernames = next.issued_usernames.slice();
+  snapshot.issued_regnos = next.issued_regnos.slice();
 
   data = next;
+  // Both set BEFORE fillDefaultsAndMigrate(), not after: migrate() can
+  // itself call save() (e.g. the first-ever boot against a fresh
+  // normalized DB triggers its one-time Department/Ambassador backfill).
+  // If that fired while lastPersistedSnapshot/postgresReady weren't set
+  // yet, the diff engine would see every already-loaded row as brand new
+  // and try to re-CREATE rows Postgres already has - caught via a real
+  // unique-constraint-violation failure during local testing, not a
+  // hypothetical (see postgresReady's own declaration-site comment above
+  // for the full race this closes).
+  lastPersistedSnapshot = snapshot;
+  postgresReady = true;
   fillDefaultsAndMigrate();
 }
 
 /**
  * Boot entry point. No-op (JSON file store, unchanged) when DATABASE_URL
- * isn't set. Otherwise runs any pending schema migrations, then refuses
- * to boot against an empty Postgres database if the JSON file has
- * existing records - that combination almost always means the one-time
- * import (`npm run migrate:import`) hasn't been run yet, and booting
- * anyway would silently serve an empty portal instead of failing loudly.
+ * isn't set. Otherwise refuses to boot against an empty Postgres database
+ * if the JSON file has existing records - that combination almost always
+ * means the one-time import (migrations/import-prisma.js, run manually via
+ * Render Shell) hasn't been run yet, and booting anyway would silently
+ * serve an empty portal instead of failing loudly.
  */
 async function initFromPostgres() {
   if (!db.enabled()) {
     console.log('[store] DATABASE_URL not set - using the JSON file store at', DB_PATH);
     return;
   }
-  if (!LEGACY_STORE_ON_POSTGRES) {
-    console.log('[store] DATABASE_URL is set, but the legacy JSON-blob Postgres sync is disabled (Prisma owns the schema now) - using the JSON file store at', DB_PATH);
-    return;
-  }
-  const { runMigrations } = require('./migrations/run');
-  await runMigrations(db.getPool());
 
   const { rows } = await db.query('SELECT count(*)::int AS n FROM users');
   const pgUserCount = rows[0].n;
@@ -280,20 +388,20 @@ async function initFromPostgres() {
   if (pgUserCount === 0 && jsonHasData) {
     throw new Error(
       `DATABASE_URL is set and the schema is ready, but Postgres has no users while ${DB_PATH} does. ` +
-      `Run "npm run migrate:import" before starting the server - refusing to boot against an empty database ` +
+      `Run migrations/import-prisma.js before starting the server - refusing to boot against an empty database ` +
       `when a populated JSON store exists, to avoid silently serving an empty portal.`
     );
   }
 
-  await loadFromPostgres();
-  console.log(`[store] loaded from Postgres: ${data.users.length} users, ${data.courses.length} courses, ${data.submissions.length} submissions`);
+  await loadFromPostgresNormalized();
+  console.log(`[store] loaded from Postgres: ${data.users.length} users, ${data.courses.length} courses, ${data.certificates.length} certificates`);
 }
 
 /** Awaited by server.js before sending each response, so a client only ever sees a successful response once that response's writes are durably in Postgres (or, in JSON-file mode, this resolves immediately since save() already wrote synchronously). */
 function pendingPersist() { return pendingPersistPromise; }
 
 function save() {
-  if (db.enabled() && LEGACY_STORE_ON_POSTGRES) {
+  if (db.enabled() && postgresReady) {
     pendingPersistPromise = queuePersistToPostgres().catch((err) => {
       console.error('[store] Postgres persist failed:', err.message);
       throw err;
@@ -3461,10 +3569,10 @@ module.exports = {
   Companies, AuditLog,
   seed, DB_PATH, allData: () => data,
   initFromPostgres, pendingPersist,
-  isUsingPostgres: () => db.enabled() && LEGACY_STORE_ON_POSTGRES,
-  // Not yet called from initFromPostgres (see that function's Batch 1 note
-  // above) - exported so it can be exercised directly for testing/manual
-  // reload ahead of being wired into the real boot path in a later batch.
+  isUsingPostgres: () => db.enabled(),
+  // Exported for direct testing (see the Batch 2 test harness); not
+  // normally called from outside this file - initFromPostgres() above
+  // calls it at boot.
   loadFromPostgresNormalized,
 };
 

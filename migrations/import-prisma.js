@@ -115,11 +115,7 @@ const fs = require('fs');
 const path = require('path');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { PrismaClient } = require('@prisma/client');
-const {
-  COLLECTIONS, FRONT_LOADED_KEYS, Prisma,
-  toCamel, isTimestampColumn, isLocalDatetimeColumn, jsonColumnInfo,
-  isoFromNowString, localDatetimeStringToDate, assertValidDate,
-} = require('../schema-map');
+const { COLLECTIONS, FRONT_LOADED_KEYS, buildPrismaRow, Prisma } = require('../schema-map');
 
 const dbPathArg = process.argv.find((a) => a.startsWith('--db-path='));
 const DB_PATH = dbPathArg ? dbPathArg.slice('--db-path='.length) : (process.env.DB_PATH || path.join(__dirname, '..', 'echolens.json'));
@@ -185,26 +181,6 @@ const FK_SCANS = [
   ['contracts', 'user_id', 'user'],
 ];
 
-function buildRow(table, columns, rec, idx, collKey) {
-  const row = {};
-  for (const col of columns) {
-    const raw = rec[col];
-    if (raw === undefined) continue; // omit -> let Prisma apply the schema default / NULL
-    const field = toCamel(col);
-    const jsonInfo = jsonColumnInfo(table, col);
-    if (jsonInfo) {
-      row[field] = raw === null ? (jsonInfo.nullable ? Prisma.DbNull : Prisma.JsonNull) : raw;
-    } else if (isLocalDatetimeColumn(table, col)) {
-      row[field] = raw == null ? null : assertValidDate(localDatetimeStringToDate(raw), `${collKey}[${idx}].${col}="${raw}"`);
-    } else if (isTimestampColumn(table, col) && raw != null) {
-      row[field] = assertValidDate(isoFromNowString(raw), `${collKey}[${idx}].${col}="${raw}"`);
-    } else {
-      row[field] = raw;
-    }
-  }
-  return row;
-}
-
 function assertNoDuplicateIds(collKey, records) {
   const seen = new Set();
   for (const r of records) {
@@ -218,7 +194,7 @@ function assertNoDuplicateIds(collKey, records) {
 async function insertCollection(tx, model, table, columns, records, collKey) {
   if (!records.length) return { inserted: 0, skipped: 0 };
   assertNoDuplicateIds(collKey, records);
-  const rows = records.map((r, i) => buildRow(table, columns, r, i, collKey));
+  const rows = records.map((r, i) => buildPrismaRow(table, columns, r, `${collKey}[${i}]`));
   const result = await tx[model].createMany({ data: rows, skipDuplicates: true });
   return { inserted: result.count, skipped: records.length - result.count };
 }

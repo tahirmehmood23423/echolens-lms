@@ -111,6 +111,22 @@ function fillDefaultsAndMigrate() {
  * response, so a client never sees a 200 for a write that didn't durably
  * land in Postgres).
  */
+
+// TEMPORARILY DISABLED (2026-07-26): Prisma now owns the schema (57
+// normalized tables via schema.prisma), and the legacy migration this
+// block used to apply at boot (migrations/0001_legacy_store_schema.sql)
+// creates the OLD `(id BIGINT, data JSONB)` per-collection shape, which
+// collides with and no longer matches the real tables Prisma manages.
+// Until store.js is rewritten to read/write the normalized tables
+// directly, this whole "sync data to Postgres as JSON blobs" pathway
+// must stay off - both loadFromPostgres() on boot and
+// persistAllToPostgres() on every save() would otherwise fail with
+// "column data does not exist" the moment they touch a real table.
+// db.enabled() itself is left alone: talent.js/talent-hiring.js query the
+// normalized tables directly and still need it to report true whenever
+// DATABASE_URL is set.
+const LEGACY_STORE_ON_POSTGRES = false;
+
 let pgQueueTail = Promise.resolve();
 let pendingPersistPromise = Promise.resolve();
 let lastPersistedSnapshot = null; // { [collection]: JSON string } - what Postgres currently holds, so save() only rewrites collections that actually changed
@@ -196,6 +212,10 @@ async function initFromPostgres() {
     console.log('[store] DATABASE_URL not set - using the JSON file store at', DB_PATH);
     return;
   }
+  if (!LEGACY_STORE_ON_POSTGRES) {
+    console.log('[store] DATABASE_URL is set, but the legacy JSON-blob Postgres sync is disabled (Prisma owns the schema now) - using the JSON file store at', DB_PATH);
+    return;
+  }
   const { runMigrations } = require('./migrations/run');
   await runMigrations(db.getPool());
 
@@ -221,7 +241,7 @@ async function initFromPostgres() {
 function pendingPersist() { return pendingPersistPromise; }
 
 function save() {
-  if (db.enabled()) {
+  if (db.enabled() && LEGACY_STORE_ON_POSTGRES) {
     pendingPersistPromise = queuePersistToPostgres().catch((err) => {
       console.error('[store] Postgres persist failed:', err.message);
       throw err;
@@ -3389,6 +3409,7 @@ module.exports = {
   Companies, AuditLog,
   seed, DB_PATH, allData: () => data,
   initFromPostgres, pendingPersist,
+  isUsingPostgres: () => db.enabled() && LEGACY_STORE_ON_POSTGRES,
 };
 
 if (require.main === module && process.argv.includes('--seed')) seed();

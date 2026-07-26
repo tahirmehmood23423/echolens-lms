@@ -3804,10 +3804,12 @@ app.use((err, req, res, next) => {
   next();
 });
 
-// store.initFromPostgres() is a no-op when DATABASE_URL isn't set (the
-// synchronous JSON-file load that already ran when `./store` was required
-// stands as-is). When it is set, this runs pending migrations and loads
-// `data` from Postgres before the app accepts any traffic.
+// store.initFromPostgres() is currently a no-op in both cases: when
+// DATABASE_URL isn't set (the synchronous JSON-file load that already ran
+// when `./store` was required stands as-is), and when it is set, since
+// store.js's legacy JSON-blob Postgres sync is disabled until store.js is
+// rewritten against Prisma's normalized schema (see LEGACY_STORE_ON_POSTGRES
+// in store.js). Either way the app runs on the JSON file store for now.
 (async () => {
   try {
     await store.initFromPostgres();
@@ -3818,7 +3820,7 @@ app.use((err, req, res, next) => {
 
   app.listen(PORT, () => {
     console.log(`EchoLens LMS v12.3 running on http://localhost:${PORT}`);
-    console.log(`Data store: ${require('./db').enabled() ? 'Postgres (DATABASE_URL)' : `JSON file (${store.DB_PATH})`}`);
+    console.log(`Data store: ${store.isUsingPostgres() ? 'Postgres (DATABASE_URL)' : `JSON file (${store.DB_PATH})`}`);
     // Live-class video provider: JaaS (8x8.vc, no time cap) vs the free public
     // meet.jit.si server, which disconnects embedded calls after 5 minutes.
     if (jaas.configured) {

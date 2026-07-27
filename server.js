@@ -212,9 +212,19 @@ app.use((req, res, next) => {
 const sign = (u) => jwt.sign({ id: u.id, role: u.role, name: u.name }, JWT_SECRET, { expiresIn: '7d' });
 function setAuthCookie(res, token) { res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: isProd, maxAge: 7 * 24 * 60 * 60 * 1000 }); }
 function currentUser(req) { const t = req.cookies[COOKIE]; if (!t) return null; try { return Users.byId(jwt.verify(t, JWT_SECRET).id); } catch { return null; } }
+// A deactivated ambassador (HR "removed" them via DELETE /api/hr/ambassadors/:id,
+// which deactivates rather than deletes - see store.js's Ambassadors.setActive)
+// keeps their `users` row, so a still-valid 7-day session cookie would
+// otherwise keep working. Checked here (not baked into currentUser) so every
+// other role's lookup stays a single cheap Users.byId with no extra query.
+function isDeactivatedAmbassador(u) {
+  if (u.role !== 'ambassador') return false;
+  const a = Ambassadors.byUserId(u.id);
+  return !a || !a.active;
+}
 function authRequired(req, res, next) {
   const u = currentUser(req);
-  if (!u) return res.status(401).json({ error: 'Please sign in to continue.' });
+  if (!u || isDeactivatedAmbassador(u)) return res.status(401).json({ error: 'Please sign in to continue.' });
   req.user = u; touchActivity(u); next();
 }
 function adminRequired(req, res, next) { if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin access only.' }); next(); }
@@ -364,6 +374,7 @@ app.post('/api/auth/login', loginThrottle, (req, res) => {
     return res.status(400).json({ error: `This email is linked to accounts in more than one portal. Sign in with the username of the one you want: ${matches.map((u) => u.username).join(', ')}.` });
   }
   const u = matches[0];
+  if (isDeactivatedAmbassador(u)) return res.status(401).json({ error: 'This ambassador account has been deactivated. Contact HR.' });
   LOGIN_ATTEMPTS.delete(req._loginIp); // successful sign-in clears the counter
   setAuthCookie(res, sign(u));
   res.json({ ok: true, role: u.role });
@@ -876,10 +887,22 @@ app.post('/api/hr/ambassadors', authRequired, hrOnly, async (req, res) => {
   res.json({ ok: true, ambassador: a, credentials: { name: user.name, username: user.username, password } });
 });
 app.delete('/api/hr/ambassadors/:id', authRequired, hrOnly, (req, res) => {
-  const a = Ambassadors.byId(req.params.id);
-  if (a && a.user_id) Users.remove(a.user_id);
-  Ambassadors.remove(req.params.id);
+  // Deactivates rather than deletes: their user account, referral history,
+  // gem events and commission reports all stay on record (HR asked that
+  // former ambassadors be kept, like past batches/employees, just no longer
+  // shown as current). Ambassadors.setActive(false) alone already stops the
+  // referral code from being accepted (byCode filters on `active`) and drops
+  // them off the visible department roster (see departmentDetail below);
+  // authRequired and the login route below both also check `active` so an
+  // already-issued session cookie can't keep the portal open past removal.
+  const a = Ambassadors.setActive(req.params.id, false);
+  if (!a) return res.status(404).json({ error: 'Ambassador not found.' });
   res.json({ ok: true });
+});
+app.post('/api/hr/ambassadors/:id/reactivate', authRequired, hrOnly, (req, res) => {
+  const a = Ambassadors.setActive(req.params.id, true);
+  if (!a) return res.status(404).json({ error: 'Ambassador not found.' });
+  res.json({ ok: true, ambassador: a });
 });
 app.get('/api/hr/ambassadors/gem-rates', authRequired, hrOnly, (req, res) => res.json({ rates: Settings.ambassadorGemRates() }));
 app.put('/api/hr/ambassadors/gem-rates', authRequired, hrOnly, (req, res) => res.json({ ok: true, rates: Settings.setAmbassadorGemRates(req.body || {}) }));
@@ -1022,24 +1045,34 @@ app.put('/api/ambassador-reports/signoff', authRequired, hrOnly, (req, res) => r
 function departmentDetail(d) {
   return {
     ...d,
-    members: DepartmentMembers.forDepartment(d.id).map((m) => {
-      const amb = Ambassadors.byUserId(m.user_id);
-      const staffRecord = m.user.role === 'staff' ? StaffRecords.byUserId(m.user_id) : null;
-      const contract = ['ambassador', 'instructor'].includes(m.user.role) ? Contracts.byUserId(m.user_id) : null;
-      return {
-        user_id: m.user_id, name: m.user.name, role: m.user.role, email: m.user.email,
-        ambassador: amb ? { id: amb.id, code: amb.code, gems: amb.gems, university: amb.university } : null,
-        instructor_tag: m.user.role === 'instructor' ? ((m.user.profile || {}).instructor_tag || null) : undefined,
-        employment_type: staffRecord ? staffRecord.employment_type : undefined,
-        contract_status: contract ? contract.status : undefined,
-      };
-    }),
+    members: DepartmentMembers.forDepartment(d.id)
+      .map((m) => ({ m, amb: Ambassadors.byUserId(m.user_id) }))
+      // A deactivated ambassador (HR "removed" them - see DELETE
+      // /api/hr/ambassadors/:id) stays a department_members row so their
+      // history is intact, but drops off the roster HR actually sees.
+      .filter(({ amb }) => !amb || amb.active)
+      .map(({ m, amb }) => {
+        const staffRecord = m.user.role === 'staff' ? StaffRecords.byUserId(m.user_id) : null;
+        const contract = ['ambassador', 'instructor'].includes(m.user.role) ? Contracts.byUserId(m.user_id) : null;
+        return {
+          user_id: m.user_id, name: m.user.name, role: m.user.role, email: m.user.email,
+          ambassador: amb ? { id: amb.id, code: amb.code, gems: amb.gems, university: amb.university } : null,
+          instructor_tag: m.user.role === 'instructor' ? ((m.user.profile || {}).instructor_tag || null) : undefined,
+          employment_type: staffRecord ? staffRecord.employment_type : undefined,
+          contract_status: contract ? contract.status : undefined,
+        };
+      }),
     tasks: DepartmentTasks.forDepartment(d.id),
     announcements: DepartmentAnnouncements.forDepartment(d.id),
   };
 }
 app.get('/api/hr/departments', authRequired, hrOnly, (req, res) => {
-  res.json({ departments: Departments.all().map((d) => ({ ...d, member_count: DepartmentMembers.forDepartment(d.id).length })) });
+  // Matches departmentDetail's own filter below: a deactivated ambassador
+  // still has a department_members row (their history is kept) but
+  // shouldn't count toward the roster HR sees.
+  const activeMemberCount = (id) => DepartmentMembers.forDepartment(id)
+    .filter((m) => { const amb = Ambassadors.byUserId(m.user_id); return !amb || amb.active; }).length;
+  res.json({ departments: Departments.all().map((d) => ({ ...d, member_count: activeMemberCount(d.id) })) });
 });
 app.post('/api/hr/departments', authRequired, hrOnly, (req, res) => {
   const { name } = req.body || {};
@@ -3463,7 +3496,9 @@ app.patch('/api/hr/staff/:id', authRequired, hrOnly, (req, res) => {
 });
 app.delete('/api/hr/staff/:id', authRequired, hrOnly, (req, res) => {
   const s = StaffRecords.byId(req.params.id);
-  if (s) Users.remove(s.user_id);
+  // Same department_members FK cleanup as DELETE /api/hr/ambassadors/:id
+  // above - every staff/intern is auto-added to a department on creation.
+  if (s) { DepartmentMembers.removeAllForUser(s.user_id); Users.remove(s.user_id); }
   StaffRecords.remove(req.params.id);
   res.json({ ok: true });
 });

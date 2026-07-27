@@ -3407,7 +3407,7 @@ async function renderDepartmentDetail(containerId, deptId, { hrView = false } = 
         <button class="btn btn-ghost btn-sm" onclick="renameDepartment('${containerId}')">Rename</button>
         <button class="btn btn-danger btn-sm" onclick="delDepartment('${containerId}')">Delete</button>` : ''}
     </div></div>
-    ${dep.name === 'Ambassadors' && hrView ? `<div id="ambGemRatesWrap" style="margin-bottom:16px"></div>` : ''}
+    ${dep.name === 'Ambassadors' && hrView ? `<div id="ambGemRatesWrap" style="margin-bottom:16px"></div><div id="ambRemovedWrap" style="margin-bottom:16px"></div>` : ''}
     <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Members</h3>
       <div style="display:flex;gap:8px">
         ${dep.name === 'Ambassadors' && hrView ? `<button class="btn btn-primary btn-sm" onclick="formNewAmbassador('${containerId}')">Add ambassador</button>` : ''}
@@ -3441,7 +3441,7 @@ async function renderDepartmentDetail(containerId, deptId, { hrView = false } = 
       <div class="card-body">
         ${dep.announcements.map((a) => `<div class="s" style="padding:9px 0;border-bottom:1px solid var(--line)"><strong>${esc(a.title)}</strong> &middot; ${esc((a.created_at || '').slice(0, 10))}<br>${esc(a.body)}</div>`).join('') || '<div class="s" style="color:var(--muted)">Nothing posted yet.</div>'}
       </div></div>`;
-  if (dep.name === 'Ambassadors' && hrView) renderAmbGemRates();
+  if (dep.name === 'Ambassadors' && hrView) { renderAmbGemRates(); renderAmbRemoved(containerId); }
 }
 /* -------- Ambassadors are a department too, but creating one issues a real
  * portal login + 4-digit referral code + QR (not just roster membership),
@@ -3465,6 +3465,29 @@ async function renderAmbGemRates() {
     try { await api('/api/hr/ambassadors/gem-rates', { method: 'PUT', body: JSON.stringify(body) }); toast('Gem rates saved.'); } catch (err) { toast(err.message, true); }
   });
 }
+// Ambassadors HR has removed: kept on record (login/referral code disabled,
+// but user account, gem history and commission reports are untouched - see
+// DELETE /api/hr/ambassadors/:id), just hidden from the active Members table
+// above. Listed here so HR can find and undo a removal.
+async function renderAmbRemoved(containerId) {
+  const box = $('ambRemovedWrap'); if (!box) return;
+  const d = await api('/api/hr/ambassadors');
+  const removed = d.ambassadors.filter((a) => !a.active);
+  if (!removed.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="card"><div class="card-head"><h3>Removed ambassadors</h3></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Email</th><th>Code</th><th>University</th><th></th></tr>
+      ${removed.map((a) => `<tr>
+        <td>${esc(a.name)}</td><td class="s">${esc(a.email || '—')}</td>
+        <td class="mono s">${esc(a.code)}</td><td class="s">${esc(a.university || '—')}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="reactivateAmbassador('${containerId}', ${a.id}, '${esc(a.name)}')">Reactivate</button></td>
+      </tr>`).join('')}
+    </table></div></div>`;
+}
+async function reactivateAmbassador(containerId, ambassadorId, name) {
+  if (!confirm(`Reactivate ${name}? Their portal login and referral code start working again immediately.`)) return;
+  try { await api(`/api/hr/ambassadors/${ambassadorId}/reactivate`, { method: 'POST' }); toast('Reactivated.'); refreshDeptDetail(containerId); } catch (e) { toast(e.message, true); }
+}
 function formNewAmbassador(containerId) {
   openModal('Add an ambassador', `<form id="f">
     <label class="field"><span>Full name</span><input name="name" required></label>
@@ -3484,7 +3507,7 @@ function formNewAmbassador(containerId) {
   });
 }
 async function delAmbassadorFromDept(containerId, ambassadorId, name) {
-  if (!confirm(`Remove ambassador ${name}? Their referral code and portal login stop working immediately.`)) return;
+  if (!confirm(`Remove ambassador ${name}? Their referral code and portal login stop working immediately. Their record, referral history and commission reports are kept, not deleted - HR can be asked to reactivate them later.`)) return;
   try { await api('/api/hr/ambassadors/' + ambassadorId, { method: 'DELETE' }); toast('Removed.'); refreshDeptDetail(containerId); } catch (e) { toast(e.message, true); }
 }
 function refreshDeptDetail(containerId) {

@@ -2314,6 +2314,17 @@ const Ambassadors = {
     return a;
   },
   remove(id) { data.ambassadors = data.ambassadors.filter((a) => a.id !== Number(id)); save(); },
+  // HR "removes" an ambassador by deactivating them, not deleting anything -
+  // their user account, referral history, gem events and commission reports
+  // all stay on record. An inactive code already can't be used at
+  // registration (see byCode above); deactivation just also drops them off
+  // the visible roster (departmentDetail in server.js) and blocks portal
+  // login (authRequired/login in server.js).
+  setActive(id, active) {
+    const a = Ambassadors.byId(id); if (!a) return null;
+    a.active = !!active; save();
+    return a;
+  },
   usesFor(code) { return data.registrations.filter((r) => r.ambassador_code === code).length; },
   addGems(id, amount, meta = {}) {
     const a = Ambassadors.byId(id); if (!a || !amount) return a;
@@ -2479,6 +2490,11 @@ const DepartmentMembers = {
     data.department_members = data.department_members.filter((m) => !(m.department_id === Number(departmentId) && m.user_id === Number(userId)));
     save();
   },
+  // Postgres has a real FK (department_members.user_id -> users.id, ON DELETE
+  // RESTRICT), so deleting a user who's still a member of any department
+  // (every ambassador/instructor is, auto-added on creation) would violate it.
+  // Callers that delete a user outright must clear their memberships first.
+  removeAllForUser(userId) { data.department_members = data.department_members.filter((m) => m.user_id !== Number(userId)); save(); },
   isMember(departmentId, userId) { return data.department_members.some((m) => m.department_id === Number(departmentId) && m.user_id === Number(userId)); },
   forDepartment(departmentId) {
     return data.department_members.filter((m) => m.department_id === Number(departmentId))

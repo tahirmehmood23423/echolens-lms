@@ -21,6 +21,7 @@ const path = require('path');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const db = require('./db');
+const mailer = require('./mailer');
 const { COLLECTIONS } = require('./migrations/collections');
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'echolens.json');
@@ -38,9 +39,19 @@ const STAGES = [
 ];
 const STREAK_MILESTONES = { 3: 15, 7: 40, 14: 90, 30: 200 }; // day -> bonus gems
 const DEFAULT_ASSIGNMENT_POINTS = 100;
+// Showcase Feed (v20): gems for publishing a post tied to a completed quest,
+// capped once per quest per user (see Showcase.awardPublishGems below).
+// Never read for likes/comments - there is deliberately no path from either
+// into GemEvents.create. 0/unset disables the award entirely rather than
+// silently defaulting to some made-up amount.
+const SHOWCASE_PUBLISH_GEMS = Math.max(0, Number(process.env.SHOWCASE_PUBLISH_GEMS) || 0);
+// Kept in sync by hand with r2-upload.js's own MAX_IMAGES_PER_POST - store.js
+// deliberately has no dependency on the upload/R2 layer (see that file's
+// header), so this is the data layer's own copy of the same invariant.
+const SHOWCASE_MAX_IMAGES = 4;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0, companies: 0, audit_log: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0, companies: 0, audit_log: 0, showcase_posts: 0, showcase_images: 0, showcase_likes: 0, showcase_comments: 0, showcase_reports: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
@@ -53,6 +64,8 @@ const empty = () => ({
   contracts: [],
   // Talent Marketplace (Phase 1+)
   companies: [], audit_log: [],
+  // Showcase Feed (v20)
+  showcase_posts: [], showcase_images: [], showcase_likes: [], showcase_comments: [], showcase_reports: [],
   settings: {
     // The CEO signature is always rendered as the typed name (see cert-image.js
     // and letterhead-flow.signatureName) - there is deliberately no signature
@@ -139,6 +152,171 @@ let lastPersistedSnapshot = null; // { [collection]: Map<id, JSON string of that
 // replaces `data` anyway.
 let postgresReady = false;
 
+/*
+ * ----------------------------- flush health (A1/A2) -----------------------------
+ * A failed flush was previously silent: the error was logged with a bare
+ * message and swallowed by queuePersistToPostgres()'s `.catch(() => {})`
+ * (that catch exists only to keep the queue itself alive for the next
+ * save() - see that function - it was never meant to hide the failure from
+ * an operator). Per the step 5 architecture note: one constraint/FK
+ * violation anywhere in the app poisons every subsequent flush for the
+ * life of the process (lastPersistedSnapshot never advances past a failed
+ * attempt, so the same bad row is retried and re-fails on every later
+ * save()), unrelated requests start 500ing on the shared
+ * pendingPersistPromise, and in-memory reads keep serving state Postgres
+ * does not durably have - invisible until a restart, which is where the
+ * unpersisted data actually disappears. These three variables plus
+ * flushHealth() below exist so that can be observed (GET
+ * /api/admin/flush-health, and folded into systemHealth()) before a
+ * restart, not diagnosed after one from a support ticket.
+ */
+let lastSuccessfulFlushAt = null; // ISO string, or null if this process has never successfully flushed
+let consecutiveFlushFailures = 0; // reset to 0 on the next successful flush
+let lastFlushFailure = null; // { at, collection, op, code, constraint, message } - never includes row data (see flushHealth()); the fuller redacted row sample goes to console.error only
+
+// Field names redacted out of any row logged on flush failure - emails and
+// anything credential-shaped. Deliberately a fixed allowlist-of-what-to-hide
+// rather than a pattern match: a pattern (e.g. /key/i) would also catch
+// r2_key/thumb_key, which aren't sensitive and are exactly what's needed to
+// debug a showcase_images flush failure.
+const FLUSH_LOG_REDACT_FIELDS = new Set(['email', 'password_hash', 'whatsapp', 'phone', 'google_sub', 'signature', 'account_number', 'iban']);
+function redactRowForLog(row) {
+  if (!row || typeof row !== 'object') return row;
+  const out = {};
+  for (const [k, v] of Object.entries(row)) out[k] = FLUSH_LOG_REDACT_FIELDS.has(k) ? '[redacted]' : v;
+  return out;
+}
+/** Summarizes the row(s) involved in a failed operation for the console.error line only - capped at 5 rows so one bad createMany() batch of hundreds doesn't flood the log. */
+function summarizeRowsForLog(rows) {
+  if (!Array.isArray(rows) || !rows.length) return { count: 0, sample: '[]' };
+  return { count: rows.length, sample: JSON.stringify(rows.slice(0, 5).map(redactRowForLog)).slice(0, 2000) };
+}
+/** Admin-facing flush status - GET /api/admin/flush-health and systemHealth() both read this. Never includes row data (that's console.error-only, see above) - just enough to tell persistence is wedged and where to start looking. */
+function flushHealth() {
+  return {
+    lastSuccessfulFlushAt,
+    secondsSinceLastSuccessfulFlush: lastSuccessfulFlushAt ? Math.round((Date.now() - new Date(lastSuccessfulFlushAt).getTime()) / 1000) : null,
+    consecutiveFlushFailures,
+    lastFailure: lastFlushFailure ? {
+      at: lastFlushFailure.at, collection: lastFlushFailure.collection, op: lastFlushFailure.op,
+      code: lastFlushFailure.code, constraint: lastFlushFailure.constraint, message: lastFlushFailure.message,
+    } : null,
+  };
+}
+
+/*
+ * ------------------------- bounded fail-fast (A1-A3) -------------------------
+ * Implements the approved design: per Part A3's own analysis, per-collection
+ * transactions would break the cross-table counter atomicity a dozen
+ * existing functions rely on, and row quarantine is the right eventual fix
+ * but a multi-day build. This is the bounded middle ground - restart once
+ * per distinct failure episode (capped, not a crash-loop), dump what would
+ * otherwise be silently lost, and alert a human on the first failure rather
+ * than waiting for the eventual crash.
+ */
+const FAIL_FAST_THRESHOLD = 3; // consecutive failures before a restart is attempted - reaches this fast under concurrent traffic, since every save() while wedged re-fails the same way
+const RESTART_MARKER_FRESH_MS = 10 * 60 * 1000; // generous margin over a real Render restart cycle; a marker older than this is presumed to be from a resolved, unrelated incident
+
+function restartMarkerPath() { return path.join(path.dirname(DB_PATH), 'flush-restart-marker.json'); }
+function readRestartMarker() {
+  try { return JSON.parse(fs.readFileSync(restartMarkerPath(), 'utf8')); } catch { return null; }
+}
+function clearRestartMarker() { try { fs.unlinkSync(restartMarkerPath()); } catch { /* already gone */ } }
+/** Written just before process.exit(1) - read back at the next failure to tell "the same problem reproduced right after a restart" (don't restart again) from "this is a fresh, different episode" (restart is worth trying). */
+function writeRestartMarker(failureInfo) {
+  try {
+    fs.writeFileSync(restartMarkerPath(), JSON.stringify({ at: new Date().toISOString(), collection: failureInfo.collection, code: failureInfo.code }, null, 2));
+  } catch (e) { console.error('[store] could not write the restart-episode marker (continuing to exit anyway):', e.message); }
+}
+/** True only if a recent restart was for THIS SAME failure (collection + Prisma error code) - a different, unrelated failure shortly after boot still gets its own one-shot restart attempt. */
+function isSameEpisodeAsRecentRestart(failureInfo) {
+  const marker = readRestartMarker();
+  if (!marker) return false;
+  if (Date.now() - new Date(marker.at).getTime() > RESTART_MARKER_FRESH_MS) return false;
+  return marker.collection === failureInfo.collection && marker.code === failureInfo.code;
+}
+
+/**
+ * A2: reconstructs the full diff a failed flush was attempting - every
+ * collection with a created/updated/deleted row since the last successful
+ * flush, not just the row that happened to throw (constraint: "the full
+ * diff, not just the offending row" - the whole batch rolled back together,
+ * so the whole batch is what's at risk). Derived straight from
+ * snapshot/prevSnapshot (the same source of truth the real diff loop
+ * above uses), independent of how far the failed transaction actually got -
+ * it rolled back everything regardless of where it stopped.
+ */
+function buildFailedFlushDump(snapshot, prevSnapshot, failureInfo) {
+  const schemaMap = require('./schema-map');
+  const collections = {};
+  for (const [key] of schemaMap.COLLECTIONS) {
+    const records = snapshot[key] || [];
+    const prevRows = prevSnapshot[key] || new Map();
+    const created = [];
+    const updated = [];
+    const seenIds = new Set();
+    for (const rec of records) {
+      seenIds.add(rec.id);
+      const json = JSON.stringify(rec);
+      if (!prevRows.has(rec.id)) created.push(redactRowForLog(rec));
+      else if (prevRows.get(rec.id) !== json) updated.push(redactRowForLog(rec));
+    }
+    const deletedIds = [];
+    for (const id of prevRows.keys()) if (!seenIds.has(id)) deletedIds.push(id);
+    if (created.length || updated.length || deletedIds.length) collections[key] = { created, updated, deleted_ids: deletedIds };
+  }
+  const seqChanges = {};
+  const prevSeq = prevSnapshot.seq || {};
+  for (const [name, value] of Object.entries(snapshot.seq || {})) if (prevSeq[name] !== value) seqChanges[name] = value;
+  return {
+    dumped_at: new Date().toISOString(),
+    note: 'Unpersisted diff at the moment of a fatal flush failure (bounded fail-fast). Rows are redacted the same way as the flush-failure log (see FLUSH_LOG_REDACT_FIELDS). To replay: hand-fix or remove whatever caused the failure below, then re-insert these rows through the normal application code path (not raw SQL) so ids/relations stay consistent - do not restore this file directly into Postgres.',
+    failure: failureInfo,
+    collections,
+    seq_changes: seqChanges,
+  };
+}
+/** Guarded write - per A2, dumping must never itself prevent the exit. Returns the path on success, null on failure (already logged). */
+function writeFailedFlushDump(snapshot, prevSnapshot, failureInfo) {
+  try {
+    const dump = buildFailedFlushDump(snapshot, prevSnapshot, failureInfo);
+    // Colons aren't valid in a Windows filename; the full ISO timestamp
+    // (with colons) is still inside the file as dumped_at.
+    const filename = `failed-flush-${dump.dumped_at.replace(/:/g, '-')}.json`;
+    const fullPath = path.join(path.dirname(DB_PATH), filename);
+    fs.writeFileSync(fullPath, JSON.stringify(dump, null, 2));
+    return fullPath;
+  } catch (e) {
+    console.error('[store] failed-flush dump itself failed (exiting anyway - see A2 guard):', e.message);
+    return null;
+  }
+}
+
+/**
+ * A3: fire-and-forget, sent exactly once per episode - called only from the
+ * `consecutiveFlushFailures === 1` branch below, i.e. before the fail-fast
+ * threshold (3) and therefore before A2's dump file exists yet (most single
+ * failures self-resolve on the next successful save() and never reach a
+ * dump at all). The dump location below is deliberately worded as where it
+ * WOULD land if this escalates, not a claim that the file already exists -
+ * reuses mailer.notify() as-is: already never throws, already doesn't
+ * block the caller.
+ */
+function sendFlushFailureAlert(failureInfo) {
+  const likelyDumpDir = path.dirname(DB_PATH);
+  const subject = `EchoLens: Postgres flush failure (${failureInfo.collection || 'unknown collection'})`;
+  const text = `A Showcase/LMS database flush just failed for the first time this episode.\n\n`
+    + `Collection: ${failureInfo.collection || 'unknown'}\n`
+    + `Operation: ${failureInfo.op || 'unknown'}\n`
+    + `Prisma error code: ${failureInfo.code || 'unknown'}\n`
+    + `Constraint/field: ${JSON.stringify(failureInfo.constraint)}\n`
+    + `Time: ${failureInfo.at}\n`
+    + `Message: ${failureInfo.message}\n\n`
+    + `This flush will keep re-failing on every subsequent write until fixed. If it reaches ${FAIL_FAST_THRESHOLD} consecutive failures the process will restart itself once (bounded fail-fast) and dump the unpersisted diff to a failed-flush-<timestamp>.json file in ${likelyDumpDir} before exiting - that file will not exist unless it gets that far.\n\n`
+    + `Check GET /api/admin/flush-health for current status - this is the only email for this episode; it will not repeat on every retry.`;
+  mailer.notify('ceo@echolens.digital', subject, text);
+}
+
 function chunkRows(rows, size) {
   const out = [];
   for (let i = 0; i < rows.length; i += size) out.push(rows.slice(i, i + size));
@@ -223,89 +401,158 @@ async function persistAllToPostgresNormalized(snapshot) {
   const perf = process.env.PERF_DEBUG
     ? { t0: Date.now(), q0: getQueryCount(), creates: 0, createBatches: 0, updates: 0, deletes: 0, deleteBatches: 0, seqUpserts: 0, settingUpserts: 0 }
     : null;
+  // A1: which collection/operation/rows were in flight the instant a throw
+  // happens inside the transaction below - read by the catch block if this
+  // flush fails, so the resulting log line points at the actual offending
+  // table and rows instead of a bare stack trace into prisma.$transaction's
+  // call site. Safe to track with one shared variable (not per-op state):
+  // everything in this function runs on one synchronous call stack between
+  // awaits, so exactly one operation is ever "in flight" at a time.
+  let lastOp = null;
 
-  await prisma.$transaction(async (tx) => {
-    // Inserts/updates in FK-safe order (parents before children). New rows
-    // for a table are collected and sent as ONE createMany() instead of one
-    // create() per row. Updates stay per-row: Prisma's updateMany() can only
-    // apply the SAME data to every matched row, which doesn't fit "each row
-    // has different values" - genuinely batching differing-per-row updates
-    // would need hand-rolled raw SQL per table (55 tables, several with
-    // JSON/Date/polymorphic columns - see schema-map.js's own history of
-    // column-mapping bugs found there), which isn't safe to ship without
-    // testing against the real schema. Left as-is pending PERF_DEBUG numbers
-    // showing whether updates (vs. the create/delete/seq/settings costs
-    // fixed here) are actually the remaining bottleneck.
-    for (const [key, table, model, columns] of schemaMap.COLLECTIONS) {
-      const records = snapshot[key] || [];
-      const prevRows = prevSnapshot[key] || new Map();
-      const nextRows = new Map();
-      const toCreate = [];
-      for (const rec of records) {
-        const json = JSON.stringify(rec);
-        nextRows.set(rec.id, json);
-        if (prevRows.get(rec.id) === json) continue; // unchanged since the last successful flush
-        const row = schemaMap.buildPrismaRow(table, columns, rec, `${key}#${rec.id}`);
-        if (prevRows.has(rec.id)) { await tx[model].update({ where: { id: rec.id }, data: row }); if (perf) perf.updates++; }
-        else toCreate.push(row);
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Inserts/updates in FK-safe order (parents before children). New rows
+      // for a table are collected and sent as ONE createMany() instead of one
+      // create() per row. Updates stay per-row: Prisma's updateMany() can only
+      // apply the SAME data to every matched row, which doesn't fit "each row
+      // has different values" - genuinely batching differing-per-row updates
+      // would need hand-rolled raw SQL per table (55 tables, several with
+      // JSON/Date/polymorphic columns - see schema-map.js's own history of
+      // column-mapping bugs found there), which isn't safe to ship without
+      // testing against the real schema. Left as-is pending PERF_DEBUG numbers
+      // showing whether updates (vs. the create/delete/seq/settings costs
+      // fixed here) are actually the remaining bottleneck.
+      for (const [key, table, model, columns] of schemaMap.COLLECTIONS) {
+        const records = snapshot[key] || [];
+        const prevRows = prevSnapshot[key] || new Map();
+        const nextRows = new Map();
+        const toCreate = [];
+        for (const rec of records) {
+          const json = JSON.stringify(rec);
+          nextRows.set(rec.id, json);
+          if (prevRows.get(rec.id) === json) continue; // unchanged since the last successful flush
+          const row = schemaMap.buildPrismaRow(table, columns, rec, `${key}#${rec.id}`);
+          if (prevRows.has(rec.id)) {
+            lastOp = { collection: key, op: 'update', rows: [rec] };
+            await tx[model].update({ where: { id: rec.id }, data: row }); if (perf) perf.updates++;
+          } else toCreate.push(row);
+        }
+        if (toCreate.length) {
+          lastOp = { collection: key, op: 'createMany', rows: records.filter((r) => !prevRows.has(r.id)) };
+          await tx[model].createMany({ data: toCreate });
+          if (perf) { perf.creates += toCreate.length; perf.createBatches++; }
+        }
+        nextSnapshot[key] = nextRows;
       }
-      if (toCreate.length) {
-        await tx[model].createMany({ data: toCreate });
-        if (perf) { perf.creates += toCreate.length; perf.createBatches++; }
+      // Deletes in REVERSE FK-safe order (children before parents), so a
+      // parent row's delete never runs while a child row still references it.
+      // Batched as ONE deleteMany() per table instead of one delete() per row.
+      for (const [key, , model] of [...schemaMap.COLLECTIONS].reverse()) {
+        const prevRows = prevSnapshot[key] || new Map();
+        const nextRows = nextSnapshot[key] || new Map();
+        const idsToDelete = [];
+        for (const id of prevRows.keys()) if (!nextRows.has(id)) idsToDelete.push(id);
+        if (idsToDelete.length) {
+          lastOp = { collection: key, op: 'deleteMany', rows: idsToDelete.map((id) => ({ id })) };
+          await tx[model].deleteMany({ where: { id: { in: idsToDelete } } });
+          if (perf) { perf.deletes += idsToDelete.length; perf.deleteBatches++; }
+        }
       }
-      nextSnapshot[key] = nextRows;
+
+      // Registries: seq/settings use upsert (small, always-present keyed
+      // rows); issued_usernames/issued_regnos are append-only sets. Diffed
+      // against prevSnapshot.seq/.settings exactly like the collections loop
+      // above - only a key whose value actually changed since the last
+      // successful flush gets an upsert, instead of unconditionally upserting
+      // all 54 seq counters + 5 settings keys on every single save() call.
+      const prevSeq = prevSnapshot.seq || {};
+      const nextSeq = {};
+      for (const [name, value] of Object.entries(snapshot.seq || {})) {
+        nextSeq[name] = value;
+        if (prevSeq[name] === value) continue; // unchanged since the last successful flush
+        lastOp = { collection: 'seq', op: 'upsert', rows: [{ name, value }] };
+        await tx.seq.upsert({ where: { name }, create: { name, value }, update: { value } });
+        if (perf) perf.seqUpserts++;
+      }
+      nextSnapshot.seq = nextSeq;
+      const prevUsernames = new Set(prevSnapshot.issued_usernames || []);
+      const newUsernames = (snapshot.issued_usernames || []).filter((v) => !prevUsernames.has(v));
+      if (newUsernames.length) {
+        lastOp = { collection: 'issued_usernames', op: 'createMany', rows: newUsernames.map((value) => ({ value })) };
+        await tx.issuedUsername.createMany({ data: newUsernames.map((value) => ({ value })), skipDuplicates: true });
+      }
+      const prevRegnos = new Set(prevSnapshot.issued_regnos || []);
+      const newRegnos = (snapshot.issued_regnos || []).filter((v) => !prevRegnos.has(v));
+      if (newRegnos.length) {
+        lastOp = { collection: 'issued_regnos', op: 'createMany', rows: newRegnos.map((value) => ({ value })) };
+        await tx.issuedRegno.createMany({ data: newRegnos.map((value) => ({ value })), skipDuplicates: true });
+      }
+      const prevSettings = prevSnapshot.settings || {};
+      const nextSettings = {};
+      for (const [key, value] of Object.entries(snapshot.settings || {})) {
+        const json = JSON.stringify(value);
+        nextSettings[key] = json;
+        if (prevSettings[key] === json) continue; // unchanged since the last successful flush
+        const v = value === null ? schemaMap.Prisma.JsonNull : value;
+        lastOp = { collection: 'settings', op: 'upsert', rows: [{ key, value: v }] };
+        await tx.setting.upsert({ where: { key }, create: { key, value: v }, update: { value: v } });
+        if (perf) perf.settingUpserts++;
+      }
+      nextSnapshot.settings = nextSettings;
+    }, { maxWait: 10000, timeout: 60000 });
+  } catch (err) {
+    // A1: loud, structured failure - logged and counted here, then
+    // re-thrown unchanged. Rollback/propagation behavior is untouched
+    // (queuePersistToPostgres's own .catch(() => {}) still only keeps the
+    // *queue* alive for the next save() attempt, same as before); this
+    // block only adds visibility on top of that, it does not swallow
+    // anything new.
+    consecutiveFlushFailures += 1;
+    const rowInfo = lastOp ? summarizeRowsForLog(lastOp.rows) : { count: 0, sample: '[]' };
+    lastFlushFailure = {
+      at: new Date().toISOString(),
+      collection: lastOp ? lastOp.collection : null,
+      op: lastOp ? lastOp.op : null,
+      code: err.code || null,
+      constraint: (err.meta && (err.meta.target || err.meta.field_name || err.meta.constraint)) || null,
+      message: String(err.message || '').split('\n')[0].slice(0, 500),
+    };
+    console.error(
+      `[store] FLUSH FAILED - consecutive failures: ${consecutiveFlushFailures}, last success: ${lastSuccessfulFlushAt || 'never (this process)'}\n` +
+      `  collection=${lastFlushFailure.collection} op=${lastFlushFailure.op} prisma_code=${lastFlushFailure.code} constraint=${JSON.stringify(lastFlushFailure.constraint)}\n` +
+      `  offending row(s) [${rowInfo.count} in this operation, redacted, first 5]: ${rowInfo.sample}\n` +
+      `  ${lastFlushFailure.message}\n` +
+      `  EVERY collection changed since the last successful flush was rolled back with this one (single-transaction flush) - not just this row.`
+    );
+
+    // A3: exactly once per episode - this branch is only ever true on the
+    // single failure that takes the counter from 0 to 1.
+    if (consecutiveFlushFailures === 1) {
+      try { sendFlushFailureAlert(lastFlushFailure); }
+      catch (mailErr) { console.error('[store] flush-failure alert email failed (non-fatal, falling back to the log line above):', mailErr.message); }
     }
-    // Deletes in REVERSE FK-safe order (children before parents), so a
-    // parent row's delete never runs while a child row still references it.
-    // Batched as ONE deleteMany() per table instead of one delete() per row.
-    for (const [key, , model] of [...schemaMap.COLLECTIONS].reverse()) {
-      const prevRows = prevSnapshot[key] || new Map();
-      const nextRows = nextSnapshot[key] || new Map();
-      const idsToDelete = [];
-      for (const id of prevRows.keys()) if (!nextRows.has(id)) idsToDelete.push(id);
-      if (idsToDelete.length) {
-        await tx[model].deleteMany({ where: { id: { in: idsToDelete } } });
-        if (perf) { perf.deletes += idsToDelete.length; perf.deleteBatches++; }
+
+    // A1/A2: bounded fail-fast, only once the threshold is actually crossed
+    // (most single failures self-resolve on the next successful save() and
+    // never reach here at all).
+    if (consecutiveFlushFailures >= FAIL_FAST_THRESHOLD) {
+      const dumpPath = writeFailedFlushDump(snapshot, prevSnapshot, lastFlushFailure);
+      if (isSameEpisodeAsRecentRestart(lastFlushFailure)) {
+        console.error(
+          `[store] FATAL condition reproduced immediately after a fail-fast restart for the SAME failure (collection=${lastFlushFailure.collection}, code=${lastFlushFailure.code}) - ` +
+          `NOT restarting again (crash-loop avoided). Persistence remains wedged; this needs a human. Dump: ${dumpPath || 'FAILED TO WRITE - see the error above'}. Flush health: GET /api/admin/flush-health.`
+        );
+      } else {
+        clearRestartMarker(); // clears any stale marker from a different, already-resolved episode before recording this one
+        writeRestartMarker(lastFlushFailure);
+        console.error(`[store] FATAL: ${consecutiveFlushFailures} consecutive flush failures - exiting to let the platform restart (bounded fail-fast, one attempt for this episode). Dump: ${dumpPath || 'FAILED TO WRITE - see the error above'}.`);
+        process.exit(1); // never returns - the throw below is unreached on this path, which is correct: nothing left to catch it
       }
     }
 
-    // Registries: seq/settings use upsert (small, always-present keyed
-    // rows); issued_usernames/issued_regnos are append-only sets. Diffed
-    // against prevSnapshot.seq/.settings exactly like the collections loop
-    // above - only a key whose value actually changed since the last
-    // successful flush gets an upsert, instead of unconditionally upserting
-    // all 54 seq counters + 5 settings keys on every single save() call.
-    const prevSeq = prevSnapshot.seq || {};
-    const nextSeq = {};
-    for (const [name, value] of Object.entries(snapshot.seq || {})) {
-      nextSeq[name] = value;
-      if (prevSeq[name] === value) continue; // unchanged since the last successful flush
-      await tx.seq.upsert({ where: { name }, create: { name, value }, update: { value } });
-      if (perf) perf.seqUpserts++;
-    }
-    nextSnapshot.seq = nextSeq;
-    const prevUsernames = new Set(prevSnapshot.issued_usernames || []);
-    const newUsernames = (snapshot.issued_usernames || []).filter((v) => !prevUsernames.has(v));
-    if (newUsernames.length) {
-      await tx.issuedUsername.createMany({ data: newUsernames.map((value) => ({ value })), skipDuplicates: true });
-    }
-    const prevRegnos = new Set(prevSnapshot.issued_regnos || []);
-    const newRegnos = (snapshot.issued_regnos || []).filter((v) => !prevRegnos.has(v));
-    if (newRegnos.length) {
-      await tx.issuedRegno.createMany({ data: newRegnos.map((value) => ({ value })), skipDuplicates: true });
-    }
-    const prevSettings = prevSnapshot.settings || {};
-    const nextSettings = {};
-    for (const [key, value] of Object.entries(snapshot.settings || {})) {
-      const json = JSON.stringify(value);
-      nextSettings[key] = json;
-      if (prevSettings[key] === json) continue; // unchanged since the last successful flush
-      const v = value === null ? schemaMap.Prisma.JsonNull : value;
-      await tx.setting.upsert({ where: { key }, create: { key, value: v }, update: { value: v } });
-      if (perf) perf.settingUpserts++;
-    }
-    nextSnapshot.settings = nextSettings;
-  }, { maxWait: 10000, timeout: 60000 });
+    throw err;
+  }
 
   if (perf) {
     const ms = Date.now() - perf.t0;
@@ -323,6 +570,8 @@ async function persistAllToPostgresNormalized(snapshot) {
   nextSnapshot.issued_usernames = (snapshot.issued_usernames || []).slice();
   nextSnapshot.issued_regnos = (snapshot.issued_regnos || []).slice();
   lastPersistedSnapshot = nextSnapshot;
+  lastSuccessfulFlushAt = new Date().toISOString();
+  consecutiveFlushFailures = 0;
 }
 
 /** Queues a Postgres persist of the current `data`, serialized after any persist already in flight. Returns a promise for *this* persist specifically (resolves/rejects on its own outcome), even though execution waits its turn in line. */
@@ -949,8 +1198,17 @@ function touchActivity(user) {
 
 /* ------------------------------- gem events ------------------------------- */
 const GemEvents = {
-  create({ user_id, batch_id = null, amount, source, note = null, by = null }) {
-    const ev = { id: nextId('gem_events'), user_id: Number(user_id), batch_id: batch_id ? Number(batch_id) : null, amount: Math.round(Number(amount) || 0), source, note, by, at: now() };
+  // reference_type/reference_id: an optional real dedup key for "award this
+  // exactly once" sources (e.g. Showcase.awardPublishGems below), backed by
+  // gem_events' own @@unique([userId, referenceType, referenceId]) - both
+  // null (the default) for every other source, exactly like every gem
+  // event before this feature existed.
+  create({ user_id, batch_id = null, amount, source, note = null, by = null, reference_type = null, reference_id = null }) {
+    const ev = {
+      id: nextId('gem_events'), user_id: Number(user_id), batch_id: batch_id ? Number(batch_id) : null,
+      amount: Math.round(Number(amount) || 0), source, note, by, at: now(),
+      reference_type, reference_id: reference_id != null ? String(reference_id) : null,
+    };
     data.gem_events.push(ev); save();
     return ev;
   },
@@ -3641,6 +3899,440 @@ const PublicAnnouncements = {
   },
 };
 
+/* ============================== v20: Showcase Feed ============================== */
+// Route-layer/image-processing concerns (multer, sharp, R2) live entirely in
+// showcase.js and r2-upload.js - everything below only ever sees plain JS
+// values (already-uploaded image metadata in, snake_case rows out), matching
+// how every other collection in this file works.
+const Showcase = {
+  PAGE_SIZE: 20,
+
+  postById(id) { return data.showcase_posts.find((p) => p.id === Number(id)) || null; },
+  commentById(id) { return data.showcase_comments.find((c) => c.id === Number(id)) || null; },
+
+  /** True if `viewer` is this post's own batch instructor or an admin - mirrors canManageBatch's admin/instructor split, scoped to the post's own batch (same authority Chat.remove uses). */
+  isStaffFor(viewer, post) {
+    if (!viewer) return false;
+    if (viewer.role === 'admin') return true;
+    if (viewer.role === 'instructor' && post.batch_id != null) return canManageBatch(viewer, Batches.byId(post.batch_id));
+    return false;
+  },
+
+  /**
+   * Constraint #8: posts tied to a level-gated quest are invisible (not just
+   * UI-hidden) to anyone who hasn't passed that level - checked against the
+   * viewer's OWN progress on that exact quest row (same-batch case) or, for
+   * a PUBLIC/cross-batch viewer, any other batch's quest row for the same
+   * track_key + level no (cross-batch equivalence - there is no existing
+   * cross-batch "same level" concept in this codebase, so this is the
+   * natural generalization of Quests.levelPassed's own per-batch check).
+   * Staff always pass, same as every other gate in this feature.
+   */
+  passesLevelGate(viewer, post) {
+    if (!post.quest_submission_id) return true;
+    const sub = Quests.subById(post.quest_submission_id);
+    if (!sub) return true; // submission gone - nothing left to gate
+    const quest = Quests.byId(sub.quest_id);
+    if (!quest) return true;
+    if (viewer && (viewer.role === 'admin' || viewer.role === 'instructor')) return true;
+    if (!viewer) return false;
+    const t = Quests.trackDef(quest.track_key);
+    const passMark = (t && t.pass_mark) || 60;
+    if (Quests.levelPassed(viewer.id, quest, passMark)) return true;
+    return data.quests.some((q2) => q2.id !== quest.id && q2.track_key === quest.track_key && q2.no === quest.no && Quests.levelPassed(viewer.id, q2, passMark));
+  },
+
+  /** Constraint #5: BATCH is the viewer's own cohort (enrolled in post.batch_id) or staff for that batch; PUBLIC is everyone; the author always sees their own. */
+  passesVisibility(viewer, post) {
+    if (post.visibility === 'PUBLIC') return true;
+    if (!viewer) return false;
+    if (viewer.id === post.author_user_id) return true;
+    if (Showcase.isStaffFor(viewer, post)) return true;
+    if (post.batch_id == null) return false; // BATCH with no batch attached - visible only to its author/staff, handled above
+    return data.enrollments.some((e) => e.user_id === viewer.id && e.batch_id === post.batch_id);
+  },
+
+  /** What the feed ever returns: PUBLISHED only, both gates passed. Pending/removed posts never appear here regardless of visibility. */
+  visibleInFeed(viewer, post) {
+    return post.status === 'PUBLISHED' && Showcase.passesLevelGate(viewer, post) && Showcase.passesVisibility(viewer, post);
+  },
+
+  /** What GET /posts/:id allows: the feed rule, plus the author/staff can always see their own post regardless of status (pending review, or removed - so they know it was taken down). */
+  canViewPost(viewer, post) {
+    if (!viewer) return false;
+    if (viewer.id === post.author_user_id || Showcase.isStaffFor(viewer, post)) return true;
+    return Showcase.visibleInFeed(viewer, post);
+  },
+
+  hydratePost(post) {
+    const author = Users.byId(post.author_user_id);
+    const images = data.showcase_images.filter((i) => i.post_id === post.id).sort((a, b) => a.sort_order - b.sort_order)
+      .map((i) => ({ id: i.id, r2_key: i.r2_key, thumb_key: i.thumb_key, width: i.width, height: i.height, sort_order: i.sort_order }));
+    return {
+      id: post.id, caption: post.caption, visibility: post.visibility, status: post.status,
+      like_count: post.like_count, comment_count: post.comment_count,
+      course_id: post.course_id, batch_id: post.batch_id, quest_submission_id: post.quest_submission_id,
+      created_at: post.created_at, updated_at: post.updated_at,
+      author: author ? { id: author.id, name: author.name, reg_no: author.reg_no, avatar: author.avatar, stage: stageFor(totalGemsForStudent(author.id)).key } : null,
+      images,
+    };
+  },
+
+  encodeCursor(post) { return Buffer.from(JSON.stringify([post.created_at, post.id])).toString('base64url'); },
+  decodeCursor(s) {
+    try {
+      const [created_at, id] = JSON.parse(Buffer.from(String(s), 'base64url').toString('utf8'));
+      return typeof created_at === 'string' && typeof id === 'number' ? { created_at, id } : null;
+    } catch { return null; }
+  },
+
+  /**
+   * Constraint #2: keyset pagination on (created_at, id), page size 20,
+   * opaque cursor - never OFFSET. There is no live per-request SQL query
+   * anywhere in this codebase (every read, everywhere, runs against the
+   * in-memory `data` snapshot - see store.js's header on Postgres
+   * persistence), so this is a sort+slice over that snapshot rather than a
+   * WHERE/LIMIT query; the pagination contract (stable, no dupes/skips as
+   * new posts land) is the same either way since it's still keyed on
+   * (created_at, id), not a row count.
+   */
+  feed(viewer, cursorStr) {
+    const cursor = cursorStr ? Showcase.decodeCursor(cursorStr) : null;
+    const eligible = data.showcase_posts.filter((p) => Showcase.visibleInFeed(viewer, p))
+      .sort((a, b) => (a.created_at !== b.created_at ? (a.created_at < b.created_at ? 1 : -1) : b.id - a.id));
+    let start = 0;
+    if (cursor) {
+      start = eligible.findIndex((p) => p.created_at < cursor.created_at || (p.created_at === cursor.created_at && p.id < cursor.id));
+      if (start === -1) start = eligible.length;
+    }
+    const page = eligible.slice(start, start + Showcase.PAGE_SIZE);
+    const last = page[page.length - 1];
+    const next_cursor = page.length === Showcase.PAGE_SIZE && last ? Showcase.encodeCursor(last) : null;
+    return {
+      posts: page.map((p) => ({
+        ...Showcase.hydratePost(p),
+        viewer_has_liked: !!(viewer && data.showcase_likes.some((l) => l.post_id === p.id && l.user_id === viewer.id)),
+      })),
+      next_cursor,
+    };
+  },
+
+  /** Full post + published comments, for a viewer already cleared by canViewPost. */
+  getPost(viewer, id) {
+    const post = Showcase.postById(id);
+    if (!post || !Showcase.canViewPost(viewer, post)) return null;
+    const comments = data.showcase_comments.filter((c) => c.post_id === post.id && c.status === 'PUBLISHED')
+      .sort((a, b) => (a.created_at !== b.created_at ? (a.created_at < b.created_at ? -1 : 1) : a.id - b.id))
+      .map((c) => {
+        const u = Users.byId(c.author_user_id);
+        return { id: c.id, body: c.body, created_at: c.created_at, author: u ? { id: u.id, name: u.name, avatar: u.avatar } : null };
+      });
+    return {
+      ...Showcase.hydratePost(post),
+      comments,
+      viewer_has_liked: !!(viewer && data.showcase_likes.some((l) => l.post_id === post.id && l.user_id === viewer.id)),
+    };
+  },
+
+  /**
+   * Constraint #7: gems for publishing, never for likes/comments - awarded
+   * once (at creation for a trusted author, or at moderation approval for
+   * a first-time one), capped once per quest per user. No GemEvents.create
+   * call exists anywhere else in this feature.
+   *
+   * Dedup key is GemEvent.referenceType/referenceId ('showcase_publish' /
+   * the quest id), not a note-text match - a real column pair, so a reworded
+   * note can never break the cap. The in-memory .some() check below is what
+   * actually protects the request path: gem_events' own
+   * @@unique([userId, referenceType, referenceId]) is enforced at flush
+   * time only (batched into the same Postgres transaction as everything
+   * else changed since the last save() - see store.js's header and the
+   * step 4 architecture note), not at the moment this function runs, so it
+   * cannot by itself stop two concurrent requests from both getting past
+   * this check before either one flushes. It's a backstop against bad data
+   * at rest (a bug, a future direct-Postgres write path, a hand-run
+   * script), not the concurrency guard - same division of responsibility as
+   * showcase_likes/showcase_reports' unique constraints, and the same
+   * reason it's safe here: Node's single-threaded, no-await-in-between
+   * synchronous write is what actually prevents the double-award, exactly
+   * like like()/unlike() above.
+   */
+  awardPublishGems(post) {
+    if (!post.quest_submission_id || !SHOWCASE_PUBLISH_GEMS) return;
+    const sub = Quests.subById(post.quest_submission_id);
+    const quest = sub && Quests.byId(sub.quest_id);
+    if (!quest) return;
+    const referenceType = 'showcase_publish';
+    const referenceId = String(quest.id);
+    const already = data.gem_events.some((e) => e.user_id === post.author_user_id && e.reference_type === referenceType && e.reference_id === referenceId);
+    if (already) return;
+    GemEvents.create({
+      user_id: post.author_user_id, batch_id: quest.batch_id, amount: SHOWCASE_PUBLISH_GEMS,
+      source: referenceType, note: `Showcase publish: quest #${quest.id}`, reference_type: referenceType, reference_id: referenceId,
+    });
+  },
+
+  /**
+   * Synchronously reserves a showcase_posts id before any upload work
+   * starts, so the caller can namespace R2 keys as showcase/{postId}/...
+   * (constraint #6) before the post row exists. Must be called - and its
+   * result passed back in as `reservedId` - before any `await`: nextId()
+   * is only collision-free because it's a synchronous bump of an in-memory
+   * counter with nothing else able to run in between on Node's single
+   * thread. Reading data.seq.showcase_posts + 1 and calling nextId() later
+   * (after an await for the image upload) would let a second concurrent
+   * request's createPost() consume that same id first - this is that
+   * fix, not a hypothetical. save() runs immediately so the reservation
+   * survives a crash/restart between this call and the post actually being
+   * created (an id that ends up unused is fine to skip forever, same as
+   * a deleted row's id - it just must never be handed out twice).
+   */
+  reservePostId() { const id = nextId('showcase_posts'); save(); return id; },
+
+  /**
+   * `images` is already-uploaded metadata from r2-upload.js
+   * ({r2Key, thumbKey, width, height, byteSize}), not files - see this
+   * section's header comment. `reservedId` must come from reservePostId()
+   * called before the images were uploaded (see that method's comment).
+   * Returns {error} on any validation failure (matching this file's
+   * convention everywhere else), or the created post.
+   */
+  createPost({ author, caption, visibility, batchId, questSubmissionId, images, reservedId }) {
+    const cap = String(caption || '').slice(0, 2000).trim();
+    if (!cap) return { error: 'Caption is required.' };
+    if (!Array.isArray(images) || !images.length) return { error: 'At least one image is required.' };
+    if (images.length > SHOWCASE_MAX_IMAGES) return { error: `A post can have at most ${SHOWCASE_MAX_IMAGES} images.` };
+    if (!reservedId) return { error: 'Internal error: no reserved post id.' };
+
+    let quest = null;
+    if (questSubmissionId) {
+      const sub = Quests.subById(questSubmissionId);
+      if (!sub || sub.user_id !== author.id) return { error: 'That quest submission does not belong to you.' };
+      quest = Quests.byId(sub.quest_id);
+    }
+
+    // A quest-linked post always uses the quest's own batch/course - never
+    // trust the client for this once a quest submission is involved.
+    let bid = null;
+    if (quest) bid = quest.batch_id;
+    else if (batchId && data.enrollments.some((e) => e.user_id === author.id && e.batch_id === Number(batchId))) bid = Number(batchId);
+    const batch = bid ? Batches.byId(bid) : null;
+    const cid = batch ? batch.course_id : null;
+
+    const vis = visibility === 'PUBLIC' ? 'PUBLIC' : 'BATCH';
+    // Constraint #9: trust is a live check over the author's CURRENT post
+    // history, not a cached flag - "do they currently have at least one
+    // still-published post" - deliberately NOT "have they ever had one
+    // published." A takedown flips that post's status to REMOVED, which no
+    // longer satisfies this check, so it revokes trust by construction: the
+    // very next post this author creates re-evaluates from scratch and,
+    // if that was their only clean post, goes back to PENDING_REVIEW. Fixed
+    // 2026-07-27: originally also counted REMOVED as trust-establishing,
+    // which inverted this - an account whose first post was taken down for
+    // being inappropriate would have kept posting straight to PUBLISHED.
+    const trusted = data.showcase_posts.some((p) => p.author_user_id === author.id && p.status === 'PUBLISHED');
+    const status = trusted ? 'PUBLISHED' : 'PENDING_REVIEW';
+
+    const nowStr = now();
+    const post = {
+      id: reservedId, author_user_id: author.id, caption: cap,
+      quest_submission_id: quest ? Number(questSubmissionId) : null, course_id: cid, batch_id: bid,
+      visibility: vis, status, like_count: 0, comment_count: 0,
+      created_at: nowStr, updated_at: nowStr, removed_at: null, removed_by_user_id: null, removal_reason: null,
+    };
+    data.showcase_posts.push(post);
+    images.forEach((img, i) => {
+      data.showcase_images.push({
+        id: nextId('showcase_images'), post_id: post.id, r2_key: img.r2Key, thumb_key: img.thumbKey,
+        width: img.width, height: img.height, byte_size: img.byteSize, sort_order: i,
+      });
+    });
+    save();
+    if (status === 'PUBLISHED') Showcase.awardPublishGems(post);
+    return post;
+  },
+
+  /** Constraint #1 (no unique-constraint-violation to catch): idempotent by construction, not by racing a DB constraint - store.js's writes are synchronous JS against one in-memory `data` object with no `await` in between the check and the push, so two requests can never interleave mid-function the way two pooled DB connections could. See this section's header and the report to the user for the full explanation. */
+  like(postId, userId) {
+    const post = Showcase.postById(postId);
+    if (!post) return { error: 'Post not found.' };
+    const uid = Number(userId);
+    const exists = data.showcase_likes.some((l) => l.post_id === post.id && l.user_id === uid);
+    if (!exists) {
+      data.showcase_likes.push({ id: nextId('showcase_likes'), post_id: post.id, user_id: uid, created_at: now() });
+      post.like_count = (post.like_count || 0) + 1; // same synchronous function, same save() - one flush, one transaction (constraint #3)
+      save();
+    }
+    return post;
+  },
+  unlike(postId, userId) {
+    const post = Showcase.postById(postId);
+    if (!post) return { error: 'Post not found.' };
+    const uid = Number(userId);
+    const before = data.showcase_likes.length;
+    data.showcase_likes = data.showcase_likes.filter((l) => !(l.post_id === post.id && l.user_id === uid));
+    if (data.showcase_likes.length < before) {
+      post.like_count = Math.max(0, (post.like_count || 0) - 1);
+      save();
+    }
+    return post;
+  },
+
+  addComment(postId, author, body) {
+    const post = Showcase.postById(postId);
+    if (!post) return { error: 'Post not found.' };
+    const text = String(body || '').slice(0, 1000).trim();
+    if (!text) return { error: 'Comment cannot be empty.' };
+    const c = {
+      id: nextId('showcase_comments'), post_id: post.id, author_user_id: author.id, body: text,
+      status: 'PUBLISHED', created_at: now(), removed_at: null, removed_by_user_id: null,
+    };
+    data.showcase_comments.push(c);
+    post.comment_count = (post.comment_count || 0) + 1;
+    save();
+    return c;
+  },
+  /** Soft delete only (constraint #8) - no hard deletes on posts or comments anywhere in this feature. */
+  removeComment(comment, actor) {
+    comment.status = 'REMOVED';
+    comment.removed_at = now();
+    comment.removed_by_user_id = actor.id;
+    const post = Showcase.postById(comment.post_id);
+    if (post) post.comment_count = Math.max(0, (post.comment_count || 0) - 1);
+    save();
+    return comment;
+  },
+
+  /** Soft delete only - sets status/removed_at/removed_by_user_id/removal_reason, same shape Chat.remove's callers already reason about, just soft instead of hard (see showcase.js's DELETE /posts/:id and the moderation "remove" action, both of which call this). */
+  removePost(post, actor, reason) {
+    post.status = 'REMOVED';
+    post.removed_at = now();
+    post.removed_by_user_id = actor.id;
+    post.removal_reason = reason ? String(reason).slice(0, 500) : null;
+    save();
+    return post;
+  },
+
+  report({ reporter, targetType, targetId, reason }) {
+    const tt = targetType === 'COMMENT' ? 'COMMENT' : 'POST';
+    const tid = Number(targetId);
+    if (tt === 'POST' && !Showcase.postById(tid)) return { error: 'Post not found.' };
+    if (tt === 'COMMENT' && !Showcase.commentById(tid)) return { error: 'Comment not found.' };
+    // Idempotent, not an error - the unique constraint (target_type, target_id, reporter_user_id) means
+    // one person reporting the same thing twice is a no-op (same "don't read-then-write races" note as
+    // like()/unlike() applies here too, for the same single-threaded-synchronous reason).
+    const already = data.showcase_reports.find((r) => r.target_type === tt && r.target_id === tid && r.reporter_user_id === reporter.id);
+    if (already) return already;
+    const r = {
+      id: nextId('showcase_reports'), target_type: tt, target_id: tid, reporter_user_id: reporter.id,
+      reason: String(reason || '').slice(0, 500).trim() || 'No reason given',
+      status: 'OPEN', resolved_by_user_id: null, resolved_at: null, created_at: now(),
+    };
+    data.showcase_reports.push(r); save();
+    return r;
+  },
+
+  hydrateReport(r) {
+    const reporter = Users.byId(r.reporter_user_id);
+    let target = null;
+    if (r.target_type === 'POST') {
+      const p = Showcase.postById(r.target_id);
+      target = p ? Showcase.hydratePost(p) : null;
+    } else {
+      const c = Showcase.commentById(r.target_id);
+      target = c ? { id: c.id, body: c.body, status: c.status, post_id: c.post_id, author: (Users.byId(c.author_user_id) || {}).name || null } : null;
+    }
+    return {
+      id: r.id, target_type: r.target_type, target_id: r.target_id, reason: r.reason, status: r.status, created_at: r.created_at,
+      reporter: reporter ? { id: reporter.id, name: reporter.name } : null,
+      target,
+    };
+  },
+
+  /**
+   * Step 6 Part C: instructors see only their own batches' items, admins
+   * see everything - enforced HERE, not in the route or the UI. Reuses
+   * isStaffFor (already: admin always true; instructor true only if
+   * canManageBatch() for that post's own batch) rather than a second
+   * scoping rule, so this can never drift from the same authority DELETE
+   * /posts/:id and DELETE /comments/:id already use.
+   */
+  moderationQueue(viewer) {
+    const isAdmin = viewer && viewer.role === 'admin';
+    const postVisibleToViewer = (post) => isAdmin || Showcase.isStaffFor(viewer, post);
+
+    const pendingPosts = data.showcase_posts
+      .filter((p) => p.status === 'PENDING_REVIEW' && postVisibleToViewer(p))
+      .sort((a, b) => a.id - b.id).map(Showcase.hydratePost);
+
+    const openReports = data.showcase_reports
+      .filter((r) => {
+        if (r.status !== 'OPEN') return false;
+        if (isAdmin) return true;
+        const post = r.target_type === 'POST'
+          ? Showcase.postById(r.target_id)
+          : (() => { const c = Showcase.commentById(r.target_id); return c ? Showcase.postById(c.post_id) : null; })();
+        // A report whose post can no longer be resolved is not shown to a
+        // non-admin - same "batch-less content falls back to admin-only"
+        // convention isStaffFor itself uses.
+        return post ? Showcase.isStaffFor(viewer, post) : false;
+      })
+      .sort((a, b) => a.id - b.id).map(Showcase.hydrateReport);
+
+    return { pending_posts: pendingPosts, open_reports: openReports };
+  },
+
+  /**
+   * `targetType` disambiguates what `:id` refers to - the brief's route
+   * table gives one URL (`POST /moderation/:id/action`) for both pending
+   * posts and open reports, which are two different collections, so the
+   * caller (showcase.js) must say which one `id` is. Guessed shape, flagged
+   * for review: body `{ target_type: 'post'|'report', action, reason? }`.
+   */
+  moderationAction({ actor, targetType, id, action, reason }) {
+    if (targetType === 'post') {
+      const post = Showcase.postById(id);
+      if (!post) return { error: 'Post not found.' };
+      if (action === 'approve') {
+        if (post.status !== 'PENDING_REVIEW') return { error: 'Only a pending post can be approved.' };
+        post.status = 'PUBLISHED'; post.updated_at = now(); save();
+        Showcase.awardPublishGems(post);
+        AuditLog.record({ actor_id: actor.id, action: 'showcase_post_approve', target_type: 'showcase_post', target_id: post.id });
+        return post;
+      }
+      if (action === 'remove') {
+        Showcase.removePost(post, actor, reason);
+        AuditLog.record({ actor_id: actor.id, action: 'showcase_post_remove', target_type: 'showcase_post', target_id: post.id, detail: reason ? { reason } : null });
+        return post;
+      }
+      return { error: 'Unsupported action for a post.' };
+    }
+    if (targetType === 'report') {
+      const r = data.showcase_reports.find((x) => x.id === Number(id));
+      if (!r) return { error: 'Report not found.' };
+      if (action === 'dismiss') {
+        r.status = 'DISMISSED'; r.resolved_by_user_id = actor.id; r.resolved_at = now(); save();
+        AuditLog.record({ actor_id: actor.id, action: 'showcase_report_dismiss', target_type: 'showcase_report', target_id: r.id });
+        return r;
+      }
+      if (action === 'remove') {
+        if (r.target_type === 'POST') {
+          const post = Showcase.postById(r.target_id);
+          if (post) Showcase.removePost(post, actor, reason || 'Reported content removed.');
+        } else {
+          const c = Showcase.commentById(r.target_id);
+          if (c) Showcase.removeComment(c, actor);
+        }
+        r.status = 'ACTIONED'; r.resolved_by_user_id = actor.id; r.resolved_at = now(); save();
+        AuditLog.record({ actor_id: actor.id, action: 'showcase_report_action', target_type: 'showcase_report', target_id: r.id, detail: reason ? { reason } : null });
+        return r;
+      }
+      return { error: 'Unsupported action for a report.' };
+    }
+    return { error: 'Unknown target type.' };
+  },
+};
+
 load();
 
 module.exports = {
@@ -3650,18 +4342,26 @@ module.exports = {
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
-  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
+  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
   Companies, AuditLog,
   seed, DB_PATH, allData: () => data,
-  initFromPostgres, pendingPersist,
+  initFromPostgres, pendingPersist, flushHealth,
   isUsingPostgres: () => db.enabled(),
   // Exported for direct testing (see the Batch 2 test harness); not
   // normally called from outside this file - initFromPostgres() above
   // calls it at boot.
   loadFromPostgresNormalized,
+  // Exported for direct testing, same reasoning - bounded fail-fast (v20
+  // step 6 Part A) has no other way to exercise without a live Postgres
+  // failure to trigger it organically.
+  _flushFailFastInternals: {
+    FAIL_FAST_THRESHOLD, RESTART_MARKER_FRESH_MS,
+    restartMarkerPath, readRestartMarker, writeRestartMarker, clearRestartMarker, isSameEpisodeAsRecentRestart,
+    buildFailedFlushDump, writeFailedFlushDump, sendFlushFailureAlert,
+  },
 };
 
 if (require.main === module && process.argv.includes('--seed')) seed();

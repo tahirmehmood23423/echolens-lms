@@ -59,73 +59,77 @@ datasource db {
 // ─────────────────────────────────────────────────────────────────
 
 model User {
-  id                  Int      @id @default(autoincrement())
-  name                String
-  role                String // admin|instructor|coordinator|student|free|hr|staff|student_coordinator|finance|ambassador|recruiter
+  id                   Int       @id @default(autoincrement())
+  name                 String
+  role                 String // admin|instructor|coordinator|student|free|hr|staff|student_coordinator|finance|ambassador|recruiter
   // VERIFIED nullable: findOrCreateGoogle() sets username: null when there's
   // no email (store.js:492). Still unique when present.
-  username            String?  @unique
-  email               String? // intentionally NOT unique — see header note in original doc
-  regNo               String?  @unique @map("reg_no")
+  username             String?   @unique
+  email                String? // intentionally NOT unique — see header note in original doc
+  regNo                String?   @unique @map("reg_no")
   // VERIFIED nullable: Google-sign-in-only accounts get password_hash: null
   // (store.js:493; checked at server.js login flow).
-  passwordHash        String?  @map("password_hash")
-  profile             Json     @default("{}")
-  streak              Int      @default(0)
-  bestStreak          Int      @default(0) @map("best_streak")
-  lastActive          DateTime? @map("last_active")
-  createdAt           DateTime @map("created_at")
-  onboardingComplete  Boolean  @default(false) @map("onboarding_complete")
-  avatar              String?
+  passwordHash         String?   @map("password_hash")
+  profile              Json      @default("{}")
+  streak               Int       @default(0)
+  bestStreak           Int       @default(0) @map("best_streak")
+  lastActive           DateTime? @map("last_active")
+  createdAt            DateTime  @map("created_at")
+  onboardingComplete   Boolean   @default(false) @map("onboarding_complete")
+  avatar               String?
   // MISSING from original draft: Users.setSignature() writes this (store.js:571).
-  signature           String?
+  signature            String?
   // MISSING from original draft: Google sign-in identity (store.js:480,489,492).
-  googleSub           String?  @unique @map("google_sub")
+  googleSub            String?   @unique @map("google_sub")
   // Migration-only tombstone flag — NOT read by any current app code. Added
   // solely so import-normalized.js can insert placeholder rows for users
   // referenced by a real FK (e.g. a certificate's user_id) whose original
   // account was deleted, without violating the FK constraint.
-  isDeletedPlaceholder Boolean @default(false) @map("is_deleted_placeholder")
+  isDeletedPlaceholder Boolean   @default(false) @map("is_deleted_placeholder")
 
   // --- Talent Marketplace recruiter fields (role='recruiter' only; null otherwise) ---
   // Users.createRecruiter/setRecruiterStatus/resubmitRecruiter (store.js:593-630).
   // Not present in the original draft at all (that backup predates this feature).
-  companyId          Int?     @map("company_id")
-  designation        String?
-  city               String?
-  hiringNote         String?  @map("hiring_note")
-  status             String?  // pending|approved|rejected|needs_info (recruiter verification)
-  statusReason       String?  @map("status_reason")
+  companyId         Int?      @map("company_id")
+  designation       String?
+  city              String?
+  hiringNote        String?   @map("hiring_note")
+  status            String? // pending|approved|rejected|needs_info (recruiter verification)
+  statusReason      String?   @map("status_reason")
   // Not always present: recruiter-only field (Users.createRecruiter), absent
   // on every non-recruiter row (78/79 real users). No @default(false) - a
   // false default would misrepresent "not a recruiter" as "opted out".
-  overrideRequested  Boolean? @map("override_requested")
-  overrideReason     String?  @map("override_reason")
-  approvedBy         Int?     @map("approved_by")
-  approvedAt         DateTime? @map("approved_at")
+  overrideRequested Boolean?  @map("override_requested")
+  overrideReason    String?   @map("override_reason")
+  approvedBy        Int?      @map("approved_by")
+  approvedAt        DateTime? @map("approved_at")
 
-  company             Company? @relation(fields: [companyId], references: [id])
-  enrollments         Enrollment[]
-  questSubmissions    QuestSubmission[]  @relation("SubmissionAuthor")
-  gradedSubmissions   QuestSubmission[]  @relation("SubmissionGrader")
-  gemEvents           GemEvent[]
-  certificates        Certificate[]      @relation("CertificateHolder")
-  attendance          Attendance[]
-  openSubmissions     OpenSubmission[]
-  courseMessages      CourseMessage[]
-  eventEntries        EventEntry[]
-  eventSubmissions    EventSubmission[]
-  eventComments       EventComment[]
-  chatReads           ChatRead[]
-  aiReports           AiReport[]         @relation("ReportSubject")
-  leads               Lead[]
-  departmentMembers   DepartmentMember[] @relation("DeptMember")
-  ambassadorProfile   Ambassador?
-  staffRecord         StaffRecord?
-  legacySubmissions   Submission[]
+  company              Company?              @relation(fields: [companyId], references: [id])
+  enrollments          Enrollment[]
+  questSubmissions     QuestSubmission[]     @relation("SubmissionAuthor")
+  gradedSubmissions    QuestSubmission[]     @relation("SubmissionGrader")
+  gemEvents            GemEvent[]
+  certificates         Certificate[]         @relation("CertificateHolder")
+  attendance           Attendance[]
+  openSubmissions      OpenSubmission[]
+  courseMessages       CourseMessage[]
+  eventEntries         EventEntry[]
+  eventSubmissions     EventSubmission[]
+  eventComments        EventComment[]
+  chatReads            ChatRead[]
+  aiReports            AiReport[]            @relation("ReportSubject")
+  leads                Lead[]
+  departmentMembers    DepartmentMember[]    @relation("DeptMember")
+  ambassadorProfile    Ambassador?
+  staffRecord          StaffRecord?
+  legacySubmissions    Submission[]
   challengeSubmissions ChallengeSubmission[]
-  quizAttempts        QuizAttempt[]
-  jobComments         JobComment[]
+  quizAttempts         QuizAttempt[]
+  jobComments          JobComment[]
+  showcasePosts        ShowcasePost[]        @relation("ShowcasePostAuthor")
+  showcaseLikes        ShowcaseLike[]
+  showcaseComments     ShowcaseComment[]     @relation("ShowcaseCommentAuthor")
+  showcaseReports      ShowcaseReport[]
 
   @@index([role])
   @@map("users")
@@ -134,20 +138,27 @@ model User {
 // Registries preventing reuse of retired usernames / reg numbers.
 model IssuedUsername {
   value String @id
+
   @@map("issued_usernames")
 }
+
 model IssuedRegno {
   value String @id
+
   @@map("issued_regnos")
 }
+
 model Seq {
   name  String @id
   value Int
+
   @@map("seq")
 }
+
 model Setting {
   key   String @id
   value Json
+
   @@map("settings")
 }
 
@@ -162,6 +173,7 @@ model Company {
   createdAt DateTime @map("created_at")
 
   recruiters User[]
+
   @@map("companies")
 }
 
@@ -199,39 +211,42 @@ model Course {
   badges    Json?
   freeMode  String?  @map("free_mode")
 
-  batches   Batch[]
-  lessons   Lesson[]
+  batches       Batch[]
+  lessons       Lesson[]
+  showcasePosts ShowcasePost[]
+
   @@map("courses")
 }
 
 model Batch {
-  id            Int      @id @default(autoincrement())
-  courseId      Int      @map("course_id")
-  code          String   @unique
-  name          String
-  startDate     String   @map("start_date") // date-only
-  status        String
-  instructorIds Json     @map("instructor_ids") // Int[]
-  createdAt     DateTime @map("created_at")
+  id                   Int      @id @default(autoincrement())
+  courseId             Int      @map("course_id")
+  code                 String   @unique
+  name                 String
+  startDate            String   @map("start_date") // date-only
+  status               String
+  instructorIds        Json     @map("instructor_ids") // Int[]
+  createdAt            DateTime @map("created_at")
   // Migration-only tombstone flag (batch 1 in the source backup is deleted
   // but still referenced by 12 quest rows) — not read by any app code.
-  isDeletedPlaceholder Boolean @default(false) @map("is_deleted_placeholder")
+  isDeletedPlaceholder Boolean  @default(false) @map("is_deleted_placeholder")
 
-  course        Course   @relation(fields: [courseId], references: [id])
-  enrollments   Enrollment[]
-  quests        Quest[]
-  sessions      Session[]
-  liveClasses   LiveClass[]
-  courseMessages CourseMessage[]
-  chatReads     ChatRead[]
-  certificates  Certificate[]
-  announcements Announcement[]
-  gemEvents     GemEvent[]
-  aiReports     AiReport[]
-  lessons       Lesson[]
-  assignments   Assignment[]
-  quizzes       Quiz[]
+  course              Course               @relation(fields: [courseId], references: [id])
+  enrollments         Enrollment[]
+  quests              Quest[]
+  sessions            Session[]
+  liveClasses         LiveClass[]
+  courseMessages      CourseMessage[]
+  chatReads           ChatRead[]
+  certificates        Certificate[]
+  announcements       Announcement[]
+  gemEvents           GemEvent[]
+  aiReports           AiReport[]
+  lessons             Lesson[]
+  assignments         Assignment[]
+  quizzes             Quiz[]
   ambassadorGemEvents AmbassadorGemEvent[]
+  showcasePosts       ShowcasePost[]
 
   @@index([courseId])
   @@map("batches")
@@ -243,33 +258,33 @@ model Enrollment {
   batchId   Int      @map("batch_id")
   createdAt DateTime @map("created_at")
 
-  user      User  @relation(fields: [userId], references: [id])
-  batch     Batch @relation(fields: [batchId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  batch Batch @relation(fields: [batchId], references: [id])
 
   @@unique([userId, batchId])
   @@map("enrollments")
 }
 
 model Session {
-  id          Int      @id @default(autoincrement())
-  batchId     Int      @map("batch_id")
+  id          Int       @id @default(autoincrement())
+  batchId     Int       @map("batch_id")
   // VERIFIED nullable: server.js:1366 `Number(week_no) || null` / `start_time
   // || null` / `end_time || null`.
-  weekNo      Int?     @map("week_no")
+  weekNo      Int?      @map("week_no")
   title       String
-  sessionDate String   @map("session_date")
-  startTime   String?  @map("start_time")
-  endTime     String?  @map("end_time")
+  sessionDate String    @map("session_date")
+  startTime   String?   @map("start_time")
+  endTime     String?   @map("end_time")
   room        String
   startedAt   DateTime? @map("started_at")
   endedAt     DateTime? @map("ended_at")
   // VERIFIED nullable: created as null (store.js:874), only set once the
   // session is actually started (store.js:901).
-  startedBy   Int?     @map("started_by")
-  createdAt   DateTime @map("created_at")
+  startedBy   Int?      @map("started_by")
+  createdAt   DateTime  @map("created_at")
 
-  batch       Batch @relation(fields: [batchId], references: [id])
-  attendance  Attendance[]
+  batch      Batch        @relation(fields: [batchId], references: [id])
+  attendance Attendance[]
 
   @@map("sessions")
 }
@@ -299,7 +314,7 @@ model Quest {
   // `.toISOString().slice(0,10)`, returns null if the batch has no start date.
   deadline  String?
 
-  batch       Batch @relation(fields: [batchId], references: [id])
+  batch       Batch             @relation(fields: [batchId], references: [id])
   submissions QuestSubmission[]
   taskFiles   TaskFile[]
 
@@ -308,30 +323,31 @@ model Quest {
 }
 
 model QuestSubmission {
-  id             Int      @id @default(autoincrement())
-  questId        Int      @map("quest_id")
+  id             Int       @id @default(autoincrement())
+  questId        Int       @map("quest_id")
   pid            Int
-  userId         Int      @map("user_id") // 3 rows reference deleted user 5 in the source backup
-  fileUrl        String?  @map("file_url")
+  userId         Int       @map("user_id") // 3 rows reference deleted user 5 in the source backup
+  fileUrl        String?   @map("file_url")
   note           String?
   grade          Int?
-  gems           Int      @default(0)
+  gems           Int       @default(0)
   remarks        String?
-  submittedAt    DateTime @map("submitted_at")
+  submittedAt    DateTime  @map("submitted_at")
   gradedAt       DateTime? @map("graded_at")
-  gradedBy       Int?     @map("graded_by") // 13 rows reference deleted user 8 in the source backup
+  gradedBy       Int?      @map("graded_by") // 13 rows reference deleted user 8 in the source backup
   code           String?
   language       String?
-  aiReview       Json?    @map("ai_review")
-  reviewShared   Boolean? @map("review_shared")
+  aiReview       Json?     @map("ai_review")
+  reviewShared   Boolean?  @map("review_shared")
   reviewSharedAt DateTime? @map("review_shared_at")
   late           Boolean?
   integrity      Json?
-  lateDeduction  Int?     @map("late_deduction")
+  lateDeduction  Int?      @map("late_deduction")
 
-  quest  Quest @relation(fields: [questId], references: [id])
-  user   User  @relation("SubmissionAuthor", fields: [userId], references: [id])
-  grader User? @relation("SubmissionGrader", fields: [gradedBy], references: [id])
+  quest         Quest          @relation(fields: [questId], references: [id])
+  user          User           @relation("SubmissionAuthor", fields: [userId], references: [id])
+  grader        User?          @relation("SubmissionGrader", fields: [gradedBy], references: [id])
+  showcasePosts ShowcasePost[]
 
   @@index([userId])
   @@index([questId, pid])
@@ -340,22 +356,22 @@ model QuestSubmission {
 
 // Public playground submissions (no enrolment required)
 model OpenSubmission {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id")
-  trackKey     String   @map("track_key")
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  trackKey     String    @map("track_key")
   level        Int
   pid          Int
-  problemTitle String   @map("problem_title")
+  problemTitle String    @map("problem_title")
   points       Int
   // VERIFIED nullable: a submission can arrive via file_url only
   // (store.js:2897-2901,2909) — code/language are null in that path.
   code         String?
   language     String?
-  fileUrl      String?  @map("file_url")
-  fileName     String?  @map("file_name")
-  submittedAt  DateTime @map("submitted_at")
+  fileUrl      String?   @map("file_url")
+  fileName     String?   @map("file_name")
+  submittedAt  DateTime  @map("submitted_at")
   score        Int?
-  gems         Int      @default(0)
+  gems         Int       @default(0)
   feedback     String?
   gradedAt     DateTime? @map("graded_at")
   attempts     Int?
@@ -372,20 +388,33 @@ model OpenSubmission {
 // ─────────────────────────────────────────────────────────────────
 
 model GemEvent {
-  id      Int      @id @default(autoincrement())
-  userId  Int      @map("user_id")
-  batchId Int?     @map("batch_id")
-  amount  Int
-  source  String
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  batchId       Int?     @map("batch_id")
+  amount        Int
+  source        String
   // VERIFIED nullable: system-awarded events (streak bonus store.js:681,
   // quiz auto-award store.js:1793) omit `by`; instructor awards pass it.
-  note    String?
-  by      Int?
-  at      DateTime
+  note          String?
+  by            Int?
+  at            DateTime
+  // Added 2026-07-27 (Showcase Feed v20): a real dedup key for "award this
+  // exactly once" sources, replacing a note-text string match. Both null on
+  // every event that isn't such a source (every event before this feature,
+  // and every showcase_publish-shaped award attempt that already exists in
+  // memory unaffected). Postgres treats NULL as distinct from NULL in a
+  // unique index by default, so @@unique below only blocks a real duplicate
+  // (same user, same referenceType, same referenceId all non-null) - it
+  // does NOT require a partial/filtered index to get "only enforced when
+  // all three are non-null" behavior; that's the ordinary multi-column
+  // unique-index semantics already, with no extra syntax needed.
+  referenceType String?  @map("reference_type")
+  referenceId   String?  @map("reference_id")
 
   user  User   @relation(fields: [userId], references: [id])
   batch Batch? @relation(fields: [batchId], references: [id])
 
+  @@unique([userId, referenceType, referenceId])
   @@index([userId])
   @@map("gem_events")
 }
@@ -395,29 +424,29 @@ model GemEvent {
 // ─────────────────────────────────────────────────────────────────
 
 model Certificate {
-  id              Int      @id @default(autoincrement())
-  serial          String   @unique
-  userId          Int      @map("user_id") // 1 row references deleted user 5 in the source backup
-  studentName     String   @map("student_name")
-  regNo           String   @map("reg_no")
-  batchId         Int?     @map("batch_id") // confirmed nullable: hackathon/webinar/quest/track/event auto-certs pass batch_id: null (store.js:2573,2952)
-  kind            String // course|hackathon|competition|quest|webinar
-  title           String
+  id             Int      @id @default(autoincrement())
+  serial         String   @unique
+  userId         Int      @map("user_id") // 1 row references deleted user 5 in the source backup
+  studentName    String   @map("student_name")
+  regNo          String   @map("reg_no")
+  batchId        Int?     @map("batch_id") // confirmed nullable: hackathon/webinar/quest/track/event auto-certs pass batch_id: null (store.js:2573,2952)
+  kind           String // course|hackathon|competition|quest|webinar
+  title          String
   // NOT always non-null despite the comment below (kept for context: it's
   // accurate for what CURRENT store.js code writes, store.js:1858) - 3 of
   // 32 real certificates hold an explicit null, from before whatever
   // change guarantees the '' fallback today. @default("") never rescues an
   // explicit null (only a missing key), which is what broke the import.
-  detail          String?
-  completionDate  String   @map("completion_date") // VERIFIED date-only, enforced by regex else falls back to today() (store.js:1859)
-  instructorName  String?  @map("instructor_name")
-  instructorSig   String?  @map("instructor_sig")
-  issuedBy        Int      @map("issued_by")
-  issuedAt        DateTime @map("issued_at")
+  detail         String?
+  completionDate String   @map("completion_date") // VERIFIED date-only, enforced by regex else falls back to today() (store.js:1859)
+  instructorName String?  @map("instructor_name")
+  instructorSig  String?  @map("instructor_sig")
+  issuedBy       Int      @map("issued_by")
+  issuedAt       DateTime @map("issued_at")
   // Not always present: missing entirely on 1/32 real certificates.
-  concepts        Json?
-  finalProject    String?  @map("final_project")
-  sourceKind      String?  @map("source_kind")
+  concepts       Json?
+  finalProject   String?  @map("final_project")
+  sourceKind     String?  @map("source_kind")
   // Re-typed Int? (audited against /data/echolens.json 2026-07-26): all 27
   // real non-null values are numeric event ids, none are a track-key slug
   // string - RESOLVED 2026-07-26 (Phase 3 batch 2): confirmed by reading
@@ -427,12 +456,12 @@ model Certificate {
   // - that code path is fully live, it just hasn't fired for any of the
   // 32 certificates imported so far. Split into two fields (below) rather
   // than reverting to String, so the common numeric case stays a real Int.
-  sourceId        Int?     @map("source_id")
+  sourceId       Int?     @map("source_id")
   // Holds source_id's String form (source_kind = 'track') instead of
   // sourceId; store.js's in-memory shape is untouched - source_id there
   // stays polymorphic Int-or-String exactly as before. Only the Postgres
   // write/read boundary (schema-map.js) knows about this split.
-  sourceTrackKey  String?  @map("source_track_key")
+  sourceTrackKey String?  @map("source_track_key")
 
   user  User   @relation("CertificateHolder", fields: [userId], references: [id])
   batch Batch? @relation(fields: [batchId], references: [id])
@@ -456,27 +485,27 @@ model Certificate {
 // guess and are NOT independently confirmed (there is no writer to check
 // them against).
 model LiveClass {
-  id        Int      @id @default(autoincrement())
-  batchId   Int      @map("batch_id")
+  id        Int       @id @default(autoincrement())
+  batchId   Int       @map("batch_id")
   title     String
   room      String
-  startedBy Int      @map("started_by")
-  startedAt DateTime @map("started_at")
+  startedBy Int       @map("started_by")
+  startedAt DateTime  @map("started_at")
   endedAt   DateTime? @map("ended_at")
   date      String
 
-  batch      Batch @relation(fields: [batchId], references: [id])
+  batch Batch @relation(fields: [batchId], references: [id])
 
   @@map("live_classes")
 }
 
 model Attendance {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   // Not always present: missing on 4/7 real rows, which carry class_id
   // instead (see classId below) - store.js's current writer
   // (Attendance.mark, store.js:1709-1723) always sets this, but older rows
   // don't have it.
-  sessionId Int?     @map("session_id")
+  sessionId Int?      @map("session_id")
   // Re-added: absent from current app code (a prior schema draft's
   // `classId Int?` was dropped on that basis - see git history), but
   // genuinely present on 4/7 real rows, disjoint from the ones that have
@@ -484,14 +513,14 @@ model Attendance {
   // session_id. Kept separate from sessionId rather than merged/backfilled
   // - there's no confirmed proof they're interchangeable, and preserving
   // the real historical value as-is is safer than guessing.
-  classId   Int?     @map("class_id")
-  userId    Int      @map("user_id")
-  joinedAt  DateTime @map("joined_at")
-  minutes   Int      @default(0)
+  classId   Int?      @map("class_id")
+  userId    Int       @map("user_id")
+  joinedAt  DateTime  @map("joined_at")
+  minutes   Int       @default(0)
   lastSeen  DateTime? @map("last_seen")
 
-  session   Session? @relation(fields: [sessionId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  session Session? @relation(fields: [sessionId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@map("attendance")
@@ -502,16 +531,16 @@ model Attendance {
 // ─────────────────────────────────────────────────────────────────
 
 model CourseMessage {
-  id         Int      @id @default(autoincrement())
-  batchId    Int      @map("batch_id")
-  userId     Int      @map("user_id")
-  body       String
-  anonymous  Boolean  @default(false)
-  staffRole  String?  @map("staff_role")
-  createdAt  DateTime @map("created_at")
+  id        Int      @id @default(autoincrement())
+  batchId   Int      @map("batch_id")
+  userId    Int      @map("user_id")
+  body      String
+  anonymous Boolean  @default(false)
+  staffRole String?  @map("staff_role")
+  createdAt DateTime @map("created_at")
   // Not always present: missing entirely on 3/6 real messages, which predate
   // the @mentions feature (audited against /data/echolens.json 2026-07-26).
-  mentions   Json?
+  mentions  Json?
 
   batch Batch @relation(fields: [batchId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
@@ -542,6 +571,7 @@ model Announcement {
   createdAt DateTime @map("created_at")
 
   batch Batch? @relation(fields: [batchId], references: [id])
+
   @@map("announcements")
 }
 
@@ -564,13 +594,13 @@ model PublicAnnouncement {
 // ─────────────────────────────────────────────────────────────────
 
 model AiReport {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @map("user_id")
-  batchId     Int?     @map("batch_id")
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  batchId     Int?      @map("batch_id")
   scope       String
   markdown    String
   status      String // draft|published|deleted
-  createdAt   DateTime @map("created_at")
+  createdAt   DateTime  @map("created_at")
   // MISSING from original draft: AiReports.publish() sets this (store.js:1164).
   publishedAt DateTime? @map("published_at")
   by          Int
@@ -586,14 +616,14 @@ model AiReport {
 // ─────────────────────────────────────────────────────────────────
 
 model Event {
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   kind            String
   title           String
   description     String
   scope           String
   entry           String
-  feePkr          Int      @map("fee_pkr")
-  payInstructions String?  @map("pay_instructions")
+  feePkr          Int       @map("fee_pkr")
+  payInstructions String?   @map("pay_instructions")
   // Raw pass-through from an <input type="datetime-local"> ("YYYY-MM-DDTHH:MM",
   // no seconds/offset) — NOT built via now(), no reformatting (store.js:2401,
   // 2428). Nullability confirmed correct; format differs from the now()
@@ -602,23 +632,23 @@ model Event {
   endsAt          DateTime? @map("ends_at")
   // VERIFIED date-only, same regex convention as Quest.deadline (store.js:2404,2430).
   deadline        String?
-  durationMinutes Int?     @map("duration_minutes")
+  durationMinutes Int?      @map("duration_minutes")
   // VERIFIED never null: `Math.max(0,Math.min(100,Number(b.pass_mark)||0))` (store.js:2406,2432).
-  passMark        Int      @default(0) @map("pass_mark")
-  autoGrade       Boolean  @default(false) @map("auto_grade")
-  autoCertificate Boolean  @default(false) @map("auto_certificate")
+  passMark        Int       @default(0) @map("pass_mark")
+  autoGrade       Boolean   @default(false) @map("auto_grade")
+  autoCertificate Boolean   @default(false) @map("auto_certificate")
   compiler        String?
-  datasetUrl      String?  @map("dataset_url")
+  datasetUrl      String?   @map("dataset_url")
   // VERIFIED always an array (possibly empty), never null (store.js:2411,2454-2461).
-  files           Json     @default("[]")
+  files           Json      @default("[]")
   // VERIFIED always an array (possibly empty), never null (store.js:2381-2391).
-  problems        Json     @default("[]")
+  problems        Json      @default("[]")
   // VERIFIED always an object {first,second,third}, never null (store.js:2413).
-  prizes          Json     @default("{}")
-  meetingLink     String?  @map("meeting_link")
-  open            Boolean  @default(true)
-  createdBy       Int      @map("created_by")
-  createdAt       DateTime @map("created_at")
+  prizes          Json      @default("{}")
+  meetingLink     String?   @map("meeting_link")
+  open            Boolean   @default(true)
+  createdBy       Int       @map("created_by")
+  createdAt       DateTime  @map("created_at")
 
   entries     EventEntry[]
   submissions EventSubmission[]
@@ -639,8 +669,8 @@ model EventEntry {
   paymentShot   String?  @map("payment_shot")
   registeredAt  DateTime @map("registered_at")
 
-  event       Event @relation(fields: [eventId], references: [id])
-  user        User  @relation(fields: [userId], references: [id])
+  event       Event             @relation(fields: [eventId], references: [id])
+  user        User              @relation(fields: [userId], references: [id])
   submissions EventSubmission[]
 
   @@index([eventId])
@@ -648,22 +678,22 @@ model EventEntry {
 }
 
 model EventSubmission {
-  id          Int      @id @default(autoincrement())
-  eventId     Int      @map("event_id")
-  entryId     Int      @map("entry_id")
-  userId      Int      @map("user_id")
+  id          Int       @id @default(autoincrement())
+  eventId     Int       @map("event_id")
+  entryId     Int       @map("entry_id")
+  userId      Int       @map("user_id")
   // VERIFIED nullable: `pid: pid ? Number(pid) : null` (store.js:2525).
   pid         Int?
   code        String?
   language    String?
-  fileUrl     String?  @map("file_url")
-  fileName    String?  @map("file_name")
+  fileUrl     String?   @map("file_url")
+  fileName    String?   @map("file_name")
   link        String?
   note        String?
-  submittedAt DateTime @map("submitted_at")
-  aiScore     Int?     @map("ai_score")
+  submittedAt DateTime  @map("submitted_at")
+  aiScore     Int?      @map("ai_score")
   score       Int?
-  aiFeedback  String?  @map("ai_feedback")
+  aiFeedback  String?   @map("ai_feedback")
   // Re-typed Int? (audited against /data/echolens.json 2026-07-26): all 27
   // real non-null values are numeric admin user ids. FORWARD-COMPATIBILITY
   // TRAP: store.js:2611 still actively writes the literal string 'ai' here
@@ -673,16 +703,16 @@ model EventSubmission {
   // but whoever rewrites store.js to write here directly must either keep
   // 'ai' out of this column (e.g. a separate gradedByAi Boolean) or revert
   // this to String.
-  gradedBy    Int?     @map("graded_by")
+  gradedBy    Int?      @map("graded_by")
   // Added 2026-07-26 (Phase 3 batch 2, write engine): the fix the comment
   // above called for. store.js's in-memory shape is untouched - graded_by
   // stays 'ai' there, unlike anywhere else. Only the Postgres write/read
   // boundary (schema-map.js) knows about this column: true here + gradedBy
   // left null when the JS value is the literal string 'ai'; gradedBy holds
   // the real admin user id otherwise.
-  gradedByAi  Boolean  @default(false) @map("graded_by_ai")
+  gradedByAi  Boolean   @default(false) @map("graded_by_ai")
   gradedAt    DateTime? @map("graded_at")
-  certified   Boolean  @default(false)
+  certified   Boolean   @default(false)
 
   event Event      @relation(fields: [eventId], references: [id])
   entry EventEntry @relation(fields: [entryId], references: [id])
@@ -706,6 +736,7 @@ model EventComment {
 
   event Event @relation(fields: [eventId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
+
   @@map("event_comments")
 }
 
@@ -730,31 +761,31 @@ model Lead {
 }
 
 model Registration {
-  id                 Int      @id @default(autoincrement())
+  id                 Int       @id @default(autoincrement())
   name               String
   email              String
   whatsapp           String
   city               String?
   // VERIFIED nullable: `String(b.course_code||'').slice(0,12) || null` (store.js:2974-2975).
-  courseCode         String?  @map("course_code")
-  courseTitle        String?  @map("course_title")
+  courseCode         String?   @map("course_code")
+  courseTitle        String?   @map("course_title")
   note               String?
   status             Json
-  adminNote          String?  @map("admin_note")
-  createdAt          DateTime @map("created_at")
-  updatedAt          DateTime @map("updated_at")
-  paymentStage       String   @map("payment_stage")
-  discountCategoryId Int?     @map("discount_category_id")
-  challanSerial      String?  @map("challan_serial")
-  enrolledUserId     Int?     @map("enrolled_user_id")
-  enrolledBatchId    Int?     @map("enrolled_batch_id")
-  clearedBy          Int?     @map("cleared_by")
+  adminNote          String?   @map("admin_note")
+  createdAt          DateTime  @map("created_at")
+  updatedAt          DateTime  @map("updated_at")
+  paymentStage       String    @map("payment_stage")
+  discountCategoryId Int?      @map("discount_category_id")
+  challanSerial      String?   @map("challan_serial")
+  enrolledUserId     Int?      @map("enrolled_user_id")
+  enrolledBatchId    Int?      @map("enrolled_batch_id")
+  clearedBy          Int?      @map("cleared_by")
   clearedAt          DateTime? @map("cleared_at")
-  ambassadorCode     String?  @map("ambassador_code")
-  ambassadorName     String?  @map("ambassador_name")
+  ambassadorCode     String?   @map("ambassador_code")
+  ambassadorName     String?   @map("ambassador_name")
 
-  discountCategory DiscountCategory? @relation(fields: [discountCategoryId], references: [id])
-  challans         Challan[]
+  discountCategory    DiscountCategory?    @relation(fields: [discountCategoryId], references: [id])
+  challans            Challan[]
   ambassadorGemEvents AmbassadorGemEvent[]
 
   @@index([email])
@@ -777,30 +808,30 @@ model DiscountCategory {
 }
 
 model Challan {
-  id                 Int      @id @default(autoincrement())
-  serial             String   @unique
-  registrationId     Int      @map("registration_id")
+  id                 Int       @id @default(autoincrement())
+  serial             String    @unique
+  registrationId     Int       @map("registration_id")
   // VERIFIED nullable: copied straight from Registration.courseCode, which is nullable (store.js:3099).
-  courseCode         String?  @map("course_code")
-  courseTitle        String   @map("course_title") // stays non-null in practice via `|| ''` fallback
-  studentName        String   @map("student_name")
-  studentEmail       String   @map("student_email")
-  studentId          String   @map("student_id")
-  grossFee           Int      @map("gross_fee")
-  feeParts           Json     @map("fee_parts")
-  discountCategoryId Int?     @map("discount_category_id")
+  courseCode         String?   @map("course_code")
+  courseTitle        String    @map("course_title") // stays non-null in practice via `|| ''` fallback
+  studentName        String    @map("student_name")
+  studentEmail       String    @map("student_email")
+  studentId          String    @map("student_id")
+  grossFee           Int       @map("gross_fee")
+  feeParts           Json      @map("fee_parts")
+  discountCategoryId Int?      @map("discount_category_id")
   discounts          Json
-  discountLabel      String?  @map("discount_label")
-  discountAmount     Int      @map("discount_amount")
-  netFee             Int      @map("net_fee")
+  discountLabel      String?   @map("discount_label")
+  discountAmount     Int       @map("discount_amount")
+  netFee             Int       @map("net_fee")
   // VERIFIED nullable: `/^\d{4}-\d{2}-\d{2}$/.test(...) ? deadline : null` (store.js:3107).
   deadline           String?
-  bankSnapshot       Json     @map("bank_snapshot")
+  bankSnapshot       Json      @map("bank_snapshot")
   status             String
-  generatedBy        Int      @map("generated_by")
-  generatedAt        DateTime @map("generated_at")
+  generatedBy        Int       @map("generated_by")
+  generatedAt        DateTime  @map("generated_at")
   sentAt             DateTime? @map("sent_at")
-  paidConfirmedBy    Int?     @map("paid_confirmed_by")
+  paidConfirmedBy    Int?      @map("paid_confirmed_by")
   paidConfirmedAt    DateTime? @map("paid_confirmed_at")
 
   registration     Registration      @relation(fields: [registrationId], references: [id])
@@ -860,6 +891,7 @@ model StaffGroup {
   createdAt   DateTime @map("created_at")
 
   records StaffRecord[]
+
   @@map("staff_groups")
 }
 
@@ -914,15 +946,16 @@ model DepartmentTask {
 // (per-recipient rows, store.js:2280-2284) / markDone (store.js:2299-2306).
 // No updatedAt field exists; real field is proof_attachment + completed_at.
 model DepartmentTaskStatus {
-  id              Int      @id @default(autoincrement())
-  taskId          Int      @map("task_id")
-  userId          Int      @map("user_id")
+  id              Int       @id @default(autoincrement())
+  taskId          Int       @map("task_id")
+  userId          Int       @map("user_id")
   status          String
   note            String?
-  proofAttachment Json?    @map("proof_attachment")
+  proofAttachment Json?     @map("proof_attachment")
   completedAt     DateTime? @map("completed_at")
 
   task DepartmentTask @relation(fields: [taskId], references: [id])
+
   @@map("department_task_status")
 }
 
@@ -936,6 +969,7 @@ model DepartmentAnnouncement {
   createdAt    DateTime @map("created_at")
 
   department Department @relation(fields: [departmentId], references: [id])
+
   @@map("department_announcements")
 }
 
@@ -962,16 +996,16 @@ model CoordinatorQuery {
 // ambassador/instructor onboarding contract + offer-letter pipeline
 // (CONTRACT_ROLES in store.js, contract-pdf.js, offer-letter-pdf.js).
 model Contract {
-  id                    Int      @id @default(autoincrement())
-  userId                Int      @map("user_id")
+  id                    Int       @id @default(autoincrement())
+  userId                Int       @map("user_id")
   role                  String
   status                String // 'sent' | 'submitted'
-  pdfFilename           String   @map("pdf_filename")
-  sentAt                DateTime @map("sent_at")
-  deadlineAt            String   @map("deadline_at") // date-only
+  pdfFilename           String    @map("pdf_filename")
+  sentAt                DateTime  @map("sent_at")
+  deadlineAt            String    @map("deadline_at") // date-only
   submittedAt           DateTime? @map("submitted_at")
-  submissionZipFilename String?  @map("submission_zip_filename")
-  offerLetterFilename   String?  @map("offer_letter_filename")
+  submissionZipFilename String?   @map("submission_zip_filename")
+  offerLetterFilename   String?   @map("offer_letter_filename")
   offerLetterSentAt     DateTime? @map("offer_letter_sent_at")
 
   @@map("contracts")
@@ -993,10 +1027,10 @@ model Ambassador {
   createdBy  Int      @map("created_by")
   createdAt  DateTime @map("created_at")
 
-  user       User?  @relation(fields: [userId], references: [id])
-  gemEvents  AmbassadorGemEvent[]
-  duties     AmbassadorDuty[]
-  reports    AmbassadorReport[]
+  user      User?                @relation(fields: [userId], references: [id])
+  gemEvents AmbassadorGemEvent[]
+  duties    AmbassadorDuty[]
+  reports   AmbassadorReport[]
 
   @@map("ambassadors")
 }
@@ -1018,6 +1052,7 @@ model AmbassadorGemEvent {
   ambassador   Ambassador    @relation(fields: [ambassadorId], references: [id])
   registration Registration? @relation(fields: [registrationId], references: [id])
   batch        Batch?        @relation(fields: [batchId], references: [id])
+
   @@map("ambassador_gem_events")
 }
 
@@ -1041,6 +1076,7 @@ model AmbassadorDuty {
 
   @@map("ambassador_duties")
 }
+
 // CONFIRMED DEAD — see AmbassadorDuty above.
 model AmbassadorDutyStatus {
   id        Int      @id @default(autoincrement())
@@ -1050,6 +1086,7 @@ model AmbassadorDutyStatus {
   updatedAt DateTime @map("updated_at")
 
   duty AmbassadorDuty @relation(fields: [dutyId], references: [id])
+
   @@map("ambassador_duty_status")
 }
 
@@ -1069,6 +1106,7 @@ model AmbassadorReport {
   generatedAt     DateTime @map("generated_at")
 
   ambassador Ambassador @relation(fields: [ambassadorId], references: [id])
+
   @@map("ambassador_reports")
 }
 
@@ -1095,6 +1133,7 @@ model Job {
   createdAt       DateTime @map("created_at")
 
   comments JobComment[]
+
   @@map("jobs")
 }
 
@@ -1113,6 +1152,7 @@ model JobComment {
 
   job  Job  @relation(fields: [jobId], references: [id])
   user User @relation(fields: [userId], references: [id])
+
   @@map("job_comments")
 }
 
@@ -1138,6 +1178,7 @@ model Lesson {
 
   course Course @relation(fields: [courseId], references: [id])
   batch  Batch  @relation(fields: [batchId], references: [id])
+
   @@map("lessons")
 }
 
@@ -1157,6 +1198,7 @@ model Assignment {
 
   batch       Batch        @relation(fields: [batchId], references: [id])
   submissions Submission[]
+
   @@map("assignments")
 }
 
@@ -1164,20 +1206,21 @@ model Assignment {
 // gamification (submissionGems()/badgesFor() in store.js)." Writer:
 // Submissions.upsert (store.js:927-957). No `code` field exists.
 model Submission {
-  id           Int      @id @default(autoincrement())
-  assignmentId Int      @map("assignment_id")
-  userId       Int      @map("user_id")
-  fileUrl      String?  @map("file_url")
+  id           Int       @id @default(autoincrement())
+  assignmentId Int       @map("assignment_id")
+  userId       Int       @map("user_id")
+  fileUrl      String?   @map("file_url")
   note         String?
   grade        Int?
-  gems         Int      @default(0)
+  gems         Int       @default(0)
   remarks      String?
-  submittedAt  DateTime @map("submitted_at")
+  submittedAt  DateTime  @map("submitted_at")
   gradedAt     DateTime? @map("graded_at")
-  gradedBy     Int?     @map("graded_by")
+  gradedBy     Int?      @map("graded_by")
 
   assignment Assignment @relation(fields: [assignmentId], references: [id])
   user       User       @relation(fields: [userId], references: [id])
+
   @@map("submissions")
 }
 
@@ -1194,6 +1237,7 @@ model Challenge {
   createdAt   DateTime @map("created_at")
 
   submissions ChallengeSubmission[]
+
   @@map("challenges")
 }
 
@@ -1201,19 +1245,20 @@ model Challenge {
 // numeric score fields exist — submissions are a link + a pending/approved/
 // rejected status; gems are awarded via a separate GemEvent row.
 model ChallengeSubmission {
-  id          Int      @id @default(autoincrement())
-  challengeId Int      @map("challenge_id")
-  userId      Int      @map("user_id")
+  id          Int       @id @default(autoincrement())
+  challengeId Int       @map("challenge_id")
+  userId      Int       @map("user_id")
   link        String
   note        String?
-  status      String   @default("pending") // pending|approved|rejected
+  status      String    @default("pending") // pending|approved|rejected
   remarks     String?
-  submittedAt DateTime @map("submitted_at")
+  submittedAt DateTime  @map("submitted_at")
   reviewedAt  DateTime? @map("reviewed_at")
-  reviewedBy  Int?     @map("reviewed_by")
+  reviewedBy  Int?      @map("reviewed_by")
 
   challenge Challenge @relation(fields: [challengeId], references: [id])
   user      User      @relation(fields: [userId], references: [id])
+
   @@map("challenge_submissions")
 }
 
@@ -1236,6 +1281,7 @@ model Hackathon {
 
   entries     HackathonEntry[]
   submissions HackathonSubmission[]
+
   @@map("hackathons")
 }
 
@@ -1253,64 +1299,68 @@ model HackathonEntry {
   paymentBy     Int?     @map("payment_by")
   registeredAt  DateTime @map("registered_at")
 
-  hackathon   Hackathon @relation(fields: [hackathonId], references: [id])
+  hackathon   Hackathon             @relation(fields: [hackathonId], references: [id])
   submissions HackathonSubmission[]
+
   @@map("hackathon_entries")
 }
 
 // Writer: Hackathons.submit/score (store.js:1103-1119). Keyed by entry, not
 // user directly (a team's single submission covers every member).
 model HackathonSubmission {
-  id          Int      @id @default(autoincrement())
-  hackathonId Int      @map("hackathon_id")
-  entryId     Int      @map("entry_id")
+  id          Int       @id @default(autoincrement())
+  hackathonId Int       @map("hackathon_id")
+  entryId     Int       @map("entry_id")
   link        String
   note        String?
   score       Int?
   remarks     String?
-  judgedBy    Int?     @map("judged_by")
+  judgedBy    Int?      @map("judged_by")
   judgedAt    DateTime? @map("judged_at")
-  submittedAt DateTime @map("submitted_at")
+  submittedAt DateTime  @map("submitted_at")
 
   hackathon Hackathon      @relation(fields: [hackathonId], references: [id])
   entry     HackathonEntry @relation(fields: [entryId], references: [id])
+
   @@map("hackathon_submissions")
 }
 
 // Writer: Quizzes.create/open/close (store.js:1752-1773).
 model Quiz {
-  id          Int      @id @default(autoincrement())
-  batchId     Int      @map("batch_id")
+  id          Int       @id @default(autoincrement())
+  batchId     Int       @map("batch_id")
   title       String
   questions   Json // [{q, options[], answer}]
-  durationMin Int      @map("duration_min")
+  durationMin Int       @map("duration_min")
   points      Int
-  allowIde    Boolean  @default(false) @map("allow_ide")
+  allowIde    Boolean   @default(false) @map("allow_ide")
   openedAt    DateTime? @map("opened_at")
   closesAt    DateTime? @map("closes_at")
-  createdBy   Int      @map("created_by")
-  createdAt   DateTime @map("created_at")
+  createdBy   Int       @map("created_by")
+  createdAt   DateTime  @map("created_at")
 
-  batch    Batch @relation(fields: [batchId], references: [id])
+  batch    Batch         @relation(fields: [batchId], references: [id])
   attempts QuizAttempt[]
+
   @@map("quizzes")
 }
 
 // Writer: Quizzes.attempt (store.js:1779-1795). Field is `score_pct`, not
 // `score`; there is no separate startedAt — only `taken_at`.
 model QuizAttempt {
-  id        Int      @id @default(autoincrement())
-  quizId    Int      @map("quiz_id")
-  userId    Int      @map("user_id")
-  answers   Json // Int[]
-  correct   Int
-  total     Int
-  scorePct  Int      @map("score_pct")
-  gems      Int
-  takenAt   DateTime @map("taken_at")
+  id       Int      @id @default(autoincrement())
+  quizId   Int      @map("quiz_id")
+  userId   Int      @map("user_id")
+  answers  Json // Int[]
+  correct  Int
+  total    Int
+  scorePct Int      @map("score_pct")
+  gems     Int
+  takenAt  DateTime @map("taken_at")
 
   quiz Quiz @relation(fields: [quizId], references: [id])
   user User @relation(fields: [userId], references: [id])
+
   @@map("quiz_attempts")
 }
 
@@ -1328,5 +1378,110 @@ model TaskFile {
   createdAt DateTime @map("created_at")
 
   quest Quest @relation(fields: [questId], references: [id])
+
   @@map("task_files")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// SHOWCASE FEED
+// ─────────────────────────────────────────────────────────────────
+
+model ShowcasePost {
+  id                Int       @id @default(autoincrement())
+  authorUserId      Int       @map("author_user_id")
+  caption           String // max 2000 chars, enforced server-side
+  questSubmissionId Int?      @map("quest_submission_id")
+  courseId          Int?      @map("course_id")
+  batchId           Int?      @map("batch_id")
+  visibility        String    @default("BATCH") // BATCH|PUBLIC
+  status            String    @default("PENDING_REVIEW") // PENDING_REVIEW|PUBLISHED|REMOVED
+  likeCount         Int       @default(0) @map("like_count")
+  commentCount      Int       @default(0) @map("comment_count")
+  createdAt         DateTime  @map("created_at")
+  updatedAt         DateTime  @map("updated_at")
+  removedAt         DateTime? @map("removed_at")
+  removedByUserId   Int?      @map("removed_by_user_id")
+  removalReason     String?   @map("removal_reason")
+
+  author          User              @relation("ShowcasePostAuthor", fields: [authorUserId], references: [id])
+  questSubmission QuestSubmission?  @relation(fields: [questSubmissionId], references: [id])
+  course          Course?           @relation(fields: [courseId], references: [id])
+  batch           Batch?            @relation(fields: [batchId], references: [id])
+  images          ShowcaseImage[]
+  likes           ShowcaseLike[]
+  comments        ShowcaseComment[]
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([authorUserId])
+  @@map("showcase_posts")
+}
+
+// Cascade delete is a deliberate exception to this schema's usual
+// RESTRICT/SET NULL convention (see ShowcasePost) - images have no
+// standalone meaning once their post is gone.
+model ShowcaseImage {
+  id        Int    @id @default(autoincrement())
+  postId    Int    @map("post_id")
+  r2Key     String @map("r2_key")
+  thumbKey  String @map("thumb_key")
+  width     Int
+  height    Int
+  byteSize  Int    @map("byte_size")
+  sortOrder Int    @map("sort_order")
+
+  post ShowcasePost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@map("showcase_images")
+}
+
+model ShowcaseLike {
+  id        Int      @id @default(autoincrement())
+  postId    Int      @map("post_id")
+  userId    Int      @map("user_id")
+  createdAt DateTime @map("created_at")
+
+  post ShowcasePost @relation(fields: [postId], references: [id])
+  user User         @relation(fields: [userId], references: [id])
+
+  // Per user row, not per person - see the multi-role email note on User.email.
+  // Accepted as noise: a person holding two role-rows could like the same
+  // post twice. Not worth new person-identity infrastructure for a cosmetic
+  // like-count edge case.
+  @@unique([postId, userId])
+  @@map("showcase_likes")
+}
+
+model ShowcaseComment {
+  id              Int       @id @default(autoincrement())
+  postId          Int       @map("post_id")
+  authorUserId    Int       @map("author_user_id")
+  body            String // max 1000 chars, enforced server-side
+  status          String    @default("PUBLISHED") // PUBLISHED|REMOVED
+  createdAt       DateTime  @map("created_at")
+  removedAt       DateTime? @map("removed_at")
+  removedByUserId Int?      @map("removed_by_user_id")
+
+  post   ShowcasePost @relation(fields: [postId], references: [id])
+  author User         @relation("ShowcaseCommentAuthor", fields: [authorUserId], references: [id])
+
+  @@index([postId, createdAt])
+  @@map("showcase_comments")
+}
+
+model ShowcaseReport {
+  id               Int       @id @default(autoincrement())
+  targetType       String    @map("target_type") // POST|COMMENT
+  targetId         Int       @map("target_id")
+  reporterUserId   Int       @map("reporter_user_id")
+  reason           String
+  status           String    @default("OPEN") // OPEN|ACTIONED|DISMISSED
+  resolvedByUserId Int?      @map("resolved_by_user_id")
+  resolvedAt       DateTime? @map("resolved_at")
+  createdAt        DateTime  @map("created_at")
+
+  reporter User @relation(fields: [reporterUserId], references: [id])
+
+  @@unique([targetType, targetId, reporterUserId])
+  @@map("showcase_reports")
 }

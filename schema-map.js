@@ -56,7 +56,7 @@ const COLLECTIONS = [
     'submitted_at', 'score', 'gems', 'feedback', 'graded_at', 'attempts', 'files',
   ]],
   ['task_files', 'task_files', 'taskFile', ['id', 'quest_id', 'pid', 'name', 'url', 'size', 'by', 'created_at']],
-  ['gem_events', 'gem_events', 'gemEvent', ['id', 'user_id', 'batch_id', 'amount', 'source', 'note', 'by', 'at']],
+  ['gem_events', 'gem_events', 'gemEvent', ['id', 'user_id', 'batch_id', 'amount', 'source', 'note', 'by', 'at', 'reference_type', 'reference_id']],
   ['certificates', 'certificates', 'certificate', [
     'id', 'serial', 'user_id', 'student_name', 'reg_no', 'batch_id', 'kind', 'title', 'detail', 'completion_date',
     'instructor_name', 'instructor_sig', 'issued_by', 'issued_at', 'concepts', 'final_project', 'source_kind', 'source_id',
@@ -120,6 +120,17 @@ const COLLECTIONS = [
   ['hackathon_submissions', 'hackathon_submissions', 'hackathonSubmission', ['id', 'hackathon_id', 'entry_id', 'link', 'note', 'score', 'remarks', 'judged_by', 'judged_at', 'submitted_at']],
   ['quizzes', 'quizzes', 'quiz', ['id', 'batch_id', 'title', 'questions', 'duration_min', 'points', 'allow_ide', 'opened_at', 'closes_at', 'created_by', 'created_at']],
   ['quiz_attempts', 'quiz_attempts', 'quizAttempt', ['id', 'quiz_id', 'user_id', 'answers', 'correct', 'total', 'score_pct', 'gems', 'taken_at']],
+  // showcase_posts depends on users/quest_submissions/courses/batches (all
+  // far earlier above); showcase_images/likes/comments depend on
+  // showcase_posts + users; showcase_reports depends only on users.
+  ['showcase_posts', 'showcase_posts', 'showcasePost', [
+    'id', 'author_user_id', 'caption', 'quest_submission_id', 'course_id', 'batch_id', 'visibility', 'status',
+    'like_count', 'comment_count', 'created_at', 'updated_at', 'removed_at', 'removed_by_user_id', 'removal_reason',
+  ]],
+  ['showcase_images', 'showcase_images', 'showcaseImage', ['id', 'post_id', 'r2_key', 'thumb_key', 'width', 'height', 'byte_size', 'sort_order']],
+  ['showcase_likes', 'showcase_likes', 'showcaseLike', ['id', 'post_id', 'user_id', 'created_at']],
+  ['showcase_comments', 'showcase_comments', 'showcaseComment', ['id', 'post_id', 'author_user_id', 'body', 'status', 'created_at', 'removed_at', 'removed_by_user_id']],
+  ['showcase_reports', 'showcase_reports', 'showcaseReport', ['id', 'target_type', 'target_id', 'reporter_user_id', 'reason', 'status', 'resolved_by_user_id', 'resolved_at', 'created_at']],
   ['audit_log', 'audit_log', 'auditLog', ['id', 'actor_id', 'action', 'target_type', 'target_id', 'detail', 'at']],
 ];
 const FRONT_LOADED_KEYS = new Set(['courses', 'companies', 'users', 'batches']); // inserted by hand before the main loop, for tombstone ordering
@@ -171,6 +182,8 @@ const TIMESTAMP_COLUMNS = new Set([
   'joined_at', 'last_seen', 'last_read_at', 'registered_at', 'added_at', 'started_at', 'ended_at', 'generated_at',
   'sent_at', 'paid_confirmed_at', 'cleared_at', 'completed_at', 'approved_at', 'published_at', 'taken_at',
   'judged_at', 'reviewed_at', 'opened_at', 'closes_at', 'offer_letter_sent_at',
+  // showcase_posts.removed_at, showcase_comments.removed_at, showcase_reports.resolved_at
+  'removed_at', 'resolved_at',
 ]);
 // Column-name collisions: the same JSON key means something different on a
 // different table. `joined_at` is a real now()-built timestamp on

@@ -112,6 +112,7 @@ const TITLES = {
   'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal', 'dept-ambassador': 'Ambassadors Portal',
   'my-department': 'My Department', 'admin-departments': 'Departments',
   'admin-recruiters': 'Recruiters', recruiter: 'Recruiter Portal',
+  'showcase-moderation': 'Showcase Moderation',
   'talent-profile': 'Talent Profile', 'hiring-interest': 'Hiring Interest',
 };
 function show(view) {
@@ -140,6 +141,7 @@ function show(view) {
     'my-department': () => renderMyDepartments('view-my-department'),
     'admin-departments': renderAdminDepartments,
     'admin-recruiters': renderAdminRecruiters, recruiter: renderRecruiterPortal,
+    'showcase-moderation': renderShowcaseModeration,
     'talent-profile': renderTalentProfile, 'hiring-interest': renderHiringInterest,
   }[view];
   if (render) render();
@@ -2550,6 +2552,148 @@ async function adminDismissReport(id) {
   try { await api(`/api/admin/talent/reports/${id}/dismiss`, { method: 'POST' }); renderTalentReports(); }
   catch (e) { toast(e.message, true); }
 }
+
+/* ------------------------- showcase moderation (v20 step 6 Part C) ------------------------- */
+// Admin sees every batch's items; instructors see only their own - enforced
+// server-side by Showcase.moderationQueue() (store.js), not here. This view
+// only ever renders whatever GET /api/showcase/moderation/queue returns.
+let SHOWCASE_MOD_QUEUE = null;
+async function renderShowcaseModeration() {
+  const el = $('view-showcase-moderation');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  try {
+    const d = await api('/api/showcase/moderation/queue');
+    SHOWCASE_MOD_QUEUE = d;
+    const reportGroups = groupShowcaseReports(d.open_reports);
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:18px"><div class="card-body">
+        <span class="s" style="color:var(--muted)">Posts held for review and open content reports${ME.role === 'instructor' ? ' for your own courses' : ' across every course'}. Every action reviews the full post first - nothing here acts from an excerpt.</span>
+      </div></div>
+      <div class="card-head" style="padding:0 0 10px;border:none"><h3>Pending review (${d.pending_posts.length})</h3></div>
+      ${d.pending_posts.length ? `<div class="card"><div class="card-body tight">${d.pending_posts.map(showcaseModPostRow).join('')}</div></div>` : '<div class="card"><div class="empty">No posts waiting for review.</div></div>'}
+      <div class="card-head" style="padding:22px 0 10px;border:none"><h3>Open reports (${reportGroups.length})</h3></div>
+      ${reportGroups.length ? `<div class="card"><div class="card-body tight">${reportGroups.map(showcaseModReportRow).join('')}</div></div>` : '<div class="card"><div class="empty">No open reports.</div></div>'}`;
+  } catch (e) {
+    el.innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+  }
+}
+// Multiple reports can target the same post/comment (ShowcaseReport is
+// unique per reporter, see the backend) - grouped here so the queue shows
+// "3 reports" once instead of three separate rows for the same content.
+function groupShowcaseReports(reports) {
+  const groups = new Map();
+  for (const r of reports || []) {
+    const key = `${r.target_type}:${r.target_id}`;
+    if (!groups.has(key)) groups.set(key, { target_type: r.target_type, target_id: r.target_id, target: r.target, reasons: [], reportIds: [] });
+    const g = groups.get(key);
+    g.reasons.push(r.reason);
+    g.reportIds.push(r.id);
+  }
+  return Array.from(groups.values());
+}
+function showcaseThumb(post) {
+  const im = post && post.images && post.images[0];
+  const base = (SHOWCASE_MOD_QUEUE && SHOWCASE_MOD_QUEUE.r2_base) || '';
+  return im
+    ? `<img src="${esc(base + '/' + (im.thumb_key || im.r2_key))}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:10px;flex:none">`
+    : `<div style="width:56px;height:56px;border-radius:10px;flex:none;background:var(--canvas)"></div>`;
+}
+function showcaseModPostRow(p) {
+  return `<div class="job-comment-row" style="align-items:center">
+    ${showcaseThumb(p)}
+    <div style="flex:1;min-width:0">
+      <div class="t">${esc(p.author ? p.author.name : 'Unknown author')}</div>
+      <div class="s">${esc((p.caption || '').slice(0, 140))}${(p.caption || '').length > 140 ? '&hellip;' : ''}</div>
+      <div class="when">${esc((p.created_at || '').slice(0, 16))} &middot; ${p.visibility === 'PUBLIC' ? 'Public' : 'Cohort'}</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="reviewShowcasePost(${p.id})">Review</button>
+  </div>`;
+}
+function showcaseModReportRow(g) {
+  const excerpt = g.target_type === 'POST'
+    ? (g.target ? esc((g.target.caption || '').slice(0, 100)) : 'Post no longer exists')
+    : (g.target ? esc((g.target.body || '').slice(0, 100)) : 'Comment no longer exists');
+  return `<div class="job-comment-row" style="align-items:center">
+    ${g.target_type === 'POST' ? showcaseThumb(g.target) : `<div style="width:56px;height:56px;border-radius:10px;flex:none;background:var(--canvas);display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--muted-2)">Comment</div>`}
+    <div style="flex:1;min-width:0">
+      <div class="t">${g.reportIds.length} report${g.reportIds.length === 1 ? '' : 's'} &middot; ${g.target_type === 'POST' ? 'Post' : 'Comment'}</div>
+      <div class="s">${excerpt}</div>
+      <div class="when">Reason${g.reasons.length === 1 ? '' : 's'}: ${esc(Array.from(new Set(g.reasons)).slice(0, 3).join('; '))}</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="reviewShowcaseReport('${g.target_type}',${g.target_id})">Review</button>
+  </div>`;
+}
+
+function reviewShowcasePost(id) {
+  const p = ((SHOWCASE_MOD_QUEUE || {}).pending_posts || []).find((x) => x.id === id);
+  if (!p) return;
+  renderShowcaseReviewModal(p, { isPending: true, postActionId: p.id });
+}
+async function reviewShowcaseReport(targetType, targetId) {
+  const group = groupShowcaseReports((SHOWCASE_MOD_QUEUE || {}).open_reports).find((g) => g.target_type === targetType && g.target_id === targetId);
+  if (!group) return;
+  if (targetType === 'POST') {
+    renderShowcaseReviewModal(group.target, { isReport: true, reportedKind: 'POST', reportIds: group.reportIds, reasons: group.reasons });
+    return;
+  }
+  // Comment report: fetch the FULL parent post so this is never actioned
+  // from just the comment's own text - "review the post in full" applies
+  // to a comment report too, per the brief.
+  openModal('Review report', '<div class="empty">Loading the full post&hellip;</div>');
+  try {
+    const post = group.target && group.target.post_id ? (await api(`/api/showcase/posts/${group.target.post_id}`)).post : null;
+    renderShowcaseReviewModal(post, { isReport: true, reportedKind: 'COMMENT', reportIds: group.reportIds, reasons: group.reasons, comment: group.target });
+  } catch (e) {
+    openModal('Could not load', `<div class="empty">${esc(e.message)}</div>`);
+  }
+}
+function renderShowcaseReviewModal(post, ctx) {
+  const images = (post && post.images) || [];
+  const base = (SHOWCASE_MOD_QUEUE && SHOWCASE_MOD_QUEUE.r2_base) || '';
+  const gallery = images.length
+    ? `<div style="display:grid;grid-template-columns:repeat(${Math.min(images.length, 2)},1fr);gap:6px;margin-bottom:12px">${images.map((im) => `<img src="${esc(base + '/' + im.r2_key)}" alt="" style="width:100%;border-radius:10px">`).join('')}</div>` : '';
+  const commentBlock = ctx.comment ? `<div class="review-share-box" style="margin-top:10px"><div class="rsb-head">Reported comment</div><div>${esc(ctx.comment.body)}</div></div>` : '';
+  const reasonsBlock = ctx.isReport ? `<div class="s" style="margin-top:10px;color:var(--muted)"><strong>${ctx.reportIds.length} report${ctx.reportIds.length === 1 ? '' : 's'}:</strong> ${esc(Array.from(new Set(ctx.reasons)).join('; '))}</div>` : '';
+  const reportIdsJson = JSON.stringify(ctx.reportIds || []);
+
+  const body = !post ? '<div class="empty">This post no longer exists.</div>' : `
+    ${gallery}
+    <div style="font-weight:700">${esc(post.author ? post.author.name : 'Unknown author')}</div>
+    <div class="s" style="color:var(--muted);margin-bottom:8px">${esc((post.created_at || '').slice(0, 16))} &middot; ${post.visibility === 'PUBLIC' ? 'Public' : 'Cohort'} &middot; ${esc(post.status)}</div>
+    <div class="sc-caption">${esc(post.caption)}</div>
+    ${commentBlock}
+    ${reasonsBlock}
+    <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+      ${ctx.isPending ? `
+        <button class="btn btn-primary btn-sm" onclick="showcaseModAction('post',[${ctx.postActionId}],'approve')">Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="showcaseModActionWithReason('post',[${ctx.postActionId}],'remove')">Reject &amp; remove</button>` : ''}
+      ${ctx.isReport ? `
+        <button class="btn btn-danger btn-sm" onclick="showcaseModActionWithReason('report',${reportIdsJson},'remove')">${ctx.reportedKind === 'COMMENT' ? 'Remove comment' : 'Remove post'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="showcaseModAction('report',${reportIdsJson},'dismiss')">Dismiss report${ctx.reportIds.length === 1 ? '' : 's'}</button>` : ''}
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Close</button>
+    </div>`;
+  openModal(ctx.isPending ? 'Review post' : 'Review report', body, true);
+}
+// A grouped report resolves as ONE action per underlying ShowcaseReport row
+// (the moderation endpoint only ever accepts one report id at a time) - looped
+// here so "remove"/"dismiss" on a 3-report group clears all 3, not just one.
+async function showcaseModAction(kind, ids, action) {
+  try {
+    for (const id of ids) await api(`/api/showcase/moderation/${id}/action`, { method: 'POST', body: JSON.stringify({ target_type: kind, action }) });
+    toast(action === 'approve' ? 'Post approved.' : action === 'dismiss' ? 'Report dismissed.' : 'Done.');
+    closeModal();
+    renderShowcaseModeration();
+  } catch (e) { toast(e.message, true); }
+}
+async function showcaseModActionWithReason(kind, ids, action) {
+  const reason = prompt('Reason (optional - kept in the audit log):') || undefined;
+  try {
+    for (const id of ids) await api(`/api/showcase/moderation/${id}/action`, { method: 'POST', body: JSON.stringify({ target_type: kind, action, reason }) });
+    toast('Removed.');
+    closeModal();
+    renderShowcaseModeration();
+  } catch (e) { toast(e.message, true); }
+}
 function adminRecruiterRow(r) {
   const c = r.company || {};
   let actions;
@@ -4461,6 +4605,41 @@ function sharedReviewBox(sr) {
 }
 
 function backToQuest() { openCourse(bid()); }
+// v20 Showcase Feed hook (step 6 Part B): one tap, mounted in place on the
+// task workspace where matplotlib output is still alive as rendered
+// <img src="data:..."> elements inside #taskTerm (see coderunner.js's
+// EchoTerm.showImages) - the whole point of putting this button HERE
+// rather than on the level map is that the blob only exists in memory
+// while this specific workspace is open and has actually been run this
+// session. Reuses the shared ShowcaseComposer component (showcase-
+// composer.js) - not a second composer implementation. Nothing about
+// grading, gating, or submission logic is touched.
+async function shareToShowcase(submissionId) {
+  const imgs = document.querySelectorAll('#taskTerm .term-imgs img');
+  if (!imgs.length) {
+    // No live output this session (student hasn't hit Run since opening
+    // this workspace, or it's a non-plotting task) - fall back to the
+    // navigate-and-attach flow rather than hiding the button, exactly as
+    // specified: the student still gets there, just picks the image(s)
+    // themselves on the showcase page instead of having one pre-attached.
+    location.href = `/showcase?compose=1&quest_submission_id=${submissionId}`;
+    return;
+  }
+  let files;
+  try {
+    files = await Promise.all(Array.from(imgs).slice(0, 4).map((im, i) => ShowcaseComposer.fileFromDataUrl(im.src, `output-${i + 1}.png`)));
+  } catch (e) {
+    // Converting the already-rendered data: URL failed for some reason -
+    // same safety net as the "no images" case above, never block sharing.
+    location.href = `/showcase?compose=1&quest_submission_id=${submissionId}`;
+    return;
+  }
+  ShowcaseComposer.open({
+    questSubmissionId: submissionId,
+    prefilledFiles: files, // student can still remove/add up to the 4-image max in the composer
+    onPublished(post) { toast(post.status === 'PENDING_REVIEW' ? 'Posted - waiting for a quick review before it goes live.' : 'Posted to your showcase!'); },
+  });
+}
 
 function openTask(qid, pid) {
   const d = QUEST_DATA;
@@ -4526,6 +4705,14 @@ function openTask(qid, pid) {
       ? `<div class="task-status ok">&#10003; Graded <strong>${sub.grade}%</strong> &middot; ${gemChip(sub.gems)}${sub.late ? ` &middot; <span style="color:var(--danger)">late: &minus;${sub.late_deduction} gems</span>` : ''} ${sub.remarks ? '&middot; &ldquo;' + esc(sub.remarks) + '&rdquo;' : ''}</div>`
       : `<div class="task-status wait">&#9203; Submitted ${esc((sub.submitted_at || '').slice(0, 16))}${sub.late ? ' <strong>(late)</strong>' : ''} - awaiting grade</div>`;
     statusHtml += sharedReviewBox(sub.shared_review);
+    // v20 Showcase Feed hook: only once the whole LEVEL is passed (not just
+    // this one problem graded) - matches "after a student passes a quest".
+    // Re-run the code below with Run to get a live output attached
+    // automatically; without a run this session it still works via the
+    // navigate fallback in shareToShowcase().
+    if (lvl.passed && sub.grade != null) {
+      statusHtml += `<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="shareToShowcase(${sub.id})">&#127942; Share your output to your showcase</button></div>`;
+    }
   }
   if (isStudent && !lvl.unlocked) statusHtml = `<div class="task-status lock">&#128274; This level is locked - pass the previous level first. You can read the task and practice in the editor, but not submit yet.</div>`;
 

@@ -14,6 +14,13 @@
  */
 
 const { Pool } = require('pg');
+const { assertNotProdDbOutsideProd } = require('./db-guard');
+
+// Fires at require() time, before anything below ever gets a chance to
+// open a real connection - store.js requires this module unconditionally
+// at its own top level, so this runs for every entry point (server.js,
+// migration scripts, one-off test scripts) the moment store.js loads.
+assertNotProdDbOutsideProd();
 
 const DATABASE_URL = process.env.DATABASE_URL || '';
 

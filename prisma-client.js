@@ -49,6 +49,11 @@ function getPrismaClient() {
   if (!process.env.DATABASE_URL) {
     throw new Error('getPrismaClient() called without DATABASE_URL set - callers must check db.enabled() first.');
   }
+  // Defense in depth: db.js's own require-time check is the primary guard
+  // (store.js always requires db.js first), but this module builds its
+  // Prisma connection independently of db.js's pg pool - checked again
+  // here so a connection can never be attempted through this path either.
+  require('./db-guard').assertNotProdDbOutsideProd();
   // Required lazily, not at module top-level: keeps @prisma/adapter-pg out
   // of the require graph entirely for JSON-file-only local dev.
   const { PrismaPg } = require('@prisma/adapter-pg');

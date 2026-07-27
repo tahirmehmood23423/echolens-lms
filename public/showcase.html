@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Showcase - EchoLens Digital</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v1318">
+</head>
+<body class="grade-page">
+
+<div id="gate" class="gate"><img src="/img/logo.png" alt="EchoLens" style="width:120px"><div>Loading the showcase&hellip;</div></div>
+
+<div class="grade-app" id="app" style="display:none">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:14px">
+      <a href="/dashboard" class="logo-pill" style="height:34px;text-decoration:none"><img src="/img/logo.png" alt="EchoLens" style="height:22px"></a>
+      <span class="page-title">Showcase</span>
+    </div>
+    <div class="user">
+      <button class="btn btn-primary btn-sm" id="composeBtn">Share your work</button>
+      <a class="btn btn-ghost btn-sm" href="/dashboard">Back to dashboard</a>
+    </div>
+  </header>
+  <div class="content">
+    <div class="sc-feed">
+      <div class="sc-toprow">
+        <button class="sc-newpill" id="newPill">New posts &middot; tap to refresh</button>
+      </div>
+      <div id="feed"><div class="empty">Loading&hellip;</div></div>
+      <div style="text-align:center;margin-top:6px">
+        <button class="btn btn-ghost" id="loadMoreBtn" style="display:none">Load more</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/showcase-composer.js?v1"></script>
+<script src="/js/showcase.js?v1"></script>
+</body>
+</html>

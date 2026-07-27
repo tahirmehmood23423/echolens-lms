@@ -500,6 +500,17 @@ function systemHealth() {
     }
   } catch { /* backups directory not created yet */ }
   checks.push({ name: 'Backup Service', ok: backupOk, detail: backupDetail, last_backup: lastBackup });
+  // Postgres-only (see step 5's architecture note on store.js's flush
+  // model) - nothing to report in JSON-file mode, where save() writes
+  // synchronously and there is no queued/batched flush to fail.
+  if (db.enabled()) {
+    const fh = store.flushHealth();
+    const ok = fh.consecutiveFlushFailures === 0;
+    const detail = ok
+      ? (fh.lastSuccessfulFlushAt ? `Last flush ${fh.secondsSinceLastSuccessfulFlush}s ago` : 'No writes flushed yet this process')
+      : `${fh.consecutiveFlushFailures} consecutive failure(s) - persistence may be wedged. Last: ${fh.lastFailure?.collection || '?'} (${fh.lastFailure?.code || 'unknown'})`;
+    checks.push({ name: 'Postgres Flush', ok, detail, flush: fh });
+  }
   return checks;
 }
 
@@ -1448,6 +1459,15 @@ app.get('/api/admin/system-health', authRequired, staffView, (req, res) => {
   } catch { /* backups directory not created yet */ }
   events.sort((a, b) => String(b.at).localeCompare(String(a.at)));
   res.json({ health: systemHealth(), events: events.slice(0, 30) });
+});
+// v20 (Showcase Feed architecture note, Part A2): dedicated flush-health
+// endpoint, same auth pattern as its sibling above - so this can be checked
+// (or polled by an external monitor later) without pulling the full
+// system-health payload. Also folded into systemHealth()'s own "Postgres
+// Flush" check above, so it shows up wherever admin already looks.
+app.get('/api/admin/flush-health', authRequired, staffView, (req, res) => {
+  if (!db.enabled()) return res.json({ enabled: false });
+  res.json({ enabled: true, ...store.flushHealth() });
 });
 
 /* ------------------------- sessions / lessons / work ------------------------- */
@@ -3789,6 +3809,7 @@ app.get('/compiler', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 require('./coursepages').register(app); // SEO landing page per course: /courses and /courses/:slug
 require('./talent').register(app, { authRequired, requireRecruiter, APP_URL, UPLOAD_DIR }); // Talent Marketplace: student profiles, projects, search (Phases 2-4)
 require('./talent-hiring').register(app, { authRequired, requireRecruiter, adminRequired, APP_URL, UPLOAD_DIR }); // Talent Marketplace: contact gating, shortlists, messaging, admin safety/analytics (Phases 5-6)
+require('./showcase').register(app, { authRequired, teacherOrAdmin, APP_URL }); // Showcase Feed (v20) - backend (step 4) + frontend pages (step 5)
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
 app.get('/recruiter-signup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'recruiter-signup.html')));

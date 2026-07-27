@@ -175,6 +175,24 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '1mb' })); // cap request bodies to blunt large-payload DoS
 app.use(cookieParser());
 
+// Perf diagnostics only, opt-in via PERF_DEBUG=1 (no effect otherwise - not
+// registered at all, so zero overhead/behavior change by default). Placed
+// this early so its timer wraps the whole request, including the
+// pendingPersist()-gated response below - that's deliberately the thing
+// being measured, not just route-handler CPU time. Pairs with the
+// [perf] save()/boot load lines from store.js's persist path.
+if (process.env.PERF_DEBUG) {
+  const { getQueryCount } = require('./prisma-client');
+  app.use((req, res, next) => {
+    const t0 = Date.now();
+    const q0 = getQueryCount();
+    res.on('finish', () => {
+      console.log(`[perf] ${req.method} ${req.originalUrl} -> ${res.statusCode} ${Date.now() - t0}ms, ${getQueryCount() - q0} Postgres round trips`);
+    });
+    next();
+  });
+}
+
 // In JSON-file mode, store.save() writes to disk synchronously, so by the
 // time a route handler calls res.json()/res.send() any mutation it just
 // made is already durable - store.pendingPersist() resolves immediately.

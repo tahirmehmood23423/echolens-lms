@@ -33,6 +33,16 @@ if (!process.env.TZ) process.env.TZ = 'UTC';
 
 let client = null;
 
+// Perf diagnostics only (see store.js's persistAllToPostgresNormalized and
+// server.js's request-timing middleware, both gated the same way): a plain
+// counter of every round trip Prisma actually sends to Postgres, always
+// incremented (negligible cost - one event + one integer add per query,
+// no behaviour change), so callers can measure "queries per request"
+// without needing PERF_DEBUG on. Only the verbose per-query console.log
+// below is gated behind PERF_DEBUG, since that one does add log volume.
+let queryCount = 0;
+function getQueryCount() { return queryCount; }
+
 /** Lazily constructs (once) and returns the shared PrismaClient. Throws if DATABASE_URL isn't set - callers must check db.enabled() first. */
 function getPrismaClient() {
   if (client) return client;
@@ -47,8 +57,12 @@ function getPrismaClient() {
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: false },
   });
-  client = new PrismaClient({ adapter });
+  client = new PrismaClient({ adapter, log: [{ emit: 'event', level: 'query' }] });
+  client.$on('query', (e) => {
+    queryCount++;
+    if (process.env.PERF_DEBUG) console.log(`[prisma] ${e.duration}ms  ${e.query.slice(0, 140)}`);
+  });
   return client;
 }
 
-module.exports = { getPrismaClient };
+module.exports = { getPrismaClient, getQueryCount };

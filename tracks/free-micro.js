@@ -20,7 +20,7 @@ module.exports = [
   key_concepts: ['Compiling and running a C program', 'Variables and data types', 'Input/output with scanf and printf', 'Arithmetic and relational operators', 'Conditional statements', 'Loops', 'Functions', '1D arrays', 'Pointers', 'Strings'],
   pass_mark: 60, titleNames: ['C Starter', 'C Solver'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'Environment & Hello World', topic: 'C is a compiled language where code is converted into machine code before running. Execution starts at main().\n\n#include <stdio.h>\nint main() {\n    printf("Hello, Platform!\\n");\n    return 0;\n}',
+    { no: 1, week: 1, session: 1, title: 'Environment & Hello World', video_url: 'https://www.youtube.com/watch?v=b00HsZvg-V0', topic: 'C is a compiled language where code is converted into machine code before running. Execution starts at main().\n\n#include <stdio.h>\nint main() {\n    printf("Hello, Platform!\\n");\n    return 0;\n}',
       problems: [
         { title: 'Print Greeting', points: 30, difficulty: 'Basic',
           description: "Output 'Hello, Platform!' to stdout.",
@@ -38,7 +38,7 @@ module.exports = [
           hint: 'Write return 0; before the closing brace.',
           solution: 'main ends with return 0; instead of falling off the end.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Variables & Data Types', topic: 'Variables act as labeled containers. Primitive types store integers, decimals (float/double), or single characters (char).\n\n#include <stdio.h>\nint main() {\n    int age = 20;\n    float height = 5.9;\n    printf("Age: %d\\n", age);\n    return 0;\n}',
+    { no: 2, week: 1, session: 2, title: 'Variables & Data Types', video_url: 'https://www.youtube.com/watch?v=QtTijZXFl5s', topic: 'Variables act as labeled containers. Primitive types store integers, decimals (float/double), or single characters (char).\n\n#include <stdio.h>\nint main() {\n    int age = 20;\n    float height = 5.9;\n    printf("Age: %d\\n", age);\n    return 0;\n}',
       problems: [
         { title: 'Declaring Integers', points: 30, difficulty: 'Basic',
           description: 'Create two int variables and print their sum.',
@@ -56,7 +56,7 @@ module.exports = [
           hint: 'Print a char variable using %d to see its ASCII value.',
           solution: 'char assigned, printed with %d, yields 65.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'Basic Input/Output', topic: 'Programs read user input using scanf() with memory addresses (&) and display text outputs using printf().\n\n#include <stdio.h>\nint main() {\n    int num;\n    scanf("%d", &num);\n    printf("Entered: %d\\n", num);\n    return 0;\n}',
+    { no: 3, week: 1, session: 3, title: 'Basic Input/Output', video_url: 'https://www.youtube.com/watch?v=hSHFjPvqFjw', topic: 'Programs read user input using scanf() with memory addresses (&) and display text outputs using printf().\n\n#include <stdio.h>\nint main() {\n    int num;\n    scanf("%d", &num);\n    printf("Entered: %d\\n", num);\n    return 0;\n}',
       problems: [
         { title: 'User Age', points: 30, difficulty: 'Basic',
           description: "Read an integer age and print 'Age: X'.",
@@ -74,7 +74,7 @@ module.exports = [
           hint: 'Use a leading space before %c in scanf to skip stray whitespace.',
           solution: 'scanf(" %c", &c) then printed inside quote characters.' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Arithmetic & Relational Operators', topic: 'Arithmetic operators compute numbers (+, -, *, /, %) while relational operators compare values, returning 1 or 0.\n\n#include <stdio.h>\nint main() {\n    int rem = 10 % 3;\n    int check = (10 > 5);\n    printf("Rem: %d, Check: %d\\n", rem, check);\n    return 0;\n}',
+    { no: 4, week: 2, session: 1, title: 'Arithmetic & Relational Operators', video_url: 'https://www.youtube.com/watch?v=8N5_27GaBxA', topic: 'Arithmetic operators compute numbers (+, -, *, /, %) while relational operators compare values, returning 1 or 0.\n\n#include <stdio.h>\nint main() {\n    int rem = 10 % 3;\n    int check = (10 > 5);\n    printf("Rem: %d, Check: %d\\n", rem, check);\n    return 0;\n}',
       problems: [
         { title: 'Modulo Check', points: 30, difficulty: 'Basic',
           description: 'Calculate the remainder of 27 divided by 4.',
@@ -92,7 +92,7 @@ module.exports = [
           hint: 'Cast the sum to float before dividing.',
           solution: '(float)sum / 3 - casting before the divide is the pass/fail line.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Conditional Statements', topic: 'Conditional statements steer execution along different paths using if, else if, else, or switch conditions.\n\n#include <stdio.h>\nint main() {\n    int score = 85;\n    if (score >= 50) printf("Pass\\n");\n    else printf("Fail\\n");\n    return 0;\n}',
+    { no: 5, week: 2, session: 2, title: 'Conditional Statements', video_url: 'https://www.youtube.com/watch?v=SOnpOBvyhDM', topic: 'Conditional statements steer execution along different paths using if, else if, else, or switch conditions.\n\n#include <stdio.h>\nint main() {\n    int score = 85;\n    if (score >= 50) printf("Pass\\n");\n    else printf("Fail\\n");\n    return 0;\n}',
       problems: [
         { title: 'Even or Odd', points: 30, difficulty: 'Basic',
           description: "Read an int and print 'Even' or 'Odd'.",
@@ -110,7 +110,7 @@ module.exports = [
           hint: "Match case '+': and case '-': (and the rest) inside the switch.",
           solution: 'switch on the operator char, one case per operator, each returning the right result.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Loops (for, while)', topic: 'Loops repeat code blocks continuously until conditions change. Use for for fixed iterations and while for conditions.\n\n#include <stdio.h>\nint main() {\n    for (int i = 1; i <= 5; i++) {\n        printf("%d ", i);\n    }\n    return 0;\n}',
+    { no: 6, week: 2, session: 3, title: 'Loops (for, while)', video_url: 'https://www.youtube.com/watch?v=Rtww83GH0BU', topic: 'Loops repeat code blocks continuously until conditions change. Use for for fixed iterations and while for conditions.\n\n#include <stdio.h>\nint main() {\n    for (int i = 1; i <= 5; i++) {\n        printf("%d ", i);\n    }\n    return 0;\n}',
       problems: [
         { title: 'Count to N', points: 30, difficulty: 'Basic',
           description: 'Print the integers 1 through N.',
@@ -128,7 +128,7 @@ module.exports = [
           hint: 'Initialize fact = 1 and multiply iteratively.',
           solution: 'fact = 1 then fact *= i across the loop.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Functions', topic: 'Functions modularize code into reusable sub-routines accepting parameters and returning values.\n\n#include <stdio.h>\nint add(int a, int b) { return a + b; }\nint main() {\n    printf("Sum: %d\\n", add(5, 7));\n    return 0;\n}',
+    { no: 7, week: 3, session: 1, title: 'Functions', video_url: 'https://www.youtube.com/watch?v=lv5IDF7dmBk', topic: 'Functions modularize code into reusable sub-routines accepting parameters and returning values.\n\n#include <stdio.h>\nint add(int a, int b) { return a + b; }\nint main() {\n    printf("Sum: %d\\n", add(5, 7));\n    return 0;\n}',
       problems: [
         { title: 'Square Function', points: 30, difficulty: 'Basic',
           description: 'Write int square(int x) returning x squared.',
@@ -146,7 +146,7 @@ module.exports = [
           hint: 'Set the function return type to void.',
           solution: 'void bannerFn() prints directly, called from main with no assignment.' },
       ] },
-    { no: 8, week: 3, session: 2, title: '1D Arrays', topic: 'Arrays store indexed, sequential sequences of elements of identical data types in contiguous memory.\n\n#include <stdio.h>\nint main() {\n    int arr[3] = {10, 20, 30};\n    printf("%d\\n", arr[0]);\n    return 0;\n}',
+    { no: 8, week: 3, session: 2, title: '1D Arrays', video_url: 'https://www.youtube.com/watch?v=7F-Q2oVBYKk', topic: 'Arrays store indexed, sequential sequences of elements of identical data types in contiguous memory.\n\n#include <stdio.h>\nint main() {\n    int arr[3] = {10, 20, 30};\n    printf("%d\\n", arr[0]);\n    return 0;\n}',
       problems: [
         { title: 'Array Initialization', points: 30, difficulty: 'Basic',
           description: 'Declare an array of size 5 and print its 3rd element.',
@@ -164,7 +164,7 @@ module.exports = [
           hint: 'Set min = arr[0] and update whenever arr[i] < min.',
           solution: 'Running-minimum pattern across the array.' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'Basic Pointers', topic: 'Pointers hold raw memory addresses of target variables, permitting direct memory manipulation.\n\n#include <stdio.h>\nint main() {\n    int x = 42;\n    int *ptr = &x;\n    printf("Val: %d, Addr: %p\\n", *ptr, ptr);\n    return 0;\n}',
+    { no: 9, week: 3, session: 3, title: 'Basic Pointers', video_url: 'https://www.youtube.com/watch?v=5BpYD7TxvKU', topic: 'Pointers hold raw memory addresses of target variables, permitting direct memory manipulation.\n\n#include <stdio.h>\nint main() {\n    int x = 42;\n    int *ptr = &x;\n    printf("Val: %d, Addr: %p\\n", *ptr, ptr);\n    return 0;\n}',
       problems: [
         { title: 'Address Printing', points: 30, difficulty: 'Basic',
           description: "Store a variable's address in a pointer and print the address.",
@@ -182,7 +182,7 @@ module.exports = [
           hint: 'Dereference the result parameter: *res = *a + *b;.',
           solution: 'void addInto(int *res, int a, int b) writing through *res.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Strings in C', topic: "Strings are character arrays ending with a null byte ('\\0'), processed using standard functions in <string.h>.\n\n#include <stdio.h>\n#include <string.h>\nint main() {\n    char s[] = \"Hello\";\n    printf(\"Len: %lu\\n\", strlen(s));\n    return 0;\n}",
+    { no: 10, week: 4, session: 1, title: 'Strings in C', video_url: 'https://www.youtube.com/watch?v=CJ_pzdZ39N4', topic: "Strings are character arrays ending with a null byte ('\\0'), processed using standard functions in <string.h>.\n\n#include <stdio.h>\n#include <string.h>\nint main() {\n    char s[] = \"Hello\";\n    printf(\"Len: %lu\\n\", strlen(s));\n    return 0;\n}",
       problems: [
         { title: 'Length Counter', points: 30, difficulty: 'Basic',
           description: "Print a string's character count, excluding the null terminator.",
@@ -212,7 +212,7 @@ module.exports = [
   key_concepts: ['Streams: cin and cout', 'References vs pointers', 'Function overloading and default parameters', 'std::string', 'std::vector', 'Dynamic memory with new/delete', 'Range-based loops and auto', 'Structs vs classes', 'STL algorithms', 'File handling with fstream'],
   pass_mark: 60, titleNames: ['Object Rookie', 'Class Builder'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'From C to C++ (Streams)', topic: 'C++ introduces standard stream abstractions (cout, cin) inside the std namespace for modern input and output.\n\n#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello C++" << endl;\n    return 0;\n}',
+    { no: 1, week: 1, session: 1, title: 'From C to C++ (Streams)', video_url: 'https://www.youtube.com/watch?v=qWDZ4ZZGAmQ', topic: 'C++ introduces standard stream abstractions (cout, cin) inside the std namespace for modern input and output.\n\n#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello C++" << endl;\n    return 0;\n}',
       problems: [
         { title: 'Hello C++', points: 30, difficulty: 'Basic',
           description: "Print 'Hello C++' using cout and endl.",
@@ -230,7 +230,7 @@ module.exports = [
           hint: 'Use using namespace std; at the top of the file.',
           solution: 'The using-namespace line makes bare cout/endl work.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'References vs Pointers', topic: 'A reference acts as an alias for an existing variable, enabling direct access without pointer syntax.\n\n#include <iostream>\nusing namespace std;\nint main() {\n    int val = 10;\n    int &ref = val;\n    ref = 50;\n    cout << val << endl; // Prints 50\n    return 0;\n}',
+    { no: 2, week: 1, session: 2, title: 'References vs Pointers', video_url: 'https://www.youtube.com/watch?v=DvUYbUn9uQ4', topic: 'A reference acts as an alias for an existing variable, enabling direct access without pointer syntax.\n\n#include <iostream>\nusing namespace std;\nint main() {\n    int val = 10;\n    int &ref = val;\n    ref = 50;\n    cout << val << endl; // Prints 50\n    return 0;\n}',
       problems: [
         { title: 'Reference Alias', points: 30, difficulty: 'Basic',
           description: 'Modify a variable through a reference alias.',
@@ -248,7 +248,7 @@ module.exports = [
           hint: 'Use a const std::string &s parameter.',
           solution: 'Function signature takes const string& and only reads it.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'Overloading & Defaults', topic: 'Functions can share names if parameters differ, or declare optional fallback parameter values.\n\n#include <iostream>\nusing namespace std;\nvoid greet(string name = "Guest") {\n    cout << "Hello " << name << endl;\n}\nint main() { greet(); return 0; }',
+    { no: 3, week: 1, session: 3, title: 'Overloading & Defaults', video_url: 'https://www.youtube.com/watch?v=GUZ6_Ur6ar8', topic: 'Functions can share names if parameters differ, or declare optional fallback parameter values.\n\n#include <iostream>\nusing namespace std;\nvoid greet(string name = "Guest") {\n    cout << "Hello " << name << endl;\n}\nint main() { greet(); return 0; }',
       problems: [
         { title: 'Overloaded Add', points: 30, difficulty: 'Basic',
           description: 'Write add() for two ints and a separate add() for two doubles.',
@@ -266,7 +266,7 @@ module.exports = [
           hint: 'Explicitly cast the argument types on the call.',
           solution: 'A cast like (double)x picks the intended overload.' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'std::string Class', topic: 'The std::string class manages text dynamically, supporting operations like concatenation and substring extraction.\n\n#include <iostream>\n#include <string>\nusing namespace std;\nint main() {\n    string s = "Hello ";\n    s += "World";\n    cout << s << endl;\n    return 0;\n}',
+    { no: 4, week: 2, session: 1, title: 'std::string Class', video_url: 'https://www.youtube.com/watch?v=LuFRDp9kKZ4', topic: 'The std::string class manages text dynamically, supporting operations like concatenation and substring extraction.\n\n#include <iostream>\n#include <string>\nusing namespace std;\nint main() {\n    string s = "Hello ";\n    s += "World";\n    cout << s << endl;\n    return 0;\n}',
       problems: [
         { title: 'String Append', points: 30, difficulty: 'Basic',
           description: 'Concatenate two strings using +.',
@@ -284,7 +284,7 @@ module.exports = [
           hint: 'Use std::getline(std::cin, str).',
           solution: 'getline captures the whole line, spaces included.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Standard Vectors', topic: 'std::vector provides dynamic arrays that resize automatically as elements are added or deleted.\n\n#include <iostream>\n#include <vector>\nusing namespace std;\nint main() {\n    vector<int> v = {10, 20};\n    v.push_back(30);\n    cout << v.size() << endl;\n    return 0;\n}',
+    { no: 5, week: 2, session: 2, title: 'Standard Vectors', video_url: 'https://www.youtube.com/watch?v=vSio4fvNgzg', topic: 'std::vector provides dynamic arrays that resize automatically as elements are added or deleted.\n\n#include <iostream>\n#include <vector>\nusing namespace std;\nint main() {\n    vector<int> v = {10, 20};\n    v.push_back(30);\n    cout << v.size() << endl;\n    return 0;\n}',
       problems: [
         { title: 'Pushing Data', points: 30, difficulty: 'Basic',
           description: 'Instantiate a vector and push values into it.',
@@ -302,7 +302,7 @@ module.exports = [
           hint: 'for(auto elem : vec).',
           solution: 'Range-based for loop printing every element.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Dynamic Memory (new/delete)', topic: 'Heap memory is allocated dynamically using the new operator and freed manually using delete.\n\n#include <iostream>\nusing namespace std;\nint main() {\n    int *p = new int(42);\n    cout << *p << endl;\n    delete p;\n    return 0;\n}',
+    { no: 6, week: 2, session: 3, title: 'Dynamic Memory (new/delete)', video_url: 'https://www.youtube.com/watch?v=zQZMc8FXPYY', topic: 'Heap memory is allocated dynamically using the new operator and freed manually using delete.\n\n#include <iostream>\nusing namespace std;\nint main() {\n    int *p = new int(42);\n    cout << *p << endl;\n    delete p;\n    return 0;\n}',
       problems: [
         { title: 'Heap Integer', points: 30, difficulty: 'Basic',
           description: 'Allocate an int on the heap, print it, then free the memory.',
@@ -320,7 +320,7 @@ module.exports = [
           hint: 'Use array syntax: delete[] arr;.',
           solution: 'delete[] arr; matching the new[] used to allocate it.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Range Loops & Auto', topic: 'The auto keyword infers variable types automatically while range-based loops simplify container traversal.\n\n#include <iostream>\n#include <vector>\nusing namespace std;\nint main() {\n    vector<int> nums = {1, 2, 3};\n    for (auto x : nums) cout << x << " ";\n    return 0;\n}',
+    { no: 7, week: 3, session: 1, title: 'Range Loops & Auto', video_url: 'https://www.youtube.com/watch?v=wDj7Wx7mwa8', topic: 'The auto keyword infers variable types automatically while range-based loops simplify container traversal.\n\n#include <iostream>\n#include <vector>\nusing namespace std;\nint main() {\n    vector<int> nums = {1, 2, 3};\n    for (auto x : nums) cout << x << " ";\n    return 0;\n}',
       problems: [
         { title: 'Auto Types', points: 30, difficulty: 'Basic',
           description: 'Declare a variable using auto.',
@@ -338,7 +338,7 @@ module.exports = [
           hint: 'Use for(const auto &x : vec).',
           solution: 'const-reference range-for used purely for reading.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Structs vs Classes', topic: 'Structs default to public member visibility, while classes enforce private access specifiers by default.\n\n#include <iostream>\nusing namespace std;\nclass Player {\n    string name;\npublic:\n    void setName(string n) { name = n; }\n};\nint main() { Player p; return 0; }',
+    { no: 8, week: 3, session: 2, title: 'Structs vs Classes', video_url: 'https://www.youtube.com/watch?v=FnwbsHtCJ1o', topic: 'Structs default to public member visibility, while classes enforce private access specifiers by default.\n\n#include <iostream>\nusing namespace std;\nclass Player {\n    string name;\npublic:\n    void setName(string n) { name = n; }\n};\nint main() { Player p; return 0; }',
       problems: [
         { title: 'Simple Struct', points: 30, difficulty: 'Basic',
           description: 'Create a Point struct with x and y members.',
@@ -356,7 +356,7 @@ module.exports = [
           hint: 'Create a public getter method.',
           solution: 'getName() returns the private name field.' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'STL Algorithms', topic: 'The <algorithm> header offers utility functions for sorting, searching, and reversing collections.\n\n#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\nint main() {\n    vector<int> v = {3, 1, 2};\n    sort(v.begin(), v.end());\n    return 0;\n}',
+    { no: 9, week: 3, session: 3, title: 'STL Algorithms', video_url: 'https://www.youtube.com/watch?v=QTjc0HYfjYg', topic: 'The <algorithm> header offers utility functions for sorting, searching, and reversing collections.\n\n#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\nint main() {\n    vector<int> v = {3, 1, 2};\n    sort(v.begin(), v.end());\n    return 0;\n}',
       problems: [
         { title: 'Vector Sort', points: 30, difficulty: 'Basic',
           description: 'Sort an unsorted vector in ascending order.',
@@ -374,7 +374,7 @@ module.exports = [
           hint: 'Compare the iterator against v.end().',
           solution: 'find() result compared to end(); reports found/not found correctly.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'File Handling (fstream)', topic: 'File stream objects (ifstream, ofstream) enable program interaction with persistent files on disk.\n\n#include <iostream>\n#include <fstream>\nusing namespace std;\nint main() {\n    ofstream out("test.txt");\n    out << "Hello File";\n    out.close();\n    return 0;\n}',
+    { no: 10, week: 4, session: 1, title: 'File Handling (fstream)', video_url: 'https://www.youtube.com/watch?v=rkJJzH-ymg8', topic: 'File stream objects (ifstream, ofstream) enable program interaction with persistent files on disk.\n\n#include <iostream>\n#include <fstream>\nusing namespace std;\nint main() {\n    ofstream out("test.txt");\n    out << "Hello File";\n    out.close();\n    return 0;\n}',
       problems: [
         { title: 'Write File', points: 30, difficulty: 'Basic',
           description: 'Open a file, write one line, and close the handle.',

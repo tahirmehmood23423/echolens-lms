@@ -22,7 +22,7 @@ module.exports = [
   key_concepts: ['Classes and objects', 'Encapsulation', 'Constructors and destructors', 'Overloading vs overriding', 'Inheritance', 'Virtual functions', 'Abstract classes', 'Static members', 'Interfaces', 'Composition vs aggregation'],
   pass_mark: 60, titleNames: ['Object Rookie', 'Design Architect'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'Classes & Objects', topic: 'Classes act as user-defined blueprints containing fields and functions, while objects are active instances.\n\n#include <iostream>\nusing namespace std;\nclass Car {\npublic:\n    string brand;\n    void drive() { cout << "Driving..." << endl; }\n};\nint main() { Car c; c.drive(); return 0; }',
+    { no: 1, week: 1, session: 1, title: 'Classes & Objects', video_url: 'https://www.youtube.com/watch?v=h1NlXUaDpmk', topic: 'Classes act as user-defined blueprints containing fields and functions, while objects are active instances.\n\n#include <iostream>\nusing namespace std;\nclass Car {\npublic:\n    string brand;\n    void drive() { cout << "Driving..." << endl; }\n};\nint main() { Car c; c.drive(); return 0; }',
       problems: [
         { title: 'Car Class', points: 30, difficulty: 'Basic',
           description: 'Define a Car class with a brand field.',
@@ -40,7 +40,7 @@ module.exports = [
           hint: 'Define the method inside the class body.',
           solution: 'drive() prints a message, called as c.drive();.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Encapsulation', topic: 'Encapsulation protects raw state by making fields private and granting controlled access through public getters/setters.\n\n#include <iostream>\nusing namespace std;\nclass Bank {\n    double balance;\npublic:\n    void setBal(double b) { if(b>=0) balance = b; }\n};\nint main() { Bank b; b.setBal(100); return 0; }',
+    { no: 2, week: 1, session: 2, title: 'Encapsulation', video_url: 'https://www.youtube.com/watch?v=GqqujGu06ag', topic: 'Encapsulation protects raw state by making fields private and granting controlled access through public getters/setters.\n\n#include <iostream>\nusing namespace std;\nclass Bank {\n    double balance;\npublic:\n    void setBal(double b) { if(b>=0) balance = b; }\n};\nint main() { Bank b; b.setBal(100); return 0; }',
       problems: [
         { title: 'Private Member', points: 30, difficulty: 'Basic',
           description: 'Create a class with a private double balance.',
@@ -58,7 +58,7 @@ module.exports = [
           hint: 'The method simply returns the private variable.',
           solution: 'double getBal() { return balance; }' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'Constructors & Destructors', topic: 'Constructors initialize object state upon instantiation, while destructors execute cleanup tasks upon object destruction.\n\n#include <iostream>\nusing namespace std;\nclass Item {\npublic:\n    Item() { cout << "Created" << endl; }\n    ~Item() { cout << "Destroyed" << endl; }\n};\nint main() { Item i; return 0; }',
+    { no: 3, week: 1, session: 3, title: 'Constructors & Destructors', video_url: 'https://www.youtube.com/watch?v=hRVfMTuFJNE', topic: 'Constructors initialize object state upon instantiation, while destructors execute cleanup tasks upon object destruction.\n\n#include <iostream>\nusing namespace std;\nclass Item {\npublic:\n    Item() { cout << "Created" << endl; }\n    ~Item() { cout << "Destroyed" << endl; }\n};\nint main() { Item i; return 0; }',
       problems: [
         { title: 'Default Constructor', points: 30, difficulty: 'Basic',
           description: "Write a constructor that initializes name to 'Unknown'.",
@@ -76,7 +76,7 @@ module.exports = [
           hint: 'Tilde prefix syntax: ~ClassName().',
           solution: '~ClassName() { cout << "cleanup message"; }' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Overloading vs Overriding', topic: 'Method overloading varies parameters at compile-time; method overriding redefines parent class methods in child classes.\n\n#include <iostream>\nusing namespace std;\nclass Animal {\npublic:\n    void sound() { cout << "Generic" << endl; }\n};\nclass Dog : public Animal {\npublic:\n    void sound() { cout << "Bark" << endl; }\n};',
+    { no: 4, week: 2, session: 1, title: 'Overloading vs Overriding', video_url: 'https://www.youtube.com/watch?v=nrR7smJpguY', topic: 'Method overloading varies parameters at compile-time; method overriding redefines parent class methods in child classes.\n\n#include <iostream>\nusing namespace std;\nclass Animal {\npublic:\n    void sound() { cout << "Generic" << endl; }\n};\nclass Dog : public Animal {\npublic:\n    void sound() { cout << "Bark" << endl; }\n};',
       problems: [
         { title: 'Compile-Time Polymorphism', points: 30, difficulty: 'Basic',
           description: 'Write overloaded print(int) and print(string) functions.',
@@ -94,7 +94,7 @@ module.exports = [
           hint: 'Match the exact method signature in the child class.',
           solution: 'Dog::sound() overrides Animal::sound(), verified by calling it on a Dog.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Inheritance Basics', topic: 'Inheritance allows a child class to acquire attributes and behaviors from a base parent class cleanly.\n\n#include <iostream>\nusing namespace std;\nclass Parent { public: void speak() { cout << "Hi"; } };\nclass Child : public Parent {};\nint main() { Child c; c.speak(); return 0; }',
+    { no: 5, week: 2, session: 2, title: 'Inheritance Basics', video_url: 'https://www.youtube.com/watch?v=rJlJ8qqVm3k', topic: 'Inheritance allows a child class to acquire attributes and behaviors from a base parent class cleanly.\n\n#include <iostream>\nusing namespace std;\nclass Parent { public: void speak() { cout << "Hi"; } };\nclass Child : public Parent {};\nint main() { Child c; c.speak(); return 0; }',
       problems: [
         { title: 'Single Inheritance', points: 30, difficulty: 'Basic',
           description: 'Create a Child class that inherits from a Parent class.',
@@ -112,7 +112,7 @@ module.exports = [
           hint: 'Place the variable under a protected: label.',
           solution: 'protected member accessed successfully from a derived class method.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Virtual Functions', topic: 'Virtual functions enable runtime dynamic polymorphism, invoking child class overrides via parent references.\n\n#include <iostream>\nusing namespace std;\nclass Base { public: virtual void show() { cout << "Base"; } };\nclass Derived : public Base { public: void show() override { cout << "Derived"; } };\nint main() { Base *b = new Derived(); b->show(); return 0; }',
+    { no: 6, week: 2, session: 3, title: 'Virtual Functions', video_url: 'https://www.youtube.com/watch?v=77eueMbWI0Y', topic: 'Virtual functions enable runtime dynamic polymorphism, invoking child class overrides via parent references.\n\n#include <iostream>\nusing namespace std;\nclass Base { public: virtual void show() { cout << "Base"; } };\nclass Derived : public Base { public: void show() override { cout << "Derived"; } };\nint main() { Base *b = new Derived(); b->show(); return 0; }',
       problems: [
         { title: 'Virtual Method', points: 30, difficulty: 'Basic',
           description: 'Mark a method virtual in the base class.',
@@ -130,7 +130,7 @@ module.exports = [
           hint: 'This executes the derived code via the virtual table.',
           solution: 'Base* calling show() prints "Derived", proving dynamic dispatch.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Abstract Classes', topic: 'Abstract classes contain at least one pure virtual function (= 0) and cannot be instantiated directly.\n\n#include <iostream>\nusing namespace std;\nclass Shape { public: virtual void draw() = 0; };\nclass Circle : public Shape { public: void draw() override { cout << "Circle"; } };\nint main() { Circle c; c.draw(); return 0; }',
+    { no: 7, week: 3, session: 1, title: 'Abstract Classes', video_url: 'https://www.youtube.com/watch?v=XNHSSduMBbY', topic: 'Abstract classes contain at least one pure virtual function (= 0) and cannot be instantiated directly.\n\n#include <iostream>\nusing namespace std;\nclass Shape { public: virtual void draw() = 0; };\nclass Circle : public Shape { public: void draw() override { cout << "Circle"; } };\nint main() { Circle c; c.draw(); return 0; }',
       problems: [
         { title: 'Pure Virtual Method', points: 30, difficulty: 'Basic',
           description: 'Declare a pure virtual function.',
@@ -148,7 +148,7 @@ module.exports = [
           hint: 'Abstract classes cannot exist as objects.',
           solution: 'Shape s; is identified as a compile error, with the reason stated.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Static Members', topic: 'Static members belong to the class type itself rather than individual instances, sharing data across objects.\n\n#include <iostream>\nusing namespace std;\nclass Counter {\npublic:\n    static int count;\n    Counter() { count++; }\n};\nint Counter::count = 0;\nint main() { Counter c1, c2; cout << Counter::count; return 0; }',
+    { no: 8, week: 3, session: 2, title: 'Static Members', video_url: 'https://www.youtube.com/watch?v=7u7ti-S69uY', topic: 'Static members belong to the class type itself rather than individual instances, sharing data across objects.\n\n#include <iostream>\nusing namespace std;\nclass Counter {\npublic:\n    static int count;\n    Counter() { count++; }\n};\nint Counter::count = 0;\nint main() { Counter c1, c2; cout << Counter::count; return 0; }',
       problems: [
         { title: 'Static Counter', points: 30, difficulty: 'Basic',
           description: 'Add a static int count that tracks how many instances exist.',
@@ -166,7 +166,7 @@ module.exports = [
           hint: 'Call using scope resolution: Counter::getCount().',
           solution: 'static int getCount() { return count; } called via ClassName::getCount().' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'Interfaces', topic: 'Interfaces define pure contract specifications containing pure virtual functions without any variable state.\n\n#include <iostream>\nusing namespace std;\nclass IPrintable { public: virtual void print() = 0; };\nclass Doc : public IPrintable { public: void print() override { cout << "Doc"; } };\nint main() { Doc d; d.print(); return 0; }',
+    { no: 9, week: 3, session: 3, title: 'Interfaces', video_url: 'https://www.youtube.com/watch?v=BkrISFxSn-4', topic: 'Interfaces define pure contract specifications containing pure virtual functions without any variable state.\n\n#include <iostream>\nusing namespace std;\nclass IPrintable { public: virtual void print() = 0; };\nclass Doc : public IPrintable { public: void print() override { cout << "Doc"; } };\nint main() { Doc d; d.print(); return 0; }',
       problems: [
         { title: 'Interface Design', points: 30, difficulty: 'Basic',
           description: 'Write a class with strictly pure virtual methods and no data fields.',
@@ -184,7 +184,7 @@ module.exports = [
           hint: 'class File : public IRead, public IWrite.',
           solution: 'One class implementing two separate interfaces fully.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Composition vs Aggregation', topic: 'Composition reflects tight ownership where child objects die with the parent; aggregation reflects loose independent association.\n\n#include <iostream>\nusing namespace std;\nclass Engine {};\nclass Car { Engine e; }; // Composition\nint main() { Car c; return 0; }',
+    { no: 10, week: 4, session: 1, title: 'Composition vs Aggregation', video_url: 'https://www.youtube.com/watch?v=B46RqPYhEys', topic: 'Composition reflects tight ownership where child objects die with the parent; aggregation reflects loose independent association.\n\n#include <iostream>\nusing namespace std;\nclass Engine {};\nclass Car { Engine e; }; // Composition\nint main() { Car c; return 0; }',
       problems: [
         { title: 'Composition', points: 30, difficulty: 'Basic',
           description: 'Embed an object directly inside a parent class.',
@@ -214,7 +214,7 @@ module.exports = [
   key_concepts: ['Syntax and print', 'Variables and dynamic types', 'User input and conversions', 'Control flow', 'Loops', 'Lists and tuples', 'Dictionaries and sets', 'Functions and scope', 'List comprehensions', 'Modules and imports'],
   pass_mark: 60, titleNames: ['Python Starter', 'Pythonista'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'Python Syntax & Print', topic: 'Python uses clean block indentation instead of curly braces to define scope boundaries.\n\nprint("Welcome to Python!")\nx = 10\nif x > 5:\n    print("x is greater than 5")',
+    { no: 1, week: 1, session: 1, title: 'Python Syntax & Print', video_url: 'https://www.youtube.com/watch?v=rfscVS0vtbw', topic: 'Python uses clean block indentation instead of curly braces to define scope boundaries.\n\nprint("Welcome to Python!")\nx = 10\nif x > 5:\n    print("x is greater than 5")',
       problems: [
         { title: 'Hello Python', points: 30, difficulty: 'Basic',
           description: 'Output a greeting using print().',
@@ -232,7 +232,7 @@ module.exports = [
           hint: 'Use triple quotes """ ... """.',
           solution: 'A triple-quoted string printed, preserving line breaks.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Variables & Dynamic Types', topic: 'Python infers variable types automatically at runtime without explicit type annotations.\n\ncount = 10\nprice = 19.99\nname = "EchoLens"\nprint(f"{name} costs ${price}")',
+    { no: 2, week: 1, session: 2, title: 'Variables & Dynamic Types', video_url: 'https://www.youtube.com/watch?v=eBReeuBz7n4', topic: 'Python infers variable types automatically at runtime without explicit type annotations.\n\ncount = 10\nprice = 19.99\nname = "EchoLens"\nprint(f"{name} costs ${price}")',
       problems: [
         { title: 'Type Checking', points: 30, difficulty: 'Basic',
           description: 'Print a value\'s type using the type() function.',
@@ -250,7 +250,7 @@ module.exports = [
           hint: 'Prefix the string with the letter f.',
           solution: 'f"..." with a variable embedded in braces.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'User Input & Conversions', topic: 'The input() function reads keyboard input as strings, requiring explicit numeric type casting.\n\nage = int(input("Enter age: "))\nprint(f"Next year: {age + 1}")',
+    { no: 3, week: 1, session: 3, title: 'User Input & Conversions', video_url: 'https://www.youtube.com/watch?v=hXOGilZyg6Y', topic: 'The input() function reads keyboard input as strings, requiring explicit numeric type casting.\n\nage = int(input("Enter age: "))\nprint(f"Next year: {age + 1}")',
       problems: [
         { title: 'String Input', points: 30, difficulty: 'Basic',
           description: 'Read the user\'s name via input().',
@@ -268,7 +268,7 @@ module.exports = [
           hint: '2026 - int(input_year).',
           solution: 'int(input()) subtracted from 2026 and printed.' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Control Flow (if/elif/else)', topic: 'Branch execution paths cleanly using human-readable if, elif, and else statements.\n\nscore = 85\nif score >= 90:\n    print("A")\nelif score >= 50:\n    print("Pass")\nelse:\n    print("Fail")',
+    { no: 4, week: 2, session: 1, title: 'Control Flow (if/elif/else)', video_url: 'https://www.youtube.com/watch?v=Zp5MuPOtsSY', topic: 'Branch execution paths cleanly using human-readable if, elif, and else statements.\n\nscore = 85\nif score >= 90:\n    print("A")\nelif score >= 50:\n    print("Pass")\nelse:\n    print("Fail")',
       problems: [
         { title: 'Check Positivity', points: 30, difficulty: 'Basic',
           description: "Print 'Positive', 'Negative', or 'Zero' for a number.",
@@ -286,7 +286,7 @@ module.exports = [
           hint: 'status = "Adult" if age >= 18 else "Minor".',
           solution: 'A single-line ternary assignment, correct both ways.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Loops (for/while)', topic: 'Iterate over sequences using for loops or repeat code conditionally using while loops.\n\nfor i in range(1, 4):\n    print(i)\n\ncount = 3\nwhile count > 0:\n    count -= 1',
+    { no: 5, week: 2, session: 2, title: 'Loops (for/while)', video_url: 'https://www.youtube.com/watch?v=6iF8Xb7Z3wQ', topic: 'Iterate over sequences using for loops or repeat code conditionally using while loops.\n\nfor i in range(1, 4):\n    print(i)\n\ncount = 3\nwhile count > 0:\n    count -= 1',
       problems: [
         { title: 'Range Loop', points: 30, difficulty: 'Basic',
           description: 'Print the even numbers from 2 to 20.',
@@ -304,7 +304,7 @@ module.exports = [
           hint: 'Execute the statement break.',
           solution: 'if x == 5: break inside the loop body.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Lists & Tuples', topic: 'Lists [] are ordered mutable sequences; tuples () are permanent immutable sequences.\n\nmy_list = [10, 20, 30]\nmy_list.append(40)\nmy_tuple = (1, 2, 3)',
+    { no: 6, week: 2, session: 3, title: 'Lists & Tuples', video_url: 'https://www.youtube.com/watch?v=W8KRzm-HUcc', topic: 'Lists [] are ordered mutable sequences; tuples () are permanent immutable sequences.\n\nmy_list = [10, 20, 30]\nmy_list.append(40)\nmy_tuple = (1, 2, 3)',
       problems: [
         { title: 'List Operations', points: 30, difficulty: 'Basic',
           description: 'Append an item to a list, then pop index 0.',
@@ -322,7 +322,7 @@ module.exports = [
           hint: 'x, y, z = point.',
           solution: 'x, y, z = point then all three printed correctly.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Dictionaries & Sets', topic: 'Dictionaries map key-value pairs; sets store unordered collections of unique elements.\n\nuser = {"name": "Alice", "age": 25}\nprint(user.get("name"))\nunique_nums = {1, 2, 2, 3} # {1, 2, 3}',
+    { no: 7, week: 3, session: 1, title: 'Dictionaries & Sets', video_url: 'https://www.youtube.com/watch?v=daefaLgNkw0', topic: 'Dictionaries map key-value pairs; sets store unordered collections of unique elements.\n\nuser = {"name": "Alice", "age": 25}\nprint(user.get("name"))\nunique_nums = {1, 2, 2, 3} # {1, 2, 3}',
       problems: [
         { title: 'Dict Access', points: 30, difficulty: 'Basic',
           description: 'Retrieve a grade using .get().',
@@ -340,7 +340,7 @@ module.exports = [
           hint: 'unique_set = set(duplicate_list).',
           solution: 'set(list_with_dupes) printed with duplicates gone.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Functions & Scope', topic: 'Define reusable functions using def, handle default arguments, and manage scopes.\n\ndef greet(name="User"):\n    return f"Hello {name}"\n\nprint(greet("Bob"))',
+    { no: 8, week: 3, session: 2, title: 'Functions & Scope', video_url: 'https://www.youtube.com/watch?v=9Os0o3wzS_I', topic: 'Define reusable functions using def, handle default arguments, and manage scopes.\n\ndef greet(name="User"):\n    return f"Hello {name}"\n\nprint(greet("Bob"))',
       problems: [
         { title: 'Simple Function', points: 30, difficulty: 'Basic',
           description: 'Write a function returning the product of its two arguments, with a default parameter value.',
@@ -358,7 +358,7 @@ module.exports = [
           hint: 'Loop over the elements in the args tuple.',
           solution: 'def total(*args): loops over args summing/printing them.' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'List Comprehensions', topic: 'List comprehensions map and filter existing sequences into new lists in a single line.\n\nnums = [1, 2, 3, 4, 5]\nsquares = [x**2 for x in nums if x % 2 == 0]\nprint(squares) # [4, 16]',
+    { no: 9, week: 3, session: 3, title: 'List Comprehensions', video_url: 'https://www.youtube.com/watch?v=E1ZAVEmRwyI', topic: 'List comprehensions map and filter existing sequences into new lists in a single line.\n\nnums = [1, 2, 3, 4, 5]\nsquares = [x**2 for x in nums if x % 2 == 0]\nprint(squares) # [4, 16]',
       problems: [
         { title: 'Square Numbers', points: 30, difficulty: 'Basic',
           description: 'Build a list of squares for 1 to 10 using a comprehension.',
@@ -376,7 +376,7 @@ module.exports = [
           hint: '[word.upper() for word in words].',
           solution: 'A comprehension calling .upper() on each word.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Modules & Imports', topic: 'Import standard libraries like math or random to leverage built-in functionality.\n\nimport math\nfrom random import randint\nprint(math.sqrt(16))\nprint(randint(1, 10))',
+    { no: 10, week: 4, session: 1, title: 'Modules & Imports', video_url: 'https://www.youtube.com/watch?v=CqvZ3vGoGs0', topic: 'Import standard libraries like math or random to leverage built-in functionality.\n\nimport math\nfrom random import randint\nprint(math.sqrt(16))\nprint(randint(1, 10))',
       problems: [
         { title: 'Math Module', points: 30, difficulty: 'Basic',
           description: 'Calculate the square root of 144.',
@@ -406,7 +406,7 @@ module.exports = [
   key_concepts: ['let/const/var and scope', 'Data types and coercion', 'Arrow functions', 'Objects and literals', 'Array methods (map/filter/reduce)', 'Template literals and destructuring', 'DOM selection', 'Event listeners', 'Promises', 'async/await and fetch()'],
   pass_mark: 60, titleNames: ['Script Starter', 'Async Architect'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'Variables (let, const, var)', topic: 'Modern JavaScript utilizes block-scoped let and const declarations instead of function-scoped var.\n\nlet count = 1;\nconst MAX = 100;\nif (true) {\n  let blockScoped = "Hidden";\n}',
+    { no: 1, week: 1, session: 1, title: 'Variables (let, const, var)', video_url: 'https://www.youtube.com/watch?v=iqjs3yNN5zo', topic: 'Modern JavaScript utilizes block-scoped let and const declarations instead of function-scoped var.\n\nlet count = 1;\nconst MAX = 100;\nif (true) {\n  let blockScoped = "Hidden";\n}',
       problems: [
         { title: 'Const Assignment', points: 30, difficulty: 'Basic',
           description: 'Reassign a const variable to observe the error, and log what happened.',
@@ -424,7 +424,7 @@ module.exports = [
           hint: 'Returns undefined due to hoisting.',
           solution: 'console.log(x) before var x = ...; logs undefined.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Data Types & Coercion', topic: "JS supports primitive types and converts matching types automatically during loose comparison evaluation.\n\nconsole.log('5' == 5); // true (coercion)\nconsole.log('5' === 5); // false (strict)\nconsole.log(typeof 42); // 'number'",
+    { no: 2, week: 1, session: 2, title: 'Data Types & Coercion', video_url: 'https://www.youtube.com/watch?v=OPZ1wfqsqrs', topic: "JS supports primitive types and converts matching types automatically during loose comparison evaluation.\n\nconsole.log('5' == 5); // true (coercion)\nconsole.log('5' === 5); // false (strict)\nconsole.log(typeof 42); // 'number'",
       problems: [
         { title: 'Strict Equality', points: 30, difficulty: 'Basic',
           description: "Compare '5' == 5 versus '5' === 5 and log both results.",
@@ -442,7 +442,7 @@ module.exports = [
           hint: "parseInt('42px') parses the leading digits.",
           solution: "parseInt('42px') logged as 42." },
       ] },
-    { no: 3, week: 1, session: 3, title: 'Arrow Functions', topic: 'Arrow functions () => {} offer concise syntax and preserve lexical context binding.\n\nconst double = x => x * 2;\nconst add = (a, b) => a + b;\nconsole.log(double(5));',
+    { no: 3, week: 1, session: 3, title: 'Arrow Functions', video_url: 'https://www.youtube.com/watch?v=LiwAKSvrfr0', topic: 'Arrow functions () => {} offer concise syntax and preserve lexical context binding.\n\nconst double = x => x * 2;\nconst add = (a, b) => a + b;\nconsole.log(double(5));',
       problems: [
         { title: 'Convert Function', points: 30, difficulty: 'Basic',
           description: 'Rewrite a regular function into arrow syntax.',
@@ -460,7 +460,7 @@ module.exports = [
           hint: "(name = 'User') => ...",
           solution: 'Arrow function with a default parameter, called both ways.' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Objects & Literals', topic: 'JavaScript objects are key-value structures storing properties and methods.\n\nconst user = {\n  name: "Alice",\n  greet() { console.log("Hi"); }\n};\nuser.greet();',
+    { no: 4, week: 2, session: 1, title: 'Objects & Literals', video_url: 'https://www.youtube.com/watch?v=7d9H34ZVRPg', topic: 'JavaScript objects are key-value structures storing properties and methods.\n\nconst user = {\n  name: "Alice",\n  greet() { console.log("Hi"); }\n};\nuser.greet();',
       problems: [
         { title: 'Object Creation', points: 30, difficulty: 'Basic',
           description: 'Instantiate a user object with name and age.',
@@ -478,7 +478,7 @@ module.exports = [
           hint: 'Place the function as an object property value.',
           solution: 'An object with a method property, invoked and logging correctly.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Array Methods (map, filter)', topic: 'Process array data functionally using non-mutating higher-order methods.\n\nconst nums = [1, 2, 3, 4];\nconst doubled = nums.map(n => n * 2);\nconst evens = nums.filter(n => n % 2 === 0);',
+    { no: 5, week: 2, session: 2, title: 'Array Methods (map, filter)', video_url: 'https://www.youtube.com/watch?v=8MoElay6dWU', topic: 'Process array data functionally using non-mutating higher-order methods.\n\nconst nums = [1, 2, 3, 4];\nconst doubled = nums.map(n => n * 2);\nconst evens = nums.filter(n => n % 2 === 0);',
       problems: [
         { title: 'Array Map', points: 30, difficulty: 'Basic',
           description: 'Double every number in an array using .map().',
@@ -496,7 +496,7 @@ module.exports = [
           hint: 'nums.reduce((acc, curr) => acc + curr, 0).',
           solution: '.reduce() accumulating a correct total, logged.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Template Literals', topic: 'Backticks `${var}` simplify multi-line string construction and string interpolation.\n\nconst name = "World";\nconst msg = `Hello ${name}!`;\nconst [a, b] = [10, 20]; // Destructuring',
+    { no: 6, week: 2, session: 3, title: 'Template Literals', video_url: 'https://www.youtube.com/watch?v=52OJhTbCtoA', topic: 'Backticks `${var}` simplify multi-line string construction and string interpolation.\n\nconst name = "World";\nconst msg = `Hello ${name}!`;\nconst [a, b] = [10, 20]; // Destructuring',
       problems: [
         { title: 'Interpolation', points: 30, difficulty: 'Basic',
           description: 'Build a dynamic template string with two variables.',
@@ -514,7 +514,7 @@ module.exports = [
           hint: 'const [first, second] = array;',
           solution: 'Array destructuring pulling the first two elements.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'DOM Selection', topic: "Query and manipulate page elements dynamically using document.querySelector().\n\nconst el = document.querySelector('#title');\nel.textContent = 'Updated Title';\nel.classList.add('active');",
+    { no: 7, week: 3, session: 1, title: 'DOM Selection', video_url: 'https://www.youtube.com/watch?v=JlgLDfINXvY', topic: "Query and manipulate page elements dynamically using document.querySelector().\n\nconst el = document.querySelector('#title');\nel.textContent = 'Updated Title';\nel.classList.add('active');",
       problems: [
         { title: 'Target Element', points: 30, difficulty: 'Basic',
           description: "Select an element with ID 'title' from the page.",
@@ -532,7 +532,7 @@ module.exports = [
           hint: "el.classList.toggle('active');.",
           solution: '.classList.toggle() flipping a class, with a visible style tied to it.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Event Listeners', topic: "Attach event handlers to DOM elements to trigger interactive functions on click or keyup.\n\nconst btn = document.querySelector('button');\nbtn.addEventListener('click', (e) => {\n  console.log('Button clicked!');\n});",
+    { no: 8, week: 3, session: 2, title: 'Event Listeners', video_url: 'https://www.youtube.com/watch?v=BqN2LsMASLY', topic: "Attach event handlers to DOM elements to trigger interactive functions on click or keyup.\n\nconst btn = document.querySelector('button');\nbtn.addEventListener('click', (e) => {\n  console.log('Button clicked!');\n});",
       problems: [
         { title: 'Click Handler', points: 30, difficulty: 'Basic',
           description: 'Attach a click listener to a button.',
@@ -550,7 +550,7 @@ module.exports = [
           hint: 'Read the e.key property inside the keyup callback.',
           solution: "addEventListener('keyup', e => console.log(e.key))." },
       ] },
-    { no: 9, week: 3, session: 3, title: 'Promises', topic: "Promises represent background asynchronous operation states (pending, fulfilled, rejected).\n\nconst p = new Promise((resolve) => {\n  setTimeout(() => resolve('Loaded'), 1000);\n});\np.then(data => console.log(data));",
+    { no: 9, week: 3, session: 3, title: 'Promises', video_url: 'https://www.youtube.com/watch?v=TnhCX0KkPqs', topic: "Promises represent background asynchronous operation states (pending, fulfilled, rejected).\n\nconst p = new Promise((resolve) => {\n  setTimeout(() => resolve('Loaded'), 1000);\n});\np.then(data => console.log(data));",
       problems: [
         { title: 'Create Promise', points: 30, difficulty: 'Basic',
           description: 'Instantiate a promise that resolves with text.',
@@ -568,7 +568,7 @@ module.exports = [
           hint: '.catch(err => console.error(err)).',
           solution: 'A promise that rejects, caught and logged via .catch().' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'async / await & fetch()', topic: "async/await provides synchronous-style syntax to handle Promises and fetch API responses.\n\nasync function getData() {\n  const res = await fetch('https://api.example.com');\n  const data = await res.json();\n}",
+    { no: 10, week: 4, session: 1, title: 'async / await & fetch()', video_url: 'https://www.youtube.com/watch?v=Yp9KIcSKTNo', topic: "async/await provides synchronous-style syntax to handle Promises and fetch API responses.\n\nasync function getData() {\n  const res = await fetch('https://api.example.com');\n  const data = await res.json();\n}",
       problems: [
         { title: 'Async Function', points: 30, difficulty: 'Basic',
           description: 'Mark a function as async.',
@@ -598,7 +598,7 @@ module.exports = [
   key_concepts: ['Selectors', 'Specificity and cascade', 'The box model', 'Colors and backgrounds', 'Typography', 'Display property', 'Positioning', 'Flexbox', 'Grid', 'Responsive media queries'],
   pass_mark: 60, titleNames: ['Style Starter', 'Layout Architect'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'Selectors & CSS Inclusion', topic: 'CSS targets HTML elements using tag names, classes (.), or unique IDs (#).\n\n/* External or Internal CSS */\nh1 { color: navy; }\n.highlight { background: yellow; }\n#main { padding: 10px; }',
+    { no: 1, week: 1, session: 1, title: 'Selectors & CSS Inclusion', video_url: 'https://www.youtube.com/watch?v=WC7WurHBGs0', topic: 'CSS targets HTML elements using tag names, classes (.), or unique IDs (#).\n\n/* External or Internal CSS */\nh1 { color: navy; }\n.highlight { background: yellow; }\n#main { padding: 10px; }',
       problems: [
         { title: 'Class Selector', points: 30, difficulty: 'Basic',
           description: 'Apply a class selector that sets yellow text.',
@@ -616,7 +616,7 @@ module.exports = [
           hint: 'div span { ... }.',
           solution: 'A descendant combinator scoping the rule correctly.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Specificity & Cascade', topic: 'The cascade resolves conflicting style rules based on Inline > ID > Class > Element priority.\n\n/* ID overrides Class rules */\np { color: black; }\n.text { color: blue; }\n#unique { color: red; } /* Wins */',
+    { no: 2, week: 1, session: 2, title: 'Specificity & Cascade', video_url: 'https://www.youtube.com/watch?v=uTcpbPMZlFE', topic: 'The cascade resolves conflicting style rules based on Inline > ID > Class > Element priority.\n\n/* ID overrides Class rules */\np { color: black; }\n.text { color: blue; }\n#unique { color: red; } /* Wins */',
       problems: [
         { title: 'Override Rule', points: 30, difficulty: 'Basic',
           description: 'Override a tag-level rule with an ID selector.',
@@ -634,7 +634,7 @@ module.exports = [
           hint: 'The rule defined lowest in the file wins.',
           solution: 'Two equally-specific rules, with the later one visibly taking effect.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'CSS Box Model', topic: 'Elements render as rectangular boxes consisting of content, padding, border, and margin.\n\n.box {\n  width: 200px;\n  padding: 20px;\n  border: 2px solid black;\n  box-sizing: border-box;\n}',
+    { no: 3, week: 1, session: 3, title: 'CSS Box Model', video_url: 'https://www.youtube.com/watch?v=Xrxd6cEajhM', topic: 'Elements render as rectangular boxes consisting of content, padding, border, and margin.\n\n.box {\n  width: 200px;\n  padding: 20px;\n  border: 2px solid black;\n  box-sizing: border-box;\n}',
       problems: [
         { title: 'Add Padding', points: 30, difficulty: 'Basic',
           description: 'Apply 20px of interior spacing to an element.',
@@ -652,7 +652,7 @@ module.exports = [
           hint: 'Prevents the element from expanding beyond its declared width.',
           solution: 'border-box applied, width stays exact including padding/border.' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Colors & Backgrounds', topic: 'Define visual styling using Hex values, RGBA opacity, or background cover images.\n\n.card {\n  background-color: #f4f4f4;\n  color: rgba(0, 0, 0, 0.8);\n  background-size: cover;\n}',
+    { no: 4, week: 2, session: 1, title: 'Colors & Backgrounds', video_url: 'https://www.youtube.com/watch?v=rQPRrPcIz5w', topic: 'Define visual styling using Hex values, RGBA opacity, or background cover images.\n\n.card {\n  background-color: #f4f4f4;\n  color: rgba(0, 0, 0, 0.8);\n  background-size: cover;\n}',
       problems: [
         { title: 'Hex Colors', points: 30, difficulty: 'Basic',
           description: 'Change a background using a Hex color code.',
@@ -670,7 +670,7 @@ module.exports = [
           hint: 'background-size: cover;.',
           solution: 'A background image with cover sizing, filling its box.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Typography & Fonts', topic: 'Format font families, relative rem font sizes, line heights, and web font stacks.\n\nbody {\n  font-family: Arial, sans-serif;\n  font-size: 1rem;\n  line-height: 1.6;\n}',
+    { no: 5, week: 2, session: 2, title: 'Typography & Fonts', video_url: 'https://www.youtube.com/watch?v=RNakAX3rVVw', topic: 'Format font families, relative rem font sizes, line heights, and web font stacks.\n\nbody {\n  font-family: Arial, sans-serif;\n  font-size: 1rem;\n  line-height: 1.6;\n}',
       problems: [
         { title: 'Font Stack', points: 30, difficulty: 'Basic',
           description: 'Define a fallback font stack.',
@@ -688,7 +688,7 @@ module.exports = [
           hint: 'line-height: 1.6;.',
           solution: 'line-height: 1.6 applied, visibly looser line spacing.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Display Property', topic: 'Control layout rendering behaviors using block, inline, inline-block, or display: none.\n\n.nav-item { display: inline-block; }\n.hidden { display: none; }\n.full-box { display: block; }',
+    { no: 6, week: 2, session: 3, title: 'Display Property', video_url: 'https://www.youtube.com/watch?v=hRHV5cjEB1w', topic: 'Control layout rendering behaviors using block, inline, inline-block, or display: none.\n\n.nav-item { display: inline-block; }\n.hidden { display: none; }\n.full-box { display: block; }',
       problems: [
         { title: 'Inline Block', points: 30, difficulty: 'Basic',
           description: 'Convert an inline link so it accepts width/height.',
@@ -706,7 +706,7 @@ module.exports = [
           hint: 'display: block;.',
           solution: 'A span forced to block display, now stacking on its own line.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'CSS Positioning', topic: 'Position elements relative to normal flow or absolutely anchored inside relative containers.\n\n.parent { position: relative; }\n.badge {\n  position: absolute;\n  top: 0; right: 0;\n}',
+    { no: 7, week: 3, session: 1, title: 'CSS Positioning', video_url: 'https://www.youtube.com/watch?v=h_Smqpqs_1k', topic: 'Position elements relative to normal flow or absolutely anchored inside relative containers.\n\n.parent { position: relative; }\n.badge {\n  position: absolute;\n  top: 0; right: 0;\n}',
       problems: [
         { title: 'Relative Anchor', points: 30, difficulty: 'Basic',
           description: 'Set a relative positioning context on a parent element.',
@@ -724,7 +724,7 @@ module.exports = [
           hint: 'position: fixed; top: 0; width: 100%;.',
           solution: 'A fixed-position header that stays put during scroll.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Flexbox Core Layout', topic: 'Flexbox simplifies 1D layout alignment along horizontal rows or vertical columns.\n\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}',
+    { no: 8, week: 3, session: 2, title: 'Flexbox Core Layout', video_url: 'https://www.youtube.com/watch?v=wsTv9y931o8', topic: 'Flexbox simplifies 1D layout alignment along horizontal rows or vertical columns.\n\n.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}',
       problems: [
         { title: 'Enable Flex', points: 30, difficulty: 'Basic',
           description: 'Convert a container to a flex context.',
@@ -742,7 +742,7 @@ module.exports = [
           hint: 'flex-direction: column;.',
           solution: 'flex-direction: column reorienting the flex items.' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'CSS Grid Basics', topic: 'CSS Grid structures 2D page layouts organized across defined rows and columns.\n\n.grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 15px;\n}',
+    { no: 9, week: 3, session: 3, title: 'CSS Grid Basics', video_url: 'https://www.youtube.com/watch?v=EiNiSFIPIQE', topic: 'CSS Grid structures 2D page layouts organized across defined rows and columns.\n\n.grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 15px;\n}',
       problems: [
         { title: 'Enable Grid', points: 30, difficulty: 'Basic',
           description: 'Create a 3 equal-width column layout.',
@@ -760,7 +760,7 @@ module.exports = [
           hint: 'grid-column: span 2;.',
           solution: 'One item spanning two columns while the rest occupy one.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Responsive Media Queries', topic: 'Media queries apply conditional CSS styling depending on viewport device width.\n\n@media (max-width: 768px) {\n  .container { flex-direction: column; }\n  .sidebar { display: none; }\n}',
+    { no: 10, week: 4, session: 1, title: 'Responsive Media Queries', video_url: 'https://www.youtube.com/watch?v=69IbzTWg5PM', topic: 'Media queries apply conditional CSS styling depending on viewport device width.\n\n@media (max-width: 768px) {\n  .container { flex-direction: column; }\n  .sidebar { display: none; }\n}',
       problems: [
         { title: 'Mobile Breakpoint', points: 30, difficulty: 'Basic',
           description: 'Target screens under 768px width.',
@@ -790,7 +790,7 @@ module.exports = [
   key_concepts: ['Document structure and DOCTYPE', 'Headings and paragraphs', 'Text formatting elements', 'Lists', 'Links and anchors', 'Images and media', 'Tables', 'Forms and inputs', 'Form labels and accessibility', 'Semantic HTML5 elements'],
   pass_mark: 60, titleNames: ['Markup Starter', 'Semantic Builder'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'Document Structure & DOCTYPE', topic: 'HTML documents build upon a standard skeleton containing DOCTYPE, html, head, and body tags.\n\n<!DOCTYPE html>\n<html>\n<head>\n  <title>My Portal</title>\n</head>\n<body>\n  <h1>Welcome</h1>\n</body>\n</html>',
+    { no: 1, week: 1, session: 1, title: 'Document Structure & DOCTYPE', video_url: 'https://www.youtube.com/watch?v=9nmFfPucWAw', topic: 'HTML documents build upon a standard skeleton containing DOCTYPE, html, head, and body tags.\n\n<!DOCTYPE html>\n<html>\n<head>\n  <title>My Portal</title>\n</head>\n<body>\n  <h1>Welcome</h1>\n</body>\n</html>',
       problems: [
         { title: 'HTML Skeleton', points: 30, difficulty: 'Basic',
           description: 'Build a boilerplate HTML document.',
@@ -808,7 +808,7 @@ module.exports = [
           hint: '<meta charset="UTF-8">.',
           solution: 'A charset meta tag correctly placed in the document head.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Headings & Paragraph Tags', topic: 'Structure document text hierarchy using headings (h1 to h6) and paragraphs (p).\n\n<h1>Main Heading</h1>\n<h2>Sub Heading</h2>\n<p>Paragraph text block.<br>New line text.</p>\n<hr>',
+    { no: 2, week: 1, session: 2, title: 'Headings & Paragraph Tags', video_url: 'https://www.youtube.com/watch?v=GHmpcvYuMWs', topic: 'Structure document text hierarchy using headings (h1 to h6) and paragraphs (p).\n\n<h1>Main Heading</h1>\n<h2>Sub Heading</h2>\n<p>Paragraph text block.<br>New line text.</p>\n<hr>',
       problems: [
         { title: 'Heading Hierarchy', points: 30, difficulty: 'Basic',
           description: 'Create an h1, h2, and h3 in sequential order.',
@@ -826,7 +826,7 @@ module.exports = [
           hint: 'Insert a self-closing <hr> tag.',
           solution: 'A single <hr> element rendering a divider.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'Text Formatting Elements', topic: 'Format inline content semantically using strong, em, mark, and code tags.\n\n<p>This is <strong>important</strong> and <em>emphasized</em> text.</p>\n<code>const x = 10;</code>',
+    { no: 3, week: 1, session: 3, title: 'Text Formatting Elements', video_url: 'https://www.youtube.com/watch?v=ElTNDaw7-Vs', topic: 'Format inline content semantically using strong, em, mark, and code tags.\n\n<p>This is <strong>important</strong> and <em>emphasized</em> text.</p>\n<code>const x = 10;</code>',
       problems: [
         { title: 'Bold Text', points: 30, difficulty: 'Basic',
           description: 'Highlight text semantically as important.',
@@ -844,7 +844,7 @@ module.exports = [
           hint: 'Wrap the target text in <mark> tags.',
           solution: 'A <mark> element visibly highlighting text.' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Lists (ul, ol)', topic: 'Group related content items into bulleted unordered lists or numbered ordered lists.\n\n<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n</ul>\n<ol>\n  <li>Step 1</li>\n</ol>',
+    { no: 4, week: 2, session: 1, title: 'Lists (ul, ol)', video_url: 'https://www.youtube.com/watch?v=fWBqwz9Nju8', topic: 'Group related content items into bulleted unordered lists or numbered ordered lists.\n\n<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n</ul>\n<ol>\n  <li>Step 1</li>\n</ol>',
       problems: [
         { title: 'Unordered List', points: 30, difficulty: 'Basic',
           description: 'Build a bullet-point list.',
@@ -862,7 +862,7 @@ module.exports = [
           hint: 'Place the <ul> directly inside the parent <li> tag.',
           solution: 'A nested <ul> living inside one <li> of an outer list.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Links & Anchors (a)', topic: 'Hyperlinks (a) connect documents using target URLs supplied to the href attribute.\n\n<a href="https://google.com" target="_blank">Search</a>\n<a href="#footer">Jump to Footer</a>',
+    { no: 5, week: 2, session: 2, title: 'Links & Anchors (a)', video_url: 'https://www.youtube.com/watch?v=81wMe4sWGVQ', topic: 'Hyperlinks (a) connect documents using target URLs supplied to the href attribute.\n\n<a href="https://google.com" target="_blank">Search</a>\n<a href="#footer">Jump to Footer</a>',
       problems: [
         { title: 'External Link', points: 30, difficulty: 'Basic',
           description: 'Create a link navigating to Google.',
@@ -880,7 +880,7 @@ module.exports = [
           hint: '<a href="#footer">Jump to Footer</a>.',
           solution: 'A hash-link paired with a matching id="footer" target element.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Images & Media', topic: 'Embed graphics, video players, and audio streams natively using media tags.\n\n<img src="logo.png" alt="Logo">\n<video src="clip.mp4" controls></video>\n<audio src="song.mp3" controls></audio>',
+    { no: 6, week: 2, session: 3, title: 'Images & Media', video_url: 'https://www.youtube.com/watch?v=ktJFw-FKOOA', topic: 'Embed graphics, video players, and audio streams natively using media tags.\n\n<img src="logo.png" alt="Logo">\n<video src="clip.mp4" controls></video>\n<audio src="song.mp3" controls></audio>',
       problems: [
         { title: 'Embed Image', points: 30, difficulty: 'Basic',
           description: 'Display an image with fallback alt text.',
@@ -898,7 +898,7 @@ module.exports = [
           hint: '<audio src="music.mp3" controls loop></audio>.',
           solution: 'An <audio> element with both controls and loop set.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Tables & Data Display', topic: 'Structure tabular datasets into organized rows and columns using table semantic tags.\n\n<table>\n  <thead><tr><th>Name</th><th>Score</th></tr></thead>\n  <tbody><tr><td>Alice</td><td>95</td></tr></tbody>\n</table>',
+    { no: 7, week: 3, session: 1, title: 'Tables & Data Display', video_url: 'https://www.youtube.com/watch?v=eM0UgWpUV8g', topic: 'Structure tabular datasets into organized rows and columns using table semantic tags.\n\n<table>\n  <thead><tr><th>Name</th><th>Score</th></tr></thead>\n  <tbody><tr><td>Alice</td><td>95</td></tr></tbody>\n</table>',
       problems: [
         { title: 'Basic Table', points: 30, difficulty: 'Basic',
           description: 'Build a 2x2 table for Name and Score.',
@@ -916,7 +916,7 @@ module.exports = [
           hint: 'Wrap headers in <thead>, rows in <tbody>.',
           solution: 'A table properly split into <thead> and <tbody> sections.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Forms & Inputs', topic: 'Collect user input using dynamic input types, checkboxes, radio buttons, and form tags.\n\n<form action="/submit" method="POST">\n  <input type="email" required>\n  <button type="submit">Submit</button>\n</form>',
+    { no: 8, week: 3, session: 2, title: 'Forms & Inputs', video_url: 'https://www.youtube.com/watch?v=MKSQYsLLFEo', topic: 'Collect user input using dynamic input types, checkboxes, radio buttons, and form tags.\n\n<form action="/submit" method="POST">\n  <input type="email" required>\n  <button type="submit">Submit</button>\n</form>',
       problems: [
         { title: 'Login Form', points: 30, difficulty: 'Basic',
           description: 'Create an email and password login form.',
@@ -934,7 +934,7 @@ module.exports = [
           hint: '<form action="/submit" method="POST">.',
           solution: 'A <form> with both action and method="POST" set correctly.' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'Form Labels & Accessibility', topic: 'Associate text descriptions with input elements using matching for and id attributes.\n\n<label for="user">Username:</label>\n<input id="user" type="text" placeholder="Enter username" required>',
+    { no: 9, week: 3, session: 3, title: 'Form Labels & Accessibility', video_url: 'https://www.youtube.com/watch?v=6xq57uhKJSA', topic: 'Associate text descriptions with input elements using matching for and id attributes.\n\n<label for="user">Username:</label>\n<input id="user" type="text" placeholder="Enter username" required>',
       problems: [
         { title: 'Label Binding', points: 30, difficulty: 'Basic',
           description: 'Bind a label to an input using matching IDs.',
@@ -952,7 +952,7 @@ module.exports = [
           hint: 'placeholder="Enter your email".',
           solution: 'An input with clear, helpful placeholder text.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Semantic HTML5 Elements', topic: 'Replace generic div wrappers with semantic structural elements describing content meaning.\n\n<header><h1>Title</h1></header>\n<nav><a href="/">Home</a></nav>\n<main><article><p>Content</p></article></main>\n<footer>Footer Text</footer>',
+    { no: 10, week: 4, session: 1, title: 'Semantic HTML5 Elements', video_url: 'https://www.youtube.com/watch?v=xGYz9yIXOz4', topic: 'Replace generic div wrappers with semantic structural elements describing content meaning.\n\n<header><h1>Title</h1></header>\n<nav><a href="/">Home</a></nav>\n<main><article><p>Content</p></article></main>\n<footer>Footer Text</footer>',
       problems: [
         { title: 'Page Skeleton', points: 30, difficulty: 'Basic',
           description: 'Refactor generic divs into header, main, and footer.',

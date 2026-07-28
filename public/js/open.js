@@ -103,6 +103,18 @@ let CUR_PROBLEM = null;  // { level, pid, problem }
 let SV_TERM = null;
 let SV_FILES = [];
 let CUR_EVENT = null;
+// "Live Tech Courses" and "Free Certified Courses" are the same underlying
+// tab (both call openTab('courses')) with different starting filters, so
+// openTab() can't tell them apart from the tab name alone - this tracks
+// which nav entry should read as active while showing that tab, kept in
+// sync by navCourses(), the #free deep link, and openCourse() (landing on
+// a free course, however you got there, should highlight the free nav item).
+let COURSE_NAV_MODE = 'live';
+function navCourses(mode) {
+  COURSE_NAV_MODE = mode;
+  openTab('courses');
+  if (mode === 'free') setCoursePill('free');
+}
 
 /* -------------------------------- boot -------------------------------- */
 (async () => {
@@ -121,7 +133,7 @@ let CUR_EVENT = null;
   if (['courses', 'events', 'announcements'].includes(h)) openTab(h);
   else if (h === 'home') openTab('courses'); // the old portal home page merged into Courses
   else if (h === 'quests') openTab('courses'); // quests now live inside each course
-  else if (h === 'free') { openTab('courses'); setCoursePill('free'); } // browse the free courses openly; signing in is asked only on solving
+  else if (h === 'free') navCourses('free'); // browse the free courses openly; signing in is asked only on solving
   else if (h === 'profile') openProfileTab();
   // #register opens the in-site enrolment form; #register-<CODE> preselects
   // that course. Wait for the catalogue so the course dropdown is populated.
@@ -245,8 +257,17 @@ function openTab(tab) {
   ['courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
-  document.querySelectorAll('.open-nav .nlink[data-tab]').forEach((n) =>
-    n.classList.toggle('active', n.dataset.tab === tab || (tab === 'course' && n.dataset.tab === 'courses') || (tab === 'solve' && n.dataset.tab === 'courses') || (tab === 'eventDetail' && n.dataset.tab === 'events')));
+  // 'courses'/'course'/'solve' all map to the same two nav links (Live Tech
+  // Courses vs Free Certified Courses) - which of those two is "active"
+  // depends on COURSE_NAV_MODE, not on the tab name, since both links open
+  // the identical tab.
+  const inCoursesFamily = ['courses', 'course', 'solve'].includes(tab);
+  document.querySelectorAll('.open-nav .nlink[data-tab]').forEach((n) => {
+    const active = inCoursesFamily
+      ? n.dataset.tab === 'courses' && (n.dataset.catnav || 'live') === COURSE_NAV_MODE
+      : n.dataset.tab === tab || (tab === 'eventDetail' && n.dataset.tab === 'events');
+    n.classList.toggle('active', active);
+  });
   if (tab !== 'eventDetail') stopEventCountdown();
   window.scrollTo({ top: 0 });
 }
@@ -493,6 +514,12 @@ async function openCourse(key) {
   let progress = null;
   if (ME) { try { progress = (await api('/api/open/progress?track=' + encodeURIComponent(key))).progress; } catch {} }
   CUR = { ...d, progress };
+  // Whichever nav link you actually arrived through, a free course should
+  // read as "Free Certified Courses" and a paid one as "Live Tech Courses" -
+  // re-sync now that we know d.track.free (openTab('course') above ran
+  // before this was known).
+  COURSE_NAV_MODE = d.track.free ? 'free' : 'live';
+  openTab('course');
   drawCourse();
 }
 // How each course takes work: shown on the course page and drives the solve workspace.
@@ -511,7 +538,7 @@ function courseOutlineHtml(t) {
   const rows = CUR.levels.map((l) => `
     <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.5">
       <span class="mono" style="color:var(--primary);font-weight:700;white-space:nowrap">${unit} ${l.no}</span>
-      <span><strong style="color:var(--ink)">${esc(l.title)}</strong>${l.topic ? ` <span style="color:var(--muted)">- ${esc(l.topic)}</span>` : ''}</span>
+      <span><strong style="color:var(--ink)">${esc(l.title)}</strong>${l.topic && l.topic.length < 90 ? ` <span style="color:var(--muted)">- ${esc(l.topic)}</span>` : ''}</span>
     </li>`).join('');
   const concepts = (t.key_concepts || []).map((k) => `<span style="display:inline-block;font-size:12px;font-weight:600;color:var(--primary);border:1px solid var(--line);border-radius:999px;padding:4px 11px;margin:3px 4px 0 0">${esc(k)}</span>`).join('');
   const clos = (t.clos || []).map((c, i) => `
@@ -546,6 +573,26 @@ function courseOutlineHtml(t) {
       <ul style="list-style:none;padding:0;margin:6px 0 0">${ep.includes.map((i) => `<li style="padding:4px 0 4px 22px;position:relative;font-size:13px;color:var(--muted);line-height:1.5"><span style="position:absolute;left:2px;color:var(--ok);font-weight:700">&#10003;</span>${esc(i)}</li>`).join('')}</ul>` : ''}
       ${ep.shipped_when ? `<p class="s" style="margin-top:10px;padding:9px 12px;border-left:3px solid var(--ok);background:var(--bg);border-radius:6px;color:var(--muted)"><strong style="color:var(--ink)">Shipped when:</strong> ${esc(ep.shipped_when)}</p>` : ''}
     </div></div>` : ''}`;
+}
+// CS-101..CS-107's `topic` field packs a short explanation paragraph and an
+// example code snippet into one string (explanation, blank line, then code
+// starting with #include/import/etc.) - too long for the one-line "Week X
+// · topic" summary above, so it gets its own block here instead, split on
+// the first blank line. Older tracks' short one-line topics stay in that
+// summary (see the length check above) and this block renders nothing for
+// them.
+function topicDetailHtml(l) {
+  if ((!l.topic || l.topic.length < 90) && !l.video_url) return '';
+  const parts = (l.topic || '').split('\n\n');
+  const explanation = parts[0] || '';
+  const code = parts.slice(1).join('\n\n');
+  return `
+    <div class="card-body tight" style="border-top:1px solid var(--line)">
+      ${explanation ? `<p class="s" style="line-height:1.6;margin-bottom:${code ? '10px' : '0'}">${esc(explanation)}</p>` : ''}
+      ${code ? `<pre style="background:#0B1530;color:#E7ECF3;border-radius:10px;padding:12px 14px;overflow-x:auto;font:12.5px/1.55 var(--font-mono);white-space:pre"><code>${esc(code)}</code></pre>` : ''}
+      ${l.video_url ? `<a href="${esc(l.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : ''}
+    </div>`;
 }
 function drawCourse() {
   const t = CUR.track, prog = CUR.progress;
@@ -587,8 +634,9 @@ function drawCourse() {
       <div class="card-head">
         <h3 style="display:flex;gap:10px;align-items:center">${unitLabel} ${l.no} - ${esc(l.title)}
           ${l.locked ? '<span class="pay-badge na">Locked</span>' : '<span class="pay-badge confirmed">Open</span>'}</h3>
-        <span class="s" style="color:var(--muted)">Week ${l.week || l.no}${l.topic ? ' · ' + esc(l.topic) : ''}</span>
+        <span class="s" style="color:var(--muted)">Week ${l.week || l.no}${l.topic && l.topic.length < 90 ? ' · ' + esc(l.topic) : ''}</span>
       </div>
+      ${topicDetailHtml(l)}
       <div class="card-body tight">
         ${(l.problems || []).map((p) => {
           const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${p.pid}`];
@@ -632,6 +680,8 @@ function openSolve(levelNo, pid) {
         <h2>${esc(p.title)}</h2>
         <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} gems</span>
       </div>
+      ${lvl.video_url ? `<a href="${esc(lvl.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:8px;display:inline-flex;gap:6px;align-items:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : ''}
       <div class="s" id="svDesc" style="white-space:pre-line;line-height:1.65;font-size:13.5px;margin-top:8px">${esc(p.description || '')}</div>
       <div class="s" id="svRefs" style="margin-top:10px"></div>
     </div></div>

@@ -2302,14 +2302,14 @@ app.get('/api/public/tracks/:key', (req, res) => {
   const levels = t.levels.map((l) => {
     if (l.no <= openN) {
       return {
-        no: l.no, week: l.week, title: l.title, topic: l.topic, locked: false,
+        no: l.no, week: l.week, title: l.title, topic: l.topic, video_url: l.video_url || null, locked: false,
         problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [], criteria: p.criteria || [], hint: p.hint || null, reference: p.reference || null })),
       };
     }
     // Locked levels: every task is listed (title, points, difficulty) so the
     // full course is visible - briefs and resources unlock on enrolment.
     return {
-      no: l.no, week: l.week, title: l.title, topic: l.topic, locked: true, problems_count: l.problems.length,
+      no: l.no, week: l.week, title: l.title, topic: l.topic, video_url: l.video_url || null, locked: true, problems_count: l.problems.length,
       problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
     };
   });

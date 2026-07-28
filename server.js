@@ -46,7 +46,25 @@ const PORT = process.env.PORT || 3000;
 const DEFAULT_JWT_SECRET = 'echolens-dev-secret-change-in-production';
 const JWT_SECRET = process.env.JWT_SECRET || DEFAULT_JWT_SECRET;
 const COOKIE = 'el_token';
-const isProd = process.env.NODE_ENV === 'production';
+// NODE_ENV=production alone is not trusted as "this is really Render" - this
+// repo's own local .env sets NODE_ENV=production unconditionally (no
+// comment explaining why), so a plain `node server.js` on a laptop reads as
+// "production" to any check that only looks at NODE_ENV, tripping the
+// JWT_SECRET/trust-proxy/Postgres-required guards below for no reason (or,
+// worse, silently satisfying db-guard.js's production exemption). RENDER is
+// a second signal Render's own infrastructure injects unconditionally into
+// every service and a local .env would not set by accident - see
+// db-guard.js's header for the fuller version of this reasoning.
+const isProd = process.env.NODE_ENV === 'production' && process.env.RENDER === 'true';
+
+// Part A load test harness only - scripts/loadtest-measure.js reads this to
+// get RSS memory cross-platform without shelling out to OS-specific process
+// tools. Explicitly opt-in and never on by default (LOADTEST_DIAG must be
+// exactly '1'), same pattern as PERF_DEBUG in prisma-client.js - a real
+// deploy never sets this.
+if (process.env.LOADTEST_DIAG === '1') {
+  app.get('/__loadtest/rss', (req, res) => res.json({ rss: process.memoryUsage().rss }));
+}
 
 // Auth cookies are signed with JWT_SECRET. If it falls back to the public
 // default, anyone can forge an admin session - so refuse to boot in
@@ -489,16 +507,32 @@ function systemHealth() {
   checks.push({ name: 'Storage', ok: storageOk, detail: storageOk ? 'Uploads folder writable' : 'Uploads folder not writable' });
   checks.push({ name: 'Email Service', ok: mailer.configured, detail: mailer.configured ? 'SMTP configured' : 'SMTP not configured - emails are logged only' });
   let backupOk = false, backupDetail = 'No backups yet', lastBackup = null;
-  try {
-    const dir = path.join(path.dirname(store.DB_PATH), 'backups');
-    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
-    if (files.length) {
-      const latest = files.map((f) => fs.statSync(path.join(dir, f)).mtimeMs).sort((a, b) => b - a)[0];
-      lastBackup = new Date(latest).toISOString();
-      backupOk = Date.now() - latest < 24 * 3600000;
-      backupDetail = backupOk ? 'Backed up within the last 24h' : 'Last backup was over 24h ago';
-    }
-  } catch { /* backups directory not created yet */ }
+  if (db.enabled()) {
+    // Postgres mode: the real backup is the scheduled pg_dump GitHub Action
+    // (scripts/backup-pg-dump.js), which runs off this instance entirely and
+    // only leaves behind a small local status marker - see U1a/U1b in
+    // RESTORE.md for why this replaced the old JSON-snapshot copy check.
+    try {
+      const statusPath = path.join(path.dirname(store.DB_PATH), 'backups', 'pg-dump-status.json');
+      const status = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+      lastBackup = status.at;
+      backupOk = !!status.ok && Date.now() - new Date(status.at).getTime() < 36 * 3600000; // 36h: daily job + margin
+      backupDetail = !status.ok
+        ? `Last pg_dump run FAILED: ${status.error || 'unknown error'}`
+        : backupOk ? `pg_dump backed up ${(status.bytes / 1024 / 1024).toFixed(1)}MB within the last 36h` : 'Last successful pg_dump was over 36h ago';
+    } catch { backupDetail = 'No pg_dump backup recorded yet - see RESTORE.md'; }
+  } else {
+    try {
+      const dir = path.join(path.dirname(store.DB_PATH), 'backups');
+      const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
+      if (files.length) {
+        const latest = files.map((f) => fs.statSync(path.join(dir, f)).mtimeMs).sort((a, b) => b - a)[0];
+        lastBackup = new Date(latest).toISOString();
+        backupOk = Date.now() - latest < 24 * 3600000;
+        backupDetail = backupOk ? 'Backed up within the last 24h' : 'Last backup was over 24h ago';
+      }
+    } catch { /* backups directory not created yet */ }
+  }
   checks.push({ name: 'Backup Service', ok: backupOk, detail: backupDetail, last_backup: lastBackup });
   // Postgres-only (see step 5's architecture note on store.js's flush
   // model) - nothing to report in JSON-file mode, where save() writes
@@ -1450,13 +1484,23 @@ app.get('/api/admin/system-health', authRequired, staffView, (req, res) => {
   Users.all().forEach((u) => events.push({ at: u.created_at, kind: 'user', text: `New ${ROLE_LABEL[u.role] || u.role} account: ${u.name}` }));
   Courses.all().forEach((c) => events.push({ at: c.created_at, kind: 'course', text: `New course added to catalogue: ${c.title}` }));
   Batches.all().forEach((b) => events.push({ at: b.created_at, kind: 'batch', text: `New cohort started: ${b.title || b.name} (${b.name})` }));
-  try {
-    const dir = path.join(path.dirname(store.DB_PATH), 'backups');
-    fs.readdirSync(dir).filter((f) => f.endsWith('.json')).forEach((f) => {
-      const st = fs.statSync(path.join(dir, f));
-      events.push({ at: st.mtime.toISOString().replace('T', ' ').slice(0, 19), kind: 'backup', text: 'Database backup created' });
-    });
-  } catch { /* backups directory not created yet */ }
+  if (db.enabled()) {
+    // Postgres mode: backups/ no longer receives new files (see U1a) - the
+    // one event worth surfacing is the last successful pg_dump, from its
+    // status marker, not a directory listing that's now permanently stale.
+    try {
+      const status = JSON.parse(fs.readFileSync(path.join(path.dirname(store.DB_PATH), 'backups', 'pg-dump-status.json'), 'utf8'));
+      if (status.ok) events.push({ at: status.at.replace('T', ' ').slice(0, 19), kind: 'backup', text: 'Database backup created (pg_dump)' });
+    } catch { /* no pg_dump status recorded yet */ }
+  } else {
+    try {
+      const dir = path.join(path.dirname(store.DB_PATH), 'backups');
+      fs.readdirSync(dir).filter((f) => f.endsWith('.json')).forEach((f) => {
+        const st = fs.statSync(path.join(dir, f));
+        events.push({ at: st.mtime.toISOString().replace('T', ' ').slice(0, 19), kind: 'backup', text: 'Database backup created' });
+      });
+    } catch { /* backups directory not created yet */ }
+  }
   events.sort((a, b) => String(b.at).localeCompare(String(a.at)));
   res.json({ health: systemHealth(), events: events.slice(0, 30) });
 });
@@ -1919,7 +1963,16 @@ app.post('/api/ai/class-summary', authRequired, teacherOrAdmin, async (req, res)
 });
 
 /* --------------------------------- backups --------------------------------- */
+// Both endpoints download store.DB_PATH, which in Postgres mode is a frozen
+// pre-cutover snapshot that never changes (see store.js's backupNow() for
+// why) - serving it as "the backup" would tell an admin they have a safety
+// net they don't. In Postgres mode real backups are the scheduled pg_dump
+// job (see scripts/backup-pg-dump.js and RESTORE.md); refuse instead of
+// silently handing back stale data.
 app.get('/api/admin/backup', authRequired, adminRequired, (req, res) => {
+  if (db.enabled()) {
+    return res.status(409).json({ error: 'JSON-snapshot backups are disabled in Postgres mode - the underlying file no longer changes. See RESTORE.md for the pg_dump-based backup this environment actually uses.' });
+  }
   store.backupNow();
   res.download(store.DB_PATH, `echolens-backup-${new Date().toISOString().slice(0, 10)}.json`);
 });
@@ -1927,6 +1980,9 @@ app.get('/api/admin/backup', authRequired, adminRequired, (req, res) => {
 // screenshots, ambassador reports) - streamed as a zip so nothing is
 // buffered fully in memory even if uploads/ is large.
 app.get('/api/admin/backup.zip', authRequired, adminRequired, (req, res) => {
+  if (db.enabled()) {
+    return res.status(409).json({ error: 'JSON-snapshot backups are disabled in Postgres mode - the underlying file no longer changes. See RESTORE.md for the pg_dump-based backup this environment actually uses.' });
+  }
   store.backupNow();
   res.setHeader('Content-Type', 'application/zip');
   res.setHeader('Content-Disposition', `attachment; filename="echolens-full-backup-${new Date().toISOString().slice(0, 10)}.zip"`);
@@ -2257,7 +2313,7 @@ app.get('/api/public/tracks/:key', (req, res) => {
       problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
     };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode }, levels, open_levels: openN });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN });
 });
 
 /* ================================ v11 routes ================================ */
@@ -3633,7 +3689,12 @@ app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCou
     submission: graded || out.submission,
     graded: !!graded,
     cert: cert ? { serial: cert.serial, url: `${APP_URL}/cert?s=${cert.serial}` } : null,
-    note: graded ? null : 'Submission recorded. Grading is not available right now - your score will appear once it is graded.',
+    // Beginner tracks (friendly_grading) never surface that grading is
+    // automated or unavailable - a calm "shortly" beats a visible failure,
+    // and there is nothing here for the student to act on either way.
+    note: graded ? null : (out.track.friendly_grading
+      ? 'Submission received! It will be graded shortly.'
+      : 'Submission recorded. Grading is not available right now - your score will appear once it is graded.'),
   });
 });
 app.get('/api/open/progress', authRequired, (req, res) => {
@@ -3878,12 +3939,34 @@ app.use((err, req, res, next) => {
   next();
 });
 
-// store.initFromPostgres() is currently a no-op in both cases: when
-// DATABASE_URL isn't set (the synchronous JSON-file load that already ran
-// when `./store` was required stands as-is), and when it is set, since
-// store.js's legacy JSON-blob Postgres sync is disabled until store.js is
-// rewritten against Prisma's normalized schema (see LEGACY_STORE_ON_POSTGRES
-// in store.js). Either way the app runs on the JSON file store for now.
+// U2: a production deploy must never silently fall back to the JSON file
+// store - store.js only writes DB_PATH in JSON-file mode (see backupNow()'s
+// comment), so once a deploy has ever run on Postgres that file is a frozen
+// pre-cutover snapshot. If DATABASE_URL is simply unset/mistyped,
+// store.initFromPostgres() below no-ops and boots on that stale file with
+// no error at all - this app would look fine and serve wrong data.
+// NODE_ENV is trusted for "is this production" (isProd, above), but an
+// *unset* NODE_ENV must not be a way to dodge this guard - DB_PATH under
+// /data only happens via Render's own persistent-disk env vars (see
+// README's Render setup section), so it's a second, independent signal
+// that this process is meant to be the real deployment even if NODE_ENV
+// itself got left off by mistake.
+const looksLikeProductionDeploy = isProd || /^[/\\]data[/\\]/.test(store.DB_PATH);
+if (looksLikeProductionDeploy && !db.enabled()) {
+  console.error(
+    'FATAL: this process looks like a production deploy (' +
+    (isProd ? 'NODE_ENV=production' : `NODE_ENV is NOT set, but DB_PATH (${store.DB_PATH}) is under /data, which only Render's persistent-disk setup does`) +
+    ') but DATABASE_URL is not set at all. Booting anyway would silently fall back to the JSON file store - ' +
+    'a frozen pre-cutover snapshot, not live data, with nothing to indicate the difference. ' +
+    'Set DATABASE_URL (and DIRECT_URL, for migrations) in the environment before starting. Refusing to boot.'
+  );
+  process.exit(1);
+}
+// DATABASE_URL present but unreachable (bad credentials, network, schema
+// not migrated yet) is the other half of "loud, not silent" - already
+// handled below: store.initFromPostgres() throws in that case (see its
+// own DATABASE_URL-set-but-Postgres-empty guard and Prisma's own connection
+// errors), and this catch exits rather than falling back to anything.
 (async () => {
   try {
     await store.initFromPostgres();

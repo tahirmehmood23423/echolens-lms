@@ -1183,7 +1183,27 @@ const AuditLog = {
 
 /* ----------------------------- activity/streaks ----------------------------- */
 function touchActivity(user) {
-  // Called once per authenticated request; only does work once per day.
+  // Called once per EVERY authenticated request (authRequired) - reads
+  // included - so this gate is the only thing standing between "opening a
+  // lesson" and a full snapshot diff + Postgres flush. It's calendar-day
+  // granularity, not a rolling N-minute window, on purpose: streak below
+  // is inherently a day-boundary calculation (yesterday vs not), and
+  // nothing that reads last_active - the risk report's inactive-day count,
+  // the profile's "last active <date>" display - needs anything finer.
+  // A minute-level staleness check layered on top would risk silently
+  // dropping the streak's own day-rollover if two requests landed a few
+  // minutes apart but on opposite sides of midnight, for no benefit over
+  // this already-coarser gate.
+  //
+  // v21 fix: this gate was correct in design but silently never matched in
+  // Postgres mode - `last_active` round-tripped through schema-map.js's
+  // general TIMESTAMP_COLUMNS path, which always appends a time-of-day
+  // ("...00:00:00"), so `=== today()` was comparing a bare date to a
+  // datetime and could never be true. Every request re-entered this branch,
+  // which is what the Part A load test's flush-per-request numbers were
+  // actually measuring. Fixed at the source in schema-map.js
+  // (DATE_ONLY_COLUMNS_BY_TABLE) rather than here, so this function's own
+  // logic - and streak's date-only semantics - didn't need to change.
   const u = Users.byId(user.id); if (!u || !['student', 'free'].includes(u.role)) return;
   const t = today();
   if (u.last_active === t) return;
@@ -1239,6 +1259,27 @@ function submissionGems(uid, aids = null) {
 }
 function totalGemsForStudent(uid) {
   return submissionGems(uid) + GemEvents.forStudent(uid).reduce((s, e) => s + e.amount, 0) + questGemsGlobal(uid) + openQuestGemsGlobal(uid);
+}
+/**
+ * Every student's gem total in one pass over each source collection -
+ * O(submissions + gem_events + quest_submissions + open_submissions) once,
+ * instead of calling totalGemsForStudent() per student (which re-scans all
+ * four collections for every single student: O(students × rows)). Same
+ * four sources, same rule (plain sum, no per-source cap or weighting) as
+ * totalGemsForStudent() - see gem-totals.test.js, which asserts the two
+ * agree exactly across a synthetic multi-source dataset. That function
+ * stays as the single-student entry point (used all over the app, e.g. a
+ * student's own profile) - this is only for "every student's total at
+ * once" call sites (leaderboard, admin overview total_gems).
+ */
+function gemTotalsByUser() {
+  const totals = new Map();
+  const add = (uid, amount) => { if (amount) totals.set(uid, (totals.get(uid) || 0) + amount); };
+  for (const s of data.submissions) add(s.user_id, s.gems || 0);
+  for (const e of data.gem_events) add(e.user_id, e.amount || 0);
+  for (const s of data.quest_submissions) add(s.user_id, s.gems || 0);
+  for (const s of data.open_submissions) add(s.user_id, s.gems || 0);
+  return totals;
 }
 function gemsForStudentInBatch(uid, bid) {
   const aids = data.assignments.filter((a) => a.batch_id === Number(bid)).map((a) => a.id);
@@ -1750,7 +1791,7 @@ const TRACKS = {};
 (function loadTracks() {
   // short-courses-full is loaded LAST so its complete builds override the
   // earlier thin stubs for the same keys (python-6w, sc02/sc03/sc06/sc07).
-  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro')];
+  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro'), ...require('./tracks/cs-fundamentals')];
   for (const t of all) {
     // Normalize: compute title thresholds from total points if only names given.
     const total = t.levels.reduce((s1, l) => s1 + l.problems.reduce((s2, p) => s2 + (p.points || 100), 0), 0);
@@ -2030,24 +2071,46 @@ const ChatReads = {
 
 /* ------------------------------ leaderboards ------------------------------ */
 function studentLeaderboard() {
+  const totals = gemTotalsByUser(); // one pass over every source, not one per student
   return data.users.filter((u) => ['student', 'free'].includes(u.role)).map((u) => {
-    const gems = totalGemsForStudent(u.id);
+    const gems = totals.get(u.id) || 0;
     return { id: u.id, name: u.name, reg_no: u.reg_no, gems, stage: stageFor(gems), streak: u.streak || 0, tier: u.role === 'free' ? 'free' : 'portal' };
   }).sort((a, b) => b.gems - a.gems);
 }
 function batchLeaderboard(bid) {
+  // gemsForStudentInBatch() stays per-student (batch-scoped filters differ
+  // from the global total below) - naturally bounded by this one batch's
+  // enrollment, not total platform users. The `stage` field's total,
+  // though, IS the global total - reuse the same one-pass map rather than
+  // calling totalGemsForStudent() again per student here.
+  const totals = gemTotalsByUser();
   return Enrollments.studentsForBatch(bid).map((u) => {
     const gems = gemsForStudentInBatch(u.id, bid);
-    return { id: u.id, name: u.name, reg_no: u.reg_no, gems, stage: stageFor(totalGemsForStudent(u.id)), streak: u.streak || 0 };
+    return { id: u.id, name: u.name, reg_no: u.reg_no, gems, stage: stageFor(totals.get(u.id) || 0), streak: u.streak || 0 };
   }).sort((a, b) => b.gems - a.gems);
 }
 function courseLeaderboard() {
+  // One pass to group submissions/gem_events by batch_id, instead of
+  // filtering both full arrays again for every batch - batch count is
+  // small today, but both arrays are the *global* ones (all courses' worth
+  // of rows), so the old version's cost still grew with total platform
+  // submissions, not just batch count.
+  const assignmentBatch = new Map(data.assignments.map((a) => [a.id, a.batch_id]));
+  const gradedByBatch = new Map();
+  for (const s of data.submissions) {
+    const bid = assignmentBatch.get(s.assignment_id);
+    if (bid == null || !s.gems) continue;
+    gradedByBatch.set(bid, (gradedByBatch.get(bid) || 0) + s.gems);
+  }
+  const bonusByBatch = new Map();
+  for (const e of data.gem_events) {
+    if (e.batch_id == null || !e.amount) continue;
+    bonusByBatch.set(e.batch_id, (bonusByBatch.get(e.batch_id) || 0) + e.amount);
+  }
   return data.batches.map((b) => {
-    const aids = data.assignments.filter((a) => a.batch_id === b.id).map((a) => a.id);
-    const graded = data.submissions.filter((s) => aids.includes(s.assignment_id)).reduce((sum, s) => sum + (s.gems || 0), 0);
-    const bonus = data.gem_events.filter((e) => e.batch_id === b.id).reduce((s, e) => s + e.amount, 0);
     const c = Courses.byId(b.course_id) || {};
-    return { id: b.id, code: b.code, title: c.title, name: b.name, gems: graded + bonus, gems_possible: Batches.decorate(b).gems_possible };
+    const gems = (gradedByBatch.get(b.id) || 0) + (bonusByBatch.get(b.id) || 0);
+    return { id: b.id, code: b.code, title: c.title, name: b.name, gems, gems_possible: Batches.decorate(b).gems_possible };
   }).sort((a, b) => b.gems - a.gems);
 }
 
@@ -2062,9 +2125,20 @@ function courseReport(bid) {
     quest_id: q.id, pid: p.pid, level: q.no, week: q.week,
     title: `L${q.no} · ${p.title}`, points: p.points || DEFAULT_ASSIGNMENT_POINTS, difficulty: p.difficulty,
   })));
-  const qids = quests.map((q) => q.id);
+  const qids = new Set(quests.map((q) => q.id));
+  // Filter the global quest_submissions array once for this batch's quests,
+  // then group by student - was filtering the full array again per
+  // student (O(students × total platform submissions), even though this
+  // report is for one batch).
+  const batchSubs = data.quest_submissions.filter((x) => qids.has(x.quest_id));
+  const subsByStudent = new Map();
+  for (const x of batchSubs) {
+    if (!subsByStudent.has(x.user_id)) subsByStudent.set(x.user_id, []);
+    subsByStudent.get(x.user_id).push(x);
+  }
+  const gemTotals = gemTotalsByUser();
   const students = Enrollments.studentsForBatch(bid).map((s) => {
-    const subs = data.quest_submissions.filter((x) => x.user_id === s.id && qids.includes(x.quest_id));
+    const subs = subsByStudent.get(s.id) || [];
     const graded = subs.filter((x) => x.grade != null);
     const gems = gemsForStudentInBatch(s.id, bid);
     const lastRemark = graded.map((x) => x.remarks).filter(Boolean).slice(-1)[0] || null;
@@ -2077,7 +2151,7 @@ function courseReport(bid) {
       id: s.id, name: s.name, username: s.username, reg_no: s.reg_no, email: s.email,
       submitted: subs.length, graded: graded.length, total_assignments: problems.length,
       level: openLevel, of_levels: quests.length,
-      gems, avg, streak: s.streak || 0, stage: stageFor(totalGemsForStudent(s.id)), last_remark: lastRemark,
+      gems, avg, streak: s.streak || 0, stage: stageFor(gemTotals.get(s.id) || 0), last_remark: lastRemark,
       inactive_days, missing,
       at_risk: (inactive_days == null || inactive_days >= 7) || missing >= 2,
     };
@@ -2098,7 +2172,10 @@ const Admin = {
       assignments: data.quests.reduce((s, q) => s + q.problems.length, 0) + data.assignments.length,
       submissions: data.submissions.length + data.quest_submissions.length,
       graded: data.submissions.filter((s) => s.grade != null).length + data.quest_submissions.filter((s) => s.grade != null).length,
-      total_gems: data.users.filter((u) => u.role === 'student').reduce((s, u) => s + totalGemsForStudent(u.id), 0),
+      total_gems: (() => {
+        const totals = gemTotalsByUser();
+        return data.users.filter((u) => u.role === 'student').reduce((s, u) => s + (totals.get(u.id) || 0), 0);
+      })(),
       batches: Batches.all(),
     };
   },
@@ -2203,10 +2280,12 @@ const OFFICIAL_CATALOGUE = [
   { code: 'ST-10', title: 'React + Next.js Frontend Specialist', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22000, badges: ['new', 'high_demand'], summary: 'Component architecture, state management and server-side rendering with Next.js.' },
   { code: 'ST-11', title: 'Mobile Apps with Flutter', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22000, badges: ['new'], summary: 'One codebase, two app stores: build and publish real Android and iOS apps.' },
   { code: 'ST-12', title: 'Video Editing', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 20000, badges: [], summary: 'Professional editing workflows, pacing and delivery for client and commercial work.' },
-  // Free Micro Courses - one 60-90 minute slot, purely quest based, 8 quests
-  // each, automatic certificate. Deliberately outside the paid catalogue.
-  { code: 'FC-01', title: 'Basics of C Programming', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language everything else was built on - your first compiling, running C programs in one slot.' },
-  { code: 'FC-02', title: 'Basics of C++ and Objects', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Your first taste of object oriented thinking - cout, cin, functions, and a working class.' },
+  // CS-101/CS-102: upgraded from the original one-slot FC-01/FC-02 micro
+  // courses to the full 10-topic/30-problem fundamentals curriculum (see
+  // tracks/free-micro.js) - code/key unchanged so nothing about existing
+  // enrolment/progress breaks, only the catalogue-facing framing here.
+  { code: 'FC-01', title: 'CS-101: Fundamentals of C', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language everything else was built on - compiling, memory, pointers, and strings across 10 topics.' },
+  { code: 'FC-02', title: 'CS-102: Fundamentals of C++', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Streams, references, STL containers, and file handling - the standard teaching language for data structures.' },
   { code: 'FC-03', title: 'Basics of Java', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language of enterprise and Android - one running program removes the setup barrier.' },
   { code: 'FC-04', title: 'Basics of Linux and the Command Line', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Stop being scared of the black screen - an hour of real terminal commands.' },
   { code: 'FC-05', title: 'Basics of Data Structures', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'How programs actually store things - arrays, stacks, and queues in plain English.' },
@@ -2215,6 +2294,14 @@ const OFFICIAL_CATALOGUE = [
   { code: 'FC-08', title: 'Basics of Cybersecurity and Online Safety', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Protect your accounts, your money, and your data - useful to every single person.' },
   { code: 'FC-09', title: 'Basics of Cloud Computing', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Where every modern app actually lives - nothing to install, nothing to pay for.' },
   { code: 'FC-10', title: 'Basics of Regex and Text Patterns', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Find any pattern in any text, instantly - a small skill with an outsized payoff.' },
+  // CS-103..CS-107: the rest of the 7-course fundamentals curriculum
+  // (tracks/cs-fundamentals.js) - same free/signin/auto-certificate shape
+  // as CS-101/CS-102 above.
+  { code: 'CS-103', title: 'CS-103: Fundamentals of Object-Oriented Programming (OOP)', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Encapsulation, inheritance, virtual functions, and abstract classes - the single idea that unlocks every modern language.' },
+  { code: 'CS-104', title: 'CS-104: Fundamentals of Python', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Dynamic typing, lists and dictionaries, comprehensions, and modules - clean, readable code from day one.' },
+  { code: 'CS-105', title: 'CS-105: Fundamentals of JavaScript', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'ES6+ syntax, array methods, the DOM, and async/await - the scripting language every browser runs.' },
+  { code: 'CS-106', title: 'CS-106: Fundamentals of CSS', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'The box model, Flexbox, Grid, and responsive media queries - styling that actually holds together.' },
+  { code: 'CS-107', title: 'CS-107: Fundamentals of HTML', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'Semantic structure, forms, accessibility, and media embeds - the markup backbone of the web.' },
 ];
 // The Web Developer Path bundle - the recommended beginner-to-job route.
 const LEARNING_PATHS = [
@@ -2527,8 +2614,17 @@ function riskReport(bid) {
   const quests = Quests.forBatch(bid);
   const openQuests = quests; // staff view considers all published levels
   const totalProblems = openQuests.reduce((s, q) => s + q.problems.length, 0);
+  // As in courseReport(): filter+group once instead of re-scanning the
+  // global quest_submissions array (with a nested quest lookup) per student.
+  const qids = new Set(openQuests.map((q) => q.id));
+  const subsByStudent = new Map();
+  for (const s of data.quest_submissions) {
+    if (!qids.has(s.quest_id)) continue;
+    if (!subsByStudent.has(s.user_id)) subsByStudent.set(s.user_id, []);
+    subsByStudent.get(s.user_id).push(s);
+  }
   return Enrollments.studentsForBatch(bid).map((u) => {
-    const subs = data.quest_submissions.filter((s) => s.user_id === u.id && openQuests.some((q) => q.id === s.quest_id));
+    const subs = subsByStudent.get(u.id) || [];
     const graded = subs.filter((s) => s.grade != null);
     const avg = graded.length ? Math.round(graded.reduce((s, x) => s + x.grade, 0) / graded.length) : null;
     const att = Attendance.rate(u.id, bid);
@@ -2901,7 +2997,20 @@ const DepartmentAnnouncements = {
   },
 };
 
+/**
+ * JSON-file-mode backup only. In Postgres mode, `save()` (above) stops
+ * writing to DB_PATH the moment the app cuts over - DB_PATH freezes at
+ * whatever it was at cutover (see README's migrate:import note) and never
+ * reflects a single write made since. Copying it into backups/ on a timer
+ * would silently produce files that *look* like current backups (same
+ * naming, fresh mtime) but are byte-identical copies of that one frozen
+ * snapshot forever - worse than no backup, because it reads as "handled".
+ * Real backups in Postgres mode are pg_dump-based (see
+ * scripts/backup-pg-dump.js / RESTORE.md) and live off this disk entirely.
+ * This function no-ops in that mode rather than producing a misleading file.
+ */
 function backupNow() {
+  if (db.enabled() && postgresReady) return null;
   try {
     if (!fs.existsSync(DB_PATH)) return null;
     const dir = path.join(path.dirname(DB_PATH), 'backups');
@@ -3493,8 +3602,12 @@ const OpenQuest = {
   },
   applyGrade(sid, aiScore, feedback) {
     const s = data.open_submissions.find((x) => x.id === Number(sid)); if (!s) return null;
+    const t = TRACKS[s.track_key];
     const raw = Math.max(0, Math.min(100, Number(aiScore) || 0));
-    s.score = Math.round(raw * 0.9); // AI grading carries the standard 10% reduction
+    // Standard 10% reduction, except for tracks flagged friendly_grading
+    // (CS-101..CS-107 - see tracks/free-micro.js) - a first-timer's first
+    // working program shouldn't come with a built-in penalty attached.
+    s.score = (t && t.friendly_grading) ? Math.round(raw) : Math.round(raw * 0.9);
     s.gems = Math.round((s.score / 100) * (s.points || 100));
     s.feedback = String(feedback || '').slice(0, 1500) || null;
     s.graded_at = now(); save();
@@ -4338,7 +4451,7 @@ load();
 module.exports = {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, learningPaths: () => LEARNING_PATHS, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
-  gemsForStudentInBatch, totalGemsForStudent, studentLeaderboard, batchLeaderboard, courseLeaderboard,
+  gemsForStudentInBatch, totalGemsForStudent, gemTotalsByUser, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,

@@ -1,0 +1,46 @@
+name: Nightly Postgres backup
+
+# U1b: independent backup of production data, decoupled from both Render
+# (the app's own instance/disk) and Supabase (the database being backed up)
+# - see RESTORE.md for why and how to restore. Runs on GitHub's own
+# infrastructure so it survives either of those going down.
+on:
+  schedule:
+    # 20:00 UTC daily - after typical usage hours, well before the next day.
+    - cron: '0 20 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write # required to create/prune GitHub Releases
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install postgresql-client (pg_dump)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Install app dependencies
+        run: npm ci --omit=dev
+
+      - name: Run backup
+        env:
+          DIRECT_URL: ${{ secrets.BACKUP_DIRECT_URL }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          BACKUP_RETENTION_COUNT: '30'
+          # Optional - omit these secrets and the script just logs failures
+          # instead of emailing (mailer.js's existing "not configured" path).
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+        run: node scripts/backup-pg-dump.js

@@ -683,7 +683,7 @@ function drawSolveStatus() {
   // left column: slim graded banner
   if (gradedBox) gradedBox.innerHTML = `
     <div class="slv-graded${sub.score >= passMark ? '' : ' wait'}">
-      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}% <span class="s" style="font-weight:600;color:var(--muted)">(instant grading, 10% reduction applied)</span> &middot; <span class="g-gems">${gems} gems earned</span></div>
+      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}%${CUR.track.friendly_grading ? '' : ' <span class="s" style="font-weight:600;color:var(--muted)">(instant grading, 10% reduction applied)</span>'} &middot; <span class="g-gems">${gems} gems earned</span></div>
       <p>${esc(short)}</p>
     </div>`;
 
@@ -703,7 +703,7 @@ function drawSolveStatus() {
       <div class="qres center">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Gems Earned</h5>
         <div class="slv-gem-big"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${gems}</div>
-        <div class="sub-note">10% instant-grading reduction applied</div>
+        ${CUR.track.friendly_grading ? '' : '<div class="sub-note">10% instant-grading reduction applied</div>'}
       </div>
       <div class="qres">
         <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.clock}</svg>Submission</h5>
@@ -713,10 +713,25 @@ function drawSolveStatus() {
     </div>`;
 }
 function svLangOptions() {
-  return `<option value="python">Python 3</option><option value="c">C</option><option value="cpp">C++</option><option value="java">Java</option><option value="sql">SQL</option>`;
+  // default_language (tracks/free-micro.js, tracks/cs-fundamentals.js) picks
+  // which option opens pre-selected, so e.g. the CSS/HTML/JS courses land on
+  // the web option instead of defaulting to Python every time.
+  const def = CUR.track.default_language || 'python';
+  const opt = (value, label) => `<option value="${value}"${value === def ? ' selected' : ''}>${label}</option>`;
+  return opt('python', 'Python 3') + opt('c', 'C') + opt('cpp', 'C++') + opt('java', 'Java') + opt('sql', 'SQL') + opt('web', 'HTML / CSS / JS');
 }
 const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 function svCertNote() { return CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''; }
+// Beginner-track courses (CS-101..CS-107 - see tracks/free-micro.js's
+// friendly_grading flag) never mention automated grading or the standard
+// 10% reduction - a first-timer's first working program shouldn't come
+// with a visible penalty attached, and how grading works internally isn't
+// something a beginner needs to know to trust their result.
+function svGradingNote() {
+  return CUR.track.friendly_grading
+    ? 'Submissions are graded automatically, and gems are awarded by score.' + svCertNote()
+    : 'Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.' + svCertNote();
+}
 // Per-problem Prompt Lab workbooks and the Excel copilot session live in
 // memory for the visit - the submitted artifact is what gets graded.
 let SV_LAB = {};
@@ -732,10 +747,10 @@ function drawWorkArea() {
   const codeIde = (opts) => `
     <div class="qide">
       <div class="qide-bar">
-        <select id="svLang" class="qide-lang">${svLangOptions()}</select>
+        <select id="svLang" class="qide-lang" onchange="svLangChanged()">${svLangOptions()}</select>
         <span class="sp"></span>
         ${opts.dataset ? `<label class="qbtn" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none">${ICONS.database}</svg>Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>` : ''}
-        <button type="button" class="qbtn" onclick="SV_TERM&&SV_TERM.clear()"><svg viewBox="0 0 24 24" fill="none">${ICONS.refresh}</svg>Clear</button>
+        <button type="button" class="qbtn" onclick="svClearOutput()"><svg viewBox="0 0 24 24" fill="none">${ICONS.refresh}</svg>Clear</button>
         <button type="button" class="qbtn" id="svRunBtn" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg>Run</button>
         ${opts.submit ? `<button type="button" class="qbtn primary" id="svSubmitBtn" onclick="submitSolve()">${opts.sub ? 'Resubmit' : 'Submit for grading'}</button>` : ''}
       </div>
@@ -752,8 +767,12 @@ function drawWorkArea() {
         </div>
       </div>
       <div class="qide-out"><div id="svTerm"></div></div>
+      <div id="svWebWrap" style="display:none">
+        <iframe id="svWebFrame" class="web-frame" sandbox="allow-scripts" title="Live preview"></iframe>
+        <pre id="svWebLog" class="web-log"></pre>
+      </div>
       ${opts.submit ? '<div id="svResults"></div>' : ''}
-      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</span></div>` : ''}
+      ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>${svGradingNote()}</span></div>` : ''}
     </div>`;
 
   const codeLike = mode === 'code' || mode === 'code-ai';
@@ -762,7 +781,7 @@ function drawWorkArea() {
     $('svWorkArea').innerHTML = codeLike
       ? codeIde({ dataset: false, submit: false, placeholder: '# Staff preview — run code freely. Submissions are for learner accounts.', status: 'Staff preview — submissions are for learner accounts.' }) + (mode === 'code-ai' ? svAiPanelHtml() : '')
       : `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview — this task takes ${mode === 'prompt' ? 'Prompt Lab workbook' : 'file'} submissions from learner accounts.</p></div></div>`;
-    if (codeLike) { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); svSyncGutter(); if (mode === 'code-ai') svWireAiPanel(); }
+    if (codeLike) { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); svSyncGutter(); svLangChanged(); if (mode === 'code-ai') svWireAiPanel(); }
     return;
   }
 
@@ -774,6 +793,7 @@ function drawWorkArea() {
     SV_TERM = EchoTerm.mount($('svTerm'));
     EchoRun.wireEditor($('svCode'));
     svSyncGutter();
+    svLangChanged();
     if (mode === 'code-ai') svWireAiPanel();
   } else if (mode === 'prompt') {
     svPromptLabArea(sub);
@@ -795,7 +815,7 @@ function drawWorkArea() {
             <div id="svFileList" class="hint" style="margin:4px 0 8px"></div>
             <button class="btn lc-btn-solve">${sub ? 'Resubmit for grading' : 'Submit for grading'}</button>
           </form>
-          <p class="hint" style="margin-top:10px">Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
+          <p class="hint" style="margin-top:10px">${svGradingNote()}</p>
         </div></div>
       <div id="svResults" style="margin-top:16px"></div>`;
     $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });
@@ -869,7 +889,7 @@ function svPromptLabArea(sub) {
           <button type="button" class="btn btn-ghost" id="svLabRun" onclick="svLabRun()">Run prompt</button>
           <button type="button" class="btn lc-btn-solve" id="svSubmitBtn" onclick="submitSolve()">${sub ? 'Resubmit workbook' : 'Submit workbook for grading'}</button>
         </div>
-        <p class="hint" style="margin-top:10px">Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
+        <p class="hint" style="margin-top:10px">${svGradingNote()}</p>
       </div></div>
     <div id="svResults" style="margin-top:16px"></div>`;
   svDrawLabBook();
@@ -924,7 +944,7 @@ function svExcelArea(sub) {
             <button class="btn btn-ghost">Ask</button>
           </form>
         </div>
-        <p class="hint" style="margin-top:10px">Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.${svCertNote()}</p>
+        <p class="hint" style="margin-top:10px">${svGradingNote()}</p>
       </div></div>
     <div id="svResults" style="margin-top:16px"></div>`;
   $('svFileForm').addEventListener('submit', (e) => { e.preventDefault(); submitSolve(e.target); });
@@ -1001,11 +1021,39 @@ function svRunLabel(running) {
     ? `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>Stop`
     : `<svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg>Run`;
 }
+// HTML/CSS/JS (web) runs as a live sandboxed preview, not in the shared
+// terminal - toggle which output area shows, same split dashboard.js uses
+// for the paid quest workspace's taskLangChanged().
+function svLangChanged() {
+  const lang = $('svLang').value, web = lang === 'web';
+  const term = $('svTerm'), wrap = $('svWebWrap');
+  if (term) term.style.display = web ? 'none' : '';
+  if (wrap) wrap.style.display = web ? '' : 'none';
+  const code = $('svCode');
+  if (code && !code.value.trim() && web) code.placeholder = '<!-- Write HTML, CSS (in <style>) and JavaScript (in <script>) here, then press Run for a live preview. -->';
+}
+function svClearOutput() {
+  if (SV_TERM) SV_TERM.clear();
+  const log = $('svWebLog'); if (log) log.textContent = '';
+  const frame = $('svWebFrame'); if (frame) frame.srcdoc = '';
+  const exec = $('svExecTime'); if (exec) exec.textContent = '';
+}
 async function runSolve() {
   if (!ME) { gate('The compiler needs a free account - the course outline and every task stay open to read without one.'); return; }
   const btn = $('svRunBtn'); const status = $('svStatus'); const exec = $('svExecTime');
   const code = $('svCode').value;
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
+  const lang = $('svLang').value;
+  if (lang === 'web') {
+    const log = $('svWebLog'); if (log) log.textContent = '';
+    EchoWeb.preview($('svWebFrame'), code, (kind, text) => {
+      if (!log) return;
+      log.textContent += (kind === 'error' ? '✗ ' : kind === 'warn' ? '! ' : '› ') + text + '\n';
+      log.scrollTop = log.scrollHeight;
+    });
+    status.textContent = 'Preview updated.';
+    return;
+  }
   if (EchoRun.isRunning()) { EchoRun.cancel(); if (btn) btn.innerHTML = svRunLabel(false); return; }
   if (btn) btn.innerHTML = svRunLabel(true);
   if (exec) exec.textContent = '';

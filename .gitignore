@@ -16,6 +16,9 @@ uploads/
 # Local database backups
 backups/
 
+# Load test manifests (Part A) - generated per run, ties to a scratch DB
+scripts/.loadtest-manifest-*.json
+
 # Dependencies
 node_modules/
 

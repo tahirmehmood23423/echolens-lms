@@ -203,6 +203,27 @@ const TIMESTAMP_COLUMN_EXCLUSIONS_BY_TABLE = { staff_records: new Set(['joined_a
 const LOCAL_DATETIME_COLUMNS_BY_TABLE = { events: new Set(['starts_at', 'ends_at']) };
 const LOCAL_DATETIME_OFFSET_MINUTES = 5 * 60;
 
+// users.last_active: a DateTime column in Postgres (schema.prisma), but
+// every JS reader/writer treats it as a plain "YYYY-MM-DD" calendar-day
+// string, not a real timestamp - touchActivity's once-per-day gate
+// (store.js) does `u.last_active === today()`, and the risk report/profile
+// code does `new Date(u.last_active + 'T00:00:00')`, both of which only
+// make sense against a bare date string. Found 2026-07-28 (load test v21):
+// because this column was in TIMESTAMP_COLUMNS, dateToNowString() below was
+// reading it back from Postgres as "YYYY-MM-DD HH:MM:SS" (always
+// "...00:00:00" in practice, since it's only ever written as a bare date -
+// see isoFromNowString's UTC-midnight parse below) - so `=== today()` could
+// never match, touchActivity's gate silently never fired once a snapshot
+// had round-tripped through Postgres, and every authenticated request from
+// a student/free user rewrote the row and entered the flush queue. This
+// column gets its own date-only conversion instead, checked before the
+// general isTimestampColumn() case.
+const DATE_ONLY_COLUMNS_BY_TABLE = { users: new Set(['last_active']) };
+function isDateOnlyColumn(table, col) {
+  const cols = DATE_ONLY_COLUMNS_BY_TABLE[table];
+  return !!(cols && cols.has(col));
+}
+
 // Columns where store.js's in-memory JS value is genuinely one of two
 // incompatible types (found via live-code read-throughs, not just data
 // audits - the historical data never happened to exercise either path).
@@ -250,6 +271,11 @@ function jsonColumnInfo(table, col) {
 function isoFromNowString(s) {
   // now(): "2026-07-21 14:30:00" -> treat as a UTC instant.
   return new Date(String(s).replace(' ', 'T') + 'Z');
+}
+function dateOnlyStringToDate(s) {
+  // today(): "2026-07-21" is already valid ISO 8601 (date-only) - the native
+  // Date constructor parses this as UTC midnight on its own, no reformatting needed.
+  return new Date(String(s));
 }
 function localDatetimeStringToDate(s) {
   // raw is "YYYY-MM-DDTHH:MM" with no seconds/offset - append both explicitly
@@ -312,6 +338,8 @@ function buildPrismaRow(table, columns, rec, context) {
       row[field] = raw === null ? (jsonInfo.nullable ? Prisma.DbNull : Prisma.JsonNull) : raw;
     } else if (isLocalDatetimeColumn(table, col)) {
       row[field] = raw == null ? null : assertValidDate(localDatetimeStringToDate(raw), `${context}.${col}="${raw}"`);
+    } else if (isDateOnlyColumn(table, col) && raw != null) {
+      row[field] = assertValidDate(dateOnlyStringToDate(raw), `${context}.${col}="${raw}"`);
     } else if (isTimestampColumn(table, col) && raw != null) {
       row[field] = assertValidDate(isoFromNowString(raw), `${context}.${col}="${raw}"`);
     } else {
@@ -326,6 +354,10 @@ function buildPrismaRow(table, columns, rec, context) {
 /** Inverse of isoFromNowString: a DateTime read back from Postgres -> store.js's "YYYY-MM-DD HH:MM:SS" now()-format string. */
 function dateToNowString(d) {
   return d.toISOString().replace('T', ' ').slice(0, 19);
+}
+/** Inverse of dateOnlyStringToDate: a DateTime read back from Postgres -> store.js's "YYYY-MM-DD" today()-format string - NOT dateToNowString(), whose trailing time-of-day is exactly what broke touchActivity's `=== today()` gate (see DATE_ONLY_COLUMNS_BY_TABLE above). */
+function dateToDateOnlyString(d) {
+  return d.toISOString().slice(0, 10);
 }
 /** Inverse of localDatetimeStringToDate: a DateTime read back from Postgres -> "YYYY-MM-DDTHH:MM" in Pakistan time, matching what the browser's <input type="datetime-local"> originally sent. */
 function dateToLocalDatetimeString(d) {
@@ -360,6 +392,8 @@ function rowFromPrisma(table, columns, prismaRow) {
       row[col] = null;
     } else if (isLocalDatetimeColumn(table, col)) {
       row[col] = dateToLocalDatetimeString(value);
+    } else if (isDateOnlyColumn(table, col)) {
+      row[col] = dateToDateOnlyString(value);
     } else if (isTimestampColumn(table, col)) {
       row[col] = dateToNowString(value);
     } else {
@@ -373,6 +407,7 @@ module.exports = {
   COLLECTIONS, FRONT_LOADED_KEYS,
   JSON_COLUMNS_BY_TABLE, TIMESTAMP_COLUMNS, TIMESTAMP_COLUMN_EXCLUSIONS_BY_TABLE,
   LOCAL_DATETIME_COLUMNS_BY_TABLE, LOCAL_DATETIME_OFFSET_MINUTES, POLYMORPHIC_COLUMNS_BY_TABLE,
+  DATE_ONLY_COLUMNS_BY_TABLE, isDateOnlyColumn, dateOnlyStringToDate, dateToDateOnlyString,
   toCamel, isTimestampColumn, isLocalDatetimeColumn, jsonColumnInfo, polymorphicColumnInfo,
   isoFromNowString, localDatetimeStringToDate, assertValidDate, buildPrismaRow,
   dateToNowString, dateToLocalDatetimeString, rowFromPrisma,

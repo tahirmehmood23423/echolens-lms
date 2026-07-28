@@ -2286,14 +2286,6 @@ const OFFICIAL_CATALOGUE = [
   // enrolment/progress breaks, only the catalogue-facing framing here.
   { code: 'FC-01', title: 'CS-101: Fundamentals of C', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language everything else was built on - compiling, memory, pointers, and strings across 10 topics.' },
   { code: 'FC-02', title: 'CS-102: Fundamentals of C++', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Streams, references, STL containers, and file handling - the standard teaching language for data structures.' },
-  { code: 'FC-03', title: 'Basics of Java', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language of enterprise and Android - one running program removes the setup barrier.' },
-  { code: 'FC-04', title: 'Basics of Linux and the Command Line', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Stop being scared of the black screen - an hour of real terminal commands.' },
-  { code: 'FC-05', title: 'Basics of Data Structures', tier: 'Micro Course', weeks: 1, hours: 1.5, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'How programs actually store things - arrays, stacks, and queues in plain English.' },
-  { code: 'FC-06', title: 'Basics of Algorithms and Flowcharts', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Think like a programmer before you write code - no programming language at all.' },
-  { code: 'FC-07', title: 'Basics of Computer Networking', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'What actually happens when you open a website - IPs, DNS, and your home network.' },
-  { code: 'FC-08', title: 'Basics of Cybersecurity and Online Safety', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Protect your accounts, your money, and your data - useful to every single person.' },
-  { code: 'FC-09', title: 'Basics of Cloud Computing', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Where every modern app actually lives - nothing to install, nothing to pay for.' },
-  { code: 'FC-10', title: 'Basics of Regex and Text Patterns', tier: 'Micro Course', weeks: 1, hours: 1, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Find any pattern in any text, instantly - a small skill with an outsized payoff.' },
   // CS-103..CS-107: the rest of the 7-course fundamentals curriculum
   // (tracks/cs-fundamentals.js) - same free/signin/auto-certificate shape
   // as CS-101/CS-102 above.

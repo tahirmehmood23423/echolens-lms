@@ -449,19 +449,37 @@
     } finally { db.close(); }
   }
 
-  /* ============================== v12: C / C++ ==============================
-   * Compiled and run through the free public Piston execution API
-   * (emkc.org) - real gcc/g++, stdin supported, nothing installed on the
-   * EchoLens server. If the API is unreachable, the student gets a clear
-   * message instead of a hang.
+  /* ============================== v19: C / C++ / Java ==============================
+   * Compiled and run through Compiler Explorer's public execution API
+   * (godbolt.org) - real gcc/g++/OpenJDK, stdin supported, nothing installed
+   * on the EchoLens server. This replaced the emkc.org Piston API, which
+   * went whitelist-only (HTTP 401 on every request) and can no longer serve
+   * anonymous traffic; Compiler Explorer is free, keyless and built to
+   * absorb heavy public load. A couple of automatic retries smooth over the
+   * rare transient network blip so students don't have to click Run twice.
    */
-  const PISTON_URL = 'https://emkc.org/api/v2/piston/execute';
-  // v18: Java joins C/C++ on Piston (real OpenJDK). The file must be
-  // Main.java, so the student's public class must be called Main.
-  const PISTON_LANG = { c: { language: 'c', version: '10.2.0', file: 'main.c' }, cpp: { language: 'c++', version: '10.2.0', file: 'main.cpp' }, java: { language: 'java', version: '15.0.2', file: 'Main.java' } };
+  const CE_URL = 'https://godbolt.org/api/compiler';
+  const CE_LANG = {
+    c: { id: 'cg132', lang: 'c', label: 'gcc 13.2' },
+    cpp: { id: 'g132', lang: 'c++', label: 'gcc 13.2' },
+    java: { id: 'java2102', lang: 'java', label: 'OpenJDK 21' },
+  };
+  const ANSI_RE = /\x1b\[[0-9;]*[a-zA-Z]/g; // strip terminal colour codes from CE's diagnostics
+  function ceText(lines) { return (lines || []).map((l) => String(l.text || '').replace(ANSI_RE, '')).join('\n'); }
+  async function ceCompile(compilerId, body, tries) {
+    let lastErr;
+    for (let i = 0; i < (tries || 2); i++) {
+      try {
+        const r = await fetch(CE_URL + '/' + compilerId + '/compile', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) });
+        if (!r.ok) throw new Error('The compile service answered ' + r.status + ' - try again in a minute.');
+        return await r.json();
+      } catch (e) { lastErr = e; if (i < tries - 1) await new Promise((res) => setTimeout(res, 1200)); }
+    }
+    throw lastErr;
+  }
   async function runNative(lang, code, { term, onStatus, extraFiles }) {
     const status = (t) => { try { onStatus && onStatus(t); } catch {} };
-    const cfg = PISTON_LANG[lang];
+    const cfg = CE_LANG[lang];
     // If the program reads input, collect it up-front (compiled programs run
     // remotely, so input is provided as stdin lines before the run).
     let stdin = '';
@@ -477,28 +495,38 @@
       term.print('\n');
     }
     status(lang === 'c' ? 'Compiling & running C (gcc)...' : lang === 'java' ? 'Compiling & running Java (OpenJDK)...' : 'Compiling & running C++ (g++)...');
+    // Sibling files (other tabs in the same project) ride along by being
+    // concatenated ahead of the active file - Compiler Explorer's execute
+    // endpoint compiles a single translation unit, so this is a best-effort
+    // stand-in for the real multi-file compile a native toolchain would do.
+    const siblingSrc = (extraFiles || []).map((f) => `// ---- ${f.name} ----\n${f.content}`).join('\n\n');
+    let source = siblingSrc ? `${siblingSrc}\n\n// ---- main ----\n${code}` : String(code);
+    // Compiler Explorer always compiles as a fixed filename, so a top-level
+    // `public class Main` (Piston's old convention, still what students type)
+    // would fail the "public class must match filename" check - strip the
+    // public modifier transparently, the student's own code is untouched.
+    if (lang === 'java') source = source.replace(/\bpublic(\s+)class\b/, 'class');
     try {
-      // Sibling files (other tabs in the same project) compile alongside the
-      // active file, so a #include "helper.h" or extra .c/.cpp file works
-      // exactly like a real multi-file project - Piston already supports it.
-      const files = [{ name: cfg.file, content: String(code) }, ...(extraFiles || []).map((f) => ({ name: f.name, content: String(f.content) }))];
-      const r = await fetch(PISTON_URL, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language: cfg.language, version: cfg.version, files, stdin, compile_timeout: 10000, run_timeout: 8000 }),
-      });
-      if (!r.ok) throw new Error('The compile service answered ' + r.status + ' - try again in a minute.');
-      const d = await r.json();
-      if (d.compile && d.compile.stderr) term.print(d.compile.stderr + '\n');
-      if (d.compile && d.compile.code !== 0 && d.compile.code != null) { status('Compilation failed - read the errors above.'); return { ok: false }; }
-      if (d.run) {
-        if (d.run.stdout) term.print(d.run.stdout);
-        if (d.run.stderr) term.print(d.run.stderr);
-        if (d.run.signal === 'SIGKILL') term.print('\n[Stopped: the program ran too long. Check for infinite loops.]\n');
-        status(d.run.code === 0 ? 'Done.' : 'Finished with exit code ' + d.run.code + '.');
-        return { ok: d.run.code === 0 };
+      const d = await ceCompile(cfg.id, {
+        source,
+        options: { userArguments: '', filters: { execute: true }, executeParameters: { args: [], stdin } },
+        lang: cfg.lang,
+      }, 2);
+      if (d.code !== 0 && !d.execResult) {
+        // Compile failed - CE's own diagnostics are on the top-level stderr array.
+        const msg = ceText(d.stderr) || ceText((d.buildResult || {}).stderr) || 'Compilation failed.';
+        term.print(msg + '\n');
+        status('Compilation failed - read the errors above.');
+        return { ok: false };
       }
-      status('Done.');
-      return { ok: true };
+      const ex = d.execResult || {};
+      const out = ceText(ex.stdout);
+      const err = ceText(ex.stderr);
+      if (out) term.print(out.endsWith('\n') ? out : out + '\n');
+      if (err) term.print(err.endsWith('\n') ? err : err + '\n');
+      if (ex.timedOut) term.print('\n[Stopped: the program ran too long. Check for infinite loops.]\n');
+      status(ex.code === 0 ? 'Done.' : 'Finished with exit code ' + ex.code + '.');
+      return { ok: ex.code === 0 };
     } catch (e) {
       term.print('[' + e.message + ']\n');
       status('Could not reach the compiler service.');

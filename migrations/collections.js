@@ -29,6 +29,8 @@ const COLLECTIONS = [
   'department_task_status', 'department_announcements', 'contracts',
   // Talent Marketplace (Phase 1+) - added in migrations/0002_recruiters.sql
   'companies', 'audit_log',
+  // Public feedback wall - added in migrations/0007_feedback.sql
+  'feedback',
 ];
 
 module.exports = { COLLECTIONS };

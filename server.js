@@ -31,7 +31,7 @@ const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
-  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments,
+  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Feedback,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
@@ -353,6 +353,7 @@ function rateLimit(name, { max, windowMs, message }) {
 const limitEmailSend = rateLimit('email-send', { max: 5, windowMs: 15 * 60 * 1000, message: 'Too many verification emails requested. Please wait a few minutes and try again.' });
 const limitSignup = rateLimit('signup', { max: 10, windowMs: 60 * 60 * 1000, message: 'Too many sign-up attempts from this network. Please try again later.' });
 const limitLead = rateLimit('lead', { max: 20, windowMs: 60 * 60 * 1000, message: 'Too many submissions from this network. Please try again later.' });
+const limitFeedback = rateLimit('feedback', { max: 10, windowMs: 60 * 60 * 1000, message: 'Too many submissions from this network. Please try again later.' });
 
 // Drop expired entries from every throttle map every 10 minutes.
 setInterval(() => {
@@ -1382,6 +1383,27 @@ app.post('/api/hr/contracts/:id/resend', authRequired, hrOnly, async (req, res) 
     mailContract(user, pdfBuffer, deadline_at);
     res.json({ ok: true, contract: fresh });
   } catch (e) { res.status(500).json({ error: 'Could not regenerate the contract: ' + e.message }); }
+});
+// HR-controlled deadline extension: HR decides how many extra days a
+// specific hire gets to sign & submit, without regenerating the contract
+// PDF (see resend above for that heavier option). Extends from today, so it
+// works the same whether the original 2-day window is still open or has
+// already lapsed.
+app.post('/api/hr/contracts/:id/extend-deadline', authRequired, hrOnly, (req, res) => {
+  const c = Contracts.byId(req.params.id);
+  if (!c) return res.status(404).json({ error: 'Contract not found.' });
+  if (c.status !== 'sent') return res.status(400).json({ error: 'Only a contract still awaiting signature can have its deadline extended.' });
+  const user = Users.byId(c.user_id);
+  if (!user) return res.status(404).json({ error: 'That account no longer exists.' });
+  const days = Number((req.body || {}).days);
+  if (!Number.isFinite(days) || days <= 0 || days > 90) return res.status(400).json({ error: 'Enter a number of days between 1 and 90.' });
+  const deadline_at = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString();
+  const fresh = Contracts.extendDeadline(c.id, { deadline_at });
+  if (user.email) {
+    mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[user.role]} contract deadline was extended`,
+      `${hi(user.name)},\n\nHR has extended your contract signing deadline. You now have until ${new Date(deadline_at).toLocaleString('en-GB')} to sign it, gather any required documents, and upload everything as a single .zip file from your portal.\n\nSign in at ${APP_URL}/login to submit.\n\nEchoLens Digital`);
+  }
+  res.json({ ok: true, contract: fresh });
 });
 
 /* --------------------------- ambassador self-service --------------------------- */
@@ -3351,6 +3373,44 @@ app.patch('/api/admin/registrations/:id', authRequired, adminRequired, (req, res
   res.json({ ok: true, registration: r });
 });
 app.delete('/api/admin/registrations/:id', authRequired, adminRequired, (req, res) => { Registrations.remove(req.params.id); res.json({ ok: true }); });
+
+/* ============================== public feedback wall ==============================
+ * Anyone on the open site (signed in or not) can leave feedback - it lands
+ * as 'pending' and only shows up on GET /api/public/feedback (the public,
+ * shareable wall) once an admin approves it. Keeps the open site (no login
+ * wall) safe from raw unmoderated text while still letting new visitors and
+ * LinkedIn shares see real, vetted feedback.
+ */
+app.post('/api/public/feedback', limitFeedback, (req, res) => {
+  const b = req.body || {};
+  if (b.company) return res.json({ ok: true }); // honeypot field: bots fill it, humans never see it
+  const message = String(b.message || '').trim();
+  if (message.length < 5) return res.status(400).json({ error: 'Write a little more before submitting.' });
+  if (message.length > 1000) return res.status(400).json({ error: 'Keep feedback under 1000 characters.' });
+  if (b.email && !isEmail(b.email)) return res.status(400).json({ error: 'Enter a valid email address, or leave it blank.' });
+  const f = Feedback.create({ name: b.name, email: b.email, message, rating: b.rating, source: 'open-site' });
+  res.json({ ok: true, feedback: { id: f.id, status: f.status } });
+});
+// Public, unauthenticated: the approved feedback wall itself - anyone
+// visiting the open site (or a link shared on LinkedIn) can see it.
+app.get('/api/public/feedback', (req, res) => {
+  res.json({ feedback: Feedback.approved().slice(0, 100).map((f) => ({ id: f.id, name: f.name, message: f.message, rating: f.rating, created_at: f.created_at })) });
+});
+app.get('/api/admin/feedback', authRequired, adminRequired, (req, res) => res.json({ feedback: Feedback.all() }));
+app.post('/api/admin/feedback/:id/approve', authRequired, adminRequired, (req, res) => {
+  const f = Feedback.setStatus(req.params.id, 'approved', req.user.name);
+  if (!f) return res.status(404).json({ error: 'Feedback not found.' });
+  res.json({ ok: true, feedback: f });
+});
+app.post('/api/admin/feedback/:id/reject', authRequired, adminRequired, (req, res) => {
+  const f = Feedback.setStatus(req.params.id, 'rejected', req.user.name);
+  if (!f) return res.status(404).json({ error: 'Feedback not found.' });
+  res.json({ ok: true, feedback: f });
+});
+app.delete('/api/admin/feedback/:id', authRequired, adminRequired, (req, res) => {
+  if (!Feedback.remove(req.params.id)) return res.status(404).json({ error: 'Feedback not found.' });
+  res.json({ ok: true });
+});
 
 /* ============================== v18: ADMISSIONS OFFICE ==============================
  * A registration flows: new -> challan_issued -> challan_sent -> paid_cleared

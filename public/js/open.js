@@ -130,7 +130,7 @@ function navCourses(mode) {
   if (ME) loadCerts();
   // Deep links: /open#courses, #events, #announcements, #register, #signup
   const h = (location.hash || '').replace('#', '');
-  if (['courses', 'events', 'announcements'].includes(h)) openTab(h);
+  if (['courses', 'events', 'announcements', 'feedback'].includes(h)) openTab(h);
   else if (h === 'home') openTab('courses'); // the old portal home page merged into Courses
   else if (h === 'quests') openTab('courses'); // quests now live inside each course
   else if (h === 'free') navCourses('free'); // browse the free courses openly; signing in is asked only on solving
@@ -254,9 +254,10 @@ function requireWhatsapp() {
 
 /* -------------------------------- tabs -------------------------------- */
 function openTab(tab) {
-  ['courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile'].forEach((t) => {
+  ['courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile', 'feedback'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
+  if (tab === 'feedback') loadFeedback();
   // 'courses'/'course'/'solve' all map to the same two nav links (Live Tech
   // Courses vs Free Certified Courses) - which of those two is "active"
   // depends on COURSE_NAV_MODE, not on the tab name, since both links open
@@ -377,6 +378,52 @@ async function loadAnnouncements() {
     $('annList').innerHTML = '<div class="empty">Announcements are unavailable right now.</div>';
     const hu = $('homeUpdates'); if (hu) hu.innerHTML = '<div class="empty">Updates are unavailable right now.</div>';
   }
+}
+
+/* -------------------------------- feedback wall --------------------------------
+ * Public, no sign-in needed either way: anyone can leave feedback, and the
+ * wall itself (admin-approved entries only) is visible to anyone with the
+ * link - including a plain /open#feedback link shared on LinkedIn. */
+function starsHtml(n) {
+  const r = Math.max(0, Math.min(5, Number(n) || 0));
+  if (!r) return '';
+  return `<div class="s" style="color:#F0A82A;letter-spacing:1px" aria-label="${r} out of 5">${'&#9733;'.repeat(r)}${'&#9734;'.repeat(5 - r)}</div>`;
+}
+async function loadFeedback() {
+  const box = $('feedbackList');
+  try {
+    const d = await api('/api/public/feedback');
+    box.innerHTML = d.feedback.length ? d.feedback.map((f) => `
+      <div class="card" style="margin-bottom:12px"><div class="card-body">
+        ${starsHtml(f.rating)}
+        <p class="s" style="color:var(--ink);white-space:pre-line;margin:6px 0">${esc(f.message)}</p>
+        <div class="s" style="color:var(--muted-2)">${esc(f.name)} &middot; ${esc((f.created_at || '').slice(0, 10))}</div>
+      </div></div>`).join('') : '<div class="empty">No feedback yet - be the first to share yours.</div>';
+  } catch {
+    box.innerHTML = '<div class="empty">Feedback is unavailable right now.</div>';
+  }
+}
+function openFeedbackForm() {
+  openModal('Leave feedback', `
+    <form id="fbForm">
+      <label class="field"><span>Your name (optional)</span><input name="name" maxlength="80" placeholder="How should we credit you?"></label>
+      <label class="field"><span>Email (optional, not shown publicly)</span><input name="email" type="email" placeholder="you@example.com"></label>
+      <label class="field"><span>Rating (optional)</span>
+        <select name="rating"><option value="">No rating</option><option value="5">&#9733;&#9733;&#9733;&#9733;&#9733; Excellent</option><option value="4">&#9733;&#9733;&#9733;&#9733; Good</option><option value="3">&#9733;&#9733;&#9733; Okay</option><option value="2">&#9733;&#9733; Poor</option><option value="1">&#9733; Very poor</option></select>
+      </label>
+      <label class="field"><span>Your feedback</span><textarea name="message" rows="4" required maxlength="1000" placeholder="What did you like, or what should we improve?"></textarea></label>
+      <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+      <p class="hint">Reviewed by our team before it appears publicly - usually within a day.</p>
+      <button class="btn btn-primary btn-block" id="fbBtn">Submit feedback</button>
+    </form>`);
+  $('fbForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = $('fbBtn'); btn.disabled = true;
+    try {
+      await api('/api/public/feedback', { method: 'POST', body: JSON.stringify({ name: f.name.value.trim(), email: f.email.value.trim(), rating: f.rating.value, message: f.message.value.trim(), company: f.company.value }) });
+      modalMsg('Thanks - your feedback was submitted for review.', true);
+      setTimeout(closeModal, 1600);
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
 }
 
 /* ------------------------------- catalogue ------------------------------- */

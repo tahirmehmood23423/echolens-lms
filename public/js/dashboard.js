@@ -107,7 +107,7 @@ const TITLES = {
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
   students: 'Students', grades: 'Grades', attendance: 'Attendance', analytics: 'Analytics',
   'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
-  'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-logs': 'System Logs',
+  'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-feedback': 'Feedback', 'admin-logs': 'System Logs',
   jobs: 'Jobs', job: 'Job',
   'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal', 'dept-ambassador': 'Ambassadors Portal',
   'my-department': 'My Department', 'admin-departments': 'Departments',
@@ -134,7 +134,7 @@ function show(view) {
     analytics: renderTeacherAnalytics,
     'admin-teachers': renderAdminTeachers, 'admin-students': renderAdminStudents,
     'admin-enrollments': renderAdminEnrollments, 'admin-finance': renderAdminFinance,
-    'admin-announcements': renderAdminAnnouncementsPage, 'admin-logs': renderAdminLogs,
+    'admin-announcements': renderAdminAnnouncementsPage, 'admin-feedback': renderAdminFeedback, 'admin-logs': renderAdminLogs,
     jobs: renderJobs,
     'dept-hr': renderDeptHR, 'dept-finance': renderDeptFinance, 'dept-student-coordinator': renderDeptStudentCoordinator, 'dept-staff': renderDeptStaff,
     'dept-ambassador': renderDeptAmbassador,
@@ -982,6 +982,45 @@ async function renderAdminAnnouncementsPage() {
     try { await api('/api/admin/public-announcements', { method: 'POST', body: JSON.stringify(obj) }); toast('Published on the open website.'); renderAdminAnnouncementsPage(); }
     catch (err) { toast(err.message, true); btn.disabled = false; }
   });
+}
+/* -------- Admin: public feedback wall moderation --------
+ * Anyone on the open site can submit feedback (POST /api/public/feedback);
+ * it lands 'pending' and only shows on the public wall once approved here -
+ * the open site has no login wall, so raw unmoderated text is a spam risk. */
+const FEEDBACK_STATUS_LABEL = { pending: 'Pending review', approved: 'Approved · public', rejected: 'Rejected' };
+async function renderAdminFeedback() {
+  const el = $('view-admin-feedback');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/admin/feedback');
+  const stars = (n) => n ? `<span class="s" style="color:#F0A82A">${'&#9733;'.repeat(n)}${'&#9734;'.repeat(5 - n)}</span>` : '';
+  const row = (f) => `
+    <div class="list-row">
+      <div class="grow">
+        <div class="t">${esc(f.name)} ${stars(f.rating)} <span class="s" style="color:var(--muted-2)">&middot; ${esc((f.created_at || '').slice(0, 10))}</span></div>
+        <div class="s" style="color:var(--muted);white-space:pre-line">${esc(f.message)}</div>
+        <div class="s" style="color:var(--muted-2)">${esc(FEEDBACK_STATUS_LABEL[f.status] || f.status)}${f.email ? ' &middot; ' + esc(f.email) : ''}</div>
+      </div>
+      ${f.status !== 'approved' ? `<button class="btn btn-primary btn-sm" onclick="adminFeedbackAction(${f.id}, 'approve')">Approve</button>` : ''}
+      ${f.status !== 'rejected' ? `<button class="btn btn-ghost btn-sm" onclick="adminFeedbackAction(${f.id}, 'reject')">Reject</button>` : ''}
+      <button class="btn btn-danger btn-sm" onclick="adminFeedbackDelete(${f.id})">Delete</button>
+    </div>`;
+  const pending = d.feedback.filter((f) => f.status === 'pending');
+  const rest = d.feedback.filter((f) => f.status !== 'pending');
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Awaiting review (${pending.length})</h3>
+      <span class="s" style="color:var(--muted)">Only approved feedback shows on the public /open#feedback wall.</span></div>
+      <div class="card-body tight">${pending.map(row).join('') || '<div class="empty">Nothing waiting on review.</div>'}</div></div>
+    <div class="card"><div class="card-head"><h3>Reviewed (${rest.length})</h3></div>
+      <div class="card-body tight">${rest.map(row).join('') || '<div class="empty">Nothing reviewed yet.</div>'}</div></div>`;
+}
+async function adminFeedbackAction(id, action) {
+  try { await api(`/api/admin/feedback/${id}/${action}`, { method: 'POST', body: JSON.stringify({}) }); renderAdminFeedback(); }
+  catch (e) { toast(e.message, true); }
+}
+async function adminFeedbackDelete(id) {
+  if (!confirm('Delete this feedback permanently?')) return;
+  try { await api(`/api/admin/feedback/${id}`, { method: 'DELETE' }); toast('Deleted.'); renderAdminFeedback(); }
+  catch (e) { toast(e.message, true); }
 }
 async function adminAnnPin(id, pinned) {
   try { await api(`/api/admin/public-announcements/${id}`, { method: 'PATCH', body: JSON.stringify({ pinned }) }); renderAdminAnnouncementsPage(); }
@@ -3859,7 +3898,10 @@ async function renderHrContractsPanel(containerId) {
           <td>${c.pdf_filename ? `<a href="/uploads/contracts/${esc(c.pdf_filename)}" target="_blank">Download</a>` : '—'}</td>
           <td>${c.submission_zip_filename ? `<a href="/uploads/contracts/${esc(c.submission_zip_filename)}" target="_blank">zip</a>` : '—'}</td>
           <td>${c.offer_letter_filename ? `<a href="/uploads/contracts/${esc(c.offer_letter_filename)}" target="_blank">Download</a>` : '—'}</td>
-          <td><button class="btn btn-ghost btn-sm" onclick="resendContract(${c.id}, '${containerId}')">Resend</button></td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="resendContract(${c.id}, '${containerId}')">Resend</button>
+            ${c.status === 'sent' ? `<button class="btn btn-ghost btn-sm" onclick="extendContractDeadline(${c.id}, '${containerId}')">Extend deadline</button>` : ''}
+          </td>
         </tr>`;
       }).join('') || '<tr><td colspan="8" class="empty">No contracts issued yet.</td></tr>'}
     </table></div></div>`;
@@ -3868,6 +3910,19 @@ async function resendContract(id, containerId) {
   if (!confirm('Regenerate this contract and reset the 2-day signing deadline? A fresh copy is emailed immediately.')) return;
   try { await api(`/api/hr/contracts/${id}/resend`, { method: 'POST', body: JSON.stringify({}) }); toast('Contract resent.'); renderHrContractsPanel(containerId); }
   catch (e) { toast(e.message, true); }
+}
+function extendContractDeadline(id, containerId) {
+  openModal('Extend signing deadline', `<form id="f">
+    <p class="hint">Choose how many days from today this hire gets to sign & submit their contract. The existing contract PDF is not changed - they're notified by email with the new date.</p>
+    <label class="field"><span>Extend by (days)</span><input name="days" type="number" min="1" max="90" value="7" required></label>
+    <button class="btn btn-primary btn-block">Extend deadline</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; f.querySelector('button').disabled = true;
+    try {
+      await api(`/api/hr/contracts/${id}/extend-deadline`, { method: 'POST', body: JSON.stringify({ days: Number(f.days.value) }) });
+      toast('Deadline extended.'); closeModal(); renderHrContractsPanel(containerId);
+    } catch (err) { modalMsg(err.message); f.querySelector('button').disabled = false; }
+  });
 }
 
 /* -------------------------------- Staff portal -------------------------------- */

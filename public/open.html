@@ -38,6 +38,7 @@
   <a class="nlink" data-tab="courses" data-catnav="free" onclick="navCourses('free')">Free Certified Courses</a>
   <a class="nlink" data-tab="events" onclick="openTab('events')">Events</a>
   <a class="nlink" data-tab="announcements" onclick="openTab('announcements')">Announcements</a>
+  <a class="nlink" data-tab="feedback" onclick="openTab('feedback')">Feedback</a>
   <a class="nlink" href="/compiler">Compiler</a>
   <a class="nlink" href="/#faq">FAQ</a>
   <a class="nlink" data-tab="profile" onclick="openProfileTab()" id="profileNavLink" style="display:none">My Profile</a>
@@ -150,6 +151,18 @@
     <div id="annList"><div class="empty">Loading announcements&hellip;</div></div>
   </section>
 
+  <!-- ================================ FEEDBACK ================================ -->
+  <section id="tab-feedback" style="display:none">
+    <div style="display:flex;gap:14px;align-items:end;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px">
+      <div>
+        <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink);margin-bottom:4px">Feedback</h1>
+        <p class="s" style="color:var(--muted)">What learners are saying about EchoLens - and a place to share your own.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openFeedbackForm()">Leave feedback</button>
+    </div>
+    <div id="feedbackList"><div class="empty">Loading feedback&hellip;</div></div>
+  </section>
+
 </div>
 
 <footer style="border-top:1px solid var(--line);padding:22px 4vw;font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between">
@@ -167,7 +180,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="/js/coderunner.js?v1317"></script>
-<script src="/js/open.js?v1328"></script>
+<script src="/js/coderunner.js?v1318"></script>
+<script src="/js/open.js?v1329"></script>
 </body>
 </html>

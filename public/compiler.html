@@ -170,7 +170,7 @@ print('Hello EchoLens!')"></textarea>
 
 <div class="toast" id="toast"></div>
 
-<script src="/js/coderunner.js?v1231"></script>
+<script src="/js/coderunner.js?v1232"></script>
 <script>
 'use strict';
 const $ = (id) => document.getElementById(id);
@@ -189,13 +189,15 @@ const DEFAULTS = {
   python: { name: 'main.py', code: "# Write Python here, press Run.\n# numpy, pandas, matplotlib and scikit-learn load automatically.\nprint('Hello EchoLens!')" },
   c: { name: 'main.c', code: '// Write C here, press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}' },
   cpp: { name: 'main.cpp', code: '// Write C++ here, press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}' },
+  java: { name: 'Main.java', code: '// Write Java here, press Run.\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello EchoLens");\n    }\n}' },
   sql: { name: 'main.sql', code: '-- Write SQL here, press Run. Loaded CSVs are tables.\nSELECT 1 + 1 AS answer;' },
   web: { name: 'index.html', code: '<!-- Write HTML, CSS (in <style>) and JS (in <script>) - Run shows a live preview. -->' },
 };
 const PKGS_TEXT = {
   python: 'numpy · pandas · matplotlib · scikit-learn ready',
-  c: 'gcc 10 · compiled & run in the cloud',
-  cpp: 'g++ 10 · compiled & run in the cloud',
+  c: 'gcc 13 · compiled & run in the cloud',
+  cpp: 'g++ 13 · compiled & run in the cloud',
+  java: 'OpenJDK 21 · compiled & run in the cloud',
   sql: 'SQLite · CSV datasets become tables automatically',
   web: 'live preview with console output',
 };

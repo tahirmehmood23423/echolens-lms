@@ -51,7 +51,7 @@ const SHOWCASE_PUBLISH_GEMS = Math.max(0, Number(process.env.SHOWCASE_PUBLISH_GE
 const SHOWCASE_MAX_IMAGES = 4;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0, companies: 0, audit_log: 0, showcase_posts: 0, showcase_images: 0, showcase_likes: 0, showcase_comments: 0, showcase_reports: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0, companies: 0, audit_log: 0, showcase_posts: 0, showcase_images: 0, showcase_likes: 0, showcase_comments: 0, showcase_reports: 0, feedback: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
@@ -66,6 +66,9 @@ const empty = () => ({
   companies: [], audit_log: [],
   // Showcase Feed (v20)
   showcase_posts: [], showcase_images: [], showcase_likes: [], showcase_comments: [], showcase_reports: [],
+  // Public feedback wall on the open site (v21): anyone can submit; only
+  // admin-approved entries are ever shown back publicly.
+  feedback: [],
   settings: {
     // The CEO signature is always rendered as the typed name (see cert-image.js
     // and letterhead-flow.signatureName) - there is deliberately no signature
@@ -2849,6 +2852,15 @@ const Contracts = {
     c.status = 'sent'; c.pdf_filename = pdf_filename; c.sent_at = now(); c.deadline_at = deadline_at; save();
     return c;
   },
+  // HR "extend deadline": pushes deadline_at out by a number of days HR
+  // chooses, without regenerating the contract PDF or touching status - a
+  // lighter-weight alternative to resend() for when the paperwork is fine
+  // and only more time is needed.
+  extendDeadline(id, { deadline_at }) {
+    const c = Contracts.byId(id); if (!c) return null;
+    c.deadline_at = deadline_at; save();
+    return c;
+  },
 };
 
 /* ============================== departments ==============================
@@ -3466,6 +3478,43 @@ const Leads = {
     }
     if (audience === 'all') for (const l of data.leads) if (l.email) emails.add(l.email.toLowerCase());
     return [...emails];
+  },
+};
+
+/* ============================== v21: PUBLIC FEEDBACK WALL ==============================
+ * Anyone visiting the open site (signed in or not) can leave feedback.
+ * Submissions land as 'pending' and are never shown back publicly until an
+ * admin approves them (see adminRequired routes in server.js) - the open
+ * site has no login wall, so unmoderated free text is a spam/abuse risk.
+ */
+const Feedback = {
+  create({ name, email, message, rating, source }) {
+    const f = {
+      id: nextId('feedback'),
+      name: String(name || '').trim().slice(0, 80) || 'Anonymous',
+      email: email ? String(email).trim().slice(0, 200) : null,
+      message: String(message || '').trim().slice(0, 1000),
+      rating: rating ? Math.max(1, Math.min(5, Math.round(Number(rating)))) : null,
+      source: String(source || 'open-site').slice(0, 40),
+      status: 'pending', created_at: now(),
+      moderated_at: null, moderated_by: null,
+    };
+    data.feedback.push(f); save();
+    return f;
+  },
+  all() { return data.feedback.slice().sort((a, b) => b.id - a.id); },
+  approved() { return data.feedback.filter((f) => f.status === 'approved').sort((a, b) => b.id - a.id); },
+  byId(id) { return data.feedback.find((f) => f.id === Number(id)) || null; },
+  setStatus(id, status, byName) {
+    const f = Feedback.byId(id); if (!f) return null;
+    f.status = status; f.moderated_at = now(); f.moderated_by = byName || null; save();
+    return f;
+  },
+  remove(id) {
+    const i = data.feedback.findIndex((f) => f.id === Number(id));
+    if (i === -1) return false;
+    data.feedback.splice(i, 1); save();
+    return true;
   },
 };
 
@@ -4447,7 +4496,7 @@ module.exports = {
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
-  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase,
+  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase, Feedback,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,

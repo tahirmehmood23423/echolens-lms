@@ -669,38 +669,22 @@ b = 20
 </section>
 
 <!-- ================================ STORIES ================================
-     Placeholder testimonials, hidden until real learner quotes are added.
-     To publish: replace the names, roles and quotes below with real quotes
-     you have permission to use, then delete style="display:none" from the
-     section tag below. Publishing invented testimonials can badly damage
-     the academy's credibility, so only real ones should go live. -->
+     Real, admin-approved learner feedback only (see /open#feedback and the
+     admin Feedback moderation panel) - loadTestimonials() in landing.js
+     fetches GET /api/public/feedback and fills this in. The section stays
+     hidden until there is at least one approved review, so the site never
+     shows an empty (or worse, invented) "Success Stories" section -
+     publishing fake testimonials would badly damage the academy's
+     credibility. -->
 <section class="sec" id="stories" style="display:none">
   <div class="sec-head-row">
     <div>
       <h2>Success Stories</h2>
-      <p>From learners to achievers.</p>
+      <p id="storiesSummary">From learners to achievers.</p>
     </div>
+    <a class="view-all" href="/open#feedback">Leave feedback &rarr;</a>
   </div>
-  <div class="story-grid">
-    <div class="story">
-      <div class="story-head"><div class="story-av">AA</div><div><b>Learner name</b><span>Role or achievement</span></div></div>
-      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-      <p>Real quote from the learner goes here, in their own words, with their permission.</p>
-      <span class="story-tag">Course name</span>
-    </div>
-    <div class="story">
-      <div class="story-head"><div class="story-av">BB</div><div><b>Learner name</b><span>Role or achievement</span></div></div>
-      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-      <p>Real quote from the learner goes here, in their own words, with their permission.</p>
-      <span class="story-tag">Course name</span>
-    </div>
-    <div class="story">
-      <div class="story-head"><div class="story-av">CC</div><div><b>Learner name</b><span>Role or achievement</span></div></div>
-      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-      <p>Real quote from the learner goes here, in their own words, with their permission.</p>
-      <span class="story-tag">Course name</span>
-    </div>
-  </div>
+  <div class="story-grid" id="storyGrid"></div>
 </section>
 
 <!-- ================================ FAQ ================================ -->
@@ -821,6 +805,6 @@ b = 20
   </div>
 </footer>
 
-<script src="/js/landing.js?v1240"></script>
+<script src="/js/landing.js?v1241"></script>
 </body>
 </html>

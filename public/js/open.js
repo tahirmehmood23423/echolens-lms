@@ -124,6 +124,7 @@ function navCourses(mode) {
   const catReady = loadCatalogue();
   loadAnnouncements();
   loadHomeStats();
+  loadFeedbackTeaser();
   // v18: browsing is public. Events and hackathons are always LISTED (the
   // public endpoint when signed out); joining them is what needs an account.
   loadEvents();
@@ -388,6 +389,22 @@ function starsHtml(n) {
   const r = Math.max(0, Math.min(5, Number(n) || 0));
   if (!r) return '';
   return `<div class="s" style="color:#F0A82A;letter-spacing:1px" aria-label="${r} out of 5">${'&#9733;'.repeat(r)}${'&#9734;'.repeat(5 - r)}</div>`;
+}
+// Small trust-building teaser on the Courses homepage: a rating summary
+// linking through to the full feedback wall. Hidden until at least one
+// approved review exists - never shows an empty state on the homepage.
+async function loadFeedbackTeaser() {
+  let list;
+  try { list = (await api('/api/public/feedback')).feedback; } catch { return; }
+  if (!list || !list.length) return;
+  const rated = list.filter((f) => f.rating);
+  const avg = rated.length ? (rated.reduce((s, f) => s + f.rating, 0) / rated.length) : null;
+  const box = $('feedbackTeaser');
+  box.innerHTML = `<a href="#feedback" onclick="openTab('feedback');return false" style="display:inline-flex;gap:10px;align-items:center;text-decoration:none;color:inherit">
+    ${avg ? `<span style="color:#F0A82A;letter-spacing:1px">${'&#9733;'.repeat(Math.round(avg))}${'&#9734;'.repeat(5 - Math.round(avg))}</span><span class="s" style="font-weight:700;color:var(--ink)">${avg.toFixed(1)}</span>` : ''}
+    <span class="s" style="color:var(--muted)">${list.length} review${list.length === 1 ? '' : 's'} from learners &middot; read what they say &rarr;</span>
+  </a>`;
+  box.style.display = '';
 }
 async function loadFeedback() {
   const box = $('feedbackList');

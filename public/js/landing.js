@@ -30,7 +30,36 @@ async function api(path, opts) {
       document.querySelectorAll('.view-all-count').forEach((el) => { el.textContent = info.stats.courses; });
     }
   } catch {}
+
+  loadTestimonials();
 })();
+
+/* ------------------------------ testimonials ------------------------------
+ * Real, admin-approved feedback only (see the public feedback wall at
+ * /open#feedback and the admin moderation panel) - the section stays
+ * hidden if there is nothing approved yet, rather than showing empty or
+ * placeholder content on the marketing homepage. */
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+async function loadTestimonials() {
+  let list;
+  try { list = (await api('/api/public/feedback')).feedback; } catch { return; }
+  if (!list || !list.length) return;
+  const rated = list.filter((f) => f.rating);
+  const avg = rated.length ? (rated.reduce((s, f) => s + f.rating, 0) / rated.length) : null;
+  const initials = (name) => (String(name || '?').trim().match(/\S+/g) || ['?']).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
+  const monthYear = (iso) => { const d = new Date(String(iso).replace(' ', 'T')); return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }); };
+  const stars = (n) => '&#9733;'.repeat(n || 0) + '&#9734;'.repeat(5 - (n || 0));
+  $('storyGrid').innerHTML = list.slice(0, 6).map((f) => `
+    <div class="story">
+      <div class="story-head"><div class="story-av">${esc(initials(f.name))}</div><div><b>${esc(f.name)}</b><span>${esc(monthYear(f.created_at))}</span></div></div>
+      ${f.rating ? `<div class="stars">${stars(f.rating)}</div>` : ''}
+      <p>${esc(f.message)}</p>
+    </div>`).join('');
+  $('storiesSummary').textContent = avg
+    ? `${avg.toFixed(1)} out of 5, from ${rated.length} review${rated.length === 1 ? '' : 's'} - ${list.length} total.`
+    : `${list.length} review${list.length === 1 ? '' : 's'} from learners.`;
+  $('stories').style.display = '';
+}
 
 /* ------------------------------ FAQ accordion ------------------------------ */
 function toggleFaq(btn) {

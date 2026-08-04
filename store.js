@@ -3486,6 +3486,10 @@ const Leads = {
  * Submissions land as 'pending' and are never shown back publicly until an
  * admin approves them (see adminRequired routes in server.js) - the open
  * site has no login wall, so unmoderated free text is a spam/abuse risk.
+ * Admin can also reply to any feedback (shown publicly alongside it once
+ * approved) and delete any entry outright - the moderation queue is the
+ * one place negative or abusive submissions get filtered before they ever
+ * reach the public wall.
  */
 const Feedback = {
   create({ name, email, message, rating, source }) {
@@ -3498,6 +3502,7 @@ const Feedback = {
       source: String(source || 'open-site').slice(0, 40),
       status: 'pending', created_at: now(),
       moderated_at: null, moderated_by: null,
+      reply: null, replied_at: null, replied_by: null,
     };
     data.feedback.push(f); save();
     return f;
@@ -3508,6 +3513,18 @@ const Feedback = {
   setStatus(id, status, byName) {
     const f = Feedback.byId(id); if (!f) return null;
     f.status = status; f.moderated_at = now(); f.moderated_by = byName || null; save();
+    return f;
+  },
+  // Admin reply, shown next to the feedback both in the moderation queue and
+  // (once the feedback is approved) on the public wall - and emailed to the
+  // submitter if they left an address. Passing an empty string clears it.
+  reply(id, text, byName) {
+    const f = Feedback.byId(id); if (!f) return null;
+    const t = String(text || '').trim().slice(0, 1000);
+    f.reply = t || null;
+    f.replied_at = t ? now() : null;
+    f.replied_by = t ? (byName || null) : null;
+    save();
     return f;
   },
   remove(id) {

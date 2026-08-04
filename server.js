@@ -3394,7 +3394,7 @@ app.post('/api/public/feedback', limitFeedback, (req, res) => {
 // Public, unauthenticated: the approved feedback wall itself - anyone
 // visiting the open site (or a link shared on LinkedIn) can see it.
 app.get('/api/public/feedback', (req, res) => {
-  res.json({ feedback: Feedback.approved().slice(0, 100).map((f) => ({ id: f.id, name: f.name, message: f.message, rating: f.rating, created_at: f.created_at })) });
+  res.json({ feedback: Feedback.approved().slice(0, 100).map((f) => ({ id: f.id, name: f.name, message: f.message, rating: f.rating, created_at: f.created_at, reply: f.reply, replied_at: f.replied_at })) });
 });
 app.get('/api/admin/feedback', authRequired, adminRequired, (req, res) => res.json({ feedback: Feedback.all() }));
 app.post('/api/admin/feedback/:id/approve', authRequired, adminRequired, (req, res) => {
@@ -3405,6 +3405,20 @@ app.post('/api/admin/feedback/:id/approve', authRequired, adminRequired, (req, r
 app.post('/api/admin/feedback/:id/reject', authRequired, adminRequired, (req, res) => {
   const f = Feedback.setStatus(req.params.id, 'rejected', req.user.name);
   if (!f) return res.status(404).json({ error: 'Feedback not found.' });
+  res.json({ ok: true, feedback: f });
+});
+// Admin reply: shown next to the feedback in the moderation queue always,
+// and on the public wall once the feedback itself is approved. Emailed to
+// the submitter too, if they left an address.
+app.post('/api/admin/feedback/:id/reply', authRequired, adminRequired, (req, res) => {
+  const text = String((req.body || {}).reply || '').trim();
+  if (text.length > 1000) return res.status(400).json({ error: 'Keep the reply under 1000 characters.' });
+  const f = Feedback.reply(req.params.id, text, req.user.name);
+  if (!f) return res.status(404).json({ error: 'Feedback not found.' });
+  if (f.reply && f.email) {
+    mailer.notify(f.email, 'EchoLens replied to your feedback',
+      `${hi(f.name)},\n\nThanks again for your feedback:\n"${f.message}"\n\nOur reply:\n${f.reply}\n\nEchoLens Digital`);
+  }
   res.json({ ok: true, feedback: f });
 });
 app.delete('/api/admin/feedback/:id', authRequired, adminRequired, (req, res) => {

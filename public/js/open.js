@@ -415,6 +415,7 @@ async function loadFeedback() {
         ${starsHtml(f.rating)}
         <p class="s" style="color:var(--ink);white-space:pre-line;margin:6px 0">${esc(f.message)}</p>
         <div class="s" style="color:var(--muted-2)">${esc(f.name)} &middot; ${esc((f.created_at || '').slice(0, 10))}</div>
+        ${f.reply ? `<div class="s" style="margin-top:10px;padding:9px 12px;background:var(--violet-soft);border-radius:9px;color:var(--ink)"><strong>EchoLens replied:</strong> ${esc(f.reply)}</div>` : ''}
       </div></div>`).join('') : '<div class="empty">No feedback yet - be the first to share yours.</div>';
   } catch {
     box.innerHTML = '<div class="empty">Feedback is unavailable right now.</div>';

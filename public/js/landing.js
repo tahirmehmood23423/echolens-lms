@@ -54,6 +54,7 @@ async function loadTestimonials() {
       <div class="story-head"><div class="story-av">${esc(initials(f.name))}</div><div><b>${esc(f.name)}</b><span>${esc(monthYear(f.created_at))}</span></div></div>
       ${f.rating ? `<div class="stars">${stars(f.rating)}</div>` : ''}
       <p>${esc(f.message)}</p>
+      ${f.reply ? `<p style="font-size:12px;background:var(--violet-soft);color:var(--ink);border-radius:8px;padding:8px 10px;margin-top:-4px"><b>EchoLens replied:</b> ${esc(f.reply)}</p>` : ''}
     </div>`).join('');
   $('storiesSummary').textContent = avg
     ? `${avg.toFixed(1)} out of 5, from ${rated.length} review${rated.length === 1 ? '' : 's'} - ${list.length} total.`

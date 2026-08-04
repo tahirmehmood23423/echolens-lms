@@ -994,15 +994,22 @@ async function renderAdminFeedback() {
   const d = await api('/api/admin/feedback');
   const stars = (n) => n ? `<span class="s" style="color:#F0A82A">${'&#9733;'.repeat(n)}${'&#9734;'.repeat(5 - n)}</span>` : '';
   const row = (f) => `
-    <div class="list-row">
+    <div class="list-row" style="align-items:start;flex-wrap:wrap">
       <div class="grow">
         <div class="t">${esc(f.name)} ${stars(f.rating)} <span class="s" style="color:var(--muted-2)">&middot; ${esc((f.created_at || '').slice(0, 10))}</span></div>
         <div class="s" style="color:var(--muted);white-space:pre-line">${esc(f.message)}</div>
         <div class="s" style="color:var(--muted-2)">${esc(FEEDBACK_STATUS_LABEL[f.status] || f.status)}${f.email ? ' &middot; ' + esc(f.email) : ''}</div>
+        ${f.reply ? `<div class="s" style="margin-top:8px;padding:8px 10px;background:var(--violet-soft);border-radius:8px"><strong>Your reply</strong> (${esc(f.replied_by || 'admin')}, ${esc((f.replied_at || '').slice(0, 10))}): ${esc(f.reply)}</div>` : ''}
+        <form onsubmit="return adminFeedbackReply(event, ${f.id})" style="display:flex;gap:6px;margin-top:8px;max-width:520px">
+          <input name="reply" placeholder="${f.reply ? 'Edit reply...' : 'Write a public reply...'}" value="${esc(f.reply || '')}" style="flex:1;padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:12.5px">
+          <button class="btn btn-ghost btn-sm">${f.reply ? 'Update' : 'Reply'}</button>
+        </form>
       </div>
-      ${f.status !== 'approved' ? `<button class="btn btn-primary btn-sm" onclick="adminFeedbackAction(${f.id}, 'approve')">Approve</button>` : ''}
-      ${f.status !== 'rejected' ? `<button class="btn btn-ghost btn-sm" onclick="adminFeedbackAction(${f.id}, 'reject')">Reject</button>` : ''}
-      <button class="btn btn-danger btn-sm" onclick="adminFeedbackDelete(${f.id})">Delete</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${f.status !== 'approved' ? `<button class="btn btn-primary btn-sm" onclick="adminFeedbackAction(${f.id}, 'approve')">Approve</button>` : ''}
+        ${f.status !== 'rejected' ? `<button class="btn btn-ghost btn-sm" onclick="adminFeedbackAction(${f.id}, 'reject')">Reject</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="adminFeedbackDelete(${f.id})">Delete</button>
+      </div>
     </div>`;
   const pending = d.feedback.filter((f) => f.status === 'pending');
   const rest = d.feedback.filter((f) => f.status !== 'pending');
@@ -1016,6 +1023,14 @@ async function renderAdminFeedback() {
 async function adminFeedbackAction(id, action) {
   try { await api(`/api/admin/feedback/${id}/${action}`, { method: 'POST', body: JSON.stringify({}) }); renderAdminFeedback(); }
   catch (e) { toast(e.message, true); }
+}
+async function adminFeedbackReply(e, id) {
+  e.preventDefault();
+  const f = e.target; const btn = f.querySelector('button'); const reply = f.reply.value.trim();
+  btn.disabled = true;
+  try { await api(`/api/admin/feedback/${id}/reply`, { method: 'POST', body: JSON.stringify({ reply }) }); toast(reply ? 'Reply saved.' : 'Reply removed.'); renderAdminFeedback(); }
+  catch (err) { toast(err.message, true); btn.disabled = false; }
+  return false;
 }
 async function adminFeedbackDelete(id) {
   if (!confirm('Delete this feedback permanently?')) return;

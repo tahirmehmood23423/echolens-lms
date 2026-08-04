@@ -12,7 +12,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
+const { PDFDocument, StandardFonts, rgb, degrees } = require('pdf-lib');
 
 const LETTERHEAD_PATH = path.join(__dirname, 'assets', 'letterhead.pdf');
 const NAVY = rgb(0x16 / 255, 0x23 / 255, 0x3a / 255);
@@ -131,6 +131,45 @@ class LetterheadFlow {
       this.y -= (size + 8);
     }
     this.y -= gapAfter;
+  }
+  // Simple vertical bar chart - labels/values are parallel arrays. Used for
+  // report PDFs (see analytics-report-pdf.js) where the on-screen chart
+  // needs a printable equivalent, not for anything data-precise like a
+  // financial statement.
+  async barChart(labels, values, { height = 150, color = GOLD, gapAfter = 34 } = {}) {
+    await this.ensureSpace(height + gapAfter + 16);
+    const top = this.y;
+    const bottom = top - height;
+    const width = RIGHT - LEFT;
+    const max = Math.max(1, ...values, 0);
+    const n = Math.max(labels.length, 1);
+    const gap = n > 40 ? 1 : 3;
+    const barW = Math.max(1, (width - gap * (n - 1)) / n);
+    let lastLabel = null; // avoid e.g. "1" appearing at both the half and full gridline when max is tiny
+    for (const frac of [0, 0.5, 1]) {
+      const y = bottom + height * frac;
+      this.page.drawLine({ start: { x: LEFT, y }, end: { x: RIGHT, y }, thickness: 0.5, color: LINE });
+      const label = String(Math.round(max * frac));
+      if (label !== lastLabel) { this.page.drawText(label, { x: LEFT - 26, y: y - 3, size: 7, font: this.font, color: MUTED }); lastLabel = label; }
+    }
+    const showEvery = n > 24 ? Math.ceil(n / 24) : 1;
+    const showValues = n <= 24;
+    let x = LEFT;
+    labels.forEach((label, i) => {
+      const v = Number(values[i]) || 0;
+      const h = v > 0 ? Math.max((v / max) * height, 2) : 0;
+      if (h > 0) this.page.drawRectangle({ x, y: bottom, width: barW, height: h, color });
+      if (showValues && v > 0) {
+        const txt = String(v);
+        const tw = this.font.widthOfTextAtSize(txt, 7);
+        this.page.drawText(txt, { x: x + barW / 2 - tw / 2, y: bottom + h + 3, size: 7, font: this.font, color: NAVY });
+      }
+      if (i % showEvery === 0 || i === n - 1) {
+        this.page.drawText(String(label), { x: x + barW / 2, y: bottom - 10, size: 6.5, font: this.font, color: MUTED, rotate: degrees(-50) });
+      }
+      x += barW + gap;
+    });
+    this.y = bottom - gapAfter;
   }
   // Two-column signature block. A column marked { signed: true } renders the
   // EchoLens digital signature (typed name, no image) plus a note; unmarked

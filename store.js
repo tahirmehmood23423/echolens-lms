@@ -3553,7 +3553,39 @@ function bucketKey(iso, granularity) {
   }
   return d; // daily
 }
-function bucketRange(granularity) {
+// `from`/`to` are 'YYYY-MM-DD' or null. With both given, dateStr's day must
+// fall within [from, to] inclusive - used to scope a report to a custom
+// range (e.g. "last 2 weeks") instead of the fixed default lookback window.
+function inDateRange(dateStr, from, to) {
+  if (!from && !to) return true;
+  const d = String(dateStr || '').slice(0, 10);
+  if (!d) return false;
+  if (from && d < from) return false;
+  if (to && d > to) return false;
+  return true;
+}
+function bucketRange(granularity, from, to) {
+  if (from && to) {
+    const out = [];
+    const start = new Date(from + 'T00:00:00Z');
+    const end = new Date(to + 'T00:00:00Z');
+    if (end < start) return [from];
+    if (granularity === 'yearly') {
+      for (let y = start.getUTCFullYear(); y <= end.getUTCFullYear(); y++) out.push(String(y));
+    } else if (granularity === 'monthly') {
+      const d = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), 1));
+      const endM = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), 1));
+      while (d <= endM) { out.push(d.toISOString().slice(0, 7)); d.setUTCMonth(d.getUTCMonth() + 1); }
+    } else if (granularity === 'weekly') {
+      const d = new Date(start);
+      const day = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - day); // back to that week's Monday
+      while (d <= end) { out.push(d.toISOString().slice(0, 10)); d.setUTCDate(d.getUTCDate() + 7); }
+    } else {
+      const d = new Date(start);
+      while (d <= end) { out.push(d.toISOString().slice(0, 10)); d.setUTCDate(d.getUTCDate() + 1); }
+    }
+    return out.length ? out : [from];
+  }
   const out = [];
   const t = new Date();
   const n = granularity === 'yearly' ? 5 : granularity === 'monthly' ? 12 : granularity === 'weekly' ? 12 : 30;
@@ -3566,33 +3598,38 @@ function bucketRange(granularity) {
   }
   return out;
 }
-function seriesFrom(items, dateField, granularity) {
-  const labels = bucketRange(granularity);
+function seriesFrom(items, dateField, granularity, from, to) {
+  const labels = bucketRange(granularity, from, to);
   const counts = Object.fromEntries(labels.map((l) => [l, 0]));
   for (const it of items) {
+    if (!inDateRange(it[dateField], from, to)) continue;
     const k = bucketKey(it[dateField], granularity);
     if (k != null && counts[k] !== undefined) counts[k] += 1;
   }
   return { labels, counts: labels.map((l) => counts[l]) };
 }
 const Analytics = {
-  overview() {
-    const students = data.users.filter((u) => u.role === 'student');
-    const openUsers = data.users.filter((u) => u.role === 'free');
+  // `from`/`to` ('YYYY-MM-DD', both or neither) scope every count to that
+  // window by its own natural date field - omit both for all-time totals
+  // (the Reports page cards' default).
+  overview({ from, to } = {}) {
+    const inR = (dt) => inDateRange(dt, from, to);
+    const students = data.users.filter((u) => u.role === 'student' && inR(u.created_at));
+    const openUsers = data.users.filter((u) => u.role === 'free' && inR(u.created_at));
     return {
       total_signups: students.length + openUsers.length,
       portal_students: students.length,
       open_users: openUsers.length,
-      leads: data.leads.length,
-      enrollments: data.enrollments.length,
+      leads: data.leads.filter((l) => inR(l.created_at)).length,
+      enrollments: data.enrollments.filter((e) => inR(e.created_at)).length,
       events: data.events.length,
-      event_registrations: data.event_entries.length,
-      event_submissions: data.event_submissions.length,
-      certificates_issued: data.certificates.length,
+      event_registrations: data.event_entries.filter((e) => inR(e.registered_at)).length,
+      event_submissions: data.event_submissions.filter((s) => inR(s.submitted_at)).length,
+      certificates_issued: data.certificates.filter((c) => inR(c.issued_at)).length,
       running_courses: data.batches.length,
     };
   },
-  series({ metric = 'signups', segment = 'all', granularity = 'daily', batch_id = null, event_id = null }) {
+  series({ metric = 'signups', segment = 'all', granularity = 'daily', batch_id = null, event_id = null, from = null, to = null }) {
     let items = [];
     let dateField = 'created_at';
     if (metric === 'signups') {
@@ -3615,7 +3652,7 @@ const Analytics = {
     } else if (metric === 'leads') {
       items = data.leads;
     }
-    return seriesFrom(items, dateField, granularity);
+    return seriesFrom(items, dateField, granularity, from, to);
   },
 };
 

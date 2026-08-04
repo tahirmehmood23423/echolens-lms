@@ -25,6 +25,7 @@ const jaas = require('./jaas');
 const { challanPdf } = require('./challan-pdf');
 const { certificatePng } = require('./cert-image');
 const { ambassadorReportPdf } = require('./ambassador-report-pdf');
+const { analyticsReportPdf } = require('./analytics-report-pdf');
 const { generateContractPdf } = require('./contract-pdf');
 const { generateOfferLetterPdf } = require('./offer-letter-pdf');
 const {
@@ -3145,33 +3146,54 @@ app.post('/api/admin/email-blast', authRequired, adminRequired, (req, res) => {
 // Complete stats to monitor progress: totals, plus time-series with segment
 // dropdowns (portal / open / a specific course, batch, or event) and daily /
 // weekly / monthly / yearly granularity.
+// A custom date range (both 'YYYY-MM-DD', or neither) scopes every count and
+// the chart to that window instead of the fixed default lookback - used by
+// the Reports page's date pickers ("last 2 weeks", "this month", etc.) and
+// by both downloadable report formats below.
+function parseDateRange(q) {
+  const from = /^\d{4}-\d{2}-\d{2}$/.test(String((q || {}).from || '')) ? String(q.from) : null;
+  const to = /^\d{4}-\d{2}-\d{2}$/.test(String((q || {}).to || '')) ? String(q.to) : null;
+  return (from && to) ? { from, to } : { from: null, to: null };
+}
 app.get('/api/admin/analytics', authRequired, staffView, (req, res) => {
   const { metric, segment, granularity, batch_id, event_id } = req.query || {};
+  const { from, to } = parseDateRange(req.query);
   res.json({
-    totals: Analytics.overview(),
+    totals: Analytics.overview({ from, to }),
     series: Analytics.series({
       metric: String(metric || 'signups'), segment: String(segment || 'all'),
       granularity: ['daily', 'weekly', 'monthly', 'yearly'].includes(String(granularity)) ? String(granularity) : 'daily',
-      batch_id: batch_id || null, event_id: event_id || null,
+      batch_id: batch_id || null, event_id: event_id || null, from, to,
     }),
     batches: Batches.all().map((b) => ({ id: b.id, name: b.name })),
     events: Events.all().map((e) => ({ id: e.id, title: e.title, kind: e.kind })),
+    range: { from, to },
   });
 });
-// Downloadable version of the Reports page: the same summary totals shown
+// Downloadable versions of the Reports page: the same summary totals shown
 // as cards, plus the time series for whichever metric/segment/granularity
-// is currently selected - so "Monthly" + download gives a monthly report.
+// (and optional date range) is currently selected - so "Monthly" + download
+// gives a monthly report, and picking a date range gives a report for just
+// those days/weeks. Two formats: a plain CSV, and a letterhead-branded PDF
+// (stats table + bar chart) suitable for printing or sharing as-is.
 const ANALYTICS_METRIC_LABEL = { signups: 'New sign-ups', enrollments: 'Course enrollments', event_registrations: 'Event registrations', event_submissions: 'Event submissions', quest_submissions: 'Quest submissions', leads: 'New leads' };
 const ANALYTICS_SEGMENT_LABEL = { all: 'Everyone', portal: 'Portal students', open: 'Open (website) students' };
-app.get('/api/admin/analytics.csv', authRequired, staffView, (req, res) => {
-  const { metric, segment, granularity, batch_id, event_id } = req.query || {};
+function loadAnalyticsReport(query) {
+  const { metric, segment, granularity, batch_id, event_id } = query || {};
   const gran = ['daily', 'weekly', 'monthly', 'yearly'].includes(String(granularity)) ? String(granularity) : 'daily';
   const met = String(metric || 'signups');
-  const series = Analytics.series({ metric: met, segment: String(segment || 'all'), granularity: gran, batch_id: batch_id || null, event_id: event_id || null });
-  const t = Analytics.overview();
+  const seg = String(segment || 'all');
+  const { from, to } = parseDateRange(query);
+  const series = Analytics.series({ metric: met, segment: seg, granularity: gran, batch_id: batch_id || null, event_id: event_id || null, from, to });
+  const totals = Analytics.overview({ from, to });
+  return { totals, series, metric: met, segment: seg, granularity: gran, from, to };
+}
+app.get('/api/admin/analytics.csv', authRequired, staffView, (req, res) => {
+  const { totals: t, series, metric: met, segment, granularity: gran, from, to } = loadAnalyticsReport(req.query);
   const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const rows = [];
   rows.push([esc(`EchoLens report - generated ${new Date().toISOString().slice(0, 10)}`)].join(','));
+  rows.push([esc(from && to ? `Report period: ${from} to ${to}` : 'Report period: all time')].join(','));
   rows.push('');
   rows.push('Summary totals');
   for (const [label, val] of [
@@ -3186,6 +3208,15 @@ app.get('/api/admin/analytics.csv', authRequired, staffView, (req, res) => {
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="echolens-report-${gran}-${new Date().toISOString().slice(0, 10)}.csv"`);
   res.send(rows.join('\n'));
+});
+app.get('/api/admin/analytics.pdf', authRequired, staffView, async (req, res) => {
+  try {
+    const report = loadAnalyticsReport(req.query);
+    const pdf = await analyticsReportPdf(report);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="echolens-report-${report.granularity}-${new Date().toISOString().slice(0, 10)}.pdf"`);
+    res.send(pdf);
+  } catch (e) { res.status(500).json({ error: 'Could not generate the report PDF: ' + e.message }); }
 });
 
 /* ----------------------------- dataset URL proxy -----------------------------

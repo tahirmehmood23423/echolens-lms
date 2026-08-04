@@ -6296,13 +6296,14 @@ async function evDelFile(eid, name) {
  * the leads database (name, email, WhatsApp) with CSV download, and the
  * email composer for announcements, enrollments and discounts.
  * ========================================================================== */
-let AN_STATE = { metric: 'signups', segment: 'all', granularity: 'daily', batch_id: '', event_id: '' };
+let AN_STATE = { metric: 'signups', segment: 'all', granularity: 'daily', batch_id: '', event_id: '', from: '', to: '' };
 async function renderAnalytics() {
   const el = $('view-admin-analytics');
   el.innerHTML = '<div class="empty">Loading analytics&hellip;</div>';
   const q = new URLSearchParams({ metric: AN_STATE.metric, segment: AN_STATE.segment, granularity: AN_STATE.granularity });
   if (AN_STATE.batch_id) q.set('batch_id', AN_STATE.batch_id);
   if (AN_STATE.event_id) q.set('event_id', AN_STATE.event_id);
+  if (AN_STATE.from && AN_STATE.to) { q.set('from', AN_STATE.from); q.set('to', AN_STATE.to); }
   const d = await api('/api/admin/analytics?' + q.toString());
   const t = d.totals;
   el.innerHTML = `
@@ -6336,7 +6337,16 @@ async function renderAnalytics() {
         </select>` : ''}
         <span style="flex:1"></span>
         ${['daily', 'weekly', 'monthly', 'yearly'].map((g) => `<button class="gran-btn${AN_STATE.granularity === g ? ' active' : ''}" onclick="anSet('granularity','${g}')">${g[0].toUpperCase() + g.slice(1)}</button>`).join('')}
-        <a class="btn btn-teal btn-sm" id="anDownload" download>Download report</a>
+      </div>
+      <div class="an-controls" style="margin-top:8px">
+        <span class="s" style="color:var(--muted)">Date range (optional)</span>
+        <input type="date" id="anFrom" value="${esc(AN_STATE.from)}" onchange="anSetRange()" style="padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:12.5px">
+        <span class="s" style="color:var(--muted)">to</span>
+        <input type="date" id="anTo" value="${esc(AN_STATE.to)}" onchange="anSetRange()" style="padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:12.5px">
+        ${AN_STATE.from && AN_STATE.to ? `<button class="btn btn-ghost btn-sm" onclick="anClearRange()">Clear</button>` : ''}
+        <span style="flex:1"></span>
+        <a class="btn btn-ghost btn-sm" id="anDownloadCsv" download>Download CSV</a>
+        <a class="btn btn-teal btn-sm" id="anDownloadPdf" download>Download PDF (letterhead)</a>
       </div>
       ${chartSvg(d.series)}
     </div>
@@ -6370,11 +6380,19 @@ async function renderAnalytics() {
       f.reset(); btn.disabled = false;
     } catch (err) { toast(err.message, true); btn.disabled = false; }
   });
-  $('anDownload').href = '/api/admin/analytics.csv?' + q.toString();
+  $('anDownloadCsv').href = '/api/admin/analytics.csv?' + q.toString();
+  $('anDownloadPdf').href = '/api/admin/analytics.pdf?' + q.toString();
   loadLeads();
   loadRegistrations();
 }
 function anSet(k, v) { AN_STATE[k] = v; if (k === 'metric') { AN_STATE.batch_id = ''; AN_STATE.event_id = ''; } renderAnalytics(); }
+function anSetRange() {
+  const from = $('anFrom').value, to = $('anTo').value;
+  if (!from || !to) return; // wait until both ends are picked before refetching
+  if (from > to) { toast('Start date must be before the end date.', true); return; }
+  AN_STATE.from = from; AN_STATE.to = to; renderAnalytics();
+}
+function anClearRange() { AN_STATE.from = ''; AN_STATE.to = ''; renderAnalytics(); }
 let LEADS_CACHE = [];
 async function loadLeads() {
   try {

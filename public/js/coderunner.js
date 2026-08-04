@@ -24,10 +24,22 @@
   const SILENCE_LIMIT_MS = 45000;   // no signal from the worker for this long -> stop
   const HARD_LIMIT_MS = 240000;     // absolute cap per run incl. package downloads
 
-  /* ------------------------------ the worker ------------------------------ */
+  /* ------------------------------ the worker ------------------------------
+   * workerMain is stringified via toString() below and run standalone inside
+   * the Worker (see makeWorker()) - it cannot see any variable declared
+   * outside itself, so everything it needs, including MICROPIP_FALLBACK,
+   * must be declared inside this function.
+   */
   function workerMain() {
     let bootPromise = null;
     const dec = new TextDecoder();
+    // numpy, pandas, matplotlib and scikit-learn all ship inside Pyodide's
+    // own package index, so loadPackagesFromImports() (below) finds them
+    // straight away. A few other pure-Python packages assignments commonly
+    // need (seaborn especially) are NOT in that index - install those from
+    // PyPI with micropip instead, exactly like `pip install` would on a
+    // laptop.
+    const MICROPIP_FALLBACK = { seaborn: 'seaborn' };
     function boot(url) {
       if (!bootPromise) {
         bootPromise = (async () => {
@@ -76,6 +88,18 @@
             errorCallback: () => {},
           });
         } catch (pkgErr) { /* unknown imports fail in Python with a clear error */ }
+        // Fill in the gap above for packages Pyodide doesn't index itself
+        // (seaborn, ...): pull them straight from PyPI with micropip before
+        // the student's code - which imports them - ever runs.
+        const neededFallbacks = Object.keys(MICROPIP_FALLBACK).filter((name) => new RegExp('(^|\\n)\\s*(import\\s+' + name + '\\b|from\\s+' + name + '\\b)').test(m.code));
+        if (neededFallbacks.length) {
+          try {
+            postMessage({ type: 'status', text: 'Installing ' + neededFallbacks.join(', ') + '...' });
+            await py.loadPackage('micropip');
+            const micropip = py.pyimport('micropip');
+            await micropip.install(neededFallbacks.map((n) => MICROPIP_FALLBACK[n]));
+          } catch (mpErr) { /* falls through to a normal ModuleNotFoundError in Python */ }
+        }
         // Headless matplotlib inside the worker. Library DeprecationWarnings
         // (e.g. pandas' pyarrow notice) are about future library versions,
         // not the student's code - silence them so they don't look like

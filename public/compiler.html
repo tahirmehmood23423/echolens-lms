@@ -118,7 +118,7 @@
           <option value="sql">SQL</option>
           <option value="web">HTML / CSS / JS</option>
         </select>
-        <span class="ide-pkgs" id="pkgs">numpy · pandas · matplotlib · scikit-learn ready</span>
+        <span class="ide-pkgs" id="pkgs">numpy · pandas · matplotlib · seaborn · scikit-learn ready</span>
         <span style="flex:1"></span>
         <button class="btn btn-ghost btn-sm" onclick="saveCode()">Save</button>
         <button class="btn btn-ghost btn-sm" onclick="shareCode()">Share</button>
@@ -130,7 +130,7 @@
         <button class="btn lc-btn-solve" id="runBtn" onclick="run()">Run</button>
       </div>
       <textarea id="code" class="code-editor ide-editor" spellcheck="false" placeholder="# Write Python here, press Run.
-# numpy, pandas, matplotlib and scikit-learn load automatically.
+# numpy, pandas, matplotlib, seaborn and scikit-learn load automatically.
 print('Hello EchoLens!')"></textarea>
       <div class="ide-status-row"><span class="s" id="status" style="color:var(--muted-2)">Ready - everything runs free of cost, nothing to install.</span></div>
       <div id="term"></div>
@@ -170,7 +170,7 @@ print('Hello EchoLens!')"></textarea>
 
 <div class="toast" id="toast"></div>
 
-<script src="/js/coderunner.js?v1232"></script>
+<script src="/js/coderunner.js?v1320"></script>
 <script>
 'use strict';
 const $ = (id) => document.getElementById(id);
@@ -186,7 +186,7 @@ function toast(t, err) { const el = $('toast'); el.textContent = t; el.className
  * into one page for the live preview. Everything is saved per-browser.
  */
 const DEFAULTS = {
-  python: { name: 'main.py', code: "# Write Python here, press Run.\n# numpy, pandas, matplotlib and scikit-learn load automatically.\nprint('Hello EchoLens!')" },
+  python: { name: 'main.py', code: "# Write Python here, press Run.\n# numpy, pandas, matplotlib, seaborn and scikit-learn load automatically.\nprint('Hello EchoLens!')" },
   c: { name: 'main.c', code: '// Write C here, press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}' },
   cpp: { name: 'main.cpp', code: '// Write C++ here, press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}' },
   java: { name: 'Main.java', code: '// Write Java here, press Run.\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello EchoLens");\n    }\n}' },
@@ -194,7 +194,7 @@ const DEFAULTS = {
   web: { name: 'index.html', code: '<!-- Write HTML, CSS (in <style>) and JS (in <script>) - Run shows a live preview. -->' },
 };
 const PKGS_TEXT = {
-  python: 'numpy · pandas · matplotlib · scikit-learn ready',
+  python: 'numpy · pandas · matplotlib · seaborn · scikit-learn ready',
   c: 'gcc 13 · compiled & run in the cloud',
   cpp: 'g++ 13 · compiled & run in the cloud',
   java: 'OpenJDK 21 · compiled & run in the cloud',

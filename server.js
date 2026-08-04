@@ -3158,6 +3158,35 @@ app.get('/api/admin/analytics', authRequired, staffView, (req, res) => {
     events: Events.all().map((e) => ({ id: e.id, title: e.title, kind: e.kind })),
   });
 });
+// Downloadable version of the Reports page: the same summary totals shown
+// as cards, plus the time series for whichever metric/segment/granularity
+// is currently selected - so "Monthly" + download gives a monthly report.
+const ANALYTICS_METRIC_LABEL = { signups: 'New sign-ups', enrollments: 'Course enrollments', event_registrations: 'Event registrations', event_submissions: 'Event submissions', quest_submissions: 'Quest submissions', leads: 'New leads' };
+const ANALYTICS_SEGMENT_LABEL = { all: 'Everyone', portal: 'Portal students', open: 'Open (website) students' };
+app.get('/api/admin/analytics.csv', authRequired, staffView, (req, res) => {
+  const { metric, segment, granularity, batch_id, event_id } = req.query || {};
+  const gran = ['daily', 'weekly', 'monthly', 'yearly'].includes(String(granularity)) ? String(granularity) : 'daily';
+  const met = String(metric || 'signups');
+  const series = Analytics.series({ metric: met, segment: String(segment || 'all'), granularity: gran, batch_id: batch_id || null, event_id: event_id || null });
+  const t = Analytics.overview();
+  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const rows = [];
+  rows.push([esc(`EchoLens report - generated ${new Date().toISOString().slice(0, 10)}`)].join(','));
+  rows.push('');
+  rows.push('Summary totals');
+  for (const [label, val] of [
+    ['Total sign-ups', t.total_signups], ['Portal students', t.portal_students], ['Open (website) users', t.open_users],
+    ['Leads collected', t.leads], ['Course enrollments', t.enrollments], ['Event registrations', t.event_registrations],
+    ['Event submissions', t.event_submissions], ['Certificates issued', t.certificates_issued], ['Running courses', t.running_courses],
+  ]) rows.push([esc(label), val].join(','));
+  rows.push('');
+  rows.push([esc(`${ANALYTICS_METRIC_LABEL[met] || met} (${gran}${met === 'signups' ? ', ' + (ANALYTICS_SEGMENT_LABEL[segment] || 'Everyone') : ''})`)].join(','));
+  rows.push(['Date', 'Count'].join(','));
+  series.labels.forEach((label, i) => rows.push([esc(label), series.counts[i]].join(',')));
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="echolens-report-${gran}-${new Date().toISOString().slice(0, 10)}.csv"`);
+  res.send(rows.join('\n'));
+});
 
 /* ----------------------------- dataset URL proxy -----------------------------
  * The compiler can read a dataset straight from a URL. Browsers block most

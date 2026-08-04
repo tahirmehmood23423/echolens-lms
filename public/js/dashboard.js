@@ -6336,6 +6336,7 @@ async function renderAnalytics() {
         </select>` : ''}
         <span style="flex:1"></span>
         ${['daily', 'weekly', 'monthly', 'yearly'].map((g) => `<button class="gran-btn${AN_STATE.granularity === g ? ' active' : ''}" onclick="anSet('granularity','${g}')">${g[0].toUpperCase() + g.slice(1)}</button>`).join('')}
+        <a class="btn btn-teal btn-sm" id="anDownload" download>Download report</a>
       </div>
       ${chartSvg(d.series)}
     </div>
@@ -6369,6 +6370,7 @@ async function renderAnalytics() {
       f.reset(); btn.disabled = false;
     } catch (err) { toast(err.message, true); btn.disabled = false; }
   });
+  $('anDownload').href = '/api/admin/analytics.csv?' + q.toString();
   loadLeads();
   loadRegistrations();
 }

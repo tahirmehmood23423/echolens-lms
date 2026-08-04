@@ -3568,6 +3568,42 @@ async function enrollRegistrationIntoBatch(r, b) {
   const updated = Registrations._setStage(r.id, 'enrolled', { enrolled_user_id: u.id, enrolled_batch_id: b.id });
   return { registration: updated, credentials: freshAccount ? { username: u.username, password } : null };
 }
+// Manual registration: some students register through channels outside the
+// website (e.g. a Google Form), which never reach Registrations.create() on
+// their own - Admissions enters those here so the rest of the pipeline
+// (challan, Finance verification, enrollment) works exactly the same as a
+// website registration. Same validation as the public route, minus the
+// honeypot/rate-limit (this is an authenticated staff action).
+app.post('/api/admissions/registrations', authRequired, admissionsOnly, async (req, res) => {
+  const b = req.body || {};
+  if (!b.name || String(b.name).trim().length < 2) return res.status(400).json({ error: "Enter the student's full name." });
+  if (!isEmail(b.email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  if (!(await emailDomainExists(b.email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
+  if (!b.whatsapp || String(b.whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: "Enter the student's WhatsApp number (e.g. 03XX-XXXXXXX)." });
+  if (!b.course_code || !b.course_title) return res.status(400).json({ error: 'Select the course the student registered for.' });
+  const rawCode = String(b.ambassador_code || '').trim();
+  if (rawCode) {
+    if (!/^\d{4}$/.test(rawCode)) return res.status(400).json({ error: 'Ambassador codes are 4 digits - check the code or leave the field empty.' });
+    const amb = Ambassadors.byCode(rawCode);
+    if (!amb) return res.status(400).json({ error: 'That ambassador code is not recognised - check it with the ambassador or leave the field empty.' });
+    b.ambassador_code = amb.code;
+    b.ambassador_name = amb.name;
+    let cat = DiscountCategories.all().find((c) => c.active && c.type === 'percent' && c.value === 10 && /ambassador/i.test(c.name));
+    if (!cat) cat = DiscountCategories.create({ name: 'Ambassador referral', type: 'percent', value: 10 }, null);
+    b.discount_category_id = cat.id;
+  } else {
+    delete b.ambassador_code;
+    // No ambassador code: Admissions may still pick a discount directly (the
+    // form only ever offers real, active categories, so no extra lookup is
+    // needed here - unlike the ambassador-code path above).
+    if (!b.discount_category_id) b.discount_category_id = null;
+  }
+  b.note = ['Registered manually by Admissions Office (e.g. via an external form).', b.note ? String(b.note).trim() : ''].filter(Boolean).join(' ');
+  const r = Registrations.create(b);
+  Leads.upsert({ name: r.name, email: r.email, whatsapp: r.whatsapp, source: 'admissions-manual' });
+  mailer.notify(r.email, 'EchoLens - registration received', `${hi(r.name)},\n\nWe have you down for registration${r.course_title ? ` for ${r.course_title}` : ''}.${r.ambassador_code ? ' Your ambassador code was accepted - a 10% discount will be applied to your fee challan.' : ''} Our Admissions Office will email you the fee challan with the payment details and next steps shortly.\n\nEchoLens Digital`);
+  res.json({ ok: true, registration: r });
+});
 app.get('/api/admissions/registrations', authRequired, admissionsOnly, (req, res) => {
   const rows = Registrations.all().map((r) => {
     const course = Courses.byCode(r.course_code);

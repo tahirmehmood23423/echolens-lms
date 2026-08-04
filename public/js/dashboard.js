@@ -3322,8 +3322,55 @@ async function renderCoordRegistrations() {
   const folderLabel = (COORD_FOLDERS.find(([k]) => k === COORD_FOLDER) || [])[1] || '';
   box.innerHTML = `
     <div class="card" style="margin-bottom:12px"><div class="card-body"><span class="s" style="color:var(--muted)">Every registration from the website lands here (you are also emailed at <strong>${esc(d.admissions_email || 'admissions@echolens.digital')}</strong>). Generate the fee challan, review it, and mail it to the student - they pay and send proof to <strong>${esc(d.finance_email || 'finance@echolens.digital')}</strong>. Once Finance confirms the payment, the student appears in your <strong>Ready to enroll</strong> folder, where you place them in the right batch.</span></div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${chips}</div>`
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${chips}</div>
+      <button type="button" class="btn btn-primary btn-sm" onclick="coordOpenManualRegForm()">+ Add registration manually</button>
+    </div>`
     + (rows.length ? rows.map(coordRegRow).join('') : `<div class="empty">Nothing in "${esc(folderLabel)}" right now.</div>`);
+}
+// Students who registered outside the website (e.g. a Google Form) never
+// reach Registrations.create() on their own - this lets Admissions log them
+// in by hand so they enter the exact same challan / Finance / enrollment
+// pipeline as a website registration.
+async function coordOpenManualRegForm() {
+  let courses = [], cats = [];
+  try { courses = (await api('/api/catalogue')).catalogue.filter((c) => c.price_pkr > 0); } catch {}
+  try { cats = (await api('/api/admissions/discount-categories')).categories.filter((c) => c.active); } catch {}
+  const courseOpts = courses.map((c) => `<option value="${esc(c.code)}|${esc(c.title)}">${esc(c.code)} - ${esc(c.title)} (PKR ${Number(c.price_pkr).toLocaleString()})</option>`).join('');
+  const discOpts = ['<option value="">No discount</option>', ...cats.map((c) => `<option value="${c.id}">${esc(c.name)} (${c.type === 'flat' ? money(c.value) : c.value + '%'})</option>`)].join('');
+  openModal('Add a registration manually', `
+    <p class="s" style="color:var(--muted);margin-bottom:12px">For students who registered outside the website (e.g. a Google Form) - this drops them into the same challan &amp; Finance pipeline as a website registration.</p>
+    <form id="f">
+      <label class="field"><span>Student's full name</span><input name="name" required></label>
+      <div class="form-grid">
+        <label class="field" style="grid-column:span 2"><span>Email</span><input name="email" type="email" required></label>
+        <label class="field"><span>WhatsApp / contact</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+      </div>
+      <label class="field"><span>Course</span><select name="course" required><option value="">Select a course&hellip;</option>${courseOpts}</select></label>
+      <div class="form-grid">
+        <label class="field"><span>City (optional)</span><input name="city"></label>
+        <label class="field"><span>Ambassador code (optional)</span><input name="ambassador_code" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="e.g. 4821"></label>
+      </div>
+      <label class="field"><span>Discount, if applicable (optional)</span><select name="discount_category_id">${discOpts}</select></label>
+      <label class="field"><span>Note (optional)</span><input name="note" placeholder="e.g. Filled the Google Form on 3 Aug"></label>
+      <button class="btn btn-primary btn-block">Add registration</button></form>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    const [course_code, course_title] = (f.course.value || '').split('|');
+    try {
+      await api('/api/admissions/registrations', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: f.name.value.trim(), email: f.email.value.trim(), whatsapp: f.whatsapp.value.trim(),
+          course_code, course_title, city: f.city.value.trim(),
+          ambassador_code: f.ambassador_code.value.trim(), discount_category_id: f.discount_category_id.value || null,
+          note: f.note.value.trim(),
+        }),
+      });
+      toast('Registration added - it is now in your New enrollments folder.');
+      closeModal(); COORD_FOLDER = 'new'; renderCoordRegistrations();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
 }
 function coordRegRow(r) {
   const latest = r.challans && r.challans[0];

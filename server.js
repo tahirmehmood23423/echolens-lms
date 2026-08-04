@@ -3212,7 +3212,7 @@ app.get('/api/admin/analytics.csv', authRequired, staffView, (req, res) => {
 app.get('/api/admin/analytics.pdf', authRequired, staffView, async (req, res) => {
   try {
     const report = loadAnalyticsReport(req.query);
-    const pdf = await analyticsReportPdf(report);
+    const pdf = await analyticsReportPdf({ ...report, settings: Settings.cert() });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="echolens-report-${report.granularity}-${new Date().toISOString().slice(0, 10)}.pdf"`);
     res.send(pdf);

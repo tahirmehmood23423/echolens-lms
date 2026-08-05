@@ -4572,7 +4572,14 @@ async function delHackathon(hid) {
 }
 
 
-/* ================================ QUEST TAB ================================ */
+/* ================================ QUEST TAB ================================
+ * Levels/tasks are rendered in the same card + Solve-button format as the
+ * public /open free-courses quest list (open.js's drawCourse()) - same
+ * classes (.card, .list-row, .lc-diff, .lc-btn-solve, .pay-badge), same
+ * Easy/Medium/Hard difficulty labels, so paid and free quests read as one
+ * product instead of two differently-styled ones.
+ */
+const QUEST_DIFF = (d) => ({ Basic: 'Easy', Core: 'Medium', Boss: 'Hard', Easy: 'Easy', Medium: 'Medium', Hard: 'Hard' }[d] || 'Easy');
 async function renderQuestTab(body) {
   body.innerHTML = '<div class="empty">Loading quest&hellip;</div>';
   const d = await api(`/api/batches/${bid()}/quest`);
@@ -4617,53 +4624,56 @@ async function renderQuestTab(body) {
 
   QUEST_DATA = d; // cached for the task portal
 
-  const map = `<div class="quest-map">${p.levels.map((l) => {
+  const map = p.levels.map((l) => {
     const q = l.quest;
-    const state = l.passed ? 'passed' : (l.unlocked ? 'current' : 'locked');
     const mySubFor = (pid) => d.my_subs[`${q.id}:${pid}`];
     const overdue = q.deadline && new Date() > new Date(q.deadline + 'T23:59:59');
     const dueChip = q.deadline
       ? `<span class="due-chip${overdue ? ' overdue' : ''}" title="Late submissions lose ${d.late_penalty_pct || 20}% of earned gems">&#9200; Due ${fmtDate(q.deadline)}${overdue ? ' &middot; past due' : ''}</span>`
       : '';
-    return `<div class="quest-node ${state}" id="qn${q.id}">
-      <div class="qgem"><div class="stone"></div></div>
-      <div class="qbody">
-        <div class="qhead" onclick="document.getElementById('qn${q.id}').classList.toggle('open')">
-          <span class="lvl">W${q.week} &middot; LVL ${q.no}</span>
-          <span class="qt">${esc(q.title)}<div class="qs">${esc(q.topic)}</div></span>
-          ${dueChip}
-          <span class="qstate ${state}">${l.passed ? 'Passed' : (l.unlocked ? 'Open' : 'Locked')}</span>
-          ${d.can_manage ? `<button class="btn btn-ghost btn-sm" style="margin-right:6px" onclick="event.stopPropagation();formLevelDeadline(${q.id},'${esc(q.deadline || '')}')" title="Set or change this level's deadline">&#128197; Deadline</button>
-          <button class="btn btn-ghost btn-sm" style="margin-right:6px" onclick="event.stopPropagation();formAddProblem(${q.id})" title="Add a coding or written problem to this level">+ Task</button>
-          <button class="btn btn-ghost btn-sm" style="margin-right:10px" onclick="event.stopPropagation();remindLevel(${q.id})" title="Email students who have not finished this level">&#128276;</button>` : ''}
-        </div>
-        <div class="qproblems">
-          ${q.problems.map((pr) => {
-            const sub = isStudent ? mySubFor(pr.pid) : null;
-            let chip = '';
-            if (isStudent && sub) {
-              chip = sub.grade != null
-                ? `<span class="grade-chip ok" title="${sub.late ? 'Submitted late: ' + sub.late_deduction + ' gems deducted' : 'Graded by your teacher'}">&#10003; Graded ${sub.grade}% &middot; ${sub.gems} gems${sub.late ? ' &#9203;' : ''}</span>`
-                : `<span class="grade-chip wait">&#9203; Submitted &middot; not graded yet${sub.late ? ' &middot; late' : ''}</span>`;
-            } else if (isStudent) {
-              chip = `<span class="grade-chip none">Not submitted</span>`;
-            }
-            return `<div class="qproblem qtopic" onclick="openTask(${q.id},${pr.pid})">
-              <span class="qdiff ${esc(pr.difficulty)}">${esc(pr.difficulty)}</span>
-              <div style="flex:1;min-width:0">
-                <div class="t" style="font-size:13.5px">${pr.type === 'written' ? '<span class="type-badge written">&#128221; Written</span> ' : ''}${esc(pr.title)}</div>
-                <div class="s" style="color:var(--muted)">${pr.points} gems${q.deadline ? ` &middot; due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : ''}${sub && sub.shared_review ? ' &middot; <span style="color:var(--teal-deep)">Feedback shared</span>' : ''}</div>
-              </div>
-              ${chip}
-              <button class="btn btn-teal btn-sm" onclick="event.stopPropagation();openTask(${q.id},${pr.pid})">Open</button>
-              ${d.can_manage ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();formEditProblem(${q.id},${pr.pid})">Edit</button>` : ''}
-              ${d.can_manage || ME.role === 'coordinator' ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openQuestSubs(${q.id},${pr.pid})">Submissions</button>` : ''}
-            </div>`;
-          }).join('')}
-        </div>
+    const stateBadge = l.passed
+      ? '<span class="pay-badge confirmed">Passed</span>'
+      : (l.unlocked ? '<span class="pay-badge confirmed">Open</span>' : '<span class="pay-badge na">Locked</span>');
+    const teacherLevelTools = d.can_manage ? `
+          <button class="btn btn-ghost btn-sm" onclick="formLevelDeadline(${q.id},'${esc(q.deadline || '')}')" title="Set or change this level's deadline">&#128197; Deadline</button>
+          <button class="btn btn-ghost btn-sm" onclick="formAddProblem(${q.id})" title="Add a coding or written problem to this level">+ Task</button>
+          <button class="btn btn-ghost btn-sm" onclick="remindLevel(${q.id})" title="Email students who have not finished this level">&#128276;</button>` : '';
+    return `<div class="card" style="margin-bottom:12px" id="qn${q.id}">
+      <div class="card-head">
+        <h3 style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">Level ${q.no} - ${esc(q.title)} ${stateBadge}</h3>
+        <span class="s" style="color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap">Week ${q.week} &middot; ${esc(q.topic)}${dueChip}${teacherLevelTools}</span>
+      </div>
+      <div class="card-body tight"${!l.unlocked ? ' style="opacity:.62"' : ''}>
+        ${q.problems.map((pr) => {
+          const sub = isStudent ? mySubFor(pr.pid) : null;
+          let chip = '';
+          if (isStudent && sub) {
+            chip = sub.grade != null
+              ? `<span class="grade-chip ok" title="${sub.late ? 'Submitted late: ' + sub.late_deduction + ' gems deducted' : 'Graded by your teacher'}">&#10003; Graded ${sub.grade}% &middot; ${sub.gems} gems${sub.late ? ' &#9203;' : ''}</span>`
+              : `<span class="grade-chip wait">&#9203; Submitted &middot; not graded yet${sub.late ? ' &middot; late' : ''}</span>`;
+          } else if (isStudent) {
+            chip = `<span class="grade-chip none">Not submitted</span>`;
+          }
+          const subLine = [
+            q.deadline ? `due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : '',
+            sub && sub.shared_review ? '<span style="color:var(--teal-deep)">Feedback shared</span>' : '',
+          ].filter(Boolean).join(' &middot; ');
+          return `<div class="list-row" style="padding:11px 4px">
+            <div class="grow">
+              <div class="t" style="font-size:13.5px">${pr.type === 'written' ? '<span class="type-badge written">&#128221; Written</span> ' : ''}${esc(pr.title)}
+                <span class="lc-diff ${QUEST_DIFF(pr.difficulty)}">${QUEST_DIFF(pr.difficulty)}</span>
+                <span class="s" style="color:var(--muted);font-weight:500">${pr.points} gems</span></div>
+              ${subLine ? `<div class="s" style="color:var(--muted);margin-top:3px">${subLine}</div>` : ''}
+              ${chip ? `<div style="margin-top:4px">${chip}</div>` : ''}
+            </div>
+            <button class="lc-btn-solve" onclick="QUEST_SCROLL_Y = window.scrollY; openTask(${q.id},${pr.pid})">${sub ? 'Reopen' : (l.unlocked ? 'Solve' : 'Preview')}</button>
+            ${d.can_manage ? `<button class="btn btn-ghost btn-sm" onclick="formEditProblem(${q.id},${pr.pid})">Edit</button>` : ''}
+            ${d.can_manage || ME.role === 'coordinator' ? `<button class="btn btn-ghost btn-sm" onclick="openQuestSubs(${q.id},${pr.pid})">Submissions</button>` : ''}
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
-  }).join('')}</div>`;
+  }).join('');
 
   const top3 = d.scoreboard.slice(0, 3);
   const podium = top3.length >= 2 ? `<div class="podium">
@@ -4691,8 +4701,7 @@ async function renderQuestTab(body) {
       <div>${map}</div><div>${board}</div>
     </div>
     <style>@media (max-width:960px){.quest-grid{grid-template-columns:1fr !important}}</style>`;
-  const cur = body.querySelector('.quest-node.current');
-  if (cur) cur.classList.add('open');
+  if (QUEST_SCROLL_RESTORE_PENDING) { QUEST_SCROLL_RESTORE_PENDING = false; window.scrollTo({ top: QUEST_SCROLL_Y || 0 }); }
 }
 async function installTrack(key) {
   try { await api(`/api/batches/${bid()}/install-track`, { method: 'POST', body: JSON.stringify({ track: key }) }); toast('Track installed - the quest begins.'); openCourse(bid()); }
@@ -4711,6 +4720,14 @@ async function uninstallTrack() {
 // matplotlib charts render below the output.
 let QUEST_DATA = null;
 let TASK_CTX = null; // { qid, pid, term }
+// Scroll offset within the quest/level list at the moment a task was opened
+// (set by the Solve/Reopen button's onclick) and a one-shot flag telling the
+// next renderQuestTab() to restore it - set only by backToQuest(), so
+// "Back" returns to the exact spot you were at (not the top of the list)
+// without changing openCourse()'s timing for its other callers (chat,
+// submission review, ...), which don't want to wait on quest data at all.
+let QUEST_SCROLL_Y = 0;
+let QUEST_SCROLL_RESTORE_PENDING = false;
 
 function sharedReviewBox(sr) {
   if (!sr) return '';
@@ -4721,7 +4738,7 @@ function sharedReviewBox(sr) {
     <div class="s" style="color:var(--muted-2)">Released by your instructor. Your grade always comes from your teacher.</div></div>`;
 }
 
-function backToQuest() { openCourse(bid()); }
+function backToQuest() { QUEST_SCROLL_RESTORE_PENDING = true; openCourse(bid()); }
 // v20 Showcase Feed hook (step 6 Part B): one tap, mounted in place on the
 // task workspace where matplotlib output is still alive as rendered
 // <img src="data:..."> elements inside #taskTerm (see coderunner.js's

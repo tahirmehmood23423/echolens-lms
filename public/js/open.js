@@ -100,6 +100,10 @@ let CATALOGUE = [];
 let CAT_LINKS = null;
 let CUR = null;          // { track, levels, progress } for the open course
 let CUR_PROBLEM = null;  // { level, pid, problem }
+// Scroll offset within the course's quest list at the moment Solve was
+// clicked, restored by backToCourse() so "Back" (after submitting) lands
+// exactly where you were - not back at the top of the course.
+let COURSE_SCROLL_Y = 0;
 let SV_TERM = null;
 let SV_FILES = [];
 let CUR_EVENT = null;
@@ -273,7 +277,10 @@ function openTab(tab) {
   if (tab !== 'eventDetail') stopEventCountdown();
   window.scrollTo({ top: 0 });
 }
-function backToCourse() { if (CUR) { openTab('course'); } else openTab('courses'); }
+function backToCourse() {
+  if (CUR) { openTab('course'); } else openTab('courses');
+  window.scrollTo({ top: COURSE_SCROLL_Y || 0 });
+}
 
 /* -------------------------------- home -------------------------------- */
 async function loadHomeStats() {
@@ -736,6 +743,7 @@ function openSolve(levelNo, pid) {
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   const p = lvl && (lvl.problems || []).find((x) => x.pid === pid);
   if (!p || lvl.locked) return;
+  COURSE_SCROLL_Y = window.scrollY;
   CUR_PROBLEM = { level: levelNo, pid, problem: p };
   openTab('solve');
   $('svLeft').innerHTML = `

@@ -4573,11 +4573,13 @@ async function delHackathon(hid) {
 
 
 /* ================================ QUEST TAB ================================
- * Levels/tasks are rendered in the same card + Solve-button format as the
- * public /open free-courses quest list (open.js's drawCourse()) - same
- * classes (.card, .list-row, .lc-diff, .lc-btn-solve, .pay-badge), same
- * Easy/Medium/Hard difficulty labels, so paid and free quests read as one
- * product instead of two differently-styled ones.
+ * Levels group into "Modules" by week, each rendered as an accordion of
+ * "Classes" (levels) - a student's own progress ring, level count and gems
+ * sit in the Learning Path card; the track's end-project brief (from the
+ * track definition, not per-item tracked) sits in the milestone card beside
+ * the scoreboard. Same difficulty labels and pill/badge classes as the
+ * public /open free-courses quest list (open.js's drawCourse()), so paid
+ * and free quests still read as one product, not two differently-styled ones.
  */
 const QUEST_DIFF = (d) => ({ Basic: 'Easy', Core: 'Medium', Boss: 'Hard', Easy: 'Easy', Medium: 'Medium', Hard: 'Hard' }[d] || 'Easy');
 async function renderQuestTab(body) {
@@ -4611,10 +4613,6 @@ async function renderQuestTab(body) {
           ? (p.completed ? 'Track complete - legendary work.' : (p.next_title ? `${p.next_title.min - p.gems} gems to become <strong style="color:#fff">${esc(p.next_title.name)}</strong>` : 'Highest title earned'))
           : `Pass mark ${p.track.pass_mark}% &middot; ${d.pending || 0} submission${(d.pending || 0) === 1 ? '' : 's'} waiting for grades`}</div>
       </div>
-      ${isStudent ? `<div class="prism-side">
-        <div class="prism-stat"><div class="n">${p.gems}</div><div class="l">Track gems</div></div>
-        <div class="prism-stat"><div class="n">${p.unlocked_up_to}</div><div class="l">Level</div></div>
-      </div>` : ''}
       <span class="quest-title-chip"><span class="bd"></span>${p.track.titles.map((t) => esc(t.name)).join(' &rarr; ')}</span>
     </div></div>
     ${d.can_manage ? `<div class="ide-toggle-strip">
@@ -4624,56 +4622,129 @@ async function renderQuestTab(body) {
 
   QUEST_DATA = d; // cached for the task portal
 
-  const map = p.levels.map((l) => {
-    const q = l.quest;
-    const mySubFor = (pid) => d.my_subs[`${q.id}:${pid}`];
-    const overdue = q.deadline && new Date() > new Date(q.deadline + 'T23:59:59');
-    const dueChip = q.deadline
-      ? `<span class="due-chip${overdue ? ' overdue' : ''}" title="Late submissions lose ${d.late_penalty_pct || 20}% of earned gems">&#9200; Due ${fmtDate(q.deadline)}${overdue ? ' &middot; past due' : ''}</span>`
-      : '';
-    const stateBadge = l.passed
-      ? '<span class="pay-badge confirmed">Passed</span>'
-      : (l.unlocked ? '<span class="pay-badge confirmed">Open</span>' : '<span class="pay-badge na">Locked</span>');
-    const teacherLevelTools = d.can_manage ? `
+  // Levels group into "Modules" by week - every seeded track already lines
+  // levels up two-per-week, so this reads as a real curriculum structure,
+  // not an invented one.
+  const modules = [];
+  const moduleByWeek = new Map();
+  p.levels.forEach((l) => {
+    const wk = l.quest.week != null ? l.quest.week : l.quest.no;
+    if (!moduleByWeek.has(wk)) { const mod = { week: wk, levels: [] }; moduleByWeek.set(wk, mod); modules.push(mod); }
+    moduleByWeek.get(wk).levels.push(l);
+  });
+  const totalGems = p.levels.reduce((s, l) => s + l.quest.problems.reduce((ss, pr) => ss + pr.points, 0), 0);
+  const trackPct = totalGems ? Math.min(100, Math.round((p.gems / totalGems) * 100)) : 0;
+  const RING_C = 326.7; // 2*pi*52
+  const passedCount = p.levels.filter((l) => l.passed).length;
+  const totalWeeks = Math.max(...p.levels.map((l) => l.quest.week || 1), 1);
+  const curLevel = p.levels.find((l) => l.unlocked && !l.passed) || p.levels[p.levels.length - 1];
+  const curWeek = curLevel ? (curLevel.quest.week || 1) : totalWeeks;
+
+  const pathCard = isStudent ? `
+    <div class="path-card">
+      <div class="path-eyebrow">My Learning Path</div>
+      <div class="path-title">${esc(p.track.title)}</div>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120">
+          <defs><linearGradient id="pathGemGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0FBFA8"/><stop offset="55%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#7C6CF5"/>
+          </linearGradient></defs>
+          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+          <circle class="ring-fill" cx="60" cy="60" r="52" stroke-dasharray="${RING_C}" stroke-dashoffset="${(RING_C * (1 - trackPct / 100)).toFixed(1)}"></circle>
+        </svg>
+        <div class="ring-label"><strong>${trackPct}%</strong><span>track progress</span></div>
+      </div>
+      <div class="path-stats">
+        <div><strong>${passedCount}/${p.levels.length}</strong><span>Levels passed</span></div>
+        <div><strong>Wk ${curWeek}</strong><span>of ${totalWeeks}</span></div>
+        <div><strong>${p.gems}</strong><span>Gems earned</span></div>
+      </div>
+    </div>` : '';
+
+  const outline = `
+    <nav class="module-outline">
+      <div class="outline-eyebrow">Course outline</div>
+      ${modules.map((mod, i) => {
+        const allPassed = mod.levels.every((l) => l.passed);
+        const isCurrentModule = curLevel && mod.levels.some((l) => l.quest.id === curLevel.quest.id);
+        return `<button type="button" class="outline-item${isCurrentModule ? ' active' : ''}" onclick="document.getElementById('qmod${i}').scrollIntoView({behavior:'smooth',block:'start'})">
+          <span class="dot${allPassed ? ' done' : ''}${isCurrentModule ? ' active' : ''}"></span>Module ${i + 1} &middot; Week ${mod.week}</button>`;
+      }).join('')}
+    </nav>`;
+
+  const modulesHtml = modules.map((mod, mi) => {
+    const classesHtml = mod.levels.map((l, li) => {
+      const q = l.quest;
+      const mySubFor = (pid) => d.my_subs[`${q.id}:${pid}`];
+      const isCurrent = curLevel && q.id === curLevel.quest.id;
+      const overdue = q.deadline && new Date() > new Date(q.deadline + 'T23:59:59');
+      const dueChip = q.deadline
+        ? `<span class="due-chip${overdue ? ' overdue' : ''}" title="Late submissions lose ${d.late_penalty_pct || 20}% of earned gems">&#9200; Due ${fmtDate(q.deadline)}${overdue ? ' &middot; past due' : ''}</span>`
+        : '';
+      const stateBadge = l.passed
+        ? '<span class="pay-badge confirmed">Passed</span>'
+        : (l.unlocked ? '<span class="pay-badge confirmed">Open</span>' : '<span class="pay-badge na">Locked</span>');
+      const teacherLevelTools = d.can_manage ? `<div style="display:flex;gap:8px;flex-wrap:wrap;padding:0 0 10px">
           <button class="btn btn-ghost btn-sm" onclick="formLevelDeadline(${q.id},'${esc(q.deadline || '')}')" title="Set or change this level's deadline">&#128197; Deadline</button>
           <button class="btn btn-ghost btn-sm" onclick="formAddProblem(${q.id})" title="Add a coding or written problem to this level">+ Task</button>
-          <button class="btn btn-ghost btn-sm" onclick="remindLevel(${q.id})" title="Email students who have not finished this level">&#128276;</button>` : '';
-    return `<div class="card" style="margin-bottom:12px" id="qn${q.id}">
-      <div class="card-head">
-        <h3 style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">Level ${q.no} - ${esc(q.title)} ${stateBadge}</h3>
-        <span class="s" style="color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap">Week ${q.week} &middot; ${esc(q.topic)}${dueChip}${teacherLevelTools}</span>
-      </div>
-      <div class="card-body tight"${!l.unlocked ? ' style="opacity:.62"' : ''}>
-        ${q.problems.map((pr) => {
-          const sub = isStudent ? mySubFor(pr.pid) : null;
-          let chip = '';
-          if (isStudent && sub) {
-            chip = sub.grade != null
-              ? `<span class="grade-chip ok" title="${sub.late ? 'Submitted late: ' + sub.late_deduction + ' gems deducted' : 'Graded by your teacher'}">&#10003; Graded ${sub.grade}% &middot; ${sub.gems} gems${sub.late ? ' &#9203;' : ''}</span>`
-              : `<span class="grade-chip wait">&#9203; Submitted &middot; not graded yet${sub.late ? ' &middot; late' : ''}</span>`;
-          } else if (isStudent) {
-            chip = `<span class="grade-chip none">Not submitted</span>`;
-          }
-          const subLine = [
-            q.deadline ? `due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : '',
-            sub && sub.shared_review ? '<span style="color:var(--teal-deep)">Feedback shared</span>' : '',
-          ].filter(Boolean).join(' &middot; ');
-          return `<div class="list-row" style="padding:11px 4px">
-            <div class="grow">
-              <div class="t" style="font-size:13.5px">${pr.type === 'written' ? '<span class="type-badge written">&#128221; Written</span> ' : ''}${esc(pr.title)}
-                <span class="lc-diff ${QUEST_DIFF(pr.difficulty)}">${QUEST_DIFF(pr.difficulty)}</span>
-                <span class="s" style="color:var(--muted);font-weight:500">${pr.points} gems</span></div>
-              ${subLine ? `<div class="s" style="color:var(--muted);margin-top:3px">${subLine}</div>` : ''}
-              ${chip ? `<div style="margin-top:4px">${chip}</div>` : ''}
-            </div>
-            <button class="lc-btn-solve" onclick="QUEST_SCROLL_Y = window.scrollY; openTask(${q.id},${pr.pid})">${sub ? 'Reopen' : (l.unlocked ? 'Solve' : 'Preview')}</button>
-            ${d.can_manage ? `<button class="btn btn-ghost btn-sm" onclick="formEditProblem(${q.id},${pr.pid})">Edit</button>` : ''}
-            ${d.can_manage || ME.role === 'coordinator' ? `<button class="btn btn-ghost btn-sm" onclick="openQuestSubs(${q.id},${pr.pid})">Submissions</button>` : ''}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
+          <button class="btn btn-ghost btn-sm" onclick="remindLevel(${q.id})" title="Email students who have not finished this level">&#128276;</button>
+        </div>` : '';
+      const rowsHtml = q.problems.map((pr) => {
+        const sub = isStudent ? mySubFor(pr.pid) : null;
+        const graded = isStudent && sub && sub.grade != null;
+        let chip = '';
+        if (isStudent && sub) {
+          chip = sub.grade != null
+            ? `<span class="grade-chip ok" title="${sub.late ? 'Submitted late: ' + sub.late_deduction + ' gems deducted' : 'Graded by your teacher'}">Graded ${sub.grade}% &middot; ${sub.gems} gems${sub.late ? ' &#9203;' : ''}</span>`
+            : `<span class="grade-chip wait">&#9203; Submitted &middot; not graded yet${sub.late ? ' &middot; late' : ''}</span>`;
+        } else if (isStudent && l.unlocked) {
+          chip = `<span class="grade-chip none">Not submitted</span>`;
+        }
+        const subLine = [
+          q.deadline ? `due ${fmtDate(q.deadline)} &middot; late = &minus;${d.late_penalty_pct || 20}% gems` : '',
+          sub && sub.shared_review ? '<span style="color:var(--teal-deep)">Feedback shared</span>' : '',
+        ].filter(Boolean).join(' &middot; ');
+        const btnLabel = !isStudent ? 'Open' : (sub ? 'Reopen' : (l.unlocked ? 'Solve' : 'Preview'));
+        return `<div class="problem-row${!l.unlocked ? ' locked' : ''}">
+          ${graded ? '<span class="check">&#10003;</span>' : ''}
+          <div class="grow">
+            <div class="t" style="font-size:13.5px">${pr.type === 'written' ? '<span class="type-badge written">&#128221; Written</span> ' : ''}${esc(pr.title)}
+              <span class="lc-diff ${QUEST_DIFF(pr.difficulty)}">${QUEST_DIFF(pr.difficulty)}</span>
+              <span class="s" style="color:var(--muted);font-weight:500">${pr.points} gems</span></div>
+            ${subLine ? `<div class="s" style="color:var(--muted);margin-top:3px">${subLine}</div>` : ''}
+            ${chip ? `<div style="margin-top:4px">${chip}</div>` : ''}
+          </div>
+          <button class="btn btn-teal btn-sm" onclick="QUEST_SCROLL_Y = window.scrollY; openTask(${q.id},${pr.pid})">${btnLabel}</button>
+          ${d.can_manage ? `<button class="btn btn-ghost btn-sm" onclick="formEditProblem(${q.id},${pr.pid})">Edit</button>` : ''}
+          ${d.can_manage || ME.role === 'coordinator' ? `<button class="btn btn-ghost btn-sm" onclick="openQuestSubs(${q.id},${pr.pid})">Submissions</button>` : ''}
+        </div>`;
+      }).join('');
+      return `<details class="class-block"${isCurrent || !isStudent ? ' open' : ''}>
+        <summary>
+          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="class-title">Class ${li + 1} &middot; ${esc(q.title)}</span>
+          ${stateBadge}${dueChip}
+        </summary>
+        <div class="class-body">${teacherLevelTools}${rowsHtml}</div>
+      </details>`;
+    }).join('');
+    return `<section class="module-panel" id="qmod${mi}">
+      <div class="module-panel-head"><span class="module-eyebrow">Week ${mod.week}</span><h3>Module ${mi + 1}</h3></div>
+      ${classesHtml}
+    </section>`;
   }).join('');
+
+  const ep = p.track.end_project;
+  const projectCard = (isStudent && ep) ? `
+    <div class="project-card">
+      <div class="project-eyebrow">End Project</div>
+      <h3>${esc(ep.title)}</h3>
+      ${ep.tagline ? `<p class="project-tagline">${esc(ep.tagline)}</p>` : ''}
+      ${(ep.includes || []).length ? `<ul class="project-checklist">${ep.includes.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+      <div class="project-progress"><div style="width:${trackPct}%"></div></div>
+      <div class="project-foot"><span>Track progress</span><span>${trackPct}%</span></div>
+      <button type="button" class="btn btn-ghost btn-sm" style="width:100%;margin-top:12px" onclick="document.getElementById('qmod${modules.length - 1}').scrollIntoView({behavior:'smooth',block:'start'})">Jump to the final level</button>
+    </div>` : '';
 
   const top3 = d.scoreboard.slice(0, 3);
   const podium = top3.length >= 2 ? `<div class="podium">
@@ -4697,10 +4768,12 @@ async function renderQuestTab(body) {
     <button class="btn btn-danger btn-sm" onclick="uninstallTrack()">Remove track from course</button></div>` : '';
 
   body.innerHTML = hero + adminBar + `
-    <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start" class="quest-grid">
-      <div>${map}</div><div>${board}</div>
+    <div style="display:grid;grid-template-columns:250px 1fr 280px;gap:20px;align-items:start" class="quest-grid">
+      <aside>${pathCard}${outline}</aside>
+      <main>${modulesHtml}</main>
+      <aside>${projectCard}${board}</aside>
     </div>
-    <style>@media (max-width:960px){.quest-grid{grid-template-columns:1fr !important}}</style>`;
+    <style>@media (max-width:1140px){.quest-grid{grid-template-columns:1fr !important}}</style>`;
   if (QUEST_SCROLL_RESTORE_PENDING) { QUEST_SCROLL_RESTORE_PENDING = false; window.scrollTo({ top: QUEST_SCROLL_Y || 0 }); }
 }
 async function installTrack(key) {

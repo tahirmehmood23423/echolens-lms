@@ -1,10 +1,10 @@
 'use strict';
 /* EchoLens tilt - lightweight pointer-driven 3D tilt for cards.
-   Applies to .course-card, .stat-card, .prism-card and .qbody. Skips touch
-   devices and reduced-motion users; costs nothing when idle. */
+   Applies to .course-card, .stat-card, .prism-card and .path-card. Skips
+   touch devices and reduced-motion users; costs nothing when idle. */
 (function () {
   if (window.matchMedia && (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(hover: none)').matches)) return;
-  const SEL = '.course-card, .stat-card, .prism-card, .qbody';
+  const SEL = '.course-card, .stat-card, .prism-card, .path-card';
   const MAX = 5; // degrees
   document.addEventListener('pointermove', (e) => {
     const el = e.target.closest && e.target.closest(SEL);

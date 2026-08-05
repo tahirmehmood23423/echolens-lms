@@ -1948,7 +1948,7 @@ const Quests = {
     let title = t.titles[0], nextTitle = null;
     for (let i = 0; i < t.titles.length; i++) if (gems >= t.titles[i].min) { title = t.titles[i]; nextTitle = t.titles[i + 1] || null; }
     return {
-      track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, titles: t.titles },
+      track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, titles: t.titles, end_project: t.end_project || null },
       levels: levels.map((l) => ({ ...l, unlocked: l.quest.no <= unlockedUpTo })),
       unlocked_up_to: Math.min(unlockedUpTo, quests.length),
       gems, title: title.name, next_title: nextTitle,

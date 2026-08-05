@@ -868,7 +868,7 @@ const LATE_PENALTY = 0.20; // late submissions lose 20% of earned gems
 // clean written-answer workspace instead. Teachers can override per course.
 const NO_IDE_TRACKS = new Set([
   'bc01-automation', 'bc02-prompting', 'bc03-everyday-ai',
-  'sc02-genai', 'sc05-ai-tools',
+  'sc05-ai-tools',
   'st01-wordpress', 'st02-graphic-design', 'st03-uiux', 'st06-ai-agents',
   // August 2026 additions without an in-browser coding component
   // (teachers can still switch the IDE on per batch; SQL+Power BI now
@@ -2261,7 +2261,7 @@ const OFFICIAL_CATALOGUE = [
   { code: 'BC-07', title: 'Excel + AI for Office Professionals', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['new'], summary: 'Clean data, build reports and automate repetitive office work by pairing Excel with AI assistants.' },
   { code: 'BC-08', title: 'Canva & AI Content Creation', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: [], summary: 'Design social posts, brand kits and marketing visuals quickly with Canva + AI tools.' },
   { code: 'SC-01', title: 'Python for Data Science', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 12500, badges: ['high_demand'], summary: 'Pandas, NumPy and Matplotlib applied to real datasets, ending with a portfolio analysis project.' },
-  { code: 'SC-02', title: 'Generative AI Essentials', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 14000, badges: ['high_demand'], summary: 'LLMs, embeddings, retrieval and building your first AI-powered features with today\'s APIs.' },
+  { code: 'SC-02', title: 'Generative AI Essentials', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 14000, badges: ['high_demand'], summary: 'Hybrid, reranked, agentic RAG in LangChain - from tokens and embeddings to a production-served system.' },
   { code: 'SC-03', title: 'Data Analytics with SQL & Power BI', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 13500, badges: ['high_demand'], summary: 'Production-grade SQL queries turned into interactive Power BI dashboards decision-makers use.' },
   { code: 'SC-04', title: 'Introduction to Machine Learning', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 13000, badges: [], summary: 'Train, evaluate and honestly interpret your first models - the foundation for every advanced AI track.' },
   { code: 'SC-05', title: 'AI Automation Tools Track', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 14000, badges: [], summary: 'A deeper pass across n8n, Make, Zapier and AI agents wired into real business processes.' },

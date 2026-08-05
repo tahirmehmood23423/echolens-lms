@@ -618,7 +618,8 @@ function courseOutlineHtml(t) {
       <span class="mono" style="color:var(--primary);font-weight:700;white-space:nowrap">CLO ${i + 1}</span>
       <span>${esc(c.replace(/^CLO\s*\d+:\s*/i, ''))}</span>
     </li>`).join('');
-  const ep = t.end_project;
+  // The end project itself now lives in the Project Milestone sidebar card
+  // (see drawCourse()) next to the Learning Path ring, not down here.
   return `
     ${concepts ? `<div class="card" style="margin-bottom:16px"><div class="card-body">
       <h3 style="margin-bottom:6px">What you will learn</h3>${concepts}
@@ -632,19 +633,7 @@ function courseOutlineHtml(t) {
       <h3 style="margin-bottom:4px">Course outline</h3>
       <p class="s" style="color:var(--muted);margin-bottom:8px">One line per ${unit.toLowerCase()} - every ${unit.toLowerCase()} ends in hands-on quests you clear below.</p>
       <ul style="list-style:none;padding:0;margin:0">${rows}</ul>
-    </div></div>
-    ${ep ? `<div class="card" style="margin-bottom:16px;border:1.5px solid var(--primary)"><div class="card-body">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
-        <span class="kbadge quest" style="background:var(--primary);color:#fff">END PROJECT</span>
-        <span class="s" style="color:var(--muted)">Your production build</span>
-      </div>
-      <h3 style="font-family:var(--font-display);font-size:19px;color:var(--ink)">${esc(ep.title)}</h3>
-      <p class="s" style="color:var(--primary);font-weight:600;margin-top:2px">${esc(ep.tagline || '')}</p>
-      <p class="s" style="color:var(--muted);margin-top:6px">${esc(ep.description || '')}</p>
-      ${(ep.includes || []).length ? `<div class="s" style="margin-top:10px;font-weight:700;color:var(--ink)">The finished product includes</div>
-      <ul style="list-style:none;padding:0;margin:6px 0 0">${ep.includes.map((i) => `<li style="padding:4px 0 4px 22px;position:relative;font-size:13px;color:var(--muted);line-height:1.5"><span style="position:absolute;left:2px;color:var(--ok);font-weight:700">&#10003;</span>${esc(i)}</li>`).join('')}</ul>` : ''}
-      ${ep.shipped_when ? `<p class="s" style="margin-top:10px;padding:9px 12px;border-left:3px solid var(--ok);background:var(--bg);border-radius:6px;color:var(--muted)"><strong style="color:var(--ink)">Shipped when:</strong> ${esc(ep.shipped_when)}</p>` : ''}
-    </div></div>` : ''}`;
+    </div></div>`;
 }
 // CS-101..CS-107's `topic` field packs a short explanation paragraph and an
 // example code snippet into one string (explanation, blank line, then code
@@ -700,36 +689,115 @@ function drawCourse() {
           ${prog.passed ? ' · <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' · Complete every task at ' + (t.pass_mark || 60) + '%+ average for the automatic certificate.' : '')}
         </div>` : (ME ? '' : `<div class="s" style="margin-top:10px;color:var(--muted)">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
     </div></div>`;
+  // Levels group into "Modules" by week - same structure as the LMS
+  // Portal's Quest tab (dashboard.js renderQuestTab), so a paid enrolled
+  // student and a free/open learner see one consistent product.
+  const modules = [];
+  const modByWeek = new Map();
+  CUR.levels.forEach((l) => {
+    const wk = l.week != null ? l.week : l.no;
+    if (!modByWeek.has(wk)) { const m = { week: wk, levels: [] }; modByWeek.set(wk, m); modules.push(m); }
+    modByWeek.get(wk).levels.push(l);
+  });
+  const levelDone = (l) => !!(CUR.progress && (l.problems || []).every((p) => {
+    const s = CUR.progress.submissions[`${l.no}:${p.pid}`];
+    return s && s.score != null;
+  }));
+  const curLevel = CUR.levels.find((l) => !l.locked && !levelDone(l)) || CUR.levels[CUR.levels.length - 1];
+  const totalWeeks = Math.max(...CUR.levels.map((l) => l.week || 1), 1);
+  const curWeek = curLevel ? (curLevel.week || 1) : totalWeeks;
+  const trackPct = (prog && t.total_points) ? Math.min(100, Math.round((prog.gems / t.total_points) * 100)) : 0;
+  const RING_C = 326.7; // 2*pi*52
+
+  const pathCard = prog ? `
+    <div class="path-card">
+      <div class="path-eyebrow">My Learning Path</div>
+      <div class="path-title">${esc(t.title)}</div>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120">
+          <defs><linearGradient id="pathGemGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0FBFA8"/><stop offset="55%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#7C6CF5"/>
+          </linearGradient></defs>
+          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+          <circle class="ring-fill" cx="60" cy="60" r="52" stroke-dasharray="${RING_C}" stroke-dashoffset="${(RING_C * (1 - trackPct / 100)).toFixed(1)}"></circle>
+        </svg>
+        <div class="ring-label"><strong>${trackPct}%</strong><span>track progress</span></div>
+      </div>
+      <div class="path-stats">
+        <div><strong>${prog.graded}/${prog.total}</strong><span>Tasks graded</span></div>
+        <div><strong>Wk ${curWeek}</strong><span>of ${totalWeeks}</span></div>
+        <div><strong>${prog.gems}</strong><span>Gems earned</span></div>
+      </div>
+    </div>` : '';
+
+  const outline = `
+    <nav class="module-outline">
+      <div class="outline-eyebrow">Course outline</div>
+      ${modules.map((mod, i) => {
+        const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
+        const isCurMod = curLevel && mod.levels.some((l) => l.no === curLevel.no);
+        return `<button type="button" class="outline-item${isCurMod ? ' active' : ''}" onclick="document.getElementById('qmod${i}').scrollIntoView({behavior:'smooth',block:'start'})">
+          <span class="dot${allDone ? ' done' : ''}${isCurMod ? ' active' : ''}"></span>Module ${i + 1} &middot; Week ${mod.week}</button>`;
+      }).join('')}
+    </nav>`;
+
   const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Level';
-  $('courseLevels').innerHTML = courseOutlineHtml(t) + CUR.levels.map((l) => `
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-head">
-        <h3 style="display:flex;gap:10px;align-items:center">${unitLabel} ${l.no} - ${esc(l.title)}
-          ${l.locked ? '<span class="pay-badge na">Locked</span>' : '<span class="pay-badge confirmed">Open</span>'}</h3>
-        <span class="s" style="color:var(--muted)">Week ${l.week || l.no}${l.topic && l.topic.length < 90 ? ' · ' + esc(l.topic) : ''}</span>
-      </div>
-      ${topicDetailHtml(l)}
-      <div class="card-body tight">
-        ${(l.problems || []).map((p) => {
-          const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${p.pid}`];
-          return `
-          <div class="list-row" style="padding:11px 4px${l.locked ? ';opacity:.62' : ''}">
-            <div class="grow">
-              <div class="t" style="font-size:13.5px">${esc(p.title)}
-                <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
-                <span class="s" style="color:var(--muted);font-weight:500">${p.points} gems</span></div>
-              ${sub ? `<div class="s" style="margin-top:3px">
-                ${sub.score != null
-                  ? `<span class="grade-chip ok">Graded ${sub.score}% · ${Math.round((sub.score / 100) * p.points)} gems</span>`
-                  : '<span class="grade-chip wait">Submitted - being graded</span>'}</div>` : ''}
-            </div>
-            ${l.locked
-              ? `<button class="btn btn-ghost btn-sm" onclick="openRegister('${esc(t.course_code || '')}', '${esc(t.title)}')">Unlock</button>`
-              : `<button class="lc-btn-solve" onclick="openSolve(${l.no}, ${p.pid})">${sub ? 'Reopen' : 'Solve'}</button>`}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`).join('');
+  const modulesHtml = modules.map((mod, mi) => {
+    const classesHtml = mod.levels.map((l, li) => {
+      const isCurrent = curLevel && l.no === curLevel.no;
+      const rowsHtml = (l.problems || []).map((p) => {
+        const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${p.pid}`];
+        const graded = sub && sub.score != null;
+        return `<div class="problem-row${l.locked ? ' locked' : ''}">
+          ${graded ? '<span class="check">&#10003;</span>' : ''}
+          <div class="grow">
+            <div class="t" style="font-size:13.5px">${esc(p.title)}
+              <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
+              <span class="s" style="color:var(--muted);font-weight:500">${p.points} gems</span></div>
+            ${sub ? `<div class="s" style="margin-top:3px">
+              ${graded
+                ? `<span class="grade-chip ok">Graded ${sub.score}% &middot; ${Math.round((sub.score / 100) * p.points)} gems</span>`
+                : '<span class="grade-chip wait">Submitted - being graded</span>'}</div>` : ''}
+          </div>
+          ${l.locked
+            ? `<button class="btn btn-ghost btn-sm" onclick="openRegister('${esc(t.course_code || '')}', '${esc(t.title)}')">Unlock</button>`
+            : `<button class="lc-btn-solve" onclick="openSolve(${l.no}, ${p.pid})">${sub ? 'Reopen' : 'Solve'}</button>`}
+        </div>`;
+      }).join('');
+      return `<details class="class-block"${isCurrent ? ' open' : ''}>
+        <summary>
+          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="class-title">${unitLabel} ${li + 1} &middot; ${esc(l.title)}</span>
+          ${l.locked ? '<span class="pay-badge na">Locked</span>' : '<span class="pay-badge confirmed">Open</span>'}
+        </summary>
+        <div class="class-body">${topicDetailHtml(l)}${rowsHtml}</div>
+      </details>`;
+    }).join('');
+    return `<section class="module-panel" id="qmod${mi}">
+      <div class="module-panel-head"><span class="module-eyebrow">Week ${mod.week}</span><h3>Module ${mi + 1}</h3></div>
+      ${classesHtml}
+    </section>`;
+  }).join('');
+
+  const ep = t.end_project;
+  const projectCard = ep ? `
+    <div class="project-card">
+      <div class="project-eyebrow">End Project</div>
+      <h3>${esc(ep.title)}</h3>
+      ${ep.tagline ? `<p class="project-tagline">${esc(ep.tagline)}</p>` : ''}
+      ${(ep.includes || []).length ? `<ul class="project-checklist">${ep.includes.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+      ${ep.shipped_when ? `<p class="s" style="margin-top:12px;padding:9px 11px;border-left:3px solid var(--ok);background:var(--bg);border-radius:0 6px 6px 0;color:var(--muted);font-size:12px;line-height:1.5"><strong style="color:var(--ink)">Shipped when:</strong> ${esc(ep.shipped_when)}</p>` : ''}
+      ${prog ? `<div class="project-progress"><div style="width:${trackPct}%"></div></div><div class="project-foot"><span>Track progress</span><span>${trackPct}%</span></div>` : ''}
+      <button type="button" class="btn btn-ghost btn-sm" style="width:100%;margin-top:12px" onclick="document.getElementById('qmod${modules.length - 1}').scrollIntoView({behavior:'smooth',block:'start'})">Jump to the final level</button>
+    </div>` : '';
+
+  $('courseLevels').innerHTML = courseOutlineHtml(t) + `
+    <div style="display:grid;grid-template-columns:250px 1fr 280px;gap:20px;align-items:start" class="quest-grid">
+      <aside>${pathCard}${outline}</aside>
+      <main>${modulesHtml}</main>
+      <aside>${projectCard}</aside>
+    </div>
+    <style>@media (max-width:1140px){.quest-grid{grid-template-columns:1fr !important}}</style>`;
 }
 
 /* ------------------------------ solve + submit ------------------------------ */

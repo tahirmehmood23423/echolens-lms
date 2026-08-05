@@ -875,7 +875,7 @@ const NO_IDE_TRACKS = new Set([
   // defaults ON because the compiler runs SQL natively):
   'bc06-git-freelance', 'bc07-excel-ai', 'bc08-canva-ai',
   'sc08-marketing-seo', 'sc09-freelancing', 'sc10-graphic-basics', 'sc11-content-ai',
-  'st11-flutter', 'st12-video-editing',
+  'st11-flutter', 'st12-video-editing', '3d01-modeling',
 ]);
 function ideEnabled(bid) {
   const b = data.batches.find((x) => x.id === Number(bid));
@@ -1794,7 +1794,7 @@ const TRACKS = {};
 (function loadTracks() {
   // short-courses-full is loaded LAST so its complete builds override the
   // earlier thin stubs for the same keys (python-6w, sc02/sc03/sc06/sc07).
-  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro'), ...require('./tracks/cs-fundamentals')];
+  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro'), ...require('./tracks/cs-fundamentals'), ...require('./tracks/design-3d')];
   for (const t of all) {
     // Normalize: compute title thresholds from total points if only names given.
     const total = t.levels.reduce((s1, l) => s1 + l.problems.reduce((s2, p) => s2 + (p.points || 100), 0), 0);
@@ -2272,8 +2272,9 @@ const OFFICIAL_CATALOGUE = [
   { code: 'SC-10', title: 'Graphic Design Basics', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 10000, badges: [], summary: 'Core design principles, typography and brand assets - a solid visual foundation.' },
   { code: 'SC-11', title: 'Content Writing with AI', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 9000, badges: [], summary: 'Professional writing workflows pairing human judgement with AI drafting, editing and research.' },
   { code: 'ST-01', title: 'WordPress Development', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 20000, badges: [], summary: 'Custom themes, WooCommerce stores and performance hardening - a large, reliable freelance market.' },
-  { code: 'ST-02', title: 'Graphic Designing', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 20000, badges: [], summary: 'A full professional design track: brand identity, collateral and a portfolio built to client standards.' },
-  { code: 'ST-03', title: 'UI/UX Designing', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 21000, badges: ['high_demand'], summary: 'Research, wireframing and high-fidelity product design in Figma, closing with a shipped-quality case study.' },
+  { code: 'ST-02', title: 'Graphic Designing', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 10000, badges: [], summary: 'A full professional design track: brand identity, collateral and a portfolio built to client standards.' },
+  { code: 'ST-03', title: 'UI/UX Designing', tier: 'Short Course', weeks: 6, hours: 24, price_pkr: 10000, badges: ['high_demand'], summary: 'Research, wireframing and high-fidelity product design in Figma, closing with a shipped-quality case study.' },
+  { code: '3D-01', title: '3D Modeling, Rendering and Introductory Animation', tier: 'Short Course', weeks: 6, hours: 18, price_pkr: 13000, badges: ['new'], summary: 'Model, texture, light, render and animate in Blender, closing with a portfolio-ready rendered scene.' },
   { code: 'ST-04', title: 'Data Analytics Specialist Track', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 21500, badges: ['high_demand'], summary: 'Python, SQL, statistics and data storytelling - the complete analyst skill set employers hire for.' },
   { code: 'ST-05', title: 'Generative AI Engineering', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22500, badges: ['high_demand'], summary: 'Production LLM systems: retrieval-augmented generation, evaluation and deployment.' },
   { code: 'ST-06', title: 'AI Agents & Automation Engineering', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 23000, badges: ['high_demand'], summary: 'Multi-step, tool-calling AI agents that plan, act and integrate with real business systems.' },

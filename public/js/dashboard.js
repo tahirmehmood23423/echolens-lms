@@ -101,7 +101,7 @@ const TITLES = {
   overview: 'Overview', courses: 'My courses', course: 'Course', schedule: 'Calendar',
   leaderboard: 'Leaderboard', announcements: 'Announcements', settings: 'Settings',
   challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'Hackathons',
-  events: 'Events', 'admin-analytics': 'Reports',
+  events: 'Events', 'admin-analytics': 'Reports', 'admin-mailer': 'Email Leads',
   'admin-catalogue': 'Courses', 'admin-users': 'Users',
   assignments: 'Assignments', quizzes: 'Quizzes', progress: 'Progress',
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
@@ -126,7 +126,7 @@ function show(view) {
     overview: renderOverview, courses: renderCourses, schedule: renderSchedule,
     leaderboard: renderLeaderboard, announcements: renderAnnouncements, settings: renderSettings,
     challenges: renderChallenges, copilot: renderCopilot, hackathons: renderHackathons,
-    events: renderEvents, 'admin-analytics': renderAnalytics,
+    events: renderEvents, 'admin-analytics': renderAnalytics, 'admin-mailer': renderAdminMailer,
     'admin-catalogue': renderCatalogue, 'admin-users': renderUsers,
     assignments: renderAssignments, quizzes: renderQuizzesGlobal, progress: renderProgress,
     certificates: renderCertificates, messages: renderMessages, resources: renderResources,
@@ -6444,32 +6444,15 @@ async function renderAnalytics() {
       <div class="card-body tight" id="regsBox"><div class="empty">Loading registrations&hellip;</div></div>
     </div>
     <div class="card"><div class="card-head"><h3>Email everyone - announcements, enrollments, discounts</h3></div>
-      <div class="card-body">
-        <form id="blastForm">
-          <div class="form-grid">
-            <label class="field"><span>Audience</span><select name="audience">
-              <option value="portal">Portal students</option>
-              <option value="open">Open (website) students</option>
-              <option value="all">Everyone - portal + open + leads</option></select></label>
-            <label class="field" style="grid-column:span 2"><span>Subject</span><input name="subject" required placeholder="e.g. 25% early-bird discount - Summer 2026 cohort"></label>
-          </div>
-          <label class="field"><span>Message</span><textarea name="body" rows="5" required placeholder="Write the announcement exactly as students should read it. It is sent from the company email address."></textarea></label>
-          <button class="btn btn-primary">Send email</button>
-        </form>
+      <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <p class="hint" style="margin:0;flex:1;min-width:220px">Compose and send email - with attachments and the optional direct registration link - from the dedicated Email Leads page. It also has manual lead entry, so you can add a contact and email them without them ever signing up.</p>
+        <button class="btn btn-primary" onclick="show('admin-mailer')">Open Email Leads</button>
       </div></div>
     <div class="card"><div class="card-head"><h3>Leads database</h3>
       <a class="btn btn-teal btn-sm" href="/api/admin/leads.csv" download>Download CSV</a></div>
       <div class="card-body" style="padding-bottom:0"><input class="search-input" placeholder="Filter by name, email, or number..." oninput="filterLeads(this.value)"></div>
       <div class="card-body tight" id="leadsBox"><div class="empty">Loading leads&hellip;</div></div>
     </div>`;
-  $('blastForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
-    try {
-      const out = await api('/api/admin/email-blast', { method: 'POST', body: JSON.stringify({ subject: f.subject.value, body: f.body.value, audience: f.audience.value }) });
-      toast(out.smtp ? `Email sent to ${out.sent} people.` : `Queued for ${out.sent} people - configure SMTP_* in the environment to actually send.`);
-      f.reset(); btn.disabled = false;
-    } catch (err) { toast(err.message, true); btn.disabled = false; }
-  });
   $('anDownloadCsv').href = '/api/admin/analytics.csv?' + q.toString();
   $('anDownloadPdf').href = '/api/admin/analytics.pdf?' + q.toString();
   loadLeads();
@@ -6488,22 +6471,102 @@ async function loadLeads() {
   try {
     const d = await api('/api/admin/leads');
     LEADS_CACHE = d.leads;
-    drawLeads(LEADS_CACHE);
+    drawLeads(LEADS_CACHE, 'leadsBox');
   } catch (e) { $('leadsBox').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
-function drawLeads(list) {
-  $('leadsBox').innerHTML = list.length ? `
+function drawLeads(list, boxId) {
+  $(boxId || 'leadsBox').innerHTML = list.length ? `
     <table class="lc-table"><thead><tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Source</th><th>Tier</th><th>Since</th></tr></thead><tbody>
       ${list.slice(0, 400).map((l) => `<tr style="cursor:default">
         <td>${esc(l.name || '—')}</td><td>${esc(l.email)}</td><td>${esc(l.whatsapp || '—')}</td>
-        <td>${{'open-signup':'Open sign-up',google:'Google sign-in',open:'Open site',portal:'Portal'}[l.source] || esc(l.source)}</td><td><span class="role-pill">${{open:'Open site',student:'Student',lead:'Lead'}[l.tier] || esc(l.tier)}</span></td><td class="s" style="color:var(--muted)">${esc((l.created_at || '').slice(0, 10))}</td>
+        <td>${{'open-signup':'Open sign-up',google:'Google sign-in',open:'Open site',portal:'Portal',manual:'Added manually',newsletter:'Newsletter'}[l.source] || esc(l.source)}</td><td><span class="role-pill">${{open:'Open site',student:'Student',lead:'Lead'}[l.tier] || esc(l.tier)}</span></td><td class="s" style="color:var(--muted)">${esc((l.created_at || '').slice(0, 10))}</td>
       </tr>`).join('')}
     </tbody></table>${list.length > 400 ? `<p class="hint">Showing 400 of ${list.length} - download the CSV for the full list.</p>` : ''}`
-    : '<div class="empty">No leads yet - they appear as soon as anyone signs in on the open website.</div>';
+    : '<div class="empty">No leads yet - they appear as soon as anyone signs in on the open website, or add one manually.</div>';
 }
 function filterLeads(q) {
   const s = q.trim().toLowerCase();
-  drawLeads(!s ? LEADS_CACHE : LEADS_CACHE.filter((l) => [l.name, l.email, l.whatsapp].some((v) => String(v || '').toLowerCase().includes(s))));
+  drawLeads(!s ? LEADS_CACHE : LEADS_CACHE.filter((l) => [l.name, l.email, l.whatsapp].some((v) => String(v || '').toLowerCase().includes(s))), 'leadsBox');
+}
+
+/* ============================================================================
+ * v22: EMAIL LEADS - a dedicated cold-mailing page: compose with optional
+ * file attachments and the direct registration link, add contacts to the
+ * leads database by hand, and see/search that database - all in one place,
+ * off the Analytics page so it doesn't get lost among the charts.
+ * ============================================================================ */
+async function renderAdminMailer() {
+  $('view-admin-mailer').innerHTML = `
+    <div class="card"><div class="card-head"><h3>Compose email</h3><span class="s" style="color:var(--muted)">Sent from info@echolens.digital</span></div>
+      <div class="card-body">
+        <form id="mailerBlastForm">
+          <div class="form-grid">
+            <label class="field"><span>Audience</span><select name="audience">
+              <option value="leads">Leads only - the database below</option>
+              <option value="portal">Portal students</option>
+              <option value="open">Open (website) students</option>
+              <option value="all">Everyone - portal + open + leads</option></select></label>
+            <label class="field" style="grid-column:span 2"><span>Subject</span><input name="subject" required placeholder="e.g. 25% early-bird discount - Summer 2026 cohort"></label>
+          </div>
+          <label class="field"><span>Message</span><textarea name="body" rows="6" required placeholder="Write the email exactly as recipients should read it."></textarea></label>
+          <div class="form-grid">
+            <label class="field" style="grid-column:span 2"><span>Attach documents or pictures (optional)</span>
+              <input type="file" name="files" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.jpg,.jpeg,.png,.gif,.webp"></label>
+          </div>
+          <label class="s" style="display:flex;align-items:center;gap:8px;margin:4px 0 14px;color:var(--ink)">
+            <input type="checkbox" name="registration_link" value="1" style="width:16px;height:16px;margin:0">
+            Include the direct registration link (optional)
+          </label>
+          <button class="btn btn-primary">Send email</button>
+        </form>
+      </div></div>
+    <div class="card"><div class="card-head"><h3>Add a lead manually</h3></div>
+      <div class="card-body">
+        <form id="mailerAddLeadForm">
+          <div class="form-grid">
+            <label class="field"><span>Name</span><input name="name" placeholder="Full name (optional)"></label>
+            <label class="field"><span>Email</span><input name="email" type="email" required placeholder="name@example.com"></label>
+            <label class="field"><span>WhatsApp</span><input name="whatsapp" placeholder="Number (optional)"></label>
+          </div>
+          <button class="btn btn-teal">Add lead</button>
+        </form>
+      </div></div>
+    <div class="card"><div class="card-head"><h3>Leads database</h3>
+      <a class="btn btn-teal btn-sm" href="/api/admin/leads.csv" download>Download CSV</a></div>
+      <div class="card-body" style="padding-bottom:0"><input class="search-input" placeholder="Filter by name, email, or number..." oninput="filterMailerLeads(this.value)"></div>
+      <div class="card-body tight" id="mailerLeadsBox"><div class="empty">Loading leads&hellip;</div></div>
+    </div>`;
+  $('mailerBlastForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try {
+      const out = await api('/api/admin/email-blast', { method: 'POST', body: new FormData(f) });
+      const attach = out.attachments ? ` with ${out.attachments} attachment${out.attachments === 1 ? '' : 's'}` : '';
+      toast(out.smtp ? `Email sent to ${out.sent} people${attach}.` : `Queued for ${out.sent} people${attach} - configure SMTP_* in the environment to actually send.`);
+      f.reset(); btn.disabled = false;
+    } catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+  $('mailerAddLeadForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try {
+      const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
+      await api('/api/admin/leads', { method: 'POST', body: JSON.stringify(obj) });
+      toast('Lead added.'); f.reset(); btn.disabled = false;
+      loadMailerLeads();
+    } catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+  loadMailerLeads();
+}
+let MAILER_LEADS_CACHE = [];
+async function loadMailerLeads() {
+  try {
+    const d = await api('/api/admin/leads');
+    MAILER_LEADS_CACHE = d.leads;
+    drawLeads(MAILER_LEADS_CACHE, 'mailerLeadsBox');
+  } catch (e) { $('mailerLeadsBox').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+function filterMailerLeads(q) {
+  const s = q.trim().toLowerCase();
+  drawLeads(!s ? MAILER_LEADS_CACHE : MAILER_LEADS_CACHE.filter((l) => [l.name, l.email, l.whatsapp].some((v) => String(v || '').toLowerCase().includes(s))), 'mailerLeadsBox');
 }
 /* Tiny dependency-free SVG line+bar chart. */
 function chartSvg(series) {

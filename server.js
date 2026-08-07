@@ -3129,17 +3129,50 @@ app.get('/api/admin/leads.csv', authRequired, adminRequired, (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="echolens-leads-${new Date().toISOString().slice(0, 10)}.csv"`);
   res.send(Leads.csv());
 });
+// Manually add a contact to the leads database - a conference list, a
+// referral introduction, anyone the admin wants in the cold-mailing list
+// without them ever having signed up. Joins the same table as sign-up leads,
+// so it is included in every "leads" / "everyone" email blast below.
+app.post('/api/admin/leads', authRequired, adminRequired, (req, res) => {
+  const { name, email, whatsapp } = req.body || {};
+  const em = String(email || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  const lead = Leads.upsert({ name: String(name || '').trim(), email: em, whatsapp: String(whatsapp || '').trim(), source: 'manual' });
+  AuditLog.record({ actor_id: req.user.id, action: 'lead_add_manual', detail: em });
+  res.json({ ok: true, lead });
+});
 // One composer for everything: announcements, enrollment openings, discounts,
-// new batches - the admin writes the mail, picks the audience, and it goes
-// out from the company address (MAIL_FROM).
-app.post('/api/admin/email-blast', authRequired, adminRequired, (req, res) => {
-  const { subject, body, audience } = req.body || {};
-  if (!subject || !body) return res.status(400).json({ error: 'Write a subject and a message.' });
-  if (!['portal', 'open', 'all'].includes(audience)) return res.status(400).json({ error: 'Pick an audience: portal students, open students, or everyone.' });
+// new batches, cold outreach to the leads database - the admin writes the
+// mail, picks the audience, optionally attaches documents/pictures and the
+// direct registration link, and it goes out from the company address
+// (MAIL_FROM, info@echolens.digital) like a real cold-mailing platform.
+const BLAST_ATTACH_EXT = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.csv', '.jpg', '.jpeg', '.png', '.gif', '.webp'];
+const BLAST_MAX_TOTAL_BYTES = 20 * 1024 * 1024; // most mail servers reject bigger attachments
+app.post('/api/admin/email-blast', authRequired, adminRequired, upload.array('files', 5), (req, res) => {
+  const cleanup = () => { for (const f of req.files || []) { try { fs.unlinkSync(f.path); } catch {} } };
+  const { subject, body, audience, registration_link } = req.body || {};
+  if (!subject || !body) { cleanup(); return res.status(400).json({ error: 'Write a subject and a message.' }); }
+  if (!['portal', 'open', 'all', 'leads'].includes(audience)) { cleanup(); return res.status(400).json({ error: 'Pick an audience: leads, portal students, open students, or everyone.' }); }
+  for (const f of req.files || []) {
+    if (!BLAST_ATTACH_EXT.includes(path.extname(f.originalname).toLowerCase())) {
+      cleanup();
+      return res.status(400).json({ error: `${f.originalname}: attach PDFs, Word/Excel/PowerPoint documents, or images only.` });
+    }
+  }
+  const totalBytes = (req.files || []).reduce((n, f) => n + f.size, 0);
+  if (totalBytes > BLAST_MAX_TOTAL_BYTES) { cleanup(); return res.status(400).json({ error: 'Attachments are too large - keep the total under 20 MB.' }); }
   const emails = Leads.emailsFor(audience);
-  if (!emails.length) return res.status(400).json({ error: 'No email addresses found for that audience yet.' });
-  mailer.notify(emails, String(subject).slice(0, 200), String(body).slice(0, 8000));
-  res.json({ ok: true, sent: emails.length, smtp: mailer.configured });
+  if (!emails.length) { cleanup(); return res.status(400).json({ error: 'No email addresses found for that audience yet.' }); }
+  const attachments = (req.files || []).map((f) => ({ filename: f.originalname, content: fs.readFileSync(f.path) }));
+  cleanup();
+  let text = String(body).slice(0, 8000);
+  if (registration_link === '1' || registration_link === 'true') {
+    const registrationUrl = /^https?:\/\//i.test(KEY_LINKS.registration) ? KEY_LINKS.registration : `${APP_URL}${KEY_LINKS.registration}`;
+    text += `\n\nRegister directly here: ${registrationUrl}`;
+  }
+  mailer.notify(emails, String(subject).slice(0, 200), text, attachments.length ? attachments : undefined);
+  AuditLog.record({ actor_id: req.user.id, action: 'email_blast', detail: `${audience} (${emails.length})${attachments.length ? ` +${attachments.length} attachment(s)` : ''} - ${subject}` });
+  res.json({ ok: true, sent: emails.length, smtp: mailer.configured, attachments: attachments.length });
 });
 
 /* -------------------------------- analytics -------------------------------- */

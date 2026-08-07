@@ -3469,7 +3469,9 @@ const Leads = {
     return rows.join('\n');
   },
   emailsFor(audience) {
-    // portal = enrolled/portal students; open = free-tier users; all = both + raw leads
+    // portal = enrolled/portal students; open = free-tier users;
+    // leads = the raw leads database only (sign-ups, newsletter, manual
+    // additions - the cold-mailing list); all = every one of the above.
     const emails = new Set();
     for (const u of data.users) {
       if (!u.email) continue;
@@ -3477,7 +3479,7 @@ const Leads = {
       if (audience === 'open' && u.role === 'free') emails.add(u.email.toLowerCase());
       if (audience === 'all' && ['student', 'free'].includes(u.role)) emails.add(u.email.toLowerCase());
     }
-    if (audience === 'all') for (const l of data.leads) if (l.email) emails.add(l.email.toLowerCase());
+    if (audience === 'all' || audience === 'leads') for (const l of data.leads) if (l.email) emails.add(l.email.toLowerCase());
     return [...emails];
   },
 };

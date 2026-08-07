@@ -38,9 +38,14 @@
   .cert::after { content: ''; position: absolute; inset: 20px; border: 1px solid #EAD9A6; border-radius: 9px; pointer-events: none; }
   .c-band { position: absolute; top: 0; left: 0; right: 0; height: 10px; background: linear-gradient(90deg, var(--teal), #38BDF8, #7C6CF5); }
   .c-head { text-align: center; margin-bottom: 4px; }
-  .c-head img { height: 46px; }
+  .c-logos { display: flex; align-items: center; justify-content: center; gap: 14px; }
+  .c-logo { height: 46px; max-width: 150px; object-fit: contain; }
+  .c-logo-x { font-size: 17px; font-weight: 300; color: var(--muted); }
+  .c-logo-fallback { font-family: 'Fraunces', serif; font-weight: 650; font-size: 17px; color: var(--navy); }
   .c-org { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 650; margin-top: 6px; }
   .c-tag { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .c-collab { font-size: 12px; color: var(--muted); margin-top: 5px; }
+  .c-collab strong { color: var(--navy); }
   .c-title { text-align: center; font-size: 12.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin: 16px 0 5px; }
   .c-line { text-align: center; color: var(--muted); font-size: 13.5px; }
   .c-name { text-align: center; font-family: 'Fraunces', serif; font-size: 38px; font-weight: 650; margin: 8px 0 3px; }
@@ -49,6 +54,7 @@
   .c-detail { text-align: center; font-size: 13px; color: var(--muted); max-width: 600px; margin: 0 auto; }
   .c-date { text-align: center; font-size: 13px; margin-top: 8px; }
   .c-foot { display: flex; justify-content: center; align-items: flex-end; gap: 110px; margin-top: 26px; flex-wrap: wrap; }
+  .c-foot.has-partner { gap: 64px; }
   .sig { min-width: 180px; max-width: 220px; text-align: center; }
   .sig img { max-height: 56px; max-width: 180px; display: block; margin: 0 auto; }
   .sig .typed { font-family: 'Alex Brush', cursive; font-size: 34px; line-height: 1; color: var(--navy); height: 54px; display: flex; align-items: flex-end; justify-content: center; }
@@ -131,15 +137,21 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
   const fmt = (x) => { try { return new Date(x + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); } catch { return x; } };
 
   document.getElementById('banner').innerHTML =
-    '<div class="verify-banner"><span class="tick">&#10003;</span><div><strong>Verified authentic.</strong> This certificate was genuinely issued through the <strong>EchoLens</strong> platform by ' + esc(c.org) + ', and is registered under serial <strong>' + esc(c.serial) + '</strong>. Scanning the QR code always returns to this official verification page - it cannot be faked or edited.</div></div>';
+    '<div class="verify-banner"><span class="tick">&#10003;</span><div><strong>Verified authentic.</strong> This certificate was genuinely issued through the <strong>EchoLens</strong> platform by ' + esc(c.org) + (c.partner ? ' in collaboration with <strong>' + esc(c.partner.name) + '</strong>' : '') + ', and is registered under serial <strong>' + esc(c.serial) + '</strong>. Scanning the QR code always returns to this official verification page - it cannot be faked or edited.</div></div>';
 
   document.getElementById('certBox').innerHTML = `
     <div class="cert">
       <div class="c-band"></div>
       <div class="c-head">
-        <img src="/img/logo.png" alt="logo">
+        <div class="c-logos">
+          <img src="/img/logo.png" alt="${esc(c.org)} logo" class="c-logo">
+          ${c.partner ? `<span class="c-logo-x">&times;</span>` + (c.partner.logo_url
+            ? `<img src="${esc(c.partner.logo_url)}" alt="${esc(c.partner.name)} logo" class="c-logo">`
+            : `<span class="c-logo-fallback">${esc(c.partner.name)}</span>`) : ''}
+        </div>
         <div class="c-org">${esc(c.org)}</div>
         ${c.tagline ? '<div class="c-tag">' + esc(c.tagline) + '</div>' : ''}
+        ${c.partner ? `<div class="c-collab">In collaboration with <strong>${esc(c.partner.name)}</strong></div>` : ''}
         <div><span class="issuer-badge">&#10003; Verified issuer &middot; EchoLens</span></div>
       </div>
       <div class="c-title">Certificate of ${c.kind === 'course' ? 'Completion' : c.kind === 'hackathon' ? 'Participation' : 'Achievement'}</div>
@@ -150,7 +162,7 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
       <div class="c-course">${esc(c.title)}</div>
       ${c.detail ? '<div class="c-detail">' + esc(c.detail) + '</div>' : ''}
       <div class="c-date">Date of completion: <strong>${esc(fmt(c.completion_date))}</strong></div>
-      <div class="c-foot">
+      <div class="c-foot${c.partner ? ' has-partner' : ''}">
         <div class="qr">
           <div id="qrbox"></div>
           <div class="s">Scan to verify</div>
@@ -161,6 +173,12 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
           <div class="who">${esc(c.ceo_name || 'Tahir Mehmood')}</div>
           <div class="role">CEO, ${esc(c.org)}</div>
         </div>
+        ${c.partner ? `<div class="sig">
+          <div class="typed">${esc(c.partner.ceo_name)}</div>
+          <div class="line"></div>
+          <div class="who">${esc(c.partner.ceo_name)}</div>
+          <div class="role">CEO, ${esc((c.partner.name || '').toUpperCase())}</div>
+        </div>` : ''}
       </div>
       <div class="serial">Serial: ${esc(c.serial)} &nbsp;&middot;&nbsp; Issued ${esc(c.issued_at)}</div>
     </div>`;

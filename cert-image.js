@@ -9,8 +9,21 @@
 
 const sharp = require('sharp');
 const QRCode = require('qrcode');
+const fs = require('fs');
+const path = require('path');
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// The partner logo (if uploaded - see /api/admin/partner-settings/logo) is
+// always normalised to this exact PNG, so it can just be read straight off
+// disk and inlined as a data URI - sharp renders this SVG standalone, with
+// no network access, so a plain <image href="/img/..."> would not load.
+function partnerLogoDataUrl() {
+  try {
+    const buf = fs.readFileSync(path.join(__dirname, 'public', 'img', 'partner-logo.png'));
+    return 'data:image/png;base64,' + buf.toString('base64');
+  } catch { return null; }
+}
 
 // Fit long course titles by shrinking the font before wrapping to two lines.
 function titleLines(title) {
@@ -37,6 +50,21 @@ async function certificatePng(c, verifyUrl) {
   const qrDataUrl = await QRCode.toDataURL(verifyUrl, { width: 168, margin: 0, color: { dark: '#16233A', light: '#00000000' } });
   const ceoName = c.ceo_name || 'Tahir Mehmood';
 
+  // v24: fits in the existing gap between the tagline and CERTIFICATE OF...
+  // line, so nothing else has to move for it.
+  const collabSvg = c.partner ? `
+  <text x="600" y="164" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#8B96A8">IN COLLABORATION WITH ${esc((c.partner.name || '').toUpperCase())}</text>` : '';
+  const echolensSigX = c.partner ? 855 : 1030;
+  const badgeX = c.partner ? 450 : 420, badgeW = c.partner ? 300 : 360;
+  const logo = c.partner ? partnerLogoDataUrl() : null;
+  const partnerSigSvg = c.partner ? `
+  <!-- Typed partner-CEO signature (far right) - same "typed name only" convention as EchoLens's own. -->
+  ${logo ? `<image x="1061" y="466" width="28" height="28" href="${logo}"/>` : ''}
+  <text x="1075" y="510" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="24" fill="#16233A">${esc(c.partner.ceo_name)}</text>
+  <line x1="1010" y1="524" x2="1145" y2="524" stroke="#16233A" stroke-width="1.5"/>
+  <text x="1075" y="540" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#16233A">${esc(c.partner.ceo_name)}</text>
+  <text x="1075" y="554" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" letter-spacing="1" fill="#5B6B84">CEO, ${esc((c.partner.name || '').toUpperCase())}</text>` : '';
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <defs>
     <linearGradient id="band" x1="0" y1="0" x2="1" y2="0">
@@ -51,6 +79,7 @@ async function certificatePng(c, verifyUrl) {
 
   <text x="600" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="36" font-weight="bold" fill="#16233A">${esc(c.org || 'EchoLens Digital')}</text>
   <text x="600" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" letter-spacing="4" fill="#5B6B84">${esc((c.tagline || 'Innovate · Educate · Elevate').toUpperCase())}</text>
+  ${collabSvg}
   <text x="600" y="192" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="bold" letter-spacing="6" fill="#D9A425">${esc(kindTitle)}</text>
 
   <text x="600" y="230" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#5B6B84">This is to certify that</text>
@@ -65,14 +94,15 @@ async function certificatePng(c, verifyUrl) {
   <text x="164" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#5B6B84">Scan to verify</text>
 
   <!-- Verified-issuer badge (centre). -->
-  <rect x="420" y="486" width="360" height="42" rx="21" fill="#16233A"/>
+  <rect x="${badgeX}" y="486" width="${badgeW}" height="42" rx="21" fill="#16233A"/>
   <text x="600" y="513" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">&#10003; Verified issuer &#183; EchoLens</text>
 
-  <!-- Typed CEO signature (right) - the name itself is the digital signature, no scanned image. -->
-  <text x="1030" y="510" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="26" fill="#16233A">${esc(ceoName)}</text>
-  <line x1="960" y1="524" x2="1100" y2="524" stroke="#16233A" stroke-width="1.5"/>
-  <text x="1030" y="540" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#16233A">${esc(ceoName)}</text>
-  <text x="1030" y="554" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" letter-spacing="1" fill="#5B6B84">CEO, ${esc((c.org || 'ECHOLENS').toUpperCase())}</text>
+  <!-- Typed CEO signature - the name itself is the digital signature, no scanned image. -->
+  <text x="${echolensSigX}" y="510" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="26" fill="#16233A">${esc(ceoName)}</text>
+  <line x1="${echolensSigX - 70}" y1="524" x2="${echolensSigX + 70}" y2="524" stroke="#16233A" stroke-width="1.5"/>
+  <text x="${echolensSigX}" y="540" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#16233A">${esc(ceoName)}</text>
+  <text x="${echolensSigX}" y="554" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" letter-spacing="1" fill="#5B6B84">CEO, ${esc((c.org || 'ECHOLENS').toUpperCase())}</text>
+  ${partnerSigSvg}
 
   <text x="600" y="590" text-anchor="middle" font-family="Courier New, monospace" font-size="13" fill="#5B6B84">Serial ${esc(c.serial)}</text>
 </svg>`;

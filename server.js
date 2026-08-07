@@ -16,6 +16,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const QRCode = require('qrcode');
+const sharp = require('sharp');
 const archiver = require('archiver');
 const store = require('./store');
 const db = require('./db');
@@ -2641,9 +2642,55 @@ app.get('/api/admin/cert-settings', authRequired, teacherOrAdmin, (req, res) => 
 app.post('/api/admin/cert-settings', authRequired, adminRequired, (req, res) => {
   res.json({ ok: true, settings: Settings.setCert(req.body || {}) });
 });
+/* ------------------------- v24: certificate partner (WebEra) -------------------------
+ * A named partner organisation certificates can be issued "in collaboration
+ * with" - same typed-signature convention as EchoLens's own CEO (no
+ * uploaded signature image). Which certificates carry it is a property of
+ * the course/event itself (Batches.partner / Events.partner, toggled below)
+ * so it travels through automatic issuance too, not just manual; free/open
+ * tracks are static code rather than DB records, so they get their own
+ * opt-in list (settings.partner_tracks).
+ */
+app.get('/api/admin/partner-settings', authRequired, teacherOrAdmin, (req, res) => {
+  res.json({
+    partner: Settings.partner(),
+    partner_tracks: Settings.partnerTracks(),
+    tracks: Quests.tracks().filter((t) => t.free).map((t) => ({ key: t.key, title: t.title, course_code: t.course_code })),
+  });
+});
+app.post('/api/admin/partner-settings', authRequired, adminRequired, (req, res) => {
+  res.json({ ok: true, partner: Settings.setPartner(req.body || {}) });
+});
+// Logo upload: normalised to a fixed public/img/ path (via sharp) so it is
+// reachable without sign-in - the /cert verification page is public, unlike
+// everything under /uploads (which requires a session).
+const PARTNER_LOGO_PATH = path.join(__dirname, 'public', 'img', 'partner-logo.png');
+app.post('/api/admin/partner-settings/logo', authRequired, adminRequired, upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Choose a logo image first.' });
+  try {
+    await sharp(req.file.path).resize(400, 400, { fit: 'inside', withoutEnlargement: true }).png().toFile(PARTNER_LOGO_PATH);
+    const partner = Settings.setPartnerLogo(`/img/partner-logo.png?v=${Date.now()}`);
+    res.json({ ok: true, partner });
+  } catch (e) {
+    res.status(400).json({ error: 'Could not process that image - try a PNG, JPEG or SVG.' });
+  } finally {
+    try { fs.unlinkSync(req.file.path); } catch {}
+  }
+});
+app.post('/api/admin/partner-settings/track', authRequired, adminRequired, (req, res) => {
+  const { key, on } = req.body || {};
+  if (!key || !Quests.trackDef(key)) return res.status(404).json({ error: 'Track not found.' });
+  res.json({ ok: true, partner_tracks: Settings.setPartnerTrack(key, !!on) });
+});
+// A specific paid/portal course - toggled from that course's own admin menu.
+app.post('/api/batches/:id/partner', authRequired, adminRequired, (req, res) => {
+  const partner = Batches.setPartner(req.params.id, !!(req.body || {}).on);
+  if (partner === null) return res.status(404).json({ error: 'Course not found.' });
+  res.json({ ok: true, partner });
+});
 // Issue one certificate (course completion / hackathon / competition).
 app.post('/api/certificates/issue', authRequired, teacherOrAdmin, (req, res) => {
-  const { reg_no, user_id, batch_id, kind, title, completion_date, detail } = req.body || {};
+  const { reg_no, user_id, batch_id, kind, title, completion_date, detail, partner } = req.body || {};
   const student = user_id ? Users.byId(user_id) : Users.byReg(String(reg_no || ''));
   if (!student) return res.status(404).json({ error: 'No student found for that registration number.' });
   if (batch_id) {
@@ -2662,7 +2709,10 @@ app.post('/api/certificates/issue', authRequired, teacherOrAdmin, (req, res) => 
   // course as it stood at the moment the certificate was earned.
   const concepts = batch_id && Quests.installed(batch_id) ? courseConcepts(batch_id) : [];
   const finalProject = batch_id && Quests.installed(batch_id) ? finalProjectFor(batch_id, student.id) : null;
-  const out = Certificates.issue({ user_id: student.id, batch_id, kind, title, completion_date, detail, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject });
+  // Defaults to the course's own WebEra-collaboration flag (if any); an
+  // admin issuing by hand can still tick/untick it for this one certificate.
+  const isPartner = partner !== undefined ? !!partner : !!(batch_id && Batches.byId(batch_id).partner);
+  const out = Certificates.issue({ user_id: student.id, batch_id, kind, title, completion_date, detail, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject, partner: isPartner });
   if (out.error) return res.status(400).json({ error: out.error });
   const cert = out.cert;
   if (student.email) {
@@ -2680,12 +2730,14 @@ app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (
   const instructorId = req.user.role === 'instructor' ? req.user.id : ((req.batch.instructor_ids || [])[0] || null);
   const installed = Quests.installed(req.batch.id);
   const concepts = installed ? courseConcepts(req.batch.id) : [];
+  const bodyPartner = (req.body || {}).partner;
+  const isPartner = bodyPartner !== undefined ? !!bodyPartner : !!req.batch.partner;
   const issued = [], skipped = [];
   for (const u of Enrollments.studentsForBatch(req.batch.id)) {
     const prog = installed ? Quests.progress(u.id, req.batch.id) : null;
     if (onlyCompleted && prog && !prog.completed) { skipped.push(u.name); continue; }
     const finalProject = installed ? finalProjectFor(req.batch.id, u.id) : null;
-    const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject });
+    const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject, partner: isPartner });
     if (out.ok) {
       issued.push(u.name);
       if (u.email) mailer.notify(u.email, `Your certificate is ready - ${title}`, `Congratulations ${u.name}! Your verified certificate for "${title}" is ready: ${APP_URL}/cert?s=${out.cert.serial}`);

@@ -74,6 +74,15 @@ const empty = () => ({
     // and letterhead-flow.signatureName) - there is deliberately no signature
     // image field here, so no scanned/hand signature can ever be attached.
     cert: { org: 'EchoLens Digital', ceo_name: 'Tahir Mehmood', tagline: 'Innovate · Educate · Elevate', ntn: 'J372619', cuin: '0342802' },
+    // v24: certificates issued "in collaboration with" a named partner
+    // organisation - same typed-signature convention as EchoLens's own CEO
+    // (no scanned/uploaded signature image, ever). Which certificates carry
+    // this lives with the course/event itself (Batches' and Events' own
+    // `partner` field) so it travels automatically through both manual and
+    // fully-automatic issuance; free/open tracks are static code, not DB
+    // records, so their opt-in list lives here instead (partner_tracks).
+    partner: { name: 'WebEra Solutions PK', ceo_name: 'Hifza Saleem', logo_url: null },
+    partner_tracks: [],
     bank: { bank_name: 'Meezan Bank', account_title: 'EchoLens (SMC-Private) Limited', account_number: '0123-4567890-123', iban: 'PK36 MEZN 0000 0123 4567 8901', branch: 'Gulberg Branch, Lahore' },
     // Gems awarded to an ambassador when a student they referred is actually
     // enrolled into a batch (not just at interest-registration), weighted by
@@ -1387,9 +1396,17 @@ const Batches = {
   byId(id) { return data.batches.find((b) => b.id === Number(id)) || null; },
   all() { return data.batches.map((b) => Batches.decorate(b)); },
   create({ course_id, name, start_date, status = 'running', instructor_ids = [] }) {
-    const b = { id: nextId('batches'), course_id: Number(course_id), code: batchCode(), name, start_date, status, instructor_ids: instructor_ids.map(Number), created_at: now() };
+    const b = { id: nextId('batches'), course_id: Number(course_id), code: batchCode(), name, start_date, status, instructor_ids: instructor_ids.map(Number), partner: false, created_at: now() };
     data.batches.push(b); save();
     return b;
+  },
+  // v24: "this course is offered in collaboration with" the partner org in
+  // settings.partner - every certificate issued for this batch, manual or
+  // auto (issue-all), carries that flag from here.
+  setPartner(id, on) {
+    const b = Batches.byId(id); if (!b) return null;
+    b.partner = !!on; save();
+    return b.partner;
   },
   addTeacher(bid, uid) {
     const b = Batches.byId(bid); if (!b) return null;
@@ -2478,7 +2495,7 @@ const Certificates = {
     while (data.certificates.some((c) => c.serial === s));
     return s;
   },
-  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by, concepts, final_project, source_kind, source_id }) {
+  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by, concepts, final_project, source_kind, source_id, partner }) {
     const u = Users.byId(user_id); if (!u) return { error: 'Student not found.' };
     // v18: when the caller knows the exact source (a specific event id or
     // track key), replace-on-reissue is scoped to THAT source - so a new
@@ -2505,6 +2522,11 @@ const Certificates = {
       concepts: Array.isArray(concepts) ? concepts.slice(0, 40) : [],
       final_project: final_project || null,
       source_kind: source_kind || null, source_id: source_id != null ? source_id : null,
+      // v24: whether this certificate is co-branded with the partner org
+      // (settings.partner) - resolved by the caller (batch/event's own
+      // `partner` flag, or a free track's membership in partner_tracks), not
+      // looked up again here, so callers can also explicitly override it.
+      partner: !!partner,
       issued_by, issued_at: now(),
     };
     data.certificates.push(cert); save();
@@ -2517,11 +2539,17 @@ const Certificates = {
   // Public view: what the QR verification page shows. No emails, no ids.
   publicView(c) {
     const s = Settings.cert();
+    // v24: the partner org's current details (name/CEO/logo) are looked up
+    // live from settings, same as EchoLens's own org/ceo_name above - if the
+    // partner ever changes, already-issued collaboration certificates pick
+    // up the update, exactly like EchoLens's own branding already does.
+    const p = c.partner ? Settings.partner() : null;
     return {
       serial: c.serial, student_name: c.student_name, reg_no: c.reg_no,
       kind: c.kind, title: c.title, detail: c.detail, completion_date: c.completion_date,
       instructor_name: c.instructor_name, instructor_sig: c.instructor_sig,
       org: s.org, tagline: s.tagline, ceo_name: s.ceo_name,
+      partner: p ? { name: p.name, ceo_name: p.ceo_name, logo_url: p.logo_url } : null,
       concepts: c.concepts || [], final_project: c.final_project || null,
       issued_at: (c.issued_at || '').slice(0, 10),
     };
@@ -2536,6 +2564,40 @@ const Settings = {
     delete c.ceo_sig; // legacy signature-image field - never written again
     save();
     return c;
+  },
+  // v24: the named partner organisation ("in collaboration with") - same
+  // typed-signature convention as the CEO above, so logo_url is the only
+  // image field (set via setPartnerLogo, uploaded through the admin UI).
+  partner() { return data.settings && data.settings.partner ? data.settings.partner : empty().settings.partner; },
+  setPartner(fields) {
+    if (!data.settings) data.settings = empty().settings;
+    if (!data.settings.partner) data.settings.partner = empty().settings.partner;
+    const p = data.settings.partner;
+    for (const k of ['name', 'ceo_name']) if (fields[k] !== undefined) p[k] = String(fields[k]).slice(0, 200);
+    save();
+    return p;
+  },
+  setPartnerLogo(url) {
+    if (!data.settings) data.settings = empty().settings;
+    if (!data.settings.partner) data.settings.partner = empty().settings.partner;
+    data.settings.partner.logo_url = url || null;
+    save();
+    return data.settings.partner;
+  },
+  // Free/open tracks (CS-101 etc.) are static code, not DB records, so
+  // "is this course a WebEra collaboration" for them lives here instead of
+  // on the course itself - see OpenQuest.maybeCertify().
+  partnerTracks() { return (data.settings && data.settings.partner_tracks) || []; },
+  isPartnerTrack(key) { return Settings.partnerTracks().includes(key); },
+  setPartnerTrack(key, on) {
+    if (!data.settings) data.settings = empty().settings;
+    if (!Array.isArray(data.settings.partner_tracks)) data.settings.partner_tracks = [];
+    const list = data.settings.partner_tracks;
+    const i = list.indexOf(key);
+    if (on && i === -1) list.push(key);
+    else if (!on && i !== -1) list.splice(i, 1);
+    save();
+    return list;
   },
   // v18: bank details the Admissions Office sets once and every challan
   // snapshots. Databases saved before the dummy defaults existed hold all-empty
@@ -3096,6 +3158,9 @@ const Events = {
       pass_mark: Math.max(0, Math.min(100, Number(b.pass_mark) || 0)),
       auto_grade: !!b.auto_grade,
       auto_certificate: !!b.auto_certificate,
+      // v24: "this event's certificates are issued in collaboration with"
+      // the partner org in settings.partner - see Events.maybeCertify().
+      partner: !!b.partner,
       compiler: EVENT_LANGS.includes(b.compiler) ? b.compiler : 'none',
       dataset_url: String(b.dataset_url || '').slice(0, 500) || null,
       files: [],
@@ -3122,6 +3187,7 @@ const Events = {
     if (b.pass_mark !== undefined) ev.pass_mark = Math.max(0, Math.min(100, Number(b.pass_mark) || 0));
     if (b.auto_grade !== undefined) ev.auto_grade = !!b.auto_grade;
     if (b.auto_certificate !== undefined) ev.auto_certificate = !!b.auto_certificate;
+    if (b.partner !== undefined) ev.partner = !!b.partner;
     if (b.compiler !== undefined && EVENT_LANGS.includes(b.compiler)) ev.compiler = b.compiler;
     if (b.open !== undefined) ev.open = !!b.open;
     if (Array.isArray(b.problems)) {
@@ -3264,6 +3330,7 @@ const Events = {
       completion_date: today(), detail: null,
       instructor_id: null, issued_by: issuedBy || ev.created_by,
       source_kind: 'event', source_id: ev.id,
+      partner: !!ev.partner,
     });
     if (out.ok) {
       const subs = data.event_submissions.filter((s) => s.event_id === ev.id && s.user_id === Number(uid));
@@ -3740,6 +3807,7 @@ const OpenQuest = {
       completion_date: today(), detail: null,
       instructor_id: null, issued_by: issuedBy || 1,
       source_kind: 'track', source_id: track_key,
+      partner: Settings.isPartnerTrack(track_key),
     });
     return out.ok ? { cert: out.cert } : null;
   },

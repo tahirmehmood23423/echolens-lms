@@ -1741,6 +1741,8 @@ async function openCourse(id, openTab) {
     menu.push(`<button onclick="formStudents()">Add students</button>`);
     menu.push(`<button onclick="formTeacher()">Add a teacher</button>`);
     menu.push(`<button onclick="formCertSettings()">Certificate settings</button>`);
+    menu.push(`<button onclick="formPartnerSettings()">Certificate partner (WebEra)</button>`);
+    menu.push(`<button onclick="toggleBatchPartner(${b.id},${!!b.partner})">${b.partner ? '✓ WebEra collaboration (on)' : 'Mark as WebEra collaboration'}</button>`);
     menu.push(`<button class="danger" onclick="deleteBatch()">Delete this course</button>`);
   }
 
@@ -5912,6 +5914,62 @@ async function formCertSettings() {
     catch (err) { modalMsg(err.message); }
   });
 }
+// v24: certificates issued "in collaboration with" a named partner org
+// (WebEra) - same typed-signature convention as the CEO above. Which
+// certificates carry it lives with the course/event itself (see
+// toggleBatchPartner and the event form's checkbox) so it travels through
+// automatic issuance too; free/open tracks are static code, not DB records,
+// so they get their own checklist right here instead.
+async function toggleBatchPartner(bid_, current) {
+  try {
+    const out = await api(`/api/batches/${bid_}/partner`, { method: 'POST', body: JSON.stringify({ on: !current }) });
+    toast(out.partner ? 'Marked as a WebEra collaboration - certificates from this course will carry both signatures.' : 'No longer a WebEra collaboration.');
+    openCourse(bid_);
+  } catch (err) { toast(err.message, true); }
+}
+async function formPartnerSettings() {
+  let d = { partner: { name: '', ceo_name: '', logo_url: null }, partner_tracks: [], tracks: [] };
+  try { d = await api('/api/admin/partner-settings'); } catch {}
+  const p = d.partner;
+  openModal('Certificate partner', `
+    <form id="fPartner">
+      <label class="field"><span>Partner organisation name</span><input name="name" required value="${esc(p.name || '')}"></label>
+      <label class="field"><span>Partner CEO full name</span><input name="ceo_name" value="${esc(p.ceo_name || '')}" placeholder="Appears as the typed signature on collaboration certificates"></label>
+      <p class="hint" style="margin:-4px 0 4px">Same convention as EchoLens's own CEO signature: the name above, rendered in a script font - no signature image is uploaded or used.</p>
+      <button class="btn btn-primary btn-block">Save</button>
+    </form>
+    <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+      <label class="field" style="margin-bottom:6px"><span>Partner logo</span></label>
+      ${p.logo_url ? `<img src="${esc(p.logo_url)}" alt="${esc(p.name)} logo" style="height:42px;display:block;margin-bottom:8px">` : '<p class="hint" style="margin:0 0 8px">No logo uploaded yet.</p>'}
+      <form id="fLogo" style="display:flex;gap:8px;align-items:center">
+        <input type="file" name="file" accept=".png,.jpg,.jpeg,.svg" required style="flex:1">
+        <button class="btn btn-teal btn-sm">Upload</button>
+      </form>
+    </div>
+    <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+      <div class="s" style="font-weight:700;color:var(--navy);margin-bottom:4px">Free courses in collaboration with ${esc(p.name || 'the partner')}</div>
+      <p class="hint" style="margin:0 0 8px">Every certificate a student auto-earns from a checked course carries both signatures. (Paid courses toggle from that course's own menu; events toggle from the Events list.)</p>
+      <div id="partnerTracksBox">${d.tracks.map((t) => `
+        <label class="s" style="display:flex;gap:8px;align-items:center;padding:5px 0;cursor:pointer">
+          <input type="checkbox" data-key="${esc(t.key)}" ${d.partner_tracks.includes(t.key) ? 'checked' : ''} onchange="togglePartnerTrack(this)" style="width:auto">
+          ${esc(t.course_code || '')} - ${esc(t.title)}
+        </label>`).join('') || '<p class="hint">No free courses yet.</p>'}</div>
+    </div>`);
+  $('fPartner').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    try { await api('/api/admin/partner-settings', { method: 'POST', body: JSON.stringify({ name: f.name.value, ceo_name: f.ceo_name.value }) }); modalMsg('Saved.', true); }
+    catch (err) { modalMsg(err.message); }
+  });
+  $('fLogo').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
+    try { await api('/api/admin/partner-settings/logo', { method: 'POST', body: new FormData(f) }); toast('Logo updated.'); formPartnerSettings(); }
+    catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+async function togglePartnerTrack(input) {
+  try { await api('/api/admin/partner-settings/track', { method: 'POST', body: JSON.stringify({ key: input.dataset.key, on: input.checked }) }); }
+  catch (err) { toast(err.message, true); input.checked = !input.checked; }
+}
 
 /* --------------------------- LEVEL TOOLS (teacher) --------------------------- */
 function formLevelDeadline(qid, current) {
@@ -5988,6 +6046,7 @@ async function renderEvents() {
           </div>
           <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
           ${d.is_admin ? `<button class="btn btn-ghost btn-sm" onclick="formEventDeadline(${ev.id},'${esc(ev.deadline || '')}')">${ev.deadline ? 'Change deadline' : 'Set deadline'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleEventPartner(${ev.id},${ev.partner ? 'false' : 'true'})">${ev.partner ? '✓ WebEra collaboration' : 'Mark WebEra collaboration'}</button>
           <button class="btn btn-ghost btn-sm" onclick="toggleEvent(${ev.id},${ev.open ? 'false' : 'true'})">${ev.open ? 'Close' : 'Reopen'}</button>
           <button class="btn btn-danger btn-sm" onclick="delEvent(${ev.id})">Delete</button>` : ''}
         </div>`).join('') : '<div class="empty">No events yet' + (d.is_admin ? ' - create the first one.' : '. Watch this space.') + '</div>'}
@@ -6016,6 +6075,13 @@ async function delEvent(id) {
   if (!confirm('Delete this event and all its registrations and submissions?')) return;
   try { await api(`/api/admin/events/${id}`, { method: 'DELETE' }); toast('Event deleted.'); renderEvents(); }
   catch (e) { toast(e.message, true); }
+}
+async function toggleEventPartner(id, on) {
+  try {
+    await api(`/api/admin/events/${id}`, { method: 'PATCH', body: JSON.stringify({ partner: on }) });
+    toast(on ? 'Marked as a WebEra collaboration - certificates from this event will carry both signatures.' : 'No longer a WebEra collaboration.');
+    renderEvents();
+  } catch (e) { toast(e.message, true); }
 }
 
 /* ------------------------------ create event ------------------------------ */
@@ -6064,6 +6130,7 @@ function formEvent() {
       <div style="display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 4px">
         <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_grade"> AI auto-grading (score carries a 10% reduction)</label>
         <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_certificate" checked> Automatic certificate at the pass mark</label>
+        <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="partner"> In collaboration with WebEra</label>
       </div>
       <p class="hint" style="margin:0 0 12px">Off by default - submissions wait for an admin to check and score them by hand from Events &rarr; Submissions. Turn AI auto-grading on only if you want scores generated instantly instead.</p>
       <div class="ev-probs">
@@ -6082,7 +6149,7 @@ function formEvent() {
   $('evForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button:not([type="button"])') || f.querySelector('button');
     const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
-    obj.auto_grade = f.auto_grade.checked; obj.auto_certificate = f.auto_certificate.checked;
+    obj.auto_grade = f.auto_grade.checked; obj.auto_certificate = f.auto_certificate.checked; obj.partner = f.partner.checked;
     obj.problems = obj.kind === 'webinar' ? [] : evReadProbs();
     if (['quest', 'competition'].includes(obj.kind) && !obj.problems.length) { modalMsg('Add at least one task for a quest or competition.'); return; }
     btn.disabled = true;

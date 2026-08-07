@@ -608,8 +608,8 @@ function courseOutlineHtml(t) {
   const isBootcamp = (t.course_code || '').startsWith('BC');
   const unit = isBootcamp ? 'Class' : 'Level';
   const rows = CUR.levels.map((l) => `
-    <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.5">
-      <span class="mono" style="color:var(--primary);font-weight:700;white-space:nowrap">${unit} ${l.no}</span>
+    <li class="outline-row">
+      <span class="outline-num">${unit[0]}${l.no}</span>
       <span><strong style="color:var(--ink)">${esc(l.title)}</strong>${l.topic && l.topic.length < 90 ? ` <span style="color:var(--muted)">- ${esc(l.topic)}</span>` : ''}</span>
     </li>`).join('');
   const concepts = (t.key_concepts || []).map((k) => `<span style="display:inline-block;font-size:12px;font-weight:600;color:var(--primary);border:1px solid var(--line);border-radius:999px;padding:4px 11px;margin:3px 4px 0 0">${esc(k)}</span>`).join('');
@@ -632,7 +632,7 @@ function courseOutlineHtml(t) {
     <div class="card" style="margin-bottom:16px"><div class="card-body">
       <h3 style="margin-bottom:4px">Course outline</h3>
       <p class="s" style="color:var(--muted);margin-bottom:8px">One line per ${unit.toLowerCase()} - every ${unit.toLowerCase()} ends in hands-on quests you clear below.</p>
-      <ul style="list-style:none;padding:0;margin:0">${rows}</ul>
+      <ul class="outline-list">${rows}</ul>
     </div></div>`;
 }
 // CS-101..CS-107's `topic` field packs a short explanation paragraph and an
@@ -658,36 +658,45 @@ function topicDetailHtml(l) {
 function drawCourse() {
   const t = CUR.track, prog = CUR.progress;
   const cat = CATALOGUE.find((c) => c.code === t.course_code);
+  const heroIcon = pickIcon(t.title);
+  const heroBg = tierBg(cat ? cat.tier : 'Bootcamp', !!t.free);
   $('courseHead').innerHTML = `
-    <div class="card" style="margin-bottom:16px"><div class="card-body">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
-        ${t.free ? '<span class="kbadge quest">FREE COURSE</span>' : ''}
-        <span class="mono s" style="color:var(--muted-2)">${esc(t.course_code || '')}</span>
-        <span class="s" style="color:var(--muted)">Pass mark ${t.pass_mark || 60}% · ${MODE_LABEL[t.submission_mode] || MODE_LABEL.file} · Graded instantly</span>
-      </div>
-      <h2 style="font-family:var(--font-display);font-size:24px;color:var(--ink)">${esc(t.title)}</h2>
-      <p class="s" style="color:var(--muted);margin-top:4px">${esc(t.description || '')}</p>
-      ${t.outcome ? `<p class="s" style="margin-top:6px;color:var(--ink)"><strong>Outcome:</strong> ${esc(t.outcome)}</p>` : ''}
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:14px;padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:var(--bg)">
-        <div>
-          <div class="s" style="color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em">${t.free ? 'Price' : 'Course fee'}</div>
-          <div style="font-family:var(--font-display);font-size:23px;font-weight:700;color:${t.free ? 'var(--teal-deep)' : 'var(--ink)'}">${t.free || !(cat && cat.price_pkr) ? 'Free' : 'PKR ' + cat.price_pkr.toLocaleString()}</div>
+    <nav class="crumb">
+      <a onclick="openTab('courses')">${COURSE_NAV_MODE === 'free' ? 'Free Certified Courses' : 'Live Tech Courses'}</a>
+      <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="crumb-cur">${esc(t.title)}</span>
+    </nav>
+    <div class="hero-card"><div class="course-hero">
+      <div class="hero-main">
+        <div class="hero-badges">
+          ${t.free ? '<span class="kbadge quest">FREE COURSE</span>' : ''}
+          <span class="mono s hero-code">${esc(t.course_code || '')}</span>
+          <span class="s hero-sub">Pass mark ${t.pass_mark || 60}% &middot; ${MODE_LABEL[t.submission_mode] || MODE_LABEL.file} &middot; Graded instantly</span>
         </div>
-        ${cat ? `<div style="border-left:1px solid var(--line);padding-left:16px">
-          <div class="s" style="color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em">Duration</div>
-          <div style="font-weight:600;color:var(--ink)">${cat.weeks} weeks · ${cat.hours} hours</div></div>` : ''}
-        <div style="border-left:1px solid var(--line);padding-left:16px">
-          <div class="s" style="color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em">Access</div>
-          <div style="font-weight:600;color:var(--ink)">${t.free ? 'All levels open free' : 'First quest free · rest unlocks on enrolment'}</div></div>
-        <span style="flex:1"></span>
-        ${!t.free && cat ? `<button class="btn btn-primary" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register &amp; unlock - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}
+        <h1 class="hero-title">${esc(t.title)}</h1>
+        <p class="hero-desc">${esc(t.description || '')}</p>
+        ${t.outcome ? `<p class="hero-outcome"><strong>Outcome:</strong> ${esc(t.outcome)}</p>` : ''}
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hs-label">${t.free ? 'Price' : 'Course fee'}</span>
+            <span class="hs-val${t.free ? ' teal' : ''}">${t.free || !(cat && cat.price_pkr) ? 'Free' : 'PKR ' + cat.price_pkr.toLocaleString()}</span>
+          </div>
+          ${cat ? `<div class="hero-stat"><span class="hs-label">Duration</span><span class="hs-val">${cat.weeks}w &middot; ${cat.hours}h</span></div>` : ''}
+          <div class="hero-stat"><span class="hs-label">Access</span><span class="hs-val">${t.free ? 'All levels' : 'First quest free'}</span></div>
+          <div class="hero-stat"><span class="hs-label">Certificate</span><span class="hs-val">${t.free ? 'Automatic' : 'Included'}</span></div>
+          ${!t.free && cat ? `<button class="btn btn-primary hero-cta" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register &amp; unlock - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}
+        </div>
+        ${prog ? `
+          <div class="oq-prog hero-prog"><div style="width:${Math.round((prog.graded / Math.max(1, prog.total)) * 100)}%"></div></div>
+          <div class="s hero-prog-note" style="color:${prog.passed ? 'var(--ok)' : 'var(--muted)'}">
+            ${prog.graded}/${prog.total} tasks graded &middot; ${prog.gems} gems earned${prog.avg != null ? ' &middot; Average ' + prog.avg + '%' : ''}
+            ${prog.passed ? ' &middot; <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' &middot; Complete every task at ' + (t.pass_mark || 60) + '%+ average for the automatic certificate.' : '')}
+          </div>` : (ME ? '' : `<div class="s hero-signin-note">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
       </div>
-      ${prog ? `
-        <div class="oq-prog" style="margin-top:12px"><div style="width:${Math.round((prog.graded / Math.max(1, prog.total)) * 100)}%"></div></div>
-        <div class="s" style="margin-top:6px;color:${prog.passed ? 'var(--ok)' : 'var(--muted)'}">
-          ${prog.graded}/${prog.total} tasks graded · ${prog.gems} gems earned${prog.avg != null ? ' · Average ' + prog.avg + '%' : ''}
-          ${prog.passed ? ' · <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' · Complete every task at ' + (t.pass_mark || 60) + '%+ average for the automatic certificate.' : '')}
-        </div>` : (ME ? '' : `<div class="s" style="margin-top:10px;color:var(--muted)">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
+      <div class="hero-visual" style="background:${heroBg}">
+        <div class="hero-visual-glow"></div>
+        <svg class="hero-visual-icon" viewBox="0 0 24 24" fill="none">${ICONS[heroIcon]}</svg>
+      </div>
     </div></div>`;
   // Levels group into "Modules" by week - same structure as the LMS
   // Portal's Quest tab (dashboard.js renderQuestTab), so a paid enrolled
@@ -807,6 +816,56 @@ function fmtSubDate(iso) {
   if (isNaN(d)) return String(iso).slice(0, 16);
   return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
+// Levels group into "Modules" by week - same grouping drawCourse() uses for
+// its module headings, kept in one place so the breadcrumb, the Course
+// Content nav, and the course page always agree on "Module N".
+function svModuleMap() {
+  const map = new Map(); // week -> { index, levels }
+  let idx = 0;
+  CUR.levels.forEach((l) => {
+    const wk = l.week != null ? l.week : l.no;
+    if (!map.has(wk)) { idx += 1; map.set(wk, { index: idx, levels: [] }); }
+    map.get(wk).levels.push(l);
+  });
+  return map;
+}
+// Course Content nav (v23): a compact week > level > problem tree beside the
+// solve workspace, built from the same CUR data already loaded for the page
+// - no new requests. Clicking a problem calls the existing openSolve(), so
+// it is a navigation shortcut, not a new workflow.
+function svNavHtml() {
+  const t = CUR.track;
+  const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Level';
+  const levelDone = (l) => !!(CUR.progress && (l.problems || []).every((pr) => {
+    const s = CUR.progress.submissions[`${l.no}:${pr.pid}`];
+    return s && s.score != null;
+  }));
+  let html = '<div class="svc-nav-head">Course Content</div>';
+  for (const [wk, mod] of svModuleMap()) {
+    html += `<div class="svc-week">Module ${mod.index} &middot; Week ${wk}</div>`;
+    html += mod.levels.map((l) => {
+      const isCurLevel = l.no === CUR_PROBLEM.level;
+      const body = l.locked
+        ? '<div class="s" style="padding:6px 8px;color:var(--muted-2)">Locked</div>'
+        : (l.problems || []).map((pr) => {
+            const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${pr.pid}`];
+            const isDone = sub && sub.score != null;
+            const isActive = isCurLevel && pr.pid === CUR_PROBLEM.pid;
+            return `<button type="button" class="svc-problem${isActive ? ' active' : ''}${isDone ? ' done' : ''}" onclick="openSolve(${l.no}, ${pr.pid})">
+              <span class="dot"></span><span class="lbl">${esc(pr.title)}</span>
+            </button>`;
+          }).join('');
+      return `<div class="svc-level${isCurLevel ? ' open' : ''}">
+        <button type="button" class="svc-level-head" onclick="this.closest('.svc-level').classList.toggle('open')">
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="lbl">${unitLabel} ${l.no} - ${esc(l.title)}</span>${levelDone(l) ? '<span class="dot" style="background:var(--teal);flex:none"></span>' : ''}
+        </button>
+        <div class="svc-problems">${body}</div>
+      </div>`;
+    }).join('');
+  }
+  return html;
+}
 function openSolve(levelNo, pid) {
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   const p = lvl && (lvl.problems || []).find((x) => x.pid === pid);
@@ -814,6 +873,17 @@ function openSolve(levelNo, pid) {
   COURSE_SCROLL_Y = window.scrollY;
   CUR_PROBLEM = { level: levelNo, pid, problem: p };
   openTab('solve');
+  const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Level';
+  const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
+  $('svCrumb').innerHTML = `
+    <a onclick="backToCourse()">${esc(CUR.track.title)}</a>
+    <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Module ${moduleIdx}</span>
+    <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>${unitLabel} ${lvl.no}</span>
+    <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="crumb-cur">${esc(p.title)}</span>`;
+  $('svNav').innerHTML = svNavHtml();
   $('svLeft').innerHTML = `
     <div class="card slv-card"><div class="card-body">
       <div class="slv-eyebrow">Level ${lvl.no} &middot; ${esc(lvl.title || '')}<span style="flex:1"></span><span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span></div>
@@ -937,30 +1007,39 @@ function drawWorkArea() {
   // shared code-editor shell (dark, line-numbered) - staff omit Dataset/Submit
   const codeIde = (opts) => `
     <div class="qide">
-      <div class="qide-bar">
-        <select id="svLang" class="qide-lang" onchange="svLangChanged()">${svLangOptions()}</select>
-        <span class="sp"></span>
-        ${opts.dataset ? `<label class="qbtn" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none">${ICONS.database}</svg>Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>` : ''}
-        <button type="button" class="qbtn" onclick="svClearOutput()"><svg viewBox="0 0 24 24" fill="none">${ICONS.refresh}</svg>Clear</button>
-        <button type="button" class="qbtn" id="svRunBtn" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg>Run</button>
-        ${opts.submit ? `<button type="button" class="qbtn primary" id="svSubmitBtn" onclick="submitSolve()">${opts.sub ? 'Resubmit' : 'Submit for grading'}</button>` : ''}
-      </div>
-      <div class="qide-box">
-        <div class="qide-editor">
-          <div class="ide2-gutter" id="svGutter"><span>1</span></div>
-          <textarea id="svCode" class="ide2-code" spellcheck="false" placeholder="${opts.placeholder}"></textarea>
+      <div class="qide-flex">
+        <div class="qide-col-editor">
+          <div class="qide-bar">
+            <select id="svLang" class="qide-lang" onchange="svLangChanged()">${svLangOptions()}</select>
+            <span class="sp"></span>
+            ${opts.dataset ? `<label class="qbtn" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none">${ICONS.database}</svg>Dataset<input type="file" accept=".csv,.tsv,.txt,.json" style="display:none" onchange="svLocalDataset(this)"></label>` : ''}
+            <button type="button" class="qbtn" onclick="svClearOutput()"><svg viewBox="0 0 24 24" fill="none">${ICONS.refresh}</svg>Clear</button>
+            <button type="button" class="qbtn" id="svRunBtn" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg>Run</button>
+            ${opts.submit ? `<button type="button" class="qbtn primary" id="svSubmitBtn" onclick="submitSolve()">${opts.sub ? 'Resubmit' : 'Submit for grading'}</button>` : ''}
+          </div>
+          <div class="qide-box">
+            <div class="qide-editor">
+              <div class="ide2-gutter" id="svGutter"><span>1</span></div>
+              <textarea id="svCode" class="ide2-code" spellcheck="false" placeholder="${opts.placeholder}"></textarea>
+            </div>
+            <div class="qide-status">
+              <span id="svStatus">${opts.status}</span>
+              <span class="sp"></span>
+              <span id="svExecTime"></span>
+              <button class="qide-rerun" title="Run again" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg></button>
+            </div>
+          </div>
         </div>
-        <div class="qide-status">
-          <span id="svStatus">${opts.status}</span>
-          <span class="sp"></span>
-          <span id="svExecTime"></span>
-          <button class="qide-rerun" title="Run again" onclick="runSolve()"><svg viewBox="0 0 24 24" fill="none">${ICONS.play}</svg></button>
+        <div class="qide-col-output">
+          <div class="qide-out">
+            <div class="qide-out-head">Output</div>
+            <div id="svTerm"></div>
+          </div>
+          <div id="svWebWrap" style="display:none">
+            <iframe id="svWebFrame" class="web-frame" sandbox="allow-scripts" title="Live preview"></iframe>
+            <pre id="svWebLog" class="web-log"></pre>
+          </div>
         </div>
-      </div>
-      <div class="qide-out"><div id="svTerm"></div></div>
-      <div id="svWebWrap" style="display:none">
-        <iframe id="svWebFrame" class="web-frame" sandbox="allow-scripts" title="Live preview"></iframe>
-        <pre id="svWebLog" class="web-log"></pre>
       </div>
       ${opts.submit ? '<div id="svResults"></div>' : ''}
       ${opts.submit ? `<div class="qide-note">${SV_NOTE_ICON}<span>${svGradingNote()}</span></div>` : ''}
@@ -1292,6 +1371,7 @@ async function submitSolve(fileForm) {
     // Refresh progress and views
     try { CUR.progress = (await api('/api/open/progress?track=' + encodeURIComponent(CUR.track.key))).progress; } catch {}
     drawSolveStatus();
+    if ($('svNav')) $('svNav').innerHTML = svNavHtml();
     if (out.cert) loadCerts();
     if ($('svSubmitBtn')) { $('svSubmitBtn').disabled = false; $('svSubmitBtn').textContent = 'Resubmit'; }
   } catch (e) {

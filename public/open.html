@@ -77,15 +77,16 @@
 
   <!-- ============================ COURSE DETAIL ============================ -->
   <section id="tab-course" style="display:none">
-    <button class="btn btn-ghost btn-sm" onclick="openTab('courses')" style="margin-bottom:12px">&larr; Back to courses</button>
+    <!-- the breadcrumb built into #courseHead (drawCourse()) is the back-to-courses affordance now -->
     <div id="courseHead"></div>
     <div id="courseLevels"></div>
   </section>
 
   <!-- ================================ SOLVE ================================ -->
   <section id="tab-solve" style="display:none">
-    <button class="btn btn-ghost btn-sm" onclick="backToCourse()" style="margin-bottom:12px">Back to the course</button>
+    <nav class="crumb" id="svCrumb" style="margin-bottom:10px"></nav>
     <div class="open-split">
+      <aside class="svc-nav" id="svNav"></aside>
       <div id="svLeft"></div>
       <div id="svWorkArea"></div>
     </div>

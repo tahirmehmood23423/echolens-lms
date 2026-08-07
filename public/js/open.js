@@ -119,6 +119,26 @@ function navCourses(mode) {
   openTab('courses');
   if (mode === 'free') setCoursePill('free');
 }
+// The two nav destinations share #tab-courses but are visually completely
+// different pages (see the v22 CSS comment above .fc-view): "Live Tech
+// Courses" is the original filterable grid, untouched; "Free Certified
+// Courses" is its own single-screen accordion. Swap which shell is visible
+// whenever the courses tab is (re)entered, and build the accordion's data
+// the first time it's shown (or once the catalogue itself finishes loading,
+// whichever is later - see loadCatalogue()).
+function updateCourseShellMode() {
+  const isFree = COURSE_NAV_MODE === 'free';
+  const live = $('liveCoursesShell'), free = $('freeCoursesShell');
+  if (!live || !free) return;
+  live.style.display = isFree ? 'none' : '';
+  free.style.display = isFree ? '' : 'none';
+  // .open-wrap's generous top/bottom padding is right for the long, scrolling
+  // "Live Tech Courses" grid but eats into the fixed 900px budget the
+  // single-screen accordion is built to (see the v22 CSS). Only ever applied
+  // in free mode, so the live page's spacing is untouched.
+  const wrap = $('appWrap'); if (wrap) wrap.classList.toggle('free-compact', isFree);
+  if (isFree && CATALOGUE.length) renderFreeCourses();
+}
 
 /* -------------------------------- boot -------------------------------- */
 (async () => {
@@ -263,6 +283,7 @@ function openTab(tab) {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
   if (tab === 'feedback') loadFeedback();
+  if (tab === 'courses') updateCourseShellMode();
   // 'courses'/'course'/'solve' all map to the same two nav links (Live Tech
   // Courses vs Free Certified Courses) - which of those two is "active"
   // depends on COURSE_NAV_MODE, not on the tab name, since both links open
@@ -475,6 +496,7 @@ async function loadCatalogue() {
         </div>
       </div></div>` : '';
     drawCourses();
+    if (COURSE_NAV_MODE === 'free') renderFreeCourses();
   } catch (e) { $('courseTable').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
 const BADGE_LABEL = { free: 'FREE', new: 'NEW', high_demand: 'HIGH DEMAND', flagship: 'FLAGSHIP' };
@@ -536,6 +558,92 @@ function courseAction(code) {
   // courses carry a "Register to unlock" call to action inside that page.
   if (c.track_key) { openCourse(c.track_key); return; }
   if (c.price_pkr > 0) openRegister(c.code, c.title); // fallback: course without a quest track
+}
+
+/* --------------- v22: Free Certified Courses - single-screen accordion ---------------
+ * One collapsed row per free course (title, one-line summary, tier tag,
+ * chevron); clicking expands it in place with the full detail - description,
+ * key concepts, duration, language/track and certificate info, pulled from
+ * /api/public/tracks/:key (fetched once per course and cached) - plus the
+ * Start button. Exclusive accordion: opening one closes whatever else was
+ * open, so the collapsed-row budget the CSS was tuned for never has to share
+ * the screen with more than one expanded panel at a time.
+ */
+const FREE_LANG_LABEL = { python: 'Python 3', cpp: 'C++', c: 'C', web: 'HTML / CSS / JavaScript', sql: 'SQL' };
+let FREE_TRACK_CACHE = {};
+function renderFreeCourses() {
+  const list = CATALOGUE.filter((c) => c.price_pkr === 0);
+  const countEl = $('fcCount');
+  if (countEl) countEl.textContent = list.length ? `${list.length} free course${list.length === 1 ? '' : 's'}` : '';
+  $('fcList').innerHTML = list.length ? list.map(freeCourseItemHtml).join('')
+    : '<div class="empty">No free courses available right now - check back soon.</div>';
+}
+function freeCourseItemHtml(c, i) {
+  const icon = pickIcon(c.title);
+  return `
+    <article class="fc-item" id="fc-item-${i}">
+      <h3 class="fc-item-h">
+        <button type="button" class="fc-item-btn" id="fc-btn-${i}" aria-expanded="false" aria-controls="fc-panel-${i}" onclick="toggleFreeCourse(${i},'${esc(c.code)}')">
+          <span class="fc-item-ic" style="background:${tierBg(c.tier, true)}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none">${ICONS[icon]}</svg></span>
+          <span class="fc-item-title" title="${esc(c.title)}">${esc(c.title)}</span>
+          <span class="fc-item-desc">${esc(c.summary || '')}</span>
+          <span class="fc-item-tag">${esc(c.tier)}</span>
+          <svg class="fc-chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">${ICONS.chev}</svg>
+        </button>
+      </h3>
+      <div class="fc-item-panel-wrap">
+        <div class="fc-item-panel-inner">
+          <div class="fc-item-panel" id="fc-panel-${i}" role="region" aria-labelledby="fc-btn-${i}">
+            <div class="empty" style="padding:6px 0">Loading details&hellip;</div>
+          </div>
+        </div>
+      </div>
+    </article>`;
+}
+async function toggleFreeCourse(i, code) {
+  const item = $('fc-item-' + i);
+  const btn = $('fc-btn-' + i);
+  const willOpen = !item.classList.contains('open');
+  // Exclusive accordion - closing whatever else is open keeps the page
+  // within the single-screen budget the collapsed rows were sized for.
+  document.querySelectorAll('.fc-item.open').forEach((el) => {
+    if (el !== item) { el.classList.remove('open'); const b = el.querySelector('.fc-item-btn'); if (b) b.setAttribute('aria-expanded', 'false'); }
+  });
+  item.classList.toggle('open', willOpen);
+  btn.setAttribute('aria-expanded', String(willOpen));
+  if (willOpen) await fillFreeCourseDetail(i, code);
+}
+async function fillFreeCourseDetail(i, code) {
+  const c = CATALOGUE.find((x) => x.code === code);
+  const panel = $('fc-panel-' + i);
+  if (!c || !c.track_key) { panel.innerHTML = '<p class="s" style="color:var(--muted)">Full details coming soon.</p>'; return; }
+  if (!FREE_TRACK_CACHE[c.track_key]) {
+    try { FREE_TRACK_CACHE[c.track_key] = (await api('/api/public/tracks/' + encodeURIComponent(c.track_key))).track; }
+    catch { panel.innerHTML = '<p class="s" style="color:var(--muted)">Could not load details - try again.</p>'; return; }
+  }
+  const t = FREE_TRACK_CACHE[c.track_key];
+  const lang = FREE_LANG_LABEL[t.default_language] || 'Multiple languages';
+  // Two-column layout on purpose (not stacked blocks): the accordion trades
+  // vertical space for horizontal, since it has to stay inside the
+  // single-screen budget even while a panel is open.
+  panel.innerHTML = `
+    <div class="fc-detail">
+      <div class="fc-detail-left">
+        <p class="fc-detail-desc">${esc(t.description || c.summary || '')}</p>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openCourse('${esc(c.track_key)}')">Start course - it's free</button>
+      </div>
+      <div class="fc-detail-right">
+        <div class="fc-detail-meta">
+          <span>${c.weeks} weeks &middot; ${c.hours} hours</span>
+          <span>${esc(lang)}</span>
+          <span>Certificate at ${t.pass_mark}%+</span>
+        </div>
+        ${(t.key_concepts || []).length ? `<div class="fc-detail-learn">
+          <span class="fc-detail-label">What you'll learn</span>
+          <div class="fc-chip-row">${t.key_concepts.slice(0, 6).map((k) => `<span class="prob-chip">${esc(k)}</span>`).join('')}</div>
+        </div>` : ''}
+      </div>
+    </div>`;
 }
 
 /* ------------------- in-site registration form (item 6) ------------------- */

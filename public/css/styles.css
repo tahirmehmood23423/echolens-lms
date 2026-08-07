@@ -1103,11 +1103,11 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .slv-graded.wait{background:#FDF8EC;border-color:#F0E2BC}
 
 .qide{display:flex;flex-direction:column;gap:16px}
-/* v23: editor and output sit side by side once the viewport genuinely has
- * room for both (a solve page needs the code editor wide first) - below
- * that they stack, exactly as before. */
-.qide-flex{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
-@media(min-width:1500px){.qide-flex{grid-template-columns:1.35fr 1fr}}
+/* v23.1: the code editor always gets the full width of this column - output
+ * sits directly under it, never beside it, so the toolbar (language select,
+ * Dataset, Clear, Run, Submit) always has room to sit on one line and the
+ * editor itself is never squeezed into a narrow half-width panel. */
+.qide-flex{display:flex;flex-direction:column;gap:16px}
 .qide-col-editor,.qide-col-output{display:flex;flex-direction:column;gap:16px;min-width:0}
 .qide-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .qide-lang{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;font:600 13px var(--font-body);background:#fff;color:var(--text);cursor:pointer;transition:border-color .12s ease}

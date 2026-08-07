@@ -80,6 +80,13 @@ BASE_URL=http://localhost:3100 node driver.mjs <flow>
 | `open` | loads the public `/open` portal (no auth) |
 | `compiler` | signs in as student, opens `/compiler`, clicks Run on the default Python snippet, waits for real output |
 
+Two extra scripts in the same folder check the Python plotting path
+(`BASE_URL=... node plot-check.mjs` / `plot-check2.mjs`): the first runs a
+seaborn snippet that downloads a remote dataset and asserts two separate
+figures plus working Download PNG buttons; the second covers `input()`
+re-runs, plots without `plt.show()`, plots before an exception, remote
+`read_csv`, and a dead URL.
+
 Screenshots land in `.claude/skills/run-echolens-lms/screenshots/<flow>-<step>.png`.
 The driver prints any non-CDN console/page errors it saw at the end of
 the run - check that output, not just the screenshot.

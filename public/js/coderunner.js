@@ -33,6 +33,10 @@
   function workerMain() {
     let bootPromise = null;
     const dec = new TextDecoder();
+    // Python calls this the moment a figure is finished (plt.show(), or the
+    // end of the run) so plots appear in the terminal in the order the
+    // program drew them instead of all at once at the very end.
+    self.echoEmitFigure = function (b64) { postMessage({ type: 'image', b64: String(b64) }); };
     // numpy, pandas, matplotlib and scikit-learn all ship inside Pyodide's
     // own package index, so loadPackagesFromImports() (below) finds them
     // straight away. A few other pure-Python packages assignments commonly
@@ -40,6 +44,142 @@
     // PyPI with micropip instead, exactly like `pip install` would on a
     // laptop.
     const MICROPIP_FALLBACK = { seaborn: 'seaborn' };
+    /* ---------------------- the Python-side runtime (v21) ----------------------
+     * Two things every data-science lesson needs, installed into the
+     * interpreter before the student's code runs:
+     *
+     * 1. Working downloads. Pyodide's Python has no sockets, so the stdlib
+     *    urlopen() dies with "unknown url type: https" - which is what
+     *    sns.load_dataset("tips") and pd.read_csv("https://...") hit. We
+     *    reimplement urlopen()/urlretrieve() on top of a synchronous
+     *    XMLHttpRequest (legal inside a Worker), trying the URL directly
+     *    first and falling back to the server's /api/fetch-dataset proxy
+     *    when the host refuses cross-origin browser requests (CORS).
+     *
+     * 2. Honest plt.show(). Under the AGG backend show() does nothing, so a
+     *    script with two plots drew both onto the SAME axes and produced one
+     *    muddled image. Here show() renders the open figures, streams them
+     *    to the terminal and closes them - so plot #2 starts on a clean
+     *    canvas, exactly like on a laptop.
+     */
+    const PY_RUNTIME = [
+      'import io as _eio, os as _eos, sys as _esys, base64 as _eb64, email.message as _emsg',
+      'import urllib.request as _ereq, urllib.error as _eerr',
+      'from urllib.parse import quote as _equote',
+      'import js as _ejs',
+      '',
+      '_ECHO_PROXY = (_ECHO_ORIGIN + "/api/fetch-dataset?url=") if _ECHO_ORIGIN else ""',
+      '',
+      'class _EchoResponse(_eio.BytesIO):',
+      '    """What urlopen() hands back: a file-like object that also answers the',
+      '    handful of attributes pandas and seaborn read off a real response."""',
+      '    def __init__(self, payload, url, ctype):',
+      '        _eio.BytesIO.__init__(self, payload)',
+      '        self.url = url; self.status = 200; self.code = 200; self.reason = "OK"',
+      '        self.headers = _emsg.Message()',
+      '        self.headers["Content-Type"] = ctype or "application/octet-stream"',
+      '    def info(self): return self.headers',
+      '    def geturl(self): return self.url',
+      '    def getcode(self): return self.status',
+      '    def __enter__(self): return self',
+      '    def __exit__(self, *a): self.close(); return False',
+      '',
+      'def _echo_download(target):',
+      '    xhr = _ejs.XMLHttpRequest.new()',
+      '    xhr.open("GET", target, False)',
+      '    binary = True',
+      '    try:',
+      '        xhr.responseType = "arraybuffer"',
+      '    except Exception:',
+      '        binary = False',
+      '        xhr.overrideMimeType("text/plain; charset=x-user-defined")',
+      '    xhr.send(None)',
+      '    code = int(xhr.status)',
+      '    if code < 200 or code >= 300:',
+      '        raise _eerr.HTTPError(target, code, "HTTP " + str(code), None, None)',
+      '    ctype = xhr.getResponseHeader("Content-Type") or ""',
+      '    if binary and xhr.response is not None:',
+      '        payload = bytes(_ejs.Uint8Array.new(xhr.response).to_py())',
+      '    else:',
+      '        payload = bytes((ord(ch) & 0xFF) for ch in str(xhr.responseText))',
+      '    return payload, ctype',
+      '',
+      '_echo_real_urlopen = _ereq.urlopen',
+      '_echo_real_urlretrieve = _ereq.urlretrieve',
+      '',
+      'def _echo_urlopen(url, data=None, timeout=None, *args, **kwargs):',
+      '    target = url.full_url if hasattr(url, "full_url") else str(url)',
+      '    if data is not None or not target.lower().startswith(("http://", "https://")):',
+      '        return _echo_real_urlopen(url, data, *args, **kwargs)',
+      '    routes = [target]',
+      '    if _ECHO_PROXY: routes.append(_ECHO_PROXY + _equote(target, safe=""))',
+      '    last = None',
+      '    for route in routes:',
+      '        try:',
+      '            payload, ctype = _echo_download(route)',
+      '            return _EchoResponse(payload, target, ctype)',
+      '        except Exception as exc:',
+      '            last = exc',
+      '    if isinstance(last, _eerr.HTTPError): raise last',
+      '    raise _eerr.URLError(',
+      '        "could not download " + target + " (" + str(last) + "). The site may block browser '
+        + 'downloads, or you may be offline - attach the file to this task or upload it instead.")',
+      '',
+      'def _echo_urlretrieve(url, filename=None, reporthook=None, data=None):',
+      '    resp = _echo_urlopen(url, data)',
+      '    payload = resp.read()',
+      '    if filename is None:',
+      '        import tempfile as _etmp',
+      '        fd, filename = _etmp.mkstemp()',
+      '        _eos.close(fd)',
+      '    with open(filename, "wb") as fh: fh.write(payload)',
+      '    if reporthook is not None:',
+      '        try: reporthook(1, len(payload), len(payload))',
+      '        except Exception: pass',
+      '    return filename, resp.headers',
+      '',
+      '_ereq.urlopen = _echo_urlopen',
+      '_ereq.urlretrieve = _echo_urlretrieve',
+      '# Modules imported before this patch kept their own reference (they did',
+      '# "from urllib.request import urlopen") - repoint those too.',
+      'for _mod in list(_esys.modules.values()):',
+      '    try:',
+      '        if getattr(_mod, "urlopen", None) is _echo_real_urlopen: _mod.urlopen = _echo_urlopen',
+      '        if getattr(_mod, "urlretrieve", None) is _echo_real_urlretrieve: _mod.urlretrieve = _echo_urlretrieve',
+      '    except Exception: pass',
+      '',
+      'def _echo_flush_figures():',
+      '    """Render every open matplotlib figure, stream it to the terminal and',
+      '    close it. Called by plt.show() and once more when the program ends."""',
+      '    if "matplotlib" not in _esys.modules: return',
+      '    try:',
+      '        import matplotlib.pyplot as _eplt',
+      '    except Exception:',
+      '        return',
+      '    for num in _eplt.get_fignums():',
+      '        fig = _eplt.figure(num)',
+      '        if not fig.get_axes(): continue',
+      '        buf = _eio.BytesIO()',
+      '        try:',
+      '            fig.savefig(buf, format="png", dpi=120, bbox_inches="tight", facecolor=fig.get_facecolor())',
+      '        except Exception:',
+      '            continue',
+      '        _ejs.echoEmitFigure(_eb64.b64encode(buf.getvalue()).decode())',
+      '    _eplt.close("all")',
+      '',
+      'def _echo_install_plot_hook():',
+      '    try:',
+      '        import matplotlib',
+      '        matplotlib.use("AGG", force=True)',
+      '        import matplotlib.pyplot as _eplt',
+      '    except Exception:',
+      '        return',
+      '    if getattr(_eplt.show, "_echolens", False): return',
+      '    def show(*args, **kwargs):',
+      '        _echo_flush_figures()',
+      '    show._echolens = True',
+      '    _eplt.show = show',
+    ].join('\n');
     function boot(url) {
       if (!bootPromise) {
         bootPromise = (async () => {
@@ -107,27 +247,27 @@
         // sibling .py files (other tabs in a multi-file project) are
         // importable, exactly like separate files on a real machine.
         await py.runPythonAsync('import os as _os\n_os.environ.setdefault("MPLBACKEND","AGG")\nimport warnings as _warnings\n_warnings.filterwarnings("ignore", category=DeprecationWarning)\n_warnings.filterwarnings("ignore", category=PendingDeprecationWarning)\nimport sys as _sys\nif "/home/pyodide" not in _sys.path: _sys.path.insert(0, "/home/pyodide")');
-        postMessage({ type: 'status', text: 'Running...' });
-        await py.runPythonAsync(m.code);
-        // Capture any matplotlib figures as PNGs.
-        let images = [];
+        // Downloads + live figures (see PY_RUNTIME). The origin comes from the
+        // page because a Worker created from a blob: URL cannot resolve the
+        // "/api/..." shorthand on its own.
         try {
-          const cap = [
-            'import sys as _sys, json as _json',
-            '_imgs = []',
-            'if "matplotlib" in _sys.modules:',
-            '    import io as _io, base64 as _b64',
-            '    import matplotlib.pyplot as _plt',
-            '    for _n in _plt.get_fignums():',
-            '        _buf = _io.BytesIO()',
-            '        _plt.figure(_n).savefig(_buf, format="png", dpi=110, bbox_inches="tight")',
-            '        _imgs.append(_b64.b64encode(_buf.getvalue()).decode())',
-            '    _plt.close("all")',
-            '_json.dumps(_imgs)',
-          ].join('\n');
-          images = JSON.parse(await py.runPythonAsync(cap));
-        } catch (capErr) { images = []; }
-        postMessage({ type: 'done', ok: true, images });
+          py.globals.set('_ECHO_ORIGIN', String(m.origin || ''));
+          await py.runPythonAsync(PY_RUNTIME);
+          // Patching plt.show() means importing pyplot, which is not free -
+          // only do it for code that actually plots.
+          if (/matplotlib|seaborn|pyplot|\bplt\b|\bsns\b/.test(m.code)) {
+            await py.runPythonAsync('_echo_install_plot_hook()');
+          }
+        } catch (rtErr) { /* the run still works, just without these extras */ }
+        postMessage({ type: 'status', text: 'Running...' });
+        try {
+          await py.runPythonAsync(m.code);
+        } finally {
+          // Figures the student never passed to plt.show() (and anything drawn
+          // before an error) still belong on screen.
+          try { await py.runPythonAsync('_echo_flush_figures()'); } catch (figErr) {}
+        }
+        postMessage({ type: 'done', ok: true, images: [] });
       } catch (err) {
         if (needInput) { postMessage({ type: 'need_input' }); return; }
         let msg = String((err && err.message) || err);
@@ -153,6 +293,28 @@
     worker = null;
   }
 
+  /* ------------------------------ figure viewer ------------------------------
+   * A plot is worth looking at properly: click any figure to blow it up to
+   * full screen, Esc or a click anywhere closes it.
+   */
+  function openLightbox(src, name) {
+    const box = document.createElement('div');
+    box.className = 'fig-lightbox';
+    box.innerHTML = `<img src="${src}" alt="${name}"><a class="fig-lb-dl" href="${src}" download="${name}">Download PNG</a><button class="fig-lb-x" aria-label="Close">&times;</button>`;
+    const close = () => { box.remove(); document.removeEventListener('keydown', onKey); };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    box.addEventListener('click', (e) => { if (!e.target.closest('.fig-lb-dl')) close(); });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(box);
+  }
+  function downloadDataUrl(src, name) {
+    const a = document.createElement('a');
+    a.href = src; a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
   /* --------------------------- terminal component --------------------------- */
   // EchoTerm.mount(el) -> { clear, print, askInput, showImages, focus }
   function mount(el) {
@@ -161,13 +323,22 @@
       <div class="term-body">
         <pre class="term-out"></pre>
         <div class="term-in-row" style="display:none"><span class="term-caret">&#8250;</span><input class="term-in" autocomplete="off" spellcheck="false" placeholder="type your answer and press Enter"></div>
+        <div class="term-figbar" style="display:none"><span class="term-figbar-label"></span><button type="button" class="term-fig-btn term-dl-all">Download all</button></div>
         <div class="term-imgs"></div>
       </div>`;
     const out = el.querySelector('.term-out');
     const row = el.querySelector('.term-in-row');
     const inp = el.querySelector('.term-in');
     const imgs = el.querySelector('.term-imgs');
+    const figbar = el.querySelector('.term-figbar');
+    const figbarLabel = el.querySelector('.term-figbar-label');
     const body = el.querySelector('.term-body');
+    let figCount = 0;
+    // Browsers throttle rapid programmatic downloads - space them out a touch.
+    el.querySelector('.term-dl-all').addEventListener('click', () => {
+      const all = Array.from(imgs.querySelectorAll('img.term-img'));
+      all.forEach((im, i) => setTimeout(() => downloadDataUrl(im.src, `figure-${i + 1}.png`), i * 350));
+    });
     const scroll = () => { body.scrollTop = body.scrollHeight; };
     let pendingResolve = null;
     inp.addEventListener('keydown', (e) => {
@@ -181,7 +352,11 @@
       }
     });
     return {
-      clear() { out.textContent = ''; imgs.innerHTML = ''; row.style.display = 'none'; if (pendingResolve) { const r = pendingResolve; pendingResolve = null; r(null); } },
+      clear() {
+        out.textContent = ''; imgs.innerHTML = ''; row.style.display = 'none';
+        figCount = 0; figbar.style.display = 'none'; el.classList.remove('has-figs');
+        if (pendingResolve) { const r = pendingResolve; pendingResolve = null; r(null); }
+      },
       print(text) { out.textContent += text; scroll(); },
       askInput() {
         return new Promise((resolve) => {
@@ -192,12 +367,40 @@
         });
       },
       cancelInput() { if (pendingResolve) { const r = pendingResolve; pendingResolve = null; row.style.display = 'none'; r(null); } },
+      // Each figure gets its own card with a Download PNG button, and the
+      // whole set gets a "Download all" once there is more than one.
       showImages(list) {
         for (const b64 of list || []) {
+          const src = 'data:image/png;base64,' + b64;
+          const name = `figure-${++figCount}.png`;
+          const fig = document.createElement('figure');
+          fig.className = 'term-fig';
           const im = document.createElement('img');
           im.className = 'term-img';
-          im.src = 'data:image/png;base64,' + b64;
-          imgs.appendChild(im);
+          im.src = src;
+          im.alt = 'Figure ' + figCount;
+          im.title = 'Click to view full size';
+          im.addEventListener('click', () => openLightbox(src, name));
+          const bar = document.createElement('figcaption');
+          bar.className = 'term-fig-bar';
+          const label = document.createElement('span');
+          label.className = 'term-fig-name';
+          label.textContent = 'Figure ' + figCount;
+          const dl = document.createElement('button');
+          dl.type = 'button';
+          dl.className = 'term-fig-btn';
+          dl.textContent = 'Download PNG';
+          dl.addEventListener('click', () => downloadDataUrl(src, name));
+          bar.appendChild(label);
+          bar.appendChild(dl);
+          fig.appendChild(im);
+          fig.appendChild(bar);
+          imgs.appendChild(fig);
+        }
+        if (figCount) {
+          el.classList.add('has-figs');
+          figbarLabel.textContent = figCount === 1 ? '1 figure' : figCount + ' figures';
+          figbar.style.display = figCount > 1 ? 'flex' : 'none';
         }
         scroll();
       },
@@ -227,6 +430,7 @@
     }
     const stdinLines = [];
     let streamPrinted = 0; // python-stream chars already shown (for replay suppression)
+    let figuresShown = 0;  // same idea for plots: a re-run redraws them all
     let stopped = false;
     cancelCurrent = () => {
       stopped = true;
@@ -254,7 +458,8 @@
         }
         if (stopped) return { ok: false, stopped: true };
 
-        let skip = streamPrinted; // suppress replayed output on re-runs
+        let skip = streamPrinted;      // suppress replayed output on re-runs
+        let skipFigs = figuresShown;   // ...and replayed figures
         const result = await new Promise((resolve) => {
           let lastSignal = Date.now();
           const started = Date.now();
@@ -283,11 +488,17 @@
               term.print(text);
               return;
             }
+            if (m.type === 'image') {
+              if (skipFigs > 0) { skipFigs--; return; }
+              figuresShown++;
+              term.showImages([m.b64]);
+              return;
+            }
             if (m.type === 'need_input') { clearInterval(tick); worker.removeEventListener('message', onMsg); resolve({ kind: 'need_input' }); }
             if (m.type === 'done') { clearInterval(tick); worker.removeEventListener('message', onMsg); resolve({ kind: 'done', ok: m.ok, images: m.images }); }
           };
           worker.addEventListener('message', onMsg);
-          worker.postMessage({ type: 'run', code: String(code), stdin: stdinLines.slice(), url: PYODIDE_URL, files: fileBytes });
+          worker.postMessage({ type: 'run', code: String(code), stdin: stdinLines.slice(), url: PYODIDE_URL, files: fileBytes, origin: location.origin });
         });
 
         if (result.kind === 'stopped') return { ok: false, stopped: true };

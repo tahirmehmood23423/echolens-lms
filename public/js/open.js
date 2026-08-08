@@ -660,6 +660,19 @@ function drawCourse() {
   const cat = CATALOGUE.find((c) => c.code === t.course_code);
   const heroIcon = pickIcon(t.title);
   const heroBg = tierBg(cat ? cat.tier : 'Bootcamp', !!t.free);
+  // Split out from hero-main so the free-course split view (freeCurriculumHtml)
+  // can place it up in the curriculum header instead, where there's spare
+  // width, rather than stacking it into the left card and forcing that
+  // card to scroll internally.
+  const heroStatsHtml = `
+    <div class="hero-stat">
+      <span class="hs-label">${t.free ? 'Price' : 'Course fee'}</span>
+      <span class="hs-val${t.free ? ' teal' : ''}">${t.free || !(cat && cat.price_pkr) ? 'Free' : 'PKR ' + cat.price_pkr.toLocaleString()}</span>
+    </div>
+    ${cat ? `<div class="hero-stat"><span class="hs-label">Duration</span><span class="hs-val">${cat.weeks}w &middot; ${cat.hours}h</span></div>` : ''}
+    <div class="hero-stat"><span class="hs-label">Access</span><span class="hs-val">${t.free ? 'All levels' : 'First quest free'}</span></div>
+    <div class="hero-stat"><span class="hs-label">Certificate</span><span class="hs-val">${t.free ? 'Automatic' : 'Included'}</span></div>
+    ${!t.free && cat ? `<button class="btn btn-primary hero-cta" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register &amp; unlock - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}`;
   const heroCardHtml = `
     <div class="hero-card"><div class="course-hero${t.free ? ' no-visual' : ''}">
       <div class="hero-main">
@@ -671,16 +684,7 @@ function drawCourse() {
         <h1 class="hero-title">${esc(t.title)}</h1>
         <p class="hero-desc">${esc(t.description || '')}</p>
         ${t.outcome ? `<p class="hero-outcome"><strong>Outcome:</strong> ${esc(t.outcome)}</p>` : ''}
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hs-label">${t.free ? 'Price' : 'Course fee'}</span>
-            <span class="hs-val${t.free ? ' teal' : ''}">${t.free || !(cat && cat.price_pkr) ? 'Free' : 'PKR ' + cat.price_pkr.toLocaleString()}</span>
-          </div>
-          ${cat ? `<div class="hero-stat"><span class="hs-label">Duration</span><span class="hs-val">${cat.weeks}w &middot; ${cat.hours}h</span></div>` : ''}
-          <div class="hero-stat"><span class="hs-label">Access</span><span class="hs-val">${t.free ? 'All levels' : 'First quest free'}</span></div>
-          <div class="hero-stat"><span class="hs-label">Certificate</span><span class="hs-val">${t.free ? 'Automatic' : 'Included'}</span></div>
-          ${!t.free && cat ? `<button class="btn btn-primary hero-cta" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register &amp; unlock - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}
-        </div>
+        ${t.free ? '' : `<div class="hero-stats">${heroStatsHtml}</div>`}
         ${prog ? `
           <div class="oq-prog hero-prog"><div style="width:${Math.round((prog.graded / Math.max(1, prog.total)) * 100)}%"></div></div>
           <div class="s hero-prog-note" style="color:${prog.passed ? 'var(--ok)' : 'var(--muted)'}">
@@ -789,7 +793,7 @@ function drawCourse() {
   }).join('');
 
   if (t.free) {
-    $('courseLevels').innerHTML = freeCurriculumHtml(t, heroCardHtml, modules, prog, curLevel, levelDone, classesHtmlFor);
+    $('courseLevels').innerHTML = freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLevel, levelDone, classesHtmlFor);
     return;
   }
 
@@ -831,7 +835,7 @@ const MODULE_STYLES = [
   { bg: '#F1E9FE', fg: '#9333EA' },
   { bg: '#FFF1E1', fg: '#EA580C' },
 ];
-function freeCurriculumHtml(t, heroCardHtml, modules, prog, curLevel, levelDone, classesHtmlFor) {
+function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLevel, levelDone, classesHtmlFor) {
   const doneMods = modules.filter((mod) => mod.levels.every((l) => !l.locked && levelDone(l))).length;
   const pct = modules.length ? Math.round((doneMods / modules.length) * 100) : 0;
   const rows = modules.map((mod, mi) => {
@@ -878,9 +882,12 @@ function freeCurriculumHtml(t, heroCardHtml, modules, prog, curLevel, levelDone,
               <h3>Course Curriculum</h3>
               <p class="s" style="color:var(--muted)">Complete all modules and pass the assessments to earn your certificate.</p>
             </div>
-            <div class="curr-progress-wrap">
-              <div class="s" style="color:var(--muted)">${modules.length} Modules &middot; ${doneMods}/${modules.length} Completed</div>
-              <div class="curr-progress"><div style="width:${pct}%"></div></div>
+            <div class="curr-head-right">
+              <div class="hero-stats curr-head-stats">${heroStatsHtml}</div>
+              <div class="curr-progress-wrap">
+                <div class="s" style="color:var(--muted)">${modules.length} Modules &middot; ${doneMods}/${modules.length} Completed</div>
+                <div class="curr-progress"><div style="width:${pct}%"></div></div>
+              </div>
             </div>
           </div>
           <div class="curr-list">${rows}</div>

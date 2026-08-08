@@ -457,6 +457,16 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 
 /* --- free-course curriculum: flat collapsed module list (open.js freeCurriculumHtml) --- */
 .course-hero.no-visual{grid-template-columns:1fr}
+/* Side-by-side: course info card (left) + curriculum module list (right),
+   instead of the two stacking full-width and pushing modules a full extra
+   scroll below the fold. */
+.free-course-grid{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:20px;align-items:start;margin-bottom:16px}
+.free-course-left .hero-card{margin-bottom:0;position:sticky;top:80px}
+.free-course-right .curr-card{margin-bottom:0}
+@media (max-width:1000px){
+  .free-course-grid{grid-template-columns:1fr}
+  .free-course-left .hero-card{position:static}
+}
 .curr-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);overflow:hidden;margin-bottom:16px}
 .curr-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px 22px;border-bottom:1px solid var(--line)}
 .curr-head h3{font-family:var(--font-display);font-size:18px;color:var(--ink)}

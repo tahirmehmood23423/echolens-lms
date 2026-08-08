@@ -660,12 +660,7 @@ function drawCourse() {
   const cat = CATALOGUE.find((c) => c.code === t.course_code);
   const heroIcon = pickIcon(t.title);
   const heroBg = tierBg(cat ? cat.tier : 'Bootcamp', !!t.free);
-  $('courseHead').innerHTML = `
-    <nav class="crumb">
-      <a onclick="openTab('courses')">${COURSE_NAV_MODE === 'free' ? 'Free Certified Courses' : 'Live Tech Courses'}</a>
-      <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="crumb-cur">${esc(t.title)}</span>
-    </nav>
+  const heroCardHtml = `
     <div class="hero-card"><div class="course-hero${t.free ? ' no-visual' : ''}">
       <div class="hero-main">
         <div class="hero-badges">
@@ -698,6 +693,13 @@ function drawCourse() {
         <svg class="hero-visual-icon" viewBox="0 0 24 24" fill="none">${ICONS[heroIcon]}</svg>
       </div>`}
     </div></div>`;
+  $('courseHead').innerHTML = `
+    <nav class="crumb">
+      <a onclick="openTab('courses')">${COURSE_NAV_MODE === 'free' ? 'Free Certified Courses' : 'Live Tech Courses'}</a>
+      <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="crumb-cur">${esc(t.title)}</span>
+    </nav>
+    ${t.free ? '' : heroCardHtml}`;
   // Levels group into "Modules" by week - same structure as the LMS
   // Portal's Quest tab (dashboard.js renderQuestTab), so a paid enrolled
   // student and a free/open learner see one consistent product.
@@ -787,7 +789,7 @@ function drawCourse() {
   }).join('');
 
   if (t.free) {
-    $('courseLevels').innerHTML = freeCurriculumHtml(t, modules, prog, curLevel, levelDone, classesHtmlFor);
+    $('courseLevels').innerHTML = freeCurriculumHtml(t, heroCardHtml, modules, prog, curLevel, levelDone, classesHtmlFor);
     return;
   }
 
@@ -829,7 +831,7 @@ const MODULE_STYLES = [
   { bg: '#F1E9FE', fg: '#9333EA' },
   { bg: '#FFF1E1', fg: '#EA580C' },
 ];
-function freeCurriculumHtml(t, modules, prog, curLevel, levelDone, classesHtmlFor) {
+function freeCurriculumHtml(t, heroCardHtml, modules, prog, curLevel, levelDone, classesHtmlFor) {
   const doneMods = modules.filter((mod) => mod.levels.every((l) => !l.locked && levelDone(l))).length;
   const pct = modules.length ? Math.round((doneMods / modules.length) * 100) : 0;
   const rows = modules.map((mod, mi) => {
@@ -866,18 +868,23 @@ function freeCurriculumHtml(t, modules, prog, curLevel, levelDone, classesHtmlFo
       : `Keep going - ${doneMods}/${modules.length} modules complete.`);
 
   return `
-    <div class="curr-card">
-      <div class="curr-head">
-        <div>
-          <h3>Course Curriculum</h3>
-          <p class="s" style="color:var(--muted)">Complete all modules and pass the assessments to earn your certificate.</p>
-        </div>
-        <div class="curr-progress-wrap">
-          <div class="s" style="color:var(--muted)">${modules.length} Modules &middot; ${doneMods}/${modules.length} Completed</div>
-          <div class="curr-progress"><div style="width:${pct}%"></div></div>
+    <div class="free-course-grid">
+      <div class="free-course-left">${heroCardHtml}</div>
+      <div class="free-course-right">
+        <div class="curr-card">
+          <div class="curr-head">
+            <div>
+              <h3>Course Curriculum</h3>
+              <p class="s" style="color:var(--muted)">Complete all modules and pass the assessments to earn your certificate.</p>
+            </div>
+            <div class="curr-progress-wrap">
+              <div class="s" style="color:var(--muted)">${modules.length} Modules &middot; ${doneMods}/${modules.length} Completed</div>
+              <div class="curr-progress"><div style="width:${pct}%"></div></div>
+            </div>
+          </div>
+          <div class="curr-list">${rows}</div>
         </div>
       </div>
-      <div class="curr-list">${rows}</div>
     </div>
     <div class="curr-cta">
       <div class="curr-cta-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>

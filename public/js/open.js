@@ -666,7 +666,7 @@ function drawCourse() {
       <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="crumb-cur">${esc(t.title)}</span>
     </nav>
-    <div class="hero-card"><div class="course-hero">
+    <div class="hero-card"><div class="course-hero${t.free ? ' no-visual' : ''}">
       <div class="hero-main">
         <div class="hero-badges">
           ${t.free ? '<span class="kbadge quest">FREE COURSE</span>' : ''}
@@ -693,10 +693,10 @@ function drawCourse() {
             ${prog.passed ? ' &middot; <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' &middot; Complete every task at ' + (t.pass_mark || 60) + '%+ average for the automatic certificate.' : '')}
           </div>` : (ME ? '' : `<div class="s hero-signin-note">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
       </div>
-      <div class="hero-visual" style="background:${heroBg}">
+      ${t.free ? '' : `<div class="hero-visual" style="background:${heroBg}">
         <div class="hero-visual-glow"></div>
         <svg class="hero-visual-icon" viewBox="0 0 24 24" fill="none">${ICONS[heroIcon]}</svg>
-      </div>
+      </div>`}
     </div></div>`;
   // Levels group into "Modules" by week - same structure as the LMS
   // Portal's Quest tab (dashboard.js renderQuestTab), so a paid enrolled
@@ -751,42 +751,50 @@ function drawCourse() {
     </nav>`;
 
   const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Level';
-  const modulesHtml = modules.map((mod, mi) => {
-    const classesHtml = mod.levels.map((l, li) => {
-      const isCurrent = curLevel && l.no === curLevel.no;
-      const rowsHtml = (l.problems || []).map((p) => {
-        const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${p.pid}`];
-        const graded = sub && sub.score != null;
-        return `<div class="problem-row${l.locked ? ' locked' : ''}">
-          ${graded ? '<span class="check">&#10003;</span>' : ''}
-          <div class="grow">
-            <div class="t" style="font-size:13.5px">${esc(p.title)}
-              <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
-              <span class="s" style="color:var(--muted);font-weight:500">${p.points} gems</span></div>
-            ${sub ? `<div class="s" style="margin-top:3px">
-              ${graded
-                ? `<span class="grade-chip ok">Graded ${sub.score}% &middot; ${Math.round((sub.score / 100) * p.points)} gems</span>`
-                : '<span class="grade-chip wait">Submitted - being graded</span>'}</div>` : ''}
-          </div>
-          ${l.locked
-            ? `<button class="btn btn-ghost btn-sm" onclick="openRegister('${esc(t.course_code || '')}', '${esc(t.title)}')">Unlock</button>`
-            : `<button class="lc-btn-solve" onclick="openSolve(${l.no}, ${p.pid})">${sub ? 'Reopen' : 'Solve'}</button>`}
-        </div>`;
-      }).join('');
-      return `<details class="class-block"${isCurrent ? ' open' : ''}>
-        <summary>
-          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="class-title">${unitLabel} ${li + 1} &middot; ${esc(l.title)}</span>
-          ${l.locked ? '<span class="pay-badge na">Locked</span>' : '<span class="pay-badge confirmed">Open</span>'}
-        </summary>
-        <div class="class-body">${topicDetailHtml(l)}${rowsHtml}</div>
-      </details>`;
+  // Per-module accordion of classes/levels - shared by the free-course
+  // curriculum list and the paid quest-grid below, so what happens *inside*
+  // a module (topic notes, Solve/compiler buttons, grading state) is always
+  // identical between the two page layouts.
+  const classesHtmlFor = (mod) => mod.levels.map((l, li) => {
+    const isCurrent = curLevel && l.no === curLevel.no;
+    const rowsHtml = (l.problems || []).map((p) => {
+      const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${p.pid}`];
+      const graded = sub && sub.score != null;
+      return `<div class="problem-row${l.locked ? ' locked' : ''}">
+        ${graded ? '<span class="check">&#10003;</span>' : ''}
+        <div class="grow">
+          <div class="t" style="font-size:13.5px">${esc(p.title)}
+            <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
+            <span class="s" style="color:var(--muted);font-weight:500">${p.points} gems</span></div>
+          ${sub ? `<div class="s" style="margin-top:3px">
+            ${graded
+              ? `<span class="grade-chip ok">Graded ${sub.score}% &middot; ${Math.round((sub.score / 100) * p.points)} gems</span>`
+              : '<span class="grade-chip wait">Submitted - being graded</span>'}</div>` : ''}
+        </div>
+        ${l.locked
+          ? `<button class="btn btn-ghost btn-sm" onclick="openRegister('${esc(t.course_code || '')}', '${esc(t.title)}')">Unlock</button>`
+          : `<button class="lc-btn-solve" onclick="openSolve(${l.no}, ${p.pid})">${sub ? 'Reopen' : 'Solve'}</button>`}
+      </div>`;
     }).join('');
-    return `<section class="module-panel" id="qmod${mi}">
-      <div class="module-panel-head"><span class="module-eyebrow">Week ${mod.week}</span><h3>Module ${mi + 1}</h3></div>
-      ${classesHtml}
-    </section>`;
+    return `<details class="class-block"${isCurrent ? ' open' : ''}>
+      <summary>
+        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="class-title">${unitLabel} ${li + 1} &middot; ${esc(l.title)}</span>
+        ${l.locked ? '<span class="pay-badge na">Locked</span>' : '<span class="pay-badge confirmed">Open</span>'}
+      </summary>
+      <div class="class-body">${topicDetailHtml(l)}${rowsHtml}</div>
+    </details>`;
   }).join('');
+
+  if (t.free) {
+    $('courseLevels').innerHTML = freeCurriculumHtml(t, modules, prog, curLevel, levelDone, classesHtmlFor);
+    return;
+  }
+
+  const modulesHtml = modules.map((mod, mi) => `<section class="module-panel" id="qmod${mi}">
+      <div class="module-panel-head"><span class="module-eyebrow">Week ${mod.week}</span><h3>Module ${mi + 1}</h3></div>
+      ${classesHtmlFor(mod)}
+    </section>`).join('');
 
   const ep = t.end_project;
   const projectCard = ep ? `
@@ -807,6 +815,78 @@ function drawCourse() {
       <aside>${projectCard}</aside>
     </div>
     <style>@media (max-width:1140px){.quest-grid{grid-template-columns:1fr !important}}</style>`;
+}
+
+// Free-course curriculum card: a flat, collapsed-by-default list of modules
+// (icon + title + lesson pills + count + chevron) instead of the paid
+// quest-grid's 3-column layout - that layout reserves a sidebar for the
+// Learning Path ring and an end-project card, both of which free tracks
+// never populate, leaving a permanently empty column. What happens inside
+// an expanded module (classesHtmlFor) is unchanged either way.
+const MODULE_STYLES = [
+  { bg: '#E3F9F1', fg: '#0A9384' },
+  { bg: '#E5F0FF', fg: '#2563EB' },
+  { bg: '#F1E9FE', fg: '#9333EA' },
+  { bg: '#FFF1E1', fg: '#EA580C' },
+];
+function freeCurriculumHtml(t, modules, prog, curLevel, levelDone, classesHtmlFor) {
+  const doneMods = modules.filter((mod) => mod.levels.every((l) => !l.locked && levelDone(l))).length;
+  const pct = modules.length ? Math.round((doneMods / modules.length) * 100) : 0;
+  const rows = modules.map((mod, mi) => {
+    const style = MODULE_STYLES[mi % MODULE_STYLES.length];
+    const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
+    const isCurMod = curLevel && mod.levels.some((l) => l.no === curLevel.no);
+    const subtitle = mod.levels.map((l) => esc(l.title)).join(' &middot; ');
+    const pills = mod.levels.map((l) => `<span class="curr-pill">L${l.no}<b>${esc(l.title)}</b></span>`).join('');
+    return `<details class="curr-row"${isCurMod && !allDone ? ' open' : ''} id="qmod${mi}">
+      <summary>
+        <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS.code}</svg></span>
+        <span class="curr-info">
+          <span class="curr-title">Module ${mi + 1}${allDone ? '<span class="curr-done-dot"></span>' : ''}</span>
+          <span class="curr-sub">${subtitle}</span>
+        </span>
+        <span class="curr-pills">${pills}</span>
+        <span class="curr-count">${mod.levels.length} Lesson${mod.levels.length > 1 ? 's' : ''}</span>
+        <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </summary>
+      <div class="curr-body">${classesHtmlFor(mod)}</div>
+    </details>`;
+  }).join('');
+
+  const subj = (t.title.split(':')[1] || t.title).trim();
+  const curModIdx = Math.max(0, modules.findIndex((mod) => curLevel && mod.levels.some((l) => l.no === curLevel.no)));
+  const ctaAction = ME
+    ? `document.getElementById('qmod${curModIdx}').open=true;document.getElementById('qmod${curModIdx}').scrollIntoView({behavior:'smooth',block:'start'})`
+    : `gate('Sign in free to start this course, track your progress and earn your certificate.')`;
+  const ctaBtnLabel = !ME ? 'Sign in free to start' : (prog && prog.passed ? 'Review the course' : 'Continue learning');
+  const ctaSub = !ME
+    ? `Start learning now and boost your programming skills with ${esc(subj)}!`
+    : (prog && prog.passed
+      ? 'You have completed every module - your certificate has been issued.'
+      : `Keep going - ${doneMods}/${modules.length} modules complete.`);
+
+  return `
+    <div class="curr-card">
+      <div class="curr-head">
+        <div>
+          <h3>Course Curriculum</h3>
+          <p class="s" style="color:var(--muted)">Complete all modules and pass the assessments to earn your certificate.</p>
+        </div>
+        <div class="curr-progress-wrap">
+          <div class="s" style="color:var(--muted)">${modules.length} Modules &middot; ${doneMods}/${modules.length} Completed</div>
+          <div class="curr-progress"><div style="width:${pct}%"></div></div>
+        </div>
+      </div>
+      <div class="curr-list">${rows}</div>
+    </div>
+    <div class="curr-cta">
+      <div class="curr-cta-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="grow">
+        <div class="curr-cta-title">Complete all modules, pass the final exam and earn your certificate</div>
+        <div class="s curr-cta-sub">${ctaSub}</div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="${ctaAction}">${ctaBtnLabel}</button>
+    </div>`;
 }
 
 /* ------------------------------ solve + submit ------------------------------ */

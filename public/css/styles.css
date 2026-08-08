@@ -455,6 +455,54 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .project-progress div{height:100%;background:var(--gem-grad);border-radius:999px}
 .project-foot{display:flex;align-items:center;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--muted-2)}
 
+/* --- free-course curriculum: flat collapsed module list (open.js freeCurriculumHtml) --- */
+.course-hero.no-visual{grid-template-columns:1fr}
+.curr-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);overflow:hidden;margin-bottom:16px}
+.curr-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px 22px;border-bottom:1px solid var(--line)}
+.curr-head h3{font-family:var(--font-display);font-size:18px;color:var(--ink)}
+.curr-head p{margin-top:4px}
+.curr-progress-wrap{min-width:220px}
+.curr-progress-wrap .s{text-align:right;margin-bottom:6px;font-weight:600}
+.curr-progress{width:220px;height:7px;border-radius:999px;background:var(--line);overflow:hidden}
+.curr-progress div{height:100%;background:var(--gem-grad);border-radius:999px}
+.curr-list{display:flex;flex-direction:column}
+.curr-row{border-top:1px solid var(--line)}
+.curr-row:first-child{border-top:none}
+.curr-row summary{list-style:none;display:flex;align-items:center;gap:14px;padding:16px 22px;cursor:pointer;flex-wrap:wrap;transition:background .12s ease}
+.curr-row summary:hover{background:var(--canvas)}
+.curr-row summary::-webkit-details-marker{display:none}
+.curr-row .chev{color:var(--muted-2);transition:transform .18s ease;flex:none;margin-left:auto}
+.curr-row[open] .chev{transform:rotate(90deg)}
+.curr-row[open] summary{background:var(--violet-soft)}
+.curr-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
+.curr-icon svg{width:18px;height:18px}
+.curr-info{display:flex;flex-direction:column;gap:2px;flex:none;width:190px}
+.curr-title{font-weight:700;color:var(--ink);font-size:14px;display:flex;align-items:center;gap:7px}
+.curr-done-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex:none}
+.curr-sub{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+.curr-pills{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:180px}
+.curr-pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--primary);background:var(--violet-soft);border-radius:999px;padding:5px 11px 5px 8px;white-space:nowrap}
+.curr-pill b{font-weight:600;color:var(--navy)}
+.curr-pill::before{content:none}
+.curr-count{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;flex:none}
+.curr-body{padding:2px 22px 14px}
+.curr-cta{display:flex;align-items:center;gap:16px;background:var(--violet-soft);border-radius:var(--radius);padding:18px 22px;flex-wrap:wrap}
+.curr-cta-icon{width:44px;height:44px;border-radius:50%;background:#fff;color:var(--primary);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:var(--shadow-sm)}
+.curr-cta-title{font-weight:700;color:var(--ink);font-size:14px}
+.curr-cta-sub{color:var(--muted);margin-top:3px}
+@media (max-width:860px){
+  .curr-head{align-items:flex-start}
+  .curr-progress-wrap{width:100%}
+  .curr-progress{width:100%}
+  .curr-row summary{padding:14px 16px}
+  .curr-info{width:100%}
+  .curr-sub{max-width:100%;white-space:normal}
+  .curr-count{margin-left:48px}
+  .curr-body{padding:2px 16px 12px}
+  .curr-cta{padding:16px}
+  .curr-cta button{width:100%;justify-content:center}
+}
+
 /* --- scoreboard --- */
 .sb-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line)}
 .sb-row:last-child{border-bottom:none}

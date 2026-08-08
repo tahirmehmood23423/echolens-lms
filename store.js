@@ -2319,6 +2319,18 @@ const LEARNING_PATHS = [
     summary: 'Complete beginner to job-ready full-stack developer on the highest-demand 2026 stack: JavaScript foundations, React and PostgreSQL.',
     bundle_pkr: 43500, full_pkr: 51000, save_pkr: 7500 },
 ];
+// The gross fee a challan or registration should charge for a course:
+// always prefers the officially published catalogue price (the one shown on
+// the public /open page, "what everyone can see") over the persisted copy in
+// data.courses. loadOfficialCatalogue() below re-syncs that persisted copy
+// on every server start, but a price edited in code here reaches Admissions
+// immediately, with no restart required, and can never drift from the
+// public listing for an official course code.
+function catalogueFee(code, fallbackCourse) {
+  const c = OFFICIAL_CATALOGUE.find((x) => x.code === String(code || '').toUpperCase());
+  if (c) return Number(c.price_pkr) || 0;
+  return fallbackCourse ? Number(fallbackCourse.price_pkr) || 0 : 0;
+}
 function loadOfficialCatalogue() {
   let added = 0;
   for (const c of OFFICIAL_CATALOGUE) {
@@ -3933,7 +3945,7 @@ const Challans = {
   generate({ registration_id, discount_category_id, deadline, generated_by }) {
     const r = Registrations.byId(registration_id); if (!r) return { error: 'Registration not found.' };
     const course = Courses.byCode(r.course_code);
-    const gross = course ? Number(course.price_pkr) || 0 : 0;
+    const gross = catalogueFee(r.course_code, course);
     // An ambassador referral attached at registration always applies on its
     // own; any other discount the Admissions Office picks stacks on top.
     // Both are computed on the gross fee and snapshotted onto the challan.
@@ -4612,7 +4624,7 @@ const Showcase = {
 load();
 
 module.exports = {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, learningPaths: () => LEARNING_PATHS, persist: save,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, catalogueFee, learningPaths: () => LEARNING_PATHS, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, gemTotalsByUser, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,

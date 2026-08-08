@@ -30,7 +30,7 @@ const { analyticsReportPdf } = require('./analytics-report-pdf');
 const { generateContractPdf } = require('./contract-pdf');
 const { generateOfferLetterPdf } = require('./offer-letter-pdf');
 const {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue, catalogueFee,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
   Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Feedback,
@@ -3753,7 +3753,7 @@ app.get('/api/admissions/registrations', authRequired, admissionsOnly, (req, res
   const rows = Registrations.all().map((r) => {
     const course = Courses.byCode(r.course_code);
     const available_batches = course ? Batches.all().filter((b) => b.course_id === course.id).map((b) => ({ id: b.id, name: b.name, start_date: b.start_date, status: b.status })) : [];
-    return { ...r, course_fee: course ? Number(course.price_pkr) || 0 : 0, challans: Challans.forRegistration(r.id), available_batches };
+    return { ...r, course_fee: catalogueFee(r.course_code, course), challans: Challans.forRegistration(r.id), available_batches };
   });
   res.json({ registrations: rows, admissions_email: ADMISSIONS_EMAIL, finance_email: FINANCE_EMAIL });
 });

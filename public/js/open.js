@@ -868,6 +868,7 @@ function freeCurriculumHtml(t, heroCardHtml, modules, prog, curLevel, levelDone,
       : `Keep going - ${doneMods}/${modules.length} modules complete.`);
 
   return `
+    <div class="free-course-wrap">
     <div class="free-course-grid">
       <div class="free-course-left">${heroCardHtml}</div>
       <div class="free-course-right">
@@ -893,6 +894,7 @@ function freeCurriculumHtml(t, heroCardHtml, modules, prog, curLevel, levelDone,
         <div class="s curr-cta-sub">${ctaSub}</div>
       </div>
       <button type="button" class="btn btn-primary" onclick="${ctaAction}">${ctaBtnLabel}</button>
+    </div>
     </div>`;
 }
 

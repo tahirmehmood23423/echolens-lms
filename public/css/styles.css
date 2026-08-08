@@ -459,13 +459,25 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .course-hero.no-visual{grid-template-columns:1fr}
 /* Side-by-side: course info card (left) + curriculum module list (right),
    instead of the two stacking full-width and pushing modules a full extra
-   scroll below the fold. */
-.free-course-grid{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:20px;align-items:start;margin-bottom:16px}
-.free-course-left .hero-card{margin-bottom:0;position:sticky;top:80px}
-.free-course-right .curr-card{margin-bottom:0}
+   scroll below the fold. The whole thing is height-capped to the viewport
+   (free-course-wrap) so the page itself doesn't scroll - only the module
+   list inside .curr-list does, once it has more modules than fit. */
+.free-course-wrap{display:flex;flex-direction:column;height:calc(100vh - 175px);min-height:420px}
+.free-course-grid{display:flex;gap:20px;align-items:stretch;flex:1 1 auto;min-height:0;margin-bottom:16px}
+.free-course-left{flex:0 0 380px;min-width:300px;min-height:0;display:flex}
+.free-course-left .hero-card{margin-bottom:0;width:100%;overflow-y:auto}
+.free-course-right{flex:1 1 auto;min-width:0;min-height:0;display:flex}
+.free-course-right .curr-card{margin-bottom:0;width:100%;display:flex;flex-direction:column;min-height:0}
+.free-course-right .curr-head{flex:none}
+.free-course-right .curr-list{flex:1 1 auto;min-height:0;overflow-y:auto}
+.free-course-wrap .curr-cta{flex:none}
 @media (max-width:1000px){
-  .free-course-grid{grid-template-columns:1fr}
-  .free-course-left .hero-card{position:static}
+  .free-course-wrap{height:auto;min-height:0}
+  .free-course-grid{flex-direction:column}
+  .free-course-left{flex:none}
+  .free-course-left .hero-card{height:auto;overflow-y:visible}
+  .free-course-right .curr-card{height:auto}
+  .free-course-right .curr-list{overflow-y:visible}
 }
 .curr-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);overflow:hidden;margin-bottom:16px}
 .curr-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px 22px;border-bottom:1px solid var(--line)}
@@ -901,7 +913,7 @@ tr.risk-high td{background:#FFF7F7}
   .open-nav .nlink{padding:6px 9px;font-size:12.5px}
   .open-nav>span[style*="flex:1"]{flex-basis:100%;height:0}
 }
-.open-wrap{max-width:1140px;margin:0 auto;padding:26px 4vw 60px}
+.open-wrap{max-width:1600px;margin:0 auto;padding:26px 4vw 60px}
 /* The Solve view breaks out of the 1140px reading column - the code editor
  * benefits from the full viewport width, unlike the text-heavy tabs. */
 #tab-solve{max-width:none;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding-left:4vw;padding-right:4vw;box-sizing:border-box}

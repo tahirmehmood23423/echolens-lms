@@ -2298,20 +2298,19 @@ const OFFICIAL_CATALOGUE = [
   { code: 'ST-10', title: 'React + Next.js Frontend Specialist', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22000, badges: ['new', 'high_demand'], summary: 'Component architecture, state management and server-side rendering with Next.js.' },
   { code: 'ST-11', title: 'Mobile Apps with Flutter', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 22000, badges: ['new'], summary: 'One codebase, two app stores: build and publish real Android and iOS apps.' },
   { code: 'ST-12', title: 'Video Editing', tier: 'Specialist Track', weeks: 8, hours: 32, price_pkr: 20000, badges: [], summary: 'Professional editing workflows, pacing and delivery for client and commercial work.' },
-  // CS-101/CS-102: upgraded from the original one-slot FC-01/FC-02 micro
-  // courses to the full 10-topic/30-problem fundamentals curriculum (see
-  // tracks/free-micro.js) - code/key unchanged so nothing about existing
-  // enrolment/progress breaks, only the catalogue-facing framing here.
-  { code: 'FC-01', title: 'CS-101: Fundamentals of C', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language everything else was built on - compiling, memory, pointers, and strings across 10 topics.' },
-  { code: 'FC-02', title: 'CS-102: Fundamentals of C++', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Streams, references, STL containers, and file handling - the standard teaching language for data structures.' },
-  // CS-103..CS-107: the rest of the 7-course fundamentals curriculum
-  // (tracks/cs-fundamentals.js) - same free/signin/auto-certificate shape
-  // as CS-101/CS-102 above.
-  { code: 'CS-103', title: 'CS-103: Fundamentals of Object-Oriented Programming (OOP)', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Encapsulation, inheritance, virtual functions, and abstract classes - the single idea that unlocks every modern language.' },
-  { code: 'CS-104', title: 'CS-104: Fundamentals of Python', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Dynamic typing, lists and dictionaries, comprehensions, and modules - clean, readable code from day one.' },
-  { code: 'CS-105', title: 'CS-105: Fundamentals of JavaScript', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'ES6+ syntax, array methods, the DOM, and async/await - the scripting language every browser runs.' },
-  { code: 'CS-106', title: 'CS-106: Fundamentals of CSS', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'The box model, Flexbox, Grid, and responsive media queries - styling that actually holds together.' },
-  { code: 'CS-107', title: 'CS-107: Fundamentals of HTML', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'Semantic structure, forms, accessibility, and media embeds - the markup backbone of the web.' },
+  // Five free fundamentals tracks (EchoLens Curriculum Blueprint), each
+  // exactly 4 modules from zero, building one real capstone project per
+  // track (see tracks/free-micro.js for C/C++, tracks/cs-fundamentals.js
+  // for Python/JavaScript/HTML & CSS). OOP is folded into the C++ track
+  // (Module 3) rather than a standalone course, and HTML+CSS are one
+  // combined track since CSS can't be taught without HTML underneath it -
+  // codes FC-01/FC-02 unchanged so existing enrolment/progress doesn't
+  // break, only the catalogue-facing framing here.
+  { code: 'FC-01', title: 'CS-101: Fundamentals of C', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language everything else was built on - compiling, memory, pointers, structs and file I/O, building a MiniBank CLI across 4 modules.' },
+  { code: 'FC-02', title: 'CS-102: Fundamentals of C++ (with OOP)', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Streams, references, classes, inheritance and STL containers - full object-oriented programming, building an expense tracker called LedgerLens.' },
+  { code: 'CS-104', title: 'CS-104: Fundamentals of Python', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Dynamic typing, lists and dictionaries, classes and JSON persistence - building a CLI to-do app called TaskFlow.' },
+  { code: 'CS-105', title: 'CS-105: Fundamentals of JavaScript', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'Variables, arrays, the live DOM and localStorage - building an interactive browser dashboard called PulseBoard.' },
+  { code: 'CS-106', title: 'CS-106: Fundamentals of HTML & CSS', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'Semantic structure, the box model, Flexbox, Grid and responsive design - building a personal portfolio site called DevFolio.' },
 ];
 // The Web Developer Path bundle - the recommended beginner-to-job route.
 const LEARNING_PATHS = [
@@ -3779,8 +3778,9 @@ const OpenQuest = {
     const t = TRACKS[s.track_key];
     const raw = Math.max(0, Math.min(100, Number(aiScore) || 0));
     // Standard 10% reduction, except for tracks flagged friendly_grading
-    // (CS-101..CS-107 - see tracks/free-micro.js) - a first-timer's first
-    // working program shouldn't come with a built-in penalty attached.
+    // (the 5 free fundamentals tracks - see tracks/free-micro.js and
+    // tracks/cs-fundamentals.js) - a first-timer's first working program
+    // shouldn't come with a built-in penalty attached.
     s.score = (t && t.friendly_grading) ? Math.round(raw) : Math.round(raw * 0.9);
     s.gems = Math.round((s.score / 100) * (s.points || 100));
     s.feedback = String(feedback || '').slice(0, 1500) || null;

@@ -635,7 +635,7 @@ function courseOutlineHtml(t) {
       <ul class="outline-list">${rows}</ul>
     </div></div>`;
 }
-// CS-101..CS-107's `topic` field packs a short explanation paragraph and an
+// The 5 free fundamentals tracks' `topic` field packs a short explanation paragraph and an
 // example code snippet into one string (explanation, blank line, then code
 // starting with #include/import/etc.) - too long for the one-line "Week X
 // · topic" summary above, so it gets its own block here instead, split on
@@ -1079,8 +1079,8 @@ function svLangOptions() {
 }
 const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 function svCertNote() { return CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''; }
-// Beginner-track courses (CS-101..CS-107 - see tracks/free-micro.js's
-// friendly_grading flag) never mention automated grading or the standard
+// Beginner-track courses (the 5 free fundamentals tracks - see
+// tracks/free-micro.js's friendly_grading flag) never mention automated grading or the standard
 // 10% reduction - a first-timer's first working program shouldn't come
 // with a visible penalty attached, and how grading works internally isn't
 // something a beginner needs to know to trust their result.

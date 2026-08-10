@@ -1768,13 +1768,51 @@ app.post('/api/ai/outline', authRequired, teacherOrAdmin, async (req, res) => {
 });
 
 /* ------------------------ AI compiler assistant (any signed-in learner) ------------------------ */
+// Same guarded assistant for both the free-standing /compiler page and a
+// real quest task's IDE - when qid/pid are given, the assignment brief is
+// looked up server-side (never trusted from the client) so the guidance can
+// reference the actual task. See ai.js's codeHelp/stripCodeFences for the
+// "never write code" guardrail itself.
 app.post('/api/compiler/ai', authRequired, async (req, res) => {
   try {
-    const { action, code, language, question } = req.body || {};
+    const { action, code, language, question, qid, pid } = req.body || {};
     if (!question && !(code && String(code).trim())) return res.status(400).json({ error: 'Write some code or ask a question first.' });
-    res.json({ reply: await ai.codeHelp(req.user.id, { action, code, language, question }) });
+    let assignment = null;
+    if (qid && pid) {
+      const q = Quests.byId(qid);
+      if (q && canViewBatch(req.user, Batches.byId(q.batch_id))) {
+        const p = q.problems.find((x) => x.pid === Number(pid));
+        if (p) assignment = { title: `${q.title} - ${p.title}`, brief: p.description };
+      }
+    }
+    res.json({ reply: await ai.codeHelp(req.user.id, { action, code, language, question, assignment }) });
   } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
+// Stateless activity report for the standalone /compiler page - no
+// assignment or submission to attach to, so nothing is persisted here.
+app.post('/api/compiler/activity-report', authRequired, async (req, res) => {
+  try {
+    const telemetry = sanitizeTelemetry((req.body || {}).telemetry);
+    if (!telemetry) return res.status(400).json({ error: 'No activity to report yet - write some code first.' });
+    res.json({ text: await ai.activityReport(req.user.id, { assignmentTitle: null, telemetry }) });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+// Only numeric fields, clamped to sane ranges - telemetry is client-computed
+// and must never be trusted blindly into storage or an AI prompt.
+function sanitizeTelemetry(t) {
+  if (!t || typeof t !== 'object') return null;
+  const num = (v, max) => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.min(n, max) : 0; };
+  return {
+    totalMs: num(t.totalMs, 24 * 3600_000),
+    activeMs: num(t.activeMs, 24 * 3600_000),
+    idleMs: num(t.idleMs, 24 * 3600_000),
+    timeToFirstKeystrokeMs: t.timeToFirstKeystrokeMs == null ? null : num(t.timeToFirstKeystrokeMs, 24 * 3600_000),
+    keystrokes: num(t.keystrokes, 1_000_000),
+    runs: num(t.runs, 10_000),
+    aiRequests: num(t.aiRequests, 10_000),
+    pasteBlocked: num(t.pasteBlocked, 10_000),
+  };
+}
 
 const TEXT_EXT = ['.txt', '.md', '.py', '.js', '.ts', '.html', '.css', '.json', '.ipynb', '.csv', '.sql', '.java', '.c', '.cpp'];
 // Prefer the code a student wrote in the built-in editor; fall back to
@@ -2074,6 +2112,8 @@ app.get('/api/batches/:id/quest', authRequired, viewBatch, (req, res) => {
       mistakes: s.ai_review.mistakes || null,
       better_approach: s.ai_review.better_approach || null,
     } : null,
+    telemetry: s.telemetry || null,
+    activity_report: s.activity_report || null,
   });
   const mySubsRaw = isStudent ? Quests.mySubs(req.user.id, req.batch.id) : {};
   const mySubs = {};
@@ -2140,7 +2180,7 @@ app.post('/api/quests/:qid/problems/:pid/submit', authRequired, upload.single('f
   } else {
     return res.status(400).json({ error: isWritten ? 'Write your logical answer in the editor, or upload it as a PDF or text file.' : 'Write your solution in the editor, or attach it as a PDF/Word file.' });
   }
-  const s = Quests.submit({ quest_id: q.id, pid: p.pid, user_id: req.user.id, ...payload, note: body.note });
+  const s = Quests.submit({ quest_id: q.id, pid: p.pid, user_id: req.user.id, ...payload, note: body.note, telemetry: sanitizeTelemetry(body.telemetry) });
   const batch = Batches.decorate(Batches.byId(q.batch_id));
   const teacherMails = (Batches.byId(q.batch_id).instructor_ids || []).map((tid) => (Users.byId(tid) || {}).email).filter(Boolean);
   mailer.notify(teacherMails, `New submission - ${batch.title || batch.name}`,
@@ -2252,6 +2292,30 @@ app.get('/api/quest-submissions/:id', authRequired, (req, res) => {
     can_grade: canManageBatch(req.user, b),
     files: TaskFiles.forProblem(q.id, s.pid),
   });
+});
+
+/* ----------------------- activity report (student or teacher) ----------------------- */
+// Turns the telemetry captured while the student worked (time, run count, AI
+// help count, blocked paste attempts) into a short readable report. Unlike
+// the AI review above, there is no grading signal here, so both the
+// submitting student and the instructor can generate/view it. Cached like
+// the AI review, with the same force-to-regenerate escape hatch.
+app.post('/api/quest-submissions/:id/activity-report', authRequired, async (req, res) => {
+  try {
+    const s = Quests.subById(req.params.id);
+    if (!s) return res.status(404).json({ error: 'Submission not found.' });
+    const q = Quests.byId(s.quest_id);
+    const b = Batches.byId(q.batch_id);
+    if (!(canManageBatch(req.user, b) || req.user.id === s.user_id)) return res.status(403).json({ error: 'Not available for your role.' });
+    if (!s.telemetry) return res.status(400).json({ error: 'No activity was recorded for this submission yet.' });
+    const { force } = req.body || {};
+    if (s.activity_report && !force) return res.json({ report: s.activity_report, cached: true });
+    const p = q.problems.find((x) => x.pid === s.pid) || {};
+    const text = await ai.activityReport(req.user.id, { assignmentTitle: `${q.title} - ${p.title}`, telemetry: s.telemetry });
+    s.activity_report = { text, generated_at: new Date().toISOString().replace('T', ' ').slice(0, 19) };
+    store.persist();
+    res.json({ report: s.activity_report, cached: false });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
 /* ----------------------- AI review layer (teacher-only) ----------------------- */

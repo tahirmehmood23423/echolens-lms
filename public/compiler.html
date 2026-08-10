@@ -152,8 +152,8 @@ print('Hello EchoLens!')"></textarea>
             <svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9 2.6 17a1.8 1.8 0 0 0 1.5 2.7h15.8a1.8 1.8 0 0 0 1.5-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Fix errors</button>
           <button type="button" class="cmp2-ai-chip" onclick="aiQuickAction('Optimize code')">
             <svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Optimize code</button>
-          <button type="button" class="cmp2-ai-chip" onclick="aiQuickAction('Generate code')">
-            <svg viewBox="0 0 24 24" fill="none"><path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Generate code</button>
+          <button type="button" class="cmp2-ai-chip" onclick="aiQuickAction('Get a hint')">
+            <svg viewBox="0 0 24 24" fill="none"><path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Get a hint</button>
         </div>
       </div>
       <form class="cmp2-ai-input" id="aiForm" onsubmit="aiSend(event)">
@@ -162,10 +162,20 @@ print('Hello EchoLens!')"></textarea>
           <svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5 21 4l-7.5 18-2.5-8-8-2.5z" fill="#fff"/></svg>
         </button>
       </form>
+      <div style="padding:10px 12px;border-top:1px solid var(--line)">
+        <button type="button" class="btn btn-ghost btn-sm" style="width:100%" onclick="showSessionReport()">Session report</button>
+      </div>
     </div>
 
   </div>
   <p class="hint">Want tasks to solve with this compiler? Head to the <a href="/open">open problem set</a> - free quests with automatic certificates.</p>
+</div>
+
+<div class="modal-backdrop" id="reportBackdrop" style="display:none;position:fixed;inset:0;background:rgba(10,14,30,.5);z-index:50;align-items:center;justify-content:center">
+  <div class="cmp2-panel" style="max-width:520px;width:92vw;max-height:80vh;display:flex;flex-direction:column">
+    <div class="cmp2-ai-head">Session report <button type="button" onclick="closeSessionReport()" style="margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:inherit">&times;</button></div>
+    <div id="reportBody" style="padding:14px;overflow-y:auto">Generating...</div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -365,6 +375,20 @@ function toggleDark(forceOn) {
   localStorage.setItem('echolens_compiler_dark', isDark ? '1' : '0');
   $('darkBtn').textContent = isDark ? 'Light' : 'Dark';
 }
+async function showSessionReport() {
+  $('reportBackdrop').style.display = 'flex';
+  $('reportBody').textContent = 'Generating...';
+  try {
+    const r = await fetch('/api/compiler/activity-report', {
+      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telemetry: EchoRun.telemetrySnapshot($('code')), language: $('lang').value }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || 'Could not generate a report.');
+    $('reportBody').innerHTML = `<pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px">${esc(data.text)}</pre>`;
+  } catch (e) { $('reportBody').textContent = e.message; }
+}
+function closeSessionReport() { $('reportBackdrop').style.display = 'none'; }
 function aiQuickAction(label) { sendToAi(label, label); }
 function aiSend(e) {
   e.preventDefault();
@@ -388,6 +412,7 @@ function appendAiBubble(text, mine) {
 async function sendToAi(displayText, action) {
   appendAiBubble(displayText, true);
   const reply = appendAiBubble('Thinking...');
+  EchoRun.telemetryMark($('code'), 'ai');
   try {
     const r = await fetch('/api/compiler/ai', {
       method: 'POST',
@@ -421,6 +446,7 @@ async function run() {
   }
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.textContent = 'Run'; return; }
   btn.textContent = 'Stop';
+  EchoRun.telemetryMark($('code'), 'run');
   // Sibling files ride along so they can be imported (Python) or compiled
   // together (C/C++) - not just organised in tabs.
   const enc = new TextEncoder();

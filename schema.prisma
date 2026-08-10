@@ -343,6 +343,8 @@ model QuestSubmission {
   late           Boolean?
   integrity      Json?
   lateDeduction  Int?      @map("late_deduction")
+  telemetry      Json?
+  activityReport Json?     @map("activity_report")
 
   quest         Quest          @relation(fields: [questId], references: [id])
   user          User           @relation("SubmissionAuthor", fields: [userId], references: [id])

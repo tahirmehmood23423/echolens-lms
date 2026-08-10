@@ -551,6 +551,83 @@
       }
     });
     addLineGutter(box);
+    wireTelemetry(box);
+  }
+
+  /* --------------------------- v13: telemetry + paste block ---------------------------
+   * Every wired editor gets: (1) pasting and drag-dropping text blocked - the
+   * point is that students type their own solution - and (2) lightweight
+   * timing/activity counters so a task can later report how long the student
+   * actually spent, how much of that was active typing vs idle/thinking, how
+   * many times they ran the code, how many times they asked the AI assistant
+   * for help, and how many paste attempts were blocked. Nothing here is sent
+   * anywhere on its own - callers pull a snapshot when they need one (e.g. on
+   * submit) via telemetrySnapshot().
+   */
+  const IDLE_GAP_MS = 30000; // gaps longer than this don't count as "active" typing time
+  const telemetryState = new WeakMap(); // box -> state
+
+  function tState(box) {
+    let st = telemetryState.get(box);
+    if (!st) {
+      st = { startedAt: Date.now(), lastActivityAt: null, activeMs: 0, firstKeystrokeAt: null, keystrokes: 0, runs: 0, aiRequests: 0, pasteBlocked: 0 };
+      telemetryState.set(box, st);
+    }
+    return st;
+  }
+  function flashWarning(box, text) {
+    const wrap = box.closest('.editor-wrap') || box.parentNode;
+    let warn = wrap.querySelector('.editor-paste-warn');
+    if (!warn) {
+      warn = document.createElement('div');
+      warn.className = 'editor-paste-warn';
+      warn.style.cssText = 'position:absolute;right:8px;bottom:8px;background:#3B1220;color:#FFD6DE;border:1px solid #7A2338;border-radius:8px;padding:5px 10px;font-size:12px;z-index:5;opacity:0;transition:opacity .15s';
+      if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+      wrap.appendChild(warn);
+    }
+    warn.textContent = text;
+    warn.style.opacity = '1';
+    clearTimeout(warn._h);
+    warn._h = setTimeout(() => { warn.style.opacity = '0'; }, 2200);
+  }
+  function wireTelemetry(box) {
+    const st = tState(box);
+    const blockCopy = (e) => {
+      e.preventDefault();
+      st.pasteBlocked += 1;
+      flashWarning(box, 'Pasting is disabled here - type your solution manually.');
+    };
+    box.addEventListener('paste', blockCopy);
+    box.addEventListener('drop', blockCopy);
+    box.addEventListener('dragover', (e) => e.preventDefault());
+    box.addEventListener('input', () => {
+      const now = Date.now();
+      if (st.firstKeystrokeAt == null) st.firstKeystrokeAt = now;
+      if (st.lastActivityAt != null && now - st.lastActivityAt < IDLE_GAP_MS) st.activeMs += now - st.lastActivityAt;
+      st.lastActivityAt = now;
+      st.keystrokes += 1;
+    });
+  }
+  // Call after a Run / AI-assistant action so the counts land in the next snapshot.
+  function telemetryMark(box, kind) {
+    const st = tState(box);
+    if (kind === 'run') st.runs += 1;
+    else if (kind === 'ai') st.aiRequests += 1;
+  }
+  function telemetrySnapshot(box) {
+    const st = tState(box);
+    const now = Date.now();
+    const totalMs = now - st.startedAt;
+    return {
+      totalMs,
+      activeMs: Math.min(st.activeMs, totalMs),
+      idleMs: Math.max(0, totalMs - st.activeMs),
+      timeToFirstKeystrokeMs: st.firstKeystrokeAt != null ? st.firstKeystrokeAt - st.startedAt : null,
+      keystrokes: st.keystrokes,
+      runs: st.runs,
+      aiRequests: st.aiRequests,
+      pasteBlocked: st.pasteBlocked,
+    };
   }
   function addLineGutter(box) {
     if (box.dataset.gutterWired) return;
@@ -802,6 +879,6 @@
   }
 
   window.EchoTerm = { mount };
-  window.EchoRun = { execute, executeAny, fetchDataset, cancel, isRunning: () => busy, wireEditor };
+  window.EchoRun = { execute, executeAny, fetchDataset, cancel, isRunning: () => busy, wireEditor, telemetryMark, telemetrySnapshot };
   window.EchoWeb = { preview: webPreview };
 })();

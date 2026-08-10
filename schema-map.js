@@ -50,6 +50,7 @@ const COLLECTIONS = [
   ['quest_submissions', 'quest_submissions', 'questSubmission', [
     'id', 'quest_id', 'pid', 'user_id', 'file_url', 'note', 'grade', 'gems', 'remarks', 'submitted_at', 'graded_at',
     'graded_by', 'code', 'language', 'ai_review', 'review_shared', 'review_shared_at', 'late', 'integrity', 'late_deduction',
+    'telemetry', 'activity_report',
   ]],
   ['open_submissions', 'open_submissions', 'openSubmission', [
     'id', 'user_id', 'track_key', 'level', 'pid', 'problem_title', 'points', 'code', 'language', 'file_url', 'file_name',
@@ -150,7 +151,7 @@ const JSON_COLUMNS_BY_TABLE = {
   courses: { badges: true },
   batches: { instructor_ids: false },
   quests: { problems: false },
-  quest_submissions: { ai_review: true, integrity: true },
+  quest_submissions: { ai_review: true, integrity: true, telemetry: true, activity_report: true },
   open_submissions: { files: true },
   certificates: { concepts: false },
   course_messages: { mentions: false },

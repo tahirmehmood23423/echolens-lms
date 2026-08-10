@@ -40,6 +40,7 @@ let ME_AI = false;
   $('app').style.display = '';
 })();
 
+function fmtMin(ms) { return ms == null ? '—' : (Math.round(ms / 6000) / 10) + ' min'; }
 function draw() {
   const { submission: s, problem: p, quest: q, course: c, can_grade, files } = DATA;
   document.title = `Grade - ${s.student_name} - ${p.title}`;
@@ -84,6 +85,21 @@ function draw() {
         ${workBlock}
       </div>
       <div>
+        ${s.telemetry ? `
+        <div class="card"><div class="card-head"><h3>&#9200; Activity</h3><span class="s" style="color:var(--muted)">How the student worked</span></div>
+          <div class="card-body">
+            <div class="s" style="display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:10px">
+              <span><strong>${fmtMin(s.telemetry.totalMs)}</strong> total</span>
+              <span><strong>${fmtMin(s.telemetry.activeMs)}</strong> active coding</span>
+              <span><strong>${s.telemetry.runs || 0}</strong> run${(s.telemetry.runs || 0) === 1 ? '' : 's'}</span>
+              <span><strong>${s.telemetry.aiRequests || 0}</strong> AI question${(s.telemetry.aiRequests || 0) === 1 ? '' : 's'}</span>
+              <span><strong>${s.telemetry.pasteBlocked || 0}</strong> paste attempt${(s.telemetry.pasteBlocked || 0) === 1 ? '' : 's'} blocked</span>
+            </div>
+            <div id="activityReportBody">${s.activity_report
+              ? `<pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px;max-height:34vh;overflow-y:auto">${esc(s.activity_report.text)}</pre>
+                 <button class="btn btn-ghost btn-sm" onclick="generateActivityReport(true)">Regenerate report</button>`
+              : `<button class="btn btn-ghost btn-sm" id="activityReportBtn" onclick="generateActivityReport(false)">Generate activity report</button>`}</div>
+          </div></div>` : ''}
         ${ME_AI ? `
         <div class="card"><div class="card-head"><h3>&#10024; AI assist</h3><span class="s" style="color:var(--muted)">Drafts only - you decide</span></div>
           <div class="card-body">
@@ -140,6 +156,18 @@ function previewWeb() {
   EchoWeb.preview($('webFrame'), DATA.submission.code, (kind, text) => {
     log.textContent += (kind === 'error' ? '✗ ' : '› ') + text + '\n';
   });
+}
+
+async function generateActivityReport(force) {
+  const btn = $('activityReportBtn');
+  const box = $('activityReportBody');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
+  try {
+    const out = await api(`/api/quest-submissions/${SID}/activity-report`, { method: 'POST', body: JSON.stringify({ force: !!force }) });
+    DATA.submission.activity_report = out.report;
+    box.innerHTML = `<pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px;max-height:34vh;overflow-y:auto">${esc(out.report.text)}</pre>
+      <button class="btn btn-ghost btn-sm" onclick="generateActivityReport(true)">Regenerate report</button>`;
+  } catch (e) { toast(e.message, true); if (btn) { btn.disabled = false; btn.textContent = 'Generate activity report'; } }
 }
 
 async function aiReview(force) {

@@ -4925,6 +4925,30 @@ function openTask(qid, pid) {
   }
   if (isStudent && !lvl.unlocked) statusHtml = `<div class="task-status lock">&#128274; This level is locked - pass the previous level first. You can read the task and practice in the editor, but not submit yet.</div>`;
 
+  // Activity report: deterministic time/run/AI-help/paste-block stats show
+  // immediately (no AI call, pure math); the readable narrative is generated
+  // on demand and cached on the submission (same cached/force pattern as the
+  // teacher's AI review), visible to the student and the instructor alike.
+  const fmtMin = (ms) => ms == null ? '—' : (Math.round(ms / 6000) / 10) + ' min';
+  const stat = sub && sub.telemetry;
+  const activityStatsHtml = stat ? `
+    <div class="s" style="display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:10px">
+      <span><strong>${fmtMin(stat.totalMs)}</strong> total</span>
+      <span><strong>${fmtMin(stat.activeMs)}</strong> active coding</span>
+      <span><strong>${stat.runs || 0}</strong> run${(stat.runs || 0) === 1 ? '' : 's'}</span>
+      <span><strong>${stat.aiRequests || 0}</strong> AI question${(stat.aiRequests || 0) === 1 ? '' : 's'}</span>
+      <span><strong>${stat.pasteBlocked || 0}</strong> paste attempt${(stat.pasteBlocked || 0) === 1 ? '' : 's'} blocked</span>
+    </div>` : '';
+  const activityReportInner = sub && sub.activity_report
+    ? `<pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px;max-height:34vh;overflow-y:auto">${esc(sub.activity_report.text)}</pre>
+       <button class="btn btn-ghost btn-sm" onclick="generateActivityReport(${sub.id},true)">Regenerate report</button>`
+    : (stat ? `<button class="btn btn-ghost btn-sm" id="activityReportBtn" onclick="generateActivityReport(${sub.id},false)">Generate my activity report</button>` : '<span class="s" style="color:var(--muted-2)">Submit your solution to see a timing report here.</span>');
+  const activityBoxHtml = `
+    <div class="cmp2-panel" style="grid-column:1/-1">
+      <div class="cmp2-ai-head">Activity report</div>
+      <div style="padding:14px">${activityStatsHtml}<div id="activityReportBody">${activityReportInner}</div></div>
+    </div>`;
+
   const fileAccept = isWritten ? '.pdf,.doc,.docx,.txt' : '.pdf,.doc,.docx';
   const fileMode = canSubmit ? `
     <details style="margin-top:14px"${isWritten ? ' open' : ''}><summary class="s" style="cursor:pointer;color:var(--muted);font-weight:600">${isWritten ? 'Upload your answer as a file (PDF, Word or text)' : 'Submit a file instead (reports, screenshots, notebooks - PDF/Word)'}</summary>
@@ -4995,8 +5019,25 @@ function openTask(qid, pid) {
           <input id="taskNote" placeholder="Note to your instructor (optional)" value="${esc((sub && sub.note) || '')}">
           <button class="btn btn-primary" id="taskSubmitBtn" onclick="submitTaskCode(${q.id},${pid})">${sub ? 'Resubmit solution' : 'Submit solution'}</button>
         </div>
-        <p class="hint" style="margin:8px 14px 14px">Submitting sends exactly what is in the editor.${q.deadline ? ` Deadline ${fmtDate(q.deadline)} - late work loses ${penalty}% of its gems.` : ''} The level average must reach the pass mark to unlock the next level.</p>` : '<div style="height:14px"></div>'}
+        <p class="hint" style="margin:8px 14px 14px">Submitting sends exactly what is in the editor.${q.deadline ? ` Deadline ${fmtDate(q.deadline)} - late work loses ${penalty}% of its gems.` : ''} The level average must reach the pass mark to unlock the next level. Pasting into the editor is disabled - write your solution yourself.</p>` : '<div style="height:14px"></div>'}
       </div>
+      <div class="cmp2-panel cmp2-ai" style="grid-column:1/-1">
+        <div class="cmp2-ai-head">AI guide <span class="cmp2-ai-beta">explains, never writes code</span></div>
+        <div class="cmp2-ai-body" id="taskAiBody">
+          <div class="cmp2-ai-empty">Ask about your code or this task. It will point you in the right direction - it will not write the solution for you.</div>
+          <div class="cmp2-ai-chips">
+            <button type="button" class="cmp2-ai-chip" onclick="taskAiQuickAction('Explain this code')">Explain this code</button>
+            <button type="button" class="cmp2-ai-chip" onclick="taskAiQuickAction('Fix errors')">Fix errors</button>
+            <button type="button" class="cmp2-ai-chip" onclick="taskAiQuickAction('Optimize code')">Optimize code</button>
+            <button type="button" class="cmp2-ai-chip" onclick="taskAiQuickAction('Get a hint')">Get a hint</button>
+          </div>
+        </div>
+        <form class="cmp2-ai-input" id="taskAiForm" onsubmit="taskAiSend(event)">
+          <input id="taskAiInput" placeholder="Ask about your code or this task...">
+          <button class="cmp2-ai-send" type="submit" aria-label="Send">&#10148;</button>
+        </form>
+      </div>
+      ${activityBoxHtml}
     </div>`;
 
   const term = EchoTerm.mount($('taskTerm'));
@@ -5092,6 +5133,7 @@ async function runTaskCode() {
   }
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = 'Run'; return; }
   btn.innerHTML = 'Stop';
+  EchoRun.telemetryMark($('codeBox'), 'run');
   const files = [...TASK_CTX.files, ...(TASK_CTX.localFiles || [])];
   try { await EchoRun.executeAny(lang, code, { term: TASK_CTX.term, files, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
@@ -5122,10 +5164,60 @@ async function submitTaskCode(qid, pid) {
   try {
     await api(`/api/quests/${qid}/problems/${pid}/submit`, {
       method: 'POST',
-      body: JSON.stringify({ code, language: $('taskLang').value, note: $('taskNote').value }),
+      body: JSON.stringify({ code, language: $('taskLang').value, note: $('taskNote').value, telemetry: EchoRun.telemetrySnapshot($('codeBox')) }),
     });
     toast('Submitted - gems incoming once graded.'); backToQuest();
   } catch (err) { toast(err.message, true); btn.disabled = false; }
+}
+
+/* -------------------------- guarded AI guide for the task IDE -------------------------- */
+// Same guarded assistant as the standalone compiler (never writes code - see
+// ai.js), bound here to the real assignment via qid/pid so its guidance can
+// reference the actual brief.
+function taskAiQuickAction(label) { sendToTaskAi(label, label); }
+function taskAiSend(e) {
+  e.preventDefault();
+  const v = $('taskAiInput').value.trim();
+  if (!v) return;
+  $('taskAiInput').value = '';
+  sendToTaskAi(v, null);
+}
+function appendTaskAiBubble(text, mine) {
+  const body = $('taskAiBody');
+  const empty = body.querySelector('.cmp2-ai-empty');
+  if (empty) empty.remove();
+  const el = document.createElement('div');
+  el.className = 'cmp2-ai-msg';
+  if (mine) el.style.background = 'var(--violet-soft)';
+  el.textContent = text;
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+  return el;
+}
+async function sendToTaskAi(displayText, action) {
+  appendTaskAiBubble(displayText, true);
+  const reply = appendTaskAiBubble('Thinking...');
+  EchoRun.telemetryMark($('codeBox'), 'ai');
+  try {
+    const r = await api('/api/compiler/ai', {
+      method: 'POST',
+      body: JSON.stringify({ action, code: $('codeBox').value, language: $('taskLang').value, question: action ? null : displayText, qid: TASK_CTX.qid, pid: TASK_CTX.pid }),
+    });
+    reply.textContent = r.reply;
+  } catch (err) { reply.textContent = err.message; reply.style.color = 'var(--danger)'; }
+  $('taskAiBody').scrollTop = $('taskAiBody').scrollHeight;
+}
+
+/* -------------------------- activity report (student + teacher) -------------------------- */
+async function generateActivityReport(sid, force) {
+  const btn = $('activityReportBtn');
+  const box = $('activityReportBody');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
+  try {
+    const out = await api(`/api/quest-submissions/${sid}/activity-report`, { method: 'POST', body: JSON.stringify({ force: !!force }) });
+    box.innerHTML = `<pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px;max-height:34vh;overflow-y:auto">${esc(out.report.text)}</pre>
+      <button class="btn btn-ghost btn-sm" onclick="generateActivityReport(${sid},true)">Regenerate report</button>`;
+  } catch (e) { toast(e.message, true); if (btn) { btn.disabled = false; btn.textContent = 'Generate my activity report'; } }
 }
 async function remindLevel(qid) {
   if (!confirm('Email a reminder to every student who has not finished this level yet?')) return;

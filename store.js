@@ -1901,7 +1901,7 @@ const Quests = {
   },
   forBatch(bid) { return data.quests.filter((q) => q.batch_id === Number(bid)).sort((a, b) => a.no - b.no); },
   byId(id) { return data.quests.find((q) => q.id === Number(id)) || null; },
-  submit({ quest_id, pid, user_id, file_url, code, language, note }) {
+  submit({ quest_id, pid, user_id, file_url, code, language, note, telemetry }) {
     const q = Quests.byId(quest_id);
     const isLate = !!(q && q.deadline && today() > q.deadline);
     let s = data.quest_submissions.find((x) => x.quest_id === Number(quest_id) && x.pid === Number(pid) && x.user_id === Number(user_id));
@@ -1911,13 +1911,15 @@ const Quests = {
       else if (file_url) { s.file_url = file_url; s.code = null; s.language = null; }
       s.note = note ?? s.note; s.submitted_at = now();
       s.late = s.late || isLate; // once late, always late - resubmitting doesn't reset it
-      // The old AI review + integrity report no longer match the new work.
-      delete s.ai_review; delete s.review_shared; delete s.review_shared_at; delete s.integrity;
+      if (telemetry) s.telemetry = telemetry;
+      // The old AI review + integrity report + activity report no longer match the new work.
+      delete s.ai_review; delete s.review_shared; delete s.review_shared_at; delete s.integrity; delete s.activity_report;
     } else {
       s = {
         id: nextId('quest_submissions'), quest_id: Number(quest_id), pid: Number(pid), user_id: Number(user_id),
         file_url: file_url || null, code: code || null, language: code ? (language || 'python') : null,
         note: note || null, grade: null, gems: 0, remarks: null, submitted_at: now(), late: isLate,
+        telemetry: telemetry || null,
       };
       data.quest_submissions.push(s);
     }

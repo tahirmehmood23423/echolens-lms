@@ -65,6 +65,22 @@
   body.cmp-dark .cmp2-ai-chip{background:#141A33;border-color:#232B52;color:#DCE6F5}
   body.cmp-dark .ide-status-row{background:#0B1128}
   body.cmp-dark h1,body.cmp-dark .cmp2-files-head,body.cmp-dark .cmp2-ai-head{color:#EAF2FF}
+  .rpt{display:flex;flex-direction:column;gap:12px}
+  .rpt-sec{border:1px solid var(--line);border-left:3px solid var(--rpt-c,var(--line-strong));border-radius:12px;padding:13px 15px 14px;background:#fff}
+  .rpt-head{display:flex;align-items:center;gap:9px;font-weight:700;font-size:13.5px;color:var(--rpt-c,var(--ink));margin-bottom:8px;letter-spacing:.01em}
+  .rpt-ic{width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--rpt-bg,var(--canvas));color:var(--rpt-c,var(--muted))}
+  .rpt-ic svg{width:15px;height:15px}
+  .rpt-body{font-size:13px;line-height:1.62;color:var(--text)}
+  .rpt-body p{margin:0 0 8px}
+  .rpt-body p:last-child{margin-bottom:0}
+  .rpt-body ul{margin:0 0 8px 18px;padding:0}
+  .rpt-body li{margin-bottom:4px}
+  .rpt-sec.time{--rpt-c:#2563EB;--rpt-bg:rgba(37,99,235,.1)}
+  .rpt-sec.good{--rpt-c:#16A34A;--rpt-bg:rgba(22,163,74,.1)}
+  .rpt-sec.help{--rpt-c:#D97706;--rpt-bg:rgba(217,119,6,.1)}
+  .rpt-sec.tip{--rpt-c:#7C3AED;--rpt-bg:rgba(124,58,237,.1)}
+  body.cmp-dark .rpt-sec{background:#171E3D;border-color:#232B52}
+  body.cmp-dark .rpt-body{color:#C7D1EC}
 </style>
 </head>
 <body>
@@ -375,6 +391,46 @@ function toggleDark(forceOn) {
   localStorage.setItem('echolens_compiler_dark', isDark ? '1' : '0');
   $('darkBtn').textContent = isDark ? 'Light' : 'Dark';
 }
+const RPT_ICONS = {
+  time: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  good: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="m8.5 12.5 2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  help: '<svg viewBox="0 0 24 24" fill="none"><path d="M10.3 3.9 2.6 17a1.8 1.8 0 0 0 1.5 2.7h15.8a1.8 1.8 0 0 0 1.5-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9.5v4M12 16.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  tip: '<svg viewBox="0 0 24 24" fill="none"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.45 1 1.15 1 1.9V16h5v-.2c0-.75.4-1.45 1-1.9A6 6 0 0 0 12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+};
+const RPT_SECTIONS = {
+  'time summary': { cls: 'time', label: 'Time summary' },
+  'what went well': { cls: 'good', label: 'What went well' },
+  'where you needed help': { cls: 'help', label: 'Where you needed help' },
+  'suggestion for next time': { cls: 'tip', label: 'Suggestion for next time' },
+};
+function mdInline(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }
+function mdBlockToHtml(block) {
+  const paras = block.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  return paras.map((p) => {
+    const lines = p.split(/\n/).map((l) => l.trim()).filter(Boolean);
+    const isList = lines.length > 0 && lines.every((l) => /^[-*]\s+/.test(l));
+    if (isList) return `<ul>${lines.map((l) => `<li>${mdInline(l.replace(/^[-*]\s+/, ''))}</li>`).join('')}</ul>`;
+    return `<p>${mdInline(lines.join(' '))}</p>`;
+  }).join('');
+}
+function renderReportMd(raw) {
+  const lines = String(raw || '').split(/\r?\n/);
+  const sections = [];
+  let current = null;
+  for (const line of lines) {
+    const h = line.match(/^#{1,3}\s+(.*)$/);
+    if (h) { current = { title: h[1].trim(), lines: [] }; sections.push(current); continue; }
+    if (!current) { current = { title: '', lines: [] }; sections.push(current); }
+    current.lines.push(line);
+  }
+  if (sections.length === 0 || (sections.length === 1 && !sections[0].title)) {
+    return `<div class="rpt"><div class="rpt-sec tip"><div class="rpt-body">${mdBlockToHtml(String(raw || ''))}</div></div></div>`;
+  }
+  return '<div class="rpt">' + sections.filter((s) => s.title || s.lines.some((l) => l.trim())).map((sec) => {
+    const meta = RPT_SECTIONS[sec.title.toLowerCase()] || { cls: 'tip', label: sec.title || 'Report' };
+    return `<div class="rpt-sec ${meta.cls}"><div class="rpt-head"><span class="rpt-ic">${RPT_ICONS[meta.cls]}</span>${esc(meta.label)}</div><div class="rpt-body">${mdBlockToHtml(sec.lines.join('\n'))}</div></div>`;
+  }).join('') + '</div>';
+}
 async function showSessionReport() {
   $('reportBackdrop').style.display = 'flex';
   $('reportBody').textContent = 'Generating...';
@@ -385,7 +441,7 @@ async function showSessionReport() {
     });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || 'Could not generate a report.');
-    $('reportBody').innerHTML = `<pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px">${esc(data.text)}</pre>`;
+    $('reportBody').innerHTML = renderReportMd(data.text);
   } catch (e) { $('reportBody').textContent = e.message; }
 }
 function closeSessionReport() { $('reportBackdrop').style.display = 'none'; }

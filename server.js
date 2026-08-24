@@ -2801,12 +2801,13 @@ app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (
     const prog = installed ? Quests.progress(u.id, req.batch.id) : null;
     if (onlyCompleted && prog && !prog.completed) { skipped.push(u.name); continue; }
     const finalProject = installed ? finalProjectFor(req.batch.id, u.id) : null;
-    const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject, partner: isPartner });
+    const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject, partner: isPartner, deferSave: true });
     if (out.ok) {
       issued.push(u.name);
       if (u.email) mailer.notify(u.email, `Your certificate is ready - ${title}`, `Congratulations ${u.name}! Your verified certificate for "${title}" is ready: ${APP_URL}/cert?s=${out.cert.serial}`);
     }
   }
+  if (issued.length) store.persist();
   res.json({ ok: true, issued: issued.length, skipped: skipped.length, skipped_names: skipped.slice(0, 20) });
 });
 app.get('/api/certificates/mine', authRequired, (req, res) => {

@@ -2494,7 +2494,7 @@ function finalProjectFor(bid, uid) {
     if (!s) return null;
     return {
       problem_title: p.title, problem_description: p.description || null,
-      file_url: s.file_url || null, code: s.code || null, language: s.language || null,
+      file_url: s.file_url || null, code: s.code ? String(s.code).slice(0, 4000) : null, language: s.language || null,
       note: s.note || null, grade: s.grade,
     };
   }).filter(Boolean);
@@ -2508,7 +2508,7 @@ const Certificates = {
     while (data.certificates.some((c) => c.serial === s));
     return s;
   },
-  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by, concepts, final_project, source_kind, source_id, partner }) {
+  issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by, concepts, final_project, source_kind, source_id, partner, deferSave }) {
     const u = Users.byId(user_id); if (!u) return { error: 'Student not found.' };
     // v18: when the caller knows the exact source (a specific event id or
     // track key), replace-on-reissue is scoped to THAT source - so a new
@@ -2542,7 +2542,7 @@ const Certificates = {
       partner: !!partner,
       issued_by, issued_at: now(),
     };
-    data.certificates.push(cert); save();
+    data.certificates.push(cert); if (!deferSave) save();
     return { ok: true, cert };
   },
   bySerial(s) { return data.certificates.find((c) => c.serial === String(s).trim().toUpperCase()) || null; },

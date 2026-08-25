@@ -3431,6 +3431,7 @@ app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
   res.json({
     catalogue: officialCatalogue().map((c) => ({ ...c, track_key: trackByCode[c.code] ? trackByCode[c.code].key : null })),
     paths: store.learningPaths(),
+    free_families: store.freeFamilies(),
     links: KEY_LINKS,
     cohort: { name: 'August 2026', registration_deadline: '31 July 2026', batch_starts: '1 August 2026' },
   });

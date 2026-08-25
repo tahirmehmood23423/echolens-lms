@@ -1811,7 +1811,7 @@ const TRACKS = {};
 (function loadTracks() {
   // short-courses-full is loaded LAST so its complete builds override the
   // earlier thin stubs for the same keys (python-6w, sc02/sc03/sc06/sc07).
-  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro'), ...require('./tracks/cs-fundamentals'), ...require('./tracks/design-3d')];
+  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro'), ...require('./tracks/cs-fundamentals'), ...require('./tracks/design-3d'), ...require('./tracks/curriculum-intermediate'), ...require('./tracks/curriculum-advanced')];
   for (const t of all) {
     // Normalize: compute title thresholds from total points if only names given.
     const total = t.levels.reduce((s1, l) => s1 + l.problems.reduce((s2, p) => s2 + (p.points || 100), 0), 0);
@@ -2308,11 +2308,41 @@ const OFFICIAL_CATALOGUE = [
   // combined track since CSS can't be taught without HTML underneath it -
   // codes FC-01/FC-02 unchanged so existing enrolment/progress doesn't
   // break, only the catalogue-facing framing here.
-  { code: 'FC-01', title: 'CS-101: Fundamentals of C', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'The language everything else was built on - compiling, memory, pointers, structs and file I/O, building a MiniBank CLI across 4 modules.' },
-  { code: 'FC-02', title: 'CS-102: Fundamentals of C++ (with OOP)', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Streams, references, classes, inheritance and STL containers - full object-oriented programming, building an expense tracker called LedgerLens.' },
-  { code: 'CS-104', title: 'CS-104: Fundamentals of Python', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', summary: 'Dynamic typing, lists and dictionaries, classes and JSON persistence - building a CLI to-do app called TaskFlow.' },
-  { code: 'CS-105', title: 'CS-105: Fundamentals of JavaScript', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'Variables, arrays, the live DOM and localStorage - building an interactive browser dashboard called PulseBoard.' },
-  { code: 'CS-106', title: 'CS-106: Fundamentals of HTML & CSS', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', summary: 'Semantic structure, the box model, Flexbox, Grid and responsive design - building a personal portfolio site called DevFolio.' },
+  // `family` groups a language's free sub-courses together for the open
+  // catalogue's "5 languages, 3 sub-courses each" grouping (open.js) - it
+  // is purely a display tag, not read anywhere else, so adding it here
+  // cannot affect enrolment, pricing or progress for these already-live
+  // course codes.
+  { code: 'FC-01', title: 'CS-101: Fundamentals of C', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'c', family_order: 1, summary: 'The language everything else was built on - compiling, memory, pointers, structs and file I/O, building a MiniBank CLI across 4 modules.' },
+  { code: 'FC-02', title: 'CS-102: Fundamentals of C++ (with OOP)', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'cpp', family_order: 1, summary: 'Streams, references, classes, inheritance and STL containers - full object-oriented programming, building an expense tracker called LedgerLens.' },
+  { code: 'CS-104', title: 'CS-104: Fundamentals of Python', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'python', family_order: 1, summary: 'Dynamic typing, lists and dictionaries, classes and JSON persistence - building a CLI to-do app called TaskFlow.' },
+  { code: 'CS-105', title: 'CS-105: Fundamentals of JavaScript', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', family: 'javascript', family_order: 1, summary: 'Variables, arrays, the live DOM and localStorage - building an interactive browser dashboard called PulseBoard.' },
+  { code: 'CS-106', title: 'CS-106: Fundamentals of HTML & CSS', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', family: 'web', family_order: 1, summary: 'Semantic structure, the box model, Flexbox, Grid and responsive design - building a personal portfolio site called DevFolio.' },
+  // Course 2 (Intermediate) and Course 3 (Advanced) sub-courses completing
+  // each language's free 3-course ladder, from the EchoLens Course and
+  // Module Handbook (see tracks/curriculum-intermediate.js and
+  // tracks/curriculum-advanced.js). Course 1 for every language is the
+  // entry above; these carry the handbook's own course codes.
+  { code: 'CS1.2', title: 'CS1.2: Pointers, Memory and Modular C', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'c', family_order: 2, summary: 'The layer most programmers skip - call stack, pointer arithmetic, buffer safety and struct layout, building toward a modular mathematics library and a binary packet serializer.' },
+  { code: 'CS1.3', title: 'CS1.3: Advanced C Systems Engineering', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'c', family_order: 3, summary: 'Dynamic memory, data structures and file persistence - the heap, hash tables and binary records, culminating in the MiniBank transaction engine capstone.' },
+  { code: 'CPP2.2', title: 'CPP2.2: Object Oriented Design in C++', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'cpp', family_order: 2, summary: 'Classes, inheritance and polymorphism that scale - invariants, the Rule of Three and virtual dispatch, building a multi-currency wallet and a polymorphic portfolio report.' },
+  { code: 'CPP2.3', title: 'CPP2.3: Advanced C++ Engineering', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'cpp', family_order: 3, summary: 'Templates, the standard library and production persistence, culminating in the LedgerLens expense management capstone.' },
+  { code: 'PY3.2', title: 'PY3.2: Python Data Structures and Object Oriented Design', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'python', family_order: 2, summary: 'Code that survives change - containers, guarded class state, dunder protocols and backtracking, building a word-frequency indexer and a constraint solver.' },
+  { code: 'PY3.3', title: 'PY3.3: Advanced Python Engineering', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'python', family_order: 3, summary: 'Defensive code, data pipelines and real APIs, culminating in the TaskFlow productivity suite capstone.' },
+  { code: 'JS4.2', title: 'JS4.2: The Browser Runtime', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'javascript', family_order: 2, summary: 'Event loop, DOM performance and reactive interfaces, building a high performance data grid and a reactive task board.' },
+  { code: 'JS4.3', title: 'JS4.3: Advanced JavaScript Applications', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'javascript', family_order: 3, summary: 'Async architecture, storage and web security, culminating in the PulseBoard real time dashboard capstone.' },
+  { code: 'WEB5.2', title: 'WEB5.2: CSS Architecture and Responsive Layout', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'web', family_order: 2, summary: 'Cascade, box model and Flexbox mastery, building a themeable design token system and a responsive site header.' },
+  { code: 'WEB5.3', title: 'WEB5.3: Advanced CSS - Grid, Subgrid and Motion', tier: 'Short Course', weeks: 4, hours: 10, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'web', family_order: 3, summary: 'Grid, subgrid, fluid design systems and motion, culminating in the DevFolio accessible portfolio capstone.' },
+];
+// Display metadata for the 5 free-course "language families" grouped by
+// the `family` tag above - purely presentational (open.js), not read by
+// any enrolment/progress/grading code.
+const FREE_FAMILIES = [
+  { key: 'c', name: 'C Systems Programming' },
+  { key: 'cpp', name: 'C++ and Object Oriented Software Design' },
+  { key: 'python', name: 'Python Programming and Algorithmic Design' },
+  { key: 'javascript', name: 'JavaScript and Interactive Web Architecture' },
+  { key: 'web', name: 'Modern Responsive Web Architecture (HTML & CSS)' },
 ];
 // The Web Developer Path bundle - the recommended beginner-to-job route.
 const LEARNING_PATHS = [
@@ -4626,7 +4656,7 @@ const Showcase = {
 load();
 
 module.exports = {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, catalogueFee, learningPaths: () => LEARNING_PATHS, persist: save,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, catalogueFee, learningPaths: () => LEARNING_PATHS, freeFamilies: () => FREE_FAMILIES, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, gemTotalsByUser, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,

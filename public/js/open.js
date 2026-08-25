@@ -98,6 +98,7 @@ const STAGE_FALLBACK = [{ key: 'spark', name: 'Spark', min: 0 }, { key: 'glow', 
 let ME = null;
 let CATALOGUE = [];
 let CAT_LINKS = null;
+let FREE_FAMILIES = [];
 let CUR = null;          // { track, levels, progress } for the open course
 let CUR_PROBLEM = null;  // { level, pid, problem }
 // Scroll offset within the course's quest list at the moment Solve was
@@ -457,6 +458,7 @@ async function loadCatalogue() {
     const d = await api('/api/public/catalogue');
     CATALOGUE = d.catalogue;
     CAT_LINKS = d.links;
+    FREE_FAMILIES = d.free_families || [];
     if (d.cohort) $('cohortLine').textContent = `31 live, instructor-led programs · Registration deadline ${d.cohort.registration_deadline} · Batch starts ${d.cohort.batch_starts}. Every paid course opens its first quest free - try before you enrol.`;
     $('actionStrip').innerHTML = `
       <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;
@@ -515,6 +517,24 @@ function courseCardHtml(c) {
       </div>
     </div>`;
 }
+// One language "family" of free courses, shown as its 3 sub-courses in
+// order (Beginner -> Intermediate -> Advanced) so the free catalogue reads
+// as a real ladder rather than a flat grid of unrelated cards.
+function freeFamilyGroupHtml(family, courses) {
+  const ordered = courses.slice().sort((a, b) => (a.family_order || 0) - (b.family_order || 0));
+  return `
+    <div class="oc-family" style="margin-bottom:22px">
+      <h4 style="margin:0 0 10px;font-family:var(--font-display);color:var(--navy)">${esc(family.name)}</h4>
+      <div class="oc-grid">${ordered.map(courseCardHtml).join('')}</div>
+    </div>`;
+}
+function drawFreeFamilies(list) {
+  const byFamily = {};
+  for (const c of list) { if (!c.family) continue; (byFamily[c.family] = byFamily[c.family] || []).push(c); }
+  const groups = FREE_FAMILIES.filter((f) => byFamily[f.key]?.length).map((f) => freeFamilyGroupHtml(f, byFamily[f.key]));
+  const ungrouped = list.filter((c) => !c.family);
+  return groups.join('') + (ungrouped.length ? `<div class="oc-grid">${ungrouped.map(courseCardHtml).join('')}</div>` : '');
+}
 function drawCourses() {
   if (!CATALOGUE.length) return;
   renderCoursePills();
@@ -523,10 +543,16 @@ function drawCourses() {
     (!tier || c.tier === tier) &&
     (!mode || (mode === 'free' ? c.price_pkr === 0 : c.price_pkr > 0)) &&
     (!q || c.title.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || (c.summary || '').toLowerCase().includes(q)));
-  $('courseTable').innerHTML = list.length ? `
-    <div class="oc-grid">${list.map(courseCardHtml).join('')}</div>
-    <p class="hint" style="margin-top:14px">Pay via bank transfer per your fee challan, then share the receipt to confirm your seat.</p>`
-    : '<div class="empty">No courses match those filters.</div>';
+  if (!list.length) { $('courseTable').innerHTML = '<div class="empty">No courses match those filters.</div>'; return; }
+  // Free courses read as 5 language ladders (Beginner/Intermediate/Advanced
+  // sub-courses per language) rather than a flat grid, whenever every
+  // filtered result is free - i.e. the "Free courses" pill, or a search
+  // that happens to only match free courses.
+  const allFree = list.every((c) => c.price_pkr === 0);
+  $('courseTable').innerHTML = allFree
+    ? drawFreeFamilies(list)
+    : `<div class="oc-grid">${list.map(courseCardHtml).join('')}</div>
+       <p class="hint" style="margin-top:14px">Pay via bank transfer per your fee challan, then share the receipt to confirm your seat.</p>`;
 }
 function courseAction(code) {
   const c = CATALOGUE.find((x) => x.code === code);

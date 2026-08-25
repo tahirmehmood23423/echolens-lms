@@ -4191,6 +4191,7 @@ require('./coursepages').register(app); // SEO landing page per course: /courses
 require('./talent').register(app, { authRequired, requireRecruiter, APP_URL, UPLOAD_DIR }); // Talent Marketplace: student profiles, projects, search (Phases 2-4)
 require('./talent-hiring').register(app, { authRequired, requireRecruiter, adminRequired, APP_URL, UPLOAD_DIR }); // Talent Marketplace: contact gating, shortlists, messaging, admin safety/analytics (Phases 5-6)
 require('./showcase').register(app, { authRequired, teacherOrAdmin, APP_URL }); // Showcase Feed (v20) - backend (step 4) + frontend pages (step 5)
+require('./curriculum').register(app, { authRequired, teacherOrAdmin, adminRequired }); // Coursera-style Programme/Course/Module curriculum (additive, own storage - see curriculum-store.js)
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
 app.get('/recruiter-signup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'recruiter-signup.html')));

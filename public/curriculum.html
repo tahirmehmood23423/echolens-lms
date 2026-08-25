@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoLens - Curriculum</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v1400">
+<style>
+  .cur-wrap{max-width:960px;margin:0 auto;padding:28px 20px 60px}
+  .cur-crumb{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .cur-crumb a{color:var(--primary);text-decoration:none;cursor:pointer}
+  .cur-prog-head{margin-bottom:22px}
+  .cur-course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:14px}
+  .cur-course-card{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+  .cur-course-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-card-hover)}
+  .cur-module-list{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+  .cur-module-row{display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-card)}
+  .cur-module-row.locked{opacity:.62}
+  .cur-module-row.clickable{cursor:pointer}
+  .cur-module-num{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none;background:var(--violet-soft);color:var(--primary-deep)}
+  .cur-module-num.passed{background:var(--stage-grad);color:#fff}
+  .cur-module-body{flex:1;min-width:0}
+  .cur-module-title{font-weight:600;font-size:15px;color:var(--text)}
+  .cur-module-outcome{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .cur-module-meta{display:flex;align-items:center;gap:10px;flex:none}
+  .cur-lock-reason{font-size:11.5px;color:var(--muted-2);max-width:180px}
+  .cur-gap{background:var(--canvas);border-radius:12px;padding:12px 14px;margin-top:10px;font-size:13px}
+  .cur-gap b{color:var(--primary-deep)}
+  .cur-section{margin-bottom:22px}
+  .cur-section h3{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .cur-video-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .cur-video-row:last-child{border-bottom:none}
+  .cur-rule{padding:9px 12px;background:var(--canvas);border-radius:10px;margin-bottom:8px;font-size:13.5px}
+  .cur-code{background:var(--ink);color:#E8EFF3;border-radius:14px;padding:16px;overflow-x:auto;font-family:var(--font-mono);font-size:12.8px;line-height:1.55}
+  .cur-code-cap{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+  .cur-submit-box{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+  .cur-submit-box textarea{min-height:90px;font-family:var(--font-body);padding:10px;border-radius:10px;border:1px solid var(--line-strong)}
+  .cur-submit-box input[type=text]{padding:10px;border-radius:10px;border:1px solid var(--line-strong)}
+  .cur-attempt{font-size:12.5px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body class="grade-page">
+
+<div id="gate" class="gate"><img src="/img/logo.png" alt="EchoLens" style="width:120px"><div>Loading the curriculum</div></div>
+
+<div id="app" style="display:none">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="logo-pill" style="height:34px"><img src="/img/logo.png" alt="EchoLens" style="height:22px"></span>
+      <span class="page-title">Curriculum</span>
+    </div>
+    <div class="user">
+      <a class="btn btn-ghost btn-sm" href="/dashboard">Back to dashboard</a>
+    </div>
+  </header>
+  <div class="content cur-wrap" id="body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/curriculum.js?v1"></script>
+</body>
+</html>

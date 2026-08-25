@@ -9,6 +9,7 @@
     "seed": "node store.js --seed",
     "migrate": "node migrations/run.js",
     "migrate:import": "node migrations/import-json.js",
+    "seed:curriculum": "node seed/curriculum/index.js",
     "test": "node --test test/*.test.js"
   },
   "engines": {

@@ -274,8 +274,15 @@
         // Trim Pyodide's internal frames from the traceback - students should
         // see their own code's error, not the plumbing.
         msg = msg.split('\n').filter((l) => !/pyodide\/|_pyodide\//.test(l)).join('\n');
+        // A Python traceback lists every frame as '  File "...", line N, in
+        // ...', innermost (closest to the actual fault) last. After trimming
+        // Pyodide's own frames above, the LAST remaining 'line N' is the
+        // deepest frame still inside the student's own code - exactly the
+        // line to point them at.
+        const lineMatches = [...msg.matchAll(/line (\d+)/g)];
+        const errorLine = lineMatches.length ? Number(lineMatches[lineMatches.length - 1][1]) : null;
         postMessage({ type: 'out', text: (msg.endsWith('\n') ? msg : msg + '\n') });
-        postMessage({ type: 'done', ok: false, images: [] });
+        postMessage({ type: 'done', ok: false, images: [], errorLine });
       }
     };
   }
@@ -495,7 +502,7 @@
               return;
             }
             if (m.type === 'need_input') { clearInterval(tick); worker.removeEventListener('message', onMsg); resolve({ kind: 'need_input' }); }
-            if (m.type === 'done') { clearInterval(tick); worker.removeEventListener('message', onMsg); resolve({ kind: 'done', ok: m.ok, images: m.images }); }
+            if (m.type === 'done') { clearInterval(tick); worker.removeEventListener('message', onMsg); resolve({ kind: 'done', ok: m.ok, images: m.images, errorLine: m.errorLine }); }
           };
           worker.addEventListener('message', onMsg);
           worker.postMessage({ type: 'run', code: String(code), stdin: stdinLines.slice(), url: PYODIDE_URL, files: fileBytes, origin: location.origin });
@@ -514,7 +521,7 @@
         // done
         term.showImages(result.images);
         status(result.ok ? 'Done.' : 'Finished with an error - read the message above.');
-        return { ok: result.ok };
+        return { ok: result.ok, errorLine: result.errorLine || null };
       }
       status('Stopped: too many input() calls in one run.');
       return { ok: false };
@@ -629,6 +636,7 @@
       pasteBlocked: st.pasteBlocked,
     };
   }
+  const gutterState = new WeakMap(); // box -> { gutter, errorLine }
   function addLineGutter(box) {
     if (box.dataset.gutterWired) return;
     box.dataset.gutterWired = '1';
@@ -639,15 +647,45 @@
     gutter.className = 'editor-gutter';
     wrap.appendChild(gutter);
     wrap.appendChild(box);
+    const state = { gutter, errorLine: null };
+    gutterState.set(box, state);
+    // One <div> per line (not a single text blob) so a specific line can be
+    // picked out and highlighted red once an error points at it - see
+    // markErrorLine() below.
     const render = () => {
       const n = box.value.split('\n').length;
       let s = '';
-      for (let i = 1; i <= n; i++) s += i + '\n';
-      gutter.textContent = s;
+      for (let i = 1; i <= n; i++) s += `<div class="editor-gutter-line${i === state.errorLine ? ' err' : ''}">${i}</div>`;
+      gutter.innerHTML = s;
     };
-    box.addEventListener('input', render);
+    box.addEventListener('input', () => { state.errorLine = null; render(); });
     box.addEventListener('scroll', () => { gutter.scrollTop = box.scrollTop; });
+    state.render = render;
     render();
+  }
+  /** Re-renders a wired editor's gutter after its value was set programmatically (input events don't fire for that) - call after any `box.value = ...` assignment. Safe to call on an editor that was never wired. */
+  function refreshGutter(box) {
+    const state = gutterState.get(box);
+    if (state) { state.errorLine = null; state.render(); }
+  }
+  /** Points at the exact line a traceback/compiler error named: highlights that row in the gutter red and selects the line's text in the editor itself (a plain <textarea> can't tint one line's background, but native text selection is visible and precise) - "where is the error", answered directly in the code. */
+  function markErrorLine(box, lineNo) {
+    const state = gutterState.get(box);
+    if (!state || !lineNo || lineNo < 1) return;
+    const lines = box.value.split('\n');
+    if (lineNo > lines.length) return;
+    state.errorLine = lineNo;
+    state.render();
+    const lineEl = state.gutter.children[lineNo - 1];
+    if (lineEl) lineEl.scrollIntoView({ block: 'center' });
+    let start = 0;
+    for (let i = 0; i < lineNo - 1; i++) start += lines[i].length + 1;
+    const end = start + lines[lineNo - 1].length;
+    try { box.focus(); box.setSelectionRange(start, end); } catch { /* focus/selection can fail if the box isn't visible - non-fatal */ }
+  }
+  function clearErrorLine(box) {
+    const state = gutterState.get(box);
+    if (state && state.errorLine != null) { state.errorLine = null; state.render(); }
   }
 
   /* --------------------------- web runner (v11) --------------------------- */
@@ -719,6 +757,7 @@
   }
   async function runSql(code, { term, onStatus, files }) {
     const status = (t) => { try { onStatus && onStatus(t); } catch {} };
+    term.clear(); // Python's execute() clears at the start of every run; this and runNative() below did not, so a language switch showed the previous run's leftover output mixed in with the new one.
     const SQL = await loadSql(status);
     const db = new SQL.Database();
     const dec = new TextDecoder();
@@ -791,6 +830,7 @@
   }
   async function runNative(lang, code, { term, onStatus, extraFiles }) {
     const status = (t) => { try { onStatus && onStatus(t); } catch {} };
+    term.clear(); // see the matching note in runSql() above
     const cfg = CE_LANG[lang];
     // If the program reads input, collect it up-front (compiled programs run
     // remotely, so input is provided as stdin lines before the run).
@@ -824,12 +864,32 @@
         options: { userArguments: '', filters: { execute: true }, executeParameters: { args: [], stdin } },
         lang: cfg.lang,
       }, 2);
-      if (d.code !== 0 && !d.execResult) {
-        // Compile failed - CE's own diagnostics are on the top-level stderr array.
-        const msg = ceText(d.stderr) || ceText((d.buildResult || {}).stderr) || 'Compilation failed.';
+      // A missing execResult always means the build failed before execution
+      // was even attempted - the case this originally checked for. But CE's
+      // API can ALSO return an execResult that IS present yet never ran
+      // (execResult.didExecute === false) for some kinds of compile
+      // failures (found 2026-08-25: reproduced with a plain missing
+      // semicolon) - that shape used to fall through to the branch below,
+      // which reads execResult.stderr (near-empty, just "Build failed")
+      // instead of the real diagnostic that was sitting in d.stderr the
+      // whole time, silently discarding it.
+      const buildFailed = d.code !== 0 || (d.execResult && d.execResult.didExecute === false);
+      if (buildFailed) {
+        // Compile failed - CE's diagnostics can be at the top level, or
+        // nested under execResult.buildResult depending on which shape
+        // this particular failure came back as; try every place they're
+        // known to appear.
+        const msg = ceText(d.stderr) || ceText((d.buildResult || {}).stderr)
+          || ceText(((d.execResult || {}).buildResult || {}).stderr) || 'Compilation failed.';
         term.print(msg + '\n');
         status('Compilation failed - read the errors above.');
-        return { ok: false };
+        // GCC/Clang diagnostics read "<source>:LINE:COL: error: ..."; javac
+        // reads "Main.java:LINE: error: ...". Either way the first ":N:"
+        // (or ":N:" then "error") after a filename is the line to point at -
+        // take the first match, since that is the earliest real error (later
+        // ones are often cascading from it).
+        const m = msg.match(/:(\d+)(?::\d+)?:\s*(?:fatal\s+)?error/i);
+        return { ok: false, errorLine: m ? Number(m[1]) : null };
       }
       const ex = d.execResult || {};
       const out = ceText(ex.stdout);
@@ -879,6 +939,6 @@
   }
 
   window.EchoTerm = { mount };
-  window.EchoRun = { execute, executeAny, fetchDataset, cancel, isRunning: () => busy, wireEditor, telemetryMark, telemetrySnapshot };
+  window.EchoRun = { execute, executeAny, fetchDataset, cancel, isRunning: () => busy, wireEditor, telemetryMark, telemetrySnapshot, refreshGutter, markErrorLine, clearErrorLine };
   window.EchoWeb = { preview: webPreview };
 })();

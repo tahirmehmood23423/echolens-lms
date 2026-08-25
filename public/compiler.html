@@ -203,6 +203,18 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let TERM = null, FILES = [], ME = null;
 function toast(t, err) { const el = $('toast'); el.textContent = t; el.className = 'toast show' + (err ? ' err' : ''); clearTimeout(el._h); el._h = setTimeout(() => el.className = 'toast', 3000); }
+// Every programmatic change to the editor's value (switching files, new
+// file, delete file, initial load, changing language) must go through
+// this rather than a bare `$('code').value = ...` - a plain assignment
+// does not fire the textarea's 'input' event, which is the only thing
+// that used to keep the line-number gutter in sync, so the gutter went
+// stale (wrong line count, or an error highlight left over from a
+// different file) every time code changed for any reason other than the
+// student's own typing.
+function setCode(text) {
+  $('code').value = text;
+  if (window.EchoRun) EchoRun.refreshGutter($('code'));
+}
 
 /* ------------------------------ multi-file projects ------------------------------
  * Each language keeps its own little project: a list of {name, content} files
@@ -262,7 +274,7 @@ function selectFile(i) {
   const cur = activeFile(); if (cur) cur.content = $('code').value;
   const f = p.files[i]; if (!f) return;
   p.active = f.name;
-  $('code').value = f.content;
+  setCode(f.content);
   saveProject(ACTIVE_LANG);
   renderFilesList();
 }
@@ -276,7 +288,7 @@ function newFile() {
   const cur = activeFile(); if (cur) cur.content = $('code').value;
   p.files.push({ name, content: '' });
   p.active = name;
-  $('code').value = '';
+  setCode('');
   saveProject(ACTIVE_LANG);
   renderFilesList();
   toast(`${name} created.`);
@@ -287,7 +299,7 @@ function deleteFile(i) {
   const f = p.files[i]; if (!f) return;
   if (!confirm(`Delete ${f.name}? This cannot be undone.`)) return;
   p.files.splice(i, 1);
-  if (p.active === f.name) { p.active = p.files[0].name; $('code').value = p.files[0].content; }
+  if (p.active === f.name) { p.active = p.files[0].name; setCode(p.files[0].content); }
   saveProject(ACTIVE_LANG);
   renderFilesList();
 }
@@ -322,7 +334,7 @@ function assembleWebCode() {
   TERM = EchoTerm.mount($('term'));
   EchoRun.wireEditor($('code'));
   ACTIVE_LANG = 'python';
-  $('code').value = activeFile().content;
+  setCode(activeFile().content);
   $('code').addEventListener('input', () => { const f = activeFile(); if (f) f.content = $('code').value; });
   renderFilesList();
   if (localStorage.getItem('echolens_compiler_dark') === '1') toggleDark(true);
@@ -338,7 +350,7 @@ function langChanged() {
   $('webWrap').style.display = isWeb ? '' : 'none';
   $('pkgs').textContent = PKGS_TEXT[newLang];
   $('code').placeholder = DEFAULTS[newLang].code;
-  $('code').value = activeFile().content;
+  setCode(activeFile().content);
   renderFilesList();
 }
 function datasetInfo(i) {
@@ -503,17 +515,29 @@ async function run() {
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.textContent = 'Run'; return; }
   btn.textContent = 'Stop';
   EchoRun.telemetryMark($('code'), 'run');
+  EchoRun.clearErrorLine($('code')); // a fresh run starts without a stale highlight from the last one
   // Sibling files ride along so they can be imported (Python) or compiled
   // together (C/C++) - not just organised in tabs.
   const enc = new TextEncoder();
   const siblingBytesFiles = siblings.map((f) => ({ name: f.name, bytes: enc.encode(f.content).buffer }));
   try {
-    await EchoRun.executeAny(lang, code, {
+    const result = await EchoRun.executeAny(lang, code, {
       term: TERM,
       files: [...FILES, ...siblingBytesFiles],
       extraFiles: siblings,
       onStatus: (t) => { status.textContent = t; },
     });
+    // For C/C++/Java, sibling files are compiled by being concatenated
+    // ahead of the active file's own source (see runNative in
+    // coderunner.js), so a reported line number only lines up with what's
+    // in this editor when there are no siblings pulling the numbering off.
+    // Python never concatenates - its line numbers always refer to the
+    // active file directly, siblings or not.
+    const lineIsTrustworthy = lang === 'python' || siblings.length === 0;
+    if (result && !result.ok && result.errorLine && lineIsTrustworthy) {
+      EchoRun.markErrorLine($('code'), result.errorLine);
+      status.textContent = (status.textContent || 'Finished with an error.') + ' (line ' + result.errorLine + ')';
+    }
   }
   catch (e) { status.textContent = e.message; }
   btn.textContent = 'Run';

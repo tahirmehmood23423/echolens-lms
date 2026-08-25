@@ -586,7 +586,10 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .editor-wrap:not(.ide) .code-editor{border:none}
 .editor-wrap.ide .editor-gutter{border-right:1px solid #1C2B52}
 .editor-gutter{flex:none;padding:12px 10px 12px 14px;text-align:right;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  font-size:13px;line-height:1.55;color:#48547A;background:#0B1128;user-select:none;white-space:pre;overflow:hidden}
+  font-size:13px;line-height:1.55;color:#48547A;background:#0B1128;user-select:none;overflow:hidden}
+.editor-gutter-line{white-space:pre}
+/* The exact line a traceback/compiler error named - see EchoRun.markErrorLine(). */
+.editor-gutter-line.err{color:#fff;background:rgba(217,83,79,.55);font-weight:700}
 .editor-wrap .code-editor{border-radius:0;white-space:pre;overflow-x:auto;flex:1;min-width:0}
 .editor-wrap .code-editor:focus{box-shadow:none;border-color:transparent}
 .code-out{white-space:pre-wrap;background:#0A0F24;color:#B8E6D5;border:1px solid #1C2B52;border-radius:11px;

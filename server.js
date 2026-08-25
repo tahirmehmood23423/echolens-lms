@@ -3265,6 +3265,10 @@ app.post('/api/admin/leads', authRequired, adminRequired, (req, res) => {
   const existingLeadEmails = new Set(Leads.all().map((l) => l.email));
   const added = [];
   const skipped = [];
+  // deferSave: true on every row below - a bulk paste can be 100+ emails,
+  // and saving after each one would queue that many separate Postgres
+  // transactions for a single request. One store.persist() after the loop
+  // covers everything (leads + the audit log entry) in one flush.
   for (const em of uniqueEmails) {
     const existingUser = Users.byLogin(em);
     const isExistingUser = existingUser && existingUser.email && existingUser.email.toLowerCase() === em;
@@ -3274,11 +3278,13 @@ app.post('/api/admin/leads', authRequired, adminRequired, (req, res) => {
       email: em,
       whatsapp: uniqueEmails.length === 1 ? String(whatsapp || '').trim() : '',
       source: 'manual',
+      deferSave: true,
     });
     added.push(lead);
     existingLeadEmails.add(em);
   }
-  AuditLog.record({ actor_id: req.user.id, action: 'lead_add_manual', detail: `+${added.length}${skipped.length ? `, skipped ${skipped.length} (already exist): ${skipped.join(', ')}` : ''}` });
+  AuditLog.record({ actor_id: req.user.id, action: 'lead_add_manual', target_type: 'lead', detail: `+${added.length}${skipped.length ? `, skipped ${skipped.length} (already exist): ${skipped.slice(0, 50).join(', ')}` : ''}`, deferSave: true });
+  store.persist();
   res.json({ ok: true, added, skipped, count_added: added.length, count_skipped: skipped.length });
 });
 // One composer for everything: announcements, enrollment openings, discounts,
@@ -3311,7 +3317,7 @@ app.post('/api/admin/email-blast', authRequired, adminRequired, upload.array('fi
     text += `\n\nRegister directly here: ${registrationUrl}`;
   }
   mailer.notify(emails, String(subject).slice(0, 200), text, attachments.length ? attachments : undefined);
-  AuditLog.record({ actor_id: req.user.id, action: 'email_blast', detail: `${audience} (${emails.length})${attachments.length ? ` +${attachments.length} attachment(s)` : ''} - ${subject}` });
+  AuditLog.record({ actor_id: req.user.id, action: 'email_blast', target_type: 'email_blast', detail: `${audience} (${emails.length})${attachments.length ? ` +${attachments.length} attachment(s)` : ''} - ${subject}` });
   res.json({ ok: true, sent: emails.length, smtp: mailer.configured, attachments: attachments.length });
 });
 

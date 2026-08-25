@@ -1186,9 +1186,15 @@ const Companies = {
 const AuditLog = {
   all() { return data.audit_log.slice().sort((a, b) => b.id - a.id); },
   forTarget(target_type, target_id) { return AuditLog.all().filter((a) => a.target_type === target_type && a.target_id === Number(target_id)); },
-  record({ actor_id = null, action, target_type, target_id = null, detail = null }) {
-    const e = { id: nextId('audit_log'), actor_id: actor_id != null ? Number(actor_id) : null, action, target_type, target_id: target_id != null ? Number(target_id) : null, detail, at: now() };
-    data.audit_log.push(e); save();
+  // target_type is a required, non-nullable column in Postgres (schema.prisma's
+  // AuditLog.targetType) - a caller that forgets it doesn't fail loudly in the
+  // JSON store (undefined just isn't written), but crashes the WHOLE Postgres
+  // flush batch (and everything else queued with it) once that record reaches
+  // Prisma. Defaulting here, rather than trusting every call site to remember
+  // it, is the actual fix - same lesson as the final_project flush-crash fix.
+  record({ actor_id = null, action, target_type, target_id = null, detail = null, deferSave }) {
+    const e = { id: nextId('audit_log'), actor_id: actor_id != null ? Number(actor_id) : null, action, target_type: target_type || 'system', target_id: target_id != null ? Number(target_id) : null, detail, at: now() };
+    data.audit_log.push(e); if (!deferSave) save();
     return e;
   },
 };
@@ -3551,7 +3557,11 @@ const JobComments = {
  * list, download (CSV), and email them.
  */
 const Leads = {
-  upsert({ name, email, whatsapp, source, user_id }) {
+  // deferSave lets a bulk caller (e.g. the comma-separated admin add-leads
+  // route) upsert many rows in one loop without triggering a separate
+  // Postgres transaction per row - it must call store.persist() itself once
+  // after the loop. Single-row callers get the old immediate-save behavior.
+  upsert({ name, email, whatsapp, source, user_id, deferSave }) {
     if (!email) return null;
     let l = data.leads.find((x) => x.email && x.email.toLowerCase() === String(email).toLowerCase());
     if (l) {
@@ -3559,7 +3569,7 @@ const Leads = {
       if (whatsapp) l.whatsapp = String(whatsapp).slice(0, 40);
       if (user_id) l.user_id = Number(user_id);
       if (source && !l.source) l.source = source;
-      l.updated_at = now(); save();
+      l.updated_at = now(); if (!deferSave) save();
       return l;
     }
     l = {
@@ -3568,7 +3578,7 @@ const Leads = {
       source: String(source || 'open').slice(0, 30), user_id: user_id ? Number(user_id) : null,
       created_at: now(), updated_at: now(),
     };
-    data.leads.push(l); save();
+    data.leads.push(l); if (!deferSave) save();
     return l;
   },
   all() {

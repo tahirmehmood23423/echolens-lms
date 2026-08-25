@@ -4,22 +4,25 @@
  * EchoLens Digital - AI copilot - provider layer (v9)
  *
  * Teacher-facing only. Free-tier friendly by design:
- *  - Providers: Google Gemini (default) or Groq. Swap with one env var.
+ *  - Providers: Groq (default - fast, generous free tier, rarely rate-limited)
+ *    or Google Gemini. Swap with one env var.
  *  - Automatic fallback: if BOTH keys are set and the primary provider fails
  *    with a quota/billing/rate error (or a 5xx), the call is retried on the
  *    other provider automatically. Teachers never see raw billing errors.
+ *  - Groq is the default because Gemini's free-tier quotas have been
+ *    unreliable in production; Groq keeps the AI features from crashing.
  *  - Per-user rate limit protects free-tier quotas.
  *  - Privacy: callers must never pass student names or emails.
  *
  * Env:
- *   AI_PROVIDER=gemini | groq        (default gemini)
- *   GEMINI_API_KEY=...               (free at aistudio.google.com)
+ *   AI_PROVIDER=groq | gemini        (default groq)
  *   GROQ_API_KEY=...                 (free at console.groq.com)
+ *   GEMINI_API_KEY=...               (free at aistudio.google.com)
  *   AI_MODEL=...                     (optional override for the PRIMARY provider)
  *   AI_HOURLY_LIMIT=30               (per user per hour)
  */
 
-const PROVIDER = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
+const PROVIDER = (process.env.AI_PROVIDER || 'groq').toLowerCase();
 const GEMINI_KEY = process.env.GEMINI_API_KEY || '';
 const GROQ_KEY = process.env.GROQ_API_KEY || '';
 

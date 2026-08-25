@@ -2587,13 +2587,21 @@ const Certificates = {
     // partner ever changes, already-issued collaboration certificates pick
     // up the update, exactly like EchoLens's own branding already does.
     const p = c.partner ? Settings.partner() : null;
+    // The public page shows what the final project was about, never the
+    // student's actual submitted solution - strip code/file_url so nobody
+    // can lift a working answer straight off a verified certificate.
+    const fp = c.final_project;
+    const finalProject = (fp && fp.items && fp.items.length)
+      ? { level_no: fp.level_no, level_title: fp.level_title, level_topic: fp.level_topic,
+          items: fp.items.map((it) => ({ problem_title: it.problem_title, problem_description: it.problem_description })) }
+      : null;
     return {
       serial: c.serial, student_name: c.student_name, reg_no: c.reg_no,
       kind: c.kind, title: c.title, detail: c.detail, completion_date: c.completion_date,
       instructor_name: c.instructor_name, instructor_sig: c.instructor_sig,
       org: s.org, tagline: s.tagline, ceo_name: s.ceo_name,
       partner: p ? { name: p.name, ceo_name: p.ceo_name, logo_url: p.logo_url } : null,
-      concepts: c.concepts || [], final_project: c.final_project || null,
+      concepts: c.concepts || [], final_project: finalProject,
       issued_at: (c.issued_at || '').slice(0, 10),
     };
   },

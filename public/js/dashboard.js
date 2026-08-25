@@ -4283,7 +4283,7 @@ async function renderCopilot() {
   if (!st.enabled) {
     el.innerHTML = `<div class="card"><div class="card-body">
       <h3 style="margin-bottom:8px">AI Copilot is not configured yet</h3>
-      <p class="s" style="color:var(--muted)">Set <span class="mono">GEMINI_API_KEY</span> (free at aistudio.google.com) or <span class="mono">GROQ_API_KEY</span> in the server environment and restart. Teachers then get grading drafts, quiz generation, course outlines, and a teaching chat - all on free-tier models.</p>
+      <p class="s" style="color:var(--muted)">Set <span class="mono">GROQ_API_KEY</span> (free at console.groq.com) or <span class="mono">GEMINI_API_KEY</span> in the server environment and restart. Teachers then get grading drafts, quiz generation, course outlines, and a teaching chat - all on free-tier models.</p>
     </div></div>`;
     return;
   }
@@ -6679,15 +6679,16 @@ async function renderAdminMailer() {
           <button class="btn btn-primary">Send email</button>
         </form>
       </div></div>
-    <div class="card"><div class="card-head"><h3>Add a lead manually</h3></div>
+    <div class="card"><div class="card-head"><h3>Add leads manually</h3></div>
       <div class="card-body">
         <form id="mailerAddLeadForm">
           <div class="form-grid">
-            <label class="field"><span>Name</span><input name="name" placeholder="Full name (optional)"></label>
-            <label class="field"><span>Email</span><input name="email" type="email" required placeholder="name@example.com"></label>
-            <label class="field"><span>WhatsApp</span><input name="whatsapp" placeholder="Number (optional)"></label>
+            <label class="field"><span>Name</span><input name="name" placeholder="Full name (optional, single email only)"></label>
+            <label class="field"><span>WhatsApp</span><input name="whatsapp" placeholder="Number (optional, single email only)"></label>
           </div>
-          <button class="btn btn-teal">Add lead</button>
+          <label class="field"><span>Email(s)</span><textarea name="email" rows="2" required placeholder="name@example.com, another@example.com, ..."></textarea></label>
+          <p class="s" style="color:var(--muted);margin:2px 0 12px">Paste one or many emails, comma-separated. Any address already belonging to a registered user or already in the leads database is skipped automatically.</p>
+          <button class="btn btn-teal">Add lead(s)</button>
         </form>
       </div></div>
     <div class="card"><div class="card-head"><h3>Leads database</h3>
@@ -6708,8 +6709,10 @@ async function renderAdminMailer() {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
     try {
       const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
-      await api('/api/admin/leads', { method: 'POST', body: JSON.stringify(obj) });
-      toast('Lead added.'); f.reset(); btn.disabled = false;
+      const out = await api('/api/admin/leads', { method: 'POST', body: JSON.stringify(obj) });
+      const parts = [`${out.count_added} added`];
+      if (out.count_skipped) parts.push(`${out.count_skipped} skipped (already exist)`);
+      toast(parts.join(', ') + '.'); f.reset(); btn.disabled = false;
       loadMailerLeads();
     } catch (err) { toast(err.message, true); btn.disabled = false; }
   });

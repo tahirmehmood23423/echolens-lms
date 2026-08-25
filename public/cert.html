@@ -80,7 +80,7 @@
   .fp-item { border-top: 1px solid var(--line); padding: 12px 0; }
   .fp-item:first-of-type { border-top: none; padding-top: 0; }
   .fp-title { font-size: 14px; font-weight: 650; }
-  .fp-desc { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .fp-desc { font-size: 13px; color: var(--muted); margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .fp-link { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--teal-deep); text-decoration: none; margin-top: 7px; }
   .fp-code { margin-top: 8px; background: var(--navy); color: #dce6f5; font-family: ui-monospace, monospace; font-size: 11.5px; padding: 12px 14px; border-radius: 10px; max-height: 220px; overflow: auto; white-space: pre-wrap; }
   .fp-note { font-size: 12.5px; color: var(--muted); font-style: italic; margin-top: 7px; }
@@ -195,14 +195,14 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
         <div class="concept-chip"><span class="cno">${co.no}</span><div><div class="ct">${esc(co.title)}</div>${co.topic ? '<div class="cs">' + esc(co.topic) + '</div>' : ''}</div></div>`).join('')}</div>
     </div>` : '';
 
+  // The certificate is public - it shows what the final project was about,
+  // never the student's actual submitted solution (source code or file),
+  // so nobody can copy a working answer straight off a verified certificate.
   const fp = c.final_project;
   const fpItemHtml = (it) => `
     <div class="fp-item">
       <div class="fp-title">${esc(it.problem_title)}</div>
       ${it.problem_description ? '<div class="fp-desc">' + esc(it.problem_description) + '</div>' : ''}
-      ${it.file_url ? '<a class="fp-link" href="' + esc(it.file_url) + '" target="_blank" rel="noopener">View submitted file &rarr;</a>' : ''}
-      ${it.code ? '<details><summary class="fp-link" style="cursor:pointer">View code (' + esc(it.language || 'code') + ') &rarr;</summary><pre class="fp-code">' + esc(it.code.slice(0, 4000)) + '</pre></details>' : ''}
-      ${it.note ? '<div class="fp-note">&ldquo;' + esc(it.note) + '&rdquo;</div>' : ''}
     </div>`;
   const finalProjectHtml = (fp && fp.items && fp.items.length) ? `
     <div class="ve-card">

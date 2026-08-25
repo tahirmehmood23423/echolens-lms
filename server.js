@@ -3246,17 +3246,40 @@ app.get('/api/admin/leads.csv', authRequired, adminRequired, (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="echolens-leads-${new Date().toISOString().slice(0, 10)}.csv"`);
   res.send(Leads.csv());
 });
-// Manually add a contact to the leads database - a conference list, a
+// Manually add contacts to the leads database - a conference list, a
 // referral introduction, anyone the admin wants in the cold-mailing list
 // without them ever having signed up. Joins the same table as sign-up leads,
 // so it is included in every "leads" / "everyone" email blast below.
+// Accepts one or many emails (comma or newline separated). Any address that
+// already belongs to a registered user, or is already in the leads database,
+// is silently skipped rather than duplicated - the remaining new addresses
+// are added.
 app.post('/api/admin/leads', authRequired, adminRequired, (req, res) => {
   const { name, email, whatsapp } = req.body || {};
-  const em = String(email || '').trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return res.status(400).json({ error: 'Enter a valid email address.' });
-  const lead = Leads.upsert({ name: String(name || '').trim(), email: em, whatsapp: String(whatsapp || '').trim(), source: 'manual' });
-  AuditLog.record({ actor_id: req.user.id, action: 'lead_add_manual', detail: em });
-  res.json({ ok: true, lead });
+  const rawList = String(email || '').split(/[,\n]+/).map((s) => s.trim().toLowerCase()).filter(Boolean);
+  const uniqueEmails = [...new Set(rawList)];
+  if (!uniqueEmails.length) return res.status(400).json({ error: 'Enter at least one email address.' });
+  const bad = uniqueEmails.find((em) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em));
+  if (bad) return res.status(400).json({ error: `"${bad}" is not a valid email address.` });
+
+  const existingLeadEmails = new Set(Leads.all().map((l) => l.email));
+  const added = [];
+  const skipped = [];
+  for (const em of uniqueEmails) {
+    const existingUser = Users.byLogin(em);
+    const isExistingUser = existingUser && existingUser.email && existingUser.email.toLowerCase() === em;
+    if (isExistingUser || existingLeadEmails.has(em)) { skipped.push(em); continue; }
+    const lead = Leads.upsert({
+      name: uniqueEmails.length === 1 ? String(name || '').trim() : '',
+      email: em,
+      whatsapp: uniqueEmails.length === 1 ? String(whatsapp || '').trim() : '',
+      source: 'manual',
+    });
+    added.push(lead);
+    existingLeadEmails.add(em);
+  }
+  AuditLog.record({ actor_id: req.user.id, action: 'lead_add_manual', detail: `+${added.length}${skipped.length ? `, skipped ${skipped.length} (already exist): ${skipped.join(', ')}` : ''}` });
+  res.json({ ok: true, added, skipped, count_added: added.length, count_skipped: skipped.length });
 });
 // One composer for everything: announcements, enrollment openings, discounts,
 // new batches, cold outreach to the leads database - the admin writes the

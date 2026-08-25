@@ -225,6 +225,30 @@ function isDateOnlyColumn(table, col) {
   return !!(cols && cols.has(col));
 }
 
+// certificates.final_project: schema.prisma types this column String? (a
+// plain text field), but store.js's finalProjectFor() (server.js) has
+// always produced a structured object -
+// {level_no, level_title, level_topic, items:[{problem_title, code, ...}]}
+// - never a string. The generic write path (buildPrismaRow below) used to
+// pass that object straight through to a String Prisma column, which
+// Prisma's client rejects outright: "Expected String or Null, provided
+// Object." Found 2026-08-25: the first certificate ever issued whose
+// student had real capstone submission content hit this and threw inside
+// the shared Postgres flush transaction - which, per this file and
+// store.js's "bounded fail-fast" design, poisons every subsequent save()
+// for the rest of the process's life until it's fixed, turning one bad
+// write into unbounded memory growth and a full crash.
+// Fixed here rather than by changing the live column's type (Json) so
+// nothing requires a database migration to deploy - JSON-encode this one
+// column at the write boundary, decode it back to an object on read. The
+// column keeps genuinely holding text in Postgres; only this file knows
+// that text is JSON.
+const STRINGIFIED_JSON_COLUMNS_BY_TABLE = { certificates: new Set(['final_project']) };
+function isStringifiedJsonColumn(table, col) {
+  const cols = STRINGIFIED_JSON_COLUMNS_BY_TABLE[table];
+  return !!(cols && cols.has(col));
+}
+
 // Columns where store.js's in-memory JS value is genuinely one of two
 // incompatible types (found via live-code read-throughs, not just data
 // audits - the historical data never happened to exercise either path).
@@ -337,6 +361,8 @@ function buildPrismaRow(table, columns, rec, context) {
       }
     } else if (jsonInfo) {
       row[field] = raw === null ? (jsonInfo.nullable ? Prisma.DbNull : Prisma.JsonNull) : raw;
+    } else if (isStringifiedJsonColumn(table, col)) {
+      row[field] = raw === null ? null : JSON.stringify(raw);
     } else if (isLocalDatetimeColumn(table, col)) {
       row[field] = raw == null ? null : assertValidDate(localDatetimeStringToDate(raw), `${context}.${col}="${raw}"`);
     } else if (isDateOnlyColumn(table, col) && raw != null) {
@@ -397,6 +423,13 @@ function rowFromPrisma(table, columns, prismaRow) {
       row[col] = dateToDateOnlyString(value);
     } else if (isTimestampColumn(table, col)) {
       row[col] = dateToNowString(value);
+    } else if (isStringifiedJsonColumn(table, col)) {
+      // Defensive fallback: no row has ever successfully stored a non-null
+      // value here before this fix (every attempt threw before reaching
+      // Postgres), so unparseable text should never occur in practice -
+      // but null rather than a crash is the safe read-side default if it
+      // somehow does.
+      try { row[col] = JSON.parse(value); } catch { row[col] = null; }
     } else {
       row[col] = value;
     }
@@ -409,6 +442,7 @@ module.exports = {
   JSON_COLUMNS_BY_TABLE, TIMESTAMP_COLUMNS, TIMESTAMP_COLUMN_EXCLUSIONS_BY_TABLE,
   LOCAL_DATETIME_COLUMNS_BY_TABLE, LOCAL_DATETIME_OFFSET_MINUTES, POLYMORPHIC_COLUMNS_BY_TABLE,
   DATE_ONLY_COLUMNS_BY_TABLE, isDateOnlyColumn, dateOnlyStringToDate, dateToDateOnlyString,
+  STRINGIFIED_JSON_COLUMNS_BY_TABLE, isStringifiedJsonColumn,
   toCamel, isTimestampColumn, isLocalDatetimeColumn, jsonColumnInfo, polymorphicColumnInfo,
   isoFromNowString, localDatetimeStringToDate, assertValidDate, buildPrismaRow,
   dateToNowString, dateToLocalDatetimeString, rowFromPrisma,

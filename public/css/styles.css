@@ -1041,6 +1041,17 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .oc-card.dark .oc-price.free{color:#5EEAD4}
 .oc-btn{width:100%;justify-content:center}
 
+/* --- free-course language picker: 5 square buttons, each opening its 2 courses --- */
+.oc-lang-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px}
+.oc-lang-btn{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;font-family:var(--font-body);padding:14px}
+.oc-lang-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--primary)}
+.oc-lang-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0FBFA8,#0A9384);box-shadow:0 6px 14px -6px rgba(20,10,50,.35)}
+.oc-lang-icon svg{width:23px;height:23px;color:#fff}
+.oc-lang-name{font-size:13.5px;font-weight:700;color:var(--ink);text-align:center;line-height:1.3}
+.oc-lang-count{font-size:11px;color:var(--muted)}
+.oc-lang-back{background:none;border:none;color:var(--primary);font-weight:600;font-size:13px;cursor:pointer;padding:0;font-family:var(--font-body)}
+.oc-lang-back:hover{text-decoration:underline}
+
 /* --- open-site quest cards (progress, gems, lock) --- */
 .qc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
 .qc-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-sm);transition:transform .15s ease,box-shadow .15s ease}

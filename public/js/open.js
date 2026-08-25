@@ -486,6 +486,7 @@ function setCoursePill(kind) {
   if (kind === 'free') { $('cFree').value = 'free'; $('cTier').value = ''; }
   else if (kind === 'all') { $('cFree').value = ''; $('cTier').value = ''; }
   else { $('cTier').value = kind; $('cFree').value = ''; }
+  FREE_SELECTED_FAMILY = null; // switching pills always starts the free-course language picker fresh
   drawCourses();
 }
 function syncCourseFilters() { renderCoursePills(); }
@@ -517,23 +518,37 @@ function courseCardHtml(c) {
       </div>
     </div>`;
 }
-// One language "family" of free courses, shown as its 3 sub-courses in
-// order (Beginner -> Intermediate -> Advanced) so the free catalogue reads
-// as a real ladder rather than a flat grid of unrelated cards.
-function freeFamilyGroupHtml(family, courses) {
-  const ordered = courses.slice().sort((a, b) => (a.family_order || 0) - (b.family_order || 0));
-  return `
-    <div class="oc-family" style="margin-bottom:22px">
-      <h4 style="margin:0 0 10px;font-family:var(--font-display);color:var(--navy)">${esc(family.name)}</h4>
-      <div class="oc-grid">${ordered.map(courseCardHtml).join('')}</div>
-    </div>`;
+// Free courses are 5 languages, one square button each; picking a language
+// reveals its exactly-2 courses (Fundamentals, then the combined Advanced
+// course covering both a Basic and an Advanced tier - see
+// tracks/curriculum-advanced-combined.js for how that merge works).
+let FREE_SELECTED_FAMILY = null;
+function freeLanguageIconIcon(key) {
+  return { c: 'code', cpp: 'code', python: 'chart', javascript: 'code', web: 'code' }[key] || 'gem';
 }
+function freeLanguageButtonsHtml(byFamily) {
+  return `<div class="oc-lang-grid">${FREE_FAMILIES.filter((f) => byFamily[f.key]?.length).map((f) => `
+    <button type="button" class="oc-lang-btn" onclick="selectFreeFamily('${f.key}')">
+      <span class="oc-lang-icon"><svg viewBox="0 0 24 24" fill="none">${ICONS[freeLanguageIconIcon(f.key)]}</svg></span>
+      <span class="oc-lang-name">${esc(f.name)}</span>
+      <span class="oc-lang-count">${byFamily[f.key].length} courses</span>
+    </button>`).join('')}</div>`;
+}
+function selectFreeFamily(key) { FREE_SELECTED_FAMILY = key; drawCourses(); }
+window.selectFreeFamily = selectFreeFamily;
 function drawFreeFamilies(list) {
   const byFamily = {};
   for (const c of list) { if (!c.family) continue; (byFamily[c.family] = byFamily[c.family] || []).push(c); }
-  const groups = FREE_FAMILIES.filter((f) => byFamily[f.key]?.length).map((f) => freeFamilyGroupHtml(f, byFamily[f.key]));
   const ungrouped = list.filter((c) => !c.family);
-  return groups.join('') + (ungrouped.length ? `<div class="oc-grid">${ungrouped.map(courseCardHtml).join('')}</div>` : '');
+  if (!FREE_SELECTED_FAMILY || !byFamily[FREE_SELECTED_FAMILY]) {
+    return freeLanguageButtonsHtml(byFamily) + (ungrouped.length ? `<div class="oc-grid" style="margin-top:20px">${ungrouped.map(courseCardHtml).join('')}</div>` : '');
+  }
+  const family = FREE_FAMILIES.find((f) => f.key === FREE_SELECTED_FAMILY);
+  const ordered = byFamily[FREE_SELECTED_FAMILY].slice().sort((a, b) => (a.family_order || 0) - (b.family_order || 0));
+  return `
+    <button type="button" class="oc-lang-back" onclick="selectFreeFamily(null)">&larr; All languages</button>
+    <h4 style="margin:14px 0 10px;font-family:var(--font-display);color:var(--navy)">${esc(family ? family.name : '')}</h4>
+    <div class="oc-grid">${ordered.map(courseCardHtml).join('')}</div>`;
 }
 function drawCourses() {
   if (!CATALOGUE.length) return;
@@ -668,8 +683,22 @@ function courseOutlineHtml(t) {
 // the first blank line. Older tracks' short one-line topics stay in that
 // summary (see the length check above) and this block renders nothing for
 // them.
+// A level can carry either the older single `video_url`, or the newer
+// `videos[]` array (multiple real YouTube links, one button each) - see
+// tracks/curriculum-advanced-combined.js. Each url there is a YouTube
+// search-query link built from the exact channel + exact title (never a
+// guessed video id, which could silently point at the wrong video).
+function videoLinksHtml(l) {
+  if (Array.isArray(l.videos) && l.videos.length) {
+    return l.videos.map((v) => `<a href="${esc(v.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;margin-right:8px;display:inline-flex;gap:6px;align-items:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${esc(v.channel)} - ${esc(v.title)}${v.length ? ` (${esc(v.length)})` : ''}</a>`).join('');
+  }
+  return l.video_url ? `<a href="${esc(l.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : '';
+}
 function topicDetailHtml(l) {
-  if ((!l.topic || l.topic.length < 90) && !l.video_url) return '';
+  const hasVideo = l.video_url || (Array.isArray(l.videos) && l.videos.length);
+  if ((!l.topic || l.topic.length < 90) && !hasVideo) return '';
   const parts = (l.topic || '').split('\n\n');
   const explanation = parts[0] || '';
   const code = parts.slice(1).join('\n\n');
@@ -677,8 +706,7 @@ function topicDetailHtml(l) {
     <div class="card-body tight" style="border-top:1px solid var(--line)">
       ${explanation ? `<p class="s" style="line-height:1.6;margin-bottom:${code ? '10px' : '0'}">${esc(explanation)}</p>` : ''}
       ${code ? `<pre style="background:#0B1530;color:#E7ECF3;border-radius:10px;padding:12px 14px;overflow-x:auto;font:12.5px/1.55 var(--font-mono);white-space:pre"><code>${esc(code)}</code></pre>` : ''}
-      ${l.video_url ? `<a href="${esc(l.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : ''}
+      ${videoLinksHtml(l)}
     </div>`;
 }
 function drawCourse() {
@@ -1013,8 +1041,7 @@ function openSolve(levelNo, pid) {
         <h2>${esc(p.title)}</h2>
         <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} gems</span>
       </div>
-      ${lvl.video_url ? `<a href="${esc(lvl.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:8px;display:inline-flex;gap:6px;align-items:center">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : ''}
+      ${videoLinksHtml(lvl)}
       <div class="s" id="svDesc" style="white-space:pre-line;line-height:1.65;font-size:13.5px;margin-top:8px">${esc(p.description || '')}</div>
       <div class="s" id="svRefs" style="margin-top:10px"></div>
     </div></div>

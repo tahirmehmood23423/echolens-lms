@@ -2526,10 +2526,7 @@ const Certificates = {
       id: nextId('certificates'), serial: Certificates.serial(),
       user_id: u.id, student_name: u.name, reg_no: u.reg_no,
       batch_id: batch_id ? Number(batch_id) : null,
-      // 'diploma' added for the Coursera-style curriculum module's
-      // Specialization Diploma credential (curriculum-store.js) - every
-      // other kind here predates that feature.
-      kind: ['course', 'hackathon', 'competition', 'quest', 'webinar', 'diploma'].includes(kind) ? kind : 'course',
+      kind: ['course', 'hackathon', 'competition', 'quest', 'webinar'].includes(kind) ? kind : 'course',
       title: String(title).slice(0, 200),
       detail: String(detail || '').slice(0, 400),
       completion_date: /^\d{4}-\d{2}-\d{2}$/.test(String(completion_date)) ? completion_date : today(),

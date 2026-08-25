@@ -3587,6 +3587,18 @@ const Leads = {
       return { ...l, tier: u ? (u.role === 'free' ? 'open' : u.role) : 'lead' };
     });
   },
+  // Only removes from the leads/cold-mailing list - NEVER touches a real
+  // user account, even if that account's email is the one that bounced.
+  // A user's email bouncing is a support issue for their account, not a
+  // reason to silently delete leads data tied to it.
+  removeByEmail(email, deferSave) {
+    const em = String(email || '').toLowerCase();
+    const before = data.leads.length;
+    data.leads = data.leads.filter((l) => (l.email || '').toLowerCase() !== em);
+    const removed = data.leads.length !== before;
+    if (removed && !deferSave) save();
+    return removed;
+  },
   csv() {
     const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const rows = [['Name', 'Email', 'WhatsApp', 'Source', 'Tier', 'Created'].join(',')];

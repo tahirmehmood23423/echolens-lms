@@ -3316,7 +3316,20 @@ app.post('/api/admin/email-blast', authRequired, adminRequired, upload.array('fi
     const registrationUrl = /^https?:\/\//i.test(KEY_LINKS.registration) ? KEY_LINKS.registration : `${APP_URL}${KEY_LINKS.registration}`;
     text += `\n\nRegister directly here: ${registrationUrl}`;
   }
-  mailer.notify(emails, String(subject).slice(0, 200), text, attachments.length ? attachments : undefined);
+  // Sending (esp. a large blast) is throttled and can take a while - the
+  // response below doesn't wait for it, same as before. Once it settles,
+  // any address that came back with a confirmed-permanent (5xx) failure is
+  // a dead mailbox, not just a rate-limited one - drop it from the leads
+  // database so future blasts don't keep re-sending to it. A merely
+  // rate-limited/temporary failure is left untouched.
+  mailer.notify(emails, String(subject).slice(0, 200), text, attachments.length ? attachments : undefined)
+    .then((result) => {
+      if (!result.permanentFail.length) return;
+      for (const bad of result.permanentFail) Leads.removeByEmail(bad, true);
+      AuditLog.record({ actor_id: req.user.id, action: 'lead_remove_bounced', target_type: 'lead', detail: `Removed ${result.permanentFail.length} permanently-invalid address(es) after blast: ${result.permanentFail.slice(0, 50).join(', ')}`, deferSave: true });
+      store.persist();
+    })
+    .catch((e) => console.error('[email-blast] post-send cleanup failed:', e.message));
   AuditLog.record({ actor_id: req.user.id, action: 'email_blast', target_type: 'email_blast', detail: `${audience} (${emails.length})${attachments.length ? ` +${attachments.length} attachment(s)` : ''} - ${subject}` });
   res.json({ ok: true, sent: emails.length, smtp: mailer.configured, attachments: attachments.length });
 });

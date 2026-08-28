@@ -683,7 +683,7 @@ const MODE_LABEL = {
 };
 function courseOutlineHtml(t) {
   const isBootcamp = (t.course_code || '').startsWith('BC');
-  const unit = isBootcamp ? 'Class' : 'Level';
+  const unit = isBootcamp ? 'Class' : 'Lecture';
   const rows = CUR.levels.map((l) => `
     <li class="outline-row">
       <span class="outline-num">${unit[0]}${l.no}</span>
@@ -942,7 +942,7 @@ function drawCourse() {
       }).join('')}
     </nav>`;
 
-  const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Level';
+  const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Lecture';
   // Per-module accordion of classes/levels - shared by the free-course
   // curriculum list and the paid quest-grid below, so what happens *inside*
   // a module (topic notes, Solve/compiler buttons, grading state) is always
@@ -1088,46 +1088,85 @@ function svModuleMap() {
   });
   return map;
 }
-// Course Content nav (v23): a compact week > level > problem tree beside the
-// solve workspace, built from the same CUR data already loaded for the page
-// - no new requests. Clicking a problem calls the existing openSolve(), so
-// it is a navigation shortcut, not a new workflow.
-// v24: each level with a real video now lists TWO subpoints - "Video" (opens
-// the dedicated full-width video page, openSolveVideo()) and the quest(s)
-// (opens the description/criteria/compiler workspace, openSolve()) - kept as
-// two separate pages rather than stacked in one column so neither the video
-// nor the compiler has to squeeze into a narrow shared column.
+// v27: "watched this video" is a self-tracking convenience, not a graded or
+// certificate-relevant fact - kept client-side (localStorage, per browser)
+// rather than adding a new synced/Postgres-backed table for it. Namespaced
+// per track so progress in one course never bleeds into another.
+function watchedVideosKey(trackKey) { return `el_watched_${trackKey}`; }
+function getWatchedVideos(trackKey) {
+  try { return new Set(JSON.parse(localStorage.getItem(watchedVideosKey(trackKey)) || '[]')); }
+  catch { return new Set(); }
+}
+function isVideoWatched(trackKey, levelNo) { return getWatchedVideos(trackKey).has(levelNo); }
+function markVideoWatched(trackKey, levelNo) {
+  const set = getWatchedVideos(trackKey);
+  set.add(levelNo);
+  try { localStorage.setItem(watchedVideosKey(trackKey), JSON.stringify([...set])); } catch {}
+}
+// A submission only counts as "done" once it's graded AND at or above the
+// course's pass mark - a graded-but-failed attempt is not "passed" and
+// shouldn't light up as complete.
+function problemPassed(l, pr) {
+  const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${pr.pid}`];
+  return !!(sub && sub.score != null && sub.score >= (CUR.track.pass_mark || 60));
+}
+function levelPassed(l) { return (l.problems || []).every((pr) => problemPassed(l, pr)); }
+// Overall course completion, shown as the percentage pill on the solve
+// workspace's top bar - the fraction of lectures whose assignment has
+// actually been PASSED (same bar the automatic certificate uses), not just
+// attempted/graded.
+function coursePercent() {
+  if (!CUR || !CUR.levels.length) return 0;
+  return Math.round((CUR.levels.filter(levelPassed).length / CUR.levels.length) * 100);
+}
+function svProgressHtml() {
+  const pct = coursePercent();
+  return `<div class="sv-progress-pill"><span class="pct">${pct}% complete</span><span class="bar"><div style="width:${pct}%"></div></span></div>`;
+}
+// Course Content nav (v23): a compact week > lecture > (video/assignment)
+// tree beside the solve workspace, built from the same CUR data already
+// loaded for the page - no new requests. Clicking an item calls the
+// existing openSolve()/openSolveVideo(), so it is a navigation shortcut,
+// not a new workflow.
+// v24: each lecture with a real video lists TWO subpoints - the video (opens
+// the dedicated full-width video page, openSolveVideo()) and the
+// assignment(s) (opens the description/criteria/compiler workspace,
+// openSolve()) - kept as two separate pages rather than stacked in one
+// column so neither the video nor the compiler has to squeeze into a
+// narrow shared column.
+// v27: the video subpoint is labelled with the topic's own title (not the
+// generic word "Video") and the assignment subpoint with the generic label
+// "Assignment" (not the quest's own title) - the reverse of how each used to
+// read, per feedback that the specific info belonged on the video row and
+// the generic label on the assignment row.
 function svNavHtml() {
   const t = CUR.track;
-  const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Level';
-  const levelDone = (l) => !!(CUR.progress && (l.problems || []).every((pr) => {
-    const s = CUR.progress.submissions[`${l.no}:${pr.pid}`];
-    return s && s.score != null;
-  }));
+  const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Lecture';
   let html = '<div class="svc-nav-head">Course Content</div>';
   for (const [wk, mod] of svModuleMap()) {
     html += `<div class="svc-week">Module ${mod.index} &middot; Week ${wk}</div>`;
     html += mod.levels.map((l) => {
       const isCurLevel = (CUR_PROBLEM && l.no === CUR_PROBLEM.level) || CUR_VIDEO_LEVEL === l.no;
+      const watched = levelHasVideo(l) && isVideoWatched(t.key, l.no);
       const videoRow = levelHasVideo(l)
-        ? `<button type="button" class="svc-problem svc-video${CUR_VIDEO_LEVEL === l.no ? ' active' : ''}" onclick="openSolveVideo(${l.no})">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="flex:none"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Video</span>
+        ? `<button type="button" class="svc-problem svc-video${CUR_VIDEO_LEVEL === l.no ? ' active' : ''}${watched ? ' done' : ''}" onclick="openSolveVideo(${l.no})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="flex:none"><path d="M8 5v14l11-7z"/></svg><span class="lbl">${esc(l.title)}</span><span class="dot"></span>
             </button>`
         : '';
+      const multi = (l.problems || []).length > 1;
       const body = l.locked
         ? '<div class="s" style="padding:6px 8px;color:var(--muted-2)">Locked</div>'
-        : videoRow + (l.problems || []).map((pr) => {
-            const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${pr.pid}`];
-            const isDone = sub && sub.score != null;
+        : videoRow + (l.problems || []).map((pr, pi) => {
+            const isDone = problemPassed(l, pr);
             const isActive = !CUR_VIDEO_LEVEL && isCurLevel && CUR_PROBLEM && pr.pid === CUR_PROBLEM.pid;
             return `<button type="button" class="svc-problem${isActive ? ' active' : ''}${isDone ? ' done' : ''}" onclick="openSolve(${l.no}, ${pr.pid})">
-              <span class="dot"></span><span class="lbl">${esc(pr.title)}</span>
+              <span class="dot"></span><span class="lbl">Assignment${multi ? ' ' + (pi + 1) : ''}</span>
             </button>`;
           }).join('');
       return `<div class="svc-level${isCurLevel ? ' open' : ''}">
         <button type="button" class="svc-level-head" onclick="this.closest('.svc-level').classList.toggle('open')">
           <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="lbl">${unitLabel} ${l.no} - ${esc(l.title)}</span>${levelDone(l) ? '<span class="dot" style="background:var(--teal);flex:none"></span>' : ''}
+          <span class="lbl">${unitLabel} ${l.no}</span>${levelPassed(l) ? '<span class="dot" style="background:var(--teal);flex:none"></span>' : ''}
         </button>
         <div class="svc-problems">${body}</div>
       </div>`;
@@ -1149,8 +1188,10 @@ function openSolve(levelNo, pid, skipPush) {
   openTab('solve');
   if (!skipPush) pushNav({ v: 'solve', key: CUR.track.key, level: levelNo, pid });
   $('svSplit').classList.remove('video-view');
-  const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Level';
+  const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Lecture';
   const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
+  const multiProblems = (lvl.problems || []).length > 1;
+  const problemIdx = multiProblems ? (lvl.problems || []).findIndex((x) => x.pid === pid) : -1;
   $('svCrumb').innerHTML = `
     <a onclick="backToCourse()">${esc(CUR.track.title)}</a>
     <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1158,11 +1199,12 @@ function openSolve(levelNo, pid, skipPush) {
     <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span>${unitLabel} ${lvl.no}</span>
     <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span class="crumb-cur">${esc(p.title)}</span>`;
+    <span class="crumb-cur">Assignment${problemIdx >= 0 ? ' ' + (problemIdx + 1) : ''}</span>`;
   $('svNav').innerHTML = svNavHtml();
+  $('svProgress').innerHTML = svProgressHtml();
   $('svLeft').innerHTML = `
     <div class="card slv-card"><div class="card-body">
-      <div class="slv-eyebrow">Level ${lvl.no} &middot; ${esc(lvl.title || '')}<span style="flex:1"></span><span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span></div>
+      <div class="slv-eyebrow">${unitLabel} ${lvl.no} &middot; ${esc(lvl.title || '')}<span style="flex:1"></span><span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span></div>
       <div class="slv-head">
         <h2>${esc(p.title)}</h2>
         <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} gems</span>
@@ -1206,7 +1248,7 @@ function openSolveVideo(levelNo, skipPush) {
   openTab('solve');
   if (!skipPush) pushNav({ v: 'video', key: CUR.track.key, level: levelNo });
   $('svSplit').classList.add('video-view');
-  const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Level';
+  const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Lecture';
   const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
   $('svCrumb').innerHTML = `
     <a onclick="backToCourse()">${esc(CUR.track.title)}</a>
@@ -1215,15 +1257,22 @@ function openSolveVideo(levelNo, skipPush) {
     <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span>${unitLabel} ${lvl.no}</span>
     <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span class="crumb-cur">Video</span>`;
+    <span class="crumb-cur">${esc(lvl.title || '')}</span>`;
   $('svNav').innerHTML = svNavHtml();
+  $('svProgress').innerHTML = svProgressHtml();
   const firstProblem = (lvl.problems || [])[0];
+  const watched = isVideoWatched(CUR.track.key, lvl.no);
   $('svLeft').innerHTML = `
     <div class="card slv-card"><div class="card-body">
       <div class="slv-eyebrow">${unitLabel} ${lvl.no} &middot; ${esc(lvl.title || '')}</div>
       <div class="slv-head"><h2>${esc(lvl.title || '')}</h2></div>
       ${videoLinksHtml(lvl, true)}
-      ${firstProblem ? `<button type="button" class="btn btn-primary" style="margin-top:16px" onclick="openSolve(${lvl.no}, ${firstProblem.pid})">Continue to the quest &rarr;</button>` : ''}
+      ${watched
+        ? `<div class="s" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;color:var(--teal);font-weight:700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Video watched</div>`
+        : `<button type="button" class="btn btn-ghost btn-sm" style="margin-top:14px;display:inline-flex;gap:6px;align-items:center" onclick="markVideoWatched('${esc(CUR.track.key)}', ${lvl.no}); openSolveVideo(${lvl.no}, true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Mark video as watched</button>`}
+      ${firstProblem ? `<button type="button" class="btn btn-primary" style="margin-top:16px;margin-left:10px" onclick="openSolve(${lvl.no}, ${firstProblem.pid})">Continue to the quest &rarr;</button>` : ''}
     </div></div>`;
   $('svWorkArea').innerHTML = '';
 }

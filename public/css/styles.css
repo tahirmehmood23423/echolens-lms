@@ -919,6 +919,14 @@ tr.risk-high td{background:#FFF7F7}
  * benefits from the full viewport width, unlike the text-heavy tabs. */
 #tab-solve{max-width:none;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding-left:4vw;padding-right:4vw;box-sizing:border-box}
 /* v23: solve page - Course Content nav (new, sticky) | problem panel | code+output */
+/* v27: top bar above the solve workspace - breadcrumb on the left, overall
+   course-completion percentage pinned to the right. */
+.sv-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.sv-topbar .crumb{margin-bottom:0}
+.sv-progress-pill{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 14px;flex:none}
+.sv-progress-pill .pct{font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+.sv-progress-pill .bar{width:90px;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.sv-progress-pill .bar div{height:100%;background:var(--gem-grad);border-radius:999px}
 .open-split{display:grid;grid-template-columns:230px 360px 1fr;gap:20px;align-items:start}
 @media(max-width:1240px){.open-split{grid-template-columns:360px 1fr}.svc-nav{display:none}}
 @media(max-width:980px){.open-split{grid-template-columns:1fr}}

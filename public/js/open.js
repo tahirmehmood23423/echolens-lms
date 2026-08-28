@@ -116,11 +116,40 @@ let CUR_EVENT = null;
 // sync by navCourses(), the #free deep link, and openCourse() (landing on
 // a free course, however you got there, should highlight the free nav item).
 let COURSE_NAV_MODE = 'live';
-function navCourses(mode) {
+function navCourses(mode, skipPush) {
   COURSE_NAV_MODE = mode;
   openTab('courses');
   if (mode === 'free') setCoursePill('free');
+  if (!skipPush) pushNav({ v: 'courses', mode });
 }
+
+/* --------------------------- back/forward history --------------------------- */
+// v26: the course browsing flow (courses list -> course curriculum -> a
+// level's video or quest) previously had zero integration with the browser's
+// own Back/Forward buttons - every "back" affordance jumped straight to a
+// fixed page instead of retracing the learner's actual path. pushNav() logs
+// each step as real history.pushState state (no URL change - these are all
+// still /open, just different in-page views), and the popstate listener
+// below replays that exact state on Back/Forward. RESTORING guards against
+// re-pushing a duplicate entry while a popstate-triggered navigation is
+// itself calling the same functions that normally push.
+let RESTORING_NAV = false;
+function pushNav(state) { if (!RESTORING_NAV) history.pushState(state, ''); }
+async function ensureCourseLoaded(key) {
+  if (CUR && CUR.track && CUR.track.key === key) return;
+  await openCourse(key, true);
+}
+async function restoreNav(state) {
+  if (!state || !state.v) return;
+  if (state.v === 'courses') { navCourses(state.mode || COURSE_NAV_MODE, true); return; }
+  if (state.v === 'course') { await ensureCourseLoaded(state.key); openTab('course'); drawCourse(); return; }
+  if (state.v === 'video') { await ensureCourseLoaded(state.key); openSolveVideo(state.level, true); return; }
+  if (state.v === 'solve') { await ensureCourseLoaded(state.key); openSolve(state.level, state.pid, true); return; }
+}
+window.addEventListener('popstate', (e) => {
+  RESTORING_NAV = true;
+  Promise.resolve(restoreNav(e.state)).finally(() => { RESTORING_NAV = false; });
+});
 
 /* -------------------------------- boot -------------------------------- */
 (async () => {
@@ -146,6 +175,10 @@ function navCourses(mode) {
   // that course. Wait for the catalogue so the course dropdown is populated.
   else if (h === 'register' || h.startsWith('register-')) catReady.then(() => openRegister(h.startsWith('register-') ? h.slice('register-'.length) : undefined));
   else if (h === 'signup' && !ME) gate();
+  // Baseline history entry so pressing Back from the very first course/video/
+  // solve page a learner opens in this tab has a sane 'courses' state to land
+  // on, instead of an unmanaged null state.
+  history.replaceState({ v: 'courses', mode: COURSE_NAV_MODE }, '');
 })();
 
 function drawUserBox() {
@@ -280,7 +313,8 @@ function openTab(tab) {
   window.scrollTo({ top: 0 });
 }
 function backToCourse() {
-  if (CUR) { openTab('course'); } else openTab('courses');
+  if (CUR) { pushNav({ v: 'course', key: CUR.track.key }); openTab('course'); drawCourse(); }
+  else { pushNav({ v: 'courses', mode: COURSE_NAV_MODE }); openTab('courses'); }
   window.scrollTo({ top: COURSE_SCROLL_Y || 0 });
 }
 
@@ -620,7 +654,7 @@ function openRegister(code, title) {
 }
 
 /* -------------------- course detail with quest locks -------------------- */
-async function openCourse(key) {
+async function openCourse(key, skipPush) {
   openTab('course');
   $('courseHead').innerHTML = '<div class="empty">Loading course&hellip;</div>';
   $('courseLevels').innerHTML = '';
@@ -635,6 +669,7 @@ async function openCourse(key) {
   COURSE_NAV_MODE = d.track.free ? 'free' : 'live';
   openTab('course');
   drawCourse();
+  if (!skipPush) pushNav({ v: 'course', key });
 }
 // How each course takes work: shown on the course page and drives the solve workspace.
 const MODE_LABEL = {
@@ -749,10 +784,9 @@ function topicDetailHtml(l) {
     </div>`;
 }
 // Per-module accordion of classes/levels (topic notes, video link, Solve/
-// compiler buttons, grading state) - shared by drawCourse() (both the free
-// curriculum overview's classesHtmlFor closure and the paid quest-grid) and
-// openModule() (the free course's per-module page), so what happens *inside*
-// a module is always identical no matter which page it's reached from.
+// compiler buttons, grading state) - used by drawCourse()'s classesHtmlFor
+// closure for both the free curriculum overview and the paid quest-grid, so
+// what happens *inside* a module is always identical between the two.
 function renderModuleLessons(mod, t, curLevel, unitLabel) {
   return mod.levels.map((l, li) => {
     const isCurrent = curLevel && l.no === curLevel.no;
@@ -785,36 +819,27 @@ function renderModuleLessons(mod, t, curLevel, unitLabel) {
     </details>`;
   }).join('');
 }
-// v25: a free course's dedicated per-module page - reached by clicking a
-// module row on the curriculum overview (freeCurriculumHtml), which no
-// longer expands that module's lessons inline. Relies on drawCourse() having
-// already stashed CUR.modules/curLevel/unitLabel (it always has, since this
-// is only ever reachable from a course page that already ran drawCourse()).
-function openModule(mi) {
+// v26: clicking a module on the curriculum overview no longer opens an
+// intermediate "lessons in this module" page - it jumps straight into that
+// module's first lesson (its Video subpoint if it has one, else straight to
+// the quest), the same solve workspace shown in the screenshot the request
+// was made from. That workspace's own "Course Content" sidebar already
+// lists every module and lesson, so a separate flat module-only page was
+// redundant - removed rather than kept as a second, competing nav surface.
+function openModuleEntry(mi) {
   if (!CUR || !CUR.modules || !CUR.modules[mi]) return;
-  const mod = CUR.modules[mi];
-  const t = CUR.track;
-  COURSE_SCROLL_Y = window.scrollY;
-  $('courseHead').innerHTML = `
-    <nav class="crumb">
-      <a onclick="openTab('courses')">${COURSE_NAV_MODE === 'free' ? 'Free Certified Courses' : 'Live Tech Courses'}</a>
-      <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <a onclick="drawCourse()">${esc(t.title)}</a>
-      <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="crumb-cur">Module ${mi + 1}</span>
-    </nav>`;
-  $('courseLevels').innerHTML = `
-    <div class="curr-card">
-      <div class="curr-head">
-        <div>
-          <h3>Module ${mi + 1} &middot; ${esc(t.title)}</h3>
-          <p class="s" style="color:var(--muted)">${mod.levels.length} lesson${mod.levels.length > 1 ? 's' : ''} in this module.</p>
-        </div>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="drawCourse()">&larr; Back to curriculum</button>
-      </div>
-      <div class="curr-body" style="padding-top:14px">${renderModuleLessons(mod, t, CUR.curLevel, CUR.unitLabel)}</div>
-    </div>`;
-  window.scrollTo({ top: 0 });
+  const first = CUR.modules[mi].levels[0];
+  if (!first || first.locked) return;
+  if (levelHasVideo(first)) openSolveVideo(first.no);
+  else if ((first.problems || [])[0]) openSolve(first.no, first.problems[0].pid);
+}
+// "Continue learning" CTA: resumes at the learner's actual current level
+// (curLevel - first not-yet-passed, unlocked level), not just module 1.
+function continueLearning() {
+  const l = CUR && CUR.curLevel;
+  if (!l) return;
+  if (levelHasVideo(l)) openSolveVideo(l.no);
+  else if ((l.problems || [])[0]) openSolve(l.no, l.problems[0].pid);
 }
 function drawCourse() {
   const t = CUR.track, prog = CUR.progress;
@@ -986,7 +1011,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
     const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
     const subtitle = mod.levels.map((l) => esc(l.title)).join(' &middot; ');
     const pills = mod.levels.map((l) => `<span class="curr-pill">L${l.no}<b>${esc(l.title)}</b></span>`).join('');
-    return `<button type="button" class="curr-row" onclick="openModule(${mi})">
+    return `<button type="button" class="curr-row" onclick="openModuleEntry(${mi})">
         <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS.code}</svg></span>
         <span class="curr-info">
           <span class="curr-title">Module ${mi + 1}${allDone ? '<span class="curr-done-dot"></span>' : ''}</span>
@@ -999,9 +1024,8 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   }).join('');
 
   const subj = (t.title.split(':')[1] || t.title).trim();
-  const curModIdx = Math.max(0, modules.findIndex((mod) => curLevel && mod.levels.some((l) => l.no === curLevel.no)));
   const ctaAction = ME
-    ? `openModule(${curModIdx})`
+    ? `continueLearning()`
     : `gate('Sign in free to start this course, track your progress and earn your certificate.')`;
   const ctaBtnLabel = !ME ? 'Sign in free to start' : (prog && prog.passed ? 'Review the course' : 'Continue learning');
   const ctaSub = !ME
@@ -1115,7 +1139,7 @@ function svNavHtml() {
 // deliberately no embedded video here (see openSolveVideo below) so this
 // column isn't squeezed by a video competing for the same space; a small
 // link back to the video subpoint is offered instead when one exists.
-function openSolve(levelNo, pid) {
+function openSolve(levelNo, pid, skipPush) {
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   const p = lvl && (lvl.problems || []).find((x) => x.pid === pid);
   if (!p || lvl.locked) return;
@@ -1123,6 +1147,7 @@ function openSolve(levelNo, pid) {
   CUR_PROBLEM = { level: levelNo, pid, problem: p };
   CUR_VIDEO_LEVEL = null;
   openTab('solve');
+  if (!skipPush) pushNav({ v: 'solve', key: CUR.track.key, level: levelNo, pid });
   $('svSplit').classList.remove('video-view');
   const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Level';
   const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
@@ -1173,12 +1198,13 @@ function openSolve(levelNo, pid) {
 // column) - the compiler has nothing to do until the learner is actually
 // solving the quest, so it doesn't need to be on screen while they watch.
 // "Continue to the quest" hands off to the normal openSolve() workspace.
-function openSolveVideo(levelNo) {
+function openSolveVideo(levelNo, skipPush) {
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   if (!lvl || lvl.locked || !levelHasVideo(lvl)) return;
   COURSE_SCROLL_Y = window.scrollY;
   CUR_VIDEO_LEVEL = levelNo;
   openTab('solve');
+  if (!skipPush) pushNav({ v: 'video', key: CUR.track.key, level: levelNo });
   $('svSplit').classList.add('video-view');
   const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Level';
   const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;

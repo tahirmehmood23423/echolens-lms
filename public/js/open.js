@@ -101,6 +101,7 @@ let CAT_LINKS = null;
 let FREE_FAMILIES = [];
 let CUR = null;          // { track, levels, progress } for the open course
 let CUR_PROBLEM = null;  // { level, pid, problem }
+let CUR_VIDEO_LEVEL = null; // level.no when the dedicated Video subpoint (openSolveVideo) is open, else null
 // Scroll offset within the course's quest list at the moment Solve was
 // clicked, restored by backToCourse() so "Back" (after submitting) lands
 // exactly where you were - not back at the top of the course.
@@ -696,10 +697,15 @@ function youtubeEmbedId(url) {
 // primary viewing path whenever we have a real video id. A small "Open on
 // YouTube" link stays underneath for anyone who wants fullscreen/theater
 // mode or to watch on another device.
-function videoEmbedHtml(url, label) {
+// maxWidth defaults to a compact 640px for the description column it's
+// normally embedded in; the dedicated full-width video view (openSolveVideo)
+// passes a much larger cap since that page has nothing else competing for
+// space.
+function videoEmbedHtml(url, label, maxWidth) {
   const id = youtubeEmbedId(url);
   if (!id) return '';
-  return `<div class="video-embed" style="position:relative;width:100%;max-width:640px;padding-top:${640 * 9 / 16}px;height:0;margin-top:10px;border-radius:12px;overflow:hidden;background:#000">
+  const w = maxWidth || 640;
+  return `<div class="video-embed" style="position:relative;width:100%;max-width:${w}px;padding-top:${w * 9 / 16}px;height:0;margin-top:10px;border-radius:12px;overflow:hidden;background:#000">
       <iframe src="https://www.youtube-nocookie.com/embed/${id}" title="${esc(label || 'Topic video')}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
     </div>
     <a href="${esc(url)}" target="_blank" rel="noopener" class="s" style="display:inline-block;margin-top:6px;color:var(--muted)">Open on YouTube &rarr;</a>`;
@@ -711,20 +717,24 @@ function videoEmbedHtml(url, label) {
 // guessed video id, which could silently point at the wrong video) - those
 // aren't embeddable (no video id in a search-query url), so they keep the
 // external-link fallback below; a real watch-url embeds inline instead.
-function videoLinksHtml(l) {
+// `large` (used by the dedicated Video subpoint page) renders at a much
+// bigger max-width than the compact default used inline in the quest view.
+function videoLinksHtml(l, large) {
+  const maxWidth = large ? 960 : 640;
   if (Array.isArray(l.videos) && l.videos.length) {
     return l.videos.map((v) => {
-      const embed = videoEmbedHtml(v.url, v.title);
+      const embed = videoEmbedHtml(v.url, v.title, maxWidth);
       if (embed) return embed;
       return `<a href="${esc(v.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;margin-right:8px;display:inline-flex;gap:6px;align-items:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${esc(v.channel)} - ${esc(v.title)}${v.length ? ` (${esc(v.length)})` : ''}</a>`;
     }).join('');
   }
-  const embed = videoEmbedHtml(l.video_url, l.title);
+  const embed = videoEmbedHtml(l.video_url, l.title, maxWidth);
   if (embed) return embed;
   return l.video_url ? `<a href="${esc(l.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : '';
 }
+function levelHasVideo(l) { return !!(l && (l.video_url || (Array.isArray(l.videos) && l.videos.length))); }
 function topicDetailHtml(l) {
   const hasVideo = l.video_url || (Array.isArray(l.videos) && l.videos.length);
   if ((!l.topic || l.topic.length < 90) && !hasVideo) return '';
@@ -1012,6 +1022,11 @@ function svModuleMap() {
 // solve workspace, built from the same CUR data already loaded for the page
 // - no new requests. Clicking a problem calls the existing openSolve(), so
 // it is a navigation shortcut, not a new workflow.
+// v24: each level with a real video now lists TWO subpoints - "Video" (opens
+// the dedicated full-width video page, openSolveVideo()) and the quest(s)
+// (opens the description/criteria/compiler workspace, openSolve()) - kept as
+// two separate pages rather than stacked in one column so neither the video
+// nor the compiler has to squeeze into a narrow shared column.
 function svNavHtml() {
   const t = CUR.track;
   const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Level';
@@ -1023,13 +1038,18 @@ function svNavHtml() {
   for (const [wk, mod] of svModuleMap()) {
     html += `<div class="svc-week">Module ${mod.index} &middot; Week ${wk}</div>`;
     html += mod.levels.map((l) => {
-      const isCurLevel = l.no === CUR_PROBLEM.level;
+      const isCurLevel = (CUR_PROBLEM && l.no === CUR_PROBLEM.level) || CUR_VIDEO_LEVEL === l.no;
+      const videoRow = levelHasVideo(l)
+        ? `<button type="button" class="svc-problem svc-video${CUR_VIDEO_LEVEL === l.no ? ' active' : ''}" onclick="openSolveVideo(${l.no})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="flex:none"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Video</span>
+            </button>`
+        : '';
       const body = l.locked
         ? '<div class="s" style="padding:6px 8px;color:var(--muted-2)">Locked</div>'
-        : (l.problems || []).map((pr) => {
+        : videoRow + (l.problems || []).map((pr) => {
             const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${pr.pid}`];
             const isDone = sub && sub.score != null;
-            const isActive = isCurLevel && pr.pid === CUR_PROBLEM.pid;
+            const isActive = !CUR_VIDEO_LEVEL && isCurLevel && CUR_PROBLEM && pr.pid === CUR_PROBLEM.pid;
             return `<button type="button" class="svc-problem${isActive ? ' active' : ''}${isDone ? ' done' : ''}" onclick="openSolve(${l.no}, ${pr.pid})">
               <span class="dot"></span><span class="lbl">${esc(pr.title)}</span>
             </button>`;
@@ -1045,13 +1065,19 @@ function svNavHtml() {
   }
   return html;
 }
+// Theory & Quest subpoint: description, criteria, hint and the compiler -
+// deliberately no embedded video here (see openSolveVideo below) so this
+// column isn't squeezed by a video competing for the same space; a small
+// link back to the video subpoint is offered instead when one exists.
 function openSolve(levelNo, pid) {
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   const p = lvl && (lvl.problems || []).find((x) => x.pid === pid);
   if (!p || lvl.locked) return;
   COURSE_SCROLL_Y = window.scrollY;
   CUR_PROBLEM = { level: levelNo, pid, problem: p };
+  CUR_VIDEO_LEVEL = null;
   openTab('solve');
+  $('svSplit').classList.remove('video-view');
   const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Level';
   const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
   $('svCrumb').innerHTML = `
@@ -1070,7 +1096,8 @@ function openSolve(levelNo, pid) {
         <h2>${esc(p.title)}</h2>
         <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} gems</span>
       </div>
-      ${videoLinksHtml(lvl)}
+      ${levelHasVideo(lvl) ? `<button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center" onclick="openSolveVideo(${lvl.no})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch the topic video</button>` : ''}
       <div class="s" id="svDesc" style="white-space:pre-line;line-height:1.65;font-size:13.5px;margin-top:8px">${esc(p.description || '')}</div>
       <div class="s" id="svRefs" style="margin-top:10px"></div>
     </div></div>
@@ -1095,6 +1122,38 @@ function openSolve(levelNo, pid) {
     : '';
   drawSolveStatus();
   drawWorkArea();
+}
+// Video subpoint: just the video, full-width (no compiler, no cramped
+// column) - the compiler has nothing to do until the learner is actually
+// solving the quest, so it doesn't need to be on screen while they watch.
+// "Continue to the quest" hands off to the normal openSolve() workspace.
+function openSolveVideo(levelNo) {
+  const lvl = CUR.levels.find((l) => l.no === levelNo);
+  if (!lvl || lvl.locked || !levelHasVideo(lvl)) return;
+  COURSE_SCROLL_Y = window.scrollY;
+  CUR_VIDEO_LEVEL = levelNo;
+  openTab('solve');
+  $('svSplit').classList.add('video-view');
+  const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Level';
+  const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
+  $('svCrumb').innerHTML = `
+    <a onclick="backToCourse()">${esc(CUR.track.title)}</a>
+    <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Module ${moduleIdx}</span>
+    <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>${unitLabel} ${lvl.no}</span>
+    <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="crumb-cur">Video</span>`;
+  $('svNav').innerHTML = svNavHtml();
+  const firstProblem = (lvl.problems || [])[0];
+  $('svLeft').innerHTML = `
+    <div class="card slv-card"><div class="card-body">
+      <div class="slv-eyebrow">${unitLabel} ${lvl.no} &middot; ${esc(lvl.title || '')}</div>
+      <div class="slv-head"><h2>${esc(lvl.title || '')}</h2></div>
+      ${videoLinksHtml(lvl, true)}
+      ${firstProblem ? `<button type="button" class="btn btn-primary" style="margin-top:16px" onclick="openSolve(${lvl.no}, ${firstProblem.pid})">Continue to the quest &rarr;</button>` : ''}
+    </div></div>`;
+  $('svWorkArea').innerHTML = '';
 }
 function showFullFeedback() {
   const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];

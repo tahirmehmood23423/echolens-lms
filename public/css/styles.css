@@ -932,6 +932,13 @@ tr.risk-high td{background:#FFF7F7}
 .open-split{display:grid;grid-template-columns:230px 360px 1fr;gap:20px;align-items:start}
 @media(max-width:1240px){.open-split{grid-template-columns:360px 1fr}.svc-nav{display:none}}
 @media(max-width:980px){.open-split{grid-template-columns:1fr}}
+/* v24: Video subpoint (openSolveVideo) - #svLeft spans the description AND
+   compiler columns so the video gets the full remaining width instead of
+   being squeezed into the 360px description column; #svWorkArea is emptied
+   by JS in that mode, so hiding it here just avoids an empty grid gap. */
+.open-split.video-view{grid-template-columns:230px 1fr}
+.open-split.video-view #svWorkArea{display:none}
+@media(max-width:1240px){.open-split.video-view{grid-template-columns:1fr}}
 
 /* v23: Course Content nav - a compact tree of week > level > problem, reusing
  * the already-loaded CUR data and calling the existing openSolve() on click -

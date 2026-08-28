@@ -19,6 +19,17 @@
  * a way a search link cannot: the wrong id silently sends a student to an
  * unrelated video, while a search for the exact channel and exact title
  * reliably surfaces the right one at the top of the results.
+ *
+ * Exception: `c-advanced` ("Advanced C Programming - Systems & Memory
+ * Control") and `cpp-advanced` ("Advanced C++ (OOP & Architecture)") were
+ * both rewritten to follow their official 4-module/12-topic syllabus PDFs
+ * verbatim (same real-life-analogy + explanation + video + one literal-I/O
+ * Compiler Quest per topic shape as tracks/free-micro.js's FC-01/FC-02) -
+ * they use real `video_url` watch links (embeddable inline, see
+ * openSolveVideo() in public/js/open.js), not the videos[] search-query
+ * pattern python-advanced/js-advanced/web-advanced below still use. The old
+ * 8-level Basic/Advanced-tier curricula they replaced are preserved in git
+ * history if ever needed again.
  */
 
 module.exports = [
@@ -29,40 +40,37 @@ module.exports = [
     "friendly_grading": true,
     "default_language": "c",
     "title": "Advanced C Programming",
-    "description": "Course 2 (final) of the C Programming free ladder - combines the Basic tier (formerly \"CS1.2: Pointers, Memory and Modular C\") and the Advanced tier (formerly \"CS1.3: Advanced C Systems Engineering\") into one course, eight modules total, each with its own two assignments and module project.",
-    "outcome": "Trace a call stack by hand and reason about recursion and pass-by-value; move fluently between array notation and pointer arithmetic; handle C strings without overrunning a buffer; predict the exact size and layout of a struct. Manage heap memory across a program lifetime with zero leaks; implement the four core dynamic structures and choose between them on evidence; persist structured data to disk and recover it after an interrupted write; combine heap structures, persistence and error recovery into one defensible application.",
+    "description": "Advanced C Programming - Systems & Memory Control: systems-level C beyond the fundamentals - pointers and memory addressing, dynamic heap allocation, structs and bitwise hardware control, through to file persistence and function-pointer dispatch. Four modules, twelve topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "outcome": "Read, write and navigate memory directly through pointers, pointer arithmetic and double pointers; manage the heap safely with malloc/calloc/realloc/free and avoid leaks and dangling pointers; design structs and typedefs and build a linked list, and manipulate hardware-style bit flags with bitwise masks; persist data to disk with both text and binary streams, and dispatch behaviour dynamically through function pointers.",
     "keywords": [
-      "C pointers course",
-      "C memory layout",
-      "buffer overflow C",
-      "struct padding C",
-      "intermediate C programming",
       "advanced C programming",
-      "C dynamic memory",
-      "C hash table",
-      "C file persistence",
-      "C systems engineering course"
+      "C pointers and memory",
+      "C dynamic memory allocation",
+      "C structs and linked lists",
+      "C bitwise operations",
+      "C file I/O",
+      "C function pointers",
+      "systems programming in C"
     ],
     "key_concepts": [
-      "Call stack & activation records",
-      "Pass-by-value vs pass-by-address",
+      "Pointers & dereferencing",
       "Pointer arithmetic",
-      "Row-major memory layout",
-      "Buffer safety & snprintf",
-      "Struct padding & alignment",
-      "Unions",
-      "malloc/realloc/free discipline",
-      "Linked lists, stacks & queues",
-      "Hash tables with chaining",
-      "Binary file streams",
-      "Atomic writes",
-      "Systems integration"
+      "Double pointers (**ptr)",
+      "malloc() & calloc()",
+      "Buffer resizing with realloc",
+      "Memory leaks & free()",
+      "struct & typedef",
+      "Linked lists",
+      "Bitwise operations & masks",
+      "Stream file I/O",
+      "Binary block I/O",
+      "Function pointers & callbacks"
     ],
     "pass_mark": 60,
     "titleNames": [
-      "Stack Tracer",
       "Pointer Adept",
       "Heap Guardian",
+      "Struct Architect",
       "Systems Engineer"
     ],
     "levels": [
@@ -70,57 +78,21 @@ module.exports = [
         "no": 1,
         "week": 1,
         "session": 1,
-        "title": "Basic 1: Procedural Abstraction and the Call Stack",
-        "video_url": null,
-        "topic": "Calling a function pushes an activation record onto the stack containing the return address, the saved base pointer and the local variables. That record explains three things at once: why C passes arguments by value, why returning the address of a local variable is a defect, and why deep recursion eventually exhausts the stack.\n\nKey rules:\n- Arguments are copied. To let a function modify a caller variable, pass its address.\n- Never return a pointer to a local variable - that memory is reclaimed the moment the function returns.\n- Recursion depth costs stack space per frame; tail-shaped recursion may or may not be optimised, so do not rely on it.\n- Declare in the header, define in the source. Anything not in the header should be marked static.\n\nWorked example - recursive GCD and fast exponentiation:\nlong gcd(long a, long b) { return b == 0 ? a : gcd(b, a % b); }\nlong power(long base, long exp) {\n  if (exp == 0) return 1;\n  long half = power(base, exp / 2);\n  return (exp % 2) ? half * half * base : half * half;\n}",
+        "title": "Pointers & Dereferencing",
+        "video_url": "https://www.youtube.com/watch?v=Hi-Ul47t3nQ",
+        "topic": "Real-life analogy: Think of a treasure map containing coordinates written on a parchment. The parchment itself is not the chest of gold - it merely holds the geographical latitude and longitude (the address) of where the gold is buried. Opening the chest at those coordinates is dereferencing.\n\nA pointer is a special variable whose value is the physical hexadecimal memory address of another variable in RAM. Using the reference operator & extracts the memory location, while the dereference operator * accesses or modifies the data stored directly at that target address, unlocking low-level memory mutation across function scopes.",
         "problems": [
           {
-            "title": "Stack trace by hand",
+            "title": "Memory Address Mutation Engine",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Given a three level recursive function, draw every frame at maximum depth with the value of each local.",
+            "description": "Write a program that takes an integer, stores its reference in a pointer, and multiplies the original variable's value by 3 strictly through the dereference operator - the same coordinates-to-treasure move the analogy describes, applied to a real variable in memory.\n\nSample Input: 15\nExpected Output:\nUpdated Value: 45",
             "criteria": [
-              "Frame count and values correct."
+              "The multiplication is performed strictly through the dereference operator (*ptr = *ptr * 3;), never by reassigning the original variable's name directly",
+              "For input 15 the program prints exactly \"Updated Value: 45\""
             ],
-            "hint": "Recursion depth costs stack space per frame - draw one box per call.",
-            "solution": "Every activation frame drawn correctly, with the right local values at maximum recursion depth."
-          },
-          {
-            "title": "Swap and modify",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Write functions that swap two integers and normalise a value in place.",
-            "criteria": [
-              "Caller variables actually change and no globals are used."
-            ],
-            "hint": "Arguments are copied - pass the address to let a function modify a caller variable.",
-            "solution": "Functions taking pointer parameters that genuinely mutate the caller's variables, with no global state used."
-          },
-          {
-            "title": "Module project: Modular mathematics library",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a reusable library with a header and a source file exposing greatest common divisor, fast exponentiation, modular arithmetic and a factorial with overflow detection, plus a test driver that exercises each.",
-            "criteria": [
-              "Declarations live in the header, definitions in the source, and a test driver exercises GCD, fast exponentiation, modular arithmetic and factorial overflow detection."
-            ],
-            "hint": "Declare in the header, define in the source.",
-            "solution": "A header/source split library covering all four functions, verified by its own test driver."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Computerphile",
-            "title": "What on Earth is Recursion",
-            "length": "9 min",
-            "url": "https://www.youtube.com/results?search_query=Computerphile%20What%20on%20Earth%20is%20Recursion"
-          },
-          {
-            "channel": "Low Level Learning",
-            "title": "the stack explained",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Low%20Level%20Learning%20the%20stack%20explained"
+            "hint": "int *ptr = &value; *ptr = *ptr * 3;",
+            "solution": "A pointer holding the variable's address, whose target is multiplied by 3 through *ptr, correctly turning 15 into 45."
           }
         ]
       },
@@ -128,63 +100,21 @@ module.exports = [
         "no": 2,
         "week": 1,
         "session": 2,
-        "title": "Basic 2: Contiguous Layouts and Two Dimensional Arrays",
-        "video_url": null,
-        "topic": "An array name in an expression decays to a pointer to its first element, which is why indexing and pointer arithmetic are the same operation written two ways. A two dimensional array is stored in row major order as one contiguous block, which is why iterating rows then columns is dramatically faster than the reverse - the fast order walks memory in the direction the cache prefetches.\n\nKey rules:\n- arr[i] is defined as the value at (arr + i). They are interchangeable.\n- Pointer arithmetic scales by the element size - adding one moves one element, not one byte.\n- Row major layout: element (r, c) of an array with C columns sits at offset (r*C + c).\n- Traverse in memory order. Row then column is cache friendly, column then row is not.\n\nWorked example - in-place transpose walking memory in row major order:\nvoid transpose(int m[][4], int n) {\n  for (int r = 0; r < n; r++)\n    for (int c = r + 1; c < n; c++) {\n      int t = m[r][c]; m[r][c] = m[c][r]; m[c][r] = t;\n    }\n}",
+        "title": "Pointer Arithmetic",
+        "video_url": "https://www.youtube.com/watch?v=ASVB8KAFypk",
+        "topic": "Real-life analogy: Think of a street where houses are numbered in steps of 4 meters. If you are standing at House 0 and take \"1 step forward,\" you don't advance 1 millimeter - you jump exactly 4 meters down the sidewalk to House 1.\n\nIn C, an array name decays into a constant pointer to its first element (arr == &arr[0]). Adding 1 to a pointer (ptr + 1) does not add 1 byte - it advances the address by sizeof(type) bytes (e.g. 4 bytes for an int). Therefore *(arr + i) is mathematically and mechanically identical to arr[i].",
         "problems": [
           {
-            "title": "Notation conversion",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Rewrite ten indexed expressions using only pointer arithmetic, and ten pointer expressions using only indexing.",
-            "criteria": [
-              "Identical behaviour on all hidden tests."
-            ],
-            "hint": "arr[i] and *(arr + i) are the same operation written two ways.",
-            "solution": "Twenty expressions correctly converted between indexing and pointer arithmetic, all behaviourally identical."
-          },
-          {
-            "title": "Traversal timing",
+            "title": "Buffer Navigation via Pointer Arithmetic",
             "points": 40,
             "difficulty": "Core",
-            "description": "Sum a large matrix in both orders and report the timing difference.",
+            "description": "Read an integer size N followed by N integers into an array. Traverse and print all elements in reverse strictly using pointer arithmetic without brackets [] - proving *(arr + i) and arr[i] really are the same address, just written two different ways.\n\nSample Input:\n4\n10 20 30 40\nExpected Output:\n40 30 20 10",
             "criteria": [
-              "Correct sums and a written cache based explanation."
+              "Every element access uses *(arr + i) style pointer arithmetic - no [] indexing appears anywhere in the traversal",
+              "For the sample input the program prints exactly \"40 30 20 10\", walking the array backward from the last element to the first"
             ],
-            "hint": "Row-then-column walks memory in the direction the cache prefetches.",
-            "solution": "Both traversal orders summed correctly, with a written explanation citing cache locality for the timing gap."
-          },
-          {
-            "title": "Module project: Image convolution filter",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a single pass convolution filter that applies a blur or edge detection kernel to a grayscale matrix loaded from a text file, handling edge pixels explicitly rather than skipping them.",
-            "criteria": [
-              "A single pass over the matrix applies the kernel, and edge pixels are handled explicitly rather than skipped or crashing."
-            ],
-            "hint": "Row major layout means element (r,c) sits at offset r*C + c.",
-            "solution": "A convolution filter that reads a grayscale matrix from file, applies the kernel in one pass, and explicitly handles every edge pixel."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Low Level Learning",
-            "title": "you will never ask about pointers again after watching this video",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Low%20Level%20Learning%20you%20will%20never%20ask%20about%20pointers%20again%20after%20watching%20this%20video"
-          },
-          {
-            "channel": "Jacob Sorber",
-            "title": "Pointer Arithmetic in C",
-            "length": "8 min",
-            "url": "https://www.youtube.com/results?search_query=Jacob%20Sorber%20Pointer%20Arithmetic%20in%20C"
-          },
-          {
-            "channel": "Computerphile",
-            "title": "Cache Memory Explained",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Computerphile%20Cache%20Memory%20Explained"
+            "hint": "Loop i from N-1 down to 0, printing *(arr + i) each time - never arr[i].",
+            "solution": "A reverse traversal using only *(arr + i) pointer arithmetic, correctly printing 40 30 20 10 for the sample array."
           }
         ]
       },
@@ -192,57 +122,21 @@ module.exports = [
         "no": 3,
         "week": 1,
         "session": 3,
-        "title": "Basic 3: Strings, Buffers and Memory Safety",
-        "video_url": null,
-        "topic": "A C string is a character array with a terminating zero byte, and every library function trusts you to have put that byte there. The entire family of buffer overflow vulnerabilities comes from functions that write until they find a terminator with no knowledge of how much room they have. The professional habit: use the bounded variants, always reserve one byte for the terminator, and treat any function that cannot be told a size limit as unusable in production.\n\nKey rules:\n- A buffer for n visible characters needs n+1 bytes. The terminator is not optional.\n- Use snprintf rather than sprintf, and prefer bounded copies over unbounded ones.\n- Never use gets - it cannot be used safely under any circumstance and has been removed from the standard.\n- strlen counts characters up to the terminator; it is not the allocation size.\n\nWorked example - a bounded copy that always terminates:\nvoid safe_copy(char *dst, size_t dst_size, const char *src) {\n  if (dst_size == 0) return;\n  size_t i = 0;\n  while (i + 1 < dst_size && src[i]) { dst[i] = src[i]; i++; }\n  dst[i] = '\\0';\n}",
+        "title": "Double Pointers (**ptr)",
+        "video_url": "https://www.youtube.com/watch?v=d3kd5KbGB48",
+        "topic": "Real-life analogy: If a manager wants to reassign which employee leads a project, they don't just change the employee's title - they update the CEO's project-assignment ledger (a pointer to a pointer) to point to a completely different lead engineer.\n\nBecause C does not have native pass-by-reference syntax, pointers allow functions to mutate variables in the caller's stack frame. When a function needs to allocate or modify the pointer itself (such as altering where a buffer points), a double pointer (type**) is passed to allow indirection across two stack levels.",
         "problems": [
           {
-            "title": "Vulnerability audit",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "You are given a 60 line program with four boundary defects. Find and fix each, and write one line explaining the failure mode.",
-            "criteria": [
-              "All four found, program clean under the address sanitizer."
-            ],
-            "hint": "A buffer for n visible characters needs n+1 bytes for the terminator.",
-            "solution": "All four boundary defects found, fixed and explained, with a clean address-sanitizer run afterward."
-          },
-          {
-            "title": "String utilities",
+            "title": "In-Place High-Performance Variable Swap",
             "points": 40,
             "difficulty": "Core",
-            "description": "Implement bounded versions of length, copy, concatenate and compare without using the standard library equivalents.",
+            "description": "Implement void swap(int *a, int *b). Read two integers, pass their memory addresses into swap(), and print their updated order in main() - the classic proof that a function can reach back into the caller's stack frame through a pointer.\n\nSample Input: 88 99\nExpected Output:\nSwapped: 99 88",
             "criteria": [
-              "All hidden tests pass including empty and maximum length inputs."
+              "swap(int *a, int *b) dereferences both parameters to exchange the values (using a temporary variable), and is called as swap(&x, &y)",
+              "For input \"88 99\" main() prints exactly \"Swapped: 99 88\" after the call, proving the swap reached the caller's real variables"
             ],
-            "hint": "Reserve one byte for the terminator in every bounded operation.",
-            "solution": "Bounded length/copy/concatenate/compare implementations passing every hidden test, including empty and max-length inputs."
-          },
-          {
-            "title": "Module project: Input sanitizer with pattern matching",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a sanitizer that validates user input against a simple pattern language supporting literal characters, digit classes and wildcards, rejecting anything that would overrun a fixed destination buffer.",
-            "criteria": [
-              "The pattern language supports literal characters, digit classes and wildcards, and any input that would overrun the fixed destination buffer is rejected rather than copied."
-            ],
-            "hint": "Never use gets - treat any unbounded-write function as unusable.",
-            "solution": "A pattern-matching sanitizer that validates against literals/digit-classes/wildcards and refuses any overrunning input."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Low Level Learning",
-            "title": "buffer overflow explained",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=Low%20Level%20Learning%20buffer%20overflow%20explained"
-          },
-          {
-            "channel": "Jacob Sorber",
-            "title": "C strings and the null terminator",
-            "length": "9 min",
-            "url": "https://www.youtube.com/results?search_query=Jacob%20Sorber%20C%20strings%20and%20the%20null%20terminator"
+            "hint": "Inside swap: int temp = *a; *a = *b; *b = temp;",
+            "solution": "A pointer-based swap() that genuinely exchanges the caller's two variables, printing Swapped: 99 88 for input 88 99."
           }
         ]
       },
@@ -250,295 +144,197 @@ module.exports = [
         "no": 4,
         "week": 2,
         "session": 1,
-        "title": "Basic 4: Structs, Padding, Unions and Binary Layout",
-        "video_url": null,
-        "topic": "A struct is not the sum of its members. The compiler inserts padding so that each member begins at an address that is a multiple of its own alignment requirement, and adds trailing padding so arrays of the struct stay aligned. Reordering members from largest to smallest often shrinks a struct by a third with no code change. Unions place all members at the same address and are the standard tool for tagged variant records.\n\nKey rules:\n- A member of size s is placed at the next offset divisible by s; total size rounds up to the largest member alignment.\n- Ordering members from largest to smallest usually minimises padding.\n- A union is exactly as large as its largest member - only one member is valid at a time, so pair it with a tag.\n- Never write a struct straight to disk or a socket without a defined layout; padding is not portable.\n\nWorked example - two identical field sets, different sizes:\nstruct wasteful { char a; int b; char c; }; /* likely 12 bytes */\nstruct packed   { int b; char a; char c; };  /* likely 8 bytes  */",
+        "title": "malloc() & calloc()",
+        "video_url": "https://www.youtube.com/watch?v=udygKrffpnY",
+        "topic": "Real-life analogy: Stack memory is like booking a hotel room for a fixed 24 hours (automatic checkout upon leaving). Heap allocation is buying commercial land on demand - you can request any custom acreage you need at runtime, but you must construct and manage it manually.\n\nStack memory has a fixed size and automatic lifetime tied to function scope. malloc(size_t) requests contiguous raw bytes from the Heap at runtime and returns a void* pointer to the base address. calloc(num, size) allocates memory and initializes every single bit to zero, preventing garbage value issues.",
         "problems": [
           {
-            "title": "Size prediction",
+            "title": "Dynamic Array Allocator",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Predict the size of six structs before compiling, then verify.",
+            "description": "Read an integer size N. Allocate space dynamically for N floats using malloc, populate the elements from input, calculate their sum, and print the total formatted to 2 decimals - buying exactly the acreage needed for N floats, no more, no less.\n\nSample Input:\n3\n1.5 2.5 4.0\nExpected Output:\nSum: 8.00",
             "criteria": [
-              "At least five correct with a written padding map for each."
+              "malloc(N * sizeof(float)) sizes the allocation to exactly N floats, and the pointer is freed at the end",
+              "For the sample input the program prints exactly \"Sum: 8.00\", using %.2f formatting"
             ],
-            "hint": "Each member is placed at the next offset divisible by its own size.",
-            "solution": "Predicted sizes matching the real compiled sizes for at least five of six structs, each with a padding map."
-          },
-          {
-            "title": "Struct diet",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Reorder three supplied structs to minimise size without removing any field.",
-            "criteria": [
-              "Target sizes met exactly."
-            ],
-            "hint": "Ordering members from largest to smallest usually minimises padding.",
-            "solution": "All three structs reordered to hit the target minimal size with every original field intact."
-          },
-          {
-            "title": "Module project: Binary packet serializer",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a serializer that writes a network style header of fixed width fields into a byte buffer with an explicit layout, and a matching parser that reads it back, verified by a round trip test.",
-            "criteria": [
-              "The layout is explicit rather than relying on native struct padding, and a round-trip test proves the parser reconstructs exactly what the serializer wrote."
-            ],
-            "hint": "Never write a struct straight to disk without a defined layout - padding is not portable.",
-            "solution": "A serializer/parser pair with an explicit, portable byte layout that survives a round-trip test."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Jacob Sorber",
-            "title": "Structure padding and alignment in C",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Jacob%20Sorber%20Structure%20padding%20and%20alignment%20in%20C"
-          },
-          {
-            "channel": "Low Level Learning",
-            "title": "how struct padding wastes your memory",
-            "length": "9 min",
-            "url": "https://www.youtube.com/results?search_query=Low%20Level%20Learning%20how%20struct%20padding%20wastes%20your%20memory"
+            "hint": "float *arr = malloc(N * sizeof(float)); then printf(\"Sum: %.2f\\n\", total);",
+            "solution": "A malloc'd float array sized exactly to N, correctly summed and printed as Sum: 8.00 for the sample input."
           }
         ]
       },
       {
         "no": 5,
-        "week": 1,
-        "session": 1,
-        "title": "Advanced 1: The Heap, Allocation and Leak Discipline",
-        "video_url": null,
-        "topic": "The heap is memory whose lifetime you control rather than the compiler. That control is the source of the four defects that dominate C bug reports: the leak, the use after free, the double free and the buffer overrun on heap memory. Every one is preventable by a discipline: every allocation has exactly one owner, and the free lives in the same file as the allocation.\n\nKey rules:\n- Every allocation call has exactly one matching release call on every path, including error paths.\n- After releasing a pointer, set it to null - a null dereference crashes loudly, a dangling one corrupts silently.\n- realloc may move the block - always assign its result, never assign it over the only pointer you have.\n- Zeroing allocation costs a pass over the memory - use it when the zero state matters, not by reflex.\n\nWorked example - a growable array that survives reallocation failure:\nint push(int **arr, size_t *len, size_t *cap, int value) {\n  if (*len == *cap) {\n    size_t next = *cap ? *cap * 2 : 8;\n    int *tmp = realloc(*arr, next * sizeof(int));\n    if (!tmp) return 0;\n    *arr = tmp; *cap = next;\n  }\n  (*arr)[(*len)++] = value; return 1;\n}",
+        "week": 2,
+        "session": 2,
+        "title": "Buffer Resizing (realloc)",
+        "video_url": "https://www.youtube.com/watch?v=34HmS804PzE",
+        "topic": "Real-life analogy: Think of expanding a modular warehouse. If adjacent land is empty, the builder simply moves the back wall outward. If adjacent land is occupied by neighbors, the builder purchases an entirely new large plot across town, moves all your inventory there, and tears down the old building.\n\nrealloc(ptr, new_size) expands or shrinks an existing heap allocation. If contiguous space is available immediately following the current block, it expands in-place. Otherwise, it allocates a new block elsewhere, copies the existing data over automatically, frees the old block, and returns the new pointer.",
         "problems": [
           {
-            "title": "Leak hunt",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "A supplied program leaks on three of its seven code paths. Find and fix all three.",
-            "criteria": [
-              "Clean report under the leak checker across every path including early returns."
-            ],
-            "hint": "Every allocation needs a matching release on every path, including error paths.",
-            "solution": "All three leaking paths found and fixed, with a clean leak-checker report across every path."
-          },
-          {
-            "title": "Growable buffer",
+            "title": "Dynamic Telemetry Buffer Resizing",
             "points": 40,
             "difficulty": "Core",
-            "description": "Implement a dynamic array with push, pop, at and free operations.",
+            "description": "Allocate an initial array of 2 integers with values [10, 20]. Use realloc to grow the buffer capacity to 4, append two incoming integers, and print all 4 elements - the warehouse moving to a bigger plot without losing any inventory already stored.\n\nSample Input: 30 40\nExpected Output:\n10 20 30 40",
             "criteria": [
-              "All hidden tests pass, no leaks, correct behaviour when allocation fails."
+              "realloc's return value is assigned back to the pointer variable (never discarded or assigned to a second, separate pointer)",
+              "The original two values [10, 20] survive the resize, and for input \"30 40\" the program prints exactly \"10 20 30 40\""
             ],
-            "hint": "Never assign realloc's result over the only pointer you have.",
-            "solution": "A dynamic array implementation passing every hidden test, leak-free, correct even when allocation fails."
-          },
-          {
-            "title": "Module project: Fixed block arena allocator",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build an allocator that requests one large block from the system and hands out fixed size chunks from it, with a free list and a statistics report showing chunks used, free and fragmentation.",
-            "criteria": [
-              "One large block backs all chunk allocations, a free list tracks reuse, and a statistics report shows chunks used, free and fragmentation."
-            ],
-            "hint": "Every allocation has exactly one owner.",
-            "solution": "An arena allocator with a working free list and an accurate used/free/fragmentation report."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Jacob Sorber",
-            "title": "Allocating memory with malloc, calloc, realloc, and free",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Jacob%20Sorber%20Allocating%20memory%20with%20malloc%2C%20calloc%2C%20realloc%2C%20and%20free"
-          },
-          {
-            "channel": "Low Level Learning",
-            "title": "i wrote my own memory allocator in C to prove a point",
-            "length": "13 min",
-            "url": "https://www.youtube.com/results?search_query=Low%20Level%20Learning%20i%20wrote%20my%20own%20memory%20allocator%20in%20C%20to%20prove%20a%20point"
+            "hint": "arr = realloc(arr, 4 * sizeof(int)); then arr[2] = 30; arr[3] = 40;",
+            "solution": "A realloc-based grow from 2 to 4 ints that preserves the original values and correctly appends the two new ones, printing 10 20 30 40."
           }
         ]
       },
       {
         "no": 6,
-        "week": 1,
-        "session": 2,
-        "title": "Advanced 2: Linked Structures, Stacks, Queues and Hash Tables",
-        "video_url": null,
-        "topic": "Once memory can be requested at run time, data structures stop being fixed arrays and become graphs of nodes. A linked list gives constant time insertion at the cost of cache locality. A hash table with separate chaining is a fixed array of list heads, and its performance collapses from constant to linear when the hash distributes badly - measuring chain length matters more than choosing a clever hash.\n\nKey rules:\n- Load factor equals stored entries divided by bucket count - above roughly 0.75, grow the table and rehash.\n- Average lookup cost in a chained table is one plus half the load factor.\n- A stack is last in first out and a queue is first in first out - the choice encodes the algorithm.\n- Every node structure needs a matching destroy function that walks and releases the whole structure.\n\nWorked example - separate chaining insert with a simple string hash:\nunsigned long hash(const char *s) {\n  unsigned long h = 5381;\n  while (*s) h = h * 33 + (unsigned char)*s++;\n  return h;\n}\nvoid insert(struct node **buckets, size_t n, const char *key, int value) {\n  size_t i = hash(key) % n;\n  struct node *node = make_node(key, value);\n  node->next = buckets[i]; buckets[i] = node;\n}",
+        "week": 2,
+        "session": 3,
+        "title": "Memory Leaks & free()",
+        "video_url": "https://www.youtube.com/watch?v=F23tNfZqUv4",
+        "topic": "Real-life analogy: Renting an apartment key, making a copy, throwing the original lease in the incinerator, and leaving the water running. You can never return the key (a memory leak), and trying to open the door after the building is demolished (a dangling pointer) leads to disaster.\n\nHeap allocations persist until explicitly released. Failing to call free(ptr) causes memory leaks that consume system RAM over time. After freeing memory, the pointer becomes a dangling pointer - dereferencing it invokes undefined behavior. Always set pointers to NULL immediately after freeing.",
         "problems": [
           {
-            "title": "List surgery",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Implement insert at position, delete by value and reverse in place for a singly linked list.",
-            "criteria": [
-              "All hidden tests pass including empty and single node lists, no leaks."
-            ],
-            "hint": "Every node structure needs a matching destroy function.",
-            "solution": "All three operations correct on every hidden test, including empty and single-node lists, with no leaks."
-          },
-          {
-            "title": "Collision study",
+            "title": "Safe Heap Cleanup & Sentinel Verification",
             "points": 40,
             "difficulty": "Core",
-            "description": "Insert ten thousand keys under two different hash functions and report the chain length distribution.",
+            "description": "Allocate an integer on the heap, store the value 500, free the memory, and set the pointer to NULL. Check if the pointer equals NULL before printing a safe status - closing the incinerator door and confirming the key can never be used again.\n\nInput: None\nExpected Output:\nPointer Safely Nullified",
             "criteria": [
-              "Both tables correct and a written comparison of the distributions."
+              "free(ptr) is called before ptr is explicitly set to NULL, in that order",
+              "The program checks if (ptr == NULL) before printing, and prints exactly \"Pointer Safely Nullified\""
             ],
-            "hint": "Above roughly 0.75 load factor, grow the table and rehash.",
-            "solution": "Both hash functions correctly compared, with a clear written analysis of their chain-length distributions."
-          },
-          {
-            "title": "Module project: Instrumented hash table",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a hash table with separate chaining that reports load factor, longest chain and average probe length on demand, and automatically grows when the load factor is exceeded.",
-            "criteria": [
-              "Load factor, longest chain and average probe length are reported on demand, and the table grows automatically past the load factor threshold."
-            ],
-            "hint": "Average lookup cost is one plus half the load factor.",
-            "solution": "A self-growing hash table with accurate on-demand load factor, longest-chain and average-probe reporting."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Computerphile",
-            "title": "Hashing Algorithms and Security",
-            "length": "8 min",
-            "url": "https://www.youtube.com/results?search_query=Computerphile%20Hashing%20Algorithms%20and%20Security"
-          },
-          {
-            "channel": "Fireship",
-            "title": "Data Structures in 10 Minutes",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20Data%20Structures%20in%2010%20Minutes"
-          },
-          {
-            "channel": "Jacob Sorber",
-            "title": "Linked lists in C",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=Jacob%20Sorber%20Linked%20lists%20in%20C"
+            "hint": "free(ptr); ptr = NULL; if (ptr == NULL) printf(\"Pointer Safely Nullified\\n\");",
+            "solution": "A heap integer that is freed, immediately nullified, and verified safe via a NULL check before printing the exact status line."
           }
         ]
       },
       {
         "no": 7,
-        "week": 1,
-        "session": 3,
-        "title": "Advanced 3: File Streams, Binary Records and Durable Writes",
-        "video_url": null,
-        "topic": "Text mode is for humans and binary mode is for machines, and mixing them is where most file corruption starts. Binary records give constant time access to record number n because the offset is simply n multiplied by the record size. Durability is the harder half: a system that must survive a crash writes to a temporary file, flushes it, and only then replaces the original.\n\nKey rules:\n- Record n begins at byte offset n multiplied by the record size.\n- Open binary files in binary mode explicitly.\n- A successful write is not a durable write - flush the stream, then rename the temporary file over the original.\n- Always check the return value of every read and write call.\n\nWorked example - atomic replace: write to a temporary file, then rename:\nint save_atomic(const char *path, const void *data, size_t n) {\n  char tmp[256]; snprintf(tmp, sizeof tmp, \"%s.tmp\", path);\n  FILE *f = fopen(tmp, \"wb\");\n  if (!f) return 0;\n  if (fwrite(data, 1, n, f) != n) { fclose(f); return 0; }\n  fflush(f); fclose(f);\n  return rename(tmp, path) == 0;\n}",
+        "week": 3,
+        "session": 1,
+        "title": "struct & typedef",
+        "video_url": "https://www.youtube.com/watch?v=qvyA8mfls_U",
+        "topic": "Real-life analogy: Think of a composite passport document. It binds different types of identity records - name (string), age (int), and visa validity (char) - into one cohesive official booklet that can be handled as a single unit.\n\nThe struct keyword packages heterogeneous data types into a contiguous composite type. Compilers automatically insert invisible byte alignment padding to keep fields aligned to 4-byte or 8-byte word boundaries for CPU performance. The typedef keyword creates clean type aliases for concise syntax.",
         "problems": [
           {
-            "title": "Record seek",
+            "title": "Embedded Sensor Telemetry Packet",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Implement read, update and append by record number over a fixed width binary file.",
+            "description": "Define a typedef struct named Telemetry containing int sensor_id and float voltage. Read values from input, populate the struct, and print a formatted log - binding two different record types into one passport-style booklet.\n\nSample Input: 101 3.32\nExpected Output:\nSensor ID: 101 | Voltage: 3.32V",
             "criteria": [
-              "Correct behaviour at the first, last and beyond the end positions."
+              "A typedef struct Telemetry exists with exactly int sensor_id and float voltage fields, populated from the two input values",
+              "For input \"101 3.32\" the program prints exactly \"Sensor ID: 101 | Voltage: 3.32V\""
             ],
-            "hint": "Record n begins at byte offset n multiplied by the record size.",
-            "solution": "Read/update/append all correct at the first, last and beyond-the-end record positions."
-          },
-          {
-            "title": "Crash simulation",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Interrupt a write halfway and demonstrate that your atomic save leaves the original intact.",
-            "criteria": [
-              "Original file readable after every simulated interruption."
-            ],
-            "hint": "A successful write is not a durable write until the temp file is renamed over the original.",
-            "solution": "The original file proven intact after every simulated mid-write interruption."
-          },
-          {
-            "title": "Module project: Binary record database",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a small database supporting add, find by key, update in place and delete with a free list, backed by a binary file and an in memory index rebuilt on startup.",
-            "criteria": [
-              "Add/find/update/delete all work correctly, backed by a binary file, with the in-memory index correctly rebuilt on startup."
-            ],
-            "hint": "Flush the stream, then rename the temp file over the original for a durable write.",
-            "solution": "A working record database with a free list for deletions and a correctly rebuilt startup index."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Jacob Sorber",
-            "title": "Reading and writing binary files in C",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Jacob%20Sorber%20Reading%20and%20writing%20binary%20files%20in%20C"
-          },
-          {
-            "channel": "Low Level Learning",
-            "title": "how files actually work",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=Low%20Level%20Learning%20how%20files%20actually%20work"
+            "hint": "typedef struct { int sensor_id; float voltage; } Telemetry; then printf(\"Sensor ID: %d | Voltage: %.2fV\\n\", t.sensor_id, t.voltage);",
+            "solution": "A Telemetry struct populated from input and printed in the exact required log format."
           }
         ]
       },
       {
         "no": 8,
-        "week": 2,
-        "session": 1,
-        "title": "Advanced 4: Systems Integration and the Course Capstone",
-        "video_url": null,
-        "topic": "Integration is a distinct skill from implementation. A program that combines dynamic structures, file persistence and user input has failure modes none of the parts have alone: a partially applied transaction, an index that disagrees with the file, memory freed by one subsystem while another still holds a pointer. The professional answer is a layered design with one owning module per resource and a single entry point for every state change.\n\nKey rules:\n- One module owns each resource - other modules borrow through functions, never raw pointers.\n- Every state change goes through a single function so logging, validation and rollback live in one place.\n- A transaction is applied only after every precondition is checked.\n- A regression harness that replays a recorded input file catches more than manual testing.\n\nWorked example - a single guarded entry point for state change:\nint apply_transfer(Bank *b, int from, int to, long paisa) {\n  if (paisa <= 0) return ERR_AMOUNT;\n  Account *a = find(b, from), *z = find(b, to);\n  if (!a || !z) return ERR_NO_ACCOUNT;\n  if (a->balance < paisa) return ERR_FUNDS;\n  a->balance -= paisa; z->balance += paisa;\n  return journal_append(b, from, to, paisa);\n}",
+        "week": 3,
+        "session": 2,
+        "title": "Linked Lists",
+        "video_url": "https://www.youtube.com/watch?v=VOpjAHCuz7I",
+        "topic": "Real-life analogy: Think of a treasure hunt where every clue card contains two things: a clue message (the data payload) and a written GPS coordinate pointing to the location of the next card in the forest (the next pointer).\n\nA self-referential struct contains a member pointer that points to another struct of its own type (struct Node *next;). Unlike contiguous arrays, linked lists allocate elements non-contiguously on the heap, linking nodes dynamically through pointer chains. This enables O(1) insertions without memory reallocations.",
         "problems": [
           {
-            "title": "Integration defects",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "A supplied two subsystem program has an ownership defect and an index consistency defect. Diagnose and repair both.",
-            "criteria": [
-              "Both found, explained in writing and fixed."
-            ],
-            "hint": "One module should own each resource; others only borrow through functions.",
-            "solution": "Both the ownership defect and the index consistency defect correctly diagnosed, explained and fixed."
-          },
-          {
-            "title": "Regression harness",
+            "title": "Linked List Traversal Engine",
             "points": 40,
             "difficulty": "Core",
-            "description": "Build a replay harness that runs a recorded command file and compares output against an expected file.",
+            "description": "Construct a 2-node singly linked list dynamically on the heap from two input integers. Traverse the list from head to tail and print the sequence - following the clue cards one GPS coordinate at a time until the trail ends.\n\nSample Input: 25 50\nExpected Output:\n25 -> 50 -> NULL",
             "criteria": [
-              "Harness detects a deliberately introduced regression."
+              "Both nodes are allocated with malloc (a self-referential struct Node { int data; struct Node *next; };), linked via the first node's next pointer, not stored in a plain array",
+              "For input \"25 50\" the traversal prints exactly \"25 -> 50 -> NULL\""
             ],
-            "hint": "A replay harness catches more than manual testing.",
-            "solution": "A working replay harness that correctly flags a deliberately introduced regression."
-          },
+            "hint": "head->next = second; second->next = NULL; then walk with a temp pointer printing data followed by \" -> \".",
+            "solution": "A 2-node heap-allocated linked list correctly traversed head to tail, printing 25 -> 50 -> NULL."
+          }
+        ]
+      },
+      {
+        "no": 9,
+        "week": 3,
+        "session": 3,
+        "title": "Bitwise Operations & Masks",
+        "video_url": "https://www.youtube.com/watch?v=jlQAMm_8c6c",
+        "topic": "Real-life analogy: Think of an electrical control panel with 8 physical toggle switches. Rather than building 8 separate giant power boxes, a single master byte controls all 8 switches. Flipping Switch #3 up is a bitwise OR operation.\n\nBitwise operators manipulate raw binary bits inside an integer: AND (&), OR (|), XOR (^), NOT (~), Left Shift (<<), and Right Shift (>>). Bit masks allow programmers to set, clear, and toggle individual hardware flags in microcontroller registers without altering neighboring bits.",
+        "problems": [
           {
-            "title": "Course capstone: MiniBank distributed CLI and transaction engine",
+            "title": "Hardware Status Flag Masking",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Read an integer register value and a bit index (0-7). Use bitwise left-shift and OR (val | (1 << bit)) to set that bit to 1, then print the new integer value - flipping exactly one switch on the control panel without disturbing the other seven.\n\nSample Input: 8 1\nExpected Output:\nUpdated Register: 10",
+            "criteria": [
+              "The bit is set using val | (1 << bit), not by recomputing the whole register value some other way",
+              "For input \"8 1\" the program prints exactly \"Updated Register: 10\" (binary 1000 with bit 1 set becomes 1010 = 10)"
+            ],
+            "hint": "int updated = val | (1 << bit); printf(\"Updated Register: %d\\n\", updated);",
+            "solution": "A single OR-with-shifted-mask operation that correctly sets the requested bit, turning register 8 with bit 1 into 10."
+          }
+        ]
+      },
+      {
+        "no": 10,
+        "week": 4,
+        "session": 1,
+        "title": "Stream File I/O",
+        "video_url": "https://www.youtube.com/watch?v=8nIilb2kiSU",
+        "topic": "Real-life analogy: Opening a file stream is like connecting a pipeline to an underground storage silo. The valve is opened with a mode key (\"r\" for read, \"w\" for write). If you forget to close the valve (fclose), fuel leaks into the system buffer.\n\nC manages persistent disk files using a buffered stream handled by the FILE* control structure. Programs must open streams with fopen(), perform formatted disk reads/writes via fscanf() and fprintf(), and flush/release kernel handles using fclose() to prevent resource locks.",
+        "problems": [
+          {
+            "title": "Persistent System Log File Writer",
+            "points": 30,
+            "difficulty": "Basic",
+            "description": "Create a file named audit.log using fopen(\"audit.log\", \"w\"), write an incoming log string using fprintf(), close the file, reopen it in read mode, and print its content - opening and closing the pipeline valve correctly on both ends.\n\nSample Input: AUTH_SUCCESS_NODE_9\nExpected Output:\nAudit Log Content: AUTH_SUCCESS_NODE_9",
+            "criteria": [
+              "The file is opened \"w\" to write and fclose()'d before being reopened \"r\" to read - never left open across both operations",
+              "For input \"AUTH_SUCCESS_NODE_9\" the program prints exactly \"Audit Log Content: AUTH_SUCCESS_NODE_9\" after reading it back from disk"
+            ],
+            "hint": "fopen(\"audit.log\",\"w\") -> fprintf -> fclose, then fopen(\"audit.log\",\"r\") -> fscanf -> fclose.",
+            "solution": "A write-then-reopen-and-read cycle through audit.log, correctly closing the file between the two operations and printing the exact recovered content."
+          }
+        ]
+      },
+      {
+        "no": 11,
+        "week": 4,
+        "session": 2,
+        "title": "Binary Block I/O",
+        "video_url": "https://www.youtube.com/watch?v=k3nU_F5sNio",
+        "topic": "Real-life analogy: Writing plain text to disk is like translating a document word-by-word into handwriting. Binary block I/O is taking a high-speed polaroid photograph of the exact physical RAM memory block and dumping it directly onto the disk in milliseconds.\n\nText files convert internal numbers into ASCII strings, which is slow and space-inefficient. Binary I/O via fwrite() and fread() streams raw contiguous byte buffers directly between RAM and disk storage, preserving exact binary representations of structs and large arrays with zero translation overhead.",
+        "problems": [
+          {
+            "title": "Binary Struct Serialization",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Write a struct containing int code, key directly to a binary file data.bin using fwrite. Read it back with fread and print the decoded fields - the polaroid-photograph copy of the exact memory block, not a translated text version.\n\nSample Input: 777 999\nExpected Output:\nDecoded Binary: Code=777, Key=999",
+            "criteria": [
+              "fwrite(&record, sizeof(record), 1, fp) writes the whole struct as raw bytes (not fprintf'd as text), and fread reads it back the same way",
+              "For input \"777 999\" the program prints exactly \"Decoded Binary: Code=777, Key=999\" after reading the binary file back"
+            ],
+            "hint": "fwrite(&rec, sizeof(rec), 1, fp); ... fread(&rec, sizeof(rec), 1, fp);",
+            "solution": "A struct written and read back via fwrite/fread as raw binary, correctly decoding to Code=777, Key=999."
+          }
+        ]
+      },
+      {
+        "no": 12,
+        "week": 4,
+        "session": 3,
+        "title": "Function Pointers & Callbacks",
+        "video_url": "https://www.youtube.com/watch?v=ynYtgGUNelE",
+        "topic": "Real-life analogy: Think of a universal power drill with quick-swap bit chucks. The drill handle (the host execution engine) doesn't care whether you plug in a screwdriver bit or a sanding bit - it simply invokes whatever tool bit is slotted in at runtime.\n\nIn C, executable machine code also resides in memory. A function's name points to the memory address of its entry instruction. A function pointer (int (*func_ptr)(int, int)) stores this executable address, enabling dynamic callback routines, event listeners, and pluggable dispatch tables like the standard library's qsort().",
+        "problems": [
+          {
+            "title": "Dynamic Arithmetic Dispatch Engine",
             "points": 60,
             "difficulty": "Boss",
-            "description": "Build a complete banking terminal application with heap managed accounts, binary persistence, a transaction journal, rollback on partial failure and zero leaks under a ten thousand operation stress run.",
+            "description": "Create two functions: add(a,b) and multiply(a,b). Assign their pointers dynamically based on an operator flag ('+' or '*') and execute the operation via the function pointer - the drill handle invoking whichever bit is slotted in, decided only at runtime. The capstone finale for this course.\n\nSample Input: * 6 7\nExpected Output:\nDispatch Result: 42",
             "criteria": [
-              "Accounts are heap managed, persistence and a transaction journal both work, partial failures roll back, and a ten-thousand-operation stress run shows zero leaks."
+              "A function pointer variable (e.g. int (*op)(int,int)) is assigned to either add or multiply based on the operator flag, and the operation is executed by CALLING THROUGH that pointer, not by an if/else branching directly to add() or multiply()",
+              "For input \"* 6 7\" the program prints exactly \"Dispatch Result: 42\""
             ],
-            "hint": "Apply a transaction only after every precondition is checked, and make the journal write durable last.",
-            "solution": "A complete MiniBank engine surviving a ten-thousand-operation stress run with correct rollback and zero leaks."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Low Level Learning",
-            "title": "how to structure a C project",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Low%20Level%20Learning%20how%20to%20structure%20a%20C%20project"
-          },
-          {
-            "channel": "Jacob Sorber",
-            "title": "Writing a Makefile",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Jacob%20Sorber%20Writing%20a%20Makefile"
+            "hint": "int (*op)(int,int) = (flag == '*') ? multiply : add; then printf(\"Dispatch Result: %d\\n\", op(a,b));",
+            "solution": "A function pointer dynamically assigned to add or multiply based on the flag and invoked through the pointer, correctly dispatching 6*7 to 42."
           }
         ]
       }
@@ -551,36 +347,36 @@ module.exports = [
     "friendly_grading": true,
     "default_language": "cpp",
     "title": "Advanced C++ Programming",
-    "description": "Course 2 (final) of the C++ Programming free ladder - combines the Basic tier (formerly \"CPP2.2: Object Oriented Design in C++\") and the Advanced tier (formerly \"CPP2.3: Advanced C++ Engineering\") into one course, eight modules total, each with its own two assignments and module project.",
-    "outcome": "Design a class whose invalid states are unrepresentable; manage a resource inside a class so copying and destruction are always correct; model a hierarchy where the base class earns its place and avoid slicing; use runtime polymorphism deliberately and explain its cost. Write generic containers and functions and read the errors they produce; replace hand written loops with standard algorithms and express intent through lambdas; express ownership in the type system and serialise an object graph; combine ownership, algorithms and persistence into a defensible desktop application.",
+    "description": "Advanced C++ (OOP & Architecture): systems-level object-oriented design - inheritance, virtual dispatch and abstract interfaces, operator overloading and copy control, templates and generic programming, through to smart pointers and move semantics. Four modules, twelve topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "outcome": "Design class hierarchies with protected inheritance and dynamic dispatch through virtual functions and abstract interfaces; overload operators for natural object syntax, and implement safe deep-copy and self-assignment-protected copy control (the Rule of Three/Five); write generic function and class templates, and use STL algorithms with lambdas; manage heap ownership safely with std::unique_ptr and std::shared_ptr, and transfer resources efficiently with move semantics.",
     "keywords": [
-      "C++ OOP course",
-      "C++ inheritance",
-      "Rule of Three C++",
-      "virtual functions C++",
-      "intermediate C++ programming",
-      "C++ templates course",
+      "advanced C++ programming",
+      "C++ inheritance and polymorphism",
+      "C++ operator overloading",
+      "C++ copy control and Rule of Five",
+      "C++ templates",
+      "C++ STL algorithms and lambdas",
       "C++ smart pointers",
-      "C++ STL algorithms",
-      "C++ serialization",
-      "advanced C++ engineering"
+      "C++ move semantics"
     ],
     "key_concepts": [
-      "Class invariants",
-      "Rule of Three",
-      "Inheritance & slicing",
-      "Virtual functions & dynamic dispatch",
-      "Abstract interfaces",
-      "Templates & generic programming",
-      "Standard algorithms & lambdas",
-      "Smart pointers & ownership",
-      "Object graph serialization",
-      "Project integration"
+      "Inheritance & protected",
+      "Virtual functions & vtables",
+      "Abstract classes & interfaces",
+      "Operator overloading (+, ==, <<)",
+      "Deep vs shallow copy",
+      "Rule of Three / Five",
+      "Function templates",
+      "Class templates",
+      "STL algorithms & lambdas",
+      "std::unique_ptr",
+      "std::shared_ptr & reference counting",
+      "Move semantics & std::move"
     ],
     "pass_mark": 60,
     "titleNames": [
-      "Invariant Guard",
       "Dispatch Architect",
+      "Copy Control Guardian",
       "Template Engineer",
       "Ownership Architect"
     ],
@@ -589,51 +385,21 @@ module.exports = [
         "no": 1,
         "week": 1,
         "session": 1,
-        "title": "Basic 1: Classes, Invariants and Encapsulation",
-        "video_url": null,
-        "topic": "An invariant is a statement about an object that is true from the end of its constructor to the start of its destructor - a balance is never negative, a date is always valid. Encapsulation exists to protect invariants, not to hide data for its own sake; a class that exposes setters for every field has encapsulation in syntax only. Member initializer lists matter because members construct in declaration order before the constructor body runs - assigning in the body means constructing twice.\n\nKey rules:\n- State the invariant in a comment above the class. If you cannot state it, the class has no reason to exist.\n- Members initialise in declaration order, not the order written in the list.\n- Mark single argument constructors explicit unless an implicit conversion is genuinely wanted.\n- Prefer a constructor that rejects bad input over a setter that validates after the fact.\n\nWorked example - a wallet whose invariant cannot be violated from outside:\nclass Wallet {\n  long paisa_; // invariant: paisa_ >= 0\npublic:\n  explicit Wallet(long paisa) : paisa_(paisa < 0 ? 0 : paisa) {}\n  bool withdraw(long amount) {\n    if (amount <= 0 || amount > paisa_) return false;\n    paisa_ -= amount; return true;\n  }\n  long balance() const { return paisa_; }\n};",
+        "title": "Inheritance & protected",
+        "video_url": "https://www.youtube.com/watch?v=X8nYM8wdNRE",
+        "topic": "Real-life analogy: A basic vehicle blueprint contains wheels, engine, and steering. An electric sports car inherits all base traits but adds battery packs and turbo modes without rebuilding a vehicle from scratch.\n\nInheritance enables a derived class to inherit member variables and methods from a base class (class Car : public Vehicle). The protected access specifier keeps members private from external client code while keeping them accessible to derived child classes.",
         "problems": [
           {
-            "title": "Invariant statements",
+            "title": "Vehicle Fleet Inheritance",
             "points": 30,
             "difficulty": "Basic",
-            "description": "For five supplied classes, write the invariant and identify the member function that can break it.",
+            "description": "Create a base class Vehicle with protected int speed. Derive a child class Truck that takes speed and cargo payload from input and prints a combined spec sheet - the electric sports car adding its own traits on top of the shared vehicle blueprint.\n\nSample Input: 80 5000\nExpected Output:\nTruck Speed: 80 km/h | Payload: 5000 kg",
             "criteria": [
-              "All five invariants stated, at least four breaches found."
+              "speed is declared protected int in Vehicle (not private), so Truck can access it directly as an inherited member",
+              "For input \"80 5000\" the program prints exactly \"Truck Speed: 80 km/h | Payload: 5000 kg\""
             ],
-            "hint": "If you cannot state the invariant, the class has no reason to exist.",
-            "solution": "Five correctly stated invariants, with at least four real breaching member functions identified."
-          },
-          {
-            "title": "Close the class",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Rewrite a struct with public fields into a class that cannot enter an invalid state.",
-            "criteria": [
-              "All hidden misuse tests are rejected."
-            ],
-            "hint": "Prefer a constructor that rejects bad input over a setter that validates after the fact.",
-            "solution": "A fully encapsulated class rejecting every hidden misuse attempt."
-          },
-          {
-            "title": "Module project: Multi currency wallet",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a wallet class supporting several currencies with a conversion table, rejecting negative balances, unknown currencies and precision losing conversions at the interface.",
-            "criteria": [
-              "Negative balances, unknown currencies and precision-losing conversions are all rejected at the constructor/interface, not left to the caller to validate."
-            ],
-            "hint": "State the invariant in a comment above the class.",
-            "solution": "A multi-currency wallet whose interface makes negative balances, unknown currencies and lossy conversions unrepresentable."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "The Cherno",
-            "title": "CLASSES in C++",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=The%20Cherno%20CLASSES%20in%20C%2B%2B"
+            "hint": "class Vehicle { protected: int speed; }; class Truck : public Vehicle { public: int payload; };",
+            "solution": "A Truck class inheriting protected speed from Vehicle and adding its own payload, correctly printing the combined spec sheet."
           }
         ]
       },
@@ -641,51 +407,21 @@ module.exports = [
         "no": 2,
         "week": 1,
         "session": 2,
-        "title": "Basic 2: Object Lifetime, Destructors and the Rule of Three",
-        "video_url": null,
-        "topic": "When a class owns a resource, the compiler generated copy operations copy the handle rather than the resource, so two objects believe they own the same memory and the second destructor releases it twice. The Rule of Three: if you need any one of destructor, copy constructor or copy assignment, you almost certainly need all three. Tying resource release to object destruction is the single most important idea in C++ - it makes cleanup automatic on every exit path including exceptions.\n\nKey rules:\n- Rule of Three: define the destructor, copy constructor and copy assignment operator together or none of them.\n- Copy assignment must handle self assignment and release the old resource before taking the new one.\n- Destruction happens in reverse order of construction, automatically, on every exit path.\n- A shallow copy of an owning class is a double free waiting for a destructor to run.\n\nWorked example - an owning buffer with all three operations defined:\nclass Buffer {\n  int* data_; std::size_t n_;\npublic:\n  explicit Buffer(std::size_t n) : data_(new int[n]{}), n_(n) {}\n  ~Buffer() { delete[] data_; }\n  Buffer(const Buffer& o) : data_(new int[o.n_]), n_(o.n_) { std::copy(o.data_, o.data_ + n_, data_); }\n  Buffer& operator=(Buffer o) { std::swap(data_, o.data_); std::swap(n_, o.n_); return *this; }\n};",
+        "title": "Virtual Functions & vtables",
+        "video_url": "https://www.youtube.com/watch?v=oIV2K4Vzs9c",
+        "topic": "Real-life analogy: A universal remote control has a \"Power\" button. When pointed at a TV, it turns on the screen; when pointed at an air conditioner, it spins up the compressor. The remote doesn't know the exact machine model - it relies on the device's internal response.\n\nDeclaring a base method as virtual enables dynamic dispatch (runtime polymorphism). The compiler generates a virtual method table (vtable) and assigns a virtual pointer (vptr) to each object. When calling a method via a base pointer (Shape* ptr), C++ resolves the derived object's override dynamically.",
         "problems": [
           {
-            "title": "Double free diagnosis",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "A supplied class crashes on copy. Explain the mechanism and fix it.",
-            "criteria": [
-              "Correct written explanation and a clean run under the sanitizer."
-            ],
-            "hint": "A shallow copy of an owning class is a double free waiting to happen.",
-            "solution": "The double-free mechanism correctly explained, with a fix producing a clean sanitizer run."
-          },
-          {
-            "title": "Rule of Three drill",
+            "title": "Dynamic Payment Gateway Dispatch",
             "points": 40,
             "difficulty": "Core",
-            "description": "Add the three operations to two supplied resource owning classes.",
+            "description": "Define base class Payment with virtual void pay(). Derive CryptoPayment that overrides pay(). Invoke it using a base class pointer (Payment*) - the same remote-control button triggering a different response depending on which device is actually plugged in.\n\nSample Input: 250\nExpected Output:\nProcessing Crypto Tx: $250",
             "criteria": [
-              "All copy, assign and destroy tests pass with no leaks."
+              "pay() is declared virtual in Payment and overridden in CryptoPayment, and is called through a Payment* pointer (not a CryptoPayment pointer/object directly)",
+              "For input 250 the program prints exactly \"Processing Crypto Tx: $250\", proving the base pointer dispatched to the derived override"
             ],
-            "hint": "Define destructor, copy constructor and copy assignment together, or none of them.",
-            "solution": "Both classes given a correct destructor, copy constructor and copy assignment, leak-free under every test."
-          },
-          {
-            "title": "Module project: Owning matrix container",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a dynamic matrix class that owns its storage, supports copy and assignment correctly, provides bounds checked access and reports its own allocation count for verification.",
-            "criteria": [
-              "Copy and assignment are both correct under the Rule of Three, access is bounds-checked, and an allocation counter is exposed for verification."
-            ],
-            "hint": "Copy assignment must handle self-assignment and release the old resource first.",
-            "solution": "A self-owning matrix class with correct copy/assignment, bounds-checked access and a verifiable allocation counter."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "The Cherno",
-            "title": "Object Lifetime in C++",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=The%20Cherno%20Object%20Lifetime%20in%20C%2B%2B"
+            "hint": "class Payment { public: virtual void pay() {} }; class CryptoPayment : public Payment { public: void pay() override { ... } }; Payment* p = new CryptoPayment(); p->pay();",
+            "solution": "A virtual pay() overridden in CryptoPayment, correctly dispatched at runtime through a base Payment* pointer."
           }
         ]
       },
@@ -693,51 +429,21 @@ module.exports = [
         "no": 3,
         "week": 1,
         "session": 3,
-        "title": "Basic 3: Inheritance, Hierarchies and Slicing",
-        "video_url": null,
-        "topic": "Inheritance says a derived object is substitutable for a base object everywhere the base is expected. If that is not true for your hierarchy, composition is the correct tool. Slicing is the classic trap: assigning a derived object into a base variable copies only the base part and silently discards the rest, which is why polymorphic collections store pointers or references rather than values. Construction runs base to derived; destruction runs derived to base.\n\nKey rules:\n- Substitution test: if a derived object cannot stand in for the base everywhere, do not inherit.\n- Slicing copies the base part only - store pointers or references instead.\n- Construction runs base to derived; destruction runs derived to base.\n- Protected means visible to derived classes only - use it sparingly, it widens the interface you must maintain.\n\nWorked example - slicing shown side by side with the correct form:\nAsset a = Equity{ \"PSO\", 1200 };        // sliced: Equity part discarded\nstd::vector<std::unique_ptr<Asset>> book;\nbook.push_back(std::make_unique<Equity>(\"PSO\", 1200)); // correct storage",
+        "title": "Abstract Classes & Interfaces",
+        "video_url": "https://www.youtube.com/watch?v=UWAdd13EfM8",
+        "topic": "Real-life analogy: An international standard for electrical wall plugs specifies exact pin dimensions and voltages. The standard itself cannot produce electricity - it is a pure contract that third-party manufacturers must implement.\n\nA class containing at least one pure virtual function (virtual void render() = 0;) is an Abstract Class. It cannot be instantiated directly and serves as a strict structural interface/contract. Derived classes must override all pure virtual methods to become concrete instantiable classes.",
         "problems": [
           {
-            "title": "Substitution audit",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "For four supplied hierarchies, decide whether inheritance or composition is correct and justify.",
-            "criteria": [
-              "At least three correct with reasons."
-            ],
-            "hint": "If a derived object cannot stand in for the base everywhere, do not inherit.",
-            "solution": "At least three of four hierarchies correctly judged as inheritance or composition, with sound reasoning."
-          },
-          {
-            "title": "Slicing repair",
+            "title": "Sensor Interface Contract",
             "points": 40,
             "difficulty": "Core",
-            "description": "A supplied portfolio loses derived data. Diagnose and fix.",
+            "description": "Create an abstract class ISensor with pure virtual method virtual double readValue() = 0;. Implement a concrete TempSensor class that reads and returns Celsius input - the wall-plug standard that only becomes real electricity once a concrete manufacturer implements it.\n\nSample Input: 36.5\nExpected Output:\nSensor Reading: 36.5 C",
             "criteria": [
-              "Derived behaviour preserved through the collection."
+              "ISensor declares readValue() as pure virtual (= 0;) and is never instantiated directly - only TempSensor, which overrides it, is instantiated",
+              "For input 36.5 the program prints exactly \"Sensor Reading: 36.5 C\""
             ],
-            "hint": "Store pointers or references in polymorphic collections, never values.",
-            "solution": "The slicing bug diagnosed and fixed by switching to pointer/reference storage, preserving derived behaviour."
-          },
-          {
-            "title": "Module project: Financial asset hierarchy",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a hierarchy of asset types with shared base behaviour and type specific valuation, stored polymorphically and printed through a common interface.",
-            "criteria": [
-              "Assets are stored polymorphically (no slicing) and printed through one shared interface while each type still computes its own valuation."
-            ],
-            "hint": "Slicing copies only the base part - store pointers or references.",
-            "solution": "An asset hierarchy stored without slicing, each type valuing itself correctly through a shared printing interface."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "The Cherno",
-            "title": "Inheritance in C++",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=The%20Cherno%20Inheritance%20in%20C%2B%2B"
+            "hint": "class ISensor { public: virtual double readValue() = 0; }; class TempSensor : public ISensor { public: double readValue() override { ... } };",
+            "solution": "An abstract ISensor interface implemented by a concrete TempSensor, correctly reading and printing 36.5 C."
           }
         ]
       },
@@ -745,277 +451,197 @@ module.exports = [
         "no": 4,
         "week": 2,
         "session": 1,
-        "title": "Basic 4: Virtual Functions, Interfaces and Dynamic Dispatch",
-        "video_url": null,
-        "topic": "A virtual function is resolved by looking up a pointer in a table attached to the object at run time rather than at compile time. That indirection costs one pointer per object and one lookup per call - negligible in almost every application. The rule that matters most: any base class intended for polymorphic deletion must have a virtual destructor, or deleting through a base pointer will run the wrong destructor and leak the derived part.\n\nKey rules:\n- A pure virtual function makes the class abstract - that class becomes an interface, not an implementation.\n- Any polymorphic base class needs a virtual destructor.\n- Mark overrides with the override keyword - it turns a silent signature mismatch into a compile error.\n- Cost of dispatch: one pointer per object plus one indirect call. Do not avoid it on speculation.\n\nWorked example - an interface and a polymorphic collection:\nstruct Reportable {\n  virtual ~Reportable() = default;\n  virtual double value() const = 0;\n  virtual std::string label() const = 0;\n};\ndouble total(const std::vector<std::unique_ptr<Reportable>>& items) {\n  double sum = 0;\n  for (const auto& i : items) sum += i->value(); // dispatched at run time\n  return sum;\n}",
+        "title": "Operator Overloading (+, ==, <<)",
+        "video_url": "https://www.youtube.com/watch?v=mS9755gF66w",
+        "topic": "Real-life analogy: Adding two numbers (2 + 3 = 5) is basic arithmetic. Adding two time durations (2 hours + 45 minutes = 2h 45m) requires teaching the plus operator how to manipulate compound clock objects.\n\nC++ allows user-defined classes to redefine standard language operators by implementing operator+, operator==, or the stream insertion operator<<. This gives custom objects natural, mathematical syntax without awkward method names like p1.add(p2).",
         "problems": [
           {
-            "title": "Missing virtual destructor",
+            "title": "2D Vector Addition Operator",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Demonstrate the leak caused by a non virtual destructor, then fix it.",
+            "description": "Create a Vector2D class with int x, y. Overload the + operator so that v1 + v2 sums both coordinates. Read 4 integers for two vectors and print the resulting sum - teaching the plus sign how to add compound coordinate objects, not just plain numbers.\n\nSample Input: 2 3 4 5\nExpected Output:\nResult Vector: (6, 8)",
             "criteria": [
-              "Leak shown before and absent after."
+              "operator+ is overloaded as a member (or friend) function on Vector2D, and v1 + v2 uses that operator directly rather than a manually-named method like add()",
+              "For input \"2 3 4 5\" the program prints exactly \"Result Vector: (6, 8)\""
             ],
-            "hint": "Any polymorphic base class needs a virtual destructor.",
-            "solution": "The leak reproduced with a non-virtual destructor, then eliminated once it is made virtual."
-          },
-          {
-            "title": "Interface extraction",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Extract an interface from three concrete classes and rewrite the caller to depend only on it.",
-            "criteria": [
-              "Caller compiles with no concrete class included."
-            ],
-            "hint": "A pure virtual function makes the class abstract.",
-            "solution": "A clean interface extracted from all three classes, with the caller depending on it alone."
-          },
-          {
-            "title": "Module project: Polymorphic portfolio report",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a reporting engine that holds mixed asset types behind one interface, computes totals and per category breakdowns and prints a formatted statement.",
-            "criteria": [
-              "Mixed asset types are held behind one interface with a virtual destructor, and totals/per-category breakdowns are computed and printed correctly."
-            ],
-            "hint": "Cost of dispatch is one pointer per object plus one indirect call - use it deliberately here.",
-            "solution": "A polymorphic reporting engine producing correct totals and category breakdowns across mixed asset types."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "The Cherno",
-            "title": "Virtual Functions in C++",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=The%20Cherno%20Virtual%20Functions%20in%20C%2B%2B"
+            "hint": "Vector2D operator+(const Vector2D& other) { return Vector2D{x + other.x, y + other.y}; }",
+            "solution": "An overloaded + operator on Vector2D that correctly sums two vectors' coordinates, printing Result Vector: (6, 8)."
           }
         ]
       },
       {
         "no": 5,
-        "week": 1,
-        "session": 1,
-        "title": "Advanced 1: Templates and Generic Programming",
-        "video_url": null,
-        "topic": "A template is not a function, it is a recipe the compiler uses to write functions on demand. Nothing is generated until the template is instantiated with concrete types, which is why template definitions live in headers. Template error messages are long because they unwind the whole instantiation chain - read them from the bottom, where the original call site is.\n\nKey rules:\n- Templates are instantiated on use - the definition must be visible, so it stays in the header.\n- Read template errors from the last line upward.\n- Specialisation lets one type take a different implementation without changing the call site.\n- Constrain templates where possible so misuse fails at the interface rather than deep inside.\n\nWorked example - a generic ring buffer with a bounds contract:\ntemplate <typename T, std::size_t N>\nclass Ring {\n  T slot_[N]; std::size_t head_ = 0, count_ = 0;\npublic:\n  bool push(const T& v) {\n    if (count_ == N) return false;\n    slot_[(head_ + count_++) % N] = v; return true;\n  }\n};",
+        "week": 2,
+        "session": 2,
+        "title": "Deep vs Shallow Copy",
+        "video_url": "https://www.youtube.com/watch?v=BvR14431p9o",
+        "topic": "Real-life analogy: A Shallow Copy gives two housemates the same single front door key (if one changes the lock, the other is locked out). A Deep Copy builds an identical duplicate house with its own separate door lock and keys.\n\nDefault memberwise copy constructors perform shallow copies: copying raw pointer addresses. If one object goes out of scope and frees the memory, the other object holds a broken dangling pointer (a double-free crash). A user-defined copy constructor allocates a fresh heap block and clones the data contents independently.",
         "problems": [
           {
-            "title": "Generalise three functions",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Convert three type specific functions into templates without losing behaviour.",
-            "criteria": [
-              "All hidden tests pass across at least three instantiated types."
-            ],
-            "hint": "Template definitions must stay in the header - they are instantiated on use.",
-            "solution": "All three functions correctly templated, passing every hidden test across at least three instantiated types."
-          },
-          {
-            "title": "Error archaeology",
+            "title": "Deep Copy Buffer Protector",
             "points": 40,
             "difficulty": "Core",
-            "description": "Diagnose four template compilation failures from their messages alone.",
+            "description": "Write a class HeapBuffer that dynamically allocates an integer on the heap. Implement a deep copy constructor. Copy an object, modify the original, and prove the clone remains unmodified - the duplicate house with its own separate lock, unaffected by changes to the original.\n\nSample Input: 50 99\nExpected Output:\nOriginal: 99 | Cloned: 50",
             "criteria": [
-              "Correct root cause for at least three."
+              "The copy constructor allocates a NEW heap block for the clone (new int(*other.ptr)) rather than copying the pointer address itself",
+              "After the original is modified post-copy, the clone still holds its own separate value, printing exactly \"Original: 99 | Cloned: 50\" for the sample input"
             ],
-            "hint": "Read template errors from the last line upward.",
-            "solution": "The correct root cause identified for at least three of the four template failures."
-          },
-          {
-            "title": "Module project: Generic bounded container",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a fixed capacity generic container with push, pop, peek and iteration, correct for both value types and types that own resources.",
-            "criteria": [
-              "Push/pop/peek/iteration are all correct both for plain value types and for resource-owning types."
-            ],
-            "hint": "Constrain templates so misuse fails at the interface.",
-            "solution": "A generic bounded container proven correct for both plain values and resource-owning types."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "The Cherno",
-            "title": "Templates in C++",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=The%20Cherno%20Templates%20in%20C%2B%2B"
-          },
-          {
-            "channel": "Fireship",
-            "title": "C++ Templates explained",
-            "length": "8 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20C%2B%2B%20Templates%20explained"
+            "hint": "HeapBuffer(const HeapBuffer& other) { data = new int(*other.data); } - never data = other.data;",
+            "solution": "A user-defined deep-copy constructor that clones the heap integer into its own separate block, correctly keeping the clone at 50 while the original changes to 99."
           }
         ]
       },
       {
         "no": 6,
-        "week": 1,
-        "session": 2,
-        "title": "Advanced 2: Standard Algorithms, Maps and Lambda Closures",
-        "video_url": null,
-        "topic": "Every hand written loop is a small opportunity for an off by one error. Standard algorithms remove that surface and name the intent: a call to sort or accumulate tells the reader what is happening without reading the body. The capture clause is where care is needed - capturing by reference into something that outlives the scope is the standard way to create a dangling reference.\n\nKey rules:\n- Ordered map lookup is logarithmic; unordered map lookup is constant on average.\n- Capture by value copies at the point of definition; capture by reference must not outlive the referenced object.\n- The accumulate algorithm folds a range into one value and replaces most manual sum loops.\n- Prefer a named algorithm over a raw loop wherever one exists.\n\nWorked example - an analytics pipeline built from algorithms and lambdas:\nauto total = std::accumulate(tx.begin(), tx.end(), 0.0,\n  [](double acc, const Tx& t) { return acc + t.amount; });\nstd::map<std::string, double> by_category;\nfor (const auto& t : tx) by_category[t.category] += t.amount;",
+        "week": 2,
+        "session": 3,
+        "title": "Rule of Three / Five",
+        "video_url": "https://www.youtube.com/watch?v=hKBbkf7q4_0",
+        "topic": "Real-life analogy: If you sign a commercial lease for property, you must have clear contractual procedures for when you enter, when you sublease (copy), when you transfer ownership (move), and when you terminate the lease (destructor).\n\nIf a class manages raw heap memory or system resources, it must explicitly define the Rule of Five: Destructor, Copy Constructor, Copy Assignment Operator, Move Constructor, and Move Assignment Operator. This prevents memory leaks, dangling pointers, and shallow double-frees.",
         "problems": [
           {
-            "title": "Loop replacement",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Replace six raw loops with standard algorithms.",
-            "criteria": [
-              "Identical output and no explicit index variables remaining."
-            ],
-            "hint": "Prefer a named algorithm over a raw loop wherever one exists.",
-            "solution": "All six loops replaced with standard algorithms, output identical, no manual indices remaining."
-          },
-          {
-            "title": "Capture defect",
+            "title": "Safe Assignment Operator (=)",
             "points": 40,
             "difficulty": "Core",
-            "description": "A supplied lambda dangles. Diagnose and fix it two ways.",
+            "description": "Overload the assignment operator HeapInt& operator=(const HeapInt& other) with self-assignment protection (this != &other). Assign an object and print the value - the lease contract's explicit sublease clause, protecting against assigning an object to itself.\n\nSample Input: 750\nExpected Output:\nAssigned Value: 750",
             "criteria": [
-              "Both fixes correct and explained."
+              "operator= checks if (this != &other) before doing any work, guarding against self-assignment corrupting the object",
+              "For input 750 the program prints exactly \"Assigned Value: 750\" after the assignment"
             ],
-            "hint": "A reference captured into something that outlives the scope dangles.",
-            "solution": "The dangling capture diagnosed and fixed two distinct ways, both explained correctly."
-          },
-          {
-            "title": "Module project: Transaction analytics engine",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build an engine that loads transactions and produces category totals, monthly trends and the top five outliers, implemented entirely through standard algorithms and lambdas.",
-            "criteria": [
-              "Category totals, monthly trends and the top five outliers are all produced using standard algorithms and lambdas, not hand-written loops."
-            ],
-            "hint": "Accumulate folds a range into one value - use it for the totals.",
-            "solution": "A fully algorithm-and-lambda-driven analytics engine producing correct totals, trends and outliers."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "The Cherno",
-            "title": "Lambdas in C++",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=The%20Cherno%20Lambdas%20in%20C%2B%2B"
-          },
-          {
-            "channel": "Fireship",
-            "title": "Functional Programming in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20Functional%20Programming%20in%20100%20Seconds"
+            "hint": "HeapInt& operator=(const HeapInt& other) { if (this != &other) { delete data; data = new int(*other.data); } return *this; }",
+            "solution": "A self-assignment-safe operator= that correctly copies the value, printing Assigned Value: 750."
           }
         ]
       },
       {
         "no": 7,
-        "week": 1,
-        "session": 3,
-        "title": "Advanced 3: Smart Pointers, Ownership and Serialization",
-        "video_url": null,
-        "topic": "A raw pointer says nothing about ownership, and that ambiguity is the root of most memory defects in large C++ code bases. A unique pointer says exactly one owner; a shared pointer says reference counted shared ownership; a weak pointer breaks the reference cycles that would otherwise leak. Serializing a graph needs stable identifiers - write nodes once and refer to them by identifier afterwards.\n\nKey rules:\n- Unique ownership by default; reach for shared ownership only when lifetime genuinely cannot be determined.\n- Two shared pointers referring to each other never reach zero - break the cycle with a weak reference.\n- Make the owning object with a factory helper rather than a bare allocation, for exception safety.\n- Serialising a graph needs stable identifiers.\n\nWorked example - ownership expressed in the signatures:\nstd::unique_ptr<Node> make_tree();\nvoid inspect(const Node& n);\nvoid adopt(std::unique_ptr<Node> n);\nstd::weak_ptr<Node> parent;",
+        "week": 3,
+        "session": 1,
+        "title": "Function Templates",
+        "video_url": "https://www.youtube.com/watch?v=I-hZkUa9mIs",
+        "topic": "Real-life analogy: Think of a cookie cutter mold. The cutter does not care whether you punch out gingerbread dough, chocolate dough, or clay - the structural star shape remains identical regardless of the material.\n\nTemplates enable generic programming without duplicating identical logic for different data types. Declaring template <typename T> instructs the compiler to generate type-specific functions at compile-time when called with int, double, or custom objects, ensuring zero runtime performance penalty.",
         "problems": [
           {
-            "title": "Ownership rewrite",
+            "title": "Universal Generic Max Finder",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Convert a raw pointer program to smart pointers without changing behaviour.",
+            "description": "Write a function template T getMax(T a, T b). Read two integers and two floating-point numbers from input, compute their maximums, and print the results - the same cookie-cutter mold stamping out a working getMax for whatever type is dropped in.\n\nSample Input: 12 45 3.14 2.71\nExpected Output:\nInt Max: 45 | Float Max: 3.14",
             "criteria": [
-              "No explicit deletes remain and no leaks are reported."
+              "A single function template T getMax(T a, T b) is used for BOTH the integer comparison and the float comparison - not two separately hand-written functions",
+              "For input \"12 45 3.14 2.71\" the program prints exactly \"Int Max: 45 | Float Max: 3.14\""
             ],
-            "hint": "Unique ownership is the default choice.",
-            "solution": "Every raw pointer converted to a smart pointer, no explicit deletes remaining, no leaks reported."
-          },
-          {
-            "title": "Cycle breaker",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "A supplied parent and child structure leaks. Fix it with a weak reference.",
-            "criteria": [
-              "Leak eliminated, traversal still works both directions."
-            ],
-            "hint": "A weak pointer breaks the reference cycle that shared pointers would create.",
-            "solution": "The reference cycle broken with a weak pointer, leak eliminated, both-direction traversal preserved."
-          },
-          {
-            "title": "Module project: Object graph serializer",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a serializer that writes a linked object graph to both a comma separated and a structured format and reads it back, verified by a round trip equality test.",
-            "criteria": [
-              "Both output formats round-trip correctly, verified by an equality test against the original graph."
-            ],
-            "hint": "Serializing a graph needs stable identifiers, not raw addresses.",
-            "solution": "A dual-format serializer whose round trip is verified equal to the original object graph."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "The Cherno",
-            "title": "SMART POINTERS in C++",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=The%20Cherno%20SMART%20POINTERS%20in%20C%2B%2B"
+            "hint": "template <typename T> T getMax(T a, T b) { return (a > b) ? a : b; }",
+            "solution": "One getMax<T>() template correctly instantiated for both int and float, printing 45 and 3.14 respectively."
           }
         ]
       },
       {
         "no": 8,
-        "week": 2,
-        "session": 1,
-        "title": "Advanced 4: Integration and the Course Capstone",
-        "video_url": null,
-        "topic": "Integration in C++ is mostly about drawing the ownership map before writing the code: which object owns the store, which borrow from it, what happens to open references when an entry is deleted. A design where those answers are in the signatures rather than the programmer's memory survives change. A project that cannot be built by someone else in one command is not finished.\n\nKey rules:\n- Draw the ownership map first - every arrow is either owning, borrowing or observing.\n- Deletion must invalidate every borrow - design the interface so a stale borrow cannot compile.\n- One build command - if setup runs past three steps, the build is part of the defect surface.\n- Public interface documented at the header; implementation detail never leaks into it.\n\nWorked example - interface that makes stale borrowing impossible:\nclass Ledger {\n  std::vector<Entry> entries_;\npublic:\n  std::size_t add(Entry e) { entries_.push_back(std::move(e)); return entries_.size() - 1; }\n  const Entry* at(std::size_t i) const { return i < entries_.size() ? &entries_[i] : nullptr; }\n};",
+        "week": 3,
+        "session": 2,
+        "title": "Class Templates",
+        "video_url": "https://www.youtube.com/watch?v=ClT36SxA08k",
+        "topic": "Real-life analogy: A shipping freight container has standard locks and crane attachment hooks. It works identically whether it is loaded with cars, electronics, or grain. The container structure is type-agnostic.\n\nA class template parameterized by template <class T> allows entire data structures (like Stacks, Queues, and Matrices) to hold any arbitrary payload. The compiler stamps out a concrete class implementation for each instantiation (such as Box<int> or Box<std::string>).",
         "problems": [
           {
-            "title": "Ownership map",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Produce an ownership diagram for a supplied three class program and identify the one incorrect arrow.",
-            "criteria": [
-              "Diagram complete and the defect found."
-            ],
-            "hint": "Every arrow is either owning, borrowing or observing.",
-            "solution": "A complete ownership diagram with the single incorrect arrow correctly identified."
-          },
-          {
-            "title": "One command build",
+            "title": "Generic Key-Value Pair Box",
             "points": 40,
             "difficulty": "Core",
-            "description": "Package a multi file project so it builds from a single command on a clean machine.",
+            "description": "Create a template class Pair<T1, T2> that stores two elements of different types. Instantiate Pair<string, int> and print the pair - the same freight-container structure holding a completely different payload type each time.\n\nSample Input: Latency 15\nExpected Output:\nPair -> Key: Latency, Val: 15ms",
             "criteria": [
-              "Build succeeds from a fresh clone."
+              "Pair is declared as template <typename T1, typename T2> class Pair with two differently-typed members, and instantiated concretely as Pair<std::string, int>",
+              "For input \"Latency 15\" the program prints exactly \"Pair -> Key: Latency, Val: 15ms\""
             ],
-            "hint": "If setup runs past three steps, the build is part of the defect surface.",
-            "solution": "The project building successfully with one command from a completely fresh clone."
-          },
+            "hint": "template <typename T1, typename T2> class Pair { public: T1 key; T2 val; };  Pair<std::string, int> p;",
+            "solution": "A two-type Pair<T1,T2> template instantiated as Pair<string,int>, correctly printing the key/value pair with the ms suffix."
+          }
+        ]
+      },
+      {
+        "no": 9,
+        "week": 3,
+        "session": 3,
+        "title": "STL Algorithms & Lambdas",
+        "video_url": "https://www.youtube.com/watch?v=mWgmYLz3vk8",
+        "topic": "Real-life analogy: Instead of writing custom sorting steps for a deck of cards from scratch, you hand the deck to an automated card sorter along with a rule card: \"Sort from Lowest to Highest.\"\n\nThe Standard Template Library provides high-performance algorithms (std::sort, std::find_if, std::accumulate) in <algorithm>. Anonymous inline lambda functions [captures](params) { body } pass custom predicate logic directly into STL algorithms without defining separate helper functions.",
+        "problems": [
           {
-            "title": "Course capstone: LedgerLens expense management and analytics engine",
+            "title": "Lambda-Powered Filter & Sort",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Read 4 integers into a vector. Sort them in descending order using std::sort with a custom lambda [](int a, int b){ return a > b; } and print the elements - handing the deck of cards to the automated sorter along with its own rule card, instead of writing a separate named function.\n\nSample Input: 15 4 89 23\nExpected Output:\nSorted: 89 23 15 4",
+            "criteria": [
+              "std::sort is called with an inline lambda predicate ([](int a, int b){ return a > b; }), not a separately-defined comparator function or a manual sorting loop",
+              "For input \"15 4 89 23\" the program prints exactly \"Sorted: 89 23 15 4\""
+            ],
+            "hint": "std::sort(v.begin(), v.end(), [](int a, int b){ return a > b; });",
+            "solution": "A std::sort call driven by an inline descending-order lambda, correctly producing 89 23 15 4."
+          }
+        ]
+      },
+      {
+        "no": 10,
+        "week": 4,
+        "session": 1,
+        "title": "std::unique_ptr",
+        "video_url": "https://www.youtube.com/watch?v=UOB7-B2MfwA",
+        "topic": "Real-life analogy: Think of a physical airplane ticket with an assigned seat number. Only one passenger can hold that unique ticket at a time. If you give the ticket to another person, you surrender your own possession completely (move semantics).\n\nstd::unique_ptr<T> is a scoped smart pointer that owns and manages a heap object exclusively. It cannot be copied, preventing multiple-pointer ownership bugs. When the unique pointer goes out of scope, it calls delete automatically, eliminating manual memory leaks.",
+        "problems": [
+          {
+            "title": "Scoped Smart Pointer Allocator",
+            "points": 30,
+            "difficulty": "Basic",
+            "description": "Allocate an integer dynamically using std::make_unique<int>(). Read a value, store it via the smart pointer, and print it without calling delete - the one-passenger airplane ticket that cleans up automatically when its scope ends, no manual free required.\n\nSample Input: 320\nExpected Output:\nSmart Pointer Val: 320",
+            "criteria": [
+              "The integer is allocated with std::make_unique<int>() (not raw new), and delete never appears anywhere in the code",
+              "For input 320 the program prints exactly \"Smart Pointer Val: 320\""
+            ],
+            "hint": "std::unique_ptr<int> ptr = std::make_unique<int>(value); std::cout << \"Smart Pointer Val: \" << *ptr;",
+            "solution": "An std::make_unique<int> allocation with no manual delete, correctly printing Smart Pointer Val: 320."
+          }
+        ]
+      },
+      {
+        "no": 11,
+        "week": 4,
+        "session": 2,
+        "title": "std::shared_ptr & Reference Counting",
+        "video_url": "https://www.youtube.com/watch?v=vYp4UrV_p-I",
+        "topic": "Real-life analogy: Think of an office room light wired to a smart occupancy sensor. Every person who enters increments the occupant count by 1. When a person leaves, the count drops. The light turns off only when the last person exits (count = 0).\n\nstd::shared_ptr<T> maintains a thread-safe reference control block. Multiple shared pointers can point to the same heap resource. Every copy increments the reference count; when a pointer goes out of scope, the count decrements. When the counter hits zero, the managed object is destroyed.",
+        "problems": [
+          {
+            "title": "Reference Count Monitor",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Create a shared_ptr<int> with value 100. Create a second shared pointer copying the first. Print the current reference count using .use_count() - two people now occupying the same room, both counted by the same sensor.\n\nInput: None\nExpected Output:\nShared Count: 2",
+            "criteria": [
+              "A second std::shared_ptr<int> is created by COPYING the first (not by making a second, independent std::make_shared call), so both genuinely share the same control block",
+              "The program prints exactly \"Shared Count: 2\" using .use_count(), reflecting both owners"
+            ],
+            "hint": "auto p1 = std::make_shared<int>(100); auto p2 = p1; std::cout << \"Shared Count: \" << p1.use_count();",
+            "solution": "Two shared_ptrs sharing one control block via a copy, correctly reporting a use_count() of 2."
+          }
+        ]
+      },
+      {
+        "no": 12,
+        "week": 4,
+        "session": 3,
+        "title": "Move Semantics & std::move",
+        "video_url": "https://www.youtube.com/watch?v=ehMg6zvXuLk",
+        "topic": "Real-life analogy: Moving into a new apartment. Instead of making exact duplicate photocopies of 500 books in your library and throwing the originals away, you pick up the existing boxes of books and move them into the new room.\n\nTraditional copying duplicates expensive heap buffers. Modern C++ (C++11+) introduces Move Semantics with Rvalue References (T&&). Using std::move() casts an object into an rvalue, allowing the receiving object to steal its internal heap pointers in O(1) time, leaving the source object in a valid but empty state.",
+        "problems": [
+          {
+            "title": "Zero-Copy Buffer Transfer",
             "points": 60,
             "difficulty": "Boss",
-            "description": "Build a complete desktop expense system with a polymorphic category hierarchy, owned resources with no raw allocation, standard algorithm reporting and serialization to two interchange formats.",
+            "description": "Create a std::vector<int> with elements [1, 2, 3]. Use std::move() to transfer ownership to a second vector. Print the size of the original vector to prove it was moved - picking up the existing boxes of books rather than photocopying all 500 and throwing the originals away. The capstone finale, closing out the course's ownership-and-memory arc.\n\nInput: None\nExpected Output:\nOriginal Size: 0 | New Size: 3",
             "criteria": [
-              "The category hierarchy is polymorphic, no raw allocation is used, reporting runs through standard algorithms, and serialization supports two interchange formats."
+              "std::move() is used to transfer the vector (std::vector<int> newVec = std::move(original);), not a copy assignment or a manual element-by-element loop",
+              "The program prints exactly \"Original Size: 0 | New Size: 3\", proving the original vector was left empty by the move rather than duplicated"
             ],
-            "hint": "Draw the ownership map before writing the code.",
-            "solution": "A complete LedgerLens engine meeting every constraint: polymorphic categories, no raw allocation, algorithm-driven reporting, two serialization formats."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "The Cherno",
-            "title": "How to make your C++ project structure",
-            "length": "13 min",
-            "url": "https://www.youtube.com/results?search_query=The%20Cherno%20How%20to%20make%20your%20C%2B%2B%20project%20structure"
-          },
-          {
-            "channel": "Fireship",
-            "title": "CMake in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20CMake%20in%20100%20Seconds"
+            "hint": "std::vector<int> newVec = std::move(original); then print original.size() and newVec.size().",
+            "solution": "A std::move()-based vector transfer that correctly empties the original (size 0) while the new vector ends up with all 3 elements."
           }
         ]
       }

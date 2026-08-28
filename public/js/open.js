@@ -683,16 +683,45 @@ function courseOutlineHtml(t) {
 // the first blank line. Older tracks' short one-line topics stay in that
 // summary (see the length check above) and this block renders nothing for
 // them.
+// Pulls the 11-char YouTube video id out of a watch/share/embed url. Returns
+// null for anything else (e.g. the search-query links some `videos[]`
+// entries use below) so those safely fall back to an external link instead
+// of an embed pointed at nothing.
+function youtubeEmbedId(url) {
+  const m = String(url || '').match(/(?:youtube\.com\/watch\?(?:.*&)?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);
+  return m ? m[1] : null;
+}
+// Real videos play INLINE on the page itself (youtube-nocookie.com embed,
+// lazy-loaded) instead of sending the learner off to YouTube - this is the
+// primary viewing path whenever we have a real video id. A small "Open on
+// YouTube" link stays underneath for anyone who wants fullscreen/theater
+// mode or to watch on another device.
+function videoEmbedHtml(url, label) {
+  const id = youtubeEmbedId(url);
+  if (!id) return '';
+  return `<div class="video-embed" style="position:relative;width:100%;max-width:640px;padding-top:${640 * 9 / 16}px;height:0;margin-top:10px;border-radius:12px;overflow:hidden;background:#000">
+      <iframe src="https://www.youtube-nocookie.com/embed/${id}" title="${esc(label || 'Topic video')}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+    </div>
+    <a href="${esc(url)}" target="_blank" rel="noopener" class="s" style="display:inline-block;margin-top:6px;color:var(--muted)">Open on YouTube &rarr;</a>`;
+}
 // A level can carry either the older single `video_url`, or the newer
 // `videos[]` array (multiple real YouTube links, one button each) - see
 // tracks/curriculum-advanced-combined.js. Each url there is a YouTube
 // search-query link built from the exact channel + exact title (never a
-// guessed video id, which could silently point at the wrong video).
+// guessed video id, which could silently point at the wrong video) - those
+// aren't embeddable (no video id in a search-query url), so they keep the
+// external-link fallback below; a real watch-url embeds inline instead.
 function videoLinksHtml(l) {
   if (Array.isArray(l.videos) && l.videos.length) {
-    return l.videos.map((v) => `<a href="${esc(v.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;margin-right:8px;display:inline-flex;gap:6px;align-items:center">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${esc(v.channel)} - ${esc(v.title)}${v.length ? ` (${esc(v.length)})` : ''}</a>`).join('');
+    return l.videos.map((v) => {
+      const embed = videoEmbedHtml(v.url, v.title);
+      if (embed) return embed;
+      return `<a href="${esc(v.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;margin-right:8px;display:inline-flex;gap:6px;align-items:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${esc(v.channel)} - ${esc(v.title)}${v.length ? ` (${esc(v.length)})` : ''}</a>`;
+    }).join('');
   }
+  const embed = videoEmbedHtml(l.video_url, l.title);
+  if (embed) return embed;
   return l.video_url ? `<a href="${esc(l.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : '';
 }

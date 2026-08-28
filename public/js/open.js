@@ -748,6 +748,74 @@ function topicDetailHtml(l) {
       ${videoLinksHtml(l)}
     </div>`;
 }
+// Per-module accordion of classes/levels (topic notes, video link, Solve/
+// compiler buttons, grading state) - shared by drawCourse() (both the free
+// curriculum overview's classesHtmlFor closure and the paid quest-grid) and
+// openModule() (the free course's per-module page), so what happens *inside*
+// a module is always identical no matter which page it's reached from.
+function renderModuleLessons(mod, t, curLevel, unitLabel) {
+  return mod.levels.map((l, li) => {
+    const isCurrent = curLevel && l.no === curLevel.no;
+    const rowsHtml = (l.problems || []).map((p) => {
+      const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${p.pid}`];
+      const graded = sub && sub.score != null;
+      return `<div class="problem-row${l.locked ? ' locked' : ''}">
+        ${graded ? '<span class="check">&#10003;</span>' : ''}
+        <div class="grow">
+          <div class="t" style="font-size:13.5px">${esc(p.title)}
+            <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
+            <span class="s" style="color:var(--muted);font-weight:500">${p.points} gems</span></div>
+          ${sub ? `<div class="s" style="margin-top:3px">
+            ${graded
+              ? `<span class="grade-chip ok">Graded ${sub.score}% &middot; ${Math.round((sub.score / 100) * p.points)} gems</span>`
+              : '<span class="grade-chip wait">Submitted - being graded</span>'}</div>` : ''}
+        </div>
+        ${l.locked
+          ? `<button class="btn btn-ghost btn-sm" onclick="openRegister('${esc(t.course_code || '')}', '${esc(t.title)}')">Unlock</button>`
+          : `<button class="lc-btn-solve" onclick="openSolve(${l.no}, ${p.pid})">${sub ? 'Reopen' : 'Solve'}</button>`}
+      </div>`;
+    }).join('');
+    return `<details class="class-block"${isCurrent ? ' open' : ''}>
+      <summary>
+        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="class-title">${unitLabel} ${li + 1} &middot; ${esc(l.title)}</span>
+        ${l.locked ? '<span class="pay-badge na">Locked</span>' : '<span class="pay-badge confirmed">Open</span>'}
+      </summary>
+      <div class="class-body">${topicDetailHtml(l)}${rowsHtml}</div>
+    </details>`;
+  }).join('');
+}
+// v25: a free course's dedicated per-module page - reached by clicking a
+// module row on the curriculum overview (freeCurriculumHtml), which no
+// longer expands that module's lessons inline. Relies on drawCourse() having
+// already stashed CUR.modules/curLevel/unitLabel (it always has, since this
+// is only ever reachable from a course page that already ran drawCourse()).
+function openModule(mi) {
+  if (!CUR || !CUR.modules || !CUR.modules[mi]) return;
+  const mod = CUR.modules[mi];
+  const t = CUR.track;
+  COURSE_SCROLL_Y = window.scrollY;
+  $('courseHead').innerHTML = `
+    <nav class="crumb">
+      <a onclick="openTab('courses')">${COURSE_NAV_MODE === 'free' ? 'Free Certified Courses' : 'Live Tech Courses'}</a>
+      <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <a onclick="drawCourse()">${esc(t.title)}</a>
+      <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="crumb-cur">Module ${mi + 1}</span>
+    </nav>`;
+  $('courseLevels').innerHTML = `
+    <div class="curr-card">
+      <div class="curr-head">
+        <div>
+          <h3>Module ${mi + 1} &middot; ${esc(t.title)}</h3>
+          <p class="s" style="color:var(--muted)">${mod.levels.length} lesson${mod.levels.length > 1 ? 's' : ''} in this module.</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="drawCourse()">&larr; Back to curriculum</button>
+      </div>
+      <div class="curr-body" style="padding-top:14px">${renderModuleLessons(mod, t, CUR.curLevel, CUR.unitLabel)}</div>
+    </div>`;
+  window.scrollTo({ top: 0 });
+}
 function drawCourse() {
   const t = CUR.track, prog = CUR.progress;
   const cat = CATALOGUE.find((c) => c.code === t.course_code);
@@ -854,39 +922,16 @@ function drawCourse() {
   // curriculum list and the paid quest-grid below, so what happens *inside*
   // a module (topic notes, Solve/compiler buttons, grading state) is always
   // identical between the two page layouts.
-  const classesHtmlFor = (mod) => mod.levels.map((l, li) => {
-    const isCurrent = curLevel && l.no === curLevel.no;
-    const rowsHtml = (l.problems || []).map((p) => {
-      const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${p.pid}`];
-      const graded = sub && sub.score != null;
-      return `<div class="problem-row${l.locked ? ' locked' : ''}">
-        ${graded ? '<span class="check">&#10003;</span>' : ''}
-        <div class="grow">
-          <div class="t" style="font-size:13.5px">${esc(p.title)}
-            <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
-            <span class="s" style="color:var(--muted);font-weight:500">${p.points} gems</span></div>
-          ${sub ? `<div class="s" style="margin-top:3px">
-            ${graded
-              ? `<span class="grade-chip ok">Graded ${sub.score}% &middot; ${Math.round((sub.score / 100) * p.points)} gems</span>`
-              : '<span class="grade-chip wait">Submitted - being graded</span>'}</div>` : ''}
-        </div>
-        ${l.locked
-          ? `<button class="btn btn-ghost btn-sm" onclick="openRegister('${esc(t.course_code || '')}', '${esc(t.title)}')">Unlock</button>`
-          : `<button class="lc-btn-solve" onclick="openSolve(${l.no}, ${p.pid})">${sub ? 'Reopen' : 'Solve'}</button>`}
-      </div>`;
-    }).join('');
-    return `<details class="class-block"${isCurrent ? ' open' : ''}>
-      <summary>
-        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span class="class-title">${unitLabel} ${li + 1} &middot; ${esc(l.title)}</span>
-        ${l.locked ? '<span class="pay-badge na">Locked</span>' : '<span class="pay-badge confirmed">Open</span>'}
-      </summary>
-      <div class="class-body">${topicDetailHtml(l)}${rowsHtml}</div>
-    </details>`;
-  }).join('');
+  const classesHtmlFor = (mod) => renderModuleLessons(mod, t, curLevel, unitLabel);
+  // v25: the free-course overview no longer expands a module's lessons
+  // inline (that squeezed a 5-module course into one cramped, internally-
+  // scrolling card) - openModule() needs the same modules/curLevel/unitLabel
+  // to render that module's own full page later, so they're stashed on CUR
+  // here rather than only living in this function's local closure.
+  CUR.modules = modules; CUR.curLevel = curLevel; CUR.unitLabel = unitLabel;
 
   if (t.free) {
-    $('courseLevels').innerHTML = freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLevel, levelDone, classesHtmlFor);
+    $('courseLevels').innerHTML = freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLevel, levelDone);
     return;
   }
 
@@ -928,17 +973,20 @@ const MODULE_STYLES = [
   { bg: '#F1E9FE', fg: '#9333EA' },
   { bg: '#FFF1E1', fg: '#EA580C' },
 ];
-function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLevel, levelDone, classesHtmlFor) {
+// v25: module rows are a flat, compact list - clicking one NAVIGATES to that
+// module's own page (openModule) instead of expanding its lessons inline.
+// That inline expansion was what forced this card into an internally-
+// scrolling, viewport-height-capped box in the first place; a plain list of
+// short rows fits every module with no scrolling anywhere on this page.
+function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLevel, levelDone) {
   const doneMods = modules.filter((mod) => mod.levels.every((l) => !l.locked && levelDone(l))).length;
   const pct = modules.length ? Math.round((doneMods / modules.length) * 100) : 0;
   const rows = modules.map((mod, mi) => {
     const style = MODULE_STYLES[mi % MODULE_STYLES.length];
     const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
-    const isCurMod = curLevel && mod.levels.some((l) => l.no === curLevel.no);
     const subtitle = mod.levels.map((l) => esc(l.title)).join(' &middot; ');
     const pills = mod.levels.map((l) => `<span class="curr-pill">L${l.no}<b>${esc(l.title)}</b></span>`).join('');
-    return `<details class="curr-row"${isCurMod && !allDone ? ' open' : ''} id="qmod${mi}">
-      <summary>
+    return `<button type="button" class="curr-row" onclick="openModule(${mi})">
         <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS.code}</svg></span>
         <span class="curr-info">
           <span class="curr-title">Module ${mi + 1}${allDone ? '<span class="curr-done-dot"></span>' : ''}</span>
@@ -947,15 +995,13 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
         <span class="curr-pills">${pills}</span>
         <span class="curr-count">${mod.levels.length} Lesson${mod.levels.length > 1 ? 's' : ''}</span>
         <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </summary>
-      <div class="curr-body">${classesHtmlFor(mod)}</div>
-    </details>`;
+      </button>`;
   }).join('');
 
   const subj = (t.title.split(':')[1] || t.title).trim();
   const curModIdx = Math.max(0, modules.findIndex((mod) => curLevel && mod.levels.some((l) => l.no === curLevel.no)));
   const ctaAction = ME
-    ? `document.getElementById('qmod${curModIdx}').open=true;document.getElementById('qmod${curModIdx}').scrollIntoView({behavior:'smooth',block:'start'})`
+    ? `openModule(${curModIdx})`
     : `gate('Sign in free to start this course, track your progress and earn your certificate.')`;
   const ctaBtnLabel = !ME ? 'Sign in free to start' : (prog && prog.passed ? 'Review the course' : 'Continue learning');
   const ctaSub = !ME

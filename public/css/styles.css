@@ -457,27 +457,21 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 
 /* --- free-course curriculum: flat collapsed module list (open.js freeCurriculumHtml) --- */
 .course-hero.no-visual{grid-template-columns:1fr}
-/* Side-by-side: course info card (left) + curriculum module list (right),
-   instead of the two stacking full-width and pushing modules a full extra
-   scroll below the fold. The whole thing is height-capped to the viewport
-   (free-course-wrap) so the page itself doesn't scroll - only the module
-   list inside .curr-list does, once it has more modules than fit. */
-.free-course-wrap{display:flex;flex-direction:column;height:calc(100vh - 175px);min-height:420px}
-.free-course-grid{display:flex;gap:20px;align-items:stretch;flex:1 1 auto;min-height:0;margin-bottom:16px}
-.free-course-left{flex:0 0 380px;min-width:300px;min-height:0;display:flex}
-.free-course-left .hero-card{margin-bottom:0;width:100%;overflow-y:auto}
-.free-course-right{flex:1 1 auto;min-width:0;min-height:0;display:flex}
-.free-course-right .curr-card{margin-bottom:0;width:100%;display:flex;flex-direction:column;min-height:0}
-.free-course-right .curr-head{flex:none}
-.free-course-right .curr-list{flex:1 1 auto;min-height:0;overflow-y:auto}
-.free-course-wrap .curr-cta{flex:none}
+/* Side-by-side: course info card (left) + curriculum module list (right).
+   v25: no more internal scrollbars on either card - a module row now
+   navigates to its own page (openModule) instead of expanding its lessons
+   inline here, so the right card is just a short flat list of module rows;
+   both cards simply grow to their natural content height and the page
+   itself scrolls like any normal page if it doesn't fit one screen. */
+.free-course-wrap{display:flex;flex-direction:column}
+.free-course-grid{display:flex;gap:20px;align-items:flex-start;margin-bottom:16px}
+.free-course-left{flex:0 0 380px;min-width:300px}
+.free-course-left .hero-card{margin-bottom:0;width:100%}
+.free-course-right{flex:1 1 auto;min-width:0}
+.free-course-right .curr-card{margin-bottom:0;width:100%}
 @media (max-width:1000px){
-  .free-course-wrap{height:auto;min-height:0}
   .free-course-grid{flex-direction:column}
   .free-course-left{flex:none}
-  .free-course-left .hero-card{height:auto;overflow-y:visible}
-  .free-course-right .curr-card{height:auto}
-  .free-course-right .curr-list{overflow-y:visible}
 }
 .curr-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);overflow:hidden;margin-bottom:16px}
 .curr-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px 22px;border-bottom:1px solid var(--line)}
@@ -495,14 +489,12 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .curr-progress{width:220px;height:7px;border-radius:999px;background:var(--line);overflow:hidden}
 .curr-progress div{height:100%;background:var(--gem-grad);border-radius:999px}
 .curr-list{display:flex;flex-direction:column}
-.curr-row{border-top:1px solid var(--line)}
+/* v25: a plain button, not <details>/<summary> - clicking a module now
+   navigates to its own page (openModule) instead of expanding in place. */
+.curr-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:none;border-top:1px solid var(--line);padding:16px 22px;cursor:pointer;flex-wrap:wrap;font:inherit;color:inherit;transition:background .12s ease}
 .curr-row:first-child{border-top:none}
-.curr-row summary{list-style:none;display:flex;align-items:center;gap:14px;padding:16px 22px;cursor:pointer;flex-wrap:wrap;transition:background .12s ease}
-.curr-row summary:hover{background:var(--canvas)}
-.curr-row summary::-webkit-details-marker{display:none}
-.curr-row .chev{color:var(--muted-2);transition:transform .18s ease;flex:none;margin-left:auto}
-.curr-row[open] .chev{transform:rotate(90deg)}
-.curr-row[open] summary{background:var(--violet-soft)}
+.curr-row:hover{background:var(--canvas)}
+.curr-row .chev{color:var(--muted-2);flex:none;margin-left:auto}
 .curr-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
 .curr-icon svg{width:18px;height:18px}
 .curr-info{display:flex;flex-direction:column;gap:2px;flex:none;width:190px}

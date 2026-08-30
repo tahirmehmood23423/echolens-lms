@@ -145,7 +145,7 @@ module.exports = [
         "week": 2,
         "session": 1,
         "title": "malloc() & calloc()",
-        "video_url": "https://www.youtube.com/watch?v=udygKrffpnY",
+        "video_url": "https://www.youtube.com/watch?v=n_Se6bt8jM0",
         "topic": "Real-life analogy: Stack memory is like booking a hotel room for a fixed 24 hours (automatic checkout upon leaving). Heap allocation is buying commercial land on demand - you can request any custom acreage you need at runtime, but you must construct and manage it manually.\n\nStack memory has a fixed size and automatic lifetime tied to function scope. malloc(size_t) requests contiguous raw bytes from the Heap at runtime and returns a void* pointer to the base address. calloc(num, size) allocates memory and initializes every single bit to zero, preventing garbage value issues.",
         "problems": [
           {
@@ -167,7 +167,7 @@ module.exports = [
         "week": 2,
         "session": 2,
         "title": "Buffer Resizing (realloc)",
-        "video_url": "https://www.youtube.com/watch?v=34HmS804PzE",
+        "video_url": "https://www.youtube.com/watch?v=eo9vm5n6DBo",
         "topic": "Real-life analogy: Think of expanding a modular warehouse. If adjacent land is empty, the builder simply moves the back wall outward. If adjacent land is occupied by neighbors, the builder purchases an entirely new large plot across town, moves all your inventory there, and tears down the old building.\n\nrealloc(ptr, new_size) expands or shrinks an existing heap allocation. If contiguous space is available immediately following the current block, it expands in-place. Otherwise, it allocates a new block elsewhere, copies the existing data over automatically, frees the old block, and returns the new pointer.",
         "problems": [
           {
@@ -189,7 +189,7 @@ module.exports = [
         "week": 2,
         "session": 3,
         "title": "Memory Leaks & free()",
-        "video_url": "https://www.youtube.com/watch?v=F23tNfZqUv4",
+        "video_url": "https://www.youtube.com/watch?v=1KVpi0VN82E",
         "topic": "Real-life analogy: Renting an apartment key, making a copy, throwing the original lease in the incinerator, and leaving the water running. You can never return the key (a memory leak), and trying to open the door after the building is demolished (a dangling pointer) leads to disaster.\n\nHeap allocations persist until explicitly released. Failing to call free(ptr) causes memory leaks that consume system RAM over time. After freeing memory, the pointer becomes a dangling pointer - dereferencing it invokes undefined behavior. Always set pointers to NULL immediately after freeing.",
         "problems": [
           {
@@ -211,7 +211,7 @@ module.exports = [
         "week": 3,
         "session": 1,
         "title": "struct & typedef",
-        "video_url": "https://www.youtube.com/watch?v=qvyA8mfls_U",
+        "video_url": "https://www.youtube.com/watch?v=CI9dRTvzgqE",
         "topic": "Real-life analogy: Think of a composite passport document. It binds different types of identity records - name (string), age (int), and visa validity (char) - into one cohesive official booklet that can be handled as a single unit.\n\nThe struct keyword packages heterogeneous data types into a contiguous composite type. Compilers automatically insert invisible byte alignment padding to keep fields aligned to 4-byte or 8-byte word boundaries for CPU performance. The typedef keyword creates clean type aliases for concise syntax.",
         "problems": [
           {
@@ -233,7 +233,7 @@ module.exports = [
         "week": 3,
         "session": 2,
         "title": "Linked Lists",
-        "video_url": "https://www.youtube.com/watch?v=VOpjAHCuz7I",
+        "video_url": "https://www.youtube.com/watch?v=1fi2CPGcdA8",
         "topic": "Real-life analogy: Think of a treasure hunt where every clue card contains two things: a clue message (the data payload) and a written GPS coordinate pointing to the location of the next card in the forest (the next pointer).\n\nA self-referential struct contains a member pointer that points to another struct of its own type (struct Node *next;). Unlike contiguous arrays, linked lists allocate elements non-contiguously on the heap, linking nodes dynamically through pointer chains. This enables O(1) insertions without memory reallocations.",
         "problems": [
           {
@@ -255,7 +255,7 @@ module.exports = [
         "week": 3,
         "session": 3,
         "title": "Bitwise Operations & Masks",
-        "video_url": "https://www.youtube.com/watch?v=jlQAMm_8c6c",
+        "video_url": "https://www.youtube.com/watch?v=tGpBOeBtr7w",
         "topic": "Real-life analogy: Think of an electrical control panel with 8 physical toggle switches. Rather than building 8 separate giant power boxes, a single master byte controls all 8 switches. Flipping Switch #3 up is a bitwise OR operation.\n\nBitwise operators manipulate raw binary bits inside an integer: AND (&), OR (|), XOR (^), NOT (~), Left Shift (<<), and Right Shift (>>). Bit masks allow programmers to set, clear, and toggle individual hardware flags in microcontroller registers without altering neighboring bits.",
         "problems": [
           {
@@ -277,7 +277,7 @@ module.exports = [
         "week": 4,
         "session": 1,
         "title": "Stream File I/O",
-        "video_url": "https://www.youtube.com/watch?v=8nIilb2kiSU",
+        "video_url": "https://www.youtube.com/watch?v=UqB4EgUxapM",
         "topic": "Real-life analogy: Opening a file stream is like connecting a pipeline to an underground storage silo. The valve is opened with a mode key (\"r\" for read, \"w\" for write). If you forget to close the valve (fclose), fuel leaks into the system buffer.\n\nC manages persistent disk files using a buffered stream handled by the FILE* control structure. Programs must open streams with fopen(), perform formatted disk reads/writes via fscanf() and fprintf(), and flush/release kernel handles using fclose() to prevent resource locks.",
         "problems": [
           {
@@ -299,7 +299,7 @@ module.exports = [
         "week": 4,
         "session": 2,
         "title": "Binary Block I/O",
-        "video_url": "https://www.youtube.com/watch?v=k3nU_F5sNio",
+        "video_url": "https://www.youtube.com/watch?v=vESy0Up66RU",
         "topic": "Real-life analogy: Writing plain text to disk is like translating a document word-by-word into handwriting. Binary block I/O is taking a high-speed polaroid photograph of the exact physical RAM memory block and dumping it directly onto the disk in milliseconds.\n\nText files convert internal numbers into ASCII strings, which is slow and space-inefficient. Binary I/O via fwrite() and fread() streams raw contiguous byte buffers directly between RAM and disk storage, preserving exact binary representations of structs and large arrays with zero translation overhead.",
         "problems": [
           {
@@ -321,7 +321,7 @@ module.exports = [
         "week": 4,
         "session": 3,
         "title": "Function Pointers & Callbacks",
-        "video_url": "https://www.youtube.com/watch?v=ynYtgGUNelE",
+        "video_url": "https://www.youtube.com/watch?v=BRsv3ZXoHto",
         "topic": "Real-life analogy: Think of a universal power drill with quick-swap bit chucks. The drill handle (the host execution engine) doesn't care whether you plug in a screwdriver bit or a sanding bit - it simply invokes whatever tool bit is slotted in at runtime.\n\nIn C, executable machine code also resides in memory. A function's name points to the memory address of its entry instruction. A function pointer (int (*func_ptr)(int, int)) stores this executable address, enabling dynamic callback routines, event listeners, and pluggable dispatch tables like the standard library's qsort().",
         "problems": [
           {
@@ -386,7 +386,7 @@ module.exports = [
         "week": 1,
         "session": 1,
         "title": "Inheritance & protected",
-        "video_url": "https://www.youtube.com/watch?v=X8nYM8wdNRE",
+        "video_url": "https://www.youtube.com/watch?v=5HYIFFuGcvk",
         "topic": "Real-life analogy: A basic vehicle blueprint contains wheels, engine, and steering. An electric sports car inherits all base traits but adds battery packs and turbo modes without rebuilding a vehicle from scratch.\n\nInheritance enables a derived class to inherit member variables and methods from a base class (class Car : public Vehicle). The protected access specifier keeps members private from external client code while keeping them accessible to derived child classes.",
         "problems": [
           {
@@ -606,7 +606,7 @@ module.exports = [
         "week": 4,
         "session": 2,
         "title": "std::shared_ptr & Reference Counting",
-        "video_url": "https://www.youtube.com/watch?v=vYp4UrV_p-I",
+        "video_url": "https://www.youtube.com/watch?v=7bjEgMzNt60",
         "topic": "Real-life analogy: Think of an office room light wired to a smart occupancy sensor. Every person who enters increments the occupant count by 1. When a person leaves, the count drops. The light turns off only when the last person exits (count = 0).\n\nstd::shared_ptr<T> maintains a thread-safe reference control block. Multiple shared pointers can point to the same heap resource. Every copy increments the reference count; when a pointer goes out of scope, the count decrements. When the counter hits zero, the managed object is destroyed.",
         "problems": [
           {
@@ -628,7 +628,7 @@ module.exports = [
         "week": 4,
         "session": 3,
         "title": "Move Semantics & std::move",
-        "video_url": "https://www.youtube.com/watch?v=ehMg6zvXuLk",
+        "video_url": "https://www.youtube.com/watch?v=zK8A4Ko53HY",
         "topic": "Real-life analogy: Moving into a new apartment. Instead of making exact duplicate photocopies of 500 books in your library and throwing the originals away, you pick up the existing boxes of books and move them into the new room.\n\nTraditional copying duplicates expensive heap buffers. Modern C++ (C++11+) introduces Move Semantics with Rvalue References (T&&). Using std::move() casts an object into an rvalue, allowing the receiving object to steal its internal heap pointers in O(1) time, leaving the source object in a valid but empty state.",
         "problems": [
           {

@@ -184,7 +184,7 @@ module.exports = [
   key_concepts: ['C++ compilation & iostream', 'Namespaces & std::cout', 'std::cin stream input', 'Types, auto & const', 'std::string & operations', 'std::vector dynamic arrays', 'Range-based for loops', 'C++ references (&ref)', 'Function overloading', 'Classes, objects & access', 'Constructors & destructors', "Getters, setters & 'this'"],
   pass_mark: 60, titleNames: ['Object Rookie', 'Class Builder'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'C++ Compilation & iostream', video_url: 'https://www.youtube.com/watch?v=-TkoO8Z07hI',
+    { no: 1, week: 1, session: 1, title: 'C++ Compilation & iostream', video_url: 'https://www.youtube.com/watch?v=S3nx34WFXjI',
       topic: "Real-life analogy: Think of upgrading an old mechanical typewriter to an automated publishing console. Instead of manually feeding characters, you connect an organized communication tube (iostream) that handles bidirectional text pipelines smoothly.\n\nC++ builds on C with stronger type safety, namespaces, and object abstractions. The preprocessor header #include <iostream> provides access to the standard input/output stream objects. Code is compiled by modern C++ compilers (like g++ or clang++) into high-performance native executables.",
       problems: [
         { title: 'System Terminal Initializer', points: 30, difficulty: 'Basic',
@@ -202,7 +202,7 @@ module.exports = [
           hint: 'std::cout << "Namespace: STD Verified" << std::endl; std::cout << "Status: 200 Ready" << std::endl;',
           solution: 'A two-line report printed via fully-scoped std::cout/std::endl calls, with no global using namespace std; anywhere in the file.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'std::cin Stream Input', video_url: 'https://www.youtube.com/watch?v=T_cr4rF417g',
+    { no: 3, week: 1, session: 3, title: 'std::cin Stream Input', video_url: 'https://www.youtube.com/watch?v=vkALQRM5NNU',
       topic: "Real-life analogy: Think of a mail conveyor belt pointing straight into your sorting bin. The stream extraction operator >> points toward the variable, seamlessly directing whatever comes off the conveyor directly into that storage slot without needing memory addresses.\n\nUnlike C's scanf which requires memory format specifiers (%d) and ampersands (&), C++ uses type-safe stream extraction with std::cin >> var. The compiler automatically determines variable types at compile-time and extracts tokens separated by whitespace.",
       problems: [
         { title: 'User Verification Scanner', points: 40, difficulty: 'Core',
@@ -211,7 +211,7 @@ module.exports = [
           hint: 'std::cin >> userId >> balance; then std::cout << "User: " << userId << " | Balance: $" << balance << std::endl;',
           solution: 'Type-safe std::cin >> extraction into an int and a double, printed in the exact required format.' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Types, auto & const', video_url: 'https://www.youtube.com/watch?v=wXhhvv4mR28',
+    { no: 4, week: 2, session: 1, title: 'Types, auto & const', video_url: 'https://www.youtube.com/watch?v=QANQHxx9I8Y',
       topic: "Real-life analogy: A smart digital scale automatically knows whether it is measuring grams or kilograms based on what you drop onto the sensor plate. The auto keyword lets the compiler deduce the exact type automatically from its initial assignment value.\n\nC++ includes standard primitives (int, double, char, bool with literal true/false). Modern C++ introduces auto for automatic type deduction at compile-time. Constants declared with const or constexpr enforce compile-time immutability and optimize runtime memory layout.",
       problems: [
         { title: 'Auto-Deduction Tax Calculator', points: 30, difficulty: 'Basic',
@@ -220,7 +220,7 @@ module.exports = [
           hint: 'const double TAX_RATE = 0.08; auto total = price + (price * TAX_RATE);',
           solution: 'A const TAX_RATE combined with an auto-deduced total variable, correctly computing 108 for a price of 100.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'std::string & Operations', video_url: 'https://www.youtube.com/watch?v=e_bBskkQv6I',
+    { no: 5, week: 2, session: 2, title: 'std::string & Operations', video_url: 'https://www.youtube.com/watch?v=3rDp0yOACZQ',
       topic: "Real-life analogy: A traditional C-string is like individual wooden alphabet blocks glued to a fixed 10-slot plank (it can easily overflow). A std::string is like magnetic alphabet letters on an infinitely expandable strip that grows or shrinks automatically.\n\nThe std::string class provides dynamic, memory-managed string handling. It supports intuitive concatenation with the + operator, size querying via .length(), and robust line extraction with std::getline(std::cin, str) to read entire sentences with spaces.",
       problems: [
         { title: 'Full Name Badge Concatenator', points: 40, difficulty: 'Core',
@@ -229,7 +229,7 @@ module.exports = [
           hint: 'std::string full = first + " " + last; then use full.length() for the count.',
           solution: 'Two strings concatenated with + into one std::string, whose .length() correctly reports 12 for "Ada Lovelace".' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'std::vector Dynamic Arrays', video_url: 'https://www.youtube.com/watch?v=rxGW3w0_e_k',
+    { no: 6, week: 2, session: 3, title: 'std::vector Dynamic Arrays', video_url: 'https://www.youtube.com/watch?v=jRXFJJN1Va4',
       topic: "Real-life analogy: Think of an accordion filing folder. When you add a new document, the folder stretches open another pocket automatically. You never need to declare a fixed size in advance.\n\nThe std::vector<T> is a sequential, contiguous dynamic container from the Standard Template Library (STL). Elements are appended dynamically at the end in O(1) amortized time using .push_back(), indexed safely using .at() or [], and queried with .size().",
       problems: [
         { title: 'Real-Time Score Tracker', points: 40, difficulty: 'Core',
@@ -238,7 +238,7 @@ module.exports = [
           hint: 'scores.push_back(n); ... std::cout << "Entries: " << scores.size() << " | Latest: " << scores.back();',
           solution: 'A std::vector<int> built entirely with push_back(), correctly reporting its own .size() and .back() as 3 and 92.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Range-based for Loops', video_url: 'https://www.youtube.com/watch?v=FjD9oA_lQ94',
+    { no: 7, week: 3, session: 1, title: 'Range-based for Loops', video_url: 'https://www.youtube.com/watch?v=qnEUB25TRaY',
       topic: "Real-life analogy: Think of a conveyor belt at airport baggage claim. Instead of counting \"Bag 0, Bag 1, Bag 2,\" you simply stand in place and say \"For every bag that rolls past me on this belt, inspect it.\"\n\nModern C++ (C++11 and beyond) introduces range-based for loops: for (const auto& item : container). This eliminates manual indexing, off-by-one errors, and boundary checks by iterating directly over every element in an array, string, or vector cleanly.",
       problems: [
         { title: 'Range Loop Sequence Summer', points: 30, difficulty: 'Basic',
@@ -256,7 +256,7 @@ module.exports = [
           hint: 'void doubleValue(int& num) { num *= 2; } - called simply as doubleValue(x);, no & needed at the call site.',
           solution: 'A reference-parameter function that doubles the caller\'s own variable in place, correctly printing Doubled Value: 48 for input 24.' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'Function Overloading', video_url: 'https://www.youtube.com/watch?v=9gWz4dZzJ60',
+    { no: 9, week: 3, session: 3, title: 'Function Overloading', video_url: 'https://www.youtube.com/watch?v=vKTYM-DJDiw',
       topic: "Real-life analogy: Think of the word \"Charge.\" If you are at an electronics store, \"charge\" means plug in a battery. If you are at a checkout counter, \"charge\" means debit an invoice. The context and parameters dictate the exact action.\n\nIn C++, multiple functions can share the exact same name as long as their parameter lists differ in type or count. The compiler performs overload resolution at compile-time by inspecting argument signatures, eliminating ugly C-style workarounds like printInt(), printFloat().",
       problems: [
         { title: 'Overloaded Area Calculator', points: 40, difficulty: 'Core',
@@ -265,7 +265,7 @@ module.exports = [
           hint: 'int area(int side) { return side*side; } int area(int length, int width) { return length*width; }',
           solution: 'Two same-named area() overloads distinguished by parameter count, correctly computing 25 and 24 for the sample input.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Classes, Objects & Access', video_url: 'https://www.youtube.com/watch?v=2BP8Nhxjr30',
+    { no: 10, week: 4, session: 1, title: 'Classes, Objects & Access', video_url: 'https://www.youtube.com/watch?v=S3nx34WFXjI',
       topic: "Real-life analogy: Think of an ATM machine. The money vault inside is private (customers cannot open it directly). The keypad and cash slot are public (authorized interfaces that safely interact with the internal cash).\n\nA class is a blueprint that combines state (member variables) and behavior (member methods). Encapsulation is enforced using access specifiers: private members are hidden from external access, while public members expose the safe interaction interface.",
       problems: [
         { title: 'Encapsulated Bank Account', points: 30, difficulty: 'Basic',
@@ -274,7 +274,7 @@ module.exports = [
           hint: 'class BankAccount { private: double balance = 0; public: void deposit(double amt) { balance += amt; } double getBalance() { return balance; } };',
           solution: 'A BankAccount class with a private balance and public deposit()/getBalance() methods, correctly reporting $150.50 after a deposit.' },
       ] },
-    { no: 11, week: 4, session: 2, title: 'Constructors & Destructors', video_url: 'https://www.youtube.com/watch?v=_b0Em_4IZOU',
+    { no: 11, week: 4, session: 2, title: 'Constructors & Destructors', video_url: 'https://www.youtube.com/watch?v=5z3KEX9AZEQ',
       topic: "Real-life analogy: Buying a new smartphone automatically runs its initial setup wizard (a Constructor). When the phone is recycled years later, its internal storage is factory wiped clean (a Destructor).\n\nA Constructor has the same name as the class and runs automatically when an object is instantiated to initialize member variables. A Destructor (prefixed with ~) runs automatically when the object goes out of scope to release resources (the RAII pattern).",
       problems: [
         { title: 'Device Lifecycle Logger', points: 40, difficulty: 'Core',

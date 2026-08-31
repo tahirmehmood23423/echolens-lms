@@ -27,11 +27,16 @@
  * rewritten to follow their official syllabus PDFs verbatim (same
  * real-life-analogy + explanation + video + one literal-I/O Compiler Quest
  * per topic shape as tracks/free-micro.js's FC-01/FC-02): C/C++ are
- * 4-module/12-topic, Python and JavaScript are 5-module/15-topic. They use
- * real `video_url` watch links (embeddable inline, see openSolveVideo() in
- * public/js/open.js), not the videos[] search-query pattern web-advanced
- * below still uses. The old 8-level Basic/Advanced-tier curricula they
- * replaced are preserved in git history if ever needed again.
+ * 4-module/12-topic, Python and JavaScript are 5-module/15-topic.
+ * `c-advanced`/`cpp-advanced` use real `video_url` watch links (embeddable
+ * inline, see openSolveVideo() in public/js/open.js). `python-advanced` and
+ * `js-advanced` instead carry a `video_url` YouTube search link
+ * (youtube.com/results?search_query=...) built from their updated syllabus
+ * PDFs' "Video lesson" query text - a wrong watch id silently sends a
+ * student to an unrelated video, a keyword search does not; these render as
+ * an external "Watch video" link rather than an inline embed. web-advanced
+ * below still uses the older videos[] search-query array. The old 8-level
+ * Basic/Advanced-tier curricula they replaced are preserved in git history.
  */
 
 module.exports = [
@@ -700,7 +705,7 @@ module.exports = [
         "week": 1,
         "session": 1,
         "title": "Iterator Protocol (__iter__, __next__)",
-        "video_url": "https://www.youtube.com/watch?v=Dyu08G2l71c",
+        "video_url": "https://www.youtube.com/results?search_query=python%20iterator%20protocol%20__iter__%20__next__",
         "topic": "Real-life analogy: Think of a mechanical ticket-roll dispenser that serves one numbered ticket every time a customer pulls the lever, and raises a little flag the moment the roll runs empty.\n\nA Python iterator implements __iter__() (which returns the iterator object itself) and __next__() (which returns the next value, or raises StopIteration once the elements are exhausted). Building your own iterable lets you evaluate lazily over a huge - even endless - stream without ever holding all of it in RAM at once.",
         "problems": [
           {
@@ -722,7 +727,7 @@ module.exports = [
         "week": 1,
         "session": 2,
         "title": "Generators & yield Statements",
-        "video_url": "https://www.youtube.com/watch?v=tmeKsb2Fras",
+        "video_url": "https://www.youtube.com/results?search_query=python%20generators%20yield",
         "topic": "Real-life analogy: Think of a chef who cooks each dish on demand as an order reaches the counter, pausing between orders - rather than cooking ten thousand meals in advance and letting them go cold.\n\nA generator function uses yield to produce values one at a time, suspending its own execution between calls and resuming exactly where it left off. It holds only the current state in memory, so it can walk a gigabyte-scale dataset in constant space.",
         "problems": [
           {
@@ -744,7 +749,7 @@ module.exports = [
         "week": 1,
         "session": 3,
         "title": "Built-in Functional Tools (map, filter, reduce, functools)",
-        "video_url": "https://www.youtube.com/watch?v=hUes6y2b--0",
+        "video_url": "https://www.youtube.com/results?search_query=python%20map%20filter%20reduce%20functools",
         "topic": "Real-life analogy: Think of an automated factory conveyor: each package is reshaped at one station (map), defective items are kicked off the belt at the next (filter), and finally every remaining weight is added into a single gross payload total (reduce).\n\nPython's functional primitives - map(), filter() and functools.reduce() - describe a transformation as a pipeline rather than a loop with mutable accumulators. functools.partial pre-binds arguments so small, reusable step functions compose cleanly.",
         "problems": [
           {
@@ -766,7 +771,7 @@ module.exports = [
         "week": 2,
         "session": 1,
         "title": "Closures & Function Factories",
-        "video_url": "https://www.youtube.com/watch?v=swU3c34d2NQ",
+        "video_url": "https://www.youtube.com/results?search_query=python%20closures%20function%20factory",
         "topic": "Real-life analogy: Think of a customised stamp tool pre-loaded with one department's ink. Wherever you carry it, every impression it makes still carries that same department's mark.\n\nA closure is an inner function that keeps access to variables from its enclosing function's scope even after that outer function has returned. A function factory uses this to manufacture specialised functions, each carrying its own captured configuration.",
         "problems": [
           {
@@ -788,7 +793,7 @@ module.exports = [
         "week": 2,
         "session": 2,
         "title": "Function Decorators & functools.wraps",
-        "video_url": "https://www.youtube.com/watch?v=FsAPt_9Bf3U",
+        "video_url": "https://www.youtube.com/results?search_query=python%20decorators%20functools%20wraps",
         "topic": "Real-life analogy: Think of slipping a waterproof case onto a phone. The phone does exactly what it did before, but every interaction now passes through an added layer of protection.\n\nA decorator is a callable that takes a function and returns a replacement wrapping extra behaviour around it, applied with @decorator syntax. Wrapping the inner function with @functools.wraps(func) copies across the original name, docstring and signature so introspection still works.",
         "problems": [
           {
@@ -810,7 +815,7 @@ module.exports = [
         "week": 2,
         "session": 3,
         "title": "Decorators with Arguments & Class Decorators",
-        "video_url": "https://www.youtube.com/watch?v=r7Dtus7N4pI",
+        "video_url": "https://www.youtube.com/results?search_query=python%20decorators%20with%20arguments%20class%20decorators",
         "topic": "Real-life analogy: Think of a security scanner whose alarm sensitivity is dialled to a different threshold depending on whether it is screening carry-on bags or heavy cargo freight.\n\nA decorator that takes its own arguments needs a three-level nest: the outer call captures the arguments, the middle layer receives the function, and the inner layer runs it. A class-based decorator instead implements __call__, which lets it keep state cleanly across every invocation of the wrapped function.",
         "problems": [
           {
@@ -832,7 +837,7 @@ module.exports = [
         "week": 3,
         "session": 1,
         "title": "Advanced Dunder Methods (__repr__, __eq__, __getitem__, __call__)",
-        "video_url": "https://www.youtube.com/watch?v=3ohzBxoFHAY",
+        "video_url": "https://www.youtube.com/results?search_query=python%20dunder%20magic%20methods%20repr%20eq%20getitem%20call",
         "topic": "Real-life analogy: Think of teaching a custom-built vehicle to respond to the universal controls every driver expects - the accelerator, the brake pedal, and the diagnostic port on the dashboard.\n\nSpecial \"dunder\" (double-underscore) methods plug a class into Python's own syntax: __repr__ gives a useful debugging string, __eq__ defines ==, __getitem__ enables obj[k] indexing, and __call__ makes an instance callable like a function.",
         "problems": [
           {
@@ -854,7 +859,7 @@ module.exports = [
         "week": 3,
         "session": 2,
         "title": "Property Descriptors & Attribute Interception (__getattr__, __setattr__)",
-        "video_url": "https://www.youtube.com/watch?v=xWHeK2pTD14",
+        "video_url": "https://www.youtube.com/results?search_query=python%20descriptors%20getattr%20setattr%20property",
         "topic": "Real-life analogy: Think of a smart building system that intercepts every attempt to change a room's thermostat, checking the requested temperature is sane before it ever lets the furnace fire.\n\nThe descriptor protocol (__get__, __set__, __delete__) is the machinery behind @property: a descriptor is a class attribute that runs code on access. __getattr__ and __setattr__ intercept attribute access on an instance, enabling validation, defaults and proxying.",
         "problems": [
           {
@@ -876,7 +881,7 @@ module.exports = [
         "week": 3,
         "session": 3,
         "title": "Abstract Base Classes (abc module) & Metaclasses",
-        "video_url": "https://www.youtube.com/watch?v=hEW-IWGluG4",
+        "video_url": "https://www.youtube.com/results?search_query=python%20abstract%20base%20classes%20metaclasses%20abc",
         "topic": "Real-life analogy: Think of a national industrial standard that requires every compliant engine factory to produce a certified mounting bracket before it is allowed to open its doors at all.\n\nThe abc module enforces a structural contract: a class with an @abstractmethod cannot be instantiated until a subclass implements that method. Metaclasses go one level deeper - by inheriting from type they customise class creation itself, powering automatic subclass registration and field validation.",
         "problems": [
           {
@@ -898,7 +903,7 @@ module.exports = [
         "week": 4,
         "session": 1,
         "title": "Custom Context Managers (__enter__, __exit__)",
-        "video_url": "https://www.youtube.com/watch?v=-aKFBoZpiqA",
+        "video_url": "https://www.youtube.com/results?search_query=python%20context%20managers%20__enter__%20__exit__%20with%20statement",
         "topic": "Real-life analogy: Think of borrowing a book from a library - the check-out is logged as you walk in, and the security scan and any late fee are settled automatically as you pass back through the door, whether or not you finished the book.\n\nThe with statement calls __enter__() to acquire a resource and __exit__() to release it - and __exit__ runs even if the block raises an exception, making it the reliable place for cleanup.",
         "problems": [
           {
@@ -920,7 +925,7 @@ module.exports = [
         "week": 4,
         "session": 2,
         "title": "contextlib Utilities (@contextmanager)",
-        "video_url": "https://www.youtube.com/watch?v=QnEB7KpywdI",
+        "video_url": "https://www.youtube.com/results?search_query=python%20contextlib%20contextmanager%20decorator",
         "topic": "Real-life analogy: Think of an express checkout lane that folds scanning and bagging into one smooth motion, instead of two separate stations.\n\nThe @contextlib.contextmanager decorator turns a generator with a single yield into a full context manager: everything before the yield is the __enter__ work, the yielded value is the \"as\" target, and everything after (ideally in a finally) is the __exit__ cleanup - no boilerplate class required.",
         "problems": [
           {
@@ -942,7 +947,7 @@ module.exports = [
         "week": 4,
         "session": 3,
         "title": "Garbage Collection, __slots__ & weakref",
-        "video_url": "https://www.youtube.com/watch?v=dRw3FdQTxqs",
+        "video_url": "https://www.youtube.com/results?search_query=python%20__slots__%20weakref%20garbage%20collection%20memory",
         "topic": "Real-life analogy: Think of designing a micro-apartment with a fixed set of built-in wall cubbies instead of bulky movable closets - the same storage in a fraction of the footprint and cost.\n\nCPython frees objects by reference counting, with a cyclic collector for reference loops. Declaring __slots__ removes each instance's per-object __dict__, cutting memory sharply, and weakref lets one object refer to another without keeping it alive, breaking reference cycles.",
         "problems": [
           {
@@ -964,7 +969,7 @@ module.exports = [
         "week": 5,
         "session": 1,
         "title": "Threading vs Multiprocessing & the GIL",
-        "video_url": "https://www.youtube.com/watch?v=ecKWiaHCEKs",
+        "video_url": "https://www.youtube.com/results?search_query=python%20threading%20vs%20multiprocessing%20GIL",
         "topic": "Real-life analogy: Threading is two cooks sharing a single kitchen counter - fine while they are mostly waiting on phone orders, but a bottleneck when both need to chop at once. Multiprocessing is building two separate kitchens in two separate buildings.\n\nThe Global Interpreter Lock (GIL) lets only one thread execute Python bytecode at a time, so threading helps I/O-bound work (network, disk) but not CPU-bound work. multiprocessing sidesteps the GIL by running separate interpreter processes on separate cores.",
         "problems": [
           {
@@ -986,7 +991,7 @@ module.exports = [
         "week": 5,
         "session": 2,
         "title": "Thread Synchronization with Lock & Queue",
-        "video_url": "https://www.youtube.com/watch?v=OE5FrlYe_rI",
+        "video_url": "https://www.youtube.com/results?search_query=python%20threading%20lock%20queue%20synchronization",
         "topic": "Real-life analogy: Think of a single-teller bank desk with a velvet-rope queue and a locked cash drawer - only one customer is served at a time, and no two hands ever reach into the drawer at once.\n\nWhen threads share mutable state, unsynchronised updates race and corrupt it. threading.Lock gives mutual exclusion, cleanest as \"with lock:\", and the thread-safe queue.Queue hands work between producer and consumer threads without any explicit locking.",
         "problems": [
           {
@@ -1008,7 +1013,7 @@ module.exports = [
         "week": 5,
         "session": 3,
         "title": "Asynchronous Programming with AsyncIO (async / await)",
-        "video_url": "https://www.youtube.com/watch?v=t5Bo1Je9EmE",
+        "video_url": "https://www.youtube.com/results?search_query=python%20asyncio%20async%20await",
         "topic": "Real-life analogy: Think of a chess grandmaster playing fifty opponents at once. Rather than standing at board one waiting for a reply, the master plays a move, walks to board two, and only returns to board one once that opponent has moved - one person, many games in flight.\n\nasyncio is single-threaded cooperative multitasking: a coroutine defined with async def gives up control at each await during I/O, and asyncio.gather() runs many coroutines concurrently on one event loop, ideal for thousands of simultaneous network calls.",
         "problems": [
           {
@@ -1078,7 +1083,7 @@ module.exports = [
         "week": 1,
         "session": 1,
         "title": "Prototypal Inheritance & the Prototype Chain",
-        "video_url": "https://www.youtube.com/watch?v=1UTqFAjYx1k",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20prototypal%20inheritance%20prototype%20chain",
         "topic": "Real-life analogy: Think of a hereditary royal lineage. If a young prince does not personally own a particular castle, the court checks his father the king, then the grandfather, on up the family tree to the founding monarch (Object.prototype).\n\nEvery JavaScript object holds an internal [[Prototype]] link (readable via Object.getPrototypeOf() or __proto__). When a property lookup misses on an object, the engine follows that link to the next object, and the next, until it either finds the property or reaches null.",
         "problems": [
           {
@@ -1100,7 +1105,7 @@ module.exports = [
         "week": 1,
         "session": 2,
         "title": "Function Constructors vs ES6 Classes & #private Fields",
-        "video_url": "https://www.youtube.com/watch?v=2ZphE5HcQPQ",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20ES6%20classes%20private%20fields%20constructor",
         "topic": "Real-life analogy: Think of a high-security briefcase. Its outer pockets are open for anyone to inspect, but the inner vault (#private) is sealed behind a hardware lock that cannot be picked from outside.\n\nES6 class syntax is sugar over the prototype system. A field declared with a # prefix is a hard private field enforced by the engine itself: it is invisible to Object.keys, JSON.stringify and reflection, and touching it from outside the class is a syntax error.",
         "problems": [
           {
@@ -1122,7 +1127,7 @@ module.exports = [
         "week": 1,
         "session": 3,
         "title": "Property Descriptors (Object.defineProperty, freeze, seal)",
-        "video_url": "https://www.youtube.com/watch?v=LD1tU_mXg6M",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20object%20defineProperty%20freeze%20seal",
         "topic": "Real-life analogy: Think of notarising a legal contract with tamper-evident wax seals: individual clauses can be marked read-only (writable: false) or non-removable (configurable: false), or the whole document can be locked shut (Object.freeze).\n\nEvery property has a descriptor - value, writable, enumerable, configurable. Object.seal() stops keys being added or removed but leaves values editable; Object.freeze() locks the whole object so existing values cannot change either.",
         "problems": [
           {
@@ -1144,7 +1149,7 @@ module.exports = [
         "week": 2,
         "session": 1,
         "title": "Proxy Traps (get, set, deleteProperty)",
-        "video_url": "https://www.youtube.com/watch?v=sDsTsuh_s7E",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20proxy%20object%20traps%20get%20set",
         "topic": "Real-life analogy: Think of a diplomatic security attache who intercepts, inspects and validates every package and courier before letting any of it through the embassy gate.\n\nA Proxy wraps a target object and intercepts fundamental operations through traps: get for reads, set for writes, deleteProperty for deletions, apply for calls. A trap can validate, transform, log or reject the operation before (or instead of) letting it reach the target.",
         "problems": [
           {
@@ -1166,7 +1171,7 @@ module.exports = [
         "week": 2,
         "session": 2,
         "title": "Reflect API & Transparent Forwarding",
-        "video_url": "https://www.youtube.com/watch?v=sDsTsuh_s7E",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20reflect%20api",
         "topic": "Real-life analogy: Think of a universal remote-control protocol: whatever brand of television you point it at, the standard commands - power, volume, input - forward through cleanly without any vendor-specific quirks.\n\nThe Reflect API exposes the interceptable object operations as plain functions - Reflect.get, Reflect.set, Reflect.has, Reflect.deleteProperty - with predictable return values. Inside a Proxy trap, calling the matching Reflect method is the correct way to perform the default behaviour while preserving the receiver.",
         "problems": [
           {
@@ -1188,7 +1193,7 @@ module.exports = [
         "week": 2,
         "session": 3,
         "title": "Well-Known Symbols (Symbol.iterator, Symbol.toPrimitive)",
-        "video_url": "https://www.youtube.com/watch?v=4J5hnOCj69w",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20well%20known%20symbols%20iterator%20toPrimitive",
         "topic": "Real-life analogy: Think of the standard markings stencilled on a shipping container. The barcode (Symbol.iterator) tells any crane in any port how to unload it, without the crane needing to know what is inside.\n\nSymbol() creates a guaranteed-unique key. The well-known symbols - Symbol.iterator, Symbol.toPrimitive, Symbol.hasInstance - are hooks the engine already looks for, so defining them on your class overrides how for...of, coercion and instanceof behave for its instances.",
         "problems": [
           {
@@ -1210,7 +1215,7 @@ module.exports = [
         "week": 3,
         "session": 1,
         "title": "Microtasks vs Macrotasks (queueMicrotask, MutationObserver)",
-        "video_url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20microtasks%20macrotasks%20event%20loop%20queueMicrotask",
         "topic": "Real-life analogy: Think of a bank teller. They call the next ticket from the lobby (a macrotask), but before calling another ticket they must first finish every piece of desk paperwork already in front of them (the microtasks).\n\nThe event loop runs one macrotask (a setTimeout / setInterval callback, an I/O event), then drains the entire microtask queue (Promise callbacks, queueMicrotask) before it will paint or take the next macrotask. So a promise callback always runs before a setTimeout(fn, 0) queued at the same time.",
         "problems": [
           {
@@ -1232,7 +1237,7 @@ module.exports = [
         "week": 3,
         "session": 2,
         "title": "WeakMap & WeakSet (Memory Leak Prevention)",
-        "video_url": "https://www.youtube.com/watch?v=yDEstg4e4gU",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20weakmap%20weakset%20memory%20leak",
         "topic": "Real-life analogy: Think of a coat-check tag. While you are in the building the tag ties your ticket to your coat; once you leave for good the tag is discarded on its own - it never keeps your coat hostage.\n\nA WeakMap keys entries by object, and holds those keys weakly: when nothing else references a key object, the entry is garbage-collected automatically. WeakMap/WeakSet are not enumerable and have no size - which is exactly what makes them safe for DOM node metadata and private caches.",
         "problems": [
           {
@@ -1254,7 +1259,7 @@ module.exports = [
         "week": 3,
         "session": 3,
         "title": "FinalizationRegistry & Garbage Collection Mechanics",
-        "video_url": "https://www.youtube.com/watch?v=IuceYkcrbEE",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20finalizationregistry%20weakref%20garbage%20collection",
         "topic": "Real-life analogy: Think of leaving instructions with a will executor: \"when this particular antique safe is finally demolished by the city, file a notice in the municipal archive.\"\n\nA FinalizationRegistry lets you register a cleanup callback that may fire after an object has been reclaimed by the garbage collector, receiving a held token you chose. Paired with WeakRef, it is how you release external resources - file handles, sockets, native buffers - tied to a JavaScript object's lifetime.",
         "problems": [
           {
@@ -1276,7 +1281,7 @@ module.exports = [
         "week": 4,
         "session": 1,
         "title": "Promise Combinators (all, allSettled, race, any)",
-        "video_url": "https://www.youtube.com/watch?v=DHvZLI7Db8E",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20promise%20all%20allSettled%20race%20any",
         "topic": "Real-life analogy: Think of an election news desk tracking four districts. Promise.all needs every district to report and fails if one collapses; Promise.any calls it the moment the first result lands; Promise.allSettled publishes the full audit of every district, wins and failures alike.\n\nPromise.all() is fail-fast parallel, Promise.allSettled() reports the outcome of every input regardless of rejections, Promise.race() settles as soon as the first input settles (fulfilled or rejected), and Promise.any() resolves with the first fulfilment.",
         "problems": [
           {
@@ -1298,7 +1303,7 @@ module.exports = [
         "week": 4,
         "session": 2,
         "title": "AbortController & Request Cancellation",
-        "video_url": "https://www.youtube.com/watch?v=7kQiX3_q4w4",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20abortcontroller%20abortsignal%20fetch%20cancel",
         "topic": "Real-life analogy: Think of the \"Cancel Print\" button on a 500-page press: one press and the job stops mid-run, before it wastes any more paper.\n\nAn AbortController produces an AbortSignal you pass into fetch(), an event listener, or your own async work. Calling controller.abort() rejects the pending operation with an AbortError, which is how you stop stale requests when the user navigates away or types a new query.",
         "problems": [
           {
@@ -1320,7 +1325,7 @@ module.exports = [
         "week": 4,
         "session": 3,
         "title": "Async Generators & for-await-of",
-        "video_url": "https://www.youtube.com/watch?v=tmeKsb2Fras",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20async%20generators%20for%20await%20of",
         "topic": "Real-life analogy: Think of streaming a series instead of downloading the whole season first - each chunk arrives and plays as it lands, and you can stop watching at any point.\n\nAn async generator (async function*) yields values that are themselves awaited, so it can pause for I/O between items. It is consumed with for await (const item of stream), which pulls one item at a time and never buffers the whole sequence in memory.",
         "problems": [
           {
@@ -1342,7 +1347,7 @@ module.exports = [
         "week": 5,
         "session": 1,
         "title": "Custom Event System (CustomEvent & EventTarget)",
-        "video_url": "https://www.youtube.com/watch?v=FkWdtpmgYqQ",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20customevent%20eventtarget%20dispatchevent",
         "topic": "Real-life analogy: Think of a stock-exchange bell. When the index hits a record the exchange rings it once (dispatches an event); every broker tuned to that signal reacts on their own, and the exchange never needs to know who is listening.\n\nEventTarget and CustomEvent give you publish/subscribe with no framework: addEventListener registers a handler, and dispatchEvent(new CustomEvent(name, { detail })) fires it with a payload, keeping the emitter and the listeners fully decoupled.",
         "problems": [
           {
@@ -1364,7 +1369,7 @@ module.exports = [
         "week": 5,
         "session": 2,
         "title": "Multithreading with Web Workers (postMessage, onmessage)",
-        "video_url": "https://www.youtube.com/watch?v=Gcp7rsiTssI",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20web%20workers%20postMessage%20onmessage",
         "topic": "Real-life analogy: Think of a restaurant manager hiring an accountant in an upstairs office. The manager keeps greeting guests at the door (the UI thread) while the accountant crunches the tax spreadsheets in the background (the worker thread).\n\nA Web Worker runs a script on its own thread, isolated from the main thread and the DOM. The two sides communicate only by structured-clone message passing - postMessage() to send, an onmessage handler to receive - so heavy computation never blocks rendering.",
         "problems": [
           {
@@ -1386,7 +1391,7 @@ module.exports = [
         "week": 5,
         "session": 3,
         "title": "SharedArrayBuffer & Atomics (Thread Synchronization)",
-        "video_url": "https://www.youtube.com/watch?v=Gcp7rsiTssI",
+        "video_url": "https://www.youtube.com/results?search_query=javascript%20sharedarraybuffer%20atomics%20thread%20synchronization",
         "topic": "Real-life analogy: Think of one physical whiteboard in a shared room. Instead of photographing notes and emailing copies, every worker writes on the same board - and follows an atomic marker rule so two people never overwrite the same spot at once.\n\nA SharedArrayBuffer is real memory shared between the main thread and workers with no message-copy overhead. The Atomics object provides the safe operations on it - Atomics.add, Atomics.load, Atomics.wait, Atomics.notify - that make concurrent reads and writes race-free.",
         "problems": [
           {

@@ -11,11 +11,12 @@
  * their official syllabus PDFs verbatim (real-life analogy + concept
  * explanation + a real YouTube video + one scenario-based Compiler Quest
  * per topic, each with an exact Sample Input/Expected Output so the grader
- * has a literal target). video_url is populated with real videos for FC-01
- * and FC-02 here, and CS-104 (Python) and CS-105 (JavaScript) in
- * tracks/cs-fundamentals.js now follow the same verbatim-syllabus shape
- * with real videos too; it is still intentionally left null for CS-106
- * (HTML & CSS) until its video links and matching PDF are sourced.
+ * has a literal target). video_url is populated with real watch links for
+ * FC-01 and FC-02 here; CS-104 (Python) and CS-105 (JavaScript) in
+ * tracks/cs-fundamentals.js follow the same verbatim-syllabus shape but
+ * carry a YouTube search link per topic (from their updated PDFs' "Video
+ * lesson" query text) rather than a specific watch id. video_url is still
+ * intentionally left null for CS-106 (HTML & CSS) until its PDF is sourced.
  */
 
 module.exports = [

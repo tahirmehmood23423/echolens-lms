@@ -408,7 +408,7 @@ module.exports = [
         "week": 1,
         "session": 2,
         "title": "Virtual Functions & vtables",
-        "video_url": "https://www.youtube.com/watch?v=oIV2K4Vzs9c",
+        "video_url": "https://www.youtube.com/watch?v=FA5bvYW4iUc",
         "topic": "Real-life analogy: A universal remote control has a \"Power\" button. When pointed at a TV, it turns on the screen; when pointed at an air conditioner, it spins up the compressor. The remote doesn't know the exact machine model - it relies on the device's internal response.\n\nDeclaring a base method as virtual enables dynamic dispatch (runtime polymorphism). The compiler generates a virtual method table (vtable) and assigns a virtual pointer (vptr) to each object. When calling a method via a base pointer (Shape* ptr), C++ resolves the derived object's override dynamically.",
         "problems": [
           {
@@ -496,7 +496,7 @@ module.exports = [
         "week": 2,
         "session": 3,
         "title": "Rule of Three / Five",
-        "video_url": "https://www.youtube.com/watch?v=hKBbkf7q4_0",
+        "video_url": "https://www.youtube.com/watch?v=z3QlnTRLNfw",
         "topic": "Real-life analogy: If you sign a commercial lease for property, you must have clear contractual procedures for when you enter, when you sublease (copy), when you transfer ownership (move), and when you terminate the lease (destructor).\n\nIf a class manages raw heap memory or system resources, it must explicitly define the Rule of Five: Destructor, Copy Constructor, Copy Assignment Operator, Move Constructor, and Move Assignment Operator. This prevents memory leaks, dangling pointers, and shallow double-frees.",
         "problems": [
           {
@@ -540,7 +540,7 @@ module.exports = [
         "week": 3,
         "session": 2,
         "title": "Class Templates",
-        "video_url": "https://www.youtube.com/watch?v=ClT36SxA08k",
+        "video_url": "https://www.youtube.com/watch?v=PD8MXD3uVOk",
         "topic": "Real-life analogy: A shipping freight container has standard locks and crane attachment hooks. It works identically whether it is loaded with cars, electronics, or grain. The container structure is type-agnostic.\n\nA class template parameterized by template <class T> allows entire data structures (like Stacks, Queues, and Matrices) to hold any arbitrary payload. The compiler stamps out a concrete class implementation for each instantiation (such as Box<int> or Box<std::string>).",
         "problems": [
           {
@@ -562,7 +562,7 @@ module.exports = [
         "week": 3,
         "session": 3,
         "title": "STL Algorithms & Lambdas",
-        "video_url": "https://www.youtube.com/watch?v=mWgmYLz3vk8",
+        "video_url": "https://www.youtube.com/watch?v=HyhvU5SJTlQ",
         "topic": "Real-life analogy: Instead of writing custom sorting steps for a deck of cards from scratch, you hand the deck to an automated card sorter along with a rule card: \"Sort from Lowest to Highest.\"\n\nThe Standard Template Library provides high-performance algorithms (std::sort, std::find_if, std::accumulate) in <algorithm>. Anonymous inline lambda functions [captures](params) { body } pass custom predicate logic directly into STL algorithms without defining separate helper functions.",
         "problems": [
           {

@@ -21,16 +21,17 @@
  * reliably surfaces the right one at the top of the results.
  *
  * Exception: `c-advanced` ("Advanced C Programming - Systems & Memory
- * Control"), `cpp-advanced` ("Advanced C++ (OOP & Architecture)") and
- * `python-advanced` ("Advanced Python - Core Language Internals") were all
+ * Control"), `cpp-advanced` ("Advanced C++ (OOP & Architecture)"),
+ * `python-advanced` ("Advanced Python - Core Language Internals") and
+ * `js-advanced` ("Advanced JavaScript - Production Architecture") were all
  * rewritten to follow their official syllabus PDFs verbatim (same
  * real-life-analogy + explanation + video + one literal-I/O Compiler Quest
  * per topic shape as tracks/free-micro.js's FC-01/FC-02): C/C++ are
- * 4-module/12-topic, Python is 5-module/15-topic. They use real `video_url`
- * watch links (embeddable inline, see openSolveVideo() in public/js/open.js),
- * not the videos[] search-query pattern js-advanced/web-advanced below still
- * use. The old 8-level Basic/Advanced-tier curricula they replaced are
- * preserved in git history if ever needed again.
+ * 4-module/12-topic, Python and JavaScript are 5-module/15-topic. They use
+ * real `video_url` watch links (embeddable inline, see openSolveVideo() in
+ * public/js/open.js), not the videos[] search-query pattern web-advanced
+ * below still uses. The old 8-level Basic/Advanced-tier curricula they
+ * replaced are preserved in git history if ever needed again.
  */
 
 module.exports = [
@@ -765,7 +766,7 @@ module.exports = [
         "week": 2,
         "session": 1,
         "title": "Closures & Function Factories",
-        "video_url": "https://www.youtube.com/watch?v=swU3cBab408",
+        "video_url": "https://www.youtube.com/watch?v=swU3c34d2NQ",
         "topic": "Real-life analogy: Think of a customised stamp tool pre-loaded with one department's ink. Wherever you carry it, every impression it makes still carries that same department's mark.\n\nA closure is an inner function that keeps access to variables from its enclosing function's scope even after that outer function has returned. A function factory uses this to manufacture specialised functions, each carrying its own captured configuration.",
         "problems": [
           {
@@ -853,7 +854,7 @@ module.exports = [
         "week": 3,
         "session": 2,
         "title": "Property Descriptors & Attribute Interception (__getattr__, __setattr__)",
-        "video_url": "https://www.youtube.com/watch?v=1v_vQ1S_Y1w",
+        "video_url": "https://www.youtube.com/watch?v=xWHeK2pTD14",
         "topic": "Real-life analogy: Think of a smart building system that intercepts every attempt to change a room's thermostat, checking the requested temperature is sane before it ever lets the furnace fire.\n\nThe descriptor protocol (__get__, __set__, __delete__) is the machinery behind @property: a descriptor is a class attribute that runs code on access. __getattr__ and __setattr__ intercept attribute access on an instance, enabling validation, defaults and proxying.",
         "problems": [
           {
@@ -875,7 +876,7 @@ module.exports = [
         "week": 3,
         "session": 3,
         "title": "Abstract Base Classes (abc module) & Metaclasses",
-        "video_url": "https://www.youtube.com/watch?v=naquhuPPduQ",
+        "video_url": "https://www.youtube.com/watch?v=hEW-IWGluG4",
         "topic": "Real-life analogy: Think of a national industrial standard that requires every compliant engine factory to produce a certified mounting bracket before it is allowed to open its doors at all.\n\nThe abc module enforces a structural contract: a class with an @abstractmethod cannot be instantiated until a subclass implements that method. Metaclasses go one level deeper - by inheriting from type they customise class creation itself, powering automatic subclass registration and field validation.",
         "problems": [
           {
@@ -897,7 +898,7 @@ module.exports = [
         "week": 4,
         "session": 1,
         "title": "Custom Context Managers (__enter__, __exit__)",
-        "video_url": "https://www.youtube.com/watch?v=iba-I4CrmVA",
+        "video_url": "https://www.youtube.com/watch?v=-aKFBoZpiqA",
         "topic": "Real-life analogy: Think of borrowing a book from a library - the check-out is logged as you walk in, and the security scan and any late fee are settled automatically as you pass back through the door, whether or not you finished the book.\n\nThe with statement calls __enter__() to acquire a resource and __exit__() to release it - and __exit__ runs even if the block raises an exception, making it the reliable place for cleanup.",
         "problems": [
           {
@@ -919,7 +920,7 @@ module.exports = [
         "week": 4,
         "session": 2,
         "title": "contextlib Utilities (@contextmanager)",
-        "video_url": "https://www.youtube.com/watch?v=iba-I4CrmVA",
+        "video_url": "https://www.youtube.com/watch?v=QnEB7KpywdI",
         "topic": "Real-life analogy: Think of an express checkout lane that folds scanning and bagging into one smooth motion, instead of two separate stations.\n\nThe @contextlib.contextmanager decorator turns a generator with a single yield into a full context manager: everything before the yield is the __enter__ work, the yielded value is the \"as\" target, and everything after (ideally in a finally) is the __exit__ cleanup - no boilerplate class required.",
         "problems": [
           {
@@ -941,7 +942,7 @@ module.exports = [
         "week": 4,
         "session": 3,
         "title": "Garbage Collection, __slots__ & weakref",
-        "video_url": "https://www.youtube.com/watch?v=IuceYkcrbEE",
+        "video_url": "https://www.youtube.com/watch?v=dRw3FdQTxqs",
         "topic": "Real-life analogy: Think of designing a micro-apartment with a fixed set of built-in wall cubbies instead of bulky movable closets - the same storage in a fraction of the footprint and cost.\n\nCPython frees objects by reference counting, with a cyclic collector for reference loops. Declaring __slots__ removes each instance's per-object __dict__, cutting memory sharply, and weakref lets one object refer to another without keeping it alive, breaking reference cycles.",
         "problems": [
           {
@@ -985,7 +986,7 @@ module.exports = [
         "week": 5,
         "session": 2,
         "title": "Thread Synchronization with Lock & Queue",
-        "video_url": "https://www.youtube.com/watch?v=Rst_7fL9Wc0",
+        "video_url": "https://www.youtube.com/watch?v=OE5FrlYe_rI",
         "topic": "Real-life analogy: Think of a single-teller bank desk with a velvet-rope queue and a locked cash drawer - only one customer is served at a time, and no two hands ever reach into the drawer at once.\n\nWhen threads share mutable state, unsynchronised updates race and corrupt it. threading.Lock gives mutual exclusion, cleanest as \"with lock:\", and the thread-safe queue.Queue hands work between producer and consumer threads without any explicit locking.",
         "problems": [
           {
@@ -1033,93 +1034,64 @@ module.exports = [
     "friendly_grading": true,
     "default_language": "web",
     "title": "Advanced JavaScript Programming",
-    "description": "Course 2 (final) of the JavaScript Programming free ladder - combines the Basic tier (formerly \"JS4.2: The Browser Runtime\") and the Advanced tier (formerly \"JS4.3: Advanced JavaScript Applications\") into one course, eight modules total, each with its own two assignments and module project.",
-    "outcome": "Predict the execution order of synchronous code, timers and promises; update the page efficiently and avoid layout thrashing; control event flow precisely; manage an interface with one listener and a single source of truth. Coordinate concurrent network work with retries, timeouts and cancellation; choose a storage mechanism deliberately and design cache expiry; defend against injection and structure an application into modules; assemble state, data access, rendering and accessibility into one production application.",
+    "description": "Advanced JavaScript (Production Architecture): the language internals behind frameworks - prototypal inheritance and true private fields, Proxies, Reflect and well-known Symbols, the microtask/macrotask event loop and weak-reference memory management, through to Promise combinators, async generators, custom event systems and Web Worker concurrency with SharedArrayBuffer. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "outcome": "Trace property lookups along the prototype chain and extend built-ins safely, and enforce true encapsulation with #private fields and property descriptors; intercept object operations with Proxy traps and forward them transparently with Reflect, and hook engine behaviour through well-known Symbols; reason about microtask versus macrotask ordering, and prevent leaks with WeakMap, WeakRef and FinalizationRegistry; orchestrate concurrent work with Promise.all / allSettled / race / any, cancel it with AbortController, and stream it with async generators; build decoupled systems on EventTarget / CustomEvent and move CPU-bound work off the main thread with Web Workers, SharedArrayBuffer and Atomics.",
     "keywords": [
-      "JavaScript event loop course",
-      "DOM performance",
-      "event delegation JavaScript",
-      "reactive JavaScript no framework",
-      "intermediate JavaScript",
-      "JavaScript async course",
-      "JavaScript web security",
-      "JavaScript caching",
-      "vanilla JS architecture",
-      "advanced JavaScript applications"
+      "advanced JavaScript programming",
+      "JavaScript prototypal inheritance",
+      "JavaScript private class fields",
+      "JavaScript Proxy and Reflect",
+      "JavaScript well-known symbols",
+      "JavaScript event loop microtasks",
+      "JavaScript WeakMap and WeakRef",
+      "JavaScript Promise combinators",
+      "JavaScript async generators",
+      "JavaScript Web Workers and Atomics"
     ],
     "key_concepts": [
-      "Event loop, tasks & microtasks",
-      "Layout thrashing",
-      "Event propagation",
-      "Event delegation & reactive rendering",
-      "Promise combinators & backoff",
-      "Browser storage & cache expiry",
-      "XSS defence & modules",
-      "Layered application architecture"
+      "Prototypal inheritance & the prototype chain",
+      "ES6 classes & #private fields",
+      "Property descriptors (freeze, seal)",
+      "Proxy traps (get, set, deleteProperty)",
+      "Reflect API & transparent forwarding",
+      "Well-known Symbols (iterator, toPrimitive)",
+      "Microtasks vs macrotasks",
+      "WeakMap & WeakSet",
+      "FinalizationRegistry & WeakRef",
+      "Promise combinators (all, allSettled, race, any)",
+      "AbortController & cancellation",
+      "Async generators & for-await-of",
+      "Custom events (EventTarget, CustomEvent)",
+      "Web Workers (postMessage, onmessage)",
+      "SharedArrayBuffer & Atomics"
     ],
     "pass_mark": 60,
     "titleNames": [
-      "Loop Reasoner",
-      "Delegation Architect",
-      "Async Engineer",
-      "Application Architect"
+      "Prototype Adept",
+      "Metaprogrammer",
+      "Memory Steward",
+      "Concurrency Architect"
     ],
     "levels": [
       {
         "no": 1,
         "week": 1,
         "session": 1,
-        "title": "Basic 1: The Event Loop, Tasks and Microtasks",
-        "video_url": null,
-        "topic": "JavaScript runs on a single thread, and everything that appears concurrent is actually queued. The engine finishes the current synchronous work, then drains the entire microtask queue, then takes one task from the macrotask queue and repeats. This explains why a resolved promise callback always runs before a zero millisecond timer, and why a long synchronous loop freezes the interface completely.\n\nKey rules:\n- Order: current synchronous code, then all microtasks, then one macrotask, then repeat.\n- Promise callbacks are microtasks; timer callbacks and interface events are macrotasks.\n- A timer set to zero milliseconds is a request, not a promise - it runs after the current work and all microtasks.\n- Long synchronous work blocks rendering; break it into chunks that yield between them.\n\nWorked example - execution order made explicit:\nconsole.log(\"1 sync\");\nsetTimeout(() => console.log(\"4 macrotask\"), 0);\nPromise.resolve().then(() => console.log(\"3 microtask\"));\nconsole.log(\"2 sync\");\n// prints 1, 2, 3, 4",
+        "title": "Prototypal Inheritance & the Prototype Chain",
+        "video_url": "https://www.youtube.com/watch?v=1UTqFAjYx1k",
+        "topic": "Real-life analogy: Think of a hereditary royal lineage. If a young prince does not personally own a particular castle, the court checks his father the king, then the grandfather, on up the family tree to the founding monarch (Object.prototype).\n\nEvery JavaScript object holds an internal [[Prototype]] link (readable via Object.getPrototypeOf() or __proto__). When a property lookup misses on an object, the engine follows that link to the next object, and the next, until it either finds the property or reaches null.",
         "problems": [
           {
-            "title": "Order prediction",
+            "title": "Prototype Delegation Engine",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Predict the output order of six mixed scripts before running.",
+            "description": "Create a base object with a greet() method, link a child object to it with Object.create(base), and call greet() on the child so the lookup is resolved by delegation up the chain - the court finding the castle one level up the family tree.\n\nInput: None\nExpected Output: [Delegation OK] Hello from Base Prototype",
             "criteria": [
-              "At least four correct with written reasoning."
+              "The child is created with Object.create(base) (not by copying greet onto it), so greet() is found on the prototype, not the child itself",
+              "Calling child.greet() prints exactly \"[Delegation OK] Hello from Base Prototype\""
             ],
-            "hint": "Synchronous code first, then every microtask, then one macrotask.",
-            "solution": "At least four of six execution orders correctly predicted, with sound reasoning about the queue order."
-          },
-          {
-            "title": "Unblock the interface",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "A supplied page freezes during a long computation. Chunk the work so the interface stays responsive.",
-            "criteria": [
-              "Same result, measured frame drops eliminated."
-            ],
-            "hint": "Break long synchronous work into chunks that yield between them.",
-            "solution": "The computation chunked to yield periodically, producing the same result with frame drops eliminated."
-          },
-          {
-            "title": "Module project: Priority task scheduler",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a scheduler that accepts tasks with priorities, runs them without blocking the interface, supports cancellation and reports queue depth in real time.",
-            "criteria": [
-              "Tasks run without blocking the interface, cancellation works, and queue depth is reported in real time."
-            ],
-            "hint": "Chunk work and yield between chunks to stay off the blocking path.",
-            "solution": "A non-blocking priority scheduler supporting cancellation and a live queue-depth readout."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Fireship",
-            "title": "The Async Await Episode I Promised",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20The%20Async%20Await%20Episode%20I%20Promised"
-          },
-          {
-            "channel": "Web Dev Simplified",
-            "title": "JavaScript Event Loop explained",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20JavaScript%20Event%20Loop%20explained"
+            "hint": "const base = { greet() { console.log(\"[Delegation OK] Hello from Base Prototype\"); } }; const child = Object.create(base); child.greet();",
+            "solution": "An Object.create(base) child whose greet() call is resolved by prototype delegation, printing the exact line."
           }
         ]
       },
@@ -1127,63 +1099,21 @@ module.exports = [
         "no": 2,
         "week": 1,
         "session": 2,
-        "title": "Basic 2: Document Internals and Render Cost",
-        "video_url": null,
-        "topic": "Reading a layout property forces the browser to finish any pending layout work before it can answer, so alternating reads and writes inside a loop makes the browser recompute layout on every iteration - layout thrashing, the most common cause of a page that feels slow despite fast code. The fix is to batch: read everything, then write everything, and build detached subtrees in a fragment before attaching them once.\n\nKey rules:\n- Reading a geometry property forces layout - alternating reads and writes in a loop forces it repeatedly.\n- Batch all reads, then all writes. Never interleave them inside a loop.\n- Build many nodes in a document fragment and attach once.\n- Changes to transform and opacity can be composited without a full layout pass - prefer them for animation.\n\nWorked example - batched construction with a single insertion:\nfunction renderRows(container, rows) {\n  const frag = document.createDocumentFragment();\n  for (const row of rows) {\n    const el = document.createElement(\"tr\");\n    el.innerHTML = `<td>${row.name}</td><td>${row.total}</td>`;\n    frag.appendChild(el);\n  }\n  container.replaceChildren(frag); // one layout pass\n}",
+        "title": "Function Constructors vs ES6 Classes & #private Fields",
+        "video_url": "https://www.youtube.com/watch?v=2ZphE5HcQPQ",
+        "topic": "Real-life analogy: Think of a high-security briefcase. Its outer pockets are open for anyone to inspect, but the inner vault (#private) is sealed behind a hardware lock that cannot be picked from outside.\n\nES6 class syntax is sugar over the prototype system. A field declared with a # prefix is a hard private field enforced by the engine itself: it is invisible to Object.keys, JSON.stringify and reflection, and touching it from outside the class is a syntax error.",
         "problems": [
           {
-            "title": "Thrashing repair",
+            "title": "Hard Encapsulated Wallet",
             "points": 30,
             "difficulty": "Basic",
-            "description": "A supplied loop reads and writes geometry alternately. Repair it and measure the difference.",
+            "description": "Create a Wallet class with a #balance private field, a deposit(amount) method and a getBalance() method. Deposit 500, print the balance through the getter, and also print the result of reading the field from outside as a plain property (which is undefined) - the vault stays sealed.\n\nSample Input: Deposit 500\nExpected Output: Balance: $500 | Private Access: undefined",
             "criteria": [
-              "Correct output and a recorded improvement."
+              "balance is declared as #balance and is only reachable through class methods - outside code reads wallet[\"balance\"] (or similar) and gets undefined",
+              "For a deposit of 500 the program prints exactly \"Balance: $500 | Private Access: undefined\""
             ],
-            "hint": "Batch all reads first, then all writes - never interleave.",
-            "solution": "Reads and writes separated into two batches, with a measured, recorded performance improvement."
-          },
-          {
-            "title": "Fragment rendering",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Render two thousand rows in under one hundred milliseconds.",
-            "criteria": [
-              "Measured render time within budget on the test machine."
-            ],
-            "hint": "Build nodes in a document fragment and attach once.",
-            "solution": "Two thousand rows rendered via a single fragment attachment, within the measured performance budget."
-          },
-          {
-            "title": "Module project: High performance data grid",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a grid that renders and re sorts several thousand rows while keeping interaction responsive, with a visible performance readout.",
-            "criteria": [
-              "Several thousand rows render and re-sort while interaction stays responsive, with a visible performance readout."
-            ],
-            "hint": "Batch reads and writes, and attach new rows via a single fragment.",
-            "solution": "A responsive data grid handling several thousand rows with a live performance readout."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Learn DOM Manipulation In 18 Minutes",
-            "length": "15 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Learn%20DOM%20Manipulation%20In%2018%20Minutes"
-          },
-          {
-            "channel": "Fireship",
-            "title": "The DOM in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20The%20DOM%20in%20100%20Seconds"
-          },
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Document Fragments explained",
-            "length": "8 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Document%20Fragments%20explained"
+            "hint": "class Wallet { #balance = 0; deposit(a) { this.#balance += a; } getBalance() { return this.#balance; } } - reading w.balance from outside is undefined.",
+            "solution": "A Wallet with a #balance field, printing \"Balance: $500 | Private Access: undefined\" after a deposit."
           }
         ]
       },
@@ -1191,51 +1121,21 @@ module.exports = [
         "no": 3,
         "week": 1,
         "session": 3,
-        "title": "Basic 3: Events, Propagation and Form Control",
-        "video_url": null,
-        "topic": "An event travels down from the document to the target, then back up. Handlers attached in the default mode fire on the way up, which is why a click on a child also triggers a parent handler. The distinction between the element that was clicked and the element the handler is attached to is what makes delegation possible. Forms add their own default behaviours that must be prevented deliberately.\n\nKey rules:\n- Phases: capture downward, target, then bubble upward. Handlers bubble by default.\n- The target property is what was interacted with; the current target is what the handler is attached to.\n- Preventing the default action stops the browser behaviour; stopping propagation stops other handlers - they are different.\n- Validate on submit, not on every keystroke.\n\nWorked example - target against current target in one handler:\nform.addEventListener(\"submit\", (e) => {\n  e.preventDefault();\n  const data = Object.fromEntries(new FormData(form));\n  if (!data.email) return show(\"Email is required\");\n  submit(data);\n});",
+        "title": "Property Descriptors (Object.defineProperty, freeze, seal)",
+        "video_url": "https://www.youtube.com/watch?v=LD1tU_mXg6M",
+        "topic": "Real-life analogy: Think of notarising a legal contract with tamper-evident wax seals: individual clauses can be marked read-only (writable: false) or non-removable (configurable: false), or the whole document can be locked shut (Object.freeze).\n\nEvery property has a descriptor - value, writable, enumerable, configurable. Object.seal() stops keys being added or removed but leaves values editable; Object.freeze() locks the whole object so existing values cannot change either.",
         "problems": [
           {
-            "title": "Propagation puzzles",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Predict which handlers fire and in what order for five nested structures.",
-            "criteria": [
-              "At least four correct with reasons."
-            ],
-            "hint": "Handlers bubble by default: target first, then upward.",
-            "solution": "At least four of five propagation orders correctly predicted with sound reasoning."
-          },
-          {
-            "title": "Dynamic form",
+            "title": "Immutable Config Protector",
             "points": 40,
             "difficulty": "Core",
-            "description": "Build a form where rows can be added and removed and validation still applies to every row.",
+            "description": "Build a config object with a host of \"127.0.0.1\", freeze it with Object.freeze(), then attempt to reassign config.host and print the (unchanged) value to prove the freeze held - the contract sealed against tampering.\n\nInput: None\nExpected Output: Config Host: 127.0.0.1 (Immutable)",
             "criteria": [
-              "All hidden interaction tests pass."
+              "The object is locked with Object.freeze() and the code then attempts to mutate config.host (the mutation must silently fail or throw, not be skipped)",
+              "The program prints exactly \"Config Host: 127.0.0.1 (Immutable)\", showing the value never changed"
             ],
-            "hint": "Validate on submit, not on every keystroke.",
-            "solution": "A dynamic multi-row form where validation correctly covers every added or removed row."
-          },
-          {
-            "title": "Module project: Dynamic form controller",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a controller for a form with repeatable sections, per field validation on submit, accessible error messaging and a clean serialised payload.",
-            "criteria": [
-              "Repeatable sections validate per field on submit, errors are accessibly announced, and the payload serialises cleanly."
-            ],
-            "hint": "Preventing default stops the browser behaviour; stopping propagation stops other handlers - use the right one.",
-            "solution": "A repeatable-section form controller with accessible validation and a clean serialised submission payload."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Learn JavaScript Event Bubbling And Capturing",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Learn%20JavaScript%20Event%20Bubbling%20And%20Capturing"
+            "hint": "const config = Object.freeze({ host: \"127.0.0.1\" }); config.host = \"0.0.0.0\"; // no effect",
+            "solution": "A frozen config whose host survives a reassignment attempt, printing \"Config Host: 127.0.0.1 (Immutable)\"."
           }
         ]
       },
@@ -1243,295 +1143,263 @@ module.exports = [
         "no": 4,
         "week": 2,
         "session": 1,
-        "title": "Basic 4: Event Delegation and Reactive Rendering",
-        "video_url": null,
-        "topic": "Attaching a listener to every element does not scale: elements added later have no listener, removed elements leak theirs. Delegation attaches one listener to a stable container and identifies the action from the event target and a data attribute. Paired with a single state object as the only source of truth, and a render function that draws the interface from that state, this produces a small reactive architecture with no framework at all.\n\nKey rules:\n- One listener on a stable ancestor - identify the action from a data attribute on the target.\n- Elements added after page load work automatically under delegation.\n- Keep one state object as the single source of truth - the interface is a function of that state.\n- Never read application state back out of the document.\n\nWorked example - one listener, one state object, one render:\nconst state = { items: [] };\nlist.addEventListener(\"click\", (e) => {\n  const btn = e.target.closest(\"[data-action]\");\n  if (!btn) return;\n  const id = Number(btn.dataset.id);\n  if (btn.dataset.action === \"delete\") state.items = state.items.filter(i => i.id !== id);\n  render(state);\n});",
+        "title": "Proxy Traps (get, set, deleteProperty)",
+        "video_url": "https://www.youtube.com/watch?v=sDsTsuh_s7E",
+        "topic": "Real-life analogy: Think of a diplomatic security attache who intercepts, inspects and validates every package and courier before letting any of it through the embassy gate.\n\nA Proxy wraps a target object and intercepts fundamental operations through traps: get for reads, set for writes, deleteProperty for deletions, apply for calls. A trap can validate, transform, log or reject the operation before (or instead of) letting it reach the target.",
         "problems": [
           {
-            "title": "Listener reduction",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Convert a page with forty listeners to a single delegated one.",
-            "criteria": [
-              "Identical behaviour, one listener, works for dynamically added elements."
-            ],
-            "hint": "Identify the action from a data attribute on the event target.",
-            "solution": "Forty listeners consolidated into one delegated listener, working correctly for dynamically added elements."
-          },
-          {
-            "title": "State as truth",
+            "title": "Schema-Validating Proxy",
             "points": 40,
             "difficulty": "Core",
-            "description": "Refactor a component that reads values back from the document so that state is the only source.",
+            "description": "Wrap a user object in a Proxy whose set trap throws a TypeError(\"Age must be a positive integer\") whenever age is assigned a non-number or a negative value. Attempt user.age = -5, catch the error, and print its message - the attache turning away an invalid courier at the gate.\n\nSample Input: user.age = -5\nExpected Output: TypeError: Age must be a positive integer",
             "criteria": [
-              "All hidden state tests pass."
+              "The validation lives in the Proxy set trap (not in a setter method or the caller), and it throws a TypeError for a non-number or negative age",
+              "Assigning -5 and printing the caught error yields exactly \"TypeError: Age must be a positive integer\""
             ],
-            "hint": "Never read application state back out of the document - it is output, not storage.",
-            "solution": "The component refactored so the document is pure output and state is the only real source of truth."
-          },
-          {
-            "title": "Module project: Reactive task board",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a create, read, update and delete board driven by one state object and one delegated listener, with filtering, counts and no framework.",
-            "criteria": [
-              "Create/read/update/delete, filtering and counts all run off one state object and one delegated listener, with no framework used."
-            ],
-            "hint": "Keep one state object as the single source of truth; render is a function of it.",
-            "solution": "A full CRUD task board driven entirely by one state object and one delegated listener, with correct filtering and counts."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Learn Event Delegation In 8 Minutes",
-            "length": "8 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Learn%20Event%20Delegation%20In%208%20Minutes"
-          },
-          {
-            "channel": "Fireship",
-            "title": "Build a to do app with vanilla JavaScript",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20Build%20a%20to%20do%20app%20with%20vanilla%20JavaScript"
+            "hint": "new Proxy(user, { set(t, k, v) { if (k === \"age\" && (typeof v !== \"number\" || v < 0)) throw new TypeError(\"Age must be a positive integer\"); t[k] = v; return true; } })",
+            "solution": "A Proxy set trap rejecting age = -5 with \"TypeError: Age must be a positive integer\"."
           }
         ]
       },
       {
         "no": 5,
-        "week": 1,
-        "session": 1,
-        "title": "Advanced 1: Promises, Concurrency and Failure Policy",
-        "video_url": null,
-        "topic": "Awaiting requests one after another when they do not depend on each other turns a fast page into a slow one. All rejects as soon as one fails, which is right when every result is required; all-settled reports every outcome, right when a dashboard should render whatever succeeded. Every request also needs a timeout and a retry policy.\n\nKey rules:\n- Awaiting sequentially adds the durations; running together takes the longest single duration.\n- All rejects on first failure; all-settled always resolves with the outcome of each.\n- Exponential backoff waits base multiplied by two to the power of the attempt number, with a cap and jitter.\n- Attach an abort signal to every request so slow work can be cancelled.\n\nWorked example - concurrent fetch with timeout and capped backoff:\nasync function fetchWithRetry(url, attempts = 3) {\n  for (let i = 0; i < attempts; i++) {\n    const ac = new AbortController();\n    const timer = setTimeout(() => ac.abort(), 5000);\n    try { const res = await fetch(url, { signal: ac.signal }); if (res.ok) return res.json(); }\n    catch {} finally { clearTimeout(timer); }\n    await new Promise(r => setTimeout(r, Math.min(2 ** i * 250, 4000)));\n  }\n  throw new Error(`failed after ${attempts} attempts`);\n}",
+        "week": 2,
+        "session": 2,
+        "title": "Reflect API & Transparent Forwarding",
+        "video_url": "https://www.youtube.com/watch?v=sDsTsuh_s7E",
+        "topic": "Real-life analogy: Think of a universal remote-control protocol: whatever brand of television you point it at, the standard commands - power, volume, input - forward through cleanly without any vendor-specific quirks.\n\nThe Reflect API exposes the interceptable object operations as plain functions - Reflect.get, Reflect.set, Reflect.has, Reflect.deleteProperty - with predictable return values. Inside a Proxy trap, calling the matching Reflect method is the correct way to perform the default behaviour while preserving the receiver.",
         "problems": [
           {
-            "title": "Sequential to concurrent",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Convert five sequential awaits into concurrent execution and measure the improvement.",
-            "criteria": [
-              "Same results and a recorded reduction in total time."
-            ],
-            "hint": "Running requests together takes the longest single duration, not the sum.",
-            "solution": "The five awaits converted to run concurrently with the same results and a measured time reduction."
-          },
-          {
-            "title": "Failure policy",
+            "title": "Reflect Property Forwarder",
             "points": 40,
             "difficulty": "Core",
-            "description": "For four described dashboards choose between all and all settled and justify.",
+            "description": "Given a plain object, use Reflect.set() to add a property and Reflect.has() to check it exists, and print both boolean results on one line - the standard commands forwarding through cleanly.\n\nInput: None\nExpected Output: Property Added: true | Key Exists: true",
             "criteria": [
-              "At least three correct with reasons."
+              "The property is written with Reflect.set(obj, key, value) and the check uses Reflect.has(obj, key) - not obj[key] = ... and key in obj",
+              "The program prints exactly \"Property Added: true | Key Exists: true\""
             ],
-            "hint": "Use all-settled when partial success should still render.",
-            "solution": "At least three of four failure-policy choices correct with sound justification."
-          },
-          {
-            "title": "Module project: Resilient API client",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a client with concurrency limits, per request timeout, capped exponential backoff, cancellation and a request log showing every retry and its reason.",
-            "criteria": [
-              "Concurrency limits, per-request timeout, capped backoff, cancellation and a full retry log are all present and correct."
-            ],
-            "hint": "Attach an abort signal to every request.",
-            "solution": "A fully resilient API client meeting every constraint, with an accurate retry log."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Fireship",
-            "title": "The Async Await Episode I Promised",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20The%20Async%20Await%20Episode%20I%20Promised"
-          },
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Learn Fetch API In 6 Minutes",
-            "length": "6 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Learn%20Fetch%20API%20In%206%20Minutes"
+            "hint": "const added = Reflect.set(obj, \"role\", \"admin\"); const exists = Reflect.has(obj, \"role\");",
+            "solution": "A Reflect.set() write and Reflect.has() check both returning true, printing \"Property Added: true | Key Exists: true\"."
           }
         ]
       },
       {
         "no": 6,
-        "week": 1,
-        "session": 2,
-        "title": "Advanced 2: Browser Storage and Cache Strategy",
-        "video_url": null,
-        "topic": "The browser offers several storage mechanisms and they are not interchangeable. Simple key value storage is synchronous, string only and small; session storage clears with the tab; the indexed database is asynchronous, structured and large. The harder problem is not storage but invalidation: cached data without an expiry rule becomes wrong data that the user trusts.\n\nKey rules:\n- Simple key value storage is synchronous and blocks the thread - keep it small and infrequent.\n- Session storage clears when the tab closes; local storage persists until cleared.\n- Store a timestamp with every cache entry and discard anything older than its allowed age.\n- Storage can fail when the quota is exceeded - wrap writes and degrade gracefully.\n\nWorked example - a cache entry that knows its own expiry:\nconst cache = {\n  set(key, value, ttlMs) {\n    try { localStorage.setItem(key, JSON.stringify({ value, expires: Date.now() + ttlMs })); } catch {}\n  },\n  get(key) {\n    const raw = localStorage.getItem(key);\n    if (!raw) return null;\n    const { value, expires } = JSON.parse(raw);\n    if (Date.now() > expires) { localStorage.removeItem(key); return null; }\n    return value;\n  }\n};",
+        "week": 2,
+        "session": 3,
+        "title": "Well-Known Symbols (Symbol.iterator, Symbol.toPrimitive)",
+        "video_url": "https://www.youtube.com/watch?v=4J5hnOCj69w",
+        "topic": "Real-life analogy: Think of the standard markings stencilled on a shipping container. The barcode (Symbol.iterator) tells any crane in any port how to unload it, without the crane needing to know what is inside.\n\nSymbol() creates a guaranteed-unique key. The well-known symbols - Symbol.iterator, Symbol.toPrimitive, Symbol.hasInstance - are hooks the engine already looks for, so defining them on your class overrides how for...of, coercion and instanceof behave for its instances.",
         "problems": [
           {
-            "title": "Mechanism choice",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "For eight scenarios choose the storage mechanism and justify.",
-            "criteria": [
-              "At least six correct with reasons."
-            ],
-            "hint": "Match the mechanism to size, structure and lifetime needs.",
-            "solution": "At least six of eight storage choices correct with sound justification."
-          },
-          {
-            "title": "Quota handling",
+            "title": "Custom Iterable Range Object",
             "points": 40,
             "difficulty": "Core",
-            "description": "Make a supplied application survive a full storage quota without breaking.",
+            "description": "Create a Range(start, end) object that defines [Symbol.iterator]() so it yields every integer from start to end inclusive. Consume Range(1, 4) with a for...of loop and print the values space-separated - the container marking that lets any crane unload it.\n\nSample Input: Range(1, 4)\nExpected Output: 1 2 3 4",
             "criteria": [
-              "Application still functional with caching disabled."
+              "Range defines a [Symbol.iterator]() method (a generator or a manual iterator) - it is consumed directly by for...of, not by a .toArray() helper",
+              "For Range(1, 4) the program prints exactly \"1 2 3 4\""
             ],
-            "hint": "Wrap storage writes and degrade gracefully when the quota is exceeded.",
-            "solution": "The application surviving a full quota gracefully, remaining functional with caching disabled."
-          },
-          {
-            "title": "Module project: Tiered cache manager",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a cache manager with memory and persistent tiers, per key expiry, a size cap with least recently used eviction and a hit rate report.",
-            "criteria": [
-              "Memory and persistent tiers, per-key expiry, LRU eviction under a size cap, and an accurate hit rate report are all present."
-            ],
-            "hint": "Store a timestamp with every entry and discard anything past its allowed age.",
-            "solution": "A tiered cache manager with correct LRU eviction and an accurate hit-rate report."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Learn localStorage In 5 Minutes",
-            "length": "5 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Learn%20localStorage%20In%205%20Minutes"
-          },
-          {
-            "channel": "Fireship",
-            "title": "IndexedDB in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20IndexedDB%20in%20100%20Seconds"
+            "hint": "*[Symbol.iterator]() { for (let i = this.start; i <= this.end; i++) yield i; }",
+            "solution": "A Range object with a [Symbol.iterator]() generator, printing \"1 2 3 4\" when looped with for...of."
           }
         ]
       },
       {
         "no": 7,
-        "week": 1,
-        "session": 3,
-        "title": "Advanced 3: Web Security and Module Architecture",
-        "video_url": null,
-        "topic": "Cross site scripting happens when data supplied by a user is treated as markup. The defence is a boundary: user data is inserted as text, never as markup, and if markup genuinely must be rendered it passes through a sanitiser with an allow list. The cross origin policy is the browser refusing to let one origin read another's responses without permission.\n\nKey rules:\n- Insert user data as text content, never as markup.\n- Sanitise with an allow list of permitted elements and attributes - deny lists are always incomplete.\n- Cross origin restrictions are enforced by the browser; the response headers grant the permission.\n- One module, one responsibility, one export surface - circular imports are a design smell.\n\nWorked example - text insertion against markup insertion:\n// unsafe: user content becomes markup\nel.innerHTML = `<p>${comment}</p>`;\n// safe: user content stays text\nconst p = document.createElement(\"p\");\np.textContent = comment;\nel.replaceChildren(p);",
+        "week": 3,
+        "session": 1,
+        "title": "Microtasks vs Macrotasks (queueMicrotask, MutationObserver)",
+        "video_url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ",
+        "topic": "Real-life analogy: Think of a bank teller. They call the next ticket from the lobby (a macrotask), but before calling another ticket they must first finish every piece of desk paperwork already in front of them (the microtasks).\n\nThe event loop runs one macrotask (a setTimeout / setInterval callback, an I/O event), then drains the entire microtask queue (Promise callbacks, queueMicrotask) before it will paint or take the next macrotask. So a promise callback always runs before a setTimeout(fn, 0) queued at the same time.",
         "problems": [
           {
-            "title": "Injection audit",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Find and fix five injection points in a supplied application.",
-            "criteria": [
-              "All five closed, supplied attack payloads render as harmless text."
-            ],
-            "hint": "Insert user data as text content, never as markup.",
-            "solution": "All five injection points closed, with the supplied attack payloads rendering as inert text."
-          },
-          {
-            "title": "Module split",
+            "title": "Event Loop Priority Ordering",
             "points": 40,
             "difficulty": "Core",
-            "description": "Split a single file application into modules with no circular imports.",
+            "description": "In one script, log a synchronous line, schedule a queueMicrotask() that logs a microtask line, and schedule a setTimeout(..., 0) that logs a macrotask line. Print a single arrow-joined summary showing the real order they run in - the teller clearing the desk before calling the next ticket.\n\nInput: None\nExpected Output: Synchronous -> Microtask -> Macrotask",
             "criteria": [
-              "Builds and runs, dependency graph acyclic."
+              "The microtask line comes from queueMicrotask() (or Promise.resolve().then) and the macrotask line from setTimeout(..., 0) - the ordering is observed, not hard-coded",
+              "The program prints exactly \"Synchronous -> Microtask -> Macrotask\""
             ],
-            "hint": "One module, one responsibility, one export surface.",
-            "solution": "The application split into modules with a verified acyclic dependency graph, building and running correctly."
-          },
-          {
-            "title": "Module project: Comment system with a sanitiser",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a comment feature that accepts limited formatting through an allow list sanitiser, rejects everything else and passes a supplied set of attack payloads.",
-            "criteria": [
-              "The allow-list sanitiser accepts limited formatting and rejects everything else, passing every supplied attack payload."
-            ],
-            "hint": "Sanitise with an allow list, never a deny list.",
-            "solution": "A comment system whose sanitiser correctly passes every supplied attack payload while allowing legitimate formatting."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Fireship",
-            "title": "Web Security in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20Web%20Security%20in%20100%20Seconds"
-          },
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Learn ES6 Modules In 10 Minutes",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Learn%20ES6%20Modules%20In%2010%20Minutes"
-          },
-          {
-            "channel": "Fireship",
-            "title": "CORS in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20CORS%20in%20100%20Seconds"
+            "hint": "Collect the three labels as each callback fires, then print order.join(\" -> \") from the last (setTimeout) callback.",
+            "solution": "An observed run order of sync, then microtask, then macrotask, printed as \"Synchronous -> Microtask -> Macrotask\"."
           }
         ]
       },
       {
         "no": 8,
-        "week": 2,
-        "session": 1,
-        "title": "Advanced 4: Application Architecture and the Course Capstone",
-        "video_url": null,
-        "topic": "A framework free application still needs an architecture: a state module that owns data, a data access module that owns network and storage, a render module that turns state into markup, and a controller that binds events to state changes. Every one of those can be tested alone. Accessibility belongs here too - keyboard access and focus management are architectural decisions, not a stylesheet pass.\n\nKey rules:\n- Four layers: state, data access, render, controller - each depends only on the one below it.\n- Render is a pure function of state.\n- Every interactive element must be reachable and operable by keyboard alone.\n- Set a performance budget before building and measure against it.\n\nWorked example - a render function that is pure with respect to state:\nfunction render(state) {\n  root.replaceChildren(header(state), listView(state), footer(state));\n}\nfunction dispatch(action) {\n  state = reduce(state, action);\n  render(state);\n}",
+        "week": 3,
+        "session": 2,
+        "title": "WeakMap & WeakSet (Memory Leak Prevention)",
+        "video_url": "https://www.youtube.com/watch?v=yDEstg4e4gU",
+        "topic": "Real-life analogy: Think of a coat-check tag. While you are in the building the tag ties your ticket to your coat; once you leave for good the tag is discarded on its own - it never keeps your coat hostage.\n\nA WeakMap keys entries by object, and holds those keys weakly: when nothing else references a key object, the entry is garbage-collected automatically. WeakMap/WeakSet are not enumerable and have no size - which is exactly what makes them safe for DOM node metadata and private caches.",
         "problems": [
           {
-            "title": "Layer separation",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Refactor a supplied tangled application into the four layers.",
-            "criteria": [
-              "No layer reaches past its neighbour, all tests pass."
-            ],
-            "hint": "Each layer should depend only on the one directly below it.",
-            "solution": "The application correctly split into four layers, each depending only on its neighbour, all tests passing."
-          },
-          {
-            "title": "Keyboard pass",
+            "title": "WeakMap Metadata Store",
             "points": 40,
             "difficulty": "Core",
-            "description": "Make a supplied interface fully keyboard operable with visible focus.",
+            "description": "Create a WeakMap, use an object as a key to store some private metadata, read it back to confirm the key works, and show that the WeakMap cannot be iterated (no keys(), no forEach, no size). Print the one-line status.\n\nInput: None\nExpected Output: WeakMap Key Valid: true | Iterability: Non-enumerable",
             "criteria": [
-              "Every action reachable without a pointer."
+              "Metadata is stored and retrieved via wm.set(objKey, data) / wm.get(objKey), and the code confirms the WeakMap exposes no iteration (typeof wm.keys === \"undefined\" or equivalent)",
+              "The program prints exactly \"WeakMap Key Valid: true | Iterability: Non-enumerable\""
             ],
-            "hint": "Keyboard access is an architectural decision, not a stylesheet pass.",
-            "solution": "Every interface action made reachable and operable by keyboard alone, with visible focus throughout."
-          },
+            "hint": "const wm = new WeakMap(); wm.set(node, meta); const valid = wm.get(node) === meta; wm.keys is undefined.",
+            "solution": "A WeakMap storing metadata under an object key, printing \"WeakMap Key Valid: true | Iterability: Non-enumerable\"."
+          }
+        ]
+      },
+      {
+        "no": 9,
+        "week": 3,
+        "session": 3,
+        "title": "FinalizationRegistry & Garbage Collection Mechanics",
+        "video_url": "https://www.youtube.com/watch?v=IuceYkcrbEE",
+        "topic": "Real-life analogy: Think of leaving instructions with a will executor: \"when this particular antique safe is finally demolished by the city, file a notice in the municipal archive.\"\n\nA FinalizationRegistry lets you register a cleanup callback that may fire after an object has been reclaimed by the garbage collector, receiving a held token you chose. Paired with WeakRef, it is how you release external resources - file handles, sockets, native buffers - tied to a JavaScript object's lifetime.",
+        "problems": [
           {
-            "title": "Course capstone: PulseBoard real time interactive dashboard",
+            "title": "Finalizer Registry Logger",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Create a FinalizationRegistry with a cleanup callback, register an object with a held token, and print the confirmation that the hook is now in place - the instructions filed with the executor.\n\nSample Input: RegisterCleanupToken\nExpected Output: [Finalizer] Cleanup Hook Registered",
+            "criteria": [
+              "A FinalizationRegistry is constructed with a callback and registry.register(obj, token) is actually called (the cleanup is registered, not just described)",
+              "After registering, the program prints exactly \"[Finalizer] Cleanup Hook Registered\""
+            ],
+            "hint": "const reg = new FinalizationRegistry(tok => console.log(`[GC] ${tok}`)); reg.register(resource, \"buffer#1\"); console.log(\"[Finalizer] Cleanup Hook Registered\");",
+            "solution": "A FinalizationRegistry with a registered object and token, printing \"[Finalizer] Cleanup Hook Registered\"."
+          }
+        ]
+      },
+      {
+        "no": 10,
+        "week": 4,
+        "session": 1,
+        "title": "Promise Combinators (all, allSettled, race, any)",
+        "video_url": "https://www.youtube.com/watch?v=DHvZLI7Db8E",
+        "topic": "Real-life analogy: Think of an election news desk tracking four districts. Promise.all needs every district to report and fails if one collapses; Promise.any calls it the moment the first result lands; Promise.allSettled publishes the full audit of every district, wins and failures alike.\n\nPromise.all() is fail-fast parallel, Promise.allSettled() reports the outcome of every input regardless of rejections, Promise.race() settles as soon as the first input settles (fulfilled or rejected), and Promise.any() resolves with the first fulfilment.",
+        "problems": [
+          {
+            "title": "Resilient allSettled Audit",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Run three promises - two that resolve and one that rejects - through Promise.allSettled(). Count how many fulfilled and how many rejected from the results array, and print the summary - the news desk publishing the full audit whatever happened.\n\nInput: None\nExpected Output: Fulfilled: 2 | Rejected: 1",
+            "criteria": [
+              "Promise.allSettled() is used (not Promise.all, which would reject) and the counts come from inspecting each result's status field",
+              "The program prints exactly \"Fulfilled: 2 | Rejected: 1\""
+            ],
+            "hint": "const results = await Promise.allSettled([p1, p2, p3]); count results.filter(r => r.status === \"fulfilled\").length.",
+            "solution": "A Promise.allSettled() audit of 2 resolves and 1 reject, printing \"Fulfilled: 2 | Rejected: 1\"."
+          }
+        ]
+      },
+      {
+        "no": 11,
+        "week": 4,
+        "session": 2,
+        "title": "AbortController & Request Cancellation",
+        "video_url": "https://www.youtube.com/watch?v=7kQiX3_q4w4",
+        "topic": "Real-life analogy: Think of the \"Cancel Print\" button on a 500-page press: one press and the job stops mid-run, before it wastes any more paper.\n\nAn AbortController produces an AbortSignal you pass into fetch(), an event listener, or your own async work. Calling controller.abort() rejects the pending operation with an AbortError, which is how you stop stale requests when the user navigates away or types a new query.",
+        "problems": [
+          {
+            "title": "Aborted Signal Handler",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Start a simulated async operation wired to an AbortController's signal, call controller.abort() while it is still pending, catch the resulting AbortError, and print a clean cancellation line - the press stopping mid-run.\n\nSample Input: CancelRequest\nExpected Output: [CANCELED] AbortError: Operation Aborted Safely",
+            "criteria": [
+              "The async operation observes controller.signal and rejects when abort() is called, and the rejection is handled in a catch block (the error is not left unhandled)",
+              "The program prints exactly \"[CANCELED] AbortError: Operation Aborted Safely\""
+            ],
+            "hint": "const c = new AbortController(); const p = task(c.signal); c.abort(); try { await p; } catch { console.log(\"[CANCELED] AbortError: Operation Aborted Safely\"); }",
+            "solution": "An AbortController-cancelled task whose AbortError is caught, printing \"[CANCELED] AbortError: Operation Aborted Safely\"."
+          }
+        ]
+      },
+      {
+        "no": 12,
+        "week": 4,
+        "session": 3,
+        "title": "Async Generators & for-await-of",
+        "video_url": "https://www.youtube.com/watch?v=tmeKsb2Fras",
+        "topic": "Real-life analogy: Think of streaming a series instead of downloading the whole season first - each chunk arrives and plays as it lands, and you can stop watching at any point.\n\nAn async generator (async function*) yields values that are themselves awaited, so it can pause for I/O between items. It is consumed with for await (const item of stream), which pulls one item at a time and never buffers the whole sequence in memory.",
+        "problems": [
+          {
+            "title": "Async Sequence Streamer",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Write an async function* that yields 1, 2, 3 with a simulated await delay between each, and consume it with for await (const n of gen()), printing \"Stream Item: <n>\" per value - the episodes arriving and playing one at a time.\n\nSample Input: Stream 3 Numbers\nExpected Output:\nStream Item: 1\nStream Item: 2\nStream Item: 3",
+            "criteria": [
+              "The producer is an async function* using yield with an await between items, and it is consumed with a for await...of loop (not collected into an array first)",
+              "The program prints exactly three lines: \"Stream Item: 1\", \"Stream Item: 2\", \"Stream Item: 3\""
+            ],
+            "hint": "async function* gen() { for (let i = 1; i <= 3; i++) { await delay(10); yield i; } } then for await (const n of gen()) ...",
+            "solution": "An async generator streamed with for await...of, printing \"Stream Item: 1..3\" one line at a time."
+          }
+        ]
+      },
+      {
+        "no": 13,
+        "week": 5,
+        "session": 1,
+        "title": "Custom Event System (CustomEvent & EventTarget)",
+        "video_url": "https://www.youtube.com/watch?v=FkWdtpmgYqQ",
+        "topic": "Real-life analogy: Think of a stock-exchange bell. When the index hits a record the exchange rings it once (dispatches an event); every broker tuned to that signal reacts on their own, and the exchange never needs to know who is listening.\n\nEventTarget and CustomEvent give you publish/subscribe with no framework: addEventListener registers a handler, and dispatchEvent(new CustomEvent(name, { detail })) fires it with a payload, keeping the emitter and the listeners fully decoupled.",
+        "problems": [
+          {
+            "title": "Decoupled Custom Event Notifier",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Create an EventTarget, add a listener for \"userLogin\" that reads event.detail.username, then dispatch a CustomEvent(\"userLogin\", { detail: { username: \"Alex\" } }) and let the listener print the greeting - the bell rung once, the broker reacting.\n\nSample Input: User: \"Alex\"\nExpected Output: [EVENT RECEIVED] User Alex logged in",
+            "criteria": [
+              "The username travels in the CustomEvent detail payload and is read from event.detail inside the listener (not from a shared outer variable)",
+              "Dispatching the event prints exactly \"[EVENT RECEIVED] User Alex logged in\""
+            ],
+            "hint": "bus.addEventListener(\"userLogin\", e => console.log(`[EVENT RECEIVED] User ${e.detail.username} logged in`)); bus.dispatchEvent(new CustomEvent(\"userLogin\", { detail: { username: \"Alex\" } }));",
+            "solution": "An EventTarget listener reading a CustomEvent detail payload, printing \"[EVENT RECEIVED] User Alex logged in\"."
+          }
+        ]
+      },
+      {
+        "no": 14,
+        "week": 5,
+        "session": 2,
+        "title": "Multithreading with Web Workers (postMessage, onmessage)",
+        "video_url": "https://www.youtube.com/watch?v=Gcp7rsiTssI",
+        "topic": "Real-life analogy: Think of a restaurant manager hiring an accountant in an upstairs office. The manager keeps greeting guests at the door (the UI thread) while the accountant crunches the tax spreadsheets in the background (the worker thread).\n\nA Web Worker runs a script on its own thread, isolated from the main thread and the DOM. The two sides communicate only by structured-clone message passing - postMessage() to send, an onmessage handler to receive - so heavy computation never blocks rendering.",
+        "problems": [
+          {
+            "title": "Background Message Worker Simulator",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Simulate the worker round trip: the main side \"dispatches\" a payload with postMessage, the worker side receives it in onmessage, does the work, and posts a result back that the main side prints. Show the full exchange on one line.\n\nSample Input: ComputePayload\nExpected Output: [MAIN] Dispatched to Worker -> [WORKER] Response: Computation 100% OK",
+            "criteria": [
+              "The exchange goes through a postMessage / onmessage pair (a real Worker or a faithful stand-in with the same message-passing shape), not a direct function call",
+              "The program prints exactly \"[MAIN] Dispatched to Worker -> [WORKER] Response: Computation 100% OK\""
+            ],
+            "hint": "worker.onmessage = e => console.log(`[MAIN] Dispatched to Worker -> [WORKER] Response: ${e.data}`); worker.postMessage(\"ComputePayload\");",
+            "solution": "A postMessage/onmessage round trip printing \"[MAIN] Dispatched to Worker -> [WORKER] Response: Computation 100% OK\"."
+          }
+        ]
+      },
+      {
+        "no": 15,
+        "week": 5,
+        "session": 3,
+        "title": "SharedArrayBuffer & Atomics (Thread Synchronization)",
+        "video_url": "https://www.youtube.com/watch?v=Gcp7rsiTssI",
+        "topic": "Real-life analogy: Think of one physical whiteboard in a shared room. Instead of photographing notes and emailing copies, every worker writes on the same board - and follows an atomic marker rule so two people never overwrite the same spot at once.\n\nA SharedArrayBuffer is real memory shared between the main thread and workers with no message-copy overhead. The Atomics object provides the safe operations on it - Atomics.add, Atomics.load, Atomics.wait, Atomics.notify - that make concurrent reads and writes race-free.",
+        "problems": [
+          {
+            "title": "Atomic Counter Synchronizer",
             "points": 60,
             "difficulty": "Boss",
-            "description": "Build a single page dashboard with reactive state and no framework, concurrent data fetching with backoff, tiered caching with expiry, injection defences and interaction held under one hundred milliseconds with one thousand records.",
+            "description": "Allocate a SharedArrayBuffer, wrap it in an Int32Array view, and increment slot 0 with Atomics.add() instead of the plain ++ operator, then read it back with Atomics.load() and print the race-free result - the capstone finale, every worker writing safely on the one shared whiteboard.\n\nInput: None\nExpected Output: Atomic Value: 1 (Race-Condition Free)",
             "criteria": [
-              "Reactive state, concurrent fetching with backoff, tiered caching, injection defences and sub-100ms interaction with a thousand records are all present and verified."
+              "The counter lives in an Int32Array backed by a SharedArrayBuffer, and it is incremented with Atomics.add(view, 0, 1) - not view[0]++",
+              "Reading it back with Atomics.load prints exactly \"Atomic Value: 1 (Race-Condition Free)\""
             ],
-            "hint": "Render should stay a pure function of one state object.",
-            "solution": "A complete PulseBoard dashboard meeting every constraint, with interaction verified under 100ms at 1000 records."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Fireship",
-            "title": "10 modern JavaScript one liners",
-            "length": "9 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%2010%20modern%20JavaScript%20one%20liners"
-          },
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Learn Web Accessibility In 10 Minutes",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Learn%20Web%20Accessibility%20In%2010%20Minutes"
+            "hint": "const view = new Int32Array(new SharedArrayBuffer(4)); Atomics.add(view, 0, 1); console.log(`Atomic Value: ${Atomics.load(view, 0)} (Race-Condition Free)`);",
+            "solution": "An Atomics.add() increment on a SharedArrayBuffer-backed Int32Array, printing \"Atomic Value: 1 (Race-Condition Free)\" - capstone complete."
           }
         ]
       }

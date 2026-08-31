@@ -122,7 +122,7 @@ module.exports = [
           hint: 'def split_bill(amount, people=2): return amount / people  - then print(f"Share per person: ${share:.2f}").',
           solution: 'A split_bill(amount, people=2) function whose returned share prints as $50.00 for 150 split 3 ways.' },
       ] },
-    { no: 11, week: 4, session: 2, title: '*args, **kwargs & Variable Arguments', video_url: 'https://www.youtube.com/watch?v=WcdaLwO4Kbg',
+    { no: 11, week: 4, session: 2, title: '*args, **kwargs & Variable Arguments', video_url: 'https://www.youtube.com/watch?v=Vh__2V2tXUM',
       topic: "Real-life analogy: Think of an open grocery bag that stretches to hold any number of items (*args), plus a box of labelled gift tags where each tag has a name and a value (**kwargs).\n\n*args collects any extra positional arguments into a tuple; **kwargs collects any extra named arguments into a dict. Together they let one function accept a variable number of inputs.",
       problems: [
         { title: 'Dynamic Math Product Engine', points: 40, difficulty: 'Core',

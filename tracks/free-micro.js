@@ -283,7 +283,7 @@ module.exports = [
           hint: 'Device(std::string n) : name(n) { std::cout << "Device " << name << " Online" << std::endl; } ~Device() { std::cout << "Device " << name << " Offline" << std::endl; }',
           solution: 'A Device class whose constructor and destructor automatically print the Online/Offline lines, firing in the correct order purely from object lifetime.' },
       ] },
-    { no: 12, week: 4, session: 3, title: "Getters, Setters & 'this'", video_url: 'https://www.youtube.com/watch?v=Z_hPJ_X3P_o',
+    { no: 12, week: 4, session: 3, title: "Getters, Setters & 'this'", video_url: 'https://www.youtube.com/watch?v=f2IrG1JabSg',
       topic: "Real-life analogy: A car's speedometer dial gives you a view of current speed (a Getter), while the gas pedal adjusts speed within safe engine limits (a Setter). The car's internal engine computer knows it is regulating this specific vehicle.\n\nGetters and Setters provide controlled access to private members, enforcing validation rules before updating state. The hidden this pointer points to the current calling object instance, allowing explicit disambiguation between member variables and constructor parameters.",
       problems: [
         { title: 'Validated Speed Governor', points: 60, difficulty: 'Boss',

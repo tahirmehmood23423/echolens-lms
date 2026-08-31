@@ -474,7 +474,7 @@ module.exports = [
         "week": 2,
         "session": 2,
         "title": "Deep vs Shallow Copy",
-        "video_url": "https://www.youtube.com/watch?v=BvR14431p9o",
+        "video_url": "https://www.youtube.com/watch?v=G_UgbP8clOs",
         "topic": "Real-life analogy: A Shallow Copy gives two housemates the same single front door key (if one changes the lock, the other is locked out). A Deep Copy builds an identical duplicate house with its own separate door lock and keys.\n\nDefault memberwise copy constructors perform shallow copies: copying raw pointer addresses. If one object goes out of scope and frees the memory, the other object holds a broken dangling pointer (a double-free crash). A user-defined copy constructor allocates a fresh heap block and clones the data contents independently.",
         "problems": [
           {
@@ -606,7 +606,7 @@ module.exports = [
         "week": 4,
         "session": 2,
         "title": "std::shared_ptr & Reference Counting",
-        "video_url": "https://www.youtube.com/watch?v=7bjEgMzNt60",
+        "video_url": "https://www.youtube.com/watch?v=UOB7-B2MfwA",
         "topic": "Real-life analogy: Think of an office room light wired to a smart occupancy sensor. Every person who enters increments the occupant count by 1. When a person leaves, the count drops. The light turns off only when the last person exits (count = 0).\n\nstd::shared_ptr<T> maintains a thread-safe reference control block. Multiple shared pointers can point to the same heap resource. Every copy increments the reference count; when a pointer goes out of scope, the count decrements. When the counter hits zero, the managed object is destroyed.",
         "problems": [
           {

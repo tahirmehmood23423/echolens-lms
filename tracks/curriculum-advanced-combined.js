@@ -21,15 +21,16 @@
  * reliably surfaces the right one at the top of the results.
  *
  * Exception: `c-advanced` ("Advanced C Programming - Systems & Memory
- * Control") and `cpp-advanced` ("Advanced C++ (OOP & Architecture)") were
- * both rewritten to follow their official 4-module/12-topic syllabus PDFs
- * verbatim (same real-life-analogy + explanation + video + one literal-I/O
- * Compiler Quest per topic shape as tracks/free-micro.js's FC-01/FC-02) -
- * they use real `video_url` watch links (embeddable inline, see
- * openSolveVideo() in public/js/open.js), not the videos[] search-query
- * pattern python-advanced/js-advanced/web-advanced below still use. The old
- * 8-level Basic/Advanced-tier curricula they replaced are preserved in git
- * history if ever needed again.
+ * Control"), `cpp-advanced` ("Advanced C++ (OOP & Architecture)") and
+ * `python-advanced` ("Advanced Python - Core Language Internals") were all
+ * rewritten to follow their official syllabus PDFs verbatim (same
+ * real-life-analogy + explanation + video + one literal-I/O Compiler Quest
+ * per topic shape as tracks/free-micro.js's FC-01/FC-02): C/C++ are
+ * 4-module/12-topic, Python is 5-module/15-topic. They use real `video_url`
+ * watch links (embeddable inline, see openSolveVideo() in public/js/open.js),
+ * not the videos[] search-query pattern js-advanced/web-advanced below still
+ * use. The old 8-level Basic/Advanced-tier curricula they replaced are
+ * preserved in git history if ever needed again.
  */
 
 module.exports = [
@@ -654,100 +655,64 @@ module.exports = [
     "friendly_grading": true,
     "default_language": "python",
     "title": "Advanced Python Programming",
-    "description": "Course 2 (final) of the Python Programming free ladder - combines the Basic tier (formerly \"PY3.2: Python Data Structures and Object Oriented Design\") and the Advanced tier (formerly \"PY3.3: Advanced Python Engineering\") into one course, eight modules total, each with its own two assignments and module project.",
-    "outcome": "Select the right container from access pattern and cost; design classes whose state cannot be corrupted from outside; make objects behave like built-in types through protocols; choose recursion where it clarifies and implement backtracking with pruning. Design failure behaviour deliberately rather than letting it happen; process data larger than memory with lazy pipelines and guaranteed cleanup; store structured data durably and consume a real API with a sane failure policy; ship a tested, installable Python application with a documented interface.",
+    "description": "Advanced Python (Core Language Internals): the Python data model beyond the fundamentals - the iterator protocol and lazy generators, closures and decorators, dunder methods, descriptors and metaclasses, context managers and the memory model, through to threading, multiprocessing and asyncio concurrency. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "outcome": "Build lazy iterables and generator pipelines that stream data larger than memory; capture state in closures and wrap behaviour with function, parameterised and class decorators; integrate custom classes with Python syntax through dunder methods, descriptors and attribute interception, and customise class creation with abstract base classes and metaclasses; guarantee cleanup with custom and contextlib context managers and shrink memory with __slots__ and weakref; run I/O-bound work concurrently with threads and a synchronised queue, bypass the GIL with multiprocessing, and schedule thousands of coroutines with asyncio.",
     "keywords": [
-      "Python data structures course",
-      "Python OOP",
-      "dunder methods Python",
-      "Python recursion",
-      "intermediate Python programming",
-      "Python exceptions course",
-      "Python generators",
-      "Python API client",
-      "Python testing pytest",
-      "advanced Python engineering"
+      "advanced Python programming",
+      "Python iterator protocol",
+      "Python generators and yield",
+      "Python decorators and closures",
+      "Python dunder methods",
+      "Python metaclasses",
+      "Python context managers",
+      "Python __slots__ and weakref",
+      "Python threading and multiprocessing",
+      "Python asyncio"
     ],
     "key_concepts": [
-      "Dictionaries & sets",
-      "Properties & guarded state",
-      "Dunder methods & protocols",
-      "Recursion & backtracking",
-      "Exception hierarchies",
-      "Generators & context managers",
-      "Schema migration",
-      "Resilient API clients",
-      "Testing & packaging"
+      "Iterator protocol (__iter__, __next__)",
+      "Generators & yield",
+      "map, filter, reduce & functools",
+      "Closures & function factories",
+      "Function decorators & functools.wraps",
+      "Decorators with arguments & class decorators",
+      "Dunder methods (__repr__, __eq__, __getitem__, __call__)",
+      "Descriptors & attribute interception",
+      "Abstract base classes & metaclasses",
+      "Custom context managers (__enter__, __exit__)",
+      "contextlib & @contextmanager",
+      "Garbage collection, __slots__ & weakref",
+      "Threading, multiprocessing & the GIL",
+      "Thread synchronization (Lock & Queue)",
+      "Async programming with asyncio"
     ],
     "pass_mark": 60,
     "titleNames": [
-      "Container Chooser",
-      "Protocol Designer",
-      "Defensive Coder",
-      "Engineering Lead"
+      "Lazy Iterator Adept",
+      "Decorator Engineer",
+      "Protocol Metaprogrammer",
+      "Concurrency Architect"
     ],
     "levels": [
       {
         "no": 1,
         "week": 1,
         "session": 1,
-        "title": "Basic 1: Dictionaries, Sets and Choosing a Container",
-        "video_url": null,
-        "topic": "A dictionary is a hash table: lookup by key is constant on average and keys must be hashable, therefore immutable. A set is the same machinery without values, turning membership testing from a linear scan into a constant time check - the single most common performance improvement in beginner Python. The correct container is chosen by asking one question: what is the access pattern.\n\nKey rules:\n- Dictionary and set lookup is constant on average. List membership testing is linear.\n- Keys must be hashable, therefore immutable - a list can never be a key, a tuple can.\n- Set algebra (union, intersection, difference, symmetric difference) replaces nested loops.\n- Counting occurrences is a dictionary of counts, or Counter from the standard library.\n\nWorked example - membership and counting done the right way:\nwords = text.lower().split()\nstop = {\"the\", \"and\", \"of\", \"a\"}     # constant time membership\ncounts = {}\nfor w in words:\n    if w in stop: continue\n    counts[w] = counts.get(w, 0) + 1",
+        "title": "Iterator Protocol (__iter__, __next__)",
+        "video_url": "https://www.youtube.com/watch?v=Dyu08G2l71c",
+        "topic": "Real-life analogy: Think of a mechanical ticket-roll dispenser that serves one numbered ticket every time a customer pulls the lever, and raises a little flag the moment the roll runs empty.\n\nA Python iterator implements __iter__() (which returns the iterator object itself) and __next__() (which returns the next value, or raises StopIteration once the elements are exhausted). Building your own iterable lets you evaluate lazily over a huge - even endless - stream without ever holding all of it in RAM at once.",
         "problems": [
           {
-            "title": "Container choice",
+            "title": "Custom Range Countdown Iterator",
             "points": 30,
             "difficulty": "Basic",
-            "description": "For eight described scenarios choose the container and justify in one line.",
+            "description": "Implement an iterator class Countdown(start) whose __next__ counts down from start to 1 and then raises StopIteration. Drive it with a for loop and print each number followed by LIFTOFF - the ticket dispenser handing out one ticket per lever pull until the roll is empty.\n\nSample Input: 3\nExpected Output: 3 2 1 LIFTOFF",
             "criteria": [
-              "At least six correct with reasons."
+              "Countdown defines both __iter__ (returning self) and __next__, and __next__ raises StopIteration once it passes 1 - the loop is never ended by an if/break in the caller",
+              "For input 3 the program prints exactly \"3 2 1 LIFTOFF\" on one line"
             ],
-            "hint": "Ask one question: what is the access pattern?",
-            "solution": "At least six of eight container choices correct, each with a sound one-line justification."
-          },
-          {
-            "title": "Linear to constant",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Speed up a supplied program by replacing list membership tests.",
-            "criteria": [
-              "Identical output and a measured speed up on the large input."
-            ],
-            "hint": "Set membership testing is constant time; list membership testing is linear.",
-            "solution": "Membership tests replaced with sets, producing identical output and a measured speedup."
-          },
-          {
-            "title": "Module project: Multi file word frequency indexer",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build an indexer that scans a folder of text files, builds a term to document map and answers queries with ranked results and per file counts.",
-            "criteria": [
-              "A term-to-document map is built across the folder, and queries return ranked results with per-file counts."
-            ],
-            "hint": "Dictionary lookup is constant on average - use it for the term-to-document map.",
-            "solution": "An indexer scanning a whole folder, answering ranked queries with correct per-file counts."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Corey Schafer",
-            "title": "Python Tutorial: Dictionary",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Corey%20Schafer%20Python%20Tutorial%3A%20Dictionary"
-          },
-          {
-            "channel": "mCoding",
-            "title": "Sets in Python",
-            "length": "9 min",
-            "url": "https://www.youtube.com/results?search_query=mCoding%20Sets%20in%20Python"
-          },
-          {
-            "channel": "Fireship",
-            "title": "Hash Tables in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20Hash%20Tables%20in%20100%20Seconds"
+            "hint": "In __next__: if self.current < 1: raise StopIteration; otherwise decrement and return the previous value.",
+            "solution": "A Countdown iterator raising StopIteration after 1, printing \"3 2 1 LIFTOFF\" when consumed by a for loop."
           }
         ]
       },
@@ -755,51 +720,21 @@ module.exports = [
         "no": 2,
         "week": 1,
         "session": 2,
-        "title": "Basic 2: Classes, Properties and Guarded State",
-        "video_url": null,
-        "topic": "Python has no private access, only conventions, which shifts the burden of protection onto design. The property decorator keeps an attribute's simple access syntax while gaining validation on write, so existing calling code never changes. Class attributes versus instance attributes is the other trap: a class attribute is shared by every instance, and a mutable one shared this way produces defects that look like haunting.\n\nKey rules:\n- A class attribute is shared by all instances - never make it mutable unless sharing is the intent.\n- The property decorator adds validation without changing the attribute access syntax used by callers.\n- A single leading underscore is a convention meaning internal - nothing enforces it, so document the contract.\n- Define a readable string representation for every class you will debug, and a precise one for developers.\n\nWorked example - a property that guards a state transition:\nclass Task:\n    VALID = {\"todo\", \"doing\", \"done\"}\n    def __init__(self, title):\n        self.title = title; self._status = \"todo\"\n    @property\n    def status(self): return self._status\n    @status.setter\n    def status(self, value):\n        if value not in self.VALID: raise ValueError(f\"unknown status: {value}\")\n        self._status = value",
+        "title": "Generators & yield Statements",
+        "video_url": "https://www.youtube.com/watch?v=tmeKsb2Fras",
+        "topic": "Real-life analogy: Think of a chef who cooks each dish on demand as an order reaches the counter, pausing between orders - rather than cooking ten thousand meals in advance and letting them go cold.\n\nA generator function uses yield to produce values one at a time, suspending its own execution between calls and resuming exactly where it left off. It holds only the current state in memory, so it can walk a gigabyte-scale dataset in constant space.",
         "problems": [
           {
-            "title": "Shared state defect",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "A supplied class shares a list between instances. Diagnose and fix.",
-            "criteria": [
-              "Instances independent, written explanation correct."
-            ],
-            "hint": "A mutable class attribute is shared by every instance.",
-            "solution": "The shared-list defect diagnosed and fixed so every instance holds its own independent list."
-          },
-          {
-            "title": "Add the guards",
+            "title": "Lazy Fibonacci Generator",
             "points": 40,
             "difficulty": "Core",
-            "description": "Convert three plain attributes into validated properties.",
+            "description": "Write a generator function fib(n) that yields the first n Fibonacci numbers lazily (starting 0, 1, 1, 2, ...). Read n, consume the generator with a for loop, and print the numbers space-separated - the chef plating one dish per order instead of all at once.\n\nSample Input: 5\nExpected Output: 0 1 1 2 3",
             "criteria": [
-              "All invalid assignment tests raise, valid ones pass unchanged."
+              "fib is a generator using yield - there is no full list built up and returned, values are produced one at a time",
+              "For input 5 the program prints exactly \"0 1 1 2 3\""
             ],
-            "hint": "The property decorator validates on write without changing access syntax.",
-            "solution": "All three attributes converted to properties that reject invalid values and accept valid ones unchanged."
-          },
-          {
-            "title": "Module project: Guarded task model",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a task class with validated status transitions, priority bounds, due date checking and a readable representation, verified by a suite of misuse tests.",
-            "criteria": [
-              "Status transitions, priority bounds and due dates are all validated by properties, and a misuse test suite passes."
-            ],
-            "hint": "Guard every field that could be set to an invalid value from outside.",
-            "solution": "A task class with fully guarded state, passing every misuse test in the verification suite."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Corey Schafer",
-            "title": "Python OOP Tutorial 1: Classes and Instances",
-            "length": "15 min",
-            "url": "https://www.youtube.com/results?search_query=Corey%20Schafer%20Python%20OOP%20Tutorial%201%3A%20Classes%20and%20Instances"
+            "hint": "a, b = 0, 1; loop n times: yield a; then a, b = b, a + b.",
+            "solution": "A yield-based fib(n) generator producing the first n Fibonacci numbers, printing \"0 1 1 2 3\" for n = 5."
           }
         ]
       },
@@ -807,57 +742,21 @@ module.exports = [
         "no": 3,
         "week": 1,
         "session": 3,
-        "title": "Basic 3: Dunder Methods and Protocol Design",
-        "video_url": null,
-        "topic": "Python is built on protocols rather than interfaces: an object is iterable because it implements the iteration protocol, sortable because it implements comparison, printable because it implements string conversion. Two rules are easy to miss: equality and hashing must agree, and the developer representation should ideally be text that recreates the object.\n\nKey rules:\n- Implement the string method for users and the representation method for developers.\n- If two objects compare equal they must hash equal - define both together or neither.\n- Implementing less-than is enough for sorting; the remaining comparisons can be generated.\n- Implementing iteration lets your object work with loops, comprehensions and the whole standard library.\n\nWorked example - a polynomial type that sorts, prints and adds natively:\nclass Poly:\n    def __init__(self, coeffs): self.c = list(coeffs)\n    def __repr__(self): return f\"Poly({self.c})\"\n    def __eq__(self, o): return isinstance(o, Poly) and self.c == o.c\n    def __hash__(self): return hash(tuple(self.c))\n    def __lt__(self, o): return self.degree() < o.degree()\n    def degree(self): return len(self.c) - 1",
+        "title": "Built-in Functional Tools (map, filter, reduce, functools)",
+        "video_url": "https://www.youtube.com/watch?v=hUes6y2b--0",
+        "topic": "Real-life analogy: Think of an automated factory conveyor: each package is reshaped at one station (map), defective items are kicked off the belt at the next (filter), and finally every remaining weight is added into a single gross payload total (reduce).\n\nPython's functional primitives - map(), filter() and functools.reduce() - describe a transformation as a pipeline rather than a loop with mutable accumulators. functools.partial pre-binds arguments so small, reusable step functions compose cleanly.",
         "problems": [
           {
-            "title": "Protocol completion",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Given a partial class, add the representation, equality, hashing and ordering methods.",
-            "criteria": [
-              "Object sorts, prints and works as a dictionary key."
-            ],
-            "hint": "If two objects compare equal they must hash equal.",
-            "solution": "All four protocol methods added correctly, with the object sorting, printing and working as a dict key."
-          },
-          {
-            "title": "Custom iterator",
+            "title": "Functional Pipeline Processor",
             "points": 40,
             "difficulty": "Core",
-            "description": "Implement a class that yields a Fibonacci sequence lazily through the iteration protocol.",
+            "description": "Read a line of space-separated integers. Using filter() drop the odd numbers, using map() square the remaining evens, and using functools.reduce() sum them into one total - the conveyor transforming, rejecting and then totalling in a single declarative pass.\n\nSample Input: 1 2 3 4 5 6\nExpected Output: Reduced Total: 56",
             "criteria": [
-              "Works in a loop and in a comprehension without materialising the whole sequence."
+              "The three stages use filter(), map() and functools.reduce() respectively - not a plain for loop with an accumulator variable",
+              "For input \"1 2 3 4 5 6\" the program prints exactly \"Reduced Total: 56\" (2*2 + 4*4 + 6*6)"
             ],
-            "hint": "Implementing iteration lets your object work with loops and comprehensions.",
-            "solution": "A lazily-iterating Fibonacci class that never materialises the full sequence, working in loops and comprehensions."
-          },
-          {
-            "title": "Module project: Polynomial mathematics type",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a polynomial class supporting addition, multiplication, evaluation, sorting by degree and readable printing, working correctly inside standard library containers.",
-            "criteria": [
-              "Addition, multiplication, evaluation, sorting by degree and printing all work, and the type behaves correctly inside standard library containers."
-            ],
-            "hint": "Equality and hashing must agree if the type is used as a dict key or set member.",
-            "solution": "A fully protocol-complete polynomial type that adds, multiplies, evaluates, sorts and prints correctly."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Corey Schafer",
-            "title": "Python OOP Tutorial 5: Special Magic Dunder Methods",
-            "length": "13 min",
-            "url": "https://www.youtube.com/results?search_query=Corey%20Schafer%20Python%20OOP%20Tutorial%205%3A%20Special%20Magic%20Dunder%20Methods"
-          },
-          {
-            "channel": "mCoding",
-            "title": "Python dunder methods you should know",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=mCoding%20Python%20dunder%20methods%20you%20should%20know"
+            "hint": "reduce(lambda acc, x: acc + x, map(lambda n: n * n, filter(lambda n: n % 2 == 0, nums))).",
+            "solution": "A filter -> map -> reduce pipeline squaring the even inputs and summing them to 56."
           }
         ]
       },
@@ -865,289 +764,263 @@ module.exports = [
         "no": 4,
         "week": 2,
         "session": 1,
-        "title": "Basic 4: Recursion, Backtracking and Divide and Conquer",
-        "video_url": null,
-        "topic": "A recursive solution has three parts: a base case that stops, a recursive case that reduces the problem, and a guarantee that repeated reduction reaches the base. Backtracking adds a fourth: undo the choice when the branch fails - that undo step turns brute force into something that finishes, especially once a pruning test rejects hopeless branches early.\n\nKey rules:\n- Every recursion needs a base case and a strictly reducing step.\n- Merge sort runs in n log n time and needs order n extra space.\n- Backtracking is choose, recurse, undo - the undo step is not optional.\n- A pruning test that rejects a branch early is usually worth more than any constant factor optimisation.\n\nWorked example - backtracking with an explicit undo step:\ndef solve(board, row, n):\n    if row == n: return True\n    for col in range(n):\n        if safe(board, row, col):\n            board[row] = col            # choose\n            if solve(board, row + 1, n): return True\n            board[row] = -1             # undo\n    return False",
+        "title": "Closures & Function Factories",
+        "video_url": "https://www.youtube.com/watch?v=swU3cBab408",
+        "topic": "Real-life analogy: Think of a customised stamp tool pre-loaded with one department's ink. Wherever you carry it, every impression it makes still carries that same department's mark.\n\nA closure is an inner function that keeps access to variables from its enclosing function's scope even after that outer function has returned. A function factory uses this to manufacture specialised functions, each carrying its own captured configuration.",
         "problems": [
           {
-            "title": "Base case repair",
+            "title": "Custom Power Function Factory",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Four recursive functions never terminate for some inputs. Repair each.",
+            "description": "Write a factory power_factory(exp) that returns a function computing x ** exp for whatever x it is later given. Read two integers - the exponent then the base - build the function with the exponent, call it with the base, and print the result. For \"3 4\" that is 4 ** 3.\n\nSample Input: 3 4\nExpected Output: 64",
             "criteria": [
-              "All four terminate correctly on every hidden test."
+              "power_factory returns an inner function that closes over exp - the exponent is captured once, not passed again at call time",
+              "For input \"3 4\" the program prints exactly \"64\" (4 ** 3)"
             ],
-            "hint": "Every recursion needs a base case and a strictly reducing step.",
-            "solution": "All four functions repaired to terminate correctly on every hidden test."
-          },
-          {
-            "title": "Pruning study",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Add a pruning test to a brute force solver and report the reduction in explored branches.",
-            "criteria": [
-              "Same answers, measurable reduction."
-            ],
-            "hint": "A pruning test that rejects a branch early is usually the biggest win.",
-            "solution": "A pruning test added with identical final answers and a measured reduction in explored branches."
-          },
-          {
-            "title": "Module project: Constraint solver",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a solver that handles both maze pathfinding and the N queens placement problem through a shared backtracking core, reporting explored branches and solution paths.",
-            "criteria": [
-              "Both maze pathfinding and N queens run through the same backtracking core, and the solver reports explored branches and solution paths."
-            ],
-            "hint": "Backtracking is choose, recurse, undo - the undo step is required.",
-            "solution": "A shared backtracking core solving both maze pathfinding and N queens, reporting explored branches and the found path."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Computerphile",
-            "title": "What on Earth is Recursion",
-            "length": "9 min",
-            "url": "https://www.youtube.com/results?search_query=Computerphile%20What%20on%20Earth%20is%20Recursion"
-          },
-          {
-            "channel": "Fireship",
-            "title": "Recursion in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20Recursion%20in%20100%20Seconds"
-          },
-          {
-            "channel": "Computerphile",
-            "title": "Merge Sort",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Computerphile%20Merge%20Sort"
+            "hint": "def power_factory(exp): def inner(x): return x ** exp; return inner  - then cube = power_factory(3); print(cube(4)).",
+            "solution": "A closure factory capturing the exponent, so power_factory(3)(4) returns 64."
           }
         ]
       },
       {
         "no": 5,
-        "week": 1,
-        "session": 1,
-        "title": "Advanced 1: Exceptions, Contracts and Failing Well",
-        "video_url": null,
-        "topic": "Exception handling is a design activity, not a safety net bolted on at the end. A bare handler that catches everything converts a crash into silent wrongness, which is strictly worse. The professional pattern: narrow handlers close to the operation that can fail, custom exception types that carry the context a caller needs to decide, and a clear boundary where errors stop being handled and start being reported.\n\nKey rules:\n- Catch the narrowest exception type that can occur - never catch everything without re-raising.\n- The else clause runs when no exception occurred; finally always runs, including on return.\n- Custom exception types carry context - a message alone forces the caller to parse text.\n- An assertion documents an assumption for developers; it is not input validation.\n\nWorked example - a narrow contract with a typed failure:\nclass ConfigError(Exception):\n    def __init__(self, key, reason):\n        super().__init__(f\"{key}: {reason}\")\n        self.key, self.reason = key, reason\n\ndef read_port(cfg):\n    try: port = int(cfg[\"port\"])\n    except KeyError: raise ConfigError(\"port\", \"missing\")\n    except ValueError: raise ConfigError(\"port\", \"not an integer\")\n    return port",
+        "week": 2,
+        "session": 2,
+        "title": "Function Decorators & functools.wraps",
+        "video_url": "https://www.youtube.com/watch?v=FsAPt_9Bf3U",
+        "topic": "Real-life analogy: Think of slipping a waterproof case onto a phone. The phone does exactly what it did before, but every interaction now passes through an added layer of protection.\n\nA decorator is a callable that takes a function and returns a replacement wrapping extra behaviour around it, applied with @decorator syntax. Wrapping the inner function with @functools.wraps(func) copies across the original name, docstring and signature so introspection still works.",
         "problems": [
           {
-            "title": "Handler narrowing",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Replace five broad handlers with narrow ones and show what each now surfaces.",
-            "criteria": [
-              "No defect silently swallowed on any hidden test."
-            ],
-            "hint": "Never catch everything without re-raising.",
-            "solution": "All five handlers narrowed, with no defect silently swallowed on any hidden test."
-          },
-          {
-            "title": "Exception hierarchy",
+            "title": "Execution Timer Decorator",
             "points": 40,
             "difficulty": "Core",
-            "description": "Design a three level exception hierarchy for a file processing tool.",
+            "description": "Write a decorator @timing_decorator that prints a start line before the wrapped function runs and a finish line after. Decorate a function named \"Task\", call it, and show the surrounding log - the protective case adding a layer around every call without changing the phone.\n\nSample Input: RunTask\nExpected Output:\n[START] Task\n[FINISH] Task",
             "criteria": [
-              "Callers can handle at any level and receive the right context."
+              "timing_decorator returns a wrapper that calls the original function between the [START] and [FINISH] prints, and uses @functools.wraps(func)",
+              "Running the decorated task prints exactly two lines: \"[START] Task\" then \"[FINISH] Task\""
             ],
-            "hint": "Custom exception types should carry the context a caller needs.",
-            "solution": "A correct three-level hierarchy letting callers handle at any level with the right context available."
-          },
-          {
-            "title": "Module project: Crash proof configuration parser",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a parser that reads a configuration file, validates every field against a schema and reports all errors at once with line numbers rather than failing at the first.",
-            "criteria": [
-              "Every field is validated against the schema, and all errors are reported at once with line numbers rather than stopping at the first."
-            ],
-            "hint": "Design failure behaviour deliberately - collect every error rather than stopping at the first.",
-            "solution": "A parser reporting every schema violation at once, with correct line numbers, instead of failing on the first error."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Corey Schafer",
-            "title": "Python Tutorial: Using Try Except Blocks",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Corey%20Schafer%20Python%20Tutorial%3A%20Using%20Try%20Except%20Blocks"
-          },
-          {
-            "channel": "mCoding",
-            "title": "Python exceptions done right",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=mCoding%20Python%20exceptions%20done%20right"
+            "hint": "def timing_decorator(func): @functools.wraps(func) def wrapper(*a, **kw): print(\"[START] Task\"); r = func(*a, **kw); print(\"[FINISH] Task\"); return r; return wrapper.",
+            "solution": "A @timing_decorator wrapping the call in [START]/[FINISH] log lines while preserving metadata via functools.wraps."
           }
         ]
       },
       {
         "no": 6,
-        "week": 1,
-        "session": 2,
-        "title": "Advanced 2: Generators, Context Managers and Streaming Data",
-        "video_url": null,
-        "topic": "A generator produces values one at a time and remembers where it stopped, which means a pipeline of generators processes a file of any size in constant memory. Context managers guarantee that a resource is released on every exit path including exceptions, which is why the with statement is not optional for file handling.\n\nKey rules:\n- A generator holds one item at a time - memory use stays flat regardless of input size.\n- Generators are consumed once - iterate again and you get nothing.\n- Always open files with a context manager - it closes on the exception path too.\n- Chain generators to build a pipeline; each stage stays a small, testable function.\n\nWorked example - a three stage streaming pipeline over a large log:\ndef lines(path):\n    with open(path, encoding=\"utf-8\") as f:\n        for line in f: yield line.rstrip(\"\\n\")\n\ndef errors(rows):\n    for r in rows:\n        if \" ERROR \" in r: yield r",
+        "week": 2,
+        "session": 3,
+        "title": "Decorators with Arguments & Class Decorators",
+        "video_url": "https://www.youtube.com/watch?v=r7Dtus7N4pI",
+        "topic": "Real-life analogy: Think of a security scanner whose alarm sensitivity is dialled to a different threshold depending on whether it is screening carry-on bags or heavy cargo freight.\n\nA decorator that takes its own arguments needs a three-level nest: the outer call captures the arguments, the middle layer receives the function, and the inner layer runs it. A class-based decorator instead implements __call__, which lets it keep state cleanly across every invocation of the wrapped function.",
         "problems": [
           {
-            "title": "Memory bounded rewrite",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Convert a program that loads a whole file into memory into a generator pipeline.",
-            "criteria": [
-              "Identical output with flat memory use on a large input."
-            ],
-            "hint": "A generator holds one item at a time, keeping memory flat.",
-            "solution": "The program converted to a generator pipeline with identical output and flat memory use on a large input."
-          },
-          {
-            "title": "Custom context manager",
+            "title": "Configurable Retry Decorator",
             "points": 40,
             "difficulty": "Core",
-            "description": "Write a context manager that times a block and guarantees a report even when the block raises.",
+            "description": "Write a parameterised decorator @retry(num_times=2) that re-runs a function each time it raises an exception, up to num_times extra attempts, and prints which retry finally succeeded. Apply it to a function that fails once then succeeds - the scanner set to its retry threshold before it gives up.\n\nSample Input: FailOnceThenSucceed\nExpected Output: [Retry 1] Success",
             "criteria": [
-              "Report printed on both paths."
+              "retry(num_times=2) is a three-tier decorator factory (arguments -> function -> wrapper) that catches the exception and re-calls up to num_times times",
+              "When the target fails once then succeeds, the program prints exactly \"[Retry 1] Success\""
             ],
-            "hint": "Context managers release resources on every exit path, including exceptions.",
-            "solution": "A context manager producing its timing report on both the success and the exception path."
-          },
-          {
-            "title": "Module project: Streaming log analyser",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build an analyser that processes a multi gigabyte log in constant memory and reports error rates per hour, top failing endpoints and the longest quiet period.",
-            "criteria": [
-              "A multi-gigabyte log is processed in constant memory, and error rates per hour, top failing endpoints and the longest quiet period are all reported correctly."
-            ],
-            "hint": "Chain small generator stages to build the pipeline.",
-            "solution": "A constant-memory log analyser producing correct hourly error rates, top endpoints and the longest quiet period."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Corey Schafer",
-            "title": "Python Tutorial: Generators",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=Corey%20Schafer%20Python%20Tutorial%3A%20Generators"
-          },
-          {
-            "channel": "mCoding",
-            "title": "Generators are underrated",
-            "length": "9 min",
-            "url": "https://www.youtube.com/results?search_query=mCoding%20Generators%20are%20underrated"
+            "hint": "def retry(num_times=2): def deco(func): def wrapper(*a, **kw): for i in range(1, num_times + 1): try: return func(*a, **kw) except Exception: continue ...",
+            "solution": "A @retry(num_times=2) decorator that swallows the first failure and prints \"[Retry 1] Success\" on the successful re-run."
           }
         ]
       },
       {
         "no": 7,
-        "week": 1,
-        "session": 3,
-        "title": "Advanced 3: Structured Persistence, Schema Migration and APIs",
-        "video_url": null,
-        "topic": "Any application that stores data will eventually change its shape, and the moment that happens the file written by the old version becomes a liability. Writing a version number into the file from day one, and a small migration function per version step, converts that liability into a routine upgrade. Calling a network API needs a timeout, a retry policy and a response check - all mandatory rather than optional.\n\nKey rules:\n- Write a schema version into every stored file - migration is a chain of small steps.\n- Every network call gets an explicit timeout.\n- Retry only on transient failures, with an increasing wait, and cap the number of attempts.\n- Validate the response shape before using it.\n\nWorked example - versioned storage with a migration chain:\nMIGRATIONS = {\n    1: lambda d: {**d, \"tags\": [], \"version\": 2},\n    2: lambda d: {**d, \"archived\": False, \"version\": 3},\n}\ndef load(path):\n    with open(path, encoding=\"utf-8\") as f: data = json.load(f)\n    while data.get(\"version\", 1) in MIGRATIONS: data = MIGRATIONS[data[\"version\"]](data)\n    return data",
+        "week": 3,
+        "session": 1,
+        "title": "Advanced Dunder Methods (__repr__, __eq__, __getitem__, __call__)",
+        "video_url": "https://www.youtube.com/watch?v=3ohzBxoFHAY",
+        "topic": "Real-life analogy: Think of teaching a custom-built vehicle to respond to the universal controls every driver expects - the accelerator, the brake pedal, and the diagnostic port on the dashboard.\n\nSpecial \"dunder\" (double-underscore) methods plug a class into Python's own syntax: __repr__ gives a useful debugging string, __eq__ defines ==, __getitem__ enables obj[k] indexing, and __call__ makes an instance callable like a function.",
         "problems": [
           {
-            "title": "Migration chain",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Write migrations that carry a stored file from version one to version four without data loss.",
-            "criteria": [
-              "All supplied old files load correctly."
-            ],
-            "hint": "Migration is a chain of small steps, not one rewrite.",
-            "solution": "All old versioned files correctly migrated to version four with no data loss."
-          },
-          {
-            "title": "Resilient client",
+            "title": "Callable Vector Math Class",
             "points": 40,
             "difficulty": "Core",
-            "description": "Write an API client with timeout, capped retries with increasing wait and response validation.",
+            "description": "Implement a 2D Vector(x, y) class with __add__ so v1 + v2 adds componentwise, __repr__ printing it as Vector(x, y), and __getitem__ so v[0] is x and v[1] is y. Add two vectors and print the sum plus its first component.\n\nSample Input: v1=(2,3), v2=(4,5)\nExpected Output: Vector(6, 8) | Index 0: 6",
             "criteria": [
-              "Survives the simulated flaky endpoint and never hangs."
+              "Vector defines __add__, __repr__ and __getitem__, and the + and [] in the program go through those dunder methods (not named helper methods)",
+              "For v1=(2,3) and v2=(4,5) the program prints exactly \"Vector(6, 8) | Index 0: 6\""
             ],
-            "hint": "Every network call needs an explicit timeout.",
-            "solution": "A resilient client surviving the simulated flaky endpoint with a capped retry policy and no hang."
-          },
-          {
-            "title": "Module project: Offline first data store",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a store that works from a local cache when the network is unavailable, synchronises when it returns, resolves conflicts by a documented rule and migrates its own schema on upgrade.",
-            "criteria": [
-              "The store functions offline from a local cache, synchronises correctly when the network returns, resolves conflicts by a documented rule, and migrates its own schema."
-            ],
-            "hint": "Write a schema version into every stored file from day one.",
-            "solution": "A working offline-first store with correct conflict resolution, sync, and its own schema migration chain."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Corey Schafer",
-            "title": "Python Tutorial: Working with JSON Data",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Corey%20Schafer%20Python%20Tutorial%3A%20Working%20with%20JSON%20Data"
+            "hint": "__add__ returns Vector(self.x + other.x, self.y + other.y); __getitem__ maps index 0 -> self.x and 1 -> self.y.",
+            "solution": "A Vector class whose __add__/__repr__/__getitem__ produce \"Vector(6, 8) | Index 0: 6\" for the sample vectors."
           }
         ]
       },
       {
         "no": 8,
-        "week": 2,
-        "session": 1,
-        "title": "Advanced 4: Testing, Packaging and the Course Capstone",
-        "video_url": null,
-        "topic": "Tests are not about proving code correct, they are about making change safe. A test suite that runs in seconds and fails loudly when behaviour changes is what allows a project to be refactored at all. Test the boundary cases and the error paths rather than the happy path. Packaging closes the loop by making the work runnable by someone other than its author.\n\nKey rules:\n- Test the boundaries and the failure paths - the happy path is the least likely place for defects.\n- Each test must be independent.\n- Coverage measures which lines ran, not whether behaviour is correct.\n- A project someone else cannot install and run in one command is not finished.\n\nWorked example - boundary focused tests rather than happy path tests:\nimport pytest\nfrom tasks import Task\n\ndef test_rejects_unknown_status():\n    t = Task(\"write report\")\n    with pytest.raises(ValueError):\n        t.status = \"finished\"",
+        "week": 3,
+        "session": 2,
+        "title": "Property Descriptors & Attribute Interception (__getattr__, __setattr__)",
+        "video_url": "https://www.youtube.com/watch?v=1v_vQ1S_Y1w",
+        "topic": "Real-life analogy: Think of a smart building system that intercepts every attempt to change a room's thermostat, checking the requested temperature is sane before it ever lets the furnace fire.\n\nThe descriptor protocol (__get__, __set__, __delete__) is the machinery behind @property: a descriptor is a class attribute that runs code on access. __getattr__ and __setattr__ intercept attribute access on an instance, enabling validation, defaults and proxying.",
         "problems": [
           {
-            "title": "Boundary suite",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Write a test suite for a supplied module covering every error path.",
-            "criteria": [
-              "Suite catches all four deliberately introduced defects."
-            ],
-            "hint": "Test boundaries and failure paths, not just the happy path.",
-            "solution": "A test suite that correctly catches all four deliberately introduced defects."
-          },
-          {
-            "title": "Make it installable",
+            "title": "Validated Integer Descriptor",
             "points": 40,
             "difficulty": "Core",
-            "description": "Package a project so it installs and runs from a clean environment in one command.",
+            "description": "Create a descriptor class PositiveNumber that stores an integer on the owner object but raises ValueError(\"Negative values prohibited\") in its __set__ whenever the assigned value is negative. Attach it to a class attribute, attempt to set it to -5, and print the caught error - the building system refusing an out-of-range thermostat setting.\n\nSample Input: Set -5\nExpected Output: ValueError: Negative values prohibited",
             "criteria": [
-              "Verified install on a fresh environment."
+              "PositiveNumber implements __set__ (plus __set_name__ / __get__ as needed) and raises ValueError inside __set__ for negatives - the check lives in the descriptor, not in the caller",
+              "Assigning -5 and printing the caught exception yields exactly \"ValueError: Negative values prohibited\""
             ],
-            "hint": "A project someone else cannot install in one command is not finished.",
-            "solution": "The project verified to install and run correctly from a clean environment in one command."
-          },
+            "hint": "In __set__(self, obj, value): if value < 0: raise ValueError(\"Negative values prohibited\").",
+            "solution": "A PositiveNumber descriptor whose __set__ rejects -5 with \"ValueError: Negative values prohibited\"."
+          }
+        ]
+      },
+      {
+        "no": 9,
+        "week": 3,
+        "session": 3,
+        "title": "Abstract Base Classes (abc module) & Metaclasses",
+        "video_url": "https://www.youtube.com/watch?v=naquhuPPduQ",
+        "topic": "Real-life analogy: Think of a national industrial standard that requires every compliant engine factory to produce a certified mounting bracket before it is allowed to open its doors at all.\n\nThe abc module enforces a structural contract: a class with an @abstractmethod cannot be instantiated until a subclass implements that method. Metaclasses go one level deeper - by inheriting from type they customise class creation itself, powering automatic subclass registration and field validation.",
+        "problems": [
           {
-            "title": "Course capstone: TaskFlow productivity and habit analytics suite",
+            "title": "Abstract Database Connector Contract",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Define an abstract base class DatabasePlugin (using abc.ABC) with an abstract method connect(). Create a concrete ConcretePlugin subclass that implements connect() to print the success line, instantiate it and call connect() - the factory that may only open once it produces the certified part.\n\nSample Input: ConcretePlugin\nExpected Output: Plugin Connected Successfully",
+            "criteria": [
+              "DatabasePlugin subclasses abc.ABC and marks connect() with @abstractmethod, so instantiating DatabasePlugin directly would raise TypeError",
+              "ConcretePlugin implements connect(); instantiating it and calling connect() prints exactly \"Plugin Connected Successfully\""
+            ],
+            "hint": "from abc import ABC, abstractmethod; class DatabasePlugin(ABC): @abstractmethod def connect(self): ...",
+            "solution": "An abstract DatabasePlugin contract with a concrete ConcretePlugin whose connect() prints \"Plugin Connected Successfully\"."
+          }
+        ]
+      },
+      {
+        "no": 10,
+        "week": 4,
+        "session": 1,
+        "title": "Custom Context Managers (__enter__, __exit__)",
+        "video_url": "https://www.youtube.com/watch?v=iba-I4CrmVA",
+        "topic": "Real-life analogy: Think of borrowing a book from a library - the check-out is logged as you walk in, and the security scan and any late fee are settled automatically as you pass back through the door, whether or not you finished the book.\n\nThe with statement calls __enter__() to acquire a resource and __exit__() to release it - and __exit__ runs even if the block raises an exception, making it the reliable place for cleanup.",
+        "problems": [
+          {
+            "title": "High-Precision Code Timer Context Manager",
+            "points": 30,
+            "difficulty": "Basic",
+            "description": "Implement a Timer context manager whose __enter__ records a start time and whose __exit__ prints a completion line. Use it in a with block around a small workload and show the message printed on exit - the library door settling everything as you leave.\n\nSample Input: RunWorkload\nExpected Output: [Timer] Execution completed successfully",
+            "criteria": [
+              "Timer is a class defining __enter__ and __exit__ (not the @contextmanager form here), and the completion line is printed from inside __exit__",
+              "Running a \"with Timer():\" block prints exactly \"[Timer] Execution completed successfully\""
+            ],
+            "hint": "class Timer: def __enter__(self): self.t0 = time.perf_counter(); return self  def __exit__(self, *exc): print(\"[Timer] Execution completed successfully\").",
+            "solution": "A class-based Timer context manager printing \"[Timer] Execution completed successfully\" from __exit__."
+          }
+        ]
+      },
+      {
+        "no": 11,
+        "week": 4,
+        "session": 2,
+        "title": "contextlib Utilities (@contextmanager)",
+        "video_url": "https://www.youtube.com/watch?v=iba-I4CrmVA",
+        "topic": "Real-life analogy: Think of an express checkout lane that folds scanning and bagging into one smooth motion, instead of two separate stations.\n\nThe @contextlib.contextmanager decorator turns a generator with a single yield into a full context manager: everything before the yield is the __enter__ work, the yielded value is the \"as\" target, and everything after (ideally in a finally) is the __exit__ cleanup - no boilerplate class required.",
+        "problems": [
+          {
+            "title": "Standard Output Redirector",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Using @contextlib.contextmanager, write a context manager that temporarily replaces sys.stdout with an in-memory io.StringIO buffer, restores it on exit, and makes the captured text available. Inside the block print \"Test Message\", then after the block print it back behind a label.\n\nSample Input: RedirectStream\nExpected Output: [Captured Output] Test Message",
+            "criteria": [
+              "The context manager is a single-yield generator decorated with @contextmanager, and sys.stdout is restored in a finally block",
+              "After the with block, the captured buffer content is printed as exactly \"[Captured Output] Test Message\""
+            ],
+            "hint": "old = sys.stdout; sys.stdout = io.StringIO(); try: yield sys.stdout finally: sys.stdout = old.",
+            "solution": "A @contextmanager-based redirector capturing stdout into a StringIO, yielding \"[Captured Output] Test Message\" afterward."
+          }
+        ]
+      },
+      {
+        "no": 12,
+        "week": 4,
+        "session": 3,
+        "title": "Garbage Collection, __slots__ & weakref",
+        "video_url": "https://www.youtube.com/watch?v=IuceYkcrbEE",
+        "topic": "Real-life analogy: Think of designing a micro-apartment with a fixed set of built-in wall cubbies instead of bulky movable closets - the same storage in a fraction of the footprint and cost.\n\nCPython frees objects by reference counting, with a cyclic collector for reference loops. Declaring __slots__ removes each instance's per-object __dict__, cutting memory sharply, and weakref lets one object refer to another without keeping it alive, breaking reference cycles.",
+        "problems": [
+          {
+            "title": "Memory-Optimized __slots__ Point",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Create a Point class declaring __slots__ = (\"x\", \"y\") with an __repr__ of Point(x, y). Build Point(10, 20), print it, then attempt to set an undeclared attribute z and report the AttributeError - the fixed wall cubbies with no room for anything unplanned.\n\nSample Input: Set Point(10, 20)\nExpected Output: Point(10, 20) | AttributeError on z",
+            "criteria": [
+              "Point declares __slots__ = (\"x\", \"y\") so no per-instance __dict__ exists, and assigning p.z raises AttributeError",
+              "The program prints exactly \"Point(10, 20) | AttributeError on z\""
+            ],
+            "hint": "Wrap p.z = 1 in try/except AttributeError, and print the repr and the \"AttributeError on z\" note on one line.",
+            "solution": "A __slots__-based Point that prints its repr and reports \"AttributeError on z\" when an undeclared attribute is set."
+          }
+        ]
+      },
+      {
+        "no": 13,
+        "week": 5,
+        "session": 1,
+        "title": "Threading vs Multiprocessing & the GIL",
+        "video_url": "https://www.youtube.com/watch?v=ecKWiaHCEKs",
+        "topic": "Real-life analogy: Threading is two cooks sharing a single kitchen counter - fine while they are mostly waiting on phone orders, but a bottleneck when both need to chop at once. Multiprocessing is building two separate kitchens in two separate buildings.\n\nThe Global Interpreter Lock (GIL) lets only one thread execute Python bytecode at a time, so threading helps I/O-bound work (network, disk) but not CPU-bound work. multiprocessing sidesteps the GIL by running separate interpreter processes on separate cores.",
+        "problems": [
+          {
+            "title": "Concurrent Thread Worker Pool",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Read a worker count N. Launch N threads with threading.Thread, passing each a 1-based worker id, where each worker prints \"Worker <id> Finished\". Join every thread before the program ends so all workers complete - the cooks sharing the counter, all done before service closes.\n\nSample Input: 2 Workers\nExpected Output:\nWorker 1 Finished\nWorker 2 Finished",
+            "criteria": [
+              "N threading.Thread objects are started with a target and a worker-id argument, and every thread is .join()ed before the program exits",
+              "For 2 workers the output contains exactly the lines \"Worker 1 Finished\" and \"Worker 2 Finished\" (one per line)"
+            ],
+            "hint": "threads = [threading.Thread(target=work, args=(i,)) for i in range(1, n + 1)]; start each, then join each.",
+            "solution": "Two joined worker threads each printing \"Worker <id> Finished\"."
+          }
+        ]
+      },
+      {
+        "no": 14,
+        "week": 5,
+        "session": 2,
+        "title": "Thread Synchronization with Lock & Queue",
+        "video_url": "https://www.youtube.com/watch?v=Rst_7fL9Wc0",
+        "topic": "Real-life analogy: Think of a single-teller bank desk with a velvet-rope queue and a locked cash drawer - only one customer is served at a time, and no two hands ever reach into the drawer at once.\n\nWhen threads share mutable state, unsynchronised updates race and corrupt it. threading.Lock gives mutual exclusion, cleanest as \"with lock:\", and the thread-safe queue.Queue hands work between producer and consumer threads without any explicit locking.",
+        "problems": [
+          {
+            "title": "Mutex-Guarded Counter",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Start 2 threads that each increment a shared counter 1000 times. Guard every increment with a single shared threading.Lock so no updates are lost, then print the final total - the locked cash drawer that only one hand touches at a time.\n\nInput: None\nExpected Output: Final Thread-Safe Counter: 2000",
+            "criteria": [
+              "Every increment of the shared counter happens inside \"with lock:\" using one shared Lock, and both threads are joined before the total is read",
+              "The program prints exactly \"Final Thread-Safe Counter: 2000\" on every run, with no lost updates"
+            ],
+            "hint": "Hold the counter in a shared mutable object; inside each loop iteration: with lock: obj.value += 1.",
+            "solution": "A lock-guarded shared counter incremented 2000 times across two threads, always printing 2000."
+          }
+        ]
+      },
+      {
+        "no": 15,
+        "week": 5,
+        "session": 3,
+        "title": "Asynchronous Programming with AsyncIO (async / await)",
+        "video_url": "https://www.youtube.com/watch?v=t5Bo1Je9EmE",
+        "topic": "Real-life analogy: Think of a chess grandmaster playing fifty opponents at once. Rather than standing at board one waiting for a reply, the master plays a move, walks to board two, and only returns to board one once that opponent has moved - one person, many games in flight.\n\nasyncio is single-threaded cooperative multitasking: a coroutine defined with async def gives up control at each await during I/O, and asyncio.gather() runs many coroutines concurrently on one event loop, ideal for thousands of simultaneous network calls.",
+        "problems": [
+          {
+            "title": "Async Coroutine Task Gatherer",
             "points": 60,
             "difficulty": "Boss",
-            "description": "Build a complete productivity application with custom exception contracts, generator based reporting over files larger than memory, schema migration between two stored versions and a test suite above eighty percent coverage.",
+            "description": "Write an async coroutine fetch(task_id) that simulates a network call with await asyncio.sleep(...). Read a task count N, dispatch N of these coroutines concurrently with asyncio.gather(), await them all, and print the completion summary - the capstone finale, the grandmaster keeping every game moving at once instead of blocking on the first.\n\nSample Input: 3 Tasks\nExpected Output: [Async Engine] 3 Network Tasks Completed",
             "criteria": [
-              "Custom exception contracts, generator-based reporting over oversized files, schema migration between two versions, and over 80% test coverage are all present and working."
+              "fetch is an async def coroutine using await asyncio.sleep(...), and all N coroutines are launched together via a single awaited asyncio.gather(*tasks) - not awaited one at a time in a loop",
+              "For 3 tasks the program prints exactly \"[Async Engine] 3 Network Tasks Completed\""
             ],
-            "hint": "Test the boundaries and failure paths first.",
-            "solution": "A complete TaskFlow suite meeting every constraint, verified by a test suite above eighty percent coverage."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Corey Schafer",
-            "title": "Python Tutorial: Unit Testing Your Code",
-            "length": "13 min",
-            "url": "https://www.youtube.com/results?search_query=Corey%20Schafer%20Python%20Tutorial%3A%20Unit%20Testing%20Your%20Code"
-          },
-          {
-            "channel": "mCoding",
-            "title": "Automated testing in Python",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=mCoding%20Automated%20testing%20in%20Python"
+            "hint": "await asyncio.gather(*(fetch(i) for i in range(n))) inside an async main(), run with asyncio.run(main()).",
+            "solution": "An asyncio.gather() dispatch of N network coroutines, printing \"[Async Engine] 3 Network Tasks Completed\" - capstone complete."
           }
         ]
       }

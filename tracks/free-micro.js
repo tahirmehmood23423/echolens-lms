@@ -12,9 +12,10 @@
  * explanation + a real YouTube video + one scenario-based Compiler Quest
  * per topic, each with an exact Sample Input/Expected Output so the grader
  * has a literal target). video_url is populated with real videos for FC-01
- * and FC-02 only; it is still intentionally left null for the other tracks
- * below (Python, JavaScript, HTML & CSS) until their video links and
- * matching PDFs are sourced too.
+ * and FC-02 here, and CS-104 (Python) in tracks/cs-fundamentals.js now
+ * follows the same verbatim-syllabus shape with real videos too; it is
+ * still intentionally left null for CS-105 (JavaScript) and CS-106
+ * (HTML & CSS) until their video links and matching PDFs are sourced.
  */
 
 module.exports = [

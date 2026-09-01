@@ -197,7 +197,7 @@ module.exports = [
           hint: 'const total = price * (1 + TAX_RATE); then total.toFixed(2) for the 2-decimal string.',
           solution: 'A const TAX_RATE and a block-scoped let total, printing "Total with Tax: $108.00" for a price of 100.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'Primitive Data Types & Type Conversion', video_url: 'https://www.youtube.com/watch?v=d_k8q8jV0Y0',
+    { no: 3, week: 1, session: 3, title: 'Primitive Data Types & Type Conversion', video_url: 'https://www.youtube.com/results?search_query=javascript+data+types+type+conversion+tutorial',
       topic: "Real-life analogy: Think of an international exchange booth: the machines turn number vouchers into text tickets and back, but hand you an empty \"Rejected\" slip (NaN) when the input makes no sense.\n\nJavaScript has seven primitive types: string, number, bigint, boolean, undefined, symbol and null. typeof reports a value's type, and Number(), String() and Boolean() convert explicitly between them.",
       problems: [
         { title: 'Type Inspector & Parser', points: 40, difficulty: 'Core',
@@ -206,7 +206,7 @@ module.exports = [
           hint: 'const n = Number(raw); then typeof (n * 2) is "number".',
           solution: 'A Number()-cast value doubled to 90, with typeof reporting "number".' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Strict Equality (===) vs Loose Equality (==)', video_url: 'https://www.youtube.com/watch?v=kVOmc7P8WVw',
+    { no: 4, week: 2, session: 1, title: 'Strict Equality (===) vs Loose Equality (==)', video_url: 'https://www.youtube.com/results?search_query=javascript+strict+vs+loose+equality+triple+equals',
       topic: "Real-life analogy: Think of an airport checkpoint: loose equality (==) waves you through if the boarding pass merely looks close after some auto-adjusting; strict equality (===) demands the passport identity and an exact biometric match.\n\n== coerces the two operands to a common type before comparing, so '5' == 5 is true and \"0\" == 0 is true. === compares type and value with no coercion, so '5' === 5 is false. Default to === everywhere.",
       problems: [
         { title: 'Coercion Sentinel Validator', points: 30, difficulty: 'Basic',
@@ -242,7 +242,7 @@ module.exports = [
           hint: '[1,2,3,4,5,6].filter(n => n % 2 === 0).map(n => n * n).reduce((a, b) => a + b, 0)',
           solution: 'A filter -> map -> reduce chain squaring the evens and summing them to 56.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Objects, Destructuring & Spread / Rest (...)', video_url: 'https://www.youtube.com/watch?v=-vR3a11WZT0',
+    { no: 8, week: 3, session: 2, title: 'Objects, Destructuring & Spread / Rest (...)', video_url: 'https://www.youtube.com/results?search_query=javascript+destructuring+spread+rest+operator+tutorial',
       topic: "Real-life analogy: Think of unpacking a flat-pack furniture crate: you lift the desk top and legs straight out by name (destructuring), and sweep the leftover screws into a spare-parts bag (rest).\n\nDestructuring pulls properties or elements into their own variables (const { name, age } = user;). The spread operator ... copies or merges objects and arrays; rest ... in a parameter or pattern collects whatever is left over.",
       problems: [
         { title: 'Object Merge & Destructure', points: 40, difficulty: 'Core',
@@ -278,7 +278,7 @@ module.exports = [
           hint: 'function createCounter() { let count = 0; return () => ++count; }',
           solution: 'A createCounter() closure over a private count, whose returned function prints "1 2 3" across three calls.' },
       ] },
-    { no: 12, week: 4, session: 3, title: 'Higher-Order Functions & Currying', video_url: 'https://www.youtube.com/watch?v=rCGYj3OmkHw',
+    { no: 12, week: 4, session: 3, title: 'Higher-Order Functions & Currying', video_url: 'https://www.youtube.com/results?search_query=javascript+higher+order+functions+currying+tutorial',
       topic: "Real-life analogy: Think of a build-your-own sandwich line: one station takes your bread choice, the next your protein, the next your sauce - each takes a single decision and passes the sandwich along.\n\nA higher-order function takes a function as an argument or returns one. Currying rewrites a multi-argument function f(a, b, c) as a chain of one-argument functions f(a)(b)(c), which makes partial application and composition natural.",
       problems: [
         { title: 'Curried Discount Calculator', points: 40, difficulty: 'Core',

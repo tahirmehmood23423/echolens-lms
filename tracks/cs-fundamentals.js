@@ -327,7 +327,7 @@ module.exports = [
   key_concepts: ['HTML boilerplate & document anatomy', 'Headings, paragraphs & lists', 'Links, images & attributes', 'Semantic layout elements', 'Tables & structured data', 'Forms & input controls', 'Applying CSS & selectors', 'Colours, units & typography', 'The box model', 'Display & positioning', 'Flexbox layout', 'CSS Grid layout', 'Responsive design & media queries', 'Transitions, transforms & animations', 'Complete responsive landing page'],
   pass_mark: 60, titleNames: ['Markup Starter', 'Layout Architect'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'HTML Boilerplate & Document Anatomy', video_url: 'https://www.youtube.com/results?search_query=html+boilerplate+document+structure+doctype+head+body',
+    { no: 1, week: 1, session: 1, title: 'HTML Boilerplate & Document Anatomy', video_url: 'https://www.youtube.com/watch?v=X4sClFRMJ00',
       topic: "Real-life analogy: Think of the blueprint and foundation of a house. Before any furniture or paint, you pour the concrete slab (doctype), raise the frame (html), route the hidden utilities in the basement (head), and define the living space people actually walk through (body).\n\nEvery HTML page begins with <!DOCTYPE html> and a root html element containing a head for metadata (title, charset, viewport) and a body for visible content. Proper nesting and the lang attribute give browsers and screen readers a reliable structure to parse.",
       problems: [
         { title: 'Minimal Valid Page', points: 30, difficulty: 'Basic',
@@ -336,7 +336,7 @@ module.exports = [
           hint: '<title> goes inside <head>; the visible greeting goes in an <h1> inside <body>.',
           solution: 'A valid HTML5 skeleton with the tab title "EchoLens" and an <h1> reading "Hello EchoLens".' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Text Content Elements (headings, paragraphs, lists)', video_url: 'https://www.youtube.com/results?search_query=html+headings+paragraphs+lists+strong+em',
+    { no: 2, week: 1, session: 2, title: 'Text Content Elements (headings, paragraphs, lists)', video_url: 'https://www.youtube.com/watch?v=m61h9YEB1fw',
       topic: "Real-life analogy: Think of laying out a newspaper page. The masthead is the biggest headline (h1), section titles are sub-headlines (h2, h3), body columns are paragraphs, and bullet briefs are lists down the margin.\n\nHeadings h1 to h6 express document hierarchy, <p> holds paragraphs, and <ul>, <ol>, <li> build unordered and ordered lists. Inline tags like <strong> and <em> add semantic emphasis rather than purely visual bold or italics.",
       problems: [
         { title: 'Recipe Card', points: 30, difficulty: 'Basic',
@@ -345,7 +345,7 @@ module.exports = [
           hint: 'Use <ol> for steps that have an order; each step is its own <li>.',
           solution: 'A heading, an intro paragraph, and a three-item <ol> that renders as a numbered 1-2-3 list.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'Links, Images & Attributes', video_url: 'https://www.youtube.com/results?search_query=html+links+images+anchor+href+img+alt+attributes',
+    { no: 3, week: 1, session: 3, title: 'Links, Images & Attributes', video_url: 'https://www.youtube.com/watch?v=t-G8GgRA5Yw',
       topic: "Real-life analogy: Think of a hotel concierge. Links are directions to other destinations (href), images are framed photographs on the wall, and the alt text is the caption a guide reads aloud to a visitor who cannot see the picture.\n\nThe <a href> element navigates to internal or external destinations, while <img src> embeds images with a mandatory alt attribute for accessibility. Attributes such as target and rel control how resources open and behave.",
       problems: [
         { title: 'Linked Logo', points: 30, difficulty: 'Basic',
@@ -354,7 +354,7 @@ module.exports = [
           hint: '<a href="https://www.echolens.digital" target="_blank" rel="noopener"><img src="..." alt="EchoLens"></a>',
           solution: 'An <img> with alt text wrapped in an <a target="_blank" rel="noopener"> that opens EchoLens in a new tab.' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Semantic Layout Elements', video_url: 'https://www.youtube.com/results?search_query=html5+semantic+elements+header+nav+main+section+article+footer',
+    { no: 4, week: 2, session: 1, title: 'Semantic Layout Elements', video_url: 'https://www.youtube.com/watch?v=YOsMJQfwqow',
       topic: "Real-life analogy: Think of posting clear signs on the rooms of a house. Instead of calling every space a generic room, you label them: Entrance (header), Hallway (nav), Living Room (main), Store Room (aside), Exit (footer).\n\nSemantic tags header, nav, main, section, article, aside and footer describe the meaning of page regions. They improve accessibility, SEO and maintainability compared with generic <div> containers.",
       problems: [
         { title: 'Semantic Skeleton', points: 40, difficulty: 'Core',
@@ -363,7 +363,7 @@ module.exports = [
           hint: 'header wraps the top, nav wraps the link list, main wraps the primary content, footer wraps the bottom.',
           solution: 'A layout rebuilt with header/nav/main/footer landmarks, visually identical to the original div version.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Tables & Structured Data', video_url: 'https://www.youtube.com/results?search_query=html+tables+thead+tbody+tr+th+td+caption',
+    { no: 5, week: 2, session: 2, title: 'Tables & Structured Data', video_url: 'https://www.youtube.com/watch?v=phkB7Aj3Klw',
       topic: "Real-life analogy: Think of a train timetable board at a station. Column headers name each track and time, rows list each departure, and the grid lets a traveller cross-reference destination against schedule instantly.\n\nTables use table, thead, tbody, tr, th and td to present two-dimensional data. A <caption> names the table and th scope=\"col\" ties each data cell to its column header for assistive technology.",
       problems: [
         { title: 'Price Table', points: 30, difficulty: 'Basic',
@@ -372,7 +372,7 @@ module.exports = [
           hint: '<caption> comes first inside <table>; header cells are <th scope="col"> in <thead>.',
           solution: 'A captioned table with a scoped <th> header row and three <td> data rows in the body.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Forms & Input Controls', video_url: 'https://www.youtube.com/results?search_query=html+forms+input+label+select+textarea+validation',
+    { no: 6, week: 2, session: 3, title: 'Forms & Input Controls', video_url: 'https://www.youtube.com/watch?v=fNcJuPIZ2WE',
       topic: "Real-life analogy: Think of a bank deposit slip. Each labelled field asks for one specific piece of information, some boxes only accept numbers, and you cannot submit until the required fields are filled in correctly.\n\nForms use <form> with controls such as input, label, select, textarea and button. Associating each <label for> with its input's id, and using types like email or number, enables native browser validation and accessibility.",
       problems: [
         { title: 'Signup Field', points: 40, difficulty: 'Core',
@@ -381,7 +381,7 @@ module.exports = [
           hint: '<label for="email">Email</label><input id="email" type="email" required> - the type and required do the validating.',
           solution: 'A labelled type="email" required input whose form only submits once a valid address is entered.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Applying CSS & Selectors', video_url: 'https://www.youtube.com/results?search_query=css+how+to+apply+stylesheet+selectors+class+id',
+    { no: 7, week: 3, session: 1, title: 'Applying CSS & Selectors', video_url: 'https://www.youtube.com/watch?v=QhMTPAbea_k',
       topic: "Real-life analogy: Think of a theatre wardrobe department. You can dress one actor directly (inline), post costume notes backstage for a scene (internal), or keep one master costume manual the whole cast follows (external stylesheet).\n\nCSS can be applied inline, internally in a <style> block, or externally via <link>. Selectors target elements by tag, class (.) or id (#), with class selectors being the primary reusable styling hook.",
       problems: [
         { title: 'Class Painter', points: 30, difficulty: 'Basic',
@@ -390,7 +390,7 @@ module.exports = [
           hint: '.highlight { background: yellow; } - the leading dot means "class", not "#id".',
           solution: 'A .highlight class rule giving every element in that class a yellow background.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Colours, Units & Typography', video_url: 'https://www.youtube.com/results?search_query=css+colors+units+px+em+rem+typography+font-family',
+    { no: 8, week: 3, session: 2, title: 'Colours, Units & Typography', video_url: 'https://www.youtube.com/watch?v=dHbYcAncAgQ',
       topic: "Real-life analogy: Think of an interior design mood board. You pick a colour palette (hex, rgb), choose measurement scales for the furniture (px, em, rem), and select the lettering style for the signage (font-family, weight, line-height).\n\nColours are set with hex, rgb() or hsl(); sizes use absolute (px) and relative (em, rem, %) units. Typography properties like font-family, font-size, font-weight and line-height control how readable text is.",
       problems: [
         { title: 'Readable Paragraph', points: 30, difficulty: 'Basic',
@@ -399,7 +399,7 @@ module.exports = [
           hint: 'p { font-size: 1.125rem; line-height: 1.6; color: #1b2733; }',
           solution: 'A paragraph rule with a rem font-size, a 1.6 line-height and a hex colour, visibly applied.' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'The Box Model', video_url: 'https://www.youtube.com/results?search_query=css+box+model+margin+padding+border+box-sizing',
+    { no: 9, week: 3, session: 3, title: 'The Box Model', video_url: 'https://www.youtube.com/watch?v=D_akuQHIPtg',
       topic: "Real-life analogy: Think of a framed painting shipped in a box. The artwork is the content, the mount board around it is padding, the wooden frame is the border, and the packing space inside the shipping box is the margin.\n\nEvery element is a rectangular box of content, padding, border and margin. Setting box-sizing to border-box makes the declared width include padding and border, preventing layout-math surprises.",
       problems: [
         { title: 'Spaced Card', points: 30, difficulty: 'Basic',
@@ -408,7 +408,7 @@ module.exports = [
           hint: '.card { box-sizing: border-box; padding: 20px; border: 2px solid #ccc; margin: 16px; }',
           solution: 'A card with 20px padding, a 2px border and a 16px margin, sized with border-box.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Display & Positioning', video_url: 'https://www.youtube.com/results?search_query=css+display+block+inline+position+relative+absolute+fixed+sticky',
+    { no: 10, week: 4, session: 1, title: 'Display & Positioning', video_url: 'https://www.youtube.com/watch?v=fF_NVrd1s14',
       topic: "Real-life analogy: Think of arranging furniture in a room. Some pieces sit in the natural flow line by line (block, inline), a rug shifts slightly from its spot (relative), a wall clock is pinned to an exact coordinate (absolute), and a ceiling fan stays put no matter where you stand (fixed).\n\nThe display property (block, inline, inline-block, none) controls flow, while position (static, relative, absolute, fixed, sticky) removes or anchors elements. Offsets top, right, bottom, left position an element relative to its containing block.",
       problems: [
         { title: 'Sticky Header', points: 40, difficulty: 'Core',
@@ -417,7 +417,7 @@ module.exports = [
           hint: 'nav { position: sticky; top: 0; } - sticky needs a top offset to know where to stick.',
           solution: 'A nav with position: sticky; top: 0 that pins to the top of the viewport on scroll.' },
       ] },
-    { no: 11, week: 4, session: 2, title: 'Flexbox Layout', video_url: 'https://www.youtube.com/results?search_query=css+flexbox+justify-content+align-items+flex',
+    { no: 11, week: 4, session: 2, title: 'Flexbox Layout', video_url: 'https://www.youtube.com/watch?v=u044iM9xsWU',
       topic: "Real-life analogy: Think of arranging books on an adjustable shelf. You choose the direction (row or column), how the gaps distribute between books (justify-content), and how they line up against the shelf edge (align-items).\n\nFlexbox lays out items along a single axis using display: flex on a container. Properties like justify-content, align-items, gap and flex control alignment, spacing, and how items grow or shrink.",
       problems: [
         { title: 'Centered Box', points: 30, difficulty: 'Basic',
@@ -426,7 +426,7 @@ module.exports = [
           hint: '.container { display: flex; justify-content: center; align-items: center; } - both properties are needed.',
           solution: 'A flex container centring its child on both axes via justify-content and align-items: center.' },
       ] },
-    { no: 12, week: 4, session: 3, title: 'CSS Grid Layout', video_url: 'https://www.youtube.com/results?search_query=css+grid+grid-template-columns+rows+gap',
+    { no: 12, week: 4, session: 3, title: 'CSS Grid Layout', video_url: 'https://www.youtube.com/watch?v=8QSqwbSztnA',
       topic: "Real-life analogy: Think of a city block planned on graph paper. You draw the streets and avenues (rows and columns), drop each building into its exact plot (grid placement), and keep alleys of consistent width between them (gap).\n\nCSS Grid is a two-dimensional system using display: grid with grid-template-columns and grid-template-rows. Items are placed into tracks and can span cells, enabling complex page layouts without floats or hacks.",
       problems: [
         { title: 'Three Column Grid', points: 40, difficulty: 'Core',
@@ -435,7 +435,7 @@ module.exports = [
           hint: '.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }',
           solution: 'A grid container with three 1fr columns and a gap, laying cards out in equal columns.' },
       ] },
-    { no: 13, week: 5, session: 1, title: 'Responsive Design & Media Queries', video_url: 'https://www.youtube.com/results?search_query=css+responsive+design+media+queries+mobile+first',
+    { no: 13, week: 5, session: 1, title: 'Responsive Design & Media Queries', video_url: 'https://www.youtube.com/watch?v=QGb-W-c-gIM',
       topic: "Real-life analogy: Think of water taking the shape of any container. The same content pours neatly into a phone glass, a tablet jug, or a desktop bucket, rearranging itself to fit each vessel.\n\nResponsive design adapts layouts across screen sizes using relative units and @media queries. A mobile-first approach writes base styles for small screens, then layers enhancements at larger breakpoints with min-width queries.",
       problems: [
         { title: 'Breakpoint Switch', points: 40, difficulty: 'Core',
@@ -444,7 +444,7 @@ module.exports = [
           hint: 'Base: the columns are block/stacked. Then @media (min-width: 768px) { .row { display: flex; } }',
           solution: 'Mobile-first stacked columns that a min-width: 768px media query lays out side by side.' },
       ] },
-    { no: 14, week: 5, session: 2, title: 'Transitions, Transforms & Animations', video_url: 'https://www.youtube.com/results?search_query=css+transitions+transforms+keyframes+animation',
+    { no: 14, week: 5, session: 2, title: 'Transitions, Transforms & Animations', video_url: 'https://www.youtube.com/watch?v=y8-F5-2EIcg',
       topic: "Real-life analogy: Think of stage lighting and choreography. A transition is a smooth dimming of the lights, a transform is an actor turning or growing on the spot, and a keyframe animation is a full scripted dance from first beat to last.\n\nTransitions smoothly interpolate property changes over time, transforms translate/rotate/scale/skew elements, and @keyframes define multi-step animations. Combined, they add polish without JavaScript - and should be disabled under prefers-reduced-motion.",
       problems: [
         { title: 'Hover Grow', points: 40, difficulty: 'Core',
@@ -453,7 +453,7 @@ module.exports = [
           hint: 'button { transition: transform 0.2s; } button:hover { transform: scale(1.1); }',
           solution: 'A button that scales up on :hover and back on leave, animated by a transition on its base rule.' },
       ] },
-    { no: 15, week: 5, session: 3, title: 'Building a Complete Responsive Landing Page', video_url: 'https://www.youtube.com/results?search_query=css+responsive+landing+page+project',
+    { no: 15, week: 5, session: 3, title: 'Building a Complete Responsive Landing Page', video_url: 'https://www.youtube.com/watch?v=X1dz0xRbSJc',
       topic: "Real-life analogy: Think of assembling a show-home for an open house. Every room you framed, painted and furnished across the course now comes together into one polished, walk-through-ready property.\n\nA landing page integrates semantic structure, the box model, Flexbox and Grid, responsive queries and motion into one cohesive deliverable. This capstone consolidates every fundamental skill into a portfolio-ready artifact.",
       problems: [
         { title: 'Hero Section', points: 60, difficulty: 'Boss',

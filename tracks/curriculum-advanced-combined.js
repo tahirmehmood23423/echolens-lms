@@ -1503,7 +1503,7 @@ module.exports = [
         "week": 1,
         "session": 3,
         "title": "CSS Architecture Methodologies (BEM & Utility-First)",
-        "video_url": "https://www.youtube.com/results?search_query=css+BEM+naming+convention+utility+first+architecture",
+        "video_url": "https://www.youtube.com/watch?v=SLjHSVwXYq4",
         "topic": "Real-life analogy: Think of two philosophies for organising a giant warehouse. BEM labels every crate with a strict block, part, variant code, while utility-first stocks tiny single-purpose bins you combine on demand.\n\nScalable CSS relies on naming conventions like BEM (block__element--modifier) to avoid collisions and specificity wars. Utility-first approaches compose many small single-purpose classes in the markup, trading verbose HTML for predictable, reusable styling.",
         "problems": [
           {
@@ -1591,7 +1591,7 @@ module.exports = [
         "week": 3,
         "session": 1,
         "title": "Advanced Transitions & Keyframe Animations",
-        "video_url": "https://www.youtube.com/results?search_query=css+advanced+animation+keyframes+cubic-bezier+easing",
+        "video_url": "https://www.youtube.com/watch?v=y8-F5-2EIcg",
         "topic": "Real-life analogy: Think of a film director sequencing a scene. You set the timing (duration), the pacing curve of the actor's movement (easing), when it begins (delay), and script a multi-beat sequence frame by frame (keyframes).\n\nAdvanced motion combines transition timing functions, cubic-bezier() easing, and multi-step @keyframes with animation-delay and iteration control. Staggered and looping animations create rich, performant interfaces - and must be muted under prefers-reduced-motion.",
         "problems": [
           {
@@ -1635,7 +1635,7 @@ module.exports = [
         "week": 3,
         "session": 3,
         "title": "Gradients, Filters & Blend Modes",
-        "video_url": "https://www.youtube.com/results?search_query=css+gradients+filters+blend+modes+backdrop-filter",
+        "video_url": "https://www.youtube.com/watch?v=4kWHW7da4U8",
         "topic": "Real-life analogy: Think of a photographer's darkroom and filter kit. You blend colours across the paper (gradients), apply lens filters like blur and sepia (filter), and overlay exposures to mix images creatively (blend modes).\n\nCSS supports linear, radial and conic gradients, the filter function (blur, brightness, grayscale), and mix-blend-mode / background-blend-mode. backdrop-filter blurs whatever sits behind an element, enabling frosted-glass overlays.",
         "problems": [
           {
@@ -1701,7 +1701,7 @@ module.exports = [
         "week": 4,
         "session": 3,
         "title": "Build Tools & CSS Optimization",
-        "video_url": "https://www.youtube.com/results?search_query=postcss+css+minification+purge+unused+optimization+build+tools",
+        "video_url": "https://www.youtube.com/watch?v=WhCXiEwdU1A",
         "topic": "Real-life analogy: Think of a shipping warehouse's packing line. Raw goods are processed (PostCSS), vacuum-sealed to save space (minification), and unused packaging is stripped out before dispatch (purging unused CSS).\n\nModern workflows use PostCSS and bundlers to autoprefix, minify and tree-shake CSS. Purging unused selectors against the markup, and splitting out critical CSS, dramatically reduce payload and improve load times.",
         "problems": [
           {
@@ -1745,7 +1745,7 @@ module.exports = [
         "week": 5,
         "session": 2,
         "title": "Performance, SEO & Core Web Vitals",
-        "video_url": "https://www.youtube.com/results?search_query=web+performance+core+web+vitals+SEO+meta+tags+optimization",
+        "video_url": "https://www.youtube.com/watch?v=cGiSr0MilsI",
         "topic": "Real-life analogy: Think of tuning a race car and posting clear road signs. You cut dead weight for speed (performance) and place unmistakable signage so search-engine traffic finds your exit (SEO).\n\nCore Web Vitals (LCP, CLS, INP) measure loading, visual stability and responsiveness. Image optimisation, lazy loading, explicit dimensions, meta tags and semantic structure improve both speed and search ranking.",
         "problems": [
           {

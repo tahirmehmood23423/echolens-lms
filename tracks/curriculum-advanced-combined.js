@@ -20,17 +20,20 @@
  * unrelated video, while a search for the exact channel and exact title
  * reliably surfaces the right one at the top of the results.
  *
- * Exception: `c-advanced` ("Advanced C Programming - Systems & Memory
- * Control"), `cpp-advanced` ("Advanced C++ (OOP & Architecture)"),
- * `python-advanced` ("Advanced Python - Core Language Internals") and
- * `js-advanced` ("Advanced JavaScript - Production Architecture") were all
- * rewritten to follow their official syllabus PDFs verbatim (same
+ * Exception: all five advanced tracks here - `c-advanced` ("Advanced C -
+ * Systems & Memory Control"), `cpp-advanced` ("Advanced C++ - OOP &
+ * Architecture"), `python-advanced` ("Advanced Python - Core Language
+ * Internals"), `js-advanced` ("Advanced JavaScript - Production
+ * Architecture") and `web-advanced` ("Advanced CSS and Web Development") -
+ * were rewritten to follow their official syllabus PDFs verbatim (same
  * real-life-analogy + explanation + video + one literal-I/O Compiler Quest
  * per topic shape as tracks/free-micro.js's FC-01/FC-02): C/C++ are
- * 4-module/12-topic, Python and JavaScript are 5-module/15-topic. They use
- * real `video_url` watch links (embeddable inline, see openSolveVideo() in
- * public/js/open.js), not the videos[] search-query pattern web-advanced
- * below still uses. The old 8-level Basic/Advanced-tier curricula they
+ * 4-module/12-topic; Python, JavaScript and CSS are 5-module/15-topic.
+ * `video_url` is a real YouTube watch link (embeddable inline, see
+ * openSolveVideo() in public/js/open.js) where a specific lesson was
+ * identified, otherwise a youtube.com/results?search_query=... link from
+ * the PDF's "Video lesson" query text (external "Watch video" link, not an
+ * inline embed). The old 8-level Basic/Advanced-tier curricula they
  * replaced are preserved in git history if ever needed again.
  */
 
@@ -1412,95 +1415,64 @@ module.exports = [
     "friendly_grading": true,
     "default_language": "web",
     "title": "Advanced CSS and Web Development",
-    "description": "Course 2 (final) of the CSS and Web Development free ladder - combines the Basic tier (formerly \"WEB5.2: CSS Architecture and Responsive Layout\") and the Advanced tier (formerly \"WEB5.3: Advanced CSS - Grid, Subgrid and Motion\") into one course, eight modules total, each with its own two assignments and module project.",
-    "outcome": "Predict which CSS rule wins and build a themeable token system; diagnose layout defects from the box model; lay out one dimensional components with correct axis reasoning; control how items grow, shrink and wrap under real content. Build layouts that reflow by themselves without breakpoint proliferation; align nested components to a shared grid and express layout by name; scale a design continuously and animate without harming users; ship an accessible interface inside a measured performance budget.",
+    "description": "Advanced CSS and Web Development (Production Front-End): functional and combinator selectors and CSS architecture, Flexbox and Grid mastery with subgrid, container queries and fluid design, motion and 3D effects, Sass and Tailwind, build tooling, then accessibility, performance and SEO, through to Git-based deployment. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "outcome": "Target elements by relationship and state with combinators and :is / :where / :has, and order styles deliberately with cascade layers and design tokens; master advanced Flexbox sizing and Grid with named areas and subgrid, and build layouts that reflow themselves with clamp() and container queries; sequence keyframe and 3D-transform motion and composite with gradients, filters and blend modes; work in Sass and Tailwind and ship an optimised production CSS build; meet WCAG accessibility criteria, tune Core Web Vitals and SEO, and version and deploy a site with automatic redeploy on push.",
     "keywords": [
-      "CSS cascade course",
-      "CSS box model",
-      "flexbox course",
-      "responsive CSS layout",
-      "intermediate CSS",
-      "CSS grid course",
+      "advanced CSS",
+      "CSS :has :is :where",
+      "CSS cascade layers",
       "CSS subgrid",
       "container queries",
-      "fluid typography CSS",
-      "advanced CSS design systems"
+      "fluid typography clamp",
+      "CSS 3D transforms",
+      "Sass and Tailwind CSS",
+      "web accessibility WCAG",
+      "Core Web Vitals SEO"
     ],
     "key_concepts": [
-      "Cascade & specificity",
-      "Custom properties / design tokens",
-      "Box model & formatting contexts",
-      "Flexbox alignment",
-      "Flexible sizing & wrapping",
-      "Two dimensional grid",
-      "Named areas & subgrid",
-      "Fluid type & container queries",
-      "Reduced motion",
-      "Performance budget & design systems"
+      "Functional & combinator selectors (:is, :where, :has)",
+      "Specificity, cascade layers & custom properties",
+      "CSS architecture (BEM & utility-first)",
+      "Advanced Flexbox patterns",
+      "Advanced Grid (areas, subgrid, auto-fit)",
+      "Fluid layout (clamp, container queries)",
+      "Advanced transitions & keyframe animation",
+      "Transforms, 3D & perspective",
+      "Gradients, filters & blend modes",
+      "Sass / SCSS",
+      "Tailwind CSS",
+      "Build tools & CSS optimization",
+      "Web accessibility (a11y)",
+      "Performance, SEO & Core Web Vitals",
+      "Version control & deployment"
     ],
     "pass_mark": 60,
     "titleNames": [
-      "Cascade Reader",
+      "Selector Surgeon",
       "Layout Architect",
-      "Grid Architect",
-      "Design Systems Lead"
+      "Motion Designer",
+      "Deployment Engineer"
     ],
     "levels": [
       {
         "no": 1,
         "week": 1,
         "session": 1,
-        "title": "Basic 1: The Cascade, Specificity and Design Tokens",
-        "video_url": null,
-        "topic": "Specificity is a comparison, not a score - once that is clear the endless override war ends. The fix for a rule not applying is almost never to add an override of last resort, it is to lower the specificity of the competing rule. Custom properties cascade and inherit, which means a theme is a set of values redefined at one place in the tree rather than a duplicate stylesheet.\n\nKey rules:\n- Specificity compares identifier count, then class count, then element count. A later rule wins only on a tie.\n- The override of last resort is a maintenance debt - reach for it only in a utility layer.\n- Custom properties inherit; redefine them on a wrapper element to retheme everything inside it.\n- Cascade layers let you order whole groups of rules, so a reset can never accidentally outrank a component.\n\nWorked example - a token system retheming through one redefinition:\n:root { --brand: #0E3457; --accent: #03C39A; --surface: #FAF8F3; --text: #12212F; }\n[data-theme=\"dark\"] { --surface: #0B1620; --text: #E8EFF3; }\n.card { background: var(--surface); color: var(--text); border-top: 3px solid var(--accent); }",
+        "title": "Advanced & Combinator Selectors (:is, :where, :has)",
+        "video_url": "https://www.youtube.com/watch?v=OGJvhpoE8b4",
+        "topic": "Real-life analogy: Think of a master librarian with advanced search filters. Instead of walking every aisle, they query for every book that has a foreword by a specific author, sitting next to a red cover, on the third shelf, and pull exactly those.\n\nCombinators (>, +, ~) and attribute selectors target elements by relationship and state. The functional pseudo-classes :is() and :where() collapse repeated selector lists (:where() adds zero specificity), and :has() finally enables true parent selection - styling an element based on what it contains.",
         "problems": [
           {
-            "title": "Specificity puzzles",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "For eight rule pairs state which wins and why.",
-            "criteria": [
-              "At least six correct with reasons."
-            ],
-            "hint": "A later rule only wins on a specificity tie.",
-            "solution": "At least six of eight specificity winners correctly identified with sound reasoning."
-          },
-          {
-            "title": "Remove the overrides",
+            "title": "Parent Select",
             "points": 40,
             "difficulty": "Core",
-            "description": "Eliminate every override of last resort from a supplied stylesheet without changing the rendered result.",
+            "description": "Given a row of cards, use :has() to style only the cards that contain an <img>, leaving image-less cards untouched - the librarian pulling exactly the books that have an illustrated plate inside.\n\nSample Input: SelectParents\nExpected Output: Only cards containing an img receive the new style",
             "criteria": [
-              "None remaining, visual output identical."
+              "The rule is .card:has(img) { ... } - a real parent selector, not a class added by hand to the image cards",
+              "Cards with an <img> get the new style and cards without one are visibly unchanged"
             ],
-            "hint": "Lower the specificity of the competing rule instead of overriding.",
-            "solution": "Every override of last resort removed while the rendered page stays pixel-identical."
-          },
-          {
-            "title": "Module project: Themeable design token system",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a token system with light and dark themes, spacing and type scales, applied to a component set and switchable with a single attribute change.",
-            "criteria": [
-              "Light and dark themes, spacing and type scale all switch correctly from a single attribute change."
-            ],
-            "hint": "Custom properties inherit - retheme by redefining them on a wrapper.",
-            "solution": "A full token system with both themes switching correctly from one attribute, applied across a real component set."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Kevin Powell",
-            "title": "CSS specificity explained",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20CSS%20specificity%20explained"
-          },
-          {
-            "channel": "Fireship",
-            "title": "CSS Cascade Layers in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20CSS%20Cascade%20Layers%20in%20100%20Seconds"
+            "hint": ".card:has(> img), or .card:has(img), selects the card based on a descendant it contains.",
+            "solution": "A .card:has(img) rule that styles only the cards containing an image."
           }
         ]
       },
@@ -1508,51 +1480,21 @@ module.exports = [
         "no": 2,
         "week": 1,
         "session": 2,
-        "title": "Basic 2: The Box Model, Formatting Contexts and Overflow",
-        "video_url": null,
-        "topic": "Most mysterious spacing comes from two behaviours: the default box sizing that adds padding and border on top of the declared width, and margin collapsing between adjacent vertical margins. A new formatting context is created by overflow, flex, grid or a few other properties - it contains floats and stops margin collapse. Debugging layout is a matter of asking which box and which context, in that order.\n\nKey rules:\n- With border-box sizing, the declared width includes padding and border - set it globally.\n- Adjacent vertical margins collapse to the larger of the two; horizontal margins never collapse.\n- A new formatting context contains floats and stops margin collapse.\n- Overflow hidden clips silently; overflow auto scrolls only when needed.\n\nWorked example - predictable sizing and a contained context:\n*, *::before, *::after { box-sizing: border-box; }\n.card { inline-size: 320px; padding: 1.5rem; border: 1px solid var(--line); display: flow-root; }",
+        "title": "Specificity, Cascade Layers & Custom Properties",
+        "video_url": "https://www.youtube.com/watch?v=NDNRGW-_1EE",
+        "topic": "Real-life analogy: Think of a courtroom hierarchy of rules. Local ordinances usually beat state law which beats federal guidance - but declaring cascade layers is like agreeing in advance which court has the final say.\n\nSpecificity and source order decide which rule wins, and @layer lets you deliberately order whole groups of styles so a reset can never accidentally outrank a component. Custom properties (--var) consumed with var() cascade and inherit, so a theme is a set of values redefined at one place in the tree rather than a duplicate stylesheet.",
         "problems": [
           {
-            "title": "Spacing diagnosis",
+            "title": "Theme Variable",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Explain the cause of six spacing anomalies and fix each.",
+            "description": "Define a --brand colour custom property on :root and reuse it via var() across three different elements, so changing that one value would retheme all three.\n\nSample Input: BuildTheme\nExpected Output: Three elements share one variable-driven brand color",
             "criteria": [
-              "At least five correct diagnoses with fixes."
+              "--brand is declared once (e.g. on :root) and read with var(--brand) by three separate rules - the colour is never hard-coded a second time",
+              "All three elements render in the same brand colour, driven by that single custom property"
             ],
-            "hint": "Ask which box, then which formatting context.",
-            "solution": "At least five of six spacing anomalies correctly diagnosed and fixed."
-          },
-          {
-            "title": "Overflow repair",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Fix three components where content escapes or is clipped.",
-            "criteria": [
-              "Content visible and scrollable as specified at every width."
-            ],
-            "hint": "Overflow hidden clips silently; overflow auto scrolls only when needed.",
-            "solution": "All three components fixed so content is correctly visible or scrollable at every width."
-          },
-          {
-            "title": "Module project: Pixel accurate card component set",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a card set matching a supplied design at three widths, with consistent spacing, contained overflow and no magic numbers in the stylesheet.",
-            "criteria": [
-              "The design matches at all three widths with consistent spacing, contained overflow and no unexplained magic numbers."
-            ],
-            "hint": "Set border-box sizing globally and use a new formatting context to contain overflow.",
-            "solution": "A pixel-accurate card set matching the design at three widths, with no magic numbers in the stylesheet."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Kevin Powell",
-            "title": "The CSS box model explained",
-            "length": "11 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20The%20CSS%20box%20model%20explained"
+            "hint": ":root { --brand: #0E3457; } then color: var(--brand) or background: var(--brand) on each element.",
+            "solution": "One :root --brand custom property consumed via var() by three elements sharing the colour."
           }
         ]
       },
@@ -1560,63 +1502,21 @@ module.exports = [
         "no": 3,
         "week": 1,
         "session": 3,
-        "title": "Basic 3: Flexbox Alignment Mechanics",
-        "video_url": null,
-        "topic": "Nearly every flexbox difficulty is an axis mistake. Justification works along the main axis, alignment works along the cross axis, and changing the direction swaps which is which. Modern gap spacing removed the last reason to space items with margins, which also removed the last row spacing defect.\n\nKey rules:\n- Justify along the main axis; align along the cross axis.\n- An automatic margin absorbs free space and is the cleanest way to push one group apart from another.\n- Use gap for spacing between items - margins on children produce edge defects when wrapping.\n- Align-self overrides the container alignment for one item without a wrapper.\n\nWorked example - a navigation bar with a pushed group and no margin hacks:\n.nav { display: flex; align-items: center; gap: 1.5rem; }\n.nav__brand { margin-inline-end: auto; }",
+        "title": "CSS Architecture Methodologies (BEM & Utility-First)",
+        "video_url": "https://www.youtube.com/results?search_query=css+BEM+naming+convention+utility+first+architecture",
+        "topic": "Real-life analogy: Think of two philosophies for organising a giant warehouse. BEM labels every crate with a strict block, part, variant code, while utility-first stocks tiny single-purpose bins you combine on demand.\n\nScalable CSS relies on naming conventions like BEM (block__element--modifier) to avoid collisions and specificity wars. Utility-first approaches compose many small single-purpose classes in the markup, trading verbose HTML for predictable, reusable styling.",
         "problems": [
           {
-            "title": "Axis drills",
+            "title": "BEM Rename",
             "points": 30,
             "difficulty": "Basic",
-            "description": "Reproduce eight supplied layouts using flexbox only, with no positioning.",
+            "description": "Rename an ad-hoc class set (e.g. .card, .card .title, .card .title.big) into correct BEM block__element--modifier notation with flat, single-class selectors.\n\nSample Input: ApplyBEM\nExpected Output: Classes follow the block element modifier structure",
             "criteria": [
-              "All eight match at every test width."
+              "Classes follow block, block__element and block__element--modifier naming, and selectors are flat single classes (no descendant selectors like .card .title)",
+              "Every state or variant is expressed as a --modifier class, not a nested or tag selector"
             ],
-            "hint": "Justify along the main axis, align along the cross axis.",
-            "solution": "All eight layouts reproduced correctly using flexbox alone, matching at every test width."
-          },
-          {
-            "title": "Margin to gap",
-            "points": 40,
-            "difficulty": "Core",
-            "description": "Convert a margin spaced layout to gap and fix the wrapping defects it reveals.",
-            "criteria": [
-              "Clean spacing at all widths."
-            ],
-            "hint": "Use gap instead of margins between items to avoid edge defects when wrapping.",
-            "solution": "The layout converted to gap spacing with every wrapping defect resolved."
-          },
-          {
-            "title": "Module project: Responsive site header",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a header with brand, navigation, search and a call to action that reflows cleanly from wide desktop to narrow mobile without a media query where possible.",
-            "criteria": [
-              "Brand, navigation, search and CTA all reflow cleanly from desktop to mobile with minimal reliance on media queries."
-            ],
-            "hint": "An automatic margin is the cleanest way to push one group apart from another.",
-            "solution": "A fully responsive header reflowing across widths using flexbox mechanics rather than heavy media-query overrides."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Kevin Powell",
-            "title": "Learn Flexbox in 15 minutes",
-            "length": "15 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20Learn%20Flexbox%20in%2015%20minutes"
-          },
-          {
-            "channel": "Fireship",
-            "title": "Flexbox in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20Flexbox%20in%20100%20Seconds"
-          },
-          {
-            "channel": "Web Dev Simplified",
-            "title": "Learn Flexbox In 15 Minutes",
-            "length": "15 min",
-            "url": "https://www.youtube.com/results?search_query=Web%20Dev%20Simplified%20Learn%20Flexbox%20In%2015%20Minutes"
+            "hint": "Block is .card; a part inside is .card__title; a variant is .card__title--large. One class per selector.",
+            "solution": "An ad-hoc class set rewritten as flat BEM block__element--modifier classes with no descendant selectors."
           }
         ]
       },
@@ -1624,283 +1524,263 @@ module.exports = [
         "no": 4,
         "week": 2,
         "session": 1,
-        "title": "Basic 4: Flexible Sizing, Wrapping and Intrinsic Layout",
-        "video_url": null,
-        "topic": "The growth, shrink and basis triple decides what happens when the container is bigger or smaller than the content. The other half of this module is intrinsic sizing: keywords that let an element size itself from its own content rather than a guessed pixel value. Layouts built from intrinsic sizes survive content changes; layouts built from fixed pixel values break the first time a longer word arrives.\n\nKey rules:\n- The shorthand order is grow, shrink, basis. Basis wins over a declared width when both are present.\n- An item cannot shrink below its minimum content size unless that minimum is explicitly lowered.\n- Wrapping plus a basis with a minimum produces a responsive grid with no media query.\n- Intrinsic keywords let content decide the size.\n\nWorked example - auto wrapping cards with no media query at all:\n.cloud { display: flex; flex-wrap: wrap; gap: 1rem; }\n.cloud > * { flex: 1 1 min(18rem, 100%); min-inline-size: 0; }",
+        "title": "Advanced Flexbox Patterns",
+        "video_url": "https://www.youtube.com/watch?v=sanswTlz4ZY",
+        "topic": "Real-life analogy: Think of a professional stagehand arranging a variable cast. Actors grow to fill empty stage space (flex-grow), shrink politely when crowded (flex-shrink), and wrap to a second row when the stage runs out of width (flex-wrap).\n\nAdvanced flex uses the flex shorthand (grow, shrink, basis), flex-wrap and align-content for multi-line control. Patterns like the holy-grail sidebar and equal-height media objects fall out naturally once the three flex values are understood.",
         "problems": [
           {
-            "title": "Sizing predictions",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Predict the rendered width of items under six different declarations.",
-            "criteria": [
-              "At least four correct with reasons."
-            ],
-            "hint": "The shorthand order is grow, shrink, basis.",
-            "solution": "At least four of six rendered widths correctly predicted with sound reasoning."
-          },
-          {
-            "title": "Overflow under long content",
+            "title": "Flexible Sidebar",
             "points": 40,
             "difficulty": "Core",
-            "description": "Fix three layouts that break when given a very long unbroken word.",
+            "description": "Build a two-part layout where a sidebar keeps a fixed width while the content area flexes to absorb all the remaining space - the fixed set piece and the actor who expands to fill the rest of the stage.\n\nSample Input: BuildSidebar\nExpected Output: Fixed sidebar, fluid content area that absorbs the remaining space",
             "criteria": [
-              "No horizontal scroll at any width."
+              "The container is display: flex; the sidebar has flex: 0 0 <fixed>, and the content has flex: 1 (grow, no shrink issues)",
+              "Resizing the container changes only the content width - the sidebar stays at its fixed width"
             ],
-            "hint": "An item cannot shrink below its minimum content size unless explicitly lowered.",
-            "solution": "All three layouts fixed with no horizontal scroll at any width, even with an extreme unbroken word."
-          },
-          {
-            "title": "Module project: Content aware tag cloud",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a tag cloud that wraps naturally, keeps even spacing, handles very long labels without overflow and needs no media query.",
-            "criteria": [
-              "Wrapping is natural, spacing stays even, long labels never overflow, and no media query is needed."
-            ],
-            "hint": "Wrapping plus a basis with a minimum produces a responsive layout with no media query.",
-            "solution": "A tag cloud that wraps and spaces itself correctly at every size with zero media queries and no overflow."
-          }
-        ],
-        "tier": "Basic",
-        "videos": [
-          {
-            "channel": "Kevin Powell",
-            "title": "flex grow, flex shrink and flex basis explained",
-            "length": "13 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20flex%20grow%2C%20flex%20shrink%20and%20flex%20basis%20explained"
+            "hint": ".sidebar { flex: 0 0 250px; } .content { flex: 1; } inside a display: flex row.",
+            "solution": "A flex row with a flex: 0 0 sidebar and a flex: 1 content area that absorbs the remaining width."
           }
         ]
       },
       {
         "no": 5,
-        "week": 1,
-        "session": 1,
-        "title": "Advanced 1: Two Dimensional Grid Layout",
-        "video_url": null,
-        "topic": "Grid is the first layout system that is genuinely two dimensional - rows and columns are declared together rather than emerging from the content flow. The single most valuable pattern is the automatically fitting track with a minimum and maximum size, because it produces a responsive grid that adds and removes columns by itself as the container changes, replacing a stack of breakpoints with one line.\n\nKey rules:\n- The fractional unit distributes leftover space after fixed tracks are placed.\n- Automatically fitting tracks collapse empty ones; automatically filling tracks keep them.\n- A minimum and maximum track function gives a floor and a ceiling, making reflow automatic.\n- Implicit rows are created as needed - set their size explicitly when consistency matters.\n\nWorked example - a responsive grid with no media queries:\n.editorial {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));\n  gap: clamp(1rem, 2vw, 2rem);\n}",
+        "week": 2,
+        "session": 2,
+        "title": "Advanced CSS Grid (areas, subgrid, auto-fit)",
+        "video_url": "https://www.youtube.com/watch?v=UwV4LtO0nHo",
+        "topic": "Real-life analogy: Think of an architect using a modular floor-plan system. Named zones let you rearrange whole rooms by editing the plan, and subgrid keeps built-in cabinetry aligned to the building's master gridlines.\n\nAdvanced Grid uses grid-template-areas for readable placement, minmax() with auto-fit / auto-fill for fluid tracks, and subgrid to align nested items to a parent grid. Together they enable magazine-style responsive layouts.",
         "problems": [
           {
-            "title": "Breakpoint elimination",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Replace a five breakpoint layout with an automatically reflowing grid.",
-            "criteria": [
-              "Identical behaviour at every width, no media query for column count."
-            ],
-            "hint": "An auto-fit track with a min/max produces automatic reflow.",
-            "solution": "The five-breakpoint layout replaced by one auto-reflowing grid rule, identical at every width."
-          },
-          {
-            "title": "Track drills",
+            "title": "Auto-Fit Gallery",
             "points": 40,
             "difficulty": "Core",
-            "description": "Reproduce six supplied layouts using grid tracks only.",
+            "description": "Build a gallery that fits as many ~200px columns as the available space allows and reflows smoothly as the width changes, with no fixed column count and no media queries.\n\nSample Input: BuildAutoGrid\nExpected Output: Columns auto-fit and reflow smoothly as the width changes",
             "criteria": [
-              "All six match at three widths."
+              "grid-template-columns uses repeat(auto-fit, minmax(200px, 1fr)) - the column count is not hard-coded and no media query is used",
+              "Widening or narrowing the container adds or removes whole columns while cells stay at least 200px"
             ],
-            "hint": "The fractional unit distributes leftover space after fixed tracks.",
-            "solution": "All six layouts correctly reproduced with grid tracks alone, matching at three widths."
-          },
-          {
-            "title": "Module project: Reflowing editorial grid",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a magazine style layout with feature and standard articles that reflows from one to four columns automatically and keeps a consistent vertical rhythm.",
-            "criteria": [
-              "The layout reflows automatically from one to four columns and keeps a consistent vertical rhythm throughout."
-            ],
-            "hint": "Use auto-fit with a minmax track function for automatic reflow.",
-            "solution": "An editorial grid reflowing automatically across one to four columns with a consistent vertical rhythm."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Kevin Powell",
-            "title": "Learn CSS Grid in 20 minutes",
-            "length": "15 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20Learn%20CSS%20Grid%20in%2020%20minutes"
-          },
-          {
-            "channel": "Fireship",
-            "title": "CSS Grid in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20CSS%20Grid%20in%20100%20Seconds"
-          },
-          {
-            "channel": "Kevin Powell",
-            "title": "auto fit vs auto fill in CSS Grid",
-            "length": "10 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20auto%20fit%20vs%20auto%20fill%20in%20CSS%20Grid"
+            "hint": ".gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }",
+            "solution": "A grid using repeat(auto-fit, minmax(200px, 1fr)) that adds and removes columns as the width changes."
           }
         ]
       },
       {
         "no": 6,
-        "week": 1,
-        "session": 2,
-        "title": "Advanced 2: Named Areas, Subgrid and Alignment Across Components",
-        "video_url": null,
-        "topic": "Named template areas turn a layout into something readable in the stylesheet, because the declaration is a picture of the arrangement. Subgrid solves the harder problem: making the internals of separate child components line up with each other. With it, a row of cards can have its titles, bodies and footers aligned across all cards regardless of content length.\n\nKey rules:\n- Template areas are declared as rows of names - each name must form a rectangle.\n- Subgrid makes a child use the parent tracks, aligning internals across sibling components.\n- Grid items can overlap deliberately by assigning them to the same lines.\n- Reordering by grid placement changes the visual order only - reading order stays as written.\n\nWorked example - card internals aligned across siblings using subgrid:\n.card-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }\n.card { display: grid; grid-template-rows: subgrid; grid-row: span 3; }",
+        "week": 2,
+        "session": 3,
+        "title": "Modern Responsive Layout (clamp, container queries)",
+        "video_url": "https://www.youtube.com/watch?v=2rlWBZ17Wes",
+        "topic": "Real-life analogy: Think of a self-adjusting camera lens. Instead of switching between fixed prime lenses at set distances (breakpoints), a zoom lens (clamp) smoothly finds the perfect focal length for any subject at any distance.\n\nFluid layouts use clamp(), min() and max() to scale type and spacing continuously without breakpoints. Container queries (@container) let a component adapt to its own parent's width rather than the viewport, so the same component works in a narrow slot and a wide one.",
         "problems": [
           {
-            "title": "Area naming",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Express three supplied page layouts entirely with named areas.",
-            "criteria": [
-              "All three match and every area forms a rectangle."
-            ],
-            "hint": "Each named area must form a rectangle.",
-            "solution": "All three layouts expressed correctly via named areas, each forming a valid rectangle."
-          },
-          {
-            "title": "Alignment without heights",
+            "title": "Fluid Heading",
             "points": 40,
             "difficulty": "Core",
-            "description": "Align card internals across a row without any fixed height.",
+            "description": "Make a heading scale smoothly between a 1.5rem minimum and a 3rem maximum as the viewport changes, using a single clamp() value and no media queries - the zoom lens finding the right size for every width.\n\nSample Input: FluidType\nExpected Output: Heading grows and shrinks smoothly with the viewport, within bounds",
             "criteria": [
-              "Alignment holds with content of very different lengths."
+              "font-size is a single clamp(1.5rem, <viewport-relative middle>, 3rem) - no @media query switches the size",
+              "The heading never renders smaller than 1.5rem or larger than 3rem, and changes continuously in between"
             ],
-            "hint": "Subgrid makes a child use the parent tracks for alignment.",
-            "solution": "Card internals aligned via subgrid, holding correctly even with very different content lengths."
-          },
-          {
-            "title": "Module project: Asymmetric dashboard layout",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a dashboard with panels of differing sizes using named areas and subgrid aligned internals, holding its alignment under every supplied data set.",
-            "criteria": [
-              "Panels of differing sizes are laid out with named areas, internals align via subgrid, and alignment holds under every supplied data set."
-            ],
-            "hint": "Reordering by grid placement never changes the reading order.",
-            "solution": "An asymmetric dashboard whose subgrid-aligned internals hold correctly across every supplied data set."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Kevin Powell",
-            "title": "CSS subgrid explained",
-            "length": "13 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20CSS%20subgrid%20explained"
+            "hint": "h1 { font-size: clamp(1.5rem, 1rem + 3vw, 3rem); } - min, preferred (with a vw term), max.",
+            "solution": "A heading whose font-size is one clamp(1.5rem, …vw…, 3rem) value, scaling fluidly within bounds."
           }
         ]
       },
       {
         "no": 7,
-        "week": 1,
-        "session": 3,
-        "title": "Advanced 3: Fluid Type, Container Queries and Accessible Motion",
-        "video_url": null,
-        "topic": "Fluid sizing replaces a stack of breakpoint overrides with one expression that has a floor, a preferred value that scales with the viewport, and a ceiling. Container queries fix the deeper flaw in responsive design: a component should respond to the space it has been given, not the size of the window. Motion needs a user preference check - for some users motion causes real physical discomfort.\n\nKey rules:\n- A clamped value takes a minimum, a preferred scaling value and a maximum.\n- Container queries respond to the parent size, so a component behaves correctly wherever placed.\n- Always honour the reduced motion preference - replace movement with a fade or with nothing.\n- Animate transform and opacity; animating layout properties forces a full recalculation each frame.\n\nWorked example - fluid type, a container query and a motion preference check:\nh1 { font-size: clamp(1.75rem, 1.2rem + 2.5vw, 3.25rem); }\n.panel { container-type: inline-size; }\n@media (prefers-reduced-motion: reduce) {\n  *, *::before, *::after { animation-duration: 0.01ms !important; }\n}",
+        "week": 3,
+        "session": 1,
+        "title": "Advanced Transitions & Keyframe Animations",
+        "video_url": "https://www.youtube.com/results?search_query=css+advanced+animation+keyframes+cubic-bezier+easing",
+        "topic": "Real-life analogy: Think of a film director sequencing a scene. You set the timing (duration), the pacing curve of the actor's movement (easing), when it begins (delay), and script a multi-beat sequence frame by frame (keyframes).\n\nAdvanced motion combines transition timing functions, cubic-bezier() easing, and multi-step @keyframes with animation-delay and iteration control. Staggered and looping animations create rich, performant interfaces - and must be muted under prefers-reduced-motion.",
         "problems": [
           {
-            "title": "Breakpoint to fluid",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Convert a four breakpoint type scale to fluid expressions.",
-            "criteria": [
-              "Sizes match at the original breakpoints and scale smoothly between them."
-            ],
-            "hint": "A clamped value takes a floor, a scaling preferred value, and a ceiling.",
-            "solution": "The type scale converted to fluid clamp() expressions matching the original breakpoints and scaling smoothly between them."
-          },
-          {
-            "title": "Portable component",
+            "title": "Staggered List",
             "points": 40,
             "difficulty": "Core",
-            "description": "Make one component render correctly in a sidebar, a main column and a modal without any change.",
+            "description": "Animate a list so its items fade in one after another, each starting slightly later than the previous - the director cueing the cast onstage in sequence rather than all at once.\n\nSample Input: StaggerList\nExpected Output: Items fade in sequentially, each slightly after the previous",
             "criteria": [
-              "Correct in all three placements."
+              "A single @keyframes fade-in is applied to every item, but each item gets an incremental animation-delay (via :nth-child or a --i custom property)",
+              "The items visibly appear in order, one shortly after the next, not simultaneously"
             ],
-            "hint": "Container queries respond to the parent size, not the viewport.",
-            "solution": "One component rendering correctly in all three placements using container queries, with no per-placement changes."
-          },
-          {
-            "title": "Module project: Fluid multi device layout",
-            "points": 60,
-            "difficulty": "Boss",
-            "description": "Build a page whose type, spacing and component layout scale continuously across three device classes, with container aware components and a full reduced motion path.",
-            "criteria": [
-              "Type, spacing and layout scale continuously across three device classes, components are container-aware, and reduced motion is fully honoured."
-            ],
-            "hint": "Always honour the reduced motion preference.",
-            "solution": "A fully fluid, container-aware page with a complete reduced-motion path across three device classes."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Kevin Powell",
-            "title": "Fluid typography with clamp",
-            "length": "12 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20Fluid%20typography%20with%20clamp"
-          },
-          {
-            "channel": "Fireship",
-            "title": "CSS Container Queries in 100 Seconds",
-            "length": "3 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20CSS%20Container%20Queries%20in%20100%20Seconds"
+            "hint": "li { animation: fade-in .4s both; } li:nth-child(2) { animation-delay: .1s; } ... or use calc(var(--i) * .1s).",
+            "solution": "One fade-in keyframe with per-item incremental animation-delay, producing a staggered reveal."
           }
         ]
       },
       {
         "no": 8,
-        "week": 2,
-        "session": 1,
-        "title": "Advanced 4: Performance, Design Systems and the Course Capstone",
-        "video_url": null,
-        "topic": "An interface is finished when it meets a number, not when it looks done. Layout shift, interaction delay and largest paint time are all measurable and fixable: reserving space for images, avoiding long synchronous work, loading what matters first. A design system replaces one-off decisions with a small set of tokens and components that have already been measured.\n\nKey rules:\n- Reserve space for every image and embed with width and height - unreserved space is the main cause of layout shift.\n- Set the performance budget before building, measured on a mid range device.\n- A design system is tokens, components and rules for combining them.\n- Document each component with its variants, states and accessibility notes.\n\nWorked example - reserving space and loading in priority order:\n<img src=\"hero.avif\" width=\"1600\" height=\"900\" alt=\"Cohort graduation\" fetchpriority=\"high\">\n<style> .hero { aspect-ratio: 16 / 9; } </style>",
+        "week": 3,
+        "session": 2,
+        "title": "Transforms, 3D & Perspective",
+        "video_url": "https://www.youtube.com/watch?v=viH8LeLP6_c",
+        "topic": "Real-life analogy: Think of a puppeteer working in three dimensions. Strings can slide a puppet sideways (translate), spin it (rotate), and - with a sense of depth on the stage (perspective) - tilt it toward or away from the audience.\n\n2D and 3D transforms translate, rotate, scale and skew elements, while perspective and transform-style: preserve-3d create depth. Hardware-accelerated transforms animate far more smoothly than layout properties.",
         "problems": [
           {
-            "title": "Shift elimination",
-            "points": 30,
-            "difficulty": "Basic",
-            "description": "Reduce the layout shift on a supplied page below the required threshold.",
-            "criteria": [
-              "Measured score within budget."
-            ],
-            "hint": "Reserve space for every image and embed with width and height.",
-            "solution": "The layout shift score reduced below the required threshold, verified by measurement."
-          },
-          {
-            "title": "Component documentation",
+            "title": "Flip Card",
             "points": 40,
             "difficulty": "Core",
-            "description": "Document three components with variants, states and accessibility notes.",
+            "description": "Build a card that flips in 3D on hover to reveal its back face - the puppet turning on its strings to show the audience its other side.\n\nSample Input: BuildFlipCard\nExpected Output: Card rotates in 3D to show its reverse side on hover",
             "criteria": [
-              "Another student can rebuild each from the documentation alone."
+              "The card container sets perspective and the inner element sets transform-style: preserve-3d; :hover applies transform: rotateY(180deg)",
+              "backface-visibility: hidden keeps the back face hidden until the card has flipped"
             ],
-            "hint": "A design system is tokens, components and rules for combining them.",
-            "solution": "Documentation complete enough that all three components could be rebuilt from it alone."
-          },
+            "hint": ".card { perspective: 800px; } .inner { transform-style: preserve-3d; transition: transform .5s; } .card:hover .inner { transform: rotateY(180deg); }",
+            "solution": "A card whose inner element rotateY-flips in a preserve-3d context on hover, with hidden backfaces."
+          }
+        ]
+      },
+      {
+        "no": 9,
+        "week": 3,
+        "session": 3,
+        "title": "Gradients, Filters & Blend Modes",
+        "video_url": "https://www.youtube.com/results?search_query=css+gradients+filters+blend+modes+backdrop-filter",
+        "topic": "Real-life analogy: Think of a photographer's darkroom and filter kit. You blend colours across the paper (gradients), apply lens filters like blur and sepia (filter), and overlay exposures to mix images creatively (blend modes).\n\nCSS supports linear, radial and conic gradients, the filter function (blur, brightness, grayscale), and mix-blend-mode / background-blend-mode. backdrop-filter blurs whatever sits behind an element, enabling frosted-glass overlays.",
+        "problems": [
           {
-            "title": "Course capstone: DevFolio accessible personal portfolio platform",
+            "title": "Glass Panel",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Build a frosted-glass overlay panel that blurs the content visible behind it - the translucent lens filter laid over the scene.\n\nSample Input: BuildGlass\nExpected Output: Translucent frosted panel blurring the content behind it",
+            "criteria": [
+              "The panel uses backdrop-filter: blur(...) (not filter, which would blur the panel itself) plus a semi-transparent background",
+              "Content sitting behind the panel is visibly blurred through it while the panel content stays sharp"
+            ],
+            "hint": ".glass { background: rgba(255,255,255,.15); backdrop-filter: blur(10px); }",
+            "solution": "A panel with a semi-transparent background and backdrop-filter: blur() frosting the content behind it."
+          }
+        ]
+      },
+      {
+        "no": 10,
+        "week": 4,
+        "session": 1,
+        "title": "Sass / SCSS (variables, nesting, mixins)",
+        "video_url": "https://www.youtube.com/watch?v=roywYSEPSvc",
+        "topic": "Real-life analogy: Think of a professional kitchen's prep system. Instead of chopping the same onions for every dish, you prep reusable bases (variables), nest recipes within recipes (nesting), and keep master sauce formulas you pour into many plates (mixins).\n\nSass extends CSS with variables, nesting, partials, mixins and functions, compiled down to plain CSS. It reduces repetition and keeps large codebases modular and maintainable.",
+        "problems": [
+          {
+            "title": "Mixin Reuse",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Write a Sass mixin for flex-centring and @include it in two different selectors, so both are centred from one shared definition.\n\nSample Input: BuildMixin\nExpected Output: Both selectors centered via one reusable mixin",
+            "criteria": [
+              "A single @mixin (e.g. flex-center) contains display: flex; justify-content: center; align-items: center, and two selectors @include it",
+              "The centring rules are written once in the mixin, not duplicated in each selector"
+            ],
+            "hint": "@mixin flex-center { display: flex; justify-content: center; align-items: center; } then @include flex-center; in each.",
+            "solution": "One flex-center @mixin @included by two selectors, centring both from a single definition."
+          }
+        ]
+      },
+      {
+        "no": 11,
+        "week": 4,
+        "session": 2,
+        "title": "Tailwind CSS (Utility-First Framework)",
+        "video_url": "https://www.youtube.com/watch?v=mr15Xzb1Ook",
+        "topic": "Real-life analogy: Think of a modular furniture catalogue with snap-together parts. Rather than commissioning a custom sofa each time, you assemble finished pieces (utility classes) directly where you need them.\n\nTailwind is a utility-first framework that styles elements via composable classes in the markup (p-4, rounded-lg, shadow, md:flex), configured through a central config file. It speeds development and enforces a consistent design scale.",
+        "problems": [
+          {
+            "title": "Utility Card",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Build a padded, rounded, shadowed card using only Tailwind utility classes in the markup - no custom CSS rule written at all.\n\nSample Input: BuildTailwindCard\nExpected Output: Styled card produced entirely from utility classes, no custom CSS",
+            "criteria": [
+              "The card is styled purely by Tailwind utility classes in class=\"...\" (padding, border-radius, box-shadow, background) - no <style> block or CSS file rule for it",
+              "The rendered card has visible padding, rounded corners and a shadow"
+            ],
+            "hint": "<div class=\"p-6 rounded-lg shadow-md bg-white\">...</div> - every visual comes from a utility class.",
+            "solution": "A card whose padding, rounding, shadow and background all come from Tailwind utility classes, with zero custom CSS."
+          }
+        ]
+      },
+      {
+        "no": 12,
+        "week": 4,
+        "session": 3,
+        "title": "Build Tools & CSS Optimization",
+        "video_url": "https://www.youtube.com/results?search_query=postcss+css+minification+purge+unused+optimization+build+tools",
+        "topic": "Real-life analogy: Think of a shipping warehouse's packing line. Raw goods are processed (PostCSS), vacuum-sealed to save space (minification), and unused packaging is stripped out before dispatch (purging unused CSS).\n\nModern workflows use PostCSS and bundlers to autoprefix, minify and tree-shake CSS. Purging unused selectors against the markup, and splitting out critical CSS, dramatically reduce payload and improve load times.",
+        "problems": [
+          {
+            "title": "Minify Pass",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Run a stylesheet through a minifier and report the before and after byte sizes, confirming the rendered page is unchanged - the packing line vacuum-sealing the same goods into a smaller box.\n\nSample Input: MinifyCSS\nExpected Output: Significantly smaller output file with identical rendering",
+            "criteria": [
+              "The original and minified byte sizes are both recorded, and the minified output is meaningfully smaller (whitespace, comments and redundancy removed)",
+              "The page rendered with the minified CSS is visually identical to the original"
+            ],
+            "hint": "Compare the file sizes before and after a minify step (e.g. cssnano / esbuild) - the visuals must not change.",
+            "solution": "A before/after size comparison for a minified stylesheet that renders identically to the source."
+          }
+        ]
+      },
+      {
+        "no": 13,
+        "week": 5,
+        "session": 1,
+        "title": "Web Accessibility (a11y)",
+        "video_url": "https://www.youtube.com/watch?v=qr0ujkLLgmE",
+        "topic": "Real-life analogy: Think of adding ramps, braille signs and audio announcements to a public building. The same destination becomes reachable and usable by every visitor, not only those who can take the stairs.\n\nAccessibility uses semantic HTML, ARIA roles only where needed, keyboard focus management and sufficient colour contrast to serve all users. WCAG guidelines define measurable success criteria (AA contrast, visible focus, labelled controls).",
+        "problems": [
+          {
+            "title": "Focus Ring",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Ensure every interactive element shows a clearly visible keyboard focus style when tabbed to - the equivalent of a lit-up sign showing exactly where you are in the building.\n\nSample Input: FixFocus\nExpected Output: All links and buttons show a clear focus indicator on tab",
+            "criteria": [
+              "A visible :focus (or :focus-visible) style is defined for links and buttons - the default outline is never removed without a clearly visible replacement",
+              "Tabbing through the page shows an obvious focus indicator move from control to control"
+            ],
+            "hint": ":focus-visible { outline: 3px solid <high-contrast colour>; outline-offset: 2px; } - never outline: none with nothing to replace it.",
+            "solution": "A visible :focus-visible indicator on every link and button, so keyboard focus is always obvious."
+          }
+        ]
+      },
+      {
+        "no": 14,
+        "week": 5,
+        "session": 2,
+        "title": "Performance, SEO & Core Web Vitals",
+        "video_url": "https://www.youtube.com/results?search_query=web+performance+core+web+vitals+SEO+meta+tags+optimization",
+        "topic": "Real-life analogy: Think of tuning a race car and posting clear road signs. You cut dead weight for speed (performance) and place unmistakable signage so search-engine traffic finds your exit (SEO).\n\nCore Web Vitals (LCP, CLS, INP) measure loading, visual stability and responsiveness. Image optimisation, lazy loading, explicit dimensions, meta tags and semantic structure improve both speed and search ranking.",
+        "problems": [
+          {
+            "title": "Lazy Images",
+            "points": 40,
+            "difficulty": "Core",
+            "description": "Add lazy loading and explicit dimensions to the images on a page, so off-screen images defer and no image causes the layout to jump when it loads - cutting dead weight and reserving the parking space in advance.\n\nSample Input: OptimizeImages\nExpected Output: Images lazy-load and reserve space, reducing layout shift",
+            "criteria": [
+              "Every <img> has loading=\"lazy\" and explicit width and height (or an aspect-ratio) attributes",
+              "Because the space is reserved, images loading in do not shift surrounding content (reduced CLS)"
+            ],
+            "hint": "<img src=\"...\" alt=\"...\" loading=\"lazy\" width=\"800\" height=\"500\"> - the dimensions reserve the box before load.",
+            "solution": "Images given loading=\"lazy\" plus explicit width/height so they defer and never shift the layout on load."
+          }
+        ]
+      },
+      {
+        "no": 15,
+        "week": 5,
+        "session": 3,
+        "title": "Version Control & Deployment",
+        "video_url": "https://www.youtube.com/watch?v=hwP7WQkmECE",
+        "topic": "Real-life analogy: Think of a ship's logbook and launch day. Every change is dated and signed in the log (Git commits), and when the vessel is ready, it leaves the dry dock for open water (deployment to a live host).\n\nGit tracks changes with commits and branches, and platforms like GitHub host the repository. Static hosts such as GitHub Pages, Netlify or Vercel deploy a site live from a connected repository and redeploy automatically on every push.",
+        "problems": [
+          {
+            "title": "First Deploy",
             "points": 60,
             "difficulty": "Boss",
-            "description": "Build a production portfolio using grid and subgrid, a complete token system, three verified breakpoints, zero accessibility violations at the required level, a full reduced motion path and a met performance budget.",
+            "description": "Push a site to a Git repository and publish it live on a free static host, confirming the public URL serves the repository contents - the capstone finale, the logbook signed and the vessel leaving the dry dock.\n\nSample Input: DeploySite\nExpected Output: Site is live at a public URL served from the repository",
             "criteria": [
-              "Grid/subgrid, a complete token system, three verified breakpoints, zero accessibility violations, full reduced motion, and a met performance budget are all present and verified."
+              "The project is a Git repo with real commits, pushed to a remote (e.g. GitHub), and connected to a static host with the build/publish settings configured",
+              "The site is reachable at a public URL, and a subsequent commit + push triggers an automatic redeploy"
             ],
-            "hint": "Set the performance budget before building, and measure against it throughout.",
-            "solution": "A complete DevFolio portfolio meeting every constraint, verified against its performance budget and zero accessibility violations."
-          }
-        ],
-        "tier": "Advanced",
-        "videos": [
-          {
-            "channel": "Fireship",
-            "title": "Core Web Vitals explained",
-            "length": "9 min",
-            "url": "https://www.youtube.com/results?search_query=Fireship%20Core%20Web%20Vitals%20explained"
-          },
-          {
-            "channel": "Kevin Powell",
-            "title": "How to structure your CSS",
-            "length": "13 min",
-            "url": "https://www.youtube.com/results?search_query=Kevin%20Powell%20How%20to%20structure%20your%20CSS"
+            "hint": "git init -> commit -> push to GitHub -> connect the repo on Netlify/Vercel/Pages -> confirm the live URL and auto-redeploy.",
+            "solution": "A Git-versioned site pushed to GitHub and connected to a static host, live at a public URL with redeploy on push - capstone complete."
           }
         ]
       }

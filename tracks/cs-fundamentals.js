@@ -14,16 +14,11 @@
  * CS-104 (Fundamentals of Python) and CS-105 (Fundamentals of JavaScript)
  * now follow their official syllabus PDFs verbatim, in the same shape as
  * FC-01/FC-02: five modules, fifteen topics, one real-life analogy +
- * concept note + a video lesson + one scenario-based Compiler Quest per
- * topic, each with an exact Sample Input / Expected Output so the grader
- * has a literal target. Per the updated syllabus PDFs, video_url here is a
- * YouTube search link (youtube.com/results?search_query=...) built from the
- * PDF's "Video lesson" query text, not a specific watch id: a wrong watch
- * id silently sends a student to an unrelated video, while a search for the
- * exact topic keywords reliably surfaces the right lesson. These render as
- * an external "Watch video" link, not an inline embed (see open.js
- * videoEmbedHtml/levelVideoHtml). video_url is still intentionally left
- * null for CS-106 (HTML & CSS) until its matching PDF is sourced too.
+ * concept note + a real YouTube video + one scenario-based Compiler Quest
+ * per topic, each with an exact Sample Input / Expected Output so the
+ * grader has a literal target. video_url is still intentionally left null
+ * for CS-106 (HTML & CSS) until its video links and matching PDF are
+ * sourced too.
  */
 
 module.exports = [
@@ -37,7 +32,7 @@ module.exports = [
   key_concepts: ['Python interpreter & print()', 'Dynamic variables & types', 'input() & type casting', 'String slicing & f-strings', 'Decision structures (if / elif / else)', 'Iteration with for & while loops', 'Lists & list comprehensions', 'Tuples & sets', 'Dictionaries & key-value lookups', 'Functions & default arguments', '*args, **kwargs & variable arguments', 'Lambda expressions & scope (LEGB)', 'Classes, objects & __init__', 'Inheritance & polymorphism', "File handling with 'with' & exceptions"],
   pass_mark: 60, titleNames: ['Python Starter', 'Pythonista'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'Python Interpreter & print()', video_url: 'https://www.youtube.com/results?search_query=python%20print%20function%20sep%20end',
+    { no: 1, week: 1, session: 1, title: 'Python Interpreter & print()', video_url: 'https://www.youtube.com/watch?v=kqtD5dpn9C8',
       topic: "Real-life analogy: Think of a live simultaneous translator reading a speech line-by-line, speaking each sentence as it arrives - never waiting for the whole book to be printed and bound first.\n\nPython runs on a bytecode interpreter that executes your source one statement at a time, so there is no separate compile-and-link step to wait through. The print() function sends formatted text to standard output; its sep parameter sets what goes between multiple arguments (a space by default) and its end parameter sets what finishes the line (a newline by default).",
       problems: [
         { title: 'System Diagnostic Banner', points: 30, difficulty: 'Basic',
@@ -46,7 +41,7 @@ module.exports = [
           hint: 'print("Booting Python Engine") then print("CPU", "MEM", "DISK", sep="-").',
           solution: 'Two print() calls, the second using sep="-" to join the three diagnostic tags into CPU-MEM-DISK.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Dynamic Variables & Types', video_url: 'https://www.youtube.com/results?search_query=python%20variables%20data%20types%20int%20float%20bool',
+    { no: 2, week: 1, session: 2, title: 'Dynamic Variables & Types', video_url: 'https://www.youtube.com/watch?v=cQT33yu9pY8',
       topic: "Real-life analogy: Think of a universal storage bin. You peel off the old label sticker and put on a new one whenever you want - today it holds shoes, tomorrow books, the day after coins - the bin never cares what type of thing goes in.\n\nPython variables are names that refer to objects on the heap, and the same name can be rebound to a value of a different type at any time - you never declare a type. The core primitives are int (whole numbers), float (decimals) and bool (True / False), and type(x) reports which one an object is.",
       problems: [
         { title: 'Inventory Price Multiplier', points: 30, difficulty: 'Basic',
@@ -55,7 +50,7 @@ module.exports = [
           hint: 'count, price = input().split(); then total = int(count) * float(price).',
           solution: "An int count times a float price giving 50.0, with type(total) printing <class 'float'>." },
       ] },
-    { no: 3, week: 1, session: 3, title: 'User Input with input() & Type Casting', video_url: 'https://www.youtube.com/results?search_query=python%20input%20function%20type%20casting%20int%20float',
+    { no: 3, week: 1, session: 3, title: 'User Input with input() & Type Casting', video_url: 'https://www.youtube.com/watch?v=61a7UkDO50s',
       topic: "Real-life analogy: Think of a microphone capturing raw audio as text. Before a synthesizer can play it back as musical notes, that text has to be converted into numerical pitch frequencies - the raw capture alone is not a number.\n\ninput() always returns a str, no matter what the user types. Before any arithmetic you must cast it with int() or float(); skipping the cast either raises a TypeError or silently does string work (\"20\" * 3) instead of maths.",
       problems: [
         { title: 'Age Verification Scanner', points: 40, difficulty: 'Core',
@@ -64,7 +59,7 @@ module.exports = [
           hint: 'name, year = input().split(); age = 2026 - int(year).',
           solution: 'An int-cast birth year subtracted from 2026, printed inside the exact summary sentence (22 for 2004).' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'String Slicing & f-Strings', video_url: 'https://www.youtube.com/results?search_query=python%20string%20slicing%20f-strings',
+    { no: 4, week: 2, session: 1, title: 'String Slicing & f-Strings', video_url: 'https://www.youtube.com/watch?v=k9TUPpGqYTo',
       topic: "Real-life analogy: Think of cutting one specific rectangular frame out of a long film strip (slicing), then laying a dynamic subtitle over that frame (an f-string).\n\nStrings are immutable sequences. The slice str[start:stop:step] returns a new substring without changing the original, and an f-string f\"{value}\" drops variables straight into text - faster and clearer than + concatenation.",
       problems: [
         { title: 'Product SKU Code Parser', points: 40, difficulty: 'Core',
@@ -73,7 +68,7 @@ module.exports = [
           hint: 'sku[4:8] grabs the four characters after "SKU-"; then print(f"Parsed Product ID: #{pid}").',
           solution: 'A slice pulling the middle 4 digits from the SKU, printed behind # with an f-string.' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Decision Structures (if, elif, else)', video_url: 'https://www.youtube.com/results?search_query=python%20if%20elif%20else%20conditional%20statements',
+    { no: 5, week: 2, session: 2, title: 'Decision Structures (if, elif, else)', video_url: 'https://www.youtube.com/watch?v=DZwmZ8Usvnk',
       topic: "Real-life analogy: Think of an automated postal sorting machine dropping each letter into the local, domestic or international chute based on its postcode - one letter, exactly one chute.\n\nif tests a condition; elif checks the next one only when every earlier test failed; else catches everything left over. Conditions use comparison operators (< > == !=) and can be combined with the logical operators and, or and not.",
       problems: [
         { title: 'Speed Radar Enforcer', points: 30, difficulty: 'Basic',
@@ -82,7 +77,7 @@ module.exports = [
           hint: 'if speed <= 80: ... elif speed <= 100: ... else: ...',
           solution: 'A chained if/elif/else printing exactly one of NORMAL, WARNING or PENALTY - WARNING for 95.' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Iteration with for & while Loops', video_url: 'https://www.youtube.com/results?search_query=python%20for%20while%20loops%20break%20continue',
+    { no: 6, week: 2, session: 3, title: 'Iteration with for & while Loops', video_url: 'https://www.youtube.com/watch?v=6iF8Xb7Z3wQ',
       topic: "Real-life analogy: Think of a quality-control conveyor belt that examines every box in turn, and keeps going until someone hits the emergency stop button.\n\nA for loop steps over a range or a collection a known number of times; a while loop repeats as long as its condition stays true. break leaves the loop early and continue skips straight to the next iteration.",
       problems: [
         { title: 'Even Sequence Accumulator', points: 30, difficulty: 'Basic',
@@ -91,7 +86,7 @@ module.exports = [
           hint: 'total = 0; for n in range(1, N + 1): if n % 2 == 0: total += n.',
           solution: 'A range() loop summing only the even values from 1 to N, printing Even Sum: 30 for N = 10.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Lists & List Comprehensions', video_url: 'https://www.youtube.com/results?search_query=python%20lists%20list%20comprehension',
+    { no: 7, week: 3, session: 1, title: 'Lists & List Comprehensions', video_url: 'https://www.youtube.com/watch?v=W8KRzm-HUcc',
       topic: "Real-life analogy: Think of a digital shopping cart you can add to, remove from, reorder, or run a bulk discount across in a single pass.\n\nA list is a mutable, ordered sequence. A comprehension [expr for x in iterable if cond] builds a whole new list in one readable line, replacing the append-inside-a-loop pattern.",
       problems: [
         { title: 'Squares of Odds Generator', points: 40, difficulty: 'Core',
@@ -100,7 +95,7 @@ module.exports = [
           hint: '[n ** 2 for n in nums if n % 2].',
           solution: 'A single comprehension filtering odds and squaring them, printing [1, 9] for 1 2 3 4.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Tuples & Sets', video_url: 'https://www.youtube.com/results?search_query=python%20tuples%20sets',
+    { no: 8, week: 3, session: 2, title: 'Tuples & Sets', video_url: 'https://www.youtube.com/watch?v=W8KRzm-HUcc',
       topic: "Real-life analogy: Think of a sealed birth certificate that can never be edited (a tuple), and an automated party guestbook that silently refuses to write down a name it already has (a set).\n\nA tuple (x, y) is an immutable record - fixed the moment it is created. A set {a, b} stores only unique values and offers O(1) membership tests plus set algebra (union, intersection, difference).",
       problems: [
         { title: 'Duplicate Identifier Filter', points: 40, difficulty: 'Core',
@@ -109,7 +104,7 @@ module.exports = [
           hint: 'uniq = set(nums); then len(uniq) and sorted(uniq).',
           solution: 'A set dropping the repeats, with len() and sorted() giving Unique Count: 3 and [2, 5, 8].' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'Dictionaries & Key-Value Lookups', video_url: 'https://www.youtube.com/results?search_query=python%20dictionaries%20key%20value%20get%20keys%20values',
+    { no: 9, week: 3, session: 3, title: 'Dictionaries & Key-Value Lookups', video_url: 'https://www.youtube.com/watch?v=daefaLgNkw0',
       topic: "Real-life analogy: Think of a physical telephone directory - you look up a contact name and get their number instantly, without scanning every page one by one.\n\nA dictionary {key: value} stores pairs and finds a value by key in near-constant time. .get() reads safely with a fallback, and .keys(), .values() and .items() let you iterate the parts.",
       problems: [
         { title: 'Word Frequency Counter', points: 40, difficulty: 'Core',
@@ -118,7 +113,7 @@ module.exports = [
           hint: 'for w in text.split(): freq[w] = freq.get(w, 0) + 1.',
           solution: "A dict tallying word counts, printing {'apple': 2, 'banana': 1} for the sample line." },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Defining Functions & Default Arguments', video_url: 'https://www.youtube.com/results?search_query=python%20functions%20def%20default%20arguments%20return',
+    { no: 10, week: 4, session: 1, title: 'Defining Functions & Default Arguments', video_url: 'https://www.youtube.com/watch?v=9Os0o3wzS_I',
       topic: "Real-life analogy: Think of a coffee vending machine with recipe buttons. Press Espresso and it uses the standard recipe; or optionally dial in a custom sugar level before you press.\n\ndef names a reusable block that takes parameters and hands back a result with return. A default argument (people=2) makes a parameter optional, and defaults must come after all the required parameters in the signature.",
       problems: [
         { title: 'Bill Splitter Function', points: 40, difficulty: 'Core',
@@ -127,7 +122,7 @@ module.exports = [
           hint: 'def split_bill(amount, people=2): return amount / people  - then print(f"Share per person: ${share:.2f}").',
           solution: 'A split_bill(amount, people=2) function whose returned share prints as $50.00 for 150 split 3 ways.' },
       ] },
-    { no: 11, week: 4, session: 2, title: '*args, **kwargs & Variable Arguments', video_url: 'https://www.youtube.com/results?search_query=python%20args%20kwargs%20variable%20arguments',
+    { no: 11, week: 4, session: 2, title: '*args, **kwargs & Variable Arguments', video_url: 'https://www.youtube.com/watch?v=Vh__2V2tXUM',
       topic: "Real-life analogy: Think of an open grocery bag that stretches to hold any number of items (*args), plus a box of labelled gift tags where each tag has a name and a value (**kwargs).\n\n*args collects any extra positional arguments into a tuple; **kwargs collects any extra named arguments into a dict. Together they let one function accept a variable number of inputs.",
       problems: [
         { title: 'Dynamic Math Product Engine', points: 40, difficulty: 'Core',
@@ -136,7 +131,7 @@ module.exports = [
           hint: 'def product_all(*numbers): total = 1; for n in numbers: total *= n; return total  - call product_all(*nums).',
           solution: 'A product_all(*numbers) function multiplying all arguments, returning 120 for 2 3 4 5.' },
       ] },
-    { no: 12, week: 4, session: 3, title: 'Lambda Expressions & Scope (LEGB)', video_url: 'https://www.youtube.com/results?search_query=python%20lambda%20functions%20LEGB%20scope',
+    { no: 12, week: 4, session: 3, title: 'Lambda Expressions & Scope (LEGB)', video_url: 'https://www.youtube.com/watch?v=25ovCm9jKfA',
       topic: "Real-life analogy: Think of a disposable sticky-note calculation you use once and throw away - and you always check your own desk notes before walking over to the office noticeboard.\n\nA lambda is a small anonymous function written inline: lambda x: x * 2. Name lookup follows LEGB - Local, then Enclosing, then Global, then Built-in - so an inner scope can see outer names but not the other way round.",
       problems: [
         { title: 'Custom Key Sorter', points: 40, difficulty: 'Core',
@@ -145,7 +140,7 @@ module.exports = [
           hint: 'sorted(pairs, key=lambda t: t[1]).',
           solution: 'A sorted() call keyed by a lambda on the age field, producing the age-ascending tuple list.' },
       ] },
-    { no: 13, week: 5, session: 1, title: 'Classes, Objects & __init__', video_url: 'https://www.youtube.com/results?search_query=python%20classes%20objects%20__init__%20OOP',
+    { no: 13, week: 5, session: 1, title: 'Classes, Objects & __init__', video_url: 'https://www.youtube.com/watch?v=ZDa-Z5JzLYM',
       topic: "Real-life analogy: Think of an architect's blueprint that defines what every car has, versus each physical car rolling off the production line built from that one blueprint.\n\nA class bundles data (attributes) and behaviour (methods). __init__(self, ...) runs automatically when an object is created and sets up its starting state; self is the current object, passed first to every method.",
       problems: [
         { title: 'Student Profile Manager', points: 40, difficulty: 'Core',
@@ -154,7 +149,7 @@ module.exports = [
           hint: 'In __init__: self.name = name and self.gpa = gpa; then def display(self): print(f"Student: {self.name} | GPA: {self.gpa}").',
           solution: 'A Student class with __init__ setting name/gpa and a display() method printing the exact profile line.' },
       ] },
-    { no: 14, week: 5, session: 2, title: 'Inheritance & Polymorphism', video_url: 'https://www.youtube.com/results?search_query=python%20inheritance%20polymorphism%20super',
+    { no: 14, week: 5, session: 2, title: 'Inheritance & Polymorphism', video_url: 'https://www.youtube.com/watch?v=RSl87lqOXDE',
       topic: "Real-life analogy: Think of a smart tablet that inherits every standard smartphone feature, then adds stylus support and a larger screen on top.\n\nclass Child(Parent) reuses the parent's code. super().__init__() runs the parent constructor so the child does not repeat that setup, and a child can override a method to change its behaviour while callers keep using the same name.",
       problems: [
         { title: 'Employee Hierarchy Manager', points: 40, difficulty: 'Core',
@@ -163,7 +158,7 @@ module.exports = [
           hint: 'class Manager(Employee): def __init__(self, name, salary, dept): super().__init__(name, salary); then self.dept = dept.',
           solution: 'A Manager subclass extending Employee via super().__init__(), printing the exact manager summary line.' },
       ] },
-    { no: 15, week: 5, session: 3, title: "File Handling with 'with' & Exceptions", video_url: 'https://www.youtube.com/results?search_query=python%20file%20handling%20with%20open%20try%20except',
+    { no: 15, week: 5, session: 3, title: "File Handling with 'with' & Exceptions", video_url: 'https://www.youtube.com/watch?v=Uh2ebFW8OYM',
       topic: "Real-life analogy: Think of an automated vault door that unlocks as you step in and swings shut and locks itself the moment you leave - you never have to remember to close it.\n\nwith open(path) as f: guarantees the file is closed even if an error strikes mid-block. try / except / finally catches failures (a missing file, a bad value) so the program recovers instead of crashing.",
       problems: [
         { title: 'Safe Log File Writer & Reader', points: 60, difficulty: 'Boss',
@@ -184,7 +179,7 @@ module.exports = [
   key_concepts: ['JS engine & console.log()', 'Scoping with let, const & var', 'Primitive types & type conversion', 'Strict vs loose equality', 'Template literals & string methods', 'Iteration (for...of, for...in, while)', 'Array methods (map, filter, reduce)', 'Destructuring, spread & rest', 'JSON serialization & deep cloning', "Arrow functions & 'this'", 'Closures & private state', 'Higher-order functions & currying', 'Event loop, callbacks & call stack', 'Promises (.then, .catch, .finally)', 'async / await & the Fetch API'],
   pass_mark: 60, titleNames: ['Script Starter', 'Async Engineer'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'JS Runtime Engine & console.log()', video_url: 'https://www.youtube.com/results?search_query=javascript%20console%20log%20runtime%20engine',
+    { no: 1, week: 1, session: 1, title: 'JS Runtime Engine & console.log()', video_url: 'https://www.youtube.com/watch?v=W6NZfCO5SIk',
       topic: "Real-life analogy: Think of a live theatre prompter whispering each line to the actors in real time, handling backstage cues on the spot and jotting the stage status straight into the stage manager's notebook.\n\nJavaScript runs inside an engine - V8 in Chrome and Node.js, SpiderMonkey in Firefox - executing statements one after another on a single-threaded call stack. console.log() streams formatted diagnostic output to the developer console, and passing it several comma-separated arguments prints them on one line separated by spaces.",
       problems: [
         { title: 'System Startup Diagnostic Banner', points: 30, difficulty: 'Basic',
@@ -193,7 +188,7 @@ module.exports = [
           hint: 'console.log("[V8 Engine] Core Initialized"); then console.log("Status: Online,", "Mode: Production");',
           solution: 'Two console.log() calls, the second using comma-separated arguments to print the status and mode line.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Variable Scoping (let, const, var) & Hoisting', video_url: 'https://www.youtube.com/results?search_query=javascript%20let%20const%20var%20hoisting%20scope',
+    { no: 2, week: 1, session: 2, title: 'Variable Scoping (let, const, var) & Hoisting', video_url: 'https://www.youtube.com/watch?v=9M4XKi25I2M',
       topic: "Real-life analogy: Think of var as a megaphone heard across the whole floor (function-scoped), let as a conversation inside a soundproof meeting room (block-scoped), and const as a permanent engraved metal plaque.\n\nModern JavaScript uses let (reassignable, block-scoped) and const (block-scoped, its binding fixed once assigned). var is hoisted to the top of its function and ignores { } block boundaries, which quietly leaks values across scopes and causes bugs.",
       problems: [
         { title: 'Block-Scoped Tax Calculator', points: 30, difficulty: 'Basic',
@@ -202,7 +197,7 @@ module.exports = [
           hint: 'const total = price * (1 + TAX_RATE); then total.toFixed(2) for the 2-decimal string.',
           solution: 'A const TAX_RATE and a block-scoped let total, printing "Total with Tax: $108.00" for a price of 100.' },
       ] },
-    { no: 3, week: 1, session: 3, title: 'Primitive Data Types & Type Conversion', video_url: 'https://www.youtube.com/results?search_query=javascript%20primitive%20data%20types%20type%20conversion%20typeof',
+    { no: 3, week: 1, session: 3, title: 'Primitive Data Types & Type Conversion', video_url: 'https://www.youtube.com/watch?v=d_k8q8jV0Y0',
       topic: "Real-life analogy: Think of an international exchange booth: the machines turn number vouchers into text tickets and back, but hand you an empty \"Rejected\" slip (NaN) when the input makes no sense.\n\nJavaScript has seven primitive types: string, number, bigint, boolean, undefined, symbol and null. typeof reports a value's type, and Number(), String() and Boolean() convert explicitly between them.",
       problems: [
         { title: 'Type Inspector & Parser', points: 40, difficulty: 'Core',
@@ -211,7 +206,7 @@ module.exports = [
           hint: 'const n = Number(raw); then typeof (n * 2) is "number".',
           solution: 'A Number()-cast value doubled to 90, with typeof reporting "number".' },
       ] },
-    { no: 4, week: 2, session: 1, title: 'Strict Equality (===) vs Loose Equality (==)', video_url: 'https://www.youtube.com/results?search_query=javascript%20strict%20equality%20loose%20equality%20triple%20equals',
+    { no: 4, week: 2, session: 1, title: 'Strict Equality (===) vs Loose Equality (==)', video_url: 'https://www.youtube.com/watch?v=kVOmc7P8WVw',
       topic: "Real-life analogy: Think of an airport checkpoint: loose equality (==) waves you through if the boarding pass merely looks close after some auto-adjusting; strict equality (===) demands the passport identity and an exact biometric match.\n\n== coerces the two operands to a common type before comparing, so '5' == 5 is true and \"0\" == 0 is true. === compares type and value with no coercion, so '5' === 5 is false. Default to === everywhere.",
       problems: [
         { title: 'Coercion Sentinel Validator', points: 30, difficulty: 'Basic',
@@ -220,7 +215,7 @@ module.exports = [
           hint: 'console.log(`Loose: ${"0" == 0} | Strict: ${"0" === 0}`);',
           solution: 'A side-by-side == vs === comparison of "0" and 0, printing "Loose: true | Strict: false".' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Template Literals & String Methods', video_url: 'https://www.youtube.com/results?search_query=javascript%20template%20literals%20string%20methods',
+    { no: 5, week: 2, session: 2, title: 'Template Literals & String Methods', video_url: 'https://www.youtube.com/watch?v=k9TUPpGqYTo',
       topic: "Real-life analogy: Think of a fill-in-the-blank invitation card where the name, the date and the RSVP link snap automatically into their pre-cut slots.\n\nTemplate literals use backticks and support multi-line text and ${expr} interpolation directly inside the string. Common string methods include includes(), slice(), trim() and replace() / replaceAll().",
       problems: [
         { title: 'Dynamic URL Query Builder', points: 40, difficulty: 'Core',
@@ -229,7 +224,7 @@ module.exports = [
           hint: '`Endpoint: https://${host}/${endpoint}?id=${id}`',
           solution: 'A template-literal URL interpolating host, endpoint and id into "https://api.site.com/users?id=101".' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Iteration (for...of, for...in, while)', video_url: 'https://www.youtube.com/results?search_query=javascript%20for%20of%20for%20in%20while%20loop',
+    { no: 6, week: 2, session: 3, title: 'Iteration (for...of, for...in, while)', video_url: 'https://www.youtube.com/watch?v=6iF8Xb7Z3wQ',
       topic: "Real-life analogy: Think of a bookshelf: for...of walks past every physical book in turn, while for...in reads the little index tags stuck to the shelf frame itself.\n\nfor...of iterates the values of an iterable (arrays, strings, sets). for...in iterates the enumerable keys of an object. while repeats its body as long as its condition stays truthy.",
       problems: [
         { title: 'Array Value Accumulator', points: 30, difficulty: 'Basic',
@@ -238,7 +233,7 @@ module.exports = [
           hint: 'let sum = 0; for (const n of arr) sum += n;',
           solution: 'A for...of loop summing the array values, printing "Sum: 100".' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Modern Array Methods (map, filter, reduce)', video_url: 'https://www.youtube.com/results?search_query=javascript%20map%20filter%20reduce%20array%20methods',
+    { no: 7, week: 3, session: 1, title: 'Modern Array Methods (map, filter, reduce)', video_url: 'https://www.youtube.com/watch?v=G3BS3sh3D8Q',
       topic: "Real-life analogy: Think of a car assembly line: map sprays every car the same colour, filter pulls the defective ones off the belt, and reduce adds every remaining car's value into one fleet total.\n\nHigher-order array methods build immutable pipelines: map() returns a new array with each element transformed, filter() returns a new array of the elements that pass a test, and reduce() folds the array into a single accumulated value.",
       problems: [
         { title: 'Even Square Reducer', points: 40, difficulty: 'Core',
@@ -247,7 +242,7 @@ module.exports = [
           hint: '[1,2,3,4,5,6].filter(n => n % 2 === 0).map(n => n * n).reduce((a, b) => a + b, 0)',
           solution: 'A filter -> map -> reduce chain squaring the evens and summing them to 56.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Objects, Destructuring & Spread / Rest (...)', video_url: 'https://www.youtube.com/results?search_query=javascript%20destructuring%20spread%20rest%20operator',
+    { no: 8, week: 3, session: 2, title: 'Objects, Destructuring & Spread / Rest (...)', video_url: 'https://www.youtube.com/watch?v=-vR3a11WZT0',
       topic: "Real-life analogy: Think of unpacking a flat-pack furniture crate: you lift the desk top and legs straight out by name (destructuring), and sweep the leftover screws into a spare-parts bag (rest).\n\nDestructuring pulls properties or elements into their own variables (const { name, age } = user;). The spread operator ... copies or merges objects and arrays; rest ... in a parameter or pattern collects whatever is left over.",
       problems: [
         { title: 'Object Merge & Destructure', points: 40, difficulty: 'Core',
@@ -256,7 +251,7 @@ module.exports = [
           hint: 'const { id, email, role } = { ...objA, ...objB }; then `User #${id}: ${email} (${role})`.',
           solution: 'A spread merge followed by destructuring, printing "User #1: a@b.com (Dev)".' },
       ] },
-    { no: 9, week: 3, session: 3, title: 'JSON Serialization & Deep Cloning', video_url: 'https://www.youtube.com/results?search_query=javascript%20json%20stringify%20parse%20structuredclone%20deep%20clone',
+    { no: 9, week: 3, session: 3, title: 'JSON Serialization & Deep Cloning', video_url: 'https://www.youtube.com/watch?v=iiADhChRriM',
       topic: "Real-life analogy: Think of flat-packing a wardrobe into a cardboard box to mail across the country (serialization), then building an identical wardrobe at the other end (deserialization).\n\nJSON.stringify() turns an object into a JSON string; JSON.parse() turns it back into an object. Parsing a stringified copy - or structuredClone() - gives a genuine deep copy that shares no references with the original.",
       problems: [
         { title: 'JSON Data Roundtrip', points: 40, difficulty: 'Core',
@@ -265,7 +260,7 @@ module.exports = [
           hint: 'const clone = JSON.parse(JSON.stringify(obj)); clone.value = 200;',
           solution: 'A stringify/parse deep clone whose mutation leaves the original at 100, printing "Original: 100 | Cloned: 200".' },
       ] },
-    { no: 10, week: 4, session: 1, title: "Arrow Functions & the 'this' Keyword", video_url: 'https://www.youtube.com/results?search_query=javascript%20arrow%20functions%20this%20keyword%20lexical%20scope',
+    { no: 10, week: 4, session: 1, title: "Arrow Functions & the 'this' Keyword", video_url: 'https://www.youtube.com/watch?v=h33Srr5J9nY',
       topic: "Real-life analogy: Think of a regular function as an actor whose identity shifts with whatever stage they stand on, and an arrow function as a reporter who always speaks with the voice of the home office they came from.\n\nArrow functions - const fn = (a, b) => a + b - are concise and, crucially, take this from the scope where they are defined rather than how they are called. A single-expression body has an implicit return with no braces.",
       problems: [
         { title: 'Concise Arrow Multiplier', points: 30, difficulty: 'Basic',
@@ -274,7 +269,7 @@ module.exports = [
           hint: 'const area = (w, h) => w * h; - no braces means the value is returned automatically.',
           solution: 'A single-expression arrow function returning w * h, printing "Area: 42" for 6 and 7.' },
       ] },
-    { no: 11, week: 4, session: 2, title: 'Closures & Encapsulation (Private State)', video_url: 'https://www.youtube.com/results?search_query=javascript%20closures%20encapsulation%20private%20state',
+    { no: 11, week: 4, session: 2, title: 'Closures & Encapsulation (Private State)', video_url: 'https://www.youtube.com/watch?v=3a0I8ICR1Vg',
       topic: "Real-life analogy: Think of a bank teller who keeps the vault combination in their head: customers deposit and withdraw through the window and never touch the dials themselves.\n\nA closure lets an inner function keep using variables from its outer function's scope even after that outer function has returned. Returning the inner function (or an object of them) creates truly private state that outside code cannot reach directly.",
       problems: [
         { title: 'Private Counter Closure', points: 40, difficulty: 'Core',
@@ -283,7 +278,7 @@ module.exports = [
           hint: 'function createCounter() { let count = 0; return () => ++count; }',
           solution: 'A createCounter() closure over a private count, whose returned function prints "1 2 3" across three calls.' },
       ] },
-    { no: 12, week: 4, session: 3, title: 'Higher-Order Functions & Currying', video_url: 'https://www.youtube.com/results?search_query=javascript%20higher%20order%20functions%20currying',
+    { no: 12, week: 4, session: 3, title: 'Higher-Order Functions & Currying', video_url: 'https://www.youtube.com/watch?v=rCGYj3OmkHw',
       topic: "Real-life analogy: Think of a build-your-own sandwich line: one station takes your bread choice, the next your protein, the next your sauce - each takes a single decision and passes the sandwich along.\n\nA higher-order function takes a function as an argument or returns one. Currying rewrites a multi-argument function f(a, b, c) as a chain of one-argument functions f(a)(b)(c), which makes partial application and composition natural.",
       problems: [
         { title: 'Curried Discount Calculator', points: 40, difficulty: 'Core',
@@ -292,7 +287,7 @@ module.exports = [
           hint: 'const applyDiscount = discount => price => price - price * discount; then applyDiscount(0.10)(200).',
           solution: 'A curried applyDiscount(rate)(price) that returns 180 for a 10% discount on 200.' },
       ] },
-    { no: 13, week: 5, session: 1, title: 'Event Loop, Callbacks & the Call Stack', video_url: 'https://www.youtube.com/results?search_query=javascript%20event%20loop%20callbacks%20call%20stack',
+    { no: 13, week: 5, session: 1, title: 'Event Loop, Callbacks & the Call Stack', video_url: 'https://www.youtube.com/watch?v=8aGhZQkoFbQ',
       topic: "Real-life analogy: Think of one busy chef (the call stack). When a dish needs 20 minutes in the oven (a Web API), the chef starts it and cooks other orders, only plating the baked dish once the timer rings and the queue hands it back.\n\nJavaScript runs on one thread. Asynchronous work is handed to the browser or Node APIs, and its callbacks wait in a task queue; the event loop only pushes a queued callback onto the call stack once the stack is empty - so setTimeout(fn, 0) still runs after all the synchronous code.",
       problems: [
         { title: 'Non-Blocking setTimeout Ordering', points: 40, difficulty: 'Core',
@@ -301,7 +296,7 @@ module.exports = [
           hint: 'console.log("A"); setTimeout(() => console.log("B"), 0); console.log("C"); - the timer callback always waits for the stack to clear.',
           solution: 'A synchronous A and C with a setTimeout-deferred B, printing in the order A, C, B.' },
       ] },
-    { no: 14, week: 5, session: 2, title: 'Promises (.then, .catch, .finally)', video_url: 'https://www.youtube.com/results?search_query=javascript%20promises%20then%20catch%20finally',
+    { no: 14, week: 5, session: 2, title: 'Promises (.then, .catch, .finally)', video_url: 'https://www.youtube.com/watch?v=DHvZLI7Db8E',
       topic: "Real-life analogy: Think of the buzzer they hand you at a burger counter. It is a promise: right now Pending, it will Resolve into a hot meal when ready, or Reject if the kitchen runs out of patties.\n\nA Promise represents a value that will arrive later. It is Pending, then either Fulfilled or Rejected. .then() handles the resolved value, .catch() handles a rejection, and .finally() runs cleanup either way.",
       problems: [
         { title: 'Promise Resolution Engine', points: 40, difficulty: 'Core',
@@ -310,7 +305,7 @@ module.exports = [
           hint: 'Promise.resolve("Data Loaded").then(v => console.log(`[Resolved] ${v}`)).finally(() => console.log("[Cleanup] Stream Closed"));',
           solution: 'A resolved Promise whose .then() prints "[Resolved] Data Loaded" and .finally() prints "[Cleanup] Stream Closed".' },
       ] },
-    { no: 15, week: 5, session: 3, title: 'Modern async / await & the Fetch API', video_url: 'https://www.youtube.com/results?search_query=javascript%20async%20await%20fetch%20api',
+    { no: 15, week: 5, session: 3, title: 'Modern async / await & the Fetch API', video_url: 'https://www.youtube.com/watch?v=V_Kr9OSfDeU',
       topic: "Real-life analogy: Think of reading a book of clear step-by-step instructions top to bottom. An assistant is fetching reference notes in the background, but your reading stays linear - no tangle of nested callbacks.\n\nasync/await is synchronous-looking syntax over Promises: await pauses an async function until a Promise settles, and try...catch handles failures. Promise.all() runs several async operations at once and waits for all of them.",
       problems: [
         { title: 'Async/Await HTTP Request Handler', points: 60, difficulty: 'Boss',

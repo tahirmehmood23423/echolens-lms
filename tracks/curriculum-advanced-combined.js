@@ -1122,7 +1122,7 @@ module.exports = [
         "week": 1,
         "session": 3,
         "title": "Property Descriptors (Object.defineProperty, freeze, seal)",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+object+defineproperty+freeze+seal+tutorial",
+        "video_url": "https://www.youtube.com/watch?v=ZqL7q8KUw9I",
         "topic": "Real-life analogy: Think of notarising a legal contract with tamper-evident wax seals: individual clauses can be marked read-only (writable: false) or non-removable (configurable: false), or the whole document can be locked shut (Object.freeze).\n\nEvery property has a descriptor - value, writable, enumerable, configurable. Object.seal() stops keys being added or removed but leaves values editable; Object.freeze() locks the whole object so existing values cannot change either.",
         "problems": [
           {
@@ -1144,7 +1144,7 @@ module.exports = [
         "week": 2,
         "session": 1,
         "title": "Proxy Traps (get, set, deleteProperty)",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+proxy+get+set+traps+tutorial",
+        "video_url": "https://www.youtube.com/watch?v=hI4AyjNnUzQ",
         "topic": "Real-life analogy: Think of a diplomatic security attache who intercepts, inspects and validates every package and courier before letting any of it through the embassy gate.\n\nA Proxy wraps a target object and intercepts fundamental operations through traps: get for reads, set for writes, deleteProperty for deletions, apply for calls. A trap can validate, transform, log or reject the operation before (or instead of) letting it reach the target.",
         "problems": [
           {
@@ -1166,7 +1166,7 @@ module.exports = [
         "week": 2,
         "session": 2,
         "title": "Reflect API & Transparent Forwarding",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+reflect+api+proxy+tutorial",
+        "video_url": "https://www.youtube.com/watch?v=X7qXJRU6qyM",
         "topic": "Real-life analogy: Think of a universal remote-control protocol: whatever brand of television you point it at, the standard commands - power, volume, input - forward through cleanly without any vendor-specific quirks.\n\nThe Reflect API exposes the interceptable object operations as plain functions - Reflect.get, Reflect.set, Reflect.has, Reflect.deleteProperty - with predictable return values. Inside a Proxy trap, calling the matching Reflect method is the correct way to perform the default behaviour while preserving the receiver.",
         "problems": [
           {
@@ -1232,7 +1232,7 @@ module.exports = [
         "week": 3,
         "session": 2,
         "title": "WeakMap & WeakSet (Memory Leak Prevention)",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+weakmap+weakset+tutorial",
+        "video_url": "https://www.youtube.com/watch?v=8B514jlvkqE",
         "topic": "Real-life analogy: Think of a coat-check tag. While you are in the building the tag ties your ticket to your coat; once you leave for good the tag is discarded on its own - it never keeps your coat hostage.\n\nA WeakMap keys entries by object, and holds those keys weakly: when nothing else references a key object, the entry is garbage-collected automatically. WeakMap/WeakSet are not enumerable and have no size - which is exactly what makes them safe for DOM node metadata and private caches.",
         "problems": [
           {
@@ -1254,7 +1254,7 @@ module.exports = [
         "week": 3,
         "session": 3,
         "title": "FinalizationRegistry & Garbage Collection Mechanics",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+finalizationregistry+weakref+garbage+collection",
+        "video_url": "https://www.youtube.com/watch?v=3sgIFrjA61U",
         "topic": "Real-life analogy: Think of leaving instructions with a will executor: \"when this particular antique safe is finally demolished by the city, file a notice in the municipal archive.\"\n\nA FinalizationRegistry lets you register a cleanup callback that may fire after an object has been reclaimed by the garbage collector, receiving a held token you chose. Paired with WeakRef, it is how you release external resources - file handles, sockets, native buffers - tied to a JavaScript object's lifetime.",
         "problems": [
           {
@@ -1298,7 +1298,7 @@ module.exports = [
         "week": 4,
         "session": 2,
         "title": "AbortController & Request Cancellation",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+abortcontroller+cancel+fetch+tutorial",
+        "video_url": "https://www.youtube.com/watch?v=bLpA9tvABb8",
         "topic": "Real-life analogy: Think of the \"Cancel Print\" button on a 500-page press: one press and the job stops mid-run, before it wastes any more paper.\n\nAn AbortController produces an AbortSignal you pass into fetch(), an event listener, or your own async work. Calling controller.abort() rejects the pending operation with an AbortError, which is how you stop stale requests when the user navigates away or types a new query.",
         "problems": [
           {
@@ -1342,7 +1342,7 @@ module.exports = [
         "week": 5,
         "session": 1,
         "title": "Custom Event System (CustomEvent & EventTarget)",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+custom+events+eventtarget+dispatchevent",
+        "video_url": "https://www.youtube.com/watch?v=b469-2H9Rew",
         "topic": "Real-life analogy: Think of a stock-exchange bell. When the index hits a record the exchange rings it once (dispatches an event); every broker tuned to that signal reacts on their own, and the exchange never needs to know who is listening.\n\nEventTarget and CustomEvent give you publish/subscribe with no framework: addEventListener registers a handler, and dispatchEvent(new CustomEvent(name, { detail })) fires it with a payload, keeping the emitter and the listeners fully decoupled.",
         "problems": [
           {
@@ -1364,7 +1364,7 @@ module.exports = [
         "week": 5,
         "session": 2,
         "title": "Multithreading with Web Workers (postMessage, onmessage)",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+web+workers+postmessage+tutorial",
+        "video_url": "https://www.youtube.com/watch?v=Gcp7triXFjg",
         "topic": "Real-life analogy: Think of a restaurant manager hiring an accountant in an upstairs office. The manager keeps greeting guests at the door (the UI thread) while the accountant crunches the tax spreadsheets in the background (the worker thread).\n\nA Web Worker runs a script on its own thread, isolated from the main thread and the DOM. The two sides communicate only by structured-clone message passing - postMessage() to send, an onmessage handler to receive - so heavy computation never blocks rendering.",
         "problems": [
           {
@@ -1386,7 +1386,7 @@ module.exports = [
         "week": 5,
         "session": 3,
         "title": "SharedArrayBuffer & Atomics (Thread Synchronization)",
-        "video_url": "https://www.youtube.com/results?search_query=javascript+sharedarraybuffer+atomics+tutorial",
+        "video_url": "https://www.youtube.com/watch?v=phs5V6qk2xk",
         "topic": "Real-life analogy: Think of one physical whiteboard in a shared room. Instead of photographing notes and emailing copies, every worker writes on the same board - and follows an atomic marker rule so two people never overwrite the same spot at once.\n\nA SharedArrayBuffer is real memory shared between the main thread and workers with no message-copy overhead. The Atomics object provides the safe operations on it - Atomics.add, Atomics.load, Atomics.wait, Atomics.notify - that make concurrent reads and writes race-free.",
         "problems": [
           {

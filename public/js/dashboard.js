@@ -6701,7 +6701,8 @@ async function renderAdminMailer() {
     try {
       const out = await api('/api/admin/email-blast', { method: 'POST', body: new FormData(f) });
       const attach = out.attachments ? ` with ${out.attachments} attachment${out.attachments === 1 ? '' : 's'}` : '';
-      toast(out.smtp ? `Email sent to ${out.sent} people${attach}.` : `Queued for ${out.sent} people${attach} - configure SMTP_* in the environment to actually send.`);
+      const n = out.queued ?? out.sent;
+      toast(out.smtp ? `Sending to ${n} recipients${attach}. It goes out in paced batches over the next few minutes - check the audit log for the final delivered count.` : `Queued for ${n} people${attach} - configure SMTP_* in the environment to actually send.`);
       f.reset(); btn.disabled = false;
     } catch (err) { toast(err.message, true); btn.disabled = false; }
   });

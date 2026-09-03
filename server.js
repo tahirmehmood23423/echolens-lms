@@ -3324,14 +3324,20 @@ app.post('/api/admin/email-blast', authRequired, adminRequired, upload.array('fi
   // rate-limited/temporary failure is left untouched.
   mailer.notify(emails, String(subject).slice(0, 200), text, attachments.length ? attachments : undefined)
     .then((result) => {
-      if (!result.permanentFail.length) return;
-      for (const bad of result.permanentFail) Leads.removeByEmail(bad, true);
-      AuditLog.record({ actor_id: req.user.id, action: 'lead_remove_bounced', target_type: 'lead', detail: `Removed ${result.permanentFail.length} permanently-invalid address(es) after blast: ${result.permanentFail.slice(0, 50).join(', ')}`, deferSave: true });
+      console.log(`[email-blast] ${audience}: ${result.sent.length} delivered, ${result.tempFail.length} deferred (retry later), ${result.permanentFail.length} rejected, of ${emails.length}`);
+      AuditLog.record({ actor_id: req.user.id, action: 'email_blast_done', target_type: 'email_blast', detail: `${audience}: ${result.sent.length}/${emails.length} delivered, ${result.tempFail.length} deferred, ${result.permanentFail.length} rejected`, deferSave: true });
+      if (result.permanentFail.length) {
+        for (const bad of result.permanentFail) Leads.removeByEmail(bad, true);
+        AuditLog.record({ actor_id: req.user.id, action: 'lead_remove_bounced', target_type: 'lead', detail: `Removed ${result.permanentFail.length} permanently-invalid address(es) after blast: ${result.permanentFail.slice(0, 50).join(', ')}`, deferSave: true });
+      }
       store.persist();
     })
     .catch((e) => console.error('[email-blast] post-send cleanup failed:', e.message));
   AuditLog.record({ actor_id: req.user.id, action: 'email_blast', target_type: 'email_blast', detail: `${audience} (${emails.length})${attachments.length ? ` +${attachments.length} attachment(s)` : ''} - ${subject}` });
-  res.json({ ok: true, sent: emails.length, smtp: mailer.configured, attachments: attachments.length });
+  // `queued`, not `sent`: notify() runs in the background in paced batches and
+  // can take many minutes for a big list. The real per-address outcome lands
+  // in the audit log (email_blast_done) once it finishes.
+  res.json({ ok: true, queued: emails.length, sent: emails.length, smtp: mailer.configured, attachments: attachments.length });
 });
 
 /* -------------------------------- analytics -------------------------------- */

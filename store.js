@@ -3609,14 +3609,32 @@ const Leads = {
     // portal = enrolled/portal students; open = free-tier users;
     // leads = the raw leads database only (sign-ups, newsletter, manual
     // additions - the cold-mailing list); all = every one of the above.
+    //
+    // BLOCK: seed/demo accounts and company mailboxes must never receive a
+    // marketing blast. The seeded "Demo Student" is student@echolens.digital
+    // and it gets back-filled into data.leads, so a plain "all"/"leads" blast
+    // would otherwise land in that inbox (and the info@/ceo@ inboxes) instead
+    // of only reaching real people in the database. We also drop any current
+    // staff/admin account - the blast audiences are learners and leads, not
+    // the team.
+    const BLOCK = new Set([
+      'student@echolens.digital', 'admin@echolens.digital', 'teacher@echolens.digital', 'coordinator@echolens.digital',
+      'info@echolens.digital', 'ceo@echolens.digital', 'admissions@echolens.digital', 'finance@echolens.digital',
+      'noreply@echolens.digital', 'no-reply@echolens.digital', 'support@echolens.digital',
+    ]);
+    const STAFF_ROLES = new Set(['admin', 'instructor', 'teacher', 'coordinator', 'staff', 'hr', 'ambassador', 'recruiter', 'finance']);
+    for (const u of data.users) if (u.email && STAFF_ROLES.has(u.role)) BLOCK.add(u.email.toLowerCase());
+    const ok = (em) => em && !BLOCK.has(em);
     const emails = new Set();
     for (const u of data.users) {
       if (!u.email) continue;
-      if (audience === 'portal' && u.role === 'student') emails.add(u.email.toLowerCase());
-      if (audience === 'open' && u.role === 'free') emails.add(u.email.toLowerCase());
-      if (audience === 'all' && ['student', 'free'].includes(u.role)) emails.add(u.email.toLowerCase());
+      const em = u.email.toLowerCase();
+      if (!ok(em)) continue;
+      if (audience === 'portal' && u.role === 'student') emails.add(em);
+      if (audience === 'open' && u.role === 'free') emails.add(em);
+      if (audience === 'all' && ['student', 'free'].includes(u.role)) emails.add(em);
     }
-    if (audience === 'all' || audience === 'leads') for (const l of data.leads) if (l.email) emails.add(l.email.toLowerCase());
+    if (audience === 'all' || audience === 'leads') for (const l of data.leads) { const em = (l.email || '').toLowerCase(); if (ok(em)) emails.add(em); }
     return [...emails];
   },
 };

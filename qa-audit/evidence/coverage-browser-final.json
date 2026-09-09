@@ -1,0 +1,33 @@
+[
+  {
+    "id": "JOB-UI-1440",
+    "actual": {
+      "hasComment": true,
+      "externalExplained": true,
+      "href": "https://employer.qa.invalid/apply"
+    },
+    "status": "PASS",
+    "scope": "actual local Jobs navigation; external application not submitted"
+  },
+  {
+    "id": "JOB-UI-390",
+    "actual": {
+      "hasComment": true,
+      "externalExplained": true,
+      "href": "https://employer.qa.invalid/apply"
+    },
+    "status": "PASS",
+    "scope": "actual local Jobs navigation; external application not submitted"
+  },
+  {
+    "id": "SLOW-DOUBLE-CLICK",
+    "actual": {
+      "requests": 1,
+      "disabledDuringSubmit": true,
+      "taskTwoDraft": "console.log(\"QA TASK TWO DRAFT\");",
+      "persistedTaskOne": "console.log(\"QA SLOW SUBMIT\");"
+    },
+    "status": "PASS",
+    "scope": "deliberate 1800ms request delay, two physical mouse clicks, task switch during pending submit; search/pagination races untested"
+  }
+]

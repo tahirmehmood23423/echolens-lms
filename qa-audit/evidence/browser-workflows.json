@@ -1,0 +1,214 @@
+[
+  {
+    "id": "BROWSE-desktop",
+    "expected": "Free language card opens chosen course curriculum",
+    "actual": {
+      "url": "http://127.0.0.1:4318/open#free",
+      "text": "Free Certified Courses\nCS-105: Fundamentals of JavaScript\nFREE COURSE\nCS-105\nPass mark 60% · Code submissions in the built-in compiler · Graded instantly\nCS-105: Fundamentals of JavaScript\n\nThe langua"
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "CODE-RUN-desktop",
+    "expected": "JavaScript executes and outputs synthetic message",
+    "actual": {
+      "output": "› QA UNSAVED DRAFT\n"
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "DRAFT-REFRESH-desktop",
+    "expected": "Refresh retains chosen task and unsaved code",
+    "actual": {
+      "beforeUrl": "http://127.0.0.1:4318/open#free",
+      "url": "http://127.0.0.1:4318/open#free",
+      "visible": [
+        "tab-courses"
+      ],
+      "code": null
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "DRAFT-SWITCH-desktop",
+    "expected": "Returning to task retains unsent work",
+    "actual": {
+      "restored": ""
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "SUBMIT-NETWORK-desktop",
+    "expected": "Failed submission retains code and re-enables retry",
+    "actual": {
+      "code": "console.log(\"QA RETRY DRAFT\");",
+      "buttonDisabled": false,
+      "message": "Failed to fetch"
+    },
+    "status": "PASS",
+    "scope": "simulated aborted request"
+  },
+  {
+    "id": "SUBMIT-RETRY-desktop",
+    "expected": "Retry persists submitted code",
+    "actual": {
+      "code": "console.log(\"QA RETRY DRAFT\");"
+    },
+    "status": "PASS",
+    "scope": "real local UI; AI disabled, grading not completed"
+  },
+  {
+    "id": "SESSION-GATE-desktop",
+    "expected": "Expired session opens a dismissible sign-in prompt",
+    "actual": {
+      "modal": "modal-overlay open",
+      "text": "Your session expired - sign in again to continue where you left off.\n\nCreate a free account with email Already have an account? Sign in\nEnrolled in a paid course, or staff? Use the same sign-in page with your LMS Portal account.\nJust want to join a paid course? Register here - no account needed; our Admissions Office emails you the fee challan.",
+      "code": "console.log(\"QA SESSION DRAFT\");"
+    },
+    "status": "PASS",
+    "scope": "simulated session removal"
+  },
+  {
+    "id": "BROWSE-mobile",
+    "expected": "Free language card opens chosen course curriculum",
+    "actual": {
+      "url": "http://127.0.0.1:4318/open#free",
+      "text": "Free Certified Courses\nCS-105: Fundamentals of JavaScript\nFREE COURSE\nCS-105\nPass mark 60% · Code submissions in the built-in compiler · Graded instantly\nCS-105: Fundamentals of JavaScript\n\nThe langua"
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "CODE-RUN-mobile",
+    "expected": "JavaScript executes and outputs synthetic message",
+    "actual": {
+      "output": "› QA UNSAVED DRAFT\n"
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "DRAFT-REFRESH-mobile",
+    "expected": "Refresh retains chosen task and unsaved code",
+    "actual": {
+      "beforeUrl": "http://127.0.0.1:4318/open#free",
+      "url": "http://127.0.0.1:4318/open#free",
+      "visible": [
+        "tab-courses"
+      ],
+      "code": null
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "DRAFT-SWITCH-mobile",
+    "expected": "Returning to task retains unsent work",
+    "actual": {
+      "restored": ""
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "SUBMIT-NETWORK-mobile",
+    "expected": "Failed submission retains code and re-enables retry",
+    "actual": {
+      "code": "console.log(\"QA RETRY DRAFT\");",
+      "buttonDisabled": false,
+      "message": "Failed to fetch"
+    },
+    "status": "PASS",
+    "scope": "simulated aborted request"
+  },
+  {
+    "id": "SUBMIT-RETRY-mobile",
+    "expected": "Retry persists submitted code",
+    "actual": {
+      "code": "console.log(\"QA RETRY DRAFT\");"
+    },
+    "status": "PASS",
+    "scope": "real local UI; AI disabled, grading not completed"
+  },
+  {
+    "id": "SESSION-GATE-mobile",
+    "expected": "Expired session opens a dismissible sign-in prompt",
+    "actual": {
+      "modal": "modal-overlay open",
+      "text": "Your session expired - sign in again to continue where you left off.\n\nCreate a free account with email Already have an account? Sign in\nEnrolled in a paid course, or staff? Use the same sign-in page with your LMS Portal account.\nJust want to join a paid course? Register here - no account needed; our Admissions Office emails you the fee challan.",
+      "code": "console.log(\"QA SESSION DRAFT\");"
+    },
+    "status": "PASS",
+    "scope": "simulated session removal"
+  },
+  {
+    "id": "A11Y-MODAL",
+    "expected": "Opening modal moves keyboard focus inside labelled dialog; Tab stays inside",
+    "actual": {
+      "focused": {
+        "tag": "BODY",
+        "id": "",
+        "insideModal": false,
+        "role": "dialog",
+        "ariaModal": "true"
+      },
+      "firstTab": {
+        "tag": "A",
+        "text": "",
+        "insideModal": false
+      }
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "AUTH-RETURN",
+    "expected": "Sign-in returns the learner to their requested Showcase page",
+    "actual": {
+      "destination": "http://127.0.0.1:4318/dashboard"
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "PROFILE-UI-SAVE",
+    "expected": "Profile edit persists and appears after reload",
+    "actual": {
+      "profile": "QA Browser City"
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "PROFILE-UI-CLEAR",
+    "expected": "Clearing City removes saved value",
+    "actual": {
+      "city": "QA Browser City",
+      "toast": "Profile saved."
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "DASHBOARD-REFRESH",
+    "expected": "Reload returns to active Settings view",
+    "actual": {
+      "title": "Overview"
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "ERROR-ASSIGNMENTS",
+    "expected": "A failed assignments request shows an error with retry",
+    "actual": {
+      "text": "Loading…"
+    },
+    "status": "FAIL",
+    "scope": "simulated HTTP 503"
+  }
+]

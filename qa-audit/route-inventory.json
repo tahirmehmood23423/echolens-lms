@@ -1,0 +1,2634 @@
+[
+  {
+    "file": "server.js",
+    "line": 68,
+    "method": "GET",
+    "route": "/__loadtest/rss",
+    "handler": ", (req, res) => res.json({ rss: process.memoryUsage().rss }));"
+  },
+  {
+    "file": "server.js",
+    "line": 396,
+    "method": "POST",
+    "route": "/api/auth/login",
+    "handler": ", loginThrottle, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 421,
+    "method": "POST",
+    "route": "/api/auth/logout",
+    "handler": ", (req, res) => { res.clearCookie(COOKIE); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 422,
+    "method": "GET",
+    "route": "/api/auth/me",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 440,
+    "method": "POST",
+    "route": "/api/auth/forgot-password",
+    "handler": ", limitEmailSend, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 468,
+    "method": "POST",
+    "route": "/api/auth/reset-password",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 483,
+    "method": "POST",
+    "route": "/api/me/password",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 494,
+    "method": "POST",
+    "route": "/api/me/profile",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 563,
+    "method": "GET",
+    "route": "/api/overview",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 647,
+    "method": "GET",
+    "route": "/api/my/courses",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 664,
+    "method": "GET",
+    "route": "/api/my/recommended",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 682,
+    "method": "GET",
+    "route": "/api/teacher/students",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 692,
+    "method": "GET",
+    "route": "/api/teacher/grades",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 702,
+    "method": "GET",
+    "route": "/api/teacher/attendance",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 717,
+    "method": "GET",
+    "route": "/api/teacher/analytics",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 738,
+    "method": "GET",
+    "route": "/api/leaderboard",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 741,
+    "method": "GET",
+    "route": "/api/batches/:id/leaderboard",
+    "handler": ", authRequired, viewBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 746,
+    "method": "GET",
+    "route": "/api/batches/:id",
+    "handler": ", authRequired, viewBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 783,
+    "method": "GET",
+    "route": "/api/admin/catalogue",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 786,
+    "method": "POST",
+    "route": "/api/admin/courses",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 792,
+    "method": "DELETE",
+    "route": "/api/admin/courses/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => { Courses.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 793,
+    "method": "POST",
+    "route": "/api/admin/batches",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 800,
+    "method": "DELETE",
+    "route": "/api/admin/batches/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => { Batches.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 806,
+    "method": "POST",
+    "route": "/api/batches/:id/students",
+    "handler": ", authRequired, adminRequired, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 835,
+    "method": "DELETE",
+    "route": "/api/batches/:id/students/:uid",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 842,
+    "method": "POST",
+    "route": "/api/batches/:id/teachers",
+    "handler": ", authRequired, canAssignInstructors, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 857,
+    "method": "DELETE",
+    "route": "/api/batches/:id/teachers/:uid",
+    "handler": ", authRequired, canAssignInstructors, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 864,
+    "method": "GET",
+    "route": "/api/admin/users",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 874,
+    "method": "POST",
+    "route": "/api/admin/users/:id/password",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 905,
+    "method": "POST",
+    "route": "/api/admin/coordinators",
+    "handler": ", authRequired, adminRequired, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 945,
+    "method": "GET",
+    "route": "/api/hr/ambassadors",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 948,
+    "method": "POST",
+    "route": "/api/hr/ambassadors",
+    "handler": ", authRequired, hrOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 963,
+    "method": "DELETE",
+    "route": "/api/hr/ambassadors/:id",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 976,
+    "method": "POST",
+    "route": "/api/hr/ambassadors/:id/reactivate",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 981,
+    "method": "GET",
+    "route": "/api/hr/ambassadors/gem-rates",
+    "handler": ", authRequired, hrOnly, (req, res) => res.json({ rates: Settings.ambassadorGemRates() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 982,
+    "method": "PUT",
+    "route": "/api/hr/ambassadors/gem-rates",
+    "handler": ", authRequired, hrOnly, (req, res) => res.json({ ok: true, rates: Settings.setAmbassadorGemRates(req.body || {}) }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1000,
+    "method": "GET",
+    "route": "/api/hr/instructors",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1003,
+    "method": "POST",
+    "route": "/api/hr/instructors",
+    "handler": ", authRequired, hrOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1016,
+    "method": "PUT",
+    "route": "/api/hr/instructors/:userId/tag",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1026,
+    "method": "GET",
+    "route": "/api/instructors-lite",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1030,
+    "method": "GET",
+    "route": "/api/course-batches-lite",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1082,
+    "method": "GET",
+    "route": "/api/ambassador-reports",
+    "handler": ", authRequired, ambassadorReportsAccess, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1086,
+    "method": "POST",
+    "route": "/api/ambassador-reports/generate",
+    "handler": ", authRequired, ambassadorReportsAccess, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1091,
+    "method": "GET",
+    "route": "/api/ambassador-reports/:id/download",
+    "handler": ", authRequired, ambassadorReportsAccess, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1096,
+    "method": "POST",
+    "route": "/api/ambassador-reports/:id/email",
+    "handler": ", authRequired, ambassadorReportsAccess, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1110,
+    "method": "GET",
+    "route": "/api/ambassador-reports/signoff",
+    "handler": ", authRequired, ambassadorReportsAccess, (req, res) => res.json({ signoff: Settings.ambassadorReportSignoff(), ceo_name: Settings.cert().ceo_name }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1111,
+    "method": "PUT",
+    "route": "/api/ambassador-reports/signoff",
+    "handler": ", authRequired, hrOnly, (req, res) => res.json({ ok: true, signoff: Settings.setAmbassadorReportSignoff(req.body || {}) }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1143,
+    "method": "GET",
+    "route": "/api/hr/departments",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1151,
+    "method": "POST",
+    "route": "/api/hr/departments",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1157,
+    "method": "PUT",
+    "route": "/api/hr/departments/:id",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1162,
+    "method": "PUT",
+    "route": "/api/hr/departments/:id/head",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1169,
+    "method": "DELETE",
+    "route": "/api/hr/departments/:id",
+    "handler": ", authRequired, hrOnly, (req, res) => { Departments.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 1172,
+    "method": "GET",
+    "route": "/api/hr/users-lite",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1182,
+    "method": "GET",
+    "route": "/api/department/:id",
+    "handler": ", authRequired, departmentManage, (req, res) => res.json({ department: departmentDetail(req.department) }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1183,
+    "method": "POST",
+    "route": "/api/department/:id/members",
+    "handler": ", authRequired, departmentManage, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1189,
+    "method": "DELETE",
+    "route": "/api/department/:id/members/:userId",
+    "handler": ", authRequired, departmentManage, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1194,
+    "method": "POST",
+    "route": "/api/department/:id/tasks",
+    "handler": ", authRequired, departmentManage, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1221,
+    "method": "POST",
+    "route": "/api/department/:id/announcements",
+    "handler": ", authRequired, departmentManage, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1231,
+    "method": "GET",
+    "route": "/api/my-departments",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1243,
+    "method": "POST",
+    "route": "/api/my-departments/tasks/:taskId/complete",
+    "handler": ", authRequired, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1301,
+    "method": "POST",
+    "route": "/api/me/onboarding",
+    "handler": ", authRequired, upload.fields(ONBOARDING_DOC_FIELDS), async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1347,
+    "method": "GET",
+    "route": "/api/me/contract",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1351,
+    "method": "POST",
+    "route": "/api/contract/submit",
+    "handler": ", authRequired, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1376,
+    "method": "GET",
+    "route": "/api/hr/contracts",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1384,
+    "method": "POST",
+    "route": "/api/hr/contracts/:id/resend",
+    "handler": ", authRequired, hrOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1402,
+    "method": "POST",
+    "route": "/api/hr/contracts/:id/extend-deadline",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1420,
+    "method": "GET",
+    "route": "/api/ambassador/me",
+    "handler": ", authRequired, ambassadorOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1426,
+    "method": "GET",
+    "route": "/api/ambassador/qr",
+    "handler": ", authRequired, ambassadorOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1435,
+    "method": "GET",
+    "route": "/api/ambassador/referrals",
+    "handler": ", authRequired, ambassadorOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1442,
+    "method": "GET",
+    "route": "/api/ambassador/leaderboard",
+    "handler": ", authRequired, ambassadorOnly, (req, res) => res.json({ leaderboard: Ambassadors.leaderboard() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1443,
+    "method": "GET",
+    "route": "/api/ambassador/leaderboard/universities",
+    "handler": ", authRequired, ambassadorOnly, (req, res) => res.json({ leaderboard: Ambassadors.universityLeaderboard() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1444,
+    "method": "GET",
+    "route": "/api/ambassador/reports",
+    "handler": ", authRequired, ambassadorOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1449,
+    "method": "GET",
+    "route": "/api/ambassador/reports/:id/download",
+    "handler": ", authRequired, ambassadorOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1456,
+    "method": "DELETE",
+    "route": "/api/admin/users/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1462,
+    "method": "GET",
+    "route": "/api/admin/enrollments",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1480,
+    "method": "GET",
+    "route": "/api/admin/finance",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1513,
+    "method": "GET",
+    "route": "/api/admin/system-health",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1544,
+    "method": "GET",
+    "route": "/api/admin/flush-health",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1550,
+    "method": "POST",
+    "route": "/api/batches/:id/sessions",
+    "handler": ", authRequired, manageBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1556,
+    "method": "DELETE",
+    "route": "/api/sessions/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1562,
+    "method": "POST",
+    "route": "/api/batches/:id/lessons",
+    "handler": ", authRequired, manageBatch, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1570,
+    "method": "DELETE",
+    "route": "/api/lessons/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1576,
+    "method": "GET",
+    "route": "/api/my/resources",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1590,
+    "method": "POST",
+    "route": "/api/batches/:id/award",
+    "handler": ", authRequired, manageBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1611,
+    "method": "GET",
+    "route": "/api/batches/:id/chat",
+    "handler": ", authRequired, viewBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1619,
+    "method": "POST",
+    "route": "/api/batches/:id/chat",
+    "handler": ", authRequired, viewBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1647,
+    "method": "DELETE",
+    "route": "/api/chat/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1656,
+    "method": "GET",
+    "route": "/api/my/messages",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1666,
+    "method": "POST",
+    "route": "/api/batches/:id/chat/read",
+    "handler": ", authRequired, viewBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1672,
+    "method": "GET",
+    "route": "/api/announcements",
+    "handler": ", authRequired, (req, res) => res.json({ announcements: Announcements.forUser(req.user) }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1673,
+    "method": "POST",
+    "route": "/api/batches/:id/announcements",
+    "handler": ", authRequired, manageBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1680,
+    "method": "POST",
+    "route": "/api/admin/announcements",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1701,
+    "method": "GET",
+    "route": "/api/public/profile/:reg",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1706,
+    "method": "GET",
+    "route": "/u/:reg",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'profile.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 1722,
+    "method": "GET",
+    "route": "/api/auth/providers",
+    "handler": ", (req, res) => res.json({ google: !!(G_ID && G_SECRET) }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1724,
+    "method": "GET",
+    "route": "/auth/google",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1736,
+    "method": "GET",
+    "route": "/auth/google/callback",
+    "handler": ", async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1764,
+    "method": "GET",
+    "route": "/api/ai/status",
+    "handler": ", authRequired, (req, res) => res.json({ enabled: ai.enabled() && ['admin', 'instructor'].includes(req.user.role), provider: ai.provider(), model: ai.model() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 1766,
+    "method": "POST",
+    "route": "/api/ai/chat",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1774,
+    "method": "POST",
+    "route": "/api/ai/quiz",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1782,
+    "method": "POST",
+    "route": "/api/ai/outline",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1796,
+    "method": "POST",
+    "route": "/api/compiler/ai",
+    "handler": ", authRequired, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1813,
+    "method": "POST",
+    "route": "/api/compiler/activity-report",
+    "handler": ", authRequired, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1850,
+    "method": "GET",
+    "route": "/api/challenges",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1859,
+    "method": "POST",
+    "route": "/api/challenges/:id/submit",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1867,
+    "method": "POST",
+    "route": "/api/admin/challenges",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1872,
+    "method": "POST",
+    "route": "/api/admin/challenges/:id/open",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1877,
+    "method": "DELETE",
+    "route": "/api/admin/challenges/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => { Challenges.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 1878,
+    "method": "GET",
+    "route": "/api/admin/challenges/:id/submissions",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1881,
+    "method": "POST",
+    "route": "/api/challenge-submissions/:id/review",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1890,
+    "method": "GET",
+    "route": "/api/hackathons",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1897,
+    "method": "GET",
+    "route": "/api/hackathons/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1909,
+    "method": "POST",
+    "route": "/api/admin/hackathons",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1914,
+    "method": "DELETE",
+    "route": "/api/admin/hackathons/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => { Hackathons.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 1915,
+    "method": "POST",
+    "route": "/api/hackathons/:id/register",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1929,
+    "method": "POST",
+    "route": "/api/hackathons/:id/submit",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1937,
+    "method": "POST",
+    "route": "/api/admin/hackathon-entries/:id/payment",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1942,
+    "method": "POST",
+    "route": "/api/admin/hackathon-submissions/:id/score",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1949,
+    "method": "POST",
+    "route": "/api/admin/hackathons/:id/finalize",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1979,
+    "method": "POST",
+    "route": "/api/ai/skill-report",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 1995,
+    "method": "POST",
+    "route": "/api/ai/overall-report",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2025,
+    "method": "POST",
+    "route": "/api/ai-reports/:id/publish",
+    "handler": ", authRequired, teacherOrAdmin, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2030,
+    "method": "DELETE",
+    "route": "/api/ai-reports/:id",
+    "handler": ", authRequired, teacherOrAdmin, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2035,
+    "method": "GET",
+    "route": "/api/batches/:id/reports",
+    "handler": ", authRequired, viewBatch, staffView, (req, res) => res.json({ reports: AiReports.forBatch(req.batch.id) }));"
+  },
+  {
+    "file": "server.js",
+    "line": 2036,
+    "method": "GET",
+    "route": "/api/me/reports",
+    "handler": ", authRequired, (req, res) => res.json({ reports: AiReports.publishedFor(req.user.id) }));"
+  },
+  {
+    "file": "server.js",
+    "line": 2037,
+    "method": "POST",
+    "route": "/api/ai/class-summary",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2054,
+    "method": "GET",
+    "route": "/api/admin/backup",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2064,
+    "method": "GET",
+    "route": "/api/admin/backup.zip",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2083,
+    "method": "GET",
+    "route": "/api/tracks",
+    "handler": ", authRequired, staffView, (req, res) => res.json({ tracks: Quests.tracks() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 2084,
+    "method": "POST",
+    "route": "/api/batches/:id/install-track",
+    "handler": ", authRequired, manageBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2095,
+    "method": "POST",
+    "route": "/api/quests/:qid/remind",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2108,
+    "method": "DELETE",
+    "route": "/api/batches/:id/track",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2111,
+    "method": "GET",
+    "route": "/api/batches/:id/quest",
+    "handler": ", authRequired, viewBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2158,
+    "method": "GET",
+    "route": "/api/my/quests",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2170,
+    "method": "POST",
+    "route": "/api/quests/:qid/problems/:pid/submit",
+    "handler": ", authRequired, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2212,
+    "method": "POST",
+    "route": "/api/quest-submissions/:id/share-review",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2223,
+    "method": "GET",
+    "route": "/api/quests/:qid/submissions",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2230,
+    "method": "POST",
+    "route": "/api/quest-submissions/:id/grade",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2247,
+    "method": "POST",
+    "route": "/api/ai/quest-grade-draft",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2265,
+    "method": "PATCH",
+    "route": "/api/quests/:qid/problems/:pid",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2273,
+    "method": "PATCH",
+    "route": "/api/quests/:qid",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2281,
+    "method": "POST",
+    "route": "/api/quests/:qid/problems",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2290,
+    "method": "DELETE",
+    "route": "/api/quests/:qid/problems/:pid",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2299,
+    "method": "GET",
+    "route": "/api/quest-submissions/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2323,
+    "method": "POST",
+    "route": "/api/quest-submissions/:id/activity-report",
+    "handler": ", authRequired, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2345,
+    "method": "POST",
+    "route": "/api/ai/review",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2369,
+    "method": "POST",
+    "route": "/api/admin/catalogue/load-official",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2380,
+    "method": "POST",
+    "route": "/api/public/subscribe",
+    "handler": ", limitLead, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2388,
+    "method": "GET",
+    "route": "/api/public/info",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2401,
+    "method": "GET",
+    "route": "/api/public/tracks",
+    "handler": ", (req, res) => res.json({ tracks: Quests.tracks(), open_levels: OPEN_LEVELS }));"
+  },
+  {
+    "file": "server.js",
+    "line": 2402,
+    "method": "GET",
+    "route": "/api/public/tracks/:key",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2433,
+    "method": "POST",
+    "route": "/api/batches/:id/ide",
+    "handler": ", authRequired, manageBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2444,
+    "method": "POST",
+    "route": "/api/me/avatar",
+    "handler": ", authRequired, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2451,
+    "method": "POST",
+    "route": "/api/me/signature",
+    "handler": ", authRequired, teacherOrAdmin, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2461,
+    "method": "POST",
+    "route": "/api/sessions/:id/start",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2474,
+    "method": "POST",
+    "route": "/api/sessions/:id/end",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2481,
+    "method": "POST",
+    "route": "/api/sessions/:id/join",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2497,
+    "method": "POST",
+    "route": "/api/sessions/:id/heartbeat",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2503,
+    "method": "GET",
+    "route": "/api/sessions/:id/attendance",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2511,
+    "method": "GET",
+    "route": "/api/batches/:id/quizzes",
+    "handler": ", authRequired, viewBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2538,
+    "method": "GET",
+    "route": "/api/my/quizzes",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2554,
+    "method": "POST",
+    "route": "/api/batches/:id/quizzes",
+    "handler": ", authRequired, manageBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2560,
+    "method": "POST",
+    "route": "/api/batches/:id/quizzes/generate",
+    "handler": ", authRequired, manageBatch, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2575,
+    "method": "POST",
+    "route": "/api/quizzes/:id/open",
+    "handler": ", authRequired, manageQuiz, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2583,
+    "method": "POST",
+    "route": "/api/quizzes/:id/close",
+    "handler": ", authRequired, manageQuiz, (req, res) => { Quizzes.close(req.quiz.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 2584,
+    "method": "DELETE",
+    "route": "/api/quizzes/:id",
+    "handler": ", authRequired, manageQuiz, (req, res) => { Quizzes.remove(req.quiz.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 2585,
+    "method": "GET",
+    "route": "/api/quizzes/:id/results",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2591,
+    "method": "POST",
+    "route": "/api/quizzes/:id/attempt",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2602,
+    "method": "GET",
+    "route": "/api/quests/:qid/problems/:pid/files",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2609,
+    "method": "POST",
+    "route": "/api/quests/:qid/problems/:pid/files",
+    "handler": ", authRequired, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2619,
+    "method": "DELETE",
+    "route": "/api/task-files/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2650,
+    "method": "POST",
+    "route": "/api/ai/integrity",
+    "handler": ", authRequired, teacherOrAdmin, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2700,
+    "method": "GET",
+    "route": "/api/students/search",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2709,
+    "method": "GET",
+    "route": "/api/students/:id/full",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2717,
+    "method": "GET",
+    "route": "/api/batches/:id/at-risk",
+    "handler": ", authRequired, viewBatch, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2725,
+    "method": "GET",
+    "route": "/api/admin/cert-settings",
+    "handler": ", authRequired, teacherOrAdmin, (req, res) => res.json({ settings: Settings.cert() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 2726,
+    "method": "POST",
+    "route": "/api/admin/cert-settings",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2738,
+    "method": "GET",
+    "route": "/api/admin/partner-settings",
+    "handler": ", authRequired, teacherOrAdmin, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2745,
+    "method": "POST",
+    "route": "/api/admin/partner-settings",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2752,
+    "method": "POST",
+    "route": "/api/admin/partner-settings/logo",
+    "handler": ", authRequired, adminRequired, upload.single('file'), async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2764,
+    "method": "POST",
+    "route": "/api/admin/partner-settings/track",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2770,
+    "method": "POST",
+    "route": "/api/batches/:id/partner",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2776,
+    "method": "POST",
+    "route": "/api/certificates/issue",
+    "handler": ", authRequired, teacherOrAdmin, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2809,
+    "method": "POST",
+    "route": "/api/batches/:id/certificates/issue-all",
+    "handler": ", authRequired, manageBatch, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2833,
+    "method": "GET",
+    "route": "/api/certificates/mine",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2839,
+    "method": "GET",
+    "route": "/api/my/open-profile",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2844,
+    "method": "GET",
+    "route": "/api/batches/:id/certificates",
+    "handler": ", authRequired, viewBatch, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2847,
+    "method": "DELETE",
+    "route": "/api/certificates/:serial",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2855,
+    "method": "GET",
+    "route": "/api/verify/:serial",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2861,
+    "method": "GET",
+    "route": "/api/verify-challan/:serial",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2869,
+    "method": "GET",
+    "route": "/api/public/cert-image/:name",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2887,
+    "method": "POST",
+    "route": "/api/auth/register-open",
+    "handler": ", limitSignup, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2908,
+    "method": "POST",
+    "route": "/api/me/contact",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2943,
+    "method": "POST",
+    "route": "/api/recruiters/signup",
+    "handler": ", limitSignup, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 2991,
+    "method": "POST",
+    "route": "/api/recruiter/resubmit",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3011,
+    "method": "GET",
+    "route": "/api/admin/recruiters",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3024,
+    "method": "POST",
+    "route": "/api/admin/recruiters/:id/approve",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3033,
+    "method": "POST",
+    "route": "/api/admin/recruiters/:id/reject",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3044,
+    "method": "POST",
+    "route": "/api/admin/recruiters/:id/request-info",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3076,
+    "method": "GET",
+    "route": "/api/events",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3091,
+    "method": "GET",
+    "route": "/api/public/events",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3094,
+    "method": "GET",
+    "route": "/api/events/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3120,
+    "method": "POST",
+    "route": "/api/admin/events",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3130,
+    "method": "PATCH",
+    "route": "/api/admin/events/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3135,
+    "method": "DELETE",
+    "route": "/api/admin/events/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => { Events.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 3137,
+    "method": "POST",
+    "route": "/api/admin/events/:id/files",
+    "handler": ", authRequired, adminRequired, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3143,
+    "method": "DELETE",
+    "route": "/api/admin/events/:id/files/:name",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3150,
+    "method": "POST",
+    "route": "/api/events/:id/register",
+    "handler": ", authRequired, upload.single('file'), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3176,
+    "method": "POST",
+    "route": "/api/admin/event-entries/:id/payment",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3193,
+    "method": "POST",
+    "route": "/api/events/:id/submit",
+    "handler": ", authRequired, upload.single('file'), async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3231,
+    "method": "GET",
+    "route": "/api/events/:id/comments",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3236,
+    "method": "POST",
+    "route": "/api/events/:id/comments",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3243,
+    "method": "DELETE",
+    "route": "/api/events/:id/comments/:cid",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3248,
+    "method": "POST",
+    "route": "/api/admin/event-submissions/:id/score",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3263,
+    "method": "GET",
+    "route": "/api/admin/leads",
+    "handler": ", authRequired, adminRequired, (req, res) => res.json({ leads: Leads.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3267,
+    "method": "GET",
+    "route": "/api/admin/suppressions",
+    "handler": ", authRequired, adminRequired, (req, res) => res.json({ suppressions: Suppressions.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3268,
+    "method": "DELETE",
+    "route": "/api/admin/suppressions/:email",
+    "handler": ", authRequired, adminRequired, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3273,
+    "method": "GET",
+    "route": "/api/admin/leads.csv",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3286,
+    "method": "POST",
+    "route": "/api/admin/leads",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3326,
+    "method": "POST",
+    "route": "/api/admin/email-blast",
+    "handler": ", authRequired, adminRequired, upload.array('files', 5), (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3407,
+    "method": "GET",
+    "route": "/api/admin/analytics",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3440,
+    "method": "GET",
+    "route": "/api/admin/analytics.csv",
+    "handler": ", authRequired, staffView, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3461,
+    "method": "GET",
+    "route": "/api/admin/analytics.pdf",
+    "handler": ", authRequired, staffView, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3503,
+    "method": "GET",
+    "route": "/api/fetch-dataset",
+    "handler": ", authRequired, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3561,
+    "method": "POST",
+    "route": "/api/auth/email-code",
+    "handler": ", limitEmailSend, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3582,
+    "method": "GET",
+    "route": "/api/public/announcements",
+    "handler": ", (req, res) => res.json({ announcements: PublicAnnouncements.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3583,
+    "method": "POST",
+    "route": "/api/admin/public-announcements",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3604,
+    "method": "PATCH",
+    "route": "/api/admin/public-announcements/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3609,
+    "method": "DELETE",
+    "route": "/api/admin/public-announcements/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => { PublicAnnouncements.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 3617,
+    "method": "GET",
+    "route": "/api/jobs",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3620,
+    "method": "GET",
+    "route": "/api/jobs/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3625,
+    "method": "POST",
+    "route": "/api/admin/jobs",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3633,
+    "method": "PATCH",
+    "route": "/api/admin/jobs/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3640,
+    "method": "DELETE",
+    "route": "/api/admin/jobs/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3644,
+    "method": "POST",
+    "route": "/api/jobs/:id/comments",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3652,
+    "method": "DELETE",
+    "route": "/api/jobs/comments/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3660,
+    "method": "POST",
+    "route": "/api/public/register-interest",
+    "handler": ", limitLead, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3690,
+    "method": "GET",
+    "route": "/api/admin/registrations",
+    "handler": ", authRequired, staffView, (req, res) => res.json({ registrations: Registrations.all(), pending: Registrations.pendingCount() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3691,
+    "method": "PATCH",
+    "route": "/api/admin/registrations/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3696,
+    "method": "DELETE",
+    "route": "/api/admin/registrations/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => { Registrations.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 3705,
+    "method": "POST",
+    "route": "/api/public/feedback",
+    "handler": ", limitFeedback, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3717,
+    "method": "GET",
+    "route": "/api/public/feedback",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3720,
+    "method": "GET",
+    "route": "/api/admin/feedback",
+    "handler": ", authRequired, adminRequired, (req, res) => res.json({ feedback: Feedback.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3721,
+    "method": "POST",
+    "route": "/api/admin/feedback/:id/approve",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3726,
+    "method": "POST",
+    "route": "/api/admin/feedback/:id/reject",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3734,
+    "method": "POST",
+    "route": "/api/admin/feedback/:id/reply",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3745,
+    "method": "DELETE",
+    "route": "/api/admin/feedback/:id",
+    "handler": ", authRequired, adminRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3757,
+    "method": "GET",
+    "route": "/api/admissions/discount-categories",
+    "handler": ", authRequired, admissionsOnly, (req, res) => res.json({ categories: DiscountCategories.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3758,
+    "method": "POST",
+    "route": "/api/admissions/discount-categories",
+    "handler": ", authRequired, admissionsOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3763,
+    "method": "PATCH",
+    "route": "/api/admissions/discount-categories/:id",
+    "handler": ", authRequired, admissionsOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3768,
+    "method": "DELETE",
+    "route": "/api/admissions/discount-categories/:id",
+    "handler": ", authRequired, admissionsOnly, (req, res) => { DiscountCategories.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 3770,
+    "method": "GET",
+    "route": "/api/admissions/bank-details",
+    "handler": ", authRequired, admissionsOnly, (req, res) => res.json({ bank: Settings.bank() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3771,
+    "method": "POST",
+    "route": "/api/admissions/bank-details",
+    "handler": ", authRequired, admissionsOnly, (req, res) => res.json({ ok: true, bank: Settings.setBank(req.body || {}) }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3773,
+    "method": "POST",
+    "route": "/api/admissions/registrations/:id/challan",
+    "handler": ", authRequired, admissionsOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3780,
+    "method": "POST",
+    "route": "/api/admissions/challans/:serial/send",
+    "handler": ", authRequired, admissionsOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3800,
+    "method": "GET",
+    "route": "/api/admissions/challans/:serial/pdf",
+    "handler": ", authRequired, admissionsOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3819,
+    "method": "GET",
+    "route": "/api/finance/registrations",
+    "handler": ", authRequired, financeOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3823,
+    "method": "POST",
+    "route": "/api/finance/registrations/:id/clear",
+    "handler": ", authRequired, financeOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3838,
+    "method": "GET",
+    "route": "/api/finance/expenses",
+    "handler": ", authRequired, financeOnly, (req, res) => res.json({ expenses: Expenses.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3839,
+    "method": "POST",
+    "route": "/api/finance/expenses",
+    "handler": ", authRequired, financeOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3844,
+    "method": "DELETE",
+    "route": "/api/finance/expenses/:id",
+    "handler": ", authRequired, financeOnly, (req, res) => { Expenses.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 3845,
+    "method": "GET",
+    "route": "/api/finance/balance-sheet",
+    "handler": ", authRequired, financeOnly, (req, res) => res.json(Expenses.balanceSheet()));"
+  },
+  {
+    "file": "server.js",
+    "line": 3898,
+    "method": "POST",
+    "route": "/api/admissions/registrations",
+    "handler": ", authRequired, admissionsOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3928,
+    "method": "GET",
+    "route": "/api/admissions/registrations",
+    "handler": ", authRequired, admissionsOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3938,
+    "method": "POST",
+    "route": "/api/admissions/registrations/:id/enroll",
+    "handler": ", authRequired, admissionsOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3949,
+    "method": "GET",
+    "route": "/api/coordinator/queries",
+    "handler": ", authRequired, studentCoordinatorOnly, (req, res) => res.json({ queries: CoordinatorQueries.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3950,
+    "method": "POST",
+    "route": "/api/coordinator/queries/:id/reply",
+    "handler": ", authRequired, studentCoordinatorOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3957,
+    "method": "PATCH",
+    "route": "/api/coordinator/queries/:id",
+    "handler": ", authRequired, studentCoordinatorOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3964,
+    "method": "GET",
+    "route": "/api/my/queries",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3968,
+    "method": "POST",
+    "route": "/api/my/queries",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3975,
+    "method": "POST",
+    "route": "/api/my/queries/:id/reply",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3988,
+    "method": "GET",
+    "route": "/api/hr/groups",
+    "handler": ", authRequired, hrOnly, (req, res) => res.json({ groups: StaffGroups.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 3989,
+    "method": "POST",
+    "route": "/api/hr/groups",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3994,
+    "method": "PATCH",
+    "route": "/api/hr/groups/:id",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 3999,
+    "method": "DELETE",
+    "route": "/api/hr/groups/:id",
+    "handler": ", authRequired, hrOnly, (req, res) => { StaffGroups.remove(req.params.id); res.json({ ok: true }); });"
+  },
+  {
+    "file": "server.js",
+    "line": 4001,
+    "method": "GET",
+    "route": "/api/hr/staff",
+    "handler": ", authRequired, hrOnly, (req, res) => res.json({ staff: StaffRecords.all() }));"
+  },
+  {
+    "file": "server.js",
+    "line": 4002,
+    "method": "POST",
+    "route": "/api/hr/staff",
+    "handler": ", authRequired, hrOnly, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4017,
+    "method": "PATCH",
+    "route": "/api/hr/staff/:id",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4022,
+    "method": "DELETE",
+    "route": "/api/hr/staff/:id",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4030,
+    "method": "POST",
+    "route": "/api/hr/staff/:id/instructions",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4037,
+    "method": "POST",
+    "route": "/api/hr/staff/:id/follow-ups",
+    "handler": ", authRequired, hrOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4046,
+    "method": "GET",
+    "route": "/api/staff/me",
+    "handler": ", authRequired, staffOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4051,
+    "method": "POST",
+    "route": "/api/staff/follow-ups/:idx/respond",
+    "handler": ", authRequired, staffOnly, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4075,
+    "method": "POST",
+    "route": "/api/open/submit",
+    "handler": ", authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 8 }]), async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4131,
+    "method": "GET",
+    "route": "/api/open/progress",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4145,
+    "method": "POST",
+    "route": "/api/open/ai",
+    "handler": ", authRequired, async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4156,
+    "method": "POST",
+    "route": "/api/open/excel-extract",
+    "handler": ", authRequired, upload.single('file'), async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4233,
+    "method": "GET",
+    "route": "/sitemap.xml",
+    "handler": ", async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4254,
+    "method": "USE",
+    "route": "/uploads",
+    "handler": ", authGate, express.static(UPLOAD_DIR));"
+  },
+  {
+    "file": "server.js",
+    "line": 4256,
+    "method": "GET",
+    "route": "/",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4300,
+    "method": "GET",
+    "route": "/open",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4308,
+    "method": "GET",
+    "route": "/compiler",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'compiler.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4313,
+    "method": "GET",
+    "route": "/login",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4314,
+    "method": "GET",
+    "route": "/reset-password",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4315,
+    "method": "GET",
+    "route": "/recruiter-signup",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'recruiter-signup.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4316,
+    "method": "GET",
+    "route": "/privacy",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4317,
+    "method": "GET",
+    "route": "/dashboard",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4325,
+    "method": "GET",
+    "route": "/admin/recruiters",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4326,
+    "method": "GET",
+    "route": "/grade",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'grade.html')));"
+  },
+  {
+    "file": "server.js",
+    "line": 4352,
+    "method": "GET",
+    "route": "/cert",
+    "handler": ", certPageWithOg);"
+  },
+  {
+    "file": "server.js",
+    "line": 4353,
+    "method": "GET",
+    "route": "/verify",
+    "handler": ", certPageWithOg);"
+  },
+  {
+    "file": "server.js",
+    "line": 4356,
+    "method": "GET",
+    "route": "/api/cert-og/:serial.png",
+    "handler": ", async (req, res) => {"
+  },
+  {
+    "file": "server.js",
+    "line": 4369,
+    "method": "GET",
+    "route": "/challan",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'challan.html')));"
+  },
+  {
+    "file": "coursepages.js",
+    "line": 387,
+    "method": "GET",
+    "route": "/courses",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "coursepages.js",
+    "line": 390,
+    "method": "GET",
+    "route": "/courses/:slug",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 321,
+    "method": "USE",
+    "route": "/talent-media",
+    "handler": ", express.static(PROJECTS_DIR));"
+  },
+  {
+    "file": "talent.js",
+    "line": 351,
+    "method": "GET",
+    "route": "/api/talent/me",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 369,
+    "method": "PUT",
+    "route": "/api/talent/me",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 418,
+    "method": "POST",
+    "route": "/api/talent/me/handle",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 429,
+    "method": "POST",
+    "route": "/api/talent/me/publish",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 439,
+    "method": "POST",
+    "route": "/api/talent/me/unpublish",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 445,
+    "method": "POST",
+    "route": "/api/talent/me/resume",
+    "handler": ", authRequired, requireDb, requireStudent, resumeUpload.single('file'), async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 459,
+    "method": "GET",
+    "route": "/api/talent/me/resume",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 466,
+    "method": "GET",
+    "route": "/api/talent/skills",
+    "handler": ", authRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 472,
+    "method": "POST",
+    "route": "/api/talent/me/skills",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 494,
+    "method": "DELETE",
+    "route": "/api/talent/me/skills/:skillId",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 500,
+    "method": "GET",
+    "route": "/api/talent/me/portfolio-eligible",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 506,
+    "method": "POST",
+    "route": "/api/talent/me/projects/from-submission",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 525,
+    "method": "GET",
+    "route": "/api/talent/me/projects",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 529,
+    "method": "POST",
+    "route": "/api/talent/me/projects",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 544,
+    "method": "PUT",
+    "route": "/api/talent/me/projects/:id",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 570,
+    "method": "DELETE",
+    "route": "/api/talent/me/projects/:id",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 577,
+    "method": "POST",
+    "route": "/api/talent/me/projects/:id/cover",
+    "handler": ", authRequired, requireDb, requireStudent, imageUpload.single('file'), async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 586,
+    "method": "POST",
+    "route": "/api/talent/me/projects/:id/gallery",
+    "handler": ", authRequired, requireDb, requireStudent, imageUpload.single('file'), async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 597,
+    "method": "DELETE",
+    "route": "/api/talent/me/projects/:id/gallery/:index",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 609,
+    "method": "GET",
+    "route": "/api/talent/search",
+    "handler": ", authRequired, requireDb, requireRecruiter, searchRateLimit, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 640,
+    "method": "GET",
+    "route": "/api/talent/saved-searches",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 644,
+    "method": "POST",
+    "route": "/api/talent/saved-searches",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 653,
+    "method": "DELETE",
+    "route": "/api/talent/saved-searches/:id",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 661,
+    "method": "GET",
+    "route": "/api/talent/projects",
+    "handler": ", requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 675,
+    "method": "GET",
+    "route": "/api/talent/profile/:handle",
+    "handler": ", requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 694,
+    "method": "GET",
+    "route": "/api/talent/profile/:handle/projects/:projectId",
+    "handler": ", requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 705,
+    "method": "GET",
+    "route": "/talent/search",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'talent-search.html')));"
+  },
+  {
+    "file": "talent.js",
+    "line": 706,
+    "method": "GET",
+    "route": "/talent/projects",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'talent-projects.html')));"
+  },
+  {
+    "file": "talent.js",
+    "line": 712,
+    "method": "GET",
+    "route": "/talent/:handle/projects/:projectId",
+    "handler": ", async (req, res) => {"
+  },
+  {
+    "file": "talent.js",
+    "line": 747,
+    "method": "GET",
+    "route": "/talent/:handle",
+    "handler": ", async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 75,
+    "method": "POST",
+    "route": "/api/talent/profile/:handle/contact-request",
+    "handler": ", authRequired, requireDb, requireRecruiter, contactRateLimit, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 111,
+    "method": "GET",
+    "route": "/api/talent/recruiter/contact-requests",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 121,
+    "method": "GET",
+    "route": "/api/talent/recruiter/contact-requests/:id",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 134,
+    "method": "GET",
+    "route": "/api/talent/recruiter/contact-requests/:id/resume",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 143,
+    "method": "GET",
+    "route": "/api/talent/me/contact-requests",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 153,
+    "method": "POST",
+    "route": "/api/talent/me/contact-requests/:id/accept",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 163,
+    "method": "POST",
+    "route": "/api/talent/me/contact-requests/:id/decline",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 170,
+    "method": "POST",
+    "route": "/api/talent/me/block-company",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 188,
+    "method": "GET",
+    "route": "/api/talent/me/blocked-companies",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 192,
+    "method": "DELETE",
+    "route": "/api/talent/me/blocked-companies/:companyId",
+    "handler": ", authRequired, requireDb, requireStudent, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 198,
+    "method": "GET",
+    "route": "/api/talent/contact-requests/:id/messages",
+    "handler": ", authRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 205,
+    "method": "POST",
+    "route": "/api/talent/contact-requests/:id/messages",
+    "handler": ", authRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 220,
+    "method": "GET",
+    "route": "/api/talent/shortlists",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 240,
+    "method": "POST",
+    "route": "/api/talent/shortlists",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 246,
+    "method": "DELETE",
+    "route": "/api/talent/shortlists/:id",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 255,
+    "method": "POST",
+    "route": "/api/talent/shortlists/:id/candidates",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 266,
+    "method": "DELETE",
+    "route": "/api/talent/shortlists/:id/candidates/:studentId",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 275,
+    "method": "GET",
+    "route": "/api/talent/shortlists/:id/export.csv",
+    "handler": ", authRequired, requireDb, requireRecruiter, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 292,
+    "method": "POST",
+    "route": "/api/talent/reports",
+    "handler": ", authRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 299,
+    "method": "GET",
+    "route": "/api/admin/talent/reports",
+    "handler": ", authRequired, adminRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 304,
+    "method": "POST",
+    "route": "/api/admin/talent/reports/:id/resolve",
+    "handler": ", authRequired, adminRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 308,
+    "method": "POST",
+    "route": "/api/admin/talent/reports/:id/dismiss",
+    "handler": ", authRequired, adminRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 314,
+    "method": "POST",
+    "route": "/api/admin/talent/profiles/:userId/unpublish",
+    "handler": ", authRequired, adminRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 324,
+    "method": "POST",
+    "route": "/api/admin/talent/projects/:id/unpublish",
+    "handler": ", authRequired, adminRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 336,
+    "method": "GET",
+    "route": "/api/admin/talent/analytics",
+    "handler": ", authRequired, adminRequired, requireDb, async (req, res) => {"
+  },
+  {
+    "file": "talent-hiring.js",
+    "line": 360,
+    "method": "GET",
+    "route": "/talent/interest",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'talent-interest.html')));"
+  },
+  {
+    "file": "showcase.js",
+    "line": 69,
+    "method": "GET",
+    "route": "/showcase",
+    "handler": ", (req, res) => res.sendFile(path.join(__dirname, 'public', 'showcase.html')));"
+  },
+  {
+    "file": "showcase.js",
+    "line": 87,
+    "method": "GET",
+    "route": "/showcase/p/:id",
+    "handler": ", (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 132,
+    "method": "GET",
+    "route": "/api/showcase/feed",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 136,
+    "method": "GET",
+    "route": "/api/showcase/posts/:id",
+    "handler": ", authRequired, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 143,
+    "method": "POST",
+    "route": "/api/showcase/posts",
+    "handler": ", authRequired, limitCreatePost, upload.array('images', r2.MAX_IMAGES_PER_POST), async (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 181,
+    "method": "DELETE",
+    "route": "/api/showcase/posts/:id",
+    "handler": ", authRequired, limitDeletePost, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 190,
+    "method": "DELETE",
+    "route": "/api/showcase/comments/:id",
+    "handler": ", authRequired, limitDeletePost, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 204,
+    "method": "POST",
+    "route": "/api/showcase/posts/:id/like",
+    "handler": ", authRequired, limitLike, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 209,
+    "method": "DELETE",
+    "route": "/api/showcase/posts/:id/like",
+    "handler": ", authRequired, limitLike, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 216,
+    "method": "POST",
+    "route": "/api/showcase/posts/:id/comments",
+    "handler": ", authRequired, limitComment, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 224,
+    "method": "POST",
+    "route": "/api/showcase/report",
+    "handler": ", authRequired, limitReport, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 232,
+    "method": "GET",
+    "route": "/api/showcase/moderation/queue",
+    "handler": ", authRequired, teacherOrAdmin, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 235,
+    "method": "POST",
+    "route": "/api/showcase/moderation/:id/action",
+    "handler": ", authRequired, teacherOrAdmin, limitModeration, (req, res) => {"
+  },
+  {
+    "file": "showcase.js",
+    "line": 244,
+    "method": "USE",
+    "route": "/api/showcase",
+    "handler": ", router);"
+  }
+]

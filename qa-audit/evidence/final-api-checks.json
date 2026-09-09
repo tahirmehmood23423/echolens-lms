@@ -1,0 +1,70 @@
+[
+  {
+    "id": "RECRUITER-REVIEW",
+    "expected": "Request info, recruiter resubmission, approval persist",
+    "actual": {
+      "request": 200,
+      "requestState": "needs_info",
+      "resubmit": 200,
+      "resubmitState": "pending",
+      "approved": 200
+    },
+    "status": "PASS",
+    "scope": "correct UI-shaped message field; supersedes initial harness reason-field attempt; mail disabled"
+  },
+  {
+    "id": "STAFF-REPLY",
+    "expected": "Staff response returns to HR record",
+    "actual": {
+      "http": 200,
+      "visibleToHR": true
+    },
+    "status": "PASS",
+    "scope": "local API"
+  },
+  {
+    "id": "SHOWCASE-FEED",
+    "expected": "Signed-in empty feed returns useful empty data",
+    "actual": {
+      "http": 200,
+      "data": {
+        "posts": [],
+        "next_cursor": null,
+        "r2_base": ""
+      }
+    },
+    "status": "PASS",
+    "scope": "local API"
+  },
+  {
+    "id": "SHOWCASE-VALIDATION",
+    "expected": "Posting without required image is rejected",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "At least one image is required."
+      }
+    },
+    "status": "PASS",
+    "scope": "local API"
+  },
+  {
+    "id": "COURSE-ROUTES",
+    "expected": "All course-detail links emitted by catalogue resolve",
+    "actual": {
+      "count": 39,
+      "failed": []
+    },
+    "status": "PASS",
+    "scope": "HTTP resolution only; not full course completion"
+  },
+  {
+    "id": "MALFORMED-JSON",
+    "expected": "Malformed JSON is rejected with a client error",
+    "actual": {
+      "http": 400
+    },
+    "status": "PASS",
+    "scope": "local API"
+  }
+]

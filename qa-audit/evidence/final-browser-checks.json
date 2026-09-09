@@ -1,0 +1,614 @@
+[
+  {
+    "id": "MOBILE-student",
+    "expected": "Dashboard fits 390px viewport",
+    "actual": {
+      "width": 390,
+      "documentWidth": 390,
+      "overflow": [
+        {
+          "tag": "ASIDE",
+          "id": "sidebar",
+          "class": "sidebar",
+          "text": "LEARNING\nOverview\nMy courses\nAssignments\nQuizzes\nProgress\nCertificates\nTalent Profile\nHiring Interes",
+          "right": 0
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "class": "brand",
+          "text": "",
+          "right": -1
+        },
+        {
+          "tag": "SPAN",
+          "id": "",
+          "class": "logo-pill",
+          "text": "",
+          "right": -47
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "class": "",
+          "text": "",
+          "right": -62
+        },
+        {
+          "tag": "NAV",
+          "id": "nav",
+          "class": "",
+          "text": "LEARNING\nOverview\nMy courses\nAssignments\nQuizzes\nProgress\nCertificates\nTalent Profile\nHiring Interes",
+          "right": -1
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "class": "nav-group admin-hide",
+          "text": "LEARNING",
+          "right": -13
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item active",
+          "text": "Overview",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -205
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -207
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item admin-hide",
+          "text": "My courses",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -206
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -206
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item admin-hide",
+          "text": "Assignments",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "rect",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -207
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -210
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -211
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item instructor-hide admin-hide",
+          "text": "Quizzes",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "rect",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -206
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -210
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item instructor-hide admin-hide",
+          "text": "Progress",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        }
+      ]
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "GRADE-UI",
+    "expected": "Learner sees teacher grade and remarks",
+    "actual": {
+      "has80": true,
+      "hasRemarks": true,
+      "priorCode": "print(\"QA paid quest\")"
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "PAID-DRAFT-REFRESH",
+    "expected": "Paid learner task and draft survive refresh",
+    "actual": {
+      "title": "Overview",
+      "codeVisible": 0
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "MOBILE-instructor",
+    "expected": "Dashboard fits 390px viewport",
+    "actual": {
+      "width": 390,
+      "documentWidth": 390,
+      "overflow": [
+        {
+          "tag": "ASIDE",
+          "id": "sidebar",
+          "class": "sidebar",
+          "text": "LEARNING\nOverview\nMy courses\nStudents\nAssignments\nGrades\nAttendance\nCalendar\nTOOLS\nMessages\n1\nResour",
+          "right": 0
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "class": "brand",
+          "text": "",
+          "right": -1
+        },
+        {
+          "tag": "SPAN",
+          "id": "",
+          "class": "logo-pill",
+          "text": "",
+          "right": -47
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "class": "",
+          "text": "",
+          "right": -62
+        },
+        {
+          "tag": "NAV",
+          "id": "nav",
+          "class": "",
+          "text": "LEARNING\nOverview\nMy courses\nStudents\nAssignments\nGrades\nAttendance\nCalendar\nTOOLS\nMessages\n1\nResour",
+          "right": -1
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "class": "nav-group admin-hide",
+          "text": "LEARNING",
+          "right": -13
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item active",
+          "text": "Overview",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -205
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -207
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item admin-hide",
+          "text": "My courses",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -206
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -206
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item instructor-only",
+          "text": "Students",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "circle",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -213
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -210
+        },
+        {
+          "tag": "circle",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -206
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -204
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item admin-hide",
+          "text": "Assignments",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "rect",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -207
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -210
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -211
+        }
+      ]
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "MOBILE-admin",
+    "expected": "Dashboard fits 390px viewport",
+    "actual": {
+      "width": 390,
+      "documentWidth": 390,
+      "overflow": [
+        {
+          "tag": "ASIDE",
+          "id": "sidebar",
+          "class": "sidebar",
+          "text": "Overview\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nUsers\nCourses\nTeachers\nStudents\nEnrollments",
+          "right": 0
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "class": "brand",
+          "text": "",
+          "right": -1
+        },
+        {
+          "tag": "SPAN",
+          "id": "",
+          "class": "logo-pill",
+          "text": "",
+          "right": -47
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "class": "",
+          "text": "",
+          "right": -62
+        },
+        {
+          "tag": "NAV",
+          "id": "nav",
+          "class": "",
+          "text": "Overview\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nUsers\nCourses\nTeachers\nStudents\nEnrollments",
+          "right": -1
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item active",
+          "text": "Overview",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -205
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -207
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item",
+          "text": "Jobs",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "rect",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -205
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -209
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -205
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item",
+          "text": "Settings",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "circle",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -210
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -204
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "class": "nav-group instructor-hide",
+          "text": "MORE",
+          "right": -13
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item instructor-hide",
+          "text": "Challenges",
+          "right": -13
+        },
+        {
+          "tag": "svg",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -202
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -207
+        },
+        {
+          "tag": "path",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -209
+        },
+        {
+          "tag": "circle",
+          "id": "",
+          "class": "[object SVGAnimatedString]",
+          "text": "",
+          "right": -212
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "nav-item instructor-hide",
+          "text": "Hackathons",
+          "right": -13
+        }
+      ]
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "FILTER-LIVE-AFTER-FREE",
+    "expected": "Live Tech Courses resets the Free-only filter",
+    "actual": {
+      "mode": "live",
+      "free": "free",
+      "shown": "C Systems Programming\n2 courses\nC++ and Object Oriented Software Design\n2 courses\nPython Programming and Algorithmic Design\n2 courses\nJavaScript and Interactive Web Architecture\n2 courses\nModern Responsive Web Architecture (HTML & CSS)\n2 courses"
+    },
+    "status": "FAIL",
+    "scope": "real local UI"
+  },
+  {
+    "id": "FILTER-EMPTY-RECOVERY",
+    "expected": "No-match search is explicit and clearing query restores results",
+    "actual": {
+      "empty": "No courses match those filters.",
+      "restored": "C Systems Programming\n2 courses\nC++ and Object Oriented Software Design\n2 course"
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  },
+  {
+    "id": "CERT-VERIFY-UI",
+    "expected": "Public verification displays the issued synthetic certificate",
+    "actual": {
+      "text": "✓\nVerified authentic. This certificate was genuinely issued through the EchoLens platform by EchoLens Digital, and is registered under serial EL-2026-FDCAF6B8. Scanning the QR code always returns to this official verification page - it cannot be faked or edited.\nEchoLens Digital\nINNOVATE · EDUCATE · ELEVATE\n✓ Verified issuer · EchoLens\nCERTIFICATE OF COMPLETION\nThis is to certify that\nQA Empty Student\nRegistration No. 171230\nhas successfully completed the course\nQA NONMEMBER CERTIFICATE — LOCAL ONLY\nDate of completion: 9 September 2026\nScan to verify\nTahir Mehmood\nTahir Mehmood\nCEO, ECHOLENS DIGITAL\nSerial: EL-2026-FDCAF6B8  ·  Issued 2026-09-09\nKey Concepts Covered\nWhat QA Empty Student learned in this course, level by level.\n1\nSetup and Python basics · Control flow and functions\nSet up Jupyter and Colab, then master variables, data types, operators, reading code, if/else, loops, functions and list comprehensions.\n2\nData structures for analysis · Files, libraries, and environments\nWork with lists, tuples, sets and dictionaries, choose the right structure, read and write files, import libraries, and set up virtual environments with pip.\n3\nNumPy arrays · NumPy operations\nCreate and shape arrays, index and slice, and use vectorised math, broadcasting and aggregations across axes - and see why arrays beat lists for data.\n4\nMeet pandas · Loading real data\nLoad real CSV and Excel data into Series and DataFrames, inspect rows, columns and the index, and read a messy dataset with he"
+    },
+    "status": "PASS",
+    "scope": "real local UI"
+  }
+]

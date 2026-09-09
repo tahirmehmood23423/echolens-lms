@@ -1,0 +1,158 @@
+[
+  {
+    "url": "/courses/ai-automation-with-n8n-and-make-com",
+    "status": 200
+  },
+  {
+    "url": "/courses/prompt-engineering-and-chatgpt-claude-mastery",
+    "status": 200
+  },
+  {
+    "url": "/courses/ai-assisted-coding-with-cursor-claude-and-copilot",
+    "status": 200
+  },
+  {
+    "url": "/courses/excel-plus-ai-for-office-professionals",
+    "status": 200
+  },
+  {
+    "url": "/courses/canva-and-ai-content-creation",
+    "status": 200
+  },
+  {
+    "url": "/courses/python-for-data-science",
+    "status": 200
+  },
+  {
+    "url": "/courses/generative-ai-essentials",
+    "status": 200
+  },
+  {
+    "url": "/courses/data-analytics-with-sql-and-power-bi",
+    "status": 200
+  },
+  {
+    "url": "/courses/introduction-to-machine-learning",
+    "status": 200
+  },
+  {
+    "url": "/courses/ai-automation-tools-track",
+    "status": 200
+  },
+  {
+    "url": "/courses/frontend-web-development-with-html-css-and-javascript",
+    "status": 200
+  },
+  {
+    "url": "/courses/javascript-deep-dive-dom-async-and-apis",
+    "status": 200
+  },
+  {
+    "url": "/courses/digital-marketing-and-seo-fundamentals",
+    "status": 200
+  },
+  {
+    "url": "/courses/freelancing-and-client-acquisition-mastery",
+    "status": 200
+  },
+  {
+    "url": "/courses/graphic-design-basics",
+    "status": 200
+  },
+  {
+    "url": "/courses/content-writing-with-ai",
+    "status": 200
+  },
+  {
+    "url": "/courses/graphic-designing",
+    "status": 200
+  },
+  {
+    "url": "/courses/ui-ux-designing",
+    "status": 200
+  },
+  {
+    "url": "/courses/3d-modeling-rendering-and-introductory-animation",
+    "status": 200
+  },
+  {
+    "url": "/courses/cs-101-fundamentals-of-c",
+    "status": 200
+  },
+  {
+    "url": "/courses/cs-102-fundamentals-of-c-plus-plus-with-oop",
+    "status": 200
+  },
+  {
+    "url": "/courses/cs-104-fundamentals-of-python",
+    "status": 200
+  },
+  {
+    "url": "/courses/cs-105-fundamentals-of-javascript",
+    "status": 200
+  },
+  {
+    "url": "/courses/cs-106-fundamentals-of-html-and-css",
+    "status": 200
+  },
+  {
+    "url": "/courses/advanced-c-programming",
+    "status": 200
+  },
+  {
+    "url": "/courses/advanced-c-plus-plus-programming",
+    "status": 200
+  },
+  {
+    "url": "/courses/advanced-python-programming",
+    "status": 200
+  },
+  {
+    "url": "/courses/advanced-javascript-programming",
+    "status": 200
+  },
+  {
+    "url": "/courses/advanced-css-and-web-development",
+    "status": 200
+  },
+  {
+    "url": "/courses/wordpress-development",
+    "status": 200
+  },
+  {
+    "url": "/courses/data-analytics-specialist-track",
+    "status": 200
+  },
+  {
+    "url": "/courses/generative-ai-engineering",
+    "status": 200
+  },
+  {
+    "url": "/courses/ai-agents-and-automation-engineering",
+    "status": 200
+  },
+  {
+    "url": "/courses/machine-learning-fundamentals",
+    "status": 200
+  },
+  {
+    "url": "/courses/deep-learning-with-pytorch",
+    "status": 200
+  },
+  {
+    "url": "/courses/full-stack-javascript-react-node-and-postgresql",
+    "status": 200
+  },
+  {
+    "url": "/courses/react-plus-next-js-frontend-specialist",
+    "status": 200
+  },
+  {
+    "url": "/courses/mobile-apps-with-flutter",
+    "status": 200
+  },
+  {
+    "url": "/courses/video-editing",
+    "status": 200
+  }
+]

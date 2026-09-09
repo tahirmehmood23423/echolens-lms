@@ -1,0 +1,458 @@
+[
+  {
+    "id": "AUTH-01-missing",
+    "expected": "HTTP 401",
+    "status": "PASS",
+    "actual": {
+      "http": 401,
+      "data": {
+        "error": "Incorrect username or password."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "AUTH-02-invalid",
+    "expected": "HTTP 401",
+    "status": "PASS",
+    "actual": {
+      "http": 401,
+      "data": {
+        "error": "Incorrect username or password."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "AUTH-03-protected",
+    "expected": "HTTP 401",
+    "status": "PASS",
+    "actual": {
+      "http": 401,
+      "data": {
+        "error": "Please sign in to continue."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "AUTH-04-expired",
+    "expected": "HTTP 401",
+    "status": "PASS",
+    "actual": {
+      "http": 401,
+      "data": {
+        "error": "Please sign in to continue."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "ROLE-01-admin-denied",
+    "expected": "HTTP 403",
+    "status": "PASS",
+    "actual": {
+      "http": 403,
+      "data": {
+        "error": "Admin access only."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "ROLE-02-unenrolled-batch",
+    "expected": "HTTP 403",
+    "status": "PASS",
+    "actual": {
+      "http": 403,
+      "data": {
+        "error": "You are not on this course."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "ROLE-03-free-batch",
+    "expected": "HTTP 403",
+    "status": "PASS",
+    "actual": {
+      "http": 403,
+      "data": {
+        "error": "You are not on this course."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "LEARN-01-course-read",
+    "expected": "Enrolled student can retrieve their course",
+    "status": "PASS",
+    "actual": {
+      "http": 200,
+      "keys": [
+        "batch",
+        "sessions",
+        "lessons",
+        "announcements",
+        "can_manage",
+        "leaderboard",
+        "my_gems_here",
+        "my_rate"
+      ]
+    },
+    "note": ""
+  },
+  {
+    "id": "PROFILE-01-save",
+    "expected": "HTTP 200",
+    "status": "PASS",
+    "actual": {
+      "http": 200,
+      "data": {
+        "ok": true
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "PROFILE-02-persist",
+    "expected": "Profile update is present in persisted local record",
+    "status": "PASS",
+    "actual": {
+      "city": "QA Saved City"
+    },
+    "note": ""
+  },
+  {
+    "id": "PROFILE-03-clear",
+    "expected": "Saving blank optional fields removes previously saved values",
+    "status": "FAIL",
+    "actual": {
+      "http": 200,
+      "city": "QA Saved City",
+      "goal": "QA save test"
+    },
+    "note": ""
+  },
+  {
+    "id": "SEC-01-private-file",
+    "expected": "Unenrolled free account cannot download private course material",
+    "status": "FAIL",
+    "actual": {
+      "uploadedBy": "assigned instructor",
+      "viewer": "unenrolled free learner",
+      "url": "/uploads/1788934589316-qa-private-course.pdf",
+      "http": 200,
+      "body": "%PDF-1.4\nQA-PRIVATE-COURSE-FILE-LOCAL-ONLY\n%%EOF"
+    },
+    "note": ""
+  },
+  {
+    "id": "SEC-02-anonymous-file",
+    "expected": "Anonymous file access is gated",
+    "status": "PASS",
+    "actual": {
+      "http": 401,
+      "location": null
+    },
+    "note": ""
+  },
+  {
+    "id": "SEC-03-gems-nonmember",
+    "expected": "Teacher can award only a student enrolled in their batch",
+    "status": "FAIL",
+    "actual": {
+      "http": 200,
+      "body": {
+        "ok": true,
+        "event": {
+          "id": 1,
+          "user_id": 12,
+          "batch_id": 1,
+          "amount": 25,
+          "source": "award",
+          "note": "QA cross-enrollment authorization probe",
+          "by": 2,
+          "at": "2026-09-09 06:16:29",
+          "reference_type": null,
+          "reference_id": null
+        }
+      },
+      "persisted": true
+    },
+    "note": ""
+  },
+  {
+    "id": "SEC-04-coordinator-write",
+    "expected": "Read-only coordinator cannot post course messages",
+    "status": "FAIL",
+    "actual": {
+      "http": 200,
+      "body": {
+        "ok": true,
+        "message": {
+          "id": 1,
+          "batch_id": 1,
+          "body": "QA read-only coordinator mutation probe",
+          "created_at": "2026-09-09 06:16:29",
+          "display_name": "QA coordinator",
+          "avatar": null,
+          "anonymous": false,
+          "staff_role": "coordinator",
+          "mentions": [],
+          "mentions_me": false,
+          "mine": true
+        }
+      }
+    },
+    "note": "Coordinator is advertised as read-only; clarify intended collaboration permissions."
+  },
+  {
+    "id": "CAT-01-free-unlocked",
+    "expected": "Every free-course level is available to browse",
+    "status": "PASS",
+    "actual": {
+      "track": "bc04-webdev-kickstart",
+      "levels": 4,
+      "locked": 0
+    },
+    "note": ""
+  },
+  {
+    "id": "CAT-02-paid-preview",
+    "expected": "Paid course has explicit locked levels and first-level preview",
+    "status": "PASS",
+    "actual": {
+      "track": "python-6w",
+      "levels": 12,
+      "open": 1
+    },
+    "note": ""
+  },
+  {
+    "id": "LEARN-02-anonymous-submit",
+    "expected": "HTTP 401",
+    "status": "PASS",
+    "actual": {
+      "http": 401,
+      "data": {
+        "error": "Please sign in to continue."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "LEARN-03-staff-submit",
+    "expected": "HTTP 403",
+    "status": "PASS",
+    "actual": {
+      "http": 403,
+      "data": {
+        "error": "Quests are for learners."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "LEARN-04-empty-submit",
+    "expected": "HTTP 400",
+    "status": "PASS",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "Submit your code or upload your work as a file."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "LEARN-05-submit-persist",
+    "expected": "Valid submission persists with explicit grading state",
+    "status": "PASS",
+    "actual": {
+      "http": 200,
+      "graded": false,
+      "note": "Submission recorded. Grading is not available right now - your score will appear once it is graded.",
+      "id": 1,
+      "persisted": true
+    },
+    "note": "AI credentials deliberately absent. This checks storage only; grading/certificate completion remains BLOCKED."
+  },
+  {
+    "id": "LEARN-06-duplicate",
+    "expected": "Repeating same task keeps one submission record",
+    "status": "PASS",
+    "actual": {
+      "first": 1,
+      "second": 1,
+      "matching": 1
+    },
+    "note": ""
+  },
+  {
+    "id": "LEARN-07-paid-lock",
+    "expected": "HTTP 400",
+    "status": "PASS",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "This level is locked - register for the course to unlock it."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "AI-01-unconfigured",
+    "expected": "HTTP 503",
+    "status": "PASS",
+    "actual": {
+      "http": 503,
+      "data": {
+        "error": "AI is not configured. Set GEMINI_API_KEY or GROQ_API_KEY in the environment."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "TALENT-01-db-unavailable",
+    "expected": "HTTP 503",
+    "status": "PASS",
+    "actual": {
+      "http": 503,
+      "data": {
+        "error": "The Talent Marketplace is not available - Postgres is not configured on this server."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "NEWS-01-invalid",
+    "expected": "HTTP 400",
+    "status": "PASS",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "Enter a valid email address."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "NEWS-02-deduplicated",
+    "expected": "Newsletter repeat creates one persisted lead",
+    "status": "PASS",
+    "actual": {
+      "count": 1
+    },
+    "note": ""
+  },
+  {
+    "id": "SIGNUP-01-invalid",
+    "expected": "HTTP 400",
+    "status": "PASS",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "Enter your full name."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "SIGNUP-02-local-no-SMTP",
+    "expected": "Synthetic account registration persists when local email validation allows reserved domain",
+    "status": "PASS",
+    "actual": {
+      "http": 200,
+      "body": {
+        "ok": true,
+        "role": "free",
+        "password": "[local fallback password redacted]"
+      },
+      "persisted": true
+    },
+    "note": "No external mail sent. Email delivery and code verification are not tested."
+  },
+  {
+    "id": "SIGNUP-03-duplicate",
+    "expected": "HTTP 400",
+    "status": "PASS",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "A learner account with this email already exists - sign in instead."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "ADMIT-01-duplicate",
+    "expected": "Repeated registration for same learner/course does not create duplicate pipeline records",
+    "status": "FAIL",
+    "actual": {
+      "statuses": [
+        200,
+        200
+      ],
+      "count": 2
+    },
+    "note": ""
+  },
+  {
+    "id": "ADMIT-02-invalid-course",
+    "expected": "Unknown course code is rejected before creating a registration",
+    "status": "FAIL",
+    "actual": {
+      "http": 200,
+      "body": {
+        "ok": true
+      },
+      "persisted": 0
+    },
+    "note": ""
+  },
+  {
+    "id": "AUTH-05-short-reset",
+    "expected": "HTTP 400",
+    "status": "PASS",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "Choose a password of at least 8 characters."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "SEC-05-reset-session",
+    "expected": "Password reset invalidates previously issued sessions",
+    "status": "FAIL",
+    "actual": {
+      "resetHttp": 200,
+      "oldSessionHttp": 200,
+      "oldSessionUser": "qa.free"
+    },
+    "note": ""
+  },
+  {
+    "id": "AUTH-06-one-time-reset",
+    "expected": "HTTP 400",
+    "status": "PASS",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "This reset link is invalid or has expired - request a new one."
+      }
+    },
+    "note": ""
+  },
+  {
+    "id": "AUTH-07-reset-outcome",
+    "expected": "New password can sign in after reset",
+    "status": "PASS",
+    "actual": {
+      "http": 200
+    },
+    "note": ""
+  }
+]

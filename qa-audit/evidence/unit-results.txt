@@ -1,0 +1,5 @@
+Observed command: node --test test/certificate-final-project.test.js test/gem-totals.test.js
+Node v24.15.0, 2026-09-09
+5 tests passed; 0 failed; 0 skipped.
+Four certificate final_project serialization/null/JSON regression cases; one gem aggregation equivalence case.
+Full npm test not run: test/talent.test.js requires a reachable PostgreSQL server with CREATEDB for its scratch database. No local PostgreSQL installed; Docker engine unavailable. No production database was contacted.

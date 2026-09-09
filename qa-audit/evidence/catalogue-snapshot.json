@@ -1,0 +1,574 @@
+{
+  "catalogue": [
+    {
+      "code": "BC-01",
+      "title": "AI Automation with n8n & Make.com",
+      "tier": "Bootcamp",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Build real business automations that connect apps, data and AI - workflows agencies bill $30-70/hour for.",
+      "track_key": "bc01-automation"
+    },
+    {
+      "code": "BC-02",
+      "title": "Prompt Engineering & ChatGPT/Claude Mastery",
+      "tier": "Bootcamp",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Structured prompting, tool use and reusable prompt systems that make AI dependable daily.",
+      "track_key": "bc02-prompting"
+    },
+    {
+      "code": "BC-05",
+      "title": "AI-Assisted Coding with Cursor, Claude & Copilot",
+      "tier": "Bootcamp",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "badges": [
+        "new",
+        "high_demand"
+      ],
+      "summary": "Agentic IDEs, AI pair programming and review workflows that multiply what one developer can ship.",
+      "track_key": "bc05-ai-coding"
+    },
+    {
+      "code": "BC-07",
+      "title": "Excel + AI for Office Professionals",
+      "tier": "Bootcamp",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "badges": [
+        "new"
+      ],
+      "summary": "Clean data, build reports and automate repetitive office work by pairing Excel with AI assistants.",
+      "track_key": "bc07-excel-ai"
+    },
+    {
+      "code": "BC-08",
+      "title": "Canva & AI Content Creation",
+      "tier": "Bootcamp",
+      "weeks": 2,
+      "hours": 8,
+      "price_pkr": 5000,
+      "badges": [],
+      "summary": "Design social posts, brand kits and marketing visuals quickly with Canva + AI tools.",
+      "track_key": "bc08-canva-ai"
+    },
+    {
+      "code": "SC-01",
+      "title": "Python for Data Science",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 12500,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Pandas, NumPy and Matplotlib applied to real datasets, ending with a portfolio analysis project.",
+      "track_key": "python-6w"
+    },
+    {
+      "code": "SC-02",
+      "title": "Generative AI Essentials",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 14000,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Hybrid, reranked, agentic RAG in LangChain - from tokens and embeddings to a production-served system.",
+      "track_key": "sc02-genai"
+    },
+    {
+      "code": "SC-03",
+      "title": "Data Analytics with SQL & Power BI",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 13500,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Production-grade SQL queries turned into interactive Power BI dashboards decision-makers use.",
+      "track_key": "sc03-sql-powerbi"
+    },
+    {
+      "code": "SC-04",
+      "title": "Introduction to Machine Learning",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 13000,
+      "badges": [],
+      "summary": "Train, evaluate and honestly interpret your first models - the foundation for every advanced AI track.",
+      "track_key": "sc04-intro-ml"
+    },
+    {
+      "code": "SC-05",
+      "title": "AI Automation Tools Track",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 14000,
+      "badges": [],
+      "summary": "A deeper pass across n8n, Make, Zapier and AI agents wired into real business processes.",
+      "track_key": "sc05-ai-tools"
+    },
+    {
+      "code": "SC-06",
+      "title": "Frontend Web Development with HTML, CSS & JavaScript",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 13000,
+      "badges": [
+        "new",
+        "high_demand"
+      ],
+      "summary": "From blank file to responsive, deployed website - practiced quest by quest in the EchoLens compiler.",
+      "track_key": "sc06-frontend"
+    },
+    {
+      "code": "SC-07",
+      "title": "JavaScript Deep Dive: DOM, Async & APIs",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 13000,
+      "badges": [
+        "new",
+        "high_demand"
+      ],
+      "summary": "The bridge to React: master the DOM, asynchronous JavaScript and consuming real REST APIs.",
+      "track_key": "sc07-js-deep"
+    },
+    {
+      "code": "SC-08",
+      "title": "Digital Marketing & SEO Fundamentals",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 12000,
+      "badges": [
+        "new"
+      ],
+      "summary": "Run real campaigns: search optimisation, paid social basics and analytics.",
+      "track_key": "sc08-marketing-seo"
+    },
+    {
+      "code": "SC-09",
+      "title": "Freelancing & Client Acquisition Mastery",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 10000,
+      "badges": [
+        "new"
+      ],
+      "summary": "Positioning, proposals, pricing and client communication - turning skills into income.",
+      "track_key": "sc09-freelancing"
+    },
+    {
+      "code": "SC-10",
+      "title": "Graphic Design Basics",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 10000,
+      "badges": [],
+      "summary": "Core design principles, typography and brand assets - a solid visual foundation.",
+      "track_key": "sc10-graphic-basics"
+    },
+    {
+      "code": "SC-11",
+      "title": "Content Writing with AI",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 9000,
+      "badges": [],
+      "summary": "Professional writing workflows pairing human judgement with AI drafting, editing and research.",
+      "track_key": "sc11-content-ai"
+    },
+    {
+      "code": "ST-01",
+      "title": "WordPress Development",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 20000,
+      "badges": [],
+      "summary": "Custom themes, WooCommerce stores and performance hardening - a large, reliable freelance market.",
+      "track_key": "st01-wordpress"
+    },
+    {
+      "code": "ST-02",
+      "title": "Graphic Designing",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 12000,
+      "badges": [],
+      "summary": "A full professional design track: brand identity, collateral and a portfolio built to client standards.",
+      "track_key": "st02-graphic-design"
+    },
+    {
+      "code": "ST-03",
+      "title": "UI/UX Designing",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 24,
+      "price_pkr": 12000,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Research, wireframing and high-fidelity product design in Figma, closing with a shipped-quality case study.",
+      "track_key": "st03-uiux"
+    },
+    {
+      "code": "3D-01",
+      "title": "3D Modeling, Rendering and Introductory Animation",
+      "tier": "Short Course",
+      "weeks": 6,
+      "hours": 18,
+      "price_pkr": 13000,
+      "badges": [
+        "new"
+      ],
+      "summary": "Model, texture, light, render and animate in Blender, closing with a portfolio-ready rendered scene.",
+      "track_key": "3d01-modeling"
+    },
+    {
+      "code": "ST-04",
+      "title": "Data Analytics Specialist Track",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 21500,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Python, SQL, statistics and data storytelling - the complete analyst skill set employers hire for.",
+      "track_key": "st04-data-analytics"
+    },
+    {
+      "code": "ST-05",
+      "title": "Generative AI Engineering",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 22500,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Production LLM systems: retrieval-augmented generation, evaluation and deployment.",
+      "track_key": "st05-genai-eng"
+    },
+    {
+      "code": "ST-06",
+      "title": "AI Agents & Automation Engineering",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 23000,
+      "badges": [
+        "high_demand"
+      ],
+      "summary": "Multi-step, tool-calling AI agents that plan, act and integrate with real business systems.",
+      "track_key": "st06-ai-agents"
+    },
+    {
+      "code": "ST-07",
+      "title": "Machine Learning Fundamentals",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 21500,
+      "badges": [],
+      "summary": "Classical ML done rigorously: feature engineering, model selection and honest evaluation.",
+      "track_key": "st07-ml-fundamentals"
+    },
+    {
+      "code": "ST-08",
+      "title": "Deep Learning with PyTorch",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 23000,
+      "badges": [],
+      "summary": "Neural networks, computer vision and transfer learning, through to deploying a trained model.",
+      "track_key": "st08-pytorch-dl"
+    },
+    {
+      "code": "ST-09",
+      "title": "Full-Stack JavaScript: React, Node & PostgreSQL",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 25000,
+      "badges": [
+        "new",
+        "flagship"
+      ],
+      "summary": "Our premium flagship: build and deploy a complete production web application on the 2026 stack.",
+      "track_key": "st09-fullstack-js"
+    },
+    {
+      "code": "ST-10",
+      "title": "React + Next.js Frontend Specialist",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 22000,
+      "badges": [
+        "new",
+        "high_demand"
+      ],
+      "summary": "Component architecture, state management and server-side rendering with Next.js.",
+      "track_key": "st10-react-next"
+    },
+    {
+      "code": "ST-11",
+      "title": "Mobile Apps with Flutter",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 22000,
+      "badges": [
+        "new"
+      ],
+      "summary": "One codebase, two app stores: build and publish real Android and iOS apps.",
+      "track_key": "st11-flutter"
+    },
+    {
+      "code": "ST-12",
+      "title": "Video Editing",
+      "tier": "Specialist Track",
+      "weeks": 8,
+      "hours": 32,
+      "price_pkr": 20000,
+      "badges": [],
+      "summary": "Professional editing workflows, pacing and delivery for client and commercial work.",
+      "track_key": "st12-video-editing"
+    },
+    {
+      "code": "FC-01",
+      "title": "CS-101: Fundamentals of C",
+      "tier": "Short Course",
+      "weeks": 5,
+      "hours": 12,
+      "price_pkr": 0,
+      "badges": [
+        "free"
+      ],
+      "free_mode": "signin",
+      "family": "c",
+      "family_order": 1,
+      "summary": "The language everything else was built on - compilation, memory, operators, branching and loops through to modular functions, with a real-life analogy, a video, and a scenario-based Compiler Quest for every one of 16 topics across 5 modules.",
+      "track_key": "fc01-c-basics"
+    },
+    {
+      "code": "FC-02",
+      "title": "CS-102: Fundamentals of C++ (with OOP)",
+      "tier": "Short Course",
+      "weeks": 4,
+      "hours": 12,
+      "price_pkr": 0,
+      "badges": [
+        "free"
+      ],
+      "free_mode": "signin",
+      "family": "cpp",
+      "family_order": 1,
+      "summary": "Streams and iostream, modern types (auto/const), std::string and std::vector, references and overloading, through to encapsulated classes with constructors, destructors and validated getters/setters.",
+      "track_key": "fc02-cpp-objects"
+    },
+    {
+      "code": "CS-104",
+      "title": "CS-104: Fundamentals of Python",
+      "tier": "Short Course",
+      "weeks": 5,
+      "hours": 12,
+      "price_pkr": 0,
+      "badges": [
+        "free"
+      ],
+      "free_mode": "signin",
+      "family": "python",
+      "family_order": 1,
+      "summary": "The bytecode interpreter and dynamic typing through strings, control flow and core data structures to functions, classes and safe file I/O, with a real-life analogy, a video, and a scenario-based Compiler Quest for every one of 15 topics across 5 modules.",
+      "track_key": "cs104-python"
+    },
+    {
+      "code": "CS-105",
+      "title": "CS-105: Fundamentals of JavaScript",
+      "tier": "Short Course",
+      "weeks": 5,
+      "hours": 12,
+      "price_pkr": 0,
+      "badges": [
+        "free",
+        "new"
+      ],
+      "free_mode": "signin",
+      "family": "javascript",
+      "family_order": 1,
+      "summary": "The JavaScript engine and console.log() through scoping, type coercion, arrays and objects to closures, currying and asynchronous code with Promises and async/await, with a real-life analogy, a video, and a scenario-based Compiler Quest for every one of 15 topics across 5 modules.",
+      "track_key": "cs105-javascript"
+    },
+    {
+      "code": "CS-106",
+      "title": "CS-106: Fundamentals of HTML & CSS",
+      "tier": "Short Course",
+      "weeks": 5,
+      "hours": 12,
+      "price_pkr": 0,
+      "badges": [
+        "free",
+        "new"
+      ],
+      "free_mode": "signin",
+      "family": "web",
+      "family_order": 1,
+      "summary": "HTML document structure, semantic markup, tables and forms, then CSS selectors, the box model, positioning, Flexbox and Grid and mobile-first responsive design, with a real-life analogy, a video, and a scenario-based Compiler Quest for every one of 15 topics across 5 modules.",
+      "track_key": "cs106-html-css"
+    },
+    {
+      "code": "CS1-ADV",
+      "title": "Advanced C Programming",
+      "tier": "Short Course",
+      "weeks": 4,
+      "hours": 12,
+      "price_pkr": 0,
+      "badges": [
+        "free"
+      ],
+      "free_mode": "signin",
+      "family": "c",
+      "family_order": 2,
+      "summary": "Systems & Memory Control: pointers, pointer arithmetic and double pointers, the heap (malloc/realloc/free), structs and linked lists, bitwise hardware masks, and file I/O through to function-pointer dispatch - four modules, one Compiler Quest per topic.",
+      "track_key": "c-advanced"
+    },
+    {
+      "code": "CPP2-ADV",
+      "title": "Advanced C++ Programming",
+      "tier": "Short Course",
+      "weeks": 4,
+      "hours": 12,
+      "price_pkr": 0,
+      "badges": [
+        "free"
+      ],
+      "free_mode": "signin",
+      "family": "cpp",
+      "family_order": 2,
+      "summary": "OOP & Architecture: inheritance, virtual dispatch and abstract interfaces, operator overloading and copy control (Rule of Three/Five), templates and STL algorithms with lambdas, and smart pointers with move semantics.",
+      "track_key": "cpp-advanced"
+    },
+    {
+      "code": "PY3-ADV",
+      "title": "Advanced Python Programming",
+      "tier": "Short Course",
+      "weeks": 5,
+      "hours": 15,
+      "price_pkr": 0,
+      "badges": [
+        "free"
+      ],
+      "free_mode": "signin",
+      "family": "python",
+      "family_order": 2,
+      "summary": "Core Language Internals: the iterator protocol and lazy generators, closures and decorators, dunder methods, descriptors and metaclasses, context managers and the memory model, through to threading, multiprocessing and asyncio concurrency - five modules, one Compiler Quest per topic.",
+      "track_key": "python-advanced"
+    },
+    {
+      "code": "JS4-ADV",
+      "title": "Advanced JavaScript Programming",
+      "tier": "Short Course",
+      "weeks": 5,
+      "hours": 15,
+      "price_pkr": 0,
+      "badges": [
+        "free"
+      ],
+      "free_mode": "signin",
+      "family": "javascript",
+      "family_order": 2,
+      "summary": "Production Architecture: prototypal inheritance and true private fields, Proxies, Reflect and Symbols, the microtask event loop and weak-reference memory management, through to Promise combinators, async generators, custom event systems and Web Worker concurrency - five modules, one Compiler Quest per topic.",
+      "track_key": "js-advanced"
+    },
+    {
+      "code": "WEB5-ADV",
+      "title": "Advanced CSS and Web Development",
+      "tier": "Short Course",
+      "weeks": 5,
+      "hours": 15,
+      "price_pkr": 0,
+      "badges": [
+        "free"
+      ],
+      "free_mode": "signin",
+      "family": "web",
+      "family_order": 2,
+      "summary": "Production front-end: functional and combinator selectors and CSS architecture, Flexbox and Grid with subgrid, container queries and fluid design, motion and 3D, Sass and Tailwind, build tooling, then accessibility, performance and SEO through to Git-based deployment - five modules, one Compiler Quest per topic.",
+      "track_key": "web-advanced"
+    }
+  ],
+  "paths": [
+    {
+      "key": "web-dev-path",
+      "title": "The Web Developer Path",
+      "codes": [
+        "BC-04",
+        "SC-06",
+        "SC-07",
+        "ST-09"
+      ],
+      "summary": "Complete beginner to job-ready full-stack developer on the highest-demand 2026 stack: JavaScript foundations, React and PostgreSQL.",
+      "bundle_pkr": 43500,
+      "full_pkr": 51000,
+      "save_pkr": 7500
+    }
+  ],
+  "free_families": [
+    {
+      "key": "c",
+      "name": "C Systems Programming"
+    },
+    {
+      "key": "cpp",
+      "name": "C++ and Object Oriented Software Design"
+    },
+    {
+      "key": "python",
+      "name": "Python Programming and Algorithmic Design"
+    },
+    {
+      "key": "javascript",
+      "name": "JavaScript and Interactive Web Architecture"
+    },
+    {
+      "key": "web",
+      "name": "Modern Responsive Web Architecture (HTML & CSS)"
+    }
+  ],
+  "links": {
+    "registration": "/open#register"
+  },
+  "cohort": {
+    "name": "August 2026",
+    "registration_deadline": "31 July 2026",
+    "batch_starts": "1 August 2026"
+  }
+}

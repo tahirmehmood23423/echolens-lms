@@ -1,0 +1,504 @@
+[
+  {
+    "name": "dashboard-staff",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Staff Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 3,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "STAFF\nQA staff\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">S"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nStaff Portal\nStaff Portal\nSTAFF\nQA staff\nQ\nQ\nStaff Portal\nUnassigned · QA assistant\nInstructions from HR\nNothing yet.\nFollow-ups\nNothing yet.\nYou are not part of any department yet."
+  },
+  {
+    "name": "view-staff-settings",
+    "navLabel": "Settings",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "QA staff"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 5,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "STAFF\nQA staff\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">S"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nStaff Portal\nSettings\nSTAFF\nQA staff\nQ\nQ\nQA staff\nStaff · staff@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore"
+  },
+  {
+    "name": "view-staff-dept-staff",
+    "navLabel": "Staff Portal",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Staff Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 3,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "STAFF\nQA staff\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">S"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nStaff Portal\nStaff Portal\nSTAFF\nQA staff\nQ\nQ\nStaff Portal\nUnassigned · QA assistant\nInstructions from HR\nNothing yet.\nFollow-ups\nNothing yet.\nYou are not part of any department yet."
+  },
+  {
+    "name": "role-errors-staff",
+    "errors": [],
+    "badRequests": [],
+    "nav": [
+      {
+        "view": "settings",
+        "label": "Settings"
+      },
+      {
+        "view": "dept-staff",
+        "label": "Staff Portal"
+      }
+    ]
+  },
+  {
+    "name": "dashboard-ambassador",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Ambassadors Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 9,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "AMBASSADOR\nQA ambassador\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">A"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Download QR",
+        "width": 89,
+        "height": 20
+      }
+    ],
+    "text": "Settings\nAmbassadors Portal\nAmbassadors Portal\nAMBASSADOR\nQA ambassador\nQ\nQ\nAmbassadors Portal\nSigned in as QA ambassador · ambassador@qa.invalid\nOverview\nMy Department\nMy referrals\nLeaderboard\nReports\nDownload QR\nReferral code\n8545\nUniversity\nQA University\nGems\n0\nLeaderboard rank\n#1\nStudents referred\n0\nRecent gem activity\nNo gems yet - share your code or QR to get your first referral enrolled."
+  },
+  {
+    "name": "view-ambassador-settings",
+    "navLabel": "Settings",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "QA ambassador"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 5,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "AMBASSADOR\nQA ambassador\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">A"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nAmbassadors Portal\nSettings\nAMBASSADOR\nQA ambassador\nQ\nQ\nQA ambassador\nAmbassador · ambassador@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore"
+  },
+  {
+    "name": "view-ambassador-dept-ambassador",
+    "navLabel": "Ambassadors Portal",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Ambassadors Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 9,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "AMBASSADOR\nQA ambassador\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">A"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Download QR",
+        "width": 93,
+        "height": 17
+      }
+    ],
+    "text": "Settings\nAmbassadors Portal\nAmbassadors Portal\nAMBASSADOR\nQA ambassador\nQ\nQ\nAmbassadors Portal\nSigned in as QA ambassador · ambassador@qa.invalid\nOverview\nMy Department\nMy referrals\nLeaderboard\nReports\nDownload QR\nReferral code\n8545\nUniversity\nQA University\nGems\n0\nLeaderboard rank\n#1\nStudents referred\n0\nRecent gem activity\nNo gems yet - share your code or QR to get your first referral enrolled."
+  },
+  {
+    "name": "role-errors-ambassador",
+    "errors": [],
+    "badRequests": [],
+    "nav": [
+      {
+        "view": "settings",
+        "label": "Settings"
+      },
+      {
+        "view": "dept-ambassador",
+        "label": "Ambassadors Portal"
+      }
+    ]
+  },
+  {
+    "name": "dashboard-recruiter",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Recruiter Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 3,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "RECRUITER\nQA recruiter\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">R"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nRecruiter Portal\nRecruiter Portal\nRECRUITER\nQA recruiter\nQ\nQ\nRecruiter Portal\nSigned in as QA recruiter · recruiter@qa.invalid\nYour account is being reviewed\n\nOur team verifies every recruiter before they can search EchoLens student profiles. This is usually done within one business day - we will email you at recruiter@qa.invalid as soon as a decision is made."
+  },
+  {
+    "name": "view-recruiter-settings",
+    "navLabel": "Settings",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "QA recruiter"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 5,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "RECRUITER\nQA recruiter\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">R"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nRecruiter Portal\nSettings\nRECRUITER\nQA recruiter\nQ\nQ\nQA recruiter\nRecruiter · recruiter@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore"
+  },
+  {
+    "name": "view-recruiter-recruiter",
+    "navLabel": "Recruiter Portal",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Recruiter Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 3,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "RECRUITER\nQA recruiter\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">R"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nRecruiter Portal\nRecruiter Portal\nRECRUITER\nQA recruiter\nQ\nQ\nRecruiter Portal\nSigned in as QA recruiter · recruiter@qa.invalid\nYour account is being reviewed\n\nOur team verifies every recruiter before they can search EchoLens student profiles. This is usually done within one business day - we will email you at recruiter@qa.invalid as soon as a decision is made."
+  },
+  {
+    "name": "role-errors-recruiter",
+    "errors": [],
+    "badRequests": [],
+    "nav": [
+      {
+        "view": "settings",
+        "label": "Settings"
+      },
+      {
+        "view": "recruiter",
+        "label": "Recruiter Portal"
+      }
+    ]
+  },
+  {
+    "name": "dashboard-free",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 13,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Ask about the portal",
+        "width": 138,
+        "height": 17
+      }
+    ],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nOverview\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nYOUR STAGE\nSpark\n250 gems to reach Glow\n0\nGEMS\n1\nDAY STREAK\n1\nBEST STREAK\nYou're on the free tier.\n0 open challenges · 0 solved by you. Earn gems, climb stages, share your profile. Want full courses, live classes, and teacher feedback? Ask about the portal.\nOpen challenges\nUpcoming classes\nFull schedule\nNo upcoming activities\nYou're all caught up - check back soon.\nLatest announcements\nAll\nNothing yet.\nTop learners\n1\nQA Empty Student\n🔥 1d streak · Spark\n25\n2\nQA student\n🔥 1d streak · Spark\n0\n3\nQA free\n🔥 1d streak · Spark\n0\n4\nQA Reserved Domain Learner\nSpark\n0"
+  },
+  {
+    "name": "view-free-overview",
+    "navLabel": "Overview",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 13,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Ask about the portal",
+        "width": 138,
+        "height": 17
+      }
+    ],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nOverview\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nYOUR STAGE\nSpark\n250 gems to reach Glow\n0\nGEMS\n1\nDAY STREAK\n1\nBEST STREAK\nYou're on the free tier.\n0 open challenges · 0 solved by you. Earn gems, climb stages, share your profile. Want full courses, live classes, and teacher feedback? Ask about the portal.\nOpen challenges\nUpcoming classes\nFull schedule\nNo upcoming activities\nYou're all caught up - check back soon.\nLatest announcements\nAll\nNothing yet.\nTop learners\n1\nQA Empty Student\n🔥 1d streak · Spark\n25\n2\nQA student\n🔥 1d streak · Spark\n0\n3\nQA free\n🔥 1d streak · Spark\n0\n4\nQA Reserved Domain Learner\nSpark\n0"
+  },
+  {
+    "name": "view-free-progress",
+    "navLabel": "Progress",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 10,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nProgress\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nYOUR STAGE\nSpark\n250 gems to reach Glow\n0\nGEMS\n1\nDAY STREAK\n1\nBEST STREAK\n1\nDay streak\n0\nGems\n1\nBadges\nStage journey\n0 gems earned\nSpark\n0+\nGlow\n250+\nBeam\n700+\nPrism\n1400+\nAurora\n2400+\nNova\n4000+\nProgress by course\nEnroll in a course to start tracking progress.\nBadges\nShare profile\nSpark stage"
+  },
+  {
+    "name": "view-free-leaderboard",
+    "navLabel": "Leaderboard",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 9,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nLeaderboard\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nLearners\nAll-time gems\n1\nQA Empty Student\n🔥 1d streak · Spark\n25\n2\nQA student\n🔥 1d streak · Spark\n0\n3\nQA free\n🔥 1d streak · Spark\n0\n4\nQA Reserved Domain Learner\nSpark\n0\nCourses\nGems per cohort\n1\nPython for Data Science\nQA Synthetic Cohort · EL-6159\n25\n2\nPython for Data Science\nQA No Curriculum · EL-3074\n0"
+  },
+  {
+    "name": "view-free-jobs",
+    "navLabel": "Jobs",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 9,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nJobs\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nNo jobs posted yet. Check back soon."
+  },
+  {
+    "name": "view-free-settings",
+    "navLabel": "Settings",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "QA free"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 11,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nSettings\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nQ\nQA free\nFree tier · Reg no 444322 · free@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore"
+  },
+  {
+    "name": "view-free-challenges",
+    "navLabel": "Challenges",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 9,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nChallenges\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nOpen challenges\nNo challenges yet. Check back soon."
+  },
+  {
+    "name": "view-free-hackathons",
+    "navLabel": "Hackathons",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 9,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nHackathons\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nEvents\nNo events yet. Watch this space."
+  },
+  {
+    "name": "view-free-events",
+    "navLabel": "Events",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 9,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FREE TIER\nQA free\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [],
+    "text": "LEARNING\nOverview\nProgress\nTOOLS\nLeaderboard\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nEvents\n🔥 1-day streak\n0\nFREE TIER\nQA free\nQ\nAll events\nNo events yet. Watch this space."
+  },
+  {
+    "name": "role-errors-free",
+    "errors": [],
+    "badRequests": [],
+    "nav": [
+      {
+        "view": "overview",
+        "label": "Overview"
+      },
+      {
+        "view": "progress",
+        "label": "Progress"
+      },
+      {
+        "view": "leaderboard",
+        "label": "Leaderboard"
+      },
+      {
+        "view": "jobs",
+        "label": "Jobs"
+      },
+      {
+        "view": "settings",
+        "label": "Settings"
+      },
+      {
+        "view": "challenges",
+        "label": "Challenges"
+      },
+      {
+        "view": "hackathons",
+        "label": "Hackathons"
+      },
+      {
+        "view": "events",
+        "label": "Events"
+      }
+    ]
+  }
+]

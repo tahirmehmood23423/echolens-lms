@@ -1,0 +1,61 @@
+{
+  "users": 14,
+  "enrollments": 2,
+  "open_submissions": [
+    {
+      "id": 1,
+      "user_id": 5,
+      "track_key": "bc04-webdev-kickstart",
+      "level": 1,
+      "pid": 1,
+      "code": "print(\"QA local submission\")",
+      "score": null
+    },
+    {
+      "id": 2,
+      "user_id": 5,
+      "track_key": "cs105-javascript",
+      "level": 1,
+      "pid": 1,
+      "code": "console.log(\"QA RETRY DRAFT\");",
+      "score": null
+    }
+  ],
+  "quest_submissions": [
+    {
+      "id": 1,
+      "grade": 80,
+      "gems": 26,
+      "remarks": "QA reviewed feedback"
+    }
+  ],
+  "registrations": [
+    {
+      "id": 1,
+      "course_code": "SC-01",
+      "payment_stage": "enrolled",
+      "enrolled_user_id": 14
+    },
+    {
+      "id": 2,
+      "course_code": "SC-01",
+      "payment_stage": "new",
+      "enrolled_user_id": null
+    },
+    {
+      "id": 3,
+      "course_code": "DOES-NOT-EXI",
+      "payment_stage": "new",
+      "enrolled_user_id": null
+    }
+  ],
+  "certificates": [
+    {
+      "id": 1,
+      "title": "QA NONMEMBER CERTIFICATE — LOCAL ONLY",
+      "serial": "EL-2026-FDCAF6B8",
+      "batch_id": 1,
+      "user_id": 12
+    }
+  ]
+}

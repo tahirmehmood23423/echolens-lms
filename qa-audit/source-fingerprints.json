@@ -1,0 +1,46 @@
+[
+  {
+    "file": "server.js",
+    "sha256": "02f6ac9501f1535c4d526b24e6b9b73c8fc697b51f1e371347efbab286f55a46"
+  },
+  {
+    "file": "store.js",
+    "sha256": "b1ea22e750ad2aab9182be9503dcbf4f84bff72dd767c67867c22c0e170a5c65"
+  },
+  {
+    "file": "public/js/open.js",
+    "sha256": "7ce4ee9475a5cc027fa24ae4bef40bce7b9e707321097a9364923c08faea30d0"
+  },
+  {
+    "file": "public/js/dashboard.js",
+    "sha256": "08490d513d31662fd0e3ef3425b14d2eec4039ea99ef3f84d5fd80b23c94f612"
+  },
+  {
+    "file": "public/js/login.js",
+    "sha256": "59cd74205f59cd2e9d0c48a4b4d170f00cf328557df4eafa2e1c2b9359adff77"
+  },
+  {
+    "file": "public/landing.html",
+    "sha256": "dff93ef2fb8907aaa976c38bd517693b077828c85f90866711bc42f4ae930efc"
+  },
+  {
+    "file": "public/compiler.html",
+    "sha256": "80200b54a076c89db2ca4c40122bc4d453aafb1477e6d710e3ef06cbfb20942e"
+  },
+  {
+    "file": "talent.js",
+    "sha256": "7fff0946954e2a943e81bcface8f664b7058ffd3657af02dee4f4d5c05734556"
+  },
+  {
+    "file": "talent-hiring.js",
+    "sha256": "88830cc72fa5c5068a4dcf6ae7a7322454feff2b3cf5a4621a0b73be0a854602"
+  },
+  {
+    "file": "showcase.js",
+    "sha256": "88263887d090a54b6cf7a2813a0ca9859b0a05b7fcd8c271b003ca9ed7b6a5de"
+  },
+  {
+    "file": "contract-pdf.js",
+    "sha256": "29b9298cec260fe0ea37870798cd04a9ffa3a4f05a31d0b3d30f755a7827fde7"
+  }
+]

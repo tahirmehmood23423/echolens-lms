@@ -1,0 +1,40 @@
+[
+  {
+    "id": "BUNDLE-PRICE",
+    "expected": "Advertised PKR 43,500 bundle produces correctly priced challan",
+    "actual": {
+      "registration": 200,
+      "challan": 200,
+      "gross": 0,
+      "net": 0
+    },
+    "status": "FAIL",
+    "scope": "local API"
+  },
+  {
+    "id": "BUNDLE-ENROLL",
+    "expected": "Bundle registration offers its component batches and can complete enrollment",
+    "actual": {
+      "availableBatches": [],
+      "clear": 200,
+      "enroll": 400,
+      "error": "Choose a valid batch for this course."
+    },
+    "status": "FAIL",
+    "scope": "local simulated clearance; no payment or email"
+  },
+  {
+    "id": "PASS-RULE-CONFLICT",
+    "expected": "An account with a failed task has a consistent completion result across UI and certificate eligibility",
+    "actual": {
+      "total": 15,
+      "graded": 15,
+      "average": 93,
+      "backendPassed": true,
+      "failedTaskScore": 0,
+      "frontendSourceRule": "open.js:1109-1120 requires each task score >= pass mark"
+    },
+    "status": "FAIL",
+    "scope": "isolated business-rule reproduction + source comparison; no certificate issued"
+  }
+]

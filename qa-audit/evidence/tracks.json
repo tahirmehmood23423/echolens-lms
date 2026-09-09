@@ -1,0 +1,422 @@
+[
+  {
+    "key": "python-6w",
+    "title": "Python for Data Science",
+    "description": "Python for Data Science is the most in-demand entry point into a data career, and this live, hands-on course takes you from zero Python to real data analysis in six weeks. You will learn Python programming, pandas, NumPy, and data visualisation, then clean and analyse real datasets exactly the way a working data analyst does. Built for students and early-career professionals in Pakistan who want practical, job-ready data science skills, not slides.",
+    "levels": 12,
+    "course_code": "SC-01",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "code-ai"
+  },
+  {
+    "key": "bc01-automation",
+    "title": "AI Automation with n8n & Make.com",
+    "description": "Week 1 builds the workflow muscle. Week 2 adds the AI layer clients actually pay for in 2026 - ending with a sellable, client-ready automation.",
+    "levels": 8,
+    "course_code": "BC-01",
+    "total_points": 2320,
+    "free": false,
+    "submission_mode": "doc"
+  },
+  {
+    "key": "bc02-prompting",
+    "title": "Prompt Engineering & ChatGPT/Claude Mastery",
+    "description": "No theory to memorise - only prompts to write, run and sharpen in the built-in Prompt Lab. Week 1 builds control over a single prompt; Week 2 turns prompts into systems and sellable products.",
+    "levels": 8,
+    "course_code": "BC-02",
+    "total_points": 2320,
+    "free": false,
+    "submission_mode": "prompt"
+  },
+  {
+    "key": "bc03-everyday-ai",
+    "title": "Everyday AI: Smarter Study, Work & Content",
+    "description": "Everyday AI is a free two-week bootcamp that teaches you to use ChatGPT, Claude, and Gemini to study smarter, work faster, and create better content. No coding, no jargon - just practical AI skills you will use the same day, from summarising a textbook chapter to writing emails and planning your week. Open to everyone in Pakistan who wants to stop watching AI from the sidelines and start actually using it.",
+    "levels": 4,
+    "course_code": "BC-03",
+    "total_points": 1120,
+    "free": true,
+    "submission_mode": "prompt"
+  },
+  {
+    "key": "sc02-genai",
+    "title": "Generative AI Essentials",
+    "description": "Generative AI Essentials is the engineering track for building real retrieval systems, not just calling an API. Starting from how LLMs process tokens, context and decoding, you will chunk and embed real documents, build a grounded RAG pipeline in LangChain's LCEL, and level it up through hybrid dense-sparse search, cross-encoder reranking, GraphRAG and agentic retrieval with LangGraph. You will learn when to fine-tune with LoRA or QLoRA instead of retrieving, evaluate a RAG system with RAGAS and LangSmith, and finish by serving a secure, cost-aware system in production. Built for Python developers in Pakistan with a machine learning background who want deep, current GenAI engineering skills and a serious portfolio project - no prior LLM, LangChain or RAG experience assumed.",
+    "levels": 12,
+    "course_code": "SC-02",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "code-ai"
+  },
+  {
+    "key": "sc03-sql-powerbi",
+    "title": "Data Analytics with SQL and Power BI",
+    "description": "Data Analytics with SQL and Power BI is the fastest route into a high-demand analyst role. Over six live, practical weeks you will learn SQL from scratch, write real analytical queries, and build interactive Power BI dashboards that businesses actually use. Built for students and professionals in Pakistan who want job-ready data analytics skills, hands-on with real datasets, not theory.",
+    "levels": 12,
+    "course_code": "SC-03",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "code-ai"
+  },
+  {
+    "key": "sc04-intro-ml",
+    "title": "Introduction to Machine Learning",
+    "description": "Introduction to Machine Learning takes you from your first model to honest, working predictions in six live weeks. You will learn regression, classification, feature engineering, cross validation, and how to evaluate a model without fooling yourself, all hands-on with scikit-learn and real datasets. Built for students and Python users in Pakistan who want practical, job-ready machine learning skills and a model they can actually defend in an interview.",
+    "levels": 12,
+    "course_code": "SC-04",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "code-ai"
+  },
+  {
+    "key": "sc05-ai-tools",
+    "title": "AI Automation Tools Track",
+    "description": "The AI Automation Tools Track teaches you to automate real business work with Make.com, n8n, and AI agents. Over six live, practical weeks you will connect the apps companies actually run on, add AI steps that classify, extract, and write, then build agents with memory and tools. Made for professionals and freelancers in Pakistan who want in-demand no-code automation skills and client-ready workflows they can sell.",
+    "levels": 12,
+    "course_code": "SC-05",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "multi"
+  },
+  {
+    "key": "st01-wordpress",
+    "title": "WordPress Development",
+    "description": "2-month quest: from local install to a client-ready website delivery.",
+    "levels": 5,
+    "course_code": "ST-01",
+    "total_points": 970,
+    "free": false,
+    "submission_mode": "file"
+  },
+  {
+    "key": "st02-graphic-design",
+    "title": "Graphic Designing",
+    "description": "Graphic Designing is a complete, career ready design course that takes you from the fundamentals to a professional brand identity portfolio in six weeks. You will master typography, layout, logo and brand design, vector and photo tools, print production, social and marketing design, motion basics, and current AI design tools like Firefly and Figma AI. Built for aspiring designers and freelancers in Pakistan who want in demand graphic design skills and client ready work that actually pays.",
+    "levels": 12,
+    "course_code": "ST-02",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "multi"
+  },
+  {
+    "key": "st03-uiux",
+    "title": "UI/UX Designing",
+    "description": "UI/UX Designing is one of the highest paid, most in demand tech skills, and this six week live course takes you from user research to a hireable product design portfolio. You will master Figma and its 2026 AI features, design systems, wireframing, prototyping, usability testing, accessibility, and developer handoff, then ship a complete, outcome driven case study. Built for aspiring product designers in Pakistan who want practical, portfolio ready UI and UX skills that lead to real freelance and job outcomes.",
+    "levels": 12,
+    "course_code": "ST-03",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "multi"
+  },
+  {
+    "key": "st04-data-analytics",
+    "title": "Data Analytics Specialist Track",
+    "description": "2-month quest: the full analyst workflow - Python, SQL, statistics, and executive storytelling.",
+    "levels": 5,
+    "course_code": "ST-04",
+    "total_points": 1060,
+    "free": false,
+    "submission_mode": "code"
+  },
+  {
+    "key": "st05-genai-eng",
+    "title": "Generative AI Engineering",
+    "description": "2-month quest: engineering real LLM applications - RAG, evaluation, and production thinking.",
+    "levels": 5,
+    "course_code": "ST-05",
+    "total_points": 1140,
+    "free": false,
+    "submission_mode": "code"
+  },
+  {
+    "key": "st06-ai-agents",
+    "title": "AI Agents & Automation Engineering",
+    "description": "2-month quest: from tool-calling basics to multi-step autonomous agents with guardrails.",
+    "levels": 5,
+    "course_code": "ST-06",
+    "total_points": 1150,
+    "free": false,
+    "submission_mode": "file"
+  },
+  {
+    "key": "st07-ml-fundamentals",
+    "title": "Machine Learning Fundamentals",
+    "description": "2-month quest: the complete classical ML toolkit with mathematical intuition and rigorous practice.",
+    "levels": 5,
+    "course_code": "ST-07",
+    "total_points": 1160,
+    "free": false,
+    "submission_mode": "code"
+  },
+  {
+    "key": "st08-pytorch-dl",
+    "title": "Deep Learning with PyTorch",
+    "description": "2-month quest: tensors to trained networks - vision, transfer learning, and a deployed model.",
+    "levels": 5,
+    "course_code": "ST-08",
+    "total_points": 1160,
+    "free": false,
+    "submission_mode": "code"
+  },
+  {
+    "key": "bc04-webdev-kickstart",
+    "title": "Web Dev Kickstart: HTML, CSS & JavaScript",
+    "description": "Web Dev Kickstart is a free two-week bootcamp that takes you from never having written code to building and sharing your own live web page. You will learn HTML, CSS, and JavaScript hands-on in the browser, building real things from the first class - a landing page, a responsive layout, a dark mode toggle, and a working to-do app. Perfect for absolute beginners in Pakistan who want to find out whether web development is for them.",
+    "levels": 4,
+    "course_code": "BC-04",
+    "total_points": 1120,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "bc05-ai-coding",
+    "title": "AI-Assisted Coding with Cursor, Claude & Copilot",
+    "description": "The three modes every AI coding tool now has - tab, chat, and agent - with one rule over everything: review every line and own the code. Week 1 is the AI coding workflow; Week 2 builds real things fast.",
+    "levels": 8,
+    "course_code": "BC-05",
+    "total_points": 2320,
+    "free": false,
+    "submission_mode": "code-ai"
+  },
+  {
+    "key": "bc06-git-freelance",
+    "title": "Git, GitHub & Freelance Profile Launch",
+    "description": "Git, GitHub and Freelance Profile Launch is a free two-week bootcamp that gets you set up as a working professional. You will learn Git and GitHub properly, publish your first project live, and build optimised Upwork, Fiverr, and LinkedIn profiles that clients actually respond to. Built for students and new freelancers in Pakistan who have the skills but no visible proof - and want a real portfolio and a live profile by the end of two weeks.",
+    "levels": 4,
+    "course_code": "BC-06",
+    "total_points": 1120,
+    "free": true,
+    "submission_mode": "multi"
+  },
+  {
+    "key": "bc07-excel-ai",
+    "title": "Excel + AI for Office Professionals",
+    "description": "Written for people who do not code and never want to. Week 1 is the Excel that saves hours; Week 2 puts AI beside Excel so you never memorise a formula again.",
+    "levels": 8,
+    "course_code": "BC-07",
+    "total_points": 2320,
+    "free": false,
+    "submission_mode": "excel-ai"
+  },
+  {
+    "key": "bc08-canva-ai",
+    "title": "Canva & AI Content Creation",
+    "description": "A make-things-every-class course. Week 1 builds real Canva skill on a sample brand; Week 2 brings in Canva's AI tools so a week of content takes an hour, not a weekend.",
+    "levels": 8,
+    "course_code": "BC-08",
+    "total_points": 2320,
+    "free": false,
+    "submission_mode": "multi"
+  },
+  {
+    "key": "sc06-frontend",
+    "title": "Frontend Web Development",
+    "description": "Frontend Web Development is the most beginner-friendly path into tech, and this six-week live course takes you from HTML and CSS to responsive, interactive, deployed websites. You will learn HTML5, modern CSS, Flexbox and Grid, JavaScript, APIs, and how to publish a real site, then ship your own portfolio. Made for beginners and career changers in Pakistan who want practical, in-demand web development skills and freelance-ready work.",
+    "levels": 12,
+    "course_code": "SC-06",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "code-ai"
+  },
+  {
+    "key": "sc07-js-deep",
+    "title": "JavaScript Deep Dive plus DOM and APIs",
+    "description": "JavaScript Deep Dive is the course that turns a beginner into a real JavaScript developer, ready for React. Over six live, hands-on weeks you will master modern JavaScript, closures, async and await, the DOM, and working with REST APIs, building interactive, data-driven apps from scratch. Ideal for aspiring frontend and full-stack developers in Pakistan who want deep, practical JavaScript skills that lead straight into React and Next.js.",
+    "levels": 12,
+    "course_code": "SC-07",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "code-ai"
+  },
+  {
+    "key": "sc08-marketing-seo",
+    "title": "Digital Marketing and SEO Fundamentals",
+    "description": "Digital Marketing and SEO Fundamentals teaches you to grow a brand and win customers with the channels that work in 2026. In six live weeks you will learn SEO and keyword research, content and social media marketing, Meta and Google Ads, email funnels, and how to rank in the new era of AI search results. Perfect for students, business owners, and aspiring marketers in Pakistan who want practical, campaign-ready digital marketing skills.",
+    "levels": 12,
+    "course_code": "SC-08",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "multi"
+  },
+  {
+    "key": "sc09-freelancing",
+    "title": "Freelancing and Client Acquisition Mastery",
+    "description": "Freelancing and Client Acquisition Mastery turns the skills you already have into paid work. Over six live weeks you will learn how to position and price your services, build a portfolio that wins, find clients on Upwork, Fiverr, and LinkedIn, write proposals that get replies, run discovery calls, and close deals safely with contracts. Built for freelancers and students in Pakistan who want a real client pipeline and dollar-earning work, not vague advice.",
+    "levels": 12,
+    "course_code": "SC-09",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "doc"
+  },
+  {
+    "key": "sc10-graphic-basics",
+    "title": "Graphic Design Basics",
+    "description": "Graphic Design Basics teaches you to design with confidence, from colour and typography to a complete brand identity. Over six live weeks you will master design principles, Canva and Figma, social media graphics, marketing collateral, and AI design tools, finishing with a portfolio-ready brand project. Made for beginners and creators in Pakistan who want practical, freelance-ready graphic design skills that clients will pay for.",
+    "levels": 12,
+    "course_code": "SC-10",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "multi"
+  },
+  {
+    "key": "sc11-content-ai",
+    "title": "Content Writing with AI",
+    "description": "Content Writing with AI teaches you to write content that ranks, converts, and sounds human, using AI as a drafting partner rather than a replacement. Over six live weeks you will learn blog and copywriting structure, brand voice, SEO writing, writing for AI search, and how to edit AI drafts so they never sound generic. Ideal for writers, students, and freelancers in Pakistan who want practical, client-ready content writing skills.",
+    "levels": 12,
+    "course_code": "SC-11",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "doc"
+  },
+  {
+    "key": "st09-fullstack-js",
+    "title": "Full-Stack JavaScript: React, Node & PostgreSQL",
+    "description": "8-week flagship quest: build and deploy a complete production web application.",
+    "levels": 8,
+    "course_code": "ST-09",
+    "total_points": 1590,
+    "free": false,
+    "submission_mode": "code"
+  },
+  {
+    "key": "st10-react-next",
+    "title": "React + Next.js Frontend Specialist",
+    "description": "8-week quest: component architecture, state management and server-side rendering.",
+    "levels": 8,
+    "course_code": "ST-10",
+    "total_points": 1620,
+    "free": false,
+    "submission_mode": "code"
+  },
+  {
+    "key": "st11-flutter",
+    "title": "Mobile Apps with Flutter",
+    "description": "8-week quest: one codebase, two app stores - build and publish real Android & iOS apps.",
+    "levels": 8,
+    "course_code": "ST-11",
+    "total_points": 1520,
+    "free": false,
+    "submission_mode": "file"
+  },
+  {
+    "key": "st12-video-editing",
+    "title": "Video Editing",
+    "description": "8-week quest: professional editing workflows, pacing and delivery for client work.",
+    "levels": 8,
+    "course_code": "ST-12",
+    "total_points": 1380,
+    "free": false,
+    "submission_mode": "file"
+  },
+  {
+    "key": "fc01-c-basics",
+    "title": "CS-101: Fundamentals of C",
+    "description": "Absolute beginner to hardware-level understanding - the classic foundation language behind operating systems, databases, and almost every other language you will ever use. Five modules, sixteen topics, one real-life analogy and one scenario-based Compiler Quest each - from how a compiler turns source into machine code, through memory, operators and branching, to loops and modular functions - certificate at the end.",
+    "levels": 16,
+    "course_code": "FC-01",
+    "total_points": 590,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "fc02-cpp-objects",
+    "title": "CS-102: Fundamentals of C++ (with Object-Oriented Programming)",
+    "description": "Modern C++ from streams to objects - stronger type safety, namespaces, references, the STL, and encapsulated classes with constructors and destructors. Four modules, twelve topics, one real-life analogy, one video and one scenario-based Compiler Quest each - certificate at the end.",
+    "levels": 12,
+    "course_code": "FC-02",
+    "total_points": 460,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "cs104-python",
+    "title": "CS-104: Fundamentals of Python",
+    "description": "Absolute beginner to working Python - the highest-demand first language, from the bytecode interpreter and dynamic typing through strings, control flow and core data structures to functions, classes and safe file I/O. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each, every quest with an exact Sample Input and Expected Output - certificate at the end.",
+    "levels": 15,
+    "course_code": "CS-104",
+    "total_points": 580,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "cs105-javascript",
+    "title": "CS-105: Fundamentals of JavaScript",
+    "description": "The language of the browser and the server. From the JavaScript engine and console.log() through scoping, type coercion, arrays and objects to closures, currying and asynchronous code with Promises, async/await and the Fetch API. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each, every quest with an exact Sample Input and Expected Output - certificate at the end.",
+    "levels": 15,
+    "course_code": "CS-105",
+    "total_points": 570,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "cs106-html-css",
+    "title": "CS-106: Fundamentals of HTML & CSS",
+    "description": "Core front-end foundations - build accessible, standards-compliant web pages from scratch: HTML document structure, semantic markup, tables and forms, then CSS selectors, the box model, display and positioning, Flexbox and Grid, and mobile-first responsive design with motion. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each, every quest with an exact Sample Input and Expected Output - certificate at the end.",
+    "levels": 15,
+    "course_code": "CS-106",
+    "total_points": 540,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "3d01-modeling",
+    "title": "3D Modeling, Rendering and Introductory Animation",
+    "description": "3D Modeling, Rendering and Introductory Animation teaches you to create professional 3D visuals in Blender, the free industry standard tool. Over six live weeks you will model, texture, light, render, and animate, building a portfolio ready 3D scene from scratch with no expensive software required. Perfect for aspiring 3D artists, product designers, and animators in Pakistan who want practical, in demand 3D skills and a reel piece that wins freelance work.",
+    "levels": 12,
+    "course_code": "3D-01",
+    "total_points": 3360,
+    "free": false,
+    "submission_mode": "multi"
+  },
+  {
+    "key": "c-advanced",
+    "title": "Advanced C Programming",
+    "description": "Advanced C Programming - Systems & Memory Control: systems-level C beyond the fundamentals - pointers and memory addressing, dynamic heap allocation, structs and bitwise hardware control, through to file persistence and function-pointer dispatch. Four modules, twelve topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "levels": 12,
+    "course_code": "CS1-ADV",
+    "total_points": 460,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "cpp-advanced",
+    "title": "Advanced C++ Programming",
+    "description": "Advanced C++ (OOP & Architecture): systems-level object-oriented design - inheritance, virtual dispatch and abstract interfaces, operator overloading and copy control, templates and generic programming, through to smart pointers and move semantics. Four modules, twelve topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "levels": 12,
+    "course_code": "CPP2-ADV",
+    "total_points": 460,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "python-advanced",
+    "title": "Advanced Python Programming",
+    "description": "Advanced Python (Core Language Internals): the Python data model beyond the fundamentals - the iterator protocol and lazy generators, closures and decorators, dunder methods, descriptors and metaclasses, context managers and the memory model, through to threading, multiprocessing and asyncio concurrency. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "levels": 15,
+    "course_code": "PY3-ADV",
+    "total_points": 590,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "js-advanced",
+    "title": "Advanced JavaScript Programming",
+    "description": "Advanced JavaScript (Production Architecture): the language internals behind frameworks - prototypal inheritance and true private fields, Proxies, Reflect and well-known Symbols, the microtask/macrotask event loop and weak-reference memory management, through to Promise combinators, async generators, custom event systems and Web Worker concurrency with SharedArrayBuffer. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "levels": 15,
+    "course_code": "JS4-ADV",
+    "total_points": 600,
+    "free": true,
+    "submission_mode": "code"
+  },
+  {
+    "key": "web-advanced",
+    "title": "Advanced CSS and Web Development",
+    "description": "Advanced CSS and Web Development (Production Front-End): functional and combinator selectors and CSS architecture, Flexbox and Grid mastery with subgrid, container queries and fluid design, motion and 3D effects, Sass and Tailwind, build tooling, then accessibility, performance and SEO, through to Git-based deployment. Five modules, fifteen topics, one real-life analogy, one video and one scenario-based Compiler Quest each.",
+    "levels": 15,
+    "course_code": "WEB5-ADV",
+    "total_points": 600,
+    "free": true,
+    "submission_mode": "code"
+  }
+]

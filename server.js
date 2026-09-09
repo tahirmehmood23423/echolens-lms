@@ -33,7 +33,7 @@ const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue, catalogueFee,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
-  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Feedback,
+  Events, Leads, Suppressions, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Feedback,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
@@ -509,6 +509,14 @@ function systemHealth() {
   let storageOk = true; try { fs.accessSync(UPLOAD_DIR, fs.constants.R_OK | fs.constants.W_OK); } catch { storageOk = false; }
   checks.push({ name: 'Storage', ok: storageOk, detail: storageOk ? 'Uploads folder writable' : 'Uploads folder not writable' });
   checks.push({ name: 'Email Service', ok: mailer.configured, detail: mailer.configured ? 'SMTP configured' : 'SMTP not configured - emails are logged only' });
+  const mailStatus = mailer.status();
+  checks.push({
+    name: 'Bulk Mail (outreach)',
+    ok: mailStatus.bulk.configured || mailStatus.bulk.dryRun,
+    detail: mailStatus.bulk.dryRun
+      ? `DRY RUN - blasts are logged, not sent (MAIL_DRY_RUN). Provider: ${mailStatus.bulk.provider || 'none'}${mailStatus.bulk.configured ? ', configured' : ', NOT configured'}`
+      : (mailStatus.bulk.configured ? `Live via ${mailStatus.bulk.provider}` : `Provider ${mailStatus.bulk.provider || 'none'} NOT configured - blasts will refuse`),
+  });
   let backupOk = false, backupDetail = 'No backups yet', lastBackup = null;
   if (db.enabled()) {
     // Postgres mode: the real backup is the scheduled pg_dump GitHub Action
@@ -1673,7 +1681,19 @@ app.post('/api/admin/announcements', authRequired, adminRequired, (req, res) => 
   const { title, body } = req.body || {};
   if (!title || !body) return res.status(400).json({ error: 'A title and message are required.' });
   const a = Announcements.create({ batch_id: null, title, body }, req.user.id);
-  mailer.sendAnnouncement(announcementRecipients(null), title, body).catch(() => {});
+  // A site-wide announcement reaches every user - that is a bulk send, so it
+  // goes through the ESP (DRY by default), not the mailbox. A single batch's
+  // announcement (the route above) stays on the transactional path.
+  const emails = announcementRecipients(null).map((r) => r.email).filter(Boolean);
+  if (emails.length) {
+    Suppressions.load()
+      .then((suppressed) => mailer.sendBulk(emails, `EchoLens: ${title}`, `${body}\n\n- EchoLens`, {
+        label: `admin-announcement ${a.id}`,
+        isSuppressed: (em) => suppressed.has(em),
+        onReject: ({ email, code, reason }) => Suppressions.add({ email, code, reason, source: 'admin-announcement' }).catch(() => {}),
+      }))
+      .catch((e) => console.error('[admin-announcement] bulk send failed:', e.message));
+  }
   res.json({ ok: true, announcement: a });
 });
 
@@ -3241,6 +3261,15 @@ app.post('/api/admin/event-submissions/:id/score', authRequired, adminRequired, 
 
 /* ------------------------------ leads & email ------------------------------ */
 app.get('/api/admin/leads', authRequired, adminRequired, (req, res) => res.json({ leads: Leads.all() }));
+// Email suppression list: addresses that hard-bounced or were rejected by
+// the ESP on a past blast and are skipped on every future send. An admin can
+// review it and, rarely, un-suppress an address they know is now valid.
+app.get('/api/admin/suppressions', authRequired, adminRequired, (req, res) => res.json({ suppressions: Suppressions.all() }));
+app.delete('/api/admin/suppressions/:email', authRequired, adminRequired, async (req, res) => {
+  const removed = await Suppressions.remove(req.params.email);
+  AuditLog.record({ actor_id: req.user.id, action: 'suppression_remove', target_type: 'email', detail: req.params.email });
+  res.json({ ok: true, removed });
+});
 app.get('/api/admin/leads.csv', authRequired, adminRequired, (req, res) => {
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="echolens-leads-${new Date().toISOString().slice(0, 10)}.csv"`);
@@ -3316,28 +3345,50 @@ app.post('/api/admin/email-blast', authRequired, adminRequired, upload.array('fi
     const registrationUrl = /^https?:\/\//i.test(KEY_LINKS.registration) ? KEY_LINKS.registration : `${APP_URL}${KEY_LINKS.registration}`;
     text += `\n\nRegister directly here: ${registrationUrl}`;
   }
-  // Sending (esp. a large blast) is throttled and can take a while - the
-  // response below doesn't wait for it, same as before. Once it settles,
-  // any address that came back with a confirmed-permanent (5xx) failure is
-  // a dead mailbox, not just a rate-limited one - drop it from the leads
-  // database so future blasts don't keep re-sending to it. A merely
-  // rate-limited/temporary failure is left untouched.
-  mailer.notify(emails, String(subject).slice(0, 200), text, attachments.length ? attachments : undefined)
+  // A blast is outreach: it goes through the BULK provider (ESP HTTP API),
+  // never the personal SMTP mailbox. It is DRY by default (MAIL_DRY_RUN) -
+  // it logs the recipients and counts and sends nothing until an operator
+  // sets MAIL_DRY_RUN=false. mailer.sendBulk paces it, and its circuit
+  // breaker aborts the ENTIRE run the instant the ESP signals abuse / quota
+  // / a sender block, or after too many consecutive failures - a failing run
+  // must stop, not grind through the rest of the list.
+  //
+  // The response below doesn't wait for the send. Once it settles, every
+  // address the ESP permanently rejected is added to the suppression list
+  // (Suppressions.add, also called live via onReject) and skipped on every
+  // future blast. The lead row itself is kept - a bounce is not a reason to
+  // silently delete contact data.
+  Suppressions.load()
+    .then((suppressed) => mailer.sendBulk(emails, String(subject).slice(0, 200), text, {
+      label: `email-blast ${audience}`,
+      attachments: attachments.length ? attachments : undefined,
+      isSuppressed: (em) => suppressed.has(em),
+      onReject: ({ email, code, reason }) => Suppressions.add({ email, code, reason, source: `blast:${audience}` }).catch(() => {}),
+    }))
     .then((result) => {
-      console.log(`[email-blast] ${audience}: ${result.sent.length} delivered, ${result.tempFail.length} deferred (retry later), ${result.permanentFail.length} rejected, of ${emails.length}`);
-      AuditLog.record({ actor_id: req.user.id, action: 'email_blast_done', target_type: 'email_blast', detail: `${audience}: ${result.sent.length}/${emails.length} delivered, ${result.tempFail.length} deferred, ${result.permanentFail.length} rejected`, deferSave: true });
-      if (result.permanentFail.length) {
-        for (const bad of result.permanentFail) Leads.removeByEmail(bad, true);
-        AuditLog.record({ actor_id: req.user.id, action: 'lead_remove_bounced', target_type: 'lead', detail: `Removed ${result.permanentFail.length} permanently-invalid address(es) after blast: ${result.permanentFail.slice(0, 50).join(', ')}`, deferSave: true });
+      if (result.dryRun) {
+        console.log(`[email-blast] ${audience}: DRY RUN - ${result.requested} requested, ${result.suppressed.length} suppressed, 0 sent (MAIL_DRY_RUN)`);
+        AuditLog.record({ actor_id: req.user.id, action: 'email_blast_dryrun', target_type: 'email_blast', detail: `${audience}: DRY RUN, ${result.requested} would-be recipients, ${result.suppressed.length} suppressed`, deferSave: true });
+        store.persist();
+        return;
       }
+      const abortNote = result.aborted ? ` - ABORTED: ${result.abortReason}` : '';
+      console.log(`[email-blast] ${audience} via ${result.provider}: ${result.sent.length} sent, ${result.tempFail.length} deferred, ${result.permanentFail.length} rejected, ${result.suppressed.length} pre-suppressed, of ${result.requested}${abortNote}`);
+      AuditLog.record({
+        actor_id: req.user.id,
+        action: result.aborted ? 'email_blast_aborted' : 'email_blast_done',
+        target_type: 'email_blast',
+        detail: `${audience} via ${result.provider}: ${result.sent.length}/${result.requested} sent, ${result.tempFail.length} deferred, ${result.permanentFail.length} rejected, ${result.suppressed.length} suppressed${abortNote}`,
+        deferSave: true,
+      });
+      for (const bad of result.permanentFail) Suppressions.add({ email: bad, reason: 'hard bounce during blast', source: `blast:${audience}` }).catch(() => {});
       store.persist();
     })
-    .catch((e) => console.error('[email-blast] post-send cleanup failed:', e.message));
+    .catch((e) => console.error('[email-blast] send failed:', e.message));
   AuditLog.record({ actor_id: req.user.id, action: 'email_blast', target_type: 'email_blast', detail: `${audience} (${emails.length})${attachments.length ? ` +${attachments.length} attachment(s)` : ''} - ${subject}` });
-  // `queued`, not `sent`: notify() runs in the background in paced batches and
-  // can take many minutes for a big list. The real per-address outcome lands
-  // in the audit log (email_blast_done) once it finishes.
-  res.json({ ok: true, queued: emails.length, sent: emails.length, smtp: mailer.configured, attachments: attachments.length });
+  // `queued`, not `sent`: sendBulk runs in the background in paced batches.
+  // The real outcome lands in the audit log once it finishes.
+  res.json({ ok: true, queued: emails.length, dry_run: mailer.bulkDryRun, provider: mailer.status().bulk.provider, attachments: attachments.length });
 });
 
 /* -------------------------------- analytics -------------------------------- */
@@ -3535,7 +3586,18 @@ app.post('/api/admin/public-announcements', authRequired, adminRequired, (req, r
   const a = PublicAnnouncements.create(b, req.user.id);
   if (['portal', 'open', 'all'].includes(b.notify)) {
     const emails = Leads.emailsFor(b.notify);
-    if (emails.length) mailer.notify(emails, `EchoLens announcement: ${a.title}`, `${a.body}${a.link ? `\n\n${a.link_label || 'More details'}: ${a.link}` : ''}\n\nSee all announcements: ${APP_URL}/open`);
+    // An announcement to a whole audience is outreach - route it through the
+    // bulk provider (ESP), never the personal mailbox. DRY by default.
+    if (emails.length) {
+      const text = `${a.body}${a.link ? `\n\n${a.link_label || 'More details'}: ${a.link}` : ''}\n\nSee all announcements: ${APP_URL}/open`;
+      Suppressions.load()
+        .then((suppressed) => mailer.sendBulk(emails, `EchoLens announcement: ${a.title}`, text, {
+          label: `public-announcement ${a.id}`,
+          isSuppressed: (em) => suppressed.has(em),
+          onReject: ({ email, code, reason }) => Suppressions.add({ email, code, reason, source: 'public-announcement' }).catch(() => {}),
+        }))
+        .catch((e) => console.error('[public-announcement] bulk send failed:', e.message));
+    }
   }
   res.json({ ok: true, announcement: a });
 });
@@ -4174,8 +4236,16 @@ app.get('/sitemap.xml', async (req, res) => {
   let profileUrls = '';
   if (db.enabled()) {
     try {
-      const { rows } = await db.query('SELECT handle, updated_at FROM talent_profiles WHERE published = true');
-      profileUrls = rows.map((r) => `  <url>\n    <loc>${APP_URL}/talent/${r.handle}</loc>\n    <lastmod>${new Date(r.updated_at).toISOString().slice(0, 10)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>`).join('\n');
+      // The talent marketplace migration (0003_talent_profiles.sql) has not
+      // necessarily been run yet - migrations are manual (`npm run migrate`),
+      // not applied on boot. Querying a missing table throws on every
+      // /sitemap.xml hit, so check it exists first and skip cleanly until the
+      // migration lands.
+      const { rows: [{ present }] } = await db.query("SELECT to_regclass('public.talent_profiles') IS NOT NULL AS present");
+      if (present) {
+        const { rows } = await db.query('SELECT handle, updated_at FROM talent_profiles WHERE published = true');
+        profileUrls = rows.map((r) => `  <url>\n    <loc>${APP_URL}/talent/${r.handle}</loc>\n    <lastmod>${new Date(r.updated_at).toISOString().slice(0, 10)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>`).join('\n');
+      }
     } catch (e) { console.error('[sitemap] could not list published talent profiles:', e.message); }
   }
   const xml = profileUrls ? base.replace('</urlset>', profileUrls + '\n</urlset>') : base;

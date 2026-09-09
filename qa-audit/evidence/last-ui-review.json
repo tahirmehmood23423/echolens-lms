@@ -1,0 +1,304 @@
+[
+  {
+    "name": "populated-student_coordinator",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Admissions Office Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 17,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "ADMISSIONS OFFICE\nQA student_coordinator\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">A"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nAdmissions Office\nAdmissions Office Portal\nADMISSIONS OFFICE\nQA student_coordinator\nQ\nQ\nAdmissions Office Portal\nSigned in as QA student_coordinator · student_coordinator@qa.invalid\nRegistrations & challans\nDiscount categories\nBank details\nStudent queries\nInstructors\nAmbassador reports\nEvery registration from the website lands here (you are also emailed at admissions@qa.invalid). Generate the fee challan, review it, and mail it to the student - they pay and send proof to finance@qa.invalid. Once Finance confirms the payment, the student appears in your Ready to enroll folder, where you place them in the right batch.\nNew enrollments (2)\nChallan generated\nChallan mailed - with Finance\nReady to enroll (1)\nEnrolled (1)\n+ Add registration manually\nQA Registration · qa-badcourse-20260909@example.com · 03001234567\nDOES-NOT-EXI  New\nGenerate challan\nQA Registration · qa-admission-20260909@example.com · 03001234567\nSC-01 · Rs 12,500  New\nGenerate challan"
+  },
+  {
+    "name": "populated-finance",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Finance Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 6,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "FINANCE\nQA finance\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">F"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nFinance Portal\nFinance Portal\nFINANCE\nQA finance\nQ\nQ\nFinance Portal\nSigned in as QA finance · finance@qa.invalid\nPayment verification\nExpenses & balance sheet\nAmbassador reports\nStudents appear here once the Admissions Office generates and mails their challan. Match the payment screenshot and record the student emailed to finance@qa.invalid against the challan, then confirm - the student moves to the Admissions Office's \"Ready to enroll\" folder, where they are placed in the right batch.\nQA Bundle Applicant · qa-bundle-20260909@example.com\nThe Web Developer Path  Payment verified\nPayment confirmed - with the Admissions Office for batch enrollment\nQA Registration · qa-admission-20260909@example.com\nSC-01  Enrolled\nPayment confirmed · Enrolled"
+  },
+  {
+    "name": "populated-hr",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "HR Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 15,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "HR\nQA hr\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">H"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nHR Portal\nAmbassadors\n0\nInterns\n0\nStaff\n0\nTeachers\n0\nAmbassador reports\nContracts\nInstructors\n+ New department\nHR Portal\nHR\nQA hr\nQ\nQ\nHR Portal\nSigned in as QA hr · hr@qa.invalid\nHire anyone directly - a portal login is emailed immediately.\nAdd an ambassador\nAdd an instructor\nAdd staff\nAdd an intern\nPick a department from the sidebar, or add a new one."
+  },
+  {
+    "name": "populated-staff",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Staff Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 3,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "STAFF\nQA staff\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">S"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nStaff Portal\nStaff Portal\nSTAFF\nQA staff\nQ\nQ\nStaff Portal\nUnassigned · QA assistant\nInstructions from HR\nQA hr · 2026-09-09 06:33\nQA local staff instruction\nFollow-ups\nQA hr · 2026-09-09 06:33\nQA status request\nYour response: QA completed the instruction\nYou are not part of any department yet."
+  },
+  {
+    "name": "populated-ambassador",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Ambassadors Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 9,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "AMBASSADOR\nQA ambassador\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">A"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Download QR",
+        "width": 89,
+        "height": 20
+      }
+    ],
+    "text": "Settings\nAmbassadors Portal\nAmbassadors Portal\nAMBASSADOR\nQA ambassador\nQ\nQ\nAmbassadors Portal\nSigned in as QA ambassador · ambassador@qa.invalid\nOverview\nMy Department\nMy referrals\nLeaderboard\nReports\nDownload QR\nReferral code\n8545\nUniversity\nQA University\nGems\n0\nLeaderboard rank\n#1\nStudents referred\n0\nRecent gem activity\nNo gems yet - share your code or QR to get your first referral enrolled."
+  },
+  {
+    "name": "populated-recruiter",
+    "url": "http://127.0.0.1:4318/dashboard",
+    "title": "EchoLens - Dashboard",
+    "heading": [
+      "Recruiter Portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 5,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "RECRUITER\nQA recruiter\nQ",
+        "html": "<div style=\"display:flex;align-items:center;gap:10px;cursor:pointer\" onclick=\"this.nextElementSibling.classList.toggle('open')\">\n            <span class=\"role-pill\" id=\"rolePill\">R"
+      }
+    ],
+    "shortTargets": [],
+    "text": "Settings\nRecruiter Portal\nRecruiter Portal\nRECRUITER\nQA recruiter\nQ\nQ\nRecruiter Portal\nSigned in as QA recruiter · recruiter@qa.invalid\nYou’re verified\n\nSearch verified EchoLens student profiles and reach out to candidates.\n\nOpen Talent Search My contact requests"
+  },
+  {
+    "name": "grade-instructor",
+    "url": "http://127.0.0.1:4318/grade?sid=1",
+    "title": "Grade - QA student - Marks Report",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 6,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "Grading: Marks Report\nPython for Data Science · Level 1\nClose tab\nMarks Report\nBasic · 40 gems · due Mon 7 Sept\nRead a student's marks for five subjects and print total, average, and pass or fail.\nStudent\nQA student 5636725 LATE\nSubmitted 2026-09-09 06:34 - after the deadline: 20% of earned gems are deducted automatically\nNote: “Synthetic QA solution”\nCurrently graded 80% · 26 gems (−6 late)\n🐍 Python submission\n▶ Run\nCopy\nprint(\"QA paid quest\")\nGrade\nGrade (0–100%)\nRemarks for the student\n\nGems = points × grade − 20% late deduction. When the level average reaches the pass mark, the next level unlocks for the student.\n\nSave grade"
+  },
+  {
+    "name": "free-profile",
+    "url": "http://127.0.0.1:4318/open#profile",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "My Profile"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 17,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "SPAN",
+        "text": "Q",
+        "html": "<span class=\"av-sm\" style=\"width:30px;height:30px;margin-right:9px;cursor:pointer\" onclick=\"openProfileTab()\">Q</span>"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 50,
+        "height": 16
+      },
+      {
+        "text": "Free compiler",
+        "width": 75,
+        "height": 16
+      },
+      {
+        "text": "LMS Portal",
+        "width": 59,
+        "height": 16
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nMy Profile\nQ QA free · 444322 Sign out\nMy Profile\n\nYour courses, hackathons, events, certificates and gems - all in one place.\n\nQ\nQA free\nReg no 444322 · free@qa.invalid · member since 9 Sept 2026\nSpark stage\n0\nGEMS\n1\nSTREAK\n1\nBEST\nFree courses & quests\n2 attempted\nWeb Dev Kickstart: HTML, CSS & JavaScript Free course\n0/20 tasks graded · 0 gems earned\nIn progress\nCS-105: Fundamentals of JavaScript Free course\n0/15 tasks graded · 0 gems earned\nIn progress\nHackathons\n0 joined\nNo hackathons joined yet.\nEvents\n1 joined\nQA synthetic open quest quest\nregistered 9 Sept 2026 · submitted\nlive\nChallenges\n0 attempted\nNo challenges attempted yet.\nCertificates\n0 earned\nComplete a free course to earn your first certificate.\nAccount\nCurrent password\nNew password\nChange password\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "populated-events",
+    "url": "http://127.0.0.1:4318/open#events",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Events hub"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 27,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "SPAN",
+        "text": "Q",
+        "html": "<span class=\"av-sm\" style=\"width:30px;height:30px;margin-right:9px;cursor:pointer\" onclick=\"openProfileTab()\">Q</span>"
+      },
+      {
+        "tag": "DIV",
+        "text": "print(…)\nOPEN QUEST\nQA synthetic open quest\nJoin this event and start earning gems.\n100 pts\nPython 3",
+        "html": "<div class=\"ev-row\" onclick=\"openOpenEvent(1)\" style=\"cursor:pointer\">\n      <div class=\"ev-thumb\" style=\"background:linear-gradient(135deg,#0FBFA8,#38BDF8)\"><span class=\"glyph\">pr"
+      },
+      {
+        "tag": "DIV",
+        "text": "REGISTERED\nContinue\n1 joined",
+        "html": "<div class=\"ev-aside\" onclick=\"event.stopPropagation()\">\n        <span class=\"ev-pill reg\">Registered</span>\n        <button class=\"ev-cta solid\" onclick=\"openOpenEvent(1)\">Continu"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nMy Profile\nQ QA free · 444322 Sign out\nEvents hub\n\nExplore open quests, hackathons, live events and webinars. Solve, earn gems, and get certified.\n\nAll Events (1)\nOpen Quests (1)\nHackathons\nLive Events (1)\nWebinars\n1\nOpen Quests\n0\nHackathons\n1\nLive Events\n0\nMy Gems Earned\n1\nParticipants\nAll Difficulties\nEasy\nMedium\nHard\nAll Languages\nPython 3\nC\nC++\nSQL\nHTML / CSS / JS\nFile / link\nAll Durations\nUnder 15 min\n15-60 min\nOver 60 min\nNewest First\nOldest First\nMost Points\nprint(…)\nOPEN QUEST\nQA synthetic open quest\nJoin this event and start earning gems.\n100 pts\nPython 3\nEasy\nDue 1 Oct 2026\nREGISTERED\nContinue\n1 joined\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "showcase-empty",
+    "url": "http://127.0.0.1:4318/showcase",
+    "title": "Showcase - EchoLens Digital",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 3,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "Showcase\nShare your work\nBack to dashboard\nNo posts yet. Be the first to share your work."
+  },
+  {
+    "name": "standalone-compiler",
+    "url": "http://127.0.0.1:4318/compiler",
+    "title": "Free Online Compiler - Python, C, C++, SQL & HTML/CSS/JS | EchoLens",
+    "heading": [
+      "Online Compiler"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 27,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "main.py",
+        "html": "<div class=\"cmp2-file active\" onclick=\"selectFile(0)\">\n      <svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M7 3h7l4 4v14H7z\" stroke=\"currentColor\" stroke-width=\"1.6\"></path><path d"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "New file",
+        "width": 10,
+        "height": 15
+      },
+      {
+        "text": "open problem set",
+        "width": 103,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nCompiler\nFAQ\nQA freeOpen portal\nOnline Compiler\n\nCode, run and test in real-time. Free with a free account.\n\nFiles\n+\nmain.py\n+ New File\nPython 3\nC\nC++\nJava\nSQL\nHTML / CSS / JS\nnumpy · pandas · matplotlib · seaborn · scikit-learn ready\nSave\nShare\nDataset\nDataset URL\nClear\nDark\nRun\n1\n2\n3\nReady - everything runs free of cost, nothing to install.\nAI Assistant\nBETA\nAsk a question about your code, or use a quick action below.\nExplain this code\nFix errors\nOptimize code\nGet a hint\nSession report\n\nWant tasks to solve with this compiler? Head to the open problem set - free quests with automatic certificates."
+  },
+  {
+    "name": "compiler-inputs",
+    "inputs": [
+      {
+        "tag": "SELECT",
+        "id": "lang",
+        "name": "",
+        "value": "python"
+      },
+      {
+        "tag": "TEXTAREA",
+        "id": "code",
+        "name": "",
+        "value": "# Write Python here, press Run.\n# numpy, pandas, matplotlib, seaborn and scikit-learn load automatically.\nprint('Hello EchoLens!')"
+      }
+    ]
+  }
+]

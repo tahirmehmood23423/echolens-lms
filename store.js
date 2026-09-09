@@ -56,7 +56,7 @@ const empty = () => ({
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
   attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
-  events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], open_submissions: [], registrations: [], public_announcements: [],
+  events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], email_suppressions: [], open_submissions: [], registrations: [], public_announcements: [],
   jobs: [], job_comments: [],
   discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [], ambassadors: [],
   ambassador_gem_events: [], ambassador_duties: [], ambassador_duty_status: [], ambassador_reports: [],
@@ -326,7 +326,7 @@ function sendFlushFailureAlert(failureInfo) {
     + `Message: ${failureInfo.message}\n\n`
     + `This flush will keep re-failing on every subsequent write until fixed. If it reaches ${FAIL_FAST_THRESHOLD} consecutive failures the process will restart itself once (bounded fail-fast) and dump the unpersisted diff to a failed-flush-<timestamp>.json file in ${likelyDumpDir} before exiting - that file will not exist unless it gets that far.\n\n`
     + `Check GET /api/admin/flush-health for current status - this is the only email for this episode; it will not repeat on every retry.`;
-  mailer.notify('ceo@echolens.digital', subject, text);
+  mailer.notify(process.env.MAIL_ALERT_TO || process.env.SMTP_USER || 'ceo@echolens.digital', subject, text);
 }
 
 function chunkRows(rows, size) {
@@ -727,7 +727,8 @@ async function initFromPostgres() {
   }
 
   await loadFromPostgresNormalized();
-  console.log(`[store] loaded from Postgres: ${data.users.length} users, ${data.courses.length} courses, ${data.certificates.length} certificates`);
+  await Suppressions._hydrate();
+  console.log(`[store] loaded from Postgres: ${data.users.length} users, ${data.courses.length} courses, ${data.certificates.length} certificates, ${data.email_suppressions.length} email suppressions`);
 }
 
 /** Awaited by server.js before sending each response, so a client only ever sees a successful response once that response's writes are durably in Postgres (or, in JSON-file mode, this resolves immediately since save() already wrote synchronously). */
@@ -3635,7 +3636,115 @@ const Leads = {
       if (audience === 'all' && ['student', 'free'].includes(u.role)) emails.add(em);
     }
     if (audience === 'all' || audience === 'leads') for (const l of data.leads) { const em = (l.email || '').toLowerCase(); if (ok(em)) emails.add(em); }
+    // Never hand a suppressed address (hard bounce / ESP rejection on a past
+    // run) to any audience. The blast route loads a fresh Set and filters
+    // again at send time - this just keeps admin-facing counts honest.
+    for (const s of data.email_suppressions) emails.delete((s.email || '').toLowerCase());
     return [...emails];
+  },
+};
+
+/* ============================== EMAIL SUPPRESSION LIST ==============================
+ * Every address that hard-bounced or was permanently rejected by the ESP on
+ * a past send. Loaded before any blast and filtered out; skipped forever
+ * after. The matching lead/user row is deliberately NOT deleted - a bounce
+ * is a delivery fact, not a reason to lose the contact.
+ *
+ * All DB access lives here (the data layer). In Postgres mode this is its
+ * own small table (migrations/0008_email_suppressions.sql; CREATE ... IF NOT
+ * EXISTS is repeated in _hydrate() so a missing migration degrades to "not
+ * suppressing" instead of crashing a blast). In JSON-file mode it is just
+ * the data.email_suppressions array, persisted like every other collection.
+ * data.email_suppressions is kept as an in-memory mirror in both modes so
+ * has()/all() stay synchronous for callers that already hold the data.
+ */
+const SUPPRESSION_DDL = `CREATE TABLE IF NOT EXISTS email_suppressions (
+  email      TEXT PRIMARY KEY,
+  reason     TEXT,
+  code       TEXT,
+  source     TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+)`;
+const Suppressions = {
+  _pg() { return db.enabled() && postgresReady; },
+  _norm(email) { return String(email || '').trim().toLowerCase(); },
+
+  /** Boot-time (Postgres) mirror load - called from initFromPostgres(). Safe to call when the table doesn't exist yet. */
+  async _hydrate() {
+    if (!this._pg()) return;
+    try {
+      await db.query(SUPPRESSION_DDL);
+      const { rows } = await db.query('SELECT email, reason, code, source, created_at FROM email_suppressions');
+      data.email_suppressions = rows.map((r) => ({
+        email: r.email, reason: r.reason || null, code: r.code || null, source: r.source || null,
+        created_at: r.created_at instanceof Date ? r.created_at.toISOString() : r.created_at,
+      }));
+    } catch (e) {
+      console.error('[suppressions] hydrate failed (blasts will not skip past bounces until fixed):', e.message);
+    }
+  },
+
+  /** Returns a fresh Set of every suppressed address. Call this before starting a blast. */
+  async load() {
+    if (this._pg()) await this._hydrate();
+    return new Set(data.email_suppressions.map((s) => this._norm(s.email)));
+  },
+
+  has(email) {
+    const em = this._norm(email);
+    return data.email_suppressions.some((s) => this._norm(s.email) === em);
+  },
+
+  /** Idempotent. Adds/updates a suppression in Postgres (or the JSON store) and the in-memory mirror. */
+  async add({ email, reason, code, source } = {}) {
+    const em = this._norm(email);
+    if (!em) return null;
+    const row = {
+      email: em,
+      reason: reason ? String(reason).slice(0, 500) : null,
+      code: code ? String(code).slice(0, 20) : null,
+      source: source ? String(source).slice(0, 60) : null,
+      created_at: now(),
+    };
+    const existing = data.email_suppressions.find((s) => this._norm(s.email) === em);
+    if (existing) { Object.assign(existing, { reason: row.reason, code: row.code, source: row.source }); }
+    else { data.email_suppressions.push(row); }
+
+    if (this._pg()) {
+      try {
+        await db.query(SUPPRESSION_DDL);
+        await db.query(
+          `INSERT INTO email_suppressions (email, reason, code, source) VALUES ($1, $2, $3, $4)
+           ON CONFLICT (email) DO UPDATE SET reason = EXCLUDED.reason, code = EXCLUDED.code, source = EXCLUDED.source`,
+          [em, row.reason, row.code, row.source]
+        );
+      } catch (e) {
+        console.error('[suppressions] persist failed for', em, '-', e.message);
+      }
+    } else if (!existing) {
+      save();
+    }
+    return row;
+  },
+
+  async remove(email) {
+    const em = this._norm(email);
+    const before = data.email_suppressions.length;
+    data.email_suppressions = data.email_suppressions.filter((s) => this._norm(s.email) !== em);
+    const removed = data.email_suppressions.length !== before;
+    if (this._pg()) {
+      try { await db.query('DELETE FROM email_suppressions WHERE email = $1', [em]); }
+      catch (e) { console.error('[suppressions] delete failed for', em, '-', e.message); }
+    } else if (removed) {
+      save();
+    }
+    return removed;
+  },
+
+  all() {
+    return data.email_suppressions
+      .slice()
+      .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
   },
 };
 
@@ -4710,7 +4819,7 @@ module.exports = {
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
-  Events, Leads, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase, Feedback,
+  Events, Leads, Suppressions, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase, Feedback,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,

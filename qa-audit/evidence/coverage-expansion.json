@@ -1,0 +1,185 @@
+[
+  {
+    "id": "DEPARTMENT-COMPLETE",
+    "expected": "Head must be a member; scoped task completion persists and is readable by HR",
+    "actual": {
+      "create": 200,
+      "duplicate": 400,
+      "headBeforeMembership": 400,
+      "head": 200,
+      "nonrecipient": 404,
+      "done": 200,
+      "status": "done",
+      "note": "QA evidence reviewed",
+      "staffRead": 200,
+      "hrRead": 200
+    },
+    "status": "PASS",
+    "scope": "local API and persisted records; synthetic data only"
+  },
+  {
+    "id": "CHALLENGE-REVIEW",
+    "expected": "Invalid link rejected; reject/resubmit/approve persists and identical approval is idempotent",
+    "actual": {
+      "invalid": 400,
+      "retry": 200,
+      "status": "approved",
+      "awarded": 40
+    },
+    "status": "PASS",
+    "scope": "local API and persisted records; synthetic data only"
+  },
+  {
+    "id": "CHALLENGE-REAWARD",
+    "expected": "One challenge win cannot accumulate duplicate rewards through review corrections",
+    "actual": {
+      "challengeId": 1,
+      "submissionId": 1,
+      "advertisedGems": 40,
+      "afterFirstApproval": 40,
+      "afterRejection": 40,
+      "afterReapproval": 80
+    },
+    "status": "FAIL",
+    "scope": "local API and persisted records; synthetic data only"
+  },
+  {
+    "id": "HACKATHON-LIFECYCLE",
+    "expected": "Paid gate, submission, scoring and one finalization persist",
+    "actual": {
+      "missingPay": 400,
+      "duplicate": 400,
+      "unpaid": 400,
+      "submit": 200,
+      "finalize": 200,
+      "repeatFinalize": 400,
+      "awards": [
+        {
+          "userId": 4,
+          "amount": 30
+        },
+        {
+          "userId": 12,
+          "amount": 30
+        },
+        {
+          "userId": 12,
+          "amount": 30
+        }
+      ]
+    },
+    "status": "PASS",
+    "scope": "simulated local payment approval; no payment/email processed"
+  },
+  {
+    "id": "HACKATHON-UNIQUE-MEMBERS",
+    "expected": "Repeated teammate input produces one membership and one prize per person",
+    "actual": {
+      "entryId": 1,
+      "memberIds": [
+        4,
+        12,
+        12
+      ],
+      "prizePerMember": 30,
+      "emptyStudentAward": 60
+    },
+    "status": "FAIL",
+    "scope": "local API and persisted records; synthetic data only"
+  },
+  {
+    "id": "PAID-EVENT-GATE",
+    "expected": "Proof required; only admin-confirmed entrant can persist work",
+    "actual": {
+      "missing": 400,
+      "register": 200,
+      "pending": 400,
+      "rejected": 400,
+      "proofRetry": 400,
+      "proofRetryMessage": "You are already registered for this event.",
+      "submit": 200,
+      "persisted": true
+    },
+    "status": "PASS",
+    "scope": "synthetic image and simulated manual payment state; rejected proof requires academy contact, no in-app replacement observed"
+  },
+  {
+    "id": "REFERRAL-ENROLLMENT",
+    "expected": "10% referral plus 5% discount snapshot; one enrolled referral reward",
+    "actual": {
+      "invalidCode": 400,
+      "registration": 200,
+      "gross": 12500,
+      "discount": 1875,
+      "net": 10625,
+      "stableAfterCategoryEdit": true,
+      "enroll": 200,
+      "repeatEnroll": 400,
+      "awards": [
+        {
+          "amount": 10,
+          "source": "enrollment"
+        }
+      ]
+    },
+    "status": "PASS",
+    "scope": "local simulated clearance and gem record; cash commission payout and email unverified"
+  },
+  {
+    "id": "MULTIPORTAL-LOGIN",
+    "expected": "Matching accounts require a username, which selects the correct role",
+    "actual": {
+      "staffCreated": 200,
+      "matches": 2,
+      "emailStatus": 400,
+      "error": "This email is linked to accounts in more than one portal. Sign in with the username of the one you want: qa-referral-final@student.echolens, qa-referral-final@staff.echolens.",
+      "byUsername": [
+        {
+          "username": "qa-referral-final@student.echolens",
+          "role": "student",
+          "http": 200
+        },
+        {
+          "username": "qa-referral-final@staff.echolens",
+          "role": "staff",
+          "http": 200
+        }
+      ]
+    },
+    "status": "PASS",
+    "scope": "API login selection; browser multiportal chooser not exercised"
+  },
+  {
+    "id": "JOB-COMMENT",
+    "expected": "Application destination required; job and learner comment persist",
+    "actual": {
+      "missingDestination": 400,
+      "create": 200,
+      "comment": 200,
+      "read": 200,
+      "hasComment": true
+    },
+    "status": "PASS",
+    "scope": "local API and persisted records; synthetic data only"
+  },
+  {
+    "id": "JOB-UI-1440",
+    "expected": "Jobs card opens details with saved comment and explicit external destination",
+    "actual": {
+      "hasComment": true,
+      "externalExplained": true,
+      "href": "https://employer.qa.invalid/apply"
+    },
+    "status": "PASS",
+    "scope": "real local UI; external application deliberately not submitted"
+  },
+  {
+    "id": "JOBS",
+    "expected": "Complete scenario",
+    "actual": {
+      "error": "locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-view=\"jobs\"]')\u001b[22m\n\u001b[2m    - locator resolved to <a class=\"nav-item\" data-view=\"jobs\">…</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    18 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    "status": "FAIL",
+    "scope": "harness interruption; not automatically a product defect"
+  }
+]

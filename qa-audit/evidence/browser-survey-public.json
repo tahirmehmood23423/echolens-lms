@@ -1,0 +1,989 @@
+[
+  {
+    "name": "landing-desktop",
+    "url": "http://127.0.0.1:4318/",
+    "title": "EchoLens Digital - Learn AI, Coding & Data Science Online in Pakistan",
+    "heading": [
+      "Become an AI Engineer,\nNot Just Another Student.",
+      "Learn Like a Game. Grow Like a Pro.",
+      "Popular Courses & Bootcamps",
+      "Built-in Browser Compiler",
+      "Start Learning Free",
+      "Real Projects. Real Skills.",
+      "Why Students Love EchoLens",
+      "Frequently Asked Questions",
+      "Ready to Start Your AI Journey?"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 55,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Live Tech Courses",
+        "width": 107,
+        "height": 22
+      },
+      {
+        "text": "Free Certified Courses",
+        "width": 134,
+        "height": 22
+      },
+      {
+        "text": "Events",
+        "width": 39,
+        "height": 22
+      },
+      {
+        "text": "Announcements",
+        "width": 100,
+        "height": 22
+      },
+      {
+        "text": "Feedback",
+        "width": 58,
+        "height": 22
+      },
+      {
+        "text": "Compiler",
+        "width": 56,
+        "height": 22
+      },
+      {
+        "text": "FAQ",
+        "width": 25,
+        "height": 22
+      },
+      {
+        "text": "View all 31 courses →",
+        "width": 135,
+        "height": 22
+      },
+      {
+        "text": "Generative AI Engineering",
+        "width": 184,
+        "height": 20
+      },
+      {
+        "text": "Machine Learning Fundamentals",
+        "width": 229,
+        "height": 20
+      },
+      {
+        "text": "See the courses →",
+        "width": 113,
+        "height": 22
+      },
+      {
+        "text": "enrollment form",
+        "width": 100,
+        "height": 18
+      },
+      {
+        "text": "Privacy",
+        "width": 37,
+        "height": 19
+      }
+    ],
+    "text": "EchoLens\nDigital\nLive Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLogin\nGet Started\nPakistan's Gamified AI & Tech Academy\nBecome an AI Engineer,\nNot Just Another Student.\n\nLearn AI through real projects, interactive coding quests, live bootcamps, and a built-in browser compiler.\n\nAugust 2026 cohort · registration closes 31 July · seats filling fast\nBook Your Seat  →\nStart Free\nExplore Courses\nTA\nHK\nMS\nAR\nZN\n\nTrusted by learners\nacross Pakistan\n\nmain.py\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"EchoLens\")\n\n# Run\nHello, EchoLens!\nQuest Progress\nLevel 4 - Beam\n320 / 500 Gems\nFast Feedback\n\nFeedback on every task, approved by your teacher.\n\nGems Earned\n12,450\n+120 this week\n39\nLive Courses\n100+\nCoding Quests\nBuilt-in\nBrowser Compiler\nProject Based\nLearning\nIndustry\nMentorship\nLearn Like a Game. Grow Like a Pro.\n\nEarn gems, complete quests and level up through 6 powerful stages.\n\nSpark\n0 - 99 Gems\nGlow\n100 - 299 Gems\nBeam\n300 - 599 Gems\nPrism\n600 - 999 Gems\nAurora\n1000 - 1999 Gems\nNova\n2000+ Gems\nPopular Courses & Bootcamps\n\nInstructor-led live classes, real projects and verified certificates.\n\nView all 31 courses →\nSpecialist Track\nGenerative AI Engineering\n8 Weeks\n32 Hours\nLive Classes\n\nProduction LLM systems: retrieval-augmented generation, evaluation and deployment.\n\nPKR 22,500 full track\nEnroll Now\nSpecialist Track\nMachine Learning Fundamentals\n8 Weeks\n32 Hours\nLive Classes\n\nClassical ML done rigorously: feature engineering, model selection and honest evaluation.\n\nPKR 21,500 full track\nEnroll Now\nSpecialist Track\nAI Agents & Automation Engineering\n8 Weeks\n32 Hours\nLive Classes\n\nMulti-step, tool-calling AI agents that plan, act and integrate with real business systems.\n\nPKR 23,000 full track\nEnroll Now\nFlagship Track\nFull-Stack JavaScript: React, Node & PostgreSQL\n8 Weeks\n32 Hours\nLive Classes\n\nOur premium flagship: build and deploy a complete production web application on the 2026 stack.\n\nPKR 25,000 full track\nEnroll Now\nBuilt-in Browser Compiler\n\nCode, run and test in real time. No installation. No setup. Python with numpy, pandas and matplotlib, plus C, C++, SQL and live HTML, CSS and JavaScript preview.\n\nMulti-language Support\nReal-time Execution\nNo Setup Required\nRun Anywhere, Anytime\nOpen the free compiler  →\nPython\nHTML\nCSS\nJavaScript\nSQL\n# main.py\na = 10\nb = 20\n\nprint(\"Sum is\", a + b)\n\nRun\nOUTPUT\nSum is 30\nStart Learning Free\nFree Coding Quests\n3 Fully Free Courses\nBrowser Compiler\nVerified Certificates\nEarn Gems & Level Up\nHackathons & Webinars\nStart Learning Free\nReal Projects. Real Skills.\n\nThe portfolio projects you build inside EchoLens courses.\n\nSee the courses →\n🤖\nAI Chat Assistant\nPython, NLP\n🛒\nE-Commerce Platform\nNext.js, Stripe\n💼\nPortfolio Website\nReact, Tailwind\n📈\nSales Dashboard\nPower BI, SQL\nWhy Students Love EchoLens\nLive Bootcamps\n\nInteractive live classes with expert instructors.\n\nFast Feedback\n\nFeedback on every task, reviewed by your teacher.\n\nEarn Gems\n\nGamified learning that keeps you motivated.\n\nBrowser Compiler\n\nPython, HTML, CSS, JS and SQL in your browser.\n\nCertificates\n\nVerified certificates with QR and LinkedIn sharing.\n\nExpert Instructors\n\nIndustry professionals with real-world experience.\n\nFrequently Asked Questions\nIs EchoLens free to use?\n+\n\nA lot of it, yes. The coding quests, the browser compiler and three complete courses are free. Paid programs add live classes with instructors, teacher-reviewed grading and the full quest tracks.\n\nHow do I enroll in a paid course?\n+\n\nFill in the enrollment form and the team contacts you on WhatsApp with the fee details. Your student account is created as soon as the payment is confirmed.\n\nDo I need to install anything?\n+\n\nNo. Everything runs in your browser, including the Python compiler with numpy, pandas and matplotlib. If you have a browser and an internet connection, you are ready.\n\nWill I get a certificate?\n+\n\nYes. Certificates carry a QR code anyone can scan to verify them on our site, and they share to LinkedIn in one click. Free courses issue a verified certificate automatically when you pass every task.\n\nHow do live classes, hackathons and webinars work?\n+\n\nLive classes run inside the portal at scheduled times and attendance is recorded automatically. Hackathons and webinars need a free account, so sign in with Google or email first. Some hackathons are free to enter and some have an entry fee, which is always shown on the event page.\n\nReady to Start Your AI Journey?\n\nJoin learners across Pakistan building their future with EchoLens.\n\nStart Free\nExplore Courses\n100+\nCoding Quests\n39\nLive Courses\n6\nProgress Stages\n3\nFully Free Courses\nStay in the Loop\n\nGet new courses, hackathons and free resources by email.\n\n→\nEchoLens\nDigital\n\nEmpowering the next generation of AI engineers and tech leaders in Pakistan and beyond.\n\nCourses\nLive Tech Courses & Bootcamps\nFree Certified Courses\nAll 31 Courses\nLearn Free\nFree Online Courses\nBrowser Compiler\nHackathons & Webinars\nVerify a Certificate\nCommunity\nAnnouncements\nFeedback\nOpen Portal\nStudent Login\nEnroll in a Course\nStudent Projects\nFor Recruiters\nContact\ninfo@echolens.digital\nWhatsApp: 0314 1479109\n© 2026 EchoLens Digital. All rights reserved.\nPrivacy\nMade with ♥ in Pakistan"
+  },
+  {
+    "name": "catalogue-desktop",
+    "url": "http://127.0.0.1:4318/courses",
+    "title": "All Courses - AI, Coding, Data Science & Design | EchoLens Digital",
+    "heading": [
+      "EchoLens Course Catalogue",
+      "Bootcamps (5)",
+      "Short Courses (24)",
+      "Specialist Tracks (10)"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 55,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Home",
+        "width": 35,
+        "height": 17
+      },
+      {
+        "text": "All courses",
+        "width": 64,
+        "height": 18
+      },
+      {
+        "text": "Free quests",
+        "width": 68,
+        "height": 18
+      },
+      {
+        "text": "Compiler",
+        "width": 54,
+        "height": 18
+      },
+      {
+        "text": "info@echolens.digital",
+        "width": 129,
+        "height": 18
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nCompiler\nFAQ\nLogin\nGet Started\nHome / Courses\nAUGUST 2026 COHORT\n39 PROGRAMS\nEchoLens Course Catalogue\n\n39 live, instructor-led online programs across AI, data science, web development and design. Learn by solving real coding quests in your browser, earn gems, and collect verified certificates. Three courses are completely free.\n\nStart free\nFree quests & events\nBootcamps (5)\nAI Automation with n8n & Make.com\nRs 5,000 · 2 weeks · 8h\nPrompt Engineering & ChatGPT/Claude Mastery\nRs 5,000 · 2 weeks · 8h\nAI-Assisted Coding with Cursor, Claude & Copilot\nRs 5,000 · 2 weeks · 8h\nExcel + AI for Office Professionals\nRs 5,000 · 2 weeks · 8h\nCanva & AI Content Creation\nRs 5,000 · 2 weeks · 8h\nShort Courses (24)\nPython for Data Science\nRs 12,500 · 6 weeks · 24h\nGenerative AI Essentials\nRs 14,000 · 6 weeks · 24h\nData Analytics with SQL & Power BI\nRs 13,500 · 6 weeks · 24h\nIntroduction to Machine Learning\nRs 13,000 · 6 weeks · 24h\nAI Automation Tools Track\nRs 14,000 · 6 weeks · 24h\nFrontend Web Development with HTML, CSS & JavaScript\nRs 13,000 · 6 weeks · 24h\nJavaScript Deep Dive: DOM, Async & APIs\nRs 13,000 · 6 weeks · 24h\nDigital Marketing & SEO Fundamentals\nRs 12,000 · 6 weeks · 24h\nFreelancing & Client Acquisition Mastery\nRs 10,000 · 6 weeks · 24h\nGraphic Design Basics\nRs 10,000 · 6 weeks · 24h\nContent Writing with AI\nRs 9,000 · 6 weeks · 24h\nGraphic Designing\nRs 12,000 · 6 weeks · 24h\nUI/UX Designing\nRs 12,000 · 6 weeks · 24h\n3D Modeling, Rendering and Introductory Animation\nRs 13,000 · 6 weeks · 18h\nCS-101: Fundamentals of C\nFree · 5 weeks · 12h\nCS-102: Fundamentals of C++ (with OOP)\nFree · 4 weeks · 12h\nCS-104: Fundamentals of Python\nFree · 5 weeks · 12h\nCS-105: Fundamentals of JavaScript\nFree · 5 weeks · 12h\nCS-106: Fundamentals of HTML & CSS\nFree · 5 weeks · 12h\nAdvanced C Programming\nFree · 4 weeks · 12h\nAdvanced C++ Programming\nFree · 4 weeks · 12h\nAdvanced Python Programming\nFree · 5 weeks · 15h\nAdvanced JavaScript Programming\nFree · 5 weeks · 15h\nAdvanced CSS and Web Development\nFree · 5 weeks · 15h\nSpecialist Tracks (10)\nWordPress Development\nRs 20,000 · 8 weeks · 32h\nData Analytics Specialist Track\nRs 21,500 · 8 weeks · 32h\nGenerative AI Engineering\nRs 22,500 · 8 weeks · 32h\nAI Agents & Automation Engineering\nRs 23,000 · 8 weeks · 32h\nMachine Learning Fundamentals\nRs 21,500 · 8 weeks · 32h\nDeep Learning with PyTorch\nRs 23,000 · 8 weeks · 32h\nFull-Stack JavaScript: React, Node & PostgreSQL\nRs 25,000 · 8 weeks · 32h\nReact + Next.js Frontend Specialist\nRs 22,000 · 8 weeks · 32h\nMobile Apps with Flutter\nRs 22,000 · 8 weeks · 32h\nVideo Editing\nRs 20,000 · 8 weeks · 32h\n© 2026 EchoLens Digital - Pakistan's gamified AI & tech academy.\nAll courses · Free quests · Compiler · info@echolens.digital"
+  },
+  {
+    "name": "open-desktop",
+    "url": "http://127.0.0.1:4318/open",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Course catalogue - August 2026 cohort"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 102,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nBOOTCAMP\nAI Automation with n8n & Make.com\n2 Weeks · 8 Hours\nPKR 5,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-01')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nBOOTCAMP\nPrompt Engineering & ChatGPT/Claude Mastery\n2 Weeks · 8 Hours\nPKR 5,000\nView co",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-02')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "NEW\nBOOTCAMP\nAI-Assisted Coding with Cursor, Claude & Copilot\n2 Weeks · 8 Hours\nPKR 5,000\nView cours",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-05')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "NEW\nBOOTCAMP\nExcel + AI for Office Professionals\n2 Weeks · 8 Hours\nPKR 5,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-07')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "BOOTCAMP\nCanva & AI Content Creation\n2 Weeks · 8 Hours\nPKR 5,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-08')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nSHORT COURSE\nPython for Data Science\n6 Weeks · 24 Hours\nPKR 12,500\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-01')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nSHORT COURSE\nGenerative AI Essentials\n6 Weeks · 24 Hours\nPKR 14,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-02')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nSHORT COURSE\nData Analytics with SQL & Power BI\n6 Weeks · 24 Hours\nPKR 13,500\nView cours",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-03')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "SHORT COURSE\nIntroduction to Machine Learning\n6 Weeks · 24 Hours\nPKR 13,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-04')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "SHORT COURSE\nAI Automation Tools Track\n6 Weeks · 24 Hours\nPKR 14,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-05')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "NEW\nSHORT COURSE\nFrontend Web Development with HTML, CSS & JavaScript\n6 Weeks · 24 Hours\nPKR 13,000\n",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-06')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "NEW\nSHORT COURSE\nJavaScript Deep Dive: DOM, Async & APIs\n6 Weeks · 24 Hours\nPKR 13,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-07')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLMS Portal Sign in free Register for a course\nCourse catalogue - August 2026 cohort\n\n31 live, instructor-led programs · Registration deadline 31 July 2026 · Batch starts 1 August 2026. Every paid course opens its first quest free - try before you enrol.\n\n39+\nLive Courses\n150+\nCoding Quests\nBuilt-in\nBrowser Compiler\nWeekly\nHackathons\nCertificates\nWith QR Verify\n4+\nLearners\nRegister for a paid course\nAll tiers\nBootcamp\nShort Course\nSpecialist Track\nAll types\nFree only\nPaid only\nAll\nBootcamps\nShort Courses\nSpecialist Tracks\nFree courses\nThe Web Developer Path\nComplete beginner to job-ready full-stack developer on the highest-demand 2026 stack: JavaScript foundations, React and PostgreSQL.\nBC-04 → SC-06 → SC-07 → ST-09\nPKR 43,500\nPKR 51,000 · Save PKR 7,500 (15%)\nRegister for the path\nHIGH DEMAND\nBOOTCAMP\nAI Automation with n8n & Make.com\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nHIGH DEMAND\nBOOTCAMP\nPrompt Engineering & ChatGPT/Claude Mastery\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nNEW\nBOOTCAMP\nAI-Assisted Coding with Cursor, Claude & Copilot\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nNEW\nBOOTCAMP\nExcel + AI for Office Professionals\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nBOOTCAMP\nCanva & AI Content Creation\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nHIGH DEMAND\nSHORT COURSE\nPython for Data Science\n6 Weeks · 24 Hours\nPKR 12,500\nView course\nHIGH DEMAND\nSHORT COURSE\nGenerative AI Essentials\n6 Weeks · 24 Hours\nPKR 14,000\nView course\nHIGH DEMAND\nSHORT COURSE\nData Analytics with SQL & Power BI\n6 Weeks · 24 Hours\nPKR 13,500\nView course\nSHORT COURSE\nIntroduction to Machine Learning\n6 Weeks · 24 Hours\nPKR 13,000\nView course\nSHORT COURSE\nAI Automation Tools Track\n6 Weeks · 24 Hours\nPKR 14,000\nView course\nNEW\nSHORT COURSE\nFrontend Web Development with HTML, CSS & JavaScript\n6 Weeks · 24 Hours\nPKR 13,000\nView course\nNEW\nSHORT COURSE\nJavaScript Deep Dive: DOM, Async & APIs\n6 Weeks · 24 Hours\nPKR 13,000\nView course\nNEW\nSHORT COURSE\nDigital Marketing & SEO Fundamentals\n6 Weeks · 24 Hours\nPKR 12,000\nView course\nNEW\nSHORT COURSE\nFreelancing & Client Acquisition Mastery\n6 Weeks · 24 Hours\nPKR 10,000\nView course\nSHORT COURSE\nGraphic Design Basics\n6 Weeks · 24 Hours\nPKR 10,000\nView course\nSHORT COURSE\nContent Writing with AI\n6 Weeks · 24 Hours\nPKR 9,000\nView course\nSPECIALIST TRACK\nWordPress Development\n8 Weeks · 32 Hours\nPKR 20,000\nView course\nSHORT COURSE\nGraphic Designing\n6 Weeks · 24 Hours\nPKR 12,000\nView course\nHIGH DEMAND\nSHORT COURSE\nUI/UX Designing\n6 Weeks · 24 Hours\nPKR 12,000\nView course\nNEW\nSHORT COURSE\n3D Modeling, Rendering and Introductory Animation\n6 Weeks · 18 Hours\nPKR 13,000\nView course\nHIGH DEMAND\nSPECIALIST TRACK\nData Analytics Specialist Track\n8 Weeks · 32 Hours\nPKR 21,500\nView course\nHIGH DEMAND\nSPECIALIST TRACK\nGenerative AI Engineering\n8 Weeks · 32 Hours\nPKR 22,500\nView course\nHIGH DEMAND\nSPECIALIST TRACK\nAI Agents & Automation Engineering\n8 Weeks · 32 Hours\nPKR 23,000\nView course\nSPECIALIST TRACK\nMachine Learning Fundamentals\n8 Weeks · 32 Hours\nPKR 21,500\nView course\nSPECIALIST TRACK\nDeep Learning with PyTorch\n8 Weeks · 32 Hours\nPKR 23,000\nView course\nNEW\nSPECIALIST TRACK\nFull-Stack JavaScript: React, Node & PostgreSQL\n8 Weeks · 32 Hours\nPKR 25,000\nView course\nNEW\nSPECIALIST TRACK\nReact + Next.js Frontend Specialist\n8 Weeks · 32 Hours\nPKR 22,000\nView course\nNEW\nSPECIALIST TRACK\nMobile Apps with Flutter\n8 Weeks · 32 Hours\nPKR 22,000\nView course\nSPECIALIST TRACK\nVideo Editing\n8 Weeks · 32 Hours\nPKR 20,000\nView course\nSHORT COURSE\nCS-101: Fundamentals of C\n5 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nCS-102: Fundamentals of C++ (with OOP)\n4 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nCS-104: Fundamentals of Python\n5 Weeks · 12 Hours\nFree course\nStart now\nNEW\nSHORT COURSE\nCS-105: Fundamentals of JavaScript\n5 Weeks · 12 Hours\nFree course\nStart now\nNEW\nSHORT COURSE\nCS-106: Fundamentals of HTML & CSS\n5 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced C Programming\n4 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced C++ Programming\n4 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced Python Programming\n5 Weeks · 15 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced JavaScript Programming\n5 Weeks · 15 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced CSS and Web Development\n5 Weeks · 15 Hours\nFree course\nStart now\n\nPay via bank transfer per your fee challan, then share the receipt to confirm your seat.\n\nYour learning journey\nSpark\n0+\nGlow\n250+\nBeam\n700+\nPrism\n1400+\nAurora\n2400+\nNova\n4000+\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "free-courses-desktop",
+    "url": "http://127.0.0.1:4318/open#free",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Course catalogue - August 2026 cohort"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 29,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLMS Portal Sign in free Register for a course\nCourse catalogue - August 2026 cohort\n\n31 live, instructor-led programs · Registration deadline 31 July 2026 · Batch starts 1 August 2026. Every paid course opens its first quest free - try before you enrol.\n\n39+\nLive Courses\n150+\nCoding Quests\nBuilt-in\nBrowser Compiler\nWeekly\nHackathons\nCertificates\nWith QR Verify\n4+\nLearners\nRegister for a paid course\nAll tiers\nBootcamp\nShort Course\nSpecialist Track\nAll types\nFree only\nPaid only\nAll\nBootcamps\nShort Courses\nSpecialist Tracks\nFree courses\nThe Web Developer Path\nComplete beginner to job-ready full-stack developer on the highest-demand 2026 stack: JavaScript foundations, React and PostgreSQL.\nBC-04 → SC-06 → SC-07 → ST-09\nPKR 43,500\nPKR 51,000 · Save PKR 7,500 (15%)\nRegister for the path\nC Systems Programming\n2 courses\nC++ and Object Oriented Software Design\n2 courses\nPython Programming and Algorithmic Design\n2 courses\nJavaScript and Interactive Web Architecture\n2 courses\nModern Responsive Web Architecture (HTML & CSS)\n2 courses\nYour learning journey\nSpark\n0+\nGlow\n250+\nBeam\n700+\nPrism\n1400+\nAurora\n2400+\nNova\n4000+\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "events-desktop",
+    "url": "http://127.0.0.1:4318/open#events",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Events hub"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 24,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLMS Portal Sign in free Register for a course\nEvents hub\n\nExplore open quests, hackathons, live events and webinars. Solve, earn gems, and get certified.\n\nAll Events\nOpen Quests\nHackathons\nLive Events\nWebinars\n0\nOpen Quests\n0\nHackathons\n0\nLive Events\n0\nMy Gems Earned\n0\nParticipants\nAll Difficulties\nEasy\nMedium\nHard\nAll Languages\nPython 3\nC\nC++\nSQL\nHTML / CSS / JS\nFile / link\nAll Durations\nUnder 15 min\n15-60 min\nOver 60 min\nNewest First\nOldest First\nMost Points\nNo events match your filters right now - try clearing them, or watch the Announcements tab.\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "announcements-desktop",
+    "url": "http://127.0.0.1:4318/open#announcements",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Announcements"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 14,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLMS Portal Sign in free Register for a course\nAnnouncements\n\nNew cohorts, registration deadlines, hackathons, webinars and discounts - straight from the academy.\n\nNo announcements yet - check back soon.\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "login-desktop",
+    "url": "http://127.0.0.1:4318/login",
+    "title": "EchoLens - Sign in",
+    "heading": [
+      "Learning portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 6,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Forgot your password?",
+        "width": 141,
+        "height": 16
+      },
+      {
+        "text": "Create a free account",
+        "width": 137,
+        "height": 16
+      },
+      {
+        "text": "Sign up as a recruiter",
+        "width": 134,
+        "height": 16
+      }
+    ],
+    "text": "Learning portal\n\nSign in with your username, email, or registration number.\n\nUsername, email, or reg no\nPassword\nSign in\n\nForgot your password?\n\nNew here? Create a free account - solve open quests, use the free compiler, earn certificates.\n\nHiring? Sign up as a recruiter to search verified student talent.\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "recruiter-signup-desktop",
+    "url": "http://127.0.0.1:4318/recruiter-signup",
+    "title": "EchoLens - Recruiter sign up",
+    "heading": [
+      "Recruiter sign up"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 11,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Sign in",
+        "width": 43,
+        "height": 16
+      }
+    ],
+    "text": "Recruiter sign up\n\nSearch verified student talent - real course projects, certificates and grades, confirmed by EchoLens.\n\nFull name\nWork email\nCompany name\nCompany website\nYour designation\nCity\nCompany size\nChoose one\n1-10\n11-50\n51-200\n201-500\n500+\nWhat do you typically hire for?\nCreate recruiter account\n\nAlready signed up? Sign in\n\nSee how student data is handled in the Talent Marketplace privacy notes.\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "compiler-signed-out-desktop",
+    "url": "http://127.0.0.1:4318/compiler",
+    "title": "Free Online Compiler - Python, C, C++, SQL & HTML/CSS/JS | EchoLens",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 11,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nCompiler\nFAQ\nLoginGet Started\nSign in to use the compiler\n\nCreate a free account to write, run and save code in the EchoLens compiler - it takes a minute and stays free.\n\nCreate a free account Already have an account? Sign in"
+  },
+  {
+    "name": "talent-projects-desktop",
+    "url": "http://127.0.0.1:4318/talent/projects",
+    "title": "EchoLens Talent Projects",
+    "heading": [
+      "Student Projects"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 1,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "Student Projects\nReal, graded coursework and self-built projects from EchoLens students.\nThe Talent Marketplace is not available - Postgres is not configured on this server."
+  },
+  {
+    "name": "showcase-desktop",
+    "url": "http://127.0.0.1:4318/login",
+    "title": "EchoLens - Sign in",
+    "heading": [
+      "Learning portal"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 6,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Forgot your password?",
+        "width": 141,
+        "height": 16
+      },
+      {
+        "text": "Create a free account",
+        "width": 137,
+        "height": 16
+      },
+      {
+        "text": "Sign up as a recruiter",
+        "width": 134,
+        "height": 16
+      }
+    ],
+    "text": "Learning portal\n\nSign in with your username, email, or registration number.\n\nUsername, email, or reg no\nPassword\nSign in\n\nForgot your password?\n\nNew here? Create a free account - solve open quests, use the free compiler, earn certificates.\n\nHiring? Sign up as a recruiter to search verified student talent.\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "privacy-desktop",
+    "url": "http://127.0.0.1:4318/privacy",
+    "title": "EchoLens - Privacy and the Talent Marketplace",
+    "heading": [
+      "Privacy"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 0,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "Privacy\n\nThis page explains what EchoLens collects in plain language, with a detailed section on the Talent Marketplace specifically. It is not a substitute for formal legal advice - if you need a full Terms of Service or a legally reviewed privacy policy, have one drafted by counsel before relying on this page for that purpose.\n\nACCOUNT AND COURSE DATA\n\nCreating a portal account collects your name, email or username, and whatever you add to your profile (phone, address, education). Course activity - submissions, grades, gems, streaks, attendance, and certificates - is recorded so the portal and your instructors can track your progress. This data is visible to EchoLens staff and, for gamification (stage, gems, streak, badges, courses), on your public learner profile at /u/<reg no> if you choose to share that link.\n\nTALENT MARKETPLACE\n\nThe Talent Marketplace is entirely opt-in for students. Nothing about it is visible to anyone until you explicitly publish your profile, and you can unpublish it at any time.\n\nWhat a published profile shows publicly - to anyone, signed in or not: your headline, about section, city, remote/availability/work-type preferences, skills, education, experience, the links you add (GitHub, LinkedIn, personal site), and your projects. It also shows a \"Verified by EchoLens\" block built automatically from your real course data: courses completed, certificates earned (each linking to its public QR verification page), your current level and gems, and per-course completion percentages from instructor-graded work. Your expected salary is only shown if you turn that on explicitly; it is hidden by default.\n\nWhat is never shown publicly, on any project or profile page, to anyone - your email, phone number, and resume. These are never rendered on a public page or to a recruiter by default, regardless of how the recruiter got there.\n\nWhat an approved recruiter can see beyond the public page - your email, phone, and resume, but only after you personally accept a specific contact request from that specific recruiter. Accepting one recruiter's request does not reveal your details to any other recruiter. Every acceptance is logged permanently (recruiter, student, timestamp, the message they sent) as an audit record, kept even if you later unpublish your profile.\n\nHow EchoLens staff use search data - recruiter searches are logged (the filters used and how many results came back) so EchoLens can see aggregate patterns, such as which skills recruiters search for most, and to review the platform for abuse. This log does not include which specific student profiles a recruiter viewed.\n\nHow to withdraw - unpublish your profile at any time from Talent Profile in the portal. This immediately removes it from search results, from its public URL (visitors get a \"not found\" page), and from every recruiter's shortlist view. It does not delete contact requests you have already accepted or the audit record of any contact reveal - those are kept for accountability, exactly as described above. An EchoLens admin can also unpublish a profile or project (for example, in response to a report); when that happens you are told the reason and can fix the issue and republish.\n\nCONTACT\n\nQuestions about your data: info@echolens.digital.\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "invalid-certificate-desktop",
+    "url": "http://127.0.0.1:4318/cert?s=QA-NONEXISTENT",
+    "title": "EchoLens - Verified Certificate",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 0,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "✗\nNot verified. No certificate exists for this serial. It may have been revoked.\nNo valid certificate for serial QA-NONEXISTENT."
+  },
+  {
+    "name": "invalid-reset-desktop",
+    "url": "http://127.0.0.1:4318/reset-password?token=invalid",
+    "title": "EchoLens - Reset password",
+    "heading": [
+      "Reset your password"
+    ],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 4,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Back to sign in",
+        "width": 91,
+        "height": 16
+      }
+    ],
+    "text": "Reset your password\n\nChoose a new password for your account.\n\nNew password\nConfirm password\nSet new password\n\nBack to sign in\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "invalid-challan-desktop",
+    "url": "http://127.0.0.1:4318/challan?s=QA-NONEXISTENT",
+    "title": "EchoLens - Fee Challan",
+    "heading": [],
+    "width": 1440,
+    "documentWidth": 1440,
+    "overflow": [],
+    "visibleControls": 0,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "✗\nNot verified. No challan exists for this serial.\nNo valid challan for serial QA-NONEXISTENT."
+  },
+  {
+    "name": "landing-mobile",
+    "url": "http://127.0.0.1:4318/",
+    "title": "EchoLens Digital - Learn AI, Coding & Data Science Online in Pakistan",
+    "heading": [
+      "Become an AI Engineer,\nNot Just Another Student.",
+      "Learn Like a Game. Grow Like a Pro.",
+      "Popular Courses & Bootcamps",
+      "Built-in Browser Compiler",
+      "Start Learning Free",
+      "Real Projects. Real Skills.",
+      "Why Students Love EchoLens",
+      "Frequently Asked Questions",
+      "Ready to Start Your AI Journey?"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 48,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "View all 31 courses →",
+        "width": 135,
+        "height": 22
+      },
+      {
+        "text": "Generative AI Engineering",
+        "width": 184,
+        "height": 20
+      },
+      {
+        "text": "Machine Learning Fundamentals",
+        "width": 229,
+        "height": 20
+      },
+      {
+        "text": "AI Agents & Automation Engineering",
+        "width": 263,
+        "height": 20
+      },
+      {
+        "text": "See the courses →",
+        "width": 113,
+        "height": 22
+      },
+      {
+        "text": "enrollment form",
+        "width": 100,
+        "height": 18
+      },
+      {
+        "text": "Privacy",
+        "width": 37,
+        "height": 19
+      }
+    ],
+    "text": "EchoLens\nDigital\nGet Started\n☰\nPakistan's Gamified AI & Tech Academy\nBecome an AI Engineer,\nNot Just Another Student.\n\nLearn AI through real projects, interactive coding quests, live bootcamps, and a built-in browser compiler.\n\nAugust 2026 cohort · registration closes 31 July · seats filling fast\nBook Your Seat  →\nStart Free\nExplore Courses\nTA\nHK\nMS\nAR\nZN\n\nTrusted by learners\nacross Pakistan\n\nmain.py\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"EchoLens\")\n\n# Run\nHello, EchoLens!\nQuest Progress\nLevel 4 - Beam\n320 / 500 Gems\n39\nLive Courses\n100+\nCoding Quests\nBuilt-in\nBrowser Compiler\nProject Based\nLearning\nIndustry\nMentorship\nLearn Like a Game. Grow Like a Pro.\n\nEarn gems, complete quests and level up through 6 powerful stages.\n\nSpark\n0 - 99 Gems\nGlow\n100 - 299 Gems\nBeam\n300 - 599 Gems\nPrism\n600 - 999 Gems\nAurora\n1000 - 1999 Gems\nNova\n2000+ Gems\nPopular Courses & Bootcamps\n\nInstructor-led live classes, real projects and verified certificates.\n\nView all 31 courses →\nSpecialist Track\nGenerative AI Engineering\n8 Weeks\n32 Hours\nLive Classes\n\nProduction LLM systems: retrieval-augmented generation, evaluation and deployment.\n\nPKR 22,500 full track\nEnroll Now\nSpecialist Track\nMachine Learning Fundamentals\n8 Weeks\n32 Hours\nLive Classes\n\nClassical ML done rigorously: feature engineering, model selection and honest evaluation.\n\nPKR 21,500 full track\nEnroll Now\nSpecialist Track\nAI Agents & Automation Engineering\n8 Weeks\n32 Hours\nLive Classes\n\nMulti-step, tool-calling AI agents that plan, act and integrate with real business systems.\n\nPKR 23,000 full track\nEnroll Now\nFlagship Track\nFull-Stack JavaScript: React, Node & PostgreSQL\n8 Weeks\n32 Hours\nLive Classes\n\nOur premium flagship: build and deploy a complete production web application on the 2026 stack.\n\nPKR 25,000 full track\nEnroll Now\nBuilt-in Browser Compiler\n\nCode, run and test in real time. No installation. No setup. Python with numpy, pandas and matplotlib, plus C, C++, SQL and live HTML, CSS and JavaScript preview.\n\nMulti-language Support\nReal-time Execution\nNo Setup Required\nRun Anywhere, Anytime\nOpen the free compiler  →\nPython\nHTML\nCSS\nJavaScript\nSQL\n# main.py\na = 10\nb = 20\n\nprint(\"Sum is\", a + b)\n\nRun\nOUTPUT\nSum is 30\nStart Learning Free\nFree Coding Quests\n3 Fully Free Courses\nBrowser Compiler\nVerified Certificates\nEarn Gems & Level Up\nHackathons & Webinars\nStart Learning Free\nReal Projects. Real Skills.\n\nThe portfolio projects you build inside EchoLens courses.\n\nSee the courses →\n🤖\nAI Chat Assistant\nPython, NLP\n🛒\nE-Commerce Platform\nNext.js, Stripe\n💼\nPortfolio Website\nReact, Tailwind\n📈\nSales Dashboard\nPower BI, SQL\nWhy Students Love EchoLens\nLive Bootcamps\n\nInteractive live classes with expert instructors.\n\nFast Feedback\n\nFeedback on every task, reviewed by your teacher.\n\nEarn Gems\n\nGamified learning that keeps you motivated.\n\nBrowser Compiler\n\nPython, HTML, CSS, JS and SQL in your browser.\n\nCertificates\n\nVerified certificates with QR and LinkedIn sharing.\n\nExpert Instructors\n\nIndustry professionals with real-world experience.\n\nFrequently Asked Questions\nIs EchoLens free to use?\n+\n\nA lot of it, yes. The coding quests, the browser compiler and three complete courses are free. Paid programs add live classes with instructors, teacher-reviewed grading and the full quest tracks.\n\nHow do I enroll in a paid course?\n+\n\nFill in the enrollment form and the team contacts you on WhatsApp with the fee details. Your student account is created as soon as the payment is confirmed.\n\nDo I need to install anything?\n+\n\nNo. Everything runs in your browser, including the Python compiler with numpy, pandas and matplotlib. If you have a browser and an internet connection, you are ready.\n\nWill I get a certificate?\n+\n\nYes. Certificates carry a QR code anyone can scan to verify them on our site, and they share to LinkedIn in one click. Free courses issue a verified certificate automatically when you pass every task.\n\nHow do live classes, hackathons and webinars work?\n+\n\nLive classes run inside the portal at scheduled times and attendance is recorded automatically. Hackathons and webinars need a free account, so sign in with Google or email first. Some hackathons are free to enter and some have an entry fee, which is always shown on the event page.\n\nReady to Start Your AI Journey?\n\nJoin learners across Pakistan building their future with EchoLens.\n\nStart Free\nExplore Courses\n100+\nCoding Quests\n39\nLive Courses\n6\nProgress Stages\n3\nFully Free Courses\nStay in the Loop\n\nGet new courses, hackathons and free resources by email.\n\n→\nEchoLens\nDigital\n\nEmpowering the next generation of AI engineers and tech leaders in Pakistan and beyond.\n\nCourses\nLive Tech Courses & Bootcamps\nFree Certified Courses\nAll 31 Courses\nLearn Free\nFree Online Courses\nBrowser Compiler\nHackathons & Webinars\nVerify a Certificate\nCommunity\nAnnouncements\nFeedback\nOpen Portal\nStudent Login\nEnroll in a Course\nStudent Projects\nFor Recruiters\nContact\ninfo@echolens.digital\nWhatsApp: 0314 1479109\n© 2026 EchoLens Digital. All rights reserved.\nPrivacy\nMade with ♥ in Pakistan"
+  },
+  {
+    "name": "catalogue-mobile",
+    "url": "http://127.0.0.1:4318/courses",
+    "title": "All Courses - AI, Coding, Data Science & Design | EchoLens Digital",
+    "heading": [
+      "EchoLens Course Catalogue",
+      "Bootcamps (5)",
+      "Short Courses (24)",
+      "Specialist Tracks (10)"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 55,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Home",
+        "width": 35,
+        "height": 17
+      },
+      {
+        "text": "All courses",
+        "width": 64,
+        "height": 18
+      },
+      {
+        "text": "Free quests",
+        "width": 68,
+        "height": 18
+      },
+      {
+        "text": "Compiler",
+        "width": 54,
+        "height": 18
+      },
+      {
+        "text": "info@echolens.digital",
+        "width": 129,
+        "height": 18
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nCompiler\nFAQ\nLogin\nGet Started\nHome / Courses\nAUGUST 2026 COHORT\n39 PROGRAMS\nEchoLens Course Catalogue\n\n39 live, instructor-led online programs across AI, data science, web development and design. Learn by solving real coding quests in your browser, earn gems, and collect verified certificates. Three courses are completely free.\n\nStart free\nFree quests & events\nBootcamps (5)\nAI Automation with n8n & Make.com\nRs 5,000 · 2 weeks · 8h\nPrompt Engineering & ChatGPT/Claude Mastery\nRs 5,000 · 2 weeks · 8h\nAI-Assisted Coding with Cursor, Claude & Copilot\nRs 5,000 · 2 weeks · 8h\nExcel + AI for Office Professionals\nRs 5,000 · 2 weeks · 8h\nCanva & AI Content Creation\nRs 5,000 · 2 weeks · 8h\nShort Courses (24)\nPython for Data Science\nRs 12,500 · 6 weeks · 24h\nGenerative AI Essentials\nRs 14,000 · 6 weeks · 24h\nData Analytics with SQL & Power BI\nRs 13,500 · 6 weeks · 24h\nIntroduction to Machine Learning\nRs 13,000 · 6 weeks · 24h\nAI Automation Tools Track\nRs 14,000 · 6 weeks · 24h\nFrontend Web Development with HTML, CSS & JavaScript\nRs 13,000 · 6 weeks · 24h\nJavaScript Deep Dive: DOM, Async & APIs\nRs 13,000 · 6 weeks · 24h\nDigital Marketing & SEO Fundamentals\nRs 12,000 · 6 weeks · 24h\nFreelancing & Client Acquisition Mastery\nRs 10,000 · 6 weeks · 24h\nGraphic Design Basics\nRs 10,000 · 6 weeks · 24h\nContent Writing with AI\nRs 9,000 · 6 weeks · 24h\nGraphic Designing\nRs 12,000 · 6 weeks · 24h\nUI/UX Designing\nRs 12,000 · 6 weeks · 24h\n3D Modeling, Rendering and Introductory Animation\nRs 13,000 · 6 weeks · 18h\nCS-101: Fundamentals of C\nFree · 5 weeks · 12h\nCS-102: Fundamentals of C++ (with OOP)\nFree · 4 weeks · 12h\nCS-104: Fundamentals of Python\nFree · 5 weeks · 12h\nCS-105: Fundamentals of JavaScript\nFree · 5 weeks · 12h\nCS-106: Fundamentals of HTML & CSS\nFree · 5 weeks · 12h\nAdvanced C Programming\nFree · 4 weeks · 12h\nAdvanced C++ Programming\nFree · 4 weeks · 12h\nAdvanced Python Programming\nFree · 5 weeks · 15h\nAdvanced JavaScript Programming\nFree · 5 weeks · 15h\nAdvanced CSS and Web Development\nFree · 5 weeks · 15h\nSpecialist Tracks (10)\nWordPress Development\nRs 20,000 · 8 weeks · 32h\nData Analytics Specialist Track\nRs 21,500 · 8 weeks · 32h\nGenerative AI Engineering\nRs 22,500 · 8 weeks · 32h\nAI Agents & Automation Engineering\nRs 23,000 · 8 weeks · 32h\nMachine Learning Fundamentals\nRs 21,500 · 8 weeks · 32h\nDeep Learning with PyTorch\nRs 23,000 · 8 weeks · 32h\nFull-Stack JavaScript: React, Node & PostgreSQL\nRs 25,000 · 8 weeks · 32h\nReact + Next.js Frontend Specialist\nRs 22,000 · 8 weeks · 32h\nMobile Apps with Flutter\nRs 22,000 · 8 weeks · 32h\nVideo Editing\nRs 20,000 · 8 weeks · 32h\n© 2026 EchoLens Digital - Pakistan's gamified AI & tech academy.\nAll courses · Free quests · Compiler · info@echolens.digital"
+  },
+  {
+    "name": "open-mobile",
+    "url": "http://127.0.0.1:4318/open",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Course catalogue - August 2026 cohort"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 102,
+    "unnamedButtons": [],
+    "clickOnly": [
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nBOOTCAMP\nAI Automation with n8n & Make.com\n2 Weeks · 8 Hours\nPKR 5,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-01')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nBOOTCAMP\nPrompt Engineering & ChatGPT/Claude Mastery\n2 Weeks · 8 Hours\nPKR 5,000\nView co",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-02')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "NEW\nBOOTCAMP\nAI-Assisted Coding with Cursor, Claude & Copilot\n2 Weeks · 8 Hours\nPKR 5,000\nView cours",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-05')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "NEW\nBOOTCAMP\nExcel + AI for Office Professionals\n2 Weeks · 8 Hours\nPKR 5,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-07')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "BOOTCAMP\nCanva & AI Content Creation\n2 Weeks · 8 Hours\nPKR 5,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('BC-08')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#9333EA,#6D28D9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nSHORT COURSE\nPython for Data Science\n6 Weeks · 24 Hours\nPKR 12,500\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-01')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nSHORT COURSE\nGenerative AI Essentials\n6 Weeks · 24 Hours\nPKR 14,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-02')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "HIGH DEMAND\nSHORT COURSE\nData Analytics with SQL & Power BI\n6 Weeks · 24 Hours\nPKR 13,500\nView cours",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-03')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "SHORT COURSE\nIntroduction to Machine Learning\n6 Weeks · 24 Hours\nPKR 13,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-04')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "SHORT COURSE\nAI Automation Tools Track\n6 Weeks · 24 Hours\nPKR 14,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-05')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "NEW\nSHORT COURSE\nFrontend Web Development with HTML, CSS & JavaScript\n6 Weeks · 24 Hours\nPKR 13,000\n",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-06')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      },
+      {
+        "tag": "DIV",
+        "text": "NEW\nSHORT COURSE\nJavaScript Deep Dive: DOM, Async & APIs\n6 Weeks · 24 Hours\nPKR 13,000\nView course",
+        "html": "<div class=\"oc-card\" onclick=\"courseAction('SC-07')\">\n      <div class=\"oc-top\">\n        <div class=\"oc-icon\" style=\"background:linear-gradient(135deg,#2563EB,#0EA5E9)\"><svg viewBo"
+      }
+    ],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLMS Portal Sign in free Register for a course\nCourse catalogue - August 2026 cohort\n\n31 live, instructor-led programs · Registration deadline 31 July 2026 · Batch starts 1 August 2026. Every paid course opens its first quest free - try before you enrol.\n\n39+\nLive Courses\n150+\nCoding Quests\nBuilt-in\nBrowser Compiler\nWeekly\nHackathons\nCertificates\nWith QR Verify\n4+\nLearners\nRegister for a paid course\nAll tiers\nBootcamp\nShort Course\nSpecialist Track\nAll types\nFree only\nPaid only\nAll\nBootcamps\nShort Courses\nSpecialist Tracks\nFree courses\nThe Web Developer Path\nComplete beginner to job-ready full-stack developer on the highest-demand 2026 stack: JavaScript foundations, React and PostgreSQL.\nBC-04 → SC-06 → SC-07 → ST-09\nPKR 43,500\nPKR 51,000 · Save PKR 7,500 (15%)\nRegister for the path\nHIGH DEMAND\nBOOTCAMP\nAI Automation with n8n & Make.com\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nHIGH DEMAND\nBOOTCAMP\nPrompt Engineering & ChatGPT/Claude Mastery\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nNEW\nBOOTCAMP\nAI-Assisted Coding with Cursor, Claude & Copilot\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nNEW\nBOOTCAMP\nExcel + AI for Office Professionals\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nBOOTCAMP\nCanva & AI Content Creation\n2 Weeks · 8 Hours\nPKR 5,000\nView course\nHIGH DEMAND\nSHORT COURSE\nPython for Data Science\n6 Weeks · 24 Hours\nPKR 12,500\nView course\nHIGH DEMAND\nSHORT COURSE\nGenerative AI Essentials\n6 Weeks · 24 Hours\nPKR 14,000\nView course\nHIGH DEMAND\nSHORT COURSE\nData Analytics with SQL & Power BI\n6 Weeks · 24 Hours\nPKR 13,500\nView course\nSHORT COURSE\nIntroduction to Machine Learning\n6 Weeks · 24 Hours\nPKR 13,000\nView course\nSHORT COURSE\nAI Automation Tools Track\n6 Weeks · 24 Hours\nPKR 14,000\nView course\nNEW\nSHORT COURSE\nFrontend Web Development with HTML, CSS & JavaScript\n6 Weeks · 24 Hours\nPKR 13,000\nView course\nNEW\nSHORT COURSE\nJavaScript Deep Dive: DOM, Async & APIs\n6 Weeks · 24 Hours\nPKR 13,000\nView course\nNEW\nSHORT COURSE\nDigital Marketing & SEO Fundamentals\n6 Weeks · 24 Hours\nPKR 12,000\nView course\nNEW\nSHORT COURSE\nFreelancing & Client Acquisition Mastery\n6 Weeks · 24 Hours\nPKR 10,000\nView course\nSHORT COURSE\nGraphic Design Basics\n6 Weeks · 24 Hours\nPKR 10,000\nView course\nSHORT COURSE\nContent Writing with AI\n6 Weeks · 24 Hours\nPKR 9,000\nView course\nSPECIALIST TRACK\nWordPress Development\n8 Weeks · 32 Hours\nPKR 20,000\nView course\nSHORT COURSE\nGraphic Designing\n6 Weeks · 24 Hours\nPKR 12,000\nView course\nHIGH DEMAND\nSHORT COURSE\nUI/UX Designing\n6 Weeks · 24 Hours\nPKR 12,000\nView course\nNEW\nSHORT COURSE\n3D Modeling, Rendering and Introductory Animation\n6 Weeks · 18 Hours\nPKR 13,000\nView course\nHIGH DEMAND\nSPECIALIST TRACK\nData Analytics Specialist Track\n8 Weeks · 32 Hours\nPKR 21,500\nView course\nHIGH DEMAND\nSPECIALIST TRACK\nGenerative AI Engineering\n8 Weeks · 32 Hours\nPKR 22,500\nView course\nHIGH DEMAND\nSPECIALIST TRACK\nAI Agents & Automation Engineering\n8 Weeks · 32 Hours\nPKR 23,000\nView course\nSPECIALIST TRACK\nMachine Learning Fundamentals\n8 Weeks · 32 Hours\nPKR 21,500\nView course\nSPECIALIST TRACK\nDeep Learning with PyTorch\n8 Weeks · 32 Hours\nPKR 23,000\nView course\nNEW\nSPECIALIST TRACK\nFull-Stack JavaScript: React, Node & PostgreSQL\n8 Weeks · 32 Hours\nPKR 25,000\nView course\nNEW\nSPECIALIST TRACK\nReact + Next.js Frontend Specialist\n8 Weeks · 32 Hours\nPKR 22,000\nView course\nNEW\nSPECIALIST TRACK\nMobile Apps with Flutter\n8 Weeks · 32 Hours\nPKR 22,000\nView course\nSPECIALIST TRACK\nVideo Editing\n8 Weeks · 32 Hours\nPKR 20,000\nView course\nSHORT COURSE\nCS-101: Fundamentals of C\n5 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nCS-102: Fundamentals of C++ (with OOP)\n4 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nCS-104: Fundamentals of Python\n5 Weeks · 12 Hours\nFree course\nStart now\nNEW\nSHORT COURSE\nCS-105: Fundamentals of JavaScript\n5 Weeks · 12 Hours\nFree course\nStart now\nNEW\nSHORT COURSE\nCS-106: Fundamentals of HTML & CSS\n5 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced C Programming\n4 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced C++ Programming\n4 Weeks · 12 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced Python Programming\n5 Weeks · 15 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced JavaScript Programming\n5 Weeks · 15 Hours\nFree course\nStart now\nSHORT COURSE\nAdvanced CSS and Web Development\n5 Weeks · 15 Hours\nFree course\nStart now\n\nPay via bank transfer per your fee challan, then share the receipt to confirm your seat.\n\nYour learning journey\nSpark\n0+\nGlow\n250+\nBeam\n700+\nPrism\n1400+\nAurora\n2400+\nNova\n4000+\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "free-courses-mobile",
+    "url": "http://127.0.0.1:4318/open#free",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Course catalogue - August 2026 cohort"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 29,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLMS Portal Sign in free Register for a course\nCourse catalogue - August 2026 cohort\n\n31 live, instructor-led programs · Registration deadline 31 July 2026 · Batch starts 1 August 2026. Every paid course opens its first quest free - try before you enrol.\n\n39+\nLive Courses\n150+\nCoding Quests\nBuilt-in\nBrowser Compiler\nWeekly\nHackathons\nCertificates\nWith QR Verify\n4+\nLearners\nRegister for a paid course\nAll tiers\nBootcamp\nShort Course\nSpecialist Track\nAll types\nFree only\nPaid only\nAll\nBootcamps\nShort Courses\nSpecialist Tracks\nFree courses\nThe Web Developer Path\nComplete beginner to job-ready full-stack developer on the highest-demand 2026 stack: JavaScript foundations, React and PostgreSQL.\nBC-04 → SC-06 → SC-07 → ST-09\nPKR 43,500\nPKR 51,000 · Save PKR 7,500 (15%)\nRegister for the path\nC Systems Programming\n2 courses\nC++ and Object Oriented Software Design\n2 courses\nPython Programming and Algorithmic Design\n2 courses\nJavaScript and Interactive Web Architecture\n2 courses\nModern Responsive Web Architecture (HTML & CSS)\n2 courses\nYour learning journey\nSpark\n0+\nGlow\n250+\nBeam\n700+\nPrism\n1400+\nAurora\n2400+\nNova\n4000+\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "events-mobile",
+    "url": "http://127.0.0.1:4318/open#events",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Events hub"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 24,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLMS Portal Sign in free Register for a course\nEvents hub\n\nExplore open quests, hackathons, live events and webinars. Solve, earn gems, and get certified.\n\nAll Events\nOpen Quests\nHackathons\nLive Events\nWebinars\n0\nOpen Quests\n0\nHackathons\n0\nLive Events\n0\nMy Gems Earned\n0\nParticipants\nAll Difficulties\nEasy\nMedium\nHard\nAll Languages\nPython 3\nC\nC++\nSQL\nHTML / CSS / JS\nFile / link\nAll Durations\nUnder 15 min\n15-60 min\nOver 60 min\nNewest First\nOldest First\nMost Points\nNo events match your filters right now - try clearing them, or watch the Announcements tab.\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "announcements-mobile",
+    "url": "http://127.0.0.1:4318/open#announcements",
+    "title": "Free AI & Coding Courses, Quests and Events | EchoLens Open",
+    "heading": [
+      "Announcements"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 14,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Main site",
+        "width": 53,
+        "height": 15
+      },
+      {
+        "text": "Free compiler",
+        "width": 81,
+        "height": 15
+      },
+      {
+        "text": "LMS Portal",
+        "width": 64,
+        "height": 15
+      }
+    ],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nFeedback\nCompiler\nFAQ\nLMS Portal Sign in free Register for a course\nAnnouncements\n\nNew cohorts, registration deadlines, hackathons, webinars and discounts - straight from the academy.\n\nNo announcements yet - check back soon.\nEchoLens (SMC-Private) Limited - Innovate, Educate, Elevate\nMain site · Free compiler · LMS Portal"
+  },
+  {
+    "name": "login-mobile",
+    "url": "http://127.0.0.1:4318/login",
+    "title": "EchoLens - Sign in",
+    "heading": [
+      "Learning portal"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 6,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Forgot your password?",
+        "width": 141,
+        "height": 16
+      },
+      {
+        "text": "Create a free account",
+        "width": 137,
+        "height": 16
+      },
+      {
+        "text": "Sign up as a recruiter",
+        "width": 134,
+        "height": 16
+      }
+    ],
+    "text": "Learning portal\n\nSign in with your username, email, or registration number.\n\nUsername, email, or reg no\nPassword\nSign in\n\nForgot your password?\n\nNew here? Create a free account - solve open quests, use the free compiler, earn certificates.\n\nHiring? Sign up as a recruiter to search verified student talent.\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "recruiter-signup-mobile",
+    "url": "http://127.0.0.1:4318/recruiter-signup",
+    "title": "EchoLens - Recruiter sign up",
+    "heading": [
+      "Recruiter sign up"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 11,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Sign in",
+        "width": 43,
+        "height": 16
+      },
+      {
+        "text": "Talent Marketplace privacy notes",
+        "width": 209,
+        "height": 16
+      }
+    ],
+    "text": "Recruiter sign up\n\nSearch verified student talent - real course projects, certificates and grades, confirmed by EchoLens.\n\nFull name\nWork email\nCompany name\nCompany website\nYour designation\nCity\nCompany size\nChoose one\n1-10\n11-50\n51-200\n201-500\n500+\nWhat do you typically hire for?\nCreate recruiter account\n\nAlready signed up? Sign in\n\nSee how student data is handled in the Talent Marketplace privacy notes.\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "compiler-signed-out-mobile",
+    "url": "http://127.0.0.1:4318/compiler",
+    "title": "Free Online Compiler - Python, C, C++, SQL & HTML/CSS/JS | EchoLens",
+    "heading": [],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 11,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "Live Tech Courses\nFree Certified Courses\nEvents\nAnnouncements\nCompiler\nFAQ\nLoginGet Started\nSign in to use the compiler\n\nCreate a free account to write, run and save code in the EchoLens compiler - it takes a minute and stays free.\n\nCreate a free account Already have an account? Sign in"
+  },
+  {
+    "name": "talent-projects-mobile",
+    "url": "http://127.0.0.1:4318/talent/projects",
+    "title": "EchoLens Talent Projects",
+    "heading": [
+      "Student Projects"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 1,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "Student Projects\nReal, graded coursework and self-built projects from EchoLens students.\nThe Talent Marketplace is not available - Postgres is not configured on this server."
+  },
+  {
+    "name": "showcase-mobile",
+    "url": "http://127.0.0.1:4318/login",
+    "title": "EchoLens - Sign in",
+    "heading": [
+      "Learning portal"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 6,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Forgot your password?",
+        "width": 141,
+        "height": 16
+      },
+      {
+        "text": "Create a free account",
+        "width": 137,
+        "height": 16
+      },
+      {
+        "text": "Sign up as a recruiter",
+        "width": 134,
+        "height": 16
+      }
+    ],
+    "text": "Learning portal\n\nSign in with your username, email, or registration number.\n\nUsername, email, or reg no\nPassword\nSign in\n\nForgot your password?\n\nNew here? Create a free account - solve open quests, use the free compiler, earn certificates.\n\nHiring? Sign up as a recruiter to search verified student talent.\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "privacy-mobile",
+    "url": "http://127.0.0.1:4318/privacy",
+    "title": "EchoLens - Privacy and the Talent Marketplace",
+    "heading": [
+      "Privacy"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 0,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "Privacy\n\nThis page explains what EchoLens collects in plain language, with a detailed section on the Talent Marketplace specifically. It is not a substitute for formal legal advice - if you need a full Terms of Service or a legally reviewed privacy policy, have one drafted by counsel before relying on this page for that purpose.\n\nACCOUNT AND COURSE DATA\n\nCreating a portal account collects your name, email or username, and whatever you add to your profile (phone, address, education). Course activity - submissions, grades, gems, streaks, attendance, and certificates - is recorded so the portal and your instructors can track your progress. This data is visible to EchoLens staff and, for gamification (stage, gems, streak, badges, courses), on your public learner profile at /u/<reg no> if you choose to share that link.\n\nTALENT MARKETPLACE\n\nThe Talent Marketplace is entirely opt-in for students. Nothing about it is visible to anyone until you explicitly publish your profile, and you can unpublish it at any time.\n\nWhat a published profile shows publicly - to anyone, signed in or not: your headline, about section, city, remote/availability/work-type preferences, skills, education, experience, the links you add (GitHub, LinkedIn, personal site), and your projects. It also shows a \"Verified by EchoLens\" block built automatically from your real course data: courses completed, certificates earned (each linking to its public QR verification page), your current level and gems, and per-course completion percentages from instructor-graded work. Your expected salary is only shown if you turn that on explicitly; it is hidden by default.\n\nWhat is never shown publicly, on any project or profile page, to anyone - your email, phone number, and resume. These are never rendered on a public page or to a recruiter by default, regardless of how the recruiter got there.\n\nWhat an approved recruiter can see beyond the public page - your email, phone, and resume, but only after you personally accept a specific contact request from that specific recruiter. Accepting one recruiter's request does not reveal your details to any other recruiter. Every acceptance is logged permanently (recruiter, student, timestamp, the message they sent) as an audit record, kept even if you later unpublish your profile.\n\nHow EchoLens staff use search data - recruiter searches are logged (the filters used and how many results came back) so EchoLens can see aggregate patterns, such as which skills recruiters search for most, and to review the platform for abuse. This log does not include which specific student profiles a recruiter viewed.\n\nHow to withdraw - unpublish your profile at any time from Talent Profile in the portal. This immediately removes it from search results, from its public URL (visitors get a \"not found\" page), and from every recruiter's shortlist view. It does not delete contact requests you have already accepted or the audit record of any contact reveal - those are kept for accountability, exactly as described above. An EchoLens admin can also unpublish a profile or project (for example, in response to a report); when that happens you are told the reason and can fix the issue and republish.\n\nCONTACT\n\nQuestions about your data: info@echolens.digital.\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "invalid-certificate-mobile",
+    "url": "http://127.0.0.1:4318/cert?s=QA-NONEXISTENT",
+    "title": "EchoLens - Verified Certificate",
+    "heading": [],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 0,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "✗\nNot verified. No certificate exists for this serial. It may have been revoked.\nNo valid certificate for serial QA-NONEXISTENT."
+  },
+  {
+    "name": "invalid-reset-mobile",
+    "url": "http://127.0.0.1:4318/reset-password?token=invalid",
+    "title": "EchoLens - Reset password",
+    "heading": [
+      "Reset your password"
+    ],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 4,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [
+      {
+        "text": "Back to sign in",
+        "width": 91,
+        "height": 16
+      }
+    ],
+    "text": "Reset your password\n\nChoose a new password for your account.\n\nNew password\nConfirm password\nSet new password\n\nBack to sign in\n\nEchoLens · Empowering Pakistan through Artificial Intelligence"
+  },
+  {
+    "name": "invalid-challan-mobile",
+    "url": "http://127.0.0.1:4318/challan?s=QA-NONEXISTENT",
+    "title": "EchoLens - Fee Challan",
+    "heading": [],
+    "width": 390,
+    "documentWidth": 390,
+    "overflow": [],
+    "visibleControls": 0,
+    "unnamedButtons": [],
+    "clickOnly": [],
+    "shortTargets": [],
+    "text": "✗\nNot verified. No challan exists for this serial.\nNo valid challan for serial QA-NONEXISTENT."
+  }
+]

@@ -6702,7 +6702,9 @@ async function renderAdminMailer() {
       const out = await api('/api/admin/email-blast', { method: 'POST', body: new FormData(f) });
       const attach = out.attachments ? ` with ${out.attachments} attachment${out.attachments === 1 ? '' : 's'}` : '';
       const n = out.queued ?? out.sent;
-      toast(out.smtp ? `Sending to ${n} recipients${attach}. It goes out in paced batches over the next few minutes - check the audit log for the final delivered count.` : `Queued for ${n} people${attach} - configure SMTP_* in the environment to actually send.`);
+      toast(out.dry_run
+        ? `DRY RUN: ${n} recipients${attach} logged, nothing sent. Set MAIL_DRY_RUN=false in the environment once ${out.provider || 'the bulk provider'} is set up and warmed (see RUNBOOK.md).`
+        : `Sending to ${n} recipients${attach} via ${out.provider}. It goes out in paced batches - check the audit log for the final delivered count.`);
       f.reset(); btn.disabled = false;
     } catch (err) { toast(err.message, true); btn.disabled = false; }
   });

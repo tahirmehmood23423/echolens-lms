@@ -1,0 +1,20 @@
+[
+  {
+    "viewport": 1440,
+    "documentWidth": 1440,
+    "findings": 35,
+    "workflows": 96,
+    "localLinksChecked": 80,
+    "filterChecks": "PASS",
+    "pageErrors": []
+  },
+  {
+    "viewport": 390,
+    "documentWidth": 390,
+    "findings": 35,
+    "workflows": 96,
+    "localLinksChecked": 80,
+    "filterChecks": "PASS",
+    "pageErrors": []
+  }
+]

@@ -1,0 +1,147 @@
+[
+  {
+    "id": "EVENT-CREATE",
+    "expected": "Admin event becomes visible in public listing",
+    "actual": {
+      "http": 200,
+      "id": 1,
+      "public": true
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "EVENT-REGISTER",
+    "expected": "Learner registration persists once and signed-out request is refused",
+    "actual": {
+      "anonymous": 401,
+      "registered": 200,
+      "repeat": 400,
+      "entries": 1
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "EVENT-SUBMIT",
+    "expected": "Registered learner event work persists",
+    "actual": {
+      "http": 200,
+      "rows": 1
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "EVENT-DEADLINE",
+    "expected": "Past-deadline work is refused",
+    "actual": {
+      "http": 400,
+      "data": {
+        "error": "This event is over - submissions are closed."
+      }
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "SEC-QUIZ-SCOPE",
+    "expected": "Teacher cannot use a body batch_id to create a quiz in an unassigned batch",
+    "actual": {
+      "authorizedUrlBatch": 1,
+      "unassignedBodyBatch": 2,
+      "http": 200,
+      "persistedBatch": 2
+    },
+    "status": "FAIL",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "RECRUITER-REVIEW",
+    "expected": "Request-information, resubmit and approve transitions persist",
+    "actual": {
+      "request": 400,
+      "resubmit": 400,
+      "approved": 200,
+      "status": "approved"
+    },
+    "status": "FAIL",
+    "scope": "local JSON account review; PostgreSQL marketplace and emails unverified"
+  },
+  {
+    "id": "CERT-VERIFY-API",
+    "expected": "Public certificate lookup verifies persisted synthetic serial",
+    "actual": {
+      "http": 200,
+      "valid": true
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "CHALLAN-VERIFY-API",
+    "expected": "Public challan lookup reflects synthetic paid record",
+    "actual": {
+      "http": 200,
+      "data": {
+        "serial": "EL-CH-2026-46E8AFE3",
+        "course_title": "Python for Data Science",
+        "student_name": "QA Registration",
+        "student_id": "REG-00001",
+        "gross_fee": 12500,
+        "fee_parts": [
+          {
+            "label": "Tuition fee",
+            "amount": 8750
+          },
+          {
+            "label": "Portal & LMS fee",
+            "amount": 2500
+          },
+          {
+            "label": "Examination & certification fee",
+            "amount": 1250
+          }
+        ],
+        "discounts": [],
+        "discount_label": null,
+        "discount_amount": 0,
+        "net_fee": 12500,
+        "deadline": "2026-09-30",
+        "bank": {
+          "bank_name": "Meezan Bank",
+          "account_title": "EchoLens (SMC-Private) Limited",
+          "account_number": "0123-4567890-123",
+          "iban": "PK36 MEZN 0000 0123 4567 8901",
+          "branch": "Gulberg Branch, Lahore"
+        },
+        "status": "paid",
+        "generated_at": "2026-09-09"
+      }
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "CONTRACT-PDF-instructor",
+    "expected": "Synthetic contract PDF opens and includes test party details",
+    "actual": {
+      "pages": 12,
+      "bytes": 569656,
+      "hasName": true
+    },
+    "status": "PASS",
+    "scope": "offline rendering only; document legal wording, signing, delivery, deadlines not validated"
+  },
+  {
+    "id": "CONTRACT-PDF-ambassador",
+    "expected": "Synthetic contract PDF opens and includes test party details",
+    "actual": {
+      "pages": 13,
+      "bytes": 617366,
+      "hasName": true
+    },
+    "status": "PASS",
+    "scope": "offline rendering only; document legal wording, signing, delivery, deadlines not validated"
+  }
+]

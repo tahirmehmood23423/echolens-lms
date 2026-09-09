@@ -1,0 +1,100 @@
+[
+  {
+    "id": "PERSIST-RESTART",
+    "expected": "Previously saved profile and submissions survive a server restart",
+    "actual": {
+      "city": "QA Browser City",
+      "openSubmissions": 2
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "PAID-SUBMIT",
+    "expected": "Enrolled student submission is persisted",
+    "actual": {
+      "http": 200,
+      "id": 1
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "GRADE-PERMISSION",
+    "expected": "Student cannot grade another student submission",
+    "actual": {
+      "http": 403
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "GRADE-PERSIST",
+    "expected": "Assigned teacher grading and feedback persist and are readable by learner",
+    "actual": {
+      "http": 200,
+      "studentHttp": 200,
+      "grade": 80,
+      "gems": 26,
+      "remarks": "QA reviewed feedback"
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "QUIZ-CREATE",
+    "expected": "Assigned teacher can create quiz",
+    "actual": {
+      "http": 200,
+      "data": {
+        "ok": true,
+        "quiz": {
+          "id": 1,
+          "batch_id": 1,
+          "title": "QA arithmetic quiz",
+          "questions": [
+            {
+              "no": 1,
+              "q": "What is 2 + 2?",
+              "options": [
+                "3",
+                "4",
+                "5",
+                "6"
+              ],
+              "answer": 1
+            }
+          ],
+          "duration_min": 5,
+          "points": 10,
+          "allow_ide": false,
+          "opened_at": null,
+          "closes_at": null,
+          "created_by": 2,
+          "created_at": "2026-09-09 06:34:25"
+        }
+      }
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  },
+  {
+    "id": "QUIZ-ATTEMPT",
+    "expected": "Enrolled student gets persisted result; nonmember and duplicate blocked",
+    "actual": {
+      "nonmember": 403,
+      "attempt": 200,
+      "data": {
+        "ok": true,
+        "score_pct": 100,
+        "correct": 1,
+        "total": 1,
+        "gems": 10
+      },
+      "duplicate": 400,
+      "count": 1
+    },
+    "status": "PASS",
+    "scope": "real local API + persisted record"
+  }
+]

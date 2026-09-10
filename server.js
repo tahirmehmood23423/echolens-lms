@@ -1840,7 +1840,6 @@ function sanitizeTelemetry(t) {
     keystrokes: num(t.keystrokes, 1_000_000),
     runs: num(t.runs, 10_000),
     aiRequests: num(t.aiRequests, 10_000),
-    pasteBlocked: num(t.pasteBlocked, 10_000),
   };
 }
 
@@ -2205,9 +2204,11 @@ app.post('/api/quests/:qid/problems/:pid/submit', authRequired, upload.single('f
     }
     payload = { file_url: `/uploads/${req.file.filename}` };
   } else if (code.trim().length >= 5) {
-    // Editor mode: Python / web (HTML+CSS+JS) code, or a typed written answer.
+    // Editor mode: any language supported by the shared compiler, or a typed
+    // written answer. Preserve the selected language so teachers can run the
+    // submission with the same runtime the student used.
     if (code.length > 200000) return res.status(400).json({ error: 'Your solution is too long - keep it under 200,000 characters.' });
-    payload = { code, language: ['python', 'text', 'web'].includes(String(body.language)) ? String(body.language) : (isWritten ? 'text' : 'python') };
+    payload = { code, language: ['python', 'javascript', 'typescript', 'c', 'cpp', 'java', 'go', 'sql', 'web', 'text'].includes(String(body.language)) ? String(body.language) : (isWritten ? 'text' : 'python') };
   } else {
     return res.status(400).json({ error: isWritten ? 'Write your logical answer in the editor, or upload it as a PDF or text file.' : 'Write your solution in the editor, or attach it as a PDF/Word file.' });
   }
@@ -2326,8 +2327,8 @@ app.get('/api/quest-submissions/:id', authRequired, (req, res) => {
 });
 
 /* ----------------------- activity report (student or teacher) ----------------------- */
-// Turns the telemetry captured while the student worked (time, run count, AI
-// help count, blocked paste attempts) into a short readable report. Unlike
+// Turns the telemetry captured while the student worked (time, run count and
+// AI help count) into a short readable report. Unlike
 // the AI review above, there is no grading signal here, so both the
 // submitting student and the instructor can generate/view it. Cached like
 // the AI review, with the same force-to-regenerate escape hatch.

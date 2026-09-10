@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * EchoLens code runner v2 (v10)
+ * EchoLens shared code runner (v22)
  *
  * A complete in-browser Python environment:
  *  - Pyodide inside a Web Worker: nothing runs on the server, and a stuck
@@ -561,15 +561,11 @@
     wireTelemetry(box);
   }
 
-  /* --------------------------- v13: telemetry + paste block ---------------------------
-   * Every wired editor gets: (1) pasting and drag-dropping text blocked - the
-   * point is that students type their own solution - and (2) lightweight
-   * timing/activity counters so a task can later report how long the student
-   * actually spent, how much of that was active typing vs idle/thinking, how
-   * many times they ran the code, how many times they asked the AI assistant
-   * for help, and how many paste attempts were blocked. Nothing here is sent
-   * anywhere on its own - callers pull a snapshot when they need one (e.g. on
-   * submit) via telemetrySnapshot().
+  /* --------------------------- editor activity telemetry ---------------------------
+   * Every wired editor records lightweight timing/activity counters so a task
+   * can report time, runs and AI help. Paste and drag/drop use the browser's
+   * normal editing behaviour; learners often need to move starter code,
+   * terminal output and project files between local tools and this editor.
    */
   const IDLE_GAP_MS = 30000; // gaps longer than this don't count as "active" typing time
   const telemetryState = new WeakMap(); // box -> state
@@ -577,36 +573,13 @@
   function tState(box) {
     let st = telemetryState.get(box);
     if (!st) {
-      st = { startedAt: Date.now(), lastActivityAt: null, activeMs: 0, firstKeystrokeAt: null, keystrokes: 0, runs: 0, aiRequests: 0, pasteBlocked: 0 };
+      st = { startedAt: Date.now(), lastActivityAt: null, activeMs: 0, firstKeystrokeAt: null, keystrokes: 0, runs: 0, aiRequests: 0 };
       telemetryState.set(box, st);
     }
     return st;
   }
-  function flashWarning(box, text) {
-    const wrap = box.closest('.editor-wrap') || box.parentNode;
-    let warn = wrap.querySelector('.editor-paste-warn');
-    if (!warn) {
-      warn = document.createElement('div');
-      warn.className = 'editor-paste-warn';
-      warn.style.cssText = 'position:absolute;right:8px;bottom:8px;background:#3B1220;color:#FFD6DE;border:1px solid #7A2338;border-radius:8px;padding:5px 10px;font-size:12px;z-index:5;opacity:0;transition:opacity .15s';
-      if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
-      wrap.appendChild(warn);
-    }
-    warn.textContent = text;
-    warn.style.opacity = '1';
-    clearTimeout(warn._h);
-    warn._h = setTimeout(() => { warn.style.opacity = '0'; }, 2200);
-  }
   function wireTelemetry(box) {
     const st = tState(box);
-    const blockCopy = (e) => {
-      e.preventDefault();
-      st.pasteBlocked += 1;
-      flashWarning(box, 'Pasting is disabled here - type your solution manually.');
-    };
-    box.addEventListener('paste', blockCopy);
-    box.addEventListener('drop', blockCopy);
-    box.addEventListener('dragover', (e) => e.preventDefault());
     box.addEventListener('input', () => {
       const now = Date.now();
       if (st.firstKeystrokeAt == null) st.firstKeystrokeAt = now;
@@ -633,21 +606,36 @@
       keystrokes: st.keystrokes,
       runs: st.runs,
       aiRequests: st.aiRequests,
-      pasteBlocked: st.pasteBlocked,
     };
   }
-  const gutterState = new WeakMap(); // box -> { gutter, errorLine }
+  const gutterState = new WeakMap(); // box -> { gutter, marker, errorLine }
   function addLineGutter(box) {
     if (box.dataset.gutterWired) return;
     box.dataset.gutterWired = '1';
-    const wrap = document.createElement('div');
-    wrap.className = 'editor-wrap' + (box.classList.contains('ide-editor') ? ' ide' : '');
-    box.parentNode.insertBefore(wrap, box);
-    const gutter = document.createElement('div');
-    gutter.className = 'editor-gutter';
-    wrap.appendChild(gutter);
-    wrap.appendChild(box);
-    const state = { gutter, errorLine: null };
+    // The course and event workspaces already render their own .ide2-gutter.
+    // Reuse it so wiring the common runner never creates duplicate line
+    // numbers beside those editors.
+    const suppliedGutter = box.previousElementSibling && box.previousElementSibling.classList.contains('ide2-gutter')
+      ? box.previousElementSibling : null;
+    let wrap = box.parentNode;
+    let gutter = suppliedGutter;
+    if (!gutter) {
+      wrap = document.createElement('div');
+      wrap.className = 'editor-wrap' + (box.classList.contains('ide-editor') ? ' ide' : '');
+      box.parentNode.insertBefore(wrap, box);
+      gutter = document.createElement('div');
+      gutter.className = 'editor-gutter';
+      wrap.appendChild(gutter);
+    }
+    const pane = document.createElement('div');
+    pane.className = 'editor-code-pane';
+    const marker = document.createElement('div');
+    marker.className = 'editor-error-line';
+    marker.setAttribute('aria-hidden', 'true');
+    pane.appendChild(marker);
+    pane.appendChild(box);
+    wrap.appendChild(pane);
+    const state = { gutter, marker, errorLine: null };
     gutterState.set(box, state);
     // One <div> per line (not a single text blob) so a specific line can be
     // picked out and highlighted red once an error points at it - see
@@ -658,17 +646,27 @@
       for (let i = 1; i <= n; i++) s += `<div class="editor-gutter-line${i === state.errorLine ? ' err' : ''}">${i}</div>`;
       gutter.innerHTML = s;
     };
-    box.addEventListener('input', () => { state.errorLine = null; render(); });
-    box.addEventListener('scroll', () => { gutter.scrollTop = box.scrollTop; });
+    box.addEventListener('input', () => { state.errorLine = null; render(); state.positionMarker && state.positionMarker(); });
+    const positionMarker = () => {
+      if (!state.errorLine) { marker.style.display = 'none'; return; }
+      const style = getComputedStyle(box);
+      const lineHeight = parseFloat(style.lineHeight) || 20;
+      const paddingTop = parseFloat(style.paddingTop) || 0;
+      marker.style.display = 'block';
+      marker.style.height = lineHeight + 'px';
+      marker.style.top = (paddingTop + (state.errorLine - 1) * lineHeight - box.scrollTop) + 'px';
+    };
+    box.addEventListener('scroll', () => { gutter.scrollTop = box.scrollTop; positionMarker(); });
     state.render = render;
+    state.positionMarker = positionMarker;
     render();
   }
   /** Re-renders a wired editor's gutter after its value was set programmatically (input events don't fire for that) - call after any `box.value = ...` assignment. Safe to call on an editor that was never wired. */
   function refreshGutter(box) {
     const state = gutterState.get(box);
-    if (state) { state.errorLine = null; state.render(); }
+    if (state) { state.errorLine = null; state.render(); state.positionMarker(); }
   }
-  /** Points at the exact line a traceback/compiler error named: highlights that row in the gutter red and selects the line's text in the editor itself (a plain <textarea> can't tint one line's background, but native text selection is visible and precise) - "where is the error", answered directly in the code. */
+  /** Points at the exact line a traceback/compiler error named: paints the full editor row and its gutter number red, scrolls it into view, and selects its text. */
   function markErrorLine(box, lineNo) {
     const state = gutterState.get(box);
     if (!state || !lineNo || lineNo < 1) return;
@@ -676,6 +674,7 @@
     if (lineNo > lines.length) return;
     state.errorLine = lineNo;
     state.render();
+    state.positionMarker();
     const lineEl = state.gutter.children[lineNo - 1];
     if (lineEl) lineEl.scrollIntoView({ block: 'center' });
     let start = 0;
@@ -685,29 +684,108 @@
   }
   function clearErrorLine(box) {
     const state = gutterState.get(box);
-    if (state && state.errorLine != null) { state.errorLine = null; state.render(); }
+    if (state && state.errorLine != null) { state.errorLine = null; state.render(); state.positionMarker(); }
+  }
+
+  /* ---------------------- JavaScript / TypeScript runner ---------------------- */
+  const TYPESCRIPT_URL = 'https://cdn.jsdelivr.net/npm/typescript@5.9.3/lib/typescript.js';
+  let typescriptPromise = null;
+  function loadTypeScript(status) {
+    if (window.ts) return Promise.resolve(window.ts);
+    if (!typescriptPromise) {
+      status && status('Loading TypeScript compiler (first run only)...');
+      typescriptPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = TYPESCRIPT_URL;
+        script.onload = () => resolve(window.ts);
+        script.onerror = () => reject(new Error('Could not load the TypeScript compiler - check your internet connection.'));
+        document.head.appendChild(script);
+      });
+    }
+    return typescriptPromise;
+  }
+  function runJavaScript(code, { term, onStatus }) {
+    const status = (text) => { try { onStatus && onStatus(text); } catch {} };
+    term.clear();
+    status('Running JavaScript...');
+    const prelude = 'const _echoText=v=>{try{return typeof v==="object"?JSON.stringify(v):String(v)}catch(_){return String(v)}};console={log:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),info:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),warn:(...a)=>postMessage({type:"out",text:"Warning: "+a.map(_echoText).join(" ")+"\\n"}),error:(...a)=>postMessage({type:"out",text:"Error: "+a.map(_echoText).join(" ")+"\\n"})};';
+    const source = `${prelude}\n${String(code)}\npostMessage({type:"done"});`;
+    return new Promise((resolve) => {
+      const scriptUrl = URL.createObjectURL(new Blob([source], { type: 'application/javascript' }));
+      const scriptWorker = new Worker(scriptUrl);
+      let finished = false;
+      const finish = (result) => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        scriptWorker.terminate();
+        URL.revokeObjectURL(scriptUrl);
+        status(result.ok ? 'Done.' : 'Finished with an error - check the red line.');
+        resolve(result);
+      };
+      const timer = setTimeout(() => {
+        term.print('[Stopped: JavaScript ran longer than 10 seconds. Check for an infinite loop.]\n');
+        finish({ ok: false });
+      }, 10000);
+      scriptWorker.onmessage = (event) => {
+        if (event.data?.type === 'out') term.print(event.data.text);
+        else if (event.data?.type === 'done') finish({ ok: true });
+      };
+      scriptWorker.onerror = (event) => {
+        event.preventDefault();
+        const line = Math.max(1, Number(event.lineno || 1) - 1);
+        term.print(`${event.message || 'JavaScript error'} (line ${line})\n`);
+        finish({ ok: false, errorLine: line });
+      };
+    });
+  }
+  async function runTypeScript(code, opts) {
+    const status = (text) => { try { opts.onStatus && opts.onStatus(text); } catch {} };
+    const ts = await loadTypeScript(status);
+    status('Checking TypeScript...');
+    const result = ts.transpileModule(String(code), {
+      fileName: 'main.ts', reportDiagnostics: true,
+      compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None, jsx: ts.JsxEmit.ReactJSX },
+    });
+    const errors = (result.diagnostics || []).filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
+    if (errors.length) {
+      opts.term.clear();
+      for (const diagnostic of errors) {
+        const position = diagnostic.file && diagnostic.start != null ? diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start) : null;
+        const line = position ? position.line + 1 : null;
+        opts.term.print(`TypeScript error${line ? ` on line ${line}` : ''}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')}\n`);
+      }
+      status('TypeScript check failed - check the red line.');
+      const first = errors[0], position = first.file && first.start != null ? first.file.getLineAndCharacterOfPosition(first.start) : null;
+      return { ok: false, errorLine: position ? position.line + 1 : null };
+    }
+    status('TypeScript check passed. Running JavaScript...');
+    // The generated JavaScript can shift line numbers after interfaces and
+    // type annotations are removed, so syntax diagnostics above point to the
+    // original source while runtime output remains in the terminal.
+    const executed = await runJavaScript(result.outputText, opts);
+    return executed.ok ? executed : { ...executed, errorLine: null };
   }
 
   /* --------------------------- web runner (v11) --------------------------- */
   // HTML / CSS / JavaScript run in a sandboxed live preview. A full page
   // (with <html> or <!doctype>) renders as-is; a fragment gets wrapped.
   // console.log / errors are forwarded to the terminal-style log below.
-  function webPreview(iframe, code, onLog) {
+  function webPreview(iframe, code, onLog, onErrorLine) {
     const raw = String(code || '');
     const isFullPage = /<\s*html|<!doctype/i.test(raw);
-    const bridge = `<script>
-      (function(){
-        function send(kind, args){ parent.postMessage({ echoweb: true, kind: kind, text: args.map(function(a){ try { return typeof a === 'object' ? JSON.stringify(a) : String(a); } catch(e){ return String(a); } }).join(' ') }, '*'); }
-        ['log','warn','error','info'].forEach(function(k){ var orig = console[k]; console[k] = function(){ send(k, [].slice.call(arguments)); orig.apply(console, arguments); }; });
-        window.addEventListener('error', function(e){ send('error', [e.message + ' (line ' + e.lineno + ')']); });
-      })();
-    <\/script>`;
+    // Keep the bridge on one physical line so the browser's reported source
+    // line still matches the learner's editor after it is injected.
+    const bridge = `<script>(function(){function send(kind,args,line){parent.postMessage({echoweb:true,kind:kind,line:line||null,text:args.map(function(a){try{return typeof a==='object'?JSON.stringify(a):String(a)}catch(e){return String(a)}}).join(' ')},'*')}['log','warn','error','info'].forEach(function(k){var orig=console[k];console[k]=function(){send(k,[].slice.call(arguments));orig.apply(console,arguments)}});window.addEventListener('error',function(e){send('error',[e.message+' (line '+e.lineno+')'],e.lineno)})})();<\/script>`;
     const doc = isFullPage
       ? raw.replace(/<head(\s[^>]*)?>/i, (m2) => m2 + bridge) || bridge + raw
       : `<!doctype html><html><head><meta charset="utf-8">${bridge}<style>body{font-family:system-ui,sans-serif;margin:12px;color:#16233A}</style></head><body>${raw}</body></html>`;
     if (iframe._echoLogHandler) window.removeEventListener('message', iframe._echoLogHandler);
     iframe._echoLogHandler = (e) => {
-      if (e.data && e.data.echoweb && onLog) onLog(e.data.kind, e.data.text);
+      if (e.data && e.data.echoweb) {
+        if (onLog) onLog(e.data.kind, e.data.text, e.data.line);
+        if (e.data.kind === 'error' && e.data.line && onErrorLine) onErrorLine(Number(e.data.line));
+      }
     };
     window.addEventListener('message', iframe._echoLogHandler);
     iframe.srcdoc = isFullPage && !/<head/i.test(raw) ? bridge + raw : doc;
@@ -795,12 +873,17 @@
       return { ok: true };
     } catch (e) {
       term.print('SQL error: ' + e.message + '\n');
-      status('Finished with an error - read the message above.');
-      return { ok: false };
+      const token = String(e.message || '').match(/near\s+["']([^"']+)["']/i)?.[1];
+      const tokenIndex = token ? String(code).toLowerCase().indexOf(token.toLowerCase()) : -1;
+      const errorLine = tokenIndex >= 0
+        ? String(code).slice(0, tokenIndex).split('\n').length
+        : /incomplete input/i.test(String(e.message || '')) ? Math.max(1, String(code).trimEnd().split('\n').length) : null;
+      status(`Finished with an SQL error${errorLine ? ` on line ${errorLine}` : ''} - check the red line and output.`);
+      return { ok: false, errorLine };
     } finally { db.close(); }
   }
 
-  /* ============================== v19: C / C++ / Java ==============================
+  /* ============================== native compilers ==============================
    * Compiled and run through Compiler Explorer's public execution API
    * (godbolt.org) - real gcc/g++/OpenJDK, stdin supported, nothing installed
    * on the EchoLens server. This replaced the emkc.org Piston API, which
@@ -814,6 +897,7 @@
     c: { id: 'cg132', lang: 'c', label: 'gcc 13.2' },
     cpp: { id: 'g132', lang: 'c++', label: 'gcc 13.2' },
     java: { id: 'java2102', lang: 'java', label: 'OpenJDK 21' },
+    go: { id: 'gl1260', lang: 'go', label: 'Go 1.26' },
   };
   const ANSI_RE = /\x1b\[[0-9;]*[a-zA-Z]/g; // strip terminal colour codes from CE's diagnostics
   function ceText(lines) { return (lines || []).map((l) => String(l.text || '').replace(ANSI_RE, '')).join('\n'); }
@@ -835,7 +919,7 @@
     // If the program reads input, collect it up-front (compiled programs run
     // remotely, so input is provided as stdin lines before the run).
     let stdin = '';
-    if (/\b(scanf|cin\s*>>|getline|gets|fgets|getchar|Scanner|nextInt|nextLine|nextDouble)\b/.test(code)) {
+    if (/\b(scanf|cin\s*>>|getline|gets|fgets|getchar|Scanner|nextInt|nextLine|nextDouble|fmt\.Scan(?:f|ln)?)\b/.test(code)) {
       term.print('This program reads input. Type ALL input lines below (press Enter after each, empty line to finish):\n');
       const lines = [];
       for (let i = 0; i < 30; i++) {
@@ -846,12 +930,14 @@
       stdin = lines.join('\n');
       term.print('\n');
     }
-    status(lang === 'c' ? 'Compiling & running C (gcc)...' : lang === 'java' ? 'Compiling & running Java (OpenJDK)...' : 'Compiling & running C++ (g++)...');
+    status(lang === 'c' ? 'Compiling & running C (gcc)...' : lang === 'java' ? 'Compiling & running Java (OpenJDK)...' : lang === 'go' ? 'Compiling & running Go...' : 'Compiling & running C++ (g++)...');
     // Sibling files (other tabs in the same project) ride along by being
     // concatenated ahead of the active file - Compiler Explorer's execute
     // endpoint compiles a single translation unit, so this is a best-effort
     // stand-in for the real multi-file compile a native toolchain would do.
-    const siblingSrc = (extraFiles || []).map((f) => `// ---- ${f.name} ----\n${f.content}`).join('\n\n');
+    const sourceExtension = { c: /\.(?:c|h)$/i, cpp: /\.(?:cc|cpp|cxx|h|hpp)$/i, java: /\.java$/i, go: /\.go$/i }[lang];
+    const siblingSrc = (extraFiles || []).filter((f) => sourceExtension.test(f.name)).map((f) => `// ---- ${f.name} ----\n${f.content}`).join('\n\n');
+    const activeLineOffset = siblingSrc ? `${siblingSrc}\n\n// ---- main ----\n`.split('\n').length - 1 : 0;
     let source = siblingSrc ? `${siblingSrc}\n\n// ---- main ----\n${code}` : String(code);
     // Compiler Explorer always compiles as a fixed filename, so a top-level
     // `public class Main` (Piston's old convention, still what students type)
@@ -889,7 +975,9 @@
         // take the first match, since that is the earliest real error (later
         // ones are often cascading from it).
         const m = msg.match(/:(\d+)(?::\d+)?:\s*(?:fatal\s+)?error/i);
-        return { ok: false, errorLine: m ? Number(m[1]) : null };
+        const reportedLine = m ? Number(m[1]) : null;
+        const errorLine = reportedLine && reportedLine > activeLineOffset ? reportedLine - activeLineOffset : null;
+        return { ok: false, errorLine };
       }
       const ex = d.execResult || {};
       const out = ceText(ex.stdout);
@@ -907,11 +995,14 @@
   }
 
   /* ----------------------- v12: one runner, every language -----------------------
-   * EchoRun.executeAny('python'|'sql'|'c'|'cpp', code, opts) - opts.files may
+   * EchoRun.executeAny() runs Python, JavaScript, TypeScript, SQL, C, C++,
+   * Java and Go. opts.files may
    * be {name, url} (fetched with the signed-in cookie) or {name, bytes}
    * (already-loaded local uploads / URL datasets).
    */
   async function executeAny(lang, code, opts) {
+    opts = opts || {};
+    if (opts.editor) clearErrorLine(opts.editor);
     const files = [];
     for (const f of (opts.files || [])) {
       if (f.bytes) files.push(f);
@@ -922,9 +1013,14 @@
         } catch {}
       }
     }
-    if (lang === 'sql') return runSql(code, { ...opts, files });
-    if (lang === 'c' || lang === 'cpp' || lang === 'java') return runNative(lang, code, opts);
-    return execute(code, { ...opts, files });
+    let result;
+    if (lang === 'sql') result = await runSql(code, { ...opts, files });
+    else if (lang === 'javascript') result = await runJavaScript(code, opts);
+    else if (lang === 'typescript') result = await runTypeScript(code, opts);
+    else if (['c', 'cpp', 'java', 'go'].includes(lang)) result = await runNative(lang, code, opts);
+    else result = await execute(code, { ...opts, files });
+    if (opts.editor && result && !result.ok && result.errorLine) markErrorLine(opts.editor, result.errorLine);
+    return result;
   }
   // Pull a dataset from a URL through the server proxy (avoids CORS) and
   // return { name, bytes } ready to mount into any language's run.

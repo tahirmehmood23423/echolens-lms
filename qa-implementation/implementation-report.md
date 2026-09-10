@@ -36,11 +36,14 @@ Free-course enrollment now uses the learner's existing account. Both the open-we
 
 A local Windows write failure discovered during validation was also fixed: atomic JSON writes use a unique temporary file, writable fsync and bounded rename retry while preserving the last good file. New critical async handlers forward failures to Express error handling. This does not claim every legacy async route has been rewritten.
 
+The shared compiler now permits normal copy, paste and drag/drop editing. Python, JavaScript, TypeScript, C, C++, Java, Go, SQL and HTML/CSS/JavaScript are available in the standalone compiler, eligible course assignments and event workspaces; paid submission records preserve the selected runtime for teacher replay. Compiler, interpreter and browser-preview diagnostics mark the reported source row red and select it. The file panel documents the project formats used by the current assignments, including TypeScript/TSX, Go, configuration, infrastructure and Docker files.
+
 ## Verification results
 
 | Check | Result | Evidence |
 |---|---|---|
-| Focused unit tests | 30 passed, 0 failed | Upload/session, free-course enrollment, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence |
+| Focused unit tests | 38 passed, 0 failed | All non-PostgreSQL tests: upload/session, free-course enrollment, offering/delivery, drafts, attempts/worker/mastery, staged tech tracks, certificate rules, gems and atomic persistence |
+| Compiler browser regression | Passed | [Screenshot](evidence/compiler-error-line.png): native paste accepted; 9 language modes present; JavaScript runtime and TypeScript syntax failures both marked the exact line red; course workspace reused one synchronized gutter |
 | Free enrollment API | 7 passed | [Results](evidence/free-enrollment-after.json): free learner and portal student, retry idempotency, three staff-role denials, unknown course and no paid/grade mutation |
 | Free enrollment browser | 5 passed | [Results](evidence/free-enrollment-browser.json): persisted My courses for both learner roles, both enrollment CTAs and staff preview without enrollment action |
 | Security API checks | 7 passed | [Results](evidence/security-after.json), [pre-fix reproduction](evidence/security-before.json) |
@@ -57,7 +60,7 @@ The browser helper suppresses external services for routine app tests. Video pro
 
 ## Course/video verification
 
-The complete inventory contains **10 courses, 47 modules, 142 lessons and 142 assignments**. The original **131 unique videos all reported AVAILABLE**. Standard embeds demonstrated playback for **107**, with **24 UNVERIFIED** in the short probe. The app's actual privacy-enhanced embed demonstrated playback for **128**, with **3 UNVERIFIED**. These are separate observations; a timeout is not proof of a broken link.
+The published inventory contains **10 courses, 47 modules, 142 lessons and 142 assignments**. Six additional Trending Tech tracks are staged with 24 modules, 72 lectures, 72 assignments and 6 capstones; they remain hidden while all 72 required EchoLens video URLs are absent. The original **131 unique videos all reported AVAILABLE**. Standard embeds demonstrated playback for **107**, with **24 UNVERIFIED** in the short probe. The app's actual privacy-enhanced embed demonstrated playback for **128**, with **3 UNVERIFIED**. These are separate observations; a timeout is not proof of a broken link.
 
 After corrections there are 141 video-backed lessons using 130 unique recordings and 1 guide-backed lesson. Input/strings/loops corrections reuse verified creator chapters and preserve useful original resources. JavaScript async generators now has an official guide while a suitable video awaits review. C++ classes still has a confirmed topic mismatch needing an inspected replacement. Available titles/chapters support a partial relevance review; inaccessible transcripts mean full lesson-to-assignment suitability remains UNVERIFIED throughout the inventory. The curriculum report specifies exactly what to inspect and proposes outlines without changing assessment IDs or historical completion.
 

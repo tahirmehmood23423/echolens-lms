@@ -1460,7 +1460,7 @@ function svLangOptions() {
   // the web option instead of defaulting to Python every time.
   const def = CUR_PROBLEM?.problem.language || CUR.track.default_language || 'python';
   const opt = (value, label) => `<option value="${value}"${value === def ? ' selected' : ''}>${label}</option>`;
-  return opt('python', 'Python 3') + opt('c', 'C') + opt('cpp', 'C++') + opt('java', 'Java') + opt('sql', 'SQL') + opt('web', 'HTML / CSS / JS');
+  return opt('python', 'Python 3') + opt('javascript', 'JavaScript') + opt('typescript', 'TypeScript') + opt('c', 'C') + opt('cpp', 'C++') + opt('java', 'Java') + opt('go', 'Go') + opt('sql', 'SQL') + opt('web', 'HTML / CSS / JS');
 }
 const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 function svCertNote() { return CUR.track.free ? (CUR.track.capstone ? ' Pass every required assignment and the staff-reviewed capstone to receive your verified certificate.' : ' Pass every required assessment at its stated threshold and your verified certificate is issued automatically.') : ''; }
@@ -1826,12 +1826,13 @@ async function runSolve() {
   if (!code.trim()) { status.textContent = 'Write some code first.'; return; }
   const lang = $('svLang').value;
   if (lang === 'web') {
+    EchoRun.clearErrorLine($('svCode'));
     const log = $('svWebLog'); if (log) log.textContent = '';
     EchoWeb.preview($('svWebFrame'), code, (kind, text) => {
       if (!log) return;
       log.textContent += (kind === 'error' ? '✗ ' : kind === 'warn' ? '! ' : '› ') + text + '\n';
       log.scrollTop = log.scrollHeight;
-    });
+    }, (line) => EchoRun.markErrorLine($('svCode'), line));
     status.textContent = 'Preview updated.';
     return;
   }
@@ -1841,8 +1842,10 @@ async function runSolve() {
   status.textContent = 'Running…';
   const started = performance.now();
   try {
-    await EchoRun.executeAny($('svLang').value, code, { term: SV_TERM, files: SV_FILES, onStatus: (t) => { status.textContent = t; } });
-    status.innerHTML = `<span class="done"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>Done.</span>`;
+    const result = await EchoRun.executeAny($('svLang').value, code, { term: SV_TERM, files: SV_FILES, editor:$('svCode'), onStatus: (t) => { status.textContent = t; } });
+    status.innerHTML = result?.ok
+      ? `<span class="done"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>Done.</span>`
+      : `<span style="color:var(--danger);font-weight:700">Fix the highlighted error${result?.errorLine ? ` on line ${result.errorLine}` : ''}.</span>`;
     if (exec) exec.textContent = 'Execution time: ' + ((performance.now() - started) / 1000).toFixed(2) + 's';
   }
   catch (e) { status.textContent = e.message; }
@@ -1907,19 +1910,23 @@ async function submitSolve(fileForm) {
 /* ---------------------------- events (signed in) ---------------------------- */
 const EV_KIND_LABEL = { quest: 'Quest', hackathon: 'Hackathon', competition: 'Competition', webinar: 'Webinar' };
 const EV_KIND_TAG = { quest: 'Open Quest', hackathon: 'Hackathon', competition: 'Competition', webinar: 'Webinar' };
-const EV_LANG_LABEL = { none: 'File or link submission', python: 'Python 3', c: 'C', cpp: 'C++', sql: 'SQL', web: 'HTML / CSS / JS' };
-const EV_LANG_SHORT = { none: 'Submission', python: 'Python 3', c: 'C', cpp: 'C++', sql: 'SQL', web: 'Web' };
+const EV_LANG_LABEL = { none: 'File or link submission', python: 'Python 3', javascript: 'JavaScript', typescript: 'TypeScript', c: 'C', cpp: 'C++', java: 'Java', go: 'Go', sql: 'SQL', web: 'HTML / CSS / JS' };
+const EV_LANG_SHORT = { none: 'Submission', python: 'Python 3', javascript: 'JavaScript', typescript: 'TypeScript', c: 'C', cpp: 'C++', java: 'Java', go: 'Go', sql: 'SQL', web: 'Web' };
 const EV_THUMB = {
   quest: { g: 'linear-gradient(135deg,#0FBFA8,#38BDF8)', glyph: '&gt;_ code' },
   hackathon: { g: 'linear-gradient(135deg,#7C3AED,#6366F1)', glyph: '{ } build' },
   competition: { g: 'linear-gradient(135deg,#F59E0B,#F0A82A)', glyph: '&#9733; compete' },
   webinar: { g: 'linear-gradient(135deg,#2A7BD1,#38BDF8)', glyph: '&#9673; live' },
 };
-const EV_LANG_GLYPH = { python: 'print(…)', c: '#include', cpp: 'std::cout', sql: 'SELECT *', web: '&lt;/&gt; html' };
+const EV_LANG_GLYPH = { python: 'print(...)', javascript: 'console.log', typescript: 'type App', c: '#include', cpp: 'std::cout', java: 'class Main', go: 'fmt.Println', sql: 'SELECT *', web: '&lt;/&gt; html' };
 const EV_LANG_BADGE = {
   python: { g: 'linear-gradient(135deg,#4B8BBE,#FFD43B)', t: 'Py' },
+  javascript: { g: 'linear-gradient(135deg,#F7DF1E,#D5B900)', t: 'JS' },
+  typescript: { g: 'linear-gradient(135deg,#3178C6,#235A97)', t: 'TS' },
   c: { g: 'linear-gradient(135deg,#5C6BC0,#3949AB)', t: 'C' },
   cpp: { g: 'linear-gradient(135deg,#00599C,#004482)', t: 'C++' },
+  java: { g: 'linear-gradient(135deg,#E76F00,#5382A1)', t: 'Java' },
+  go: { g: 'linear-gradient(135deg,#00ADD8,#007D9C)', t: 'Go' },
   sql: { g: 'linear-gradient(135deg,#0FBFA8,#0C8F8F)', t: 'SQL' },
   web: { g: 'linear-gradient(135deg,#F06529,#E44D26)', t: '{ }' },
 };
@@ -2198,7 +2205,7 @@ let EV_OUT_TERM = null;  // output terminal for the code editor
 let EV_CD_TIMER = null;  // countdown interval
 let EV_EDITOR_LIGHT = false;
 
-function evRunnableLang(ev) { return ['python', 'c', 'cpp', 'sql'].includes(ev.compiler) ? ev.compiler : null; }
+function evRunnableLang(ev) { return ['python', 'javascript', 'typescript', 'c', 'cpp', 'java', 'go', 'sql', 'web'].includes(ev.compiler) ? ev.compiler : null; }
 function evCurProblem() { const ps = (CUR_EVENT && CUR_EVENT.event.problems) || []; return ps.find((p) => p.pid === CUR_EV_PID) || ps[0] || null; }
 function evDraftKey(eid, pid) { return `echoev:${eid}:${pid || 0}:${(ME && ME.id) || 0}`; }
 
@@ -2555,6 +2562,15 @@ async function evRunCode() {
   const ev = CUR_EVENT.event, lang = evRunnableLang(ev);
   const btn = $('evRunBtn'), code = $('evCode');
   if (!code.value.trim()) { evOutText('Write some code first.'); return; }
+  if (lang === 'web') {
+    EchoRun.clearErrorLine(code);
+    $('evOutBody').innerHTML = '<iframe id="evWebFrame" class="web-frame" sandbox="allow-scripts" title="Live preview"></iframe><pre id="evWebLog" class="web-log"></pre>';
+    const log = $('evWebLog');
+    EchoWeb.preview($('evWebFrame'), code.value, (kind, text) => {
+      log.textContent += (kind === 'error' ? '✗ ' : kind === 'warn' ? '! ' : '› ') + text + '\n';
+    }, (line) => EchoRun.markErrorLine(code, line));
+    return;
+  }
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = evRunLabel(); return; }
   if (!EV_OUT_TERM) { $('evOutBody').innerHTML = ''; EV_OUT_TERM = EchoTerm.mount($('evOutBody')); }
   EV_OUT_TERM.clear();
@@ -2562,7 +2578,7 @@ async function evRunCode() {
   const files = [];
   if (ev.dataset_url) { try { files.push(await EchoRun.fetchDataset(ev.dataset_url)); } catch (e) { EV_OUT_TERM.print('[Dataset: ' + e.message + ']\n'); } }
   for (const f of (ev.files || [])) if (/\.(csv|tsv|txt|json)$/i.test(f.name)) files.push({ name: f.name, url: f.url });
-  try { await EchoRun.executeAny(lang, code.value, { term: EV_OUT_TERM, files, onStatus: () => {} }); }
+  try { await EchoRun.executeAny(lang, code.value, { term: EV_OUT_TERM, files, editor:code, onStatus: () => {} }); }
   catch (e) { EV_OUT_TERM.print('\n[' + e.message + ']\n'); }
   btn.innerHTML = evRunLabel();
 }

@@ -4967,7 +4967,7 @@ function openTask(qid, pid) {
   }
   if (isStudent && !lvl.unlocked) statusHtml = `<div class="task-status lock">&#128274; This level is locked - pass the previous level first. You can read the task and practice in the editor, but not submit yet.</div>`;
 
-  // Activity report: deterministic time/run/AI-help/paste-block stats show
+  // Activity report: deterministic time/run/AI-help stats show
   // immediately (no AI call, pure math); the readable narrative is generated
   // on demand and cached on the submission (same cached/force pattern as the
   // teacher's AI review), visible to the student and the instructor alike.
@@ -4979,7 +4979,6 @@ function openTask(qid, pid) {
       <span><strong>${fmtMin(stat.activeMs)}</strong> active coding</span>
       <span><strong>${stat.runs || 0}</strong> run${(stat.runs || 0) === 1 ? '' : 's'}</span>
       <span><strong>${stat.aiRequests || 0}</strong> AI question${(stat.aiRequests || 0) === 1 ? '' : 's'}</span>
-      <span><strong>${stat.pasteBlocked || 0}</strong> paste attempt${(stat.pasteBlocked || 0) === 1 ? '' : 's'} blocked</span>
     </div>` : '';
   const activityReportInner = sub && sub.activity_report
     ? `<pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px;max-height:34vh;overflow-y:auto">${esc(sub.activity_report.text)}</pre>
@@ -5008,9 +5007,12 @@ function openTask(qid, pid) {
   const langOptions = isWritten
     ? `<option value="text" selected>Written answer</option>`
     : `<option value="python"${prevLang === 'python' ? ' selected' : ''}>Python 3</option>
+       <option value="javascript"${prevLang === 'javascript' ? ' selected' : ''}>JavaScript</option>
+       <option value="typescript"${prevLang === 'typescript' ? ' selected' : ''}>TypeScript</option>
        <option value="c"${prevLang === 'c' ? ' selected' : ''}>C</option>
        <option value="cpp"${prevLang === 'cpp' ? ' selected' : ''}>C++</option>
        <option value="java"${prevLang === 'java' ? ' selected' : ''}>Java</option>
+       <option value="go"${prevLang === 'go' ? ' selected' : ''}>Go</option>
        <option value="sql"${prevLang === 'sql' ? ' selected' : ''}>SQL</option>
        <option value="web"${prevLang === 'web' ? ' selected' : ''}>HTML / CSS / JS</option>
        <option value="text"${prevLang === 'text' ? ' selected' : ''}>Written answer</option>`;
@@ -5061,7 +5063,7 @@ function openTask(qid, pid) {
           <input id="taskNote" placeholder="Note to your instructor (optional)" value="${esc((sub && sub.note) || '')}">
           <button class="btn btn-primary" id="taskSubmitBtn" onclick="submitTaskCode(${q.id},${pid})">${sub ? 'Resubmit solution' : 'Submit solution'}</button>
         </div>
-        <p class="hint" style="margin:8px 14px 14px">Submitting sends exactly what is in the editor.${q.deadline ? ` Deadline ${fmtDate(q.deadline)} - late work loses ${penalty}% of its gems.` : ''} The level average must reach the pass mark to unlock the next level. Pasting into the editor is disabled - write your solution yourself.</p>` : '<div style="height:14px"></div>'}
+        <p class="hint" style="margin:8px 14px 14px">Submitting sends exactly what is in the editor.${q.deadline ? ` Deadline ${fmtDate(q.deadline)} - late work loses ${penalty}% of its gems.` : ''} The level average must reach the pass mark to unlock the next level. Copy, paste and drag/drop are available for moving code between your project tools.</p>` : '<div style="height:14px"></div>'}
       </div>
       <div class="cmp2-panel cmp2-ai" style="grid-column:1/-1">
         <div class="cmp2-ai-head">AI guide <span class="cmp2-ai-beta">explains, never writes code</span></div>
@@ -5115,7 +5117,7 @@ async function delTaskFile(fid, qid, pid) {
 }
 async function toggleCourseIde(enabled) {
   if (!confirm(enabled
-    ? 'Turn the built-in compiler ON for this course? Coding tasks will show the Python / web IDE again.'
+    ? 'Turn the built-in compiler ON for this course? Coding tasks will show the multi-language IDE again.'
     : 'Turn the built-in compiler OFF for this course? Every task will show a clean written-answer workspace instead - right for UI/UX, graphics, and no-code automation courses. You can turn it back on any time.')) return;
   try {
     await api(`/api/batches/${bid()}/ide`, { method: 'POST', body: JSON.stringify({ enabled }) });
@@ -5130,28 +5132,37 @@ function toggleFocusMode() {
 }
 function taskLangChanged() {
   const lang = $('taskLang').value;
-  const term = ['python', 'c', 'cpp', 'sql'].includes(lang), web = lang === 'web';
+  const term = ['python', 'javascript', 'typescript', 'c', 'cpp', 'java', 'go', 'sql'].includes(lang), web = lang === 'web';
   $('runBtn').style.display = (term || web) ? '' : 'none';
   $('taskTerm').style.display = term ? '' : 'none';
   $('webWrap').style.display = web ? '' : 'none';
   $('idePkgs').style.display = term ? '' : 'none';
   const pk = $('idePkgs');
-  if (!pk.dataset.py) pk.dataset.py = pk.innerHTML; // remember the Python label
+  if (!pk.dataset.py) pk.dataset.py = pk.innerHTML;
+  const packageLabels = {
+    javascript: 'JavaScript ES2022 - isolated browser worker',
+    typescript: 'TypeScript 5.9 - checked then run as JavaScript',
+    c: 'C - gcc 13 - compiled and run in the cloud',
+    cpp: 'C++ - g++ 13 - compiled and run in the cloud',
+    java: 'Java - OpenJDK 21 - compiled and run in the cloud',
+    go: 'Go 1.26 - compiled and run in the cloud',
+    sql: 'SQLite - CSV datasets load as tables automatically',
+  };
   if (lang === 'python') pk.innerHTML = pk.dataset.py;
-  else if (lang === 'c') pk.textContent = 'C · gcc 10 · compiled & run in the cloud';
-  else if (lang === 'cpp') pk.textContent = 'C++ · g++ 10 · compiled & run in the cloud';
-  else if (lang === 'sql') pk.textContent = 'SQLite · CSV datasets load as tables automatically';
-  $('codeBox').placeholder = lang === 'python'
-    ? '# Write your Python solution here, then press Run.'
-    : lang === 'c'
-      ? '// Write your C solution here, then press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}'
-      : lang === 'cpp'
-        ? '// Write your C++ solution here, then press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}'
-        : lang === 'sql'
-          ? '-- Write SQL here, then press Run. Attached CSV datasets become tables automatically.\nSELECT 1 + 1 AS answer;'
-          : web
-            ? '<!-- Write HTML, CSS (in <style>) and JavaScript (in <script>) here, then press Run for a live preview. -->'
-            : 'Write your answer here, then press Submit.';
+  else if (packageLabels[lang]) pk.textContent = packageLabels[lang];
+  const placeholders = {
+    python: '# Write your Python solution here, then press Run.',
+    javascript: '// Write JavaScript here, then press Run.\nconsole.log("Hello EchoLens!");',
+    typescript: '// Write TypeScript here, then press Run.\nconst message: string = "Hello EchoLens!";\nconsole.log(message);',
+    c: '// Write your C solution here, then press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}',
+    cpp: '// Write your C++ solution here, then press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}',
+    java: '// Write Java here, then press Run.\nclass Main { public static void main(String[] args) { System.out.println("Hello EchoLens!"); } }',
+    go: '// Write Go here, then press Run.\npackage main\nimport "fmt"\nfunc main() { fmt.Println("Hello EchoLens!") }',
+    sql: '-- Write SQL here, then press Run. Attached CSV datasets become tables automatically.\nSELECT 1 + 1 AS answer;',
+    web: '<!-- Write HTML, CSS and JavaScript here, then press Run for a live preview. -->',
+    text: 'Write your answer here, then press Submit.',
+  };
+  $('codeBox').placeholder = placeholders[lang] || placeholders.text;
 }
 function clearTaskTerm() {
   if (TASK_CTX) TASK_CTX.term.clear();
@@ -5166,11 +5177,12 @@ async function runTaskCode() {
   const lang = $('taskLang').value;
   if (lang === 'web') {
     // Instant live preview - console output and errors appear in the log.
+    EchoRun.clearErrorLine($('codeBox'));
     const log = $('webLog'); log.textContent = '';
     EchoWeb.preview($('webFrame'), code, (kind, text) => {
       log.textContent += (kind === 'error' ? '✗ ' : kind === 'warn' ? '! ' : '› ') + text + '\n';
       log.scrollTop = log.scrollHeight;
-    });
+    }, (line) => EchoRun.markErrorLine($('codeBox'), line));
     status.textContent = 'Preview updated.';
     return;
   }
@@ -5178,7 +5190,7 @@ async function runTaskCode() {
   btn.innerHTML = 'Stop';
   EchoRun.telemetryMark($('codeBox'), 'run');
   const files = [...TASK_CTX.files, ...(TASK_CTX.localFiles || [])];
-  try { await EchoRun.executeAny(lang, code, { term: TASK_CTX.term, files, onStatus: (t) => { status.textContent = t; } }); }
+  try { await EchoRun.executeAny(lang, code, { term: TASK_CTX.term, files, editor:$('codeBox'), onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
   btn.innerHTML = 'Run';
 }
@@ -6149,12 +6161,22 @@ function formAddProblem(qid) {
  * v12: EVENTS - the unified admin-generated system for quests, hackathons,
  * competitions and webinars: free or paid (payment screenshot verified by
  * the admin), inside the portal / on the open site / both, optional built-in
- * compiler (Python, C, C++, SQL, web) with datasets from URL, admin
+ * compiler (Python, JavaScript, TypeScript, C/C++, Java, Go, SQL, web) with datasets from URL, admin
  * documents, AI auto-grading (-10%), pass marks, automatic certificates,
  * and email announcements to portal / open / all audiences.
  * ========================================================================== */
 const EV_KIND_LABEL = { quest: 'Quest', hackathon: 'Hackathon', competition: 'Competition', webinar: 'Webinar' };
-const EV_LANG_LABEL = { none: 'No compiler', python: 'Python 3', c: 'C', cpp: 'C++', sql: 'SQL', web: 'HTML / CSS / JS' };
+const EV_LANG_LABEL = { none: 'No compiler', python: 'Python 3', javascript: 'JavaScript', typescript: 'TypeScript', c: 'C', cpp: 'C++', java: 'Java', go: 'Go', sql: 'SQL', web: 'HTML / CSS / JS' };
+function evCompilerPlaceholder(lang) {
+  return ({
+    python: '# Write Python here, then press Run.', javascript: '// Write JavaScript here, then press Run.',
+    typescript: '// Write TypeScript here, then press Run.', c: '// Write C here, then press Run.',
+    cpp: '// Write C++ here, then press Run.', java: '// Write Java here, then press Run.',
+    go: '// Write Go here, then press Run.\npackage main\nimport "fmt"\nfunc main() { fmt.Println("Hello EchoLens!") }',
+    sql: '-- Write SQL here. CSV datasets are loaded as tables automatically.',
+    web: '<!-- Write HTML, CSS and JavaScript here, then press Run. -->',
+  })[lang] || 'Write code here, then press Run.';
+}
 function evStatusBadge(st) {
   const map = { upcoming: ['Upcoming', 'var(--st-beam)'], live: ['LIVE', 'var(--danger)'], ended: ['Ended', 'var(--muted-2)'], closed: ['Closed', 'var(--muted-2)'] };
   const [t, c] = map[st] || [st, 'var(--muted)'];
@@ -6253,7 +6275,7 @@ function formEvent() {
       <div class="form-grid">
         <label class="field"><span>Built-in compiler</span><select name="compiler">
           <option value="none">None (file / link submissions)</option><option value="python">Python 3</option>
-          <option value="c">C</option><option value="cpp">C++</option><option value="java">Java</option><option value="sql">SQL</option><option value="web">HTML / CSS / JS</option></select></label>
+          <option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="c">C</option><option value="cpp">C++</option><option value="java">Java</option><option value="go">Go</option><option value="sql">SQL</option><option value="web">HTML / CSS / JS</option></select></label>
         <label class="field"><span>Dataset URL (optional)</span><input name="dataset_url" type="url" placeholder="https://.../data.csv - mounted into the compiler"></label>
         <label class="field"><span>Pass mark (%)</span><input name="pass_mark" type="number" min="0" max="100" value="60"></label>
       </div>
@@ -6419,7 +6441,7 @@ async function openEventTask(eid, pid) {
       <span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span>
       <span class="s" style="color:var(--muted)">${p.points} pts &middot; ${lang ? EV_LANG_LABEL[lang] : 'file / link submission'}${ev.auto_grade ? ' &middot; graded instantly' : ''}</span></div>
     <div class="s" style="white-space:pre-line;line-height:1.6;margin-bottom:12px">${esc(p.description)}</div>
-    ${lang && lang !== 'web' ? `
+    ${lang ? `
       <div class="task-ide card" style="margin-bottom:12px">
         <div class="ide-toolbar">
           <span class="ide-pkgs">${EV_LANG_LABEL[lang]}${ev.dataset_url ? ' &middot; dataset auto-loaded from URL' : ''}</span>
@@ -6427,7 +6449,7 @@ async function openEventTask(eid, pid) {
           <button type="button" class="btn btn-ghost btn-sm" onclick="EV_TERM&&EV_TERM.clear()">Clear</button>
           <button type="button" class="btn btn-teal btn-sm" id="evRunBtn" onclick="runEventCode('${lang}',${eid})">Run</button>
         </div>
-        <textarea id="evCode" class="code-editor ide-editor" spellcheck="false" placeholder="${lang === 'sql' ? '-- Write your SQL here. CSV datasets are loaded as tables automatically.' : lang === 'c' ? '// Write your C solution here.\n#include <stdio.h>\nint main(){\n    printf(&quot;Hello EchoLens\\n&quot;);\n    return 0;\n}' : lang === 'cpp' ? '// Write your C++ solution here.' : '# Write your Python solution here.'}">${esc(sub && sub.code || '')}</textarea>
+        <textarea id="evCode" class="code-editor ide-editor" spellcheck="false" placeholder="${esc(evCompilerPlaceholder(lang))}">${esc(sub && sub.code || '')}</textarea>
         <div class="ide-status-row"><span class="s" id="evRunStatus" style="color:var(--muted-2)">Ready.</span></div>
         <div id="evTerm"></div>
       </div>
@@ -6442,7 +6464,7 @@ async function openEventTask(eid, pid) {
         </form></details>`
     : eventSubmitFormHtml(ev, pid, sub)}
     ${sub && sub.ai_feedback ? `<div class="s" style="margin-top:10px;background:#F4FBF9;border:1px solid #B7E9DA;border-radius:10px;padding:10px 12px"><strong>Feedback:</strong> ${esc(sub.ai_feedback)}</div>` : ''}`, true);
-  if (lang && lang !== 'web') {
+  if (lang) {
     window.EV_TERM = EchoTerm.mount($('evTerm'));
     EchoRun.wireEditor($('evCode'));
   }
@@ -6452,6 +6474,16 @@ async function runEventCode(lang, eid) {
   const btn = $('evRunBtn'); const status = $('evRunStatus');
   const code = $('evCode').value;
   if (!code.trim()) { toast('Write some code first.', true); return; }
+  if (lang === 'web') {
+    EchoRun.clearErrorLine($('evCode'));
+    const wrap = $('evTerm');
+    wrap.innerHTML = '<iframe id="eventWebFrame" class="web-frame" sandbox="allow-scripts" title="Live preview"></iframe><pre id="eventWebLog" class="web-log"></pre>';
+    EchoWeb.preview($('eventWebFrame'), code, (kind, text) => {
+      $('eventWebLog').textContent += (kind === 'error' ? '✗ ' : kind === 'warn' ? '! ' : '› ') + text + '\n';
+    }, (line) => EchoRun.markErrorLine($('evCode'), line));
+    status.textContent = 'Preview updated.';
+    return;
+  }
   if (EchoRun.isRunning()) { EchoRun.cancel(); btn.innerHTML = 'Run'; return; }
   btn.innerHTML = 'Stop';
   const files = [];
@@ -6461,7 +6493,7 @@ async function runEventCode(lang, eid) {
     catch (e) { window.EV_TERM.print('[Dataset: ' + e.message + ']\n'); }
   }
   for (const f of (ev && ev.files || [])) if (/\.(csv|tsv|txt|json)$/i.test(f.name)) files.push({ name: f.name, url: f.url });
-  try { await EchoRun.executeAny(lang, code, { term: window.EV_TERM, files, onStatus: (t) => { status.textContent = t; } }); }
+  try { await EchoRun.executeAny(lang, code, { term: window.EV_TERM, files, editor:$('evCode'), onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
   btn.innerHTML = 'Run';
 }

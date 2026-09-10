@@ -39,6 +39,7 @@
 <p>Other changes include explicit profile clearing, recoverable loaders, coordinator read-only UI/chat alignment, accurate catalogue/stage copy, idempotent challenge correction deltas and unique team reward recipients. Focused UI work adds accessible shared dialogs, larger controls, concise clamped summaries, catalogue pagination/filter recovery, Continue learning, starter code, attempt history and resumable onboarding with a separate marketing preference.</p>
 <p>Free-course enrollment now uses the learner&#39;s existing account. Both the open-web <strong>free</strong> role and portal <strong>student</strong> role can select <strong>Enroll for free</strong>, keep their current role, and see the course with assessment progress under <strong>My courses</strong>. Existing free-course submissions are recognized automatically. Staff roles can preview public lesson material but cannot create or list learner enrollments. Repeated enrollment is idempotent and does not create paid enrollments, registrations, challans, grades or rewards.</p>
 <p>A local Windows write failure discovered during validation was also fixed: atomic JSON writes use a unique temporary file, writable fsync and bounded rename retry while preserving the last good file. New critical async handlers forward failures to Express error handling. This does not claim every legacy async route has been rewritten.</p>
+<p>The shared compiler now permits normal copy, paste and drag/drop editing. Python, JavaScript, TypeScript, C, C++, Java, Go, SQL and HTML/CSS/JavaScript are available in the standalone compiler, eligible course assignments and event workspaces; paid submission records preserve the selected runtime for teacher replay. Compiler, interpreter and browser-preview diagnostics mark the reported source row red and select it. The file panel documents the project formats used by the current assignments, including TypeScript/TSX, Go, configuration, infrastructure and Docker files.</p>
 <h2>Verification results</h2>
 <table>
 <thead>
@@ -50,8 +51,13 @@
 </thead>
 <tbody><tr>
 <td>Focused unit tests</td>
-<td>30 passed, 0 failed</td>
-<td>Upload/session, free-course enrollment, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence</td>
+<td>38 passed, 0 failed</td>
+<td>All non-PostgreSQL tests: upload/session, free-course enrollment, offering/delivery, drafts, attempts/worker/mastery, staged tech tracks, certificate rules, gems and atomic persistence</td>
+</tr>
+<tr>
+<td>Compiler browser regression</td>
+<td>Passed</td>
+<td><a href="evidence/compiler-error-line.png">Screenshot</a>: native paste accepted; 9 language modes present; JavaScript runtime and TypeScript syntax failures both marked the exact line red; course workspace reused one synchronized gutter</td>
 </tr>
 <tr>
 <td>Free enrollment API</td>
@@ -102,7 +108,7 @@
 <p>The end-to-end free policy test manually grades all 15 JavaScript required assessments, obtains a publicly verifiable synthetic certificate and confirms lower/failed later attempts preserve score 100 and 570 gems. The automatic worker success path is a <strong>unit-test fake grader</strong>, not live AI. The paid path uses synthetic manual clearance and confirms one correct enrollment; no real money moves. Skipped mail is exercised against the actual unconfigured local provider, while provider acceptance is a unit-test acknowledgment.</p>
 <p>The browser helper suppresses external services for routine app tests. Video probes use separate clean browser contexts with public provider access. Chrome at 1440px and 390px is covered; this does not establish Firefox/Safari, screen-reader, real touch or full contrast conformance. Tests requiring the real PostgreSQL talent backend were not run.</p>
 <h2>Course/video verification</h2>
-<p>The complete inventory contains <strong>10 courses, 47 modules, 142 lessons and 142 assignments</strong>. The original <strong>131 unique videos all reported AVAILABLE</strong>. Standard embeds demonstrated playback for <strong>107</strong>, with <strong>24 UNVERIFIED</strong> in the short probe. The app&#39;s actual privacy-enhanced embed demonstrated playback for <strong>128</strong>, with <strong>3 UNVERIFIED</strong>. These are separate observations; a timeout is not proof of a broken link.</p>
+<p>The published inventory contains <strong>10 courses, 47 modules, 142 lessons and 142 assignments</strong>. Six additional Trending Tech tracks are staged with 24 modules, 72 lectures, 72 assignments and 6 capstones; they remain hidden while all 72 required EchoLens video URLs are absent. The original <strong>131 unique videos all reported AVAILABLE</strong>. Standard embeds demonstrated playback for <strong>107</strong>, with <strong>24 UNVERIFIED</strong> in the short probe. The app&#39;s actual privacy-enhanced embed demonstrated playback for <strong>128</strong>, with <strong>3 UNVERIFIED</strong>. These are separate observations; a timeout is not proof of a broken link.</p>
 <p>After corrections there are 141 video-backed lessons using 130 unique recordings and 1 guide-backed lesson. Input/strings/loops corrections reuse verified creator chapters and preserve useful original resources. JavaScript async generators now has an official guide while a suitable video awaits review. C++ classes still has a confirmed topic mismatch needing an inspected replacement. Available titles/chapters support a partial relevance review; inaccessible transcripts mean full lesson-to-assignment suitability remains UNVERIFIED throughout the inventory. The curriculum report specifies exactly what to inspect and proposes outlines without changing assessment IDs or historical completion.</p>
 <h2>Before/after visual evidence</h2>
 <p>These are synthetic local accounts. Before images come from the original audit; after images show the current patch. Viewport comparisons are 1440px/390px where available. Captures compare workflow states, not pixel-identical data snapshots.</p>

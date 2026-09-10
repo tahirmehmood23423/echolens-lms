@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Free Online Compiler - Python, C, C++, SQL & HTML/CSS/JS | EchoLens</title>
-<meta name="description" content="A free online compiler by EchoLens. Run Python (numpy, pandas, matplotlib), C, C++, SQL and live HTML/CSS/JS right in your browser - load datasets from a file or URL, nothing to install.">
-<meta name="keywords" content="online compiler, free Python compiler, run Python online, online C compiler, C++ compiler online, SQL compiler online, browser compiler, code editor online, numpy pandas online">
+<title>Free Online Compiler - Python, JavaScript, TypeScript, Go, C, C++, Java & SQL | EchoLens</title>
+<meta name="description" content="Run Python, JavaScript, TypeScript, Go, C, C++, Java, SQL and live HTML/CSS/JS in the EchoLens browser compiler, with datasets and multi-file projects.">
+<meta name="keywords" content="online compiler, Python compiler, JavaScript runner, TypeScript compiler, Go compiler, C compiler, C++ compiler, Java compiler, SQL compiler, browser code editor">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#7C3AED">
 <link rel="canonical" href="https://www.echolens.digital/compiler">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="EchoLens">
 <meta property="og:url" content="https://www.echolens.digital/compiler">
-<meta property="og:title" content="Free Online Compiler - Python, C, C++, SQL & HTML/CSS/JS | EchoLens">
-<meta property="og:description" content="Run Python (numpy, pandas, matplotlib), C, C++, SQL and live HTML/CSS/JS in your browser. Free, no install, load datasets from a file or URL.">
+<meta property="og:title" content="Free Online Compiler - Python, JavaScript, TypeScript, Go, C, C++, Java & SQL | EchoLens">
+<meta property="og:description" content="Run Python, JavaScript, TypeScript, Go, C, C++, Java, SQL and live web projects in your browser.">
 <meta property="og:image" content="https://www.echolens.digital/img/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Free Online Compiler - Python, C, C++, SQL & HTML/CSS/JS | EchoLens">
-<meta name="twitter:description" content="Run Python (numpy, pandas, matplotlib), C, C++, SQL and live HTML/CSS/JS in your browser. Free, no install.">
+<meta name="twitter:title" content="Free Online Compiler - Python, JavaScript, TypeScript, Go, C, C++, Java & SQL | EchoLens">
+<meta name="twitter:description" content="Run Python, JavaScript, TypeScript, Go, C, C++, Java, SQL and live HTML/CSS/JS projects in your browser. Free, no install.">
 <meta name="twitter:image" content="https://www.echolens.digital/img/og-image.png">
 <script type="application/ld+json">
 {
@@ -28,8 +28,8 @@
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Any (web browser)",
   "browserRequirements": "Requires a modern web browser with JavaScript enabled",
-  "description": "A free online compiler to run Python (with numpy, pandas and matplotlib), C, C++, SQL and live HTML/CSS/JS in the browser, with dataset loading from a file or URL and nothing to install.",
-  "featureList": "Python, C, C++, SQL, live HTML/CSS/JS, numpy, pandas, matplotlib, dataset upload from file or URL",
+  "description": "A free online compiler for Python, JavaScript, TypeScript, Go, C, C++, Java, SQL and live HTML/CSS/JS projects.",
+  "featureList": "Python, JavaScript, TypeScript, Go, C, C++, Java, SQL, live HTML/CSS/JS, multi-file projects, dataset upload",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "publisher": {
     "@type": "EducationalOrganization",
@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v1400">
+<link rel="stylesheet" href="/css/styles.css?v1402">
 <style>
   body{background:#FBFAF7}
   .cmp-wrap{max-width:1320px;margin:0 auto;padding:22px 4vw 60px}
@@ -121,6 +121,7 @@
       <div class="cmp2-files-head">Files<button type="button" onclick="newFile()" aria-label="New file">+</button></div>
       <div id="filesList"></div>
       <button type="button" class="btn btn-ghost btn-sm cmp2-newfile" style="width:calc(100% - 24px)" onclick="newFile()">+ New File</button>
+      <p class="cmp2-file-help">Project files: .py, .js, .ts, .tsx, .c, .h, .cpp, .hpp, .java, .go, .sql, .html, .css, .json, .yaml, .toml, .proto, .tf and Dockerfile.</p>
     </div>
 
     <!-- ------------------------------ Editor ------------------------------ -->
@@ -128,9 +129,12 @@
       <div class="ide-toolbar">
         <select id="lang" onchange="langChanged()">
           <option value="python">Python 3</option>
+          <option value="javascript">JavaScript</option>
+          <option value="typescript">TypeScript</option>
           <option value="c">C</option>
           <option value="cpp">C++</option>
           <option value="java">Java</option>
+          <option value="go">Go</option>
           <option value="sql">SQL</option>
           <option value="web">HTML / CSS / JS</option>
         </select>
@@ -196,7 +200,7 @@ print('Hello EchoLens!')"></textarea>
 
 <div class="toast" id="toast"></div>
 
-<script src="/js/coderunner.js?v1320"></script>
+<script src="/js/coderunner.js?v1321"></script>
 <script>
 'use strict';
 const $ = (id) => document.getElementById(id);
@@ -225,18 +229,24 @@ function setCode(text) {
  */
 const DEFAULTS = {
   python: { name: 'main.py', code: "# Write Python here, press Run.\n# numpy, pandas, matplotlib, seaborn and scikit-learn load automatically.\nprint('Hello EchoLens!')" },
+  javascript: { name: 'main.js', code: "// Write JavaScript here, press Run.\nconst message = 'Hello EchoLens!';\nconsole.log(message);" },
+  typescript: { name: 'main.ts', code: "// Write TypeScript here, press Run.\nconst message: string = 'Hello EchoLens!';\nconsole.log(message);" },
   c: { name: 'main.c', code: '// Write C here, press Run.\n#include <stdio.h>\nint main(){\n    printf("Hello EchoLens\\n");\n    return 0;\n}' },
   cpp: { name: 'main.cpp', code: '// Write C++ here, press Run.\n#include <iostream>\nint main(){\n    std::cout << "Hello EchoLens\\n";\n    return 0;\n}' },
   java: { name: 'Main.java', code: '// Write Java here, press Run.\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello EchoLens");\n    }\n}' },
+  go: { name: 'main.go', code: '// Write Go here, press Run.\npackage main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello EchoLens!")\n}' },
   sql: { name: 'main.sql', code: '-- Write SQL here, press Run. Loaded CSVs are tables.\nSELECT 1 + 1 AS answer;' },
   web: { name: 'index.html', code: '<!-- Write HTML, CSS (in <style>) and JS (in <script>) - Run shows a live preview. -->' },
 };
 const PKGS_TEXT = {
-  python: 'numpy · pandas · matplotlib · seaborn · scikit-learn ready',
-  c: 'gcc 13 · compiled & run in the cloud',
-  cpp: 'g++ 13 · compiled & run in the cloud',
-  java: 'OpenJDK 21 · compiled & run in the cloud',
-  sql: 'SQLite · CSV datasets become tables automatically',
+  python: 'numpy - pandas - matplotlib - seaborn - scikit-learn ready',
+  javascript: 'JavaScript ES2022 - isolated browser worker',
+  typescript: 'TypeScript 5.9 - checked then run as JavaScript',
+  c: 'gcc 13 - compiled and run in the cloud',
+  cpp: 'g++ 13 - compiled and run in the cloud',
+  java: 'OpenJDK 21 - compiled and run in the cloud',
+  go: 'Go 1.26 - compiled and run in the cloud',
+  sql: 'SQLite - CSV datasets become tables automatically',
   web: 'live preview with console output',
 };
 let ACTIVE_LANG = 'python';
@@ -507,8 +517,9 @@ async function run() {
   const siblings = siblingCodeFiles();
 
   if (lang === 'web') {
+    EchoRun.clearErrorLine($('code'));
     const log = $('webLog'); log.textContent = '';
-    EchoWeb.preview($('webFrame'), assembleWebCode(), (kind, text) => { log.textContent += (kind === 'error' ? '✗ ' : '› ') + text + '\n'; });
+    EchoWeb.preview($('webFrame'), assembleWebCode(), (kind, text) => { log.textContent += (kind === 'error' ? '✗ ' : '› ') + text + '\n'; }, (line) => EchoRun.markErrorLine($('code'), line));
     status.textContent = 'Preview updated.';
     return;
   }
@@ -517,7 +528,7 @@ async function run() {
   EchoRun.telemetryMark($('code'), 'run');
   EchoRun.clearErrorLine($('code')); // a fresh run starts without a stale highlight from the last one
   // Sibling files ride along so they can be imported (Python) or compiled
-  // together (C/C++) - not just organised in tabs.
+  // together (C/C++/Java/Go) - not just organised in tabs.
   const enc = new TextEncoder();
   const siblingBytesFiles = siblings.map((f) => ({ name: f.name, bytes: enc.encode(f.content).buffer }));
   try {
@@ -525,17 +536,12 @@ async function run() {
       term: TERM,
       files: [...FILES, ...siblingBytesFiles],
       extraFiles: siblings,
+      editor: $('code'),
       onStatus: (t) => { status.textContent = t; },
     });
-    // For C/C++/Java, sibling files are compiled by being concatenated
-    // ahead of the active file's own source (see runNative in
-    // coderunner.js), so a reported line number only lines up with what's
-    // in this editor when there are no siblings pulling the numbering off.
-    // Python never concatenates - its line numbers always refer to the
-    // active file directly, siblings or not.
-    const lineIsTrustworthy = lang === 'python' || siblings.length === 0;
-    if (result && !result.ok && result.errorLine && lineIsTrustworthy) {
-      EchoRun.markErrorLine($('code'), result.errorLine);
+    // Native diagnostics account for sibling source lines before mapping an
+    // error back to the active editor; Python imports sibling files directly.
+    if (result && !result.ok && result.errorLine) {
       status.textContent = (status.textContent || 'Finished with an error.') + ' (line ' + result.errorLine + ')';
     }
   }

@@ -3166,13 +3166,13 @@ function backupNow() {
  * One unified system for admin-created quests, hackathons, competitions and
  * webinars. Every event carries: scope (inside the portal / on the open site
  * / both), entry (free or paid with a payment-screenshot flow), an optional
- * built-in compiler (python/c/cpp/sql/web) with an optional dataset URL,
+ * built-in compiler (Python, JavaScript, TypeScript, C/C++, Java, Go, SQL or web) with an optional dataset URL,
  * admin-attached documents, problems (for quests & competitions), a pass
  * mark, AI auto-grading (with a 10% reduction), and automatic certificates.
  */
 const EVENT_KINDS = ['quest', 'hackathon', 'competition', 'webinar'];
 const EVENT_SCOPES = ['portal', 'open', 'both'];
-const EVENT_LANGS = ['none', 'python', 'c', 'cpp', 'sql', 'web'];
+const EVENT_LANGS = ['none', 'python', 'javascript', 'typescript', 'c', 'cpp', 'java', 'go', 'sql', 'web'];
 
 const Events = {
   byId(id) { return data.events.find((e) => e.id === Number(id)) || null; },

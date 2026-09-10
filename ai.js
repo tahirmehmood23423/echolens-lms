@@ -310,7 +310,6 @@ async function activityReport(userId, { assignmentTitle, telemetry }) {
 - Time before first keystroke: ${t.timeToFirstKeystrokeMs != null ? mins(t.timeToFirstKeystrokeMs) : 'unknown'}
 - Times the code was run: ${t.runs ?? 0}
 - Times the AI assistant was asked for help: ${t.aiRequests ?? 0}
-- Paste/drag-drop attempts blocked (the student tried to paste instead of typing): ${t.pasteBlocked ?? 0}
 - Total keystrokes: ${t.keystrokes ?? 0}`;
   return complete(userId, system, [{ role: 'user', content }], 500);
 }

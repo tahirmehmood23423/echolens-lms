@@ -25,6 +25,8 @@ function fmtDate(d) { if (!d) return '—'; try { return new Date(d + 'T00:00:00
 const SID = new URLSearchParams(location.search).get('sid');
 let DATA = null;
 let ME_AI = false;
+const RUNNABLE_LANGS = ['python', 'javascript', 'typescript', 'c', 'cpp', 'java', 'go', 'sql'];
+const LANG_LABELS = { python: 'Python 3', javascript: 'JavaScript', typescript: 'TypeScript', c: 'C', cpp: 'C++', java: 'Java', go: 'Go', sql: 'SQL', web: 'Web (HTML/CSS/JS)', text: 'Written answer' };
 
 (async () => {
   try {
@@ -49,10 +51,10 @@ function draw() {
 
   const workBlock = s.code ? `
     <div class="card"><div class="ide-toolbar">
-      <strong>${s.language === 'web' ? '🌐 Web submission (HTML/CSS/JS)' : s.language === 'text' ? '📝 Written answer' : '🐍 Python submission'}</strong>
+      <strong>${esc(LANG_LABELS[s.language || 'python'] || s.language || 'Code')} submission</strong>
       <span style="flex:1"></span>
       <span class="s" id="runStatus" style="color:var(--muted-2)"></span>
-      ${s.language === 'python' || !s.language ? '<button class="btn btn-ghost btn-sm" id="runBtn" onclick="runCode()">&#9654; Run</button>' : ''}
+      ${RUNNABLE_LANGS.includes(s.language || 'python') ? '<button class="btn btn-ghost btn-sm" id="runBtn" onclick="runCode()">&#9654; Run</button>' : ''}
       ${s.language === 'web' ? '<button class="btn btn-ghost btn-sm" onclick="previewWeb()">&#9654; Preview</button>' : ''}
       <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('subCode').textContent).then(()=>toast('Copied.'))">Copy</button>
     </div>
@@ -93,7 +95,6 @@ function draw() {
               <span><strong>${fmtMin(s.telemetry.activeMs)}</strong> active coding</span>
               <span><strong>${s.telemetry.runs || 0}</strong> run${(s.telemetry.runs || 0) === 1 ? '' : 's'}</span>
               <span><strong>${s.telemetry.aiRequests || 0}</strong> AI question${(s.telemetry.aiRequests || 0) === 1 ? '' : 's'}</span>
-              <span><strong>${s.telemetry.pasteBlocked || 0}</strong> paste attempt${(s.telemetry.pasteBlocked || 0) === 1 ? '' : 's'} blocked</span>
             </div>
             <div id="activityReportBody">${s.activity_report
               ? `<pre style="white-space:pre-wrap;background:var(--canvas);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:12.5px;max-height:34vh;overflow-y:auto">${esc(s.activity_report.text)}</pre>
@@ -146,7 +147,7 @@ async function runCode() {
   if (!wrap._term) wrap._term = EchoTerm.mount(wrap);
   btn.innerHTML = '&#9632; Stop';
   const files = (DATA.files || []).map((f) => ({ name: f.name, url: f.url }));
-  try { await EchoRun.execute(DATA.submission.code, { term: wrap._term, files, onStatus: (t) => { status.textContent = t; } }); }
+  try { await EchoRun.executeAny(DATA.submission.language || 'python', DATA.submission.code, { term: wrap._term, files, onStatus: (t) => { status.textContent = t; } }); }
   catch (e) { status.textContent = e.message; }
   btn.innerHTML = '&#9654; Run';
 }

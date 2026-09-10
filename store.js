@@ -1823,8 +1823,11 @@ const TRACKS = {};
 (function loadTracks() {
   // short-courses-full is loaded LAST so its complete builds override the
   // earlier thin stubs for the same keys (python-6w, sc02/sc03/sc06/sc07).
-  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro'), ...require('./tracks/cs-fundamentals'), ...require('./tracks/design-3d'), ...require('./tracks/curriculum-advanced-combined')];
+  const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro'), ...require('./tracks/cs-fundamentals'), ...require('./tracks/design-3d'), ...require('./tracks/curriculum-advanced-combined'), ...require('./tracks/trending-tech')];
   for (const t of all) {
+    // Existing tracks predate publication metadata and remain public. A
+    // staged track must opt in explicitly after passing its content checks.
+    t.published = t.published !== false;
     for(const l of t.levels)l.problems.forEach((p,i)=>{if(p.pid==null)p.pid=i+1;});
     // Normalize: compute title thresholds from total points if only names given.
     const total = t.levels.reduce((s1, l) => s1 + l.problems.reduce((s2, p) => s2 + (p.points || 100), 0), 0);
@@ -1837,13 +1840,18 @@ const TRACKS = {};
     t.total_points = total;
     TRACKS[t.key] = t;
   }
+  const trending = require('./tracks/trending-tech');
+  if (trending.some((track) => track.published)) {
+    const checked = trending.validateTrendingTechCatalogue(trending);
+    if (!checked.valid) throw new Error(`Cannot publish Trending Tech Tracks: ${checked.errors.join(' ')}`);
+  }
 })();
 
 const Quests = {
   // submission_mode: a track can declare its own workspace ('doc', 'prompt',
   // 'code-ai', 'excel-ai', 'multi'); otherwise no-IDE tracks take files and
   // coding tracks use the built-in compiler.
-  tracks() { return Object.values(TRACKS).map((t) => ({ key: t.key, title: t.title, description: t.description, levels: t.levels.length, course_code: t.course_code || null, total_points: t.total_points, free: !!t.free, submission_mode: t.submission || (NO_IDE_TRACKS.has(t.key) ? 'file' : 'code') })); },
+  tracks({ includeUnpublished = false } = {}) { return Object.values(TRACKS).filter((t) => includeUnpublished || t.published !== false).map((t) => ({ key: t.key, title: t.title, description: t.description, levels: t.levels.length, course_code: t.course_code || null, total_points: t.total_points, free: !!t.free, published: t.published !== false, submission_mode: t.submission || (NO_IDE_TRACKS.has(t.key) ? 'file' : 'code') })); },
   trackDef(key) { return TRACKS[key] || null; },
   installed(bid) { return data.quests.some((q) => q.batch_id === Number(bid)); },
   install(bid, trackKey) {
@@ -2347,6 +2355,14 @@ const OFFICIAL_CATALOGUE = [
   { code: 'PY3-ADV', title: 'Advanced Python Programming', tier: 'Short Course', weeks: 5, hours: 15, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'python', family_order: 2, summary: 'Core Language Internals: the iterator protocol and lazy generators, closures and decorators, dunder methods, descriptors and metaclasses, context managers and the memory model, through to threading, multiprocessing and asyncio concurrency - five modules, one Compiler Quest per topic.' },
   { code: 'JS4-ADV', title: 'Advanced JavaScript Programming', tier: 'Short Course', weeks: 5, hours: 15, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'javascript', family_order: 2, summary: 'Production Architecture: prototypal inheritance and true private fields, Proxies, Reflect and Symbols, the microtask event loop and weak-reference memory management, through to Promise combinators, async generators, custom event systems and Web Worker concurrency - five modules, one Compiler Quest per topic.' },
   { code: 'WEB5-ADV', title: 'Advanced CSS and Web Development', tier: 'Short Course', weeks: 5, hours: 15, price_pkr: 0, badges: ['free'], free_mode: 'signin', family: 'web', family_order: 2, summary: 'Production front-end: functional and combinator selectors and CSS architecture, Flexbox and Grid with subgrid, container queries and fluid design, motion and 3D, Sass and Tailwind, build tooling, then accessibility, performance and SEO through to Git-based deployment - five modules, one Compiler Quest per topic.' },
+  // Top Trending Tech Track, Revision 3. These definitions are complete but
+  // intentionally staged until all 72 in-house EchoLens videos are published.
+  { code: 'TT-01', title: 'Modern Full Stack Development with Next.js and TypeScript', tier: 'Specialist Track', weeks: 8, hours: 40, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', family: 'trending-tech', family_order: 1, published: false, summary: 'Ship a deployed, authenticated, database backed web application with typed end to end data flow and a passing smoke test suite.' },
+  { code: 'TT-02', title: 'Applied Generative AI and Retrieval Augmented Generation', tier: 'Specialist Track', weeks: 8, hours: 40, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', family: 'trending-tech', family_order: 2, published: false, summary: 'Ship a grounded question answering service over a private document set, with measured retrieval quality, guardrails and a cost budget you can defend.' },
+  { code: 'TT-03', title: 'Data Structures and Algorithmic Problem Solving', tier: 'Career Track support course', weeks: 8, hours: 56, hours_label: '6 to 8 hours per week', price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', family: 'trending-tech', family_order: 3, published: false, summary: 'Solve unfamiliar interview problems under time pressure, state complexity before coding, and explain tradeoffs clearly while producing tested solutions.' },
+  { code: 'TT-04', title: 'Cloud DevOps and Container Orchestration', tier: 'Specialist Track', weeks: 8, hours: 40, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', family: 'trending-tech', family_order: 4, published: false, summary: 'Deliver a containerised application through Kubernetes and GitOps, provision its cloud infrastructure as code, and operate it with metrics, alerts and traces.' },
+  { code: 'TT-05', title: 'High Performance Backend Engineering with Go', tier: 'Specialist Track', weeks: 8, hours: 40, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', family: 'trending-tech', family_order: 5, published: false, summary: 'Build and measure a production Go service with safe concurrency, typed database access, REST and gRPC APIs, caching, observability and graceful shutdown.' },
+  { code: 'TT-06', title: 'Database Systems and PostgreSQL Internals', tier: 'Specialist Track', weeks: 8, hours: 40, price_pkr: 0, badges: ['free', 'new'], free_mode: 'signin', family: 'trending-tech', family_order: 6, published: false, summary: 'Design, diagnose and tune PostgreSQL systems using advanced SQL, indexes, query plans, transaction control, MVCC and routine maintenance.' },
 ];
 // Display metadata for the 5 free-course "language families" grouped by
 // the `family` tag above - purely presentational (open.js), not read by
@@ -2357,6 +2373,7 @@ const FREE_FAMILIES = [
   { key: 'python', name: 'Python Programming and Algorithmic Design' },
   { key: 'javascript', name: 'JavaScript and Interactive Web Architecture' },
   { key: 'web', name: 'Modern Responsive Web Architecture (HTML & CSS)' },
+  { key: 'trending-tech', name: 'Trending Tech Specialist Tracks' },
 ];
 // The Web Developer Path bundle - the recommended beginner-to-job route.
 const LEARNING_PATHS = [
@@ -3949,7 +3966,7 @@ const OpenQuest = {
     const u = Users.byId(uid);
     if (!u || !['free', 'student'].includes(u.role)) return { error: 'Free-course enrollment is available to learner accounts only.', status: 403 };
     const t = TRACKS[track_key];
-    if (!t?.free || !OFFICIAL_CATALOGUE.some(c => c.code === t.course_code && c.price_pkr === 0)) return { error: 'Choose a published free course.', status: 400 };
+    if (!t?.free || t.published === false || !OFFICIAL_CATALOGUE.some(c => c.code === t.course_code && c.price_pkr === 0 && c.published !== false)) return { error: 'Choose a published free course.', status: 400 };
     const existing = OpenQuest.enrollment(uid, track_key);
     if (existing) return { enrollment: existing, existing: true };
     const enrollment = { track_key, enrolled_at: now() };
@@ -3967,35 +3984,48 @@ const OpenQuest = {
       const t = TRACKS[track_key];
       if (!t?.free) return [];
       const progress = OpenQuest.progress(uid, track_key);
-      return [{ ...OpenQuest.enrollment(uid, track_key), title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, completed: progress.passed }];
+      return [{ ...OpenQuest.enrollment(uid, track_key), title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, assignment_average: progress.assignment_average, capstone: progress.capstone ? { unlocked: progress.capstone.unlocked, submitted: progress.capstone.submitted, score: progress.capstone.score, passed: progress.capstone.passed } : null, weighted_score: progress.weighted_score, completed: progress.passed }];
     });
   },
   find(uid, track_key, level, pid) {
     return data.open_submissions.find((s) => s.user_id === Number(uid) && s.track_key === track_key && s.level === Number(level) && s.pid === Number(pid)) || null;
   },
-  submit({ user, track_key, level, pid, code, language, file_url, file_name, files, request_key, fingerprint }) {
+  submit({ user, track_key, level, pid, code, language, file_url, file_name, files, evidence, assessment_kind = 'assignment', request_key, fingerprint }) {
     if (!['free', 'student'].includes(Users.byId(user.id)?.role)) return { error: 'Practice submissions are for learner accounts only.', status: 403 };
     const t = TRACKS[track_key];
-    if (!t) return { error: 'Course not found.' };
-    const lvl = t.levels.find((l) => l.no === Number(level));
-    if (!lvl) return { error: 'Level not found.' };
-    // Paid programs open only the first quest (one level); free programs open all.
-    const openN = t.free ? t.levels.length : Number(process.env.OPEN_LEVELS || 1);
-    if (Number(level) > openN) return { error: 'This level is locked - register for the course to unlock it.' };
-    const pr = lvl.problems.find((p) => p.pid === Number(pid));
-    if (!pr) return { error: 'Task not found.' };
-    if (!code && !file_url) return { error: 'Submit your code or upload your work as a file.' };
+    if (!t || t.published === false) return { error: 'Course not found.' };
+    const kind = assessment_kind === 'capstone' ? 'capstone' : 'assignment';
+    let lvl, pr;
+    if (kind === 'capstone') {
+      if (!t.capstone) return { error: 'This course does not have a capstone.', status: 400 };
+      const policy = freeCompletion(t, data.open_submissions.filter((s) => s.user_id === Number(user.id) && s.track_key === track_key));
+      if (!policy.assignments_passed) return { error: 'Pass all twelve required assignments before submitting the capstone.', status: 409 };
+      level = 0; pid = 0;
+      pr = { ...t.capstone, title: t.capstone.title, description: t.capstone.description, grading_mode: 'staff' };
+    } else {
+      lvl = t.levels.find((l) => l.no === Number(level));
+      if (!lvl) return { error: 'Level not found.' };
+      // Paid programs open only the first quest (one level); free programs open all.
+      const openN = t.free ? t.levels.length : Number(process.env.OPEN_LEVELS || 1);
+      if (Number(level) > openN) return { error: 'This level is locked - register for the course to unlock it.' };
+      pr = lvl.problems.find((p) => p.pid === Number(pid));
+      if (!pr) return { error: 'Task not found.' };
+    }
+    const hasEvidence = !!(evidence && ((evidence.links || []).length || (evidence.files || []).length || String(evidence.notes || '').trim()));
+    if (!code && !file_url && !hasEvidence) return { error: 'Submit code, a link, a note, or at least one evidence file.' };
     let s = OpenQuest.find(user.id, track_key, level, pid);
     const fields = {
+      assessment_kind: kind,
       code: code ? String(code).slice(0, 60000) : null,
       language: language ? String(language).slice(0, 20) : null,
       file_url: file_url || null, file_name: file_name || null,
       files: Array.isArray(files) && files.length ? files : null, // extra files beyond the first (multi-file courses)
+      evidence: evidence || null,
       submitted_at: now(),
     };
     if (!s) {
       s = { id: nextId('open_submissions'), user_id: user.id, track_key, level: Number(level), pid: Number(pid),
-            problem_title: pr.title, points: pr.points || 100, ...fields, score: null, gems: 0, feedback: null, graded_at: null, attempts: 1 };
+            assessment_kind: kind, problem_title: pr.title, points: pr.points || 100, ...fields, score: null, gems: 0, feedback: null, graded_at: null, attempts: 1 };
       data.open_submissions.push(s);
     }
     const result = OpenAttempts.create(s,fields,pr,request_key,fingerprint);
@@ -4006,17 +4036,22 @@ const OpenQuest = {
   progress(uid, track_key) {
     const t = TRACKS[track_key]; if (!t) return null;
     const mine = data.open_submissions.filter((s) => s.user_id === Number(uid) && s.track_key === track_key);
+    const assignmentMine = mine.filter((s) => (s.assessment_kind || 'assignment') === 'assignment' && !(s.level === 0 && s.pid === 0));
+    const capstoneSubmission = mine.find((s) => s.assessment_kind === 'capstone' || (s.level === 0 && s.pid === 0));
     const byKey = {};
     const policy = freeCompletion(t,mine);
-    for (const s of mine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, file_name: s.file_name, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public) };
+    for (const s of assignmentMine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, file_name: s.file_name, evidence:s.evidence||null, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public) };
     const totalProblems = t.levels.reduce((a, l) => a + l.problems.length, 0);
-    const graded = mine.filter((s) => s.score != null);
+    const graded = assignmentMine.filter((s) => s.score != null);
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;
+    const capstone = t.capstone ? { ...policy.capstone, title:t.capstone.title, weight:t.capstone.weight, submission:capstoneSubmission ? { score:capstoneSubmission.score, gems:capstoneSubmission.gems, feedback:capstoneSubmission.feedback, submitted_at:capstoneSubmission.submitted_at, evidence:capstoneSubmission.evidence||null, attempts:capstoneSubmission.attempts||1, history:OpenAttempts.list(uid,track_key,0,0).map(OpenAttempts.public) } : null } : null;
     return {
       submissions: byKey,
       gems: mine.reduce((a, s) => a + (s.gems || 0), 0),
-      attempted: mine.length, graded: graded.length, total: totalProblems, avg,
-      complete: policy.passed, ...policy,
+      attempted: assignmentMine.length, graded: graded.length, total: totalProblems, avg,
+      ...policy,
+      capstone,
+      complete: policy.passed,
     };
   },
   // Fully free tracks issue an automatic verified certificate on completion.
@@ -4035,6 +4070,8 @@ const OpenQuest = {
       completion_date: today(), detail: null,
       instructor_id: null, issued_by: issuedBy || 1,
       source_kind: 'track', source_id: track_key,
+      concepts: (t.modules || []).map((module) => ({ no:module.no, title:module.title, topic:null })),
+      final_project: t.capstone ? { level_no: 0, level_title: t.capstone.title, level_topic: t.capstone.description, items: [{ problem_title:t.capstone.title, problem_description:t.capstone.description }] } : null,
       partner: Settings.isPartnerTrack(track_key),
     });
     return out.ok ? { cert: out.cert } : null;
@@ -4860,7 +4897,7 @@ const Showcase = {
 load();
 
 module.exports = {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: () => OFFICIAL_CATALOGUE, catalogueFee, learningPaths: () => LEARNING_PATHS, freeFamilies: () => FREE_FAMILIES, persist: save,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: ({ includeUnpublished = false } = {}) => OFFICIAL_CATALOGUE.filter((course) => includeUnpublished || course.published !== false), catalogueFee, learningPaths: () => LEARNING_PATHS, freeFamilies: () => FREE_FAMILIES, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, gemTotalsByUser, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,

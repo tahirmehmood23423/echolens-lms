@@ -361,6 +361,7 @@ model OpenSubmission {
   id           Int       @id @default(autoincrement())
   userId       Int       @map("user_id")
   trackKey     String    @map("track_key")
+  assessmentKind String  @default("assignment") @map("assessment_kind")
   level        Int
   pid          Int
   problemTitle String    @map("problem_title")
@@ -378,6 +379,7 @@ model OpenSubmission {
   gradedAt     DateTime? @map("graded_at")
   attempts     Int?
   files        Json?
+  evidence     Json?
 
   user User @relation(fields: [userId], references: [id])
 

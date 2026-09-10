@@ -1,0 +1,1996 @@
+[
+  {
+    "no": 1,
+    "title": "Modern Full Stack Development with Next.js and TypeScript",
+    "format": "Specialist Track, 8 weeks",
+    "time_commitment": "12 lectures. Each lecture is one video under 10 minutes plus one graded assignment. Budget 5 to 7 hours per week across 8 weeks, roughly 40 hours in total.",
+    "prerequisites": "Comfortable with modern JavaScript (arrow functions, destructuring, promises, modules), basic HTML and CSS, and Git add, commit, push.",
+    "outcome": "Ship a deployed, authenticated, database backed web application with typed end to end data flow and a passing smoke test suite.",
+    "environment": "Node 20 LTS or newer, pnpm, Docker Desktop for a local PostgreSQL container, VS Code with the ESLint, Prisma and Tailwind extensions, and a free Vercel account.",
+    "capstone": "A multi tenant task board. Google sign in, tenant scoped data, server actions for every mutation, streamed dashboard, Zod validated API, and a live Vercel deployment with a Playwright smoke suite running in CI.",
+    "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached.",
+    "modules": [
+      {
+        "no": 1,
+        "title": "React 19 Foundations and TypeScript",
+        "resources": [
+          {
+            "title": "React course, full length, Bob Ziroll on freeCodeCamp",
+            "url": "https://www.youtube.com/watch?v=x4rFhThSX04"
+          },
+          {
+            "title": "React official learn path",
+            "url": "https://react.dev/learn"
+          },
+          {
+            "title": "TypeScript handbook",
+            "url": "https://www.typescriptlang.org/docs/handbook/intro.html"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "1.1",
+            "title": "Components, JSX and Typed Props",
+            "video_title": "React Components and Typed Props in 8 Minutes",
+            "target_runtime": "8:20",
+            "video_outline": "0:00 the Lego framing | 0:50 component tree and one way data flow | 2:30 JSX compiles to createElement | 4:10 typing props with an interface | 6:20 discriminated unions for variants | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "Snapping standardised Lego blocks together to build a structure, where every stud spacing is fixed so blocks always fit.",
+            "covered": "Component hierarchies, one way data flow, JSX compilation to createElement calls, prop typing with TypeScript interfaces, discriminated unions for variant props, and children typing.",
+            "assignment": {
+              "code": "A1.1",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Build a typed e commerce product card with variant selectors, price display and an inventory badge. Props must be described by an exported interface with no use of any.",
+              "deliverable": "A `product-card` folder containing the component, its exported props interface and three rendered instances.",
+              "criteria": "Render three card instances with different props. `pnpm tsc --noEmit` exits with code 0 and the badge changes text when the stock prop crosses zero.",
+              "submission_text": "Repository link plus a screenshot of a clean `tsc --noEmit` run."
+            }
+          },
+          {
+            "number": "1.2",
+            "title": "State with useState and useReducer",
+            "video_title": "useState or useReducer: How to Choose",
+            "target_runtime": "7:40",
+            "video_outline": "0:00 the cash register framing | 0:45 state as a value over time | 2:00 immutable update rules | 3:30 when useState stops scaling | 5:00 a typed action union | 6:50 assignment brief",
+            "video_url": null,
+            "analogy": "A cash register that records every drawer opening, sale and refund as a separate entry rather than overwriting yesterday's total.",
+            "covered": "Local state, the rules of immutable updates, when useReducer beats useState, pure reducer functions, typed action unions, and lifting state to the nearest common parent.",
+            "assignment": {
+              "code": "A1.2",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a three step checkout wizard holding personal details, shipping address and payment method in a single useReducer store with a typed action union.",
+              "deliverable": "A three step checkout wizard driven by one reducer, with the reducer exported and unit testable.",
+              "criteria": "Move forward and back through all three steps. State from step one is still present at step three, and the submit button stays disabled until every required field validates.",
+              "submission_text": "Repository link plus a 60 second screen recording moving forward and back through all steps."
+            }
+          },
+          {
+            "number": "1.3",
+            "title": "Effects, Cleanup and Custom Hooks",
+            "video_title": "useEffect Cleanup and Custom Hooks",
+            "target_runtime": "9:10",
+            "video_outline": "0:00 the motion sensor framing | 1:00 dependency arrays and stale closures | 2:40 why cleanup exists | 4:20 race conditions and AbortController | 6:30 extracting a custom hook | 8:20 assignment brief",
+            "video_url": null,
+            "analogy": "A motion sensor light that switches on when someone walks in and, just as importantly, switches itself off when they leave.",
+            "covered": "useEffect dependency arrays, cleanup functions, avoiding effects for derived state, race conditions with AbortController, and extracting reusable stateful logic into custom hooks.",
+            "assignment": {
+              "code": "A1.3",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Write a `useDebounce(value, delay)` hook and wire it to a live search input that queries a public API.",
+              "deliverable": "A `useDebounce` hook plus a search input wired to a live API, with the hook in its own file.",
+              "criteria": "Type ten characters quickly with the network tab open. Exactly one request fires, 300 ms after the last keystroke, and unmounting mid request logs no state update warning.",
+              "submission_text": "Repository link plus a network tab screenshot showing one request after ten keystrokes."
+            }
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "Next.js App Router and Server Components",
+        "resources": [
+          {
+            "title": "Next.js 15 full beginner course",
+            "url": "https://www.youtube.com/watch?v=3qGQ4dGA42o"
+          },
+          {
+            "title": "Next.js beginner to advanced playlist, Codevolution",
+            "url": "https://www.youtube.com/playlist?list=PLC3y8-rFHvwhIEc4I4YsRz5C7GOBnxSJY"
+          },
+          {
+            "title": "Next.js documentation",
+            "url": "https://nextjs.org/docs"
+          },
+          {
+            "title": "Next.js official learn course",
+            "url": "https://nextjs.org/learn"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "2.1",
+            "title": "Server Components and Client Components",
+            "video_title": "Server Components and Client Components",
+            "target_runtime": "8:50",
+            "video_outline": "0:00 the restaurant kitchen framing | 1:10 what runs where | 3:00 the 'use client' boundary | 5:00 what can cross it and what cannot | 7:00 measuring the bundle | 8:00 assignment brief",
+            "video_url": null,
+            "analogy": "A restaurant kitchen that plates the dish out of sight and sends only the finished plate to the table, keeping the knives in the back.",
+            "covered": "React Server Components running on the server with no client bundle cost, the 'use client' boundary, what can and cannot cross it, serialisation limits, and where data fetching belongs.",
+            "assignment": {
+              "code": "A1.4",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Build a dynamic route `app/posts/[id]/page.tsx` that reads markdown from disk and renders it entirely on the server.",
+              "deliverable": "A `/posts/[id]` route rendering markdown entirely on the server.",
+              "criteria": "Run `pnpm build` and inspect the route output. The markdown parser does not appear in any client chunk, and the First Load JS figure for that route is under 100 kB.",
+              "submission_text": "Repository link plus the `next build` route table output."
+            }
+          },
+          {
+            "number": "2.2",
+            "title": "Server Actions and Form Mutations",
+            "video_title": "Server Actions in 9 Minutes",
+            "target_runtime": "9:00",
+            "video_outline": "0:00 the deposit slip framing | 1:00 an action is a POST you did not write | 2:40 useActionState and useFormStatus | 5:00 revalidatePath and revalidateTag | 7:00 every action needs its own auth check | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "Dropping a signed deposit slip into a bank drop box that posts straight to your ledger, with no separate teller queue in between.",
+            "covered": "Server Actions from server and client components, progressive enhancement, `useFormStatus` and `useActionState`, revalidatePath and revalidateTag, and why every action still needs its own authorisation check.",
+            "assignment": {
+              "code": "A1.5",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a task creation form calling a Server Action that validates input, inserts a row and calls revalidatePath.",
+              "deliverable": "A task creation form backed by a Server Action, working with JavaScript disabled.",
+              "criteria": "Submit a task with JavaScript disabled in the browser. The row is inserted and the list updates without a manual refresh.",
+              "submission_text": "Repository link plus a recording of a submission with scripting turned off."
+            }
+          },
+          {
+            "number": "2.3",
+            "title": "Streaming, Suspense and Loading States",
+            "video_title": "Streaming and Suspense Boundaries",
+            "target_runtime": "7:50",
+            "video_outline": "0:00 the appetiser framing | 0:50 how streaming HTML works | 2:30 loading.tsx and error.tsx | 4:20 boundary placement decides the experience | 6:20 slow route or slow component | 7:00 assignment brief",
+            "video_url": null,
+            "analogy": "Bringing out bread and olives the moment guests sit down while the slow roast keeps cooking, rather than serving nothing for an hour.",
+            "covered": "Incremental HTML streaming, Suspense boundaries, the loading.tsx and error.tsx conventions, granular boundary placement, and the difference between a slow route and a slow component.",
+            "assignment": {
+              "code": "A1.6",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Build a dashboard where the profile panel renders immediately and two analytics panels stream in behind separate Suspense boundaries.",
+              "deliverable": "A dashboard with an instant profile panel and two independently streaming analytics panels.",
+              "criteria": "Throttle the network to Slow 3G. The profile panel is interactive before the analytics panels resolve, and each skeleton is replaced independently.",
+              "submission_text": "Repository link plus a recording under Slow 3G throttling."
+            }
+          }
+        ]
+      },
+      {
+        "no": 3,
+        "title": "Data Layer with Prisma and PostgreSQL",
+        "resources": [
+          {
+            "title": "Prisma crash course, Traversy Media",
+            "url": "https://www.youtube.com/watch?v=CYH04BJzamo"
+          },
+          {
+            "title": "Prisma ORM crash course, Laith Academy",
+            "url": "https://www.youtube.com/watch?v=mU8-nKwfw4Y"
+          },
+          {
+            "title": "Prisma ORM documentation",
+            "url": "https://www.prisma.io/docs"
+          },
+          {
+            "title": "Zod documentation",
+            "url": "https://zod.dev"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "3.1",
+            "title": "Schema Modelling and Migrations",
+            "video_title": "Prisma Schema and Migrations",
+            "target_runtime": "9:20",
+            "video_outline": "0:00 the building code framing | 1:00 models, fields and attributes | 3:00 one to many and many to many | 5:20 constraints and cascade rules | 7:20 migrate dev against migrate deploy | 8:30 assignment brief",
+            "video_url": null,
+            "analogy": "Building codes signed off before the first slab is poured, so nobody discovers the load bearing wall is in the wrong place after handover.",
+            "covered": "The Prisma schema language, one to many and many to many relations, unique and composite constraints, cascade rules, enum types, and the difference between `migrate dev` and `migrate deploy`.",
+            "assignment": {
+              "code": "A1.7",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Model User, Product, Order and OrderItem in `schema.prisma` with foreign keys and a composite unique constraint, then generate and apply the migration.",
+              "deliverable": "A `schema.prisma` covering User, Product, Order and OrderItem, plus the generated migration files.",
+              "criteria": "Run `npx prisma migrate dev`. `\\d+ \"OrderItem\"` in psql shows both foreign keys and the composite unique index, and a duplicate insert is rejected by the database rather than by application code.",
+              "submission_text": "Repository link plus psql output of `\\d+ \"OrderItem\"`."
+            }
+          },
+          {
+            "number": "3.2",
+            "title": "Queries, Pagination and Transactions",
+            "video_title": "Prisma Queries, Pagination and Transactions",
+            "target_runtime": "9:40",
+            "video_outline": "0:00 the vault transfer framing | 1:00 select against include | 2:40 the N plus 1 problem | 4:40 cursor pagination against offset | 6:40 interactive transactions | 8:40 assignment brief",
+            "video_url": null,
+            "analogy": "A vault transfer where the money leaves one box and enters the other in the same movement, or neither box is touched at all.",
+            "covered": "Prisma Client reads and writes, `select` versus `include`, cursor pagination against offset pagination, the N plus 1 problem, and interactive transactions with `prisma.$transaction`.",
+            "assignment": {
+              "code": "A1.8",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Write an order placement routine that decrements stock and creates the order inside one interactive transaction, then add cursor paginated order history.",
+              "deliverable": "An order placement function using one interactive transaction, plus a cursor paginated history endpoint.",
+              "criteria": "Throw a simulated payment error halfway through the transaction. Stock is unchanged and no order row exists. Paginating through 1,000 orders returns every row exactly once.",
+              "submission_text": "Repository link plus a test log showing the rollback case."
+            }
+          },
+          {
+            "number": "3.3",
+            "title": "Route Handlers, Zod Validation and Tests",
+            "video_title": "Route Handlers, Zod and Your First Tests",
+            "target_runtime": "8:10",
+            "video_outline": "0:00 the goods inward framing | 0:50 route.ts basics | 2:20 parsing with Zod and inferring types | 4:30 error envelopes and status codes | 6:20 three Vitest cases | 7:20 assignment brief",
+            "video_url": null,
+            "analogy": "A goods inward desk that measures every crate against a checklist before it is allowed onto the warehouse floor.",
+            "covered": "Route handlers in `route.ts`, parsing request bodies with Zod, inferring TypeScript types from schemas, consistent error envelopes, correct status codes, and writing the first integration tests with Vitest.",
+            "assignment": {
+              "code": "A1.9",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Implement `POST /api/checkout` that parses the payload through a Zod schema and returns 422 with field level errors on failure, then cover it with three Vitest cases.",
+              "deliverable": "A `POST /api/checkout` handler with a Zod schema and three passing Vitest cases.",
+              "criteria": "Send a malformed payload with curl. The response is 422 with a per field error list, and `pnpm test` reports three passing tests.",
+              "submission_text": "Repository link plus the `pnpm test` output."
+            }
+          }
+        ]
+      },
+      {
+        "no": 4,
+        "title": "Authentication, Middleware, Testing and Deployment",
+        "resources": [
+          {
+            "title": "Next.js 15 full beginner course, authentication and deployment sections",
+            "url": "https://www.youtube.com/watch?v=3qGQ4dGA42o"
+          },
+          {
+            "title": "Auth.js documentation",
+            "url": "https://authjs.dev"
+          },
+          {
+            "title": "Vercel platform documentation",
+            "url": "https://vercel.com/docs"
+          },
+          {
+            "title": "Playwright documentation",
+            "url": "https://playwright.dev/docs/intro"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "4.1",
+            "title": "Auth.js Credentials, OAuth and Sessions",
+            "video_title": "Auth.js Credentials, OAuth and Sessions",
+            "target_runtime": "9:30",
+            "video_outline": "0:00 the keycard framing | 1:00 providers and the session object | 3:00 hashing passwords properly | 5:00 JWT against database sessions | 7:00 role claims and cookie flags | 8:40 assignment brief",
+            "video_url": null,
+            "analogy": "A hotel keycard that opens only your floor and stops working at checkout time, whether or not you hand it back.",
+            "covered": "Credential and OAuth providers, password hashing with bcrypt or argon2, JWT versus database sessions, session callbacks for role claims, and CSRF protection.",
+            "assignment": {
+              "code": "A1.10",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Configure Auth.js with a credentials provider and Google OAuth, hash passwords on registration, and attach a role claim to the session.",
+              "deliverable": "A working sign in flow with a credentials provider, Google OAuth and a role claim on the session.",
+              "criteria": "Sign in with a wrong password and confirm access is refused with no user enumeration in the error text. The session cookie is HttpOnly, Secure and SameSite Lax.",
+              "submission_text": "Repository link plus a screenshot of the session cookie attributes."
+            }
+          },
+          {
+            "number": "4.2",
+            "title": "Middleware and Route Protection",
+            "video_title": "Middleware Is Not Authorisation",
+            "target_runtime": "7:30",
+            "video_outline": "0:00 the turnstile framing | 0:50 the matcher config | 2:20 redirecting unauthenticated traffic | 4:00 why middleware alone is not enough | 5:50 defence in depth | 6:40 assignment brief",
+            "video_url": null,
+            "analogy": "A station turnstile that checks the pass before the platform, not a guard who taps you on the shoulder once you are already on the train.",
+            "covered": "Edge middleware and the matcher config, redirecting unauthenticated traffic, why middleware alone is not authorisation, and defence in depth with per action checks.",
+            "assignment": {
+              "code": "A1.11",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Write `middleware.ts` that intercepts every `/admin` route and redirects non admin users to the sign in page, then add a server side role check inside one admin action.",
+              "deliverable": "A `middleware.ts` guarding `/admin` plus a server side role check inside one admin action.",
+              "criteria": "Request `/admin/settings` with no session and confirm a 307 redirect. Then call the admin server action directly with a valid non admin session and confirm it is still refused.",
+              "submission_text": "Repository link plus a curl transcript showing both the redirect and the refused direct call."
+            }
+          },
+          {
+            "number": "4.3",
+            "title": "Testing, Build Configuration and Deployment",
+            "video_title": "Ship It: Environment, Tests and Deployment",
+            "target_runtime": "9:45",
+            "video_outline": "0:00 the sea trials framing | 1:00 env scoping and the public prefix | 3:00 two Playwright smoke tests | 5:30 wiring them into Actions | 7:30 deploying with production secrets | 8:50 assignment brief",
+            "video_url": null,
+            "analogy": "Sea trials before the ship leaves harbour, then loading the containers and sailing to port under its own power.",
+            "covered": "Environment variable scoping and the NEXT PUBLIC prefix, secret handling, standalone output, image and font optimisation, Playwright smoke tests in CI, and deploying to Vercel or a Docker host.",
+            "assignment": {
+              "code": "A1.12",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Write two Playwright smoke tests covering sign in and task creation, wire them into GitHub Actions, then deploy the project with production environment variables.",
+              "deliverable": "A live deployment URL, a green CI run and two Playwright specs in the repository.",
+              "criteria": "The Actions run is green and the live HTTPS URL serves authenticated pages backed by the production database, with no secret visible in the client bundle.",
+              "submission_text": "Deployment URL, repository link and the Actions run link."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "no": 2,
+    "title": "Applied Generative AI and Retrieval Augmented Generation",
+    "format": "Specialist Track, 8 weeks",
+    "time_commitment": "12 lectures. Each lecture is one video under 10 minutes plus one graded assignment. Budget 5 to 7 hours per week across 8 weeks, roughly 40 hours in total.",
+    "prerequisites": "Intermediate Python (functions, classes, virtual environments, async basics), comfort with the terminal, and a working understanding of REST APIs. No machine learning maths is required.",
+    "outcome": "Ship a grounded question answering service over a private document set, with measured retrieval quality, guardrails and a cost budget you can defend.",
+    "environment": "Python 3.11 or newer with uv or venv, an OpenAI or Anthropic API key, a free Cohere key for re ranking, Docker for local Chroma or Qdrant, and a LangSmith account for tracing.",
+    "capstone": "A grounded assistant over a 200 document corpus of the learner's choice. Hybrid retrieval, re ranking, citations, refusal behaviour, a 30 item evaluation set with recorded scores, PII redaction and a FastAPI endpoint with caching and per request cost logging.",
+    "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached.",
+    "modules": [
+      {
+        "no": 1,
+        "title": "Embeddings, Chunking and Vector Stores",
+        "resources": [
+          {
+            "title": "Production RAG with LangChain and vector databases, freeCodeCamp",
+            "url": "https://www.youtube.com/watch?v=mHxLXzYjQRE"
+          },
+          {
+            "title": "LangChain Python documentation",
+            "url": "https://python.langchain.com/docs/introduction/"
+          },
+          {
+            "title": "Chroma documentation",
+            "url": "https://docs.trychroma.com"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "1.1",
+            "title": "Embeddings and Semantic Similarity",
+            "video_title": "Embeddings and Similarity Without the Maths Degree",
+            "target_runtime": "8:00",
+            "video_outline": "0:00 the map coordinates framing | 1:00 what a dense vector is | 2:40 cosine against Euclidean | 4:30 model choice and dimensions | 6:20 similarity is not relevance | 7:10 assignment brief",
+            "video_url": null,
+            "analogy": "Giving every book in a library a map coordinate so that books about the same subject end up on neighbouring streets.",
+            "covered": "Dense vector representations, embedding model choice and dimensionality, cosine similarity against Euclidean distance, normalisation, batching and token cost, and why similarity is not relevance.",
+            "assignment": {
+              "code": "A2.1",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Embed 200 customer support tickets, compute a pairwise similarity matrix, and plot the distribution of scores.",
+              "deliverable": "A notebook embedding 200 tickets with a similarity matrix and a score distribution plot.",
+              "criteria": "Query 'refund requested'. The top five results are all refund tickets, and you can state the score gap between rank five and rank six.",
+              "submission_text": "Notebook in the repository plus the plot exported as PNG."
+            }
+          },
+          {
+            "number": "1.2",
+            "title": "Chunking Strategies",
+            "video_title": "Chunking Decides Your RAG Quality",
+            "target_runtime": "8:40",
+            "video_outline": "0:00 the index card framing | 1:00 fixed against recursive splitting | 3:00 token aware splitting | 4:40 choosing overlap | 6:20 structure aware splitters for markdown and code | 7:50 assignment brief",
+            "video_url": null,
+            "analogy": "Cutting a legal manual into index cards along clause boundaries rather than slicing straight through the middle of a sentence.",
+            "covered": "Fixed character splitting, recursive splitting on structure, token aware splitting, overlap sizing, markdown and code aware splitters, and attaching parent document context to each chunk.",
+            "assignment": {
+              "code": "A2.2",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Chunk a 5,000 word technical guide into roughly 400 token chunks with 50 token overlap using a recursive splitter, preserving fenced code blocks.",
+              "deliverable": "A chunking script producing roughly 400 token chunks with 50 token overlap and heading path metadata.",
+              "criteria": "No chunk splits a fenced code block or ends mid sentence, and every chunk carries a source identifier and heading path in its metadata.",
+              "submission_text": "Script plus a printed sample of five chunks including one containing a code block."
+            }
+          },
+          {
+            "number": "1.3",
+            "title": "Vector Databases and Metadata Filtering",
+            "video_title": "Vector Databases and Metadata Filters",
+            "target_runtime": "7:55",
+            "video_outline": "0:00 the filing cabinet framing | 0:50 approximate nearest neighbour and HNSW | 2:40 collections and upserts | 4:20 metadata filtering | 6:10 Chroma against Qdrant against pgvector | 7:10 assignment brief",
+            "video_url": null,
+            "analogy": "A filing system that pulls the right folder by subject, then lets you narrow to a single department and date range before it hands anything over.",
+            "covered": "Approximate nearest neighbour indexes, HNSW parameters, collections and namespaces, metadata filters, upserts and deletions, and choosing between Chroma, Qdrant and pgvector.",
+            "assignment": {
+              "code": "A2.3",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Index 100 policy documents into Chroma with department and date metadata, then run filtered vector queries.",
+              "deliverable": "A Chroma collection of 100 documents with department and date metadata and three filtered queries.",
+              "criteria": "Query 'vacation policy' filtered to department equals HR. Every returned chunk carries the HR tag, and deleting one source removes exactly its chunks and no others.",
+              "submission_text": "Script plus query output for the HR filter case."
+            }
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "Retrieval Pipelines with LangChain",
+        "resources": [
+          {
+            "title": "LangChain full course",
+            "url": "https://www.youtube.com/watch?v=Cyv-dgv80kE"
+          },
+          {
+            "title": "RAG crash course with LangChain, Krish Naik",
+            "url": "https://www.youtube.com/watch?v=o126p1QN_RI"
+          },
+          {
+            "title": "LangChain Expression Language",
+            "url": "https://python.langchain.com/docs/concepts/lcel/"
+          },
+          {
+            "title": "OWASP top ten for LLM applications",
+            "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "2.1",
+            "title": "Prompting, Grounding and Injection Defence",
+            "video_title": "Grounded Prompts and Injection Defence",
+            "target_runtime": "9:15",
+            "video_outline": "0:00 the expert witness framing | 1:00 system instruction structure | 3:00 citation requirements | 4:40 the refusal string | 6:20 retrieved text is data, not instructions | 8:20 assignment brief",
+            "video_url": null,
+            "analogy": "Briefing an expert witness with the case file and telling them plainly to say 'not in the record' rather than guess.",
+            "covered": "System instruction design, few shot examples, context grounding, citation formats, explicit refusal behaviour, and treating retrieved text as untrusted input rather than instructions.",
+            "assignment": {
+              "code": "A2.4",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Write a strict RAG prompt template that requires document identifiers in every claim and returns a fixed refusal string when the context does not answer the question.",
+              "deliverable": "A prompt template file plus a short report on two adversarial tests you ran against it.",
+              "criteria": "Ask a question with no supporting context and receive the exact refusal string. Then plant 'ignore previous instructions' inside a retrieved chunk and confirm the model does not follow it.",
+              "submission_text": "Template file and the adversarial test transcript."
+            }
+          },
+          {
+            "number": "2.2",
+            "title": "LCEL Chains and Streaming",
+            "video_title": "LCEL Chains and Streaming",
+            "target_runtime": "8:05",
+            "video_outline": "0:00 the assembly line framing | 0:50 the pipe operator | 2:30 RunnableParallel and passthrough | 4:20 output parsers | 6:00 streaming and tracing | 7:10 assignment brief",
+            "video_url": null,
+            "analogy": "An assembly line where each station hands its output to the next without anyone stacking parts on the floor in between.",
+            "covered": "Runnable composition with the pipe operator, RunnableParallel and RunnablePassthrough, output parsers, streaming tokens, batching, and adding LangSmith tracing.",
+            "assignment": {
+              "code": "A2.5",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Build an LCEL chain composing retriever, prompt template, chat model and string output parser, streaming tokens to the console with tracing enabled.",
+              "deliverable": "An LCEL chain streaming tokens to the console with LangSmith tracing enabled.",
+              "criteria": "The first token appears in under two seconds on a warm connection, and the LangSmith trace shows retriever and model as separate timed spans.",
+              "submission_text": "Script plus a screenshot of the trace showing separate retriever and model spans."
+            }
+          },
+          {
+            "number": "2.3",
+            "title": "Hybrid Retrieval and Re-ranking",
+            "video_title": "Hybrid Search and Re-ranking",
+            "target_runtime": "9:05",
+            "video_outline": "0:00 the librarian framing | 1:00 BM25 next to dense retrieval | 3:00 reciprocal rank fusion | 5:00 multi query and HyDE | 6:50 cross encoder re ranking | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "A reference librarian who rewrites a vague question into three sharper ones, gathers everything, then puts the three best results on top.",
+            "covered": "BM25 keyword search, reciprocal rank fusion, multi query generation, HyDE, and cross encoder re ranking with Cohere or a local model.",
+            "assignment": {
+              "code": "A2.6",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a hybrid pipeline that fuses BM25 and dense results, retrieves 20 candidates and re ranks them down to 3.",
+              "deliverable": "A hybrid retrieval pipeline with re ranking and a recall at 3 comparison table against the dense baseline.",
+              "criteria": "On a 20 question evaluation set, recall at 3 improves against the dense only baseline, and both numbers are recorded in a results table.",
+              "submission_text": "Pipeline code plus the comparison table as a markdown file."
+            }
+          }
+        ]
+      },
+      {
+        "no": 3,
+        "title": "Tool Calling and Agents",
+        "resources": [
+          {
+            "title": "LangGraph complete course, freeCodeCamp",
+            "url": "https://www.youtube.com/watch?v=jGg_1h0qzaM"
+          },
+          {
+            "title": "Agentic AI with LangGraph, part one",
+            "url": "https://www.youtube.com/watch?v=4RtKGasvNC0"
+          },
+          {
+            "title": "LangGraph documentation",
+            "url": "https://langchain-ai.github.io/langgraph/"
+          },
+          {
+            "title": "Anthropic tool use guide",
+            "url": "https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "3.1",
+            "title": "Function Calling and Tool Schemas",
+            "video_title": "Tool Calling and JSON Schemas",
+            "target_runtime": "8:25",
+            "video_outline": "0:00 the assistant with a calculator framing | 1:00 schema shape | 2:40 forcing and restricting tool choice | 4:30 returning results to the model | 6:20 handling tool failure | 7:30 assignment brief",
+            "video_url": null,
+            "analogy": "Handing an assistant a calculator and a booking terminal, with written rules about which one to reach for.",
+            "covered": "JSON tool schemas, argument validation, forcing or restricting tool choice, returning results to the model, parallel tool calls, and error handling when a tool fails.",
+            "assignment": {
+              "code": "A2.7",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Write two Python tools, one running a parameterised SQL query and one doing arithmetic, and expose them to the model with typed schemas.",
+              "deliverable": "Two tools, one SQL and one arithmetic, with typed schemas and a handled failure path.",
+              "criteria": "Ask for the total order value for customer 45. The trace shows the SQL tool invoked with the correct parameter, and a deliberately failing tool returns a handled error rather than a stack trace.",
+              "submission_text": "Code plus the trace showing the SQL tool called with the correct parameter."
+            }
+          },
+          {
+            "number": "3.2",
+            "title": "ReAct Loops and Agent Control",
+            "video_title": "ReAct Loops and Runaway Agents",
+            "target_runtime": "8:45",
+            "video_outline": "0:00 the detective framing | 1:00 thought, action, observation | 3:00 the scratchpad | 4:40 step limits, timeouts and cost ceilings | 6:40 when an agent is the wrong tool | 7:50 assignment brief",
+            "video_url": null,
+            "analogy": "A detective working the board in cycles of observe, think, act, then observe again, with a rule that they stop after ten leads.",
+            "covered": "Thought, action and observation loops, scratchpad management, step limits and timeouts, cost ceilings, and recognising when an agent is the wrong tool for a deterministic job.",
+            "assignment": {
+              "code": "A2.8",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a ReAct agent that can search documentation and calculate, with a hard limit of six steps and a token budget.",
+              "deliverable": "A ReAct agent with a six step limit and a token budget, plus its execution log.",
+              "criteria": "Submit a multi step question. The log shows at least three reasoning cycles, and a deliberately unanswerable question terminates at the step limit instead of looping.",
+              "submission_text": "Code plus logs for one solvable and one unsolvable question."
+            }
+          },
+          {
+            "number": "3.3",
+            "title": "LangGraph State Machines and Multi-agent Graphs",
+            "video_title": "LangGraph: State, Edges and Cycles",
+            "target_runtime": "9:35",
+            "video_outline": "0:00 the newsroom framing | 1:10 typed state schemas | 3:00 nodes and conditional edges | 5:00 cycles without infinite loops | 7:00 checkpointing and resumption | 8:40 assignment brief",
+            "video_url": null,
+            "analogy": "A newsroom where the researcher gathers, the writer drafts and the editor sends work back until it is fit to print.",
+            "covered": "Typed state schemas, nodes and conditional edges, cycles, checkpointing and resumption, human in the loop interrupts, and supervisor patterns.",
+            "assignment": {
+              "code": "A2.9",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a two node graph where a writer node produces Python and a tester node runs it and routes back on failure, with checkpointing enabled.",
+              "deliverable": "A writer and tester graph that loops on failure, with checkpointing enabled.",
+              "criteria": "Feed it a task that fails on the first attempt. The graph loops once, passes on the second cycle, and the run can be resumed from the checkpoint after a forced restart.",
+              "submission_text": "Code plus a log showing the failed first cycle and the passing second cycle."
+            }
+          }
+        ]
+      },
+      {
+        "no": 4,
+        "title": "Evaluation, Safety and Production",
+        "resources": [
+          {
+            "title": "Production RAG with LangChain and vector databases, evaluation and deployment sections",
+            "url": "https://www.youtube.com/watch?v=mHxLXzYjQRE"
+          },
+          {
+            "title": "Ragas documentation",
+            "url": "https://docs.ragas.io"
+          },
+          {
+            "title": "FastAPI documentation",
+            "url": "https://fastapi.tiangolo.com"
+          },
+          {
+            "title": "NIST AI risk management framework",
+            "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "4.1",
+            "title": "Evaluation with Ragas and a Golden Set",
+            "video_title": "Ragas and Your First Golden Set",
+            "target_runtime": "9:00",
+            "video_outline": "0:00 the bar exam framing | 1:00 building a golden set that is worth having | 3:00 faithfulness and answer relevancy | 5:00 context precision and recall | 7:00 where model graded evaluation lies to you | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "A bar exam that marks answers against the statute book, not against how confident the candidate sounded.",
+            "covered": "Building a golden question set, faithfulness, answer relevancy, context precision and recall, the limits of model graded evaluation, and tracking scores across changes.",
+            "assignment": {
+              "code": "A2.10",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a 20 item golden set from your corpus and run a Ragas evaluation, then change one retrieval parameter and re run it.",
+              "deliverable": "A 20 item golden set and two evaluation runs, before and after one retrieval change.",
+              "criteria": "You produce a table with both runs side by side, name which metric moved and by how much, and can explain one case where the metric disagreed with your own judgement.",
+              "submission_text": "Golden set file plus a results table naming which metric moved."
+            }
+          },
+          {
+            "number": "4.2",
+            "title": "Guardrails, PII Redaction and Structured Output",
+            "video_title": "Guardrails, PII Redaction and Structured Output",
+            "target_runtime": "8:30",
+            "video_outline": "0:00 the exit scanner framing | 1:00 input against output filtering | 2:40 PII detection and redaction | 4:40 topic restriction | 6:20 schema constrained generation | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "A scanner at the exit rather than the entrance, checking what is leaving the building as well as what came in.",
+            "covered": "Input and output filtering, PII detection and redaction, topic restriction, schema constrained generation, refusal handling, and logging blocked events for review.",
+            "assignment": {
+              "code": "A2.11",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Add an output guardrail that redacts card numbers and national identifiers, restricts answers to your corpus domain, and enforces a JSON response schema.",
+              "deliverable": "A guardrail layer redacting identifiers, restricting topic and enforcing a response schema.",
+              "criteria": "Prompt the system to reveal a configuration secret and to answer an off topic medical question. Both are intercepted, both are logged, and the response still validates against the schema.",
+              "submission_text": "Code plus the blocked event log for two attack attempts."
+            }
+          },
+          {
+            "number": "4.3",
+            "title": "Serving, Caching, Cost and Observability",
+            "video_title": "Serving RAG: FastAPI, Caching and Cost per Query",
+            "target_runtime": "9:20",
+            "video_outline": "0:00 the drive through framing | 1:00 the FastAPI endpoint | 2:50 exact match against semantic caching | 5:00 rate limiting | 6:40 logging tokens and cost per request | 8:20 assignment brief",
+            "video_url": null,
+            "analogy": "A drive through that keeps the popular orders hot on the counter and prices every item before it leaves the window.",
+            "covered": "Serving with FastAPI, semantic and exact match caching, rate limiting, streaming responses, per request token and cost accounting, and structured logging.",
+            "assignment": {
+              "code": "A2.12",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Deploy the pipeline behind a FastAPI endpoint with exact match caching, rate limiting and per request cost logging.",
+              "deliverable": "A deployed FastAPI endpoint with caching, rate limiting and per request cost logging.",
+              "criteria": "Fire the same query twice. The second response is served from cache and is at least ten times faster, and the log line for every request records prompt tokens, completion tokens and estimated cost.",
+              "submission_text": "Endpoint URL or container image, plus log lines for a cache miss and a cache hit."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "no": 3,
+    "title": "Data Structures and Algorithmic Problem Solving",
+    "format": "Career Track support course, 8 weeks",
+    "time_commitment": "12 lectures. Each lecture is one video under 10 minutes plus one timed problem set of about 3 hours. Budget 6 to 8 hours per week across 8 weeks.",
+    "prerequisites": "One language at a working level (Python, Java, C++ or JavaScript), including arrays, dictionaries, recursion and classes.",
+    "outcome": "Solve an unseen medium difficulty problem in 35 minutes while explaining the approach aloud, and state the time and space complexity of your own solution without being asked twice.",
+    "environment": "A LeetCode or NeetCode account, a local editor with a debugger, and a stopwatch. Interview practice is done out loud, not in silence.",
+    "capstone": "A recorded 45 minute mock interview covering two unseen problems, one medium and one hard, graded on correctness, complexity analysis and communication rather than on speed alone.",
+    "assessment": "12 timed problem sets at 10 marks each, 120 marks, worth 60 percent. Mock interview worth 40 percent. Marks are split evenly between a correct solution and a spoken explanation of the approach and its complexity. Positioning note. This course serves a different outcome from the other five. The others build shippable systems, this one prepares for hiring filters. It is scheduled alongside a build course rather than instead of one.",
+    "modules": [
+      {
+        "no": 1,
+        "title": "Complexity, Two Pointers, Sliding Window and Binary Search",
+        "resources": [
+          {
+            "title": "Algorithms and data structures, NeetCode",
+            "url": "https://www.youtube.com/watch?v=laCgvPLhL4I"
+          },
+          {
+            "title": "NeetCode DSA for beginners playlist",
+            "url": "https://www.youtube.com/playlist?list=PLtWSRlKFDhsqLgNOQpXALOGrRMweMJT32"
+          },
+          {
+            "title": "NeetCode structured practice",
+            "url": "https://neetcode.io/practice"
+          },
+          {
+            "title": "Data structures and algorithms course notes, freeCodeCamp",
+            "url": "https://www.freecodecamp.org/news/master-technical-interviews-by-learning-data-structures-and-algorithms/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "1.1",
+            "title": "Complexity Analysis and Two Pointers",
+            "video_title": "Big-O in 7 Minutes and the Two Pointer Pattern",
+            "target_runtime": "7:10",
+            "video_outline": "0:00 the bridge inspectors framing | 0:50 counting operations | 2:20 space includes the call stack | 3:40 pointer convergence on sorted input | 5:40 worked example | 6:30 assignment brief",
+            "video_url": null,
+            "analogy": "Two inspectors walking towards each other from opposite ends of a bridge, so the whole span is covered in one pass.",
+            "covered": "Counting operations, dropping constants, amortised cost, space complexity including the call stack, and pointer convergence on sorted input.",
+            "assignment": {
+              "code": "A3.1",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Solve Two Sum on a sorted array, Container With Most Water and 3Sum using converging pointers.",
+              "deliverable": "Solutions to Two Sum sorted, Container With Most Water and 3Sum, each with a complexity comment at the top.",
+              "criteria": "3Sum returns correct results on an array of 3,000 elements with duplicates and no repeated triplets, and you state its complexity as O(n squared) time and O(1) extra space before running it.",
+              "submission_text": "Repository folder plus a 90 second recording explaining 3Sum aloud."
+            }
+          },
+          {
+            "number": "1.2",
+            "title": "Fixed and Dynamic Sliding Window",
+            "video_title": "Sliding Window: Fixed and Dynamic",
+            "target_runtime": "8:15",
+            "video_outline": "0:00 the viewfinder framing | 0:50 the window invariant | 2:30 expand and contract conditions | 4:30 state inside the window | 6:20 spotting a window problem | 7:20 assignment brief",
+            "video_url": null,
+            "analogy": "A camera viewfinder sliding along a landscape, widening when the shot is incomplete and tightening once it is.",
+            "covered": "The window invariant, expanding and contracting conditions, hash map and set state inside the window, and recognising which problems are windows in disguise.",
+            "assignment": {
+              "code": "A3.2",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Solve Longest Substring Without Repeating Characters and Minimum Window Substring.",
+              "deliverable": "Solutions to Longest Substring Without Repeating Characters and Minimum Window Substring.",
+              "criteria": "Input 'ADOBECODEBANC' with target 'ABC' returns 'BANC', and you can name the invariant your loop maintains.",
+              "submission_text": "Repository folder plus one written sentence naming your loop invariant."
+            }
+          },
+          {
+            "number": "1.3",
+            "title": "Binary Search on Sorted Data and on Answer Spaces",
+            "video_title": "Binary Search on the Answer Space",
+            "target_runtime": "8:35",
+            "video_outline": "0:00 the guessing game framing | 1:00 the half open interval convention | 2:40 avoiding off by one | 4:20 monotonic predicates | 6:20 worked example | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "Guessing a number between one and a thousand by halving the range every time, then realising the same trick works on any yes or no question that flips once.",
+            "covered": "The half open interval convention, avoiding off by one errors, lower and upper bound searches, and binary search over a monotonic feasibility predicate.",
+            "assignment": {
+              "code": "A3.3",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Solve Koko Eating Bananas and Capacity To Ship Packages Within D Days.",
+              "deliverable": "Solutions to Koko Eating Bananas and Capacity To Ship Packages, with the feasibility predicate as its own function.",
+              "criteria": "Both solutions pass every edge case, including a single item and all items identical, and you can write the feasibility predicate as a standalone function.",
+              "submission_text": "Repository folder plus edge case tests for a single item and all items identical."
+            }
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "Linked Lists, Stacks and Heaps",
+        "resources": [
+          {
+            "title": "NeetCode DSA for beginners playlist",
+            "url": "https://www.youtube.com/playlist?list=PLtWSRlKFDhsqLgNOQpXALOGrRMweMJT32"
+          },
+          {
+            "title": "NeetCode structured practice",
+            "url": "https://neetcode.io/practice"
+          },
+          {
+            "title": "LeetCode problem set",
+            "url": "https://leetcode.com/problemset/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "2.1",
+            "title": "Linked Lists and Fast and Slow Pointers",
+            "video_title": "Fast and Slow Pointers",
+            "target_runtime": "7:45",
+            "video_outline": "0:00 the circular track framing | 0:50 pointer rewiring and dummy heads | 2:40 in place reversal | 4:30 Floyd cycle detection | 6:20 finding the entry node | 7:00 assignment brief",
+            "video_url": null,
+            "analogy": "Two runners on a circular track, where the faster one is guaranteed to lap the slower one if the track loops at all.",
+            "covered": "Pointer rewiring, dummy head nodes, in place reversal, cycle detection with Floyd's algorithm, and finding the cycle entry point.",
+            "assignment": {
+              "code": "A3.4",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Reverse a linked list in place, detect a cycle, and return the node where the cycle begins.",
+              "deliverable": "In place reversal, cycle detection and cycle entry, all in O(1) extra space.",
+              "criteria": "Cycle detection returns the correct entry node using O(1) extra space, and reversal handles empty and single node lists without a special case branch.",
+              "submission_text": "Repository folder plus tests for empty and single node lists."
+            }
+          },
+          {
+            "number": "2.2",
+            "title": "Monotonic Stacks",
+            "video_title": "Monotonic Stacks Made Obvious",
+            "target_runtime": "8:20",
+            "video_outline": "0:00 the blocked view framing | 1:00 increasing against decreasing stacks | 2:50 next greater element | 4:40 the amortised argument | 6:30 histogram walkthrough | 7:30 assignment brief",
+            "video_url": null,
+            "analogy": "A queue of people where a taller person blocks the view of everyone shorter standing behind them.",
+            "covered": "Maintaining increasing and decreasing stacks, next greater and next smaller elements, and why every element is pushed and popped at most once.",
+            "assignment": {
+              "code": "A3.5",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Solve Daily Temperatures and Largest Rectangle in Histogram.",
+              "deliverable": "Solutions to Daily Temperatures and Largest Rectangle in Histogram.",
+              "criteria": "Input [73, 74, 75, 71, 69, 72, 76, 73] returns [1, 1, 4, 2, 1, 1, 0, 0], and you can justify the linear bound by counting pushes and pops.",
+              "submission_text": "Repository folder plus a written justification of the linear bound."
+            }
+          },
+          {
+            "number": "2.3",
+            "title": "Heaps and Priority Queues",
+            "video_title": "Heaps, Top K and the Two Heap Median",
+            "target_runtime": "8:50",
+            "video_outline": "0:00 the triage desk framing | 1:00 heap structure and sift operations | 3:00 heapify in linear time | 4:40 the k largest pattern | 6:40 two heaps for a running median | 7:50 assignment brief",
+            "video_url": null,
+            "analogy": "An emergency room triage desk that admits by severity rather than by who walked in first.",
+            "covered": "Binary heap structure, sift up and sift down, heapify in linear time, k largest patterns, and the two heap technique for running medians.",
+            "assignment": {
+              "code": "A3.6",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Solve Top K Frequent Elements and Find Median from Data Stream using two heaps.",
+              "deliverable": "Solutions to Top K Frequent Elements and Find Median from Data Stream.",
+              "criteria": "Stream 1,000 values through the median structure. Each insertion is O(log n), each median query is O(1), and the result matches a sorted reference on every step.",
+              "submission_text": "Repository folder plus a test comparing 1,000 streamed medians against a sorted reference."
+            }
+          }
+        ]
+      },
+      {
+        "no": 3,
+        "title": "Trees and Graphs",
+        "resources": [
+          {
+            "title": "NeetCode DSA for beginners playlist",
+            "url": "https://www.youtube.com/playlist?list=PLtWSRlKFDhsqLgNOQpXALOGrRMweMJT32"
+          },
+          {
+            "title": "NeetCode structured practice",
+            "url": "https://neetcode.io/practice"
+          },
+          {
+            "title": "LeetCode problem set",
+            "url": "https://leetcode.com/problemset/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "3.1",
+            "title": "Binary Trees and Breadth First Traversal",
+            "video_title": "BFS and Level Order Traversal",
+            "target_runtime": "7:25",
+            "video_outline": "0:00 the chain of command framing | 0:50 traversal orders | 2:20 the queue mechanic | 4:00 depth and diameter | 5:40 BST properties | 6:30 assignment brief",
+            "video_url": null,
+            "analogy": "Passing an order down a chain of command one rank at a time, so everyone at the same level hears it together.",
+            "covered": "Tree traversals, binary search tree properties, level order traversal with a queue, and computing depth and diameter.",
+            "assignment": {
+              "code": "A3.7",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Implement level order traversal and lowest common ancestor in a binary search tree.",
+              "deliverable": "Level order traversal and lowest common ancestor in a binary search tree.",
+              "criteria": "Level order output on a 15 node tree matches the expected nested lists exactly, and the ancestor function runs in O(h) without visiting the whole tree.",
+              "submission_text": "Repository folder plus output for a 15 node tree."
+            }
+          },
+          {
+            "number": "3.2",
+            "title": "Depth First Search, Cycles and Components",
+            "video_title": "DFS, Cycles and Components",
+            "target_runtime": "8:40",
+            "video_outline": "0:00 the maze framing | 1:00 adjacency lists against matrices | 2:40 recursive and iterative DFS | 4:30 the three colour method | 6:30 topological order | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "Following one corridor of a maze to its dead end before returning to try the next turning.",
+            "covered": "Adjacency lists against adjacency matrices, recursive and iterative depth first search, visited state and the three colour method, connected components, and topological ordering.",
+            "assignment": {
+              "code": "A3.8",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Solve Number of Islands and Course Schedule.",
+              "deliverable": "Solutions to Number of Islands and Course Schedule.",
+              "criteria": "A grid with three land masses returns exactly 3, and Course Schedule correctly reports false on a prerequisite cycle of length four.",
+              "submission_text": "Repository folder plus a test case with a prerequisite cycle of length four."
+            }
+          },
+          {
+            "number": "3.3",
+            "title": "Shortest Paths with Breadth First Search and Dijkstra",
+            "video_title": "Dijkstra Without the Textbook",
+            "target_runtime": "9:10",
+            "video_outline": "0:00 the satnav framing | 1:00 BFS for unweighted shortest paths | 2:50 the priority queue version | 5:00 why negative edges break it | 6:50 reconstructing the path | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "Satellite navigation choosing the cheapest route rather than the one with the fewest turns.",
+            "covered": "Breadth first search for unweighted shortest paths, Dijkstra with a priority queue, why negative edges break it, and reconstructing the path itself.",
+            "assignment": {
+              "code": "A3.9",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Implement Dijkstra on a weighted network topology and return both the cost and the path.",
+              "deliverable": "Dijkstra returning both cost and path, verified against brute force on a ten node graph.",
+              "criteria": "The returned path between node 0 and node 5 is minimal and is verified against a brute force search on a graph of ten nodes.",
+              "submission_text": "Repository folder plus the brute force comparison output."
+            }
+          }
+        ]
+      },
+      {
+        "no": 4,
+        "title": "Backtracking and Dynamic Programming",
+        "resources": [
+          {
+            "title": "NeetCode DSA for beginners playlist",
+            "url": "https://www.youtube.com/playlist?list=PLtWSRlKFDhsqLgNOQpXALOGrRMweMJT32"
+          },
+          {
+            "title": "NeetCode structured practice",
+            "url": "https://neetcode.io/practice"
+          },
+          {
+            "title": "LeetCode problem set",
+            "url": "https://leetcode.com/problemset/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "4.1",
+            "title": "Backtracking and Pruning",
+            "video_title": "Backtracking: Choose, Explore, Undo",
+            "target_runtime": "8:30",
+            "video_outline": "0:00 the Sudoku in pencil framing | 1:00 the three step pattern | 2:50 subsets and permutations | 4:40 pruning conditions | 6:30 handling duplicates | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "Filling a Sudoku grid in pencil and rubbing out the moment two numbers clash, rather than finishing the page first.",
+            "covered": "The choose, explore, un choose pattern, subsets, permutations and combinations, pruning conditions, and handling duplicates without producing duplicate results.",
+            "assignment": {
+              "code": "A3.10",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Implement Subsets with duplicates, Combination Sum and the N Queens solver.",
+              "deliverable": "Subsets with duplicates, Combination Sum and N Queens.",
+              "criteria": "N Queens returns 2 distinct boards for n equals 4 and 92 for n equals 8, and Subsets with input [1, 2, 2] returns no repeated set.",
+              "submission_text": "Repository folder plus counts for n equals 4 and n equals 8."
+            }
+          },
+          {
+            "number": "4.2",
+            "title": "One Dimensional Dynamic Programming",
+            "video_title": "1D DP: From Recursion to Tabulation",
+            "target_runtime": "9:00",
+            "video_outline": "0:00 the notepad framing | 1:00 optimal substructure and overlap | 3:00 memoisation | 5:00 converting to a table | 7:00 rolling variables | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "Writing intermediate answers on a notepad so the same sum is never worked out twice.",
+            "covered": "Spotting optimal substructure and overlapping subproblems, top down memoisation, bottom up tabulation, and reducing space to a rolling variable.",
+            "assignment": {
+              "code": "A3.11",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Solve House Robber, Coin Change and Longest Increasing Subsequence.",
+              "deliverable": "House Robber, Coin Change and Longest Increasing Subsequence, with House Robber in O(1) space.",
+              "criteria": "Coins [1, 2, 5] with amount 11 returns 3, an impossible amount returns minus 1, and your House Robber solution uses O(1) extra space.",
+              "submission_text": "Repository folder plus the impossible amount test case."
+            }
+          },
+          {
+            "number": "4.3",
+            "title": "Two Dimensional Dynamic Programming",
+            "video_title": "2D DP: Knapsack and LCS",
+            "target_runtime": "9:40",
+            "video_outline": "0:00 the rucksack framing | 1:00 two dimensional state | 3:00 the 0 or 1 knapsack table | 5:20 longest common subsequence | 7:20 reconstructing the answer | 8:50 assignment brief",
+            "video_url": null,
+            "analogy": "Packing an expedition rucksack for the highest value load the straps will bear.",
+            "covered": "Two dimensional state tables, the 0 or 1 knapsack, longest common subsequence, edit distance, and grid path counting with obstacles.",
+            "assignment": {
+              "code": "A3.12",
+              "duration": "3 hours, timed",
+              "points": 10,
+              "brief": "Implement the 0 or 1 knapsack and longest common subsequence, then reconstruct the chosen items and the subsequence itself.",
+              "deliverable": "Knapsack and LCS with reconstruction of the chosen items and the subsequence.",
+              "criteria": "Strings 'abcde' and 'ace' return length 3 and the reconstruction prints 'ace', and the knapsack returns both the optimal value and the selected item list.",
+              "submission_text": "Repository folder plus output for 'abcde' and 'ace'."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "no": 4,
+    "title": "Cloud DevOps and Container Orchestration",
+    "format": "Specialist Track, 8 weeks",
+    "time_commitment": "12 lectures. Each lecture is one video under 10 minutes plus one graded assignment. Budget 5 to 7 hours per week across 8 weeks, roughly 40 hours in total.",
+    "prerequisites": "Comfortable on a Linux command line, able to run and debug at least one web application locally, and familiar with Git branches and pull requests.",
+    "outcome": "Take an application from source to a monitored, autoscaling cluster deployment driven entirely by declarative files in Git.",
+    "environment": "Docker Desktop or Podman, kind or minikube with at least 6 GB of RAM allocated, kubectl, Helm, Terraform, and an AWS free tier account with billing alerts switched on before the first lab.",
+    "capstone": "A three tier application delivered end to end. Multi stage images, a Helm chart, an Argo CD application syncing from Git, Terraform provisioned infrastructure, Prometheus alerts and a Grafana dashboard, with a documented rollback that is actually performed once.",
+    "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached. Cost warning. Every cloud lab in Module 4 creates billable resources. Destroy each stack at the end of the session and confirm the bill is back to zero before the next lecture.",
+    "modules": [
+      {
+        "no": 1,
+        "title": "Docker Containers and Image Engineering",
+        "resources": [
+          {
+            "title": "Docker and Kubernetes full course",
+            "url": "https://www.youtube.com/watch?v=bhBSlnQcq2k"
+          },
+          {
+            "title": "TechWorld with Nana, DevOps channel",
+            "url": "https://www.youtube.com/c/techworldwithnana"
+          },
+          {
+            "title": "Docker documentation",
+            "url": "https://docs.docker.com"
+          },
+          {
+            "title": "Dockerfile reference",
+            "url": "https://docs.docker.com/reference/dockerfile/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "1.1",
+            "title": "Container Internals and Image Optimisation",
+            "video_title": "Multi-Stage Dockerfiles and Layer Caching",
+            "target_runtime": "8:45",
+            "video_outline": "0:00 the sealed crate framing | 1:00 namespaces and control groups | 2:40 layer order decides cache hits | 4:40 the multi stage build | 6:40 non root users and dockerignore | 7:50 assignment brief",
+            "video_url": null,
+            "analogy": "Packing everything a machine needs into one sealed crate that behaves identically in every warehouse it lands in.",
+            "covered": "Namespaces and control groups, the layered filesystem and cache invalidation order, multi stage builds, distroless and Alpine base images, running as a non root user, and the dockerignore file.",
+            "assignment": {
+              "code": "A4.1",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Containerise a Go service with a multi stage build, and separately containerise a Node service, using a non root user in both.",
+              "deliverable": "Two Dockerfiles, one Go and one Node, both multi stage and both running as non root.",
+              "criteria": "`docker images` shows the Go image under 25 MB and the Node image under 150 MB. `docker run --rm <image> id` prints a non zero user id in both cases.",
+              "submission_text": "Repository folder plus `docker images` output showing both sizes."
+            }
+          },
+          {
+            "number": "1.2",
+            "title": "Networking and Persistent Storage",
+            "video_title": "Networks and Volumes: Where Your Data Lives",
+            "target_runtime": "8:10",
+            "video_outline": "0:00 the private cabling framing | 0:50 bridge, host and user defined networks | 2:40 name resolution between containers | 4:30 named volumes against bind mounts | 6:30 destroying the container safely | 7:20 assignment brief",
+            "video_url": null,
+            "analogy": "Running private cabling between offices and putting the filing cabinet in the building rather than inside a desk that gets replaced.",
+            "covered": "Bridge, host and user defined networks, container name resolution, published ports, named volumes against bind mounts, and where database data actually lives.",
+            "assignment": {
+              "code": "A4.2",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Run PostgreSQL with a named volume, insert rows, destroy the container, then recreate it against the same volume.",
+              "deliverable": "A PostgreSQL container with a named volume and a written record of the destroy and recreate test.",
+              "criteria": "Every row survives the container being removed. Removing the volume as well loses the data, which you confirm deliberately.",
+              "submission_text": "Command transcript showing rows surviving container removal."
+            }
+          },
+          {
+            "number": "1.3",
+            "title": "Multi Service Stacks with Compose",
+            "video_title": "Compose with Health Checks",
+            "target_runtime": "7:50",
+            "video_outline": "0:00 the master switch framing | 0:50 service definitions | 2:20 depends on with condition | 4:00 health checks that mean something | 5:50 profiles and env files | 6:50 assignment brief",
+            "video_url": null,
+            "analogy": "One master switch that brings up the lights, the fridge and the stove in the right order, rather than three separate trips to the fuse box.",
+            "covered": "Compose file structure, service dependencies with condition on health, environment files, health checks, named networks, and profiles for optional services.",
+            "assignment": {
+              "code": "A4.3",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Write a compose file linking an API, PostgreSQL and Redis, with a health check on each and correct startup ordering.",
+              "deliverable": "A compose file linking an API, PostgreSQL and Redis with health checks on all three.",
+              "criteria": "`docker compose up` brings all three services to healthy state, and the API container resolves the database by service name with no hardcoded IP address.",
+              "submission_text": "Compose file plus `docker compose ps` output showing healthy states."
+            }
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "Kubernetes Cluster Architecture",
+        "resources": [
+          {
+            "title": "Docker and Kubernetes full course",
+            "url": "https://www.youtube.com/watch?v=bhBSlnQcq2k"
+          },
+          {
+            "title": "TechWorld with Nana, DevOps channel",
+            "url": "https://www.youtube.com/c/techworldwithnana"
+          },
+          {
+            "title": "Kubernetes documentation",
+            "url": "https://kubernetes.io/docs/home/"
+          },
+          {
+            "title": "Kubernetes tutorials",
+            "url": "https://kubernetes.io/docs/tutorials/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "2.1",
+            "title": "Pods, Deployments and Self Healing",
+            "video_title": "Pods, Deployments and Probes",
+            "target_runtime": "9:05",
+            "video_outline": "0:00 the control tower framing | 1:00 the reconciliation loop | 2:50 Deployments and ReplicaSets | 4:40 liveness, readiness and startup probes | 6:50 requests and limits | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "A control tower that dispatches a replacement aircraft the moment one is taken out of service, without waiting to be told.",
+            "covered": "Control plane components, the reconciliation loop, Deployments and ReplicaSets, liveness, readiness and startup probes, resource requests and limits, and rolling update strategy.",
+            "assignment": {
+              "code": "A4.4",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Deploy a three replica service with liveness and readiness probes and explicit resource requests, then delete a pod.",
+              "deliverable": "Manifests for a three replica deployment with probes and explicit resource requests.",
+              "criteria": "A replacement pod is scheduled immediately and reaches Ready within the pull and startup time you measured. Requests are never routed to a pod that is not Ready, which you verify from the endpoints object.",
+              "submission_text": "Manifests plus a transcript of a pod deletion and its replacement timing."
+            }
+          },
+          {
+            "number": "2.2",
+            "title": "Services, Ingress and Traffic Routing",
+            "video_title": "Services and Ingress Routing",
+            "target_runtime": "8:35",
+            "video_outline": "0:00 the terminal gates framing | 1:00 ClusterIP, NodePort, LoadBalancer | 3:00 selectors and endpoints | 4:50 the Ingress controller | 6:40 TLS termination | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "An airport terminal that sends arriving passengers to the correct gate rather than leaving them to wander the concourse.",
+            "covered": "ClusterIP, NodePort and LoadBalancer, service discovery through DNS, endpoints and selectors, Ingress controllers, path and host routing, and TLS termination.",
+            "assignment": {
+              "code": "A4.5",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Install an Ingress controller and route `/api` to the backend service and `/` to the frontend, with TLS on a self signed certificate.",
+              "deliverable": "An Ingress routing `/api` to the backend and `/` to the frontend over TLS.",
+              "criteria": "Requests to `/api/health` reach backend pods and are distributed across replicas, and the root path serves the frontend over HTTPS.",
+              "submission_text": "Manifests plus curl output for both paths."
+            }
+          },
+          {
+            "number": "2.3",
+            "title": "ConfigMaps, Secrets and Autoscaling",
+            "video_title": "ConfigMaps, Secrets and the HPA",
+            "target_runtime": "9:15",
+            "video_outline": "0:00 the safe and the extra lane framing | 1:00 config as env vars and as files | 3:00 why Secrets are only encoded | 4:50 external secret stores | 6:40 metrics server and HPA behaviour | 8:20 assignment brief",
+            "video_url": null,
+            "analogy": "Keeping the combination out of the safe door and adding motorway lanes automatically when traffic builds.",
+            "covered": "ConfigMaps and Secrets as environment variables and mounted files, why Secrets are only base64 encoded at rest by default, sealed secrets and external secret stores, the metrics server, and Horizontal Pod Autoscaler behaviour.",
+            "assignment": {
+              "code": "A4.6",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Move all configuration out of the image into ConfigMaps and Secrets, then configure a Horizontal Pod Autoscaler from 2 to 10 replicas at 70 percent CPU.",
+              "deliverable": "All configuration externalised, plus an HPA scaling from 2 to 10 replicas at 70 percent CPU.",
+              "criteria": "Generate load with a load testing tool. `kubectl get hpa` shows the replica count rising and, after the load stops, falling back once the stabilisation window elapses.",
+              "submission_text": "Manifests plus `kubectl get hpa` output during and after a load test."
+            }
+          }
+        ]
+      },
+      {
+        "no": 3,
+        "title": "Continuous Integration, Delivery and GitOps",
+        "resources": [
+          {
+            "title": "TechWorld with Nana, DevOps channel",
+            "url": "https://www.youtube.com/c/techworldwithnana"
+          },
+          {
+            "title": "GitHub Actions documentation",
+            "url": "https://docs.github.com/en/actions"
+          },
+          {
+            "title": "Argo CD documentation",
+            "url": "https://argo-cd.readthedocs.io/en/stable/"
+          },
+          {
+            "title": "Trivy documentation",
+            "url": "https://trivy.dev/latest/docs/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "3.1",
+            "title": "Pipelines with GitHub Actions",
+            "video_title": "A Pipeline That Blocks Bad Merges",
+            "target_runtime": "8:40",
+            "video_outline": "0:00 the inspection line framing | 1:00 triggers and jobs | 2:40 caching dependencies | 4:30 secrets and environments | 6:20 required status checks | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "An inspection line that tests and seals every unit coming off the belt, so nothing untested reaches the loading bay.",
+            "covered": "Workflow and job syntax, triggers, matrix builds, caching dependencies, repository and environment secrets, artefacts, and required status checks on protected branches.",
+            "assignment": {
+              "code": "A4.7",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Write a workflow that runs on push to main, executes the test suite, builds a Docker image and tags it with the commit SHA.",
+              "deliverable": "A workflow running tests and building an image tagged with the commit SHA, plus branch protection enabled.",
+              "criteria": "A commit that breaks a test blocks the merge. A passing commit produces an image tagged with the exact SHA, and a second run of the same commit is measurably faster because the cache is hit.",
+              "submission_text": "Workflow file plus links to one failing and one passing run."
+            }
+          },
+          {
+            "number": "3.2",
+            "title": "Registry Publishing and Image Scanning",
+            "video_title": "Publishing Images and Failing on CVEs",
+            "target_runtime": "7:55",
+            "video_outline": "0:00 the export seal framing | 0:50 registry authentication | 2:20 tagging strategy and why latest is not a version | 4:00 image signing and SBOMs | 5:50 Trivy in the pipeline | 6:50 assignment brief",
+            "video_url": null,
+            "analogy": "Inspectors opening every crate for contraband before the export seal goes on.",
+            "covered": "Registry authentication, tagging strategy and why latest is not a version, image signing, software bills of materials, and vulnerability scanning with Trivy.",
+            "assignment": {
+              "code": "A4.8",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Publish images to GitHub Container Registry and add a Trivy scan step that fails the job on critical severity findings.",
+              "deliverable": "A publish step to a container registry and a Trivy gate that fails on critical findings.",
+              "criteria": "Scanning a deliberately outdated base image fails the job and uploads the report as an artefact. Bumping the base image makes the same job pass.",
+              "submission_text": "Workflow file plus the scan artefact from a failing run and a passing run."
+            }
+          },
+          {
+            "number": "3.3",
+            "title": "GitOps Delivery with Argo CD",
+            "video_title": "Argo CD and Rollback by Git Revert",
+            "target_runtime": "9:20",
+            "video_outline": "0:00 the autopilot framing | 1:00 declarative delivery | 2:50 the Application resource | 4:40 sync policies and self healing | 6:40 drift detection | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "An autopilot that keeps comparing the aircraft's actual attitude with the filed flight plan and corrects the difference itself.",
+            "covered": "Declarative delivery, Git as the single source of truth, the Argo CD Application resource, sync policies and self healing, drift detection, and rollback by reverting a commit.",
+            "assignment": {
+              "code": "A4.9",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Install Argo CD in your cluster and register an Application that auto syncs from a manifest repository.",
+              "deliverable": "An Argo CD Application auto syncing from a manifest repository, with a demonstrated rollback.",
+              "criteria": "Change the replica count in Git and watch the cluster follow. Then change it directly with kubectl and watch Argo CD revert the drift. Finally roll back by reverting the commit.",
+              "submission_text": "Repository link plus recordings of the drift correction and the revert rollback."
+            }
+          }
+        ]
+      },
+      {
+        "no": 4,
+        "title": "Infrastructure as Code and Observability",
+        "resources": [
+          {
+            "title": "TechWorld with Nana, DevOps channel",
+            "url": "https://www.youtube.com/c/techworldwithnana"
+          },
+          {
+            "title": "Terraform tutorials",
+            "url": "https://developer.hashicorp.com/terraform/tutorials"
+          },
+          {
+            "title": "Prometheus documentation",
+            "url": "https://prometheus.io/docs/introduction/overview/"
+          },
+          {
+            "title": "Grafana documentation",
+            "url": "https://grafana.com/docs/grafana/latest/"
+          },
+          {
+            "title": "OpenTelemetry documentation",
+            "url": "https://opentelemetry.io/docs/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "4.1",
+            "title": "Terraform and Cloud Provisioning",
+            "video_title": "Terraform: Plan, Apply, Destroy",
+            "target_runtime": "9:00",
+            "video_outline": "0:00 the blueprint framing | 1:00 providers and version pinning | 2:50 variables and outputs | 4:40 remote state and locking | 6:40 plan against apply, and drift | 8:00 assignment brief",
+            "video_url": null,
+            "analogy": "A blueprint that orders the servers, the cabling and the locks, and can also un order all of them in one instruction.",
+            "covered": "HCL syntax, providers and version pinning, variables and outputs, remote state and state locking, plan against apply, modules, and why manual console changes cause drift.",
+            "assignment": {
+              "code": "A4.10",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Provision a VPC, a public subnet, a security group and one small EC2 instance with Terraform, using remote state.",
+              "deliverable": "Terraform configuration for a VPC, subnet, security group and one instance, using remote state.",
+              "criteria": "`terraform plan` on unchanged code reports no changes. `terraform destroy` removes every resource, and the AWS console shows nothing left behind.",
+              "submission_text": "Configuration files plus plan, apply and destroy transcripts."
+            }
+          },
+          {
+            "number": "4.2",
+            "title": "Prometheus Metrics and Alerting",
+            "video_title": "Prometheus Metrics and a Real Alert",
+            "target_runtime": "9:25",
+            "video_outline": "0:00 the ward monitor framing | 1:00 the pull model | 2:40 counters, gauges and histograms | 4:40 PromQL rate and quantiles | 6:50 alert rules and Alertmanager | 8:20 assignment brief",
+            "video_url": null,
+            "analogy": "A ward monitor that beeps when the reading crosses a threshold, not one that simply records numbers nobody reads.",
+            "covered": "The pull model and scrape configuration, counters, gauges, histograms and summaries, PromQL including rate and histogram quantile, recording rules, and alert routing with Alertmanager.",
+            "assignment": {
+              "code": "A4.11",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Expose a metrics endpoint from your application, scrape it with Prometheus, and write an alert on a raised error rate over five minutes.",
+              "deliverable": "An instrumented metrics endpoint, a scrape config and an error rate alert rule.",
+              "criteria": "Drive a burst of 500 responses. The alert moves from pending to firing, the notification is delivered, and it resolves on its own once the errors stop.",
+              "submission_text": "Config files plus screenshots of the alert pending, firing and resolved."
+            }
+          },
+          {
+            "number": "4.3",
+            "title": "Grafana Dashboards and Distributed Tracing",
+            "video_title": "Grafana Dashboards and One Trace End to End",
+            "target_runtime": "8:55",
+            "video_outline": "0:00 the cockpit framing | 1:00 connecting the data source | 2:40 panel and dashboard design | 4:30 percentiles from histograms | 6:30 instrumenting with OpenTelemetry | 7:50 assignment brief",
+            "video_url": null,
+            "analogy": "A cockpit display showing altitude, fuel and engine health together, plus a flight recorder that can replay any single journey.",
+            "covered": "Connecting Grafana to Prometheus, dashboard and panel design, variables, alert visualisation, distributed tracing concepts, and instrumenting a service with OpenTelemetry.",
+            "assignment": {
+              "code": "A4.12",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a dashboard showing request rate, error rate and latency percentiles, and instrument one request path with OpenTelemetry tracing.",
+              "deliverable": "A dashboard showing request rate, error rate and p95 latency, plus one instrumented traced request path.",
+              "criteria": "The dashboard updates live under load and the p95 latency panel is derived from a histogram rather than an average. One trace shows the request crossing at least two services with per span timings.",
+              "submission_text": "Dashboard JSON export plus a screenshot of a multi span trace."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "no": 5,
+    "title": "High Performance Backend Engineering with Go",
+    "format": "Specialist Track, 8 weeks",
+    "time_commitment": "12 lectures. Each lecture is one video under 10 minutes plus one graded assignment. Budget 5 to 7 hours per week across 8 weeks, roughly 40 hours in total.",
+    "prerequisites": "One year of backend experience in any language, familiarity with HTTP, JSON and SQL, and comfort reading compiler error messages.",
+    "outcome": "Build and operate a Go service that survives a load test, shuts down without dropping in flight requests, and has no data races under the race detector.",
+    "environment": "Go 1.22 or newer, Docker for PostgreSQL and Redis, protoc with the Go plugins, and a load testing tool such as k6 or vegeta.",
+    "capstone": "An order service exposing REST and gRPC, backed by PostgreSQL through a connection pool and sqlc generated queries, with Redis caching, structured logging, graceful shutdown, and a k6 report showing throughput and p99 latency before and after one optimisation.",
+    "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached.",
+    "modules": [
+      {
+        "no": 1,
+        "title": "The Go Memory Model and Language Foundations",
+        "resources": [
+          {
+            "title": "Go programming full course with projects, freeCodeCamp",
+            "url": "https://www.youtube.com/watch?v=un6ZyFkqFKo"
+          },
+          {
+            "title": "A tour of Go",
+            "url": "https://go.dev/tour/welcome/1"
+          },
+          {
+            "title": "Effective Go",
+            "url": "https://go.dev/doc/effective_go"
+          },
+          {
+            "title": "Go by Example",
+            "url": "https://gobyexample.com"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "1.1",
+            "title": "Pointers, Structs and Escape Analysis",
+            "video_title": "Go Pointers, Structs and Escape Analysis",
+            "target_runtime": "8:50",
+            "video_outline": "0:00 the loaded truck framing | 1:00 value against pointer semantics | 3:00 stack or heap | 4:50 field ordering and padding | 6:40 reading benchmark output | 7:50 assignment brief",
+            "video_url": null,
+            "analogy": "Loading a truck so the heaviest crates sit over the axles, because where things are placed changes what the vehicle can carry.",
+            "covered": "Value against pointer semantics, when a struct escapes to the heap, struct field ordering and padding, the cost of copying large values, and reading benchmark allocation output.",
+            "assignment": {
+              "code": "A5.1",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Define a domain struct twice, once with value receivers and once with pointer receivers, and benchmark both with allocation reporting.",
+              "deliverable": "Two implementations of the same struct with a benchmark comparing time and allocations.",
+              "criteria": "`go test -bench=. -benchmem` produces a table comparing nanoseconds per operation and allocations per operation for both versions, and `go build -gcflags='-m'` shows which values escape and why.",
+              "submission_text": "Repository folder plus the `-benchmem` table and the `-gcflags='-m'` output."
+            }
+          },
+          {
+            "number": "1.2",
+            "title": "Interfaces and Composition",
+            "video_title": "Go Interfaces: Small, Local, Implicit",
+            "target_runtime": "7:40",
+            "video_outline": "0:00 the wall socket framing | 0:50 implicit satisfaction | 2:20 define interfaces where you use them | 4:00 type assertions and switches | 5:40 the nil interface trap | 6:40 assignment brief",
+            "video_url": null,
+            "analogy": "A wall socket that accepts any appliance whose plug has the right pins, without knowing what the appliance does.",
+            "covered": "Implicit interface satisfaction, keeping interfaces small and defining them at the point of use, type assertions and type switches, embedding, and the nil interface trap.",
+            "assignment": {
+              "code": "A5.2",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Define a PaymentGateway interface and implement it with Stripe and PayPal structs, then write one processor that accepts the interface.",
+              "deliverable": "A PaymentGateway interface with two implementations and one processor that accepts the interface.",
+              "criteria": "The processor handles both implementations with no type switch. A mock implementation is injected in a unit test with no change to the processor code.",
+              "submission_text": "Repository folder plus a unit test injecting a mock implementation."
+            }
+          },
+          {
+            "number": "1.3",
+            "title": "Error Handling, Wrapping and Defer",
+            "video_title": "Errors, Wrapping and Defer",
+            "target_runtime": "8:20",
+            "video_outline": "0:00 the closing checklist framing | 1:00 explicit error returns | 2:40 sentinel and custom errors | 4:20 wrapping with percent w | 6:10 defer order and the limits of recover | 7:20 assignment brief",
+            "video_url": null,
+            "analogy": "A closing checklist that requires the door to be locked whether the shift ended normally or was cut short.",
+            "covered": "Explicit error returns, sentinel errors, custom error types, wrapping with percent w, errors.Is and errors.As, defer evaluation order, and the limits of recover.",
+            "assignment": {
+              "code": "A5.3",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Write a file processing function that guarantees closure with defer and wraps failures with context at each layer.",
+              "deliverable": "A file processing function with deferred cleanup and two layers of error wrapping.",
+              "criteria": "Trigger a read failure. The final message names the file and the operation, `errors.Is` matches the sentinel cause through two layers of wrapping, and the file descriptor is closed.",
+              "submission_text": "Repository folder plus a test asserting `errors.Is` matches through both layers."
+            }
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "Concurrency, Goroutines and Channels",
+        "resources": [
+          {
+            "title": "Go programming full course with projects, concurrency sections",
+            "url": "https://www.youtube.com/watch?v=un6ZyFkqFKo"
+          },
+          {
+            "title": "Go memory model",
+            "url": "https://go.dev/ref/mem"
+          },
+          {
+            "title": "Go concurrency patterns, official blog",
+            "url": "https://go.dev/blog/pipelines"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "2.1",
+            "title": "Goroutines and Channel Communication",
+            "video_title": "Goroutines, Channels and Worker Pools",
+            "target_runtime": "9:10",
+            "video_outline": "0:00 the message tubes framing | 1:00 what a goroutine costs | 2:50 buffered against unbuffered | 4:40 closing channels correctly | 6:40 goroutine leaks | 8:00 assignment brief",
+            "video_url": null,
+            "analogy": "Couriers passing sealed messages down dedicated tubes instead of everyone writing on the same whiteboard at once.",
+            "covered": "The scheduler and the cost of a goroutine, buffered against unbuffered channels, directional channel types, closing channels correctly, WaitGroups, and goroutine leaks.",
+            "assignment": {
+              "code": "A5.4",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a worker pool of five goroutines processing fifty jobs through a buffered channel with results collected on a second channel.",
+              "deliverable": "A five worker pool processing fifty jobs with results collected on a second channel.",
+              "criteria": "All fifty results are collected, the program exits cleanly with no deadlock, and adding a `-race` run and a goroutine count assertion at exit shows no leaked workers.",
+              "submission_text": "Repository folder plus a race detector run and a goroutine count assertion at exit."
+            }
+          },
+          {
+            "number": "2.2",
+            "title": "Multiplexing with select and Timeouts",
+            "video_title": "select, Timeouts and Abandoned Goroutines",
+            "target_runtime": "8:00",
+            "video_outline": "0:00 the radio channels framing | 0:50 select semantics | 2:30 the default clause | 4:10 time.After against time.NewTimer | 6:00 the timer leak | 7:00 assignment brief",
+            "video_url": null,
+            "analogy": "A controller listening to four radio channels at once and answering whichever pilot speaks first.",
+            "covered": "select semantics and random choice among ready cases, the default clause for non blocking reads, time.After and time.NewTimer, and why an abandoned timer can hold memory.",
+            "assignment": {
+              "code": "A5.5",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Build a request handler that abandons the call if the upstream does not respond within 200 milliseconds.",
+              "deliverable": "A handler that abandons an upstream call after 200 milliseconds without leaking the goroutine.",
+              "criteria": "With a simulated 300 millisecond upstream delay, the handler returns a timeout error in roughly 200 milliseconds and the abandoned goroutine terminates rather than lingering.",
+              "submission_text": "Repository folder plus timing output for the 300 millisecond delay case."
+            }
+          },
+          {
+            "number": "2.3",
+            "title": "Synchronisation Primitives and Context",
+            "video_title": "Mutexes, Atomics and Context Cancellation",
+            "target_runtime": "9:05",
+            "video_outline": "0:00 the signal box framing | 1:00 Mutex and RWMutex | 2:50 atomics and sync.Once | 4:40 the race detector | 6:40 context deadlines and propagation | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "A signal box coordinating trains, plus a central order that stops every departure at once when the weather turns.",
+            "covered": "Mutex and RWMutex, atomic operations, sync.Once, the race detector, context cancellation and deadlines, and passing context through call chains.",
+            "assignment": {
+              "code": "A5.6",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Implement a thread safe in memory cache guarded by RWMutex that honours cancellation from a parent context.",
+              "deliverable": "A thread safe cache guarded by RWMutex that honours parent context cancellation.",
+              "criteria": "Run 100 concurrent readers and writers under `go test -race`. Zero races are reported, and cancelling the parent context stops all in flight work within one second.",
+              "submission_text": "Repository folder plus a clean `go test -race` run with 100 concurrent operations."
+            }
+          }
+        ]
+      },
+      {
+        "no": 3,
+        "title": "HTTP Services and PostgreSQL Access",
+        "resources": [
+          {
+            "title": "Go programming full course with projects",
+            "url": "https://www.youtube.com/watch?v=un6ZyFkqFKo"
+          },
+          {
+            "title": "net/http package reference",
+            "url": "https://pkg.go.dev/net/http"
+          },
+          {
+            "title": "pgx driver documentation",
+            "url": "https://pkg.go.dev/github.com/jackc/pgx/v5"
+          },
+          {
+            "title": "sqlc documentation",
+            "url": "https://docs.sqlc.dev/en/latest/"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "3.1",
+            "title": "REST Services with net/http and chi",
+            "video_title": "A Production HTTP Service with chi",
+            "target_runtime": "9:30",
+            "video_outline": "0:00 the service window framing | 1:00 routing with chi | 3:00 middleware chains | 5:00 request scoped context | 7:00 server timeouts and error envelopes | 8:40 assignment brief",
+            "video_url": null,
+            "analogy": "A service window that takes the order, records it and hands back a receipt with a code the customer can quote later.",
+            "covered": "Routing with chi, middleware chains for logging, recovery and request identifiers, JSON encoding and decoding, request scoped context, timeouts on the server, and consistent error envelopes.",
+            "assignment": {
+              "code": "A5.7",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Build a REST API with create, read, update and list endpoints for user records, with validation and middleware.",
+              "deliverable": "A REST API with create, read, update and list endpoints, validation and recovery middleware.",
+              "criteria": "Every endpoint returns the correct status code, including 400 on malformed JSON and 404 on a missing record. A panic in one handler is recovered and logged with its request identifier rather than killing the process.",
+              "submission_text": "Repository folder plus a curl transcript covering 200, 400 and 404 responses."
+            }
+          },
+          {
+            "number": "3.2",
+            "title": "Connection Pooling with pgx",
+            "video_title": "pgx Pooling and Parameterised Queries",
+            "target_runtime": "8:25",
+            "video_outline": "0:00 the shared van pool framing | 1:00 pgxpool configuration | 2:50 lifetime and health checks | 4:40 parameterised queries against injection | 6:30 scanning rows safely | 7:30 assignment brief",
+            "video_url": null,
+            "analogy": "A shared pool of delivery vans that drivers take and return, instead of buying a new van for every parcel.",
+            "covered": "pgxpool configuration, maximum and minimum connections, connection lifetime and health checks, parameterised queries and why string concatenation is an injection risk, and scanning rows safely.",
+            "assignment": {
+              "code": "A5.8",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Integrate pgxpool into the service with tuned pool limits and replace every query with a parameterised one.",
+              "deliverable": "A pgxpool integration with tuned limits and every query parameterised.",
+              "criteria": "Drive 200 concurrent requests with k6. No request fails with a pool exhaustion error, and pool acquisition wait time is recorded in the metrics.",
+              "submission_text": "Repository folder plus a k6 report for 200 concurrent requests."
+            }
+          },
+          {
+            "number": "3.3",
+            "title": "Type Safe Queries with sqlc and Transactions",
+            "video_title": "sqlc and Transactions in Go",
+            "target_runtime": "8:55",
+            "video_outline": "0:00 the ledger framing | 1:00 writing SQL first | 2:50 generating the Go layer | 4:40 migrations | 6:20 transactions and isolation choice | 7:50 assignment brief",
+            "video_url": null,
+            "analogy": "An accountant posting both sides of a transfer with one signature, so the ledger is never half written.",
+            "covered": "Writing SQL first and generating Go from it with sqlc, migrations with goose or migrate, transactions in Go, and choosing an isolation level. Transaction theory is covered in depth in Course 6.",
+            "assignment": {
+              "code": "A5.9",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Generate a query layer with sqlc and implement an account transfer that debits and credits inside a single transaction.",
+              "deliverable": "A generated query layer and an account transfer inside a single transaction.",
+              "criteria": "Inject a failure between the debit and the credit. Both balances are unchanged, and running the transfer from ten goroutines against the same account leaves the total sum exactly as it started.",
+              "submission_text": "Repository folder plus a test running ten concurrent transfers with a preserved total."
+            }
+          }
+        ]
+      },
+      {
+        "no": 4,
+        "title": "Distributed Services and Production Readiness",
+        "resources": [
+          {
+            "title": "Go programming full course with projects",
+            "url": "https://www.youtube.com/watch?v=un6ZyFkqFKo"
+          },
+          {
+            "title": "gRPC Go documentation",
+            "url": "https://grpc.io/docs/languages/go/"
+          },
+          {
+            "title": "Redis documentation",
+            "url": "https://redis.io/docs/latest/"
+          },
+          {
+            "title": "log/slog package reference",
+            "url": "https://pkg.go.dev/log/slog"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "4.1",
+            "title": "Protocol Buffers and gRPC",
+            "video_title": "gRPC and Protocol Buffers in 9 Minutes",
+            "target_runtime": "9:00",
+            "video_outline": "0:00 the telegraph framing | 1:00 proto3 basics | 2:50 generating Go code | 4:40 unary and streaming calls | 6:40 deadlines, status codes and schema evolution | 8:00 assignment brief",
+            "video_url": null,
+            "analogy": "A dedicated telegraph line carrying dense agreed shorthand between two stations, rather than posting a letter each time.",
+            "covered": "Proto3 schema definition, code generation with protoc, unary and streaming calls, interceptors, deadlines and cancellation, status codes, and schema evolution without breaking clients.",
+            "assignment": {
+              "code": "A5.10",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Define an OrderService in protobuf, generate the Go code, and implement both server and client with a deadline on every call.",
+              "deliverable": "An OrderService proto with a working server and client, deadlines on every call.",
+              "criteria": "The client receives a valid response, a deliberately slow server call is cancelled by the deadline with a DeadlineExceeded status, and adding a new optional field leaves the old client working.",
+              "submission_text": "Repository folder plus a transcript of a DeadlineExceeded case."
+            }
+          },
+          {
+            "number": "4.2",
+            "title": "Caching with Redis",
+            "video_title": "Cache Aside with Redis and the Stampede",
+            "target_runtime": "8:35",
+            "video_outline": "0:00 the hot counter framing | 1:00 the cache aside pattern | 2:40 key design and TTL choice | 4:30 invalidation on write | 6:20 single flight against stampedes | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "Keeping the ten most ordered dishes plated on the pass, and knowing exactly when to throw them away.",
+            "covered": "The cache aside pattern, key design, TTL selection, invalidation on write, stampede protection with single flight, and deciding what should never be cached.",
+            "assignment": {
+              "code": "A5.11",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Add cache aside caching to a read heavy profile endpoint with a 60 second TTL and explicit invalidation on update.",
+              "deliverable": "Cache aside on a read heavy endpoint with a 60 second TTL, invalidation and stampede protection.",
+              "criteria": "The first request hits the database and the second is served from Redis. Updating the record invalidates the key immediately, and 100 simultaneous misses on a cold key produce exactly one database query.",
+              "submission_text": "Repository folder plus a query count log for 100 simultaneous cold misses."
+            }
+          },
+          {
+            "number": "4.3",
+            "title": "Structured Logging, Graceful Shutdown and Load Testing",
+            "video_title": "slog, Graceful Shutdown and a k6 Report",
+            "target_runtime": "9:15",
+            "video_outline": "0:00 the bulkheads framing | 1:00 structured logging with slog | 2:50 levels and never logging secrets | 4:40 intercepting SIGTERM | 6:40 draining and closing pools in order | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "A captain who closes the bulkheads and berths the ship before cutting the engines, rather than stopping mid channel.",
+            "covered": "Structured JSON logging with slog, log levels and sampling, never logging secrets, intercepting SIGTERM, draining in flight requests, closing pools in order, and reading a load test report.",
+            "assignment": {
+              "code": "A5.12",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Implement graceful shutdown that drains active requests and closes the database and Redis pools, then run a k6 load test before and after one optimisation.",
+              "deliverable": "Graceful shutdown draining in flight requests, plus k6 reports before and after one optimisation.",
+              "criteria": "Send SIGTERM during an in flight request. The request completes, the process exits within the drain window with code 0, and the k6 report shows p99 latency and error rate for both runs.",
+              "submission_text": "Repository folder plus both k6 summaries showing p99 latency and error rate."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "no": 6,
+    "title": "Database Systems and PostgreSQL Internals",
+    "format": "Specialist Track, 8 weeks",
+    "time_commitment": "12 lectures. Each lecture is one video under 10 minutes plus one graded assignment. Budget 5 to 7 hours per week across 8 weeks, roughly 40 hours in total.",
+    "prerequisites": "Able to write SELECT, INSERT, UPDATE and DELETE with joins and GROUP BY. This course starts where an introductory SQL course ends.",
+    "outcome": "Diagnose why a query is slow from its execution plan, fix it with the right index or rewrite, and prove the improvement with numbers.",
+    "environment": "PostgreSQL 16 or newer in Docker, psql, pgAdmin or DBeaver, the pageinspect and pg stat statements extensions enabled, and a seed dataset of at least one million rows generated on day one.",
+    "capstone": "A performance case study on a one million row schema. Five slow queries profiled with EXPLAIN ANALYZE, each fixed by indexing, rewriting or partitioning, with before and after timings, plan node evidence, and a written note on the write cost each new index adds.",
+    "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached.",
+    "modules": [
+      {
+        "no": 1,
+        "title": "Advanced Relational SQL",
+        "resources": [
+          {
+            "title": "PostgreSQL full course, freeCodeCamp",
+            "url": "https://www.youtube.com/watch?v=qw--VYLpxG4"
+          },
+          {
+            "title": "PostgreSQL official documentation",
+            "url": "https://www.postgresql.org/docs/current/"
+          },
+          {
+            "title": "PostgreSQL exercises",
+            "url": "https://pgexercises.com"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "1.1",
+            "title": "Joins, Set Operations and NULL Semantics",
+            "video_title": "Joins, Set Operations and the NULL Trap",
+            "target_runtime": "8:30",
+            "video_outline": "0:00 the case file framing | 1:00 inner and outer joins | 2:50 self joins and lateral joins | 4:40 UNION, INTERSECT, EXCEPT | 6:30 how NULL breaks comparisons and aggregates | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "Matching records from separate archives to assemble one complete case file, while noting which folders had no match at all.",
+            "covered": "Inner, left, right and full outer joins, self joins, lateral joins, UNION, INTERSECT and EXCEPT, and how NULL behaves in comparisons, aggregates and joins.",
+            "assignment": {
+              "code": "A6.1",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Write a query joining Customers, Orders and OrderItems to compute lifetime value, including customers with no orders.",
+              "deliverable": "A lifetime value query including customers with zero orders.",
+              "criteria": "Customers with zero orders appear with a value of 0 rather than NULL or being dropped, and the total across all customers reconciles with a separate aggregate query.",
+              "submission_text": "SQL file plus a reconciliation query proving the totals agree."
+            }
+          },
+          {
+            "number": "1.2",
+            "title": "Window Functions",
+            "video_title": "Window Functions Without the Confusion",
+            "target_runtime": "9:10",
+            "video_outline": "0:00 the office window framing | 1:00 PARTITION BY and ORDER BY | 3:00 ROW NUMBER, RANK, DENSE RANK | 5:00 LAG and LEAD | 6:50 frame clauses and running totals | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "Ranking staff within each department while everyone stays visible on the roster, rather than collapsing the roster into one line per department.",
+            "covered": "OVER with PARTITION BY and ORDER BY, ROW NUMBER, RANK and DENSE RANK, LAG and LEAD, frame clauses, running totals, and window functions against grouped aggregates.",
+            "assignment": {
+              "code": "A6.2",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Rank the top three spending customers per country and compute a running monthly revenue total.",
+              "deliverable": "A query ranking the top three customers per country plus a running monthly revenue total.",
+              "criteria": "Individual order rows are still present in the output, ties are handled the way your chosen ranking function documents, and the running total on the final month equals the grand total.",
+              "submission_text": "SQL file plus output showing individual order rows preserved."
+            }
+          },
+          {
+            "number": "1.3",
+            "title": "Common Table Expressions and Recursion",
+            "video_title": "CTEs and Recursive Hierarchies",
+            "target_runtime": "8:45",
+            "video_outline": "0:00 the org chart framing | 1:00 structuring with WITH | 2:40 materialisation behaviour | 4:20 the recursive form | 6:20 the CYCLE clause | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "Tracing an organisation chart from the chief executive down through every reporting line, level by level.",
+            "covered": "Structuring queries with WITH, materialisation behaviour, recursive CTEs, cycle protection, and when a CTE hurts rather than helps.",
+            "assignment": {
+              "code": "A6.3",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Write a recursive CTE that walks an employee hierarchy and returns the depth and full management chain for each person.",
+              "deliverable": "A recursive CTE returning depth and full management chain for every employee.",
+              "criteria": "The output shows the correct depth for a five level chain, and introducing a deliberate cycle in the data terminates through the CYCLE clause instead of running forever.",
+              "submission_text": "SQL file plus output for a five level chain and for a deliberately cyclic dataset."
+            }
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "Storage Internals and Indexing",
+        "resources": [
+          {
+            "title": "PostgreSQL full course, freeCodeCamp",
+            "url": "https://www.youtube.com/watch?v=qw--VYLpxG4"
+          },
+          {
+            "title": "PostgreSQL database physical storage",
+            "url": "https://www.postgresql.org/docs/current/storage.html"
+          },
+          {
+            "title": "PostgreSQL indexes",
+            "url": "https://www.postgresql.org/docs/current/indexes.html"
+          },
+          {
+            "title": "Use the index, Luke",
+            "url": "https://use-the-index-luke.com"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "2.1",
+            "title": "Pages, Tuples and the Write Ahead Log",
+            "video_title": "Inside a Postgres Page and the WAL",
+            "target_runtime": "9:20",
+            "video_outline": "0:00 the fixed size box framing | 1:00 the 8 kB page layout | 3:00 item pointers and tuple headers | 5:00 TOAST and fill factor | 7:00 the write ahead log and checkpoints | 8:20 assignment brief",
+            "video_url": null,
+            "analogy": "A warehouse that stores everything in identical fixed size boxes on numbered shelves, and keeps a running logbook of every box touched.",
+            "covered": "The 8 kB page layout, item pointers and tuple headers, TOAST for oversized values, the fill factor, the write ahead log and why it exists, and checkpoints.",
+            "assignment": {
+              "code": "A6.4",
+              "duration": "2 hours",
+              "points": 10,
+              "brief": "Enable pageinspect and inspect the raw page and tuple headers of a test table before and after an update.",
+              "deliverable": "A pageinspect session comparing raw page contents before and after an update.",
+              "criteria": "`SELECT * FROM page_header(get_raw_page('users', 0))` returns a page of 8192 bytes, and after an UPDATE you can point to the old and new tuple versions on the page.",
+              "submission_text": "psql transcript plus a note identifying the old and new tuple versions."
+            }
+          },
+          {
+            "number": "2.2",
+            "title": "B-tree and Composite Indexes",
+            "video_title": "B-tree and Composite Column Order",
+            "target_runtime": "9:00",
+            "video_outline": "0:00 the phone directory framing | 1:00 B-tree structure | 2:50 index only scans and INCLUDE | 4:40 composite ordering rules | 6:40 the write cost of every index | 8:00 assignment brief",
+            "video_url": null,
+            "analogy": "A telephone directory sorted by surname and then by first name, which is useless for finding everyone called James unless you already know the surname.",
+            "covered": "B-tree structure, index only scans and covering indexes with INCLUDE, composite column ordering rules, selectivity and cardinality, and the write and storage cost every index adds.",
+            "assignment": {
+              "code": "A6.5",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Create a composite index on (tenant id, created at) and compare query plans before and after, then test a query that filters on created at alone.",
+              "deliverable": "A composite index plus plans for a leading column query and a trailing column query.",
+              "criteria": "EXPLAIN shows an index scan for the tenant filtered query and a sequential scan for the created at only query, and you can explain the difference from the column ordering.",
+              "submission_text": "SQL file plus both EXPLAIN outputs with a written explanation of the difference."
+            }
+          },
+          {
+            "number": "2.3",
+            "title": "GIN, GiST, BRIN and Partial Indexes",
+            "video_title": "GIN, GiST, BRIN and Partial Indexes",
+            "target_runtime": "8:40",
+            "video_outline": "0:00 the book index framing | 1:00 GIN for JSONB and full text | 3:00 GiST for ranges and geometry | 4:40 BRIN for ordered bulk data | 6:20 partial and expression indexes | 7:40 assignment brief",
+            "video_url": null,
+            "analogy": "The keyword index at the back of a book, which works differently from the alphabetical contents at the front.",
+            "covered": "GIN for JSONB, arrays and full text search, GiST for geometric and range types, BRIN for naturally ordered large tables, partial indexes, expression indexes, and index bloat.",
+            "assignment": {
+              "code": "A6.6",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Create a GIN index on a JSONB column and a partial index limited to active users, then compare plan and index size against a full index.",
+              "deliverable": "A GIN index on a JSONB column and a partial index on active rows, with size comparison.",
+              "criteria": "A containment query using the @> operator uses the GIN index in EXPLAIN, and the partial index is measurably smaller than the equivalent full index in `pg_relation_size`.",
+              "submission_text": "SQL file plus `pg_relation_size` output for the partial and full indexes."
+            }
+          }
+        ]
+      },
+      {
+        "no": 3,
+        "title": "Query Plans and Performance Tuning",
+        "resources": [
+          {
+            "title": "PostgreSQL full course, freeCodeCamp",
+            "url": "https://www.youtube.com/watch?v=qw--VYLpxG4"
+          },
+          {
+            "title": "Using EXPLAIN",
+            "url": "https://www.postgresql.org/docs/current/using-explain.html"
+          },
+          {
+            "title": "PostgreSQL performance tips",
+            "url": "https://www.postgresql.org/docs/current/performance-tips.html"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "3.1",
+            "title": "Reading EXPLAIN ANALYZE",
+            "video_title": "Reading EXPLAIN ANALYZE Properly",
+            "target_runtime": "9:35",
+            "video_outline": "0:00 the x ray framing | 1:00 plan node types | 3:00 startup against total cost | 5:00 estimated against actual rows | 7:00 loops and buffers | 8:40 assignment brief",
+            "video_url": null,
+            "analogy": "An x ray that shows exactly which section of the pipe is narrowing the flow, rather than a guess based on where the noise is loudest.",
+            "covered": "Plan node types, startup against total cost, estimated against actual rows, loops and how per loop timing is reported, buffer hits and reads, and the cost of ANALYZE itself.",
+            "assignment": {
+              "code": "A6.7",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Run EXPLAIN (ANALYZE, BUFFERS) on three slow queries and identify the dominant node in each.",
+              "deliverable": "Plans for three slow queries, each with the dominant node identified and the misestimate quantified.",
+              "criteria": "For each query you name the node consuming the most time, state whether the planner misestimated rows and by what factor, and say whether the pain is disk reads or CPU.",
+              "submission_text": "A markdown report with the three plans pasted and annotated."
+            }
+          },
+          {
+            "number": "3.2",
+            "title": "Join Algorithms, Statistics and Memory",
+            "video_title": "Join Algorithms, Statistics and work_mem",
+            "target_runtime": "9:05",
+            "video_outline": "0:00 the two lists framing | 1:00 nested loop, hash join, merge join | 3:20 how the planner chooses | 5:00 statistics and extended statistics | 7:00 tuning memory settings | 8:10 assignment brief",
+            "video_url": null,
+            "analogy": "Two ways to match two lists: check every pair by hand, or sort both piles first and walk them together.",
+            "covered": "Nested loop, hash join and merge join and when each is chosen, the role of table statistics and ANALYZE, extended statistics for correlated columns, and tuning work mem and shared buffers.",
+            "assignment": {
+              "code": "A6.8",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Force a plan change by raising work mem and by refreshing statistics on a skewed table.",
+              "deliverable": "A demonstrated plan change from an on disk sort to an in memory sort, plus a statistics refresh case.",
+              "criteria": "EXPLAIN output changes from an external merge sort on disk to a quicksort in memory, and refreshing statistics brings the estimated row count within a factor of two of the actual.",
+              "submission_text": "SQL transcript plus both EXPLAIN outputs."
+            }
+          },
+          {
+            "number": "3.3",
+            "title": "Table Partitioning",
+            "video_title": "Range Partitioning and Partition Pruning",
+            "target_runtime": "8:25",
+            "video_outline": "0:00 the yearly binders framing | 1:00 range, list and hash partitioning | 3:00 choosing the key | 4:40 pruning in the plan | 6:20 constraint and foreign key limits | 7:30 assignment brief",
+            "video_url": null,
+            "analogy": "Filing tax records in one binder per year rather than stacking twenty years into a single crate.",
+            "covered": "Declarative partitioning by range, list and hash, choosing a partition key, partition pruning, indexes on partitions, constraints and foreign key limits, and the maintenance cost of partitioning.",
+            "assignment": {
+              "code": "A6.9",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Create an orders table partitioned by range on order date with yearly partitions and load 100,000 rows across them.",
+              "deliverable": "A range partitioned orders table with yearly partitions and 100,000 rows loaded.",
+              "criteria": "A query filtered to one year shows the other partitions removed by pruning in EXPLAIN, and a query with no date filter demonstrably scans every partition.",
+              "submission_text": "SQL file plus plans for a pruned query and an unpruned query."
+            }
+          }
+        ]
+      },
+      {
+        "no": 4,
+        "title": "Transactions, Concurrency and Maintenance",
+        "resources": [
+          {
+            "title": "PostgreSQL full course, freeCodeCamp",
+            "url": "https://www.youtube.com/watch?v=qw--VYLpxG4"
+          },
+          {
+            "title": "Transaction isolation",
+            "url": "https://www.postgresql.org/docs/current/transaction-iso.html"
+          },
+          {
+            "title": "Explicit locking",
+            "url": "https://www.postgresql.org/docs/current/explicit-locking.html"
+          },
+          {
+            "title": "Routine vacuuming",
+            "url": "https://www.postgresql.org/docs/current/routine-vacuuming.html"
+          }
+        ],
+        "lessons": [
+          {
+            "number": "4.1",
+            "title": "ACID and Isolation Levels",
+            "video_title": "Isolation Levels and the Anomalies They Stop",
+            "target_runtime": "9:30",
+            "video_outline": "0:00 the deposit box framing | 1:00 the four ACID properties in practice | 3:00 read committed | 5:00 repeatable read | 7:00 serializable and retryable failures | 8:30 assignment brief",
+            "video_url": null,
+            "analogy": "A deposit box that either locks completely or stays open, with no state in between that a second person could exploit.",
+            "covered": "Atomicity, consistency, isolation and durability in practice, read committed, repeatable read and serializable in PostgreSQL, dirty reads, non repeatable reads, phantom reads, and serialisation failures the application must retry.",
+            "assignment": {
+              "code": "A6.10",
+              "duration": "3 hours",
+              "points": 10,
+              "brief": "Reproduce a phantom read across two psql sessions, then raise the isolation level to SERIALIZABLE and observe the difference.",
+              "deliverable": "A reproduced phantom read at repeatable read and a serialisation failure at serializable, plus retry code.",
+              "criteria": "At repeatable read the anomaly appears. At serializable one transaction aborts with a serialisation failure, and your application code retries it successfully.",
+              "submission_text": "Two session transcripts plus the retry implementation."
+            }
+          },
+          {
+            "number": "4.2",
+            "title": "Row Level Locking",
+            "video_title": "SELECT FOR UPDATE and SKIP LOCKED",
+            "target_runtime": "8:15",
+            "video_outline": "0:00 the ledger clip framing | 0:50 row level lock modes | 2:30 FOR UPDATE against FOR SHARE | 4:10 SKIP LOCKED and NOWAIT | 6:00 advisory locks | 7:10 assignment brief",
+            "video_url": null,
+            "analogy": "Placing a physical clip on a single ledger line while a transfer is posted, rather than closing the whole ledger.",
+            "covered": "SELECT FOR UPDATE and FOR SHARE, SKIP LOCKED and NOWAIT, lock escalation behaviour, advisory locks, and preventing lost updates and oversold inventory.",
+            "assignment": {
+              "code": "A6.11",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Write a checkout routine that reserves stock with SELECT FOR UPDATE, then write a queue consumer using SKIP LOCKED.",
+              "deliverable": "A stock reservation routine and a queue consumer using SKIP LOCKED.",
+              "criteria": "Run ten concurrent checkouts against one remaining item. Exactly one succeeds and nine receive a clean out of stock response. Two queue consumers never process the same job.",
+              "submission_text": "SQL and script files plus output from ten concurrent checkouts on one item."
+            }
+          },
+          {
+            "number": "4.3",
+            "title": "MVCC, VACUUM and Deadlocks",
+            "video_title": "MVCC, VACUUM and Deadlocks",
+            "target_runtime": "9:25",
+            "video_outline": "0:00 the city archive framing | 1:00 xmin and xmax | 3:00 dead tuples and bloat | 5:00 autovacuum tuning | 7:00 wraparound and deadlock detection | 8:30 assignment brief",
+            "video_url": null,
+            "analogy": "A city that keeps photographs of every previous version of a street while a night crew clears away the rubble from demolished buildings.",
+            "covered": "Multiversion concurrency control, xmin and xmax, dead tuples and table bloat, VACUUM and autovacuum tuning, transaction identifier wraparound, and how PostgreSQL detects and resolves deadlocks.",
+            "assignment": {
+              "code": "A6.12",
+              "duration": "2 to 3 hours",
+              "points": 10,
+              "brief": "Create bloat with a large UPDATE, measure it, then vacuum. Separately, force a deadlock between two sessions updating two tables in opposite order.",
+              "deliverable": "A measured bloat and vacuum cycle plus a deliberately forced deadlock.",
+              "criteria": "Table size reported by `pg_total_relation_size` falls after vacuuming, and the deadlock produces the 'deadlock detected' error on exactly one session while the other commits.",
+              "submission_text": "psql transcript with sizes before and after, plus the deadlock error output."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

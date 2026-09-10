@@ -31,6 +31,7 @@ const { generateContractPdf } = require('./contract-pdf');
 const { generateOfferLetterPdf } = require('./offer-letter-pdf');
 const { sessionVersion, validSession, safeReturnPath } = require('./session-security');
 const uploadAccess = require('./upload-access');
+const { validateEvidenceInput } = require('./evidence-submission');
 const { deliverRegistrationMail } = require('./registration-delivery');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue, catalogueFee,
@@ -2413,7 +2414,7 @@ app.get('/api/public/info', (req, res) => {
 app.get('/api/public/tracks', (req, res) => res.json({ tracks: Quests.tracks(), open_levels: OPEN_LEVELS }));
 app.get('/api/public/tracks/:key', (req, res) => {
   const t = Quests.trackDef(req.params.key);
-  if (!t) return res.status(404).json({ error: 'Track not found.' });
+  if (!t || t.published === false) return res.status(404).json({ error: 'Track not found.' });
   // Free programs open every level; paid programs open just the first quest
   // (a single level) so every course - bootcamps included - offers the same
   // one-quest taste, and the rest is visible but locked until enrolment.
@@ -2422,18 +2423,18 @@ app.get('/api/public/tracks/:key', (req, res) => {
   const levels = t.levels.map((l) => {
     if (l.no <= openN) {
       return {
-        no: l.no, week: l.week, title: l.title, topic: l.topic, video_url: l.video_url || null, resource_url:l.resource_url||null,resource_note:l.resource_note||null, videos:l.videos||[], locked: false,
-        problems: l.problems.map((p, i) => ({ pid: p.pid ?? i + 1, required:p.required!==false&&!p.optional, optional:!!p.optional, pass_mark:p.pass_mark??t.pass_mark??60, language:p.language||t.default_language,starter_code:p.starter_code||p.starter||null, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [], criteria: p.criteria || [], hint: p.hint || null, reference: p.reference || null })),
+        no: l.no, week: l.week, session:l.session, module_no:l.module_no||null, module_title:l.module_title||null, lecture_no:l.lecture_no||null, title: l.title, topic: l.topic, analogy:l.analogy||null, covered:l.covered||null, video_title:l.video_title||null, video_runtime:l.video_runtime||null, video_outline:l.video_outline||null, video_url: l.video_url || null, resource_url:l.resource_url||null,resource_note:l.resource_note||null, videos:l.videos||[], locked: false,
+        problems: l.problems.map((p, i) => ({ pid: p.pid ?? i + 1, code:p.code||null, duration:p.duration||null, required:p.required!==false&&!p.optional, optional:!!p.optional, pass_mark:p.pass_mark??t.pass_mark??60, language:p.language||t.default_language,starter_code:p.starter_code||p.starter||null, title: p.title, description: p.description, deliverable:p.deliverable||null, submission_text:p.submission_text||null, submission:p.submission||null, grading_mode:p.grading_mode||t.grading_mode||'automatic', points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [], criteria: p.criteria || [], hint: p.hint || null, reference: p.reference || null })),
       };
     }
     // Locked levels: every task is listed (title, points, difficulty) so the
     // full course is visible - briefs and resources unlock on enrolment.
     return {
-      no: l.no, week: l.week, title: l.title, topic: l.topic, video_url: l.video_url || null, locked: true, problems_count: l.problems.length,
+      no: l.no, week: l.week, module_no:l.module_no||null, module_title:l.module_title||null, lecture_no:l.lecture_no||null, title: l.title, topic: l.topic, video_url: l.video_url || null, locked: true,
       problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
     };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, format:t.format||null, time_commitment:t.time_commitment||null, prerequisites:t.prerequisites||null, environment:t.environment||null, assessment:t.assessment||null, warnings:t.warnings||[], modules:t.modules||[], capstone:t.capstone||null, assignment_weight:t.assignment_weight||null, capstone_weight:t.capstone_weight||null, inline_video_only:!!t.inline_video_only, published:t.published!==false, grading_mode:t.grading_mode||null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN });
 });
 
 /* ================================ v11 routes ================================ */
@@ -4134,36 +4135,56 @@ const OPEN_SUBMIT_RULES = {
   'excel-ai': { pattern: /\.(xlsx|csv)$/i, error: 'Upload your workbook as .xlsx or .csv (save modern Excel format, not the old .xls).' },
   multi: { pattern: /\.(pdf|png|jpe?g)$/i, error: 'This course takes PDF or image (PNG/JPEG) submissions.', multiple: true },
   file: { pattern: /\.(pdf|docx?|pptx?|txt|md|ipynb|png|jpe?g|zip)$/i, error: 'Upload PDF, Word, text, notebook, PNG, JPEG, or ZIP files.' },
+  evidence: { pattern: /\.(pdf|docx?|pptx?|txt|md|ipynb|png|jpe?g|zip|mp4|webm|mov|csv|json|ya?ml|toml|sql|py|go|js|ts|tsx|proto|tf)$/i, error: 'Upload a supported document, source, archive, image, or recording file.', multiple: true },
 };
 function asyncRoute(handler){return (req,res,next)=>Promise.resolve().then(()=>handler(req,res,next)).catch(next);}
-app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 8 }]), asyncRoute(async (req, res) => {
-  const cleanup = () => { for (const f of allFiles) { try { fs.unlinkSync(f.path); } catch {} } };
+async function submitOpenAssessment(req, res, assessmentKind) {
   const allFiles = [...((req.files || {}).file || []), ...((req.files || {}).files || [])];
+  const cleanup = () => { for (const f of allFiles) { try { fs.unlinkSync(f.path); } catch {} } };
   if (!['free', 'student'].includes(req.user.role)) { cleanup(); return res.status(403).json({ error: 'Quests are for learners.' }); }
   const b = req.body || {};
-  const mode = (Quests.tracks().find((x) => x.key === String(b.track_key || '')) || {}).submission_mode || 'code';
+  const track = Quests.trackDef(String(b.track_key || ''));
+  if (!track || track.published === false) { cleanup(); return res.status(404).json({ error: 'Course not found.' }); }
+  const kind = assessmentKind === 'capstone' ? 'capstone' : 'assignment';
+  const level = kind === 'capstone' ? 0 : Number(b.level);
+  const pid = kind === 'capstone' ? 0 : Number(b.pid);
+  const problem = kind === 'capstone' ? track.capstone : track.levels.find((item) => item.no === level)?.problems.find((item) => item.pid === pid);
+  if (!problem) { cleanup(); return res.status(400).json({ error: kind === 'capstone' ? 'This course does not have a capstone.' : 'Task not found.' }); }
+  const mode = problem.submission?.mode || track.submission || (Quests.tracks().find((item) => item.key === track.key) || {}).submission_mode || 'code';
   const rule = OPEN_SUBMIT_RULES[mode] || OPEN_SUBMIT_RULES.file;
+  const submissionRule = problem.submission || {};
+  const maxFiles = Math.min(8, Number(submissionRule.files?.max ?? (rule.multiple ? 8 : 1)));
+  if (allFiles.length > maxFiles || (allFiles.length > 1 && !rule.multiple)) { cleanup(); return res.status(400).json({ error: `This assessment takes at most ${maxFiles} evidence file${maxFiles === 1 ? '' : 's'}.` }); }
+  for (const f of allFiles) {
+    if (!rule.pattern.test(f.originalname)) { cleanup(); return res.status(400).json({ error: rule.error }); }
+  }
+  const evidenceCheck = validateEvidenceInput({ rawLinks:b.links, notes:b.notes, files:allFiles, rule:submissionRule, hasCode:!!String(b.code || '').trim() });
+  if (evidenceCheck.error) { cleanup(); return res.status(400).json({ error:evidenceCheck.error }); }
+  const { links, notes } = evidenceCheck;
   let file_url = null, file_name = null, extra_files = [];
   if (allFiles.length) {
-    for (const f of allFiles) {
-      if (!rule.pattern.test(f.originalname)) { cleanup(); return res.status(400).json({ error: rule.error }); }
-    }
-    if (allFiles.length > 1 && !rule.multiple) { cleanup(); return res.status(400).json({ error: 'This course takes one file per submission.' }); }
-    file_url = `/uploads/${allFiles[0].filename}`; file_name = allFiles[0].originalname;
+    file_url = `/uploads/${allFiles[0].filename}`;
+    file_name = allFiles[0].originalname;
     extra_files = allFiles.slice(1).map((f) => ({ url: `/uploads/${f.filename}`, name: f.originalname }));
   }
+  const evidenceFiles = allFiles.map((f) => ({ url: `/uploads/${f.filename}`, name: f.originalname, size: f.size }));
+  const evidence = mode === 'evidence' || kind === 'capstone' ? { links, notes: notes || null, files: evidenceFiles } : null;
   const request_key = b.request_key || crypto.randomUUID();
   if (!/^[\w-]{16,80}$/.test(request_key)) { cleanup(); return res.status(400).json({error:'Invalid submission request key.'}); }
-  const fingerprint = crypto.createHash('sha256').update(JSON.stringify([b.track_key,String(b.level),String(b.pid),b.code||null,b.language||null,...allFiles.map(f=>[f.originalname,crypto.createHash('sha256').update(fs.readFileSync(f.path)).digest('hex')])])).digest('hex');
+  const fingerprint = crypto.createHash('sha256').update(JSON.stringify([track.key,String(level),String(pid),kind,b.code||null,b.language||null,links,notes,...allFiles.map(f=>[f.originalname,crypto.createHash('sha256').update(fs.readFileSync(f.path)).digest('hex')])])).digest('hex');
   const previous = store.allData().open_attempts.find(a=>a.user_id===req.user.id&&a.request_key===request_key);
   if (previous && previous.payload.fingerprint !== fingerprint) { cleanup(); return res.status(409).json({error:'This request key belongs to different work.'}); }
-  const out = OpenQuest.submit({ user:req.user,track_key:String(b.track_key||''),level:b.level,pid:b.pid,code:b.code||null,language:b.language||null,file_url,file_name,files:extra_files,request_key,fingerprint });
+  const out = OpenQuest.submit({ user:req.user,track_key:track.key,level,pid,assessment_kind:kind,code:b.code||null,language:b.language||null,file_url,file_name,files:extra_files,evidence,request_key,fingerprint });
   if(out.error){cleanup();return res.status(out.status||400).json({error:out.error});}
   if(out.existing)cleanup();
   if(!ai.enabled() && out.attempt.status==='queued')store.OpenAttempts.fail(out.attempt.id,'Grading is unavailable. Your attempt is saved. Retry later or request staff review.');
   await store.pendingPersist();
-  res.status(out.existing?200:202).json({ok:true,existing:!!out.existing,attempt:store.OpenAttempts.public(out.attempt),submission:out.submission,graded:out.attempt.status==='completed',note:out.attempt.status==='failed'?out.attempt.payload.error:'Attempt saved and queued for grading. You can leave and return to check its status.'});
-}));
+  const awaitingReview = out.attempt.status === 'awaiting_review';
+  return res.status(out.existing?200:202).json({ok:true,existing:!!out.existing,attempt:store.OpenAttempts.public(out.attempt),submission:out.submission,graded:out.attempt.status==='completed',note:awaitingReview?'Evidence saved and sent for staff review.':out.attempt.status==='failed'?out.attempt.payload.error:'Attempt saved and queued for grading. You can leave and return to check its status.'});
+}
+app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'assignment')));
+app.post('/api/open/capstone/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'capstone')));
+app.get('/api/open/capstone/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),0,0).map(store.OpenAttempts.public)}));
 function openLearnerRequired(req, res, next) {
   if (['free', 'student'].includes(req.user.role)) return next();
   return res.status(403).json({ error: 'Free-course enrollment and progress are for learner accounts only.' });
@@ -4184,7 +4205,7 @@ app.post('/api/open/attempts/:id/retry',authRequired,openLearnerRequired,asyncRo
   if(out.error)return res.status(out.status||400).json({error:out.error});
   await store.pendingPersist();res.json({ok:true,attempt:store.OpenAttempts.public(out.attempt)});
 }));
-app.get('/api/admin/open-attempts',authRequired,adminRequired,(req,res)=>res.json({attempts:store.allData().open_attempts.filter(a=>a.status==='failed').map(store.OpenAttempts.public)}));
+app.get('/api/admin/open-attempts',authRequired,adminRequired,(req,res)=>res.json({attempts:store.allData().open_attempts.filter(a=>['awaiting_review','failed'].includes(a.status)).map(a=>{const submission=store.allData().open_submissions.find(s=>s.id===a.submission_id),learner=Users.byId(a.user_id);return {...store.OpenAttempts.public(a),assessment_kind:submission?.assessment_kind||(a.level===0&&a.pid===0?'capstone':'assignment'),problem_title:submission?.problem_title||null,learner_name:learner?.name||null};})}));
 app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRoute(async (req,res)=>{
   const a=store.OpenAttempts.byId(req.params.id);if(!a)return res.status(404).json({error:'Attempt not found.'});
   if(a.status==='processing')return res.status(409).json({error:'This attempt is being graded. Wait until grading finishes.'});

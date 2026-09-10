@@ -3,8 +3,21 @@ const crypto = require('node:crypto');
 const MAX_TRIES = 3;
 function completion(track, submissions) {
   const required = track.levels.flatMap(l => l.problems.filter(p => p.required !== false && p.optional !== true).map(p => ({ level:l.no, pid:p.pid, pass_mark:Number(p.pass_mark ?? track.pass_mark ?? 60) })));
-  const results = required.map(p => ({...p, passed:submissions.some(s => s.level === p.level && s.pid === p.pid && s.score != null && s.score >= p.pass_mark)}));
-  return {required_total:required.length,required_passed:results.filter(p=>p.passed).length,requirements:results,passed:required.length>0 && results.every(p=>p.passed)};
+  const results = required.map(p => {
+    const submission=submissions.find(s => (s.assessment_kind||'assignment')==='assignment' && s.level === p.level && s.pid === p.pid);
+    return {...p,score:submission?.score??null,passed:submission?.score!=null&&submission.score>=p.pass_mark};
+  });
+  const assignmentScores=results.filter(p=>p.score!=null).map(p=>Number(p.score));
+  const assignment_average=assignmentScores.length?Math.round(assignmentScores.reduce((sum,score)=>sum+score,0)/assignmentScores.length):null;
+  const assignments_passed=required.length>0&&results.every(p=>p.passed);
+  if(!track.capstone)return {required_total:required.length,required_passed:results.filter(p=>p.passed).length,requirements:results,assignment_average,assignments_passed,weighted_score:assignment_average,passed:assignments_passed};
+  const capstoneSubmission=submissions.find(s=>s.assessment_kind==='capstone'||(s.level===0&&s.pid===0));
+  const capstoneScore=capstoneSubmission?.score??null,capstonePassMark=Number(track.capstone.pass_mark??track.pass_mark??60);
+  const capstone={required:true,unlocked:assignments_passed,submitted:!!capstoneSubmission,score:capstoneScore,pass_mark:capstonePassMark,passed:capstoneScore!=null&&capstoneScore>=capstonePassMark};
+  const allAssignmentsGraded=assignmentScores.length===required.length;
+  const assignmentWeight=Number(track.assignment_weight??60),capstoneWeight=Number(track.capstone.weight??track.capstone_weight??40);
+  const weighted_score=allAssignmentsGraded&&capstoneScore!=null?Math.round((assignment_average*assignmentWeight+Number(capstoneScore)*capstoneWeight)/(assignmentWeight+capstoneWeight)):null;
+  return {required_total:required.length,required_passed:results.filter(p=>p.passed).length,requirements:results,assignment_average,assignments_passed,capstone,weighted_score,passed:assignments_passed&&capstone.passed};
 }
 // getData is intentional: Postgres hydration replaces the store object at boot.
 function createAttempts({getData,nextId,save,tracks,now=()=>new Date().toISOString()}) {
@@ -20,9 +33,10 @@ function createAttempts({getData,nextId,save,tracks,now=()=>new Date().toISOStri
       const existing=rows().find(a=>a.user_id===sub.user_id&&a.request_key===key);
       if(existing)return existing.payload.fingerprint===fingerprint?{attempt:existing,existing:true}:{error:'This request key belongs to different work. Refresh and submit again.',status:409};
       if(sub.score!=null&&!rows().some(a=>a.submission_id===sub.id)){
-        rows().push({id:nextId('open_attempts'),user_id:sub.user_id,submission_id:sub.id,request_key:'historical-'+crypto.randomUUID(),track_key:sub.track_key,level:sub.level,pid:sub.pid,status:'completed',payload:{code:sub.code,language:sub.language,file_url:sub.file_url,file_name:sub.file_name,files:sub.files,score:sub.score,gems:sub.gems,feedback:sub.feedback,graded_at:sub.graded_at,historical:true,tries:0},created_at:sub.submitted_at,updated_at:now()});
+        rows().push({id:nextId('open_attempts'),user_id:sub.user_id,submission_id:sub.id,request_key:'historical-'+crypto.randomUUID(),track_key:sub.track_key,level:sub.level,pid:sub.pid,status:'completed',payload:{assessment_kind:sub.assessment_kind||'assignment',code:sub.code,language:sub.language,file_url:sub.file_url,file_name:sub.file_name,files:sub.files,evidence:sub.evidence,score:sub.score,gems:sub.gems,feedback:sub.feedback,graded_at:sub.graded_at,historical:true,tries:0},created_at:sub.submitted_at,updated_at:now()});
       }
-      const a={id:nextId('open_attempts'),user_id:sub.user_id,submission_id:sub.id,request_key:key,track_key:sub.track_key,level:sub.level,pid:sub.pid,status:'queued',payload:{...fields,problem:JSON.parse(JSON.stringify(problem)),fingerprint,tries:0},created_at:now(),updated_at:now()};
+      const status=problem.grading_mode==='staff'?'awaiting_review':'queued';
+      const a={id:nextId('open_attempts'),user_id:sub.user_id,submission_id:sub.id,request_key:key,track_key:sub.track_key,level:sub.level,pid:sub.pid,status,payload:{...fields,problem:JSON.parse(JSON.stringify(problem)),fingerprint,tries:0},created_at:now(),updated_at:now()};
       rows().push(a);sub.attempts=rows().filter(x=>x.submission_id===sub.id).length;save();return {attempt:a};
     },
     due(){const time=Date.parse(now());return rows().find(a=>a.status==='queued'&&(!a.payload.retry_at||Date.parse(a.payload.retry_at)<=time));},
@@ -37,7 +51,7 @@ function createAttempts({getData,nextId,save,tracks,now=()=>new Date().toISOStri
       const raw=Number(score),effective=grader==='ai'&&!tracks[a.track_key]?.friendly_grading?Math.round(raw*.9):Math.round(raw);
       Object.assign(a.payload,{score:effective,gems:Math.round(effective/100*sub.points),feedback:String(feedback||'').slice(0,4000),graded_at:now(),graded_by:grader,error:null,retry_at:null});
       // A later failed or lower-scoring attempt never destroys a successful result.
-      if(sub.score==null||effective>sub.score)Object.assign(sub,{code:a.payload.code,language:a.payload.language,file_url:a.payload.file_url,file_name:a.payload.file_name,files:a.payload.files,submitted_at:a.created_at,score:effective,gems:a.payload.gems,feedback:a.payload.feedback,graded_at:a.payload.graded_at});
+      if(sub.score==null||effective>sub.score)Object.assign(sub,{assessment_kind:a.payload.assessment_kind||sub.assessment_kind||'assignment',code:a.payload.code,language:a.payload.language,file_url:a.payload.file_url,file_name:a.payload.file_name,files:a.payload.files,evidence:a.payload.evidence,submitted_at:a.created_at,score:effective,gems:a.payload.gems,feedback:a.payload.feedback,graded_at:a.payload.graded_at});
       return update(a,{status:'completed'});
     },
     public(a){return {...a,payload:{...a.payload,problem:undefined,fingerprint:undefined},can_retry:a.status==='failed'&&a.payload.tries<MAX_TRIES};},

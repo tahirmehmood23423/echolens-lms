@@ -1742,3 +1742,21 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 /* public teaser (/showcase/p/:id, signed out) */
 .sc-teaser-img{width:100%;border-radius:14px;margin:14px 0;display:block;max-height:520px;object-fit:cover}
 .sc-teaser-cta{margin-top:20px;text-align:center}
+
+/* Trending Tech course requirements, evidence and capstone workflow */
+.tech-course-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+.tech-course-facts>.card{margin:0}
+.tech-capstone-card{margin:18px 0;border-color:rgba(15,191,168,.35);background:linear-gradient(135deg,var(--card),rgba(15,191,168,.05))}
+.evidence-instructions{padding:11px 13px;border-left:3px solid var(--primary);background:var(--canvas);border-radius:0 8px 8px 0;line-height:1.6;margin-bottom:14px}
+.attempt-evidence-links{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}
+.attempt-history details .btn{margin:5px 5px 0 0}
+@media(max-width:900px){.tech-course-facts{grid-template-columns:1fr}.tech-capstone-card .btn{width:100%}}
+
+/* Trending Tech free courses: setup facts, capstone and evidence workflow. */
+.tech-course-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+.tech-course-facts>.card{margin:0}
+.tech-capstone-card{margin:18px 0;border-color:rgba(15,191,168,.35);background:linear-gradient(135deg,var(--card),rgba(15,191,168,.05))}
+.evidence-instructions{line-height:1.65;color:var(--muted);padding:10px 12px;border-left:3px solid var(--teal);background:var(--canvas);border-radius:0 8px 8px 0;margin-bottom:14px}
+.attempt-evidence-links{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}
+.attempt-history details .btn{margin:6px 6px 0 0}
+@media(max-width:900px){.tech-course-facts{grid-template-columns:1fr}.tech-capstone-card .btn{width:100%}}

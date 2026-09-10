@@ -715,6 +715,7 @@ const MODE_LABEL = {
   prompt: 'AI Prompt Lab - write and run prompts like a compiler, submit the workbook directly',
   'excel-ai': 'Workbook submissions (.xlsx / .csv) with an AI copilot linked to your sheet',
   multi: 'PDF or image submissions - multiple files per quest',
+  evidence: 'Project evidence - links, notes and supporting files reviewed by staff',
 };
 function courseOutlineHtml(t) {
   const isBootcamp = (t.course_code || '').startsWith('BC');
@@ -771,7 +772,7 @@ function youtubeEmbedId(url) {
 // normally embedded in; the dedicated full-width video view (openSolveVideo)
 // passes a much larger cap since that page has nothing else competing for
 // space.
-function videoEmbedHtml(url, label, maxWidth) {
+function videoEmbedHtml(url, label, maxWidth, inlineOnly) {
   const id = youtubeEmbedId(url);
   if (!id) return '';
   const w = maxWidth || 640;
@@ -779,8 +780,8 @@ function videoEmbedHtml(url, label, maxWidth) {
   const startParam=start?'?start='+start:'';
   return `<div class="video-embed" style="position:relative;width:100%;max-width:${w}px;aspect-ratio:16/9;height:auto;margin-top:10px;border-radius:12px;overflow:hidden;background:#000">
       <iframe src="https://www.youtube-nocookie.com/embed/${id}${startParam}" title="${esc(label || 'Topic video')}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
-    </div>
-    <a href="${esc(url)}" target="_blank" rel="noopener" class="s" style="display:inline-block;margin-top:6px;color:var(--muted)">Open on YouTube &rarr;</a>`;
+    </div>${inlineOnly ? '' : `
+    <a href="${esc(url)}" target="_blank" rel="noopener" class="s" style="display:inline-block;margin-top:6px;color:var(--muted)">Open on YouTube &rarr;</a>`}`;
 }
 // A level can carry either the older single `video_url`, or the newer
 // `videos[]` array (multiple real YouTube links, one button each) - see
@@ -796,16 +797,36 @@ function videoLinksHtml(l, large) {
   const maxWidth = large ? 960 : 640;
   if (Array.isArray(l.videos) && l.videos.length) {
     return l.videos.map((v) => {
-      const embed = videoEmbedHtml(v.url, v.title, maxWidth);
+      const embed = videoEmbedHtml(v.url, v.title, maxWidth, CUR?.track?.inline_video_only);
       if (embed) return embed;
       return `<a href="${esc(v.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;margin-right:8px;display:inline-flex;gap:6px;align-items:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${esc(v.channel)} - ${esc(v.title)}${v.length ? ` (${esc(v.length)})` : ''}</a>`;
     }).join('');
   }
-  const embed = videoEmbedHtml(l.video_url, l.title, maxWidth);
+  const embed = videoEmbedHtml(l.video_url, l.video_title || l.title, maxWidth, CUR?.track?.inline_video_only);
   if (embed) return embed;
   return l.video_url ? `<a href="${esc(l.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : '';
+}
+function lessonStudyGuideHtml(l) {
+  if (!l.video_title && !l.video_outline && !l.analogy && !l.covered) return '';
+  return `<div class="slv-block" style="margin-top:16px">
+    <div class="slv-block-head">Lesson guide${l.video_runtime ? ` &middot; ${esc(l.video_runtime)} target` : ''}</div>
+    ${l.video_title ? `<p class="s"><strong>Video:</strong> ${esc(l.video_title)}</p>` : ''}
+    ${l.analogy ? `<p class="s" style="margin-top:8px"><strong>Analogy:</strong> ${esc(l.analogy)}</p>` : ''}
+    ${l.covered ? `<p class="s" style="margin-top:8px"><strong>Covered:</strong> ${esc(l.covered)}</p>` : ''}
+    ${l.video_outline ? `<p class="s" style="margin-top:8px"><strong>Outline:</strong> ${esc(l.video_outline)}</p>` : ''}
+  </div>`;
+}
+function moduleResourcesHtml(l) {
+  const module = (CUR?.track?.modules || []).find((item) => item.no === l.module_no);
+  const resources = module?.resources || [];
+  if (!resources.length) return '';
+  return `<details class="slv-block" style="margin-top:16px"><summary><span class="slv-block-head" style="display:inline">Optional module deep dives</span></summary>
+    <div style="padding-top:10px">${resources.map((resource) => {
+      const embed = videoEmbedHtml(resource.url, resource.title, 960, true);
+      return embed || `<a class="btn btn-ghost btn-sm" href="${esc(resource.url)}" target="_blank" rel="noopener" style="margin:4px 6px 4px 0">${esc(resource.title)}</a>`;
+    }).join('')}</div></details>`;
 }
 function levelHasVideo(l) { return !!(l && (l.resource_url || l.video_url || (Array.isArray(l.videos) && l.videos.length))); }
 function topicDetailHtml(l) {
@@ -836,7 +857,7 @@ function renderModuleLessons(mod, t, curLevel, unitLabel) {
         <div class="grow">
           <div class="t" style="font-size:13.5px">${esc(p.title)}
             <span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span>
-            <span class="s" style="color:var(--muted);font-weight:500">${p.points} gems</span></div>
+            <span class="s" style="color:var(--muted);font-weight:500">${p.grading_mode === 'staff' ? p.points + ' marks' : p.points + ' gems'}</span></div>
           ${sub ? `<div class="s" style="margin-top:3px">
             ${graded
               ? `<span class="grade-chip ok">Graded ${sub.score}% &middot; ${Math.round((sub.score / 100) * p.points)} gems</span>`
@@ -931,7 +952,7 @@ function drawCourse() {
         ${prog ? `
           <div class="oq-prog hero-prog"><div style="width:${Math.round((prog.graded / Math.max(1, prog.total)) * 100)}%"></div></div>
           <div class="s hero-prog-note" style="color:${prog.passed ? 'var(--ok)' : 'var(--muted)'}">
-            ${prog.graded}/${prog.total} tasks graded &middot; ${prog.gems} gems earned${prog.avg != null ? ' &middot; Average ' + prog.avg + '%' : ''}
+            ${prog.graded}/${prog.total} assignments graded &middot; ${prog.gems} gems earned${prog.assignment_average != null ? ' &middot; Assignment average ' + prog.assignment_average + '%' : prog.avg != null ? ' &middot; Average ' + prog.avg + '%' : ''}${prog.weighted_score != null ? ' &middot; Final score ' + prog.weighted_score + '%' : ''}
             ${prog.passed ? ' &middot; <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' &middot; Pass every required assessment at ' + (t.pass_mark || 60) + '% or its stated threshold for the automatic certificate.' : '')}
           </div>` : (ME ? '' : `<div class="s hero-signin-note">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
       </div>
@@ -953,18 +974,18 @@ function drawCourse() {
   const modules = [];
   const modByWeek = new Map();
   CUR.levels.forEach((l) => {
-    const wk = l.week != null ? l.week : l.no;
-    if (!modByWeek.has(wk)) { const m = { week: wk, levels: [] }; modByWeek.set(wk, m); modules.push(m); }
-    modByWeek.get(wk).levels.push(l);
+    const moduleKey = l.module_no != null ? `module:${l.module_no}` : `week:${l.week != null ? l.week : l.no}`;
+    if (!modByWeek.has(moduleKey)) { const m = { no:l.module_no||modules.length+1, week: l.week != null ? l.week : l.no, title:l.module_title||null, levels: [] }; modByWeek.set(moduleKey, m); modules.push(m); }
+    modByWeek.get(moduleKey).levels.push(l);
   });
   const levelDone = (l) => !!(CUR.progress && (l.problems || []).every((p) => {
     const s = CUR.progress.submissions[`${l.no}:${p.pid}`];
-    return s && s.score != null;
+    return s && s.score != null && s.score >= (p.pass_mark ?? t.pass_mark ?? 60);
   }));
   const curLevel = CUR.levels.find((l) => !l.locked && !levelDone(l)) || CUR.levels[CUR.levels.length - 1];
   const totalWeeks = Math.max(...CUR.levels.map((l) => l.week || 1), 1);
   const curWeek = curLevel ? (curLevel.week || 1) : totalWeeks;
-  const trackPct = (prog && t.total_points) ? Math.min(100, Math.round((prog.gems / t.total_points) * 100)) : 0;
+  const trackPct = prog ? (t.capstone ? Math.round((prog.required_passed + (prog.capstone?.passed ? 1 : 0)) / Math.max(1, prog.required_total + 1) * 100) : (t.total_points ? Math.min(100, Math.round((prog.gems / t.total_points) * 100)) : 0)) : 0;
   const RING_C = 326.7; // 2*pi*52
 
   const pathCard = prog ? `
@@ -995,7 +1016,7 @@ function drawCourse() {
         const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
         const isCurMod = curLevel && mod.levels.some((l) => l.no === curLevel.no);
         return `<button type="button" class="outline-item${isCurMod ? ' active' : ''}" onclick="document.getElementById('qmod${i}').scrollIntoView({behavior:'smooth',block:'start'})">
-          <span class="dot${allDone ? ' done' : ''}${isCurMod ? ' active' : ''}"></span>Module ${i + 1} &middot; Week ${mod.week}</button>`;
+          <span class="dot${allDone ? ' done' : ''}${isCurMod ? ' active' : ''}"></span>Module ${i + 1}${mod.title ? ' &middot; ' + esc(mod.title) : ' &middot; Week ' + mod.week}</button>`;
       }).join('')}
     </nav>`;
 
@@ -1018,7 +1039,7 @@ function drawCourse() {
   }
 
   const modulesHtml = modules.map((mod, mi) => `<section class="module-panel" id="qmod${mi}">
-      <div class="module-panel-head"><span class="module-eyebrow">Week ${mod.week}</span><h3>Module ${mi + 1}</h3></div>
+      <div class="module-panel-head"><span class="module-eyebrow">${mod.title ? `Weeks ${Math.min(...mod.levels.map(l=>l.week))}-${Math.max(...mod.levels.map(l=>l.week))}` : `Week ${mod.week}`}</span><h3>Module ${mi + 1}${mod.title ? `: ${esc(mod.title)}` : ''}</h3></div>
       ${classesHtmlFor(mod)}
     </section>`).join('');
 
@@ -1055,6 +1076,35 @@ const MODULE_STYLES = [
   { bg: '#F1E9FE', fg: '#9333EA' },
   { bg: '#FFF1E1', fg: '#EA580C' },
 ];
+function courseRequirementsHtml(t) {
+  if (!t.time_commitment && !t.prerequisites && !t.environment && !(t.warnings || []).length) return '';
+  const fact = (title, body) => body ? `<div class="card"><div class="card-body"><h3 style="margin-bottom:6px">${title}</h3><p class="s" style="line-height:1.6;color:var(--muted)">${esc(body)}</p></div></div>` : '';
+  return `<div class="tech-course-facts">
+    ${fact('Time commitment', t.time_commitment)}
+    ${fact('Prerequisites', t.prerequisites)}
+    ${fact('Required environment', t.environment)}
+    ${(t.warnings || []).map((warning) => `<div class="card"><div class="card-body" style="border-left:4px solid #EA580C"><h3 style="margin-bottom:6px">Cost and safety notice</h3><p class="s" style="line-height:1.6;color:var(--muted)">${esc(warning)}</p></div></div>`).join('')}
+  </div>`;
+}
+function capstoneCardHtml(t, prog) {
+  if (!t.capstone) return '';
+  const learner = ME && ['free', 'student'].includes(ME.role), state = prog?.capstone;
+  const locked = !state?.unlocked;
+  const button = !ME
+    ? '<button class="btn btn-primary" onclick="gate(\'Sign in to enroll and complete the capstone.\')">Sign in to enroll</button>'
+    : !learner ? '<button class="btn btn-ghost" disabled>Staff preview</button>'
+    : !prog?.enrolled ? '<button class="btn btn-primary" onclick="enrollFreeCourse(this)">Enroll for free</button>'
+    : locked ? '<button class="btn btn-ghost" disabled>Pass all assignments to unlock</button>'
+    : `<button class="btn btn-primary" onclick="openCapstone()">${state?.submitted ? 'Open capstone submission' : 'Submit capstone'}</button>`;
+  const status = state?.passed ? `Passed at ${state.score}%` : state?.submitted ? (state.score == null ? 'Awaiting staff review' : `Scored ${state.score}% — ${state.pass_mark}% required`) : locked ? `${prog?.required_passed || 0}/${prog?.required_total || 12} assignments passed` : 'Ready for submission';
+  return `<div class="card tech-capstone-card"><div class="card-body">
+    <div class="project-eyebrow">Capstone &middot; ${t.capstone.weight || 40}% of final result</div>
+    <h3>${esc(t.capstone.title)}</h3>
+    <p class="s" style="line-height:1.65;color:var(--muted);margin:8px 0 12px">${esc(t.capstone.description)}</p>
+    <div class="s" style="font-weight:700;margin-bottom:12px;color:${state?.passed ? 'var(--ok)' : 'var(--muted)'}">${esc(status)}</div>
+    ${button}
+  </div></div>`;
+}
 // v25: module rows are a flat, compact list - clicking one NAVIGATES to that
 // module's own page (openModule) instead of expanding its lessons inline.
 // That inline expansion was what forced this card into an internally-
@@ -1071,7 +1121,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
     return `<button type="button" class="curr-row" onclick="openModuleEntry(${mi})">
         <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS.code}</svg></span>
         <span class="curr-info">
-          <span class="curr-title">Module ${mi + 1}${allDone ? '<span class="curr-done-dot"></span>' : ''}</span>
+          <span class="curr-title">Module ${mi + 1}${mod.title ? ': ' + esc(mod.title) : ''}${allDone ? '<span class="curr-done-dot"></span>' : ''}</span>
           <span class="curr-sub">${subtitle}</span>
         </span>
         <span class="curr-pills">${pills}</span>
@@ -1115,15 +1165,53 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
         </div>
       </div>
     </div>
+    ${courseRequirementsHtml(t)}
+    ${capstoneCardHtml(t, prog)}
     <div class="curr-cta">
       <div class="curr-cta-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
       <div class="grow">
-        <div class="curr-cta-title">Pass the required assessments to earn your certificate</div>
+        <div class="curr-cta-title">${t.capstone ? 'Pass all assignments and the capstone to earn your certificate' : 'Pass the required assessments to earn your certificate'}</div>
         <div class="s curr-cta-sub">${ctaSub}</div>
       </div>
       <button type="button" class="btn btn-primary" onclick="${ctaAction}">${ctaBtnLabel}</button>
     </div>
     </div>`;
+}
+
+function capstoneHistoryHtml(state) {
+  const history=state?.submission?.history||[];
+  if(!history.length)return '<div class="empty" style="margin-top:12px">No capstone submission yet.</div>';
+  return `<section class="attempt-history" style="margin-top:14px"><h3>Capstone submission history</h3>${history.map((attempt,index)=>`<details><summary>Attempt ${history.length-index} &middot; ${esc(attempt.status==='awaiting_review'?'awaiting staff review':attempt.status)}${attempt.payload.score!=null?' &middot; '+attempt.payload.score+'%':''}</summary><p>${esc(attempt.payload.feedback||attempt.payload.error||'Your capstone evidence is saved.')}</p>${attemptEvidenceHtml(attempt.payload)}</details>`).join('')}</section>`;
+}
+function addCapstoneLink() {
+  const box=$('capstoneEvidenceLinks');if(!box||box.children.length>=8)return;
+  const label=document.createElement('label');label.className='field';label.innerHTML=`<span>Additional evidence URL ${box.children.length+1}</span><input class="capstone-evidence-link" type="url" inputmode="url" placeholder="https://" pattern="https://.*">`;box.appendChild(label);label.querySelector('input').focus();
+}
+function openCapstone() {
+  const t=CUR?.track,state=CUR?.progress?.capstone;if(!t?.capstone||!state?.unlocked)return;
+  const cfg=t.capstone.submission||{},submission=state.submission;
+  openModal(t.capstone.title,`<p class="s" style="line-height:1.65;color:var(--muted)">${esc(t.capstone.description)}</p>
+    <div class="task-status ${state.passed?'ok':'wait'}" style="margin-top:12px"><strong>${state.passed?`Passed at ${state.score}%`:submission?(state.score==null?'Awaiting staff review':`Scored ${state.score}%`):'Ready for submission'}</strong> &middot; ${state.pass_mark}% required &middot; ${t.capstone.weight}% of final result</div>
+    <form id="capstoneEvidenceForm" style="margin-top:14px">
+      <p class="s evidence-instructions">${esc(cfg.instructions||'Provide the capstone project URL and supporting evidence.')}</p>
+      <div id="capstoneEvidenceLinks"><label class="field"><span>${esc(cfg.link_labels?.[0]||'Repository or project URL')}</span><input class="capstone-evidence-link" type="url" inputmode="url" placeholder="https://" pattern="https://.*" required></label></div>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="addCapstoneLink()">Add another link</button>
+      <label class="field" style="margin-top:12px"><span>Supporting files (up to 8)</span><input name="files" type="file" accept="${esc((cfg.files?.accept||[]).join(','))}" multiple></label>
+      <label class="field"><span>Reviewer notes (optional)</span><textarea name="notes" rows="4" maxlength="${Number(cfg.notes?.max_length||4000)}"></textarea></label>
+      <button class="btn btn-primary" type="submit">${submission?'Resubmit capstone evidence':'Submit capstone for review'}</button>
+    </form>${capstoneHistoryHtml(state)}`);
+  $('capstoneEvidenceForm').addEventListener('submit',submitCapstone);
+}
+async function submitCapstone(event) {
+  event.preventDefault();const form=event.currentTarget,button=form.querySelector('button[type="submit"]'),fd=new FormData();
+  const links=[...form.querySelectorAll('.capstone-evidence-link')].map(input=>input.value.trim()).filter(Boolean),files=[...form.elements.files.files];
+  fd.set('track_key',CUR.track.key);fd.set('links',JSON.stringify(links));fd.set('notes',form.elements.notes.value.trim());if(files[0])fd.set('file',files[0]);for(const file of files.slice(1))fd.append('files',file);
+  const requestParts=[];for(const [key,value] of fd.entries())requestParts.push([key,value instanceof File?[value.name,value.size,value.lastModified]:value]);
+  const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(requestParts))))).join('-'),storageKey=`el:capstone:${ME.id}:${digest}`;
+  let requestKey;try{requestKey=sessionStorage.getItem(storageKey)||crypto.randomUUID();sessionStorage.setItem(storageKey,requestKey);}catch{requestKey=crypto.randomUUID();}fd.set('request_key',requestKey);
+  button.disabled=true;button.textContent='Submitting?';
+  try{const out=await api('/api/open/capstone/submit',{method:'POST',body:fd});try{sessionStorage.removeItem(storageKey);}catch{}CUR.progress=(await api('/api/open/progress?track='+encodeURIComponent(CUR.track.key))).progress;closeModal();drawCourse();toast(out.note||'Capstone evidence saved for staff review.');}
+  catch(error){modalMsg(error.message);button.disabled=false;button.textContent='Submit capstone for review';}
 }
 
 /* ------------------------------ solve + submit ------------------------------ */
@@ -1140,9 +1228,9 @@ function svModuleMap() {
   const map = new Map(); // week -> { index, levels }
   let idx = 0;
   CUR.levels.forEach((l) => {
-    const wk = l.week != null ? l.week : l.no;
-    if (!map.has(wk)) { idx += 1; map.set(wk, { index: idx, levels: [] }); }
-    map.get(wk).levels.push(l);
+    const key = l.module_no != null ? `module:${l.module_no}` : `week:${l.week != null ? l.week : l.no}`;
+    if (!map.has(key)) { idx += 1; map.set(key, { index: idx, no:l.module_no||idx, title:l.module_title||null, week:l.week, levels: [] }); }
+    map.get(key).levels.push(l);
   });
   return map;
 }
@@ -1175,7 +1263,9 @@ function levelPassed(l) { return (l.problems || []).filter(pr=>pr.required!==fal
 // attempted/graded.
 function coursePercent() {
   if (!CUR || !CUR.levels.length) return 0;
-  return CUR.progress?.required_total ? Math.round(CUR.progress.required_passed / CUR.progress.required_total * 100) : 0;
+  if (!CUR.progress?.required_total) return 0;
+  const capstoneCredit=CUR.track.capstone&&CUR.progress.capstone?.passed?1:0,total=CUR.progress.required_total+(CUR.track.capstone?1:0);
+  return Math.round((CUR.progress.required_passed+capstoneCredit)/total*100);
 }
 function svProgressHtml() {
   const pct = coursePercent();
@@ -1201,8 +1291,8 @@ function svNavHtml() {
   const t = CUR.track;
   const unitLabel = 'Lesson';
   let html = '<div class="svc-nav-head">Course Content</div>';
-  for (const [wk, mod] of svModuleMap()) {
-    html += `<div class="svc-week">Module ${mod.index} &middot; Week ${wk}</div>`;
+  for (const [, mod] of svModuleMap()) {
+    html += `<div class="svc-week">Module ${mod.index}${mod.title ? ' &middot; ' + esc(mod.title) : ' &middot; Week ' + mod.week}</div>`;
     html += mod.levels.map((l) => {
       const isCurLevel = (CUR_PROBLEM && l.no === CUR_PROBLEM.level) || CUR_VIDEO_LEVEL === l.no;
       const watched = levelHasVideo(l) && isVideoWatched(t.key, l.no);
@@ -1248,7 +1338,8 @@ function openSolve(levelNo, pid, skipPush) {
   if (!skipPush) pushNav({ v: 'solve', key: CUR.track.key, level: levelNo, pid });
   $('svSplit').classList.remove('video-view');
   const unitLabel = 'Lesson';
-  const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
+  const moduleKey = lvl.module_no != null ? `module:${lvl.module_no}` : `week:${lvl.week != null ? lvl.week : lvl.no}`;
+  const moduleIdx = (svModuleMap().get(moduleKey) || {}).index || 1;
   const multiProblems = (lvl.problems || []).length > 1;
   const problemIdx = multiProblems ? (lvl.problems || []).findIndex((x) => x.pid === pid) : -1;
   $('svCrumb').innerHTML = `
@@ -1266,11 +1357,13 @@ function openSolve(levelNo, pid, skipPush) {
       <div class="slv-eyebrow">${unitLabel} ${lvl.no} &middot; ${esc(lvl.title || '')}<span style="flex:1"></span><span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span></div>
       <div class="slv-head">
         <h2>${esc(p.title)}</h2>
-        <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} gems</span>
+        <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} ${p.grading_mode === 'staff' ? 'marks' : 'gems'}${p.duration ? ` &middot; ${esc(p.duration)}` : ''}</span>
       </div>
       ${levelHasVideo(lvl) ? `<button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center" onclick="openSolveVideo(${lvl.no})">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${lvl.resource_url ? 'Read lesson guide' : 'Watch the topic video'}</button>` : ''}
       <div class="s" id="svDesc" style="white-space:pre-line;line-height:1.65;font-size:13.5px;margin-top:8px">${esc(p.description || '')}</div>
+      ${p.deliverable ? `<div class="s" style="margin-top:12px;line-height:1.6"><strong>Deliverable:</strong> ${esc(p.deliverable)}</div>` : ''}
+      ${p.submission_text ? `<div class="s" style="margin-top:8px;line-height:1.6"><strong>Submission evidence:</strong> ${esc(p.submission_text)}</div>` : ''}
       <div class="s" id="svRefs" style="margin-top:10px"></div>
     </div></div>
     ${(p.criteria || []).length ? `
@@ -1308,7 +1401,8 @@ function openSolveVideo(levelNo, skipPush) {
   if (!skipPush) pushNav({ v: 'video', key: CUR.track.key, level: levelNo });
   $('svSplit').classList.add('video-view');
   const unitLabel = 'Lesson';
-  const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
+  const moduleKey = lvl.module_no != null ? `module:${lvl.module_no}` : `week:${lvl.week != null ? lvl.week : lvl.no}`;
+  const moduleIdx = (svModuleMap().get(moduleKey) || {}).index || 1;
   $('svCrumb').innerHTML = `
     <a onclick="backToCourse()">${esc(CUR.track.title)}</a>
     <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1326,6 +1420,8 @@ function openSolveVideo(levelNo, skipPush) {
       <div class="slv-eyebrow">${unitLabel} ${lvl.no} &middot; ${esc(lvl.title || '')}</div>
       <div class="slv-head"><h2>${esc(lvl.title || '')}</h2></div>
       ${videoLinksHtml(lvl, true)}
+      ${lessonStudyGuideHtml(lvl)}
+      ${moduleResourcesHtml(lvl)}
       ${watched
         ? `<div class="s" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;color:var(--teal);font-weight:700">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Video watched</div>`
@@ -1340,15 +1436,19 @@ function showFullFeedback() {
   if (!sub) return;
   openModal('Feedback', `<p class="s" style="white-space:pre-line;line-height:1.6">${esc(sub.feedback || '')}</p>`);
 }
+function attemptEvidenceHtml(payload) {
+  const evidence=payload?.evidence||{},links=evidence.links||[],files=evidence.files||payload?.files||[];
+  return `${links.length?`<div class="attempt-evidence-links">${links.map((url,index)=>`<a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener">Evidence link ${index+1}</a>`).join('')}</div>`:''}${evidence.notes?`<p style="white-space:pre-wrap">${esc(evidence.notes)}</p>`:''}${payload?.file_url?`<a class="btn btn-ghost btn-sm" href="${esc(payload.file_url)}" target="_blank" rel="noopener">Download submitted file</a>`:''}${files.filter(file=>file.url!==payload?.file_url).map(file=>`<a class="btn btn-ghost btn-sm" href="${esc(file.url)}" target="_blank" rel="noopener">${esc(file.name||'Evidence file')}</a>`).join('')}`;
+}
 function drawSolveStatus() {
   if (!CUR_PROBLEM || !CUR) return;
   const sub=CUR.progress?.submissions[CUR_PROBLEM.level+':'+CUR_PROBLEM.pid];
   const box=$('svGradedBox'),results=$('svResults');if(!sub){if(box)box.innerHTML='';if(results)results.innerHTML='';return;}
   const history=sub.history||[],latest=history[0],passMark=CUR_PROBLEM.problem.pass_mark??CUR.track.pass_mark??60;
   if(box)box.innerHTML=sub.score==null?'':`<div class="slv-graded${sub.score>=passMark?'':' wait'}"><div class="g-head">Best score: ${sub.score}% &middot; ${sub.gems} gems</div><p>Required score: ${passMark}%. ${esc(sub.feedback||'')}</p></div>`;
-  const state=latest?.status||'awaiting staff review';
-  if(results)results.innerHTML=`<section class="attempt-history" aria-label="Submission history"><h3>Submission history</h3><p role="status">Latest attempt: ${esc(state)}${latest?.payload.error?' ? '+esc(latest.payload.error):''}</p><button class="btn btn-ghost btn-sm" onclick="refreshAttempts()">Refresh results</button>${history.map((a,i)=>`<details><summary>Attempt ${history.length-i} &middot; ${esc(a.status)}${a.payload.score!=null?' &middot; '+a.payload.score+'%':''} &middot; ${esc(fmtSubDate(a.created_at))}</summary><p>${esc(a.payload.feedback||a.payload.error||'Your work is saved.')}</p>${a.payload.code?'<pre>'+esc(a.payload.code)+'</pre><button class="btn btn-ghost btn-sm" onclick="restoreAttempt('+a.id+')">Load this code into editor</button>':''}${a.payload.file_url?'<a class="btn btn-ghost btn-sm" href="'+esc(a.payload.file_url)+'" target="_blank" rel="noopener">Download submitted file</a>':''}${(a.payload.files||[]).map(f=>'<a href="'+esc(f.url)+'" target="_blank" rel="noopener">'+esc(f.name)+'</a>').join(' ')}${a.can_retry?'<button class="btn btn-primary btn-sm" onclick="retryAttempt('+a.id+')">Retry grading</button>':''}</details>`).join('')}</section>`;
-  clearTimeout(ATTEMPT_POLL);if(history.some(a=>['queued','processing'].includes(a.status)))ATTEMPT_POLL=setTimeout(()=>refreshAttempts(true),3000);
+  const state=latest?.status==='awaiting_review'?'awaiting staff review':latest?.status||'awaiting staff review';
+  if(results)results.innerHTML=`<section class="attempt-history" aria-label="Submission history"><h3>Submission history</h3><p role="status">Latest attempt: ${esc(state)}${latest?.payload.error?' ? '+esc(latest.payload.error):''}</p><button class="btn btn-ghost btn-sm" onclick="refreshAttempts()">Refresh results</button>${history.map((attempt,index)=>`<details><summary>Attempt ${history.length-index} &middot; ${esc(attempt.status==='awaiting_review'?'awaiting staff review':attempt.status)}${attempt.payload.score!=null?' &middot; '+attempt.payload.score+'%':''} &middot; ${esc(fmtSubDate(attempt.created_at))}</summary><p>${esc(attempt.payload.feedback||attempt.payload.error||'Your work is saved.')}</p>${attempt.payload.code?'<pre>'+esc(attempt.payload.code)+'</pre><button class="btn btn-ghost btn-sm" onclick="restoreAttempt('+attempt.id+')">Load this code into editor</button>':''}${attemptEvidenceHtml(attempt.payload)}${attempt.can_retry?'<button class="btn btn-primary btn-sm" onclick="retryAttempt('+attempt.id+')">Retry grading</button>':''}</details>`).join('')}</section>`;
+  clearTimeout(ATTEMPT_POLL);if(history.some(attempt=>['queued','processing'].includes(attempt.status)))ATTEMPT_POLL=setTimeout(()=>refreshAttempts(true),3000);
 }
 let ATTEMPT_POLL;
 async function refreshAttempts(quiet=false){if(!CUR||!CUR_PROBLEM)return;const key=CUR.track.key;try{const d=await api('/api/open/progress?track='+encodeURIComponent(key));if(CUR?.track.key!==key)return;CUR.progress=d.progress;drawSolveStatus();if($('svNav'))$('svNav').innerHTML=svNavHtml();}catch(e){if(!quiet)toast(EL.errorMessage(e),true);}}
@@ -1363,13 +1463,14 @@ function svLangOptions() {
   return opt('python', 'Python 3') + opt('c', 'C') + opt('cpp', 'C++') + opt('java', 'Java') + opt('sql', 'SQL') + opt('web', 'HTML / CSS / JS');
 }
 const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-function svCertNote() { return CUR.track.free ? ' Pass every required assessment at its stated threshold and your verified certificate is issued automatically.' : ''; }
+function svCertNote() { return CUR.track.free ? (CUR.track.capstone ? ' Pass every required assignment and the staff-reviewed capstone to receive your verified certificate.' : ' Pass every required assessment at its stated threshold and your verified certificate is issued automatically.') : ''; }
 // Beginner-track courses (the 5 free fundamentals tracks - see
 // tracks/free-micro.js's friendly_grading flag) never mention automated grading or the standard
 // 10% reduction - a first-timer's first working program shouldn't come
 // with a visible penalty attached, and how grading works internally isn't
 // something a beginner needs to know to trust their result.
 function svGradingNote() {
+  if (CUR_PROBLEM?.problem?.grading_mode === 'staff') return 'Your evidence is saved immediately and sent to staff for review. Your best score is preserved.' + svCertNote();
   return CUR.track.friendly_grading
     ? 'Your work is saved before grading. Gems reflect your best result.' + svCertNote()
     : 'Automated grading applies the configured 10% adjustment. Gems reflect your best result.' + svCertNote();
@@ -1380,6 +1481,32 @@ let SV_LAB = {};
 let SV_SHEET = null;
 let SV_EXCEL_CHAT = [];
 function labKey() { return `${CUR.track.key}:${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`; }
+
+function addEvidenceLink(label) {
+  const box = $('svEvidenceLinks'); if (!box || box.children.length >= 8) return;
+  const row = document.createElement('label'); row.className = 'field';
+  row.innerHTML = `<span>${esc(label || `Additional evidence URL ${box.children.length + 1}`)}</span><input class="sv-evidence-link" type="url" inputmode="url" placeholder="https://" pattern="https://.*">`;
+  box.appendChild(row); row.querySelector('input').focus();
+}
+function svEvidenceArea(sub) {
+  const cfg = CUR_PROBLEM.problem.submission || {}, labels = (cfg.link_labels || []).slice();
+  while (labels.length < Math.max(1, Number(cfg.links?.min || 0))) labels.push(`Evidence URL ${labels.length + 1}`);
+  if (!labels.length) labels.push('Evidence URL (optional when files or notes are attached)');
+  const accept = (cfg.files?.accept || []).join(',');
+  $('svWorkArea').innerHTML = `<div class="card"><div class="card-head"><h3>Submit project evidence</h3><span class="s" style="color:var(--muted)">Staff reviewed</span></div><div class="card-body">
+    <p class="s evidence-instructions">${esc(cfg.instructions || CUR_PROBLEM.problem.submission_text || 'Attach evidence for this assignment.')}</p>
+    <form id="svEvidenceForm">
+      <div id="svEvidenceLinks">${labels.map((label, index) => `<label class="field"><span>${esc(label)}</span><input class="sv-evidence-link" type="url" inputmode="url" placeholder="https://" pattern="https://.*"${index < Number(cfg.links?.min || 0) ? ' required' : ''}></label>`).join('')}</div>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="addEvidenceLink()">Add another link</button>
+      <label class="field" style="margin-top:12px"><span>Supporting files${Number(cfg.files?.min || 0) ? ` — at least ${cfg.files.min} required` : ' (optional)'}</span><input name="files" type="file" accept="${esc(accept)}" multiple${Number(cfg.files?.min || 0) ? ' required' : ''}></label>
+      <div id="svFileList" class="hint" style="margin:4px 0 8px"></div>
+      <label class="field"><span>Evidence notes${cfg.notes?.required ? '' : ' (optional)'}</span><textarea name="notes" maxlength="${Number(cfg.notes?.max_length || 4000)}" rows="4" placeholder="Add commands run, test results, access instructions, or reviewer context."></textarea></label>
+      <button class="btn lc-btn-solve" type="submit">${sub ? 'Resubmit evidence' : 'Submit for staff review'}</button>
+    </form><p class="hint" style="margin-top:10px">${svGradingNote()}</p>
+  </div></div><div id="svResults" style="margin-top:16px"></div>`;
+  const form=$('svEvidenceForm');form.addEventListener('submit',(event)=>{event.preventDefault();submitSolve(form);});
+  form.files.addEventListener('change',(event)=>{const names=[...event.target.files].map(file=>file.name);$('svFileList').textContent=names.length?`${names.length} file${names.length===1?'':'s'} attached: ${names.join(', ')}`:'';});
+}
 
 function drawWorkArea() {
   const isLearner = !ME || ['free', 'student'].includes(ME.role);
@@ -1431,7 +1558,7 @@ function drawWorkArea() {
     // Staff can read and run everything, but submissions are for learners.
     $('svWorkArea').innerHTML = codeLike
       ? codeIde({ dataset: false, submit: false, placeholder: '# Staff preview — run code freely. Submissions are for learner accounts.', status: 'Staff preview — submissions are for learner accounts.' }) + (mode === 'code-ai' ? svAiPanelHtml() : '')
-      : `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview — this task takes ${mode === 'prompt' ? 'Prompt Lab workbook' : 'file'} submissions from learner accounts.</p></div></div>`;
+      : `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview — this task takes ${mode === 'prompt' ? 'Prompt Lab workbook' : mode === 'evidence' ? 'links, notes and evidence files' : 'file'} submissions from learner accounts.</p></div></div>`;
     if (codeLike) { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); svSyncGutter(); svLangChanged(); if (mode === 'code-ai') svWireAiPanel(); }
     return;
   }
@@ -1451,6 +1578,8 @@ function drawWorkArea() {
     svPromptLabArea(sub);
   } else if (mode === 'excel-ai') {
     svExcelArea(sub);
+  } else if (mode === 'evidence') {
+    svEvidenceArea(sub);
   } else {
     const CFG = {
       doc: { accept: '.pdf,.doc,.docx', multiple: false, label: 'Your report (Word or PDF)', blurb: 'This course takes report submissions - upload your work as a Word or PDF file only.' },
@@ -1732,6 +1861,12 @@ async function submitSolve(fileForm) {
     if (!entries.length) { toast('Run at least one prompt in the lab first - the workbook is what gets graded.', true); return; }
     fd.set('code', entries.map((e, i) => `PROMPT ${i + 1}:\n${e.prompt}\n\nMODEL OUTPUT ${i + 1}:\n${e.reply}`).join('\n\n----------------\n\n').slice(0, 60000));
     fd.set('language', 'prompt');
+  } else if (mode === 'evidence' && fileForm) {
+    const links=[...fileForm.querySelectorAll('.sv-evidence-link')].map(input=>input.value.trim()).filter(Boolean);
+    const files=[...(fileForm.elements.files?.files||[])],notes=fileForm.elements.notes?.value.trim()||'';
+    if (!links.length && !files.length && !notes) { toast('Add at least one evidence link, note, or file.', true); return; }
+    fd.set('links',JSON.stringify(links));fd.set('notes',notes);
+    if(files.length){fd.set('file',files[0]);for(const file of files.slice(1))fd.append('files',file);}
   } else if (fileForm) {
     const files = [...fileForm.file.files];
     if (!files.length) { toast('Choose your file first.', true); return; }
@@ -1958,11 +2093,11 @@ function profFmtDate(d) {
   try { return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return d; }
 }
 function profTrackRow(t) {
-  const pct = t.total ? Math.round((t.graded / t.total) * 100) : 0;
+  const pct = t.required_total ? Math.round((t.required_passed + (t.capstone?.passed ? 1 : 0)) / (t.required_total + (t.capstone ? 1 : 0)) * 100) : (t.total ? Math.round((t.graded / t.total) * 100) : 0);
   return `<div class="list-row">
     <div class="grow">
       <div class="t">${esc(t.title)}${t.free ? ' <span class="kbadge quest">Free course</span>' : ''}</div>
-      <div class="s" style="color:var(--muted)">${t.graded}/${t.total} tasks graded${t.avg != null ? ' &middot; avg ' + t.avg + '%' : ''} &middot; ${t.gems} gems earned</div>
+      <div class="s" style="color:var(--muted)">${t.graded}/${t.total} assignments graded${t.assignment_average != null ? ' &middot; assignment average ' + t.assignment_average + '%' : t.avg != null ? ' &middot; avg ' + t.avg + '%' : ''}${t.capstone ? ' &middot; capstone ' + (t.capstone.passed ? 'passed' : t.capstone.submitted ? 'submitted' : 'pending') : ''}${t.weighted_score != null ? ' &middot; final ' + t.weighted_score + '%' : ''} &middot; ${t.gems} gems earned</div>
       <div class="cl-bar" style="margin-top:6px;max-width:280px"><div class="cl-fill" style="width:${pct}%"></div></div>
     </div>
     <span class="grade-chip ${t.passed ? 'ok' : (t.complete ? 'wait' : 'none')}">${t.passed ? 'Passed' : (t.complete ? 'Completed' : 'In progress')}</span>

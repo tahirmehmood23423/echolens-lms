@@ -118,8 +118,8 @@ const COLLECTIONS = [
     'graded_by', 'code', 'language', 'ai_review', 'review_shared', 'review_shared_at', 'late', 'integrity', 'late_deduction',
   ]],
   ['open_submissions', 'open_submissions', [
-    'id', 'user_id', 'track_key', 'level', 'pid', 'problem_title', 'points', 'code', 'language', 'file_url', 'file_name',
-    'submitted_at', 'score', 'gems', 'feedback', 'graded_at', 'attempts', 'files',
+    'id', 'user_id', 'track_key', 'assessment_kind', 'level', 'pid', 'problem_title', 'points', 'code', 'language', 'file_url', 'file_name',
+    'submitted_at', 'score', 'gems', 'feedback', 'graded_at', 'attempts', 'files', 'evidence',
   ]],
   ['task_files', 'task_files', ['id', 'quest_id', 'pid', 'name', 'url', 'size', 'by', 'created_at']],
   ['gem_events', 'gem_events', ['id', 'user_id', 'batch_id', 'amount', 'source', 'note', 'by', 'at']],

@@ -218,7 +218,7 @@ async function logout() { EL.drafts.flushAll(); EL.drafts.setAccount(null); try 
     $('bellBtn').style.display = '';
     $('bellBtn').onclick = () => show('admin-logs');
   }
-  if (ME.role === 'free') ['courses', 'schedule', 'announcements', 'assignments', 'quizzes', 'certificates', 'messages', 'resources'].forEach((v) => { const n = document.querySelector(`.nav-item[data-view="${v}"]`); if (n) n.style.display = 'none'; });
+  if (ME.role === 'free') ['schedule', 'announcements', 'assignments', 'quizzes', 'certificates', 'messages', 'resources'].forEach((v) => { const n = document.querySelector(`.nav-item[data-view="${v}"]`); if (n) n.style.display = 'none'; });
   if (ME.gamify && ME.gamify.streak > 0) {
     $('topStreak').style.display = '';
     $('topStreak').innerHTML = `&#128293; ${ME.gamify.streak}-day streak`;
@@ -1144,7 +1144,7 @@ async function renderStudentOverview(el, d) {
 
   let lastLesson='';try{lastLesson=EL.safeReturn(localStorage.getItem('el:last:'+ME.id),'');}catch{}
   el.innerHTML = `
-    ${lastLesson?'<p class="learning-primary"><a class="btn btn-primary" href="'+esc(lastLesson)+'">Continue your last practice</a> <a class="btn btn-ghost" href="/open#free">Browse free courses</a></p>':''}
+    <p class="learning-primary">${lastLesson?'<a class="btn btn-primary" href="'+esc(lastLesson)+'">Continue your last practice</a> ':''}<a class="btn btn-ghost" href="/open#free">Browse free courses</a> <a class="btn btn-ghost" href="/dashboard#view=courses">My courses</a></p>
     <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start" class="ovr-grid">
       <div>
         ${cont ? `<div class="card"><div class="cl-hero">
@@ -1333,9 +1333,12 @@ function lbRow(r, i) {
 async function renderCourses() {
   const el = $('view-courses');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
-  const d = await api('/api/overview');
-  if (!d.courses.length) { el.innerHTML = '<div class="card"><div class="empty">No courses yet. ' + (ME.role === 'admin' ? 'Start one from Catalogue &amp; new course.' : 'You will see your courses here once you are enrolled.') + '</div></div>'; return; }
-  el.innerHTML = `<div class="course-grid">${d.courses.map((b) => `
+  const learner = ['free', 'student'].includes(ME.role);
+  const [d, free] = await Promise.all([api('/api/overview'), learner ? api('/api/open/enrollments') : Promise.resolve({ courses: [] })]);
+  const freeHtml = learner ? `<div class="card"><div class="card-head"><h3>My free courses</h3><a class="btn btn-teal btn-sm" href="/open#free">Browse free courses</a></div><div class="card-body tight">${free.courses.length ? free.courses.map(c => `
+    <div class="list-row"><div class="grow"><div class="t">${esc(c.title)}</div><div class="s" style="color:var(--muted)">Self-paced &middot; ${c.required_passed} of ${c.required_total} required assessments passed</div></div>
+    <a class="btn btn-primary btn-sm" href="/open#course/${encodeURIComponent(c.track_key)}">${c.completed ? 'Review course' : 'Continue learning'}</a></div>`).join('') : '<div class="empty">Choose a free course and select Enroll for free. Your existing learner account works for every free course.</div>'}</div></div>` : '';
+  const paidHtml = d.courses.length ? `${learner ? '<h3 style="margin:20px 0 12px">My instructor-led courses</h3>' : ''}<div class="course-grid">${d.courses.map((b) => `
     <div class="course-card" onclick="openCourse(${b.id})">
       <div class="course-band"></div>
       <div class="cc-body">
@@ -1348,7 +1351,8 @@ async function renderCourses() {
           <span>${gemChip(b.gems_possible)} possible</span>
         </div>
       </div>
-    </div>`).join('')}</div>`;
+    </div>`).join('')}</div>` : (!learner ? '<div class="card"><div class="empty">No courses yet. ' + (ME.role === 'admin' ? 'Start one from Catalogue &amp; new course.' : 'You will see your courses here once you are enrolled.') + '</div></div>' : '');
+  el.innerHTML = freeHtml + paidHtml;
 }
 
 /* ============================= ASSIGNMENTS ============================= */

@@ -3,12 +3,14 @@
 <h2>Local verification</h2>
 <p>From the repository root, use <code>node qa-implementation/local-server.cjs</code> in a dedicated terminal. It uses port 4318, its own JSON data/uploads under ignored <code>qa-implementation/runtime/</code>, synthetic <code>@qa.invalid</code> accounts, a fixed <strong>test-only</strong> JWT secret, disabled dotenv loading, disabled integration credentials and a test DNS response only for <code>qa.invalid</code>. Never run this harness as a public service. It is not a deployment entry point.</p>
 <p>Run security checks before browser login tests because the former reset synthetic passwords and invalidate sessions. Workflow checks mutate only their synthetic fixtures and exercise idempotent repeats. A first seed creates the accounts; subsequent runs reuse them. <code>free@qa.invalid</code> becomes enrolled during the paid lifecycle test; <code>observer@qa.invalid</code> remains the unrelated free account. Login uses email because enrollment may update the username.</p>
-<pre><code class="language-powershell">node --test test/atomic-json.test.js test/certificate-final-project.test.js test/draft-store.test.js test/gem-totals.test.js test/learning-attempts.test.js test/registration.test.js test/upload-access.test.js
+<pre><code class="language-powershell">node --test test/atomic-json.test.js test/certificate-final-project.test.js test/draft-store.test.js test/free-enrollment.test.js test/gem-totals.test.js test/learning-attempts.test.js test/registration.test.js test/upload-access.test.js
 node qa-implementation/security-checks.cjs
 node qa-implementation/workflow-checks.cjs
 node qa-implementation/browser-regression.cjs
 node qa-implementation/ui-survey.cjs
 node qa-implementation/final-checks.cjs
+node qa-implementation/free-enrollment-checks.cjs
+node qa-implementation/free-enrollment-browser.cjs
 node qa-implementation/capture-inventory.cjs
 node qa-implementation/build-deliverables.cjs
 node qa-implementation/review-artifacts.cjs
@@ -65,4 +67,4 @@ node qa-implementation/review-artifacts.cjs
 <li>Talent, showcase and live-class full workflows remain integration-blocked. Capability handling is partial for image sharing/live sessions (E-04).</li>
 </ol>
 <p>The patch can be reviewed now. These conditions prevent an unconditional whole-product production-readiness claim.</p>
-<footer>Local synthetic verification · 2026-09-10T04:57:37.075Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>
+<footer>Local synthetic verification · 2026-09-10T09:32:00.084Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>

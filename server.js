@@ -4164,8 +4164,21 @@ app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCou
   await store.pendingPersist();
   res.status(out.existing?200:202).json({ok:true,existing:!!out.existing,attempt:store.OpenAttempts.public(out.attempt),submission:out.submission,graded:out.attempt.status==='completed',note:out.attempt.status==='failed'?out.attempt.payload.error:'Attempt saved and queued for grading. You can leave and return to check its status.'});
 }));
-app.get('/api/open/attempts', authRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),req.query.level,req.query.pid).map(store.OpenAttempts.public)}));
-app.post('/api/open/attempts/:id/retry',authRequired,asyncRoute(async (req,res)=>{
+function openLearnerRequired(req, res, next) {
+  if (['free', 'student'].includes(req.user.role)) return next();
+  return res.status(403).json({ error: 'Free-course enrollment and progress are for learner accounts only.' });
+}
+app.get('/api/open/enrollments', authRequired, openLearnerRequired, (req, res) => {
+  res.json({ courses: OpenQuest.enrollments(req.user.id) });
+});
+app.post('/api/open/enrollments', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {
+  const out = OpenQuest.enroll(req.user.id, String(req.body.track_key || ''));
+  if (out.error) return res.status(out.status).json({ error: out.error });
+  await store.pendingPersist();
+  res.status(out.existing ? 200 : 201).json({ ok: true, ...out, progress: { ...OpenQuest.progress(req.user.id, out.enrollment.track_key), enrolled: true } });
+}));
+app.get('/api/open/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),req.query.level,req.query.pid).map(store.OpenAttempts.public)}));
+app.post('/api/open/attempts/:id/retry',authRequired,openLearnerRequired,asyncRoute(async (req,res)=>{
   if(!ai.enabled())return res.status(503).json({error:'Grading is still unavailable. Your attempt and previous grades are saved. Ask staff for a review.'});
   const out=store.OpenAttempts.retry(req.params.id,req.user.id);
   if(out.error)return res.status(out.status||400).json({error:out.error});
@@ -4190,11 +4203,11 @@ const gradingWorker = require('./grading-worker').createGradingWorker({
     return ai.autoGrade(a.user_id,{eventTitle:track?.title,problemTitle:p.problem.title,problemBrief:p.problem.description,passMark:p.problem.pass_mark??track?.pass_mark??60,code:p.code,language:p.language,text});
   },onComplete:async a=>{OpenQuest.maybeCertify(a.user_id,a.track_key);},
 });
-app.get('/api/open/progress', authRequired, (req, res) => {
+app.get('/api/open/progress', authRequired, openLearnerRequired, (req, res) => {
   const track = String(req.query.track || '');
   const prog = OpenQuest.progress(req.user.id, track);
   if (!prog) return res.status(404).json({ error: 'Course not found.' });
-  res.json({ progress: prog });
+  res.json({ progress: { ...prog, enrolled: !!OpenQuest.enrollment(req.user.id, track) } });
 });
 
 /* ---------------- learner AI copilot for the quest workspaces ----------------

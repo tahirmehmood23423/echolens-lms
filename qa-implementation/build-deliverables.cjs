@@ -60,7 +60,7 @@ write('lesson-review.csv',csv(lessons));write('lesson-review.json',JSON.stringif
 const matrix='# Updated issue matrix\n\nAll 35 requested findings are accounted for. FIXED AND VERIFIED means the specified local/code/unit/browser boundary passed; it does not certify external services or all production workflows. Integration limits are explicit in each row. Original evidence remains in [the original audit](../qa-audit/audit-report.html).\n\n'+table(['Issue ID','Original finding','Reproduction result','Fix','Changed files','Verification','Remaining limitation','Status'],issues.map(r=>Object.values(r)));
 write('issue-matrix.md',matrix);
 const stats={generated_at:new Date().toISOString(),issues:countBy(issues,'status'),courses:current.courses.length,modules:current.courses.reduce((n,c)=>n+new Set(c.levels.map(l=>l.week)).size,0),lessons:lessons.length,assignments:lessons.length,original_unique_videos:videos.length,current_unique_videos:new Set(lessons.filter(l=>l.resource_type==='video').map(l=>id(l.current_resource))).size,current_video_lessons:lessons.filter(l=>l.resource_type==='video').length,guide_lessons:lessons.filter(l=>l.resource_type==='guide').length,availability:countBy(videos,'availability'),standard_playback:countBy(videos,'playback'),app_playback:countBy(app,'status'),tests:{}};
-for(const f of ['security-after','workflow-after','browser-after','ui-survey-after','final-checks'])stats.tests[f]=countBy(read('evidence/'+f+'.json'),'status');
+for(const f of ['security-after','workflow-after','browser-after','ui-survey-after','final-checks','free-enrollment-after','free-enrollment-browser'])stats.tests[f]=countBy(read('evidence/'+f+'.json'),'status');
 write('verification-summary.json',JSON.stringify(stats,null,2));
 const counts=table(['Status','Findings'],Object.entries(stats.issues));
 const report=`# EchoLens implementation and verification report
@@ -92,13 +92,17 @@ Free submissions create independent attempts with immutable work snapshots, boun
 
 Other changes include explicit profile clearing, recoverable loaders, coordinator read-only UI/chat alignment, accurate catalogue/stage copy, idempotent challenge correction deltas and unique team reward recipients. Focused UI work adds accessible shared dialogs, larger controls, concise clamped summaries, catalogue pagination/filter recovery, Continue learning, starter code, attempt history and resumable onboarding with a separate marketing preference.
 
+Free-course enrollment now uses the learner's existing account. Both the open-web **free** role and portal **student** role can select **Enroll for free**, keep their current role, and see the course with assessment progress under **My courses**. Existing free-course submissions are recognized automatically. Staff roles can preview public lesson material but cannot create or list learner enrollments. Repeated enrollment is idempotent and does not create paid enrollments, registrations, challans, grades or rewards.
+
 A local Windows write failure discovered during validation was also fixed: atomic JSON writes use a unique temporary file, writable fsync and bounded rename retry while preserving the last good file. New critical async handlers forward failures to Express error handling. This does not claim every legacy async route has been rewritten.
 
 ## Verification results
 
 | Check | Result | Evidence |
 |---|---|---|
-| Focused unit tests | 24 passed, 0 failed | [Output](evidence/unit-tests.txt): upload/session, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence |
+| Focused unit tests | 30 passed, 0 failed | Upload/session, free-course enrollment, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence |
+| Free enrollment API | 7 passed | [Results](evidence/free-enrollment-after.json): free learner and portal student, retry idempotency, three staff-role denials, unknown course and no paid/grade mutation |
+| Free enrollment browser | 5 passed | [Results](evidence/free-enrollment-browser.json): persisted My courses for both learner roles, both enrollment CTAs and staff preview without enrollment action |
 | Security API checks | 7 passed | [Results](evidence/security-after.json), [pre-fix reproduction](evidence/security-before.json) |
 | Workflow API groups | 7 passed | [Results](evidence/workflow-after.json): profile, registration-to-enrollment, free attempts/certificate, paid grading/feedback, challenge corrections, team awards, coordinator boundaries |
 | Browser regressions | 10 passed | [Results](evidence/browser-after.json): 1440/390 free draft/run/auth resume/account isolation; Settings/task route; paid draft; 503 Retry; keyboard dialog |

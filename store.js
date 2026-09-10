@@ -2762,7 +2762,7 @@ function riskReport(bid) {
 // way), and community challenges. Shared by the admin's student profile
 // modal and the open user's own self-service profile page.
 function openActivity(uid) {
-  const trackKeys = [...new Set(data.open_submissions.filter((s) => s.user_id === Number(uid)).map((s) => s.track_key))];
+  const trackKeys = [...new Set([...OpenQuest.enrollments(uid).map(e => e.track_key), ...data.open_submissions.filter((s) => s.user_id === Number(uid)).map((s) => s.track_key)])];
   const tracks = trackKeys.map((key) => {
     const t = TRACKS[key]; if (!t) return null;
     const prog = OpenQuest.progress(uid, key);
@@ -3932,10 +3932,49 @@ const { completion: freeCompletion, createAttempts } = require('./learning-attem
 const OpenAttempts = createAttempts({getData:()=>data,nextId,save,tracks:TRACKS,now});
 const OpenQuest = {
   key(track_key, level, pid) { return `${track_key}:${level}:${pid}`; },
+  // Free learning belongs to the existing learner account, independently of
+  // paid cohort enrollment. Structured profile metadata persists in all store
+  // modes and cannot be set through the editable-profile field whitelist.
+  enrollment(uid, track_key) {
+    const u = Users.byId(uid), t = TRACKS[track_key];
+    if (!u || !['free', 'student'].includes(u.role) || !t?.free) return null;
+    const savedEnrollments = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
+    const saved = savedEnrollments.find(e => e.track_key === track_key);
+    if (saved) return { track_key, enrolled_at: saved.enrolled_at };
+    // Keep learners with existing submissions enrolled without rewriting work.
+    const previous = data.open_submissions.find(s => s.user_id === u.id && s.track_key === track_key);
+    return previous ? { track_key, enrolled_at: previous.submitted_at } : null;
+  },
+  enroll(uid, track_key) {
+    const u = Users.byId(uid);
+    if (!u || !['free', 'student'].includes(u.role)) return { error: 'Free-course enrollment is available to learner accounts only.', status: 403 };
+    const t = TRACKS[track_key];
+    if (!t?.free || !OFFICIAL_CATALOGUE.some(c => c.code === t.course_code && c.price_pkr === 0)) return { error: 'Choose a published free course.', status: 400 };
+    const existing = OpenQuest.enrollment(uid, track_key);
+    if (existing) return { enrollment: existing, existing: true };
+    const enrollment = { track_key, enrolled_at: now() };
+    const savedEnrollments = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
+    u.profile = { ...(u.profile || {}), free_course_enrollments: [...savedEnrollments, enrollment] };
+    save();
+    return { enrollment, existing: false };
+  },
+  enrollments(uid) {
+    const u = Users.byId(uid);
+    if (!u || !['free', 'student'].includes(u.role)) return [];
+    const savedEnrollments = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
+    const keys = new Set([...savedEnrollments.map(e => e.track_key), ...data.open_submissions.filter(s => s.user_id === u.id).map(s => s.track_key)]);
+    return [...keys].flatMap(track_key => {
+      const t = TRACKS[track_key];
+      if (!t?.free) return [];
+      const progress = OpenQuest.progress(uid, track_key);
+      return [{ ...OpenQuest.enrollment(uid, track_key), title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, completed: progress.passed }];
+    });
+  },
   find(uid, track_key, level, pid) {
     return data.open_submissions.find((s) => s.user_id === Number(uid) && s.track_key === track_key && s.level === Number(level) && s.pid === Number(pid)) || null;
   },
   submit({ user, track_key, level, pid, code, language, file_url, file_name, files, request_key, fingerprint }) {
+    if (!['free', 'student'].includes(Users.byId(user.id)?.role)) return { error: 'Practice submissions are for learner accounts only.', status: 403 };
     const t = TRACKS[track_key];
     if (!t) return { error: 'Course not found.' };
     const lvl = t.levels.find((l) => l.no === Number(level));

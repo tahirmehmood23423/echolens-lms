@@ -9,12 +9,14 @@ From the repository root, use `node qa-implementation/local-server.cjs` in a ded
 Run security checks before browser login tests because the former reset synthetic passwords and invalidate sessions. Workflow checks mutate only their synthetic fixtures and exercise idempotent repeats. A first seed creates the accounts; subsequent runs reuse them. `free@qa.invalid` becomes enrolled during the paid lifecycle test; `observer@qa.invalid` remains the unrelated free account. Login uses email because enrollment may update the username.
 
 ```powershell
-node --test test/atomic-json.test.js test/certificate-final-project.test.js test/draft-store.test.js test/gem-totals.test.js test/learning-attempts.test.js test/registration.test.js test/upload-access.test.js
+node --test test/atomic-json.test.js test/certificate-final-project.test.js test/draft-store.test.js test/free-enrollment.test.js test/gem-totals.test.js test/learning-attempts.test.js test/registration.test.js test/upload-access.test.js
 node qa-implementation/security-checks.cjs
 node qa-implementation/workflow-checks.cjs
 node qa-implementation/browser-regression.cjs
 node qa-implementation/ui-survey.cjs
 node qa-implementation/final-checks.cjs
+node qa-implementation/free-enrollment-checks.cjs
+node qa-implementation/free-enrollment-browser.cjs
 node qa-implementation/capture-inventory.cjs
 node qa-implementation/build-deliverables.cjs
 node qa-implementation/review-artifacts.cjs

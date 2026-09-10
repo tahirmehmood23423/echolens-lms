@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T04:57:37.075Z",
+  "generated_at": "2026-09-10T09:32:00.084Z",
   "issues": {
     "FIXED AND VERIFIED": 29,
     "IMPLEMENTED, VERIFICATION BLOCKED": 5,
@@ -40,6 +40,12 @@
     },
     "final-checks": {
       "PASS": 3
+    },
+    "free-enrollment-after": {
+      "PASS": 7
+    },
+    "free-enrollment-browser": {
+      "PASS": 5
     }
   }
 }

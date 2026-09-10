@@ -1,0 +1,67 @@
+[
+  {
+    "id": "LEARNER-FREE",
+    "status": "PASS",
+    "actual": {
+      "first": 201,
+      "repeat": 200,
+      "track": "fc01-c-basics",
+      "role": "free",
+      "myCourses": 1
+    }
+  },
+  {
+    "id": "LEARNER-STUDENT",
+    "status": "PASS",
+    "actual": {
+      "first": 201,
+      "repeat": 200,
+      "track": "fc02-cpp-objects",
+      "role": "student",
+      "myCourses": 1
+    }
+  },
+  {
+    "id": "STAFF-REJECT-ADMIN",
+    "status": "PASS",
+    "actual": {
+      "post": 403,
+      "list": 403
+    }
+  },
+  {
+    "id": "STAFF-REJECT-STAFF",
+    "status": "PASS",
+    "actual": {
+      "post": 403,
+      "list": 403
+    }
+  },
+  {
+    "id": "STAFF-REJECT-INSTRUCTOR",
+    "status": "PASS",
+    "actual": {
+      "post": 403,
+      "list": 403
+    }
+  },
+  {
+    "id": "UNKNOWN-COURSE",
+    "status": "PASS",
+    "actual": {
+      "status": 400
+    }
+  },
+  {
+    "id": "NO-FINANCIAL-OR-GRADE-MUTATION",
+    "status": "PASS",
+    "actual": {
+      "financial": [
+        2,
+        1,
+        1
+      ],
+      "openSubmissions": 15
+    }
+  }
+]

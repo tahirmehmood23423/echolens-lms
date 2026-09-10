@@ -32,13 +32,17 @@ Free submissions create independent attempts with immutable work snapshots, boun
 
 Other changes include explicit profile clearing, recoverable loaders, coordinator read-only UI/chat alignment, accurate catalogue/stage copy, idempotent challenge correction deltas and unique team reward recipients. Focused UI work adds accessible shared dialogs, larger controls, concise clamped summaries, catalogue pagination/filter recovery, Continue learning, starter code, attempt history and resumable onboarding with a separate marketing preference.
 
+Free-course enrollment now uses the learner's existing account. Both the open-web **free** role and portal **student** role can select **Enroll for free**, keep their current role, and see the course with assessment progress under **My courses**. Existing free-course submissions are recognized automatically. Staff roles can preview public lesson material but cannot create or list learner enrollments. Repeated enrollment is idempotent and does not create paid enrollments, registrations, challans, grades or rewards.
+
 A local Windows write failure discovered during validation was also fixed: atomic JSON writes use a unique temporary file, writable fsync and bounded rename retry while preserving the last good file. New critical async handlers forward failures to Express error handling. This does not claim every legacy async route has been rewritten.
 
 ## Verification results
 
 | Check | Result | Evidence |
 |---|---|---|
-| Focused unit tests | 24 passed, 0 failed | [Output](evidence/unit-tests.txt): upload/session, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence |
+| Focused unit tests | 30 passed, 0 failed | Upload/session, free-course enrollment, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence |
+| Free enrollment API | 7 passed | [Results](evidence/free-enrollment-after.json): free learner and portal student, retry idempotency, three staff-role denials, unknown course and no paid/grade mutation |
+| Free enrollment browser | 5 passed | [Results](evidence/free-enrollment-browser.json): persisted My courses for both learner roles, both enrollment CTAs and staff preview without enrollment action |
 | Security API checks | 7 passed | [Results](evidence/security-after.json), [pre-fix reproduction](evidence/security-before.json) |
 | Workflow API groups | 7 passed | [Results](evidence/workflow-after.json): profile, registration-to-enrollment, free attempts/certificate, paid grading/feedback, challenge corrections, team awards, coordinator boundaries |
 | Browser regressions | 10 passed | [Results](evidence/browser-after.json): 1440/390 free draft/run/auth resume/account isolation; Settings/task route; paid draft; 503 Retry; keyboard dialog |

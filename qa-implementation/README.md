@@ -9,7 +9,7 @@ Open [implementation-report.html](implementation-report.html) for the completed 
 - [Historical data review plan](historical-data-review.html)
 - [ChatGPT design-review handoff](design-handoff.html)
 
-Results: 24 unit tests; 7 security checks; 7 workflow groups; 10 browser regressions; 3 final checks passed. The role/layout survey has 98 PASS and 2 recovered UNAVAILABLE results across 100 records. Artifact review checks local links, issue filtering and stable mobile screenshots. Syntax, whitespace, Prisma validation and client generation passed. No SQL migration or deployment was performed.
+Results: 30 unit tests; 7 security checks; 7 workflow groups; 10 browser regressions; 3 final checks; 7 free-enrollment API checks and 5 free-enrollment browser checks passed. The role/layout survey has 98 PASS and 2 recovered UNAVAILABLE results across 100 records. Artifact review checks local links, issue filtering and stable mobile screenshots. Syntax, whitespace, Prisma validation and client generation passed. No SQL migration or deployment was performed.
 
 All 10 free courses, 47 modules, 142 lessons and 142 assignments are inventoried. All 131 original unique videos report available; 128 demonstrated playback in the app's privacy-enhanced player and 3 remain UNVERIFIED. Full pedagogical coverage is separately UNVERIFIED where transcripts/inspected segments were insufficient. See the per-lesson evidence rather than inferring suitability from playback.
 

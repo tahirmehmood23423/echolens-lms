@@ -37,6 +37,7 @@
 <p>Course/lesson/practice and important dashboard views have stable destinations. Sign-in, reset and session expiry preserve a validated return path. Account/task/language drafts survive refresh and navigation, show save state, and reject stale overwrites. Browser checks demonstrate actual code output after recovery and isolate drafts across accounts.</p>
 <p>Free submissions create independent attempts with immutable work snapshots, bounded grading retries and manual admin recovery. Pending, failed and lower results preserve a previous best score/reward. Progress and certificate eligibility share the required-assessment policy: each required task passes its configured threshold, optional practice does not block, watching is not mastery, and no unconfigured final exam is added. Historical certificates/grades are preserved.</p>
 <p>Other changes include explicit profile clearing, recoverable loaders, coordinator read-only UI/chat alignment, accurate catalogue/stage copy, idempotent challenge correction deltas and unique team reward recipients. Focused UI work adds accessible shared dialogs, larger controls, concise clamped summaries, catalogue pagination/filter recovery, Continue learning, starter code, attempt history and resumable onboarding with a separate marketing preference.</p>
+<p>Free-course enrollment now uses the learner&#39;s existing account. Both the open-web <strong>free</strong> role and portal <strong>student</strong> role can select <strong>Enroll for free</strong>, keep their current role, and see the course with assessment progress under <strong>My courses</strong>. Existing free-course submissions are recognized automatically. Staff roles can preview public lesson material but cannot create or list learner enrollments. Repeated enrollment is idempotent and does not create paid enrollments, registrations, challans, grades or rewards.</p>
 <p>A local Windows write failure discovered during validation was also fixed: atomic JSON writes use a unique temporary file, writable fsync and bounded rename retry while preserving the last good file. New critical async handlers forward failures to Express error handling. This does not claim every legacy async route has been rewritten.</p>
 <h2>Verification results</h2>
 <table>
@@ -49,8 +50,18 @@
 </thead>
 <tbody><tr>
 <td>Focused unit tests</td>
-<td>24 passed, 0 failed</td>
-<td><a href="evidence/unit-tests.txt">Output</a>: upload/session, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence</td>
+<td>30 passed, 0 failed</td>
+<td>Upload/session, free-course enrollment, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence</td>
+</tr>
+<tr>
+<td>Free enrollment API</td>
+<td>7 passed</td>
+<td><a href="evidence/free-enrollment-after.json">Results</a>: free learner and portal student, retry idempotency, three staff-role denials, unknown course and no paid/grade mutation</td>
+</tr>
+<tr>
+<td>Free enrollment browser</td>
+<td>5 passed</td>
+<td><a href="evidence/free-enrollment-browser.json">Results</a>: persisted My courses for both learner roles, both enrollment CTAs and staff preview without enrollment action</td>
 </tr>
 <tr>
 <td>Security API checks</td>
@@ -143,4 +154,4 @@
 <p>PostgreSQL migrations/persistence, live mail/AI, cloud storage/talent consent, OAuth and real live-class workflows need staging integrations. One app/worker instance is required; distributed claims and concurrent snapshot persistence are not implemented. Do not label a configured provider healthy solely because a credential exists. E-04 remains partially open for image/live capability handling. Some embedded detail views and paid/staff vocabulary still need design follow-up.</p>
 <p>PATH remains unavailable until its real bundle rules are established. Full curriculum coverage, advanced runner prerequisites, the C++ mismatch, the async-generator replacement video and UNVERIFIED playback require content review. Historical duplicate registrations/rewards and certificate-policy differences need the separate approved review plan; no automatic repair was performed.</p>
 <p>See the release runbook for the exact schema-mode choice, sandbox acceptance checks and rollback constraints. The code and evidence are ready for review; deployment remains a separate instruction.</p>
-<footer>Local synthetic verification · 2026-09-10T04:57:37.075Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>
+<footer>Local synthetic verification · 2026-09-10T09:32:00.084Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>

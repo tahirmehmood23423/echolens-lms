@@ -305,11 +305,11 @@
 </tr>
 <tr>
 <td>E-01</td>
-<td>Learning destinations felt disconnected.</td>
-<td>Original public/portal review.</td>
-<td>Continue learning from student overview and clear access to free courses using shared session and stable URLs.</td>
-<td>public/js/dashboard.js; public/js/open.js</td>
-<td>Student overview screenshots and cross-portal lesson return tests.</td>
+<td>Learning destinations felt disconnected, and portal students had no saved free-course enrollment route.</td>
+<td>Original public/portal review; portal students could reach public content but free courses did not appear in My courses.</td>
+<td>Both free-account learners and portal students can enroll in published free courses with their existing account; My courses shows saved progress; staff remain preview-only.</td>
+<td>store.js; server.js; public/js/dashboard.js; public/js/open.js; test/free-enrollment.test.js</td>
+<td>Six enrollment unit tests, seven API boundary checks and five browser checks pass, including persistence after restart and staff 403.</td>
 <td>No wholesale portal consolidation; last-practice link is browser-local.</td>
 <td>FIXED AND VERIFIED</td>
 </tr>
@@ -364,4 +364,4 @@
 <td>IMPLEMENTED, VERIFICATION BLOCKED</td>
 </tr>
 </tbody></table>
-<footer>Local synthetic verification · 2026-09-10T04:57:37.075Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>
+<footer>Local synthetic verification · 2026-09-10T09:32:00.084Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>

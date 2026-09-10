@@ -207,7 +207,7 @@ function drawUserBox() {
   $('userBox').innerHTML = ME
     ? `<span class="av-sm" style="width:30px;height:30px;margin-right:9px;cursor:pointer" onclick="openProfileTab()">${ME.avatar ? `<img src="${esc(ME.avatar)}" alt="">` : esc((ME.name || '?').charAt(0).toUpperCase())}</span>
        <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
-       ${ME.role !== 'free' ? '<a class="btn btn-teal btn-sm" href="/dashboard" style="margin-right:8px">LMS Portal</a>' : ''}
+       <a class="btn btn-teal btn-sm" href="${ME.role === 'free' ? '/dashboard#view=courses' : '/dashboard'}" style="margin-right:8px">${ME.role === 'free' ? 'My courses' : 'LMS Portal'}</a>
        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`
     : `<a class="btn btn-ghost btn-sm" href="${esc(EL.loginURL())}" style="margin-right:8px" title="For enrolled students and staff">LMS Portal</a>
        <button class="btn btn-ghost btn-sm" style="margin-right:8px" onclick="gate()" title="Free account - for the compiler, free courses, events and hackathons">Sign in free</button>
@@ -694,7 +694,7 @@ async function openCourse(key, skipPush) {
   $('courseLevels').innerHTML = '';
   const d = await api('/api/public/tracks/' + encodeURIComponent(key));
   let progress = null;
-  if (ME) { try { progress = (await api('/api/open/progress?track=' + encodeURIComponent(key))).progress; } catch {} }
+  if (ME && ['free', 'student'].includes(ME.role)) { try { progress = (await api('/api/open/progress?track=' + encodeURIComponent(key))).progress; } catch {} }
   if (request !== OPEN_COURSE_REQUEST) return;
   CUR = { ...d, progress };
   // Whichever nav link you actually arrived through, a free course should
@@ -879,6 +879,25 @@ function continueLearning() {
   if (levelHasVideo(l)) openSolveVideo(l.no);
   else if ((l.problems || [])[0]) openSolve(l.no, l.problems[0].pid);
 }
+const ENROLLING_TRACKS = new Set();
+async function enrollFreeCourse(button) {
+  if (!CUR?.track.free) return;
+  if (!ME) { gate('Sign in with your existing learner account to enroll. Portal students and free-account learners can both join.'); return; }
+  if (!['free', 'student'].includes(ME.role)) { toast('Enrollment is available to learner accounts only.', true); return; }
+  const key = CUR.track.key;
+  if (ENROLLING_TRACKS.has(key)) return;
+  ENROLLING_TRACKS.add(key);
+  if (button) { button.disabled = true; button.textContent = 'Enrolling…'; }
+  try {
+    const out = await api('/api/open/enrollments', { method: 'POST', body: JSON.stringify({ track_key: key }) });
+    if (CUR?.track.key !== key) return;
+    CUR.progress = out.progress;
+    drawCourse();
+    toast('Course added to My courses.');
+    continueLearning();
+  } catch (e) { if (!e.handled) toast(EL.errorMessage(e), true); }
+  finally { ENROLLING_TRACKS.delete(key); if (button?.isConnected) { button.disabled = false; button.textContent = 'Enroll for free'; } }
+}
 function drawCourse() {
   const t = CUR.track, prog = CUR.progress;
   const cat = CATALOGUE.find((c) => c.code === t.course_code);
@@ -1062,12 +1081,13 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   }).join('');
 
   const subj = (t.title.split(':')[1] || t.title).trim();
-  const ctaAction = ME
-    ? `continueLearning()`
-    : `gate('Sign in free to start this course, track your progress and earn your certificate.')`;
-  const ctaBtnLabel = !ME ? 'Sign in free to start' : (prog && prog.passed ? 'Review the course' : prog?.attempted ? 'Continue learning' : 'Start learning');
+  const learner = ME && ['free', 'student'].includes(ME.role);
+  const ctaAction = !ME || (learner && !prog?.enrolled) ? 'enrollFreeCourse(this)' : 'continueLearning()';
+  const ctaBtnLabel = !ME ? 'Sign in to enroll' : !learner ? 'Preview lessons' : !prog?.enrolled ? 'Enroll for free' : prog.passed ? 'Review the course' : 'Continue learning';
   const ctaSub = !ME
-    ? `Start learning now and boost your programming skills with ${esc(subj)}!`
+    ? 'Use your existing portal student or free learner account. No second account is needed.'
+    : !learner ? 'Enrollment is available to learner accounts only. Staff can preview the course content.'
+    : !prog?.enrolled ? `Add ${esc(subj)} to My courses and learn at your own pace.`
     : (prog && prog.passed
       ? 'You have completed every module - your certificate has been issued.'
       : `Keep going - ${doneMods}/${modules.length} modules complete.`);
@@ -2001,8 +2021,8 @@ async function loadProfile() {
       </div>
     </div></div>
 
-    <div class="card"><div class="card-head"><h3>Free courses &amp; quests</h3><span class="s" style="color:var(--muted)">${p.tracks.length} attempted</span></div>
-      <div class="card-body tight">${p.tracks.length ? p.tracks.map(profTrackRow).join('') : `<div class="empty">No free quests attempted yet - <a href="javascript:void(0)" onclick="openTab('courses')">open a course</a>.</div>`}</div></div>
+    <div class="card"><div class="card-head"><h3>Free courses &amp; quests</h3><span class="s" style="color:var(--muted)">${p.tracks.length} joined</span></div>
+      <div class="card-body tight">${p.tracks.length ? p.tracks.map(profTrackRow).join('') : `<div class="empty">No courses joined yet - <a href="/open#free">browse free courses</a>.</div>`}</div></div>
 
     <div class="card"><div class="card-head"><h3>Hackathons</h3><span class="s" style="color:var(--muted)">${p.hackathons.length} joined</span></div>
       <div class="card-body tight">${p.hackathons.length ? p.hackathons.map(profHackRow).join('') : '<div class="empty">No hackathons joined yet.</div>'}</div></div>

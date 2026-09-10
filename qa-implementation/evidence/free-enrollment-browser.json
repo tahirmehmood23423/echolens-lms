@@ -1,0 +1,43 @@
+[
+  {
+    "id": "MY-COURSES-STUDENT",
+    "status": "PASS",
+    "actual": {
+      "title": "CS-102: Fundamentals of C++ (with Object-Oriented Programming)",
+      "href": "/open#course/fc02-cpp-objects"
+    }
+  },
+  {
+    "id": "MY-COURSES-OBSERVER",
+    "status": "PASS",
+    "actual": {
+      "title": "CS-101: Fundamentals of C",
+      "href": "/open#course/fc01-c-basics"
+    }
+  },
+  {
+    "id": "ENROLL-CTA-STUDENT",
+    "status": "PASS",
+    "actual": {
+      "track": "c-advanced",
+      "saved": true,
+      "url": "http://127.0.0.1:4318/open#course/c-advanced/lesson/1"
+    }
+  },
+  {
+    "id": "ENROLL-CTA-OBSERVER",
+    "status": "PASS",
+    "actual": {
+      "track": "cpp-advanced",
+      "saved": true,
+      "url": "http://127.0.0.1:4318/open#course/cpp-advanced/lesson/1"
+    }
+  },
+  {
+    "id": "STAFF-PREVIEW-NO-ENROLL",
+    "status": "PASS",
+    "actual": {
+      "cta": "Pass the required assessments to earn your certificate\nEnrollment is available to learner accounts only. Staff can preview the course content.\nPreview lessons"
+    }
+  }
+]

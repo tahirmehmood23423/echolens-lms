@@ -291,11 +291,11 @@
   },
   {
     "id": "E-01",
-    "original": "Learning destinations felt disconnected.",
-    "reproduction": "Original public/portal review.",
-    "fix": "Continue learning from student overview and clear access to free courses using shared session and stable URLs.",
-    "files": "public/js/dashboard.js; public/js/open.js",
-    "verification": "Student overview screenshots and cross-portal lesson return tests.",
+    "original": "Learning destinations felt disconnected, and portal students had no saved free-course enrollment route.",
+    "reproduction": "Original public/portal review; portal students could reach public content but free courses did not appear in My courses.",
+    "fix": "Both free-account learners and portal students can enroll in published free courses with their existing account; My courses shows saved progress; staff remain preview-only.",
+    "files": "store.js; server.js; public/js/dashboard.js; public/js/open.js; test/free-enrollment.test.js",
+    "verification": "Six enrollment unit tests, seven API boundary checks and five browser checks pass, including persistence after restart and staff 403.",
     "limitation": "No wholesale portal consolidation; last-practice link is browser-local.",
     "status": "FIXED AND VERIFIED"
   },

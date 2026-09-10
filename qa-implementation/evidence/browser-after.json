@@ -1,0 +1,82 @@
+[
+  {
+    "id": "DRAFT-REFRESH-1440",
+    "actual": {
+      "url": "http://127.0.0.1:4318/open#course/cs105-javascript/lesson/1/practice/1",
+      "code": "<script>console.log(\"QA DURABLE 1440\");</script>",
+      "output": "› QA DURABLE 1440\n",
+      "errors": []
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "AUTH-RESUME-1440",
+    "actual": {
+      "url": "http://127.0.0.1:4318/open#course/cs105-javascript/lesson/1/practice/1",
+      "code": "<script>console.log(\"QA DURABLE 1440\");</script>"
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "ACCOUNT-ISOLATION-1440",
+    "actual": {
+      "differentAccountCode": "<script>console.log(\"QA attempt\");</script>"
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "DRAFT-REFRESH-390",
+    "actual": {
+      "url": "http://127.0.0.1:4318/open#course/cs105-javascript/lesson/1/practice/1",
+      "code": "<script>console.log(\"QA DURABLE 390\");</script>",
+      "output": "› QA DURABLE 390\n",
+      "errors": []
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "AUTH-RESUME-390",
+    "actual": {
+      "url": "http://127.0.0.1:4318/open#course/cs105-javascript/lesson/1/practice/1",
+      "code": "<script>console.log(\"QA DURABLE 390\");</script>"
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "ACCOUNT-ISOLATION-390",
+    "actual": {
+      "differentAccountCode": "<script>console.log(\"QA attempt\");</script>"
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "DASHBOARD-ROUTE",
+    "actual": {
+      "url": "http://127.0.0.1:4318/dashboard#view=settings",
+      "active": "view-settings"
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "PAID-DRAFT",
+    "actual": {
+      "url": "http://127.0.0.1:4318/dashboard#view=task&batch=1&qid=1&pid=1",
+      "code": "print(\"QA PAID DRAFT\")"
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "ERROR-RETRY",
+    "actual": {
+      "text": "This feature is temporarily unavailable. Please try again later.\n\nRetry"
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "MODAL-FOCUS",
+    "actual": {
+      "contained": true
+    },
+    "status": "PASS"
+  }
+]

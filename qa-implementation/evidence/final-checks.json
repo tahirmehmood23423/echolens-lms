@@ -1,0 +1,27 @@
+[
+  {
+    "id": "RECOVERY-RETURN",
+    "status": "PASS",
+    "actual": {
+      "status": 200,
+      "destination": "/open#course/cs105-javascript/lesson/1/practice/1"
+    }
+  },
+  {
+    "id": "FILTER-REFRESH-BACK-FORWARD",
+    "status": "PASS",
+    "actual": {
+      "search": "python",
+      "returnedCourse": "cs104-python"
+    }
+  },
+  {
+    "id": "VIDEO-TIMESTAMP-AND-GUIDE",
+    "status": "PASS",
+    "actual": {
+      "start": 548,
+      "ratio": 1.7778172453600924,
+      "asyncGeneratorGuide": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*"
+    }
+  }
+]

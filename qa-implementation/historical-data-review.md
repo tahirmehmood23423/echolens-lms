@@ -1,0 +1,18 @@
+# Historical data review — separate from the code patch
+
+No historical student grades, certificates, registrations or ledger entries were deleted, revoked or rewritten in this task. The following work must use a read-only staging snapshot first and produce a reviewable candidate manifest before anyone approves corrections.
+
+| Candidate set | Read-only identification | Review and proposed correction |
+|---|---|---|
+| Duplicate registrations | Group by normalized email and offering; include every linked challan, clearance, enrollment and referral payout. | Select a canonical record only after checking fulfillment/payment evidence. Preserve original IDs in an alias/audit mapping; suppress duplicate follow-up. Do not automatically cancel invoices or refund money. |
+| Invalid/PATH invoices | Find unresolvable offering codes, PATH and zero-fee paid challans. | Confirm actual applicant/payment status with authorized staff. Correct configuration first; propose explicit replacement/voiding records with old document references. Never silently overwrite an issued invoice. |
+| Challenge corrections | Group ledger events by challenge/submission/user, including older unreferenced awards; compare net delta with final reviewed status. | Prepare one compensating adjustment per approved correction with actor, reason and stable reference. Ambiguous historical transitions are blocked by the new code for manual review. |
+| Team reward duplicates | Resolve historical team member aliases to unique user IDs; compare expected one award per eligible person against actual ledger entries. | Preserve original team and ledger history; propose compensating entries only for confirmed duplicate amounts. Do not silently reduce balances. |
+| Course certificate eligibility | Compare issue-time enrollment and available submission evidence with the configured requirements in force at issuance; list current-policy differences separately. | Keep certificates valid pending an explicit policy decision and learner-impact review. Offer remediation where appropriate. Current policy is not grounds for automatic retroactive revocation. |
+| Historical grades/attempts | Identify aggregate records with a successful grade and subsequent code changes, missing grading status or no attempt history. | Preserve available best grade and source evidence. Import only recoverable snapshots with a historical provenance label; never fabricate lost attempts. New lazy history snapshots do not reconstruct already overwritten work. |
+| Incorrect course gem awards | Compare course award recipient membership at award time, issuer permission and associated outcome. | Propose compensating ledger entries and record the reason; preserve legitimate later achievements. |
+| Promotional preferences | Identify contacts without explicit preference evidence and records created by mandatory contact capture. | Ask the product/privacy owner to determine the appropriate audience policy. Explicit new opt-out is respected prospectively; missing legacy consent is not converted into consent. |
+
+Candidate output should contain internal IDs, reason, current state, supporting evidence, proposed delta, reviewer and decision. Keep names/contact details out of broadly shared reports. Record before/after counts and totals, execute approved adjustments transactionally in small batches, and use stable idempotency references. A second dry run must propose no already-applied correction. Retain rollback mapping and approvals with the adjustment manifest.
+
+No production query was run to count affected historical records. The number of affected people is **UNVERIFIED** until a designated snapshot is available.

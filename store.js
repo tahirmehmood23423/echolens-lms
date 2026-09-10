@@ -51,12 +51,12 @@ const SHOWCASE_PUBLISH_GEMS = Math.max(0, Number(process.env.SHOWCASE_PUBLISH_GE
 const SHOWCASE_MAX_IMAGES = 4;
 
 const empty = () => ({
-  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0, companies: 0, audit_log: 0, showcase_posts: 0, showcase_images: 0, showcase_likes: 0, showcase_comments: 0, showcase_reports: 0, feedback: 0 },
+  seq: { users: 0, courses: 0, batches: 0, enrollments: 0, sessions: 0, lessons: 0, assignments: 0, submissions: 0, announcements: 0, gem_events: 0, challenges: 0, challenge_submissions: 0, hackathons: 0, hackathon_entries: 0, hackathon_submissions: 0, ai_reports: 0, quests: 0, quest_submissions: 0, course_messages: 0, attendance: 0, quizzes: 0, quiz_attempts: 0, certificates: 0, task_files: 0, events: 0, event_entries: 0, event_submissions: 0, event_comments: 0, leads: 0, open_submissions: 0, open_attempts: 0, registrations: 0, public_announcements: 0, chat_reads: 0, jobs: 0, job_comments: 0, discount_categories: 0, challans: 0, expenses: 0, coordinator_queries: 0, staff_groups: 0, staff_records: 0, ambassadors: 0, ambassador_gem_events: 0, ambassador_duties: 0, ambassador_duty_status: 0, ambassador_reports: 0, departments: 0, department_members: 0, department_tasks: 0, department_task_status: 0, department_announcements: 0, contracts: 0, companies: 0, audit_log: 0, showcase_posts: 0, showcase_images: 0, showcase_likes: 0, showcase_comments: 0, showcase_reports: 0, feedback: 0 },
   issued_usernames: [],
   issued_regnos: [],
   users: [], courses: [], batches: [], enrollments: [], sessions: [], lessons: [], assignments: [], submissions: [], announcements: [], gem_events: [], challenges: [], challenge_submissions: [], hackathons: [], hackathon_entries: [], hackathon_submissions: [], ai_reports: [], quests: [], quest_submissions: [], course_messages: [], chat_reads: [],
   attendance: [], quizzes: [], quiz_attempts: [], certificates: [], task_files: [],
-  events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], email_suppressions: [], open_submissions: [], registrations: [], public_announcements: [],
+  events: [], event_entries: [], event_submissions: [], event_comments: [], leads: [], email_suppressions: [], open_submissions: [], open_attempts: [], registrations: [], public_announcements: [],
   jobs: [], job_comments: [],
   discount_categories: [], challans: [], expenses: [], coordinator_queries: [], staff_groups: [], staff_records: [], ambassadors: [],
   ambassador_gem_events: [], ambassador_duties: [], ambassador_duty_status: [], ambassador_reports: [],
@@ -742,9 +742,7 @@ function save() {
     });
     return;
   }
-  const tmp = DB_PATH + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
-  fs.renameSync(tmp, DB_PATH);
+  require('./atomic-json').atomicJson(DB_PATH,data);
 }
 function nextId(t) { data.seq[t] += 1; return data.seq[t]; }
 function now() { return new Date().toISOString().replace('T', ' ').slice(0, 19); }
@@ -1056,7 +1054,7 @@ const Users = {
   // Institute-grade profile fields. Students and staff share the base set;
   // staff get professional fields on top. Unknown keys are dropped.
   PROFILE_FIELDS: {
-    base: ['phone', 'whatsapp', 'dob', 'gender', 'cnic', 'father_name', 'address', 'city', 'education', 'institute', 'university_reg_no', 'emergency_contact', 'goal', 'links'],
+    base: ['marketing_opt_in', 'phone', 'whatsapp', 'dob', 'gender', 'cnic', 'father_name', 'address', 'city', 'education', 'institute', 'university_reg_no', 'emergency_contact', 'goal', 'links'],
     staff: ['designation', 'qualification', 'expertise', 'experience_years', 'joining_date', 'office_hours'],
   },
   updateProfile(id, profile) {
@@ -1644,12 +1642,14 @@ const Challenges = {
   review(sid, { approve, remarks, gems }, by) {
     const s = data.challenge_submissions.find((x) => x.id === Number(sid)); if (!s) return null;
     const c = Challenges.byId(s.challenge_id) || {};
-    const already = s.status === 'approved';
-    s.status = approve ? 'approved' : 'rejected';
-    s.remarks = remarks || null; s.reviewed_at = now(); s.reviewed_by = by;
-    if (approve && !already) {
-      GemEvents.create({ user_id: s.user_id, batch_id: null, amount: Math.round(Number(gems) || c.gems || 50), source: 'challenge', note: `Challenge: ${c.title || ''}`.trim(), by });
-    }
+    const ledger=data.gem_events.filter(e=>e.user_id===s.user_id&&e.reference_type==='challenge_review'&&String(e.reference_id).startsWith(s.id+':'));
+    const legacy=data.gem_events.filter(e=>e.user_id===s.user_id&&e.source==='challenge'&&!e.reference_type&&e.note===('Challenge: '+(c.title||'')).trim());
+    if(legacy.length)return {error:'Historical rewards for this challenge need a ledger review before changing the decision.'};
+    const target=approve?Math.round(Number(gems??c.gems??50)):0;
+    if(!Number.isFinite(target)||target<0||target>500)return {error:'Challenge rewards must be between 0 and 500 gems.'};
+    const delta=target-ledger.reduce((sum,e)=>sum+e.amount,0);
+    if(delta)GemEvents.create({user_id:s.user_id,amount:delta,source:'challenge',note:(approve?'Approved':'Reversed')+' challenge #'+c.id+': '+(remarks||c.title||''),by,reference_type:'challenge_review',reference_id:s.id+':'+(ledger.length+1)});
+    s.status=approve?'approved':'rejected';s.remarks=remarks||null;s.reviewed_at=now();s.reviewed_by=by;
     save();
     return s;
   },
@@ -1706,14 +1706,17 @@ const Hackathons = {
     const member_ids = [user.id];
     const resolved = [], missing = [];
     if (h.mode === 'team') {
-      for (const raw of (member_regs || []).slice(0, h.team_max - 1)) {
+      for (const raw of (member_regs || [])) {
         const m = Users.byLogin(String(raw).trim());
+        if (m && member_ids.includes(m.id)) return {error:'Each team member can be listed only once, including the captain.'};
         if (m && ['student', 'free'].includes(m.role) && m.id !== user.id) {
           if (Hackathons.entryFor(h.id, m.id)) return { error: `${m.name} is already on another team for this event.` };
           member_ids.push(m.id); resolved.push(m.name);
         } else if (String(raw).trim()) missing.push(String(raw).trim());
       }
     }
+    if (missing.length) return {error:'These learner accounts were not found: '+missing.join(', ')};
+    if (member_ids.length > h.team_max) return {error:'This team exceeds the event team-size limit.'};
     if (h.entry === 'paid' && !String(payment_ref || '').trim()) return { error: 'A payment reference is required for this paid event.' };
     const e = {
       id: nextId('hackathon_entries'), hackathon_id: h.id,
@@ -1765,11 +1768,13 @@ const Hackathons = {
     const board = Hackathons.board(hid).filter((s) => s.score != null);
     if (!board.length) return { error: 'Score at least one submission before finalizing.' };
     const prizes = [h.prizes.first, h.prizes.second, h.prizes.third];
-    const winners = [];
+    const winners = [], awarded = new Set();
     board.slice(0, 3).forEach((s, i) => {
       const e = data.hackathon_entries.find((x) => x.id === s.entry_id);
-      for (const uid of e.member_ids) {
-        GemEvents.create({ user_id: uid, batch_id: null, amount: prizes[i], source: 'hackathon', note: `#${i + 1} in ${h.title}`, by });
+      for (const uid of new Set(e.member_ids)) {
+        if(awarded.has(uid))continue;awarded.add(uid);
+        if(data.gem_events.some(g=>g.user_id===uid&&g.reference_type==='hackathon_prize'&&g.reference_id===String(h.id)))continue;
+        GemEvents.create({ user_id: uid, batch_id: null, amount: prizes[i], source: 'hackathon', note: `#${i + 1} in ${h.title}`, by, reference_type:'hackathon_prize',reference_id:String(h.id) });
       }
       winners.push({ rank: i + 1, team: e.team_name, gems_each: prizes[i] });
     });
@@ -1820,6 +1825,7 @@ const TRACKS = {};
   // earlier thin stubs for the same keys (python-6w, sc02/sc03/sc06/sc07).
   const all = [require('./tracks/python'), ...require('./tracks/bootcamps'), ...require('./tracks/short-courses'), ...require('./tracks/specialist'), ...require('./tracks/august-2026'), ...require('./tracks/short-courses-full'), ...require('./tracks/free-micro'), ...require('./tracks/cs-fundamentals'), ...require('./tracks/design-3d'), ...require('./tracks/curriculum-advanced-combined')];
   for (const t of all) {
+    for(const l of t.levels)l.problems.forEach((p,i)=>{if(p.pid==null)p.pid=i+1;});
     // Normalize: compute title thresholds from total points if only names given.
     const total = t.levels.reduce((s1, l) => s1 + l.problems.reduce((s2, p) => s2 + (p.points || 100), 0), 0);
     if (!t.titles && Array.isArray(t.titleNames)) {
@@ -1827,6 +1833,7 @@ const TRACKS = {};
       t.titles = t.titleNames.map((name, i) => ({ name, min: Math.round(total * (fr[i] ?? (i / t.titleNames.length)) / 10) * 10 }));
     }
     t.pass_mark = t.pass_mark || 60;
+    require('./tracks/content-corrections')(t);
     t.total_points = total;
     TRACKS[t.key] = t;
   }
@@ -1974,7 +1981,7 @@ const Quests = {
     let title = t.titles[0], nextTitle = null;
     for (let i = 0; i < t.titles.length; i++) if (gems >= t.titles[i].min) { title = t.titles[i]; nextTitle = t.titles[i + 1] || null; }
     return {
-      track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, titles: t.titles, end_project: t.end_project || null },
+      track: { key: t.key, title: t.title, description: t.description, pass_mark: t.pass_mark, titles: t.titles, end_project: t.end_project || null, default_language: t.default_language || 'python' },
       levels: levels.map((l) => ({ ...l, unlocked: l.quest.no <= unlockedUpTo })),
       unlocked_up_to: Math.min(unlockedUpTo, quests.length),
       gems, title: title.name, next_title: nextTitle,
@@ -2369,6 +2376,7 @@ function catalogueFee(code, fallbackCourse) {
   if (c) return Number(c.price_pkr) || 0;
   return fallbackCourse ? Number(fallbackCourse.price_pkr) || 0 : 0;
 }
+function resolveOffering(code) { return require('./offering-policy').resolveOffering(code, OFFICIAL_CATALOGUE, data.courses); }
 function loadOfficialCatalogue() {
   let added = 0;
   for (const c of OFFICIAL_CATALOGUE) {
@@ -2547,17 +2555,8 @@ const Certificates = {
   },
   issue({ user_id, batch_id, kind, title, completion_date, detail, instructor_id, issued_by, concepts, final_project, source_kind, source_id, partner, deferSave }) {
     const u = Users.byId(user_id); if (!u) return { error: 'Student not found.' };
-    // v18: when the caller knows the exact source (a specific event id or
-    // track key), replace-on-reissue is scoped to THAT source - so a new
-    // event that merely shares a title with an old one gets its own fresh
-    // certificate instead of silently colliding with the old one. Manual
-    // issuance (no source given, e.g. a batch course certificate) keeps the
-    // original one-per-title-per-student behaviour.
-    if (source_kind && source_id != null) {
-      data.certificates = data.certificates.filter((c) => !(c.user_id === u.id && c.source_kind === source_kind && String(c.source_id) === String(source_id)));
-    } else {
-      data.certificates = data.certificates.filter((c) => !(c.user_id === u.id && c.title === title));
-    }
+    const existing = data.certificates.find(c => c.user_id === u.id && (source_kind && source_id != null ? c.source_kind === source_kind && String(c.source_id) === String(source_id) : c.title === title && c.batch_id === (batch_id ? Number(batch_id) : null)));
+    if (existing) return {ok:true,cert:existing,existing:true};
     const instructor = instructor_id ? Users.byId(instructor_id) : null;
     const cert = {
       id: nextId('certificates'), serial: Certificates.serial(),
@@ -3624,7 +3623,7 @@ const Leads = {
       'noreply@echolens.digital', 'no-reply@echolens.digital', 'support@echolens.digital',
     ]);
     const STAFF_ROLES = new Set(['admin', 'instructor', 'teacher', 'coordinator', 'staff', 'hr', 'ambassador', 'recruiter', 'finance']);
-    for (const u of data.users) if (u.email && STAFF_ROLES.has(u.role)) BLOCK.add(u.email.toLowerCase());
+    for (const u of data.users) if (u.email && (STAFF_ROLES.has(u.role) || u.profile?.marketing_opt_in==='no')) BLOCK.add(u.email.toLowerCase());
     const ok = (em) => em && !BLOCK.has(em);
     const emails = new Set();
     for (const u of data.users) {
@@ -3929,12 +3928,14 @@ const Analytics = {
  * completing a fully free track above its pass mark - receive an automatic
  * verified certificate.
  */
+const { completion: freeCompletion, createAttempts } = require('./learning-attempts');
+const OpenAttempts = createAttempts({getData:()=>data,nextId,save,tracks:TRACKS,now});
 const OpenQuest = {
   key(track_key, level, pid) { return `${track_key}:${level}:${pid}`; },
   find(uid, track_key, level, pid) {
     return data.open_submissions.find((s) => s.user_id === Number(uid) && s.track_key === track_key && s.level === Number(level) && s.pid === Number(pid)) || null;
   },
-  submit({ user, track_key, level, pid, code, language, file_url, file_name, files }) {
+  submit({ user, track_key, level, pid, code, language, file_url, file_name, files, request_key, fingerprint }) {
     const t = TRACKS[track_key];
     if (!t) return { error: 'Course not found.' };
     const lvl = t.levels.find((l) => l.no === Number(level));
@@ -3942,7 +3943,7 @@ const OpenQuest = {
     // Paid programs open only the first quest (one level); free programs open all.
     const openN = t.free ? t.levels.length : Number(process.env.OPEN_LEVELS || 1);
     if (Number(level) > openN) return { error: 'This level is locked - register for the course to unlock it.' };
-    const pr = lvl.problems.find((p) => p.pid === Number(pid) || lvl.problems.indexOf(p) + 1 === Number(pid));
+    const pr = lvl.problems.find((p) => p.pid === Number(pid));
     if (!pr) return { error: 'Task not found.' };
     if (!code && !file_url) return { error: 'Submit your code or upload your work as a file.' };
     let s = OpenQuest.find(user.id, track_key, level, pid);
@@ -3953,34 +3954,22 @@ const OpenQuest = {
       files: Array.isArray(files) && files.length ? files : null, // extra files beyond the first (multi-file courses)
       submitted_at: now(),
     };
-    if (s) { s.attempts = (s.attempts || 1) + 1; Object.assign(s, fields, { score: null, gems: 0, feedback: null, graded_at: null }); }
-    else {
+    if (!s) {
       s = { id: nextId('open_submissions'), user_id: user.id, track_key, level: Number(level), pid: Number(pid),
             problem_title: pr.title, points: pr.points || 100, ...fields, score: null, gems: 0, feedback: null, graded_at: null, attempts: 1 };
       data.open_submissions.push(s);
     }
+    const result = OpenAttempts.create(s,fields,pr,request_key,fingerprint);
+    if (result.error) return result;
     save();
-    return { submission: s, problem: pr, track: t };
-  },
-  applyGrade(sid, aiScore, feedback) {
-    const s = data.open_submissions.find((x) => x.id === Number(sid)); if (!s) return null;
-    const t = TRACKS[s.track_key];
-    const raw = Math.max(0, Math.min(100, Number(aiScore) || 0));
-    // Standard 10% reduction, except for tracks flagged friendly_grading
-    // (the 5 free fundamentals tracks - see tracks/free-micro.js and
-    // tracks/cs-fundamentals.js) - a first-timer's first working program
-    // shouldn't come with a built-in penalty attached.
-    s.score = (t && t.friendly_grading) ? Math.round(raw) : Math.round(raw * 0.9);
-    s.gems = Math.round((s.score / 100) * (s.points || 100));
-    s.feedback = String(feedback || '').slice(0, 1500) || null;
-    s.graded_at = now(); save();
-    return s;
+    return { submission:s,problem:pr,track:t,...result };
   },
   progress(uid, track_key) {
     const t = TRACKS[track_key]; if (!t) return null;
     const mine = data.open_submissions.filter((s) => s.user_id === Number(uid) && s.track_key === track_key);
     const byKey = {};
-    for (const s of mine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, file_name: s.file_name, has_code: !!s.code, attempts: s.attempts || 1 };
+    const policy = freeCompletion(t,mine);
+    for (const s of mine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, file_name: s.file_name, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public) };
     const totalProblems = t.levels.reduce((a, l) => a + l.problems.length, 0);
     const graded = mine.filter((s) => s.score != null);
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;
@@ -3988,8 +3977,7 @@ const OpenQuest = {
       submissions: byKey,
       gems: mine.reduce((a, s) => a + (s.gems || 0), 0),
       attempted: mine.length, graded: graded.length, total: totalProblems, avg,
-      complete: graded.length >= totalProblems,
-      passed: graded.length >= totalProblems && avg != null && avg >= (t.pass_mark || 60),
+      complete: policy.passed, ...policy,
     };
   },
   // Fully free tracks issue an automatic verified certificate on completion.
@@ -4020,21 +4008,36 @@ const OpenQuest = {
  * to a course - plus notes, purely for the academy's records.
  */
 const Registrations = {
+  find(email, code) { return data.registrations.find(r => String(r.email).trim().toLowerCase() === String(email).trim().toLowerCase() && String(r.course_code).toUpperCase() === String(code).trim().toUpperCase()) || null; },
+  receiptToken(r) {
+    if (!r.status.receipt_token) { r.status.receipt_token = crypto.randomBytes(32).toString('hex'); save(); }
+    return r.status.receipt_token;
+  },
+  byReceipt(token) { return typeof token === 'string' && /^[a-f0-9]{64}$/.test(token) ? data.registrations.find(r => r.status?.receipt_token === token) || null : null; },
+  delivery(id, state, details = {}, kind = 'challan') {
+    const r = Registrations.byId(id); if (!r) return null;
+    const key = kind === 'challan' ? 'delivery' : 'confirmation_delivery';
+    r.status[key] = { state, at: now(), ...details }; r.updated_at = now(); save(); return r.status[key];
+  },
   create(b) {
+    const resolved = resolveOffering(b.course_code);
+    if (resolved.error) throw new Error(resolved.error);
+    const previous = Registrations.find(b.email, resolved.offer.code);
+    if (previous) return previous;
     const r = {
       id: nextId('registrations'),
       name: String(b.name || '').slice(0, 120),
-      email: String(b.email || '').slice(0, 200).toLowerCase(),
+      email: String(b.email || '').trim().slice(0, 200).toLowerCase(),
       whatsapp: String(b.whatsapp || '').slice(0, 40),
       city: String(b.city || '').slice(0, 80) || null,
-      course_code: String(b.course_code || '').slice(0, 12) || null,
-      course_title: String(b.course_title || '').slice(0, 200) || null,
+      course_code: resolved.offer.code,
+      course_title: resolved.offer.title,
       note: String(b.note || '').slice(0, 600) || null,
       // Ambassador referral: a valid 4-digit code (validated by the server)
       // records who referred the student and pre-attaches the 10% discount.
       ambassador_code: String(b.ambassador_code || '').slice(0, 4) || null,
       ambassador_name: b.ambassador_name ? String(b.ambassador_name).slice(0, 120) : null,
-      status: { contacted: false, challan_sent: false, added_to_course: false },
+      status: { contacted: false, challan_sent: false, added_to_course: false, dedup_guard: 'v1', receipt_token: crypto.randomBytes(32).toString('hex'), request_key: /^[a-zA-Z0-9-]{16,80}$/.test(String(b.request_key || '')) ? b.request_key : null },
       admin_note: null,
       // v17: registration -> challan -> payment -> enrollment pipeline.
       discount_category_id: b.discount_category_id || null, challan_serial: null, payment_stage: 'new',
@@ -4133,8 +4136,12 @@ const Challans = {
   },
   generate({ registration_id, discount_category_id, deadline, generated_by }) {
     const r = Registrations.byId(registration_id); if (!r) return { error: 'Registration not found.' };
+    const resolved = resolveOffering(r.course_code);
+    if (resolved.error) return { error: resolved.error };
+    const existing = r.challan_serial && Challans.bySerial(r.challan_serial);
+    if (existing) return { ok: true, challan: existing, existing: true };
     const course = Courses.byCode(r.course_code);
-    const gross = catalogueFee(r.course_code, course);
+    const gross = resolved.offer.price_pkr;
     // An ambassador referral attached at registration always applies on its
     // own; any other discount the Admissions Office picks stacks on top.
     // Both are computed on the gross fee and snapshotted onto the challan.
@@ -4183,6 +4190,7 @@ const Challans = {
   },
   markPaid(serial, by) {
     const c = Challans.bySerial(serial); if (!c) return null;
+    if(c.status==='paid')return c;
     c.status = 'paid'; c.paid_confirmed_by = by; c.paid_confirmed_at = now(); save();
     Registrations._setStage(c.registration_id, 'paid_cleared', { cleared_by: by, cleared_at: now() });
     return c;
@@ -4819,12 +4827,12 @@ module.exports = {
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
-  Events, Leads, Suppressions, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase, Feedback,
+  Events, Leads, Suppressions, Analytics, OpenQuest, OpenAttempts, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase, Feedback,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
   Companies, AuditLog,
-  seed, DB_PATH, allData: () => data,
+  seed, DB_PATH, allData: () => data, resolveOffering,
   initFromPostgres, pendingPersist, flushHealth,
   isUsingPostgres: () => db.enabled(),
   // Exported for direct testing (see the Batch 2 test harness); not

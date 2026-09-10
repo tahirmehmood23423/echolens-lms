@@ -1,0 +1,46 @@
+'use strict';
+const crypto = require('node:crypto');
+const MAX_TRIES = 3;
+function completion(track, submissions) {
+  const required = track.levels.flatMap(l => l.problems.filter(p => p.required !== false && p.optional !== true).map(p => ({ level:l.no, pid:p.pid, pass_mark:Number(p.pass_mark ?? track.pass_mark ?? 60) })));
+  const results = required.map(p => ({...p, passed:submissions.some(s => s.level === p.level && s.pid === p.pid && s.score != null && s.score >= p.pass_mark)}));
+  return {required_total:required.length,required_passed:results.filter(p=>p.passed).length,requirements:results,passed:required.length>0 && results.every(p=>p.passed)};
+}
+// getData is intentional: Postgres hydration replaces the store object at boot.
+function createAttempts({getData,nextId,save,tracks,now=()=>new Date().toISOString()}) {
+  const rows=()=>getData().open_attempts;
+  const byId=id=>rows().find(a=>a.id===Number(id));
+  const update=(a,fields)=>{Object.assign(a,fields,{updated_at:now()});save();return a;};
+  const api={
+    byId,
+    list(uid,track,level,pid){return rows().filter(a=>a.user_id===Number(uid)&&a.track_key===track&&(level==null||a.level===Number(level))&&(pid==null||a.pid===Number(pid))).sort((a,b)=>b.id-a.id);},
+    create(sub,fields,problem,requestKey,fingerprint){
+      const key=requestKey||crypto.randomUUID();
+      if(!/^[\w-]{16,80}$/.test(key))return {error:'Invalid submission request key.'};
+      const existing=rows().find(a=>a.user_id===sub.user_id&&a.request_key===key);
+      if(existing)return existing.payload.fingerprint===fingerprint?{attempt:existing,existing:true}:{error:'This request key belongs to different work. Refresh and submit again.',status:409};
+      if(sub.score!=null&&!rows().some(a=>a.submission_id===sub.id)){
+        rows().push({id:nextId('open_attempts'),user_id:sub.user_id,submission_id:sub.id,request_key:'historical-'+crypto.randomUUID(),track_key:sub.track_key,level:sub.level,pid:sub.pid,status:'completed',payload:{code:sub.code,language:sub.language,file_url:sub.file_url,file_name:sub.file_name,files:sub.files,score:sub.score,gems:sub.gems,feedback:sub.feedback,graded_at:sub.graded_at,historical:true,tries:0},created_at:sub.submitted_at,updated_at:now()});
+      }
+      const a={id:nextId('open_attempts'),user_id:sub.user_id,submission_id:sub.id,request_key:key,track_key:sub.track_key,level:sub.level,pid:sub.pid,status:'queued',payload:{...fields,problem:JSON.parse(JSON.stringify(problem)),fingerprint,tries:0},created_at:now(),updated_at:now()};
+      rows().push(a);sub.attempts=rows().filter(x=>x.submission_id===sub.id).length;save();return {attempt:a};
+    },
+    due(){const time=Date.parse(now());return rows().find(a=>a.status==='queued'&&(!a.payload.retry_at||Date.parse(a.payload.retry_at)<=time));},
+    recover(){for(const a of rows())if(a.status==='processing')api.fail(a.id,'Grading was interrupted. Your work is saved.',true);},
+    start(id){const a=byId(id);if(!a||a.status!=='queued')return null;a.payload.tries++;a.payload.started_at=now();return update(a,{status:'processing'});},
+    fail(id,message,retryable=false){const a=byId(id);if(!a||a.status==='completed')return a;a.payload.error=message;a.payload.retry_at=retryable&&a.payload.tries<MAX_TRIES?new Date(Date.parse(now())+1000*2**a.payload.tries).toISOString():null;return update(a,{status:a.payload.retry_at?'queued':'failed'});},
+    retry(id,uid){const a=byId(id);if(!a||a.user_id!==Number(uid))return {error:'Attempt not found.',status:404};if(a.status!=='failed')return {error:'Only failed attempts can be retried.',status:409};if(a.payload.tries>=MAX_TRIES)return {error:'Automatic retry limit reached. Request staff review or submit a new attempt.',status:409};a.payload.error=null;a.payload.retry_at=null;return {attempt:update(a,{status:'queued'})};},
+    complete(id,score,feedback,grader='ai'){
+      const a=byId(id);if(!a)return null;if(a.status==='completed')return a;
+      if(!Number.isFinite(Number(score))||Number(score)<0||Number(score)>100)throw new Error('Invalid grader score');
+      const sub=getData().open_submissions.find(s=>s.id===a.submission_id);if(!sub)throw new Error('Missing submission');
+      const raw=Number(score),effective=grader==='ai'&&!tracks[a.track_key]?.friendly_grading?Math.round(raw*.9):Math.round(raw);
+      Object.assign(a.payload,{score:effective,gems:Math.round(effective/100*sub.points),feedback:String(feedback||'').slice(0,4000),graded_at:now(),graded_by:grader,error:null,retry_at:null});
+      // A later failed or lower-scoring attempt never destroys a successful result.
+      if(sub.score==null||effective>sub.score)Object.assign(sub,{code:a.payload.code,language:a.payload.language,file_url:a.payload.file_url,file_name:a.payload.file_name,files:a.payload.files,submitted_at:a.created_at,score:effective,gems:a.payload.gems,feedback:a.payload.feedback,graded_at:a.payload.graded_at});
+      return update(a,{status:'completed'});
+    },
+    public(a){return {...a,payload:{...a.payload,problem:undefined,fingerprint:undefined},can_retry:a.status==='failed'&&a.payload.tries<MAX_TRIES};},
+  };return api;
+}
+module.exports={completion,createAttempts,MAX_TRIES};

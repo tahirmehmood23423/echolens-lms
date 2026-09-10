@@ -1,5 +1,6 @@
 'use strict';
 const $ = (id) => document.getElementById(id);
+const destination = role => EL.safeReturn(new URLSearchParams(location.search).get('returnTo'), role === 'free' ? '/open#free' : '/dashboard');
 async function api(path, opts = {}) {
   const res = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json().catch(() => ({}));
@@ -15,14 +16,14 @@ function msg(text, ok) {
 // Already signed in? Go straight to the dashboard.
 // Already signed in? Route by role: open (free) accounts live on the open
 // portal, everyone else on the LMS portal.
-(async () => { try { const me = await api('/api/auth/me'); location.href = me.role === 'free' ? '/open' : '/dashboard'; } catch {} })();
+(async () => { try { const me = await api('/api/auth/me'); location.href = destination(me.role); } catch {} })();
 
 $('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target; const btn = $('submit'); btn.disabled = true; msg('');
   try {
     const out = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ login: f.login.value.trim(), password: f.password.value }) });
-    location.href = out.role === 'free' ? '/open' : '/dashboard';
+    location.href = destination(out.role);
   } catch (err) { msg(err.message); btn.disabled = false; }
 });
 
@@ -37,7 +38,7 @@ $('forgotForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target; const btn = $('forgotSubmit'); btn.disabled = true; msg('');
   try {
-    const out = await api('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email: f.email.value.trim() }) });
+    const out = await api('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email: f.email.value.trim(),returnTo:destination('free') }) });
     msg(out.dev_link ? `${out.message} ${out.dev_link}` : out.message, true);
   } catch (err) { msg(err.message); }
   btn.disabled = false;

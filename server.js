@@ -29,6 +29,9 @@ const { ambassadorReportPdf } = require('./ambassador-report-pdf');
 const { analyticsReportPdf } = require('./analytics-report-pdf');
 const { generateContractPdf } = require('./contract-pdf');
 const { generateOfferLetterPdf } = require('./offer-letter-pdf');
+const { sessionVersion, validSession, safeReturnPath } = require('./session-security');
+const uploadAccess = require('./upload-access');
+const { deliverRegistrationMail } = require('./registration-delivery');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue, catalogueFee,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
@@ -92,7 +95,7 @@ fs.mkdirSync(CONTRACTS_DIR, { recursive: true });
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')),
+    filename: (req, file, cb) => cb(null, crypto.randomUUID() + '-' + file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')),
   }),
   limits: { fileSize: 50 * 1024 * 1024 },
 });
@@ -247,9 +250,9 @@ app.use((req, res, next) => {
 });
 
 /* ------------------------------ auth helpers ------------------------------ */
-const sign = (u) => jwt.sign({ id: u.id, role: u.role, name: u.name }, JWT_SECRET, { expiresIn: '7d' });
+const sign = (u) => jwt.sign({ id: u.id, role: u.role, name: u.name, sv: sessionVersion(u, JWT_SECRET) }, JWT_SECRET, { expiresIn: '7d' });
 function setAuthCookie(res, token) { res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: isProd, maxAge: 7 * 24 * 60 * 60 * 1000 }); }
-function currentUser(req) { const t = req.cookies[COOKIE]; if (!t) return null; try { return Users.byId(jwt.verify(t, JWT_SECRET).id); } catch { return null; } }
+function currentUser(req) { const t = req.cookies[COOKIE]; if (!t) return null; try { const payload = jwt.verify(t, JWT_SECRET); const user = Users.byId(payload.id); return validSession(payload, user, JWT_SECRET) ? user : null; } catch { return null; } }
 // A deactivated ambassador (HR "removed" them via DELETE /api/hr/ambassadors/:id,
 // which deactivates rather than deletes - see store.js's Ambassadors.setActive)
 // keeps their `users` row, so a still-valid 7-day session cookie would
@@ -449,7 +452,7 @@ app.post('/api/auth/forgot-password', limitEmailSend, async (req, res) => {
   const u = Users.allByLogin(String(email).trim()).find((x) => x.role === 'free') || null;
   if (!u) return res.json({ ok: true, message: genericMsg });
   const token = crypto.randomBytes(24).toString('hex');
-  RESET_TOKENS.set(token, { userId: u.id, expires: Date.now() + 30 * 60000 });
+  RESET_TOKENS.set(token, { userId: u.id, expires: Date.now() + 30 * 60000, return_to:safeReturnPath(req.body.returnTo,APP_URL,'/open#free') });
   const link = `${APP_URL}/reset-password?token=${token}`;
   if (mailer.configured) {
     mailer.notify(u.email, 'Reset your EchoLens password',
@@ -476,7 +479,7 @@ app.post('/api/auth/reset-password', (req, res) => {
   Users.setPassword(u.id, String(password));
   RESET_TOKENS.delete(String(token));
   setAuthCookie(res, sign(u));
-  res.json({ ok: true, role: u.role });
+  res.json({ ok: true, role: u.role, return_to:rec.return_to||'/open#free' });
 });
 
 /* ---------------------------------- me ---------------------------------- */
@@ -489,29 +492,30 @@ app.post('/api/me/password', authRequired, (req, res) => {
     return res.status(400).json({ error: 'Current password is incorrect.' });
   }
   Users.setPassword(req.user.id, String(next));
+  setAuthCookie(res, sign(Users.byId(req.user.id)));
   res.json({ ok: true });
 });
 app.post('/api/me/profile', authRequired, (req, res) => {
   const clean = {};
   for (const [k, v] of Object.entries(req.body || {})) {
-    if (typeof v === 'string' && v.trim() && k.length < 40) clean[k.slice(0, 40)] = v.trim().slice(0, 300);
+    if ((typeof v === 'string' || v === null) && k.length < 40) clean[k] = String(v ?? '').trim().slice(0, 300);
   }
-  Users.updateProfile(req.user.id, clean);
-  res.json({ ok: true });
+  const updated = Users.updateProfile(req.user.id, clean);
+  res.json({ ok: true, profile:updated.profile });
 });
 
 /* v16: admin portal - real system health checks (no fake "all green"). Each
  * check inspects an actual resource this process depends on. */
 function systemHealth() {
-  const checks = [{ name: 'Web Server', ok: true, detail: `Responding &middot; up ${Math.round(process.uptime() / 60)}m` }];
+  const checks = [{ name: 'Web Server', ok: true, detail: `Responding ? up ${Math.round(process.uptime() / 60)}m` }];
   let dbOk = true; try { fs.accessSync(store.DB_PATH, fs.constants.R_OK | fs.constants.W_OK); } catch { dbOk = false; }
-  checks.push({ name: 'Database', ok: dbOk, detail: dbOk ? 'Read/write OK' : 'Database file not accessible' });
+  checks.push({ name: 'Database', ok: db.enabled() ? store.flushHealth().consecutiveFlushFailures===0 : dbOk, status:db.enabled()?'configured':'test_mode', detail:db.enabled()?'PostgreSQL connected at startup; see flush status below.':'Local JSON store; PostgreSQL integration is not active.' });
   let storageOk = true; try { fs.accessSync(UPLOAD_DIR, fs.constants.R_OK | fs.constants.W_OK); } catch { storageOk = false; }
   checks.push({ name: 'Storage', ok: storageOk, detail: storageOk ? 'Uploads folder writable' : 'Uploads folder not writable' });
-  checks.push({ name: 'Email Service', ok: mailer.configured, detail: mailer.configured ? 'SMTP configured' : 'SMTP not configured - emails are logged only' });
+  checks.push({ name: 'Email Service', ok: mailer.configured, status:mailer.configured?'configured':'disabled', detail: mailer.configured ? 'SMTP configured' : 'SMTP not configured - emails are logged only' });
   const mailStatus = mailer.status();
   checks.push({
-    name: 'Bulk Mail (outreach)',
+    name: 'Bulk Mail (outreach)', status:mailStatus.bulk.dryRun?'test_mode':mailStatus.bulk.configured?'configured':'disabled',
     ok: mailStatus.bulk.configured || mailStatus.bulk.dryRun,
     detail: mailStatus.bulk.dryRun
       ? `DRY RUN - blasts are logged, not sent (MAIL_DRY_RUN). Provider: ${mailStatus.bulk.provider || 'none'}${mailStatus.bulk.configured ? ', configured' : ', NOT configured'}`
@@ -556,6 +560,7 @@ function systemHealth() {
       : `${fh.consecutiveFlushFailures} consecutive failure(s) - persistence may be wedged. Last: ${fh.lastFailure?.collection || '?'} (${fh.lastFailure?.code || 'unknown'})`;
     checks.push({ name: 'Postgres Flush', ok, detail, flush: fh });
   }
+  checks.push({name:'Automated grading',ok:ai.enabled(),status:ai.enabled()?'configured':'disabled',detail:ai.enabled()?'Provider configured; check attempt outcomes for delivery.':'Unavailable; saved attempts can be reviewed by an administrator.'});
   return checks;
 }
 
@@ -1590,7 +1595,7 @@ app.get('/api/my/resources', authRequired, (req, res) => {
 app.post('/api/batches/:id/award', authRequired, manageBatch, (req, res) => {
   const { user_id, amount, reason } = req.body || {};
   const target = Users.byId(user_id);
-  if (!target || target.role !== 'student') return res.status(400).json({ error: 'Choose a student on this course.' });
+  if (!target || target.role !== 'student' || !Enrollments.all().some(e => e.user_id === target.id && e.batch_id === req.batch.id)) return res.status(400).json({ error: 'Choose a student enrolled on this course.' });
   const amt = Math.round(Number(amount));
   if (!amt || amt < 1 || amt > 200) return res.status(400).json({ error: 'Award between 1 and 200 gems.' });
   const ev = GemEvents.create({ user_id: target.id, batch_id: req.batch.id, amount: amt, source: 'award', note: (reason || '').slice(0, 200) || 'Teacher award', by: req.user.id });
@@ -1613,10 +1618,12 @@ app.get('/api/batches/:id/chat', authRequired, viewBatch, (req, res) => {
     messages: Chat.forBatch(req.batch.id, req.user),
     my_alias: ['student', 'free'].includes(req.user.role) ? Chat.myAlias(req.user.id, req.batch.id) : null,
     can_moderate: canManageBatch(req.user, req.batch) || req.user.role === 'admin',
+    can_post:req.user.role!=='coordinator',
     members: chatMembers(req.batch), // for @-tagging
   });
 });
 app.post('/api/batches/:id/chat', authRequired, viewBatch, (req, res) => {
+  if(req.user.role==='coordinator')return res.status(403).json({error:'Coordinators have read-only course access.'});
   const body = String((req.body || {}).body || '').trim();
   if (!body) return res.status(400).json({ error: 'Write a message first.' });
   if (body.length > 2000) return res.status(400).json({ error: 'Keep messages under 2000 characters.' });
@@ -1723,9 +1730,9 @@ app.get('/api/auth/providers', (req, res) => res.json({ google: !!(G_ID && G_SEC
 
 app.get('/auth/google', (req, res) => {
   if (!G_ID || !G_SECRET) return res.redirect('/login?err=' + encodeURIComponent('Google sign-in is not configured yet.'));
-  const back = String(req.query.back || '');
-  if (['/open', '/compiler'].includes(back)) res.cookie('el_back', back, { httpOnly: true, sameSite: 'lax', maxAge: 600000 });
-  const state = jwt.sign({ n: Date.now() }, JWT_SECRET, { expiresIn: '10m' });
+  const back = safeReturnPath(req.query.returnTo || req.query.back, APP_URL);
+  const state = jwt.sign({ nonce: crypto.randomBytes(24).toString('hex'), back }, JWT_SECRET, { expiresIn: '10m' });
+  res.cookie('el_oauth_state', state, { httpOnly: true, sameSite: 'lax', secure: isProd, maxAge: 600000 });
   const params = new URLSearchParams({
     client_id: G_ID, redirect_uri: G_REDIRECT, response_type: 'code',
     scope: 'openid email profile', state, prompt: 'select_account',
@@ -1736,7 +1743,9 @@ app.get('/auth/google', (req, res) => {
 app.get('/auth/google/callback', async (req, res) => {
   try {
     const { code, state } = req.query;
-    jwt.verify(String(state || ''), JWT_SECRET); // CSRF protection
+    if (!state || req.cookies.el_oauth_state !== state) throw new Error('Sign-in expired. Please start again.');
+    const oauthState = jwt.verify(String(state), JWT_SECRET);
+    res.clearCookie('el_oauth_state');
     if (!code) throw new Error('Sign-in was cancelled.');
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -1749,12 +1758,12 @@ app.get('/auth/google/callback', async (req, res) => {
     const info = await infoRes.json();
     if (!info.sub) throw new Error('Could not read your Google profile.');
     const u = Users.findOrCreateGoogle({ sub: info.sub, name: info.name, email: info.email });
-    if (u.email) Leads.upsert({ name: u.name, email: u.email, whatsapp: (u.profile || {}).phone || null, source: 'google', user_id: u.id });
+    if (u.email && u.profile?.marketing_opt_in==='yes') Leads.upsert({ name: u.name, email: u.email, whatsapp: (u.profile || {}).phone || null, source: 'google', user_id: u.id });
     setAuthCookie(res, sign(u));
     // Google sign-ins from the open site go back to the open site.
-    const back = String(req.cookies.el_back || '');
+    const back = safeReturnPath(oauthState.back, APP_URL, u.role === 'free' ? '/open#free' : '/dashboard');
     res.clearCookie('el_back');
-    res.redirect(['/open', '/compiler'].includes(back) ? back : (u.role === 'free' ? '/open' : '/dashboard'));
+    res.redirect(back);
   } catch (e) {
     res.redirect('/login?err=' + encodeURIComponent(e.message || 'Google sign-in failed.'));
   }
@@ -1881,6 +1890,7 @@ app.get('/api/admin/challenges/:id/submissions', authRequired, staffView, (req, 
 app.post('/api/challenge-submissions/:id/review', authRequired, adminRequired, (req, res) => {
   const { approve, remarks, gems } = req.body || {};
   const s = Challenges.review(req.params.id, { approve: !!approve, remarks, gems }, req.user.id);
+  if(s?.error)return res.status(409).json({error:s.error});
   if (!s) return res.status(404).json({ error: 'Submission not found.' });
   res.json({ ok: true, submission: s });
 });
@@ -2394,6 +2404,8 @@ app.get('/api/public/info', (req, res) => {
       courses: officialCatalogue().length,
       tracks: Quests.tracks().length,
     },
+    capabilities:{grading:ai.enabled(),talent:db.enabled(),email:mailer.configured},
+    stages:store.STAGES,
     open_levels: OPEN_LEVELS,
     contact: 'info@echolens.digital',
   });
@@ -2410,8 +2422,8 @@ app.get('/api/public/tracks/:key', (req, res) => {
   const levels = t.levels.map((l) => {
     if (l.no <= openN) {
       return {
-        no: l.no, week: l.week, title: l.title, topic: l.topic, video_url: l.video_url || null, locked: false,
-        problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [], criteria: p.criteria || [], hint: p.hint || null, reference: p.reference || null })),
+        no: l.no, week: l.week, title: l.title, topic: l.topic, video_url: l.video_url || null, resource_url:l.resource_url||null,resource_note:l.resource_note||null, videos:l.videos||[], locked: false,
+        problems: l.problems.map((p, i) => ({ pid: p.pid ?? i + 1, required:p.required!==false&&!p.optional, optional:!!p.optional, pass_mark:p.pass_mark??t.pass_mark??60, language:p.language||t.default_language,starter_code:p.starter_code||p.starter||null, title: p.title, description: p.description, points: p.points || 100, difficulty: p.difficulty, refs: p.refs || [], criteria: p.criteria || [], hint: p.hint || null, reference: p.reference || null })),
       };
     }
     // Locked levels: every task is listed (title, points, difficulty) so the
@@ -2552,7 +2564,9 @@ app.get('/api/my/quizzes', authRequired, (req, res) => {
   res.json({ open, mine: mine.sort((a, b) => String(b.taken_at).localeCompare(String(a.taken_at))) });
 });
 app.post('/api/batches/:id/quizzes', authRequired, manageBatch, (req, res) => {
-  const out = Quizzes.create({ batch_id: req.batch.id, ...req.body, created_by: req.user.id });
+  const fields = {};
+  for (const key of ['title','questions','duration_min','points','allow_ide']) if (req.body?.[key] !== undefined) fields[key] = req.body[key];
+  const out = Quizzes.create({ ...fields, batch_id: req.batch.id, created_by: req.user.id });
   if (out.error) return res.status(400).json({ error: out.error });
   res.json(out);
 });
@@ -2781,6 +2795,9 @@ app.post('/api/certificates/issue', authRequired, teacherOrAdmin, (req, res) => 
     const b = Batches.byId(batch_id);
     if (!b) return res.status(404).json({ error: 'Course not found.' });
     if (!canManageBatch(req.user, b)) return res.status(403).json({ error: 'You cannot issue certificates on this course.' });
+    if (!Enrollments.all().some(e => e.user_id === student.id && e.batch_id === b.id)) return res.status(400).json({ error: 'This learner is not enrolled in the course.' });
+    const progress = Quests.progress(student.id, b.id);
+    if (!progress?.completed) return res.status(400).json({ error: 'Course completion has not been established. Grade the configured assessments before issuing a course certificate.' });
   } else if (req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Only the admin issues certificates outside a course.' });
   }
@@ -2810,7 +2827,6 @@ app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (
   const bd = Batches.decorate(req.batch);
   const title = (req.body || {}).title || bd.title || bd.name;
   const completion_date = (req.body || {}).completion_date;
-  const onlyCompleted = (req.body || {}).only_completed !== false;
   const instructorId = req.user.role === 'instructor' ? req.user.id : ((req.batch.instructor_ids || [])[0] || null);
   const installed = Quests.installed(req.batch.id);
   const concepts = installed ? courseConcepts(req.batch.id) : [];
@@ -2819,7 +2835,7 @@ app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (
   const issued = [], skipped = [];
   for (const u of Enrollments.studentsForBatch(req.batch.id)) {
     const prog = installed ? Quests.progress(u.id, req.batch.id) : null;
-    if (onlyCompleted && prog && !prog.completed) { skipped.push(u.name); continue; }
+    if (!prog?.completed) { skipped.push(u.name); continue; }
     const finalProject = installed ? finalProjectFor(req.batch.id, u.id) : null;
     const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject, partner: isPartner, deferSave: true });
     if (out.ok) {
@@ -2893,8 +2909,8 @@ app.post('/api/auth/register-open', limitSignup, async (req, res) => {
   if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
   if (Users.allByLogin(email).some((u) => ['student', 'free'].includes(u.role))) return res.status(400).json({ error: 'A learner account with this email already exists - sign in instead.' });
   const { user, password } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase(), username: String(email).trim().toLowerCase() });
-  Users.updateProfile(user.id, { phone: String(whatsapp).trim() });
-  Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
+  Users.updateProfile(user.id, { phone: String(whatsapp).trim(),marketing_opt_in:req.body.marketing_opt_in===true?'yes':'no' });
+  if(req.body.marketing_opt_in===true)Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
   setAuthCookie(res, sign(Users.byId(user.id)));
   mailer.notify(user.email, 'Welcome to EchoLens - your password',
     `${hi(user.name)},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Profile after signing in.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
@@ -2908,8 +2924,8 @@ app.post('/api/auth/register-open', limitSignup, async (req, res) => {
 app.post('/api/me/contact', authRequired, (req, res) => {
   const { whatsapp } = req.body || {};
   if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter a valid WhatsApp number (e.g. 03XX-XXXXXXX).' });
-  Users.updateProfile(req.user.id, { phone: String(whatsapp).trim() });
-  if (req.user.email) Leads.upsert({ name: req.user.name, email: req.user.email, whatsapp: String(whatsapp).trim(), source: req.user.role === 'free' ? 'open' : 'portal', user_id: req.user.id });
+  Users.updateProfile(req.user.id, { phone: String(whatsapp).trim(),marketing_opt_in:req.body.marketing_opt_in===true?'yes':'no' });
+  if (req.user.email && req.body.marketing_opt_in===true) Leads.upsert({ name: req.user.name, email: req.user.email, whatsapp: String(whatsapp).trim(), source: req.user.role === 'free' ? 'open' : 'portal', user_id: req.user.id });
   res.json({ ok: true });
 });
 
@@ -3529,10 +3545,11 @@ app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
   for (const t of Quests.tracks()) if (t.course_code) trackByCode[t.course_code] = t;
   res.json({
     catalogue: officialCatalogue().map((c) => ({ ...c, track_key: trackByCode[c.code] ? trackByCode[c.code].key : null })),
-    paths: store.learningPaths(),
+    paths: store.learningPaths().map(p => ({ ...p, enrollment_available: false, availability_reason: 'Bundle enrollment is not available yet. Choose an individual course.' })),
     free_families: store.freeFamilies(),
     links: KEY_LINKS,
-    cohort: { name: 'August 2026', registration_deadline: '31 July 2026', batch_starts: '1 August 2026' },
+    cohort: null,
+    counts:{total:officialCatalogue().length,free:officialCatalogue().filter(c=>c.price_pkr===0).length},
   });
 });
 
@@ -3657,9 +3674,12 @@ app.delete('/api/jobs/comments/:id', authRequired, (req, res) => {
 });
 
 /* ------------------- in-site course registration (item 6) ------------------- */
-app.post('/api/public/register-interest', limitLead, async (req, res) => {
-  const b = req.body || {};
+app.post('/api/public/register-interest', limitLead, asyncRoute(async (req, res) => {
+  const b = { ...req.body };
   if (b.company) return res.json({ ok: true }); // honeypot field: bots fill it, humans never see it
+  const resolved = store.resolveOffering(b.course_code);
+  if (resolved.error) return res.status(400).json({ error: resolved.error });
+  b.course_code = resolved.offer.code; b.course_title = resolved.offer.title;
   if (!b.name || String(b.name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
   if (!isEmail(b.email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!(await emailDomainExists(b.email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
@@ -3678,16 +3698,46 @@ app.post('/api/public/register-interest', limitLead, async (req, res) => {
     if (!cat) cat = DiscountCategories.create({ name: 'Ambassador referral', type: 'percent', value: 10 }, null);
     b.discount_category_id = cat.id;
   } else { delete b.ambassador_code; }
+  const previous = Registrations.find(b.email, b.course_code);
+  if (previous) {
+    const sameRequest = previous.status?.request_key && previous.status.request_key === b.request_key;
+    return res.json({ ok: true, existing: true, reference: `EL-R-${previous.id}`, receipt_url: sameRequest ? `/registration-status#${Registrations.receiptToken(previous)}` : null, message: 'A registration for this email and course already exists. Use your saved receipt or recover it by email.' });
+  }
   const r = Registrations.create(b);
-  Leads.upsert({ name: r.name, email: r.email, whatsapp: r.whatsapp, source: 'course-registration' });
+  if(b.marketing_opt_in===true)Leads.upsert({ name: r.name, email: r.email, whatsapp: r.whatsapp, source: 'course-registration' });
   // Every registration lands in the Admissions Office inbox (plus the admins)
   // so admissions can generate and send the fee challan from their portal.
   const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
   mailer.notify([ADMISSIONS_EMAIL, ...admins], `New course registration - ${r.name}`, `${r.name} registered${r.course_title ? ` for ${r.course_code} ${r.course_title}` : ''}.\nEmail: ${r.email}\nWhatsApp: ${r.whatsapp}${r.city ? `\nCity: ${r.city}` : ''}${r.note ? `\nNote: ${r.note}` : ''}${r.ambassador_code ? `\n\nAMBASSADOR REFERRAL: code ${r.ambassador_code} from ambassador ${r.ambassador_name} was verified automatically - a straight 10% discount applies to this student's challan.` : ''}\n\nGenerate and send the fee challan from the Admissions Office portal.`);
-  mailer.notify(r.email, 'EchoLens - registration received', `${hi(r.name)},\n\nWe received your registration${r.course_title ? ` for ${r.course_title}` : ''}.${r.ambassador_code ? ' Your ambassador code was accepted - a 10% discount will be applied to your fee challan.' : ''} Our Admissions Office will email you the fee challan with the payment details and next steps shortly.\n\nEchoLens Digital`);
-  res.json({ ok: true });
-});
+  await deliverRegistrationMail(store, mailer, r, { to: r.email, subject: 'EchoLens - registration received', text: 'Your registration for ' + r.course_title + ' is saved. Keep this private receipt to check your next step: ' + APP_URL + '/registration-status#' + Registrations.receiptToken(r) }, { kind: 'confirmation', reference: String(r.id) });
+  res.json({ ok: true, reference: `EL-R-${r.id}`, receipt_url: `/registration-status#${Registrations.receiptToken(r)}`, message: 'Registration saved. Keep your private receipt link to check the next step.' });
+}));
 app.get('/api/admin/registrations', authRequired, staffView, (req, res) => res.json({ registrations: Registrations.all(), pending: Registrations.pendingCount() }));
+app.get('/registration-status', (req, res) => res.sendFile(path.join(__dirname, 'public', 'registration-status.html')));
+app.post('/api/public/registration-status', limitLead, (req, res) => {
+  const r = Registrations.byReceipt(req.body?.token);
+  if (!r) return res.status(404).json({ error: 'Receipt link not found. Recover your link by email or contact Admissions.' });
+  const c = r.challan_serial && Challans.bySerial(r.challan_serial);
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.json({ reference: `EL-R-${r.id}`, offering: r.course_title, stage: r.payment_stage, delivery: r.status.delivery || null, confirmation_delivery: r.status.confirmation_delivery || null, amount: c ? c.net_fee : null, deadline: c ? c.deadline : null, has_challan: !!c, enrolled: r.payment_stage === 'enrolled' });
+});
+app.post('/api/public/registration-challan', limitLead, asyncRoute(async (req, res) => {
+  const r = Registrations.byReceipt(req.body?.token);
+  const c = r?.challan_serial && Challans.bySerial(r.challan_serial);
+  if (!c) return res.status(404).json({ error: 'No challan is available for this receipt yet.' });
+  try { res.setHeader('Cache-Control', 'private, no-store'); res.type('pdf').send(await challanPdf(c, `${APP_URL}/challan?s=${c.serial}`)); }
+  catch { res.status(503).json({ error: 'The PDF is temporarily unavailable. Please retry.' }); }
+}));
+app.post('/api/public/registrations/recover', limitEmailSend, asyncRoute(async (req, res) => {
+  if (!isEmail(req.body?.email)) return res.status(400).json({ error: 'Enter your registration email address.' });
+  if (!mailer.configured) return res.status(503).json({ error: 'Receipt email recovery is temporarily unavailable. Contact Admissions with your email address or registration reference.' });
+  const records = Registrations.all().filter(r => r.email === String(req.body.email).trim().toLowerCase());
+  if (records.length) {
+    try { const delivery=await mailer.send({ to: records[0].email, subject: 'Your private EchoLens registration receipts', text: records.map(r => `${r.course_title}: ${APP_URL}/registration-status#${Registrations.receiptToken(r)}`).join('\n') }); if(!delivery.sent)throw new Error('Provider rejected receipt recovery'); }
+    catch { return res.status(503).json({ error: 'Receipt recovery is temporarily unavailable. Please retry or contact Admissions.' }); }
+  }
+  res.json({ ok: true, message: 'If registrations match that email, their private receipt links have been handed to the email provider. Check your inbox and spam folder.' });
+}));
 app.patch('/api/admin/registrations/:id', authRequired, adminRequired, (req, res) => {
   const r = Registrations.update(req.params.id, req.body || {});
   if (!r) return res.status(404).json({ error: 'Registration not found.' });
@@ -3777,7 +3827,7 @@ app.post('/api/admissions/registrations/:id/challan', authRequired, admissionsOn
   if (out.error) return res.status(400).json({ error: out.error });
   res.json({ ok: true, challan: out.challan });
 });
-app.post('/api/admissions/challans/:serial/send', authRequired, admissionsOnly, async (req, res) => {
+app.post('/api/admissions/challans/:serial/send', authRequired, admissionsOnly, asyncRoute(async (req, res) => {
   const c = Challans.bySerial(req.params.serial);
   if (!c) return res.status(404).json({ error: 'Challan not found.' });
   // The challan itself travels as a PDF attachment; the email body carries a
@@ -3790,12 +3840,15 @@ app.post('/api/admissions/challans/:serial/send', authRequired, admissionsOnly, 
     console.error('Challan PDF generation failed:', e.message);
     return res.status(500).json({ error: 'Could not generate the challan PDF - try again.' });
   }
-  mailer.notify(c.student_email, `EchoLens - fee challan for ${c.course_title}`,
-    `${hi(c.student_name)},\n\nYour fee challan for ${c.course_title} is attached as a PDF.\n\nStudent ID: ${c.student_id || '-'}\nChallan serial: ${c.serial}\nAmount payable: Rs ${c.net_fee.toLocaleString('en-US')}\nDeadline: ${c.deadline}\n\nAfter paying, email a screenshot of your payment along with the payment record (transaction ID, date, and amount) to ${FINANCE_EMAIL}. Our finance team will verify it and confirm your enrollment by email.\n\nYou can also view and verify this challan online: ${APP_URL}/challan?s=${c.serial}`,
-    attachments);
-  Challans.markSent(c.serial);
-  res.json({ ok: true });
-});
+  const registration = Registrations.byId(c.registration_id);
+  const delivery = await deliverRegistrationMail(store, mailer, registration, {
+    to: c.student_email, subject: 'EchoLens - fee challan for ' + c.course_title,
+    text: 'Your fee challan is attached. Amount payable: PKR ' + c.net_fee + '. Deadline: ' + c.deadline + '. After paying, send the transaction record to ' + FINANCE_EMAIL + '. Keep your private registration receipt for status updates.', attachments,
+  }, { kind: 'challan', reference: c.serial, resend: req.body?.resend === true });
+  if (delivery.state !== 'provider_accepted') return res.status(503).json({ error: delivery.message, delivery });
+  if (['new','challan_issued','challan_sent'].includes(registration.payment_stage)) Challans.markSent(c.serial);
+  res.json({ ok: true, delivery, message: 'Accepted by the email provider. Inbox delivery is not confirmed.' });
+}));
 // Lets the Admissions Office download the exact PDF the student receives.
 app.get('/api/admissions/challans/:serial/pdf', authRequired, admissionsOnly, async (req, res) => {
   const c = Challans.bySerial(req.params.serial);
@@ -3823,6 +3876,7 @@ app.get('/api/finance/registrations', authRequired, financeOnly, (req, res) => {
 app.post('/api/finance/registrations/:id/clear', authRequired, financeOnly, (req, res) => {
   const r = Registrations.byId(req.params.id);
   if (!r || !r.challan_serial) return res.status(400).json({ error: 'The Admissions Office has not generated a challan for this registration yet.' });
+  if(Challans.bySerial(r.challan_serial)?.status==='paid')return res.json({ok:true,existing:true,registration:r});
   const c = Challans.markPaid(r.challan_serial, req.user.id);
   if (!c) return res.status(404).json({ error: 'Challan not found.' });
   // Payment confirmed. Enrollment stays a human step: several batches of the
@@ -3849,7 +3903,10 @@ app.get('/api/finance/balance-sheet', authRequired, financeOnly, (req, res) => r
 // account, records the enrollment, emails the student, and advances the
 // pipeline to "enrolled". Shared by Finance's payment confirmation
 // (auto-enroll) and the Admissions Office's manual fallback.
-async function enrollRegistrationIntoBatch(r, b) {
+const enrollmentWork=new Map();
+async function enrollRegistrationIntoBatch(r,b){if(enrollmentWork.has(r.id))return enrollmentWork.get(r.id);const job=performRegistrationEnrollment(r,b);enrollmentWork.set(r.id,job);try{return await job;}finally{enrollmentWork.delete(r.id);}}
+async function performRegistrationEnrollment(r, b) {
+  if(r.payment_stage==='enrolled')return r.enrolled_batch_id===b.id?{registration:r,existing:true}:{error:'Already enrolled in another batch. Use the explicit batch-transfer workflow.'};
   // One email can hold accounts in several portals: enroll into the LEARNER
   // account when one exists; staff accounts on the same email are ignored
   // and a separate student account is created alongside them.
@@ -3895,13 +3952,18 @@ async function enrollRegistrationIntoBatch(r, b) {
 // (challan, Finance verification, enrollment) works exactly the same as a
 // website registration. Same validation as the public route, minus the
 // honeypot/rate-limit (this is an authenticated staff action).
-app.post('/api/admissions/registrations', authRequired, admissionsOnly, async (req, res) => {
-  const b = req.body || {};
+app.post('/api/admissions/registrations', authRequired, admissionsOnly, asyncRoute(async (req, res) => {
+  const b = { ...req.body };
+  const resolved = store.resolveOffering(b.course_code);
+  if (resolved.error) return res.status(400).json({ error: resolved.error });
+  b.course_code = resolved.offer.code; b.course_title = resolved.offer.title;
   if (!b.name || String(b.name).trim().length < 2) return res.status(400).json({ error: "Enter the student's full name." });
   if (!isEmail(b.email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!(await emailDomainExists(b.email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling.' });
   if (!b.whatsapp || String(b.whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: "Enter the student's WhatsApp number (e.g. 03XX-XXXXXXX)." });
   if (!b.course_code || !b.course_title) return res.status(400).json({ error: 'Select the course the student registered for.' });
+  const previous = Registrations.find(b.email, b.course_code);
+  if (previous) return res.json({ ok: true, existing: true, registration: previous });
   const rawCode = String(b.ambassador_code || '').trim();
   if (rawCode) {
     if (!/^\d{4}$/.test(rawCode)) return res.status(400).json({ error: 'Ambassador codes are 4 digits - check the code or leave the field empty.' });
@@ -3921,10 +3983,10 @@ app.post('/api/admissions/registrations', authRequired, admissionsOnly, async (r
   }
   b.note = ['Registered manually by Admissions Office (e.g. via an external form).', b.note ? String(b.note).trim() : ''].filter(Boolean).join(' ');
   const r = Registrations.create(b);
-  Leads.upsert({ name: r.name, email: r.email, whatsapp: r.whatsapp, source: 'admissions-manual' });
+
   mailer.notify(r.email, 'EchoLens - registration received', `${hi(r.name)},\n\nWe have you down for registration${r.course_title ? ` for ${r.course_title}` : ''}.${r.ambassador_code ? ' Your ambassador code was accepted - a 10% discount will be applied to your fee challan.' : ''} Our Admissions Office will email you the fee challan with the payment details and next steps shortly.\n\nEchoLens Digital`);
   res.json({ ok: true, registration: r });
-});
+}));
 app.get('/api/admissions/registrations', authRequired, admissionsOnly, (req, res) => {
   const rows = Registrations.all().map((r) => {
     const course = Courses.byCode(r.course_code);
@@ -3935,17 +3997,18 @@ app.get('/api/admissions/registrations', authRequired, admissionsOnly, (req, res
 });
 // Manual fallback for cleared payments that could not auto-enroll (e.g. no
 // batch was open when Finance confirmed).
-app.post('/api/admissions/registrations/:id/enroll', authRequired, admissionsOnly, async (req, res) => {
+app.post('/api/admissions/registrations/:id/enroll', authRequired, admissionsOnly, asyncRoute(async (req, res) => {
   const r = Registrations.byId(req.params.id);
   if (!r) return res.status(404).json({ error: 'Registration not found.' });
+  if(r.payment_stage==='enrolled')return res.json({ok:true,existing:true,registration:r});
   if (r.payment_stage !== 'paid_cleared') return res.status(400).json({ error: 'This registration is not yet cleared by Finance.' });
   const b = Batches.byId((req.body || {}).batch_id);
   const course = Courses.byCode(r.course_code);
-  if (!b || !course || b.course_id !== course.id) return res.status(400).json({ error: 'Choose a valid batch for this course.' });
+  if (!b || !course || b.course_id !== course.id || ['completed','archived','cancelled'].includes(b.status)) return res.status(400).json({ error: 'Choose a valid batch for this course.' });
   const out = await enrollRegistrationIntoBatch(r, b);
   if (out.error) return res.status(400).json({ error: out.error });
   res.json({ ok: true, ...out });
-});
+}));
 app.get('/api/coordinator/queries', authRequired, studentCoordinatorOnly, (req, res) => res.json({ queries: CoordinatorQueries.all() }));
 app.post('/api/coordinator/queries/:id/reply', authRequired, studentCoordinatorOnly, (req, res) => {
   const { body } = req.body || {};
@@ -4072,7 +4135,8 @@ const OPEN_SUBMIT_RULES = {
   multi: { pattern: /\.(pdf|png|jpe?g)$/i, error: 'This course takes PDF or image (PNG/JPEG) submissions.', multiple: true },
   file: { pattern: /\.(pdf|docx?|pptx?|txt|md|ipynb|png|jpe?g|zip)$/i, error: 'Upload PDF, Word, text, notebook, PNG, JPEG, or ZIP files.' },
 };
-app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 8 }]), async (req, res) => {
+function asyncRoute(handler){return (req,res,next)=>Promise.resolve().then(()=>handler(req,res,next)).catch(next);}
+app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 8 }]), asyncRoute(async (req, res) => {
   const cleanup = () => { for (const f of allFiles) { try { fs.unlinkSync(f.path); } catch {} } };
   const allFiles = [...((req.files || {}).file || []), ...((req.files || {}).files || [])];
   if (!['free', 'student'].includes(req.user.role)) { cleanup(); return res.status(403).json({ error: 'Quests are for learners.' }); }
@@ -4088,45 +4152,43 @@ app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCou
     file_url = `/uploads/${allFiles[0].filename}`; file_name = allFiles[0].originalname;
     extra_files = allFiles.slice(1).map((f) => ({ url: `/uploads/${f.filename}`, name: f.originalname }));
   }
-  const out = OpenQuest.submit({ user: req.user, track_key: String(b.track_key || ''), level: b.level, pid: b.pid, code: b.code || null, language: b.language || null, file_url, file_name, files: extra_files });
-  if (out.error) return res.status(400).json({ error: out.error });
-  let graded = null, cert = null;
-  if (ai.enabled()) {
-    try {
-      let text = out.submission.code;
-      if (!text && file_url) {
-        const parts = [];
-        for (const u of [file_url, ...extra_files.map((f) => f.url)]) {
-          const ex = await extractText(u);
-          if (ex.text) parts.push(extra_files.length ? `--- ${ex.name} ---\n${ex.text}` : ex.text);
-        }
-        text = parts.join('\n\n') || null;
-      }
-      const g = await ai.autoGrade(req.user.id, {
-        eventTitle: out.track.title, problemTitle: out.problem.title, problemBrief: out.problem.description,
-        passMark: out.track.pass_mark || 60, code: out.submission.code, language: out.submission.language, text,
-      });
-      graded = OpenQuest.applyGrade(out.submission.id, g.score, g.feedback);
-      const c = OpenQuest.maybeCertify(req.user.id, out.track.key, out.track.created_by);
-      if (c && c.cert && !c.existing) {
-        cert = c.cert;
-        if (req.user.email) mailer.notify(req.user.email, `Certificate earned - ${out.track.title}`,
-          `Congratulations ${req.user.name}!\n\nYou completed the free course "${out.track.title}" and your verified certificate has been issued (serial ${cert.serial}).\n\nView, download and share it: ${APP_URL}/cert?s=${cert.serial}`);
-      }
-    } catch (e) { console.error('Open auto-grade failed:', e.message); }
-  }
-  res.json({
-    ok: true,
-    submission: graded || out.submission,
-    graded: !!graded,
-    cert: cert ? { serial: cert.serial, url: `${APP_URL}/cert?s=${cert.serial}` } : null,
-    // Beginner tracks (friendly_grading) never surface that grading is
-    // automated or unavailable - a calm "shortly" beats a visible failure,
-    // and there is nothing here for the student to act on either way.
-    note: graded ? null : (out.track.friendly_grading
-      ? 'Submission received! It will be graded shortly.'
-      : 'Submission recorded. Grading is not available right now - your score will appear once it is graded.'),
-  });
+  const request_key = b.request_key || crypto.randomUUID();
+  if (!/^[\w-]{16,80}$/.test(request_key)) { cleanup(); return res.status(400).json({error:'Invalid submission request key.'}); }
+  const fingerprint = crypto.createHash('sha256').update(JSON.stringify([b.track_key,String(b.level),String(b.pid),b.code||null,b.language||null,...allFiles.map(f=>[f.originalname,crypto.createHash('sha256').update(fs.readFileSync(f.path)).digest('hex')])])).digest('hex');
+  const previous = store.allData().open_attempts.find(a=>a.user_id===req.user.id&&a.request_key===request_key);
+  if (previous && previous.payload.fingerprint !== fingerprint) { cleanup(); return res.status(409).json({error:'This request key belongs to different work.'}); }
+  const out = OpenQuest.submit({ user:req.user,track_key:String(b.track_key||''),level:b.level,pid:b.pid,code:b.code||null,language:b.language||null,file_url,file_name,files:extra_files,request_key,fingerprint });
+  if(out.error){cleanup();return res.status(out.status||400).json({error:out.error});}
+  if(out.existing)cleanup();
+  if(!ai.enabled() && out.attempt.status==='queued')store.OpenAttempts.fail(out.attempt.id,'Grading is unavailable. Your attempt is saved. Retry later or request staff review.');
+  await store.pendingPersist();
+  res.status(out.existing?200:202).json({ok:true,existing:!!out.existing,attempt:store.OpenAttempts.public(out.attempt),submission:out.submission,graded:out.attempt.status==='completed',note:out.attempt.status==='failed'?out.attempt.payload.error:'Attempt saved and queued for grading. You can leave and return to check its status.'});
+}));
+app.get('/api/open/attempts', authRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),req.query.level,req.query.pid).map(store.OpenAttempts.public)}));
+app.post('/api/open/attempts/:id/retry',authRequired,asyncRoute(async (req,res)=>{
+  if(!ai.enabled())return res.status(503).json({error:'Grading is still unavailable. Your attempt and previous grades are saved. Ask staff for a review.'});
+  const out=store.OpenAttempts.retry(req.params.id,req.user.id);
+  if(out.error)return res.status(out.status||400).json({error:out.error});
+  await store.pendingPersist();res.json({ok:true,attempt:store.OpenAttempts.public(out.attempt)});
+}));
+app.get('/api/admin/open-attempts',authRequired,adminRequired,(req,res)=>res.json({attempts:store.allData().open_attempts.filter(a=>a.status==='failed').map(store.OpenAttempts.public)}));
+app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRoute(async (req,res)=>{
+  const a=store.OpenAttempts.byId(req.params.id);if(!a)return res.status(404).json({error:'Attempt not found.'});
+  if(a.status==='processing')return res.status(409).json({error:'This attempt is being graded. Wait until grading finishes.'});
+  if(a.status==='completed')return res.json({ok:true,existing:true,attempt:store.OpenAttempts.public(a)});
+  const score=Number(req.body.score);if(req.body.score==null||req.body.score===''||!Number.isFinite(score)||score<0||score>100||!String(req.body.feedback||'').trim())return res.status(400).json({error:'Provide a score from 0 to 100 and written feedback.'});
+  store.OpenAttempts.complete(a.id,score,req.body.feedback,'staff:'+req.user.id);
+  const certificate=OpenQuest.maybeCertify(a.user_id,a.track_key,req.user.id);
+  await store.pendingPersist();res.json({ok:true,attempt:store.OpenAttempts.public(a),certificate:certificate?.cert||null});
+}));
+const gradingWorker = require('./grading-worker').createGradingWorker({
+  attempts:store.OpenAttempts,persist:()=>store.pendingPersist(),enabled:()=>ai.enabled(),
+  grade:async a=>{
+    const p=a.payload,track=Quests.trackDef(a.track_key);let text=p.code;
+    if(!text&&p.file_url){const parts=[];for(const url of [p.file_url,...(p.files||[]).map(f=>f.url)]){const x=await extractText(url);if(x.text)parts.push(x.text);}text=parts.join('\n\n');}
+    if(!text)throw new Error('No readable submission content');
+    return ai.autoGrade(a.user_id,{eventTitle:track?.title,problemTitle:p.problem.title,problemBrief:p.problem.description,passMark:p.problem.pass_mark??track?.pass_mark??60,code:p.code,language:p.language,text});
+  },onComplete:async a=>{OpenQuest.maybeCertify(a.user_id,a.track_key);},
 });
 app.get('/api/open/progress', authRequired, (req, res) => {
   const track = String(req.query.track || '');
@@ -4169,59 +4231,13 @@ app.post('/api/open/excel-extract', authRequired, upload.single('file'), async (
 });
 
 /* --------------------------------- static --------------------------------- */
-// Decide whether a signed-in user may read one uploaded file. Sensitive
-// categories (payment screenshots and submitted work) are restricted to the
-// owner and the relevant course staff/admin; everything else (avatars,
-// signatures, course resources, datasets, event documents) stays viewable by
-// any signed-in user, as before - so legitimate sharing is unaffected.
-function canAccessUpload(user, name) {
-  if (!name) return false;
-  if (user.role === 'admin') return true;
-  const d = store.allData();
-  const isFile = (url) => url && path.basename(url) === name;
-
-  // Payment screenshots: the uploader only.
-  if (d.event_entries.some((e) => isFile(e.payment_shot))) {
-    return d.event_entries.some((e) => isFile(e.payment_shot) && e.user_id === user.id);
-  }
-  // Quest submission files: owner, a teacher who manages the course, or a coordinator.
-  const qs = d.quest_submissions.find((s) => isFile(s.file_url));
-  if (qs) {
-    if (qs.user_id === user.id) return true;
-    const q = d.quests.find((x) => x.id === qs.quest_id);
-    const b = q && Batches.byId(q.batch_id);
-    return !!(b && (canManageBatch(user, b) || user.role === 'coordinator'));
-  }
-  // Legacy assignment submissions (assignment -> batch).
-  const ls = d.submissions.find((s) => isFile(s.file_url));
-  if (ls) {
-    if (ls.user_id === user.id) return true;
-    const a = d.assignments.find((x) => x.id === ls.assignment_id);
-    const b = a && Batches.byId(a.batch_id);
-    return !!(b && (canManageBatch(user, b) || user.role === 'coordinator'));
-  }
-  // Event submissions and open-track submissions: the owner only.
-  if (d.event_submissions.some((s) => isFile(s.file_url))) {
-    return d.event_submissions.some((s) => isFile(s.file_url) && s.user_id === user.id);
-  }
-  const os = d.open_submissions.find((s) => isFile(s.file_url) || (Array.isArray(s.files) && s.files.some((f) => isFile(f.url))));
-  if (os) return os.user_id === user.id;
-  // Contracts, signed submissions and offer letters carry CNIC/personal legal
-  // data: the account they belong to, or HR.
-  const contract = d.contracts.find((c) => isFile(c.pdf_filename) || isFile(c.submission_zip_filename) || isFile(c.offer_letter_filename));
-  if (contract) return user.role === 'hr' || contract.user_id === user.id;
-  // Instructor onboarding documents (degree/transcript/certification).
-  const docOwner = d.users.find((u) => ['degree_files', 'transcript_files', 'certification_files'].some((k) => Array.isArray((u.profile || {})[k]) && u.profile[k].some((f) => isFile(f.filename))));
-  if (docOwner) return user.role === 'hr' || docOwner.id === user.id;
-
-  return true; // shareable content (avatars, signatures, resources, datasets, event docs)
-}
+// File URLs keep their existing shape; access is resolved from persisted purpose.
 function authGate(req, res, next) {
-  const u = currentUser(req);
-  if (!u) return res.status(401).send('Sign in to view files.');
-  let name;
-  try { name = path.basename(decodeURIComponent(req.path)); } catch { name = path.basename(req.path); }
-  if (!canAccessUpload(u, name)) return res.status(403).send('You do not have access to this file.');
+  const current = currentUser(req);
+  const user = current && !isDeactivatedAmbassador(current) ? current : null;
+  const name = req.path.replace(/^\//, '');
+  if (!uploadAccess.canAccessUpload(user, name, store.allData())) return res.status(user ? 403 : 401).send(user ? 'You do not have access to this file.' : 'Sign in to view this file.');
+  res.setHeader('Cache-Control', 'private, no-store');
   next();
 }
 // Dynamic sitemap: the static entries below (courses, landing, etc.) are
@@ -4280,7 +4296,6 @@ function buildOpenHtml() {
         '@type': 'CourseInstance',
         courseMode: 'Online',
         courseWorkload: c.hours ? ('PT' + c.hours + 'H') : undefined,
-        startDate: '2026-08-01',
         location: { '@type': 'VirtualLocation', url: 'https://www.echolens.digital/open' },
       },
     };
@@ -4289,7 +4304,7 @@ function buildOpenHtml() {
   const ld = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'EchoLens Course Catalogue - August 2026',
+    name: 'EchoLens Course Catalogue',
     numberOfItems: items.length,
     itemListElement: items,
   };
@@ -4372,8 +4387,9 @@ app.use((err, req, res, next) => {
   if (err) {
     // Preserve a meaningful status when the error carries one (e.g. 413 for an
     // over-limit body, 400 for malformed JSON); default to 400 otherwise.
-    const status = err.status || err.statusCode || 400;
-    return res.status(status >= 400 && status < 600 ? status : 400).json({ error: err.message || 'Something went wrong.' });
+    const status=err.status||err.statusCode||(err instanceof multer.MulterError?400:503);
+    console.error('[request failed]',req.method,req.path,err.code||'',err.message);
+    return res.status(status>=400&&status<600?status:503).json({error:status>=500?'This request could not finish. Your prior saved work is available; please retry.':err.message||'Check the request and try again.'});
   }
   next();
 });
@@ -4414,6 +4430,7 @@ if (looksLikeProductionDeploy && !db.enabled()) {
     process.exit(1);
   }
 
+  gradingWorker.start();
   app.listen(PORT, () => {
     console.log(`EchoLens LMS v12.3 running on http://localhost:${PORT}`);
     console.log(`Data store: ${store.isUsingPostgres() ? 'Postgres (DATABASE_URL)' : `JSON file (${store.DB_PATH})`}`);

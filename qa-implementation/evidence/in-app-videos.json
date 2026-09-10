@@ -1,0 +1,23 @@
+[
+  {
+    "id": "KnvbUiSxvbM",
+    "host": "youtube-nocookie.com",
+    "status": "UNVERIFIED",
+    "reason": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('iframe').contentFrame().locator('.ytp-large-play-button, .ytp-play-button').first() to be visible\u001b[22m\n",
+    "player_text": "#1: Getting Started with C Programming [2025] | C Programming for Beginners\nProgramiz\nProgramiz\n221K subscribers\nWatch on"
+  },
+  {
+    "id": "9M4XKi25I2M",
+    "host": "youtube-nocookie.com",
+    "status": "UNVERIFIED",
+    "reason": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('iframe').contentFrame().locator('.ytp-large-play-button, .ytp-play-button').first() to be visible\u001b[22m\n",
+    "player_text": "JavaScript Programming All-in-One Tutorial Series (9 HOURS!)\nCaleb Curry\nCaleb Curry\n741K subscribers\nWatch on"
+  },
+  {
+    "id": "kqtD5dpn9C8",
+    "host": "youtube-nocookie.com",
+    "status": "UNVERIFIED",
+    "reason": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('iframe').contentFrame().locator('.ytp-large-play-button, .ytp-play-button').first() to be visible\u001b[22m\n",
+    "player_text": "Python for Beginners - Learn Coding with Python in 1 Hour\nProgramming with Mosh\nProgramming with Mosh\n5.15M subscribers\nWatch on"
+  }
+]

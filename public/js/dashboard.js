@@ -18,8 +18,8 @@ async function api(path, opts = {}) {
     ...opts,
   });
   const data = await res.json().catch(() => ({}));
-  if (res.status === 401) { location.href = '/'; throw new Error('Signed out.'); }
-  if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+  if (res.status === 401) { EL.drafts.flushAll(); location.href = EL.loginURL(); throw new Error('Signed out.'); }
+  if (!res.ok) { const e=new Error(data.error || 'Something went wrong.');e.status=res.status;e.message=EL.errorMessage(e);throw e; }
   return data;
 }
 function toast(text, isErr) {
@@ -77,15 +77,16 @@ function prismGem(key, size = 84) {
 
 /* ------------------------------ modal ------------------------------ */
 function openModal(title, bodyHTML, wide) {
+  window.MODAL_LOCK=false;$('modalBox').querySelector('.close').style.display='';
   $('modalTitle').textContent = title;
   $('modalBody').innerHTML = bodyHTML;
   modalMsg('');
   $('modalBox').classList.toggle('wide', !!wide);
-  $('modal').classList.add('open');
+  $('modal').classList.add('open'); EL.dialog.open($('modal'));
 }
-function closeModal() { if (window.MODAL_LOCK) return; $('modal').classList.remove('open'); }
+function closeModal() { if (window.MODAL_LOCK) return; $('modal').classList.remove('open'); EL.dialog.close(); }
 function modalMsg(text, ok) {
-  const el = $('modalMsg');
+  const el = $('modalMsg'); el.setAttribute('role', 'alert');
   if (!text) { el.className = 'form-msg'; el.textContent = ''; return; }
   el.className = 'form-msg ' + (ok ? 'ok' : 'err'); el.textContent = text;
 }
@@ -115,7 +116,26 @@ const TITLES = {
   'showcase-moderation': 'Showcase Moderation',
   'talent-profile': 'Talent Profile', 'hiring-interest': 'Hiring Interest',
 };
+let DASH_RESTORING = false, COURSE_REQUEST = 0;
+function dashboardRoute(state) { if (DASH_RESTORING) return; const hash = '#' + new URLSearchParams(state).toString(); if (location.hash !== hash) history.pushState(state, '', '/dashboard' + hash); }
+async function restoreDashboard() {
+  const state = Object.fromEntries(new URLSearchParams(location.hash.slice(1)));
+  DASH_RESTORING = true;
+  try {
+    if (state.view === 'task' && Number(state.batch) > 0) { await openCourse(Number(state.batch), 'Quest'); openTask(Number(state.qid),Number(state.pid)); }
+    else if (state.view === 'course' && Number(state.batch) > 0) await openCourse(Number(state.batch), state.tab);
+    else if (state.view === 'job' && Number(state.id) > 0) await openJob(Number(state.id));
+    else await show(TITLES[state.view] ? state.view : (DEPT_ROLES[ME.role]?.view || 'overview'));
+  } catch(e) { EL.error(document.querySelector('.view.active'),e,restoreDashboard); }
+  finally { DASH_RESTORING = false; }
+}
+window.addEventListener('popstate',()=>{if(ME)restoreDashboard();});
 function show(view) {
+  EL.drafts.flushAll(); COURSE_REQUEST++;
+  if (!$('view-' + view)) view = 'overview';
+  const item = document.querySelector('[data-view="' + view + '"]');
+  if (item && getComputedStyle(item).display === 'none') view = DEPT_ROLES[ME.role]?.view || 'overview';
+  dashboardRoute({view});
   if (typeof CHAT_TIMER !== 'undefined' && CHAT_TIMER) { clearInterval(CHAT_TIMER); CHAT_TIMER = null; }
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   $(`view-${view}`).classList.add('active');
@@ -144,15 +164,16 @@ function show(view) {
     'showcase-moderation': renderShowcaseModeration,
     'talent-profile': renderTalentProfile, 'hiring-interest': renderHiringInterest,
   }[view];
-  if (render) render();
+  if (render) return Promise.resolve().then(render).catch(e => EL.error($('view-' + view),e,()=>show(view)));
 }
 document.querySelectorAll('.nav-item[data-view]').forEach((n) => n.addEventListener('click', () => show(n.dataset.view)));
-async function logout() { try { await api('/api/auth/logout', { method: 'POST' }); } catch {} location.href = '/'; }
+async function logout() { EL.drafts.flushAll(); EL.drafts.setAccount(null); try { await api('/api/auth/logout', { method: 'POST' }); } catch {} location.href = '/'; }
 
 /* ------------------------------ boot ------------------------------ */
 (async () => {
   try {
     ME = await api('/api/auth/me');
+    EL.drafts.setAccount(ME.id);
   } catch { return; }
   $('userName').textContent = ME.name;
   $('rolePill').textContent = roleLabel(ME.role);
@@ -168,11 +189,13 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
     if (settingsNav) settingsNav.style.display = '';
     $('gate').style.display = 'none';
     $('app').style.display = '';
-    show(DEPT_ROLES[ME.role].view);
+    await restoreDashboard();
     requireOnboarding();
     requireContractSubmission(false);
     return;
   }
+  if(ME.role==='coordinator')for(const view of ['admin-mailer']){const n=document.querySelector('[data-view="'+view+'"]');if(n){n.classList.remove('staff-only');n.style.display='none';}}
+  if(ME.role==='admin'){const n=document.querySelector('[data-view="grades"]');if(n)n.style.display='';}
   if (ME.role === 'admin') document.querySelectorAll('.admin-only').forEach((el) => (el.style.display = ''));
   if (['admin', 'coordinator'].includes(ME.role)) document.querySelectorAll('.staff-only').forEach((el) => (el.style.display = ''));
   if (ME.ai_enabled) document.querySelectorAll('.teacher-only').forEach((el) => (el.style.display = ''));
@@ -210,7 +233,7 @@ async function logout() { try { await api('/api/auth/logout', { method: 'POST' }
   // this same single-page app - jump straight to the queue for an admin who
   // lands here directly; anyone else just gets the normal overview.
   if (location.pathname === '/admin/recruiters' && ME.role === 'admin') { show('admin-recruiters'); return; }
-  renderOverview();
+  await restoreDashboard();
   requireWhatsapp(); // v12: contact details are mandatory for every learner
   requireOnboarding(); // instructors must complete their first-login profile
   requireContractSubmission(false);
@@ -266,17 +289,19 @@ function closeTopSearch() { const out = $('topSearchResults'); if (out) { out.cl
 function requireWhatsapp() {
   if (!['student', 'free'].includes(ME.role)) return;
   if (ME.profile && ME.profile.phone) return;
-  openModal('One last step - your WhatsApp number', `
+  openModal('Add account contact details', `
     <form id="waForm">
-      <p class="s" style="color:var(--muted);margin-bottom:12px">We use WhatsApp to share class updates, quest openings, and your certificates. This is required to continue.</p>
+      <p class="s" style="color:var(--muted);margin-bottom:12px">Add a contact number for class support and account updates. You can finish this step later. Promotional messages are optional.</p>
       <label class="field"><span>WhatsApp number</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
       <button class="btn btn-primary btn-block">Save & continue</button></form>`);
   window.MODAL_LOCK = true;
   $('modalBox').querySelector('.close').style.display = 'none';
+  EL.deferForm($('waForm'),ME.id,'Profile');
+  $('waForm').insertAdjacentHTML('beforeend','<label class="field"><span><input type="checkbox" name="marketing_opt_in" style="width:auto"> Send me optional course offers and webinar invitations</span></label>');
   $('waForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
     try {
-      await api('/api/me/contact', { method: 'POST', body: JSON.stringify({ whatsapp: f.whatsapp.value.trim() }) });
+      await api('/api/me/contact', { method: 'POST', body: JSON.stringify({ whatsapp: f.whatsapp.value.trim(), marketing_opt_in:f.marketing_opt_in.checked }) });
       ME.profile = ME.profile || {}; ME.profile.phone = f.whatsapp.value.trim();
       window.MODAL_LOCK = false;
       $('modalBox').querySelector('.close').style.display = '';
@@ -318,6 +343,7 @@ function requireOnboarding() {
       <button class="btn btn-primary btn-block">Save & continue</button></form>`);
   window.MODAL_LOCK = true;
   $('modalBox').querySelector('.close').style.display = 'none';
+  EL.deferForm($('onboardForm'),ME.id,'Profile');
   $('onboardForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
     try {
@@ -326,7 +352,7 @@ function requireOnboarding() {
       window.MODAL_LOCK = false;
       $('modalBox').querySelector('.close').style.display = '';
       closeModal();
-      toast(d.contract ? 'Saved - your contract has been emailed to you.' : 'Saved - welcome aboard!');
+      toast(d.contract ? 'Profile saved. Open your contract from your portal.' : 'Saved - welcome aboard!');
       if (d.contract) requireContractSubmission(true);
     } catch (err) {
       if (err.message === 'Signed out.') { window.MODAL_LOCK = false; location.href = '/'; return; }
@@ -700,7 +726,7 @@ function healthRow(h) {
     <div class="dot-ic ${h.ok ? 'ok' : 'bad'}">${h.ok ? T_ICONS.check : T_ICONS.x}</div>
     <div class="t">${esc(h.name)}</div>
     <div class="s" style="color:var(--muted);margin-right:10px">${esc(h.detail)}</div>
-    <span class="status ${h.ok ? 'ok' : 'bad'}">${h.ok ? 'Operational' : 'Attention needed'}</span>
+    <span class="status ${['configured','disabled','test_mode'].includes(h.status)?'wait':h.ok?'ok':'bad'}">${({operational:'Healthy',configured:'Configured',disabled:'Disabled',test_mode:'Test mode',failed:'Failed'})[h.status] || (h.ok?'Healthy':'Failed')}</span>
   </div>`;
 }
 function logRow(e) {
@@ -818,7 +844,7 @@ async function renderAdminTeachers() {
   const d = await api('/api/admin/users');
   el.innerHTML = userGroupTable('Teachers', d.users.filter((u) => u.role === 'instructor'), ME.role === 'admin')
     + '<div id="teacherAssignWrap" style="margin-top:16px"></div>';
-  renderInstructorAssignmentPanel('teacherAssignWrap', { canEditTag: true, canAssign: true });
+  if(ME.role==='admin')renderInstructorAssignmentPanel('teacherAssignWrap', { canEditTag: true, canAssign: true });
 }
 /* -------- Instructor directory: HR/admin-set specialization tag, and
  * "assign to course" (an instructor can teach several courses at once) -
@@ -1116,7 +1142,9 @@ async function renderStudentOverview(el, d) {
   const featured = withDue[0] || openChallenges[openChallenges.length - 1] || null;
   const mineChallenge = featured ? (challR.mine || {})[featured.id] : null;
 
+  let lastLesson='';try{lastLesson=EL.safeReturn(localStorage.getItem('el:last:'+ME.id),'');}catch{}
   el.innerHTML = `
+    ${lastLesson?'<p class="learning-primary"><a class="btn btn-primary" href="'+esc(lastLesson)+'">Continue your last practice</a> <a class="btn btn-ghost" href="/open#free">Browse free courses</a></p>':''}
     <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start" class="ovr-grid">
       <div>
         ${cont ? `<div class="card"><div class="cl-hero">
@@ -1164,7 +1192,7 @@ async function renderStudentOverview(el, d) {
               <div class="cc-body">
                 <div class="tier">${esc(c.tier)} &middot; ${esc(c.code)}</div>
                 <h4>${esc(c.title)}</h4>
-                <div class="s" style="color:var(--muted)">${esc((c.summary || '').slice(0, 90))}</div>
+                <div class="s course-summary" style="color:var(--muted)">${esc(c.summary)}</div>
               </div>
             </a>`).join('')}</div></div></div>` : ''}
       </div>
@@ -1173,7 +1201,7 @@ async function renderStudentOverview(el, d) {
         ${featured ? `<div class="card"><div class="card-head"><h3>Daily challenge</h3></div>
           <div class="card-body">
             <div class="t" style="font-weight:600;margin-bottom:4px">${esc(featured.title)}</div>
-            <div class="s" style="color:var(--muted);margin-bottom:10px">${esc((featured.description || '').slice(0, 120))}</div>
+            <div class="s" style="color:var(--muted);margin-bottom:10px">${esc(featured.description)}</div>
             ${featured.due_date ? `<div class="cd-grid" id="dcCountdown">
               <div class="cd-box"><b id="dc-d">--</b><span>Days</span></div>
               <div class="cd-box"><b id="dc-h">--</b><span>Hours</span></div>
@@ -1390,6 +1418,7 @@ function filterTeacherStudents() {
 async function renderTeacherGrades() {
   const el = $('view-grades');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  if(ME.role==='admin')return renderFreeReviews(el);
   const d = await api('/api/teacher/grades');
   if (!d.pending.length) { el.innerHTML = '<div class="card"><div class="card-body"><div class="empty">Nothing waiting for grades - nice work.</div></div></div>'; return; }
   el.innerHTML = `<div class="card"><div class="card-head"><h3>Pending submissions</h3><span class="s" style="color:var(--muted)">${d.pending.length} waiting</span></div>
@@ -1534,6 +1563,7 @@ function jobCardHtml(j) {
   </div>`;
 }
 async function openJob(id) {
+  EL.drafts.flushAll(); dashboardRoute({view:'job',id});
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   $('view-job').classList.add('active');
   $('pageTitle').textContent = 'Job';
@@ -1717,11 +1747,14 @@ async function openMessageThread(batchId) {
 
 /* ============================ COURSE DETAIL ============================ */
 async function openCourse(id, openTab) {
+  EL.drafts.flushAll(); const request = ++COURSE_REQUEST;
+  dashboardRoute({view:'course',batch:id,tab:openTab || 'Quest'});
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   $('view-course').classList.add('active');
   $('pageTitle').textContent = 'Course';
   $('view-course').innerHTML = '<div class="empty">Loading&hellip;</div>';
   const d = await api(`/api/batches/${id}`);
+  if (request !== COURSE_REQUEST) return;
   CURRENT_BATCH = d;
   const b = d.batch;
   const canManage = d.can_manage;
@@ -1764,9 +1797,10 @@ async function openCourse(id, openTab) {
     </div>
     <div class="tabs">${tabs.map((t) => `<div class="tab${t === initialTab ? ' active' : ''}" data-tab="${t}" onclick="courseTab(this)">${t}</div>`).join('')}</div>
     <div id="courseTabBody"></div>`;
-  drawCourseTab(initialTab);
+  await drawCourseTab(initialTab);
 }
 function courseTab(el) {
+  dashboardRoute({view:'course',batch:bid(),tab:el.dataset.tab});
   document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
   el.classList.add('active');
   drawCourseTab(el.dataset.tab);
@@ -1779,7 +1813,7 @@ function drawCourseTab(tab) {
   // Deliberately does NOT stop a live call here - the call widget lives
   // outside this tab body so it keeps running no matter which tab is open.
 
-  if (tab === 'Quest') { renderQuestTab(body); return; }
+  if (tab === 'Quest') return renderQuestTab(body);
   if (tab === 'Quizzes') { renderQuizzesTab(body); return; }
   if (tab === 'At-risk') { renderAtRiskTab(body); return; }
   if (tab === 'Chat') { renderChatTab(body); return; }
@@ -2043,8 +2077,9 @@ async function renderSettings() {
   ME = await api('/api/auth/me');
   drawAvatar();
   const p = ME.profile || {};
+  if(!ME.onboarding_complete && ['instructor','staff','ambassador','hr'].includes(ME.role))setTimeout(()=>{if(!document.getElementById('resumeOnboarding'))el.insertAdjacentHTML('afterbegin','<p id="resumeOnboarding"><button class="btn btn-primary" onclick="requireOnboarding()">Resume account setup</button></p>');},0);
   const fieldLabels = {
-    phone: 'Phone', dob: 'Date of birth', gender: 'Gender', cnic: 'CNIC / B-form', father_name: 'Father / guardian name',
+    marketing_opt_in:'Optional promotional messages', phone: 'Phone', dob: 'Date of birth', gender: 'Gender', cnic: 'CNIC / B-form', father_name: 'Father / guardian name',
     address: 'Address', city: 'City', education: 'Education', institute: 'School / institute', emergency_contact: 'Emergency contact',
     goal: 'Goal', links: 'LinkedIn / GitHub', designation: 'Designation', qualification: 'Qualification',
     expertise: 'Expertise', experience_years: 'Experience (years)', joining_date: 'Joining date', office_hours: 'Office hours',
@@ -2219,7 +2254,7 @@ function openProfileForm() {
         <label class="field"><span>Goal</span><input name="goal" value="${esc(p.goal || '')}" placeholder="What are you here to achieve?"></label>
         <label class="field"><span>LinkedIn / GitHub</span><input name="links" value="${esc(p.links || '')}"></label>
       </div>
-      <button class="btn btn-primary btn-block">Save</button></form>`, true);
+      <label class="field"><span>Optional promotional messages</span><select name="marketing_opt_in"><option value="no">Do not send offers</option><option value="yes" ${p.marketing_opt_in==='yes'?'selected':''}>Send course offers and invitations</option></select></label><button class="btn btn-primary btn-block">Save</button></form>`, true);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const obj = {}; new FormData(f).forEach((v, k) => { obj[k] = String(v).trim(); });
     try { await api('/api/me/profile', { method: 'POST', body: JSON.stringify(obj) }); toast('Profile saved.'); closeModal(); renderSettings(); }
@@ -2434,7 +2469,7 @@ async function delUser(uid, name) {
  * enrollment pipeline, plus HR's staff/group directory.
  */
 function money(n) { return 'Rs ' + Number(n || 0).toLocaleString('en-US'); }
-const PIPELINE_LABEL = { new: 'New', challan_issued: 'Challan issued', challan_sent: 'Challan sent', paid_cleared: 'Payment verified', enrolled: 'Enrolled' };
+const PIPELINE_LABEL = { new: 'New', challan_issued: 'Challan issued', challan_sent: 'Email provider accepted', paid_cleared: 'Payment verified', enrolled: 'Enrolled' };
 const PIPELINE_COLOR = { new: '#6B7280', challan_issued: '#D89A00', challan_sent: '#2A7BD1', paid_cleared: '#0FBFA8', enrolled: '#1FA36B' };
 function pipelineBadge(stage) {
   const label = PIPELINE_LABEL[stage] || stage, color = PIPELINE_COLOR[stage] || '#6B7280';
@@ -3219,7 +3254,7 @@ function finRegRow(r) {
     action = `<span class="s" style="color:var(--muted)">Challan generated (net ${money(latest.net_fee)}) - not yet mailed to the student</span>
       <a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>`;
   } else if (r.payment_stage === 'challan_sent') {
-    action = `<span class="s" style="color:var(--muted)">Mailed &middot; net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
+    action = `<span class="s" style="color:var(--muted)">Email provider accepted &middot; net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
       <a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>
       <button class="btn btn-primary btn-sm" onclick="finClearPayment(${r.id})">Verify &amp; confirm payment</button>`;
   } else if (r.payment_stage === 'paid_cleared') {
@@ -3308,7 +3343,7 @@ let COORD_FOLDER = 'new';
 const COORD_FOLDERS = [
   ['new', 'New enrollments'],
   ['challan_issued', 'Challan generated'],
-  ['challan_sent', 'Challan mailed - with Finance'],
+  ['challan_sent', 'Challan handed to provider'],
   ['paid_cleared', 'Ready to enroll'],
   ['enrolled', 'Enrolled'],
 ];
@@ -3383,11 +3418,11 @@ function coordRegRow(r) {
     action = `<span class="s" style="color:var(--muted)">Net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
       ${viewBtn}
       <button class="btn btn-primary btn-sm" onclick="coordSendChallan('${latest.serial}')">Send to student</button>
-      <button class="btn btn-ghost btn-sm" onclick="coordOpenChallanForm(${r.id})">Re-issue</button>`;
+      <button class="btn btn-ghost btn-sm" onclick="window.open('/challan?s=${latest.serial}','_blank','noopener')">View fee details</button>`;
   } else if (r.payment_stage === 'challan_sent') {
     action = `<span class="s" style="color:var(--muted)">Mailed &middot; net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')} &middot; awaiting Finance verification</span>
       ${viewBtn}
-      <button class="btn btn-ghost btn-sm" onclick="coordSendChallan('${latest.serial}')">Resend</button>`;
+      <button class="btn btn-ghost btn-sm" onclick="coordSendChallan('${latest.serial}',true)">Resend</button>`;
   } else if (r.payment_stage === 'paid_cleared') {
     action = r.available_batches.length
       ? `<select id="batchSel${r.id}" class="field" style="margin:0;min-width:200px">${r.available_batches.map((b) => `<option value="${b.id}">${esc(b.name)} &middot; starts ${esc(b.start_date || '-')}</option>`).join('')}</select>
@@ -3404,6 +3439,7 @@ function coordRegRow(r) {
       <div style="font-weight:700">${esc(r.name)} <span class="s" style="color:var(--muted);font-weight:400">&middot; ${esc(r.email)}${r.whatsapp ? ' &middot; ' + esc(r.whatsapp) : ''}</span></div>
       <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')}${r.course_fee ? ` &middot; ${money(r.course_fee)}` : ''} &nbsp;${pipelineBadge(r.payment_stage)}</div>
       ${amb}
+      ${r.status?.delivery ? `<p class="s" role="status">Email: ${esc(r.status.delivery.state.replaceAll("_", " "))}${r.status.delivery.state === "failed" ? " ? download the PDF or retry sending." : ""}</p>` : ""}
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}</div>
   </div></div>`;
@@ -3431,10 +3467,10 @@ async function coordOpenChallanForm(regId) {
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
-async function coordSendChallan(serial) {
+async function coordSendChallan(serial,resend=false) {
   try {
-    await api(`/api/admissions/challans/${encodeURIComponent(serial)}/send`, { method: 'POST' });
-    toast('Challan PDF emailed - the student was asked to send payment proof to finance@echolens.digital.');
+    await api(`/api/admissions/challans/${encodeURIComponent(serial)}/send`, { method: 'POST',body:JSON.stringify({resend}) });
+    toast('Accepted by the email provider. Inbox delivery is not confirmed.');
     renderCoordRegistrations();
   } catch (e) { toast(e.message, true); }
 }
@@ -3443,7 +3479,7 @@ async function coordEnroll(regId) {
   if (!sel || !sel.value) { toast('Choose a batch first.', true); return; }
   try {
     const out = await api(`/api/admissions/registrations/${regId}/enroll`, { method: 'POST', body: JSON.stringify({ batch_id: sel.value }) });
-    toast(out.credentials ? 'Enrolled - new account credentials emailed.' : 'Enrolled - added to their existing account.');
+    toast(out.credentials ? 'Enrolled. Account created; email delivery must be checked separately.' : 'Enrolled - added to their existing account.');
     renderCoordRegistrations();
   } catch (e) { toast(e.message, true); }
 }
@@ -4122,7 +4158,7 @@ async function myDeptCompleteTask(e, taskId) {
 async function renderAmbReferrals() {
   const box = $('ambTabBody');
   const d = await api('/api/ambassador/referrals');
-  const stageLabel = { new: 'New', challan_issued: 'Challan issued', challan_sent: 'Challan sent', paid_cleared: 'Payment cleared', enrolled: 'Enrolled' };
+  const stageLabel = { new: 'New', challan_issued: 'Challan issued', challan_sent: 'Email provider accepted', paid_cleared: 'Payment cleared', enrolled: 'Enrolled' };
   box.innerHTML = `<div class="card"><div class="card-head"><h3>Students you referred</h3></div>
     <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
       <tr><th>Name</th><th>Email</th><th>Course</th><th>Stage</th><th>Registered</th></tr>
@@ -4851,6 +4887,7 @@ async function shareToShowcase(submissionId) {
 }
 
 function openTask(qid, pid) {
+  EL.drafts.flushAll();
   const d = QUEST_DATA;
   if (!d || !d.progress) return;
   const lvl = d.progress.levels.find((l) => l.quest.id === qid);
@@ -4870,6 +4907,7 @@ function openTask(qid, pid) {
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   $('view-task').classList.add('active');
   $('pageTitle').textContent = pr.title;
+  dashboardRoute({view:'task',batch:bid(),qid,pid});
   $('sidebar').classList.remove('open');
 
   const refsHtml = (pr.refs || []).length
@@ -4959,7 +4997,7 @@ function openTask(qid, pid) {
       </form></details>` : '';
 
   const prevCode = sub && sub.code ? sub.code : '';
-  const prevLang = (sub && sub.language) || (isWritten ? 'text' : 'python');
+  const prevLang = (sub && sub.language) || (isWritten ? 'text' : (pr.language || d.progress.track.default_language || 'python'));
 
   // Written problems get a clean answer workspace; coding problems get the
   // full-height IDE (Python or HTML/CSS/JS) beside a collapsible brief.
@@ -5043,6 +5081,7 @@ function openTask(qid, pid) {
   const term = EchoTerm.mount($('taskTerm'));
   TASK_CTX = { qid, pid, term, files: taskFiles.map((f) => ({ name: f.name, url: f.url })) };
   EchoRun.wireEditor($('codeBox'));
+  EL.drafts.bind({editor:$('codeBox'),language:$('taskLang'),identity:['paid',bid(),qid,pid],initial:prevCode,starter:lang=>EL.starter(lang,pr)});
   taskLangChanged();
 
   const ff = $('taskFileForm');
@@ -5250,6 +5289,7 @@ async function renderChatTab(body) {
         <p class="hint" style="margin:6px 2px 0">Messages are permanent${d.can_moderate ? ' - you can moderate as course staff' : ' and cannot be deleted'}. Tagging someone sends them an email${isLearner ? ' and posts with your real name' : ''}.</p>
       </div></div>`;
   drawChat_(d);
+  if(d.can_post===false){$('chatForm').remove();return;}
   wireMentions(d.members || []);
   $('chatForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -5974,7 +6014,7 @@ function formIssueAllCerts() {
     <form id="f">
       <label class="field"><span>Certificate title</span><input name="title" required value="${esc(bd.title || bd.name)}"></label>
       <label class="field"><span>Completion date</span><input name="completion_date" type="date" value="${new Date().toISOString().slice(0, 10)}"></label>
-      <label class="field" style="flex-direction:row;gap:8px;align-items:center"><input name="only_completed" type="checkbox" checked style="width:auto"><span>Only students who completed the full quest track</span></label>
+      <label class="field" style="flex-direction:row;gap:8px;align-items:center"><input name="only_completed" type="checkbox" checked disabled style="width:auto"><span>Only students who completed the full quest track</span></label>
       <p class="hint">Each student gets a QR-verified certificate and an email with their link. Untick the box to certify everyone enrolled.</p>
       <button class="btn btn-primary btn-block">Issue certificates</button></form>`);
   $('f').addEventListener('submit', async (e) => {
@@ -6602,7 +6642,7 @@ async function renderAnalytics() {
     <div class="card" style="margin-top:18px"><div class="card-head"><h3>New student registrations</h3><span class="s" style="color:var(--muted)" id="regsCount"></span></div>
       <div class="card-body tight" id="regsBox"><div class="empty">Loading registrations&hellip;</div></div>
     </div>
-    <div class="card"><div class="card-head"><h3>Email everyone - announcements, enrollments, discounts</h3></div>
+    <div class="card" id="reportOutreach"><div class="card-head"><h3>Email everyone - announcements, enrollments, discounts</h3></div>
       <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <p class="hint" style="margin:0;flex:1;min-width:220px">Compose and send email - with attachments and the optional direct registration link - from the dedicated Email Leads page. It also has manual lead entry, so you can add a contact and email them without them ever signing up.</p>
         <button class="btn btn-primary" onclick="show('admin-mailer')">Open Email Leads</button>
@@ -6614,7 +6654,7 @@ async function renderAnalytics() {
     </div>`;
   $('anDownloadCsv').href = '/api/admin/analytics.csv?' + q.toString();
   $('anDownloadPdf').href = '/api/admin/analytics.pdf?' + q.toString();
-  loadLeads();
+  if(ME.role==='admin')loadLeads();else{$('reportOutreach')?.remove();$('leadsBox')?.closest('.card')?.remove();}
   loadRegistrations();
 }
 function anSet(k, v) { AN_STATE[k] = v; if (k === 'metric') { AN_STATE.batch_id = ''; AN_STATE.event_id = ''; } renderAnalytics(); }
@@ -6856,3 +6896,7 @@ async function regDelete(id) {
   try { await api(`/api/admin/registrations/${id}`, { method: 'DELETE' }); loadRegistrations(); }
   catch (e) { toast(e.message, true); }
 }
+
+async function renderFreeReviews(el){const d=await api('/api/admin/open-attempts');el.innerHTML='<div class="card"><div class="card-head"><h3>Free-course submissions needing review</h3></div><div class="card-body">'+(d.attempts.length?d.attempts.map(a=>'<div class="list-row"><div class="grow"><strong>'+esc(a.track_key)+' ? Lesson '+a.level+' ? Practice '+a.pid+'</strong><p>Attempt #'+a.id+' ? Learner #'+a.user_id+'</p></div><button class="btn btn-primary" onclick="reviewFreeAttempt('+a.id+')">Review</button></div>').join(''):'No failed attempts need review.')+'</div></div>';FREE_REVIEW_ATTEMPTS=d.attempts;}
+let FREE_REVIEW_ATTEMPTS=[];
+function reviewFreeAttempt(id){const a=FREE_REVIEW_ATTEMPTS.find(a=>a.id===id);if(!a)return;openModal('Review saved attempt #'+id,'<p>'+esc(a.track_key)+' ? Lesson '+a.level+' ? Practice '+a.pid+'</p>'+(a.payload.code?'<pre style="white-space:pre-wrap;max-height:300px;overflow:auto">'+esc(a.payload.code)+'</pre>':'')+(a.payload.file_url?'<a href="'+esc(a.payload.file_url)+'" target="_blank" rel="noopener">Open submitted work</a>':'')+'<form id="freeReviewForm"><label class="field"><span>Score (0?100)</span><input name="score" type="number" min="0" max="100" required></label><label class="field"><span>Feedback</span><textarea name="feedback" required></textarea></label><button class="btn btn-primary">Save review</button></form>');$('freeReviewForm').onsubmit=async e=>{e.preventDefault();const f=e.target,btn=f.querySelector('button');btn.disabled=true;try{await api('/api/admin/open-attempts/'+id+'/grade',{method:'POST',body:JSON.stringify({score:Number(f.score.value),feedback:f.feedback.value})});closeModal();show('grades');}catch(e){modalMsg(e.message);btn.disabled=false;}};}

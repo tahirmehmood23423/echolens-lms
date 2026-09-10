@@ -21,7 +21,7 @@ const COLLECTIONS = [
   'hackathons', 'hackathon_entries', 'hackathon_submissions', 'ai_reports', 'quests',
   'quest_submissions', 'course_messages', 'chat_reads', 'live_classes', 'attendance',
   'quizzes', 'quiz_attempts', 'certificates', 'task_files', 'events', 'event_entries',
-  'event_submissions', 'event_comments', 'leads', 'open_submissions', 'registrations',
+  'event_submissions', 'event_comments', 'leads', 'open_submissions', 'open_attempts', 'registrations',
   'public_announcements', 'jobs', 'job_comments', 'discount_categories', 'challans',
   'expenses', 'coordinator_queries', 'staff_groups', 'staff_records', 'ambassadors',
   'ambassador_gem_events', 'ambassador_duties', 'ambassador_duty_status',

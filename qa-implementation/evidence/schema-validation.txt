@@ -1,0 +1,4 @@
+The schema at schema.prisma is valid 🚀
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from schema.prisma.

@@ -1487,3 +1487,22 @@ model ShowcaseReport {
   @@unique([targetType, targetId, reporterUserId])
   @@map("showcase_reports")
 }
+
+// Independent, durable free-course attempts. Payload is an immutable work snapshot plus job/result metadata.
+model OpenAttempt {
+  id Int @id @default(autoincrement())
+  userId Int @map("user_id")
+  submissionId Int @map("submission_id")
+  requestKey String @map("request_key")
+  trackKey String @map("track_key")
+  level Int
+  pid Int
+  status String
+  payload Json
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @map("updated_at")
+  @@unique([userId, requestKey])
+  @@index([status])
+  @@index([userId, trackKey])
+  @@map("open_attempts")
+}

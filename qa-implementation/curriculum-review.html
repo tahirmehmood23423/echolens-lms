@@ -1,0 +1,134 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Free-course curriculum review</title><style>:root{font-family:Inter,system-ui,Segoe UI,sans-serif;color:#15314a;background:#f4f8fa;line-height:1.6}*{box-sizing:border-box}body{margin:0}header{background:#103449;color:white;padding:20px 5vw}header a{color:#b4fff0}main{max-width:1500px;margin:auto;padding:32px 5vw 80px}h1{font-size:clamp(26px,4vw,40px);line-height:1.2;color:#123d51}h2{margin-top:36px;font-size:23px}h3{font-size:19px}p,li{max-width:110ch}a{color:#006b77;text-underline-offset:3px}a:focus-visible,input:focus-visible{outline:3px solid #ce7700;outline-offset:3px}table{border-collapse:collapse;width:100%;font-size:14px;background:white}th,td{border:1px solid #d6e1e6;text-align:left;padding:12px;vertical-align:top;min-width:130px;overflow-wrap:anywhere}th{background:#e0f0ef;color:#143f44;position:sticky;top:0}td:first-child{font-weight:600}.table-scroll{overflow:auto;margin:20px 0;max-height:75vh;border:1px solid #d6e1e6;border-radius:8px}pre{background:#e5edef;padding:16px;overflow:auto;border-radius:8px}code{font-size:.92em}input{min-height:44px;border:1px solid #7b99a7;border-radius:6px;padding:10px;font:inherit;width:min(600px,100%)}.search{position:sticky;top:0;z-index:3;background:#f4f8fa;padding:12px 0}.search small{display:block;color:#466272}img{max-width:100%;height:auto}footer{border-top:1px solid #ccdce4;padding-top:20px;color:#4a6473;font-size:14px}@media print{header,.search{display:none}.table-scroll{overflow:visible;max-height:none}main{padding:0}th{position:static}table{font-size:10px}a{color:inherit}}</style></head><body><header><strong>EchoLens · QA implementation</strong> &nbsp; <a href="implementation-report.html">Report</a> · <a href="issue-matrix.html">Issue matrix</a> · <a href="course-video-review.html">Course inventory</a> · <a href="release-runbook.html">Release checks</a></header><main><div class="search"><label for="filter">Filter table rows on this page</label><br><input id="filter" type="search" placeholder="Search issue ID, course or status"><small id="matches" aria-live="polite"></small></div><h1>Free-course curriculum review</h1>
+<p>The machine-readable inventory records every published free course, module, lesson and assignment, including the complete existing lesson text, instructions, grading criteria and resources. <code>course-inventory-before.json</code> preserves the original mappings; <code>course-inventory.json</code> captures the final local API. <code>lesson-review.csv</code> joins each assignment to its resource and verification evidence. <code>video-inventory.csv</code> lists each unique original video, reuse, availability and both playback methods.</p>
+<h2>What was checked</h2>
+<p>All 131 original unique YouTube resources were opened on the provider&#39;s watch page and attempted in an embedded player. Availability comes from the provider&#39;s playability response, not a thumbnail. Standard embedded playback required advancing media time. The second pass uses the app&#39;s actual <code>videoEmbedHtml</code> output, privacy-enhanced host and a click in the player, requiring media time greater than one second. A short playback sample proves that playback started, not that the entire recording is intact or suitable.</p>
+<p>The original <code>in-app-videos.json</code> three-video probe used an incorrect hidden-control selector. Its timeouts are inconclusive and superseded by <code>in-app-playback.json</code>; they must not be counted as broken videos. Standard playback and in-app playback can have different outcomes because of browser policy, timing and network conditions. UNVERIFIED playback needs a manual check using the normal Play control on the target network/device, inspection of any provider restriction, and a longer seek/play sample. No video was confirmed removed or private in this run.</p>
+<p>Transcript retrieval returned empty responses or timed out. Provider titles and available creator chapters/descriptions were inspected for topic mismatches and specific timestamps. These are partial content evidence. Every row retains <strong>UNVERIFIED full lesson/assignment coverage</strong> unless the precise reviewed scope is stated. An instructor must inspect the relevant segment or obtain accessible captions and solve the assignment using only the lesson and declared prerequisites before marking full coverage verified. Availability, embed loading and chapter relevance are separate checks.</p>
+<h2>Narrow corrections implemented</h2>
+<table>
+<thead>
+<tr>
+<th>Lesson</th>
+<th>Before</th>
+<th>Current correction</th>
+<th>Evidence and limit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Python basics lesson 3: input and casting</td>
+<td>Advanced Python Hindi recording</td>
+<td>Existing Mosh beginner recording at 9:08</td>
+<td><a href="https://www.youtube.com/watch?v=kqtD5dpn9C8&t=548s">Creator video</a>: input chapter 9:08, conversion 10:48. Full assignment still needs pedagogical review.</td>
+</tr>
+<tr>
+<td>JavaScript basics lesson 5: strings and templates</td>
+<td>Python strings recording</td>
+<td>Existing Caleb Curry JavaScript recording at 1:51:19 plus MDN template-literal reference</td>
+<td><a href="https://www.youtube.com/watch?v=9M4XKi25I2M&t=6679s">Creator video</a>: string datatype 1:51:19, string methods 1:57:08. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals">MDN template literals</a> covers the language-specific template syntax.</td>
+</tr>
+<tr>
+<td>JavaScript basics lesson 6: iteration</td>
+<td>Python loops recording</td>
+<td>Same JavaScript recording at 2:45:11 plus MDN loop guide</td>
+<td><a href="https://www.youtube.com/watch?v=9M4XKi25I2M&t=9911s">Creator video</a>: introduction to loops at 2:45:11. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration">MDN loops and iteration</a> supplements specific loop forms.</td>
+</tr>
+<tr>
+<td>Advanced JavaScript lesson 12: async generators</td>
+<td>Python generators recording</td>
+<td>Explicit Read lesson guide action; wrong video mapping removed from this JS lesson</td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*">MDN async generators</a> is the correct language reference. A replacement video remains <strong>OPEN</strong>. The useful Python resource remains in its appropriate Python lesson and original inventory.</td>
+</tr>
+</tbody></table>
+<p>The player now respects verified timestamp parameters and maintains a 16:9 ratio on mobile. A browser check confirms the 548-second parameter and the rendered mobile aspect ratio. The 131-video playback pass samples the base recordings; it does not claim playback or comprehension of every individual timestamped segment.</p>
+<h2>Confirmed mismatch still needing a verified replacement</h2>
+<p>C++ basics lesson 10 requires classes, objects and access control, but its <a href="https://www.youtube.com/watch?v=S3nx34WFXjI">linked introductory recording</a> has installation and first-program chapters. It supplies insufficient evidence for the bank-account exercise. Keep the authored lesson and assignment; select and inspect an appropriate classes/access-control segment before changing its video. A matching search title alone is not an approved replacement.</p>
+<h2>Coverage gaps to review before calling the curriculum complete</h2>
+<p>These are topic/assignment coverage concerns based on the available chapters and titles, not claims that every recording is defective. The per-lesson CSV includes the corresponding review note.</p>
+<table>
+<thead>
+<tr>
+<th>Course</th>
+<th>Specific review work</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>C fundamentals</td>
+<td>Lesson 2 uses a variables/output recording for program-entry anatomy; lesson 3 needs explicit escape sequences; lesson 13 requires break/continue beyond a basic loop recording.</td>
+</tr>
+<tr>
+<td>C++ fundamentals</td>
+<td>Verify auto/const in lesson 4, overloading in lesson 9, destructors in lesson 11, and replace the confirmed lesson 10 mismatch.</td>
+</tr>
+<tr>
+<td>Python fundamentals</td>
+<td>Verify modern f-strings, list comprehensions, LEGB as well as lambda, and exception handling alongside file I/O.</td>
+</tr>
+<tr>
+<td>JavaScript fundamentals</td>
+<td>Add inspected chapter offsets for reused long recordings; lesson 2 needs scope/hoisting sections. Verify filter/reduce as well as map in lesson 7 and currying as well as higher-order functions in lesson 12.</td>
+</tr>
+<tr>
+<td>HTML/CSS fundamentals</td>
+<td>Generally aligned chapter topics; still solve every assignment from the supplied explanation/example. Check form labels, keyboard use and responsive outcomes in the exercises.</td>
+</tr>
+<tr>
+<td>Advanced C</td>
+<td>The memory-address recording needs explicit malloc/free/leak coverage; struct-pointer material needs actual linked-list construction/traversal. Confirm masks and binary I/O with runnable examples.</td>
+</tr>
+<tr>
+<td>Advanced C++</td>
+<td>Class templates currently use function-template material; verify Rule of Five/move semantics, vtables and algorithm predicates/lambdas beyond introductory examples.</td>
+</tr>
+<tr>
+<td>Advanced Python</td>
+<td>Verify metaclasses beyond ABCs, slots beyond weak references, and decorators beyond simple wrappers. The contextlib video is in French without a language label: disclose language or provide an inspected equivalent.</td>
+</tr>
+<tr>
+<td>Advanced JavaScript</td>
+<td>Verify #private fields, property descriptors/freeze, current microtask behavior, all four promise combinators and worker/isolation prerequisites. Async-generator video replacement remains open.</td>
+</tr>
+<tr>
+<td>Advanced web</td>
+<td>Cascade layers does not alone teach theme variables; subgrid does not alone teach auto-fit; container queries does not alone teach clamp. Verify backdrop-filter for the glass task, animation delay for staggered items, actual lazy-loading implementation, and hosting deployment beyond Git commands. Very short Sass/Tailwind/PostCSS introductions need practical worked examples.</td>
+</tr>
+</tbody></table>
+<h2>Proposed revised outlines — not applied</h2>
+<p>Preserve IDs, completion records and existing useful explanations. These outlines organize additions and prerequisite checks; they are not permission to replace the published course wholesale.</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Proposed module sequence</th>
+<th>Changes requiring content review</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>C foundations → advanced</td>
+<td>Toolchain and I/O → types/operators → control flow → functions → pointers/heap → structured data → file I/O/callbacks</td>
+<td>Add memory diagrams and leak-check demonstration; supply a complete linked-list worked example before its task.</td>
+</tr>
+<tr>
+<td>C++ foundations → advanced</td>
+<td>Streams/types → strings/containers → references/functions → objects/lifetime → inheritance/interfaces → value semantics/templates → STL/ownership</td>
+<td>Add an actual class/access-control lesson; separate function templates and class templates; pair constructors with destructor/RAII behavior.</td>
+</tr>
+<tr>
+<td>Python foundations → advanced</td>
+<td>Runtime/data → branching/collections → functions/scope → objects/files/errors → iterators/decorators → descriptors/context managers → concurrency</td>
+<td>Explicit f-string/comprehension practice; separate slots/weakref/metaclasses objectives; label recording language and local-interpreter requirements.</td>
+</tr>
+<tr>
+<td>JavaScript foundations → advanced</td>
+<td>Runtime/types → strings/collections → functions/objects → async basics → object model/iteration → scheduling/cancellation → workers/shared memory</td>
+<td>Remove cross-language dependencies; give task-specific timestamps; add explicit async-generator, modern microtask and allSettled examples.</td>
+</tr>
+<tr>
+<td>HTML/CSS foundations → advanced</td>
+<td>Semantic structure/forms → cascade/layout → responsive patterns → interaction/accessibility → architecture/build tools → performance/deployment</td>
+<td>Add custom-property, auto-fit, clamp and backdrop-filter examples; provide real Sass/PostCSS setup and a verified deploy walkthrough.</td>
+</tr>
+</tbody></table>
+<p>Before promoting an advanced course, declare prerequisite course/skills, execution environment and tool setup next to its outcome. C/C++ need a supported compiler and interactive/file behavior; Python concurrency/file exercises need a suitable interpreter; Sass/PostCSS need a build step; JavaScript workers/shared memory need the required origin/isolation support. The generic browser preview does not prove those environments work. Supply a tested local-tool fallback where the built-in runner cannot perform the exercise. These additions remain <strong>NEEDS DECISION</strong> for the curriculum owner rather than silently changing assessment requirements.</p>
+<h2>Acceptance checklist for the content owner</h2>
+<p>For each UNVERIFIED row: confirm the spoken language and prerequisites, inspect the precise segment, add a verified timestamp when a long recording is reused, solve the assignment from its declared inputs, confirm the runner supports it, and record reviewer/date/evidence. Keep the existing assignment IDs and thresholds. Do not add a compulsory final exam unless an actual configured assessment has been authored and reviewed.</p>
+<footer>Local synthetic verification · 2026-09-10T04:57:37.075Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>

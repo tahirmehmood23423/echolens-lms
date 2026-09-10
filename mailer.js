@@ -85,8 +85,9 @@ async function notify(to, subject, text, attachments) {
   for (let i = 0; i < list.length; i++) {
     const addr = list[i];
     try {
-      await send({ to: addr, subject, text: `${text}\n\n- EchoLens`, attachments });
-      result.sent.push(addr);
+      const outcome = await send({ to: addr, subject, text: `${text}\n\n- EchoLens`, attachments });
+      if (outcome && outcome.sent) result.sent.push(addr);
+      else result.skipped.push(addr);
       consecutive = 0;
     } catch (e) {
       consecutive++;

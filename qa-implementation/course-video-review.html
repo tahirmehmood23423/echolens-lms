@@ -1,0 +1,2152 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Complete course and video inventory</title><style>:root{font-family:Inter,system-ui,Segoe UI,sans-serif;color:#15314a;background:#f4f8fa;line-height:1.6}*{box-sizing:border-box}body{margin:0}header{background:#103449;color:white;padding:20px 5vw}header a{color:#b4fff0}main{max-width:1500px;margin:auto;padding:32px 5vw 80px}h1{font-size:clamp(26px,4vw,40px);line-height:1.2;color:#123d51}h2{margin-top:36px;font-size:23px}h3{font-size:19px}p,li{max-width:110ch}a{color:#006b77;text-underline-offset:3px}a:focus-visible,input:focus-visible{outline:3px solid #ce7700;outline-offset:3px}table{border-collapse:collapse;width:100%;font-size:14px;background:white}th,td{border:1px solid #d6e1e6;text-align:left;padding:12px;vertical-align:top;min-width:130px;overflow-wrap:anywhere}th{background:#e0f0ef;color:#143f44;position:sticky;top:0}td:first-child{font-weight:600}.table-scroll{overflow:auto;margin:20px 0;max-height:75vh;border:1px solid #d6e1e6;border-radius:8px}pre{background:#e5edef;padding:16px;overflow:auto;border-radius:8px}code{font-size:.92em}input{min-height:44px;border:1px solid #7b99a7;border-radius:6px;padding:10px;font:inherit;width:min(600px,100%)}.search{position:sticky;top:0;z-index:3;background:#f4f8fa;padding:12px 0}.search small{display:block;color:#466272}img{max-width:100%;height:auto}footer{border-top:1px solid #ccdce4;padding-top:20px;color:#4a6473;font-size:14px}@media print{header,.search{display:none}.table-scroll{overflow:visible;max-height:none}main{padding:0}th{position:static}table{font-size:10px}a{color:inherit}}</style></head><body><header><strong>EchoLens · QA implementation</strong> &nbsp; <a href="implementation-report.html">Report</a> · <a href="issue-matrix.html">Issue matrix</a> · <a href="course-video-review.html">Course inventory</a> · <a href="release-runbook.html">Release checks</a></header><main><div class="search"><label for="filter">Filter table rows on this page</label><br><input id="filter" type="search" placeholder="Search issue ID, course or status"><small id="matches" aria-live="polite"></small></div><h1>Complete course and video inventory</h1>
+<p><a href="curriculum-review.html">Curriculum evidence, changes and unresolved review</a> · <a href="lesson-review.csv">All lesson/assignment rows (CSV)</a> · <a href="video-inventory.csv">Unique videos (CSV)</a> · <a href="course-inventory-before.json">Original complete content (JSON)</a> · <a href="course-inventory.json">Current complete content (JSON)</a></p>
+<p>Search the table in the HTML page to find a course, topic or UNVERIFIED concern. Availability and playback are independent from content coverage.</p>
+<table>
+<thead>
+<tr>
+<th>Course</th>
+<th>Modules</th>
+<th>Lessons</th>
+<th>Assignments</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CS-101: Fundamentals of C</td>
+<td>5</td>
+<td>16</td>
+<td>16</td>
+</tr>
+<tr>
+<td>CS-102: Fundamentals of C++ (with Object-Oriented Programming)</td>
+<td>4</td>
+<td>12</td>
+<td>12</td>
+</tr>
+<tr>
+<td>CS-104: Fundamentals of Python</td>
+<td>5</td>
+<td>15</td>
+<td>15</td>
+</tr>
+<tr>
+<td>CS-105: Fundamentals of JavaScript</td>
+<td>5</td>
+<td>15</td>
+<td>15</td>
+</tr>
+<tr>
+<td>CS-106: Fundamentals of HTML &amp; CSS</td>
+<td>5</td>
+<td>15</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Advanced C Programming</td>
+<td>4</td>
+<td>12</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Advanced C++ Programming</td>
+<td>4</td>
+<td>12</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Advanced Python Programming</td>
+<td>5</td>
+<td>15</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Advanced JavaScript Programming</td>
+<td>5</td>
+<td>15</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Advanced CSS and Web Development</td>
+<td>5</td>
+<td>15</td>
+<td>15</td>
+</tr>
+</tbody></table>
+<h2>Every lesson and assignment</h2>
+<table>
+<thead>
+<tr>
+<th>Course / module / lesson</th>
+<th>Topic</th>
+<th>Practice</th>
+<th>Resource / timestamp</th>
+<th>Playback (standard / app)</th>
+<th>Relevance evidence and next work</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>fc01-c-basics / 1 / 1</td>
+<td>The C Compilation Lifecycle</td>
+<td>Airport Gate Terminal Initialization; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=KnvbUiSxvbM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 1 / 2</td>
+<td>Anatomy of main() and Program Entry</td>
+<td>Server Handshake Status; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=h4VBpylsjJc">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Variables/output recording; program-entry anatomy needs inspected coverage. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 1 / 3</td>
+<td>Standard Output &amp; Escape Sequences</td>
+<td>Cafe POS Itemized Receipt; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=h4VBpylsjJc">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Output chapter exists; confirm explicit escape-sequence examples. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 2 / 4</td>
+<td>Primitive Data Types &amp; Memory Footprint</td>
+<td>Patient Intake Triage Card; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=sARaqR0hRI4">video</a></td>
+<td>PLAYED / UNVERIFIED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 2 / 5</td>
+<td>Variable Declaration, Initialization &amp; Constants</td>
+<td>Fixed Toll Plaza Billing; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=aIQk1O08zpg">video</a></td>
+<td>PLAYED / UNVERIFIED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 2 / 6</td>
+<td>Format Specifiers</td>
+<td>Precision Currency Formatter; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=iLZOL-hmr7M">video</a></td>
+<td>UNVERIFIED / UNVERIFIED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 2 / 7</td>
+<td>Interactive Input with scanf()</td>
+<td>ATM Cash Withdrawal Prompt; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=17gp5DJEyiw">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 3 / 8</td>
+<td>Arithmetic &amp; Modulo Operations</td>
+<td>Warehouse Cargo Box Packer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=_57FcSBtJNU">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 3 / 9</td>
+<td>Relational &amp; Logical Decisions</td>
+<td>Theme Park Ride Safety Gate; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=xyQrVEFz9kw">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 3 / 10</td>
+<td>Branching with if, else if, and else</td>
+<td>Smart Thermostat Temperature Alert; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=iD05HmGLZXc">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 4 / 11</td>
+<td>Counter-Controlled for Loops</td>
+<td>Rocket Launch Countdown; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=b4DPj0XAfSg">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 4 / 12</td>
+<td>Condition-Driven while Loops</td>
+<td>EV Fast-Charging Battery Monitor; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=qUPXsPtWGoY">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 4 / 13</td>
+<td>Loop Controls (break &amp; continue)</td>
+<td>Inventory Defect Scanner; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=qUPXsPtWGoY">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Basic loop recording; inspect break/continue coverage needed for defect scanner. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 5 / 14</td>
+<td>Function Declarations &amp; Prototypes</td>
+<td>Temperature Unit Converter Module; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=vc9A6HdrTz4">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 5 / 15</td>
+<td>Pass-by-Value &amp; Parameter Passing</td>
+<td>Coupon Discount Scope Verification; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=7VM571tSKC0">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc01-c-basics / 5 / 16</td>
+<td>Return Types &amp; Void Functions</td>
+<td>Emergency Siren Dispatcher; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=7Bq87y7eJEg">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 1 / 1</td>
+<td>C++ Compilation &amp; iostream</td>
+<td>System Terminal Initializer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=S3nx34WFXjI">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 1 / 2</td>
+<td>Namespaces &amp; std::cout</td>
+<td>Scoped Banner Generator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=18c3MTX0PK0">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 1 / 3</td>
+<td>std::cin Stream Input</td>
+<td>User Verification Scanner; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=vkALQRM5NNU">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 2 / 4</td>
+<td>Types, auto &amp; const</td>
+<td>Auto-Deduction Tax Calculator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=QANQHxx9I8Y">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Variables material; auto deduction and const need explicit coverage. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 2 / 5</td>
+<td>std::string &amp; Operations</td>
+<td>Full Name Badge Concatenator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=3rDp0yOACZQ">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 2 / 6</td>
+<td>std::vector Dynamic Arrays</td>
+<td>Real-Time Score Tracker; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=jRXFJJN1Va4">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 3 / 7</td>
+<td>Range-based for Loops</td>
+<td>Range Loop Sequence Summer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=qnEUB25TRaY">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 3 / 8</td>
+<td>C++ References (&amp;ref)</td>
+<td>In-Place Reference Doubler; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=IzoFn3dfsPA">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 3 / 9</td>
+<td>Function Overloading</td>
+<td>Overloaded Area Calculator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=vKTYM-DJDiw">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>User-defined functions material; verify overloaded signatures and resolution. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 4 / 10</td>
+<td>Classes, Objects &amp; Access</td>
+<td>Encapsulated Bank Account; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=S3nx34WFXjI">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>CONFIRMED MISMATCH: introductory installation/first-program chapters do not provide classes/access-control coverage. Verified replacement remains OPEN. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 4 / 11</td>
+<td>Constructors &amp; Destructors</td>
+<td>Device Lifecycle Logger; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=5z3KEX9AZEQ">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Constructor material; inspect destructor lifecycle coverage for the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>fc02-cpp-objects / 4 / 12</td>
+<td>Getters, Setters &amp; &#39;this&#39;</td>
+<td>Validated Speed Governor; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=f2IrG1JabSg">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 1 / 1</td>
+<td>Python Interpreter &amp; print()</td>
+<td>System Diagnostic Banner; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=kqtD5dpn9C8">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 1 / 2</td>
+<td>Dynamic Variables &amp; Types</td>
+<td>Inventory Price Multiplier; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=cQT33yu9pY8">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 1 / 3</td>
+<td>User Input with input() &amp; Type Casting</td>
+<td>Age Verification Scanner; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=kqtD5dpn9C8&t=548s">video</a> @ 548s</td>
+<td>PLAYED / PLAYED</td>
+<td>CORRECTED: advanced Hindi Python replaced with beginner input chapter 9:08 and conversion 10:48. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 2 / 4</td>
+<td>String Slicing &amp; f-Strings</td>
+<td>Product SKU Code Parser; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=k9TUPpGqYTo">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Older string tutorial; verify modern f-string syntax as well as slicing. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 2 / 5</td>
+<td>Decision Structures (if, elif, else)</td>
+<td>Speed Radar Enforcer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=DZwmZ8Usvnk">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 2 / 6</td>
+<td>Iteration with for &amp; while Loops</td>
+<td>Even Sequence Accumulator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=6iF8Xb7Z3wQ">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 3 / 7</td>
+<td>Lists &amp; List Comprehensions</td>
+<td>Squares of Odds Generator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=W8KRzm-HUcc">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Lists/tuples basics; inspect list-comprehension coverage. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 3 / 8</td>
+<td>Tuples &amp; Sets</td>
+<td>Duplicate Identifier Filter; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=W8KRzm-HUcc">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 3 / 9</td>
+<td>Dictionaries &amp; Key-Value Lookups</td>
+<td>Word Frequency Counter; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=daefaLgNkw0">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 4 / 10</td>
+<td>Defining Functions &amp; Default Arguments</td>
+<td>Bill Splitter Function; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=9Os0o3wzS_I">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 4 / 11</td>
+<td>*args, **kwargs &amp; Variable Arguments</td>
+<td>Dynamic Math Product Engine; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=Vh__2V2tXUM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 4 / 12</td>
+<td>Lambda Expressions &amp; Scope (LEGB)</td>
+<td>Custom Key Sorter; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=25ovCm9jKfA">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Lambda material; verify LEGB scope explanation separately. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 5 / 13</td>
+<td>Classes, Objects &amp; <strong>init</strong></td>
+<td>Student Profile Manager; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=ZDa-Z5JzLYM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 5 / 14</td>
+<td>Inheritance &amp; Polymorphism</td>
+<td>Employee Hierarchy Manager; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=RSl87lqOXDE">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs104-python / 5 / 15</td>
+<td>File Handling with &#39;with&#39; &amp; Exceptions</td>
+<td>Safe Log File Writer &amp; Reader; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=Uh2ebFW8OYM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>File-object material; verify safe exception handling in addition to with. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 1 / 1</td>
+<td>JS Runtime Engine &amp; console.log()</td>
+<td>System Startup Diagnostic Banner; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=W6NZfCO5SIk">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 1 / 2</td>
+<td>Variable Scoping (let, const, var) &amp; Hoisting</td>
+<td>Block-Scoped Tax Calculator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=9M4XKi25I2M">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Long reused recording: scope chapters at 53:36/59:21 and hoisting 5:29:06. No lesson-specific offset applied; inspect segment before adding. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 1 / 3</td>
+<td>Primitive Data Types &amp; Type Conversion</td>
+<td>Type Inspector &amp; Parser; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=jLRnuVHwHKk">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 2 / 4</td>
+<td>Strict Equality (===) vs Loose Equality (==)</td>
+<td>Coercion Sentinel Validator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=kVOmc7NK1M0">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 2 / 5</td>
+<td>Template Literals &amp; String Methods</td>
+<td>Dynamic URL Query Builder; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=9M4XKi25I2M&t=6679s">video</a> @ 6679s</td>
+<td>PLAYED / PLAYED</td>
+<td>CORRECTED: Python strings replaced with JavaScript strings chapter 1:51:19 and methods 1:57:08; MDN template literals supplement. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 2 / 6</td>
+<td>Iteration (for...of, for...in, while)</td>
+<td>Array Value Accumulator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=9M4XKi25I2M&t=9911s">video</a> @ 9911s</td>
+<td>PLAYED / PLAYED</td>
+<td>CORRECTED: Python loops replaced with JavaScript loop introduction 2:45:11; MDN specific loop forms supplement. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 3 / 7</td>
+<td>Modern Array Methods (map, filter, reduce)</td>
+<td>Even Square Reducer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=G3BS3sh3D8Q">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Map recording; filter and reduce coverage needs inspection. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 3 / 8</td>
+<td>Objects, Destructuring &amp; Spread / Rest (...)</td>
+<td>Object Merge &amp; Destructure; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=UgEaJBz3bjY">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 3 / 9</td>
+<td>JSON Serialization &amp; Deep Cloning</td>
+<td>JSON Data Roundtrip; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=iiADhChRriM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 4 / 10</td>
+<td>Arrow Functions &amp; the &#39;this&#39; Keyword</td>
+<td>Concise Arrow Multiplier; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=h33Srr5J9nY">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 4 / 11</td>
+<td>Closures &amp; Encapsulation (Private State)</td>
+<td>Private Counter Closure; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=3a0I8ICR1Vg">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 4 / 12</td>
+<td>Higher-Order Functions &amp; Currying</td>
+<td>Curried Discount Calculator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=8EW_AZRPxXM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Higher-order functions recording; explicit currying example needs inspection. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 5 / 13</td>
+<td>Event Loop, Callbacks &amp; the Call Stack</td>
+<td>Non-Blocking setTimeout Ordering; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 5 / 14</td>
+<td>Promises (.then, .catch, .finally)</td>
+<td>Promise Resolution Engine; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=DHvZLI7Db8E">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs105-javascript / 5 / 15</td>
+<td>Modern async / await &amp; the Fetch API</td>
+<td>Async/Await HTTP Request Handler; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=V_Kr9OSfDeU">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 1 / 1</td>
+<td>HTML Boilerplate &amp; Document Anatomy</td>
+<td>Minimal Valid Page; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=X4sClFRMJ00">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 1 / 2</td>
+<td>Text Content Elements (headings, paragraphs, lists)</td>
+<td>Recipe Card; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=m61h9YEB1fw">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 1 / 3</td>
+<td>Links, Images &amp; Attributes</td>
+<td>Linked Logo; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=t-G8GgRA5Yw">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 2 / 4</td>
+<td>Semantic Layout Elements</td>
+<td>Semantic Skeleton; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=YOsMJQfwqow">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 2 / 5</td>
+<td>Tables &amp; Structured Data</td>
+<td>Price Table; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=phkB7Aj3Klw">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 2 / 6</td>
+<td>Forms &amp; Input Controls</td>
+<td>Signup Field; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=fNcJuPIZ2WE">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 3 / 7</td>
+<td>Applying CSS &amp; Selectors</td>
+<td>Class Painter; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=QhMTPAbea_k">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 3 / 8</td>
+<td>Colours, Units &amp; Typography</td>
+<td>Readable Paragraph; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=dHbYcAncAgQ">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 3 / 9</td>
+<td>The Box Model</td>
+<td>Spaced Card; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=D_akuQHIPtg">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 4 / 10</td>
+<td>Display &amp; Positioning</td>
+<td>Sticky Header; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=fF_NVrd1s14">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 4 / 11</td>
+<td>Flexbox Layout</td>
+<td>Centered Box; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=u044iM9xsWU">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 4 / 12</td>
+<td>CSS Grid Layout</td>
+<td>Three Column Grid; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=8QSqwbSztnA">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 5 / 13</td>
+<td>Responsive Design &amp; Media Queries</td>
+<td>Breakpoint Switch; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=QGb-W-c-gIM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 5 / 14</td>
+<td>Transitions, Transforms &amp; Animations</td>
+<td>Hover Grow; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=y8-F5-2EIcg">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cs106-html-css / 5 / 15</td>
+<td>Building a Complete Responsive Landing Page</td>
+<td>Hero Section; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=X1dz0xRbSJc">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 1 / 1</td>
+<td>Pointers &amp; Dereferencing</td>
+<td>Memory Address Mutation Engine; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=Hi-Ul47t3nQ">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 1 / 2</td>
+<td>Pointer Arithmetic</td>
+<td>Buffer Navigation via Pointer Arithmetic; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=ASVB8KAFypk">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 1 / 3</td>
+<td>Double Pointers (**ptr)</td>
+<td>In-Place High-Performance Variable Swap; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=d3kd5KbGB48">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 2 / 4</td>
+<td>malloc() &amp; calloc()</td>
+<td>Dynamic Array Allocator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=n_Se6bt8jM0">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 2 / 5</td>
+<td>Buffer Resizing (realloc)</td>
+<td>Dynamic Telemetry Buffer Resizing; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=eo9vm5n6DBo">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 2 / 6</td>
+<td>Memory Leaks &amp; free()</td>
+<td>Safe Heap Cleanup &amp; Sentinel Verification; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=1KVpi0VN82E">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Memory-address topic does not establish heap cleanup/leak diagnosis coverage. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 3 / 7</td>
+<td>struct &amp; typedef</td>
+<td>Embedded Sensor Telemetry Packet; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=CI9dRTvzgqE">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 3 / 8</td>
+<td>Linked Lists</td>
+<td>Linked List Traversal Engine; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=1fi2CPGcdA8">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Struct-pointer topic does not establish linked-list construction and traversal. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 3 / 9</td>
+<td>Bitwise Operations &amp; Masks</td>
+<td>Hardware Status Flag Masking; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=tGpBOeBtr7w">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Verify multi-bit masks and flag manipulation, not only switching a bit. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 4 / 10</td>
+<td>Stream File I/O</td>
+<td>Persistent System Log File Writer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=UqB4EgUxapM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 4 / 11</td>
+<td>Binary Block I/O</td>
+<td>Binary Struct Serialization; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=vESy0Up66RU">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>c-advanced / 4 / 12</td>
+<td>Function Pointers &amp; Callbacks</td>
+<td>Dynamic Arithmetic Dispatch Engine; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=BRsv3ZXoHto">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 1 / 1</td>
+<td>Inheritance &amp; protected</td>
+<td>Vehicle Fleet Inheritance; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=5HYIFFuGcvk">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 1 / 2</td>
+<td>Virtual Functions &amp; vtables</td>
+<td>Dynamic Payment Gateway Dispatch; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=FA5bvYW4iUc">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Virtual-function basics; verify vtables explanation and task-level dispatch. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 1 / 3</td>
+<td>Abstract Classes &amp; Interfaces</td>
+<td>Sensor Interface Contract; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=UWAdd13EfM8">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 2 / 4</td>
+<td>Operator Overloading (+, ==, &lt;&lt;)</td>
+<td>2D Vector Addition Operator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=mS9755gF66w">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 2 / 5</td>
+<td>Deep vs Shallow Copy</td>
+<td>Deep Copy Buffer Protector; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=G_UgbP8clOs">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 2 / 6</td>
+<td>Rule of Three / Five</td>
+<td>Safe Assignment Operator (=); required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=z3QlnTRLNfw">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 3 / 7</td>
+<td>Function Templates</td>
+<td>Universal Generic Max Finder; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=I-hZkUa9mIs">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 3 / 8</td>
+<td>Class Templates</td>
+<td>Generic Key-Value Pair Box; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=PD8MXD3uVOk">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Function-template resource reused for class-template task; full class-template coverage UNVERIFIED. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 3 / 9</td>
+<td>STL Algorithms &amp; Lambdas</td>
+<td>Lambda-Powered Filter &amp; Sort; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=HyhvU5SJTlQ">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Sorting material; verify lambda predicate/filter pipeline. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 4 / 10</td>
+<td>std::unique_ptr</td>
+<td>Scoped Smart Pointer Allocator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=UOB7-B2MfwA">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 4 / 11</td>
+<td>std::shared_ptr &amp; Reference Counting</td>
+<td>Reference Count Monitor; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=UOB7-B2MfwA">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>cpp-advanced / 4 / 12</td>
+<td>Move Semantics &amp; std::move</td>
+<td>Zero-Copy Buffer Transfer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=zK8A4Ko53HY">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 1 / 1</td>
+<td>Iterator Protocol (<strong>iter</strong>, <strong>next</strong>)</td>
+<td>Custom Range Countdown Iterator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=Dyu08G2l71c">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 1 / 2</td>
+<td>Generators &amp; yield Statements</td>
+<td>Lazy Fibonacci Generator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=tmeKsb2Fras">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 1 / 3</td>
+<td>Built-in Functional Tools (map, filter, reduce, functools)</td>
+<td>Functional Pipeline Processor; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=hUes6y2b--0">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 2 / 4</td>
+<td>Closures &amp; Function Factories</td>
+<td>Custom Power Function Factory; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=swU3c34d2NQ">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 2 / 5</td>
+<td>Function Decorators &amp; functools.wraps</td>
+<td>Execution Timer Decorator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=FsAPt_9Bf3U">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 2 / 6</td>
+<td>Decorators with Arguments &amp; Class Decorators</td>
+<td>Configurable Retry Decorator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=r7Dtus7N4pI">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 3 / 7</td>
+<td>Advanced Dunder Methods (<strong>repr</strong>, <strong>eq</strong>, <strong>getitem</strong>, <strong>call</strong>)</td>
+<td>Callable Vector Math Class; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=3ohzBxoFHAY">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 3 / 8</td>
+<td>Property Descriptors &amp; Attribute Interception (<strong>getattr</strong>, <strong>setattr</strong>)</td>
+<td>Validated Integer Descriptor; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=xWHeK2pTD14">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 3 / 9</td>
+<td>Abstract Base Classes (abc module) &amp; Metaclasses</td>
+<td>Abstract Database Connector Contract; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=hEW-IWGluG4">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>ABC material; metaclass objective needs separate inspection. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 4 / 10</td>
+<td>Custom Context Managers (<strong>enter</strong>, <strong>exit</strong>)</td>
+<td>High-Precision Code Timer Context Manager; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=-aKFBoZpiqA">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 4 / 11</td>
+<td>contextlib Utilities (@contextmanager)</td>
+<td>Standard Output Redirector; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=QnEB7KpywdI">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>French-language context-manager recording; language unexplained; contextdecorator chapter 11:55. Confirm contextmanager and redirect_stdout coverage. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 4 / 12</td>
+<td>Garbage Collection, <strong>slots</strong> &amp; weakref</td>
+<td>Memory-Optimized <strong>slots</strong> Point; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=dRw3FdQTxqs">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Weakref resource; slots-based memory layout/task coverage needs inspection. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 5 / 13</td>
+<td>Threading vs Multiprocessing &amp; the GIL</td>
+<td>Concurrent Thread Worker Pool; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=ecKWiaHCEKs">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Requires real concurrency-capable Python execution; browser runner support UNVERIFIED. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 5 / 14</td>
+<td>Thread Synchronization with Lock &amp; Queue</td>
+<td>Mutex-Guarded Counter; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=OE5FrlYe_rI">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Lock/Queue task requires concurrency-capable Python execution; runner support UNVERIFIED. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>python-advanced / 5 / 15</td>
+<td>Asynchronous Programming with AsyncIO (async / await)</td>
+<td>Async Coroutine Task Gatherer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=t5Bo1Je9EmE">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 1 / 1</td>
+<td>Prototypal Inheritance &amp; the Prototype Chain</td>
+<td>Prototype Delegation Engine; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=1UTqFAjYx1k">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 1 / 2</td>
+<td>Function Constructors vs ES6 Classes &amp; #private Fields</td>
+<td>Hard Encapsulated Wallet; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=2ZphE5HcQPQ">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>ES6 class chapters do not establish modern #private-field coverage. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 1 / 3</td>
+<td>Property Descriptors (Object.defineProperty, freeze, seal)</td>
+<td>Immutable Config Protector; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=ZqL7q8KUw9I">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Seal material; verify descriptors and freeze as well. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 2 / 4</td>
+<td>Proxy Traps (get, set, deleteProperty)</td>
+<td>Schema-Validating Proxy; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=hI4AyjNnUzQ">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 2 / 5</td>
+<td>Reflect API &amp; Transparent Forwarding</td>
+<td>Reflect Property Forwarder; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=X7qXJRU6qyM">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 2 / 6</td>
+<td>Well-Known Symbols (Symbol.iterator, Symbol.toPrimitive)</td>
+<td>Custom Iterable Range Object; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=4J5hnOCj69w">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 3 / 7</td>
+<td>Microtasks vs Macrotasks (queueMicrotask, MutationObserver)</td>
+<td>Event Loop Priority Ordering; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Older event-loop talk; verify current queueMicrotask/MutationObserver ordering. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 3 / 8</td>
+<td>WeakMap &amp; WeakSet (Memory Leak Prevention)</td>
+<td>WeakMap Metadata Store; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=8B514jlvkqE">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 3 / 9</td>
+<td>FinalizationRegistry &amp; Garbage Collection Mechanics</td>
+<td>Finalizer Registry Logger; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=3sgIFrjA61U">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 4 / 10</td>
+<td>Promise Combinators (all, allSettled, race, any)</td>
+<td>Resilient allSettled Audit; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=DHvZLI7Db8E">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Promise basics; verify allSettled/race/any as well as all. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 4 / 11</td>
+<td>AbortController &amp; Request Cancellation</td>
+<td>Aborted Signal Handler; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=bLpA9tvABb8">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 4 / 12</td>
+<td>Async Generators &amp; for-await-of</td>
+<td>Async Sequence Streamer; required; threshold 60</td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*">guide</a></td>
+<td>N/A / N/A</td>
+<td>CORRECTED: wrong-language Python video removed from JS mapping. MDN async-generator guide supplied; replacement video OPEN. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 5 / 13</td>
+<td>Custom Event System (CustomEvent &amp; EventTarget)</td>
+<td>Decoupled Custom Event Notifier; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=b469-2H9Rew">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 5 / 14</td>
+<td>Multithreading with Web Workers (postMessage, onmessage)</td>
+<td>Background Message Worker Simulator; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=Gcp7triXFjg">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Worker implementation and Blob/origin support need a tested runner setup. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>js-advanced / 5 / 15</td>
+<td>SharedArrayBuffer &amp; Atomics (Thread Synchronization)</td>
+<td>Atomic Counter Synchronizer; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=phs5V6qk2xk">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>SharedArrayBuffer/Atomics require appropriate origin isolation. Isolation topic at 1:03 and Atomics at 6:10; runner compatibility UNVERIFIED. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 1 / 1</td>
+<td>Advanced &amp; Combinator Selectors (:is, :where, :has)</td>
+<td>Parent Select; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=OGJvhpoE8b4">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 1 / 2</td>
+<td>Specificity, Cascade Layers &amp; Custom Properties</td>
+<td>Theme Variable; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=NDNRGW-_1EE">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Cascade-layer recording; task needs explicit CSS custom-property example. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 1 / 3</td>
+<td>CSS Architecture Methodologies (BEM &amp; Utility-First)</td>
+<td>BEM Rename; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=SLjHSVwXYq4">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 2 / 4</td>
+<td>Advanced Flexbox Patterns</td>
+<td>Flexible Sidebar; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=sanswTlz4ZY">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 2 / 5</td>
+<td>Advanced CSS Grid (areas, subgrid, auto-fit)</td>
+<td>Auto-Fit Gallery; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=UwV4LtO0nHo">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Subgrid recording; auto-fit/minmax gallery task coverage UNVERIFIED. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 2 / 6</td>
+<td>Modern Responsive Layout (clamp, container queries)</td>
+<td>Fluid Heading; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=2rlWBZ17Wes">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Container-query recording; clamp-based fluid heading task coverage UNVERIFIED. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 3 / 7</td>
+<td>Advanced Transitions &amp; Keyframe Animations</td>
+<td>Staggered List; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=y8-F5-2EIcg">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Timing functions/animation material; inspect delay/stagger sequence. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 3 / 8</td>
+<td>Transforms, 3D &amp; Perspective</td>
+<td>Flip Card; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=viH8LeLP6_c">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 3 / 9</td>
+<td>Gradients, Filters &amp; Blend Modes</td>
+<td>Glass Panel; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=4kWHW7da4U8">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Gradient material; backdrop-filter/glass effect coverage UNVERIFIED. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 4 / 10</td>
+<td>Sass / SCSS (variables, nesting, mixins)</td>
+<td>Mixin Reuse; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=roywYSEPSvc">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Sass task needs compiler/build step beyond HTML preview; practical setup UNVERIFIED. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 4 / 11</td>
+<td>Tailwind CSS (Utility-First Framework)</td>
+<td>Utility Card; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=mr15Xzb1Ook">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>100-second Tailwind overview; verify working dependency/setup and task example. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 4 / 12</td>
+<td>Build Tools &amp; CSS Optimization</td>
+<td>Minify Pass; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=WhCXiEwdU1A">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>100-second PostCSS overview; verify usable minification toolchain and task example. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 5 / 13</td>
+<td>Web Accessibility (a11y)</td>
+<td>Focus Ring; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=qr0ujkLLgmE">video</a></td>
+<td>UNVERIFIED / PLAYED</td>
+<td>Provider title/topic screened; full explanation/example/assignment coverage UNVERIFIED because no usable transcript was returned. Inspect segment and solve the assignment. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 5 / 14</td>
+<td>Performance, SEO &amp; Core Web Vitals</td>
+<td>Lazy Images; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=cGiSr0MilsI">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Core Web Vitals overview; verify concrete loading=lazy implementation. Full coverage: UNVERIFIED.</td>
+</tr>
+<tr>
+<td>web-advanced / 5 / 15</td>
+<td>Version Control &amp; Deployment</td>
+<td>First Deploy; required; threshold 60</td>
+<td><a href="https://www.youtube.com/watch?v=hwP7WQkmECE">video</a></td>
+<td>PLAYED / PLAYED</td>
+<td>Git overview does not establish actual hosting deployment; add inspected deployment walkthrough. Full coverage: UNVERIFIED.</td>
+</tr>
+</tbody></table>
+<h2>Every unique original video</h2>
+<table>
+<thead>
+<tr>
+<th>Video</th>
+<th>Availability</th>
+<th>Standard / app playback</th>
+<th>Original reuse</th>
+<th>Current use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://www.youtube.com/watch?v=h4VBpylsjJc">#2: C Variables and Print Output | [2025] C Programming for Beginners</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>fc01-c-basics/2, fc01-c-basics/3</td>
+<td>fc01-c-basics/2, fc01-c-basics/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=sARaqR0hRI4">#3: Data Types in C Programming | [2025] C Programming for Beginners</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / UNVERIFIED</td>
+<td>fc01-c-basics/4</td>
+<td>fc01-c-basics/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=KnvbUiSxvbM">#1: Getting Started with C Programming [2025] | C Programming for Beginners</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/1</td>
+<td>fc01-c-basics/1</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=iLZOL-hmr7M">C format specifiers 🔧</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / UNVERIFIED</td>
+<td>fc01-c-basics/6</td>
+<td>fc01-c-basics/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=aIQk1O08zpg">C variables 💰</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / UNVERIFIED</td>
+<td>fc01-c-basics/5</td>
+<td>fc01-c-basics/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=17gp5DJEyiw">#4: Get User Input in C Programming</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/7</td>
+<td>fc01-c-basics/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=_57FcSBtJNU">#6: C Operators | [2025] C Programming for Beginners</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/8</td>
+<td>fc01-c-basics/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=xyQrVEFz9kw">C if statements ✔️</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/9</td>
+<td>fc01-c-basics/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=iD05HmGLZXc">If Statement Best Practice | C Programming Tutorial</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/10</td>
+<td>fc01-c-basics/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=b4DPj0XAfSg">C for loops in 3 minutes! 🔁</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/11</td>
+<td>fc01-c-basics/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=qUPXsPtWGoY">for and while Loops</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/12, fc01-c-basics/13</td>
+<td>fc01-c-basics/12, fc01-c-basics/13</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=vc9A6HdrTz4">C function prototypes 🤖</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/14</td>
+<td>fc01-c-basics/14</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=7VM571tSKC0">C arguments 📧</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/15</td>
+<td>fc01-c-basics/15</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=7Bq87y7eJEg">Functions in C are easy! 📞</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc01-c-basics/16</td>
+<td>fc01-c-basics/16</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=S3nx34WFXjI">C++ tutorial for beginners 👨‍💻</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/1, fc02-cpp-objects/10</td>
+<td>fc02-cpp-objects/1, fc02-cpp-objects/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=18c3MTX0PK0">Welcome to C++</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/2</td>
+<td>fc02-cpp-objects/2</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=vkALQRM5NNU">C++ User Input Explained (How Input Handling Works Step by Step)</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/3</td>
+<td>fc02-cpp-objects/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=QANQHxx9I8Y">C++ variables &amp; data types (#3) ✖️</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/4</td>
+<td>fc02-cpp-objects/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=3rDp0yOACZQ">C++ Programming Language Tutorial | Strings in C++ | GeeksforGeeks</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>fc02-cpp-objects/5</td>
+<td>fc02-cpp-objects/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=jRXFJJN1Va4">Beginner’s Guide to Vectors in C++: Everything You Need to Know</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/6</td>
+<td>fc02-cpp-objects/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=IzoFn3dfsPA">REFERENCES in C++</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/8</td>
+<td>fc02-cpp-objects/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=qnEUB25TRaY">C++ &#39;for each&#39; loop explained 🗂️</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/7</td>
+<td>fc02-cpp-objects/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=5z3KEX9AZEQ">C++ CONSTRUCTORS explained easy 👷</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/11</td>
+<td>fc02-cpp-objects/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=vKTYM-DJDiw">C++ user defined functions (#15) 📬</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>fc02-cpp-objects/9</td>
+<td>fc02-cpp-objects/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=f2IrG1JabSg">C++ Data Hiding, Setters, and Getters</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>fc02-cpp-objects/12</td>
+<td>fc02-cpp-objects/12</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=kqtD5dpn9C8">Python for Beginners - Learn Coding with Python in 1 Hour</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/1</td>
+<td>cs104-python/1, cs104-python/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=cQT33yu9pY8">Python Variables - Python Tutorial for Beginners with Examples | Mosh</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/2</td>
+<td>cs104-python/2</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=61a7UkDO50s">Python Programming Course in Hindi (Advanced) 🔥</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/3</td>
+<td>Removed from incorrect mapping; preserved in original inventory</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=DZwmZ8Usvnk">Python Tutorial for Beginners 6: Conditionals and Booleans - If, Else, and Elif Statements</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/5</td>
+<td>cs104-python/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=k9TUPpGqYTo">Python Tutorial for Beginners 2: Strings - Working with Textual Data</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/4, cs105-javascript/5</td>
+<td>cs104-python/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=6iF8Xb7Z3wQ">Python Tutorial for Beginners 7: Loops and Iterations - For/While Loops</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/6, cs105-javascript/6</td>
+<td>cs104-python/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=daefaLgNkw0">Python Tutorial for Beginners 5: Dictionaries - Working with Key-Value Pairs</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/9</td>
+<td>cs104-python/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=W8KRzm-HUcc">Python Tutorial for Beginners 4: Lists, Tuples, and Sets</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/7, cs104-python/8</td>
+<td>cs104-python/7, cs104-python/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=9Os0o3wzS_I">Python Tutorial for Beginners 8: Functions</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/10</td>
+<td>cs104-python/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=Vh__2V2tXUM">Python *ARGS &amp; **KWARGS are awesome! 📦</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/11</td>
+<td>cs104-python/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=ZDa-Z5JzLYM">Python OOP Tutorial 1: Classes and Instances</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/13</td>
+<td>cs104-python/13</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=RSl87lqOXDE">Python OOP Tutorial 4: Inheritance - Creating Subclasses</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/14</td>
+<td>cs104-python/14</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=25ovCm9jKfA">Lambda Expressions &amp; Anonymous Functions ||  Python Tutorial  ||  Learn Python Programming</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/12</td>
+<td>cs104-python/12</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=W6NZfCO5SIk">JavaScript Course for Beginners – Your First Step to Web Development</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/1</td>
+<td>cs105-javascript/1</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=9M4XKi25I2M">JavaScript Programming All-in-One Tutorial Series (9 HOURS!)</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/2</td>
+<td>cs105-javascript/2, cs105-javascript/5, cs105-javascript/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=Uh2ebFW8OYM">Python Tutorial: File Objects - Reading and Writing to Files</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs104-python/15</td>
+<td>cs104-python/15</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=jLRnuVHwHKk">Learn JavaScript TYPE CONVERSION in 5 minutes! 💱</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/3</td>
+<td>cs105-javascript/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=G3BS3sh3D8Q">JavaScript Array Map</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/7</td>
+<td>cs105-javascript/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=kVOmc7NK1M0">== vs === - Beau teaches JavaScript</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/4</td>
+<td>cs105-javascript/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=UgEaJBz3bjY">JS Destructuring in 100 Seconds</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/8</td>
+<td>cs105-javascript/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=iiADhChRriM">Learn JSON in 10 Minutes</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/9</td>
+<td>cs105-javascript/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=h33Srr5J9nY">JavaScript ES6 Arrow Functions Tutorial</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/10</td>
+<td>cs105-javascript/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=3a0I8ICR1Vg">Learn Closures In 7 Minutes</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/11</td>
+<td>cs105-javascript/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=8EW_AZRPxXM">JavaScript HIGHER ORDER FUNCTIONS Simplified</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/12</td>
+<td>cs105-javascript/12</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">What the heck is the event loop anyway? | Philip Roberts | JSConf EU</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/13, js-advanced/7</td>
+<td>cs105-javascript/13, js-advanced/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=DHvZLI7Db8E">JavaScript Promises In 10 Minutes</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/14, js-advanced/10</td>
+<td>cs105-javascript/14, js-advanced/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=V_Kr9OSfDeU">JavaScript Async Await</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs105-javascript/15</td>
+<td>cs105-javascript/15</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=X4sClFRMJ00">HTML &amp; CSS for Absolute Beginners: What is HTML?</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/1</td>
+<td>cs106-html-css/1</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=m61h9YEB1fw">HTML &amp; CSS for Absolute Beginners: HTML Lists (ol and ul)</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/2</td>
+<td>cs106-html-css/2</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=t-G8GgRA5Yw">HTML &amp; CSS for Absolute Beginners: Images</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/3</td>
+<td>cs106-html-css/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=YOsMJQfwqow">HTML &amp; CSS for Absolute Beginners: Semantic HTML</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/4</td>
+<td>cs106-html-css/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=phkB7Aj3Klw">How to Organize HTML Tables with Caption, Thead, Tbody, and Tfoot</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cs106-html-css/5</td>
+<td>cs106-html-css/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=QhMTPAbea_k">HTML &amp; CSS for Absolute Beginners: Intro to CSS</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/7</td>
+<td>cs106-html-css/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=fNcJuPIZ2WE">Learn HTML Forms In 25 Minutes</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/6</td>
+<td>cs106-html-css/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=D_akuQHIPtg">HTML &amp; CSS for Absolute Beginners: The box model - width, height, inline-size, block-size</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cs106-html-css/9</td>
+<td>cs106-html-css/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=fF_NVrd1s14">CSS position deep dive</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/10</td>
+<td>cs106-html-css/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=dHbYcAncAgQ">px vs rem: what to use for font-size in your CSS</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cs106-html-css/8</td>
+<td>cs106-html-css/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=u044iM9xsWU">Learn flexbox the easy way</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/11</td>
+<td>cs106-html-css/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=8QSqwbSztnA">Get started with grid WITHOUT being overwhelmed</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/12</td>
+<td>cs106-html-css/12</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=QGb-W-c-gIM">HTML &amp; CSS for Absolute Beginners: Media Query basics - making a layout responsive</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/13</td>
+<td>cs106-html-css/13</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=Hi-Ul47t3nQ">Pointers are easy! 👈</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/1</td>
+<td>c-advanced/1</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=X1dz0xRbSJc">Build a Modern Landing Page Website | HTML &amp; CSS</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/15</td>
+<td>cs106-html-css/15</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=y8-F5-2EIcg">10 CSS animation tips and tricks</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cs106-html-css/14, web-advanced/7</td>
+<td>cs106-html-css/14, web-advanced/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=n_Se6bt8jM0">Malloc in C is easy! 🏢</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/4</td>
+<td>c-advanced/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=d3kd5KbGB48">Pointers to Pointers in C/C++</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/3</td>
+<td>c-advanced/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=ASVB8KAFypk">Pointers and arrays</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/2</td>
+<td>c-advanced/2</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=eo9vm5n6DBo">Dynamic Memory Allocation in C | malloc, calloc, realloc, free Explained with Example | CODE WITH ME</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/5</td>
+<td>c-advanced/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=1KVpi0VN82E">Learn C memory addresses in 7 minutes 📬</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/6</td>
+<td>c-advanced/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=CI9dRTvzgqE">C typedef 📛</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/7</td>
+<td>c-advanced/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=tGpBOeBtr7w">How to turn off a particular bit in a number? | GeeksforGeeks</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/9</td>
+<td>c-advanced/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=UqB4EgUxapM">C writing files✍️</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/10</td>
+<td>c-advanced/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=1fi2CPGcdA8">Structs and Pointers to Structs in C -- Engineer Man</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/8</td>
+<td>c-advanced/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=vESy0Up66RU">C Programming:File Handling (fread fwrite block read write) Lab 3</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>c-advanced/11</td>
+<td>c-advanced/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=5HYIFFuGcvk">What is INHERITANCE in C++? 👨‍👧‍👧</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cpp-advanced/1</td>
+<td>cpp-advanced/1</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=BRsv3ZXoHto">Function Pointers in C</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>c-advanced/12</td>
+<td>c-advanced/12</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=UWAdd13EfM8">Interfaces in C++ (Pure Virtual Functions)</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cpp-advanced/3</td>
+<td>cpp-advanced/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=FA5bvYW4iUc">C++ Pure Virtual Functions, Abstract Classes | Cpp Video Tutorial</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cpp-advanced/2</td>
+<td>cpp-advanced/2</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=mS9755gF66w">OPERATORS and OPERATOR OVERLOADING in C++</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cpp-advanced/4</td>
+<td>cpp-advanced/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=G_UgbP8clOs">Deep Copy in C++</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cpp-advanced/5</td>
+<td>cpp-advanced/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=I-hZkUa9mIs">Templates in C++</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cpp-advanced/7</td>
+<td>cpp-advanced/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=z3QlnTRLNfw">C++ Rule of 3/5 and Vectors</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cpp-advanced/6</td>
+<td>cpp-advanced/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=PD8MXD3uVOk">C++ Function Templates Tutorial</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cpp-advanced/8</td>
+<td>cpp-advanced/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=HyhvU5SJTlQ">Sorting - C++ Tutorial (Part 29)</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cpp-advanced/9</td>
+<td>cpp-advanced/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=UOB7-B2MfwA">SMART POINTERS in C++ (std::unique_ptr, std::shared_ptr, std::weak_ptr)</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>cpp-advanced/10, cpp-advanced/11</td>
+<td>cpp-advanced/10, cpp-advanced/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=zK8A4Ko53HY">C++ 11 Move Semantics: Move Assignment Operator</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>cpp-advanced/12</td>
+<td>cpp-advanced/12</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=Dyu08G2l71c">#61 Python Tutorial for Beginners | Iterator</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/1</td>
+<td>python-advanced/1</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=tmeKsb2Fras">Python Generators</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>python-advanced/2, js-advanced/12</td>
+<td>python-advanced/2</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=FsAPt_9Bf3U">Python Tutorial: Decorators - Dynamically Alter The Functionality Of Your Functions</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/5</td>
+<td>python-advanced/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=swU3c34d2NQ">Programming Terms: Closures - How to Use Them and Why They Are Useful</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/4</td>
+<td>python-advanced/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=hUes6y2b--0">Map, Filter, and Reduce Functions  ||  Python Tutorial  ||  Learn Python Programming</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/3</td>
+<td>python-advanced/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=r7Dtus7N4pI">Python Decorators in 15 Minutes</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>python-advanced/6</td>
+<td>python-advanced/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=3ohzBxoFHAY">Python OOP Tutorial 5: Special (Magic/Dunder) Methods</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/7</td>
+<td>python-advanced/7</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=xWHeK2pTD14">Python Descriptors: Creating a Class and a Descriptor</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>python-advanced/8</td>
+<td>python-advanced/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=QnEB7KpywdI">Tutoriel Python - gestionnaires de contexte</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/11</td>
+<td>python-advanced/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=-aKFBoZpiqA">Python Tutorial: Context Managers - Efficiently Managing Resources</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/10</td>
+<td>python-advanced/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=hEW-IWGluG4">Python abstract base class (ABC) example</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/9</td>
+<td>python-advanced/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=dRw3FdQTxqs">Python - Weakref</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>python-advanced/12</td>
+<td>python-advanced/12</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=ecKWiaHCEKs">Threading vs Multiprocessing in Python</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/13</td>
+<td>python-advanced/13</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=OE5FrlYe_rI">Introduction to Thread Locks in Python - Part#1</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>python-advanced/14</td>
+<td>python-advanced/14</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=2ZphE5HcQPQ">JavaScript Classes Tutorial</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>js-advanced/2</td>
+<td>js-advanced/2</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=1UTqFAjYx1k">JavaScript Prototypal inheritance - Tutorial</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/1</td>
+<td>js-advanced/1</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=t5Bo1Je9EmE">Python Asynchronous Programming - AsyncIO &amp; Async/Await</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>python-advanced/15</td>
+<td>python-advanced/15</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=ZqL7q8KUw9I">How to protect JavaScript Objects with Object.seal() - JavaScript Tutorial</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/3</td>
+<td>js-advanced/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=hI4AyjNnUzQ">How to use Proxy Objects - JavaScript Tutorial</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>js-advanced/4</td>
+<td>js-advanced/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=X7qXJRU6qyM">JavaScript ES6 Reflect Object</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/5</td>
+<td>js-advanced/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=3sgIFrjA61U">JavaScript FinalizationRegistry Unraveled: Memory Management Magic Explained!</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/9</td>
+<td>js-advanced/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=8B514jlvkqE">Weak References, Reachability, WeakSets, and WeakMaps</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/8</td>
+<td>js-advanced/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=4J5hnOCj69w">The Complete Guide to JS Symbols ES6</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/6</td>
+<td>js-advanced/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=bLpA9tvABb8">How To Abort A Fetch Request With AbortController In JavaScript</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>js-advanced/11</td>
+<td>js-advanced/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=b469-2H9Rew">Custom Events in Javascript (CustomEvent)</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/13</td>
+<td>js-advanced/13</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=phs5V6qk2xk">Javascript: SharedArrayBuffer, Atomics &amp; Synchronization  #multithreading</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/15</td>
+<td>js-advanced/15</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=Gcp7triXFjg">JavaScript Web Workers Explained</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>js-advanced/14</td>
+<td>js-advanced/14</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=OGJvhpoE8b4">:has() opens up new possibilities with CSS</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/1</td>
+<td>web-advanced/1</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=NDNRGW-_1EE">No more specificity issues?! (or all new ones 🤔) - A look at CSS Cascade Layers</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>web-advanced/2</td>
+<td>web-advanced/2</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=SLjHSVwXYq4">Why I use the BEM naming convention for my CSS</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/3</td>
+<td>web-advanced/3</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=sanswTlz4ZY">Flex grow, shrink, basis | CSS Flexbox tutorial</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/4</td>
+<td>web-advanced/4</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=UwV4LtO0nHo">Creating a robust grid system using subgrid</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/5</td>
+<td>web-advanced/5</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=2rlWBZ17Wes">Learn how to use Media queries &amp; Container queries</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/6</td>
+<td>web-advanced/6</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=viH8LeLP6_c">3D Transform a Card with CSS</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/8</td>
+<td>web-advanced/8</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=4kWHW7da4U8">CSS Gradients and repeating gradients</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/9</td>
+<td>web-advanced/9</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=roywYSEPSvc">Learn Sass in this Free Crash Course - Give your CSS Superpowers!</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/10</td>
+<td>web-advanced/10</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=WhCXiEwdU1A">PostCSS in 100 Seconds</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/12</td>
+<td>web-advanced/12</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=mr15Xzb1Ook">Tailwind in 100 Seconds</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/11</td>
+<td>web-advanced/11</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=hwP7WQkmECE">Git Explained in 100 Seconds</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/15</td>
+<td>web-advanced/15</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=cGiSr0MilsI">Core Web Vitals Explained: LCP, INP &amp; CLS</a></td>
+<td>AVAILABLE</td>
+<td>PLAYED / PLAYED</td>
+<td>web-advanced/14</td>
+<td>web-advanced/14</td>
+</tr>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=qr0ujkLLgmE">Getting started with web accessibility with Ashlee Boyer</a></td>
+<td>AVAILABLE</td>
+<td>UNVERIFIED / PLAYED</td>
+<td>web-advanced/13</td>
+<td>web-advanced/13</td>
+</tr>
+</tbody></table>
+<footer>Local synthetic verification · 2026-09-10T04:57:37.075Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>

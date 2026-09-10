@@ -1,0 +1,33 @@
+[
+  {
+    "id": "D-01",
+    "actual": {
+      "free": 200,
+      "member": 200,
+      "assigned": 200,
+      "anonymous": 401
+    },
+    "status": "FAIL"
+  },
+  {
+    "id": "D-11",
+    "actual": {
+      "status": 200
+    },
+    "status": "FAIL"
+  },
+  {
+    "id": "D-06",
+    "actual": {
+      "status": 200
+    },
+    "status": "FAIL"
+  },
+  {
+    "id": "D-02",
+    "actual": {
+      "oldSession": 200
+    },
+    "status": "FAIL"
+  }
+]

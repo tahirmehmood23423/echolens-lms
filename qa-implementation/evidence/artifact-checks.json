@@ -1,0 +1,80 @@
+[
+  {
+    "id": "admin/1440",
+    "status": "PASS",
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 246,
+      "height": 1000
+    }
+  },
+  {
+    "id": "admin/390",
+    "status": "PASS",
+    "sidebar": {
+      "x": -250,
+      "y": 0,
+      "width": 250,
+      "height": 844
+    }
+  },
+  {
+    "id": "student/1440",
+    "status": "PASS",
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 246,
+      "height": 1000
+    }
+  },
+  {
+    "id": "student/390",
+    "status": "PASS",
+    "sidebar": {
+      "x": -250,
+      "y": 0,
+      "width": 250,
+      "height": 844
+    }
+  },
+  {
+    "id": "coordinator/1440",
+    "status": "PASS",
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 246,
+      "height": 1000
+    }
+  },
+  {
+    "id": "coordinator/390",
+    "status": "PASS",
+    "sidebar": {
+      "x": -250,
+      "y": 0,
+      "width": 250,
+      "height": 844
+    }
+  },
+  {
+    "id": "learning/1440",
+    "status": "PASS"
+  },
+  {
+    "id": "learning/390",
+    "status": "PASS"
+  },
+  {
+    "id": "report-local-links",
+    "status": "PASS",
+    "htmlFiles": 7
+  },
+  {
+    "id": "report-filter",
+    "status": "PASS",
+    "issues": 35
+  }
+]

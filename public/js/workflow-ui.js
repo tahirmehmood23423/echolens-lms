@@ -1,0 +1,40 @@
+(function(){
+  'use strict';
+  const EL=window.EL={};
+  EL.deferForm=(form,account,resume)=>{if(!form)return;const key='el:onboarding:'+account+':'+form.id;try{const values=JSON.parse(sessionStorage.getItem(key)||'{}');for(const [name,value] of Object.entries(values)){const input=form.elements.namedItem(name);if(input&&input.type!=='file')input.value=value;}}catch{}const save=()=>{const values={};for(const input of form.elements)if(input.name&&!['file','password','checkbox'].includes(input.type))values[input.name]=input.value;try{sessionStorage.setItem(key,JSON.stringify(values));}catch{}};form.addEventListener('input',save);const button=document.createElement('button');button.type='button';button.className='btn btn-ghost btn-block';button.textContent='Finish later';button.onclick=()=>{save();window.MODAL_LOCK=false;window.closeModal();window.toast('You can resume from '+resume+'. Files must be selected again.');};form.append(button);};
+  EL.starter=(lang,problem={})=>{const configured=problem.starter_code||problem.starter;if(typeof configured==='string')return configured;if(configured?.[lang])return configured[lang];const title=String(problem.title||'Practice').replace(/[\r\n<>]/g,' ');return ({python:'# '+title+'\n# Write your solution below.\n',c:'#include <stdio.h>\n\nint main(void) {\n    // Write your solution here.\n    return 0;\n}\n',cpp:'#include <iostream>\n\nint main() {\n    // Write your solution here.\n    return 0;\n}\n',java:'class Main {\n    public static void main(String[] args) {\n        // Write your solution here.\n    }\n}\n',sql:'-- '+title+'\n-- Write your query below.\n',web:'<!doctype html>\n<html lang="en">\n<head><meta charset="utf-8"><title>Practice</title>\n<style>/* Add your styles here. */</style></head>\n<body>\n<!-- Build the requested page here. -->\n<script>\n// Write your JavaScript here.\n</script>\n</body>\n</html>',text:''})[lang]||'';};
+  EL.safeReturn=(value,fallback='/open#free')=>{try{if(typeof value!=='string'||/[\\\r\n]/.test(value))return fallback;const u=new URL(value,location.origin);if(u.origin!==location.origin||!u.pathname.startsWith('/')||['/login','/auth/google/callback'].includes(u.pathname)||u.pathname.startsWith('/api/'))return fallback;return u.pathname+u.search+u.hash;}catch{return fallback;}};
+  EL.loginURL=()=>'/login?returnTo='+encodeURIComponent(EL.safeReturn(location.href));
+  EL.errorMessage=(e)=>e?.status===503?'This feature is temporarily unavailable. Please try again later.':e?.status===403?'This action is not available for your account.':/GEMINI_|GROQ_|PostgreSQL|DATABASE_URL|API_KEY|SMTP_|configure/i.test(e?.message||'')?'This feature is temporarily unavailable. Your saved work is unchanged.':e?.message||'We could not complete this request. Please retry.';
+  EL.error=(container,e,retry)=>{if(!container)return;container.replaceChildren();const box=document.createElement('div');box.className='empty workflow-error';box.setAttribute('role','alert');const p=document.createElement('p');p.textContent=EL.errorMessage(e);box.append(p);if(retry){const b=document.createElement('button');b.className='btn btn-ghost';b.textContent='Retry';b.onclick=retry;box.append(b);}container.append(box);};
+  let activeDialog=null,trigger=null,inert=[];
+  const focusable=()=>activeDialog?[...activeDialog.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),summary,[tabindex="0"]')].filter(e=>e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden'):[];
+  EL.dialog={open(dialog){if(!activeDialog){trigger=document.activeElement;activeDialog=dialog;for(const el of document.body.children){if(el!==dialog&&!['SCRIPT','STYLE','LINK'].includes(el.tagName)){inert.push([el,el.inert]);el.inert=true;}}}dialog.setAttribute('aria-labelledby','modalTitle');dialog.setAttribute('aria-describedby','modalMsg');dialog.tabIndex=-1;queueMicrotask(()=>{if(activeDialog)(focusable()[0]||activeDialog).focus();});},close(){const old=trigger;activeDialog=null;trigger=null;for(const [el,value]of inert)el.inert=value;inert=[];if(old?.isConnected)old.focus();}};
+  document.addEventListener('keydown',e=>{if(e.key!=='Tab'||!activeDialog)return;const items=focusable();if(!items.length){e.preventDefault();activeDialog.focus();return;}const first=items[0],last=items.at(-1);if(!activeDialog.contains(document.activeElement)||(e.shiftKey&&document.activeElement===first)){e.preventDefault();(e.shiftKey?last:first).focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}},true);
+  document.addEventListener('focusin',e=>{if(activeDialog&&!activeDialog.contains(e.target))(focusable()[0]||activeDialog).focus();});
+  let account=null;const controllers=new Set();
+  function flushAll(){for(const c of controllers){c.flush();if(!c.editor.isConnected)controllers.delete(c);}}
+  EL.drafts={
+    setAccount(id){if(account!==id){flushAll();for(const c of controllers){if(c.editor.isConnected)c.editor.value='';}controllers.clear();account=id;}},
+    flushAll,
+    last(){try{return EL.safeReturn(localStorage.getItem('el:last:'+account),'');}catch{return '';}},
+    bind({editor,language,identity,initial='',starter=null}){
+      if(!editor||editor.dataset.draftBound)return;
+      editor.dataset.draftBound='true';const label=document.createElement('div');label.className='draft-status';label.setAttribute('role','status');label.setAttribute('aria-live','polite');(editor.closest('.qide-box,.cmp2-panel')||editor.parentElement).append(label);
+      if(!account){label.textContent='Sign in to save drafts on this device.';return;}
+      const languageKey='el:draft:language:'+JSON.stringify([account,...identity]);
+      try{const last=localStorage.getItem(languageKey);if(language&&[...language.options].some(o=>o.value===last))language.value=last;}catch{}
+      let lang=language?.value||'text',revision=0,dirty=false,timer=null,failed=false;
+      const owner=account;let draftIdentity=[owner,...identity,lang];
+      function status(text,bad=false){label.textContent=text;label.classList.toggle('failed',bad);}
+      function restore(fallback){try{const saved=EchoDraftStore.read(localStorage,draftIdentity);revision=saved?.revision||0;editor.value=saved?saved.code:fallback;dirty=false;failed=false;status(saved?'Saved on this device':'Draft saves automatically on this device');}catch(e){failed=true;status('Save failed — '+e.message,true);}}
+      function flush(){clearTimeout(timer);if(!dirty)return;if(account!==owner){failed=true;status('Save failed — sign in to the original account.',true);return;}try{const saved=EchoDraftStore.write(localStorage,draftIdentity,editor.value,revision);revision=saved.revision;dirty=false;failed=false;status('Saved on this device');}catch(e){failed=true;status('Save failed — '+e.message,true);}}
+      const controller={editor,flush,atRisk:()=>dirty&&failed};controllers.add(controller);restore(initial||editor.value||(starter?.(lang)||''));
+      editor.addEventListener('input',()=>{dirty=true;status('Saving…');clearTimeout(timer);timer=setTimeout(flush,250);});
+      if(language)language.addEventListener('change',()=>{flush();if(dirty){language.value=lang;return;}lang=language.value;try{localStorage.setItem(languageKey,lang);}catch{}draftIdentity=[owner,...identity,lang];restore(starter?.(lang)||'');editor.dispatchEvent(new Event('draftrestored'));},true);
+      try{localStorage.setItem('el:last:'+owner,EL.safeReturn(location.href));}catch{}
+    },
+  };
+  window.addEventListener('beforeunload',e=>{flushAll();if([...controllers].some(c=>c.atRisk())){e.preventDefault();e.returnValue='';}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)flushAll();});
+})();

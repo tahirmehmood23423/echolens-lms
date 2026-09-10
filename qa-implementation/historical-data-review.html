@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Historical data review — separate from the code patch</title><style>:root{font-family:Inter,system-ui,Segoe UI,sans-serif;color:#15314a;background:#f4f8fa;line-height:1.6}*{box-sizing:border-box}body{margin:0}header{background:#103449;color:white;padding:20px 5vw}header a{color:#b4fff0}main{max-width:1500px;margin:auto;padding:32px 5vw 80px}h1{font-size:clamp(26px,4vw,40px);line-height:1.2;color:#123d51}h2{margin-top:36px;font-size:23px}h3{font-size:19px}p,li{max-width:110ch}a{color:#006b77;text-underline-offset:3px}a:focus-visible,input:focus-visible{outline:3px solid #ce7700;outline-offset:3px}table{border-collapse:collapse;width:100%;font-size:14px;background:white}th,td{border:1px solid #d6e1e6;text-align:left;padding:12px;vertical-align:top;min-width:130px;overflow-wrap:anywhere}th{background:#e0f0ef;color:#143f44;position:sticky;top:0}td:first-child{font-weight:600}.table-scroll{overflow:auto;margin:20px 0;max-height:75vh;border:1px solid #d6e1e6;border-radius:8px}pre{background:#e5edef;padding:16px;overflow:auto;border-radius:8px}code{font-size:.92em}input{min-height:44px;border:1px solid #7b99a7;border-radius:6px;padding:10px;font:inherit;width:min(600px,100%)}.search{position:sticky;top:0;z-index:3;background:#f4f8fa;padding:12px 0}.search small{display:block;color:#466272}img{max-width:100%;height:auto}footer{border-top:1px solid #ccdce4;padding-top:20px;color:#4a6473;font-size:14px}@media print{header,.search{display:none}.table-scroll{overflow:visible;max-height:none}main{padding:0}th{position:static}table{font-size:10px}a{color:inherit}}</style></head><body><header><strong>EchoLens · QA implementation</strong> &nbsp; <a href="implementation-report.html">Report</a> · <a href="issue-matrix.html">Issue matrix</a> · <a href="course-video-review.html">Course inventory</a> · <a href="release-runbook.html">Release checks</a></header><main><div class="search"><label for="filter">Filter table rows on this page</label><br><input id="filter" type="search" placeholder="Search issue ID, course or status"><small id="matches" aria-live="polite"></small></div><h1>Historical data review — separate from the code patch</h1>
+<p>No historical student grades, certificates, registrations or ledger entries were deleted, revoked or rewritten in this task. The following work must use a read-only staging snapshot first and produce a reviewable candidate manifest before anyone approves corrections.</p>
+<table>
+<thead>
+<tr>
+<th>Candidate set</th>
+<th>Read-only identification</th>
+<th>Review and proposed correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Duplicate registrations</td>
+<td>Group by normalized email and offering; include every linked challan, clearance, enrollment and referral payout.</td>
+<td>Select a canonical record only after checking fulfillment/payment evidence. Preserve original IDs in an alias/audit mapping; suppress duplicate follow-up. Do not automatically cancel invoices or refund money.</td>
+</tr>
+<tr>
+<td>Invalid/PATH invoices</td>
+<td>Find unresolvable offering codes, PATH and zero-fee paid challans.</td>
+<td>Confirm actual applicant/payment status with authorized staff. Correct configuration first; propose explicit replacement/voiding records with old document references. Never silently overwrite an issued invoice.</td>
+</tr>
+<tr>
+<td>Challenge corrections</td>
+<td>Group ledger events by challenge/submission/user, including older unreferenced awards; compare net delta with final reviewed status.</td>
+<td>Prepare one compensating adjustment per approved correction with actor, reason and stable reference. Ambiguous historical transitions are blocked by the new code for manual review.</td>
+</tr>
+<tr>
+<td>Team reward duplicates</td>
+<td>Resolve historical team member aliases to unique user IDs; compare expected one award per eligible person against actual ledger entries.</td>
+<td>Preserve original team and ledger history; propose compensating entries only for confirmed duplicate amounts. Do not silently reduce balances.</td>
+</tr>
+<tr>
+<td>Course certificate eligibility</td>
+<td>Compare issue-time enrollment and available submission evidence with the configured requirements in force at issuance; list current-policy differences separately.</td>
+<td>Keep certificates valid pending an explicit policy decision and learner-impact review. Offer remediation where appropriate. Current policy is not grounds for automatic retroactive revocation.</td>
+</tr>
+<tr>
+<td>Historical grades/attempts</td>
+<td>Identify aggregate records with a successful grade and subsequent code changes, missing grading status or no attempt history.</td>
+<td>Preserve available best grade and source evidence. Import only recoverable snapshots with a historical provenance label; never fabricate lost attempts. New lazy history snapshots do not reconstruct already overwritten work.</td>
+</tr>
+<tr>
+<td>Incorrect course gem awards</td>
+<td>Compare course award recipient membership at award time, issuer permission and associated outcome.</td>
+<td>Propose compensating ledger entries and record the reason; preserve legitimate later achievements.</td>
+</tr>
+<tr>
+<td>Promotional preferences</td>
+<td>Identify contacts without explicit preference evidence and records created by mandatory contact capture.</td>
+<td>Ask the product/privacy owner to determine the appropriate audience policy. Explicit new opt-out is respected prospectively; missing legacy consent is not converted into consent.</td>
+</tr>
+</tbody></table>
+<p>Candidate output should contain internal IDs, reason, current state, supporting evidence, proposed delta, reviewer and decision. Keep names/contact details out of broadly shared reports. Record before/after counts and totals, execute approved adjustments transactionally in small batches, and use stable idempotency references. A second dry run must propose no already-applied correction. Retain rollback mapping and approvals with the adjustment manifest.</p>
+<p>No production query was run to count affected historical records. The number of affected people is <strong>UNVERIFIED</strong> until a designated snapshot is available.</p>
+<footer>Local synthetic verification · 2026-09-10T04:57:37.075Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>

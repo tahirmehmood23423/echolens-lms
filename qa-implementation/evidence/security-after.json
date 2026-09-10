@@ -1,0 +1,58 @@
+[
+  {
+    "id": "D-01",
+    "actual": {
+      "free": 403,
+      "member": 200,
+      "assigned": 200,
+      "anonymous": 401
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "D-11",
+    "actual": {
+      "status": 400
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "D-06",
+    "actual": {
+      "status": 400
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "D-06-incomplete-member",
+    "actual": {
+      "status": 400,
+      "beforeCerts": 2,
+      "afterCerts": 2
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "D-12",
+    "actual": {
+      "status": 200,
+      "batch": 1
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "D-02",
+    "actual": {
+      "oldSession": 401
+    },
+    "status": "PASS"
+  },
+  {
+    "id": "D-02-admin-reset",
+    "actual": {
+      "reset": 200,
+      "oldSession": 401
+    },
+    "status": "PASS"
+  }
+]

@@ -51,7 +51,7 @@ module.exports = [
           hint: 'count, price = input().split(); then total = int(count) * float(price).',
           solution: "An int count times a float price giving 50.0, with type(total) printing <class 'float'>." },
       ] },
-    { no: 3, week: 1, session: 3, title: 'User Input with input() & Type Casting', video_url: 'https://www.youtube.com/watch?v=61a7UkDO50s',
+    { no: 3, week: 1, session: 3, title: 'User Input with input() & Type Casting', video_url: 'https://www.youtube.com/watch?v=kqtD5dpn9C8&t=548s',
       topic: "Real-life analogy: Think of a microphone capturing raw audio as text. Before a synthesizer can play it back as musical notes, that text has to be converted into numerical pitch frequencies - the raw capture alone is not a number.\n\ninput() always returns a str, no matter what the user types. Before any arithmetic you must cast it with int() or float(); skipping the cast either raises a TypeError or silently does string work (\"20\" * 3) instead of maths.",
       problems: [
         { title: 'Age Verification Scanner', points: 40, difficulty: 'Core',
@@ -216,7 +216,7 @@ module.exports = [
           hint: 'console.log(`Loose: ${"0" == 0} | Strict: ${"0" === 0}`);',
           solution: 'A side-by-side == vs === comparison of "0" and 0, printing "Loose: true | Strict: false".' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Template Literals & String Methods', video_url: 'https://www.youtube.com/watch?v=k9TUPpGqYTo',
+    { no: 5, week: 2, session: 2, title: 'Template Literals & String Methods', video_url: 'https://www.youtube.com/watch?v=9M4XKi25I2M&t=6679s',
       topic: "Real-life analogy: Think of a fill-in-the-blank invitation card where the name, the date and the RSVP link snap automatically into their pre-cut slots.\n\nTemplate literals use backticks and support multi-line text and ${expr} interpolation directly inside the string. Common string methods include includes(), slice(), trim() and replace() / replaceAll().",
       problems: [
         { title: 'Dynamic URL Query Builder', points: 40, difficulty: 'Core',
@@ -225,7 +225,7 @@ module.exports = [
           hint: '`Endpoint: https://${host}/${endpoint}?id=${id}`',
           solution: 'A template-literal URL interpolating host, endpoint and id into "https://api.site.com/users?id=101".' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Iteration (for...of, for...in, while)', video_url: 'https://www.youtube.com/watch?v=6iF8Xb7Z3wQ',
+    { no: 6, week: 2, session: 3, title: 'Iteration (for...of, for...in, while)', video_url: 'https://www.youtube.com/watch?v=9M4XKi25I2M&t=9911s',
       topic: "Real-life analogy: Think of a bookshelf: for...of walks past every physical book in turn, while for...in reads the little index tags stuck to the shelf frame itself.\n\nfor...of iterates the values of an iterable (arrays, strings, sets). for...in iterates the enumerable keys of an object. while repeats its body as long as its condition stays truthy.",
       problems: [
         { title: 'Array Value Accumulator', points: 30, difficulty: 'Basic',

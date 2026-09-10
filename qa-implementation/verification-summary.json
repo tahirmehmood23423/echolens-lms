@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-09-10T04:57:37.075Z",
+  "issues": {
+    "FIXED AND VERIFIED": 29,
+    "IMPLEMENTED, VERIFICATION BLOCKED": 5,
+    "OPEN": 1
+  },
+  "courses": 10,
+  "modules": 47,
+  "lessons": 142,
+  "assignments": 142,
+  "original_unique_videos": 131,
+  "current_unique_videos": 130,
+  "current_video_lessons": 141,
+  "guide_lessons": 1,
+  "availability": {
+    "AVAILABLE": 131
+  },
+  "standard_playback": {
+    "UNVERIFIED": 24,
+    "PLAYED": 107
+  },
+  "app_playback": {
+    "PLAYED": 128,
+    "UNVERIFIED": 3
+  },
+  "tests": {
+    "security-after": {
+      "PASS": 7
+    },
+    "workflow-after": {
+      "PASS": 7
+    },
+    "browser-after": {
+      "PASS": 10
+    },
+    "ui-survey-after": {
+      "PASS": 98,
+      "UNAVAILABLE": 2
+    },
+    "final-checks": {
+      "PASS": 3
+    }
+  }
+}

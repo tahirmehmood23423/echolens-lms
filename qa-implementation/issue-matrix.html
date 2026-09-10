@@ -1,0 +1,367 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Updated issue matrix</title><style>:root{font-family:Inter,system-ui,Segoe UI,sans-serif;color:#15314a;background:#f4f8fa;line-height:1.6}*{box-sizing:border-box}body{margin:0}header{background:#103449;color:white;padding:20px 5vw}header a{color:#b4fff0}main{max-width:1500px;margin:auto;padding:32px 5vw 80px}h1{font-size:clamp(26px,4vw,40px);line-height:1.2;color:#123d51}h2{margin-top:36px;font-size:23px}h3{font-size:19px}p,li{max-width:110ch}a{color:#006b77;text-underline-offset:3px}a:focus-visible,input:focus-visible{outline:3px solid #ce7700;outline-offset:3px}table{border-collapse:collapse;width:100%;font-size:14px;background:white}th,td{border:1px solid #d6e1e6;text-align:left;padding:12px;vertical-align:top;min-width:130px;overflow-wrap:anywhere}th{background:#e0f0ef;color:#143f44;position:sticky;top:0}td:first-child{font-weight:600}.table-scroll{overflow:auto;margin:20px 0;max-height:75vh;border:1px solid #d6e1e6;border-radius:8px}pre{background:#e5edef;padding:16px;overflow:auto;border-radius:8px}code{font-size:.92em}input{min-height:44px;border:1px solid #7b99a7;border-radius:6px;padding:10px;font:inherit;width:min(600px,100%)}.search{position:sticky;top:0;z-index:3;background:#f4f8fa;padding:12px 0}.search small{display:block;color:#466272}img{max-width:100%;height:auto}footer{border-top:1px solid #ccdce4;padding-top:20px;color:#4a6473;font-size:14px}@media print{header,.search{display:none}.table-scroll{overflow:visible;max-height:none}main{padding:0}th{position:static}table{font-size:10px}a{color:inherit}}</style></head><body><header><strong>EchoLens · QA implementation</strong> &nbsp; <a href="implementation-report.html">Report</a> · <a href="issue-matrix.html">Issue matrix</a> · <a href="course-video-review.html">Course inventory</a> · <a href="release-runbook.html">Release checks</a></header><main><div class="search"><label for="filter">Filter table rows on this page</label><br><input id="filter" type="search" placeholder="Search issue ID, course or status"><small id="matches" aria-live="polite"></small></div><h1>Updated issue matrix</h1>
+<p>All 35 requested findings are accounted for. FIXED AND VERIFIED means the specified local/code/unit/browser boundary passed; it does not certify external services or all production workflows. Integration limits are explicit in each row. Original evidence remains in <a href="../qa-audit/audit-report.html">the original audit</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Issue ID</th>
+<th>Original finding</th>
+<th>Reproduction result</th>
+<th>Fix</th>
+<th>Changed files</th>
+<th>Verification</th>
+<th>Remaining limitation</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>D-01</td>
+<td>Unrelated authenticated users could download private uploads.</td>
+<td>Reproduced before patch: unrelated learner received private bytes.</td>
+<td>Purpose/owner/membership authorization; deny unknown files, malformed paths and talent-resume bypass; random upload names.</td>
+<td>upload-access.js; server.js; test/upload-access.test.js</td>
+<td>7 security checks plus upload policy unit cases: anonymous 401, unrelated 403, enrolled/assigned 200.</td>
+<td>Cloud storage and complete PostgreSQL talent consent lifecycle require staging.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-02</td>
+<td>Recovery and admin reset left old JWTs valid.</td>
+<td>Reproduced before patch; old session remained accepted.</td>
+<td>Bind sessions to persisted password hash; rotate current password-change session; validated recovery return destination.</td>
+<td>session-security.js; server.js; public/js/login.js; public/reset-password.html</td>
+<td>Both reset paths make old session return 401; destination recovery passes; unit rejection of unsafe destinations.</td>
+<td>Rollout signs everyone out; real recovery inbox and Google provider flow unavailable locally.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-03</td>
+<td>Clearing optional profile values retained old data.</td>
+<td>Confirmed filtering of blank values in current route/store.</td>
+<td>Whitelist editable fields, accept explicit blank/null deletion, return canonical profile; separate marketing preference.</td>
+<td>server.js; store.js; public/js/dashboard.js</td>
+<td>Workflow test clears profile values and rejects role injection.</td>
+<td>Historical promotional consent requires separate review.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-04</td>
+<td>Login, refresh and navigation lost the selected destination.</td>
+<td>Confirmed missing stable view URLs and login return path.</td>
+<td>Stable course/lesson/practice and dashboard view/task hashes; safe return through login/recovery; Back/Forward restoration.</td>
+<td>public/js/open.js; public/js/dashboard.js; public/js/workflow-ui.js; public/js/login.js; session-security.js</td>
+<td>Desktop/mobile auth resume, Settings refresh, task refresh, course/filter Back/Forward and reset destination pass.</td>
+<td>Coverage targets learning and dashboard views; embedded job/event detail selections are not all independently bookmarkable. Google callback needs provider verification.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-05</td>
+<td>Unsubmitted free and paid drafts disappeared.</td>
+<td>Reproduced editor rebuilding without local recovery.</td>
+<td>Account/task/language autosave, visible state, revision guard, flush before transition; drafts independent of attempts.</td>
+<td>public/js/draft-store.js; public/js/workflow-ui.js; public/js/open.js; public/js/dashboard.js</td>
+<td>Browser refresh/back/session expiry/account isolation and paid draft recovery pass; storage failure and stale-write unit tests pass.</td>
+<td>Drafts are local to this browser/device; cleared storage cannot be recovered; conflicts need learner review.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-06</td>
+<td>Teacher could certify a nonmember or ineligible learner.</td>
+<td>Reproduced unauthorized recipient certificate before patch.</td>
+<td>Require course enrollment and actual course completion; remove bulk bypass; idempotent certificate issuance.</td>
+<td>server.js; store.js</td>
+<td>Nonmember and incomplete member rejected with 400; certificate count unchanged; free required-assessment completion produces publicly verifiable certificate; certificate rule unit tests pass.</td>
+<td>Existing certificates unchanged; full teacher completion UI and historical eligibility review remain staging/review work.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-07</td>
+<td>Failed requests left permanent loading screens.</td>
+<td>Confirmed assignment rejection and local talent 503 loader paths.</td>
+<td>Shared error boundary, plain unavailable state and Retry for dashboard loaders.</td>
+<td>public/js/workflow-ui.js; public/js/dashboard.js; public/js/open.js</td>
+<td>Injected assignment 503 shows Retry; 100 survey records: 98 pass, 2 talent views show unavailable, zero recorded page errors.</td>
+<td>Talent success flows need PostgreSQL; unavailable is a verified failure state, not a successful integration.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-08</td>
+<td>Skipped challan email advanced to sent.</td>
+<td>Confirmed markSent before an awaited provider outcome.</td>
+<td>Persist queued/failed/provider_accepted independently; await provider result; explicit retry and duplicate suppression; private receipt/download recovery.</td>
+<td>registration-delivery.js; server.js; store.js; mailer.js; mail-provider.js; public/js/registration-status.js</td>
+<td>Local skipped SMTP returns recoverable 503 and never sent; mocked acceptance/retry/durable-write tests pass.</td>
+<td>Real provider acceptance, inbox arrival and crash-after-send reconciliation remain unverified. Other legacy transactional email workflows are outside this specific fix.</td>
+<td>IMPLEMENTED, VERIFICATION BLOCKED</td>
+</tr>
+<tr>
+<td>D-09</td>
+<td>Repeated registration created duplicate learner/offering records.</td>
+<td>Confirmed missing normalized registration identity.</td>
+<td>Reuse normalized email/offering registration; prospective unique DB guard; idempotent challan, clearance and enrollment.</td>
+<td>store.js; server.js; prisma/migrations/20260909000000_qa_attempts_registration_guard/migration.sql; migrations/0009_qa_attempts.sql</td>
+<td>Concurrent local requests return one ID; repeat invoice, clearance and enrollment preserve one record and enrolled stage.</td>
+<td>PostgreSQL index execution and multi-process races unverified; require one app instance. Existing duplicates deliberately retained.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-10</td>
+<td>Unknown offering codes were accepted.</td>
+<td>Confirmed arbitrary truncated codes could enter registration.</td>
+<td>Resolve published paid offerings and server fee; reject missing, unknown, free and inactive codes.</td>
+<td>offering-policy.js; store.js; server.js</td>
+<td>Invalid/free/PATH API rejections and active/inactive offering unit cases pass; authoritative SC-01 fee 12500.</td>
+<td>Stored historical invalid codes require review.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-11</td>
+<td>Teacher could award course gems to a nonmember.</td>
+<td>Reproduced before patch.</td>
+<td>Require actual batch membership and authorized teacher before award.</td>
+<td>server.js</td>
+<td>Unenrolled synthetic student rejected with 400; rejection does not create award.</td>
+<td>Historical mistaken awards need a ledger adjustment plan.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-12</td>
+<td>Quiz body batch_id overrode authorized URL batch.</td>
+<td>Original audit reproduced batch crossover; pre-fix rerun fixture skipped; code confirmed unsafe spread.</td>
+<td>Whitelist quiz fields; authoritative URL batch and actor; inspect analogous creation routes.</td>
+<td>server.js</td>
+<td>Malicious other batch in body still creates quiz only in authorized batch 1.</td>
+<td>This is a focused resource-ID review, not a formal whole-code security assessment.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-13</td>
+<td>Live navigation retained the Free-only filter.</td>
+<td>Confirmed stale cFree state.</td>
+<td>Reset mode-specific filters; preserve search/filter history and progressive course pagination.</td>
+<td>public/js/open.js</td>
+<td>Desktop/mobile Free to Live and search pass; filter refresh and Back/Forward pass.</td>
+<td>New browser/device opens default filters.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-14</td>
+<td>Coordinator tabs fetched admin-only sections; documented read-only chat was writable.</td>
+<td>Confirmed role/API mismatch and writable chat handler.</td>
+<td>Keep authorized read views; omit admin-only requests/actions; expose can_post and enforce read-only chat.</td>
+<td>public/js/dashboard.js; server.js</td>
+<td>Coordinator Teachers/Reports survey passes; read 200, chat write 403, admin instructor endpoint remains 403.</td>
+<td>Role policy preserved from repository; no permission expansion.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-15</td>
+<td>Expired cohort dates, incorrect course counts and gem thresholds.</td>
+<td>Confirmed July/August campaign and stale 31/3 counts and stage bands.</td>
+<td>Remove expired urgency; derive counts and stage thresholds; distinguish self-paced free courses from paid live classes.</td>
+<td>coursepages.js; public/landing.html; public/js/landing.js; public/open.html; public/js/open.js; server.js</td>
+<td>Catalogue inventory reports 39 offerings/10 free; source and rendered survey checked; current free course metadata self-paced.</td>
+<td>Future campaign dates still need an owner and configuration process.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-16</td>
+<td>Failed grading stranded attempts and erased best grades/rewards on resubmission.</td>
+<td>Confirmed aggregate overwrite and missing durable worker/manual recovery.</td>
+<td>Independent attempt snapshots; bounded durable worker; visible failures/retry; admin recovery grading; preserve best aggregate and idempotent results.</td>
+<td>learning-attempts.js; grading-worker.js; schema.prisma; schema-map.js; store.js; server.js; public/js/open.js; public/js/dashboard.js</td>
+<td>Local failure/manual completion for all 15 JS tasks; lower/failed resubmissions preserve 100 score and 570 gems; worker timeout/restart/retry-bound unit tests pass.</td>
+<td>Live AI, PostgreSQL restart and real provider/file grading blocked. Single app/worker instance required; no distributed job lease.</td>
+<td>IMPLEMENTED, VERIFICATION BLOCKED</td>
+</tr>
+<tr>
+<td>D-17</td>
+<td>Advertised PATH bundle generated a zero invoice and could not enroll.</td>
+<td>Audit reproduced zero invoice; incomplete configuration confirmed.</td>
+<td>Disable actionable PATH enrollment and reject server requests; preserve descriptive offer without inventing components.</td>
+<td>offering-policy.js; store.js; coursepages.js; public/js/open.js</td>
+<td>PATH registration/challan is rejected; valid paid lifecycle succeeds.</td>
+<td>Bundle fulfillment is a business/configuration decision before re-enabling.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-18</td>
+<td>Average-based server completion disagreed with per-task UI.</td>
+<td>Confirmed mismatched policies.</td>
+<td>One server-owned required-assessment policy using each configured threshold; optional practice excluded; no empty-course or invented final exam completion.</td>
+<td>learning-attempts.js; store.js; server.js; public/js/open.js</td>
+<td>Mixed-score/per-task/optional/no-assessment unit tests; 15 of 15 JS assessments pass then certificate verifies publicly.</td>
+<td>Existing certificates and grades unchanged; historical review separate.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-19</td>
+<td>Approve/reject/reapprove duplicated challenge rewards.</td>
+<td>Confirmed approval flag without reward reconciliation.</td>
+<td>Reference-linked reversible ledger deltas and idempotent corrections; block ambiguous historical correction for review.</td>
+<td>store.js</td>
+<td>API correction ledger is +50,-50,+50; repeated approval adds nothing.</td>
+<td>Do not auto-repair historical unreferenced rewards; reconciliation approval required.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>D-20</td>
+<td>Duplicate teammate aliases earned duplicate prizes.</td>
+<td>Confirmed repeated resolved user IDs in team array.</td>
+<td>Resolve and validate unique people, reject duplicate aliases; finalization awards each eligible member once.</td>
+<td>store.js</td>
+<td>Duplicate aliases rejected; two valid members receive two awards; repeated finalization adds none.</td>
+<td>Historical duplicate prizes unchanged.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>U-01</td>
+<td>Dialog focus remained behind overlay.</td>
+<td>Original screenshot/browser evidence; shared modal helpers confirmed.</td>
+<td>Focus entry, inert background, Tab containment and trigger restoration.</td>
+<td>public/js/workflow-ui.js; public/js/open.js; public/js/dashboard.js</td>
+<td>Nine successive keyboard tabs remain in sign-in dialog; onboarding dismissal/resume passes.</td>
+<td>Full screen-reader and all specialized dialogs not exhaustively tested.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>U-02</td>
+<td>Very long mobile catalogue with weak return/filter recovery.</td>
+<td>Original 12156px catalogue and lost filters.</td>
+<td>Load more after 12 offerings, result count, search/category recovery.</td>
+<td>public/js/open.js; public/css/workflow.css</td>
+<td>1440/390 search tests, &lt;=12 initial cards, refresh and Back/Forward pass.</td>
+<td>Free language groups retain existing card design.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>U-03</td>
+<td>Recommendation text ended mid-word.</td>
+<td>Confirmed string slicing in card summaries.</td>
+<td>Preserve full strings and use CSS line clamp with ellipsis/detail access.</td>
+<td>public/js/open.js; public/css/workflow.css</td>
+<td>Source review and student overview screenshots at desktop/mobile.</td>
+<td>Not an editorial rewrite of all course summaries.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>U-04</td>
+<td>Mixed hierarchy and unconfigured final-exam claims.</td>
+<td>Confirmed contradictory free-course labels/completion text.</td>
+<td>Course / Module / Lesson / Practice labels and named topics; actual assessment counts; contextual language/starter code.</td>
+<td>public/js/open.js; public/js/workflow-ui.js; server.js</td>
+<td>Free task workspace/browser journey and required-completion route pass.</td>
+<td>Some paid/staff views retain Assignments/Quest terminology; a full cross-role vocabulary cleanup remains a design decision.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>U-05</td>
+<td>Learner errors exposed infrastructure configuration instructions.</td>
+<td>Confirmed raw unavailable responses in UI.</td>
+<td>Plain service error messages and Retry; authorized admin health retains diagnostics.</td>
+<td>public/js/workflow-ui.js; public/js/open.js; public/js/dashboard.js; server.js</td>
+<td>Injected 503 and actual talent unavailable views show user-facing recovery copy.</td>
+<td>Legacy third-party/rare handlers still require broader staging error injection.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>U-06</td>
+<td>Applicants had no receipt/status recovery after missed mail.</td>
+<td>Confirmed success-only registration flow.</td>
+<td>Private receipt token fragment, durable reference, status recovery, challan download and staff retry.</td>
+<td>public/registration-status.html; public/js/registration-status.js; public/js/open.js; server.js; store.js</td>
+<td>Registration workflow verifies bearer-only status, invalid token rejection, invoice identity and failed-mail recovery contract.</td>
+<td>Real recovery inbox and complete applicant browser journey require sandbox mail.</td>
+<td>IMPLEMENTED, VERIFICATION BLOCKED</td>
+</tr>
+<tr>
+<td>U-07</td>
+<td>Mandatory onboarding trapped users; promotions mixed with contact requirements.</td>
+<td>Confirmed locked contact form and no resume.</td>
+<td>Finish later, session-scoped form restore, Settings resume; explicit optional marketing choice.</td>
+<td>public/js/workflow-ui.js; public/js/open.js; public/js/dashboard.js; store.js; server.js</td>
+<td>390px finish-later/reopen preserves contact text; checkbox/profile preference persisted by allowed fields.</td>
+<td>File selections must be chosen again; historical unspecified marketing consent is not retroactively rewritten.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>U-08</td>
+<td>Secondary mobile links had very small hit targets.</td>
+<td>Original measured 15-16px links.</td>
+<td>Shared padded actions, 44px design target and readable mobile controls.</td>
+<td>public/css/workflow.css; public/login.html; public/open.html; public/dashboard.html</td>
+<td>390px layout survey has no horizontal overflow; keyboard interaction passes.</td>
+<td>Real-device touch, full target measurement and contrast audit remain unverified.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>U-09</td>
+<td>Admin health labels clipped and test-mode mail looked operational.</td>
+<td>Confirmed escaped separator and broad green state.</td>
+<td>Explicit configured/disabled/test_mode/failed states; wrapping and corrected separators.</td>
+<td>server.js; public/js/dashboard.js; public/css/workflow.css</td>
+<td>Desktop/mobile admin screenshots and local unconfigured/test-mode state reviewed.</td>
+<td>Configured states are configuration evidence, not proof of external service delivery.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>E-01</td>
+<td>Learning destinations felt disconnected.</td>
+<td>Original public/portal review.</td>
+<td>Continue learning from student overview and clear access to free courses using shared session and stable URLs.</td>
+<td>public/js/dashboard.js; public/js/open.js</td>
+<td>Student overview screenshots and cross-portal lesson return tests.</td>
+<td>No wholesale portal consolidation; last-practice link is browser-local.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>E-02</td>
+<td>Applicant/learner onboarding had no resumable next step.</td>
+<td>Confirmed forced forms and receipt gap.</td>
+<td>Finish later/resume plus applicant status receipt and current next action.</td>
+<td>public/js/workflow-ui.js; public/js/dashboard.js; public/js/registration-status.js</td>
+<td>Onboarding browser test and registration lifecycle API contract pass.</td>
+<td>Complete provider-backed applicant journey blocked; no new onboarding dashboard layer.</td>
+<td>IMPLEMENTED, VERIFICATION BLOCKED</td>
+</tr>
+<tr>
+<td>E-03</td>
+<td>Submission history was not available.</td>
+<td>Confirmed single mutable free-submission aggregate.</td>
+<td>Versioned attempt history with code/files, status, feedback, retry and restore draft.</td>
+<td>learning-attempts.js; public/js/open.js; server.js</td>
+<td>Ownership/history tests and failed/lower attempt preservation pass.</td>
+<td>History is unpaginated; historical snapshots begin when older record is resubmitted. Live AI completion blocked.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>E-04</td>
+<td>Unavailable services were not treated as product states.</td>
+<td>Confirmed endless loaders and raw configuration errors.</td>
+<td>Public grading/talent/email capabilities, truthful admin health, recoverable unavailable states and grading queue.</td>
+<td>server.js; public/js/workflow-ui.js; public/js/dashboard.js; public/js/open.js</td>
+<td>Unavailable talent/AI failure contracts and role survey verified.</td>
+<td>R2 showcase and real live-session availability still lack full capability-aware end-to-end handling; integrations unavailable.</td>
+<td>OPEN</td>
+</tr>
+<tr>
+<td>E-05</td>
+<td>Equivalent views lacked shared UI behavior.</td>
+<td>Original role/screen review.</td>
+<td>Focused shared dialog, error, draft, focus and mobile control primitives; retain brand and existing layouts.</td>
+<td>public/js/workflow-ui.js; public/css/workflow.css</td>
+<td>100 role/layout survey records and keyboard/draft regressions.</td>
+<td>Not a full component or table/navigation rewrite; specialized legacy surfaces remain.</td>
+<td>FIXED AND VERIFIED</td>
+</tr>
+<tr>
+<td>E-06</td>
+<td>Staging regression coverage was incomplete.</td>
+<td>Original audit had limited fixtures and unverified integrations.</td>
+<td>Isolated synthetic server, focused unit/API/browser scripts, evidence, inventory and staging runbook.</td>
+<td>qa-implementation/<em>.cjs; test/</em>.test.js</td>
+<td>24 unit tests, 7 security checks, 7 workflow groups, 10 browser checks, 3 final checks and 100 survey records.</td>
+<td>Live SMTP/AI/PostgreSQL/R2/JaaS sandbox matrix remains blocked; no CI service credentials introduced.</td>
+<td>IMPLEMENTED, VERIFICATION BLOCKED</td>
+</tr>
+</tbody></table>
+<footer>Local synthetic verification · 2026-09-10T04:57:37.075Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>

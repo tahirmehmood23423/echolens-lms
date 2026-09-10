@@ -24,6 +24,7 @@ async function api(path, opts) {
   // Live counts, so the page never shows stale numbers.
   try {
     const info = await api('/api/public/info');
+    document.querySelectorAll('[data-stage]').forEach(el=>{const stages=info.stages||[],i=stages.findIndex(s=>s.name===el.dataset.stage);if(i>=0)el.textContent=stages[i].min+'?'+(stages[i+1]?stages[i+1].min-1:'+')+' Gems';});
     if (info.stats && info.stats.courses) {
       $('statCourses').textContent = info.stats.courses;
       $('ctaCourses').textContent = info.stats.courses;

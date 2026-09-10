@@ -68,6 +68,9 @@ class SmtpProvider {
           maxConnections: 1,
           rateDelta: Number(process.env.SMTP_RATE_DELTA_MS || 1000),
           rateLimit: Number(process.env.SMTP_RATE_LIMIT || 3),
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 30000,
         })
       : null;
   }

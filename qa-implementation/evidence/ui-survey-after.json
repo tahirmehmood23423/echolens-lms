@@ -1,0 +1,1124 @@
+[
+  {
+    "id": "student/overview",
+    "status": "PASS",
+    "text": "📚\nCONTINUE LEARNING\nPython for Data Science\n0% complete\nNEXT\nLevel 1: Setup and Python basics · Control flow and functions\nResume learning\nUpcoming schedule\nFull calendar\nASSIGNMENT\nLevel 1: Setup and Python basics · Control flow and functions\nPython for Data Science\nMon 7 Sept\nLIVE CLASS\nQA upcomi",
+    "pageErrors": []
+  },
+  {
+    "id": "student/courses",
+    "status": "PASS",
+    "text": "SHORT COURSE · EL-6819\nPython for Data Science\nQA Synthetic Cohort · starts Tue 1 Sept\n2 students\nTaught by QA instructor\n3360 possible",
+    "pageErrors": []
+  },
+  {
+    "id": "student/assignments",
+    "status": "PASS",
+    "text": "Python for Data Science\n0/12 levels passed\nLevel 1: Setup and Python basics · Control flow and functions\nDue Mon 7 Sept\nIn progress\nOpen\nLevel 2: Data structures for analysis · Files, libraries, and environments\nDue Mon 7 Sept\nLocked\nLevel 3: NumPy arrays · NumPy operations\nDue Mon 14 Sept\nLocked\nLe",
+    "pageErrors": []
+  },
+  {
+    "id": "student/quizzes",
+    "status": "PASS",
+    "text": "Open now\nNo quizzes open right now.\nPast attempts\nNo attempts yet.",
+    "pageErrors": []
+  },
+  {
+    "id": "student/progress",
+    "status": "PASS",
+    "text": "YOUR STAGE\nGlow\n73 gems to reach Beam\n627\nGEMS\n2\nDAY STREAK\n2\nBEST STREAK\n2\nDay streak\n627\nGems\n2\nBadges\nStage journey\n627 gems earned\nSpark\n0+\nGlow\n250+\nBeam\n700+\nPrism\n1400+\nAurora\n2400+\nNova\n4000+\nProgress by course\nPython for Data Science\nNext: Level 1 · Setup and Python basics · Control flow an",
+    "pageErrors": []
+  },
+  {
+    "id": "student/certificates",
+    "status": "PASS",
+    "text": "No certificates yet - complete a course or quest to earn one.",
+    "pageErrors": []
+  },
+  {
+    "id": "student/talent-profile",
+    "status": "UNAVAILABLE",
+    "text": "This feature is temporarily unavailable. Please try again later.\n\nRetry",
+    "pageErrors": []
+  },
+  {
+    "id": "student/hiring-interest",
+    "status": "UNAVAILABLE",
+    "text": "This feature is temporarily unavailable. Please try again later.\n\nRetry",
+    "pageErrors": []
+  },
+  {
+    "id": "student/schedule",
+    "status": "PASS",
+    "text": "Upcoming classes\nTue 15 Sept\n18:00–19:00\nQA upcoming live class\nPython for Data Science · QA Synthetic Cohort\nOpen class",
+    "pageErrors": []
+  },
+  {
+    "id": "student/messages",
+    "status": "PASS",
+    "text": "Course conversations\nPython for Data Science\nNo messages yet\nOpen",
+    "pageErrors": []
+  },
+  {
+    "id": "student/leaderboard",
+    "status": "PASS",
+    "text": "Learners\nAll-time gems\n1\nQA Empty Student\n🔥 1d streak · Beam\n1320\n2\nQA student\n🔥 2d streak · Glow\n627\n3\nQA free\n🔥 1d streak · Spark\n0\n4\nQA Unenrolled Observer\nSpark\n0\nCourses\nGems per cohort\n1\nPython for Data Science\nQA Synthetic Cohort · EL-6819\n50\n2\nPython for Data Science\nQA unrelated batch · ",
+    "pageErrors": []
+  },
+  {
+    "id": "student/resources",
+    "status": "PASS",
+    "text": "Python for Data Science\n📎 QA private course resource\nOpen\n📎 QA private course resource\nOpen\n📎 QA private course resource\nOpen\n📎 QA private course resource\nOpen",
+    "pageErrors": []
+  },
+  {
+    "id": "student/jobs",
+    "status": "PASS",
+    "text": "No jobs posted yet. Check back soon.",
+    "pageErrors": []
+  },
+  {
+    "id": "student/settings",
+    "status": "PASS",
+    "text": "Q\nQA student\nStudent · Reg no 6841848 · student@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567",
+    "pageErrors": []
+  },
+  {
+    "id": "student/announcements",
+    "status": "PASS",
+    "text": "Announcements\nQA welcome\nSynthetic course announcement for local workflow testing.\nQA admin · 2026-09-09 · Python for Data Science",
+    "pageErrors": []
+  },
+  {
+    "id": "student/challenges",
+    "status": "PASS",
+    "text": "Open challenges\nBeginner\nno deadline\nQA ledger 1788976767445 · 50 gems\nSubmit\nBeginner\nno deadline\nQA ledger 1788976302672 · 50 gems\nSubmit",
+    "pageErrors": []
+  },
+  {
+    "id": "student/hackathons",
+    "status": "PASS",
+    "text": "Events\nFinalized\n2026-09-01 00:00 → 2026-10-01 00:00\nQA team 1788976302823 · teams up to 4 · free entry\nPrizes: 300/150/75 gems · 1 registered\nRegistered as QA's team\nOpen\nFinalized\n2026-09-01 00:00 → 2026-10-01 00:00\nQA team 1788976767811 · teams up to 4 · free entry\nPrizes: 300/150/75 gems · 1 reg",
+    "pageErrors": []
+  },
+  {
+    "id": "student/events",
+    "status": "PASS",
+    "text": "All events\nNo events yet. Watch this space.",
+    "pageErrors": []
+  },
+  {
+    "id": "student/mobile",
+    "status": "PASS",
+    "documentWidth": 390,
+    "overflow": [
+      {
+        "tag": "ASIDE",
+        "id": "sidebar",
+        "class": "sidebar",
+        "text": "LEARNING\nOverview\nMy courses\nAssignments\nQuizzes\nProgress\nCertificates\nTalent Profile\nHiring Interes",
+        "right": 0
+      },
+      {
+        "tag": "DIV",
+        "id": "",
+        "class": "brand",
+        "text": "",
+        "right": -1
+      },
+      {
+        "tag": "SPAN",
+        "id": "",
+        "class": "logo-pill",
+        "text": "",
+        "right": -47
+      },
+      {
+        "tag": "IMG",
+        "id": "",
+        "class": "",
+        "text": "",
+        "right": -62
+      },
+      {
+        "tag": "NAV",
+        "id": "nav",
+        "class": "",
+        "text": "LEARNING\nOverview\nMy courses\nAssignments\nQuizzes\nProgress\nCertificates\nTalent Profile\nHiring Interes",
+        "right": -1
+      },
+      {
+        "tag": "DIV",
+        "id": "",
+        "class": "nav-group admin-hide",
+        "text": "LEARNING",
+        "right": -13
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item active",
+        "text": "Overview",
+        "right": -13
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -202
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -205
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -207
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item admin-hide",
+        "text": "My courses",
+        "right": -13
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -202
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -206
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -206
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item admin-hide",
+        "text": "Assignments",
+        "right": -13
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -202
+      },
+      {
+        "tag": "rect",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -207
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -210
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -211
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item instructor-hide admin-hide",
+        "text": "Quizzes",
+        "right": -13
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -202
+      },
+      {
+        "tag": "rect",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -206
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -210
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item instructor-hide admin-hide",
+        "text": "Progress",
+        "right": -13
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -202
+      }
+    ]
+  },
+  {
+    "id": "admin/overview",
+    "status": "PASS",
+    "text": "Welcome back, QA 👋\nHere's what's happening in EchoLens.\nThursday, 10 September 2026\n13\nTotal Users\n+100% this week\n39\nCourses\n+100% this week\n3\nActive Students\n+100% this week\n2\nEnrollments\n+100% this week\nPKR 25.0K\nRevenue (September)\nEstimated\nUser Growth Overview\nThis Week\nThis Month\nThis Year\n0",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/grades",
+    "status": "PASS",
+    "text": "Free-course submissions needing review\ncs105-javascript ? Lesson 8 ? Practice 1\n\nAttempt #8 ? Learner #12\n\nReview",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/jobs",
+    "status": "PASS",
+    "text": "Post jobs you've sourced from the market - students and teachers see them here and apply directly with the employer.\n+ Post a job\nNo jobs posted yet - post the first one.",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/settings",
+    "status": "PASS",
+    "text": "Q\nQA admin\nAdmin · admin@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/challenges",
+    "status": "PASS",
+    "text": "Challenges are open to free-tier users and students. You review submissions and award the gems.\nNew challenge\nOpen challenges\nBeginner\nno deadline\nQA ledger 1788976767445 · 50 gems\nReview\nClose\nDelete\nBeginner\nno deadline\nQA ledger 1788976302672 · 50 gems\nReview\nClose\nDelete",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/hackathons",
+    "status": "PASS",
+    "text": "Time-boxed events with prizes. Paid events collect a payment reference (JazzCash / Easypaisa / bank) that you confirm before teams can submit.\nNew hackathon\nEvents\nFinalized\n2026-09-01 00:00 → 2026-10-01 00:00\nQA team 1788976302823 · teams up to 4 · free entry\nPrizes: 300/150/75 gems · 1 registered\n",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/events",
+    "status": "PASS",
+    "text": "Create quests, hackathons, competitions and webinars from here - free or paid, inside the portal, on the open website, or both. Everything (fees, pass marks, AI grading, certificates, compiler, emails) is configured per event.\nWebsite announcements\n+ New event\nAll events\nNo events yet - create the f",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-users",
+    "status": "PASS",
+    "text": "Find a student\nSearch by registration number or name - opens the complete profile\nForgot passwords are fixed here - reset keeps the account, gems, and enrollments intact.\nCertificate settings\nAdd a coordinator\nAdd HR staff\nAdd finance staff\nAdd admissions officer\nAdd an ambassador\nAdd an instructor\n",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-catalogue",
+    "status": "PASS",
+    "text": "Start a course\nCourse\nCS-101: Fundamentals of C\nCS-102: Fundamentals of C++ (with OOP)\nAI Automation with n8n & Make.com\nPrompt Engineering & ChatGPT/Claude Mastery\nAI-Assisted Coding with Cursor, Claude & Copilot\nExcel + AI for Office Professionals\nCanva & AI Content Creation\nPython for Data Scienc",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-teachers",
+    "status": "PASS",
+    "text": "Teachers (1)\nNAME\tREG NO\tUSERNAME\tGEMS\tCOURSES\t\nQA instructor\t—\tqa.instructor\t—\tPython for Data Science\tReset password Delete\nInstructor directory\nOne instructor can be assigned to several courses at once.\nNAME\tEMAIL\tSPECIALIZATION\tASSIGNED COURSES\t\nQA instructor\tinstructor@qa.invalid\t— Edit\tPython ",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-students",
+    "status": "PASS",
+    "text": "Students (3)\nNAME\tREG NO\tUSERNAME\tGEMS\tCOURSES\t\nQA Empty Student\t408525\tqa.empty\t\n1320\t—\tView profile Reset password Delete\nQA free\t928467\tfree@student.echolens\t\n0\tPython for Data Science\tView profile Reset password Delete\nQA student\t6841848\tqa.student\t\n627\tPython for Data Science\tView profile Reset",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-enrollments",
+    "status": "PASS",
+    "text": "Enrollment requests - website form\n0 awaiting enrollment\nNAME\tEMAIL\tWHATSAPP\tCOURSE\tSTAGE\tRECEIVED\nNo pending enrollment requests - new website registrations appear here.\n\nFollow up (challan, payment, enrolment) from Analytics & Leads or the Admissions Office portal - once enrolled, the student move",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-analytics",
+    "status": "PASS",
+    "text": "4\ntotal sign-ups\n3\nportal students\n1\nopen (website) users\n3\nleads collected\n2\ncourse enrollments\n0\nevent registrations\n0\nevent submissions\n2\ncertificates issued\nNew sign-ups\nCourse enrollments\nEvent registrations\nEvent submissions\nQuest submissions\nNew leads\nEveryone\nPortal students\nOpen (website) s",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-mailer",
+    "status": "PASS",
+    "text": "Compose email\nSent from info@echolens.digital\nAudience\nLeads only - the database below\nPortal students\nOpen (website) students\nEveryone - portal + open + leads\nSubject\nMessage\nAttach documents or pictures (optional)\nInclude the direct registration link (optional)\nSend email\nAdd leads manually\nName\nW",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-finance",
+    "status": "PASS",
+    "text": "PKR 25,000\nTotal estimated revenue\nPKR 25,000\nRevenue (September)\n1\nCourses with enrollments\nRevenue trend\nLast 6 months\n0\n6250\n12500\n18750\n25000\nApr\nMay\nJun\nJul\nAug\nSep\nRevenue by course\nCOURSE\tPRICE (PKR)\tENROLLMENTS\tREVENUE (PKR)\nPython for Data Science\t12,500\t2\t25,000\n\nRevenue is estimated from ",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-announcements",
+    "status": "PASS",
+    "text": "Publish an announcement\nType\nNew cohort / registration\nHackathon\nWebinar\nDiscount\nInformation\nTitle\nMessage\nAction link (optional)\nLink button label\nPin to the top\nEmail it to:\nNobody - website only\nPortal students\nOpen students\nEveryone incl. leads\nPublish announcement\nPublished (0)\nNothing publish",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-feedback",
+    "status": "PASS",
+    "text": "Awaiting review (0)\nOnly approved feedback shows on the public /open#feedback wall.\nNothing waiting on review.\nReviewed (0)\nNothing reviewed yet.",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-logs",
+    "status": "PASS",
+    "text": "The database backs itself up automatically every 12 hours on the server disk. Download a copy off-server regularly.\nDatabase only\nFull backup (with files)\nSystem health\nWeb Server\nResponding ? up 0m\nHealthy\nDatabase\nLocal JSON store; PostgreSQL integration is not active.\nTest mode\nStorage\nUploads fo",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-departments",
+    "status": "PASS",
+    "text": "Manage every department's roster, head, tasks and announcements.\n+ New department\nAmbassadors (0)\nInterns (0)\nStaff (0)\nTeachers (0)",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/admin-recruiters",
+    "status": "PASS",
+    "text": "Verification\nTalent analytics\nReports\nEvery recruiter signup lands here for review before they can search student profiles.\nPending (1)\nNeeds info\nApproved\nRejected\nQA recruiter · recruiter@qa.invalid\n- (-) · - · - · -\nApprove\nRequest more information\nReject",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/showcase-moderation",
+    "status": "PASS",
+    "text": "Posts held for review and open content reports across every course. Every action reviews the full post first - nothing here acts from an excerpt.\nPending review (0)\nNo posts waiting for review.\nOpen reports (0)\nNo open reports.",
+    "pageErrors": []
+  },
+  {
+    "id": "admin/mobile",
+    "status": "PASS",
+    "documentWidth": 390,
+    "overflow": [
+      {
+        "tag": "ASIDE",
+        "id": "sidebar",
+        "class": "sidebar",
+        "text": "Overview\nGrades\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nUsers\nCourses\nTeachers\nStudents\nEnro",
+        "right": 4
+      },
+      {
+        "tag": "DIV",
+        "id": "",
+        "class": "brand",
+        "text": "",
+        "right": 3
+      },
+      {
+        "tag": "SPAN",
+        "id": "",
+        "class": "logo-pill",
+        "text": "",
+        "right": -43
+      },
+      {
+        "tag": "IMG",
+        "id": "",
+        "class": "",
+        "text": "",
+        "right": -58
+      },
+      {
+        "tag": "NAV",
+        "id": "nav",
+        "class": "",
+        "text": "Overview\nGrades\nJobs\nSettings\nMORE\nChallenges\nHackathons\nEvents\nUsers\nCourses\nTeachers\nStudents\nEnro",
+        "right": 3
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item active",
+        "text": "Overview",
+        "right": -9
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -198
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -201
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -202
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item instructor-only",
+        "text": "Grades",
+        "right": -9
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -198
+      },
+      {
+        "tag": "rect",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -202
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -206
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item",
+        "text": "Jobs",
+        "right": -9
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -198
+      },
+      {
+        "tag": "rect",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -201
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -205
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -201
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item",
+        "text": "Settings",
+        "right": -9
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -198
+      },
+      {
+        "tag": "circle",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -206
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -200
+      },
+      {
+        "tag": "DIV",
+        "id": "",
+        "class": "nav-group instructor-hide",
+        "text": "MORE",
+        "right": -9
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item instructor-hide",
+        "text": "Challenges",
+        "right": -9
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -198
+      }
+    ]
+  },
+  {
+    "id": "instructor/overview",
+    "status": "PASS",
+    "text": "Good morning, QA 👋\nHere's what's happening in your classes today.\nThursday, 10 September 2026\n0\nClasses Today\nNothing scheduled\n0\nAssignments to Review\nAll caught up\n2\nActive Students\nAcross 1 course\n0%\nAvg. Class Progress\nQuest completion\nToday's Classes\nView full schedule\nNo upcoming activities\nN",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/courses",
+    "status": "PASS",
+    "text": "SHORT COURSE · EL-6819\nPython for Data Science\nQA Synthetic Cohort · starts Tue 1 Sept\n2 students\nTaught by QA instructor\n3360 possible",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/students",
+    "status": "PASS",
+    "text": "All courses\nPython for Data Science\nSTUDENT\tCOURSE\tLEVEL\tSUBMITTED\tAVG GRADE\tGEMS\tRISK\nQ QA free\tPython for Data Science\t1/12\t0/60\t—\t\n0\tAt risk\nQ QA student\tPython for Data Science\t1/12\t1/60\t85%\t\n27\tAt risk",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/assignments",
+    "status": "PASS",
+    "text": "Manage assignments\nQuest levels & tasks live inside each course\nPython for Data Science\n2 students\nOpen",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/grades",
+    "status": "PASS",
+    "text": "Nothing waiting for grades - nice work.",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/attendance",
+    "status": "PASS",
+    "text": "Python for Data Science\nNo classes held yet\nNo class live right now\nOpen course\nDATE\tCLASS\tPRESENT\tABSENT\t\nNo classes held yet.",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/schedule",
+    "status": "PASS",
+    "text": "Upcoming classes\nTue 15 Sept\n18:00–19:00\nQA upcoming live class\nPython for Data Science · QA Synthetic Cohort\nOpen class",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/messages",
+    "status": "PASS",
+    "text": "Course conversations\nPython for Data Science\nNo messages yet\nOpen",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/resources",
+    "status": "PASS",
+    "text": "No course content posted yet.",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/jobs",
+    "status": "PASS",
+    "text": "No jobs posted yet. Check back soon.",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/analytics",
+    "status": "PASS",
+    "text": "2\nStudents taught\n1\nCourses\n2\nStudents at risk\n27\nGems awarded\nPer-course breakdown\nCOURSE\tSTUDENTS\tAVG GRADE\tAVG PROGRESS\tAT RISK\tGEMS\nPython for Data Science\t2\t85%\t8%\t2\t\n27\nTop learners\nAcross all courses site-wide\n1\nQA Empty Student\n🔥 1d streak · Beam\n1320\n2\nQA student\n🔥 2d streak · Glow\n627\n3\n",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/my-department",
+    "status": "PASS",
+    "text": "You are not part of any department yet.",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/settings",
+    "status": "PASS",
+    "text": "Q\nQA instructor\nTeacher · instructor@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "instructor/showcase-moderation",
+    "status": "PASS",
+    "text": "Posts held for review and open content reports for your own courses. Every action reviews the full post first - nothing here acts from an excerpt.\nPending review (0)\nNo posts waiting for review.\nOpen reports (0)\nNo open reports.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/overview",
+    "status": "PASS",
+    "text": "You have view-only access: track progress across every course, but adding, editing, or grading is reserved for teachers and admins.\n3\nStudents\n1\nTeachers\n2\nRunning courses\n1\nSubmissions\n1\nGraded\n1947\nGems earned\n1\nFree-tier users\nUpcoming classes\nFull schedule\nTue 15 Sept\n18:00–19:00\nQA upcoming liv",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/courses",
+    "status": "PASS",
+    "text": "SHORT COURSE · EL-6819\nPython for Data Science\nQA Synthetic Cohort · starts Tue 1 Sept\n2 students\nTaught by QA instructor\n3360 possible\nSHORT COURSE · EL-8741\nPython for Data Science\nQA unrelated batch · starts Tue 1 Sept\n0 students\nNo teacher yet\n0 possible",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/assignments",
+    "status": "PASS",
+    "text": "No assignments yet - they appear once a teacher installs a quest track on your course.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/quizzes",
+    "status": "PASS",
+    "text": "Open now\nNo quizzes open right now.\nPast attempts\nNo attempts yet.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/progress",
+    "status": "PASS",
+    "text": "Progress tracking is for student accounts.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/certificates",
+    "status": "PASS",
+    "text": "No certificates yet - complete a course or quest to earn one.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/schedule",
+    "status": "PASS",
+    "text": "Upcoming classes\nTue 15 Sept\n18:00–19:00\nQA upcoming live class\nPython for Data Science · QA Synthetic Cohort\nOpen class",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/messages",
+    "status": "PASS",
+    "text": "No course chat yet - enroll in a course to start one.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/leaderboard",
+    "status": "PASS",
+    "text": "Learners\nAll-time gems\n1\nQA Empty Student\n🔥 1d streak · Beam\n1320\n2\nQA student\n🔥 2d streak · Glow\n627\n3\nQA free\n🔥 1d streak · Spark\n0\n4\nQA Unenrolled Observer\nSpark\n0\nCourses\nGems per cohort\n1\nPython for Data Science\nQA Synthetic Cohort · EL-6819\n50\n2\nPython for Data Science\nQA unrelated batch · ",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/resources",
+    "status": "PASS",
+    "text": "No course content posted yet.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/jobs",
+    "status": "PASS",
+    "text": "No jobs posted yet. Check back soon.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/settings",
+    "status": "PASS",
+    "text": "Q\nQA coordinator\nCoordinator · coordinator@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/announcements",
+    "status": "PASS",
+    "text": "Announcements\nQA welcome\nSynthetic course announcement for local workflow testing.\nQA admin · 2026-09-09 · Python for Data Science",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/challenges",
+    "status": "PASS",
+    "text": "Open challenges\nBeginner\nno deadline\nQA ledger 1788976767445 · 50 gems\nBeginner\nno deadline\nQA ledger 1788976302672 · 50 gems",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/hackathons",
+    "status": "PASS",
+    "text": "Events\nFinalized\n2026-09-01 00:00 → 2026-10-01 00:00\nQA team 1788976302823 · teams up to 4 · free entry\nPrizes: 300/150/75 gems · 1 registered\nOpen\nFinalized\n2026-09-01 00:00 → 2026-10-01 00:00\nQA team 1788976767811 · teams up to 4 · free entry\nPrizes: 300/150/75 gems · 1 registered\nOpen",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/events",
+    "status": "PASS",
+    "text": "All events\nNo events yet. Watch this space.",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/admin-users",
+    "status": "PASS",
+    "text": "Find a student\nSearch by registration number or name - opens the complete profile\nStudents (3)\nNAME\tREG NO\tUSERNAME\tGEMS\tCOURSES\t\nQA Empty Student\t408525\tqa.empty\t\n1320\t—\tView profile\nQA free\t928467\tfree@student.echolens\t\n0\tPython for Data Science\tView profile\nQA student\t6841848\tqa.student\t\n627\tPyth",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/admin-teachers",
+    "status": "PASS",
+    "text": "Teachers (1)\nNAME\tREG NO\tUSERNAME\tGEMS\tCOURSES\t\nQA instructor\t—\tqa.instructor\t—\tPython for Data Science\t",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/admin-students",
+    "status": "PASS",
+    "text": "Students (3)\nNAME\tREG NO\tUSERNAME\tGEMS\tCOURSES\t\nQA Empty Student\t408525\tqa.empty\t\n1320\t—\tView profile\nQA free\t928467\tfree@student.echolens\t\n0\tPython for Data Science\tView profile\nQA student\t6841848\tqa.student\t\n627\tPython for Data Science\tView profile",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/admin-enrollments",
+    "status": "PASS",
+    "text": "Enrollment requests - website form\n0 awaiting enrollment\nNAME\tEMAIL\tWHATSAPP\tCOURSE\tSTAGE\tRECEIVED\nNo pending enrollment requests - new website registrations appear here.\n\nFollow up (challan, payment, enrolment) from Analytics & Leads or the Admissions Office portal - once enrolled, the student move",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/admin-analytics",
+    "status": "PASS",
+    "text": "4\ntotal sign-ups\n3\nportal students\n1\nopen (website) users\n3\nleads collected\n2\ncourse enrollments\n0\nevent registrations\n0\nevent submissions\n2\ncertificates issued\nNew sign-ups\nCourse enrollments\nEvent registrations\nEvent submissions\nQuest submissions\nNew leads\nEveryone\nPortal students\nOpen (website) s",
+    "pageErrors": []
+  },
+  {
+    "id": "coordinator/mobile",
+    "status": "PASS",
+    "documentWidth": 390,
+    "overflow": [
+      {
+        "tag": "ASIDE",
+        "id": "sidebar",
+        "class": "sidebar",
+        "text": "LEARNING\nOverview\nMy courses\nAssignments\nQuizzes\nProgress\nCertificates\nCalendar\nTOOLS\nMessages\nLeade",
+        "right": 1
+      },
+      {
+        "tag": "DIV",
+        "id": "",
+        "class": "brand",
+        "text": "",
+        "right": 0
+      },
+      {
+        "tag": "SPAN",
+        "id": "",
+        "class": "logo-pill",
+        "text": "",
+        "right": -47
+      },
+      {
+        "tag": "IMG",
+        "id": "",
+        "class": "",
+        "text": "",
+        "right": -62
+      },
+      {
+        "tag": "NAV",
+        "id": "nav",
+        "class": "",
+        "text": "LEARNING\nOverview\nMy courses\nAssignments\nQuizzes\nProgress\nCertificates\nCalendar\nTOOLS\nMessages\nLeade",
+        "right": 0
+      },
+      {
+        "tag": "DIV",
+        "id": "",
+        "class": "nav-group admin-hide",
+        "text": "LEARNING",
+        "right": -12
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item active",
+        "text": "Overview",
+        "right": -12
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -201
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -204
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -206
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item admin-hide",
+        "text": "My courses",
+        "right": -12
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -201
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -205
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -205
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item admin-hide",
+        "text": "Assignments",
+        "right": -12
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -201
+      },
+      {
+        "tag": "rect",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -206
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -209
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -210
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item instructor-hide admin-hide",
+        "text": "Quizzes",
+        "right": -12
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -201
+      },
+      {
+        "tag": "rect",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -205
+      },
+      {
+        "tag": "path",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -209
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "class": "nav-item instructor-hide admin-hide",
+        "text": "Progress",
+        "right": -12
+      },
+      {
+        "tag": "svg",
+        "id": "",
+        "class": "[object SVGAnimatedString]",
+        "text": "",
+        "right": -201
+      }
+    ]
+  },
+  {
+    "id": "hr/settings",
+    "status": "PASS",
+    "text": "Q\nQA hr\nHR · hr@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "hr/dept-hr",
+    "status": "PASS",
+    "text": "Q\nHR Portal\nSigned in as QA hr · hr@qa.invalid\nHire anyone directly - a portal login is emailed immediately.\nAdd an ambassador\nAdd an instructor\nAdd staff\nAdd an intern\nPick a department from the sidebar, or add a new one.",
+    "pageErrors": []
+  },
+  {
+    "id": "finance/settings",
+    "status": "PASS",
+    "text": "Q\nQA finance\nFinance · finance@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "finance/dept-finance",
+    "status": "PASS",
+    "text": "Q\nFinance Portal\nSigned in as QA finance · finance@qa.invalid\nPayment verification\nExpenses & balance sheet\nAmbassador reports\nStudents appear here once the Admissions Office generates and mails their challan. Match the payment screenshot and record the student emailed to finance@qa.invalid against ",
+    "pageErrors": []
+  },
+  {
+    "id": "student_coordinator/settings",
+    "status": "PASS",
+    "text": "Q\nQA student_coordinator\nAdmissions Office · student_coordinator@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "student_coordinator/dept-student-coordinator",
+    "status": "PASS",
+    "text": "Q\nAdmissions Office Portal\nSigned in as QA student_coordinator · student_coordinator@qa.invalid\nRegistrations & challans\nDiscount categories\nBank details\nStudent queries\nInstructors\nAmbassador reports\nEvery registration from the website lands here (you are also emailed at admissions@qa.invalid). Gen",
+    "pageErrors": []
+  },
+  {
+    "id": "staff/settings",
+    "status": "PASS",
+    "text": "Q\nQA staff\nStaff · staff@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "staff/dept-staff",
+    "status": "PASS",
+    "text": "Q\nStaff Portal\nUnassigned · QA assistant\nInstructions from HR\nNothing yet.\nFollow-ups\nNothing yet.\nYou are not part of any department yet.",
+    "pageErrors": []
+  },
+  {
+    "id": "ambassador/settings",
+    "status": "PASS",
+    "text": "Q\nQA ambassador\nAmbassador · ambassador@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "ambassador/dept-ambassador",
+    "status": "PASS",
+    "text": "Q\nAmbassadors Portal\nSigned in as QA ambassador · ambassador@qa.invalid\nOverview\nMy Department\nMy referrals\nLeaderboard\nReports\nDownload QR\nReferral code\n2064\nUniversity\nQA University\nGems\n0\nLeaderboard rank\n#1\nStudents referred\n0\nRecent gem activity\nNo gems yet - share your code or QR to get your f",
+    "pageErrors": []
+  },
+  {
+    "id": "recruiter/settings",
+    "status": "PASS",
+    "text": "Q\nQA recruiter\nRecruiter · recruiter@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567\nWhatsapp\n03001234567\nCity\nLahore",
+    "pageErrors": []
+  },
+  {
+    "id": "recruiter/recruiter",
+    "status": "PASS",
+    "text": "Q\nRecruiter Portal\nSigned in as QA recruiter · recruiter@qa.invalid\nYour account is being reviewed\n\nOur team verifies every recruiter before they can search EchoLens student profiles. This is usually done within one business day - we will email you at recruiter@qa.invalid as soon as a decision is ma",
+    "pageErrors": []
+  },
+  {
+    "id": "observer/overview",
+    "status": "PASS",
+    "text": "YOUR STAGE\nSpark\n250 gems to reach Glow\n0\nGEMS\n1\nDAY STREAK\n1\nBEST STREAK\nYou're on the free tier.\n2 open challenges · 0 solved by you. Earn gems, climb stages, share your profile. Want full courses, live classes, and teacher feedback? Ask about the portal.\nOpen challenges\nUpcoming classes\nFull sche",
+    "pageErrors": []
+  },
+  {
+    "id": "observer/progress",
+    "status": "PASS",
+    "text": "YOUR STAGE\nSpark\n250 gems to reach Glow\n0\nGEMS\n1\nDAY STREAK\n1\nBEST STREAK\n1\nDay streak\n0\nGems\n1\nBadges\nStage journey\n0 gems earned\nSpark\n0+\nGlow\n250+\nBeam\n700+\nPrism\n1400+\nAurora\n2400+\nNova\n4000+\nProgress by course\nEnroll in a course to start tracking progress.\nBadges\nShare profile\nSpark stage",
+    "pageErrors": []
+  },
+  {
+    "id": "observer/leaderboard",
+    "status": "PASS",
+    "text": "Learners\nAll-time gems\n1\nQA Empty Student\n🔥 1d streak · Beam\n1320\n2\nQA student\n🔥 2d streak · Glow\n627\n3\nQA free\n🔥 1d streak · Spark\n0\n4\nQA Unenrolled Observer\n🔥 1d streak · Spark\n0\nCourses\nGems per cohort\n1\nPython for Data Science\nQA Synthetic Cohort · EL-6819\n50\n2\nPython for Data Science\nQA unr",
+    "pageErrors": []
+  },
+  {
+    "id": "observer/jobs",
+    "status": "PASS",
+    "text": "No jobs posted yet. Check back soon.",
+    "pageErrors": []
+  },
+  {
+    "id": "observer/settings",
+    "status": "PASS",
+    "text": "Q\nQA Unenrolled Observer\nFree tier · observer@qa.invalid\n⋮\nProfile details\nEdit\nPhone\n03001234567",
+    "pageErrors": []
+  },
+  {
+    "id": "observer/challenges",
+    "status": "PASS",
+    "text": "Open challenges\nBeginner\nno deadline\nQA ledger 1788976767445 · 50 gems\nSubmit\nBeginner\nno deadline\nQA ledger 1788976302672 · 50 gems\nSubmit",
+    "pageErrors": []
+  },
+  {
+    "id": "observer/hackathons",
+    "status": "PASS",
+    "text": "Events\nFinalized\n2026-09-01 00:00 → 2026-10-01 00:00\nQA team 1788976302823 · teams up to 4 · free entry\nPrizes: 300/150/75 gems · 1 registered\nOpen\nFinalized\n2026-09-01 00:00 → 2026-10-01 00:00\nQA team 1788976767811 · teams up to 4 · free entry\nPrizes: 300/150/75 gems · 1 registered\nOpen",
+    "pageErrors": []
+  },
+  {
+    "id": "observer/events",
+    "status": "PASS",
+    "text": "All events\nNo events yet. Watch this space.",
+    "pageErrors": []
+  },
+  {
+    "id": "D-13/search/1440",
+    "status": "PASS"
+  },
+  {
+    "id": "D-13/search/390",
+    "status": "PASS"
+  },
+  {
+    "id": "U-07/onboarding-resume",
+    "status": "PASS"
+  }
+]

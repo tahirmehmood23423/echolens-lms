@@ -14,7 +14,7 @@ const BASE = 'https://www.echolens.digital';
 // admin portal): /open#register, optionally /open#register-<CODE> to preselect.
 const WHATSAPP = 'https://wa.me/923141479109';
 const EMAIL = 'info@echolens.digital';
-const COHORT = { name: 'August 2026', starts: '1 August 2026', startDate: '2026-08-01', deadline: '31 July 2026' };
+const COHORT = { name: 'Available courses', starts: 'Confirmed by Admissions', startDate: undefined };
 
 function slugify(s) {
   return String(s || '')
@@ -209,7 +209,7 @@ function renderCourse(c, all) {
   // present, then top up with the generic catalogue keywords.
   const trackKw = trackForCourse(c)?.def?.keywords || [];
   const kw = [...trackKw, c.title, c.tier, 'course', 'online course Pakistan', free ? 'free ' + c.title.toLowerCase() : c.title.toLowerCase() + ' fee', 'EchoLens', 'learn ' + c.title.split(/[:&,]/)[0].trim().toLowerCase() + ' online'].join(', ');
-  const metaDesc = `${c.summary} ${free ? 'Free, ' : ''}${c.weeks}-week ${c.tier.toLowerCase()}, ${c.hours} hours of live instructor-led learning with coding quests, a browser compiler and a verified certificate. ${COHORT.name} cohort - enrol at EchoLens.`.slice(0, 300);
+  const metaDesc = `${c.summary} ${free ? 'Free, ' : ''}${c.weeks}-week ${c.tier.toLowerCase()}, ${c.hours} hours of ${free ? 'self-paced' : 'instructor-led'} learning with coding quests, a browser compiler and a verified certificate. ${COHORT.name} - enrol at EchoLens.`.slice(0, 300);
   const title = `${c.title} ${free ? '(Free) ' : ''}| ${c.tier} - EchoLens Digital`;
 
   const badges = [];
@@ -223,11 +223,11 @@ function renderCourse(c, all) {
   badges.push(`<span class="cp-badge">${esc(c.tier)}</span>`);
 
   const included = [
-    `Live, instructor-led online sessions across ${c.weeks} weeks (${c.hours} hours total).`,
+    free ? `Self-paced lessons and practice (${c.hours} estimated hours).` : `Live, instructor-led online sessions across ${c.weeks} weeks (${c.hours} hours total).`,
     'Hands-on coding quests you solve inside the EchoLens browser compiler - nothing to install.',
     'Gems, stages and a leaderboard that keep you moving instead of grade anxiety.',
-    'A verified certificate with a scannable QR code, ready to share on LinkedIn, when you finish.',
-    free ? 'Completely free - no fee, just create an account and start.' : 'The first week is open free so you can try the course before you pay.',
+    'A verified certificate with a scannable QR code, ready to share on LinkedIn, when you satisfy the course requirements.',
+    free ? 'Completely free - no fee, just create an account and start.' : 'The first lesson is open free so you can try the course before you pay.',
   ];
 
   const related = all.filter((x) => x.tier === c.tier && x.code !== c.code).slice(0, 4);
@@ -300,27 +300,27 @@ function renderCourse(c, all) {
       <section class="cp-card">
         <h2>About this course</h2>
         <p>${esc(c.summary)}</p>
-        <p>${esc(tierBlurb(c.tier))} It runs online in the ${esc(COHORT.name)} cohort (starting ${esc(COHORT.starts)}) and is taught the EchoLens way: you learn by doing real, gradeable work rather than just watching lectures.</p>
+        <p>${esc(tierBlurb(c.tier))} ${free ? 'Learn online at your own pace.' : 'Admissions confirms the batch and start date when you enroll.'} Practice the concepts with the listed assessments.</p>
         <h2>What's included</h2>
         <ul class="cp-list">${included.map((i) => '<li>' + esc(i) + '</li>').join('')}</ul>
         ${outlineSection(c)}
         <h2>Who it's for</h2>
         <p>${esc(c.title)} suits learners at a <b>${esc(level.toLowerCase())}</b> level who want a practical, project-based route into ${esc(c.title.split(/[:&,]/)[0].trim())}. You need only a browser and an internet connection - all coding runs inside the EchoLens compiler, so there is nothing to set up.</p>
         <h2>Certificate</h2>
-        <p>Finish every stage and EchoLens issues a verified certificate carrying a QR code anyone can scan to confirm it on our site. You can add it to your CV or share it to LinkedIn in one click.</p>
+        <p>${free ? 'Pass every required assessment at its stated threshold to earn your verified certificate. Optional practice and watching videos do not determine eligibility.' : 'Complete the course requirements to become eligible for a verified certificate.'} Anyone can scan its QR code to verify it on our site. You can add it to your CV or share it to LinkedIn in one click.</p>
       </section>
     </main>
 
     <aside class="cp-side">
       <div class="cp-card">
-        <div class="cp-price">${esc(priceLabel(c))}<small>${free ? 'Free forever - just sign in' : COHORT.name + ' cohort - fee payable on enrolment'}</small></div>
+        <div class="cp-price">${esc(priceLabel(c))}<small>${free ? 'Free forever - just sign in' : 'Fee payable on enrollment'}</small></div>
         <ul class="cp-facts">
-          <li><span>Format</span><span>Online, live</span></li>
+          <li><span>Format</span><span>${free ? 'Online, self-paced' : 'Online, instructor-led'}</span></li>
           <li><span>Tier</span><span>${esc(c.tier)}</span></li>
           <li><span>Duration</span><span>${c.weeks} weeks</span></li>
           <li><span>Total hours</span><span>${c.hours} hours</span></li>
           <li><span>Level</span><span>${esc(level)}</span></li>
-          <li><span>Cohort</span><span>${esc(COHORT.name)}</span></li>
+          ${free ? '' : '<li><span>Start date</span><span>Confirmed by Admissions</span></li>'}
           <li><span>Certificate</span><span>Verified</span></li>
         </ul>
         <div style="display:flex;flex-direction:column;gap:8px">${ctaPrimary}${ctaSecondary}</div>
@@ -361,7 +361,7 @@ function renderIndex(all) {
   };
   return pageHead({
     title: 'All Courses - AI, Coding, Data Science & Design | EchoLens Digital',
-    description: `Browse all ${all.length} EchoLens courses for the ${COHORT.name} cohort: AI, Python, data science, web development, machine learning and design. Live instructor-led online programs with coding quests, a free browser compiler and verified certificates. Three courses are completely free.`,
+    description: `Browse all ${all.length} EchoLens courses : AI, Python, data science, web development, machine learning and design. Live instructor-led online programs with coding quests, a free browser compiler and verified certificates. ${all.filter(c=>!c.price_pkr).length} courses are free and self-paced.`,
     canonical: url,
     keywords: 'AI courses Pakistan, coding courses online, data science course, Python course, machine learning course, web development course, online bootcamp Pakistan, EchoLens courses',
     jsonld: [listLd, crumbLd],
@@ -371,7 +371,7 @@ function renderIndex(all) {
   <header class="cp-hero">
     <div class="cp-badges"><span class="cp-badge">${COHORT.name} cohort</span><span class="cp-badge hot">${all.length} programs</span></div>
     <h1 class="cp-h1">EchoLens Course Catalogue</h1>
-    <p class="cp-lead">${all.length} live, instructor-led online programs across AI, data science, web development and design. Learn by solving real coding quests in your browser, earn gems, and collect verified certificates. Three courses are completely free.</p>
+    <p class="cp-lead">${all.length} online courses across AI, data science, web development and design. Learn by solving real coding quests in your browser, earn gems, and collect verified certificates. ${all.filter(c=>!c.price_pkr).length} courses are free and self-paced.</p>
     <div class="cp-cta"><a class="btn btn-grad" href="/open#signup">Start free</a><a class="btn btn-light" href="/open">Free quests &amp; events</a></div>
   </header>
   ${tiers.map(section).join('')}

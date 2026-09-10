@@ -52,6 +52,7 @@ const COLLECTIONS = [
     'graded_by', 'code', 'language', 'ai_review', 'review_shared', 'review_shared_at', 'late', 'integrity', 'late_deduction',
     'telemetry', 'activity_report',
   ]],
+  ['open_attempts', 'open_attempts', 'openAttempt', ['id','user_id','submission_id','request_key','track_key','level','pid','status','payload','created_at','updated_at']],
   ['open_submissions', 'open_submissions', 'openSubmission', [
     'id', 'user_id', 'track_key', 'level', 'pid', 'problem_title', 'points', 'code', 'language', 'file_url', 'file_name',
     'submitted_at', 'score', 'gems', 'feedback', 'graded_at', 'attempts', 'files',
@@ -147,6 +148,7 @@ const FRONT_LOADED_KEYS = new Set(['courses', 'companies', 'users', 'batches']);
 // literal null, since NOT NULL forbids a real SQL NULL) when required -
 // Prisma rejects a plain JS `null` for any Json field outright.
 const JSON_COLUMNS_BY_TABLE = {
+  open_attempts: { payload: false },
   users: { profile: false },
   courses: { badges: true },
   batches: { instructor_ids: false },

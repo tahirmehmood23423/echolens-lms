@@ -1,0 +1,352 @@
+[
+  {
+    "id": "D-01",
+    "original": "Unrelated authenticated users could download private uploads.",
+    "reproduction": "Reproduced before patch: unrelated learner received private bytes.",
+    "fix": "Purpose/owner/membership authorization; deny unknown files, malformed paths and talent-resume bypass; random upload names.",
+    "files": "upload-access.js; server.js; test/upload-access.test.js",
+    "verification": "7 security checks plus upload policy unit cases: anonymous 401, unrelated 403, enrolled/assigned 200.",
+    "limitation": "Cloud storage and complete PostgreSQL talent consent lifecycle require staging.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-02",
+    "original": "Recovery and admin reset left old JWTs valid.",
+    "reproduction": "Reproduced before patch; old session remained accepted.",
+    "fix": "Bind sessions to persisted password hash; rotate current password-change session; validated recovery return destination.",
+    "files": "session-security.js; server.js; public/js/login.js; public/reset-password.html",
+    "verification": "Both reset paths make old session return 401; destination recovery passes; unit rejection of unsafe destinations.",
+    "limitation": "Rollout signs everyone out; real recovery inbox and Google provider flow unavailable locally.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-03",
+    "original": "Clearing optional profile values retained old data.",
+    "reproduction": "Confirmed filtering of blank values in current route/store.",
+    "fix": "Whitelist editable fields, accept explicit blank/null deletion, return canonical profile; separate marketing preference.",
+    "files": "server.js; store.js; public/js/dashboard.js",
+    "verification": "Workflow test clears profile values and rejects role injection.",
+    "limitation": "Historical promotional consent requires separate review.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-04",
+    "original": "Login, refresh and navigation lost the selected destination.",
+    "reproduction": "Confirmed missing stable view URLs and login return path.",
+    "fix": "Stable course/lesson/practice and dashboard view/task hashes; safe return through login/recovery; Back/Forward restoration.",
+    "files": "public/js/open.js; public/js/dashboard.js; public/js/workflow-ui.js; public/js/login.js; session-security.js",
+    "verification": "Desktop/mobile auth resume, Settings refresh, task refresh, course/filter Back/Forward and reset destination pass.",
+    "limitation": "Coverage targets learning and dashboard views; embedded job/event detail selections are not all independently bookmarkable. Google callback needs provider verification.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-05",
+    "original": "Unsubmitted free and paid drafts disappeared.",
+    "reproduction": "Reproduced editor rebuilding without local recovery.",
+    "fix": "Account/task/language autosave, visible state, revision guard, flush before transition; drafts independent of attempts.",
+    "files": "public/js/draft-store.js; public/js/workflow-ui.js; public/js/open.js; public/js/dashboard.js",
+    "verification": "Browser refresh/back/session expiry/account isolation and paid draft recovery pass; storage failure and stale-write unit tests pass.",
+    "limitation": "Drafts are local to this browser/device; cleared storage cannot be recovered; conflicts need learner review.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-06",
+    "original": "Teacher could certify a nonmember or ineligible learner.",
+    "reproduction": "Reproduced unauthorized recipient certificate before patch.",
+    "fix": "Require course enrollment and actual course completion; remove bulk bypass; idempotent certificate issuance.",
+    "files": "server.js; store.js",
+    "verification": "Nonmember and incomplete member rejected with 400; certificate count unchanged; free required-assessment completion produces publicly verifiable certificate; certificate rule unit tests pass.",
+    "limitation": "Existing certificates unchanged; full teacher completion UI and historical eligibility review remain staging/review work.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-07",
+    "original": "Failed requests left permanent loading screens.",
+    "reproduction": "Confirmed assignment rejection and local talent 503 loader paths.",
+    "fix": "Shared error boundary, plain unavailable state and Retry for dashboard loaders.",
+    "files": "public/js/workflow-ui.js; public/js/dashboard.js; public/js/open.js",
+    "verification": "Injected assignment 503 shows Retry; 100 survey records: 98 pass, 2 talent views show unavailable, zero recorded page errors.",
+    "limitation": "Talent success flows need PostgreSQL; unavailable is a verified failure state, not a successful integration.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-08",
+    "original": "Skipped challan email advanced to sent.",
+    "reproduction": "Confirmed markSent before an awaited provider outcome.",
+    "fix": "Persist queued/failed/provider_accepted independently; await provider result; explicit retry and duplicate suppression; private receipt/download recovery.",
+    "files": "registration-delivery.js; server.js; store.js; mailer.js; mail-provider.js; public/js/registration-status.js",
+    "verification": "Local skipped SMTP returns recoverable 503 and never sent; mocked acceptance/retry/durable-write tests pass.",
+    "limitation": "Real provider acceptance, inbox arrival and crash-after-send reconciliation remain unverified. Other legacy transactional email workflows are outside this specific fix.",
+    "status": "IMPLEMENTED, VERIFICATION BLOCKED"
+  },
+  {
+    "id": "D-09",
+    "original": "Repeated registration created duplicate learner/offering records.",
+    "reproduction": "Confirmed missing normalized registration identity.",
+    "fix": "Reuse normalized email/offering registration; prospective unique DB guard; idempotent challan, clearance and enrollment.",
+    "files": "store.js; server.js; prisma/migrations/20260909000000_qa_attempts_registration_guard/migration.sql; migrations/0009_qa_attempts.sql",
+    "verification": "Concurrent local requests return one ID; repeat invoice, clearance and enrollment preserve one record and enrolled stage.",
+    "limitation": "PostgreSQL index execution and multi-process races unverified; require one app instance. Existing duplicates deliberately retained.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-10",
+    "original": "Unknown offering codes were accepted.",
+    "reproduction": "Confirmed arbitrary truncated codes could enter registration.",
+    "fix": "Resolve published paid offerings and server fee; reject missing, unknown, free and inactive codes.",
+    "files": "offering-policy.js; store.js; server.js",
+    "verification": "Invalid/free/PATH API rejections and active/inactive offering unit cases pass; authoritative SC-01 fee 12500.",
+    "limitation": "Stored historical invalid codes require review.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-11",
+    "original": "Teacher could award course gems to a nonmember.",
+    "reproduction": "Reproduced before patch.",
+    "fix": "Require actual batch membership and authorized teacher before award.",
+    "files": "server.js",
+    "verification": "Unenrolled synthetic student rejected with 400; rejection does not create award.",
+    "limitation": "Historical mistaken awards need a ledger adjustment plan.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-12",
+    "original": "Quiz body batch_id overrode authorized URL batch.",
+    "reproduction": "Original audit reproduced batch crossover; pre-fix rerun fixture skipped; code confirmed unsafe spread.",
+    "fix": "Whitelist quiz fields; authoritative URL batch and actor; inspect analogous creation routes.",
+    "files": "server.js",
+    "verification": "Malicious other batch in body still creates quiz only in authorized batch 1.",
+    "limitation": "This is a focused resource-ID review, not a formal whole-code security assessment.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-13",
+    "original": "Live navigation retained the Free-only filter.",
+    "reproduction": "Confirmed stale cFree state.",
+    "fix": "Reset mode-specific filters; preserve search/filter history and progressive course pagination.",
+    "files": "public/js/open.js",
+    "verification": "Desktop/mobile Free to Live and search pass; filter refresh and Back/Forward pass.",
+    "limitation": "New browser/device opens default filters.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-14",
+    "original": "Coordinator tabs fetched admin-only sections; documented read-only chat was writable.",
+    "reproduction": "Confirmed role/API mismatch and writable chat handler.",
+    "fix": "Keep authorized read views; omit admin-only requests/actions; expose can_post and enforce read-only chat.",
+    "files": "public/js/dashboard.js; server.js",
+    "verification": "Coordinator Teachers/Reports survey passes; read 200, chat write 403, admin instructor endpoint remains 403.",
+    "limitation": "Role policy preserved from repository; no permission expansion.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-15",
+    "original": "Expired cohort dates, incorrect course counts and gem thresholds.",
+    "reproduction": "Confirmed July/August campaign and stale 31/3 counts and stage bands.",
+    "fix": "Remove expired urgency; derive counts and stage thresholds; distinguish self-paced free courses from paid live classes.",
+    "files": "coursepages.js; public/landing.html; public/js/landing.js; public/open.html; public/js/open.js; server.js",
+    "verification": "Catalogue inventory reports 39 offerings/10 free; source and rendered survey checked; current free course metadata self-paced.",
+    "limitation": "Future campaign dates still need an owner and configuration process.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-16",
+    "original": "Failed grading stranded attempts and erased best grades/rewards on resubmission.",
+    "reproduction": "Confirmed aggregate overwrite and missing durable worker/manual recovery.",
+    "fix": "Independent attempt snapshots; bounded durable worker; visible failures/retry; admin recovery grading; preserve best aggregate and idempotent results.",
+    "files": "learning-attempts.js; grading-worker.js; schema.prisma; schema-map.js; store.js; server.js; public/js/open.js; public/js/dashboard.js",
+    "verification": "Local failure/manual completion for all 15 JS tasks; lower/failed resubmissions preserve 100 score and 570 gems; worker timeout/restart/retry-bound unit tests pass.",
+    "limitation": "Live AI, PostgreSQL restart and real provider/file grading blocked. Single app/worker instance required; no distributed job lease.",
+    "status": "IMPLEMENTED, VERIFICATION BLOCKED"
+  },
+  {
+    "id": "D-17",
+    "original": "Advertised PATH bundle generated a zero invoice and could not enroll.",
+    "reproduction": "Audit reproduced zero invoice; incomplete configuration confirmed.",
+    "fix": "Disable actionable PATH enrollment and reject server requests; preserve descriptive offer without inventing components.",
+    "files": "offering-policy.js; store.js; coursepages.js; public/js/open.js",
+    "verification": "PATH registration/challan is rejected; valid paid lifecycle succeeds.",
+    "limitation": "Bundle fulfillment is a business/configuration decision before re-enabling.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-18",
+    "original": "Average-based server completion disagreed with per-task UI.",
+    "reproduction": "Confirmed mismatched policies.",
+    "fix": "One server-owned required-assessment policy using each configured threshold; optional practice excluded; no empty-course or invented final exam completion.",
+    "files": "learning-attempts.js; store.js; server.js; public/js/open.js",
+    "verification": "Mixed-score/per-task/optional/no-assessment unit tests; 15 of 15 JS assessments pass then certificate verifies publicly.",
+    "limitation": "Existing certificates and grades unchanged; historical review separate.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-19",
+    "original": "Approve/reject/reapprove duplicated challenge rewards.",
+    "reproduction": "Confirmed approval flag without reward reconciliation.",
+    "fix": "Reference-linked reversible ledger deltas and idempotent corrections; block ambiguous historical correction for review.",
+    "files": "store.js",
+    "verification": "API correction ledger is +50,-50,+50; repeated approval adds nothing.",
+    "limitation": "Do not auto-repair historical unreferenced rewards; reconciliation approval required.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "D-20",
+    "original": "Duplicate teammate aliases earned duplicate prizes.",
+    "reproduction": "Confirmed repeated resolved user IDs in team array.",
+    "fix": "Resolve and validate unique people, reject duplicate aliases; finalization awards each eligible member once.",
+    "files": "store.js",
+    "verification": "Duplicate aliases rejected; two valid members receive two awards; repeated finalization adds none.",
+    "limitation": "Historical duplicate prizes unchanged.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "U-01",
+    "original": "Dialog focus remained behind overlay.",
+    "reproduction": "Original screenshot/browser evidence; shared modal helpers confirmed.",
+    "fix": "Focus entry, inert background, Tab containment and trigger restoration.",
+    "files": "public/js/workflow-ui.js; public/js/open.js; public/js/dashboard.js",
+    "verification": "Nine successive keyboard tabs remain in sign-in dialog; onboarding dismissal/resume passes.",
+    "limitation": "Full screen-reader and all specialized dialogs not exhaustively tested.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "U-02",
+    "original": "Very long mobile catalogue with weak return/filter recovery.",
+    "reproduction": "Original 12156px catalogue and lost filters.",
+    "fix": "Load more after 12 offerings, result count, search/category recovery.",
+    "files": "public/js/open.js; public/css/workflow.css",
+    "verification": "1440/390 search tests, <=12 initial cards, refresh and Back/Forward pass.",
+    "limitation": "Free language groups retain existing card design.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "U-03",
+    "original": "Recommendation text ended mid-word.",
+    "reproduction": "Confirmed string slicing in card summaries.",
+    "fix": "Preserve full strings and use CSS line clamp with ellipsis/detail access.",
+    "files": "public/js/open.js; public/css/workflow.css",
+    "verification": "Source review and student overview screenshots at desktop/mobile.",
+    "limitation": "Not an editorial rewrite of all course summaries.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "U-04",
+    "original": "Mixed hierarchy and unconfigured final-exam claims.",
+    "reproduction": "Confirmed contradictory free-course labels/completion text.",
+    "fix": "Course / Module / Lesson / Practice labels and named topics; actual assessment counts; contextual language/starter code.",
+    "files": "public/js/open.js; public/js/workflow-ui.js; server.js",
+    "verification": "Free task workspace/browser journey and required-completion route pass.",
+    "limitation": "Some paid/staff views retain Assignments/Quest terminology; a full cross-role vocabulary cleanup remains a design decision.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "U-05",
+    "original": "Learner errors exposed infrastructure configuration instructions.",
+    "reproduction": "Confirmed raw unavailable responses in UI.",
+    "fix": "Plain service error messages and Retry; authorized admin health retains diagnostics.",
+    "files": "public/js/workflow-ui.js; public/js/open.js; public/js/dashboard.js; server.js",
+    "verification": "Injected 503 and actual talent unavailable views show user-facing recovery copy.",
+    "limitation": "Legacy third-party/rare handlers still require broader staging error injection.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "U-06",
+    "original": "Applicants had no receipt/status recovery after missed mail.",
+    "reproduction": "Confirmed success-only registration flow.",
+    "fix": "Private receipt token fragment, durable reference, status recovery, challan download and staff retry.",
+    "files": "public/registration-status.html; public/js/registration-status.js; public/js/open.js; server.js; store.js",
+    "verification": "Registration workflow verifies bearer-only status, invalid token rejection, invoice identity and failed-mail recovery contract.",
+    "limitation": "Real recovery inbox and complete applicant browser journey require sandbox mail.",
+    "status": "IMPLEMENTED, VERIFICATION BLOCKED"
+  },
+  {
+    "id": "U-07",
+    "original": "Mandatory onboarding trapped users; promotions mixed with contact requirements.",
+    "reproduction": "Confirmed locked contact form and no resume.",
+    "fix": "Finish later, session-scoped form restore, Settings resume; explicit optional marketing choice.",
+    "files": "public/js/workflow-ui.js; public/js/open.js; public/js/dashboard.js; store.js; server.js",
+    "verification": "390px finish-later/reopen preserves contact text; checkbox/profile preference persisted by allowed fields.",
+    "limitation": "File selections must be chosen again; historical unspecified marketing consent is not retroactively rewritten.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "U-08",
+    "original": "Secondary mobile links had very small hit targets.",
+    "reproduction": "Original measured 15-16px links.",
+    "fix": "Shared padded actions, 44px design target and readable mobile controls.",
+    "files": "public/css/workflow.css; public/login.html; public/open.html; public/dashboard.html",
+    "verification": "390px layout survey has no horizontal overflow; keyboard interaction passes.",
+    "limitation": "Real-device touch, full target measurement and contrast audit remain unverified.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "U-09",
+    "original": "Admin health labels clipped and test-mode mail looked operational.",
+    "reproduction": "Confirmed escaped separator and broad green state.",
+    "fix": "Explicit configured/disabled/test_mode/failed states; wrapping and corrected separators.",
+    "files": "server.js; public/js/dashboard.js; public/css/workflow.css",
+    "verification": "Desktop/mobile admin screenshots and local unconfigured/test-mode state reviewed.",
+    "limitation": "Configured states are configuration evidence, not proof of external service delivery.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "E-01",
+    "original": "Learning destinations felt disconnected.",
+    "reproduction": "Original public/portal review.",
+    "fix": "Continue learning from student overview and clear access to free courses using shared session and stable URLs.",
+    "files": "public/js/dashboard.js; public/js/open.js",
+    "verification": "Student overview screenshots and cross-portal lesson return tests.",
+    "limitation": "No wholesale portal consolidation; last-practice link is browser-local.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "E-02",
+    "original": "Applicant/learner onboarding had no resumable next step.",
+    "reproduction": "Confirmed forced forms and receipt gap.",
+    "fix": "Finish later/resume plus applicant status receipt and current next action.",
+    "files": "public/js/workflow-ui.js; public/js/dashboard.js; public/js/registration-status.js",
+    "verification": "Onboarding browser test and registration lifecycle API contract pass.",
+    "limitation": "Complete provider-backed applicant journey blocked; no new onboarding dashboard layer.",
+    "status": "IMPLEMENTED, VERIFICATION BLOCKED"
+  },
+  {
+    "id": "E-03",
+    "original": "Submission history was not available.",
+    "reproduction": "Confirmed single mutable free-submission aggregate.",
+    "fix": "Versioned attempt history with code/files, status, feedback, retry and restore draft.",
+    "files": "learning-attempts.js; public/js/open.js; server.js",
+    "verification": "Ownership/history tests and failed/lower attempt preservation pass.",
+    "limitation": "History is unpaginated; historical snapshots begin when older record is resubmitted. Live AI completion blocked.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "E-04",
+    "original": "Unavailable services were not treated as product states.",
+    "reproduction": "Confirmed endless loaders and raw configuration errors.",
+    "fix": "Public grading/talent/email capabilities, truthful admin health, recoverable unavailable states and grading queue.",
+    "files": "server.js; public/js/workflow-ui.js; public/js/dashboard.js; public/js/open.js",
+    "verification": "Unavailable talent/AI failure contracts and role survey verified.",
+    "limitation": "R2 showcase and real live-session availability still lack full capability-aware end-to-end handling; integrations unavailable.",
+    "status": "OPEN"
+  },
+  {
+    "id": "E-05",
+    "original": "Equivalent views lacked shared UI behavior.",
+    "reproduction": "Original role/screen review.",
+    "fix": "Focused shared dialog, error, draft, focus and mobile control primitives; retain brand and existing layouts.",
+    "files": "public/js/workflow-ui.js; public/css/workflow.css",
+    "verification": "100 role/layout survey records and keyboard/draft regressions.",
+    "limitation": "Not a full component or table/navigation rewrite; specialized legacy surfaces remain.",
+    "status": "FIXED AND VERIFIED"
+  },
+  {
+    "id": "E-06",
+    "original": "Staging regression coverage was incomplete.",
+    "reproduction": "Original audit had limited fixtures and unverified integrations.",
+    "fix": "Isolated synthetic server, focused unit/API/browser scripts, evidence, inventory and staging runbook.",
+    "files": "qa-implementation/*.cjs; test/*.test.js",
+    "verification": "24 unit tests, 7 security checks, 7 workflow groups, 10 browser checks, 3 final checks and 100 survey records.",
+    "limitation": "Live SMTP/AI/PostgreSQL/R2/JaaS sandbox matrix remains blocked; no CI service credentials introduced.",
+    "status": "IMPLEMENTED, VERIFICATION BLOCKED"
+  }
+]

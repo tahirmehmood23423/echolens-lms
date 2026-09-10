@@ -1,0 +1,146 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EchoLens implementation and verification report</title><style>:root{font-family:Inter,system-ui,Segoe UI,sans-serif;color:#15314a;background:#f4f8fa;line-height:1.6}*{box-sizing:border-box}body{margin:0}header{background:#103449;color:white;padding:20px 5vw}header a{color:#b4fff0}main{max-width:1500px;margin:auto;padding:32px 5vw 80px}h1{font-size:clamp(26px,4vw,40px);line-height:1.2;color:#123d51}h2{margin-top:36px;font-size:23px}h3{font-size:19px}p,li{max-width:110ch}a{color:#006b77;text-underline-offset:3px}a:focus-visible,input:focus-visible{outline:3px solid #ce7700;outline-offset:3px}table{border-collapse:collapse;width:100%;font-size:14px;background:white}th,td{border:1px solid #d6e1e6;text-align:left;padding:12px;vertical-align:top;min-width:130px;overflow-wrap:anywhere}th{background:#e0f0ef;color:#143f44;position:sticky;top:0}td:first-child{font-weight:600}.table-scroll{overflow:auto;margin:20px 0;max-height:75vh;border:1px solid #d6e1e6;border-radius:8px}pre{background:#e5edef;padding:16px;overflow:auto;border-radius:8px}code{font-size:.92em}input{min-height:44px;border:1px solid #7b99a7;border-radius:6px;padding:10px;font:inherit;width:min(600px,100%)}.search{position:sticky;top:0;z-index:3;background:#f4f8fa;padding:12px 0}.search small{display:block;color:#466272}img{max-width:100%;height:auto}footer{border-top:1px solid #ccdce4;padding-top:20px;color:#4a6473;font-size:14px}@media print{header,.search{display:none}.table-scroll{overflow:visible;max-height:none}main{padding:0}th{position:static}table{font-size:10px}a{color:inherit}}</style></head><body><header><strong>EchoLens · QA implementation</strong> &nbsp; <a href="implementation-report.html">Report</a> · <a href="issue-matrix.html">Issue matrix</a> · <a href="course-video-review.html">Course inventory</a> · <a href="release-runbook.html">Release checks</a></header><main><div class="search"><label for="filter">Filter table rows on this page</label><br><input id="filter" type="search" placeholder="Search issue ID, course or status"><small id="matches" aria-live="polite"></small></div><h1>EchoLens implementation and verification report</h1>
+<p>Prepared 2026-09-10 UTC (local working date 10 September 2026). Branch: <strong>fix/qa-workflow-remediation</strong>, base <strong>5fcab96</strong>. Implementation is local and uncommitted. No deployment, merge, production mutation, payment charge or real message was performed.</p>
+<p>The security, registration, draft recovery, grading/progress and focused UI fixes are implemented and locally exercised. All <strong>35 audit findings</strong> have a disposition. This is a completed local remediation handoff with explicit remaining work; it is <strong>not an unconditional production-readiness sign-off</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Findings</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FIXED AND VERIFIED</td>
+<td>29</td>
+</tr>
+<tr>
+<td>IMPLEMENTED, VERIFICATION BLOCKED</td>
+<td>5</td>
+</tr>
+<tr>
+<td>OPEN</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<h2>Review the deliverables</h2>
+<ul>
+<li><a href="issue-matrix.html">Issue matrix</a> · <a href="issue-matrix.csv">CSV</a>: every D-01–D-20, U-01–U-09 and E-01–E-06 with reproduction, files, verification and limitations.</li>
+<li><a href="course-video-review.html">Course and video review</a> · <a href="lesson-review.csv">every lesson/assignment CSV</a> · <a href="video-inventory.csv">every unique video CSV</a>.</li>
+<li><a href="curriculum-review.html">Curriculum findings and proposed outlines</a>: four narrow corrections, remaining mappings and prerequisite/tooling gaps.</li>
+<li><a href="release-runbook.html">Configuration, migrations, rollback and release checks</a>.</li>
+<li><a href="historical-data-review.html">Separate historical data review plan</a>.</li>
+<li><a href="design-handoff.html">ChatGPT product-design handoff</a>.</li>
+<li><a href="../qa-audit/audit-report.html">Original audit</a> remains preserved as before evidence.</li>
+</ul>
+<h2>Completed changes</h2>
+<p>Private uploads now require purpose/owner/course authorization; unknown attachments are denied. Password recovery/admin resets invalidate earlier sessions. Course certificate and gem recipients must be eligible members, and quiz creation cannot override its authorized URL batch.</p>
+<p>Registration uses authoritative offering metadata and fees, normalized deduplication and idempotent invoice/clearance/enrollment transitions. The incomplete PATH bundle is disabled. Durable queued, failed and provider-accepted email states are separate from registration stage. Applicants receive a private reference/status/download path, and staff can retry delivery without creating another financial record.</p>
+<p>Course/lesson/practice and important dashboard views have stable destinations. Sign-in, reset and session expiry preserve a validated return path. Account/task/language drafts survive refresh and navigation, show save state, and reject stale overwrites. Browser checks demonstrate actual code output after recovery and isolate drafts across accounts.</p>
+<p>Free submissions create independent attempts with immutable work snapshots, bounded grading retries and manual admin recovery. Pending, failed and lower results preserve a previous best score/reward. Progress and certificate eligibility share the required-assessment policy: each required task passes its configured threshold, optional practice does not block, watching is not mastery, and no unconfigured final exam is added. Historical certificates/grades are preserved.</p>
+<p>Other changes include explicit profile clearing, recoverable loaders, coordinator read-only UI/chat alignment, accurate catalogue/stage copy, idempotent challenge correction deltas and unique team reward recipients. Focused UI work adds accessible shared dialogs, larger controls, concise clamped summaries, catalogue pagination/filter recovery, Continue learning, starter code, attempt history and resumable onboarding with a separate marketing preference.</p>
+<p>A local Windows write failure discovered during validation was also fixed: atomic JSON writes use a unique temporary file, writable fsync and bounded rename retry while preserving the last good file. New critical async handlers forward failures to Express error handling. This does not claim every legacy async route has been rewritten.</p>
+<h2>Verification results</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Focused unit tests</td>
+<td>24 passed, 0 failed</td>
+<td><a href="evidence/unit-tests.txt">Output</a>: upload/session, offering/delivery, drafts, attempts/worker/mastery, certificate rules, gems and atomic persistence</td>
+</tr>
+<tr>
+<td>Security API checks</td>
+<td>7 passed</td>
+<td><a href="evidence/security-after.json">Results</a>, <a href="evidence/security-before.json">pre-fix reproduction</a></td>
+</tr>
+<tr>
+<td>Workflow API groups</td>
+<td>7 passed</td>
+<td><a href="evidence/workflow-after.json">Results</a>: profile, registration-to-enrollment, free attempts/certificate, paid grading/feedback, challenge corrections, team awards, coordinator boundaries</td>
+</tr>
+<tr>
+<td>Browser regressions</td>
+<td>10 passed</td>
+<td><a href="evidence/browser-after.json">Results</a>: 1440/390 free draft/run/auth resume/account isolation; Settings/task route; paid draft; 503 Retry; keyboard dialog</td>
+</tr>
+<tr>
+<td>Final focused checks</td>
+<td>3 passed</td>
+<td><a href="evidence/final-checks.json">Results</a>: reset return path, filter refresh/Back/Forward, video timestamp/mobile ratio and async-generator guide</td>
+</tr>
+<tr>
+<td>Role/layout survey</td>
+<td>100 records: 98 PASS, 2 UNAVAILABLE</td>
+<td><a href="evidence/ui-survey-after.json">Results</a>: 11 roles; both unavailable records are PostgreSQL-dependent talent views with recovered error state; zero recorded page errors</td>
+</tr>
+<tr>
+<td>Syntax/whitespace/schema</td>
+<td>Passed</td>
+<td><a href="evidence/syntax-checks.json">JS syntax</a>, <a href="change-manifest.json">change manifest and whitespace</a>, <a href="evidence/schema-validation.txt">schema validation</a>, <a href="evidence/schema-generation.txt">client generation</a>; no PostgreSQL migration applied</td>
+</tr>
+<tr>
+<td>Artifact review</td>
+<td>10 passed</td>
+<td><a href="evidence/artifact-checks.json">Results</a>: six role/viewport sidebar checks, two running-workspace captures, report links and issue filter</td>
+</tr>
+</tbody></table>
+<p>The end-to-end free policy test manually grades all 15 JavaScript required assessments, obtains a publicly verifiable synthetic certificate and confirms lower/failed later attempts preserve score 100 and 570 gems. The automatic worker success path is a <strong>unit-test fake grader</strong>, not live AI. The paid path uses synthetic manual clearance and confirms one correct enrollment; no real money moves. Skipped mail is exercised against the actual unconfigured local provider, while provider acceptance is a unit-test acknowledgment.</p>
+<p>The browser helper suppresses external services for routine app tests. Video probes use separate clean browser contexts with public provider access. Chrome at 1440px and 390px is covered; this does not establish Firefox/Safari, screen-reader, real touch or full contrast conformance. Tests requiring the real PostgreSQL talent backend were not run.</p>
+<h2>Course/video verification</h2>
+<p>The complete inventory contains <strong>10 courses, 47 modules, 142 lessons and 142 assignments</strong>. The original <strong>131 unique videos all reported AVAILABLE</strong>. Standard embeds demonstrated playback for <strong>107</strong>, with <strong>24 UNVERIFIED</strong> in the short probe. The app&#39;s actual privacy-enhanced embed demonstrated playback for <strong>128</strong>, with <strong>3 UNVERIFIED</strong>. These are separate observations; a timeout is not proof of a broken link.</p>
+<p>After corrections there are 141 video-backed lessons using 130 unique recordings and 1 guide-backed lesson. Input/strings/loops corrections reuse verified creator chapters and preserve useful original resources. JavaScript async generators now has an official guide while a suitable video awaits review. C++ classes still has a confirmed topic mismatch needing an inspected replacement. Available titles/chapters support a partial relevance review; inaccessible transcripts mean full lesson-to-assignment suitability remains UNVERIFIED throughout the inventory. The curriculum report specifies exactly what to inspect and proposes outlines without changing assessment IDs or historical completion.</p>
+<h2>Before/after visual evidence</h2>
+<p>These are synthetic local accounts. Before images come from the original audit; after images show the current patch. Viewport comparisons are 1440px/390px where available. Captures compare workflow states, not pixel-identical data snapshots.</p>
+<table>
+<thead>
+<tr>
+<th>View</th>
+<th>Before</th>
+<th>After</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Student overview, desktop</td>
+<td><a href="../qa-audit/evidence/dashboard-student.png">Before</a></td>
+<td><a href="evidence/student-overview-after-1440.png">After</a></td>
+</tr>
+<tr>
+<td>Student overview, mobile</td>
+<td><a href="../qa-audit/evidence/dashboard-student-mobile.png">Before</a></td>
+<td><a href="evidence/student-overview-after-390.png">After</a></td>
+</tr>
+<tr>
+<td>Admin health, desktop</td>
+<td><a href="../qa-audit/evidence/dashboard-admin.png">Before</a></td>
+<td><a href="evidence/admin-overview-after-1440.png">After</a></td>
+</tr>
+<tr>
+<td>Admin health, mobile</td>
+<td><a href="../qa-audit/evidence/dashboard-admin-mobile.png">Before</a></td>
+<td><a href="evidence/admin-overview-after-390.png">After</a></td>
+</tr>
+<tr>
+<td>Mobile catalogue</td>
+<td><a href="../qa-audit/evidence/open-mobile.png">Original all-course length</a></td>
+<td><a href="evidence/catalogue-after-390.png">Current filtered catalogue</a></td>
+</tr>
+<tr>
+<td>Free learning workspace</td>
+<td><a href="../qa-audit/evidence/free-curriculum-desktop.png">Original curriculum</a></td>
+<td><a href="evidence/learning-after-1440.png">Recovered draft and successful run</a>, <a href="evidence/learning-after-390.png">mobile</a></td>
+</tr>
+<tr>
+<td>Modal/onboarding</td>
+<td><a href="../qa-audit/evidence/annotated-signin-focus.png">Original focus failure</a></td>
+<td><a href="evidence/onboarding-after-390.png">Resumed onboarding</a>; keyboard evidence in browser results</td>
+</tr>
+</tbody></table>
+<h2>Remaining limits and release decisions</h2>
+<p>PostgreSQL migrations/persistence, live mail/AI, cloud storage/talent consent, OAuth and real live-class workflows need staging integrations. One app/worker instance is required; distributed claims and concurrent snapshot persistence are not implemented. Do not label a configured provider healthy solely because a credential exists. E-04 remains partially open for image/live capability handling. Some embedded detail views and paid/staff vocabulary still need design follow-up.</p>
+<p>PATH remains unavailable until its real bundle rules are established. Full curriculum coverage, advanced runner prerequisites, the C++ mismatch, the async-generator replacement video and UNVERIFIED playback require content review. Historical duplicate registrations/rewards and certificate-policy differences need the separate approved review plan; no automatic repair was performed.</p>
+<p>See the release runbook for the exact schema-mode choice, sandbox acceptance checks and rollback constraints. The code and evidence are ready for review; deployment remains a separate instruction.</p>
+<footer>Local synthetic verification · 2026-09-10T04:57:37.075Z · Original audit evidence preserved · No deployment</footer></main><script>document.querySelectorAll('table').forEach(t=>{const w=document.createElement('div');w.className='table-scroll';w.tabIndex=0;w.setAttribute('role','region');w.setAttribute('aria-label','Scrollable results table');t.before(w);w.append(t)});document.getElementById('filter').addEventListener('input',e=>{const q=e.target.value.toLowerCase();let shown=0,total=0;document.querySelectorAll('tbody tr').forEach(r=>{total++;r.hidden=!r.textContent.toLowerCase().includes(q);if(!r.hidden)shown++});document.getElementById('matches').textContent=shown+' of '+total+' rows shown';});</script></body></html>

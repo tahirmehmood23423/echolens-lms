@@ -11,7 +11,7 @@ async function api(path, opts = {}) {
   const isForm = opts.body instanceof FormData;
   const res = await fetch(path, { credentials: 'same-origin', headers: isForm ? {} : { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json().catch(() => ({}));
-  if (res.status === 401) { location.href = '/login'; throw new Error('Signed out.'); }
+  if (res.status === 401) { location.href = EL.loginURL(); throw new Error('Signed out.'); }
   if (!res.ok) throw new Error(data.error || 'Something went wrong.');
   return data;
 }

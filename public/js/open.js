@@ -23,6 +23,7 @@ async function api(path, opts = {}) {
   if (res.status === 401 && ME && path !== '/api/auth/me') {
     // The session expired or was signed out in another tab: recover cleanly
     // instead of leaving the person stuck behind a locked modal.
+    EL.drafts.flushAll();
     ME = null;
     window.MODAL_LOCK = false;
     const closeBtn = $('modalBox') && $('modalBox').querySelector('.close');
@@ -41,14 +42,15 @@ function toast(text, isErr) {
   clearTimeout(t._h); t._h = setTimeout(() => (t.className = 'toast'), 3200);
 }
 function openModal(title, bodyHTML) {
+  window.MODAL_LOCK=false;$('modalBox').querySelector('.close').style.display='';
   $('modalTitle').textContent = title;
   $('modalBody').innerHTML = bodyHTML;
   modalMsg('');
-  $('modal').classList.add('open');
+  $('modal').classList.add('open'); EL.dialog.open($('modal'));
 }
-function closeModal() { if (window.MODAL_LOCK) return; $('modal').classList.remove('open'); }
+function closeModal() { if (window.MODAL_LOCK) return; $('modal').classList.remove('open'); EL.dialog.close(); }
 function modalMsg(text, ok) {
-  const el = $('modalMsg');
+  const el = $('modalMsg'); el.setAttribute('role', 'alert');
   if (!text) { el.className = 'form-msg'; el.textContent = ''; return; }
   el.className = 'form-msg ' + (ok ? 'ok' : 'err'); el.textContent = text;
 }
@@ -119,7 +121,7 @@ let COURSE_NAV_MODE = 'live';
 function navCourses(mode, skipPush) {
   COURSE_NAV_MODE = mode;
   openTab('courses');
-  if (mode === 'free') setCoursePill('free');
+  setCoursePill(mode === 'free' ? 'free' : 'all');
   if (!skipPush) pushNav({ v: 'courses', mode });
 }
 
@@ -134,26 +136,43 @@ function navCourses(mode, skipPush) {
 // re-pushing a duplicate entry while a popstate-triggered navigation is
 // itself calling the same functions that normally push.
 let RESTORING_NAV = false;
-function pushNav(state) { if (!RESTORING_NAV) history.pushState(state, ''); }
+function openRoute(state) {
+  if (state.v === 'courses') return state.mode === 'free' ? '#free' : '#courses';
+  if (['course','video','solve'].includes(state.v)) return '#course/' + encodeURIComponent(state.key) + (state.v !== 'course' ? '/lesson/' + state.level : '') + (state.v === 'solve' ? '/practice/' + state.pid : '');
+  return '#' + state.v;
+}
+function openState() {
+  const parts = location.hash.slice(1).split('/');
+  if (parts[0] === 'course' && parts[1]) { let key; try { key = decodeURIComponent(parts[1]); } catch { return null; } return {v: parts[4] === 'practice' ? 'solve' : parts[2] === 'lesson' ? 'video' : 'course', key, level:Number(parts[3]), pid:Number(parts[5])}; }
+  if (['courses','free'].includes(parts[0])) return {v:'courses',mode:parts[0] === 'free' ? 'free' : 'live'};
+  if (['events','profile','announcements','feedback'].includes(parts[0])) return {v:parts[0]};
+  return null;
+}
+function pushNav(state) { if (!RESTORING_NAV && location.hash !== openRoute(state)) history.pushState(state, '', openRoute(state)); }
+let OPEN_COURSE_REQUEST = 0;
 async function ensureCourseLoaded(key) {
   if (CUR && CUR.track && CUR.track.key === key) return;
   await openCourse(key, true);
 }
 async function restoreNav(state) {
   if (!state || !state.v) return;
-  if (state.v === 'courses') { navCourses(state.mode || COURSE_NAV_MODE, true); return; }
+  if (['events','announcements','feedback'].includes(state.v)) { openTab(state.v); return; }
+  if (state.v === 'profile') { openProfileTab(); return; }
+  if (state.v === 'courses') { navCourses(state.mode || COURSE_NAV_MODE, true);if(state.filters){$('cSearch').value=state.filters.search||'';$('cTier').value=state.filters.tier||'';$('cFree').value=state.filters.free||'';FREE_SELECTED_FAMILY=state.filters.family||null;drawCourses();}return; }
   if (state.v === 'course') { await ensureCourseLoaded(state.key); openTab('course'); drawCourse(); return; }
   if (state.v === 'video') { await ensureCourseLoaded(state.key); openSolveVideo(state.level, true); return; }
   if (state.v === 'solve') { await ensureCourseLoaded(state.key); openSolve(state.level, state.pid, true); return; }
 }
 window.addEventListener('popstate', (e) => {
   RESTORING_NAV = true;
-  Promise.resolve(restoreNav(e.state)).finally(() => { RESTORING_NAV = false; });
+  EL.drafts.flushAll();
+  Promise.resolve(restoreNav(e.state || openState())).catch(e => EL.error($('courseHead'),e,()=>restoreNav(openState()))).finally(() => { RESTORING_NAV = false; });
 });
 
 /* -------------------------------- boot -------------------------------- */
 (async () => {
   try { ME = await api('/api/auth/me'); } catch { ME = null; }
+  EL.drafts.setAccount(ME?.id || null);
   drawUserBox();
   if (ME) requireWhatsapp();
   const catReady = loadCatalogue();
@@ -165,6 +184,8 @@ window.addEventListener('popstate', (e) => {
   loadEvents();
   if (ME) loadCerts();
   // Deep links: /open#courses, #events, #announcements, #register, #signup
+  const initialState = history.state?.v ? history.state : openState();
+  if (initialState) { RESTORING_NAV = true; try { await catReady; await restoreNav(initialState); history.replaceState(initialState, '', openRoute(initialState)); } catch(e) { EL.error($('courseHead'),e,()=>restoreNav(initialState)); } finally { RESTORING_NAV = false; } return; }
   const h = (location.hash || '').replace('#', '');
   if (['courses', 'events', 'announcements', 'feedback'].includes(h)) openTab(h);
   else if (h === 'home') openTab('courses'); // the old portal home page merged into Courses
@@ -188,11 +209,11 @@ function drawUserBox() {
        <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
        ${ME.role !== 'free' ? '<a class="btn btn-teal btn-sm" href="/dashboard" style="margin-right:8px">LMS Portal</a>' : ''}
        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`
-    : `<a class="btn btn-ghost btn-sm" href="/login" style="margin-right:8px" title="For enrolled students and staff">LMS Portal</a>
+    : `<a class="btn btn-ghost btn-sm" href="${esc(EL.loginURL())}" style="margin-right:8px" title="For enrolled students and staff">LMS Portal</a>
        <button class="btn btn-ghost btn-sm" style="margin-right:8px" onclick="gate()" title="Free account - for the compiler, free courses, events and hackathons">Sign in free</button>
        <button class="btn btn-primary btn-sm" onclick="openRegister()" title="Join a paid course - no account needed to register">Register for a course</button>`;
 }
-async function logout() { try { await api('/api/auth/logout', { method: 'POST' }); } catch {} location.reload(); }
+async function logout() { EL.drafts.flushAll(); EL.drafts.setAccount(null); try { await api('/api/auth/logout', { method: 'POST' }); } catch {} location.reload(); }
 
 /* ------------------------------ sign-in gate ------------------------------
  * Browsing is public; solving, events and certificates need an account.
@@ -213,9 +234,9 @@ function gate(afterMsg) {
   openModal('Sign in to EchoLens - free', `
     <p class="s" style="color:var(--muted);margin-bottom:14px">${esc(afterMsg || 'A free account is only needed to USE things: the compiler, the free courses, and joining events or hackathons. Browsing courses, outlines and projects needs no account at all.')}</p>
     <button class="btn btn-primary btn-block" style="margin-bottom:10px" onclick="showSignup()">Create a free account with email</button>
-    <a class="btn btn-ghost btn-block" href="/login">Already have an account? Sign in</a>
+    <a class="btn btn-ghost btn-block" href="${esc(EL.loginURL())}">Already have an account? Sign in</a>
     <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px;font-size:12.5px;color:var(--muted);text-align:left">
-      <div style="margin-bottom:6px"><strong>Enrolled in a paid course, or staff?</strong> Use the same <a href="/login">sign-in page</a> with your LMS Portal account.</div>
+      <div style="margin-bottom:6px"><strong>Enrolled in a paid course, or staff?</strong> Use the same <a href="${esc(EL.loginURL())}">sign-in page</a> with your LMS Portal account.</div>
       <div><strong>Just want to join a paid course?</strong> <a href="#" onclick="closeModal();openRegister();return false">Register here</a> - no account needed; our Admissions Office emails you the fee challan.</div>
     </div>
     <div id="signupArea" style="margin-top:14px"></div>`);
@@ -229,7 +250,7 @@ function showSignup() {
         <label class="field"><span>Verification code (check your inbox)</span><input name="code" inputmode="numeric" maxlength="6" placeholder="6-digit code"></label>
       </div>
       <label class="field"><span>WhatsApp number (required)</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
-      <p class="hint">No password to choose - once your email is verified, we generate one and email it to you.</p>
+      <label class="field"><span><input name="marketing_opt_in" type="checkbox" style="width:auto"> Send optional course offers and webinar invitations</span></label><p class="hint">No password to choose - once your email is verified, we generate one and email it to you.</p>
       <button class="btn btn-primary btn-block" id="suBtn">Create account</button>
     </form>`;
   const f = $('suForm');
@@ -273,17 +294,19 @@ function showSignup() {
 function requireWhatsapp() {
   if (!['free', 'student'].includes(ME.role)) return; // learners only - staff never see this
   if (ME.profile && ME.profile.phone) return;
-  openModal('One last step - your WhatsApp number', `
+  openModal('Add account contact details', `
     <form id="waForm">
-      <p class="s" style="color:var(--muted);margin-bottom:12px">We share quest openings, webinar invites, and your certificates on WhatsApp. This is required to continue.</p>
+      <p class="s" style="color:var(--muted);margin-bottom:12px">Add a contact number for class support and account updates. You can finish this step later. Promotional messages are optional.</p>
       <label class="field"><span>WhatsApp number</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
       <button class="btn btn-primary btn-block">Save and continue</button></form>`);
   window.MODAL_LOCK = true;
   $('modalBox').querySelector('.close').style.display = 'none';
+  EL.deferForm($('waForm'),ME.id,'Profile');
+  $('waForm').insertAdjacentHTML('beforeend','<label class="field"><span><input type="checkbox" name="marketing_opt_in" style="width:auto"> Send me optional course offers and webinar invitations</span></label>');
   $('waForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
     try {
-      await api('/api/me/contact', { method: 'POST', body: JSON.stringify({ whatsapp: f.whatsapp.value.trim() }) });
+      await api('/api/me/contact', { method: 'POST', body: JSON.stringify({ whatsapp: f.whatsapp.value.trim(), marketing_opt_in:f.marketing_opt_in.checked }) });
       ME.profile = ME.profile || {}; ME.profile.phone = f.whatsapp.value.trim();
       window.MODAL_LOCK = false;
       $('modalBox').querySelector('.close').style.display = '';
@@ -294,6 +317,9 @@ function requireWhatsapp() {
 
 /* -------------------------------- tabs -------------------------------- */
 function openTab(tab) {
+  EL.drafts.flushAll();
+  if (['courses','events','profile','announcements','feedback'].includes(tab)) OPEN_COURSE_REQUEST++;
+  if (['events','profile','announcements','feedback'].includes(tab)) pushNav({v:tab});
   ['courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile', 'feedback'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
@@ -322,14 +348,14 @@ function backToCourse() {
 async function loadHomeStats() {
   renderHomePreview();
   renderJourney();
-  let courses = 31, students = null;
+  let courses = CATALOGUE.length || null, students = null;
   try {
     const d = await api('/api/public/info');
     courses = d.stats.courses || courses;
     students = d.stats.students;
   } catch {}
   const items = [
-    ['#7C3AED', 'chart', String(courses) + '+', 'Live Courses'],
+    ['#7C3AED', 'chart', courses==null?'?':String(courses), 'Courses'],
     ['#10B981', 'code', '150+', 'Coding Quests'],
     ['#3B82F6', 'gear', 'Built-in', 'Browser Compiler'],
     ['#F59E0B', 'spark', 'Weekly', 'Hackathons'],
@@ -494,7 +520,7 @@ async function loadCatalogue() {
     CATALOGUE = d.catalogue;
     CAT_LINKS = d.links;
     FREE_FAMILIES = d.free_families || [];
-    if (d.cohort) $('cohortLine').textContent = `31 live, instructor-led programs · Registration deadline ${d.cohort.registration_deadline} · Batch starts ${d.cohort.batch_starts}. Every paid course opens its first quest free - try before you enrol.`;
+    $('cohortLine').textContent = CATALOGUE.length+' courses ? '+CATALOGUE.filter(c=>c.price_pkr===0).length+' free self-paced courses. Paid cohorts are arranged by Admissions. Try the first lesson before registering.';
     $('actionStrip').innerHTML = `
       <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;
     const p = (d.paths || [])[0];
@@ -508,7 +534,7 @@ async function loadCatalogue() {
         <div style="text-align:right">
           <div style="font-family:var(--font-display);font-size:22px;color:var(--teal-deep)">PKR ${p.bundle_pkr.toLocaleString()}</div>
           <div class="s" style="color:var(--muted)"><s>PKR ${p.full_pkr.toLocaleString()}</s> · Save PKR ${p.save_pkr.toLocaleString()} (${Math.round((p.save_pkr / p.full_pkr) * 100)}%)</div>
-          <button class="lc-btn-solve" style="margin-top:6px" onclick="openRegister('PATH', '${esc(p.title)}')">Register for the path</button>
+          <p class="s" style="margin-top:6px">${esc(p.availability_reason || "Bundle enrollment is not available yet. Choose an individual course.")}</p>
         </div>
       </div></div>` : '';
     drawCourses();
@@ -558,6 +584,7 @@ function courseCardHtml(c) {
 // course covering both a Basic and an Advanced tier - see
 // tracks/curriculum-advanced-combined.js for how that merge works).
 let FREE_SELECTED_FAMILY = null;
+let COURSE_LIMIT=12, COURSE_FILTER_KEY='';
 function freeLanguageIconIcon(key) {
   return { c: 'code', cpp: 'code', python: 'chart', javascript: 'code', web: 'code' }[key] || 'gem';
 }
@@ -589,6 +616,7 @@ function drawCourses() {
   if (!CATALOGUE.length) return;
   renderCoursePills();
   const tier = $('cTier').value, mode = $('cFree').value, q = $('cSearch').value.trim().toLowerCase();
+  if(openState()?.v==='courses')history.replaceState({v:'courses',mode:COURSE_NAV_MODE,filters:{search:q,tier,free:mode,family:FREE_SELECTED_FAMILY}},'',location.href);
   const list = CATALOGUE.filter((c) =>
     (!tier || c.tier === tier) &&
     (!mode || (mode === 'free' ? c.price_pkr === 0 : c.price_pkr > 0)) &&
@@ -598,10 +626,11 @@ function drawCourses() {
   // sub-courses per language) rather than a flat grid, whenever every
   // filtered result is free - i.e. the "Free courses" pill, or a search
   // that happens to only match free courses.
+  const filterKey=[tier,mode,q].join(':');if(filterKey!==COURSE_FILTER_KEY){COURSE_LIMIT=12;COURSE_FILTER_KEY=filterKey;}
   const allFree = list.every((c) => c.price_pkr === 0);
   $('courseTable').innerHTML = allFree
     ? drawFreeFamilies(list)
-    : `<div class="oc-grid">${list.map(courseCardHtml).join('')}</div>
+    : `<div class="oc-grid">${list.slice(0,COURSE_LIMIT).map(courseCardHtml).join('')}</div><p class="hint">Showing ${Math.min(COURSE_LIMIT,list.length)} of ${list.length} courses</p>${list.length>COURSE_LIMIT?'<button class="btn btn-ghost" onclick="COURSE_LIMIT+=12;drawCourses()">Show more courses</button>':''}
        <p class="hint" style="margin-top:14px">Pay via bank transfer per your fee challan, then share the receipt to confirm your seat.</p>`;
 }
 function courseAction(code) {
@@ -623,6 +652,7 @@ const AMBASSADOR_REF_CODE = (() => {
   return v && /^\d{4}$/.test(v) ? v : null;
 })();
 function openRegister(code, title) {
+  if (code === 'PATH') { toast('Bundle enrollment is not available yet. Choose an individual course.', true); return; }
   const options = CATALOGUE.filter((c) => c.price_pkr > 0).map((c) =>
     `<option value="${esc(c.code)}|${esc(c.title)}"${c.code === code ? ' selected' : ''}>${esc(c.code)} - ${esc(c.title)} (PKR ${c.price_pkr.toLocaleString()})</option>`).join('');
   openModal('Register for a course', `
@@ -642,25 +672,30 @@ function openRegister(code, title) {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
     const [course_code, course_title] = f.course.value.split('|');
     try {
-      await api('/api/public/register-interest', {
+      const out = await api('/api/public/register-interest', {
         method: 'POST',
-        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, course_code, course_title, ambassador_code: f.ambassador_code.value.trim(), company: f.company.value }),
+        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, course_code, course_title, ambassador_code: f.ambassador_code.value.trim(), company: f.company.value, request_key: f.dataset.requestKey || (f.dataset.requestKey = crypto.randomUUID()) }),
       });
-      openModal('Registration received', `
-        <p class="s" style="line-height:1.6">Thank you - your registration for <strong>${esc(course_title)}</strong> is with our Admissions Office.${f.ambassador_code.value.trim() ? ' Your ambassador code was accepted - a <strong>10% discount</strong> will be applied to your fee challan.' : ''} A confirmation email is on its way, and the Admissions Office will email you the fee challan with payment details. After paying, send your payment screenshot and record to <strong>finance@echolens.digital</strong> to confirm your enrollment.</p>
-        <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal()">Done</button>`);
+      openModal(out.existing ? 'Registration already saved' : 'Registration received', `
+        <p>Your registration for <strong>${esc(course_title)}</strong> is saved. Reference: <strong>${esc(out.reference || '')}</strong>.</p>
+        <p>Check your receipt for the challan, email status and next step. A saved registration does not mean an email has reached your inbox.</p>
+        <a class="btn btn-primary btn-block" href="${esc(out.receipt_url || '/registration-status')}">${out.receipt_url ? 'Open my private receipt' : 'Recover my receipt'}</a>
+        <button class="btn btn-ghost btn-block" style="margin-top:14px" onclick="closeModal()">Done</button>`);
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
 
 /* -------------------- course detail with quest locks -------------------- */
 async function openCourse(key, skipPush) {
+  EL.drafts.flushAll();
+  const request = ++OPEN_COURSE_REQUEST;
   openTab('course');
   $('courseHead').innerHTML = '<div class="empty">Loading course&hellip;</div>';
   $('courseLevels').innerHTML = '';
   const d = await api('/api/public/tracks/' + encodeURIComponent(key));
   let progress = null;
   if (ME) { try { progress = (await api('/api/open/progress?track=' + encodeURIComponent(key))).progress; } catch {} }
+  if (request !== OPEN_COURSE_REQUEST) return;
   CUR = { ...d, progress };
   // Whichever nav link you actually arrived through, a free course should
   // read as "Free Certified Courses" and a paid one as "Live Tech Courses" -
@@ -740,8 +775,10 @@ function videoEmbedHtml(url, label, maxWidth) {
   const id = youtubeEmbedId(url);
   if (!id) return '';
   const w = maxWidth || 640;
-  return `<div class="video-embed" style="position:relative;width:100%;max-width:${w}px;padding-top:${w * 9 / 16}px;height:0;margin-top:10px;border-radius:12px;overflow:hidden;background:#000">
-      <iframe src="https://www.youtube-nocookie.com/embed/${id}" title="${esc(label || 'Topic video')}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+  let start=0;try{const u=new URL(url);start=Math.max(0,parseInt(u.searchParams.get('start')||u.searchParams.get('t')||'0',10)||0);}catch{}
+  const startParam=start?'?start='+start:'';
+  return `<div class="video-embed" style="position:relative;width:100%;max-width:${w}px;aspect-ratio:16/9;height:auto;margin-top:10px;border-radius:12px;overflow:hidden;background:#000">
+      <iframe src="https://www.youtube-nocookie.com/embed/${id}${startParam}" title="${esc(label || 'Topic video')}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
     </div>
     <a href="${esc(url)}" target="_blank" rel="noopener" class="s" style="display:inline-block;margin-top:6px;color:var(--muted)">Open on YouTube &rarr;</a>`;
 }
@@ -755,6 +792,7 @@ function videoEmbedHtml(url, label, maxWidth) {
 // `large` (used by the dedicated Video subpoint page) renders at a much
 // bigger max-width than the compact default used inline in the quest view.
 function videoLinksHtml(l, large) {
+  if(l.resource_url)return `<p class="hint">${esc(l.resource_note||'Read the lesson guide.')}</p><a class="btn btn-primary" href="${esc(l.resource_url)}" target="_blank" rel="noopener">Read lesson guide</a>`;
   const maxWidth = large ? 960 : 640;
   if (Array.isArray(l.videos) && l.videos.length) {
     return l.videos.map((v) => {
@@ -769,7 +807,7 @@ function videoLinksHtml(l, large) {
   return l.video_url ? `<a href="${esc(l.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : '';
 }
-function levelHasVideo(l) { return !!(l && (l.video_url || (Array.isArray(l.videos) && l.videos.length))); }
+function levelHasVideo(l) { return !!(l && (l.resource_url || l.video_url || (Array.isArray(l.videos) && l.videos.length))); }
 function topicDetailHtml(l) {
   const hasVideo = l.video_url || (Array.isArray(l.videos) && l.videos.length);
   if ((!l.topic || l.topic.length < 90) && !hasVideo) return '';
@@ -865,7 +903,7 @@ function drawCourse() {
         <div class="hero-badges">
           ${t.free ? '<span class="kbadge quest">FREE COURSE</span>' : ''}
           <span class="mono s hero-code">${esc(t.course_code || '')}</span>
-          <span class="s hero-sub">Pass mark ${t.pass_mark || 60}% &middot; ${MODE_LABEL[t.submission_mode] || MODE_LABEL.file} &middot; Graded instantly</span>
+          <span class="s hero-sub">Pass mark ${t.pass_mark || 60}% &middot; ${MODE_LABEL[t.submission_mode] || MODE_LABEL.file} &middot; Track each attempt and its feedback</span>
         </div>
         <h1 class="hero-title">${esc(t.title)}</h1>
         <p class="hero-desc">${esc(t.description || '')}</p>
@@ -875,7 +913,7 @@ function drawCourse() {
           <div class="oq-prog hero-prog"><div style="width:${Math.round((prog.graded / Math.max(1, prog.total)) * 100)}%"></div></div>
           <div class="s hero-prog-note" style="color:${prog.passed ? 'var(--ok)' : 'var(--muted)'}">
             ${prog.graded}/${prog.total} tasks graded &middot; ${prog.gems} gems earned${prog.avg != null ? ' &middot; Average ' + prog.avg + '%' : ''}
-            ${prog.passed ? ' &middot; <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' &middot; Complete every task at ' + (t.pass_mark || 60) + '%+ average for the automatic certificate.' : '')}
+            ${prog.passed ? ' &middot; <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' &middot; Pass every required assessment at ' + (t.pass_mark || 60) + '% or its stated threshold for the automatic certificate.' : '')}
           </div>` : (ME ? '' : `<div class="s hero-signin-note">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
       </div>
       ${t.free ? '' : `<div class="hero-visual" style="background:${heroBg}">
@@ -942,7 +980,7 @@ function drawCourse() {
       }).join('')}
     </nav>`;
 
-  const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Lecture';
+  const unitLabel = 'Lesson';
   // Per-module accordion of classes/levels - shared by the free-course
   // curriculum list and the paid quest-grid below, so what happens *inside*
   // a module (topic notes, Solve/compiler buttons, grading state) is always
@@ -1027,7 +1065,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   const ctaAction = ME
     ? `continueLearning()`
     : `gate('Sign in free to start this course, track your progress and earn your certificate.')`;
-  const ctaBtnLabel = !ME ? 'Sign in free to start' : (prog && prog.passed ? 'Review the course' : 'Continue learning');
+  const ctaBtnLabel = !ME ? 'Sign in free to start' : (prog && prog.passed ? 'Review the course' : prog?.attempted ? 'Continue learning' : 'Start learning');
   const ctaSub = !ME
     ? `Start learning now and boost your programming skills with ${esc(subj)}!`
     : (prog && prog.passed
@@ -1060,7 +1098,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
     <div class="curr-cta">
       <div class="curr-cta-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
       <div class="grow">
-        <div class="curr-cta-title">Complete all modules, pass the final exam and earn your certificate</div>
+        <div class="curr-cta-title">Pass the required assessments to earn your certificate</div>
         <div class="s curr-cta-sub">${ctaSub}</div>
       </div>
       <button type="button" class="btn btn-primary" onclick="${ctaAction}">${ctaBtnLabel}</button>
@@ -1108,16 +1146,16 @@ function markVideoWatched(trackKey, levelNo) {
 // shouldn't light up as complete.
 function problemPassed(l, pr) {
   const sub = CUR.progress && CUR.progress.submissions[`${l.no}:${pr.pid}`];
-  return !!(sub && sub.score != null && sub.score >= (CUR.track.pass_mark || 60));
+  return !!(sub && sub.score != null && sub.score >= (pr.pass_mark ?? CUR.track.pass_mark ?? 60));
 }
-function levelPassed(l) { return (l.problems || []).every((pr) => problemPassed(l, pr)); }
+function levelPassed(l) { return (l.problems || []).filter(pr=>pr.required!==false&&!pr.optional).every((pr) => problemPassed(l, pr)); }
 // Overall course completion, shown as the percentage pill on the solve
 // workspace's top bar - the fraction of lectures whose assignment has
 // actually been PASSED (same bar the automatic certificate uses), not just
 // attempted/graded.
 function coursePercent() {
   if (!CUR || !CUR.levels.length) return 0;
-  return Math.round((CUR.levels.filter(levelPassed).length / CUR.levels.length) * 100);
+  return CUR.progress?.required_total ? Math.round(CUR.progress.required_passed / CUR.progress.required_total * 100) : 0;
 }
 function svProgressHtml() {
   const pct = coursePercent();
@@ -1141,7 +1179,7 @@ function svProgressHtml() {
 // the generic label on the assignment row.
 function svNavHtml() {
   const t = CUR.track;
-  const unitLabel = (t.course_code || '').startsWith('BC') ? 'Class' : 'Lecture';
+  const unitLabel = 'Lesson';
   let html = '<div class="svc-nav-head">Course Content</div>';
   for (const [wk, mod] of svModuleMap()) {
     html += `<div class="svc-week">Module ${mod.index} &middot; Week ${wk}</div>`;
@@ -1160,7 +1198,7 @@ function svNavHtml() {
             const isDone = problemPassed(l, pr);
             const isActive = !CUR_VIDEO_LEVEL && isCurLevel && CUR_PROBLEM && pr.pid === CUR_PROBLEM.pid;
             return `<button type="button" class="svc-problem${isActive ? ' active' : ''}${isDone ? ' done' : ''}" onclick="openSolve(${l.no}, ${pr.pid})">
-              <span class="dot"></span><span class="lbl">Assignment${multi ? ' ' + (pi + 1) : ''}</span>
+              <span class="dot"></span><span class="lbl">Practice${multi ? ' ' + (pi + 1) : ''}</span>
             </button>`;
           }).join('');
       return `<div class="svc-level${isCurLevel ? ' open' : ''}">
@@ -1179,6 +1217,7 @@ function svNavHtml() {
 // column isn't squeezed by a video competing for the same space; a small
 // link back to the video subpoint is offered instead when one exists.
 function openSolve(levelNo, pid, skipPush) {
+  EL.drafts.flushAll();
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   const p = lvl && (lvl.problems || []).find((x) => x.pid === pid);
   if (!p || lvl.locked) return;
@@ -1188,7 +1227,7 @@ function openSolve(levelNo, pid, skipPush) {
   openTab('solve');
   if (!skipPush) pushNav({ v: 'solve', key: CUR.track.key, level: levelNo, pid });
   $('svSplit').classList.remove('video-view');
-  const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Lecture';
+  const unitLabel = 'Lesson';
   const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
   const multiProblems = (lvl.problems || []).length > 1;
   const problemIdx = multiProblems ? (lvl.problems || []).findIndex((x) => x.pid === pid) : -1;
@@ -1199,7 +1238,7 @@ function openSolve(levelNo, pid, skipPush) {
     <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span>${unitLabel} ${lvl.no}</span>
     <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span class="crumb-cur">Assignment${problemIdx >= 0 ? ' ' + (problemIdx + 1) : ''}</span>`;
+    <span class="crumb-cur">Practice${problemIdx >= 0 ? ' ' + (problemIdx + 1) : ''}</span>`;
   $('svNav').innerHTML = svNavHtml();
   $('svProgress').innerHTML = svProgressHtml();
   $('svLeft').innerHTML = `
@@ -1210,7 +1249,7 @@ function openSolve(levelNo, pid, skipPush) {
         <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} gems</span>
       </div>
       ${levelHasVideo(lvl) ? `<button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center" onclick="openSolveVideo(${lvl.no})">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch the topic video</button>` : ''}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${lvl.resource_url ? 'Read lesson guide' : 'Watch the topic video'}</button>` : ''}
       <div class="s" id="svDesc" style="white-space:pre-line;line-height:1.65;font-size:13.5px;margin-top:8px">${esc(p.description || '')}</div>
       <div class="s" id="svRefs" style="margin-top:10px"></div>
     </div></div>
@@ -1248,7 +1287,7 @@ function openSolveVideo(levelNo, skipPush) {
   openTab('solve');
   if (!skipPush) pushNav({ v: 'video', key: CUR.track.key, level: levelNo });
   $('svSplit').classList.add('video-view');
-  const unitLabel = (CUR.track.course_code || '').startsWith('BC') ? 'Class' : 'Lecture';
+  const unitLabel = 'Lesson';
   const moduleIdx = (svModuleMap().get(lvl.week != null ? lvl.week : lvl.no) || {}).index || 1;
   $('svCrumb').innerHTML = `
     <a onclick="backToCourse()">${esc(CUR.track.title)}</a>
@@ -1282,65 +1321,29 @@ function showFullFeedback() {
   openModal('Feedback', `<p class="s" style="white-space:pre-line;line-height:1.6">${esc(sub.feedback || '')}</p>`);
 }
 function drawSolveStatus() {
-  const sub = CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`];
-  const gradedBox = $('svGradedBox');
-  const results = $('svResults');
-  if (!sub) { if (gradedBox) gradedBox.innerHTML = ''; if (results) results.innerHTML = ''; return; }
-
-  // pending (submitted, not yet graded)
-  if (sub.score == null) {
-    if (gradedBox) gradedBox.innerHTML = `<div class="slv-graded wait"><div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.clock}</svg>Submitted — your grade will appear here once it is marked.</div></div>`;
-    if (results) results.innerHTML = '';
-    return;
-  }
-
-  const gems = sub.gems != null ? sub.gems : Math.round((sub.score / 100) * (CUR_PROBLEM.problem.points || 100));
-  const feedback = sub.feedback || 'Nice work.';
-  const short = feedback.length > 130 ? feedback.slice(0, 130) + '…' : feedback;
-  const passMark = CUR.track.pass_mark || 60;
-
-  // left column: slim graded banner
-  if (gradedBox) gradedBox.innerHTML = `
-    <div class="slv-graded${sub.score >= passMark ? '' : ' wait'}">
-      <div class="g-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Graded ${sub.score}%${CUR.track.friendly_grading ? '' : ' <span class="s" style="font-weight:600;color:var(--muted)">(instant grading, 10% reduction applied)</span>'} &middot; <span class="g-gems">${gems} gems earned</span></div>
-      <p>${esc(short)}</p>
-    </div>`;
-
-  // right column: results card (under the output)
-  if (results) results.innerHTML = `
-    <div class="qresults">
-      <div class="qres">
-        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.sparkle}</svg>Feedback</h5>
-        <p>${esc(short)}</p>
-        ${feedback.length > 130 ? `<button type="button" class="slv-link-btn" onclick="showFullFeedback()">View detailed feedback</button>` : ''}
-      </div>
-      <div class="qres center">
-        <h5>Score</h5>
-        <div class="score-ring" style="--pct:${sub.score};--ring-color:${sub.score >= passMark ? 'var(--ok)' : 'var(--gold)'}"><span class="val">${sub.score}%</span></div>
-        <div class="sub-note">(Instant)</div>
-      </div>
-      <div class="qres center">
-        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>Gems Earned</h5>
-        <div class="slv-gem-big"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${gems}</div>
-        ${CUR.track.friendly_grading ? '' : '<div class="sub-note">10% instant-grading reduction applied</div>'}
-      </div>
-      <div class="qres">
-        <h5><svg viewBox="0 0 24 24" fill="none">${ICONS.clock}</svg>Submission</h5>
-        <div class="slv-sub-line">Submitted<strong>${esc(fmtSubDate(sub.submitted_at))}</strong></div>
-        <div class="slv-sub-line" style="margin-top:6px">Attempts<strong>${sub.attempts || 1}</strong></div>
-      </div>
-    </div>`;
+  if (!CUR_PROBLEM || !CUR) return;
+  const sub=CUR.progress?.submissions[CUR_PROBLEM.level+':'+CUR_PROBLEM.pid];
+  const box=$('svGradedBox'),results=$('svResults');if(!sub){if(box)box.innerHTML='';if(results)results.innerHTML='';return;}
+  const history=sub.history||[],latest=history[0],passMark=CUR_PROBLEM.problem.pass_mark??CUR.track.pass_mark??60;
+  if(box)box.innerHTML=sub.score==null?'':`<div class="slv-graded${sub.score>=passMark?'':' wait'}"><div class="g-head">Best score: ${sub.score}% &middot; ${sub.gems} gems</div><p>Required score: ${passMark}%. ${esc(sub.feedback||'')}</p></div>`;
+  const state=latest?.status||'awaiting staff review';
+  if(results)results.innerHTML=`<section class="attempt-history" aria-label="Submission history"><h3>Submission history</h3><p role="status">Latest attempt: ${esc(state)}${latest?.payload.error?' ? '+esc(latest.payload.error):''}</p><button class="btn btn-ghost btn-sm" onclick="refreshAttempts()">Refresh results</button>${history.map((a,i)=>`<details><summary>Attempt ${history.length-i} &middot; ${esc(a.status)}${a.payload.score!=null?' &middot; '+a.payload.score+'%':''} &middot; ${esc(fmtSubDate(a.created_at))}</summary><p>${esc(a.payload.feedback||a.payload.error||'Your work is saved.')}</p>${a.payload.code?'<pre>'+esc(a.payload.code)+'</pre><button class="btn btn-ghost btn-sm" onclick="restoreAttempt('+a.id+')">Load this code into editor</button>':''}${a.payload.file_url?'<a class="btn btn-ghost btn-sm" href="'+esc(a.payload.file_url)+'" target="_blank" rel="noopener">Download submitted file</a>':''}${(a.payload.files||[]).map(f=>'<a href="'+esc(f.url)+'" target="_blank" rel="noopener">'+esc(f.name)+'</a>').join(' ')}${a.can_retry?'<button class="btn btn-primary btn-sm" onclick="retryAttempt('+a.id+')">Retry grading</button>':''}</details>`).join('')}</section>`;
+  clearTimeout(ATTEMPT_POLL);if(history.some(a=>['queued','processing'].includes(a.status)))ATTEMPT_POLL=setTimeout(()=>refreshAttempts(true),3000);
 }
+let ATTEMPT_POLL;
+async function refreshAttempts(quiet=false){if(!CUR||!CUR_PROBLEM)return;const key=CUR.track.key;try{const d=await api('/api/open/progress?track='+encodeURIComponent(key));if(CUR?.track.key!==key)return;CUR.progress=d.progress;drawSolveStatus();if($('svNav'))$('svNav').innerHTML=svNavHtml();}catch(e){if(!quiet)toast(EL.errorMessage(e),true);}}
+async function retryAttempt(id){try{await api('/api/open/attempts/'+id+'/retry',{method:'POST'});await refreshAttempts();}catch(e){toast(EL.errorMessage(e),true);}}
+function restoreAttempt(id){const a=CUR.progress?.submissions[CUR_PROBLEM.level+':'+CUR_PROBLEM.pid]?.history.find(a=>a.id===id);if(!a||!$('svCode'))return;EL.drafts.flushAll();if(a.payload.language&&$('svLang')){$('svLang').value=a.payload.language;$('svLang').dispatchEvent(new Event('change'));}$('svCode').value=a.payload.code||'';$('svCode').dispatchEvent(new Event('input',{bubbles:true}));$('svCode').focus();}
 function svLangOptions() {
   // default_language (tracks/free-micro.js, tracks/cs-fundamentals.js) picks
   // which option opens pre-selected, so e.g. the CSS/HTML/JS courses land on
   // the web option instead of defaulting to Python every time.
-  const def = CUR.track.default_language || 'python';
+  const def = CUR_PROBLEM?.problem.language || CUR.track.default_language || 'python';
   const opt = (value, label) => `<option value="${value}"${value === def ? ' selected' : ''}>${label}</option>`;
   return opt('python', 'Python 3') + opt('c', 'C') + opt('cpp', 'C++') + opt('java', 'Java') + opt('sql', 'SQL') + opt('web', 'HTML / CSS / JS');
 }
 const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-function svCertNote() { return CUR.track.free ? ' Complete every task above the pass mark and your verified certificate is issued automatically.' : ''; }
+function svCertNote() { return CUR.track.free ? ' Pass every required assessment at its stated threshold and your verified certificate is issued automatically.' : ''; }
 // Beginner-track courses (the 5 free fundamentals tracks - see
 // tracks/free-micro.js's friendly_grading flag) never mention automated grading or the standard
 // 10% reduction - a first-timer's first working program shouldn't come
@@ -1348,8 +1351,8 @@ function svCertNote() { return CUR.track.free ? ' Complete every task above the 
 // something a beginner needs to know to trust their result.
 function svGradingNote() {
   return CUR.track.friendly_grading
-    ? 'Submissions are graded automatically, and gems are awarded by score.' + svCertNote()
-    : 'Submissions are graded instantly, with a 10% reduction, and gems are awarded by score.' + svCertNote();
+    ? 'Your work is saved before grading. Gems reflect your best result.' + svCertNote()
+    : 'Automated grading applies the configured 10% adjustment. Gems reflect your best result.' + svCertNote();
 }
 // Per-problem Prompt Lab workbooks and the Excel copilot session live in
 // memory for the visit - the submitted artifact is what gets graded.
@@ -1421,6 +1424,7 @@ function drawWorkArea() {
     SV_TERM = EchoTerm.mount($('svTerm'));
     EchoRun.wireEditor($('svCode'));
     svSyncGutter();
+    EL.drafts.bind({editor:$('svCode'),language:$('svLang'),identity:['free',CUR.track.key,CUR_PROBLEM.level,CUR_PROBLEM.pid],initial:sub?.code || '',starter:lang=>EL.starter(lang,CUR_PROBLEM.problem)});
     svLangChanged();
     if (mode === 'code-ai') svWireAiPanel();
   } else if (mode === 'prompt') {
@@ -1719,13 +1723,20 @@ async function submitSolve(fileForm) {
     fd.set('code', code);
     fd.set('language', $('svLang').value);
   }
+  EL.drafts.flushAll();
+  const submitContext=CUR.track.key+':'+CUR_PROBLEM.level+':'+CUR_PROBLEM.pid;
+  const requestParts=[];for(const [key,value] of fd.entries())requestParts.push([key,value instanceof File ? [value.name,Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await value.arrayBuffer()))).join('-')] : value]);
+  const requestHash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(requestParts))))).join('-');
+  const pendingKey='el:submit:'+ME.id+':'+requestHash;let requestKey;try{requestKey=sessionStorage.getItem(pendingKey)||crypto.randomUUID();sessionStorage.setItem(pendingKey,requestKey);}catch{requestKey=crypto.randomUUID();}fd.set('request_key',requestKey);
   const btn = $('svSubmitBtn') || (fileForm && fileForm.querySelector('button:not([type="button"])'));
   if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
   try {
     const out = await api('/api/open/submit', { method: 'POST', body: fd });
+    try{sessionStorage.removeItem(pendingKey);}catch{}
+    if(!CUR_PROBLEM||CUR.track.key+':'+CUR_PROBLEM.level+':'+CUR_PROBLEM.pid!==submitContext)return;
     if (out.cert) toast(`Course passed - certificate ${out.cert.serial} issued. Find it under Events, in My certificates.`);
     else if (out.graded) toast(`Graded ${out.submission.score}% · ${out.submission.gems} gems earned.`);
-    else toast(out.note || 'Submitted - it will be graded soon.');
+    else toast(out.note || 'Attempt saved. Check submission history for its status.');
     // Refresh progress and views
     try { CUR.progress = (await api('/api/open/progress?track=' + encodeURIComponent(CUR.track.key))).progress; } catch {}
     drawSolveStatus();

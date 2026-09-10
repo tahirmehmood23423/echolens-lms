@@ -1,0 +1,24 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const {BASE,launch,context,login}=require('./browser-lib.cjs');
+const results=[];
+function record(id,actual,pass){results.push({id,actual,status:pass?'PASS':'FAIL'});fs.writeFileSync(path.join(__dirname,'evidence/browser-after.json'),JSON.stringify(results,null,2));console.log(JSON.stringify(results.at(-1)));}
+async function scenario(id,fn){try{await fn()}catch(e){record(id,{error:e.message},false);}}
+(async()=>{const browser=await launch();try{
+for(const width of [1440,390])await scenario('FREE-'+width,async()=>{
+ const ctx=await context(browser,{width,height:width<600?844:1000});await login(ctx,'free');const p=await ctx.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));
+ const url='/open#course/cs105-javascript/lesson/1/practice/1';await p.goto(BASE+url);await p.locator('#svCode').waitFor({state:'visible'});await p.locator('#svCode').fill('<script>console.log("QA DURABLE '+width+'");</script>');await p.waitForTimeout(450);assert.match(await p.locator('.draft-status').innerText(),/Saved/);
+ await p.evaluate(()=>backToCourse());await p.goBack();await p.waitForTimeout(300);assert.match(await p.locator('#svCode').inputValue(),/QA DURABLE/);await p.reload();await p.locator('#svCode').waitFor({state:'visible'});assert.match(await p.locator('#svCode').inputValue(),/QA DURABLE/);
+ await p.locator('#svRunBtn').click();await p.waitForFunction(()=>document.querySelector('#svWebLog')?.innerText.includes('QA DURABLE'));record('DRAFT-REFRESH-'+width,{url:p.url(),code:await p.locator('#svCode').inputValue(),output:await p.locator('#svWebLog').innerText(),errors},errors.length===0);
+ await p.screenshot({path:path.join(__dirname,'evidence','learning-after-'+width+'.png'),fullPage:true});
+ await ctx.clearCookies();await p.locator('#svSubmitBtn').click();await p.locator('#modal.open').waitFor();const sign=p.locator('#modalBody a').filter({hasText:'Already have an account'});const returnLink=await sign.getAttribute('href');assert.ok(returnLink.includes('returnTo='));await sign.click();await p.locator('input[name="login"]').fill('free@qa.invalid');await p.locator('input[name="password"]').fill('LocalQa!2026');await p.locator('#submit').click();await p.locator('#svCode').waitFor({state:'visible'});record('AUTH-RESUME-'+width,{url:p.url(),code:await p.locator('#svCode').inputValue()},p.url().endsWith(url)&&(await p.locator('#svCode').inputValue()).includes('QA DURABLE'));
+ await ctx.clearCookies();await login(ctx,'empty');await p.reload();await p.locator('#svCode').waitFor({state:'visible'});record('ACCOUNT-ISOLATION-'+width,{differentAccountCode:await p.locator('#svCode').inputValue()},!(await p.locator('#svCode').inputValue()).includes('QA DURABLE'));
+ await ctx.close();
+});
+await scenario('DASHBOARD',async()=>{
+ const ctx=await context(browser);await login(ctx,'student');const p=await ctx.newPage();await p.goto(BASE+'/dashboard#view=settings');await p.locator('#view-settings.active').waitFor();await p.reload();await p.locator('#view-settings.active').waitFor();record('DASHBOARD-ROUTE',{url:p.url(),active:await p.locator('.view.active').getAttribute('id')},true);
+ const fixture=require('./runtime/fixtures.json');const data=JSON.parse(fs.readFileSync(path.join(__dirname,'runtime/data.json'),'utf8'));const q=data.quests.find(q=>q.batch_id===fixture.batchId);const url=`/dashboard#view=task&batch=${fixture.batchId}&qid=${q.id}&pid=${q.problems[0].pid}`;await p.goto(BASE+url);await p.locator('#codeBox').waitFor({state:'visible'});await p.locator('#codeBox').fill('print("QA PAID DRAFT")');await p.reload();await p.locator('#codeBox').waitFor({state:'visible'});record('PAID-DRAFT',{url:p.url(),code:await p.locator('#codeBox').inputValue()},(await p.locator('#codeBox').inputValue()).includes('QA PAID DRAFT'));
+ await ctx.route(BASE+'/api/my/quests',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Synthetic unavailable'})}));await p.locator('[data-view="assignments"]').click();await p.locator('#view-assignments .workflow-error').waitFor();record('ERROR-RETRY',{text:await p.locator('#view-assignments').innerText()},(await p.locator('#view-assignments').innerText()).includes('Retry'));await ctx.close();
+});
+await scenario('MODAL',async()=>{const ctx=await context(browser);const p=await ctx.newPage();await p.goto(BASE+'/open#free');await p.getByRole('button',{name:'Sign in free',exact:true}).click();await p.locator('#modal.open').waitFor();for(let i=0;i<9;i++){await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.getElementById('modal').contains(document.activeElement)),true);}record('MODAL-FOCUS',{contained:true},true);await ctx.close();});
+}finally{await browser.close();}if(results.some(r=>r.status==='FAIL'))process.exitCode=1;})().catch(e=>{console.error(e);process.exitCode=1});

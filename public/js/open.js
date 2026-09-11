@@ -520,7 +520,9 @@ async function loadCatalogue() {
     CATALOGUE = d.catalogue;
     CAT_LINKS = d.links;
     FREE_FAMILIES = d.free_families || [];
-    $('cohortLine').textContent = CATALOGUE.length+' courses ? '+CATALOGUE.filter(c=>c.price_pkr===0).length+' free self-paced courses. Paid cohorts are arranged by Admissions. Try the first lesson before registering.';
+    const available = CATALOGUE.filter((course) => course.available !== false);
+    const comingSoon = CATALOGUE.filter((course) => course.coming_soon);
+    $('cohortLine').textContent = available.length + ' available courses | ' + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses.' + (comingSoon.length ? ' ' + comingSoon.length + ' new certified courses are open for syllabus preview and coming soon.' : '') + ' Paid cohorts are arranged by Admissions.';
     $('actionStrip').innerHTML = `
       <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;
     const p = (d.paths || [])[0];
@@ -540,8 +542,8 @@ async function loadCatalogue() {
     drawCourses();
   } catch (e) { $('courseTable').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
-const BADGE_LABEL = { free: 'FREE', new: 'NEW', high_demand: 'HIGH DEMAND', flagship: 'FLAGSHIP' };
-const BADGE_CLASS = { free: 'quest', new: 'webinar', high_demand: 'competition', flagship: 'hackathon' };
+const BADGE_LABEL = { free: 'FREE', new: 'NEW', coming_soon: 'COMING SOON', high_demand: 'HIGH DEMAND', flagship: 'FLAGSHIP' };
+const BADGE_CLASS = { free: 'quest', new: 'webinar', coming_soon: 'webinar', high_demand: 'competition', flagship: 'hackathon' };
 const COURSE_PILLS = [['all', 'All'], ['Bootcamp', 'Bootcamps'], ['Short Course', 'Short Courses'], ['Specialist Track', 'Specialist Tracks'], ['free', 'Free courses']];
 function setCoursePill(kind) {
   if (kind === 'free') { $('cFree').value = 'free'; $('cTier').value = ''; }
@@ -560,8 +562,9 @@ function renderCoursePills() {
 }
 function courseCardHtml(c) {
   const isFree = c.price_pkr === 0;
+  const comingSoon = c.available === false || c.coming_soon;
   const icon = pickIcon(c.title);
-  const demand = (c.badges || []).find((b) => ['high_demand', 'flagship', 'new'].includes(b));
+  const demand = comingSoon ? 'coming_soon' : (c.badges || []).find((b) => ['high_demand', 'flagship', 'new'].includes(b));
   return `
     <div class="oc-card${isFree ? ' teal' : ''}" onclick="courseAction('${esc(c.code)}')">
       <div class="oc-top">
@@ -574,8 +577,8 @@ function courseCardHtml(c) {
       </div>
       <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${c.weeks} Weeks &middot; ${c.hours} Hours</div>
       <div class="oc-foot">
-        <div class="oc-price${isFree ? ' free' : ''}">${isFree ? 'Free course' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
-        <button type="button" class="btn ${isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${isFree ? 'Start now' : 'View course'}</button>
+        <div class="oc-price${isFree ? ' free' : ''}">${comingSoon ? 'Free certified course' : isFree ? 'Free course' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
+        <button type="button" class="btn ${comingSoon ? 'btn-ghost' : isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${comingSoon ? 'View syllabus' : isFree ? 'Start now' : 'View course'}</button>
       </div>
     </div>`;
 }
@@ -586,7 +589,7 @@ function courseCardHtml(c) {
 let FREE_SELECTED_FAMILY = null;
 let COURSE_LIMIT=12, COURSE_FILTER_KEY='';
 function freeLanguageIconIcon(key) {
-  return { c: 'code', cpp: 'code', python: 'chart', javascript: 'code', web: 'code' }[key] || 'gem';
+  return { c: 'code', cpp: 'code', python: 'chart', javascript: 'code', web: 'code', 'trending-tech': 'spark' }[key] || 'gem';
 }
 function freeLanguageButtonsHtml(byFamily) {
   return `<div class="oc-lang-grid">${FREE_FAMILIES.filter((f) => byFamily[f.key]?.length).map((f) => `
@@ -694,7 +697,7 @@ async function openCourse(key, skipPush) {
   $('courseLevels').innerHTML = '';
   const d = await api('/api/public/tracks/' + encodeURIComponent(key));
   let progress = null;
-  if (ME && ['free', 'student'].includes(ME.role)) { try { progress = (await api('/api/open/progress?track=' + encodeURIComponent(key))).progress; } catch {} }
+  if (d.track.available !== false && ME && ['free', 'student'].includes(ME.role)) { try { progress = (await api('/api/open/progress?track=' + encodeURIComponent(key))).progress; } catch {} }
   if (request !== OPEN_COURSE_REQUEST) return;
   CUR = { ...d, progress };
   // Whichever nav link you actually arrived through, a free course should
@@ -903,6 +906,10 @@ function continueLearning() {
 const ENROLLING_TRACKS = new Set();
 async function enrollFreeCourse(button) {
   if (!CUR?.track.free) return;
+  if (CUR.track.available === false) {
+    toast('This course is open for syllabus preview. Enrollment starts when its lecture videos are ready.', true);
+    return;
+  }
   if (!ME) { gate('Sign in with your existing learner account to enroll. Portal students and free-account learners can both join.'); return; }
   if (!['free', 'student'].includes(ME.role)) { toast('Enrollment is available to learner accounts only.', true); return; }
   const key = CUR.track.key;
@@ -921,6 +928,7 @@ async function enrollFreeCourse(button) {
 }
 function drawCourse() {
   const t = CUR.track, prog = CUR.progress;
+  const comingSoon = t.available === false;
   const cat = CATALOGUE.find((c) => c.code === t.course_code);
   const heroIcon = pickIcon(t.title);
   const heroBg = tierBg(cat ? cat.tier : 'Bootcamp', !!t.free);
@@ -934,14 +942,15 @@ function drawCourse() {
       <span class="hs-val${t.free ? ' teal' : ''}">${t.free || !(cat && cat.price_pkr) ? 'Free' : 'PKR ' + cat.price_pkr.toLocaleString()}</span>
     </div>
     ${cat ? `<div class="hero-stat"><span class="hs-label">Duration</span><span class="hs-val">${cat.weeks}w &middot; ${cat.hours}h</span></div>` : ''}
-    <div class="hero-stat"><span class="hs-label">Access</span><span class="hs-val">${t.free ? 'All levels' : 'First quest free'}</span></div>
-    <div class="hero-stat"><span class="hs-label">Certificate</span><span class="hs-val">${t.free ? 'Automatic' : 'Included'}</span></div>
+    <div class="hero-stat"><span class="hs-label">Access</span><span class="hs-val">${comingSoon ? 'Syllabus preview' : t.free ? 'All levels' : 'First quest free'}</span></div>
+    <div class="hero-stat"><span class="hs-label">Certificate</span><span class="hs-val">${comingSoon ? 'Available at launch' : t.free ? 'Automatic' : 'Included'}</span></div>
     ${!t.free && cat ? `<button class="btn btn-primary hero-cta" onclick="openRegister('${esc(cat.code)}', '${esc(cat.title)}')">Register &amp; unlock - PKR ${cat.price_pkr.toLocaleString()}</button>` : ''}`;
   const heroCardHtml = `
     <div class="hero-card"><div class="course-hero${t.free ? ' no-visual' : ''}">
       <div class="hero-main">
         <div class="hero-badges">
           ${t.free ? '<span class="kbadge quest">FREE COURSE</span>' : ''}
+          ${comingSoon ? '<span class="kbadge webinar">COMING SOON</span>' : ''}
           <span class="mono s hero-code">${esc(t.course_code || '')}</span>
           <span class="s hero-sub">Pass mark ${t.pass_mark || 60}% &middot; ${MODE_LABEL[t.submission_mode] || MODE_LABEL.file} &middot; Track each attempt and its feedback</span>
         </div>
@@ -954,7 +963,7 @@ function drawCourse() {
           <div class="s hero-prog-note" style="color:${prog.passed ? 'var(--ok)' : 'var(--muted)'}">
             ${prog.graded}/${prog.total} assignments graded &middot; ${prog.gems} gems earned${prog.assignment_average != null ? ' &middot; Assignment average ' + prog.assignment_average + '%' : prog.avg != null ? ' &middot; Average ' + prog.avg + '%' : ''}${prog.weighted_score != null ? ' &middot; Final score ' + prog.weighted_score + '%' : ''}
             ${prog.passed ? ' &middot; <strong>Course passed - your certificate is issued.</strong>' : (t.free ? ' &middot; Pass every required assessment at ' + (t.pass_mark || 60) + '% or its stated threshold for the automatic certificate.' : '')}
-          </div>` : (ME ? '' : `<div class="s hero-signin-note">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
+          </div>` : (comingSoon ? '<div class="s hero-signin-note">Enrollment and submissions will open when the course launches.</div>' : ME ? '' : `<div class="s hero-signin-note">Sign in free to submit, earn gems${t.free ? ' and the certificate' : ''}.</div>`)}
       </div>
       ${t.free ? '' : `<div class="hero-visual" style="background:${heroBg}">
         <div class="hero-visual-glow"></div>
@@ -1088,15 +1097,18 @@ function courseRequirementsHtml(t) {
 }
 function capstoneCardHtml(t, prog) {
   if (!t.capstone) return '';
+  const preview = t.available === false;
   const learner = ME && ['free', 'student'].includes(ME.role), state = prog?.capstone;
   const locked = !state?.unlocked;
-  const button = !ME
+  const button = preview
+    ? '<button class="btn btn-ghost" disabled>Available when course launches</button>'
+    : !ME
     ? '<button class="btn btn-primary" onclick="gate(\'Sign in to enroll and complete the capstone.\')">Sign in to enroll</button>'
     : !learner ? '<button class="btn btn-ghost" disabled>Staff preview</button>'
     : !prog?.enrolled ? '<button class="btn btn-primary" onclick="enrollFreeCourse(this)">Enroll for free</button>'
     : locked ? '<button class="btn btn-ghost" disabled>Pass all assignments to unlock</button>'
     : `<button class="btn btn-primary" onclick="openCapstone()">${state?.submitted ? 'Open capstone submission' : 'Submit capstone'}</button>`;
-  const status = state?.passed ? `Passed at ${state.score}%` : state?.submitted ? (state.score == null ? 'Awaiting staff review' : `Scored ${state.score}% — ${state.pass_mark}% required`) : locked ? `${prog?.required_passed || 0}/${prog?.required_total || 12} assignments passed` : 'Ready for submission';
+  const status = preview ? 'Capstone submission opens with enrollment' : state?.passed ? `Passed at ${state.score}%` : state?.submitted ? (state.score == null ? 'Awaiting staff review' : `Scored ${state.score}% - ${state.pass_mark}% required`) : locked ? `${prog?.required_passed || 0}/${prog?.required_total || 12} assignments passed` : 'Ready for submission';
   return `<div class="card tech-capstone-card"><div class="card-body">
     <div class="project-eyebrow">Capstone &middot; ${t.capstone.weight || 40}% of final result</div>
     <h3>${esc(t.capstone.title)}</h3>
@@ -1111,6 +1123,7 @@ function capstoneCardHtml(t, prog) {
 // scrolling, viewport-height-capped box in the first place; a plain list of
 // short rows fits every module with no scrolling anywhere on this page.
 function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLevel, levelDone) {
+  const preview = t.available === false;
   const doneMods = modules.filter((mod) => mod.levels.every((l) => !l.locked && levelDone(l))).length;
   const pct = modules.length ? Math.round((doneMods / modules.length) * 100) : 0;
   const rows = modules.map((mod, mi) => {
@@ -1118,7 +1131,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
     const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
     const subtitle = mod.levels.map((l) => esc(l.title)).join(' &middot; ');
     const pills = mod.levels.map((l) => `<span class="curr-pill">L${l.no}<b>${esc(l.title)}</b></span>`).join('');
-    return `<button type="button" class="curr-row" onclick="openModuleEntry(${mi})">
+    return `<button type="button" class="curr-row"${preview ? ' disabled aria-disabled="true"' : ` onclick="openModuleEntry(${mi})"`}>
         <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS.code}</svg></span>
         <span class="curr-info">
           <span class="curr-title">Module ${mi + 1}${mod.title ? ': ' + esc(mod.title) : ''}${allDone ? '<span class="curr-done-dot"></span>' : ''}</span>
@@ -1132,9 +1145,11 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
 
   const subj = (t.title.split(':')[1] || t.title).trim();
   const learner = ME && ['free', 'student'].includes(ME.role);
-  const ctaAction = !ME || (learner && !prog?.enrolled) ? 'enrollFreeCourse(this)' : 'continueLearning()';
-  const ctaBtnLabel = !ME ? 'Sign in to enroll' : !learner ? 'Preview lessons' : !prog?.enrolled ? 'Enroll for free' : prog.passed ? 'Review the course' : 'Continue learning';
-  const ctaSub = !ME
+  const ctaAction = preview ? '' : !ME || (learner && !prog?.enrolled) ? 'enrollFreeCourse(this)' : 'continueLearning()';
+  const ctaBtnLabel = preview ? 'Coming soon' : !ME ? 'Sign in to enroll' : !learner ? 'Preview lessons' : !prog?.enrolled ? 'Enroll for free' : prog.passed ? 'Review the course' : 'Continue learning';
+  const ctaSub = preview
+    ? 'The complete syllabus is available now. Enrollment, lecture playback and submissions open after all EchoLens videos pass readiness checks.'
+    : !ME
     ? 'Use your existing portal student or free learner account. No second account is needed.'
     : !learner ? 'Enrollment is available to learner accounts only. Staff can preview the course content.'
     : !prog?.enrolled ? `Add ${esc(subj)} to My courses and learn at your own pace.`
@@ -1151,7 +1166,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
           <div class="curr-head">
             <div>
               <h3>Course Curriculum</h3>
-              <p class="s" style="color:var(--muted)">Complete all modules and pass the assessments to earn your certificate.</p>
+              <p class="s" style="color:var(--muted)">${preview ? 'Preview all modules, lectures and assessment titles before enrollment opens.' : 'Complete all modules and pass the assessments to earn your certificate.'}</p>
             </div>
             <div class="curr-head-right">
               <div class="hero-stats curr-head-stats">${heroStatsHtml}</div>
@@ -1170,10 +1185,10 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
     <div class="curr-cta">
       <div class="curr-cta-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
       <div class="grow">
-        <div class="curr-cta-title">${t.capstone ? 'Pass all assignments and the capstone to earn your certificate' : 'Pass the required assessments to earn your certificate'}</div>
+        <div class="curr-cta-title">${preview ? 'Course syllabus published &middot; enrollment coming soon' : t.capstone ? 'Pass all assignments and the capstone to earn your certificate' : 'Pass the required assessments to earn your certificate'}</div>
         <div class="s curr-cta-sub">${ctaSub}</div>
       </div>
-      <button type="button" class="btn btn-primary" onclick="${ctaAction}">${ctaBtnLabel}</button>
+      <button type="button" class="btn ${preview ? 'btn-ghost' : 'btn-primary'}"${preview ? ' disabled' : ` onclick="${ctaAction}"`}>${ctaBtnLabel}</button>
     </div>
     </div>`;
 }

@@ -2415,12 +2415,13 @@ app.get('/api/public/info', (req, res) => {
 app.get('/api/public/tracks', (req, res) => res.json({ tracks: Quests.tracks(), open_levels: OPEN_LEVELS }));
 app.get('/api/public/tracks/:key', (req, res) => {
   const t = Quests.trackDef(req.params.key);
-  if (!t || t.published === false) return res.status(404).json({ error: 'Track not found.' });
+  const previewOnly = !!(t && t.published === false && t.staged_catalogue);
+  if (!t || (t.published === false && !previewOnly)) return res.status(404).json({ error: 'Track not found.' });
   // Free programs open every level; paid programs open just the first quest
   // (a single level) so every course - bootcamps included - offers the same
   // one-quest taste, and the rest is visible but locked until enrolment.
-  const openN = t.free ? t.levels.length : OPEN_LEVELS;
-  const mode = Quests.tracks().find((x) => x.key === t.key)?.submission_mode || 'code';
+  const openN = previewOnly ? 0 : t.free ? t.levels.length : OPEN_LEVELS;
+  const mode = Quests.tracks({ includeUnpublished: true }).find((x) => x.key === t.key)?.submission_mode || 'code';
   const levels = t.levels.map((l) => {
     if (l.no <= openN) {
       return {
@@ -2435,7 +2436,7 @@ app.get('/api/public/tracks/:key', (req, res) => {
       problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
     };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, format:t.format||null, time_commitment:t.time_commitment||null, prerequisites:t.prerequisites||null, environment:t.environment||null, assessment:t.assessment||null, warnings:t.warnings||[], modules:t.modules||[], capstone:t.capstone||null, assignment_weight:t.assignment_weight||null, capstone_weight:t.capstone_weight||null, inline_video_only:!!t.inline_video_only, published:t.published!==false, grading_mode:t.grading_mode||null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, format:t.format||null, time_commitment:t.time_commitment||null, prerequisites:t.prerequisites||null, environment:t.environment||null, assessment:t.assessment||null, warnings:t.warnings||[], modules:t.modules||[], capstone:t.capstone||null, assignment_weight:t.assignment_weight||null, capstone_weight:t.capstone_weight||null, inline_video_only:!!t.inline_video_only, published:t.published!==false, available:!previewOnly, coming_soon:previewOnly, grading_mode:t.grading_mode||null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN });
 });
 
 /* ================================ v11 routes ================================ */
@@ -3543,10 +3544,8 @@ const KEY_LINKS = {
   registration: process.env.REGISTRATION_FORM_URL || '/open#register',
 };
 app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
-  const trackByCode = {};
-  for (const t of Quests.tracks()) if (t.course_code) trackByCode[t.course_code] = t;
   res.json({
-    catalogue: officialCatalogue().map((c) => ({ ...c, track_key: trackByCode[c.code] ? trackByCode[c.code].key : null })),
+    catalogue: store.publicCatalogue(),
     paths: store.learningPaths().map(p => ({ ...p, enrollment_available: false, availability_reason: 'Bundle enrollment is not available yet. Choose an individual course.' })),
     free_families: store.freeFamilies(),
     links: KEY_LINKS,

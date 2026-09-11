@@ -1851,7 +1851,7 @@ const Quests = {
   // submission_mode: a track can declare its own workspace ('doc', 'prompt',
   // 'code-ai', 'excel-ai', 'multi'); otherwise no-IDE tracks take files and
   // coding tracks use the built-in compiler.
-  tracks({ includeUnpublished = false } = {}) { return Object.values(TRACKS).filter((t) => includeUnpublished || t.published !== false).map((t) => ({ key: t.key, title: t.title, description: t.description, levels: t.levels.length, course_code: t.course_code || null, total_points: t.total_points, free: !!t.free, published: t.published !== false, submission_mode: t.submission || (NO_IDE_TRACKS.has(t.key) ? 'file' : 'code') })); },
+  tracks({ includeUnpublished = false } = {}) { return Object.values(TRACKS).filter((t) => includeUnpublished || t.published !== false).map((t) => ({ key: t.key, title: t.title, description: t.description, levels: t.levels.length, course_code: t.course_code || null, total_points: t.total_points, free: !!t.free, published: t.published !== false, staged_catalogue: !!t.staged_catalogue, submission_mode: t.submission || (NO_IDE_TRACKS.has(t.key) ? 'file' : 'code') })); },
   trackDef(key) { return TRACKS[key] || null; },
   installed(bid) { return data.quests.some((q) => q.batch_id === Number(bid)); },
   install(bid, trackKey) {
@@ -2373,8 +2373,24 @@ const FREE_FAMILIES = [
   { key: 'python', name: 'Python Programming and Algorithmic Design' },
   { key: 'javascript', name: 'JavaScript and Interactive Web Architecture' },
   { key: 'web', name: 'Modern Responsive Web Architecture (HTML & CSS)' },
-  { key: 'trending-tech', name: 'Trending Tech Specialist Tracks' },
+  { key: 'trending-tech', name: 'Trending Tech Tracks' },
 ];
+
+// Public discovery includes content-complete catalogue previews even when a
+// track is not ready for enrollment. This keeps staged courses visible while
+// preserving the stronger `published` gate used by enrollment, submissions,
+// recommendations and certification.
+function publicCatalogue() {
+  const trackByCode = {};
+  for (const track of Quests.tracks({ includeUnpublished: true })) if (track.course_code) trackByCode[track.course_code] = track;
+  return OFFICIAL_CATALOGUE
+    .filter((course) => course.published !== false || trackByCode[course.code]?.staged_catalogue)
+    .map((course) => {
+      const track = trackByCode[course.code];
+      const available = course.published !== false && (!track || track.published !== false);
+      return { ...course, track_key: track?.key || null, available, coming_soon: !available };
+    });
+}
 // The Web Developer Path bundle - the recommended beginner-to-job route.
 const LEARNING_PATHS = [
   { key: 'web-dev-path', title: 'The Web Developer Path', codes: ['BC-04', 'SC-06', 'SC-07', 'ST-09'],
@@ -4897,7 +4913,7 @@ const Showcase = {
 load();
 
 module.exports = {
-  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: ({ includeUnpublished = false } = {}) => OFFICIAL_CATALOGUE.filter((course) => includeUnpublished || course.published !== false), catalogueFee, learningPaths: () => LEARNING_PATHS, freeFamilies: () => FREE_FAMILIES, persist: save,
+  Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, backupNow, loadOfficialCatalogue, officialCatalogue: ({ includeUnpublished = false } = {}) => OFFICIAL_CATALOGUE.filter((course) => includeUnpublished || course.published !== false), publicCatalogue, catalogueFee, learningPaths: () => LEARNING_PATHS, freeFamilies: () => FREE_FAMILIES, persist: save,
   coursesForUser, canManageBatch, canViewBatch, announcementRecipients, courseReport,
   gemsForStudentInBatch, totalGemsForStudent, gemTotalsByUser, studentLeaderboard, batchLeaderboard, courseLeaderboard,
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,

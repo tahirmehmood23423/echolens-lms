@@ -26,7 +26,7 @@ async function main() {
     process.exitCode = 1;
   } else {
     console.log(`Trending Tech catalogue structure is valid: ${result.counts.courses} courses, ${result.counts.modules} modules, ${result.counts.lectures} lectures, ${result.counts.assignments} assignments and ${result.counts.capstones} capstones.`);
-    console.log(releaseCheck ? 'All lecture videos are direct, unique and embeddable.' : `${result.counts.videos_ready}/72 lecture videos ready; courses remain staged.`);
+    console.log(releaseCheck ? 'All lecture videos are direct, unique and embeddable.' : `${result.counts.videos_ready}/72 lecture videos ready; courses remain staged for enrollment and appear as Coming Soon previews.`);
   }
 }
 

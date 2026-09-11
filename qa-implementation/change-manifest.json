@@ -1,32 +1,25 @@
 {
-  "checked_at": "2026-09-10T17:06:29.795Z",
+  "checked_at": "2026-09-11T05:19:56.181Z",
   "branch": "fix/qa-workflow-remediation",
-  "base": "0bc81629c35e5e3adccb11e3a015baeed88d0d5b",
+  "base": "9bf194b2ba9ecea4049f9ed27d20c2485ef11aa8",
   "diffCheck": "PASS",
   "syntax": {
-    "checked": 8,
+    "checked": 6,
     "failures": []
   },
   "changedFiles": [
-    "README.md",
-    "ai.js",
-    "public/compiler.html",
-    "public/css/styles.css",
-    "public/dashboard.html",
-    "public/grade.html",
-    "public/js/coderunner.js",
-    "public/js/dashboard.js",
-    "public/js/grade.js",
     "public/js/open.js",
-    "public/js/workflow-ui.js",
-    "public/landing.html",
     "public/open.html",
     "qa-implementation/change-manifest.json",
     "qa-implementation/evidence/syntax-checks.json",
     "qa-implementation/implementation-report.html",
     "qa-implementation/implementation-report.md",
+    "scripts/validate-trending-tech.js",
     "server.js",
     "store.js",
-    "qa-implementation/evidence/compiler-error-line.png"
+    "test/trending-tech.test.js",
+    "qa-implementation/evidence/trending-tech-coming-soon.png",
+    "qa-implementation/evidence/trending-tech-syllabus-preview.png",
+    "qa-implementation/trending-preview-browser.cjs"
   ]
 }

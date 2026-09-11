@@ -29,11 +29,17 @@ test('Revision 3 catalogue contains the exact staged course structure', () => {
   }
 });
 
-test('staged courses are absent from public catalogue and track collections', () => {
+test('staged courses stay out of enrollment collections but appear as public previews', () => {
   assert.equal(store.officialCatalogue().some((course) => course.code.startsWith('TT-')), false);
   assert.equal(Quests.tracks().some((track) => track.course_code?.startsWith('TT-')), false);
   assert.equal(store.officialCatalogue({ includeUnpublished: true }).filter((course) => course.code.startsWith('TT-')).length, 6);
   assert.equal(Quests.tracks({ includeUnpublished: true }).filter((track) => track.course_code?.startsWith('TT-')).length, 6);
+  const previews = store.publicCatalogue().filter((course) => course.code.startsWith('TT-'));
+  assert.equal(previews.length, 6);
+  assert.deepEqual(previews.map((course) => course.code), ['TT-01', 'TT-02', 'TT-03', 'TT-04', 'TT-05', 'TT-06']);
+  assert.ok(previews.every((course) => course.available === false && course.coming_soon && course.track_key));
+  store.allData().users.push({ id: 890, role: 'student', name: 'Preview Learner', profile: {} });
+  assert.deepEqual(OpenQuest.enroll(890, previews[0].track_key), { error: 'Choose a published free course.', status: 400 });
 });
 
 test('release validation accepts 72 unique direct videos and rejects placeholders or duplicates', () => {

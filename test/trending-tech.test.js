@@ -119,7 +119,11 @@ test('learner capstone waits for assignments, enters staff review, and gates its
   const early = OpenQuest.submit({ user: Users.byId(901), track_key: track.key, assessment_kind: 'capstone', evidence: { links: ['https://example.com/project'], notes: null, files: [] }, request_key: 'capstone-request-early', fingerprint: 'early' });
   assert.equal(early.status, 409);
   let id = 0;
-  for (const level of track.levels) data.open_submissions.push({ id: ++id, user_id: 901, track_key: track.key, assessment_kind: 'assignment', level: level.no, pid: 1, problem_title: level.problems[0].title, points: 10, score: 80, gems: 8, attempts: 1, submitted_at: new Date().toISOString() });
+  // Backdated past the 12h grade hold (course-pacing.js): a grade awarded
+  // moments ago is deliberately not visible yet, so seeding "now" would leave
+  // the capstone locked for a reason this test is not about.
+  const released = new Date(Date.now() - 24 * 3600_000).toISOString();
+  for (const level of track.levels) data.open_submissions.push({ id: ++id, user_id: 901, track_key: track.key, assessment_kind: 'assignment', level: level.no, pid: 1, problem_title: level.problems[0].title, points: 10, score: 80, gems: 8, attempts: 1, submitted_at: released });
   data.seq.open_submissions = id;
   assert.equal(OpenQuest.progress(901, track.key).capstone.unlocked, true);
   const submitted = OpenQuest.submit({ user: Users.byId(901), track_key: track.key, assessment_kind: 'capstone', evidence: { links: ['https://example.com/project'], notes: 'Reviewer access is documented.', files: [] }, request_key: 'capstone-request-0001', fingerprint: 'capstone-fingerprint' });

@@ -4182,35 +4182,100 @@ async function submitOpenAssessment(req, res, assessmentKind) {
   const previous = store.allData().open_attempts.find(a=>a.user_id===req.user.id&&a.request_key===request_key);
   if (previous && previous.payload.fingerprint !== fingerprint) { cleanup(); return res.status(409).json({error:'This request key belongs to different work.'}); }
   const out = OpenQuest.submit({ user:req.user,track_key:track.key,level,pid,assessment_kind:kind,code:b.code||null,language:b.language||null,file_url,file_name,files:extra_files,evidence,request_key,fingerprint });
-  if(out.error){cleanup();return res.status(out.status||400).json({error:out.error});}
+  if(out.error){cleanup();return res.status(out.status||400).json({error:out.error,unlocks_at:out.unlocks_at||null});}
   if(out.existing)cleanup();
   if(!ai.enabled() && out.attempt.status==='queued')store.OpenAttempts.fail(out.attempt.id,'Grading is unavailable. Your attempt is saved. Retry later or request staff review.');
   await store.pendingPersist();
   const awaitingReview = out.attempt.status === 'awaiting_review';
-  return res.status(out.existing?200:202).json({ok:true,existing:!!out.existing,attempt:store.OpenAttempts.public(out.attempt),submission:out.submission,graded:out.attempt.status==='completed',note:awaitingReview?'Evidence saved and sent for staff review.':out.attempt.status==='failed'?out.attempt.payload.error:'Attempt saved and queued for grading. You can leave and return to check its status.'});
+  return res.status(out.existing?200:202).json({ok:true,existing:!!out.existing,attempt:store.OpenAttempts.public(out.attempt),submission:out.submission,graded:out.attempt.status==='completed',note:awaitingReview?'Evidence saved and sent for staff review.':out.attempt.status==='failed'?out.attempt.payload.error:`Submission received. Your grade is released ${Math.round(pacing.GRADE_HOLD_MS/3600000)} hours from now - you do not need to stay on this page.`,grade_release_at:kind==='capstone'?null:pacing.releaseAt(out.submission.submitted_at)});
 }
 app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'assignment')));
 app.post('/api/open/capstone/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'capstone')));
 app.get('/api/open/capstone/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),0,0).map(store.OpenAttempts.public)}));
+const pacing = require('./course-pacing');
+/**
+ * An attempt row carries the grader's score and feedback, so the learner-facing
+ * view of it is held on the same 12 h clock as the submission it belongs to
+ * (course-pacing.js). Without this the held grade leaks straight out of
+ * /api/open/attempts while the progress endpoint carefully hides it.
+ */
+function learnerAttempt(a) {
+  const view = store.OpenAttempts.public(a);
+  const shaped = { level: a.level, pid: a.pid, assessment_kind: a.payload?.assessment_kind, submitted_at: a.created_at, score: a.payload?.score ?? null };
+  if (!pacing.isHeldKind(shaped)) return view;
+  if (pacing.isReleased(shaped)) return { ...view, grade_released: true };
+  return {
+    ...view,
+    payload: { ...view.payload, score: null, gems: 0, feedback: null, graded_at: null },
+    grade_released: false,
+    grade_release_at: pacing.releaseAt(a.created_at),
+  };
+}
 function openLearnerRequired(req, res, next) {
   if (['free', 'student'].includes(req.user.role)) return next();
   return res.status(403).json({ error: 'Free-course enrollment and progress are for learner accounts only.' });
 }
 app.get('/api/open/enrollments', authRequired, openLearnerRequired, (req, res) => {
-  res.json({ courses: OpenQuest.enrollments(req.user.id) });
+  const courses = OpenQuest.enrollments(req.user.id);
+  const gate = pacing.canEnroll(courses);
+  res.json({
+    courses,
+    waitlist: OpenQuest.waitlist(req.user.id),
+    active: gate.active, limit: gate.limit, can_enroll: gate.ok,
+  });
 });
+
+/* ------------------------- launch waitlist (staged courses) -------------------------
+ * A learner reserves a seat on a course whose videos are not published yet.
+ * It grants no content and costs none of their two active-course slots; it
+ * only buys them the launch email. See OpenQuest.reserve in store.js.
+ */
+app.post('/api/open/waitlist', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {
+  const out = OpenQuest.reserve(req.user.id, String(req.body.track_key || ''));
+  if (out.error) return res.status(out.status).json({ error: out.error });
+  await store.pendingPersist();
+  res.status(out.existing ? 200 : 201).json({ ok: true, ...out, waitlist: OpenQuest.waitlist(req.user.id) });
+}));
+app.delete('/api/open/waitlist/:track', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {
+  const out = OpenQuest.unreserve(req.user.id, String(req.params.track || ''));
+  if (out.error) return res.status(out.status).json({ error: out.error });
+  await store.pendingPersist();
+  res.json({ ok: true, waitlist: OpenQuest.waitlist(req.user.id) });
+}));
+/**
+ * Admin: email everyone holding a seat on a track that it has launched. Goes
+ * through the BULK provider, never the transactional mailbox - a waitlist can
+ * be hundreds of addresses and that path is capped at TRANSACTIONAL_MAX_PER_RUN
+ * for good reason (see mail-provider split in mailer.js). Nobody is emailed
+ * twice: markNotified stamps each reservation as it goes out.
+ */
+app.post('/api/admin/tracks/:key/launch-notice', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const key = String(req.params.key || '');
+  const t = Quests.trackDef(key);
+  if (!t) return res.status(404).json({ error: 'Track not found.' });
+  if (t.published === false) return res.status(409).json({ error: 'Publish the course before telling its waitlist it has launched.' });
+  const waiting = OpenQuest.waitlistFor(key).filter((u) => u.email);
+  if (!waiting.length) return res.json({ ok: true, notified: 0, note: 'Nobody is waiting on this course.' });
+  const subject = `${t.title} is now open on EchoLens`;
+  const text = `The course you reserved a seat on has launched.\n\n${t.title}\n${t.description || ''}\n\nSign in and start module 1: ${APP_URL}/open\n\nYou can study two courses at a time, and one module opens per day.\n\n- EchoLens`;
+  const result = await mailer.sendBulk(waiting.map((u) => u.email), subject, text, { label: 'course-launch:' + key });
+  const sent = new Set((result.sent || []).map((e) => String(e).toLowerCase()));
+  for (const u of waiting) if (sent.has(String(u.email).toLowerCase())) OpenQuest.markNotified(u.id, key);
+  await store.pendingPersist();
+  res.json({ ok: true, requested: waiting.length, notified: sent.size, dry_run: !!result.dryRun, aborted: !!result.aborted, reason: result.abortReason || null });
+}));
 app.post('/api/open/enrollments', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {
   const out = OpenQuest.enroll(req.user.id, String(req.body.track_key || ''));
   if (out.error) return res.status(out.status).json({ error: out.error });
   await store.pendingPersist();
   res.status(out.existing ? 200 : 201).json({ ok: true, ...out, progress: { ...OpenQuest.progress(req.user.id, out.enrollment.track_key), enrolled: true } });
 }));
-app.get('/api/open/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),req.query.level,req.query.pid).map(store.OpenAttempts.public)}));
+app.get('/api/open/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),req.query.level,req.query.pid).map(learnerAttempt)}));
 app.post('/api/open/attempts/:id/retry',authRequired,openLearnerRequired,asyncRoute(async (req,res)=>{
   if(!ai.enabled())return res.status(503).json({error:'Grading is still unavailable. Your attempt and previous grades are saved. Ask staff for a review.'});
   const out=store.OpenAttempts.retry(req.params.id,req.user.id);
   if(out.error)return res.status(out.status||400).json({error:out.error});
-  await store.pendingPersist();res.json({ok:true,attempt:store.OpenAttempts.public(out.attempt)});
+  await store.pendingPersist();res.json({ok:true,attempt:learnerAttempt(out.attempt)});
 }));
 app.get('/api/admin/open-attempts',authRequired,adminRequired,(req,res)=>res.json({attempts:store.allData().open_attempts.filter(a=>['awaiting_review','failed'].includes(a.status)).map(a=>{const submission=store.allData().open_submissions.find(s=>s.id===a.submission_id),learner=Users.byId(a.user_id);return {...store.OpenAttempts.public(a),assessment_kind:submission?.assessment_kind||(a.level===0&&a.pid===0?'capstone':'assignment'),problem_title:submission?.problem_title||null,learner_name:learner?.name||null};})}));
 app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRoute(async (req,res)=>{

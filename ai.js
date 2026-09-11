@@ -33,7 +33,11 @@ const GROQ_KEY = clean(process.env.GROQ_API_KEY);
 // gemini-2.0-flash is being retired and its free-tier quotas collapsed;
 // flash-lite has the most generous free quota of the 2.5 family.
 const GEMINI_DEFAULT = 'gemini-2.5-flash-lite';
-const GROQ_DEFAULT = 'llama-3.3-70b-versatile';
+// llama-3.3-70b-versatile was retired from Groq's catalogue - calls for it now
+// come back 404 model_not_found, which reads like a dead key. gpt-oss-120b is
+// the strongest general model on the free tier (131k context, ample for a
+// 14k-char submission plus the grading rubric).
+const GROQ_DEFAULT = 'openai/gpt-oss-120b';
 const MODEL = process.env.AI_MODEL || (PROVIDER === 'groq' ? GROQ_DEFAULT : GEMINI_DEFAULT);
 const HOURLY_LIMIT = Number(process.env.AI_HOURLY_LIMIT || 30);
 

@@ -3963,8 +3963,11 @@ const Analytics = {
  */
 const { completion: freeCompletion, createAttempts } = require('./learning-attempts');
 const OpenAttempts = createAttempts({getData:()=>data,nextId,save,tracks:TRACKS,now});
+const pacing = require('./course-pacing');
+
 const OpenQuest = {
   key(track_key, level, pid) { return `${track_key}:${level}:${pid}`; },
+  pacing,
   // Free learning belongs to the existing learner account, independently of
   // paid cohort enrollment. Structured profile metadata persists in all store
   // modes and cannot be set through the editable-profile field whitelist.
@@ -3985,6 +3988,10 @@ const OpenQuest = {
     if (!t?.free || t.published === false || !OFFICIAL_CATALOGUE.some(c => c.code === t.course_code && c.price_pkr === 0 && c.published !== false)) return { error: 'Choose a published free course.', status: 400 };
     const existing = OpenQuest.enrollment(uid, track_key);
     if (existing) return { enrollment: existing, existing: true };
+    // Two courses at a time. Checked against the learner's OTHER enrolments so
+    // re-enrolling in something they already hold can never be blocked.
+    const gate = pacing.canEnroll(OpenQuest.enrollments(uid).filter((e) => e.track_key !== track_key));
+    if (!gate.ok) return { error: gate.error, status: gate.status, active: gate.active, limit: gate.limit };
     const enrollment = { track_key, enrolled_at: now() };
     const savedEnrollments = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
     u.profile = { ...(u.profile || {}), free_course_enrollments: [...savedEnrollments, enrollment] };
@@ -4002,6 +4009,62 @@ const OpenQuest = {
       const progress = OpenQuest.progress(uid, track_key);
       return [{ ...OpenQuest.enrollment(uid, track_key), title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, assignment_average: progress.assignment_average, capstone: progress.capstone ? { unlocked: progress.capstone.unlocked, submitted: progress.capstone.submitted, score: progress.capstone.score, passed: progress.capstone.passed } : null, weighted_score: progress.weighted_score, completed: progress.passed }];
     });
+  },
+  /* ---------------------- launch waitlist (staged courses) ----------------------
+   * The trending-tech tracks are content-complete but have no lecture videos
+   * yet, so they are catalogue previews rather than enrollable courses. A
+   * learner can still reserve a seat: they are emailed the moment the course
+   * opens. A reservation is NOT an enrollment - it grants no content and does
+   * not consume one of the learner's two active-course slots, because there is
+   * nothing there to study yet.
+   */
+  isStaged(track_key) {
+    const t = TRACKS[track_key];
+    return !!(t && t.published === false && t.staged_catalogue);
+  },
+  waitlist(uid) {
+    const u = Users.byId(uid);
+    if (!u) return [];
+    const saved = Array.isArray(u.profile?.free_course_waitlist) ? u.profile.free_course_waitlist : [];
+    return saved.flatMap((w) => {
+      const t = TRACKS[w.track_key];
+      if (!t) return [];
+      return [{ ...w, waitlisted: true, completed: false, title: t.title, course_code: t.course_code || null, launched: t.published !== false }];
+    });
+  },
+  reserve(uid, track_key) {
+    const u = Users.byId(uid);
+    if (!u || !['free', 'student'].includes(u.role)) return { error: 'Reserving a seat is available to learner accounts only.', status: 403 };
+    if (!OpenQuest.isStaged(track_key)) return { error: 'This course is open now - enroll instead of reserving a seat.', status: 400 };
+    const saved = Array.isArray(u.profile?.free_course_waitlist) ? u.profile.free_course_waitlist : [];
+    const existing = saved.find((w) => w.track_key === track_key);
+    if (existing) return { reservation: existing, existing: true };
+    const reservation = { track_key, reserved_at: now(), notified_at: null };
+    u.profile = { ...(u.profile || {}), free_course_waitlist: [...saved, reservation] };
+    save();
+    return { reservation, existing: false };
+  },
+  unreserve(uid, track_key) {
+    const u = Users.byId(uid);
+    if (!u) return { error: 'Account not found.', status: 404 };
+    const saved = Array.isArray(u.profile?.free_course_waitlist) ? u.profile.free_course_waitlist : [];
+    u.profile = { ...(u.profile || {}), free_course_waitlist: saved.filter((w) => w.track_key !== track_key) };
+    save();
+    return { ok: true };
+  },
+  /** Learners still owed a launch email for this track. */
+  waitlistFor(track_key) {
+    return data.users.filter((u) => {
+      const saved = Array.isArray(u.profile?.free_course_waitlist) ? u.profile.free_course_waitlist : [];
+      return saved.some((w) => w.track_key === track_key && !w.notified_at);
+    });
+  },
+  markNotified(uid, track_key) {
+    const u = Users.byId(uid);
+    if (!u) return;
+    const saved = Array.isArray(u.profile?.free_course_waitlist) ? u.profile.free_course_waitlist : [];
+    u.profile = { ...(u.profile || {}), free_course_waitlist: saved.map((w) => (w.track_key === track_key ? { ...w, notified_at: now() } : w)) };
+    save();
   },
   find(uid, track_key, level, pid) {
     return data.open_submissions.find((s) => s.user_id === Number(uid) && s.track_key === track_key && s.level === Number(level) && s.pid === Number(pid)) || null;
@@ -4021,6 +4084,12 @@ const OpenQuest = {
     } else {
       lvl = t.levels.find((l) => l.no === Number(level));
       if (!lvl) return { error: 'Level not found.' };
+      // One module at a time, one module per day. Only the first entry into a
+      // module is gated - resubmitting inside an open module stays free.
+      if (t.free) {
+        const paced = pacing.canSubmit(t, data.open_submissions.filter((s) => s.user_id === Number(user.id) && s.track_key === track_key), level);
+        if (!paced.ok) return { error: paced.error, status: paced.status, unlocks_at: paced.unlocks_at };
+      }
       // Paid programs open only the first quest (one level); free programs open all.
       const openN = t.free ? t.levels.length : Number(process.env.OPEN_LEVELS || 1);
       if (Number(level) > openN) return { error: 'This level is locked - register for the course to unlock it.' };
@@ -4051,12 +4120,20 @@ const OpenQuest = {
   },
   progress(uid, track_key) {
     const t = TRACKS[track_key]; if (!t) return null;
-    const mine = data.open_submissions.filter((s) => s.user_id === Number(uid) && s.track_key === track_key);
+    const nowMs = Date.now();
+    const raw = data.open_submissions.filter((s) => s.user_id === Number(uid) && s.track_key === track_key);
+    // Grades are held for 12 h, and the hold is applied HERE - before gems,
+    // averages, pass state or certification are computed - so a score can
+    // never leak out through a total the learner can watch move.
+    const mine = t.free ? raw.map((s) => pacing.publicSubmission(s, nowMs)) : raw;
     const assignmentMine = mine.filter((s) => (s.assessment_kind || 'assignment') === 'assignment' && !(s.level === 0 && s.pid === 0));
     const capstoneSubmission = mine.find((s) => s.assessment_kind === 'capstone' || (s.level === 0 && s.pid === 0));
     const byKey = {};
     const policy = freeCompletion(t,mine);
-    for (const s of assignmentMine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, file_name: s.file_name, evidence:s.evidence||null, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public) };
+    // The attempt trail carries the grader's score and feedback too, so it is
+    // held on exactly the same clock as the submission it belongs to.
+    const heldHistory = (s, rows) => (s.grade_pending ? rows.map((a) => ({ ...a, payload: { ...a.payload, score: null, gems: 0, feedback: null, graded_at: null } })) : rows);
+    for (const s of assignmentMine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, grade_pending: !!s.grade_pending, grade_release_at: s.grade_release_at || null, file_name: s.file_name, evidence:s.evidence||null, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:heldHistory(s, OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public)) };
     const totalProblems = t.levels.reduce((a, l) => a + l.problems.length, 0);
     const graded = assignmentMine.filter((s) => s.score != null);
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;
@@ -4068,6 +4145,9 @@ const OpenQuest = {
       ...policy,
       capstone,
       complete: policy.passed,
+      modules: t.free ? pacing.moduleStates(t, raw, nowMs) : null,
+      awaiting_release: t.free ? raw.filter((s) => s.score != null && !pacing.isReleased(s, nowMs)).length : 0,
+      grade_hold_hours: Math.round(pacing.GRADE_HOLD_MS / 3600000),
     };
   },
   // Fully free tracks issue an automatic verified certificate on completion.

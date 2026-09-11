@@ -116,8 +116,15 @@ test('learner capstone waits for assignments, enters staff review, and gates its
   data.users = [{ id: 901, role: 'student', name: 'Tech Track Learner', reg_no: 'TT901', profile: {} }];
   data.open_submissions = []; data.open_attempts = []; data.certificates = [];
   assert.equal(OpenQuest.enroll(901, track.key).existing, false);
+  // A seat is confirmed an hour after enrolling (course-pacing.js). Backdate it
+  // so the refusal below is the one this test is about - assignments not passed
+  // yet - rather than the enrolment still being unconfirmed.
+  const learnerRow = Users.byId(901);
+  learnerRow.profile.free_course_enrollments = learnerRow.profile.free_course_enrollments
+    .map((e) => ({ ...e, activates_at: new Date(Date.now() - 3600_000).toISOString() }));
   const early = OpenQuest.submit({ user: Users.byId(901), track_key: track.key, assessment_kind: 'capstone', evidence: { links: ['https://example.com/project'], notes: null, files: [] }, request_key: 'capstone-request-early', fingerprint: 'early' });
   assert.equal(early.status, 409);
+  assert.match(early.error, /assignments/i, 'refused for the capstone prerequisite, not the seat');
   let id = 0;
   // Backdated past the 12h grade hold (course-pacing.js): a grade awarded
   // moments ago is deliberately not visible yet, so seeding "now" would leave

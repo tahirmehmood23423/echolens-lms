@@ -50,6 +50,15 @@ function reset(uid) {
   const u = Users.byId(uid);
   if (u) u.profile = {};
 }
+/** Enrol and backdate the seat past its one-hour confirmation window. */
+function enrolConfirmed(uid, key = track.key) {
+  const out = OpenQuest.enroll(uid, key);
+  if (out.error) throw new Error('enrol failed: ' + out.error);
+  const u = Users.byId(uid);
+  u.profile.free_course_enrollments = u.profile.free_course_enrollments.map((e) =>
+    e.track_key === key ? { ...e, activates_at: new Date(Date.now() - HOUR).toISOString() } : e);
+  return OpenQuest.enrollment(uid, key);
+}
 const submitTo = (u, level, pid, key) =>
   OpenQuest.submit({ user: u, track_key: track.key, level, pid, code: 'int main(){}', language: 'c', request_key: key, fingerprint: key });
 
@@ -65,6 +74,7 @@ test('the free tracks group into far fewer modules than levels', () => {
 test('a later module is refused until the previous one is graded and released', () => {
   const u = learner(9101, 'Paced Learner');
   reset(u.id);
+  enrolConfirmed(u.id);
   const m2 = modules[1];
   const entry = m2.levels[0];
   const pid = pacing.requiredProblems(entry)[0].pid;
@@ -83,6 +93,7 @@ test('a later module is refused until the previous one is graded and released', 
 
   // Same work, 30h ago: released, and a day has passed.
   reset(u.id);
+  enrolConfirmed(u.id);
   seedModule(u.id, modules[0], 30, 80);
   const ok = submitTo(u, entry.no, pid, 'pacing-open-000001');
   assert.ok(!ok.error, 'module 2 opens: ' + ok.error);
@@ -172,4 +183,50 @@ test('reserving a staged course is not an enrollment and costs no slot', (t) => 
 
   OpenQuest.unreserve(u.id, staged.key);
   assert.equal(OpenQuest.waitlist(u.id).length, 0);
+});
+
+test('a free course is shut until the seat is confirmed an hour later', () => {
+  const u = learner(9106, 'New Learner');
+  reset(u.id);
+  const level = modules[0].levels[0];
+  const pid = pacing.requiredProblems(level)[0].pid;
+
+  // Not enrolled at all: submission is refused outright.
+  const stranger = submitTo(u, level.no, pid, 'seat-none-00000001');
+  assert.equal(stranger.status, 403);
+  assert.match(stranger.error, /Enroll in this course/i);
+
+  // Enrolled, but inside the confirmation hour: still refused, with the wait.
+  const seat = OpenQuest.enroll(u.id, track.key).enrollment;
+  assert.equal(seat.active, false, 'a new seat is not active');
+  assert.match(seat.confirmation_note, /confirmed in about/i);
+  const early = submitTo(u, level.no, pid, 'seat-early-0000001');
+  assert.equal(early.status, 409);
+  assert.match(early.error, /confirmed/i);
+  assert.ok(early.activates_at, 'the learner is told when the seat opens');
+
+  // The slot is consumed while pending - a held seat is a held seat.
+  assert.equal(pacing.canEnroll(OpenQuest.enrollments(u.id)).active, 1);
+
+  // Past the hour: confirmed, and work is accepted.
+  enrolConfirmed(u.id);
+  assert.equal(OpenQuest.enrollment(u.id, track.key).active, true);
+  const ok = submitTo(u, level.no, pid, 'seat-ready-0000001');
+  assert.ok(!ok.error, 'confirmed seat accepts work: ' + ok.error);
+});
+
+test('the confirmation sweep emails each seat exactly once', () => {
+  const u = learner(9107, 'Sweep Learner');
+  reset(u.id);
+  OpenQuest.enroll(u.id, track.key);
+  assert.equal(OpenQuest.dueForConfirmation().some((r) => r.user.id === u.id), false, 'not due inside the hour');
+
+  enrolConfirmed(u.id); // backdate past the window
+  const due = OpenQuest.dueForConfirmation();
+  assert.ok(due.some((r) => r.user.id === u.id), 'due once the hour has passed');
+  assert.equal(due.find((r) => r.user.id === u.id).title, track.title);
+
+  OpenQuest.markConfirmed(u.id, track.key);
+  assert.equal(OpenQuest.dueForConfirmation().some((r) => r.user.id === u.id), false, 'never emailed twice');
+  assert.equal(OpenQuest.enrollment(u.id, track.key).active, true, 'and access is unaffected by the email');
 });

@@ -2427,7 +2427,19 @@ app.get('/api/public/tracks/:key', (req, res) => {
   // Free programs open every level; paid programs open just the first quest
   // (a single level) so every course - bootcamps included - offers the same
   // one-quest taste, and the rest is visible but locked until enrolment.
-  const openN = previewOnly ? 0 : t.free ? t.levels.length : OPEN_LEVELS;
+  // A free course is NOT open just because it is free. Its levels unlock on a
+  // CONFIRMED enrolment (course-pacing.js: enrol now, seat confirmed an hour
+  // later). Until then the learner gets the same locked shape a paid course
+  // shows - titles, points and difficulty, but no brief, hint or video URL -
+  // so the syllabus stays browsable while the content stays shut. Staff keep
+  // full visibility for review.
+  // This route is public (no authRequired), so req.user is never populated -
+  // read the session directly. A signed-out visitor simply has no seat.
+  const viewer = currentUser(req);
+  const seat = t.free && viewer ? OpenQuest.enrollment(viewer.id, t.key) : null;
+  const staffPreview = !!viewer && !['free', 'student'].includes(viewer.role);
+  const freeOpen = staffPreview || !!(seat && seat.active);
+  const openN = previewOnly ? 0 : t.free ? (freeOpen ? t.levels.length : 0) : OPEN_LEVELS;
   const mode = Quests.tracks({ includeUnpublished: true }).find((x) => x.key === t.key)?.submission_mode || 'code';
   const levels = t.levels.map((l) => {
     if (l.no <= openN) {
@@ -2438,12 +2450,16 @@ app.get('/api/public/tracks/:key', (req, res) => {
     }
     // Locked levels: every task is listed (title, points, difficulty) so the
     // full course is visible - briefs and resources unlock on enrolment.
+    // On a FREE course the lock is the enrolment gate, so the lecture text and
+    // video URL go too: leaving them in would hand over exactly the content
+    // the confirmed-seat rule exists to withhold. Paid courses keep their
+    // existing teaser shape - that preview is deliberate and unrelated.
     return {
-      no: l.no, week: l.week, module_no:l.module_no||null, module_title:l.module_title||null, lecture_no:l.lecture_no||null, title: l.title, topic: l.topic, video_url: l.video_url || null, locked: true,
+      no: l.no, week: l.week, module_no:l.module_no||null, module_title:l.module_title||null, lecture_no:l.lecture_no||null, title: l.title, topic: t.free ? null : l.topic, video_url: t.free ? null : (l.video_url || null), locked: true,
       problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
     };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, format:t.format||null, time_commitment:t.time_commitment||null, prerequisites:t.prerequisites||null, environment:t.environment||null, assessment:t.assessment||null, warnings:t.warnings||[], modules:t.modules||[], capstone:t.capstone||null, assignment_weight:t.assignment_weight||null, capstone_weight:t.capstone_weight||null, inline_video_only:!!t.inline_video_only, published:t.published!==false, available:!previewOnly, coming_soon:previewOnly, grading_mode:t.grading_mode||null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, format:t.format||null, time_commitment:t.time_commitment||null, prerequisites:t.prerequisites||null, environment:t.environment||null, assessment:t.assessment||null, warnings:t.warnings||[], modules:t.modules||[], capstone:t.capstone||null, assignment_weight:t.assignment_weight||null, capstone_weight:t.capstone_weight||null, inline_video_only:!!t.inline_video_only, published:t.published!==false, available:!previewOnly, coming_soon:previewOnly, grading_mode:t.grading_mode||null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN, enrollment: seat ? { active: seat.active, enrolled_at: seat.enrolled_at, activates_at: seat.activates_at || null, confirmation_note: seat.confirmation_note || null } : null, staff_preview: staffPreview });
 });
 
 /* ================================ v11 routes ================================ */
@@ -4287,6 +4303,37 @@ app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRo
   const certificate=OpenQuest.maybeCertify(a.user_id,a.track_key,req.user.id);
   await store.pendingPersist();res.json({ok:true,attempt:store.OpenAttempts.public(a),certificate:certificate?.cert||null});
 }));
+/* ------------------- enrolment confirmation sweep -------------------
+ * A free-course seat is taken on enrolment and confirmed an hour later
+ * (course-pacing.js). Access does not depend on this sweep - isEnrollmentActive
+ * is a clock comparison, so a course opens on time even if the process was
+ * down. The sweep exists only to send the confirmation the learner was
+ * promised, and confirmed_at makes that exactly-once. It runs on the
+ * transactional path, batched under TRANSACTIONAL_MAX_PER_RUN, because this is
+ * mail the recipient is expecting right now rather than outreach.
+ */
+async function sweepEnrollmentConfirmations() {
+  const due = OpenQuest.dueForConfirmation(15);
+  if (!due.length) return;
+  for (const row of due) {
+    OpenQuest.markConfirmed(row.user.id, row.track_key);
+    if (row.user.email) {
+      const first = String(row.user.name || '').trim().split(/\s+/)[0] || 'there';
+      mailer.notify(
+        row.user.email,
+        `Your seat is confirmed: ${row.title}`,
+        `Hi ${first},\n\nYour enrolment in ${row.title} is confirmed and the course is now open.\n\nStart module 1: ${APP_URL}/open\n\nHow this course works:\n- One module opens per day.\n- Grades are released 12 hours after you submit, so a busy grader never blocks you.\n- You can study two courses at a time.\n\n- EchoLens`,
+      );
+    }
+  }
+  await store.pendingPersist();
+  console.log(`[enrolment] confirmed ${due.length} seat(s).`);
+}
+if (process.env.NODE_ENV !== 'test') {
+  const confirmTimer = setInterval(() => { sweepEnrollmentConfirmations().catch((e) => console.error('[enrolment] sweep failed:', e.message)); }, 60_000);
+  confirmTimer.unref();
+}
+
 const gradingWorker = require('./grading-worker').createGradingWorker({
   attempts:store.OpenAttempts,persist:()=>store.pendingPersist(),enabled:()=>ai.enabled(),
   grade:async a=>{

@@ -974,12 +974,15 @@ async function enrollFreeCourse(button) {
   ENROLLING_TRACKS.add(key);
   if (button) { button.disabled = true; button.textContent = 'Enrolling…'; }
   try {
-    const out = await api('/api/open/enrollments', { method: 'POST', body: JSON.stringify({ track_key: key }) });
+    await api('/api/open/enrollments', { method: 'POST', body: JSON.stringify({ track_key: key }) });
     if (CUR?.track.key !== key) return;
-    CUR.progress = out.progress;
-    drawCourse();
-    toast('Course added to My courses.');
-    continueLearning();
+    await loadMyEnrollments();
+    // Re-fetch instead of patching CUR in place: the seat is unconfirmed for an
+    // hour, so the track now comes back with every level locked and a pending
+    // banner. Dropping the learner into continueLearning() here - as this used
+    // to - would open a course that is shut.
+    await openCourse(key, true);
+    toast('Seat held. Your enrollment is confirmed in about an hour, and we will email you when the course opens.', true);
   } catch (e) { if (!e.handled) toast(EL.errorMessage(e), true); }
   finally { ENROLLING_TRACKS.delete(key); if (button?.isConnected) { button.disabled = false; button.textContent = 'Enroll for free'; } }
 }
@@ -1187,13 +1190,21 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   // one module at a time, one per day, unlocked by a RELEASED grade. Rendering
   // anything else would invite a click that the API then refuses.
   const paceStates = (prog && prog.modules) || [];
+  // The seat rides at the top of the track payload, beside `track`/`levels`.
+  // Until it is confirmed the API returns every level locked, so EVERY module
+  // row is shut here too - including module 1, which the pacing states alone
+  // would still call "available".
+  const seat = CUR && CUR.enrollment;
+  const pendingSeat = !!(seat && seat.active === false);
   const rows = modules.map((mod, mi) => {
     const style = MODULE_STYLES[mi % MODULE_STYLES.length];
     const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
     const pace = paceStates[mi] || null;
-    const paceLocked = !preview && !!prog?.enrolled && pace && pace.status === 'locked';
+    const paceLocked = !preview && (pendingSeat || (!!prog?.enrolled && pace && pace.status === 'locked'));
     const disabled = preview || paceLocked;
-    const subtitle = paceLocked ? esc(pace.reason || 'Locked.') : mod.levels.map((l) => esc(l.title)).join(' &middot; ');
+    const subtitle = pendingSeat ? esc(seat.confirmation_note || 'Your seat is being confirmed.')
+      : paceLocked ? esc(pace.reason || 'Locked.')
+      : mod.levels.map((l) => esc(l.title)).join(' &middot; ');
     const pills = mod.levels.map((l) => `<span class="curr-pill">L${l.no}<b>${esc(l.title)}</b></span>`).join('');
     return `<button type="button" class="curr-row${paceLocked ? ' curr-row-locked' : ''}"${disabled ? ' disabled aria-disabled="true"' : ` onclick="openModuleEntry(${mi})"`}>
         <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS[paceLocked ? 'lock' : 'code'] || ICONS.code}</svg></span>
@@ -1216,15 +1227,25 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   const subj = (t.title.split(':')[1] || t.title).trim();
   const learner = ME && ['free', 'student'].includes(ME.role);
   const reserved = preview && isReserved(t.key);
+  // Say the wait plainly rather than leaving a "Continue learning" button that
+  // opens a course with nothing in it. (seat/pendingSeat are resolved above,
+  // where the module rows need them too.)
+  const seatNote = pendingSeat
+    ? `<div class="pace-note pace-note-wait"><strong>${esc(seat.confirmation_note || 'Your seat is being confirmed.')}</strong> Your place on this course is held. We will email you the moment it opens - there is nothing else to do.</div>`
+    : '';
   // A staged course now takes a reservation: no content, no course slot, just
   // the launch email. See OpenQuest.reserve in store.js.
   const ctaAction = preview
     ? (reserved || !learner ? '' : `reserveSeat('${esc(t.key)}', this)`)
+    : pendingSeat ? ''
     : !ME || (learner && !prog?.enrolled) ? 'enrollFreeCourse(this)' : 'continueLearning()';
   const ctaBtnLabel = preview
     ? (reserved ? 'Seat reserved' : !ME ? 'Sign in to reserve a seat' : !learner ? 'Coming soon' : 'Reserve your seat')
+    : pendingSeat ? 'Confirming your seat'
     : !ME ? 'Sign in to enroll' : !learner ? 'Preview lessons' : !prog?.enrolled ? 'Enroll for free' : prog.passed ? 'Review the course' : 'Continue learning';
-  const ctaSub = preview
+  const ctaSub = pendingSeat
+    ? `${esc(seat.confirmation_note || '')} Enrolment is confirmed an hour after you join, and this course then counts as one of your two active courses.`
+    : preview
     ? (reserved
       ? 'Your seat is held. We will email you the day this course opens - nothing else to do.'
       : 'The full syllabus is published. Reserve a seat and we will email you the moment the lectures go live. A reservation is free and does not use either of your two course slots.')
@@ -1255,7 +1276,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
               </div>
             </div>
           </div>
-          ${holdNote}
+          ${seatNote}${holdNote}
           <div class="curr-list">${rows}</div>
         </div>
       </div>
@@ -1265,7 +1286,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
     <div class="curr-cta">
       <div class="curr-cta-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
       <div class="grow">
-        <div class="curr-cta-title">${preview ? (reserved ? 'Your seat is reserved &middot; we will email you at launch' : 'Course syllabus published &middot; reserve your seat now') : t.capstone ? 'Pass all assignments and the capstone to earn your certificate' : 'Pass the required assessments to earn your certificate'}</div>
+        <div class="curr-cta-title">${pendingSeat ? 'Seat held &middot; your enrolment is being confirmed' : preview ? (reserved ? 'Your seat is reserved &middot; we will email you at launch' : 'Course syllabus published &middot; reserve your seat now') : t.capstone ? 'Pass all assignments and the capstone to earn your certificate' : 'Pass the required assessments to earn your certificate'}</div>
         <div class="s curr-cta-sub">${ctaSub}</div>
       </div>
       <button type="button" class="btn ${preview && !ctaAction ? 'btn-ghost' : preview ? 'btn-teal' : 'btn-primary'}"${ctaAction ? ` onclick="${ctaAction}"` : ' disabled'}>${ctaBtnLabel}</button>
@@ -1387,6 +1408,12 @@ function svProgressHtml() {
 // moduleStates() does, so state N-1 belongs to module N. Without this the
 // sidebar would keep inviting clicks into a module the API then refuses.
 function svModulePaceLocked(modIndex) {
+  // An unconfirmed seat shuts the whole course, module 1 included - the API has
+  // already returned every level locked, so the sidebar must agree.
+  const seat = CUR && CUR.enrollment;
+  if (seat && seat.active === false) {
+    return { status: 'locked', reason: seat.confirmation_note || 'Your seat is being confirmed.' };
+  }
   const prog = CUR && CUR.progress;
   if (!prog || !prog.enrolled || !Array.isArray(prog.modules)) return null;
   const st = prog.modules[modIndex - 1];
@@ -2246,8 +2273,10 @@ function profCourseCard(c) {
   const openMod = pace?.modules?.find((m) => m.status === 'open');
   const nextMod = pace?.modules?.find((m) => m.status === 'available' || m.status === 'locked');
   const holding = Number(pace?.awaiting_release || 0);
+  const pendingSeat = c.active === false;
   let next;
-  if (c.completed) next = 'Course complete - your certificate has been issued.';
+  if (pendingSeat) next = c.confirmation_note || 'Your seat is being confirmed.';
+  else if (c.completed) next = 'Course complete - your certificate has been issued.';
   else if (holding) next = `${holding} submission${holding > 1 ? 's' : ''} being graded - results release ${whenText(pace.next_release)}.`;
   else if (openMod) next = `Module ${openMod.no} is open${openMod.title ? ': ' + esc(openMod.title) : ''}.`;
   else if (nextMod && nextMod.status === 'available') next = `Module ${nextMod.no} is ready to start.`;
@@ -2260,12 +2289,12 @@ function profCourseCard(c) {
         <div class="t">${esc(c.title)}</div>
         <div class="s" style="color:var(--muted)">${c.course_code ? esc(c.course_code) + ' &middot; ' : ''}${done}/${total || '?'} assessments passed${c.assignment_average != null ? ' &middot; average ' + c.assignment_average + '%' : ''}</div>
       </div>
-      <span class="grade-chip ${c.completed ? 'ok' : 'wait'}">${c.completed ? 'Completed' : 'Studying'}</span>
+      <span class="grade-chip ${c.completed ? 'ok' : pendingSeat ? 'none' : 'wait'}">${c.completed ? 'Completed' : pendingSeat ? 'Confirming' : 'Studying'}</span>
     </div>
     <div class="cl-bar"><div class="cl-fill" style="width:${pct}%"></div></div>
     <div class="prof-course-foot">
       <span class="s">${next}</span>
-      <button type="button" class="btn btn-teal btn-sm" onclick="openCourse('${esc(c.track_key)}')">${c.completed ? 'Review' : 'Continue'}</button>
+      <button type="button" class="btn ${pendingSeat ? 'btn-ghost' : 'btn-teal'} btn-sm" onclick="openCourse('${esc(c.track_key)}')">${c.completed ? 'Review' : pendingSeat ? 'View syllabus' : 'Continue'}</button>
     </div>
   </div>`;
 }

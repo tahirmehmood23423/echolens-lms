@@ -3976,10 +3976,16 @@ const OpenQuest = {
     if (!u || !['free', 'student'].includes(u.role) || !t?.free) return null;
     const savedEnrollments = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
     const saved = savedEnrollments.find(e => e.track_key === track_key);
-    if (saved) return { track_key, enrolled_at: saved.enrolled_at };
+    if (saved) {
+      // `active` is what every gate reads: content, submissions and the CTA.
+      // An enrolment saved before the confirmation rule existed has no
+      // activates_at and stays open - see isEnrollmentActive.
+      const active = pacing.isEnrollmentActive(saved);
+      return { ...saved, track_key, enrolled_at: saved.enrolled_at, active, confirmation_note: pacing.confirmationNote(saved) };
+    }
     // Keep learners with existing submissions enrolled without rewriting work.
     const previous = data.open_submissions.find(s => s.user_id === u.id && s.track_key === track_key);
-    return previous ? { track_key, enrolled_at: previous.submitted_at } : null;
+    return previous ? { track_key, enrolled_at: previous.submitted_at, active: true, confirmation_note: null } : null;
   },
   enroll(uid, track_key) {
     const u = Users.byId(uid);
@@ -3992,11 +3998,17 @@ const OpenQuest = {
     // re-enrolling in something they already hold can never be blocked.
     const gate = pacing.canEnroll(OpenQuest.enrollments(uid).filter((e) => e.track_key !== track_key));
     if (!gate.ok) return { error: gate.error, status: gate.status, active: gate.active, limit: gate.limit };
-    const enrollment = { track_key, enrolled_at: now() };
+    // The seat is taken now; the course opens an hour later. confirmed_at is
+    // stamped by the sweep that emails the learner, so a confirmation is sent
+    // exactly once even across restarts.
+    const at = now();
+    const enrollment = { track_key, enrolled_at: at, activates_at: pacing.activatesAt(at), confirmed_at: null };
     const savedEnrollments = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
     u.profile = { ...(u.profile || {}), free_course_enrollments: [...savedEnrollments, enrollment] };
     save();
-    return { enrollment, existing: false };
+    // Read it back through enrollment() so a first enrolment and a repeat one
+    // return the identical shape - callers must not have to care which it was.
+    return { enrollment: OpenQuest.enrollment(uid, track_key), existing: false };
   },
   enrollments(uid) {
     const u = Users.byId(uid);
@@ -4007,7 +4019,7 @@ const OpenQuest = {
       const t = TRACKS[track_key];
       if (!t?.free) return [];
       const progress = OpenQuest.progress(uid, track_key);
-      return [{ ...OpenQuest.enrollment(uid, track_key), title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, assignment_average: progress.assignment_average, capstone: progress.capstone ? { unlocked: progress.capstone.unlocked, submitted: progress.capstone.submitted, score: progress.capstone.score, passed: progress.capstone.passed } : null, weighted_score: progress.weighted_score, completed: progress.passed }];
+      return [{ ...OpenQuest.enrollment(uid, track_key), track_key, title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, assignment_average: progress.assignment_average, capstone: progress.capstone ? { unlocked: progress.capstone.unlocked, submitted: progress.capstone.submitted, score: progress.capstone.score, passed: progress.capstone.passed } : null, weighted_score: progress.weighted_score, completed: progress.passed }];
     });
   },
   /* ---------------------- launch waitlist (staged courses) ----------------------
@@ -4052,6 +4064,33 @@ const OpenQuest = {
     save();
     return { ok: true };
   },
+  /**
+   * Enrolments whose confirmation hour has elapsed but which have not been
+   * confirmed yet. The sweep in server.js turns these into the learner's
+   * confirmation email; confirmed_at makes that exactly-once across restarts.
+   */
+  dueForConfirmation(limit = 20) {
+    const out = [];
+    for (const u of data.users) {
+      const saved = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
+      for (const e of saved) {
+        if (e.confirmed_at || !e.activates_at) continue;
+        if (!pacing.isEnrollmentActive(e)) continue;
+        const t = TRACKS[e.track_key];
+        if (!t) continue;
+        out.push({ user: u, track_key: e.track_key, title: t.title, course_code: t.course_code || null });
+        if (out.length >= limit) return out;
+      }
+    }
+    return out;
+  },
+  markConfirmed(uid, track_key) {
+    const u = Users.byId(uid);
+    if (!u) return;
+    const saved = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
+    u.profile = { ...(u.profile || {}), free_course_enrollments: saved.map((e) => (e.track_key === track_key && !e.confirmed_at ? { ...e, confirmed_at: now() } : e)) };
+    save();
+  },
   /** Learners still owed a launch email for this track. */
   waitlistFor(track_key) {
     return data.users.filter((u) => {
@@ -4073,6 +4112,14 @@ const OpenQuest = {
     if (!['free', 'student'].includes(Users.byId(user.id)?.role)) return { error: 'Practice submissions are for learner accounts only.', status: 403 };
     const t = TRACKS[track_key];
     if (!t || t.published === false) return { error: 'Course not found.' };
+    // A free course takes work only from a CONFIRMED seat. Without this the
+    // enrolment hold would be cosmetic: the submit endpoint is reachable
+    // directly, so the gate has to live here, not only in the UI.
+    if (t.free) {
+      const seat = OpenQuest.enrollment(user.id, track_key);
+      if (!seat) return { error: 'Enroll in this course before submitting work.', status: 403 };
+      if (!seat.active) return { error: seat.confirmation_note + ' You can submit once it is confirmed.', status: 409, activates_at: seat.activates_at };
+    }
     const kind = assessment_kind === 'capstone' ? 'capstone' : 'assignment';
     let lvl, pr;
     if (kind === 'capstone') {

@@ -110,3 +110,39 @@ test('staff-reviewed capstones are never held - the hold only buys the AI grader
   assert.equal(P.isHeldKind(capstone), false);
   assert.equal(P.isHeldKind({ level: 1, pid: 1 }), true, 'assignments default to held');
 });
+
+test('a seat is confirmed an hour after enrolling, not on enrolling', () => {
+  const e = { enrolled_at: at(0), activates_at: P.activatesAt(at(0)) };
+  assert.equal(e.activates_at, at(1), 'confirmation lands one hour later');
+  assert.equal(P.isEnrollmentActive(e, T0), false, 'not active at enrolment');
+  assert.equal(P.isEnrollmentActive(e, T0 + 59 * 60_000), false, 'still not at 59 min');
+  assert.equal(P.isEnrollmentActive(e, T0 + HOUR), true, 'active on the hour');
+  assert.match(P.confirmationNote(e, T0 + 20 * 60_000), /about 40 minutes/);
+  assert.equal(P.confirmationNote(e, T0 + HOUR), null, 'no note once confirmed');
+});
+
+test('an enrolment predating the confirmation rule is never locked out', () => {
+  assert.equal(P.isEnrollmentActive({ enrolled_at: at(-100) }), true, 'no activates_at means already open');
+  assert.equal(P.isEnrollmentActive(null), false, 'but no enrolment at all is not access');
+});
+
+// Regression: store.js's now() renders UTC as 'YYYY-MM-DD HH:mm:ss', which
+// Date.parse reads as LOCAL time. Parsed naively, every deadline shifted by the
+// host's UTC offset - the 12h hold ran 7h on UTC+5 and 17h on UTC-5, and the 1h
+// enrolment hold expired before it started. It only looked correct because
+// Render runs UTC.
+test('bare store timestamps are read as UTC, so holds do not shift with the host timezone', () => {
+  const bare = '2026-09-11 08:00:00';          // store.js now() format, UTC
+  const explicit = '2026-09-11T08:00:00.000Z'; // the same instant, zoned
+  assert.equal(P.activatesAt(bare), P.activatesAt(explicit), 'both parse to the same instant');
+  assert.equal(P.activatesAt(bare), '2026-09-11T09:00:00.000Z');
+  assert.equal(P.releaseAt(bare), '2026-09-11T20:00:00.000Z', '12h after 08:00 UTC');
+
+  // A seat taken "now" in store format must never already be confirmed.
+  const storeNow = new Date().toISOString().replace('T', ' ').slice(0, 19);
+  assert.equal(P.isEnrollmentActive({ activates_at: P.activatesAt(storeNow) }), false,
+    'a brand-new seat is not instantly active');
+  // And a grade submitted "now" must not already be released.
+  assert.equal(P.isReleased({ score: 80, submitted_at: storeNow, level: 1, pid: 1 }), false,
+    'a brand-new grade is not instantly released');
+});

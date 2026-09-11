@@ -31,14 +31,58 @@
  */
 
 const HOUR_MS = 60 * 60 * 1000;
+// Enrolling does not open a course. The seat is confirmed an hour later, and
+// only a CONFIRMED enrolment unlocks lesson content or accepts a submission -
+// so nobody reaches the material by walking straight into a lesson URL.
+const ENROLLMENT_HOLD_MS = Number(process.env.ENROLLMENT_HOLD_HOURS || 1) * HOUR_MS;
 const GRADE_HOLD_MS = Number(process.env.GRADE_HOLD_HOURS || 12) * HOUR_MS;
 const MODULE_COOLDOWN_MS = Number(process.env.MODULE_COOLDOWN_HOURS || 24) * HOUR_MS;
 // Free self-paced courses a learner may study at once. Waitlisted courses that
 // have not launched do not count - they cannot be studied yet.
 const MAX_ACTIVE_COURSES = Number(process.env.MAX_ACTIVE_FREE_COURSES || 2);
 
-const ms = (t) => (t ? Date.parse(t) : NaN);
+/**
+ * store.js's now() renders UTC as 'YYYY-MM-DD HH:mm:ss' (store.js:748) - a bare
+ * format Date.parse reads as LOCAL time. Parsing it naively shifts every
+ * deadline by the host's UTC offset: on a UTC+5 box the 12 h grade hold became
+ * 7 h and the 1 h enrolment hold expired before it began; on UTC-5 the hold
+ * would have run 17 h. It only looked right because Render happens to run UTC.
+ * Timestamps with an explicit zone (our own iso() output, ISO strings from the
+ * API) already parse correctly and are passed through untouched.
+ */
+const BARE_TIMESTAMP = /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/;
+const ms = (t) => {
+  if (!t) return NaN;
+  const s = String(t);
+  return Date.parse(BARE_TIMESTAMP.test(s) ? s.replace(' ', 'T') + 'Z' : s);
+};
 const iso = (n) => new Date(n).toISOString();
+
+/* ----------------------- enrolment confirmation window -----------------------
+ * An enrolment carries `activates_at`. Until that moment the seat is held but
+ * the course is shut: no lesson bodies, no video URLs, no submissions.
+ * Enrolments made before this rule existed have no `activates_at` at all and
+ * are treated as confirmed - a live learner must never be locked out by a
+ * rule that arrived after they started.
+ */
+function activatesAt(enrolledAt) {
+  const t = ms(enrolledAt);
+  return Number.isFinite(t) ? iso(t + ENROLLMENT_HOLD_MS) : null;
+}
+function isEnrollmentActive(enrollment, nowMs = Date.now()) {
+  if (!enrollment) return false;
+  if (!enrollment.activates_at) return true; // pre-existing enrolment
+  const due = ms(enrollment.activates_at);
+  return !Number.isFinite(due) || due <= nowMs;
+}
+/** How the wait reads to the learner, e.g. "in about 40 minutes". */
+function confirmationNote(enrollment, nowMs = Date.now()) {
+  if (isEnrollmentActive(enrollment, nowMs)) return null;
+  const mins = Math.max(1, Math.ceil((ms(enrollment.activates_at) - nowMs) / 60000));
+  return mins < 60
+    ? `Your seat is confirmed in about ${mins} minute${mins === 1 ? '' : 's'}.`
+    : `Your seat is confirmed in about ${Math.round(mins / 60)} hour${Math.round(mins / 60) === 1 ? '' : 's'}.`;
+}
 
 /** Problems a learner must pass for the module to count as done. */
 function requiredProblems(level) {
@@ -222,7 +266,8 @@ function canEnroll(enrollments) {
 }
 
 module.exports = {
-  GRADE_HOLD_MS, MODULE_COOLDOWN_MS, MAX_ACTIVE_COURSES,
+  GRADE_HOLD_MS, MODULE_COOLDOWN_MS, MAX_ACTIVE_COURSES, ENROLLMENT_HOLD_MS,
+  activatesAt, isEnrollmentActive, confirmationNote,
   requiredProblems, releaseAt, isReleased, isHeldKind, publicSubmission,
   moduleComplete, moduleStartedAt, moduleStates, canSubmit, modulesOf, moduleOfLevel, moduleKeyOf,
   activeCourseCount, canEnroll,

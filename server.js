@@ -1771,7 +1771,14 @@ app.get('/auth/google/callback', async (req, res) => {
 });
 
 /* ----------------------------- AI copilot (teachers) ----------------------------- */
-app.get('/api/ai/status', authRequired, (req, res) => res.json({ enabled: ai.enabled() && ['admin', 'instructor'].includes(req.user.role), provider: ai.provider(), model: ai.model() }));
+app.get('/api/ai/status', authRequired, (req, res) => res.json({
+  enabled: ai.enabled() && ['admin', 'instructor'].includes(req.user.role),
+  provider: ai.provider(),
+  model: ai.model(),
+  // Admins also see which keys the running process actually picked up (never
+  // the keys themselves), so a missing env var is one request away from proof.
+  ...(req.user.role === 'admin' ? { diagnostics: ai.status() } : {}),
+}));
 
 app.post('/api/ai/chat', authRequired, teacherOrAdmin, async (req, res) => {
   try {

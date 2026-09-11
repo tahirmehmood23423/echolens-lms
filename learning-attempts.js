@@ -42,7 +42,7 @@ function createAttempts({getData,nextId,save,tracks,now=()=>new Date().toISOStri
     due(){const time=Date.parse(now());return rows().find(a=>a.status==='queued'&&(!a.payload.retry_at||Date.parse(a.payload.retry_at)<=time));},
     recover(){for(const a of rows())if(a.status==='processing')api.fail(a.id,'Grading was interrupted. Your work is saved.',true);},
     start(id){const a=byId(id);if(!a||a.status!=='queued')return null;a.payload.tries++;a.payload.started_at=now();return update(a,{status:'processing'});},
-    fail(id,message,retryable=false){const a=byId(id);if(!a||a.status==='completed')return a;a.payload.error=message;a.payload.retry_at=retryable&&a.payload.tries<MAX_TRIES?new Date(Date.parse(now())+1000*2**a.payload.tries).toISOString():null;return update(a,{status:a.payload.retry_at?'queued':'failed'});},
+    fail(id,message,retryable=false){const a=byId(id);if(!a||a.status==='completed')return a;a.payload.error=message;a.payload.retry_at=retryable&&a.payload.tries<MAX_TRIES?new Date(Date.parse(now())+30000*2**(a.payload.tries-1)).toISOString():null;return update(a,{status:a.payload.retry_at?'queued':'failed'});},
     retry(id,uid){const a=byId(id);if(!a||a.user_id!==Number(uid))return {error:'Attempt not found.',status:404};if(a.status!=='failed')return {error:'Only failed attempts can be retried.',status:409};if(a.payload.tries>=MAX_TRIES)return {error:'Automatic retry limit reached. Request staff review or submit a new attempt.',status:409};a.payload.error=null;a.payload.retry_at=null;return {attempt:update(a,{status:'queued'})};},
     complete(id,score,feedback,grader='ai'){
       const a=byId(id);if(!a)return null;if(a.status==='completed')return a;

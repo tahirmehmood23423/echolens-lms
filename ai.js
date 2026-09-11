@@ -23,8 +23,12 @@
  */
 
 const PROVIDER = (process.env.AI_PROVIDER || 'groq').toLowerCase();
-const GEMINI_KEY = process.env.GEMINI_API_KEY || '';
-const GROQ_KEY = process.env.GROQ_API_KEY || '';
+// Trimmed: a key pasted into a hosting dashboard picks up stray whitespace or
+// quotes surprisingly often, and an untrimmed key fails as a 401 that reads
+// like "the provider is down" rather than "the key never arrived".
+const clean = (v) => String(v || '').trim().replace(/^["']|["']$/g, '');
+const GEMINI_KEY = clean(process.env.GEMINI_API_KEY);
+const GROQ_KEY = clean(process.env.GROQ_API_KEY);
 
 // gemini-2.0-flash is being retired and its free-tier quotas collapsed;
 // flash-lite has the most generous free quota of the 2.5 family.
@@ -38,6 +42,10 @@ function enabled() {
 }
 
 /* ------------------------------ rate limiting ------------------------------ */
+// Only a SERVED answer costs the user a slot. A provider-side failure (quota,
+// 5xx, timeout) refunds it: otherwise a provider outage silently eats the whole
+// hourly budget - three auto-retries per queued attempt - and every later call
+// reports "AI hourly limit reached" instead of the real problem.
 const usage = new Map(); // userId -> { count, resetAt }
 function checkLimit(userId) {
   const now = Date.now();
@@ -50,6 +58,26 @@ function checkLimit(userId) {
     throw err;
   }
   u.count += 1;
+  return () => { const cur = usage.get(userId); if (cur === u && cur.count > 0) cur.count -= 1; };
+}
+
+/* --------------------------- provider cooldowns --------------------------- */
+// A provider that answers "quota exhausted" keeps saying so for minutes
+// (per-minute caps) or until midnight Pacific (daily caps). Parking it sends
+// the next call straight to the other key instead of spending a round-trip -
+// and a failed grading attempt - to rediscover the same thing.
+const COOLDOWN_MS = Number(process.env.AI_COOLDOWN_MINUTES || 15) * 60_000;
+const cooldown = new Map(); // provider name -> parked until (ms)
+function parkProvider(name, status, message) {
+  if (status !== 429 && !/quota|resource.?exhausted|rate.?limit/i.test(String(message || ''))) return;
+  cooldown.set(name, Date.now() + COOLDOWN_MS);
+  console.warn(`[ai] ${name} is out of quota - parking it for ${Math.round(COOLDOWN_MS / 60000)} minutes.`);
+}
+function cooledDown(name) {
+  const until = cooldown.get(name) || 0;
+  if (until > Date.now()) return true;
+  if (until) cooldown.delete(name);
+  return false;
 }
 
 /* --------------------------- error classification --------------------------- */
@@ -125,23 +153,47 @@ async function callGroq(system, messages, model, maxTokens) {
 /* ------------------------- completion with fallback ------------------------- */
 async function complete(userId, system, messages, maxTokens) {
   if (!enabled()) { const e = new Error('AI is not configured. Set GEMINI_API_KEY or GROQ_API_KEY in the environment.'); e.status = 503; throw e; }
-  checkLimit(userId);
+  const refund = checkLimit(userId);
 
-  const primaryIsGroq = PROVIDER === 'groq';
-  const primary = primaryIsGroq ? { fn: callGroq, ok: !!GROQ_KEY, name: 'Groq' } : { fn: callGemini, ok: !!GEMINI_KEY, name: 'Gemini' };
-  const backup = primaryIsGroq ? { fn: callGemini, ok: !!GEMINI_KEY, name: 'Gemini' } : { fn: callGroq, ok: !!GROQ_KEY, name: 'Groq' };
+  const groq = { fn: callGroq, ok: !!GROQ_KEY, name: 'Groq' };
+  const gemini = { fn: callGemini, ok: !!GEMINI_KEY, name: 'Gemini' };
+  const configured = (PROVIDER === 'groq' ? [groq, gemini] : [gemini, groq]).filter((p) => p.ok);
+  // Preferred order, except that a provider parked on a quota cooldown drops to
+  // the back - still tried if nothing else is left, since its quota may have reset.
+  const order = [...configured.filter((p) => !cooledDown(p.name)), ...configured.filter((p) => cooledDown(p.name))];
 
-  if (!primary.ok && backup.ok) return backup.fn(system, messages, undefined, maxTokens);
-
-  try {
-    return await primary.fn(system, messages, undefined, maxTokens);
-  } catch (err) {
-    if (err.retryable && backup.ok) {
-      console.warn(`[ai] ${primary.name} failed (${err.message}) - falling back to ${backup.name}.`);
-      return backup.fn(system, messages, undefined, maxTokens);
+  let lastErr;
+  for (let i = 0; i < order.length; i++) {
+    try {
+      return await order[i].fn(system, messages, undefined, maxTokens);
+    } catch (err) {
+      lastErr = err;
+      parkProvider(order[i].name, err.status, err.message);
+      if (!err.retryable) break;
+      if (i < order.length - 1) console.warn(`[ai] ${order[i].name} failed (${err.message}) - falling back to ${order[i + 1].name}.`);
     }
-    throw err;
   }
+  refund(); // nobody got an answer - do not charge it to the user's hourly budget
+  if (lastErr && configured.length < 2) {
+    const missing = GROQ_KEY ? 'GEMINI_API_KEY' : 'GROQ_API_KEY';
+    lastErr.message += ` Only one provider is configured - set ${missing} in the server environment so the app can switch automatically.`;
+  }
+  throw lastErr;
+}
+
+/* ------------------------------ diagnostics ------------------------------ */
+// Answers "did the key actually reach the running server?" without exposing the
+// key itself - the question that matters the moment grading starts failing.
+function status() {
+  const now = Date.now();
+  return {
+    enabled: enabled(),
+    provider: PROVIDER,
+    model: MODEL,
+    hourly_limit: HOURLY_LIMIT,
+    keys: { groq: !!GROQ_KEY, gemini: !!GEMINI_KEY },
+    cooling_down: Object.fromEntries([...cooldown].filter(([, until]) => until > now).map(([n, until]) => [n, Math.ceil((until - now) / 60000) + ' min'])),
+  };
 }
 
 /* ------------------------------ copilot tasks ------------------------------ */
@@ -404,4 +456,4 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
   return { score, feedback: String(parsed.feedback || '').slice(0, 1500) };
 }
 
-module.exports = { enabled, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, codeHelp, promptLab, excelCopilot, activityReport };
+module.exports = { enabled, status, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, codeHelp, promptLab, excelCopilot, activityReport };

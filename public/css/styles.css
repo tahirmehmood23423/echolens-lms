@@ -1764,3 +1764,70 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .attempt-evidence-links{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}
 .attempt-history details .btn{margin:6px 6px 0 0}
 @media(max-width:900px){.tech-course-facts{grid-template-columns:1fr}.tech-capstone-card .btn{width:100%}}
+
+/* ====================== course pacing + profile panels (v1410) ======================
+ * Three additions, all built from tokens already defined above so they inherit
+ * the theme rather than restating it:
+ *   .tech-front  - the trending-tech tracks surfaced on the free-course view
+ *   .curr-row-locked / .pace-note - a module the pacing rules have closed
+ *   .prof-tabs / .prof-course     - the tabbed learner profile
+ */
+.tech-front { margin-top: 26px; }
+.tech-front-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.tech-front-head h4 { margin: 0 0 2px; font-family: var(--font-display); font-size: 19px; color: var(--navy); }
+.tech-front-head p { margin: 0; max-width: 62ch; }
+
+/* A locked module still reads as part of the course - dimmed and explained,
+   never hidden, so the learner can see what is coming and why it is shut. */
+.curr-row-locked { opacity: .62; cursor: not-allowed; }
+.curr-row-locked .curr-title { color: var(--muted); }
+.curr-row-locked .curr-sub { color: var(--muted-2); font-style: italic; }
+.curr-row-locked .curr-count { color: var(--muted-2); font-weight: 600; }
+.curr-row-locked .curr-pills { opacity: .5; }
+.curr-row-locked .chev { visibility: hidden; }
+
+.pace-note {
+  margin: 0 0 14px; padding: 11px 14px; border-radius: 10px;
+  background: rgba(20, 184, 166, .09); border: 1px solid rgba(20, 184, 166, .28);
+  color: var(--ink); font-size: 13px; line-height: 1.55;
+}
+.pace-note strong { color: var(--teal-deep); }
+
+/* Profile: four panels instead of one long scroll. */
+.prof-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 16px; }
+.prof-tab {
+  appearance: none; border: 1px solid var(--line); background: var(--card);
+  color: var(--muted); font: inherit; font-size: 13px; font-weight: 600;
+  padding: 8px 15px; border-radius: 999px; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.prof-tab:hover { color: var(--ink); border-color: var(--teal); }
+.prof-tab.active { background: var(--teal-deep); border-color: var(--teal-deep); color: #fff; }
+
+.prof-course {
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 12px; background: var(--card);
+}
+.prof-course:last-child { margin-bottom: 0; }
+.prof-course.reserved { border-style: dashed; }
+.prof-course-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.prof-course-head .t { font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+.prof-course-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 10px; flex-wrap: wrap;
+}
+.prof-course-foot .s { color: var(--muted); flex: 1; min-width: 200px; }
+@media (max-width: 560px) {
+  .prof-course-foot { align-items: stretch; }
+  .prof-course-foot .btn { width: 100%; }
+}
+
+/* A pacing-locked module in the solve-workspace sidebar: dimmed and explained
+   in place, so the learner sees what is next without being able to open it. */
+.svc-week.locked { color: var(--muted-2); }
+.svc-lock {
+  margin-left: 6px; padding: 1px 7px; border-radius: 999px;
+  background: var(--line); color: var(--muted); font-size: 10px;
+  font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+}
+.svc-lock-note { padding: 2px 10px 10px; color: var(--muted-2); font-size: 11.5px; line-height: 1.5; }

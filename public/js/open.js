@@ -79,6 +79,7 @@ const ICONS = {
   play: '<path d="M7 4.5v15l13-7.5-13-7.5z" fill="currentColor"/>',
   sparkle: '<path d="M12 3v3M12 18v3M4.5 12h3M16.5 12h3M6.5 6.5l2 2M15.5 15.5l2 2M17.5 6.5l-2 2M8.5 15.5l-2 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7" fill="none"/>',
   clock: '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>',
+  lock: '<rect x="4.5" y="10.5" width="15" height="10" rx="2.2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>',
 };
 function pickIcon(title) {
   const t = (title || '').toLowerCase();
@@ -175,6 +176,9 @@ window.addEventListener('popstate', (e) => {
   EL.drafts.setAccount(ME?.id || null);
   drawUserBox();
   if (ME) requireWhatsapp();
+  // Slots and reservations must be known before the catalogue draws, or a
+  // coming-soon card offers a seat the learner already holds.
+  await loadMyEnrollments();
   const catReady = loadCatalogue();
   loadAnnouncements();
   loadHomeStats();
@@ -513,6 +517,33 @@ function openFeedbackForm() {
   });
 }
 
+/* --------------------- my enrolments, slots and reservations ---------------------
+ * One fetch backs three things: the 2-course cap shown on the catalogue, the
+ * "Seat reserved" state on a coming-soon course, and the My courses tab.
+ */
+let MY_COURSES = [], MY_WAITLIST = [], MY_SLOTS = { active: 0, limit: 2, can_enroll: true };
+async function loadMyEnrollments() {
+  if (!ME || !['free', 'student'].includes(ME.role)) { MY_COURSES = []; MY_WAITLIST = []; return; }
+  try {
+    const d = await api('/api/open/enrollments');
+    MY_COURSES = d.courses || [];
+    MY_WAITLIST = d.waitlist || [];
+    MY_SLOTS = { active: d.active || 0, limit: d.limit || 2, can_enroll: d.can_enroll !== false };
+  } catch { /* a stale slot count must never block the catalogue from drawing */ }
+}
+const isReserved = (key) => MY_WAITLIST.some((w) => w.track_key === key);
+async function reserveSeat(key, btn) {
+  if (!ME) { openTab('signin'); return; }
+  if (btn) btn.disabled = true;
+  try {
+    await api('/api/open/waitlist', { method: 'POST', body: JSON.stringify({ track_key: key }) });
+    await loadMyEnrollments();
+    toast('Seat reserved. We will email you the day this course opens.', true);
+    if (CUR && CUR.track) openCourse(CUR.track.key); else drawCourses();
+  } catch (e) { toast(e.message); if (btn) btn.disabled = false; }
+}
+window.reserveSeat = reserveSeat;
+
 /* ------------------------------- catalogue ------------------------------- */
 async function loadCatalogue() {
   try {
@@ -578,7 +609,7 @@ function courseCardHtml(c) {
       <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${c.weeks} Weeks &middot; ${c.hours} Hours</div>
       <div class="oc-foot">
         <div class="oc-price${isFree ? ' free' : ''}">${comingSoon ? 'Free certified course' : isFree ? 'Free course' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
-        <button type="button" class="btn ${comingSoon ? 'btn-ghost' : isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${comingSoon ? 'View syllabus' : isFree ? 'Start now' : 'View course'}</button>
+        <button type="button" class="btn ${comingSoon ? 'btn-ghost' : isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${comingSoon ? (c.track_key && isReserved(c.track_key) ? 'Seat reserved' : 'View &amp; reserve') : isFree ? 'Start now' : 'View course'}</button>
       </div>
     </div>`;
 }
@@ -601,12 +632,38 @@ function freeLanguageButtonsHtml(byFamily) {
 }
 function selectFreeFamily(key) { FREE_SELECTED_FAMILY = key; drawCourses(); }
 window.selectFreeFamily = selectFreeFamily;
+// The six trending-tech tracks used to sit one click inside the "Trending Tech"
+// language button, where nobody found them. They are now a titled section of
+// real cards on the front of the free-course view, alongside the language
+// ladders - the same card component the language courses use, so the two read
+// as one catalogue rather than two systems.
+const TECH_FAMILY = 'trending-tech';
+function techSectionHtml(courses) {
+  if (!courses.length) return '';
+  const open = courses.filter((c) => c.available !== false && !c.coming_soon).length;
+  return `
+    <section class="tech-front">
+      <div class="tech-front-head">
+        <div>
+          <h4>Top trending tech tracks</h4>
+          <p class="s" style="color:var(--muted)">${courses.length} certified specialist tracks, free. ${open ? open + ' open now.' : 'Reserve a seat and we will email you the day each one opens.'}</p>
+        </div>
+        <span class="kbadge quest">Free &middot; certified</span>
+      </div>
+      <div class="oc-grid">${courses.map(courseCardHtml).join('')}</div>
+    </section>`;
+}
 function drawFreeFamilies(list) {
   const byFamily = {};
   for (const c of list) { if (!c.family) continue; (byFamily[c.family] = byFamily[c.family] || []).push(c); }
   const ungrouped = list.filter((c) => !c.family);
   if (!FREE_SELECTED_FAMILY || !byFamily[FREE_SELECTED_FAMILY]) {
-    return freeLanguageButtonsHtml(byFamily) + (ungrouped.length ? `<div class="oc-grid" style="margin-top:20px">${ungrouped.map(courseCardHtml).join('')}</div>` : '');
+    const tech = (byFamily[TECH_FAMILY] || []).slice().sort((a, b) => (a.family_order || 0) - (b.family_order || 0));
+    const ladders = {};
+    for (const k of Object.keys(byFamily)) if (k !== TECH_FAMILY) ladders[k] = byFamily[k];
+    return freeLanguageButtonsHtml(ladders)
+      + techSectionHtml(tech)
+      + (ungrouped.length ? `<div class="oc-grid" style="margin-top:20px">${ungrouped.map(courseCardHtml).join('')}</div>` : '');
   }
   const family = FREE_FAMILIES.find((f) => f.key === FREE_SELECTED_FAMILY);
   const ordered = byFamily[FREE_SELECTED_FAMILY].slice().sort((a, b) => (a.family_order || 0) - (b.family_order || 0));
@@ -1126,29 +1183,51 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   const preview = t.available === false;
   const doneMods = modules.filter((mod) => mod.levels.every((l) => !l.locked && levelDone(l))).length;
   const pct = modules.length ? Math.round((doneMods / modules.length) * 100) : 0;
+  // The server is the authority on which module is open (course-pacing.js):
+  // one module at a time, one per day, unlocked by a RELEASED grade. Rendering
+  // anything else would invite a click that the API then refuses.
+  const paceStates = (prog && prog.modules) || [];
   const rows = modules.map((mod, mi) => {
     const style = MODULE_STYLES[mi % MODULE_STYLES.length];
     const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
-    const subtitle = mod.levels.map((l) => esc(l.title)).join(' &middot; ');
+    const pace = paceStates[mi] || null;
+    const paceLocked = !preview && !!prog?.enrolled && pace && pace.status === 'locked';
+    const disabled = preview || paceLocked;
+    const subtitle = paceLocked ? esc(pace.reason || 'Locked.') : mod.levels.map((l) => esc(l.title)).join(' &middot; ');
     const pills = mod.levels.map((l) => `<span class="curr-pill">L${l.no}<b>${esc(l.title)}</b></span>`).join('');
-    return `<button type="button" class="curr-row"${preview ? ' disabled aria-disabled="true"' : ` onclick="openModuleEntry(${mi})"`}>
-        <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS.code}</svg></span>
+    return `<button type="button" class="curr-row${paceLocked ? ' curr-row-locked' : ''}"${disabled ? ' disabled aria-disabled="true"' : ` onclick="openModuleEntry(${mi})"`}>
+        <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS[paceLocked ? 'lock' : 'code'] || ICONS.code}</svg></span>
         <span class="curr-info">
-          <span class="curr-title">Module ${mi + 1}${mod.title ? ': ' + esc(mod.title) : ''}${allDone ? '<span class="curr-done-dot"></span>' : ''}</span>
+          <span class="curr-title">Module ${mi + 1}${mod.title ? ': ' + esc(mod.title) : ''}${allDone ? '<span class="curr-done-dot"></span>' : ''}${pace && pace.status === 'open' ? ' <span class="kbadge quest">In progress</span>' : ''}</span>
           <span class="curr-sub">${subtitle}</span>
         </span>
         <span class="curr-pills">${pills}</span>
-        <span class="curr-count">${mod.levels.length} Lesson${mod.levels.length > 1 ? 's' : ''}</span>
+        <span class="curr-count">${paceLocked ? 'Locked' : mod.levels.length + ' Lesson' + (mod.levels.length > 1 ? 's' : '')}</span>
         <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>`;
   }).join('');
+  // Submissions waiting on the 12h release - the one thing a learner will
+  // otherwise read as "my work vanished".
+  const holding = Number(prog?.awaiting_release || 0);
+  const holdNote = holding
+    ? `<div class="pace-note"><strong>${holding} submission${holding > 1 ? 's' : ''} being graded.</strong> Grades are released ${prog.grade_hold_hours || 12} hours after you submit, so your work is never blocked by a busy grader. You can close this page - nothing is lost.</div>`
+    : '';
 
   const subj = (t.title.split(':')[1] || t.title).trim();
   const learner = ME && ['free', 'student'].includes(ME.role);
-  const ctaAction = preview ? '' : !ME || (learner && !prog?.enrolled) ? 'enrollFreeCourse(this)' : 'continueLearning()';
-  const ctaBtnLabel = preview ? 'Coming soon' : !ME ? 'Sign in to enroll' : !learner ? 'Preview lessons' : !prog?.enrolled ? 'Enroll for free' : prog.passed ? 'Review the course' : 'Continue learning';
+  const reserved = preview && isReserved(t.key);
+  // A staged course now takes a reservation: no content, no course slot, just
+  // the launch email. See OpenQuest.reserve in store.js.
+  const ctaAction = preview
+    ? (reserved || !learner ? '' : `reserveSeat('${esc(t.key)}', this)`)
+    : !ME || (learner && !prog?.enrolled) ? 'enrollFreeCourse(this)' : 'continueLearning()';
+  const ctaBtnLabel = preview
+    ? (reserved ? 'Seat reserved' : !ME ? 'Sign in to reserve a seat' : !learner ? 'Coming soon' : 'Reserve your seat')
+    : !ME ? 'Sign in to enroll' : !learner ? 'Preview lessons' : !prog?.enrolled ? 'Enroll for free' : prog.passed ? 'Review the course' : 'Continue learning';
   const ctaSub = preview
-    ? 'The complete syllabus is available now. Enrollment, lecture playback and submissions open after all EchoLens videos pass readiness checks.'
+    ? (reserved
+      ? 'Your seat is held. We will email you the day this course opens - nothing else to do.'
+      : 'The full syllabus is published. Reserve a seat and we will email you the moment the lectures go live. A reservation is free and does not use either of your two course slots.')
     : !ME
     ? 'Use your existing portal student or free learner account. No second account is needed.'
     : !learner ? 'Enrollment is available to learner accounts only. Staff can preview the course content.'
@@ -1176,6 +1255,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
               </div>
             </div>
           </div>
+          ${holdNote}
           <div class="curr-list">${rows}</div>
         </div>
       </div>
@@ -1185,10 +1265,10 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
     <div class="curr-cta">
       <div class="curr-cta-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
       <div class="grow">
-        <div class="curr-cta-title">${preview ? 'Course syllabus published &middot; enrollment coming soon' : t.capstone ? 'Pass all assignments and the capstone to earn your certificate' : 'Pass the required assessments to earn your certificate'}</div>
+        <div class="curr-cta-title">${preview ? (reserved ? 'Your seat is reserved &middot; we will email you at launch' : 'Course syllabus published &middot; reserve your seat now') : t.capstone ? 'Pass all assignments and the capstone to earn your certificate' : 'Pass the required assessments to earn your certificate'}</div>
         <div class="s curr-cta-sub">${ctaSub}</div>
       </div>
-      <button type="button" class="btn ${preview ? 'btn-ghost' : 'btn-primary'}"${preview ? ' disabled' : ` onclick="${ctaAction}"`}>${ctaBtnLabel}</button>
+      <button type="button" class="btn ${preview && !ctaAction ? 'btn-ghost' : preview ? 'btn-teal' : 'btn-primary'}"${ctaAction ? ` onclick="${ctaAction}"` : ' disabled'}>${ctaBtnLabel}</button>
     </div>
     </div>`;
 }
@@ -1302,12 +1382,27 @@ function svProgressHtml() {
 // "Assignment" (not the quest's own title) - the reverse of how each used to
 // read, per feedback that the specific info belonged on the video row and
 // the generic label on the assignment row.
+// A module the pacing rules have closed (course-pacing.js) reads as locked in
+// this sidebar too. svModuleMap() builds its index in the same order
+// moduleStates() does, so state N-1 belongs to module N. Without this the
+// sidebar would keep inviting clicks into a module the API then refuses.
+function svModulePaceLocked(modIndex) {
+  const prog = CUR && CUR.progress;
+  if (!prog || !prog.enrolled || !Array.isArray(prog.modules)) return null;
+  const st = prog.modules[modIndex - 1];
+  return st && st.status === 'locked' ? st : null;
+}
 function svNavHtml() {
   const t = CUR.track;
   const unitLabel = 'Lesson';
   let html = '<div class="svc-nav-head">Course Content</div>';
   for (const [, mod] of svModuleMap()) {
-    html += `<div class="svc-week">Module ${mod.index}${mod.title ? ' &middot; ' + esc(mod.title) : ' &middot; Week ' + mod.week}</div>`;
+    const paced = svModulePaceLocked(mod.index);
+    html += `<div class="svc-week${paced ? ' locked' : ''}">Module ${mod.index}${mod.title ? ' &middot; ' + esc(mod.title) : ' &middot; Week ' + mod.week}${paced ? ' <span class="svc-lock">Locked</span>' : ''}</div>`;
+    if (paced) {
+      html += `<div class="s svc-lock-note">${esc(paced.reason || 'Locked.')}</div>`;
+      continue;
+    }
     html += mod.levels.map((l) => {
       const isCurLevel = (CUR_PROBLEM && l.no === CUR_PROBLEM.level) || CUR_VIDEO_LEVEL === l.no;
       const watched = levelHasVideo(l) && isVideoWatched(t.key, l.no);
@@ -2114,6 +2209,77 @@ function profFmtDate(d) {
   if (!d) return '—';
   try { return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return d; }
 }
+/* --------------------------- profile: my courses ---------------------------
+ * The profile used to be one long scroll of five cards. It is now four named
+ * panels, opening on the one a learner actually comes here for: which courses
+ * they are studying, how far in they are, and what unlocks next.
+ */
+let PROF_PANEL = 'courses';
+const PROF_PANELS = [['courses', 'My courses'], ['achievements', 'Achievements'], ['activity', 'Activity'], ['account', 'Account']];
+function profSubTab(key) {
+  PROF_PANEL = key;
+  for (const [k] of PROF_PANELS) {
+    const panel = $('profPanel-' + k), tab = $('profTab-' + k);
+    if (panel) panel.hidden = k !== key;
+    if (tab) tab.classList.toggle('active', k === key);
+  }
+}
+window.profSubTab = profSubTab;
+function profPanelNav() {
+  return `<div class="prof-tabs" role="tablist">${PROF_PANELS.map(([k, label]) =>
+    `<button type="button" id="profTab-${k}" class="prof-tab${k === PROF_PANEL ? ' active' : ''}" role="tab" onclick="profSubTab('${k}')">${esc(label)}</button>`).join('')}</div>`;
+}
+function whenText(iso) {
+  if (!iso) return '';
+  const mins = Math.round((Date.parse(iso) - Date.now()) / 60000);
+  if (!Number.isFinite(mins) || mins <= 0) return 'now';
+  if (mins < 60) return `in ${mins} min`;
+  const hours = Math.round(mins / 60);
+  return hours < 48 ? `in ${hours} hour${hours === 1 ? '' : 's'}` : `in ${Math.round(hours / 24)} days`;
+}
+/** One studied course: progress, which module is live, and the next unlock. */
+function profCourseCard(c) {
+  const total = (c.required_total || 0) + (c.capstone ? 1 : 0);
+  const done = (c.required_passed || 0) + (c.capstone?.passed ? 1 : 0);
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  const pace = c.pace || null;
+  const openMod = pace?.modules?.find((m) => m.status === 'open');
+  const nextMod = pace?.modules?.find((m) => m.status === 'available' || m.status === 'locked');
+  const holding = Number(pace?.awaiting_release || 0);
+  let next;
+  if (c.completed) next = 'Course complete - your certificate has been issued.';
+  else if (holding) next = `${holding} submission${holding > 1 ? 's' : ''} being graded - results release ${whenText(pace.next_release)}.`;
+  else if (openMod) next = `Module ${openMod.no} is open${openMod.title ? ': ' + esc(openMod.title) : ''}.`;
+  else if (nextMod && nextMod.status === 'available') next = `Module ${nextMod.no} is ready to start.`;
+  else if (nextMod && nextMod.unlocks_at) next = `Module ${nextMod.no} unlocks ${whenText(nextMod.unlocks_at)}.`;
+  else if (nextMod) next = esc(nextMod.reason || 'Waiting on your last grade.');
+  else next = 'Ready when you are.';
+  return `<div class="prof-course">
+    <div class="prof-course-head">
+      <div class="grow">
+        <div class="t">${esc(c.title)}</div>
+        <div class="s" style="color:var(--muted)">${c.course_code ? esc(c.course_code) + ' &middot; ' : ''}${done}/${total || '?'} assessments passed${c.assignment_average != null ? ' &middot; average ' + c.assignment_average + '%' : ''}</div>
+      </div>
+      <span class="grade-chip ${c.completed ? 'ok' : 'wait'}">${c.completed ? 'Completed' : 'Studying'}</span>
+    </div>
+    <div class="cl-bar"><div class="cl-fill" style="width:${pct}%"></div></div>
+    <div class="prof-course-foot">
+      <span class="s">${next}</span>
+      <button type="button" class="btn btn-teal btn-sm" onclick="openCourse('${esc(c.track_key)}')">${c.completed ? 'Review' : 'Continue'}</button>
+    </div>
+  </div>`;
+}
+function profReservedCard(w) {
+  return `<div class="prof-course reserved">
+    <div class="prof-course-head">
+      <div class="grow">
+        <div class="t">${esc(w.title)}</div>
+        <div class="s" style="color:var(--muted)">${w.course_code ? esc(w.course_code) + ' &middot; ' : ''}Seat reserved - we will email you the day it opens.</div>
+      </div>
+      <span class="grade-chip none">Reserved</span>
+    </div>
+  </div>`;
+}
 function profTrackRow(t) {
   const pct = t.required_total ? Math.round((t.required_passed + (t.capstone?.passed ? 1 : 0)) / (t.required_total + (t.capstone ? 1 : 0)) * 100) : (t.total ? Math.round((t.graded / t.total) * 100) : 0);
   return `<div class="list-row">
@@ -2163,6 +2329,18 @@ async function loadProfile() {
   try { d = await api('/api/my/open-profile'); }
   catch (e) { box.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
   const p = d.profile;
+  await loadMyEnrollments();
+  // At most two courses can be active, so this is two requests at worst.
+  await Promise.all(MY_COURSES.filter((c) => !c.completed).map(async (c) => {
+    try {
+      const r = await api('/api/open/progress?track=' + encodeURIComponent(c.track_key));
+      const held = Object.values(r.progress?.submissions || {}).filter((s) => s.grade_pending).map((s) => s.grade_release_at).filter(Boolean).sort();
+      c.pace = { modules: r.progress?.modules || [], awaiting_release: r.progress?.awaiting_release || 0, next_release: held[0] || null };
+    } catch { /* a course whose pacing will not load still renders its progress */ }
+  }));
+  const slotNote = MY_SLOTS.active >= MY_SLOTS.limit
+    ? `You are studying ${MY_SLOTS.active} of ${MY_SLOTS.limit} courses. Finish one to start another.`
+    : `You are studying ${MY_SLOTS.active} of ${MY_SLOTS.limit} courses - ${MY_SLOTS.limit - MY_SLOTS.active} slot${MY_SLOTS.limit - MY_SLOTS.active === 1 ? '' : 's'} free.`;
   box.innerHTML = `
     <div class="card"><div class="card-body" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
       <span class="av-sm" style="width:64px;height:64px;font-size:24px;flex:none">${p.avatar ? `<img src="${esc(p.avatar)}" alt="">` : esc((p.name || '?').charAt(0).toUpperCase())}</span>
@@ -2178,20 +2356,42 @@ async function loadProfile() {
       </div>
     </div></div>
 
-    <div class="card"><div class="card-head"><h3>Free courses &amp; quests</h3><span class="s" style="color:var(--muted)">${p.tracks.length} joined</span></div>
-      <div class="card-body tight">${p.tracks.length ? p.tracks.map(profTrackRow).join('') : `<div class="empty">No courses joined yet - <a href="/open#free">browse free courses</a>.</div>`}</div></div>
+    ${profPanelNav()}
 
-    <div class="card"><div class="card-head"><h3>Hackathons</h3><span class="s" style="color:var(--muted)">${p.hackathons.length} joined</span></div>
-      <div class="card-body tight">${p.hackathons.length ? p.hackathons.map(profHackRow).join('') : '<div class="empty">No hackathons joined yet.</div>'}</div></div>
+    <div id="profPanel-courses"${PROF_PANEL === 'courses' ? '' : ' hidden'}>
+      <div class="card"><div class="card-head"><h3>Courses I am studying</h3><span class="s" style="color:var(--muted)">${MY_SLOTS.active}/${MY_SLOTS.limit} slots</span></div>
+        <div class="card-body">
+          <p class="s" style="color:var(--muted);margin-bottom:12px">${esc(slotNote)} One module opens per day, and grades are released 12 hours after you submit.</p>
+          ${MY_COURSES.length ? MY_COURSES.map(profCourseCard).join('') : `<div class="empty">No courses yet - <a href="/open#free">browse the free courses</a>.</div>`}
+        </div></div>
 
-    <div class="card"><div class="card-head"><h3>Events</h3><span class="s" style="color:var(--muted)">${p.events.length} joined</span></div>
-      <div class="card-body tight">${p.events.length ? p.events.map(profEventRow).join('') : '<div class="empty">No events joined yet.</div>'}</div></div>
+      ${MY_WAITLIST.length ? `<div class="card"><div class="card-head"><h3>Seats reserved</h3><span class="s" style="color:var(--muted)">${MY_WAITLIST.length} course${MY_WAITLIST.length > 1 ? 's' : ''}</span></div>
+        <div class="card-body">
+          <p class="s" style="color:var(--muted);margin-bottom:12px">These courses have not launched yet. A reservation costs neither money nor a course slot.</p>
+          ${MY_WAITLIST.map(profReservedCard).join('')}
+        </div></div>` : ''}
+    </div>
 
-    <div class="card"><div class="card-head"><h3>Challenges</h3><span class="s" style="color:var(--muted)">${p.challenges.length} attempted</span></div>
-      <div class="card-body tight">${p.challenges.length ? p.challenges.map(profChallRow).join('') : '<div class="empty">No challenges attempted yet.</div>'}</div></div>
+    <div id="profPanel-achievements"${PROF_PANEL === 'achievements' ? '' : ' hidden'}>
+      <div class="card"><div class="card-head"><h3>Certificates</h3><span class="s" style="color:var(--muted)">${p.certificates.length} earned</span></div>
+        <div class="card-body tight">${p.certificates.length ? p.certificates.map(profCertRow).join('') : '<div class="empty">Complete a free course to earn your first certificate.</div>'}</div></div>
 
-    <div class="card"><div class="card-head"><h3>Certificates</h3><span class="s" style="color:var(--muted)">${p.certificates.length} earned</span></div>
-      <div class="card-body tight">${p.certificates.length ? p.certificates.map(profCertRow).join('') : '<div class="empty">Complete a free course to earn your first certificate.</div>'}</div></div>
+      <div class="card"><div class="card-head"><h3>All courses &amp; quests</h3><span class="s" style="color:var(--muted)">${p.tracks.length} joined</span></div>
+        <div class="card-body tight">${p.tracks.length ? p.tracks.map(profTrackRow).join('') : `<div class="empty">No courses joined yet - <a href="/open#free">browse free courses</a>.</div>`}</div></div>
+
+      <div class="card"><div class="card-head"><h3>Challenges</h3><span class="s" style="color:var(--muted)">${p.challenges.length} attempted</span></div>
+        <div class="card-body tight">${p.challenges.length ? p.challenges.map(profChallRow).join('') : '<div class="empty">No challenges attempted yet.</div>'}</div></div>
+    </div>
+
+    <div id="profPanel-activity"${PROF_PANEL === 'activity' ? '' : ' hidden'}>
+      <div class="card"><div class="card-head"><h3>Hackathons</h3><span class="s" style="color:var(--muted)">${p.hackathons.length} joined</span></div>
+        <div class="card-body tight">${p.hackathons.length ? p.hackathons.map(profHackRow).join('') : '<div class="empty">No hackathons joined yet.</div>'}</div></div>
+
+      <div class="card"><div class="card-head"><h3>Events</h3><span class="s" style="color:var(--muted)">${p.events.length} joined</span></div>
+        <div class="card-body tight">${p.events.length ? p.events.map(profEventRow).join('') : '<div class="empty">No events joined yet.</div>'}</div></div>
+    </div>
+
+    <div id="profPanel-account"${PROF_PANEL === 'account' ? '' : ' hidden'}>
 
     <div class="card"><div class="card-head"><h3>Account</h3></div>
       <div class="card-body">
@@ -2201,7 +2401,8 @@ async function loadProfile() {
           <label class="field"><span>New password</span><input name="next" type="password" minlength="8" required placeholder="At least 8 characters"></label>
           <button class="btn btn-primary" id="pwBtn">${p.has_password ? 'Change password' : 'Set password'}</button>
         </form>
-      </div></div>`;
+      </div></div>
+    </div>`;
   $('pwForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = $('pwBtn'); btn.disabled = true;
     const el = $('pwMsg'); el.className = 'form-msg'; el.textContent = '';

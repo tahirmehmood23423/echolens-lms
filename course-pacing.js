@@ -3,31 +3,33 @@
 /**
  * EchoLens - course pacing rules for the free self-paced tracks.
  *
- * Three rules, all pure functions over a track definition plus the learner's
- * own submissions, so they can be unit-tested and reused by both the API and
- * the catalogue UI without touching the store:
+ * All pure functions over a track definition plus the learner's own
+ * submissions, so they can be unit-tested and reused by both the API and the
+ * catalogue UI without touching the store:
  *
- *  1. HELD GRADES - a grade stays hidden until 12 h after submission. The
- *     grading worker still runs immediately, so the AI provider gets a twelve
- *     hour window (and three retries) to answer inside its free-tier quota.
- *     A learner therefore never watches a grading failure happen: by the time
- *     the result is due, it has been retried long since. This is the whole
- *     point of the hold - see AI_COOLDOWN_MINUTES in ai.js for the other half.
+ *  1. ONE MODULE AT A TIME - exactly one module is open. Module N+1 opens the
+ *     moment every required problem in module N is GRADED, and nothing else
+ *     gates it: no clock, no daily quota. Finish early and you move on early.
  *
- *  2. SEQUENTIAL MODULES - module N+1 opens only once every required problem
- *     in module N has a RELEASED grade. Released, not merely graded, so the
- *     learner always sees their result before the next module appears; an
- *     unlocked module they cannot explain is worse than a wait.
+ *  2. EIGHT-HOUR GRADING WINDOW - a grade appears as soon as it is awarded,
+ *     which may be seconds or may be hours: the AI grader works through the
+ *     queue as its free-tier quota allows (8k tokens/minute - see ai.js). The
+ *     8 h is a PROMISE, not a delay. It is the deadline the learner is shown
+ *     ("your grades arrive within 8 hours") and the span the grading worker
+ *     keeps retrying across, so a provider outage is absorbed by retries
+ *     rather than surfacing to the learner as a failure.
  *
- *  3. ONE MODULE PER DAY - a learner cannot open a new module within 24 h of
- *     opening the previous one. Rule 2 alone already paces at ~12 h; this
- *     makes the cadence exactly one module per day as the academy intends.
- *     It is a rolling 24 h from their own first submission, not a midnight
- *     reset, so a learner who studies at night is not cut off at 00:00.
+ *  3. CONFIRMED SEAT - a free course is shut until the enrolment is confirmed,
+ *     one hour after enrolling. See isEnrollmentActive below.
  *
- * Rules 2 and 3 gate only the FIRST submission into a module. Once a module is
- * open, every problem inside it can be submitted and resubmitted freely - the
- * pacing is per module, never per problem.
+ * Rule 1 gates only the FIRST submission into a module. Once a module is open,
+ * every problem inside it can be submitted and resubmitted freely - the pacing
+ * is per module, never per problem.
+ *
+ * An earlier revision held every grade for 12 h and capped learners at one
+ * module per 24 h. Both are gone: holding a grade that had already been awarded
+ * only made the course feel broken, and the daily cap could keep a module shut
+ * for hours after its predecessor was marked.
  */
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -35,8 +37,10 @@ const HOUR_MS = 60 * 60 * 1000;
 // only a CONFIRMED enrolment unlocks lesson content or accepts a submission -
 // so nobody reaches the material by walking straight into a lesson URL.
 const ENROLLMENT_HOLD_MS = Number(process.env.ENROLLMENT_HOLD_HOURS || 1) * HOUR_MS;
-const GRADE_HOLD_MS = Number(process.env.GRADE_HOLD_HOURS || 12) * HOUR_MS;
-const MODULE_COOLDOWN_MS = Number(process.env.MODULE_COOLDOWN_HOURS || 24) * HOUR_MS;
+// The window the learner is promised and the grading worker retries across.
+// Not a delay: a grade shows the moment it is awarded, often long before this.
+const GRADING_WINDOW_MS = Number(process.env.GRADING_WINDOW_HOURS || 8) * HOUR_MS;
+const GRADING_WINDOW_HOURS = Math.round(GRADING_WINDOW_MS / HOUR_MS);
 // Free self-paced courses a learner may study at once. Waitlisted courses that
 // have not launched do not count - they cannot be studied yet.
 const MAX_ACTIVE_COURSES = Number(process.env.MAX_ACTIVE_FREE_COURSES || 2);
@@ -89,44 +93,37 @@ function requiredProblems(level) {
   return (level.problems || []).filter((p) => p.required !== false && p.optional !== true);
 }
 
-/** A grade is visible only once the hold has elapsed. */
-function releaseAt(submittedAt) {
+/** When a submission's grade is promised by. Shown while it is still pending. */
+function gradeDueBy(submittedAt) {
   const t = ms(submittedAt);
-  return Number.isFinite(t) ? iso(t + GRADE_HOLD_MS) : null;
+  return Number.isFinite(t) ? iso(t + GRADING_WINDOW_MS) : null;
+}
+/** Is this submission still inside the window the worker should keep retrying? */
+function withinGradingWindow(submittedAt, nowMs = Date.now()) {
+  const due = ms(gradeDueBy(submittedAt));
+  return !Number.isFinite(due) || due > nowMs;
 }
 /**
- * The hold exists to buy the AI grader quota headroom, so it applies only to
- * AI-graded assignments. A capstone is reviewed by a human who has already
- * looked at the work - making that learner wait another 12 h serves nobody.
+ * Graded means graded. Nothing is withheld: the moment the grader answers, the
+ * learner sees the score and the next module opens.
  */
-function isHeldKind(submission) {
-  return (submission.assessment_kind || 'assignment') === 'assignment' && !(submission.level === 0 && submission.pid === 0);
-}
-function isReleased(submission, nowMs = Date.now()) {
-  if (!submission || submission.score == null) return false;
-  if (!isHeldKind(submission)) return true;
-  const due = ms(releaseAt(submission.submitted_at));
-  return !Number.isFinite(due) || due <= nowMs;
+function isGraded(submission) {
+  return !!submission && submission.score != null;
 }
 
 /**
- * The learner-facing view of one submission: the grade is stripped out until
- * it is due. Everything else (that it was received, when it lands) is shown,
- * because silence during a 12 h wait reads as a lost submission.
+ * The learner-facing view of one submission. An awarded grade passes straight
+ * through; a pending one carries the deadline it is promised by, because
+ * silence while waiting reads as a lost submission.
  */
 function publicSubmission(submission, nowMs = Date.now()) {
   if (!submission) return submission;
-  if (!isHeldKind(submission)) return { ...submission, grade_released: submission.score != null, grade_release_at: null };
-  const released = isReleased(submission, nowMs);
-  const due = releaseAt(submission.submitted_at);
-  if (released || submission.score == null) {
-    return { ...submission, grade_released: released, grade_release_at: submission.score == null ? due : null };
-  }
+  if (isGraded(submission)) return { ...submission, grade_pending: false, grade_due_by: null };
   return {
     ...submission,
-    score: null, gems: 0, feedback: null, graded_at: null,
-    grade_released: false, grade_release_at: due,
     grade_pending: true,
+    grade_due_by: gradeDueBy(submission.submitted_at),
+    grade_overdue: !withinGradingWindow(submission.submitted_at, nowMs),
   };
 }
 
@@ -159,13 +156,13 @@ function moduleOfLevel(track, levelNo) {
   return modulesOf(track).find((m) => m.levels.some((l) => l.no === Number(levelNo))) || null;
 }
 
-/** Every required problem across every level of this module has a released grade. */
-function moduleComplete(module_, submissions, nowMs = Date.now()) {
+/** Every required problem across every level of this module has been graded. */
+function moduleComplete(module_, submissions) {
   const pairs = module_.levels.flatMap((l) => requiredProblems(l).map((p) => [l.no, p.pid]));
   if (!pairs.length) return false;
   return pairs.every(([levelNo, pid]) => {
     const s = submissions.find((x) => x.level === levelNo && x.pid === pid && (x.assessment_kind || 'assignment') === 'assignment');
-    return isReleased(s, nowMs);
+    return isGraded(s);
   });
 }
 
@@ -187,25 +184,35 @@ function moduleStartedAt(module_, submissions) {
 function moduleStates(track, submissions, nowMs = Date.now()) {
   const out = [];
   let previousComplete = true; // module 1 has no predecessor
-  let previousStartedAt = null;
 
   for (const module_ of modulesOf(track)) {
     const started = moduleStartedAt(module_, submissions);
-    const complete = moduleComplete(module_, submissions, nowMs);
-    const cooldownUntil = previousStartedAt == null ? null : previousStartedAt + MODULE_COOLDOWN_MS;
-    const inCooldown = started == null && cooldownUntil != null && cooldownUntil > nowMs;
+    const complete = moduleComplete(module_, submissions);
 
-    let status, reason = null, unlocks_at = null;
+    // A started-but-unfinished module is either still being worked on or
+    // waiting on the grader; the learner needs to be told which, and when the
+    // grades are due, since that wait is the only thing between them and the
+    // next module.
+    const pending = module_.levels.flatMap((l) => requiredProblems(l).map((p) =>
+      submissions.find((x) => x.level === l.no && x.pid === p.pid && (x.assessment_kind || 'assignment') === 'assignment')))
+      .filter((s) => s && !isGraded(s));
+    const dueBy = pending.length
+      ? pending.map((s) => gradeDueBy(s.submitted_at)).filter(Boolean).sort().pop()
+      : null;
+
+    let status, reason = null, unlocks_at = null, awaiting_grades = 0;
     if (started != null) {
       status = complete ? 'complete' : 'open';
-      if (!complete) reason = 'In progress.';
+      awaiting_grades = pending.length;
+      if (!complete && pending.length) {
+        unlocks_at = dueBy;
+        reason = `Grading ${pending.length} submission${pending.length > 1 ? 's' : ''} - results arrive within ${GRADING_WINDOW_HOURS} hours, and the next module opens as soon as they do.`;
+      } else if (!complete) {
+        reason = 'In progress.';
+      }
     } else if (!previousComplete) {
       status = 'locked';
-      reason = 'Finish the previous module and collect its grade to unlock this one.';
-    } else if (inCooldown) {
-      status = 'locked';
-      unlocks_at = iso(cooldownUntil);
-      reason = 'One module opens per day. This module unlocks ' + hoursFrom(cooldownUntil, nowMs) + '.';
+      reason = `Opens as soon as the previous module is graded - within ${GRADING_WINDOW_HOURS} hours of your last submission.`;
     } else {
       status = 'available';
     }
@@ -217,20 +224,13 @@ function moduleStates(track, submissions, nowMs = Date.now()) {
       title: module_.title || module_.levels[0]?.title || `Module ${module_.no}`,
       levels: module_.levels.map((l) => l.no),
       required: module_.levels.reduce((a, l) => a + requiredProblems(l).length, 0),
-      status, reason, unlocks_at,
+      status, reason, unlocks_at, awaiting_grades,
     });
     previousComplete = complete;
-    previousStartedAt = started != null ? started : previousStartedAt;
   }
   return out;
 }
 
-function hoursFrom(targetMs, nowMs) {
-  const mins = Math.max(1, Math.ceil((targetMs - nowMs) / 60000));
-  if (mins < 60) return `in about ${mins} minute${mins === 1 ? '' : 's'}`;
-  const hours = Math.round(mins / 60);
-  return `in about ${hours} hour${hours === 1 ? '' : 's'}`;
-}
 
 /**
  * May this learner submit to `level` right now? Returns {ok:true} or an error
@@ -266,9 +266,10 @@ function canEnroll(enrollments) {
 }
 
 module.exports = {
-  GRADE_HOLD_MS, MODULE_COOLDOWN_MS, MAX_ACTIVE_COURSES, ENROLLMENT_HOLD_MS,
+  GRADING_WINDOW_MS, GRADING_WINDOW_HOURS, MAX_ACTIVE_COURSES, ENROLLMENT_HOLD_MS,
+  parseTimestamp: ms,
   activatesAt, isEnrollmentActive, confirmationNote,
-  requiredProblems, releaseAt, isReleased, isHeldKind, publicSubmission,
+  requiredProblems, gradeDueBy, withinGradingWindow, isGraded, publicSubmission,
   moduleComplete, moduleStartedAt, moduleStates, canSubmit, modulesOf, moduleOfLevel, moduleKeyOf,
   activeCourseCount, canEnroll,
 };

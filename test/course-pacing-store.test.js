@@ -71,7 +71,7 @@ test('the free tracks group into far fewer modules than levels', () => {
   assert.equal(new Set(seen).size, track.levels.length);
 });
 
-test('a later module is refused until the previous one is graded and released', () => {
+test('a later module opens the moment the previous one is graded', () => {
   const u = learner(9101, 'Paced Learner');
   reset(u.id);
   enrolConfirmed(u.id);
@@ -81,22 +81,19 @@ test('a later module is refused until the previous one is graded and released', 
 
   const blocked = submitTo(u, entry.no, pid, 'pacing-locked-000001');
   assert.equal(blocked.status, 409, 'module 2 is locked from the start');
-  assert.match(blocked.error, /previous module/i);
+  assert.match(blocked.error, /previous module is graded/i);
 
-  // Module 1 graded 14h ago: past the 12h hold so it counts as complete, but
-  // less than 24h since it was opened - now the daily gate is what blocks.
-  seedModule(u.id, modules[0], 14, 80);
-  const tooSoon = submitTo(u, entry.no, pid, 'pacing-locked-000002');
-  assert.equal(tooSoon.status, 409);
-  assert.match(tooSoon.error, /One module opens per day/);
-  assert.ok(tooSoon.unlocks_at, 'the learner is told when it opens');
+  // Module 1 submitted but NOT yet graded: module 2 stays shut.
+  seedModule(u.id, modules[0], 0.1, null);
+  const ungraded = submitTo(u, entry.no, pid, 'pacing-locked-000002');
+  assert.equal(ungraded.status, 409, 'a submitted-but-ungraded module does not unlock the next');
 
-  // Same work, 30h ago: released, and a day has passed.
+  // Graded ten minutes ago - no clock, no daily cap, it opens straight away.
   reset(u.id);
   enrolConfirmed(u.id);
-  seedModule(u.id, modules[0], 30, 80);
+  seedModule(u.id, modules[0], 0.16, 80);
   const ok = submitTo(u, entry.no, pid, 'pacing-open-000001');
-  assert.ok(!ok.error, 'module 2 opens: ' + ok.error);
+  assert.ok(!ok.error, 'module 2 opens as soon as module 1 is graded: ' + ok.error);
 
   // ...and a second problem in the SAME module is never gated.
   const sibling = m2.levels[m2.levels.length - 1];
@@ -104,30 +101,31 @@ test('a later module is refused until the previous one is graded and released', 
   assert.ok(!ok2.error, 'same module stays open: ' + ok2.error);
 });
 
-test('a fresh grade is withheld from progress, gems and average for 12 hours', () => {
-  const u = learner(9102, 'Held Learner');
+test('a grade is visible as soon as it is awarded, and a pending one names its deadline', () => {
+  const u = learner(9102, 'Graded Learner');
   reset(u.id);
   const level = modules[0].levels[0];
   const pid = pacing.requiredProblems(level)[0].pid;
-  seedModule(u.id, modules[0], 1, 95); // graded an hour ago
 
-  const held = OpenQuest.progress(u.id, track.key);
-  const cell = held.submissions[`${level.no}:${pid}`];
-  assert.equal(cell.score, null, 'score hidden');
-  assert.equal(cell.feedback, null, 'feedback hidden');
-  assert.equal(cell.grade_pending, true);
-  assert.ok(cell.grade_release_at, 'the release time is published');
-  assert.equal(held.gems, 0, 'gems must not leak the score');
-  assert.equal(held.avg, null, 'nor the average');
-  assert.ok(held.awaiting_release > 0);
-
-  // The same work, 13h old, is fully visible.
-  reset(u.id);
-  seedModule(u.id, modules[0], 13, 95);
+  // Graded a minute ago - nothing is held back.
+  seedModule(u.id, modules[0], 0.02, 95);
   const shown = OpenQuest.progress(u.id, track.key);
-  assert.equal(shown.submissions[`${level.no}:${pid}`].score, 95);
-  assert.ok(shown.gems > 0);
-  assert.equal(shown.awaiting_release, 0);
+  const cell = shown.submissions[`${level.no}:${pid}`];
+  assert.equal(cell.score, 95, 'the score is visible immediately');
+  assert.equal(cell.grade_pending, false);
+  assert.ok(shown.gems > 0, 'and it counts toward gems right away');
+  assert.equal(shown.awaiting_grades, 0);
+
+  // Submitted but not yet graded - the learner is told when it is due.
+  reset(u.id);
+  seedModule(u.id, modules[0], 0.02, null);
+  const pending = OpenQuest.progress(u.id, track.key);
+  const waiting = pending.submissions[`${level.no}:${pid}`];
+  assert.equal(waiting.score, null);
+  assert.equal(waiting.grade_pending, true);
+  assert.ok(waiting.grade_due_by, 'the deadline is published');
+  assert.ok(pending.awaiting_grades > 0);
+  assert.equal(pending.grading_window_hours, 8);
 });
 
 test('progress reports a module map the catalogue can render', () => {
@@ -229,4 +227,46 @@ test('the confirmation sweep emails each seat exactly once', () => {
   OpenQuest.markConfirmed(u.id, track.key);
   assert.equal(OpenQuest.dueForConfirmation().some((r) => r.user.id === u.id), false, 'never emailed twice');
   assert.equal(OpenQuest.enrollment(u.id, track.key).active, true, 'and access is unaffected by the email');
+});
+
+test('the learner is told once - and only once - when the next module opens', () => {
+  const u = learner(9108, 'Unlock Learner');
+  reset(u.id);
+  enrolConfirmed(u.id);
+
+  // Nothing to announce before module 1 is finished.
+  assert.equal(OpenQuest.moduleUnlockToAnnounce(u.id, track.key), null, 'nothing at the start');
+  seedModule(u.id, modules[0], 0.1, null); // submitted, ungraded
+  assert.equal(OpenQuest.moduleUnlockToAnnounce(u.id, track.key), null, 'nothing while it is being graded');
+
+  // Grade module 1 -> module 2 opens and is announced exactly once.
+  reset(u.id);
+  enrolConfirmed(u.id);
+  seedModule(u.id, modules[0], 0.1, 80);
+  const out = OpenQuest.moduleUnlockToAnnounce(u.id, track.key);
+  assert.ok(out, 'the unlock is announced');
+  assert.equal(out.module.no, 2);
+  assert.equal(out.previous.no, 1);
+  assert.equal(out.course, track.title);
+  assert.ok(out.user.email);
+
+  assert.equal(OpenQuest.moduleUnlockToAnnounce(u.id, track.key), null, 'never announced twice');
+
+  // A regrade of the same module must not re-announce it either.
+  const data = store.allData();
+  for (const s of data.open_submissions.filter((s) => s.user_id === u.id)) s.score = 90;
+  assert.equal(OpenQuest.moduleUnlockToAnnounce(u.id, track.key), null, 'a regrade does not re-announce');
+
+  // Finishing module 2 announces module 3 - a different, separate unlock.
+  seedModule(u.id, modules[1], 0.05, 85);
+  const next = OpenQuest.moduleUnlockToAnnounce(u.id, track.key);
+  assert.ok(next, 'the following unlock is announced in its turn');
+  assert.equal(next.module.no, 3);
+});
+
+test('module 1 is never announced - there is no unlock to report', () => {
+  const u = learner(9109, 'Fresh Learner');
+  reset(u.id);
+  enrolConfirmed(u.id);
+  assert.equal(OpenQuest.moduleUnlockToAnnounce(u.id, track.key), null);
 });

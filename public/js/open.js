@@ -1219,9 +1219,9 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   }).join('');
   // Submissions waiting on the 12h release - the one thing a learner will
   // otherwise read as "my work vanished".
-  const holding = Number(prog?.awaiting_release || 0);
+  const holding = Number(prog?.awaiting_grades || 0);
   const holdNote = holding
-    ? `<div class="pace-note"><strong>${holding} submission${holding > 1 ? 's' : ''} being graded.</strong> Grades are released ${prog.grade_hold_hours || 12} hours after you submit, so your work is never blocked by a busy grader. You can close this page - nothing is lost.</div>`
+    ? `<div class="pace-note"><strong>${holding} submission${holding > 1 ? 's' : ''} being graded.</strong> Your grades arrive within ${prog.grading_window_hours || 8} hours, and the next module opens as soon as this one is fully graded. You can close this page - nothing is lost.</div>`
     : '';
 
   const subj = (t.title.split(':')[1] || t.title).trim();
@@ -2272,12 +2272,12 @@ function profCourseCard(c) {
   const pace = c.pace || null;
   const openMod = pace?.modules?.find((m) => m.status === 'open');
   const nextMod = pace?.modules?.find((m) => m.status === 'available' || m.status === 'locked');
-  const holding = Number(pace?.awaiting_release || 0);
+  const holding = Number(pace?.awaiting_grades || 0);
   const pendingSeat = c.active === false;
   let next;
   if (pendingSeat) next = c.confirmation_note || 'Your seat is being confirmed.';
   else if (c.completed) next = 'Course complete - your certificate has been issued.';
-  else if (holding) next = `${holding} submission${holding > 1 ? 's' : ''} being graded - results release ${whenText(pace.next_release)}.`;
+  else if (holding) next = `${holding} submission${holding > 1 ? 's' : ''} being graded - results due ${whenText(pace.next_release)}, and the next module opens with them.`;
   else if (openMod) next = `Module ${openMod.no} is open${openMod.title ? ': ' + esc(openMod.title) : ''}.`;
   else if (nextMod && nextMod.status === 'available') next = `Module ${nextMod.no} is ready to start.`;
   else if (nextMod && nextMod.unlocks_at) next = `Module ${nextMod.no} unlocks ${whenText(nextMod.unlocks_at)}.`;
@@ -2363,8 +2363,8 @@ async function loadProfile() {
   await Promise.all(MY_COURSES.filter((c) => !c.completed).map(async (c) => {
     try {
       const r = await api('/api/open/progress?track=' + encodeURIComponent(c.track_key));
-      const held = Object.values(r.progress?.submissions || {}).filter((s) => s.grade_pending).map((s) => s.grade_release_at).filter(Boolean).sort();
-      c.pace = { modules: r.progress?.modules || [], awaiting_release: r.progress?.awaiting_release || 0, next_release: held[0] || null };
+      const pendingDue = Object.values(r.progress?.submissions || {}).filter((s) => s.grade_pending).map((s) => s.grade_due_by).filter(Boolean).sort();
+      c.pace = { modules: r.progress?.modules || [], awaiting_grades: r.progress?.awaiting_grades || 0, next_release: pendingDue[0] || null };
     } catch { /* a course whose pacing will not load still renders its progress */ }
   }));
   const slotNote = MY_SLOTS.active >= MY_SLOTS.limit

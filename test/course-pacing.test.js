@@ -16,77 +16,76 @@ const track = {
 };
 const sub = (level, pid, hoursAgo, score = null) => ({ level, pid, assessment_kind: 'assignment', submitted_at: at(hoursAgo), score });
 
-test('a grade stays hidden for 12 hours, then releases', () => {
-  const graded = sub(1, 1, 0, 90);
-  assert.equal(P.isReleased(graded, T0 + 11 * HOUR), false, '11h: still held');
-  assert.equal(P.isReleased(graded, T0 + 12 * HOUR), true, '12h: released');
+/* --------------------------- the 8-hour window --------------------------- */
 
-  const held = P.publicSubmission(graded, T0 + 2 * HOUR);
-  assert.equal(held.score, null, 'score is stripped while held');
-  assert.equal(held.feedback, null);
-  assert.equal(held.grade_pending, true);
-  assert.equal(held.grade_release_at, at(12), 'UI can count down to the release');
-
-  const shown = P.publicSubmission(graded, T0 + 13 * HOUR);
-  assert.equal(shown.score, 90, 'score is visible once due');
-  assert.equal(shown.grade_released, true);
+test('a grade shows the moment it is awarded - the 8 hours is a promise, not a delay', () => {
+  const justGraded = sub(1, 1, 0, 90);
+  assert.equal(P.isGraded(justGraded), true);
+  const view = P.publicSubmission(justGraded, T0 + 60_000);
+  assert.equal(view.score, 90, 'no hold: the score is visible one minute later');
+  assert.equal(view.grade_pending, false);
+  assert.equal(view.grade_due_by, null, 'nothing is owed once it is graded');
 });
 
-test('an ungraded submission reports when its grade is due, and never leaks a score', () => {
+test('a pending submission carries the deadline it is promised by', () => {
   const pending = P.publicSubmission(sub(1, 1, 0, null), T0 + HOUR);
   assert.equal(pending.score, null);
-  assert.equal(pending.grade_release_at, at(12), 'learner is told when to come back');
+  assert.equal(pending.grade_pending, true);
+  assert.equal(pending.grade_due_by, at(8), 'due 8 hours after submitting');
+  assert.equal(pending.grade_overdue, false);
+
+  const late = P.publicSubmission(sub(1, 1, -9, null), T0);
+  assert.equal(late.grade_overdue, true, 'past the window, the promise is broken');
 });
 
-test('module 2 stays locked until every required problem in module 1 is released', () => {
-  const partly = [sub(1, 1, -13, 80)]; // only one of the two required problems
-  let states = P.moduleStates(track, partly, T0);
+test('the grading window is what the worker retries across', () => {
+  assert.equal(P.withinGradingWindow(at(0), T0 + 7 * HOUR), true);
+  assert.equal(P.withinGradingWindow(at(0), T0 + 8 * HOUR), false, 'give up at the deadline');
+  assert.equal(P.GRADING_WINDOW_HOURS, 8);
+});
+
+/* ------------------------- one module at a time ------------------------- */
+
+test('module 2 opens the moment module 1 is fully graded - no clock, no daily cap', () => {
+  // Only one of module 1's two required problems is graded.
+  let states = P.moduleStates(track, [sub(1, 1, -1, 80)], T0);
   assert.equal(states[0].status, 'open');
   assert.equal(states[1].status, 'locked');
-  assert.match(states[1].reason, /previous module/i);
+  assert.match(states[1].reason, /as soon as the previous module is graded/i);
 
-  // Both graded but the second is still inside its 12h hold -> still locked.
-  const held = [sub(1, 1, -13, 80), sub(1, 2, -2, 70)];
-  states = P.moduleStates(track, held, T0);
-  assert.equal(states[1].status, 'locked', 'a held grade does not unlock the next module');
-
-  // Both released, and 24h have passed since module 1 was opened.
-  const done = [sub(1, 1, -30, 80), sub(1, 2, -26, 70)];
-  states = P.moduleStates(track, done, T0);
+  // Both graded, ten minutes ago: module 2 is open immediately.
+  states = P.moduleStates(track, [sub(1, 1, -1, 80), sub(1, 2, -0.16, 70)], T0);
   assert.equal(states[0].status, 'complete');
-  assert.equal(states[1].status, 'available');
-  assert.equal(states[2].status, 'locked', 'module 3 waits on module 2');
+  assert.equal(states[1].status, 'available', 'graded means open, right away');
+  assert.equal(states[2].status, 'locked', 'module 3 still waits on module 2');
+});
+
+test('an open module waiting on the grader says so, and names the deadline', () => {
+  const states = P.moduleStates(track, [sub(1, 1, -1, 80), sub(1, 2, -1, null)], T0);
+  assert.equal(states[0].status, 'open');
+  assert.equal(states[0].awaiting_grades, 1);
+  assert.match(states[0].reason, /results arrive within 8 hours/i);
+  assert.equal(states[0].unlocks_at, at(7), 'the pending grade is due 8h after it was submitted');
+  assert.equal(states[1].status, 'locked');
 });
 
 test('optional problems do not hold a module back', () => {
-  // Module 2's pid 2 is optional: pid 1 alone completes it.
-  const s = [sub(1, 1, -60, 80), sub(1, 2, -60, 70), sub(2, 1, -30, 75)];
+  const s = [sub(1, 1, -2, 80), sub(1, 2, -2, 70), sub(2, 1, -1, 75)];
   const states = P.moduleStates(track, s, T0);
-  assert.equal(states[1].status, 'complete', 'optional problem is not required');
+  assert.equal(states[1].status, 'complete', 'module 2 pid 2 is optional');
   assert.equal(states[2].status, 'available');
 });
 
-test('a new module cannot be opened within 24h of the previous one', () => {
-  // Module 1 opened 20h ago and is fully released, but the day is not up.
-  const s = [sub(1, 1, -20, 80), sub(1, 2, -20, 70)];
-  const states = P.moduleStates(track, s, T0);
-  assert.equal(states[1].status, 'locked');
-  assert.equal(states[1].unlocks_at, at(4), 'unlocks 24h after module 1 was opened');
-  assert.match(states[1].reason, /One module opens per day/);
-
-  const gate = P.canSubmit(track, s, 2, T0);
-  assert.equal(gate.ok, false);
-  assert.equal(gate.status, 409);
-  assert.equal(gate.unlocks_at, at(4));
-});
-
 test('pacing gates the first entry to a module, never resubmission inside it', () => {
-  const s = [sub(1, 1, -1, null)];
-  assert.equal(P.canSubmit(track, s, 1, T0).ok, true, 'same module: always allowed');
+  assert.equal(P.canSubmit(track, [sub(1, 1, -1, null)], 1, T0).ok, true, 'same module: always allowed');
   assert.equal(P.canSubmit(track, [], 1, T0).ok, true, 'module 1 is open from the start');
-  assert.equal(P.canSubmit(track, [], 2, T0).ok, false, 'module 2 is not');
+  const blocked = P.canSubmit(track, [], 2, T0);
+  assert.equal(blocked.ok, false);
+  assert.equal(blocked.status, 409);
   assert.equal(P.canSubmit(track, [], 99, T0).status, 404, 'unknown module');
 });
+
+/* ------------------------------ enrolment ------------------------------ */
 
 test('two active courses at a time; completed and waitlisted courses do not occupy a slot', () => {
   assert.equal(P.canEnroll([]).ok, true);
@@ -101,14 +100,6 @@ test('two active courses at a time; completed and waitlisted courses do not occu
   assert.equal(P.canEnroll([{ waitlisted: true }, { waitlisted: true }, { completed: false }]).ok, true,
     'reserving an unlaunched course costs nothing');
   assert.equal(P.activeCourseCount([{ completed: true }, { waitlisted: true }, { completed: false }]), 1);
-});
-
-test('staff-reviewed capstones are never held - the hold only buys the AI grader quota room', () => {
-  const capstone = { level: 0, pid: 0, assessment_kind: 'capstone', submitted_at: at(0), score: 90 };
-  assert.equal(P.isReleased(capstone, T0 + 60_000), true, 'visible as soon as staff grade it');
-  assert.equal(P.publicSubmission(capstone, T0 + 60_000).score, 90);
-  assert.equal(P.isHeldKind(capstone), false);
-  assert.equal(P.isHeldKind({ level: 1, pid: 1 }), true, 'assignments default to held');
 });
 
 test('a seat is confirmed an hour after enrolling, not on enrolling', () => {
@@ -126,23 +117,24 @@ test('an enrolment predating the confirmation rule is never locked out', () => {
   assert.equal(P.isEnrollmentActive(null), false, 'but no enrolment at all is not access');
 });
 
-// Regression: store.js's now() renders UTC as 'YYYY-MM-DD HH:mm:ss', which
-// Date.parse reads as LOCAL time. Parsed naively, every deadline shifted by the
-// host's UTC offset - the 12h hold ran 7h on UTC+5 and 17h on UTC-5, and the 1h
-// enrolment hold expired before it started. It only looked correct because
-// Render runs UTC.
-test('bare store timestamps are read as UTC, so holds do not shift with the host timezone', () => {
+/* ------------------------------ regression ------------------------------ */
+
+// store.js's now() renders UTC as 'YYYY-MM-DD HH:mm:ss', which Date.parse reads
+// as LOCAL time. Parsed naively, every deadline shifted by the host's UTC
+// offset - the grading window and the 1h enrolment hold both drifted, and
+// learning-attempts.js delayed each retry by the same amount. It only looked
+// correct because Render runs UTC.
+test('bare store timestamps are read as UTC, so deadlines do not shift with the host timezone', () => {
   const bare = '2026-09-11 08:00:00';          // store.js now() format, UTC
   const explicit = '2026-09-11T08:00:00.000Z'; // the same instant, zoned
-  assert.equal(P.activatesAt(bare), P.activatesAt(explicit), 'both parse to the same instant');
+  assert.equal(P.parseTimestamp(bare), P.parseTimestamp(explicit), 'both parse to one instant');
   assert.equal(P.activatesAt(bare), '2026-09-11T09:00:00.000Z');
-  assert.equal(P.releaseAt(bare), '2026-09-11T20:00:00.000Z', '12h after 08:00 UTC');
+  assert.equal(P.gradeDueBy(bare), '2026-09-11T16:00:00.000Z', '8h after 08:00 UTC');
 
   // A seat taken "now" in store format must never already be confirmed.
   const storeNow = new Date().toISOString().replace('T', ' ').slice(0, 19);
   assert.equal(P.isEnrollmentActive({ activates_at: P.activatesAt(storeNow) }), false,
     'a brand-new seat is not instantly active');
-  // And a grade submitted "now" must not already be released.
-  assert.equal(P.isReleased({ score: 80, submitted_at: storeNow, level: 1, pid: 1 }), false,
-    'a brand-new grade is not instantly released');
+  assert.equal(P.withinGradingWindow(storeNow), true,
+    'a brand-new submission is inside its grading window');
 });

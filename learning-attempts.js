@@ -1,6 +1,16 @@
 'use strict';
 const crypto = require('node:crypto');
+const { GRADING_WINDOW_MS, parseTimestamp } = require('./course-pacing');
+// Manual retries a learner may request. Unchanged: this is the "you have had
+// enough goes" bound, not the machine's.
 const MAX_TRIES = 3;
+// Automatic retries the worker may make while the grading window is still open.
+// The learner is promised a result within 8 h, so the worker keeps trying for
+// that long - backing off, capped at 30 min - and gives up only at the
+// deadline. A provider outage is then absorbed by retries instead of surfacing
+// as a failed attempt minutes after submission.
+const MAX_AUTO_TRIES = 20;
+const AUTO_BACKOFF_CAP_MS = 30 * 60_000;
 function completion(track, submissions) {
   const required = track.levels.flatMap(l => l.problems.filter(p => p.required !== false && p.optional !== true).map(p => ({ level:l.no, pid:p.pid, pass_mark:Number(p.pass_mark ?? track.pass_mark ?? 60) })));
   const results = required.map(p => {
@@ -39,10 +49,22 @@ function createAttempts({getData,nextId,save,tracks,now=()=>new Date().toISOStri
       const a={id:nextId('open_attempts'),user_id:sub.user_id,submission_id:sub.id,request_key:key,track_key:sub.track_key,level:sub.level,pid:sub.pid,status,payload:{...fields,problem:JSON.parse(JSON.stringify(problem)),fingerprint,tries:0},created_at:now(),updated_at:now()};
       rows().push(a);sub.attempts=rows().filter(x=>x.submission_id===sub.id).length;save();return {attempt:a};
     },
-    due(){const time=Date.parse(now());return rows().find(a=>a.status==='queued'&&(!a.payload.retry_at||Date.parse(a.payload.retry_at)<=time));},
+    // parseTimestamp, not Date.parse: now() is UTC in a bare format Date.parse
+    // reads as local, which delayed every retry by the host's UTC offset.
+    due(){const time=parseTimestamp(now());return rows().find(a=>a.status==='queued'&&(!a.payload.retry_at||parseTimestamp(a.payload.retry_at)<=time));},
     recover(){for(const a of rows())if(a.status==='processing')api.fail(a.id,'Grading was interrupted. Your work is saved.',true);},
     start(id){const a=byId(id);if(!a||a.status!=='queued')return null;a.payload.tries++;a.payload.started_at=now();return update(a,{status:'processing'});},
-    fail(id,message,retryable=false){const a=byId(id);if(!a||a.status==='completed')return a;a.payload.error=message;a.payload.retry_at=retryable&&a.payload.tries<MAX_TRIES?new Date(Date.parse(now())+30000*2**(a.payload.tries-1)).toISOString():null;return update(a,{status:a.payload.retry_at?'queued':'failed'});},
+    fail(id,message,retryable=false){
+      const a=byId(id);if(!a||a.status==='completed')return a;
+      a.payload.error=message;
+      // Keep retrying for as long as the learner's grading window is open.
+      const nowMs=parseTimestamp(now());
+      const deadline=parseTimestamp(a.created_at)+GRADING_WINDOW_MS;
+      const backoff=Math.min(AUTO_BACKOFF_CAP_MS,30000*2**Math.max(0,a.payload.tries-1));
+      const nextAt=nowMs+backoff;
+      a.payload.retry_at=retryable&&a.payload.tries<MAX_AUTO_TRIES&&nextAt<deadline?new Date(nextAt).toISOString():null;
+      return update(a,{status:a.payload.retry_at?'queued':'failed'});
+    },
     retry(id,uid){const a=byId(id);if(!a||a.user_id!==Number(uid))return {error:'Attempt not found.',status:404};if(a.status!=='failed')return {error:'Only failed attempts can be retried.',status:409};if(a.payload.tries>=MAX_TRIES)return {error:'Automatic retry limit reached. Request staff review or submit a new attempt.',status:409};a.payload.error=null;a.payload.retry_at=null;return {attempt:update(a,{status:'queued'})};},
     complete(id,score,feedback,grader='ai'){
       const a=byId(id);if(!a)return null;if(a.status==='completed')return a;

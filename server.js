@@ -4203,29 +4203,22 @@ async function submitOpenAssessment(req, res, assessmentKind) {
   if(!ai.enabled() && out.attempt.status==='queued')store.OpenAttempts.fail(out.attempt.id,'Grading is unavailable. Your attempt is saved. Retry later or request staff review.');
   await store.pendingPersist();
   const awaitingReview = out.attempt.status === 'awaiting_review';
-  return res.status(out.existing?200:202).json({ok:true,existing:!!out.existing,attempt:store.OpenAttempts.public(out.attempt),submission:out.submission,graded:out.attempt.status==='completed',note:awaitingReview?'Evidence saved and sent for staff review.':out.attempt.status==='failed'?out.attempt.payload.error:`Submission received. Your grade is released ${Math.round(pacing.GRADE_HOLD_MS/3600000)} hours from now - you do not need to stay on this page.`,grade_release_at:kind==='capstone'?null:pacing.releaseAt(out.submission.submitted_at)});
+  return res.status(out.existing?200:202).json({ok:true,existing:!!out.existing,attempt:store.OpenAttempts.public(out.attempt),submission:out.submission,graded:out.attempt.status==='completed',note:awaitingReview?'Evidence saved and sent for staff review.':out.attempt.status==='failed'?out.attempt.payload.error:`Submission received. Your grade arrives within ${pacing.GRADING_WINDOW_HOURS} hours, and the next module opens as soon as this one is fully graded. You do not need to stay on this page.`,grade_due_by:kind==='capstone'?null:pacing.gradeDueBy(out.submission.submitted_at)});
 }
 app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'assignment')));
 app.post('/api/open/capstone/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'capstone')));
 app.get('/api/open/capstone/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),0,0).map(store.OpenAttempts.public)}));
 const pacing = require('./course-pacing');
 /**
- * An attempt row carries the grader's score and feedback, so the learner-facing
- * view of it is held on the same 12 h clock as the submission it belongs to
- * (course-pacing.js). Without this the held grade leaks straight out of
- * /api/open/attempts while the progress endpoint carefully hides it.
+ * The learner-facing view of an attempt. Nothing is hidden - a grade shows the
+ * moment it is awarded - but an attempt still waiting on the grader carries the
+ * deadline it is promised by, so the UI can say "within 8 hours" instead of
+ * showing an unexplained blank.
  */
 function learnerAttempt(a) {
   const view = store.OpenAttempts.public(a);
-  const shaped = { level: a.level, pid: a.pid, assessment_kind: a.payload?.assessment_kind, submitted_at: a.created_at, score: a.payload?.score ?? null };
-  if (!pacing.isHeldKind(shaped)) return view;
-  if (pacing.isReleased(shaped)) return { ...view, grade_released: true };
-  return {
-    ...view,
-    payload: { ...view.payload, score: null, gems: 0, feedback: null, graded_at: null },
-    grade_released: false,
-    grade_release_at: pacing.releaseAt(a.created_at),
-  };
+  if (a.payload?.score != null) return { ...view, grade_pending: false, grade_due_by: null };
+  return { ...view, grade_pending: true, grade_due_by: pacing.gradeDueBy(a.created_at) };
 }
 function openLearnerRequired(req, res, next) {
   if (['free', 'student'].includes(req.user.role)) return next();
@@ -4301,8 +4294,29 @@ app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRo
   const score=Number(req.body.score);if(req.body.score==null||req.body.score===''||!Number.isFinite(score)||score<0||score>100||!String(req.body.feedback||'').trim())return res.status(400).json({error:'Provide a score from 0 to 100 and written feedback.'});
   store.OpenAttempts.complete(a.id,score,req.body.feedback,'staff:'+req.user.id);
   const certificate=OpenQuest.maybeCertify(a.user_id,a.track_key,req.user.id);
+  announceModuleUnlock(a.user_id,a.track_key); // a staff grade opens the next module too
   await store.pendingPersist();res.json({ok:true,attempt:store.OpenAttempts.public(a),certificate:certificate?.cert||null});
 }));
+/**
+ * Tell a learner their next module is open, the moment the grade that opened it
+ * lands. Called from the grading worker's onComplete and from the staff-grading
+ * route, so it fires whoever did the marking. moduleUnlockToAnnounce() returns
+ * an unlock at most once, so a regrade or a restart cannot re-send it.
+ */
+function announceModuleUnlock(uid, track_key) {
+  let out;
+  try { out = OpenQuest.moduleUnlockToAnnounce(uid, track_key); }
+  catch (e) { console.error('[module-unlock] check failed:', e.message); return; }
+  if (!out) return;
+  const first = String(out.user.name || '').trim().split(/\s+/)[0] || 'there';
+  mailer.notify(
+    out.user.email,
+    `Module ${out.module.no} is open: ${out.course}`,
+    `Hi ${first},\n\nYour work on module ${out.previous.no} has been graded, so module ${out.module.no} of ${out.course} is now open.\n\n${out.module.title}\n\nPick up where you left off: ${APP_URL}/open\n\nAs always, your grades arrive within ${pacing.GRADING_WINDOW_HOURS} hours of submitting, and the module after this one opens as soon as this one is fully graded.\n\n- EchoLens`,
+  );
+  console.log(`[module-unlock] told user ${uid} that module ${out.module.no} of ${track_key} is open.`);
+}
+
 /* ------------------- enrolment confirmation sweep -------------------
  * A free-course seat is taken on enrolment and confirmed an hour later
  * (course-pacing.js). Access does not depend on this sweep - isEnrollmentActive
@@ -4341,7 +4355,7 @@ const gradingWorker = require('./grading-worker').createGradingWorker({
     if(!text&&p.file_url){const parts=[];for(const url of [p.file_url,...(p.files||[]).map(f=>f.url)]){const x=await extractText(url);if(x.text)parts.push(x.text);}text=parts.join('\n\n');}
     if(!text)throw new Error('No readable submission content');
     return ai.autoGrade(a.user_id,{eventTitle:track?.title,problemTitle:p.problem.title,problemBrief:p.problem.description,passMark:p.problem.pass_mark??track?.pass_mark??60,code:p.code,language:p.language,text});
-  },onComplete:async a=>{OpenQuest.maybeCertify(a.user_id,a.track_key);},
+  },onComplete:async a=>{OpenQuest.maybeCertify(a.user_id,a.track_key);announceModuleUnlock(a.user_id,a.track_key);},
 });
 app.get('/api/open/progress', authRequired, openLearnerRequired, (req, res) => {
   const track = String(req.query.track || '');

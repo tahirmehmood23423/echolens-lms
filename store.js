@@ -4084,6 +4084,34 @@ const OpenQuest = {
     }
     return out;
   },
+  /* ------------------------- module-unlock notification -------------------------
+   * Called after every grade lands. If that grade completed a module and the
+   * next one is now open, this returns it ONCE - the module number is recorded
+   * on the enrolment, so a learner is emailed a given unlock a single time no
+   * matter how many attempts, regrades or restarts follow.
+   */
+  moduleUnlockToAnnounce(uid, track_key) {
+    const u = Users.byId(uid), t = TRACKS[track_key];
+    if (!u || !t?.free || !u.email) return null;
+    const mine = data.open_submissions.filter((s) => s.user_id === Number(uid) && s.track_key === track_key);
+    const states = pacing.moduleStates(t, mine);
+    // The first module a learner has not started yet, now that grading is done.
+    const opened = states.find((m) => m.status === 'available');
+    if (!opened || opened.no === 1) return null; // module 1 needs no announcement
+    const previous = states.find((m) => m.no === opened.no - 1);
+    if (!previous || previous.status !== 'complete') return null;
+
+    const saved = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
+    const row = saved.find((e) => e.track_key === track_key);
+    if (!row) return null;
+    const announced = Array.isArray(row.modules_announced) ? row.modules_announced : [];
+    if (announced.includes(opened.no)) return null;
+
+    u.profile = { ...(u.profile || {}), free_course_enrollments: saved.map((e) =>
+      e.track_key === track_key ? { ...e, modules_announced: [...announced, opened.no] } : e) };
+    save();
+    return { user: u, track_key, course: t.title, module: opened, previous };
+  },
   markConfirmed(uid, track_key) {
     const u = Users.byId(uid);
     if (!u) return;
@@ -4169,18 +4197,15 @@ const OpenQuest = {
     const t = TRACKS[track_key]; if (!t) return null;
     const nowMs = Date.now();
     const raw = data.open_submissions.filter((s) => s.user_id === Number(uid) && s.track_key === track_key);
-    // Grades are held for 12 h, and the hold is applied HERE - before gems,
-    // averages, pass state or certification are computed - so a score can
-    // never leak out through a total the learner can watch move.
+    // Nothing is withheld any more: an awarded grade passes straight through.
+    // publicSubmission only annotates a PENDING submission with the deadline
+    // it is promised by, so gems, averages and pass state are unaffected.
     const mine = t.free ? raw.map((s) => pacing.publicSubmission(s, nowMs)) : raw;
     const assignmentMine = mine.filter((s) => (s.assessment_kind || 'assignment') === 'assignment' && !(s.level === 0 && s.pid === 0));
     const capstoneSubmission = mine.find((s) => s.assessment_kind === 'capstone' || (s.level === 0 && s.pid === 0));
     const byKey = {};
     const policy = freeCompletion(t,mine);
-    // The attempt trail carries the grader's score and feedback too, so it is
-    // held on exactly the same clock as the submission it belongs to.
-    const heldHistory = (s, rows) => (s.grade_pending ? rows.map((a) => ({ ...a, payload: { ...a.payload, score: null, gems: 0, feedback: null, graded_at: null } })) : rows);
-    for (const s of assignmentMine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, grade_pending: !!s.grade_pending, grade_release_at: s.grade_release_at || null, file_name: s.file_name, evidence:s.evidence||null, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:heldHistory(s, OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public)) };
+    for (const s of assignmentMine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, grade_pending: !!s.grade_pending, grade_due_by: s.grade_due_by || null, file_name: s.file_name, evidence:s.evidence||null, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public) };
     const totalProblems = t.levels.reduce((a, l) => a + l.problems.length, 0);
     const graded = assignmentMine.filter((s) => s.score != null);
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;
@@ -4193,8 +4218,8 @@ const OpenQuest = {
       capstone,
       complete: policy.passed,
       modules: t.free ? pacing.moduleStates(t, raw, nowMs) : null,
-      awaiting_release: t.free ? raw.filter((s) => s.score != null && !pacing.isReleased(s, nowMs)).length : 0,
-      grade_hold_hours: Math.round(pacing.GRADE_HOLD_MS / 3600000),
+      awaiting_grades: t.free ? raw.filter((s) => s.score == null).length : 0,
+      grading_window_hours: pacing.GRADING_WINDOW_HOURS,
     };
   },
   // Fully free tracks issue an automatic verified certificate on completion.

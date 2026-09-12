@@ -4197,7 +4197,7 @@ async function submitOpenAssessment(req, res, assessmentKind) {
   const fingerprint = crypto.createHash('sha256').update(JSON.stringify([track.key,String(level),String(pid),kind,b.code||null,b.language||null,links,notes,...allFiles.map(f=>[f.originalname,crypto.createHash('sha256').update(fs.readFileSync(f.path)).digest('hex')])])).digest('hex');
   const previous = store.allData().open_attempts.find(a=>a.user_id===req.user.id&&a.request_key===request_key);
   if (previous && previous.payload.fingerprint !== fingerprint) { cleanup(); return res.status(409).json({error:'This request key belongs to different work.'}); }
-  const out = OpenQuest.submit({ user:req.user,track_key:track.key,level,pid,assessment_kind:kind,code:b.code||null,language:b.language||null,file_url,file_name,files:extra_files,evidence,request_key,fingerprint });
+  const out = OpenQuest.submit({ user:req.user,track_key:track.key,level,pid,assessment_kind:kind,code:b.code||null,language:b.language||null,output:b.output||null,file_url,file_name,files:extra_files,evidence,request_key,fingerprint });
   if(out.error){cleanup();return res.status(out.status||400).json({error:out.error,unlocks_at:out.unlocks_at||null});}
   if(out.existing)cleanup();
   if(!ai.enabled() && out.attempt.status==='queued')store.OpenAttempts.fail(out.attempt.id,'Grading is unavailable. Your attempt is saved. Retry later or request staff review.');
@@ -4208,6 +4208,7 @@ async function submitOpenAssessment(req, res, assessmentKind) {
 app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'assignment')));
 app.post('/api/open/capstone/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'capstone')));
 app.get('/api/open/capstone/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),0,0).map(store.OpenAttempts.public)}));
+const { graderContext } = require('./problem-rubric');
 const pacing = require('./course-pacing');
 /**
  * The learner-facing view of an attempt. Nothing is hidden - a grade shows the
@@ -4354,7 +4355,11 @@ const gradingWorker = require('./grading-worker').createGradingWorker({
     const p=a.payload,track=Quests.trackDef(a.track_key);let text=p.code;
     if(!text&&p.file_url){const parts=[];for(const url of [p.file_url,...(p.files||[]).map(f=>f.url)]){const x=await extractText(url);if(x.text)parts.push(x.text);}text=parts.join('\n\n');}
     if(!text)throw new Error('No readable submission content');
-    return ai.autoGrade(a.user_id,{eventTitle:track?.title,problemTitle:p.problem.title,problemBrief:p.problem.description,passMark:p.problem.pass_mark??track?.pass_mark??60,code:p.code,language:p.language,text});
+    // The rubric, the reference solution and the program's REAL output all go to
+    // the grader. Without the rubric it invented its own standard; without the
+    // output it guessed at behaviour from source and got it wrong.
+    const rubric=graderContext(p.problem,track);
+    return ai.autoGrade(a.user_id,{eventTitle:track?.title,problemTitle:p.problem.title,problemBrief:p.problem.description,passMark:rubric.passMark,code:p.code,language:p.language,text,criteria:rubric.criteria,solution:rubric.solution,expectedOutput:rubric.expectedOutput,sampleInput:rubric.sampleInput,output:p.output||null});
   },onComplete:async a=>{OpenQuest.maybeCertify(a.user_id,a.track_key);announceModuleUnlock(a.user_id,a.track_key);},
 });
 app.get('/api/open/progress', authRequired, openLearnerRequired, (req, res) => {

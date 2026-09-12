@@ -3361,6 +3361,9 @@ const Events = {
     const fields = {
       code: code ? String(code).slice(0, 60000) : null,
       language: language ? String(language).slice(0, 20) : null,
+      // What the learner's program actually printed when they ran it. The
+      // grader compares this against the brief's expected output.
+      output: output ? String(output).slice(0, 4000) : null,
       file_url: file_url || null, file_name: file_name || null,
       link: link ? String(link).slice(0, 400) : null,
       note: note ? String(note).slice(0, 500) : null,
@@ -4136,7 +4139,7 @@ const OpenQuest = {
   find(uid, track_key, level, pid) {
     return data.open_submissions.find((s) => s.user_id === Number(uid) && s.track_key === track_key && s.level === Number(level) && s.pid === Number(pid)) || null;
   },
-  submit({ user, track_key, level, pid, code, language, file_url, file_name, files, evidence, assessment_kind = 'assignment', request_key, fingerprint }) {
+  submit({ user, track_key, level, pid, code, language, output, file_url, file_name, files, evidence, assessment_kind = 'assignment', request_key, fingerprint }) {
     if (!['free', 'student'].includes(Users.byId(user.id)?.role)) return { error: 'Practice submissions are for learner accounts only.', status: 403 };
     const t = TRACKS[track_key];
     if (!t || t.published === false) return { error: 'Course not found.' };
@@ -4178,6 +4181,9 @@ const OpenQuest = {
       assessment_kind: kind,
       code: code ? String(code).slice(0, 60000) : null,
       language: language ? String(language).slice(0, 20) : null,
+      // What the learner's program actually printed when they ran it. The
+      // grader compares this against the brief's expected output.
+      output: output ? String(output).slice(0, 4000) : null,
       file_url: file_url || null, file_name: file_name || null,
       files: Array.isArray(files) && files.length ? files : null, // extra files beyond the first (multi-file courses)
       evidence: evidence || null,

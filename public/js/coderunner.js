@@ -365,6 +365,10 @@
         if (pendingResolve) { const r = pendingResolve; pendingResolve = null; r(null); }
       },
       print(text) { out.textContent += text; scroll(); },
+      // Everything the program has printed so far. Submitting this alongside the
+      // code lets the grader compare real output against the brief's expected
+      // output instead of guessing at behaviour from the source.
+      text() { return out.textContent || ''; },
       askInput() {
         return new Promise((resolve) => {
           pendingResolve = resolve;

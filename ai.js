@@ -106,7 +106,7 @@ function friendly(providerName, status, rawMessage) {
 }
 
 /* ------------------------------- providers ------------------------------- */
-async function callGemini(system, messages, model, maxTokens) {
+async function callGemini(system, messages, model, maxTokens, temperature) {
   const useModel = model || (PROVIDER === 'gemini' ? MODEL : GEMINI_DEFAULT);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${useModel}:generateContent?key=${GEMINI_KEY}`;
   const contents = messages.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
@@ -116,7 +116,7 @@ async function callGemini(system, messages, model, maxTokens) {
     body: JSON.stringify({
       system_instruction: { parts: [{ text: system }] },
       contents,
-      generationConfig: { temperature: 0.4, maxOutputTokens: maxTokens || 2048 },
+      generationConfig: { temperature: temperature ?? 0.4, maxOutputTokens: maxTokens || 2048 },
     }),
   });
   const data = await res.json().catch(() => ({}));
@@ -131,7 +131,7 @@ async function callGemini(system, messages, model, maxTokens) {
   return text;
 }
 
-async function callGroq(system, messages, model, maxTokens) {
+async function callGroq(system, messages, model, maxTokens, temperature) {
   const useModel = model || (PROVIDER === 'groq' ? MODEL : GROQ_DEFAULT);
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -139,7 +139,7 @@ async function callGroq(system, messages, model, maxTokens) {
     body: JSON.stringify({
       model: useModel,
       messages: [{ role: 'system', content: system }, ...messages],
-      temperature: 0.4, max_tokens: maxTokens || 2048,
+      temperature: temperature ?? 0.4, max_tokens: maxTokens || 2048,
     }),
   });
   const data = await res.json().catch(() => ({}));
@@ -155,7 +155,9 @@ async function callGroq(system, messages, model, maxTokens) {
 }
 
 /* ------------------------- completion with fallback ------------------------- */
-async function complete(userId, system, messages, maxTokens) {
+// `temperature` is optional: grading passes 0 so the same submission does not
+// score differently on two runs. Everything else keeps the conversational 0.4.
+async function complete(userId, system, messages, maxTokens, temperature) {
   if (!enabled()) { const e = new Error('AI is not configured. Set GEMINI_API_KEY or GROQ_API_KEY in the environment.'); e.status = 503; throw e; }
   const refund = checkLimit(userId);
 
@@ -169,7 +171,7 @@ async function complete(userId, system, messages, maxTokens) {
   let lastErr;
   for (let i = 0; i < order.length; i++) {
     try {
-      return await order[i].fn(system, messages, undefined, maxTokens);
+      return await order[i].fn(system, messages, undefined, maxTokens, temperature);
     } catch (err) {
       lastErr = err;
       parkProvider(order[i].name, err.status, err.message);
@@ -444,20 +446,81 @@ JSON schema: [{"q":"question text","options":["A","B","C","D"],"answer":0}] wher
 // { score, feedback }. The caller applies the 10% AI-grading reduction.
 // The system user id 0 is exempt from the per-user rate limit budget being
 // tied to one person, but the same window still applies.
-async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passMark, code, language, text }) {
-  const system = 'You are an automatic grader for EchoLens, an AI education academy. '
-    + 'Grade the submission strictly against the task. '
-    + 'Reply with ONLY a JSON object, no markdown fences, in exactly this shape: '
-    + '{"score": <integer 0-100>, "feedback": "<2-3 sentences for the student>"} '
-    + 'Score 0 if the submission is empty, off-topic, or clearly not an attempt.';
-  const content = `Event: ${eventTitle}\nTask: ${problemTitle}\n\nTask brief:\n${String(problemBrief || '').slice(0, 4000)}\n\nPass mark: ${passMark}%\n\nSubmission${language ? ` (${language})` : ''}:\n${String(code || text || '').slice(0, 12000)}`;
-  const raw = await complete(userId, system, [{ role: 'user', content }]);
+async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passMark, code, language, text, criteria, solution, output, expectedOutput, sampleInput }) {
+  // The rubric is the same "What we're looking for" checklist the student was
+  // shown. It used to be left out of this prompt entirely, so the grader
+  // invented its own standard and marked correct work wrong. It is now the
+  // spine of the whole judgement.
+  const rubric = (Array.isArray(criteria) ? criteria : []).filter(Boolean);
+  const system = [
+    'You are the automatic grader for EchoLens, an AI education academy in Pakistan.',
+    '',
+    rubric.length
+      ? 'You grade ONE student submission against a GRADING RUBRIC. That rubric is the same checklist the student was shown, and it is the ONLY thing that decides the score. Work through it item by item.'
+      : 'You grade ONE student submission against the task brief. Judge only what the brief actually asks for.',
+    '',
+    'Rules you must not break:',
+    '1. Judge ONLY what is asked for. A submission that satisfies every requirement',
+    '   scores at least 90, even if you would have written it differently.',
+    '2. Never invent behaviour. Do not claim the program prints, computes or does',
+    '   anything you cannot point to a line for. If you are unsure what it does,',
+    '   trace it line by line before judging.',
+    '3. A task often demonstrates a concept by what does NOT happen - a value left',
+    '   unchanged, no side effect, nothing printed. When the task asks for that, the',
+    '   unchanged result is CORRECT. Never mark it as "failed to demonstrate".',
+    '4. Score 0 ONLY for an empty submission, or work that is off-topic or plainly',
+    '   not an attempt. A genuine attempt that misses requirements gets partial',
+    '   credit, never 0.',
+    '5. Style, whitespace, comments, naming and extra output never cost marks unless',
+    '   the task names them.',
+    '6. If the real output of the program is given below, trust it over your own',
+    '   reading of the code, and compare it against the expected output.',
+    '',
+    'Reply with ONLY a JSON object, no markdown fences, in exactly this shape:',
+    rubric.length
+      ? '{"rubric": [{"item": "<rubric item, abbreviated>", "met": true|false, "why": "<one short clause citing the code>"}], "score": <integer 0-100>, "feedback": "<2-3 sentences addressed to the student>"}'
+      : '{"score": <integer 0-100>, "feedback": "<2-3 sentences addressed to the student>"}',
+  ].join('\n');
+
+  const parts = [
+    `Course: ${eventTitle}`,
+    `Task: ${problemTitle}`,
+    '',
+    'Task brief:',
+    String(problemBrief || '').slice(0, 4000),
+  ];
+  if (rubric.length) {
+    parts.push('', 'GRADING RUBRIC - score against these and nothing else:',
+      rubric.map((c, i) => `${i + 1}. ${c}`).join('\n'));
+  }
+  if (solution) {
+    parts.push('', 'Reference solution (what a full-marks answer does; the learner need not match it word for word):', String(solution).slice(0, 2000));
+  }
+  if (sampleInput) parts.push('', 'Sample input the program is run with:', String(sampleInput).slice(0, 500));
+  if (expectedOutput) parts.push('', 'Expected output:', String(expectedOutput).slice(0, 1000));
+  if (output) {
+    parts.push('', `The student's program was actually run. Its real output was:`, String(output).slice(0, 4000),
+      '(This is what the program really printed. Trust it over your own reading of the code.)');
+  }
+  parts.push('', `Pass mark: ${passMark}%`, '', `Student submission${language ? ` (${language})` : ''}:`,
+    String(code || text || '').slice(0, 12000));
+
+  // temperature 0: the same submission must not score differently on two runs.
+  const raw = await complete(userId, system, [{ role: 'user', content: parts.join('\n') }], 1200, 0);
   const cleaned = String(raw).replace(/```json|```/g, '').trim();
   const m = cleaned.match(/\{[\s\S]*\}/);
   if (!m) throw new Error('The AI grader returned an unreadable response.');
   const parsed = JSON.parse(m[0]);
   const score = Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 0)));
-  return { score, feedback: String(parsed.feedback || '').slice(0, 1500) };
+  // The per-item verdicts are appended to the feedback so a learner (and the
+  // staff member reviewing a dispute) can see exactly which requirement the
+  // grader thought was missing, instead of a bare number.
+  const checklist = Array.isArray(parsed.rubric)
+    ? parsed.rubric.filter((r) => r && r.item).map((r) => `${r.met ? '[x]' : '[ ]'} ${r.item}${r.why ? ' - ' + r.why : ''}`)
+    : [];
+  const feedback = [String(parsed.feedback || '').trim(), checklist.length ? '\n' + checklist.join('\n') : '']
+    .filter(Boolean).join('\n').slice(0, 1500);
+  return { score, feedback, rubric: checklist };
 }
 
 module.exports = { enabled, status, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, codeHelp, promptLab, excelCopilot, activityReport };

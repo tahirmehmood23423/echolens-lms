@@ -11,7 +11,8 @@
     "migrate:import": "node migrations/import-json.js",
     "validate:catalogue": "node scripts/validate-trending-tech.js",
     "validate:catalogue:release": "node scripts/validate-trending-tech.js --release",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "audit:rubrics": "node scripts/audit-rubrics.js"
   },
   "engines": {
     "node": ">=18"

@@ -2017,6 +2017,11 @@ async function submitSolve(fileForm) {
     if (!code.trim()) { toast('Write your solution first.', true); return; }
     fd.set('code', code);
     fd.set('language', $('svLang').value);
+    // Send what the program actually printed, if they ran it. The grader used
+    // to reason about behaviour from source alone and got it wrong; with the
+    // real output it can check against the brief's expected output instead.
+    const ran = SV_TERM && typeof SV_TERM.text === 'function' ? SV_TERM.text().trim() : '';
+    if (ran) fd.set('output', ran.slice(0, 4000));
   }
   EL.drafts.flushAll();
   const submitContext=CUR.track.key+':'+CUR_PROBLEM.level+':'+CUR_PROBLEM.pid;

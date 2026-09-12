@@ -4226,6 +4226,12 @@ const OpenQuest = {
       modules: t.free ? pacing.moduleStates(t, raw, nowMs) : null,
       awaiting_grades: t.free ? raw.filter((s) => s.score == null).length : 0,
       grading_window_hours: pacing.GRADING_WINDOW_HOURS,
+      // The certificate itself, so the course page can congratulate the learner
+      // the moment their final grade lands instead of only linking them away.
+      certificate: (() => {
+        const c = data.certificates.find((x) => x.user_id === Number(uid) && x.source_kind === 'track' && x.source_id === track_key);
+        return c ? { serial: c.serial, title: c.title, completion_date: c.completion_date, url: `/cert?s=${c.serial}` } : null;
+      })(),
     };
   },
   // Fully free tracks issue an automatic verified certificate on completion.

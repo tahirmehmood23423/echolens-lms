@@ -764,6 +764,9 @@ async function openCourse(key, skipPush) {
   COURSE_NAV_MODE = d.track.free ? 'free' : 'live';
   openTab('course');
   drawCourse();
+  // A learner who finished while away from the page is congratulated the next
+  // time they open the course, not silently left to spot a changed badge.
+  maybeCelebrate();
   if (!skipPush) pushNav({ v: 'course', key });
 }
 // How each course takes work: shown on the course page and drives the solve workspace.
@@ -1588,7 +1591,50 @@ function drawSolveStatus() {
   clearTimeout(ATTEMPT_POLL);if(history.some(attempt=>['queued','processing'].includes(attempt.status)))ATTEMPT_POLL=setTimeout(()=>refreshAttempts(true),3000);
 }
 let ATTEMPT_POLL;
-async function refreshAttempts(quiet=false){if(!CUR||!CUR_PROBLEM)return;const key=CUR.track.key;try{const d=await api('/api/open/progress?track='+encodeURIComponent(key));if(CUR?.track.key!==key)return;CUR.progress=d.progress;drawSolveStatus();if($('svNav'))$('svNav').innerHTML=svNavHtml();}catch(e){if(!quiet)toast(EL.errorMessage(e),true);}}
+async function refreshAttempts(quiet=false){if(!CUR||!CUR_PROBLEM)return;const key=CUR.track.key;try{const d=await api('/api/open/progress?track='+encodeURIComponent(key));if(CUR?.track.key!==key)return;CUR.progress=d.progress;drawSolveStatus();if($('svNav'))$('svNav').innerHTML=svNavHtml();maybeCelebrate();}catch(e){if(!quiet)toast(EL.errorMessage(e),true);}}
+
+/* --------------------------- course completion --------------------------- */
+// The moment the final grade lands, the learner has finished the course. Their
+// certificate is issued server-side and emailed to them; this is the screen
+// that says so, rather than leaving them to notice a toast.
+//
+// It cannot fire at submit time: grading is asynchronous (course-pacing.js), so
+// at the instant of submitting there is no grade and no certificate yet. It
+// fires from the attempt poll, which is already running while an attempt is
+// queued - so a learner still on the page sees it appear by itself.
+function celebratedKey(trackKey) { return `el:celebrated:${(ME && ME.id) || 0}:${trackKey}`; }
+function alreadyCelebrated(trackKey) {
+  try { return localStorage.getItem(celebratedKey(trackKey)) === '1'; } catch { return false; }
+}
+function markCelebrated(trackKey) {
+  try { localStorage.setItem(celebratedKey(trackKey), '1'); } catch { /* private mode: it just shows again */ }
+}
+/** Show the congratulations screen once, when the course is genuinely complete. */
+function maybeCelebrate() {
+  const prog = CUR && CUR.progress;
+  if (!prog || !prog.complete || !prog.certificate) return;
+  if (alreadyCelebrated(CUR.track.key)) return;
+  markCelebrated(CUR.track.key);
+  showCourseComplete(CUR.track, prog.certificate);
+}
+function showCourseComplete(track, cert) {
+  const name = (ME && ME.name) ? String(ME.name).trim().split(/\s+/)[0] : 'there';
+  openModal('Course complete', `
+    <div class="cert-done">
+      <div class="cert-done-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Congratulations, ${esc(name)}!</h3>
+      <p class="cert-done-sub">You have completed <strong>${esc(track.title)}</strong>. Your verified certificate has been issued and emailed to you.</p>
+      <div class="cert-done-serial">Serial <span class="mono">${esc(cert.serial)}</span></div>
+      <div class="cert-done-actions">
+        <a class="btn btn-primary" href="${esc(cert.url)}" target="_blank" rel="noopener">View your certificate</a>
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Back to the course</button>
+      </div>
+      <p class="cert-done-note">Anyone can verify it from that page - the QR code on the certificate points to it, so it holds up on a CV or a LinkedIn profile.</p>
+    </div>`);
+}
+window.showCourseComplete = showCourseComplete;
 async function retryAttempt(id){try{await api('/api/open/attempts/'+id+'/retry',{method:'POST'});await refreshAttempts();}catch(e){toast(EL.errorMessage(e),true);}}
 function restoreAttempt(id){const a=CUR.progress?.submissions[CUR_PROBLEM.level+':'+CUR_PROBLEM.pid]?.history.find(a=>a.id===id);if(!a||!$('svCode'))return;EL.drafts.flushAll();if(a.payload.language&&$('svLang')){$('svLang').value=a.payload.language;$('svLang').dispatchEvent(new Event('change'));}$('svCode').value=a.payload.code||'';$('svCode').dispatchEvent(new Event('input',{bubbles:true}));$('svCode').focus();}
 function svLangOptions() {
@@ -2034,14 +2080,17 @@ async function submitSolve(fileForm) {
     const out = await api('/api/open/submit', { method: 'POST', body: fd });
     try{sessionStorage.removeItem(pendingKey);}catch{}
     if(!CUR_PROBLEM||CUR.track.key+':'+CUR_PROBLEM.level+':'+CUR_PROBLEM.pid!==submitContext)return;
-    if (out.cert) toast(`Course passed - certificate ${out.cert.serial} issued. Find it under Events, in My certificates.`);
-    else if (out.graded) toast(`Graded ${out.submission.score}% · ${out.submission.gems} gems earned.`);
+    if (out.graded) toast(`Graded ${out.submission.score}% · ${out.submission.gems} gems earned.`);
     else toast(out.note || 'Attempt saved. Check submission history for its status.');
     // Refresh progress and views
     try { CUR.progress = (await api('/api/open/progress?track=' + encodeURIComponent(CUR.track.key))).progress; } catch {}
     drawSolveStatus();
     if ($('svNav')) $('svNav').innerHTML = svNavHtml();
-    if (out.cert) loadCerts();
+    // Usually a no-op here - grading is asynchronous, so the course completes
+    // later and the attempt poll is what raises the congratulations screen.
+    // It still matters for the staff-graded path, where the result is instant.
+    if (CUR.progress && CUR.progress.certificate) loadCerts();
+    maybeCelebrate();
     if ($('svSubmitBtn')) { $('svSubmitBtn').disabled = false; $('svSubmitBtn').textContent = 'Resubmit'; }
   } catch (e) {
     if (!e.handled) toast(e.message, true);

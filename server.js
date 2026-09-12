@@ -4209,6 +4209,51 @@ app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCou
 app.post('/api/open/capstone/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'capstone')));
 app.get('/api/open/capstone/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),0,0).map(store.OpenAttempts.public)}));
 const { graderContext } = require('./problem-rubric');
+/**
+ * A free course has been completed: send the learner their certificate, with
+ * the PNG attached so it arrives as a file rather than only a link. Certificates
+ * for events were already emailed; free-course ones never were, so a learner who
+ * finished while away from the page was told nothing at all.
+ *
+ * maybeCertify() returns {existing:true} for an already-issued certificate, so
+ * passing its result straight in makes this send exactly once per course.
+ */
+async function announceCourseCompletion(uid, track_key, certResult) {
+  if (!certResult || certResult.existing || !certResult.cert) return;
+  const u = Users.byId(uid);
+  if (!u || !u.email) return;
+  const cert = certResult.cert;
+  const verifyUrl = `${APP_URL}/cert?s=${cert.serial}`;
+  let attachments;
+  try {
+    const png = await certificatePng(Certificates.publicView(cert), verifyUrl);
+    attachments = [{ filename: `EchoLens-certificate-${cert.serial}.png`, content: png }];
+  } catch (e) {
+    // A rendering failure must not cost the learner the email itself.
+    console.error('[certificate] could not render the PNG for', cert.serial, '-', e.message);
+  }
+  const first = String(u.name || '').trim().split(/\s+/)[0] || 'there';
+  mailer.notify(
+    u.email,
+    `Congratulations - you have completed ${cert.title}`,
+    `Hi ${first},
+
+You have completed ${cert.title}. Your verified certificate is attached, and it is permanently available here:
+
+${verifyUrl}
+
+Serial: ${cert.serial}
+
+Anyone can verify it from that page - the QR code on the certificate points to it, so it holds up on a CV or a LinkedIn profile.
+
+Well done, and thank you for learning with us.
+
+- EchoLens`,
+    attachments,
+  );
+  console.log(`[certificate] emailed ${cert.serial} (${cert.title}) to user ${uid}.`);
+}
+
 const pacing = require('./course-pacing');
 /**
  * The learner-facing view of an attempt. Nothing is hidden - a grade shows the
@@ -4296,6 +4341,7 @@ app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRo
   store.OpenAttempts.complete(a.id,score,req.body.feedback,'staff:'+req.user.id);
   const certificate=OpenQuest.maybeCertify(a.user_id,a.track_key,req.user.id);
   announceModuleUnlock(a.user_id,a.track_key); // a staff grade opens the next module too
+  await announceCourseCompletion(a.user_id,a.track_key,certificate).catch(e=>console.error('[certificate] email failed:',e.message));
   await store.pendingPersist();res.json({ok:true,attempt:store.OpenAttempts.public(a),certificate:certificate?.cert||null});
 }));
 /**
@@ -4360,7 +4406,11 @@ const gradingWorker = require('./grading-worker').createGradingWorker({
     // output it guessed at behaviour from source and got it wrong.
     const rubric=graderContext(p.problem,track);
     return ai.autoGrade(a.user_id,{eventTitle:track?.title,problemTitle:p.problem.title,problemBrief:p.problem.description,passMark:rubric.passMark,code:p.code,language:p.language,text,criteria:rubric.criteria,solution:rubric.solution,expectedOutput:rubric.expectedOutput,sampleInput:rubric.sampleInput,output:p.output||null});
-  },onComplete:async a=>{OpenQuest.maybeCertify(a.user_id,a.track_key);announceModuleUnlock(a.user_id,a.track_key);},
+  },onComplete:async a=>{
+    const certified=OpenQuest.maybeCertify(a.user_id,a.track_key);
+    announceModuleUnlock(a.user_id,a.track_key);
+    await announceCourseCompletion(a.user_id,a.track_key,certified).catch(e=>console.error('[certificate] email failed:',e.message));
+  },
 });
 app.get('/api/open/progress', authRequired, openLearnerRequired, (req, res) => {
   const track = String(req.query.track || '');

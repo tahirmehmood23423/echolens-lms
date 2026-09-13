@@ -25,6 +25,7 @@ const mailer = require('./mailer');
 const jaas = require('./jaas');
 const { challanPdf } = require('./challan-pdf');
 const { certificatePng } = require('./cert-image');
+const { graderContext } = require('./problem-rubric');
 const { ambassadorReportPdf } = require('./ambassador-report-pdf');
 const { analyticsReportPdf } = require('./analytics-report-pdf');
 const { generateContractPdf } = require('./contract-pdf');
@@ -3242,7 +3243,7 @@ app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (r
   if (body.link && !/^https?:\/\//i.test(String(body.link))) return res.status(400).json({ error: 'Links must start with http:// or https://' });
   const out = Events.submit({
     event_id: ev.id, user: req.user, pid: body.pid || null,
-    code: body.code || null, language: body.language || null,
+    code: body.code || null, language: body.language || null, output: body.output || null,
     file_url, file_name, link: body.link || null, note: body.note || null,
   });
   if (out.error) return res.status(400).json({ error: out.error });
@@ -3253,9 +3254,13 @@ app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (r
       let text = out.submission.code;
       if (!text && file_url) { const ex = await extractText(file_url); text = ex.text; }
       if (!text && out.submission.link) text = `The participant submitted only a link: ${out.submission.link}. Grade conservatively based on the task; you cannot open links.`;
+      const evRubric = graderContext(pr, ev);
       const g = await ai.autoGrade(req.user.id, {
         eventTitle: ev.title, problemTitle: pr.title, problemBrief: pr.description,
         passMark: ev.pass_mark, code: out.submission.code, language: out.submission.language, text,
+        criteria: evRubric.criteria, solution: evRubric.solution,
+        expectedOutput: evRubric.expectedOutput, sampleInput: evRubric.sampleInput,
+        output: out.submission.output || null,
       });
       graded = Events.applyAiGrade(out.submission.id, g.score, g.feedback);
       const c = Events.maybeCertify(ev, req.user.id, ev.created_by);
@@ -4208,7 +4213,6 @@ async function submitOpenAssessment(req, res, assessmentKind) {
 app.post('/api/open/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'assignment')));
 app.post('/api/open/capstone/submit', authRequired, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 7 }]), asyncRoute((req, res) => submitOpenAssessment(req, res, 'capstone')));
 app.get('/api/open/capstone/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),0,0).map(store.OpenAttempts.public)}));
-const { graderContext } = require('./problem-rubric');
 /**
  * A free course has been completed: send the learner their certificate, with
  * the PNG attached so it arrives as a file rather than only a link. Certificates

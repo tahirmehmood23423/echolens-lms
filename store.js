@@ -3349,7 +3349,7 @@ const Events = {
   submissionFor(eid, uid, pid) {
     return data.event_submissions.find((s) => s.event_id === Number(eid) && s.user_id === Number(uid) && (s.pid || null) === (pid ? Number(pid) : null)) || null;
   },
-  submit({ event_id, user, pid, code, language, file_url, file_name, link, note }) {
+  submit({ event_id, user, pid, code, language, output, file_url, file_name, link, note }) {
     const ev = Events.byId(event_id); if (!ev) return { error: 'Event not found.' };
     const st = Events.status(ev);
     if (st !== 'live') return { error: st === 'upcoming' ? 'This event has not started yet.' : 'This event is over - submissions are closed.' };

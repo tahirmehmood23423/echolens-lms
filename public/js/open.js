@@ -2898,6 +2898,10 @@ async function evSubmitCode() {
   const fd = new FormData();
   if (p) fd.set('pid', p.pid);
   fd.set('code', code); fd.set('language', lang);
+  // Same as the free-course path: send what the program actually printed, so
+  // the grader checks real output instead of guessing from the source.
+  const ran = EV_OUT_TERM && typeof EV_OUT_TERM.text === 'function' ? EV_OUT_TERM.text().trim() : '';
+  if (ran) fd.set('output', ran.slice(0, 4000));
   try {
     const out = await api(`/api/events/${ev.id}/submit`, { method: 'POST', body: fd });
     localStorage.removeItem(evDraftKey(ev.id, p && p.pid));

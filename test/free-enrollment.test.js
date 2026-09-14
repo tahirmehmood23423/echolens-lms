@@ -33,3 +33,8 @@ test('existing free-course work is recognized without resetting progress',()=>{
 test('editable profile cannot forge or erase enrollment metadata',()=>{
   OpenQuest.enroll(1,key);Users.updateProfile(1,{city:'',free_course_enrollments:[],role:'admin'});assert.equal(Users.byId(1).role,'free');assert.equal(Users.byId(1).profile.city,undefined);assert.equal(OpenQuest.enrollments(1).length,1);
 });
+test('learner contact and education profile is structured and complete only with every required field',()=>{
+  const user=Users.byId(1);assert.equal(Users.learnerProfileComplete(user),false);
+  Users.updateProfile(user.id,{phone:'03001234567',whatsapp:'03001234567',city:'Lahore',university:'QA University',degree:'BS Computer Science',study_year:'3',goal:'Backend engineering',unknown_lead_field:'drop me'});
+  assert.equal(Users.learnerProfileComplete(user),true);assert.equal(user.profile.university,'QA University');assert.equal(user.profile.degree,'BS Computer Science');assert.equal(user.profile.study_year,'3');assert.equal(user.profile.unknown_lead_field,undefined);
+});

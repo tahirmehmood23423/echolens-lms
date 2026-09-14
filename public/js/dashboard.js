@@ -234,7 +234,7 @@ async function logout() { EL.drafts.flushAll(); EL.drafts.setAccount(null); try 
   // lands here directly; anyone else just gets the normal overview.
   if (location.pathname === '/admin/recruiters' && ME.role === 'admin') { show('admin-recruiters'); return; }
   await restoreDashboard();
-  requireWhatsapp(); // v12: contact details are mandatory for every learner
+  requireLearnerProfile();
   requireOnboarding(); // instructors must complete their first-login profile
   requireContractSubmission(false);
 })();
@@ -283,29 +283,38 @@ function wireTopSearch() {
 }
 function closeTopSearch() { const out = $('topSearchResults'); if (out) { out.classList.remove('open'); out.innerHTML = ''; } $('topSearch').blur(); }
 
-/* v12: WhatsApp number is MANDATORY for students and open users - it feeds
- * the leads database the admin uses for announcements. The modal cannot be
- * dismissed until a number is saved. */
-function requireWhatsapp() {
+/* Learners complete one structured profile after sign-in. These details
+ * support course delivery and future lead follow-up; promotional consent
+ * remains a separate optional choice. */
+function requireLearnerProfile() {
   if (!['student', 'free'].includes(ME.role)) return;
-  if (ME.profile && ME.profile.phone) return;
-  openModal('Add account contact details', `
-    <form id="waForm">
-      <p class="s" style="color:var(--muted);margin-bottom:12px">Add a contact number for class support and account updates. You can finish this step later. Promotional messages are optional.</p>
-      <label class="field"><span>WhatsApp number</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
-      <button class="btn btn-primary btn-block">Save & continue</button></form>`);
+  if (ME.learner_profile_complete) return;
+  const p = ME.profile || {};
+  openModal('Complete your learner profile', `
+    <form id="learnerProfileForm">
+      <p class="s" style="color:var(--muted);margin-bottom:12px">Complete these details once so course support, enrollment records and future learning opportunities match your profile.</p>
+      <div class="form-grid"><label class="field"><span>Full name</span><input value="${esc(ME.name)}" readonly></label><label class="field"><span>Email</span><input value="${esc(ME.email || '')}" readonly></label></div>
+      <div class="form-grid">
+        <label class="field"><span>Contact / WhatsApp</span><input name="whatsapp" required value="${esc(p.phone || p.whatsapp || '')}" placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+        <label class="field"><span>City</span><input name="city" required maxlength="100" value="${esc(p.city || '')}"></label>
+        <label class="field"><span>University / institute</span><input name="university" required maxlength="150" value="${esc(p.university || p.institute || '')}"></label>
+        <label class="field"><span>Degree / program</span><input name="degree" required maxlength="150" value="${esc(p.degree || p.education || '')}"></label>
+        <label class="field"><span>Current study year</span><select name="study_year" required><option value="">Choose year</option>${[['1','1st year'],['2','2nd year'],['3','3rd year'],['4','4th year'],['5+','5th year or above'],['graduated','Graduated'],['other','Other']].map(([v,l])=>`<option value="${v}"${p.study_year===v?' selected':''}>${l}</option>`).join('')}</select></label>
+        <label class="field"><span>Learning or career goal (optional)</span><input name="goal" maxlength="300" value="${esc(p.goal || '')}"></label>
+      </div>
+      <label class="field"><span><input type="checkbox" name="marketing_opt_in" style="width:auto"${p.marketing_opt_in==='yes'?' checked':''}> Send me optional course offers and webinar invitations</span></label>
+      <button class="btn btn-primary btn-block">Save and continue</button></form>`);
   window.MODAL_LOCK = true;
   $('modalBox').querySelector('.close').style.display = 'none';
-  EL.deferForm($('waForm'),ME.id,'Profile');
-  $('waForm').insertAdjacentHTML('beforeend','<label class="field"><span><input type="checkbox" name="marketing_opt_in" style="width:auto"> Send me optional course offers and webinar invitations</span></label>');
-  $('waForm').addEventListener('submit', async (e) => {
+  EL.deferForm($('learnerProfileForm'),ME.id,'Learner profile');
+  $('learnerProfileForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
     try {
-      await api('/api/me/contact', { method: 'POST', body: JSON.stringify({ whatsapp: f.whatsapp.value.trim(), marketing_opt_in:f.marketing_opt_in.checked }) });
-      ME.profile = ME.profile || {}; ME.profile.phone = f.whatsapp.value.trim();
+      const out = await api('/api/me/learner-profile', { method: 'POST', body: JSON.stringify({ whatsapp:f.whatsapp.value.trim(), city:f.city.value.trim(), university:f.university.value.trim(), degree:f.degree.value.trim(), study_year:f.study_year.value, goal:f.goal.value.trim(), marketing_opt_in:f.marketing_opt_in.checked }) });
+      ME.profile = out.profile; ME.learner_profile_complete = true;
       window.MODAL_LOCK = false;
       $('modalBox').querySelector('.close').style.display = '';
-      closeModal(); toast('Saved - welcome aboard!');
+      closeModal(); toast('Profile complete - welcome aboard!');
     } catch (err) {
       if (err.message === 'Signed out.') { window.MODAL_LOCK = false; location.href = '/'; return; }
       modalMsg(err.message); btn.disabled = false;
@@ -316,7 +325,7 @@ function requireWhatsapp() {
 /* Instructors, staff, ambassadors and HR must complete a first-login profile
  * (contact/address/qualifications, plus mandatory documents for instructors)
  * before using their portal - same non-dismissable pattern as
- * requireWhatsapp() above. Submitting auto-issues a contract by email for
+ * requireLearnerProfile() above. Submitting auto-issues a contract by email for
  * ambassador/instructor - see requireContractSubmission() below. */
 function requireOnboarding() {
   if (!['instructor', 'staff', 'ambassador', 'hr'].includes(ME.role)) return;
@@ -2132,7 +2141,7 @@ async function renderSettings() {
   if(!ME.onboarding_complete && ['instructor','staff','ambassador','hr'].includes(ME.role))setTimeout(()=>{if(!document.getElementById('resumeOnboarding'))el.insertAdjacentHTML('afterbegin','<p id="resumeOnboarding"><button class="btn btn-primary" onclick="requireOnboarding()">Resume account setup</button></p>');},0);
   const fieldLabels = {
     marketing_opt_in:'Optional promotional messages', phone: 'Phone', dob: 'Date of birth', gender: 'Gender', cnic: 'CNIC / B-form', father_name: 'Father / guardian name',
-    address: 'Address', city: 'City', education: 'Education', institute: 'School / institute', emergency_contact: 'Emergency contact',
+    address: 'Address', city: 'City', education: 'Education', institute: 'School / institute', university: 'University / institute', degree: 'Degree / program', study_year: 'Current study year', emergency_contact: 'Emergency contact',
     goal: 'Goal', links: 'LinkedIn / GitHub', designation: 'Designation', qualification: 'Qualification',
     expertise: 'Expertise', experience_years: 'Experience (years)', joining_date: 'Joining date', office_hours: 'Office hours',
   };
@@ -2276,6 +2285,7 @@ async function renderProgress() {
 function openProfileForm() {
   const p = ME.profile || {};
   const isStaffRole = ['instructor', 'admin', 'coordinator'].includes(ME.role);
+  const isLearner = ['student', 'free'].includes(ME.role);
   openModal('Update profile', `
     <form id="f">
       <div class="form-grid">
@@ -2288,8 +2298,10 @@ function openProfileForm() {
       </div>
       <label class="field"><span>Address</span><input name="address" value="${esc(p.address || '')}"></label>
       <div class="form-grid">
-        <label class="field"><span>Education</span><input name="education" value="${esc(p.education || '')}" placeholder="e.g. BS Computer Science"></label>
-        <label class="field"><span>School / institute</span><input name="institute" value="${esc(p.institute || '')}"></label>
+        ${isLearner ? `<label class="field"><span>Degree / program</span><input name="degree" value="${esc(p.degree || p.education || '')}" placeholder="e.g. BS Computer Science"></label>
+        <label class="field"><span>University / institute</span><input name="university" value="${esc(p.university || p.institute || '')}"></label>
+        <label class="field"><span>Current study year</span><select name="study_year"><option value="">Choose year</option>${[['1','1st year'],['2','2nd year'],['3','3rd year'],['4','4th year'],['5+','5th year or above'],['graduated','Graduated'],['other','Other']].map(([v,l])=>`<option value="${v}"${p.study_year===v?' selected':''}>${l}</option>`).join('')}</select></label>` : `<label class="field"><span>Education</span><input name="education" value="${esc(p.education || '')}" placeholder="e.g. BS Computer Science"></label>
+        <label class="field"><span>School / institute</span><input name="institute" value="${esc(p.institute || '')}"></label>`}
       </div>
       <label class="field"><span>Emergency contact - name &amp; phone</span><input name="emergency_contact" value="${esc(p.emergency_contact || '')}"></label>
       ${isStaffRole ? `

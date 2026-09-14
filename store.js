@@ -1113,7 +1113,7 @@ const Users = {
   // Institute-grade profile fields. Students and staff share the base set;
   // staff get professional fields on top. Unknown keys are dropped.
   PROFILE_FIELDS: {
-    base: ['marketing_opt_in', 'phone', 'whatsapp', 'dob', 'gender', 'cnic', 'father_name', 'address', 'city', 'education', 'institute', 'university_reg_no', 'emergency_contact', 'goal', 'links'],
+    base: ['marketing_opt_in', 'phone', 'whatsapp', 'dob', 'gender', 'cnic', 'father_name', 'address', 'city', 'education', 'institute', 'university', 'degree', 'study_year', 'university_reg_no', 'emergency_contact', 'goal', 'links'],
     staff: ['designation', 'qualification', 'expertise', 'experience_years', 'joining_date', 'office_hours'],
   },
   updateProfile(id, profile) {
@@ -1125,6 +1125,11 @@ const Users = {
     for (const k of Object.keys(u.profile)) if (u.profile[k] === '') delete u.profile[k];
     save();
     return u;
+  },
+  learnerProfileComplete(user) {
+    if (!user || !['student', 'free'].includes(user.role)) return true;
+    const p = user.profile || {};
+    return ['phone', 'city', 'university', 'degree', 'study_year'].every((key) => String(p[key] || '').trim().length > 0);
   },
   setOnboarded(id) { const u = Users.byId(id); if (!u) return null; u.onboarding_complete = true; save(); return u; },
   // HR-set short specialization highlight shown on the instructor's record
@@ -4234,6 +4239,8 @@ const OpenQuest = {
       for (const e of saved) {
         if (e.confirmed_at || !e.activates_at) continue;
         if (!pacing.isEnrollmentActive(e)) continue;
+        const lastAttempt = pacing.parseTimestamp(e.confirmation_email_attempted_at);
+        if (Number.isFinite(lastAttempt) && Date.now() - lastAttempt < 15 * 60 * 1000) continue;
         const t = TRACKS[e.track_key];
         if (!t) continue;
         out.push({ user: u, track_key: e.track_key, title: t.title, course_code: t.course_code || null });
@@ -4276,6 +4283,23 @@ const OpenQuest = {
     const saved = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
     u.profile = { ...(u.profile || {}), free_course_enrollments: saved.map((e) => (e.track_key === track_key && !e.confirmed_at ? { ...e, confirmed_at: now() } : e)) };
     save();
+  },
+  markConfirmationAttempt(uid, track_key, { sent, error = null } = {}) {
+    const u = Users.byId(uid);
+    if (!u) return null;
+    const saved = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
+    const attemptedAt = now();
+    u.profile = { ...(u.profile || {}), free_course_enrollments: saved.map((e) => {
+      if (e.track_key !== track_key || e.confirmed_at) return e;
+      return {
+        ...e,
+        confirmation_email_attempted_at: attemptedAt,
+        confirmation_email_error: sent ? null : String(error || 'Email was not accepted').slice(0, 300),
+        ...(sent ? { confirmed_at: attemptedAt, confirmation_email_sent_at: attemptedAt } : {}),
+      };
+    }) };
+    save();
+    return OpenQuest.enrollment(uid, track_key);
   },
   /** Learners still owed a launch email for this track. */
   waitlistFor(track_key) {

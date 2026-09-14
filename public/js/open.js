@@ -182,7 +182,7 @@ window.addEventListener('popstate', (e) => {
   try { ME = await api('/api/auth/me'); } catch { ME = null; }
   EL.drafts.setAccount(ME?.id || null);
   drawUserBox();
-  if (ME) requireWhatsapp();
+  if (ME) requireLearnerProfile();
   // Slots and reservations must be known before the catalogue draws, or a
   // coming-soon card offers a seat the learner already holds.
   await loadMyEnrollments();
@@ -261,6 +261,13 @@ function showSignup() {
         <label class="field"><span>Verification code (check your inbox)</span><input name="code" inputmode="numeric" maxlength="6" placeholder="6-digit code"></label>
       </div>
       <label class="field"><span>WhatsApp number (required)</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+      <div class="form-grid">
+        <label class="field"><span>City</span><input name="city" required maxlength="100" placeholder="Your city"></label>
+        <label class="field"><span>University / institute</span><input name="university" required maxlength="150" placeholder="University, college or school"></label>
+        <label class="field"><span>Degree / program</span><input name="degree" required maxlength="150" placeholder="e.g. BS Computer Science"></label>
+        <label class="field"><span>Current study year</span><select name="study_year" required><option value="">Choose year</option><option value="1">1st year</option><option value="2">2nd year</option><option value="3">3rd year</option><option value="4">4th year</option><option value="5+">5th year or above</option><option value="graduated">Graduated</option><option value="other">Other</option></select></label>
+      </div>
+      <label class="field"><span>Learning or career goal (optional)</span><input name="goal" maxlength="300" placeholder="What would you like to achieve?"></label>
       <label class="field"><span><input name="marketing_opt_in" type="checkbox" style="width:auto"> Send optional course offers and webinar invitations</span></label><p class="hint">No password to choose - once your email is verified, we generate one and email it to you.</p>
       <button class="btn btn-primary btn-block" id="suBtn">Create account</button>
     </form>`;
@@ -289,12 +296,18 @@ function showSignup() {
       // system-generated password mailed to the now-verified address.
       const out = await api('/api/auth/register-open', {
         method: 'POST',
-        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, code: f.code ? f.code.value.trim() : undefined }),
+        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, city: f.city.value.trim(), university: f.university.value.trim(), degree: f.degree.value.trim(), study_year: f.study_year.value, goal: f.goal.value.trim(), marketing_opt_in: f.marketing_opt_in.checked, code: f.code ? f.code.value.trim() : undefined }),
       });
       if (out.password) {
-        // Dev fallback only: no SMTP configured to deliver the password anywhere else.
-        modalMsg('Account created. SMTP is not configured, so here is your password once: ' + out.password, true);
-        setTimeout(() => location.reload(), 4000);
+        // Two reasons the server hands back the password directly instead of
+        // emailing it: no SMTP configured at all (dev), or mail is temporarily
+        // down (out.mail_paused - see signupMailDown() in server.js). Same UI,
+        // different wording so a real outage doesn't read like a bug.
+        const note = out.mail_paused
+          ? 'Account created. Email delivery is paused right now, so here is your password once - save it: '
+          : 'Account created. SMTP is not configured, so here is your password once: ';
+        modalMsg(note + out.password, true);
+        setTimeout(() => location.reload(), 6000);
       } else {
         modalMsg('Account created - we emailed your password to ' + f.email.value.trim() + '.', true);
         setTimeout(() => location.reload(), 1800);
@@ -302,26 +315,35 @@ function showSignup() {
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
-function requireWhatsapp() {
+function requireLearnerProfile() {
   if (!['free', 'student'].includes(ME.role)) return; // learners only - staff never see this
-  if (ME.profile && ME.profile.phone) return;
-  openModal('Add account contact details', `
-    <form id="waForm">
-      <p class="s" style="color:var(--muted);margin-bottom:12px">Add a contact number for class support and account updates. You can finish this step later. Promotional messages are optional.</p>
-      <label class="field"><span>WhatsApp number</span><input name="whatsapp" required placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+  if (ME.learner_profile_complete) return;
+  const p = ME.profile || {};
+  openModal('Complete your learner profile', `
+    <form id="learnerProfileForm">
+      <p class="s" style="color:var(--muted);margin-bottom:12px">Complete these details once so course support, enrollment records and future learning opportunities match your profile.</p>
+      <div class="form-grid"><label class="field"><span>Full name</span><input value="${esc(ME.name)}" readonly></label><label class="field"><span>Email</span><input value="${esc(ME.email || '')}" readonly></label></div>
+      <div class="form-grid">
+        <label class="field"><span>Contact / WhatsApp</span><input name="whatsapp" required value="${esc(p.phone || p.whatsapp || '')}" placeholder="03XX-XXXXXXX" inputmode="tel"></label>
+        <label class="field"><span>City</span><input name="city" required maxlength="100" value="${esc(p.city || '')}"></label>
+        <label class="field"><span>University / institute</span><input name="university" required maxlength="150" value="${esc(p.university || p.institute || '')}"></label>
+        <label class="field"><span>Degree / program</span><input name="degree" required maxlength="150" value="${esc(p.degree || p.education || '')}"></label>
+        <label class="field"><span>Current study year</span><select name="study_year" required><option value="">Choose year</option>${[['1','1st year'],['2','2nd year'],['3','3rd year'],['4','4th year'],['5+','5th year or above'],['graduated','Graduated'],['other','Other']].map(([v,l])=>`<option value="${v}"${p.study_year===v?' selected':''}>${l}</option>`).join('')}</select></label>
+        <label class="field"><span>Learning or career goal (optional)</span><input name="goal" maxlength="300" value="${esc(p.goal || '')}"></label>
+      </div>
+      <label class="field"><span><input type="checkbox" name="marketing_opt_in" style="width:auto"${p.marketing_opt_in==='yes'?' checked':''}> Send me optional course offers and webinar invitations</span></label>
       <button class="btn btn-primary btn-block">Save and continue</button></form>`);
   window.MODAL_LOCK = true;
   $('modalBox').querySelector('.close').style.display = 'none';
-  EL.deferForm($('waForm'),ME.id,'Profile');
-  $('waForm').insertAdjacentHTML('beforeend','<label class="field"><span><input type="checkbox" name="marketing_opt_in" style="width:auto"> Send me optional course offers and webinar invitations</span></label>');
-  $('waForm').addEventListener('submit', async (e) => {
+  EL.deferForm($('learnerProfileForm'),ME.id,'Learner profile');
+  $('learnerProfileForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true;
     try {
-      await api('/api/me/contact', { method: 'POST', body: JSON.stringify({ whatsapp: f.whatsapp.value.trim(), marketing_opt_in:f.marketing_opt_in.checked }) });
-      ME.profile = ME.profile || {}; ME.profile.phone = f.whatsapp.value.trim();
+      const out = await api('/api/me/learner-profile', { method: 'POST', body: JSON.stringify({ whatsapp:f.whatsapp.value.trim(), city:f.city.value.trim(), university:f.university.value.trim(), degree:f.degree.value.trim(), study_year:f.study_year.value, goal:f.goal.value.trim(), marketing_opt_in:f.marketing_opt_in.checked }) });
+      ME.profile = out.profile; ME.learner_profile_complete = true;
       window.MODAL_LOCK = false;
       $('modalBox').querySelector('.close').style.display = '';
-      closeModal(); toast('Saved - happy learning.');
+      closeModal(); toast('Profile complete - happy learning.');
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }

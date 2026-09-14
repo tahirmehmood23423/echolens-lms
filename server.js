@@ -434,6 +434,7 @@ app.get('/api/auth/me', authRequired, (req, res) => {
     profile: u.profile || {}, gamify: ['student', 'free'].includes(u.role) ? gamifyFor(u) : null,
     ai_enabled: ['admin', 'instructor'].includes(u.role) && ai.enabled(),
     onboarding_complete: u.onboarding_complete !== false,
+    learner_profile_complete: Users.learnerProfileComplete(u),
     recruiter: u.role === 'recruiter' ? recruiterView(u) : null,
   });
 });
@@ -2922,29 +2923,57 @@ app.get('/api/public/cert-image/:name', (req, res) => {
 /* ================================ v12 routes ================================ */
 
 /* --------------------------- open sign-up + leads --------------------------- */
-// Anyone can create a FREE open account with just name, email and WhatsApp -
-// no chosen password. The email is verified up front (MX check, plus a
+// Anyone can create a FREE open account with learner contact and education
+// details, but no chosen password. The email is verified up front (MX check, plus a
 // mailed 6-digit code when SMTP is configured - proof the inbox is real and
 // reachable) BEFORE the account exists. Once verified, the system generates
 // a password and emails it there, so the working inbox is confirmed for a
 // second time by the one place the credentials can ever be read from. Every
 // open user also becomes a lead the admin can download.
+const LEARNER_STUDY_YEARS = new Set(['1', '2', '3', '4', '5+', 'graduated', 'other']);
+function learnerProfileInput(body) {
+  const contact = String(body.whatsapp || body.phone || '').trim();
+  const city = String(body.city || '').trim();
+  const university = String(body.university || '').trim();
+  const degree = String(body.degree || '').trim();
+  const studyYear = String(body.study_year || '').trim().toLowerCase();
+  if (contact.replace(/\D/g, '').length < 10) return { error: 'Enter a valid contact or WhatsApp number.' };
+  if (city.length < 2 || city.length > 100) return { error: 'Enter your city.' };
+  if (university.length < 2 || university.length > 150) return { error: 'Enter your university, college, school, or institute.' };
+  if (degree.length < 2 || degree.length > 150) return { error: 'Enter your degree or current program.' };
+  if (!LEARNER_STUDY_YEARS.has(studyYear)) return { error: 'Choose your current study year.' };
+  return { profile: {
+    phone: contact, whatsapp: contact, city, university, institute: university, degree,
+    education: degree, study_year: studyYear, goal: String(body.goal || '').trim().slice(0, 300),
+    marketing_opt_in: body.marketing_opt_in === true ? 'yes' : 'no',
+  } };
+}
 app.post('/api/auth/register-open', limitSignup, async (req, res) => {
-  const { name, email, whatsapp, code } = req.body || {};
+  const { name, email, code } = req.body || {};
   if (!name || String(name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
-  if (mailer.configured && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
-  if (!whatsapp || String(whatsapp).replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'Enter your WhatsApp number (e.g. 03XX-XXXXXXX).' });
+  const mailDown = signupMailDown();
+  if (mailer.configured && !mailDown && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
+  const learnerInput = learnerProfileInput(req.body || {});
+  if (learnerInput.error) return res.status(400).json({ error: learnerInput.error });
   if (Users.allByLogin(email).some((u) => ['student', 'free'].includes(u.role))) return res.status(400).json({ error: 'A learner account with this email already exists - sign in instead.' });
   const { user, password } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase(), username: String(email).trim().toLowerCase() });
-  Users.updateProfile(user.id, { phone: String(whatsapp).trim(),marketing_opt_in:req.body.marketing_opt_in===true?'yes':'no' });
-  if(req.body.marketing_opt_in===true)Leads.upsert({ name: user.name, email: user.email, whatsapp: String(whatsapp).trim(), source: 'open-signup', user_id: user.id });
+  Users.updateProfile(user.id, learnerInput.profile);
+  Leads.upsert({ name: user.name, email: user.email, whatsapp: learnerInput.profile.phone, source: 'open-signup', user_id: user.id });
   setAuthCookie(res, sign(Users.byId(user.id)));
-  mailer.notify(user.email, 'Welcome to EchoLens - your password',
-    `${hi(user.name)},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Profile after signing in.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
+  // mailDown: mail is known to be undeliverable right now (see signupMailDown
+  // above) - skip the send entirely rather than let it fail against Zoho's
+  // quota, same as the no-SMTP case just below.
+  if (!mailDown) {
+    mailer.notify(user.email, 'Welcome to EchoLens - your password',
+      `${hi(user.name)},\n\nYour free EchoLens account is live. Your registration number is ${user.reg_no}.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Profile after signing in.\n\nSolve open quests, use the free compiler, join hackathons and webinars, and earn verified certificates: ${APP_URL}/open`);
+  }
   const out = { ok: true, role: 'free' };
-  if (!mailer.configured) out.password = password; // dev fallback: no SMTP to deliver it anywhere else
+  if (!mailer.configured || mailDown) {
+    out.password = password; // nothing will deliver it any other way right now
+    out.mail_paused = mailer.configured && mailDown; // distinguishes "outage" from the permanent no-SMTP dev case, for the UI copy
+  }
   res.json(out);
 });
 
@@ -3606,11 +3635,32 @@ async function emailDomainExists(email) {
   }
 }
 const EMAIL_CODES = new Map(); // email -> { code, expires, tries }
+/**
+ * TEMPORARY: Zoho's transactional mailbox hit its daily send limit on
+ * 2026-09-14 (resets ~24h later). Until it resets, a verification code or
+ * welcome email sent through it never arrives - which was silently blocking
+ * every open-course signup behind a code field nobody could ever fill in.
+ *
+ * While this is active, open signup behaves exactly like the existing
+ * "no SMTP configured" path below: no code is requested, no mail is
+ * attempted, and the generated password is returned in the API response
+ * once so the student can still sign in later.
+ *
+ *   SIGNUP_MAIL_DOWN=false   turn it off immediately (Zoho has recovered)
+ *   SIGNUP_MAIL_DOWN=true    force it on, ignoring the auto window
+ *   unset                    auto: on for 24h from this process starting
+ */
+const SIGNUP_MAIL_DOWN_OVERRIDE = process.env.SIGNUP_MAIL_DOWN;
+const SIGNUP_MAIL_DOWN_AUTO_UNTIL = Date.now() + 24 * 3600_000;
+function signupMailDown() {
+  if (SIGNUP_MAIL_DOWN_OVERRIDE != null) return SIGNUP_MAIL_DOWN_OVERRIDE.toLowerCase() === 'true';
+  return Date.now() < SIGNUP_MAIL_DOWN_AUTO_UNTIL;
+}
 app.post('/api/auth/email-code', limitEmailSend, async (req, res) => {
   const { email } = req.body || {};
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
-  if (!mailer.configured) return res.json({ ok: true, verification: false }); // no SMTP: MX check is the gate
+  if (!mailer.configured || signupMailDown()) return res.json({ ok: true, verification: false }); // no SMTP, or mail temporarily down: MX check is the gate
   const code = String(Math.floor(100000 + Math.random() * 900000));
   EMAIL_CODES.set(String(email).toLowerCase(), { code, expires: Date.now() + 10 * 60 * 1000, tries: 0 });
   mailer.notify(email, 'Your EchoLens verification code', `Your EchoLens verification code is ${code}. It expires in 10 minutes. If you did not request this, ignore this email.`);
@@ -3826,6 +3876,15 @@ app.post('/api/admin/feedback/:id/reply', authRequired, adminRequired, (req, res
 app.delete('/api/admin/feedback/:id', authRequired, adminRequired, (req, res) => {
   if (!Feedback.remove(req.params.id)) return res.status(404).json({ error: 'Feedback not found.' });
   res.json({ ok: true });
+});
+
+app.post('/api/me/learner-profile', authRequired, (req, res) => {
+  if (!['student', 'free'].includes(req.user.role)) return res.status(403).json({ error: 'Learner profile details are for student accounts.' });
+  const parsed = learnerProfileInput(req.body || {});
+  if (parsed.error) return res.status(400).json({ error: parsed.error });
+  const user = Users.updateProfile(req.user.id, parsed.profile);
+  if (user.email) Leads.upsert({ name: user.name, email: user.email, whatsapp: parsed.profile.phone, source: user.role === 'free' ? 'open-profile' : 'portal-profile', user_id: user.id });
+  res.json({ ok: true, profile: user.profile, learner_profile_complete: Users.learnerProfileComplete(user) });
 });
 
 /* Private support tickets live beside the feedback workflow in the UI, but
@@ -4395,6 +4454,10 @@ function openLearnerRequired(req, res, next) {
   if (['free', 'student'].includes(req.user.role)) return next();
   return res.status(403).json({ error: 'Free-course enrollment and progress are for learner accounts only.' });
 }
+function learnerProfileRequired(req, res, next) {
+  if (Users.learnerProfileComplete(req.user)) return next();
+  return res.status(409).json({ error: 'Complete your learner profile before enrolling in a course.' });
+}
 app.get('/api/open/enrollments', authRequired, openLearnerRequired, (req, res) => {
   const courses = OpenQuest.enrollments(req.user.id);
   const gate = pacing.canEnroll(courses);
@@ -4444,7 +4507,7 @@ app.post('/api/admin/tracks/:key/launch-notice', authRequired, adminRequired, as
   await store.pendingPersist();
   res.json({ ok: true, requested: waiting.length, notified: sent.size, dry_run: !!result.dryRun, aborted: !!result.aborted, reason: result.abortReason || null });
 }));
-app.post('/api/open/enrollments', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {
+app.post('/api/open/enrollments', authRequired, openLearnerRequired, learnerProfileRequired, asyncRoute(async (req, res) => {
   const out = OpenQuest.enroll(req.user.id, String(req.body.track_key || ''));
   if (out.error) return res.status(out.status).json({ error: out.error });
   await store.pendingPersist();
@@ -4510,14 +4573,17 @@ async function sweepEnrollmentConfirmations() {
   const due = OpenQuest.dueForConfirmation(15);
   if (!due.length) return;
   for (const row of due) {
-    OpenQuest.markConfirmed(row.user.id, row.track_key);
     if (row.user.email) {
       const first = String(row.user.name || '').trim().split(/\s+/)[0] || 'there';
-      mailer.notify(
+      const delivery = await mailer.notify(
         row.user.email,
-        `Your seat is confirmed: ${row.title}`,
-        `Hi ${first},\n\nYour enrolment in ${row.title} is confirmed and the course is now open.\n\nStart module 1: ${APP_URL}/open\n\nHow this course works:\n- One module opens per day.\n- Grades are released 12 hours after you submit, so a busy grader never blocks you.\n- You can study two courses at a time.\n\n- EchoLens`,
+        `Congratulations - you are enrolled in ${row.title}`,
+        `Hi ${first},\n\nCongratulations! Your enrolment in ${row.title} is confirmed and the course is now open.\n\nStart module 1: ${APP_URL}/open\n\nHow your free certified course works:\n- You can study up to two active courses at a time.\n- The next module opens as soon as the current module's required assignments are graded and passed.\n- Grades are released as soon as they are ready, within ${pacing.GRADING_WINDOW_HOURS} hours of submission.\n- Complete the required assessments to earn your verified certificate.\n\nWelcome to the course, and best of luck with your learning!`,
       );
+      const sent = delivery.sent.includes(String(row.user.email).toLowerCase());
+      OpenQuest.markConfirmationAttempt(row.user.id, row.track_key, { sent, error: sent ? null : 'The email provider did not accept the confirmation message.' });
+    } else {
+      OpenQuest.markConfirmationAttempt(row.user.id, row.track_key, { sent: false, error: 'The learner account has no email address.' });
     }
   }
   await store.pendingPersist();

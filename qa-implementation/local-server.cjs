@@ -61,6 +61,13 @@ if (!store.Users.byLogin('observer@qa.invalid')) {
   const observer=store.Users.createFixed({name:'QA Unenrolled Observer',role:'free',username:'qa.observer',email:'observer@qa.invalid',password:'LocalQa!2026'});
   observer.profile.phone='03001234567';store.persist();
 }
+for (const learner of store.Users.all().filter(u => ['student','free'].includes(u.role) && u.email?.endsWith('@qa.invalid'))) {
+  if (!store.Users.learnerProfileComplete(learner)) store.Users.updateProfile(learner.id, {
+    phone: learner.profile?.phone || '03001234567', whatsapp: learner.profile?.phone || '03001234567',
+    city: 'Lahore', university: 'QA University', institute: 'QA University',
+    degree: 'BS Computer Science', education: 'BS Computer Science', study_year: '3', marketing_opt_in: 'no',
+  });
+}
 const ambassadorUser = store.Users.byId(qaFixtures.users.ambassador.id);
 if (!store.Ambassadors.byUserId(ambassadorUser.id)) store.Ambassadors.create({ name: ambassadorUser.name, email: ambassadorUser.email, university: 'QA University', user_id: ambassadorUser.id }, qaFixtures.users.admin.id);
 const staffUser = store.Users.byId(qaFixtures.users.staff.id);

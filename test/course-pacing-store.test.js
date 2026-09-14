@@ -224,7 +224,13 @@ test('the confirmation sweep emails each seat exactly once', () => {
   assert.ok(due.some((r) => r.user.id === u.id), 'due once the hour has passed');
   assert.equal(due.find((r) => r.user.id === u.id).title, track.title);
 
-  OpenQuest.markConfirmed(u.id, track.key);
+  OpenQuest.markConfirmationAttempt(u.id, track.key, { sent: false, error: 'Temporary mail failure' });
+  assert.equal(OpenQuest.dueForConfirmation().some((r) => r.user.id === u.id), false, 'failed mail observes a retry cooldown');
+  const pending = Users.byId(u.id).profile.free_course_enrollments.find((e) => e.track_key === track.key);
+  pending.confirmation_email_attempted_at = new Date(Date.now() - 16 * 60_000).toISOString();
+  assert.equal(OpenQuest.dueForConfirmation().some((r) => r.user.id === u.id), true, 'failed mail becomes retryable');
+
+  OpenQuest.markConfirmationAttempt(u.id, track.key, { sent: true });
   assert.equal(OpenQuest.dueForConfirmation().some((r) => r.user.id === u.id), false, 'never emailed twice');
   assert.equal(OpenQuest.enrollment(u.id, track.key).active, true, 'and access is unaffected by the email');
 });

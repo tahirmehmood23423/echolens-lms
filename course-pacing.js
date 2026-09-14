@@ -43,7 +43,7 @@ const GRADING_WINDOW_MS = Number(process.env.GRADING_WINDOW_HOURS || 8) * HOUR_M
 const GRADING_WINDOW_HOURS = Math.round(GRADING_WINDOW_MS / HOUR_MS);
 // Free self-paced courses a learner may study at once. Waitlisted courses that
 // have not launched do not count - they cannot be studied yet.
-const MAX_ACTIVE_COURSES = Number(process.env.MAX_ACTIVE_FREE_COURSES || 2);
+const MAX_ACTIVE_COURSES = 2;
 
 /**
  * store.js's now() renders UTC as 'YYYY-MM-DD HH:mm:ss' (store.js:748) - a bare

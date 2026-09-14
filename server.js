@@ -4537,6 +4537,20 @@ app.get('/api/admin/open-courses/:key/students', authRequired, adminRequired, (r
   if (!t) return res.status(404).json({ error: 'Free course not found.' });
   res.json({ ok: true, track: { key: t.key, title: t.title, course_code: t.course_code || null }, students: OpenQuest.studentsFor(t.key) });
 });
+app.get('/api/admin/open-courses-progress', authRequired, adminRequired, (req, res) => {
+  const certificates = store.allData().certificates || [];
+  const courses = store.publicCatalogue().filter((c) => c.price_pkr === 0 && c.track_key && c.available);
+  const report = courses.map((c) => {
+    const students = OpenQuest.studentsFor(c.track_key);
+    const enrolled = students.length;
+    const completed = students.filter((s) => s.completed).length;
+    const lectureTotal = (Quests.trackDef(c.track_key)?.levels || []).length;
+    const lecturesCovered = students.reduce((n, s) => n + Number(s.completed_levels || s.levels_completed || 0), 0);
+    const certs = certificates.filter((x) => x.track_key === c.track_key || x.title === c.title).length;
+    return { code: c.code, title: c.title, enrolled, completed, completion_rate: enrolled ? Math.round(completed / enrolled * 100) : 0, lectures_total: enrolled * lectureTotal, lectures_covered: lecturesCovered, certificates: certs };
+  });
+  res.json({ courses: report, totals: { enrolled: report.reduce((n, x) => n + x.enrolled, 0), certificates: report.reduce((n, x) => n + x.certificates, 0) } });
+});
 app.post('/api/admin/open-courses/:key/students', authRequired, adminRequired, asyncRoute(async (req, res) => {
   const t = freePublishedTrack(req.params.key);
   if (!t) return res.status(404).json({ error: 'Free course not found.' });

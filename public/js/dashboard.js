@@ -108,6 +108,7 @@ const TITLES = {
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
   students: 'Students', grades: 'Grades', attendance: 'Attendance', analytics: 'Analytics',
   'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
+  'admin-open-courses': 'Free Courses',
   'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-feedback': 'Feedback & Tickets', 'admin-logs': 'System Logs',
   jobs: 'Jobs', job: 'Job',
   'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal', 'dept-ambassador': 'Ambassadors Portal',
@@ -153,7 +154,7 @@ function show(view) {
     students: renderTeacherStudents, grades: renderTeacherGrades, attendance: renderTeacherAttendance,
     analytics: renderTeacherAnalytics,
     'admin-teachers': renderAdminTeachers, 'admin-students': renderAdminStudents,
-    'admin-enrollments': renderAdminEnrollments, 'admin-finance': renderAdminFinance,
+    'admin-enrollments': renderAdminEnrollments, 'admin-open-courses': renderAdminOpenCourses, 'admin-finance': renderAdminFinance,
     'admin-announcements': renderAdminAnnouncementsPage, 'admin-feedback': renderAdminFeedback, 'admin-logs': renderAdminLogs,
     jobs: renderJobs,
     'dept-hr': renderDeptHR, 'dept-finance': renderDeptFinance, 'dept-student-coordinator': renderDeptStudentCoordinator, 'dept-staff': renderDeptStaff,
@@ -947,6 +948,90 @@ async function renderAdminEnrollments() {
         <td class="s">${esc((e.created_at || '').slice(0, 10))}</td>
       </tr>`).join('') || '<tr><td colspan="6" class="empty">No enrollments yet.</td></tr>'}
     </table></div></div>`;
+}
+/* ---------------------------- admin: free courses ----------------------------
+ * Manually enroll students in a free, self-paced open-web course - same shape
+ * as adding students to a paid batch (formStudents() above): new candidates
+ * by "Full Name, email" get an account created and their credentials mailed;
+ * existing accounts by reg no / username / email are just enrolled. Every
+ * enrolment goes through the same rules a self-service learner would hit
+ * (two-course cap, confirmation window), so this is a shortcut for staff, not
+ * a separate set of rules.
+ */
+let OPEN_COURSE_ADMIN_KEY = null;
+async function renderAdminOpenCourses() {
+  const el = $('view-admin-open-courses');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  // The catalogue, not the raw track list: a track can be free/published while
+  // its catalogue entry is not (or vice versa) - only what the catalogue marks
+  // available is actually enrollable, matching what OpenQuest.enroll() checks.
+  const d = await api('/api/public/catalogue');
+  const tracks = (d.catalogue || []).filter((c) => c.price_pkr === 0 && c.available && c.track_key)
+    .map((c) => ({ key: c.track_key, title: c.title, course_code: c.code }));
+  if (!tracks.length) { el.innerHTML = '<div class="empty">No free courses are open for enrolment right now.</div>'; return; }
+  if (!OPEN_COURSE_ADMIN_KEY || !tracks.some((t) => t.key === OPEN_COURSE_ADMIN_KEY)) OPEN_COURSE_ADMIN_KEY = tracks[0].key;
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:14px"><div class="card-body" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+      <label class="field" style="flex:1;min-width:240px;margin:0"><span>Free course</span>
+        <select id="ocSelect">${tracks.map((t) => `<option value="${esc(t.key)}"${t.key === OPEN_COURSE_ADMIN_KEY ? ' selected' : ''}>${esc(t.title)}${t.course_code ? ' (' + esc(t.course_code) + ')' : ''}</option>`).join('')}</select>
+      </label>
+      <button class="btn btn-primary" id="ocAddBtn">Add students</button>
+    </div></div>
+    <div id="ocRoster"><div class="empty">Loading&hellip;</div></div>`;
+  $('ocSelect').addEventListener('change', (e) => { OPEN_COURSE_ADMIN_KEY = e.target.value; loadOpenCourseRoster(); });
+  $('ocAddBtn').addEventListener('click', () => formOpenCourseStudents());
+  await loadOpenCourseRoster();
+}
+async function loadOpenCourseRoster() {
+  const box = $('ocRoster'); if (!box) return;
+  box.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  try {
+    const d = await api(`/api/admin/open-courses/${encodeURIComponent(OPEN_COURSE_ADMIN_KEY)}/students`);
+    box.innerHTML = `<div class="card"><div class="card-head"><h3>Enrolled students</h3><span class="s" style="color:var(--muted)">${d.students.length} total</span></div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Student</th><th>Reg no</th><th>Email</th><th>Enrolled</th><th>Status</th><th>Progress</th></tr>
+        ${d.students.map((s) => `<tr>
+          <td>${esc(s.name)}</td><td class="mono">${esc(s.reg_no || '—')}</td><td class="s">${esc(s.email || '—')}</td>
+          <td class="s">${esc((s.enrolled_at || '').slice(0, 10))}</td>
+          <td>${s.active ? '<span class="s" style="color:var(--ok)">Active</span>' : `<span class="s" style="color:var(--muted)">${esc(s.confirmation_note || 'Confirming')}</span>`}</td>
+          <td class="s">${s.completed ? 'Completed' : s.required_total != null ? `${s.required_passed}/${s.required_total} passed` : '—'}</td>
+        </tr>`).join('') || '<tr><td colspan="6" class="empty">Nobody is enrolled in this course yet - add students above.</td></tr>'}
+      </table></div></div>`;
+  } catch (err) { box.innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
+}
+function formOpenCourseStudents() {
+  const key = OPEN_COURSE_ADMIN_KEY;
+  openModal('Add students to this free course', `
+    <form id="f">
+      <label class="field"><span>New students - one per line as "Full Name, email"</span><textarea name="names" placeholder="Ayesha Khan, ayesha@gmail.com&#10;Bilal Noor, bilal@gmail.com"></textarea></label>
+      <p class="hint">A real, working email is required for each candidate - their generated username is just a login handle, not an inbox. A password and registration number are generated and mailed to that email automatically (or shown here once, if mail can't be delivered right now).</p>
+      <label class="field"><span>Existing learners - one reg no, username or email per line</span><textarea name="existing" placeholder="4821736"></textarea></label>
+      <p class="hint">Enrolls learners who already have an EchoLens account. The usual two-courses-at-a-time limit still applies.</p>
+      <button class="btn btn-primary btn-block">Add to course</button></form>
+    <div id="credOut"></div>`);
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    const names = f.names.value.split('\n').map((s) => s.trim()).filter(Boolean);
+    const existing = f.existing.value.split('\n').map((s) => s.trim()).filter(Boolean);
+    if (!names.length && !existing.length) { modalMsg('Add at least one new or existing student.'); btn.disabled = false; return; }
+    try {
+      const out = await api(`/api/admin/open-courses/${encodeURIComponent(key)}/students`, { method: 'POST', body: JSON.stringify({ names, existing }) });
+      let html = '';
+      if (out.created.length) html += `<p style="margin:12px 0 4px;font-weight:600">New accounts - copy these now, passwords are shown once:</p>` +
+        out.created.map((c) => `<div class="cred-box">${esc(c.name)}<br>Reg no: <strong>${esc(c.reg_no)}</strong><br>Username: ${esc(c.username)}<br>Password: ${esc(c.password)}${
+          c.emailed ? '<br><span style="color:var(--ok)">&#10003; credentials emailed to ' + esc(c.email) + '</span>'
+          : c.mail_paused ? '<br><span style="color:var(--warn,#b45309)">Email delivery is paused right now - share these credentials yourself</span>'
+          : '<br><span style="color:var(--muted)">SMTP not configured - share these credentials yourself</span>'
+        }</div>`).join('');
+      if (out.added.length) html += `<p style="margin:12px 0 4px;font-weight:600">Enrolled existing learners:</p>` + out.added.map((a) => `<div class="cred-box">${esc(a.name)} (${esc(a.reg_no)})${a.existing ? ' - already enrolled' : ''}</div>`).join('');
+      if (out.invalid && out.invalid.length) html += `<p style="margin:12px 0 4px;color:var(--danger)">Skipped: ${out.invalid.map(esc).join('; ')}</p>`;
+      if (out.missing.length) html += `<p style="margin:12px 0 4px;color:var(--danger)">Not found (or not a learner account): ${out.missing.map(esc).join(', ')}</p>`;
+      $('credOut').innerHTML = html || '';
+      modalMsg('Done.', true); f.reset();
+      await loadOpenCourseRoster();
+    } catch (err) { modalMsg(err.message); }
+    btn.disabled = false;
+  });
 }
 async function renderAdminFinance() {
   const el = $('view-admin-finance');

@@ -4185,6 +4185,42 @@ const OpenQuest = {
       return [{ ...OpenQuest.enrollment(uid, track_key), track_key, title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, assignment_average: progress.assignment_average, capstone: progress.capstone ? { unlocked: progress.capstone.unlocked, submitted: progress.capstone.submitted, score: progress.capstone.score, passed: progress.capstone.passed } : null, weighted_score: progress.weighted_score, completed: progress.passed }];
     });
   },
+  /**
+   * Reverse of enrollments(uid): every learner currently holding a seat on
+   * this free track. Admin-facing roster for the "manually add students"
+   * page - lets staff see who is already in before adding more, and confirm
+   * an add actually landed.
+   */
+  studentsFor(track_key) {
+    const t = TRACKS[track_key];
+    if (!t?.free) return [];
+    const out = [];
+    for (const u of data.users) {
+      if (!['free', 'student'].includes(u.role)) continue;
+      const enr = OpenQuest.enrollment(u.id, track_key);
+      if (!enr) continue;
+      const progress = OpenQuest.progress(u.id, track_key);
+      out.push({
+        id: u.id, name: u.name, email: u.email || null, reg_no: u.reg_no, username: u.username,
+        enrolled_at: enr.enrolled_at, active: enr.active, confirmation_note: enr.confirmation_note || null,
+        required_passed: progress?.required_passed ?? null, required_total: progress?.required_total ?? null,
+        completed: !!progress?.passed,
+      });
+    }
+    return out.sort((a, b) => Date.parse(b.enrolled_at) - Date.parse(a.enrolled_at));
+  },
+  /**
+   * Admin-driven enrollment: same rules as self-service (enroll()) - role,
+   * published-free-course, and the two-course cap all still apply - so an
+   * admin cannot place a learner anywhere they could not have reached
+   * themselves. The only difference from self-service is who clicked the
+   * button; pacing, the confirmation window and its email are identical
+   * (the existing confirmation sweep picks this up exactly like a normal
+   * enrolment, so no separate notification path is needed here).
+   */
+  adminEnroll(uid, track_key) {
+    return OpenQuest.enroll(uid, track_key);
+  },
   /* ---------------------- launch waitlist (staged courses) ----------------------
    * The trending-tech tracks are content-complete but have no lecture videos
    * yet, so they are catalogue previews rather than enrollable courses. A

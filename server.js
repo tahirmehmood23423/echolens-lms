@@ -4507,6 +4507,68 @@ app.post('/api/admin/tracks/:key/launch-notice', authRequired, adminRequired, as
   await store.pendingPersist();
   res.json({ ok: true, requested: waiting.length, notified: sent.size, dry_run: !!result.dryRun, aborted: !!result.aborted, reason: result.abortReason || null });
 }));
+/* ------------------- admin: manually enroll students in a free course -------------------
+ * Same shape as /api/batches/:id/students (add students to a paid batch):
+ * new candidates by "Full Name, email" (account created, credentials mailed)
+ * or existing accounts by reg no / username / email (just enrolled). Every
+ * enrolment - admin-driven or self-service - goes through OpenQuest.enroll,
+ * so the two-course cap and the confirmation window apply identically either
+ * way; the confirmation-opens-the-course email is the existing sweep, not
+ * something this route sends itself.
+ */
+// The same test OpenQuest.enroll() applies internally: a track can be
+// t.free && t.published while its OFFICIAL_CATALOGUE entry is still
+// unpublished (or vice versa) - only a course that is enrollable through the
+// catalogue is actually enrollable at all, so this route must agree with
+// that, not just the raw track flags, or the admin dropdown would offer
+// courses OpenQuest.enroll() then refuses every single time.
+function freePublishedTrack(key) {
+  const t = Quests.trackDef(key);
+  if (!t || !t.free) return null;
+  const inCatalogue = store.publicCatalogue().some((c) => c.track_key === key && c.price_pkr === 0 && c.available);
+  return inCatalogue ? t : null;
+}
+app.get('/api/admin/open-courses/:key/students', authRequired, adminRequired, (req, res) => {
+  const t = freePublishedTrack(req.params.key);
+  if (!t) return res.status(404).json({ error: 'Free course not found.' });
+  res.json({ ok: true, track: { key: t.key, title: t.title, course_code: t.course_code || null }, students: OpenQuest.studentsFor(t.key) });
+});
+app.post('/api/admin/open-courses/:key/students', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const t = freePublishedTrack(req.params.key);
+  if (!t) return res.status(404).json({ error: 'Free course not found.' });
+  const { names, existing } = req.body || {};
+  const created = [], added = [], missing = [], invalid = [];
+  const mailDown = signupMailDown();
+  for (const raw of Array.isArray(names) ? names : []) {
+    // Each line: "Full Name, email@domain" - a real email is mandatory so the
+    // generated username/password can always be mailed to the candidate.
+    const parts = String(raw).split(',').map((x) => x.trim());
+    const name = parts[0]; if (!name) continue;
+    const email = (parts[1] || '').toLowerCase();
+    if (!isEmail(email)) { invalid.push(`${raw} - missing or invalid email`); continue; }
+    if (!(await emailDomainExists(email))) { invalid.push(`${raw} - that email domain does not receive mail`); continue; }
+    if (Users.allByLogin(email).some((u) => ['student', 'free'].includes(u.role))) { invalid.push(`${raw} - a learner account with this email already exists (add them as an existing student instead)`); continue; }
+    const { user, password } = Users.create({ name, role: 'free', email, username: email });
+    const enrolled = OpenQuest.adminEnroll(user.id, t.key);
+    if (enrolled.error) { invalid.push(`${raw} - account created, but could not enrol: ${enrolled.error}`); continue; }
+    const emailed = mailer.configured && !mailDown;
+    if (emailed) {
+      mailer.notify(email, 'Welcome to EchoLens - your account',
+        `${hi(user.name)},\n\nAn EchoLens account has been created for you and you have been enrolled in ${t.title}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.\n\n${enrolled.enrollment.confirmation_note || 'The course is open now - start module 1 any time.'}`);
+    }
+    created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed, mail_paused: mailer.configured && mailDown });
+  }
+  for (const raw of Array.isArray(existing) ? existing : []) {
+    const u = Users.byLogin(String(raw).trim());
+    if (!u || !['free', 'student'].includes(u.role)) { missing.push(String(raw).trim()); continue; }
+    const enrolled = OpenQuest.adminEnroll(u.id, t.key);
+    if (enrolled.error) { invalid.push(`${u.name} (${raw}) - ${enrolled.error}`); continue; }
+    added.push({ name: u.name, reg_no: u.reg_no, existing: !!enrolled.existing });
+  }
+  await store.pendingPersist();
+  res.json({ ok: true, track: { key: t.key, title: t.title }, created, added, missing, invalid });
+}));
+
 app.post('/api/open/enrollments', authRequired, openLearnerRequired, learnerProfileRequired, asyncRoute(async (req, res) => {
   const out = OpenQuest.enroll(req.user.id, String(req.body.track_key || ''));
   if (out.error) return res.status(out.status).json({ error: out.error });

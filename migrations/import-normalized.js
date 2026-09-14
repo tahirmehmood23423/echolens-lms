@@ -442,7 +442,7 @@ async function main() {
       }
     } else {
       console.log('--force passed: truncating all tables first...');
-      const tableNames = [...new Set(COLLECTIONS.map(([, t]) => t))].concat(['seq', 'issued_usernames', 'issued_regnos', 'settings']);
+      const tableNames = [...new Set(COLLECTIONS.map(([, t]) => t))].concat(['feedback', 'seq', 'issued_usernames', 'issued_regnos', 'settings']);
       await client.query(`TRUNCATE ${tableNames.join(', ')} RESTART IDENTITY CASCADE`);
     }
 
@@ -483,6 +483,14 @@ async function main() {
       const inserted = await insertCollection(client, table, columns, records);
       summary.push({ key, table, jsonCount: records.length, inserted });
     }
+
+    const feedbackRecords = Array.isArray(json.feedback) ? json.feedback : [];
+    let feedbackInserted = 0;
+    for (const record of feedbackRecords) {
+      const result = await client.query('INSERT INTO feedback (id, data) VALUES ($1, $2::jsonb) ON CONFLICT (id) DO NOTHING', [record.id, JSON.stringify(record)]);
+      feedbackInserted += result.rowCount;
+    }
+    summary.push({ key: 'feedback', table: 'feedback', jsonCount: feedbackRecords.length, inserted: feedbackInserted });
 
     await importStoreMeta(client, json);
 

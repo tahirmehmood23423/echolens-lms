@@ -277,6 +277,21 @@ function buildFailedFlushDump(snapshot, prevSnapshot, failureInfo) {
     for (const id of prevRows.keys()) if (!seenIds.has(id)) deletedIds.push(id);
     if (created.length || updated.length || deletedIds.length) collections[key] = { created, updated, deleted_ids: deletedIds };
   }
+  // Feedback/support tickets use the existing JSONB feedback table rather
+  // than a flattened schema-map row, but must still be present in a fatal
+  // flush dump so an unresolved user ticket can never disappear silently.
+  {
+    const key = 'feedback', records = snapshot[key] || [], prevRows = prevSnapshot[key] || new Map();
+    const created = [], updated = [], seenIds = new Set();
+    for (const rec of records) {
+      seenIds.add(rec.id); const json = JSON.stringify(rec);
+      if (!prevRows.has(rec.id)) created.push(redactRowForLog(rec));
+      else if (prevRows.get(rec.id) !== json) updated.push(redactRowForLog(rec));
+    }
+    const deletedIds = [];
+    for (const id of prevRows.keys()) if (!seenIds.has(id)) deletedIds.push(id);
+    if (created.length || updated.length || deletedIds.length) collections[key] = { created, updated, deleted_ids: deletedIds };
+  }
   const seqChanges = {};
   const prevSeq = prevSnapshot.seq || {};
   for (const [name, value] of Object.entries(snapshot.seq || {})) if (prevSeq[name] !== value) seqChanges[name] = value;
@@ -472,6 +487,37 @@ async function persistAllToPostgresNormalized(snapshot) {
         }
       }
 
+      // The pre-existing feedback table intentionally stores whole records as
+      // JSONB. Persist it in the same transaction as every normalized table;
+      // support-ticket creation and resolution must be durable before the API
+      // reports success or sends the corresponding lifecycle response.
+      {
+        const key = 'feedback', records = snapshot[key] || [], prevRows = prevSnapshot[key] || new Map();
+        const nextRows = new Map(), toCreate = [];
+        for (const rec of records) {
+          const json = JSON.stringify(rec); nextRows.set(rec.id, json);
+          if (prevRows.get(rec.id) === json) continue;
+          if (prevRows.has(rec.id)) {
+            lastOp = { collection: key, op: 'update', rows: [rec] };
+            await tx.feedbackRecord.update({ where: { id: BigInt(rec.id) }, data: { data: rec } });
+            if (perf) perf.updates++;
+          } else toCreate.push({ id: BigInt(rec.id), data: rec });
+        }
+        if (toCreate.length) {
+          lastOp = { collection: key, op: 'createMany', rows: records.filter((rec) => !prevRows.has(rec.id)) };
+          await tx.feedbackRecord.createMany({ data: toCreate });
+          if (perf) { perf.creates += toCreate.length; perf.createBatches++; }
+        }
+        const idsToDelete = [];
+        for (const id of prevRows.keys()) if (!nextRows.has(id)) idsToDelete.push(BigInt(id));
+        if (idsToDelete.length) {
+          lastOp = { collection: key, op: 'deleteMany', rows: idsToDelete.map((id) => ({ id: Number(id) })) };
+          await tx.feedbackRecord.deleteMany({ where: { id: { in: idsToDelete } } });
+          if (perf) perf.deletes += idsToDelete.length;
+        }
+        nextSnapshot[key] = nextRows;
+      }
+
       // Registries: seq/settings use upsert (small, always-present keyed
       // rows); issued_usernames/issued_regnos are append-only sets. Diffed
       // against prevSnapshot.seq/.settings exactly like the collections loop
@@ -659,6 +705,11 @@ async function loadFromPostgresNormalized() {
     snapshot[key] = new Map(next[key].map((r) => [r.id, JSON.stringify(r)]));
   }
 
+  const feedbackRows = await prisma.feedbackRecord.findMany({ orderBy: { id: 'asc' } });
+  next.feedback = feedbackRows.map((row) => ({ ...(row.data && typeof row.data === 'object' ? row.data : {}), id: Number(row.id) }));
+  next.seq.feedback = next.feedback.reduce((max, row) => Math.max(max, row.id), 0);
+  snapshot.feedback = new Map(next.feedback.map((row) => [row.id, JSON.stringify(row)]));
+
   const seqRows = await prisma.seq.findMany();
   for (const r of seqRows) next.seq[r.name] = Math.max(next.seq[r.name] || 0, r.value);
   const issuedUsernameRows = await prisma.issuedUsername.findMany();
@@ -712,6 +763,14 @@ async function initFromPostgres() {
     return;
   }
 
+  // Feedback predates the normalized Prisma schema and uses one JSONB payload
+  // per row. Ensure that table exists before Prisma loads reviews/tickets so
+  // an environment cannot boot with an in-memory-only support queue.
+  await db.query(`CREATE TABLE IF NOT EXISTS feedback (
+    id BIGINT PRIMARY KEY,
+    data JSONB NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
   const { rows } = await db.query('SELECT count(*)::int AS n FROM users');
   const pgUserCount = rows[0].n;
   let jsonHasData = false;
@@ -3797,6 +3856,7 @@ const Feedback = {
   create({ name, email, message, rating, source }) {
     const f = {
       id: nextId('feedback'),
+      type: 'feedback',
       name: String(name || '').trim().slice(0, 80) || 'Anonymous',
       email: email ? String(email).trim().slice(0, 200) : null,
       message: String(message || '').trim().slice(0, 1000),
@@ -3809,9 +3869,9 @@ const Feedback = {
     data.feedback.push(f); save();
     return f;
   },
-  all() { return data.feedback.slice().sort((a, b) => b.id - a.id); },
-  approved() { return data.feedback.filter((f) => f.status === 'approved').sort((a, b) => b.id - a.id); },
-  byId(id) { return data.feedback.find((f) => f.id === Number(id)) || null; },
+  all() { return data.feedback.filter((f) => f.type !== 'ticket').sort((a, b) => b.id - a.id); },
+  approved() { return data.feedback.filter((f) => f.type !== 'ticket' && f.status === 'approved').sort((a, b) => b.id - a.id); },
+  byId(id) { return data.feedback.find((f) => f.id === Number(id) && f.type !== 'ticket') || null; },
   setStatus(id, status, byName) {
     const f = Feedback.byId(id); if (!f) return null;
     f.status = status; f.moderated_at = now(); f.moderated_by = byName || null; save();
@@ -3830,10 +3890,65 @@ const Feedback = {
     return f;
   },
   remove(id) {
-    const i = data.feedback.findIndex((f) => f.id === Number(id));
+    const i = data.feedback.findIndex((f) => f.id === Number(id) && f.type !== 'ticket');
     if (i === -1) return false;
     data.feedback.splice(i, 1); save();
     return true;
+  },
+};
+
+/* Private support tickets share the durable feedback collection so existing
+ * JSON and Postgres installations need no data migration. They are explicitly
+ * excluded from every public-feedback query above and only the open queue is
+ * exposed to admins. Resolving a ticket preserves its audit record while
+ * removing it from the active admin queue. */
+const SupportTickets = {
+  create({ user_id, name, email, category, subject, message, context, source }) {
+    const id = nextId('feedback');
+    const ticket = {
+      id,
+      type: 'ticket',
+      ticket_no: `EL-${String(id).padStart(6, '0')}`,
+      user_id: user_id ? Number(user_id) : null,
+      name: String(name || '').trim().slice(0, 80),
+      email: String(email || '').trim().toLowerCase().slice(0, 200),
+      category: String(category || 'other').trim().slice(0, 40),
+      subject: String(subject || '').trim().slice(0, 120),
+      message: String(message || '').trim().slice(0, 2000),
+      context: String(context || '').trim().slice(0, 300) || null,
+      source: String(source || 'open-site').slice(0, 40),
+      status: 'open',
+      created_at: now(),
+      expected_by: new Date(Date.now() + (48 * 60 * 60 * 1000)).toISOString(),
+      acknowledgement_email_sent: false,
+      acknowledgement_email_at: null,
+      resolution: null,
+      resolved_at: null,
+      resolved_by: null,
+      resolution_email_sent: false,
+      resolution_email_at: null,
+    };
+    data.feedback.push(ticket); save();
+    return ticket;
+  },
+  open() { return data.feedback.filter((f) => f.type === 'ticket' && f.status === 'open').sort((a, b) => b.id - a.id); },
+  byId(id) { return data.feedback.find((f) => f.id === Number(id) && f.type === 'ticket') || null; },
+  markAcknowledged(id, sent) {
+    const ticket = SupportTickets.byId(id); if (!ticket) return null;
+    ticket.acknowledgement_email_sent = !!sent;
+    ticket.acknowledgement_email_at = sent ? now() : null;
+    save(); return ticket;
+  },
+  resolve(id, resolution, byName, emailSent) {
+    const ticket = SupportTickets.byId(id);
+    if (!ticket || ticket.status !== 'open') return null;
+    ticket.status = 'resolved';
+    ticket.resolution = String(resolution || '').trim().slice(0, 2000);
+    ticket.resolved_at = now();
+    ticket.resolved_by = byName || null;
+    ticket.resolution_email_sent = !!emailSent;
+    ticket.resolution_email_at = emailSent ? now() : null;
+    save(); return ticket;
   },
 };
 
@@ -5083,7 +5198,7 @@ module.exports = {
   stageFor, gemLevel, gamifyFor, gemLedger, touchActivity, STAGES,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile, ideEnabled, setIde,
   courseConcepts, finalProjectFor,
-  Events, Leads, Suppressions, Analytics, OpenQuest, OpenAttempts, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase, Feedback,
+  Events, Leads, Suppressions, Analytics, OpenQuest, OpenAttempts, Registrations, PublicAnnouncements, Jobs, JobComments, Showcase, Feedback, SupportTickets,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,

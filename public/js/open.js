@@ -517,6 +517,49 @@ function openFeedbackForm() {
   });
 }
 
+function openSupportTicketForm() {
+  const knownName = ME?.name || '';
+  const knownEmail = ME?.email || '';
+  openModal('Submit a support ticket', `
+    <p class="s" style="color:var(--muted);margin-bottom:14px">Describe the problem clearly. Your ticket is private and our team aims to resolve it within 24 to 48 hours.</p>
+    <form id="supportTicketForm">
+      <div class="form-grid">
+        <label class="field"><span>Your name</span><input name="name" maxlength="80" value="${esc(knownName)}" required${knownName ? ' readonly' : ''}></label>
+        <label class="field"><span>Email for updates</span><input name="email" type="email" maxlength="200" value="${esc(knownEmail)}" placeholder="you@example.com" required${knownEmail ? ' readonly' : ''}></label>
+      </div>
+      <label class="field"><span>Issue category</span><select name="category" required>
+        <option value="compiler">Compiler or code editor</option><option value="course">Course or assignment</option><option value="account">Account or sign-in</option><option value="payment">Payment or enrollment</option><option value="certificate">Certificate</option><option value="event">Event or hackathon</option><option value="other">Other</option>
+      </select></label>
+      <label class="field"><span>Issue summary</span><input name="subject" minlength="5" maxlength="120" required placeholder="Briefly describe what went wrong"></label>
+      <label class="field"><span>What happened?</span><textarea name="message" rows="6" minlength="10" maxlength="2000" required placeholder="Tell us what you expected, what happened instead, and any error message you saw."></textarea></label>
+      <label class="field"><span>Page or feature (optional)</span><input name="context" maxlength="300" placeholder="For example: Compiler dark mode, Python editor"></label>
+      <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+      <button class="btn btn-primary btn-block" id="supportTicketBtn">Submit ticket</button>
+    </form>`);
+  $('supportTicketForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.target, button = $('supportTicketBtn');
+    button.disabled = true; button.textContent = 'Submitting...';
+    try {
+      const data = await api('/api/public/support-tickets', { method: 'POST', body: JSON.stringify({
+        name: form.name.value.trim(), email: form.email.value.trim(), category: form.category.value,
+        subject: form.subject.value.trim(), message: form.message.value.trim(), context: form.context.value.trim(), company: form.company.value,
+      }) });
+      if (!data.ticket) { modalMsg('Your request was received.', true); return; }
+      modalMsg(data.message, true);
+      $('modalBody').innerHTML = `<div class="card"><div class="card-body">
+        <div class="s" style="color:var(--muted-2);font-weight:700;text-transform:uppercase;letter-spacing:.05em">Ticket number</div>
+        <div style="font:700 24px var(--font-mono);color:var(--primary);margin:5px 0 10px">${esc(data.ticket.ticket_no)}</div>
+        <p class="s" style="color:var(--muted)">${data.email_sent ? 'A confirmation email was sent to your inbox.' : 'Your ticket is saved. Email delivery is temporarily unavailable, so keep this ticket number for reference.'}</p>
+        <p class="s" style="color:var(--muted);margin-top:6px">Expected response: within 24 to 48 hours.</p>
+        <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal()">Done</button>
+      </div></div>`;
+    } catch (error) {
+      modalMsg(error.message); button.disabled = false; button.textContent = 'Submit ticket';
+    }
+  });
+}
+
 /* --------------------- my enrolments, slots and reservations ---------------------
  * One fetch backs three things: the 2-course cap shown on the catalogue, the
  * "Seat reserved" state on a coming-soon course, and the My courses tab.

@@ -1,25 +1,31 @@
 {
-  "checked_at": "2026-09-11T05:19:56.181Z",
+  "checked_at": "2026-09-14T03:27:56.806Z",
   "branch": "fix/qa-workflow-remediation",
-  "base": "9bf194b2ba9ecea4049f9ed27d20c2485ef11aa8",
+  "base": "c7fc362be87e20e96c4f27646cadd8efcd91740d",
   "diffCheck": "PASS",
   "syntax": {
-    "checked": 6,
+    "checked": 9,
     "failures": []
   },
   "changedFiles": [
+    "migrations/import-normalized.js",
+    "migrations/import-prisma.js",
+    "public/compiler.html",
+    "public/dashboard.html",
+    "public/js/dashboard.js",
     "public/js/open.js",
     "public/open.html",
     "qa-implementation/change-manifest.json",
     "qa-implementation/evidence/syntax-checks.json",
-    "qa-implementation/implementation-report.html",
-    "qa-implementation/implementation-report.md",
-    "scripts/validate-trending-tech.js",
+    "schema.prisma",
     "server.js",
     "store.js",
-    "test/trending-tech.test.js",
-    "qa-implementation/evidence/trending-tech-coming-soon.png",
-    "qa-implementation/evidence/trending-tech-syllabus-preview.png",
-    "qa-implementation/trending-preview-browser.cjs"
+    "prisma/migrations/20260914000000_feedback_records/migration.sql",
+    "qa-implementation/compiler-dark-browser.cjs",
+    "qa-implementation/evidence/compiler-dark-contrast.png",
+    "qa-implementation/evidence/support-ticket-admin-queue.png",
+    "qa-implementation/evidence/support-ticket-receipt.png",
+    "qa-implementation/support-ticket-browser.cjs",
+    "test/support-tickets.test.js"
   ]
 }

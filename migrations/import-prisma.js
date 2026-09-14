@@ -277,7 +277,7 @@ async function resetSequences(prisma) {
 }
 
 function assertKnownTopLevelKeys(json) {
-  const known = new Set([...COLLECTIONS.map((c) => c[0]), 'seq', 'settings', 'issued_usernames', 'issued_regnos']);
+  const known = new Set([...COLLECTIONS.map((c) => c[0]), 'feedback', 'seq', 'settings', 'issued_usernames', 'issued_regnos']);
   for (const key of Object.keys(json)) {
     if (known.has(key)) continue;
     const v = json[key];
@@ -362,6 +362,15 @@ async function main() {
         log(`${table}: ${r.inserted} inserted, ${r.skipped} already present (json had ${records.length})`);
       }
 
+      const feedbackRecords = Array.isArray(json.feedback) ? json.feedback : [];
+      if (feedbackRecords.length) {
+        const result = await tx.feedbackRecord.createMany({
+          data: feedbackRecords.map((record) => ({ id: BigInt(record.id), data: record })),
+          skipDuplicates: true,
+        });
+        log(`feedback: ${result.count} inserted (json had ${feedbackRecords.length})`);
+      }
+
       await importRegistries(tx, json);
     }, { maxWait: 30000, timeout: 10 * 60 * 1000 });
 
@@ -380,6 +389,10 @@ async function main() {
       if (!ok) allOk = false;
       log(`  ${table.padEnd(28)} json=${jsonCount}${extra ? ` (+${extra} tombstone)` : ''}  postgres=${now}  ${ok ? 'OK' : 'MISMATCH'}`);
     }
+    const feedbackJsonCount = Array.isArray(json.feedback) ? json.feedback.length : 0;
+    const feedbackRows = await prisma.feedbackRecord.count();
+    if (feedbackRows < feedbackJsonCount) allOk = false;
+    log(`  ${'feedback'.padEnd(28)} json=${feedbackJsonCount}  postgres=${feedbackRows}  ${feedbackRows >= feedbackJsonCount ? 'OK' : 'MISMATCH'}`);
     if (!allOk) {
       throw new Error('One or more collections do not have matching row counts after import - investigate before trusting this import.');
     }

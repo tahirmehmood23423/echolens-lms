@@ -1508,3 +1508,14 @@ model OpenAttempt {
   @@index([userId, trackKey])
   @@map("open_attempts")
 }
+
+// Private support tickets and moderated public reviews share the existing
+// generic feedback table. The JSON payload keeps old feedback records and
+// the newer ticket shape backward compatible without a destructive rewrite.
+model FeedbackRecord {
+  id        BigInt   @id
+  data      Json
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("feedback")
+}

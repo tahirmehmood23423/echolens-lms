@@ -38,7 +38,7 @@ const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue, catalogueFee,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
   courseConcepts, finalProjectFor,
-  Events, Leads, Suppressions, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Feedback,
+  Events, Leads, Suppressions, Analytics, OpenQuest, Registrations, PublicAnnouncements, Jobs, JobComments, Feedback, SupportTickets,
   DiscountCategories, Challans, Expenses, CoordinatorQueries, StaffGroups, StaffRecords, Ambassadors,
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
@@ -361,6 +361,7 @@ const limitEmailSend = rateLimit('email-send', { max: 5, windowMs: 15 * 60 * 100
 const limitSignup = rateLimit('signup', { max: 10, windowMs: 60 * 60 * 1000, message: 'Too many sign-up attempts from this network. Please try again later.' });
 const limitLead = rateLimit('lead', { max: 20, windowMs: 60 * 60 * 1000, message: 'Too many submissions from this network. Please try again later.' });
 const limitFeedback = rateLimit('feedback', { max: 10, windowMs: 60 * 60 * 1000, message: 'Too many submissions from this network. Please try again later.' });
+const limitSupportTicket = rateLimit('support-ticket', { max: 5, windowMs: 60 * 60 * 1000, message: 'Too many support tickets were submitted from this network. Please wait before trying again.' });
 
 // Drop expired entries from every throttle map every 10 minutes.
 setInterval(() => {
@@ -3825,6 +3826,56 @@ app.delete('/api/admin/feedback/:id', authRequired, adminRequired, (req, res) =>
   if (!Feedback.remove(req.params.id)) return res.status(404).json({ error: 'Feedback not found.' });
   res.json({ ok: true });
 });
+
+/* Private support tickets live beside the feedback workflow in the UI, but
+ * are never returned by the public feedback wall. A valid email is required
+ * because both receipt and resolution are communicated to the submitter. */
+app.post('/api/public/support-tickets', limitSupportTicket, asyncRoute(async (req, res) => {
+  const b = req.body || {};
+  if (b.company) return res.status(201).json({ ok: true }); // honeypot
+  const account = currentUser(req);
+  const name = String(account?.name || b.name || '').trim();
+  const email = String(account?.email || b.email || '').trim().toLowerCase();
+  const category = String(b.category || 'other').trim().toLowerCase();
+  const subject = String(b.subject || '').trim();
+  const message = String(b.message || '').trim();
+  const context = String(b.context || '').trim();
+  const categories = new Set(['compiler', 'course', 'account', 'payment', 'certificate', 'event', 'other']);
+  if (name.length < 2) return res.status(400).json({ error: 'Enter your name.' });
+  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email so we can confirm and resolve your ticket.' });
+  if (!categories.has(category)) return res.status(400).json({ error: 'Choose a valid issue category.' });
+  if (subject.length < 5 || subject.length > 120) return res.status(400).json({ error: 'Summarise the issue in 5 to 120 characters.' });
+  if (message.length < 10 || message.length > 2000) return res.status(400).json({ error: 'Describe the issue in 10 to 2000 characters.' });
+  if (context.length > 300) return res.status(400).json({ error: 'Keep the page or feature detail under 300 characters.' });
+  const ticket = SupportTickets.create({ user_id: account?.id, name, email, category, subject, message, context, source: account ? 'signed-in-user' : 'open-site' });
+  const delivery = await mailer.notify(email, `Support ticket ${ticket.ticket_no} received`,
+    `${hi(name)},\n\nWe received your support ticket ${ticket.ticket_no}: "${ticket.subject}".\n\nOur team will review it and aims to resolve your problem within 24 to 48 hours. Keep this ticket number for reference.\n\nEchoLens Digital`);
+  const emailSent = delivery.sent.includes(email);
+  SupportTickets.markAcknowledged(ticket.id, emailSent);
+  res.status(201).json({
+    ok: true,
+    ticket: { ticket_no: ticket.ticket_no, status: ticket.status, created_at: ticket.created_at, expected_by: ticket.expected_by },
+    email_sent: emailSent,
+    message: `Ticket ${ticket.ticket_no} was submitted. Our team aims to resolve it within 24 to 48 hours.`,
+  });
+}));
+
+app.get('/api/admin/support-tickets', authRequired, adminRequired, (req, res) => {
+  res.json({ tickets: SupportTickets.open() });
+});
+
+app.post('/api/admin/support-tickets/:id/resolve', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const resolution = String((req.body || {}).resolution || '').trim();
+  if (resolution.length < 5 || resolution.length > 2000) return res.status(400).json({ error: 'Write a resolution message between 5 and 2000 characters.' });
+  const ticket = SupportTickets.byId(req.params.id);
+  if (!ticket || ticket.status !== 'open') return res.status(404).json({ error: 'Open support ticket not found.' });
+  const delivery = await mailer.notify(ticket.email, `Support ticket ${ticket.ticket_no} resolved`,
+    `${hi(ticket.name)},\n\nYour support ticket ${ticket.ticket_no}, "${ticket.subject}", has been resolved.\n\nResolution:\n${resolution}\n\nIf the issue continues, submit a new ticket and include this ticket number.\n\nEchoLens Digital`);
+  const emailSent = delivery.sent.includes(ticket.email);
+  if (mailer.configured && !emailSent) return res.status(503).json({ error: 'The resolution email could not be delivered. The ticket remains open so you can retry.' });
+  const resolved = SupportTickets.resolve(ticket.id, resolution, req.user.name, emailSent);
+  res.json({ ok: true, ticket: { ticket_no: resolved.ticket_no, status: resolved.status, resolved_at: resolved.resolved_at }, email_sent: emailSent });
+}));
 
 /* ============================== v18: ADMISSIONS OFFICE ==============================
  * A registration flows: new -> challan_issued -> challan_sent -> paid_cleared

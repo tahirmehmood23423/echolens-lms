@@ -162,10 +162,17 @@
     <div style="display:flex;gap:14px;align-items:end;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px">
       <div>
         <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink);margin-bottom:4px">Feedback</h1>
-        <p class="s" style="color:var(--muted)">What learners are saying about EchoLens - and a place to share your own.</p>
+        <p class="s" style="color:var(--muted)">Read learner feedback, share your experience, or privately report a problem to our support team.</p>
       </div>
-      <button class="btn btn-primary" onclick="openFeedbackForm()">Leave feedback</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="openFeedbackForm()">Leave feedback</button>
+        <button class="btn btn-primary" onclick="openSupportTicketForm()">Submit a support ticket</button>
+      </div>
     </div>
+    <div class="card" style="margin-bottom:18px;border-left:4px solid var(--primary)"><div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div class="grow"><h3 style="margin-bottom:4px">Having a technical or account issue?</h3><p class="s" style="color:var(--muted)">Support tickets are private. You will receive a ticket number and email confirmation, and our team aims to resolve the issue within 24 to 48 hours.</p></div>
+      <button class="btn btn-primary" onclick="openSupportTicketForm()">Report an issue</button>
+    </div></div>
     <div id="feedbackList"><div class="empty">Loading feedback&hellip;</div></div>
   </section>
 
@@ -189,6 +196,6 @@
 <script src="/js/draft-store.js?v1"></script>
 <script src="/js/workflow-ui.js?v2"></script>
 <script src="/js/coderunner.js?v1421"></script>
-<script src="/js/open.js?v1431"></script>
+<script src="/js/open.js?v1432"></script>
 </body>
 </html>

@@ -108,7 +108,7 @@ const TITLES = {
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
   students: 'Students', grades: 'Grades', attendance: 'Attendance', analytics: 'Analytics',
   'admin-teachers': 'Teachers', 'admin-students': 'Students', 'admin-enrollments': 'Enrollments',
-  'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-feedback': 'Feedback', 'admin-logs': 'System Logs',
+  'admin-finance': 'Finance', 'admin-announcements': 'Announcements', 'admin-feedback': 'Feedback & Tickets', 'admin-logs': 'System Logs',
   jobs: 'Jobs', job: 'Job',
   'dept-hr': 'HR Portal', 'dept-finance': 'Finance Portal', 'dept-student-coordinator': 'Admissions Office Portal', 'dept-staff': 'Staff Portal', 'dept-ambassador': 'Ambassadors Portal',
   'my-department': 'My Department', 'admin-departments': 'Departments',
@@ -1017,8 +1017,21 @@ const FEEDBACK_STATUS_LABEL = { pending: 'Pending review', approved: 'Approved Â
 async function renderAdminFeedback() {
   const el = $('view-admin-feedback');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
-  const d = await api('/api/admin/feedback');
+  const [d, support] = await Promise.all([api('/api/admin/feedback'), api('/api/admin/support-tickets')]);
   const stars = (n) => n ? `<span class="s" style="color:#F0A82A">${'&#9733;'.repeat(n)}${'&#9734;'.repeat(5 - n)}</span>` : '';
+  const ticketRow = (ticket) => `
+    <div class="list-row" style="align-items:start;flex-wrap:wrap">
+      <div class="grow">
+        <div class="t"><span class="role-pill">${esc(ticket.ticket_no)}</span> ${esc(ticket.subject)} <span class="s" style="color:var(--muted-2)">&middot; ${esc((ticket.created_at || '').slice(0, 16).replace('T', ' '))}</span></div>
+        <div class="s" style="color:var(--muted);white-space:pre-line;margin-top:5px">${esc(ticket.message)}</div>
+        <div class="s" style="color:var(--muted-2);margin-top:5px">${esc(ticket.category)} &middot; ${esc(ticket.name)} &middot; ${esc(ticket.email)}${ticket.context ? ' &middot; ' + esc(ticket.context) : ''}</div>
+        <div class="s" style="color:var(--muted-2)">Confirmation email: ${ticket.acknowledgement_email_sent ? 'sent' : 'not delivered'} &middot; Resolve target: ${esc((ticket.expected_by || '').slice(0, 16).replace('T', ' '))}</div>
+        <form onsubmit="return adminResolveSupportTicket(event, ${ticket.id})" style="display:flex;gap:6px;margin-top:9px;max-width:720px;align-items:start">
+          <textarea name="resolution" rows="2" minlength="5" maxlength="2000" required placeholder="Explain how the issue was resolved. This message will be emailed to the user." style="flex:1;min-width:220px;padding:9px 11px;border:1.5px solid var(--line);border-radius:9px;font:13px var(--font-body);resize:vertical"></textarea>
+          <button class="btn btn-primary btn-sm">Resolve &amp; email</button>
+        </form>
+      </div>
+    </div>`;
   const row = (f) => `
     <div class="list-row" style="align-items:start;flex-wrap:wrap">
       <div class="grow">
@@ -1039,12 +1052,29 @@ async function renderAdminFeedback() {
     </div>`;
   const pending = d.feedback.filter((f) => f.status === 'pending');
   const rest = d.feedback.filter((f) => f.status !== 'pending');
+  const tickets = support.tickets || [];
   el.innerHTML = `
+    <div class="card" style="margin-bottom:16px;border-top:3px solid var(--primary)"><div class="card-head"><h3>Open support tickets (${tickets.length})</h3>
+      <span class="s" style="color:var(--muted)">Resolving a ticket emails the user and removes it from this active queue.</span></div>
+      <div class="card-body tight">${tickets.map(ticketRow).join('') || '<div class="empty">No open support tickets.</div>'}</div></div>
     <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Awaiting review (${pending.length})</h3>
       <span class="s" style="color:var(--muted)">Only approved feedback shows on the public /open#feedback wall.</span></div>
       <div class="card-body tight">${pending.map(row).join('') || '<div class="empty">Nothing waiting on review.</div>'}</div></div>
     <div class="card"><div class="card-head"><h3>Reviewed (${rest.length})</h3></div>
       <div class="card-body tight">${rest.map(row).join('') || '<div class="empty">Nothing reviewed yet.</div>'}</div></div>`;
+}
+async function adminResolveSupportTicket(event, id) {
+  event.preventDefault();
+  const form = event.target, button = form.querySelector('button'), resolution = form.resolution.value.trim();
+  button.disabled = true; button.textContent = 'Resolving...';
+  try {
+    const data = await api(`/api/admin/support-tickets/${id}/resolve`, { method: 'POST', body: JSON.stringify({ resolution }) });
+    toast(data.email_sent ? `Ticket ${data.ticket.ticket_no} resolved and the user was emailed.` : `Ticket ${data.ticket.ticket_no} resolved. Email service is unavailable.`);
+    renderAdminFeedback();
+  } catch (error) {
+    toast(error.message, true); button.disabled = false; button.textContent = 'Resolve & email';
+  }
+  return false;
 }
 async function adminFeedbackAction(id, action) {
   try { await api(`/api/admin/feedback/${id}/${action}`, { method: 'POST', body: JSON.stringify({}) }); renderAdminFeedback(); }

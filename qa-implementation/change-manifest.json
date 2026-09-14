@@ -1,24 +1,14 @@
 {
-  "checked_at": "2026-09-14T04:09:31.535Z",
+  "checked_at": "2026-09-14T08:17:48.177Z",
   "branch": "fix/qa-workflow-remediation",
-  "base": "65fde675b72b58212c72a2b28c7a70b15a4ccc98",
+  "base": "6e8d24b707f7de100071ab427304158c1d166220",
   "diffCheck": "PASS",
   "syntax": {
-    "checked": 6,
+    "checked": 0,
     "failures": []
   },
   "changedFiles": [
-    ".env.example",
     "public/dashboard.html",
-    "public/js/dashboard.js",
-    "public/js/open.js",
-    "public/open.html",
-    "qa-implementation/evidence/support-ticket-admin-queue.png",
-    "qa-implementation/evidence/support-ticket-receipt.png",
-    "qa-implementation/support-ticket-browser.cjs",
-    "server.js",
-    "store.js",
-    "test/support-tickets.test.js",
-    "qa-implementation/evidence/support-ticket-conversation.png"
+    "public/open.html"
   ]
 }

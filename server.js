@@ -3603,13 +3603,17 @@ const KEY_LINKS = {
   registration: process.env.REGISTRATION_FORM_URL || '/open#register',
 };
 app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
+  const enrollment_counts = {};
+  Users.all().forEach((u) => (u.profile?.free_course_enrollments || []).forEach((e) => {
+    if (e.track_key) enrollment_counts[e.track_key] = (enrollment_counts[e.track_key] || 0) + 1;
+  }));
   res.json({
-    catalogue: store.publicCatalogue(),
+    catalogue: store.publicCatalogue().map((c) => ({ ...c, enrollment_count: enrollment_counts[c.track_key] || 0 })),
     paths: store.learningPaths().map(p => ({ ...p, enrollment_available: false, availability_reason: 'Bundle enrollment is not available yet. Choose an individual course.' })),
     free_families: store.freeFamilies(),
     links: KEY_LINKS,
     cohort: null,
-    counts:{total:officialCatalogue().length,free:officialCatalogue().filter(c=>c.price_pkr===0).length},
+    counts:{total:officialCatalogue().length,free:officialCatalogue().filter(c=>c.price_pkr===0).length, open_web_enrollments:Object.values(enrollment_counts).reduce((a,b)=>a+b,0)},
   });
 });
 
@@ -4573,14 +4577,8 @@ app.post('/api/open/enrollments', authRequired, openLearnerRequired, learnerProf
   const out = OpenQuest.enroll(req.user.id, String(req.body.track_key || ''));
   if (out.error) return res.status(out.status).json({ error: out.error });
   await store.pendingPersist();
-  let adminEmailSent = null;
-  if (!out.existing) {
-    const track = Quests.trackDef(out.enrollment.track_key);
-    const recipients = supportAdminEmails();
-    const delivery = await mailer.notify(recipients, `New free course enrollment - ${req.user.name}`,
-      `${req.user.name} enrolled in the free certified course "${track?.title || out.enrollment.track_key}".\n\nEmail: ${req.user.email || 'Not provided'}\nAccount role: ${req.user.role}\nRegistration number: ${req.user.reg_no || 'Not assigned'}\nCourse code: ${track?.course_code || 'Free course'}\nEnrolled at: ${out.enrollment.enrolled_at}\n\nView learner activity in the admin portal: ${APP_URL}/dashboard#view=admin-students`);
-    adminEmailSent = delivery.sent.length > 0;
-  }
+  // Free-course enrollments are included in the daily admissions digest.
+  const adminEmailSent = null;
   res.status(out.existing ? 200 : 201).json({ ok: true, ...out, admin_email_sent: adminEmailSent, progress: { ...OpenQuest.progress(req.user.id, out.enrollment.track_key), enrolled: true } });
 }));
 app.get('/api/open/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),req.query.level,req.query.pid).map(learnerAttempt)}));
@@ -4651,9 +4649,24 @@ async function sweepEnrollmentConfirmations() {
   await store.pendingPersist();
   console.log(`[enrolment] confirmed ${due.length} seat(s).`);
 }
+let lastFreeEnrollmentDigestAt = Date.now();
+async function sendFreeEnrollmentDigest() {
+  const now = Date.now();
+  const rows = [];
+  Users.all().forEach((u) => (u.profile?.free_course_enrollments || []).forEach((e) => {
+    const at = Date.parse(e.enrolled_at || '');
+    if (at > lastFreeEnrollmentDigestAt && at <= now) rows.push({ user: u, enrollment: e });
+  }));
+  lastFreeEnrollmentDigestAt = now;
+  if (!rows.length) return;
+  const lines = rows.map((r, i) => `${i + 1}. ${r.user.name} <${r.user.email || 'no email'}> - ${r.enrollment.track_key} (${r.enrollment.enrolled_at})`).join('\n');
+  await mailer.notify(supportAdminEmails(), `EchoLens open-web enrollment report - ${rows.length} new`, `Open-web free-course enrollments received in the last 24 hours:\n\n${lines}\n\nView the complete report in the admin portal: ${APP_URL}/dashboard#view=admin-students`);
+}
 if (process.env.NODE_ENV !== 'test') {
   const confirmTimer = setInterval(() => { sweepEnrollmentConfirmations().catch((e) => console.error('[enrolment] sweep failed:', e.message)); }, 60_000);
   confirmTimer.unref();
+  const digestTimer = setInterval(() => { sendFreeEnrollmentDigest().catch((e) => console.error('[enrolment digest] failed:', e.message)); }, 24 * 60 * 60 * 1000);
+  digestTimer.unref();
 }
 
 const gradingWorker = require('./grading-worker').createGradingWorker({

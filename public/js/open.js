@@ -671,7 +671,8 @@ async function loadCatalogue() {
     FREE_FAMILIES = d.free_families || [];
     const available = CATALOGUE.filter((course) => course.available !== false);
     const comingSoon = CATALOGUE.filter((course) => course.coming_soon);
-    $('cohortLine').textContent = available.length + ' available courses | ' + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses.' + (comingSoon.length ? ' ' + comingSoon.length + ' new certified courses are open for syllabus preview and coming soon.' : '') + ' Paid cohorts are arranged by Admissions.';
+    const totalOpenEnrollments = Number(d.counts?.open_web_enrollments || 0);
+    $('cohortLine').textContent = available.length + ' available courses | ' + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses | ' + totalOpenEnrollments.toLocaleString() + ' students enrolled in open-web courses.' + (comingSoon.length ? ' ' + comingSoon.length + ' new certified courses are open for syllabus preview and coming soon.' : '') + ' Paid cohorts are arranged by Admissions.';
     $('actionStrip').innerHTML = `
       <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;
     const p = (d.paths || [])[0];
@@ -725,6 +726,7 @@ function courseCardHtml(c) {
         <h4 class="oc-title">${esc(c.title)}</h4>
       </div>
       <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${c.weeks} Weeks &middot; ${c.hours} Hours</div>
+      ${isFree ? `<div class="oc-meta" aria-label="Students enrolled"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19v-1.5A3.5 3.5 0 0 1 7.5 14h3A3.5 3.5 0 0 1 14 17.5V19M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM16 13a2.5 2.5 0 1 0-1.5-4.5M16 15h.5A3.5 3.5 0 0 1 20 18.5V19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>${Number(c.enrollment_count || 0).toLocaleString()} students enrolled</div>` : ''}
       <div class="oc-foot">
         <div class="oc-price${isFree ? ' free' : ''}">${comingSoon ? 'Free certified course' : isFree ? 'Free course' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
         <button type="button" class="btn ${comingSoon ? 'btn-ghost' : isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${comingSoon ? (c.track_key && isReserved(c.track_key) ? 'Seat reserved' : 'View &amp; reserve') : isFree ? 'Start now' : 'View course'}</button>

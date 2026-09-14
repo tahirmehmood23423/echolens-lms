@@ -3927,11 +3927,19 @@ const SupportTickets = {
       resolved_by: null,
       resolution_email_sent: false,
       resolution_email_at: null,
+      messages: [],
+      updated_at: now(),
     };
     data.feedback.push(ticket); save();
     return ticket;
   },
-  open() { return data.feedback.filter((f) => f.type === 'ticket' && f.status === 'open').sort((a, b) => b.id - a.id); },
+  open() { return data.feedback.filter((f) => f.type === 'ticket' && f.status !== 'resolved').sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)); },
+  forUser(user) {
+    if (!user) return [];
+    const email = String(user.email || '').trim().toLowerCase();
+    return data.feedback.filter((f) => f.type === 'ticket' && (f.user_id === Number(user.id) || (!!email && f.email === email)))
+      .sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
+  },
   byId(id) { return data.feedback.find((f) => f.id === Number(id) && f.type === 'ticket') || null; },
   markAcknowledged(id, sent) {
     const ticket = SupportTickets.byId(id); if (!ticket) return null;
@@ -3939,15 +3947,47 @@ const SupportTickets = {
     ticket.acknowledgement_email_at = sent ? now() : null;
     save(); return ticket;
   },
+  addAdminMessage(id, message, byName, emailSent) {
+    const ticket = SupportTickets.byId(id);
+    if (!ticket || ticket.status === 'resolved') return null;
+    ticket.messages = Array.isArray(ticket.messages) ? ticket.messages : [];
+    ticket.messages.push({
+      id: ticket.messages.length + 1,
+      author: 'admin',
+      name: String(byName || 'EchoLens Support').slice(0, 80),
+      message: String(message || '').trim().slice(0, 2000),
+      created_at: now(),
+      email_sent: !!emailSent,
+    });
+    ticket.status = 'waiting_on_user';
+    ticket.updated_at = now();
+    save(); return ticket;
+  },
+  addUserMessage(id, message, user) {
+    const ticket = SupportTickets.byId(id);
+    if (!ticket || ticket.status === 'resolved') return null;
+    ticket.messages = Array.isArray(ticket.messages) ? ticket.messages : [];
+    ticket.messages.push({
+      id: ticket.messages.length + 1,
+      author: 'user',
+      name: String(user?.name || ticket.name || 'User').slice(0, 80),
+      message: String(message || '').trim().slice(0, 2000),
+      created_at: now(),
+    });
+    ticket.status = 'open';
+    ticket.updated_at = now();
+    save(); return ticket;
+  },
   resolve(id, resolution, byName, emailSent) {
     const ticket = SupportTickets.byId(id);
-    if (!ticket || ticket.status !== 'open') return null;
+    if (!ticket || ticket.status === 'resolved') return null;
     ticket.status = 'resolved';
     ticket.resolution = String(resolution || '').trim().slice(0, 2000);
     ticket.resolved_at = now();
     ticket.resolved_by = byName || null;
     ticket.resolution_email_sent = !!emailSent;
     ticket.resolution_email_at = emailSent ? now() : null;
+    ticket.updated_at = now();
     save(); return ticket;
   },
 };

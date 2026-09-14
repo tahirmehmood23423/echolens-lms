@@ -362,6 +362,7 @@ const limitSignup = rateLimit('signup', { max: 10, windowMs: 60 * 60 * 1000, mes
 const limitLead = rateLimit('lead', { max: 20, windowMs: 60 * 60 * 1000, message: 'Too many submissions from this network. Please try again later.' });
 const limitFeedback = rateLimit('feedback', { max: 10, windowMs: 60 * 60 * 1000, message: 'Too many submissions from this network. Please try again later.' });
 const limitSupportTicket = rateLimit('support-ticket', { max: 5, windowMs: 60 * 60 * 1000, message: 'Too many support tickets were submitted from this network. Please wait before trying again.' });
+const limitSupportReply = rateLimit('support-reply', { max: 20, windowMs: 60 * 60 * 1000, message: 'Too many ticket replies were submitted from this network. Please wait before trying again.' });
 
 // Drop expired entries from every throttle map every 10 minutes.
 setInterval(() => {
@@ -3828,8 +3829,39 @@ app.delete('/api/admin/feedback/:id', authRequired, adminRequired, (req, res) =>
 });
 
 /* Private support tickets live beside the feedback workflow in the UI, but
- * are never returned by the public feedback wall. A valid email is required
- * because both receipt and resolution are communicated to the submitter. */
+ * are never returned by the public feedback wall. Signed-in owners can read
+ * their tickets directly; emailed links carry a short-lived signed token so
+ * anonymous reporters can safely continue the same conversation in-portal. */
+function supportTicketView(ticket) {
+  return {
+    id: ticket.id, ticket_no: ticket.ticket_no, subject: ticket.subject, message: ticket.message,
+    category: ticket.category, context: ticket.context, status: ticket.status, created_at: ticket.created_at,
+    expected_by: ticket.expected_by, updated_at: ticket.updated_at || ticket.created_at,
+    messages: Array.isArray(ticket.messages) ? ticket.messages.map((m) => ({ id: m.id, author: m.author, name: m.name, message: m.message, created_at: m.created_at })) : [],
+    resolution: ticket.resolution, resolved_at: ticket.resolved_at,
+  };
+}
+function supportTicketToken(ticket) {
+  return jwt.sign({ purpose: 'support-ticket', ticket_id: ticket.id, email: ticket.email }, JWT_SECRET, { expiresIn: '30d' });
+}
+function supportTicketLink(ticket) {
+  return `${APP_URL}/open#ticket=${ticket.ticket_no}&token=${encodeURIComponent(supportTicketToken(ticket))}`;
+}
+function supportTicketFromRequest(req) {
+  const id = String(req.params.id || '');
+  const ticket = /^EL-\d{6}$/.test(id) ? SupportTickets.byId(Number(id.slice(3))) : SupportTickets.byId(id);
+  if (!ticket) return null;
+  const account = currentUser(req);
+  if (account && (ticket.user_id === account.id || ticket.email === String(account.email || '').toLowerCase())) return ticket;
+  try {
+    const payload = jwt.verify(String(req.query.token || (req.body || {}).token || ''), JWT_SECRET);
+    if (payload.purpose === 'support-ticket' && payload.ticket_id === ticket.id && payload.email === ticket.email) return ticket;
+  } catch {}
+  return null;
+}
+function supportAdminEmails() {
+  return [...new Set([ADMISSIONS_EMAIL, ...store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email)].map((email) => String(email || '').trim().toLowerCase()).filter(Boolean))];
+}
 app.post('/api/public/support-tickets', limitSupportTicket, asyncRoute(async (req, res) => {
   const b = req.body || {};
   if (b.company) return res.status(201).json({ ok: true }); // honeypot
@@ -3848,21 +3880,59 @@ app.post('/api/public/support-tickets', limitSupportTicket, asyncRoute(async (re
   if (message.length < 10 || message.length > 2000) return res.status(400).json({ error: 'Describe the issue in 10 to 2000 characters.' });
   if (context.length > 300) return res.status(400).json({ error: 'Keep the page or feature detail under 300 characters.' });
   const ticket = SupportTickets.create({ user_id: account?.id, name, email, category, subject, message, context, source: account ? 'signed-in-user' : 'open-site' });
+  const replyUrl = supportTicketLink(ticket);
   const delivery = await mailer.notify(email, `Support ticket ${ticket.ticket_no} received`,
-    `${hi(name)},\n\nWe received your support ticket ${ticket.ticket_no}: "${ticket.subject}".\n\nOur team will review it and aims to resolve your problem within 24 to 48 hours. Keep this ticket number for reference.\n\nEchoLens Digital`);
+    `${hi(name)},\n\nWe received your support ticket ${ticket.ticket_no}: "${ticket.subject}".\n\nOur team will review it and aims to resolve your problem within 24 to 48 hours. You can read updates and reply securely inside the portal:\n\n${replyUrl}\n\nKeep this ticket number for reference.\n\nEchoLens Digital`);
   const emailSent = delivery.sent.includes(email);
   SupportTickets.markAcknowledged(ticket.id, emailSent);
   res.status(201).json({
     ok: true,
-    ticket: { ticket_no: ticket.ticket_no, status: ticket.status, created_at: ticket.created_at, expected_by: ticket.expected_by },
+    ticket: { ticket_no: ticket.ticket_no, status: ticket.status, created_at: ticket.created_at, expected_by: ticket.expected_by, reply_url: replyUrl },
     email_sent: emailSent,
     message: `Ticket ${ticket.ticket_no} was submitted. Our team aims to resolve it within 24 to 48 hours.`,
   });
 }));
 
+app.get('/api/support-tickets', authRequired, (req, res) => {
+  res.json({ tickets: SupportTickets.forUser(req.user).map(supportTicketView) });
+});
+app.get('/api/public/support-tickets/:id', (req, res) => {
+  const ticket = supportTicketFromRequest(req);
+  if (!ticket) return res.status(404).json({ error: 'Ticket not found or the secure reply link has expired.' });
+  res.json({ ticket: supportTicketView(ticket) });
+});
+app.post('/api/public/support-tickets/:id/replies', limitSupportReply, asyncRoute(async (req, res) => {
+  const ticket = supportTicketFromRequest(req);
+  if (!ticket) return res.status(404).json({ error: 'Ticket not found or the secure reply link has expired.' });
+  if (ticket.status === 'resolved') return res.status(409).json({ error: 'This ticket is resolved. Submit a new ticket if you still need help.' });
+  const message = String((req.body || {}).message || '').trim();
+  if (message.length < 5 || message.length > 2000) return res.status(400).json({ error: 'Write a reply between 5 and 2000 characters.' });
+  const account = currentUser(req);
+  const updated = SupportTickets.addUserMessage(ticket.id, message, account || { name: ticket.name });
+  await store.pendingPersist();
+  mailer.notify(supportAdminEmails(), `Reply received on support ticket ${ticket.ticket_no}`,
+    `${ticket.name} replied to ${ticket.ticket_no}, "${ticket.subject}":\n\n${message}\n\nOpen the admin ticket queue: ${APP_URL}/dashboard#view=admin-feedback`);
+  res.status(201).json({ ok: true, ticket: supportTicketView(updated) });
+}));
+
 app.get('/api/admin/support-tickets', authRequired, adminRequired, (req, res) => {
   res.json({ tickets: SupportTickets.open() });
 });
+
+app.post('/api/admin/support-tickets/:id/request-info', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const message = String((req.body || {}).message || '').trim();
+  if (message.length < 5 || message.length > 2000) return res.status(400).json({ error: 'Write a message between 5 and 2000 characters.' });
+  const ticket = SupportTickets.byId(req.params.id);
+  if (!ticket || ticket.status === 'resolved') return res.status(404).json({ error: 'Open support ticket not found.' });
+  const replyUrl = supportTicketLink(ticket);
+  const delivery = await mailer.notify(ticket.email, `More information needed for support ticket ${ticket.ticket_no}`,
+    `${hi(ticket.name)},\n\nEchoLens Support needs more information about ${ticket.ticket_no}, "${ticket.subject}":\n\n${message}\n\nReply securely inside the portal:\n\n${replyUrl}\n\nEchoLens Digital`);
+  const emailSent = delivery.sent.includes(ticket.email);
+  if (mailer.configured && !emailSent) return res.status(503).json({ error: 'The message email could not be delivered. Nothing was added to the ticket, so you can retry.' });
+  const updated = SupportTickets.addAdminMessage(ticket.id, message, req.user.name, emailSent);
+  await store.pendingPersist();
+  res.json({ ok: true, ticket: supportTicketView(updated), email_sent: emailSent });
+}));
 
 app.post('/api/admin/support-tickets/:id/resolve', authRequired, adminRequired, asyncRoute(async (req, res) => {
   const resolution = String((req.body || {}).resolution || '').trim();
@@ -4378,7 +4448,15 @@ app.post('/api/open/enrollments', authRequired, openLearnerRequired, asyncRoute(
   const out = OpenQuest.enroll(req.user.id, String(req.body.track_key || ''));
   if (out.error) return res.status(out.status).json({ error: out.error });
   await store.pendingPersist();
-  res.status(out.existing ? 200 : 201).json({ ok: true, ...out, progress: { ...OpenQuest.progress(req.user.id, out.enrollment.track_key), enrolled: true } });
+  let adminEmailSent = null;
+  if (!out.existing) {
+    const track = Quests.trackDef(out.enrollment.track_key);
+    const recipients = supportAdminEmails();
+    const delivery = await mailer.notify(recipients, `New free course enrollment - ${req.user.name}`,
+      `${req.user.name} enrolled in the free certified course "${track?.title || out.enrollment.track_key}".\n\nEmail: ${req.user.email || 'Not provided'}\nAccount role: ${req.user.role}\nRegistration number: ${req.user.reg_no || 'Not assigned'}\nCourse code: ${track?.course_code || 'Free course'}\nEnrolled at: ${out.enrollment.enrolled_at}\n\nView learner activity in the admin portal: ${APP_URL}/dashboard#view=admin-students`);
+    adminEmailSent = delivery.sent.length > 0;
+  }
+  res.status(out.existing ? 200 : 201).json({ ok: true, ...out, admin_email_sent: adminEmailSent, progress: { ...OpenQuest.progress(req.user.id, out.enrollment.track_key), enrolled: true } });
 }));
 app.get('/api/open/attempts', authRequired, openLearnerRequired, (req,res)=>res.json({attempts:store.OpenAttempts.list(req.user.id,String(req.query.track||''),req.query.level,req.query.pid).map(learnerAttempt)}));
 app.post('/api/open/attempts/:id/retry',authRequired,openLearnerRequired,asyncRoute(async (req,res)=>{

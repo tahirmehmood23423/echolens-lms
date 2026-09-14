@@ -1,31 +1,24 @@
 {
-  "checked_at": "2026-09-14T03:27:56.806Z",
+  "checked_at": "2026-09-14T04:09:31.535Z",
   "branch": "fix/qa-workflow-remediation",
-  "base": "c7fc362be87e20e96c4f27646cadd8efcd91740d",
+  "base": "65fde675b72b58212c72a2b28c7a70b15a4ccc98",
   "diffCheck": "PASS",
   "syntax": {
-    "checked": 9,
+    "checked": 6,
     "failures": []
   },
   "changedFiles": [
-    "migrations/import-normalized.js",
-    "migrations/import-prisma.js",
-    "public/compiler.html",
+    ".env.example",
     "public/dashboard.html",
     "public/js/dashboard.js",
     "public/js/open.js",
     "public/open.html",
-    "qa-implementation/change-manifest.json",
-    "qa-implementation/evidence/syntax-checks.json",
-    "schema.prisma",
-    "server.js",
-    "store.js",
-    "prisma/migrations/20260914000000_feedback_records/migration.sql",
-    "qa-implementation/compiler-dark-browser.cjs",
-    "qa-implementation/evidence/compiler-dark-contrast.png",
     "qa-implementation/evidence/support-ticket-admin-queue.png",
     "qa-implementation/evidence/support-ticket-receipt.png",
     "qa-implementation/support-ticket-browser.cjs",
-    "test/support-tickets.test.js"
+    "server.js",
+    "store.js",
+    "test/support-tickets.test.js",
+    "qa-implementation/evidence/support-ticket-conversation.png"
   ]
 }

@@ -138,11 +138,17 @@ function navCourses(mode, skipPush) {
 // itself calling the same functions that normally push.
 let RESTORING_NAV = false;
 function openRoute(state) {
+  if (state.v === 'ticket') return '#ticket=' + encodeURIComponent(state.ticket) + '&token=' + encodeURIComponent(state.token || '');
   if (state.v === 'courses') return state.mode === 'free' ? '#free' : '#courses';
   if (['course','video','solve'].includes(state.v)) return '#course/' + encodeURIComponent(state.key) + (state.v !== 'course' ? '/lesson/' + state.level : '') + (state.v === 'solve' ? '/practice/' + state.pid : '');
   return '#' + state.v;
 }
 function openState() {
+  if (location.hash.startsWith('#ticket=')) {
+    const params = new URLSearchParams(location.hash.slice(1));
+    const ticket = params.get('ticket'), token = params.get('token');
+    if (ticket && token) return { v: 'ticket', ticket, token };
+  }
   const parts = location.hash.slice(1).split('/');
   if (parts[0] === 'course' && parts[1]) { let key; try { key = decodeURIComponent(parts[1]); } catch { return null; } return {v: parts[4] === 'practice' ? 'solve' : parts[2] === 'lesson' ? 'video' : 'course', key, level:Number(parts[3]), pid:Number(parts[5])}; }
   if (['courses','free'].includes(parts[0])) return {v:'courses',mode:parts[0] === 'free' ? 'free' : 'live'};
@@ -157,6 +163,7 @@ async function ensureCourseLoaded(key) {
 }
 async function restoreNav(state) {
   if (!state || !state.v) return;
+  if (state.v === 'ticket') { openTab('feedback'); await openSupportTicket(state.ticket, state.token); return; }
   if (['events','announcements','feedback'].includes(state.v)) { openTab(state.v); return; }
   if (state.v === 'profile') { openProfileTab(); return; }
   if (state.v === 'courses') { navCourses(state.mode || COURSE_NAV_MODE, true);if(state.filters){$('cSearch').value=state.filters.search||'';$('cTier').value=state.filters.tier||'';$('cFree').value=state.filters.free||'';FREE_SELECTED_FAMILY=state.filters.family||null;drawCourses();}return; }
@@ -481,6 +488,7 @@ async function loadFeedbackTeaser() {
 }
 async function loadFeedback() {
   const box = $('feedbackList');
+  loadMySupportTickets();
   try {
     const d = await api('/api/public/feedback');
     box.innerHTML = d.feedback.length ? d.feedback.map((f) => `
@@ -515,6 +523,50 @@ function openFeedbackForm() {
       setTimeout(closeModal, 1600);
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
+}
+
+const supportStatusLabel = (status) => ({ open: 'Support reviewing', waiting_on_user: 'Waiting for your reply', resolved: 'Resolved' }[status] || status);
+async function loadMySupportTickets() {
+  const box = $('mySupportTickets');
+  if (!box) return;
+  if (!ME) { box.innerHTML = ''; return; }
+  try {
+    const data = await api('/api/support-tickets');
+    const tickets = data.tickets || [];
+    box.innerHTML = tickets.length ? `<div class="card" style="margin-bottom:18px"><div class="card-head"><h3>My support tickets</h3><span class="s" style="color:var(--muted)">Open a ticket to read updates or reply.</span></div><div class="card-body tight">${tickets.map((ticket) => `
+      <button class="list-row" style="width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);cursor:pointer" onclick="openSupportTicket('${esc(ticket.ticket_no)}')">
+        <div class="grow"><div class="t">${esc(ticket.ticket_no)} &middot; ${esc(ticket.subject)}</div><div class="s" style="color:var(--muted)">${esc(supportStatusLabel(ticket.status))} &middot; Updated ${esc((ticket.updated_at || '').slice(0, 16).replace('T', ' '))}</div></div><span aria-hidden="true">&rarr;</span>
+      </button>`).join('')}</div></div>` : '';
+  } catch { box.innerHTML = ''; }
+}
+function supportThreadHtml(ticket) {
+  const messages = (ticket.messages || []).map((item) => `<div style="margin:9px 0;padding:10px 12px;border-radius:10px;background:${item.author === 'admin' ? 'var(--violet-soft)' : 'var(--surface-2)'}">
+    <div class="s" style="font-weight:700;color:var(--ink)">${item.author === 'admin' ? 'EchoLens Support' : 'You'}</div>
+    <div class="s" style="white-space:pre-line;color:var(--muted);margin-top:3px">${esc(item.message)}</div>
+    <div class="s" style="color:var(--muted-2);margin-top:4px">${esc((item.created_at || '').slice(0, 16).replace('T', ' '))}</div>
+  </div>`).join('');
+  return `<div class="s" style="color:var(--muted-2);margin-bottom:5px">${esc(ticket.ticket_no)} &middot; ${esc(supportStatusLabel(ticket.status))}</div>
+    <h3 style="margin-bottom:8px">${esc(ticket.subject)}</h3>
+    <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px"><div class="s" style="font-weight:700">Your original issue</div><div class="s" style="white-space:pre-line;color:var(--muted);margin-top:3px">${esc(ticket.message)}</div></div>
+    ${messages || '<p class="s" style="color:var(--muted);margin:12px 0">Support has not added an update yet.</p>'}
+    ${ticket.resolution ? `<div style="padding:11px 13px;border-radius:10px;background:var(--teal-soft);margin-top:10px"><strong>Resolution</strong><div class="s" style="white-space:pre-line;margin-top:4px">${esc(ticket.resolution)}</div></div>` : ''}`;
+}
+async function openSupportTicket(ticketNo, token = '') {
+  try {
+    const suffix = token ? `?token=${encodeURIComponent(token)}` : '';
+    const data = await api(`/api/public/support-tickets/${encodeURIComponent(ticketNo)}${suffix}`);
+    const ticket = data.ticket;
+    openModal(`Support ticket ${ticket.ticket_no}`, `${supportThreadHtml(ticket)}
+      ${ticket.status !== 'resolved' ? `<form id="supportReplyForm" style="margin-top:14px"><label class="field"><span>Your reply</span><textarea name="message" rows="4" minlength="5" maxlength="2000" required placeholder="Add the information our support team needs"></textarea></label><button class="btn btn-primary btn-block">Send reply</button></form>` : '<button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal()">Done</button>'}`);
+    const form = $('supportReplyForm');
+    if (form) form.addEventListener('submit', async (event) => {
+      event.preventDefault(); const button = form.querySelector('button'); button.disabled = true; button.textContent = 'Sending...';
+      try {
+        const updated = await api(`/api/public/support-tickets/${encodeURIComponent(ticket.ticket_no)}/replies${suffix}`, { method: 'POST', body: JSON.stringify({ message: form.message.value.trim(), token }) });
+        $('modalBody').innerHTML = `${supportThreadHtml(updated.ticket)}<div class="form-msg ok" role="status" style="display:block">Your reply was sent to EchoLens Support.</div><button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal();loadMySupportTickets()">Done</button>`;
+      } catch (error) { modalMsg(error.message); button.disabled = false; button.textContent = 'Send reply'; }
+    });
+  } catch (error) { openModal('Support ticket', `<div class="form-msg err" style="display:block">${esc(error.message)}</div><button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="closeModal()">Close</button>`); }
 }
 
 function openSupportTicketForm() {
@@ -552,7 +604,8 @@ function openSupportTicketForm() {
         <div style="font:700 24px var(--font-mono);color:var(--primary);margin:5px 0 10px">${esc(data.ticket.ticket_no)}</div>
         <p class="s" style="color:var(--muted)">${data.email_sent ? 'A confirmation email was sent to your inbox.' : 'Your ticket is saved. Email delivery is temporarily unavailable, so keep this ticket number for reference.'}</p>
         <p class="s" style="color:var(--muted);margin-top:6px">Expected response: within 24 to 48 hours.</p>
-        <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal()">Done</button>
+        <a class="btn btn-primary btn-block" style="margin-top:14px" href="${esc(data.ticket.reply_url)}">View ticket &amp; reply</a>
+        <button class="btn btn-ghost btn-block" style="margin-top:7px" onclick="closeModal();loadMySupportTickets()">Done</button>
       </div></div>`;
     } catch (error) {
       modalMsg(error.message); button.disabled = false; button.textContent = 'Submit ticket';

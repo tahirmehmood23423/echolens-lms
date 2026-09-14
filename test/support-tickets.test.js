@@ -34,11 +34,21 @@ test('support tickets stay private and leave the admin queue after resolution', 
 
   SupportTickets.markAcknowledged(ticket.id, true);
   assert.equal(SupportTickets.byId(ticket.id).acknowledgement_email_sent, true);
+  const waiting = SupportTickets.addAdminMessage(ticket.id, 'Which browser and version are you using?', 'Admin User', true);
+  assert.equal(waiting.status, 'waiting_on_user');
+  assert.equal(waiting.messages[0].author, 'admin');
+  assert.equal(SupportTickets.open().length, 1);
+  const replied = SupportTickets.addUserMessage(ticket.id, 'Chrome 140 on Windows 11.', { name: 'Learner' });
+  assert.equal(replied.status, 'open');
+  assert.equal(replied.messages[1].author, 'user');
+  assert.equal(SupportTickets.forUser({ id: 42, email: 'learner@example.com' })[0].id, ticket.id);
+  assert.equal(SupportTickets.forUser({ id: 77, email: 'other@example.com' }).length, 0);
   const resolved = SupportTickets.resolve(ticket.id, 'The compiler theme contrast was corrected.', 'Admin User', true);
   assert.equal(resolved.status, 'resolved');
   assert.equal(resolved.resolution_email_sent, true);
   assert.equal(SupportTickets.open().length, 0);
   assert.equal(SupportTickets.byId(ticket.id).resolution, 'The compiler theme contrast was corrected.');
+  assert.equal(SupportTickets.addUserMessage(ticket.id, 'One more reply', { name: 'Learner' }), null);
 });
 
 test('legacy feedback entries without a type remain public-feedback records', () => {

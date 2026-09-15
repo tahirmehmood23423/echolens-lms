@@ -95,7 +95,7 @@ class SmtpProvider {
 }
 
 class ZeptoApiProvider {
-  constructor() { this.name = 'zeptomail-api'; this.kind = 'transactional'; this.token = process.env.ZEPTO_SEND_MAIL_TOKEN || ''; this.configured = !!this.token; }
+  constructor() { this.name = 'zeptomail-api'; this.kind = 'transactional'; this.token = String(process.env.ZEPTO_SEND_MAIL_TOKEN || '').replace(/^Zoho-enczapikey\s+/i, '').trim(); this.configured = !!this.token; }
   async send({ to, subject, text, html }) {
     if (!this.configured) return { sent: false, skipped: true };
     const from = parseAddress(FROM, 'EchoLens');

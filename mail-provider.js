@@ -94,6 +94,22 @@ class SmtpProvider {
   }
 }
 
+class ZeptoApiProvider {
+  constructor() { this.name = 'zeptomail-api'; this.kind = 'transactional'; this.token = process.env.ZEPTO_SEND_MAIL_TOKEN || ''; this.configured = !!this.token; }
+  async send({ to, subject, text, html }) {
+    if (!this.configured) return { sent: false, skipped: true };
+    const from = parseAddress(FROM, 'EchoLens');
+    const payload = JSON.stringify({ from: { address: from.email, name: from.name }, to: [{ email_address: { address: String(to), name: '' } }], subject, textbody: text, htmlbody: html || `<pre style="font-family:Arial,sans-serif;white-space:pre-wrap">${String(text || '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</pre>` });
+    return new Promise((resolve, reject) => {
+      const req = https.request({ hostname: 'api.zeptomail.com', path: '/v1.1/email', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Zoho-enczapikey ${this.token}`, 'Content-Length': Buffer.byteLength(payload) }, timeout: 15000 }, (res) => {
+        let body = ''; res.on('data', (c) => { body += c; }); res.on('end', () => { if (res.statusCode >= 200 && res.statusCode < 300) resolve({ sent: true, id: body }); else { const e = new Error(`ZeptoMail API ${res.statusCode}: ${body}`); e.statusCode = res.statusCode; reject(e); } });
+      });
+      req.on('timeout', () => req.destroy(new Error('ZeptoMail API timeout'))); req.on('error', reject); req.write(payload); req.end();
+    });
+  }
+  close() {}
+}
+
 // A 5xx SMTP reply is a permanent rejection of the address. A 4xx or a
 // connection-level error is the server backing off and says nothing about
 // the address. "Unusual sending activity" / 5.4.6 / "blocked" is the sender
@@ -198,7 +214,7 @@ function safeJson(s) { try { return JSON.parse(s); } catch { return {}; } }
 
 let _transactional = null;
 function getTransactionalProvider() {
-  if (!_transactional) _transactional = new SmtpProvider();
+  if (!_transactional) _transactional = process.env.ZEPTO_SEND_MAIL_TOKEN ? new ZeptoApiProvider() : new SmtpProvider();
   return _transactional;
 }
 
@@ -217,4 +233,4 @@ function getBulkProvider() {
   return _bulk;
 }
 
-module.exports = { getTransactionalProvider, getBulkProvider, SmtpProvider, BrevoProvider };
+module.exports = { getTransactionalProvider, getBulkProvider, SmtpProvider, ZeptoApiProvider, BrevoProvider };

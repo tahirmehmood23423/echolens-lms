@@ -2817,7 +2817,7 @@ app.post('/api/batches/:id/partner', authRequired, adminRequired, (req, res) => 
   res.json({ ok: true, partner });
 });
 // Issue one certificate (course completion / hackathon / competition).
-app.post('/api/certificates/issue', authRequired, teacherOrAdmin, (req, res) => {
+app.post('/api/certificates/issue', authRequired, teacherOrAdmin, asyncRoute(async (req, res) => {
   const { reg_no, user_id, batch_id, kind, title, completion_date, detail, partner } = req.body || {};
   const student = user_id ? Users.byId(user_id) : Users.byReg(String(reg_no || ''));
   if (!student) return res.status(404).json({ error: 'No student found for that registration number.' });
@@ -2850,8 +2850,9 @@ app.post('/api/certificates/issue', authRequired, teacherOrAdmin, (req, res) => 
     mailer.notify(student.email, `Your certificate is ready - ${cert.title}`,
       `Congratulations ${student.name}!\n\nYour verified certificate for "${cert.title}" has been issued (serial ${cert.serial}).\n\nView, download and share it to LinkedIn from your profile, or open it directly: ${APP_URL}/cert?s=${cert.serial}`);
   }
+  await store.pendingPersist();
   res.json({ ok: true, cert, url: `${APP_URL}/cert?s=${cert.serial}` });
-});
+}));
 // Issue for every student who COMPLETED the course's quest track.
 app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (req, res) => {
   const bd = Batches.decorate(req.batch);

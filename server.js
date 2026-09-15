@@ -4700,12 +4700,19 @@ const gradingWorker = require('./grading-worker').createGradingWorker({
     await announceCourseCompletion(a.user_id,a.track_key,certified).catch(e=>console.error('[certificate] email failed:',e.message));
   },
 });
-app.get('/api/open/progress', authRequired, openLearnerRequired, (req, res) => {
+app.get('/api/open/progress', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {
   const track = String(req.query.track || '');
-  const prog = OpenQuest.progress(req.user.id, track);
+  let prog = OpenQuest.progress(req.user.id, track);
   if (!prog) return res.status(404).json({ error: 'Course not found.' });
+  // Repair certificates for completions that finished while the grading worker
+  // or mail process was restarting. This is idempotent and keeps the learner's
+  // progress page authoritative without requiring a second submission.
+  if (prog.passed && !prog.certificate) {
+    const issued = OpenQuest.maybeCertify(req.user.id, track);
+    if (issued) { await store.pendingPersist(); prog = OpenQuest.progress(req.user.id, track); }
+  }
   res.json({ progress: { ...prog, enrolled: !!OpenQuest.enrollment(req.user.id, track) } });
-});
+}));
 
 /* ---------------- learner AI copilot for the quest workspaces ----------------
  * kind 'prompt' -> BC-02's Prompt Lab: runs the student's prompt like a real

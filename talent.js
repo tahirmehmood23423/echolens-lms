@@ -175,6 +175,8 @@ async function refreshSearchCache(userId) {
   );
 }
 async function refreshAllSearchCaches() {
+  const { rows: [{ present }] } = await db.query("SELECT to_regclass('public.talent_profiles') IS NOT NULL AS present");
+  if (!present) return; // optional talent migration may not be applied yet
   const { rows } = await db.query('SELECT user_id FROM talent_profiles WHERE published = true');
   for (const r of rows) {
     try { await refreshSearchCache(r.user_id); } catch (e) { console.error('[talent] search cache refresh failed for user', r.user_id, e.message); }

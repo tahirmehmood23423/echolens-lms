@@ -1,5 +1,9 @@
 # EchoLens LMS - Talent Marketplace, Phases 4-6 and cross-cutting
 
+**September 2026 certificate/server crash fix (Prisma deployments):** startup now applies only the supplemental Talent migrations `0003` through `0006` before loading the LMS and accepting requests. These tables are accessed through `pg` and are not in Prisma's schema. The Prisma cutover had stopped creating them, so `/api/talent/me` could raise `42P01` (`talent_profiles` missing). Talent async routes now forward failures to the request error handler instead of terminating Node and interrupting certificate requests.
+
+Deploy this version and restart the Render service; startup installs any pending Talent migrations automatically. To apply them explicitly from the deployed Render Shell, use `npm run migrate:talent`. The runtime database role needs schema creation privileges. Do **not** run the full legacy `npm run migrate` or `migrate:import` against the normalized production database: those commands target the old JSONB LMS tables. Continue using Prisma migrations for the core LMS schema. No new environment variables are required. See [the incident verification and rollout notes](qa-implementation/talent-certificate-fix.md).
+
 **Phase 4: search.** Recruiter search lives at `/talent/search` (`GET /api/talent/search`, `requireRecruiter`). Every filter in the spec (free text, skills AND/OR, city, remote, availability, work type, verified projects, courses completed, certificates held, minimum gems, graduation year range) runs as one real, keyset-paginated SQL query - see `migrations/0004_talent_search.sql`:
 - Free text uses a generated `tsvector` + GIN index on `talent_profiles` (headline/about) and `projects` (title/summary/tech stack) separately - Postgres generated columns can't span two tables, so the query unions both rather than faking one. `websearch_to_tsquery` is used, never `LIKE '%term%'`.
 - Skills use `talent_profiles.skill_ids`, a denormalised `BIGINT[]` mirror of the `student_skills` join table, kept in sync by a Postgres trigger (not application code, so it can't drift) with a GIN index for `@>` (AND) / `&&` (OR) containment queries.
@@ -61,6 +65,8 @@
 ---
 
 # EchoLens LMS - Postgres data layer (Talent Marketplace Phase 0)
+
+Historical notes for the original JSONB deployment follow. Current normalized Prisma deployments use Prisma for core schema changes and `npm run migrate:talent` for supplemental Talent tables; the legacy import commands below do not apply to them.
 
 **Persistence moved from a JSON file to Postgres, with no behaviour change.** Every route, every business-logic function in `store.js`, and the in-memory `data` object it has always worked with are unchanged - what changed is where that `data` object is loaded from and saved to.
 

@@ -8,6 +8,7 @@
     "start": "node server.js",
     "seed": "node store.js --seed",
     "migrate": "node migrations/run.js",
+    "migrate:talent": "node migrations/run.js --talent",
     "migrate:import": "node migrations/import-json.js",
     "validate:catalogue": "node scripts/validate-trending-tech.js",
     "validate:catalogue:release": "node scripts/validate-trending-tech.js --release",
@@ -38,5 +39,8 @@
     "prisma": "^7.9.0",
     "qrcode": "^1.5.4",
     "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.4.3"
   }
 }

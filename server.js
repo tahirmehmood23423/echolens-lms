@@ -34,6 +34,7 @@ const { sessionVersion, validSession, safeReturnPath } = require('./session-secu
 const uploadAccess = require('./upload-access');
 const { validateEvidenceInput } = require('./evidence-submission');
 const { deliverRegistrationMail } = require('./registration-delivery');
+const asyncRoute = require('./async-route');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue, catalogueFee,
   Attendance, Quizzes, Certificates, Settings, TaskFiles, riskReport, fullStudentProfile, openUserProfile,
@@ -4350,7 +4351,6 @@ const OPEN_SUBMIT_RULES = {
   file: { pattern: /\.(pdf|docx?|pptx?|txt|md|ipynb|png|jpe?g|zip)$/i, error: 'Upload PDF, Word, text, notebook, PNG, JPEG, or ZIP files.' },
   evidence: { pattern: /\.(pdf|docx?|pptx?|txt|md|ipynb|png|jpe?g|zip|mp4|webm|mov|csv|json|ya?ml|toml|sql|py|go|js|ts|tsx|proto|tf)$/i, error: 'Upload a supported document, source, archive, image, or recording file.', multiple: true },
 };
-function asyncRoute(handler){return (req,res,next)=>Promise.resolve().then(()=>handler(req,res,next)).catch(next);}
 async function submitOpenAssessment(req, res, assessmentKind) {
   const allFiles = [...((req.files || {}).file || []), ...((req.files || {}).files || [])];
   const cleanup = () => { for (const f of allFiles) { try { fs.unlinkSync(f.path); } catch {} } };
@@ -4903,6 +4903,7 @@ app.get('/challan', (req, res) => res.sendFile(path.join(__dirname, 'public', 'c
 
 app.use((err, req, res, next) => {
   if (err) {
+    if (res.headersSent) return next(err);
     // Preserve a meaningful status when the error carries one (e.g. 413 for an
     // over-limit body, 400 for malformed JSON); default to 400 otherwise.
     const status=err.status||err.statusCode||(err instanceof multer.MulterError?400:503);

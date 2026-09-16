@@ -117,6 +117,7 @@ Departments are isolated by role and permissions. HR/admin can manage department
 ## Integrations and infrastructure
 
 - PostgreSQL through Prisma/PG adapter for production persistence, migrations, JSON profile/evidence data, and durable records.
+- Startup installs the supplemental Talent Marketplace schema before accepting requests. Talent route failures return request errors without terminating the LMS or interrupting certificate services for learners and authorized staff.
 - Local JSON store/test mode for development and QA, with backup and persistence utilities.
 - ZeptoMail HTTPS Send Mail API for transactional email; SMTP fallback is supported through Nodemailer.
 - Brevo HTTP API path for bulk/outreach email, with dry-run defaults, suppression handling, batching, pacing, and circuit-breaker protection.
@@ -153,4 +154,3 @@ When adding or changing a feature:
 5. Add or update API/UI tests and the QA implementation reports.
 6. Update screenshots, marketing copy, and release notes when the user-visible behavior changes.
 7. Verify production configuration before publishing the claim.
-

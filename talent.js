@@ -24,6 +24,7 @@ const db = require('./db');
 const store = require('./store');
 const mailer = require('./mailer');
 const searchConfig = require('./search-config');
+const asyncRoute = require('./async-route');
 
 const { Users, Quests, coursesForUser } = store;
 
@@ -350,7 +351,7 @@ module.exports = {
     }
 
     /* ----------------------------- my profile ----------------------------- */
-    app.get('/api/talent/me', authRequired, requireDb, requireStudent, async (req, res) => {
+    app.get('/api/talent/me', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       let profile = await getProfileByUserId(req.user.id);
       const skills = profile ? await skillsForUser(req.user.id) : [];
       const completeness = await computeCompleteness(profile || {}, skills.length);
@@ -366,9 +367,9 @@ module.exports = {
         verified: verifiedBlockFor(req.user, APP_URL),
         public_url: profile ? `${APP_URL}/talent/${profile.handle}` : null,
       });
-    });
+    }));
 
-    app.put('/api/talent/me', authRequired, requireDb, requireStudent, async (req, res) => {
+    app.put('/api/talent/me', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const b = req.body || {};
       if (b.remote_pref !== undefined && b.remote_pref !== null && !REMOTE_PREFS.includes(b.remote_pref)) return res.status(400).json({ error: 'Invalid remote preference.' });
       if (b.availability !== undefined && b.availability !== null && !AVAILABILITY.includes(b.availability)) return res.status(400).json({ error: 'Invalid availability.' });
@@ -415,9 +416,9 @@ module.exports = {
       }
       refreshSearchCache(req.user.id).catch(() => {});
       res.json({ ok: true, handle: profile.handle });
-    });
+    }));
 
-    app.post('/api/talent/me/handle', authRequired, requireDb, requireStudent, async (req, res) => {
+    app.post('/api/talent/me/handle', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const handle = slugify((req.body || {}).handle);
       if (handle.length < 3) return res.status(400).json({ error: 'Choose a handle with at least 3 characters.' });
       const existing = await getProfileByHandle(handle);
@@ -426,9 +427,9 @@ module.exports = {
       if (!mine) return res.status(400).json({ error: 'Save your profile before choosing a handle.' });
       await db.query('UPDATE talent_profiles SET handle=$1, updated_at=now() WHERE user_id=$2', [handle, req.user.id]);
       res.json({ ok: true, handle });
-    });
+    }));
 
-    app.post('/api/talent/me/publish', authRequired, requireDb, requireStudent, async (req, res) => {
+    app.post('/api/talent/me/publish', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const profile = await getProfileByUserId(req.user.id);
       if (!profile) return res.status(400).json({ error: 'Fill in your profile before publishing.' });
       const skills = await skillsForUser(req.user.id);
@@ -437,14 +438,14 @@ module.exports = {
       await db.query('UPDATE talent_profiles SET published=true, unpublished_reason=NULL, updated_at=now() WHERE user_id=$1', [req.user.id]);
       await refreshSearchCache(req.user.id).catch(() => {});
       res.json({ ok: true, public_url: `${APP_URL}/talent/${profile.handle}` });
-    });
-    app.post('/api/talent/me/unpublish', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.post('/api/talent/me/unpublish', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       await db.query('UPDATE talent_profiles SET published=false, updated_at=now() WHERE user_id=$1', [req.user.id]);
       res.json({ ok: true });
-    });
+    }));
 
     /* ------------------------------- resume ------------------------------- */
-    app.post('/api/talent/me/resume', authRequired, requireDb, requireStudent, resumeUpload.single('file'), async (req, res) => {
+    app.post('/api/talent/me/resume', authRequired, requireDb, requireStudent, resumeUpload.single('file'), asyncRoute(async (req, res) => {
       if (!req.file) return res.status(400).json({ error: 'Attach a PDF file.' });
       if (!detectPdf(req.file.buffer)) return res.status(400).json({ error: 'Only PDF files are accepted for a resume.' });
       const profile = await getProfileByUserId(req.user.id);
@@ -454,24 +455,24 @@ module.exports = {
       if (profile.resume_filename) { try { fs.unlinkSync(path.join(RESUME_DIR, profile.resume_filename)); } catch { /* already gone */ } }
       await db.query('UPDATE talent_profiles SET resume_filename=$1, updated_at=now() WHERE user_id=$2', [filename, req.user.id]);
       res.json({ ok: true });
-    });
+    }));
     // Never served under a public static mount - the owner only. Contact
     // gating for recruiters is Phase 5's job; until it exists nobody but
     // the student themselves can fetch this.
-    app.get('/api/talent/me/resume', authRequired, requireDb, requireStudent, async (req, res) => {
+    app.get('/api/talent/me/resume', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const profile = await getProfileByUserId(req.user.id);
       if (!profile || !profile.resume_filename) return res.status(404).json({ error: 'No resume uploaded.' });
       res.sendFile(path.join(RESUME_DIR, profile.resume_filename));
-    });
+    }));
 
     /* ------------------------------- skills ------------------------------- */
-    app.get('/api/talent/skills', authRequired, requireDb, async (req, res) => {
+    app.get('/api/talent/skills', authRequired, requireDb, asyncRoute(async (req, res) => {
       const q = String(req.query.q || '').trim();
       if (q.length < 1) return res.json({ skills: [] });
       const { rows } = await db.query(`SELECT id, name FROM skills WHERE name ILIKE $1 ORDER BY name LIMIT 15`, [`%${q}%`]);
       res.json({ skills: rows.map((r) => ({ id: Number(r.id), name: r.name })) });
-    });
-    app.post('/api/talent/me/skills', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.post('/api/talent/me/skills', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const { skill_id, name } = req.body || {};
       let skillId = skill_id ? Number(skill_id) : null;
       if (!skillId && name && String(name).trim()) {
@@ -492,20 +493,20 @@ module.exports = {
         [req.user.id, skillId, skillRow.source === 'catalogue' ? 'catalogue' : 'freetext', !!skillRow.needs_review]
       );
       res.json({ ok: true, skills: await skillsForUser(req.user.id) });
-    });
-    app.delete('/api/talent/me/skills/:skillId', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.delete('/api/talent/me/skills/:skillId', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       await db.query('DELETE FROM student_skills WHERE user_id = $1 AND skill_id = $2', [req.user.id, req.params.skillId]);
       res.json({ ok: true, skills: await skillsForUser(req.user.id) });
-    });
+    }));
 
     /* ------------------------------ projects: mine ------------------------------ */
-    app.get('/api/talent/me/portfolio-eligible', authRequired, requireDb, requireStudent, async (req, res) => {
+    app.get('/api/talent/me/portfolio-eligible', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const eligible = portfolioEligibleSubmissions(req.user.id);
       const published = await db.query('SELECT source_submission_id FROM projects WHERE user_id = $1 AND source_submission_id IS NOT NULL', [req.user.id]);
       const publishedIds = new Set(published.rows.map((r) => Number(r.source_submission_id)));
       res.json({ eligible: eligible.filter((e) => !publishedIds.has(e.submission_id)) });
-    });
-    app.post('/api/talent/me/projects/from-submission', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.post('/api/talent/me/projects/from-submission', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const { submission_id } = req.body || {};
       const eligible = portfolioEligibleSubmissions(req.user.id).find((e) => e.submission_id === Number(submission_id));
       if (!eligible) return res.status(400).json({ error: 'That submission is not eligible to publish as a project.' });
@@ -523,12 +524,12 @@ module.exports = {
         if (err.code === '23505') return res.status(400).json({ error: 'This submission has already been published as a project.' });
         throw err;
       }
-    });
-    app.get('/api/talent/me/projects', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.get('/api/talent/me/projects', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const { rows } = await db.query('SELECT * FROM projects WHERE user_id = $1 ORDER BY verified DESC, created_at DESC', [req.user.id]);
       res.json({ projects: rows.map(projectPublicView) });
-    });
-    app.post('/api/talent/me/projects', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.post('/api/talent/me/projects', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const b = req.body || {};
       if (!b.title || !String(b.title).trim()) return res.status(400).json({ error: 'Enter a project title.' });
       if (!isOptionalUrl(b.repo_url) || !isOptionalUrl(b.demo_url)) return res.status(400).json({ error: 'Enter valid links, or leave them blank.' });
@@ -542,8 +543,8 @@ module.exports = {
           b.team_size ? Number(b.team_size) : null, b.completed_month ? Number(b.completed_month) : null, b.completed_year ? Number(b.completed_year) : null]
       );
       res.json({ ok: true, project: projectPublicView(rows[0]) });
-    });
-    app.put('/api/talent/me/projects/:id', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.put('/api/talent/me/projects/:id', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const proj = await ownProject(req, res); if (!proj) return;
       const b = req.body || {};
       if (!isOptionalUrl(b.repo_url) || !isOptionalUrl(b.demo_url)) return res.status(400).json({ error: 'Enter valid links, or leave them blank.' });
@@ -568,15 +569,15 @@ module.exports = {
           proj.id]
       );
       res.json({ ok: true, project: projectPublicView(rows[0]) });
-    });
-    app.delete('/api/talent/me/projects/:id', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.delete('/api/talent/me/projects/:id', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const proj = await ownProject(req, res); if (!proj) return;
       deleteProjectImage(proj.cover_image);
       (proj.gallery || []).forEach(deleteProjectImage);
       await db.query('DELETE FROM projects WHERE id = $1', [proj.id]);
       res.json({ ok: true });
-    });
-    app.post('/api/talent/me/projects/:id/cover', authRequired, requireDb, requireStudent, imageUpload.single('file'), async (req, res) => {
+    }));
+    app.post('/api/talent/me/projects/:id/cover', authRequired, requireDb, requireStudent, imageUpload.single('file'), asyncRoute(async (req, res) => {
       const proj = await ownProject(req, res); if (!proj) return;
       if (!req.file) return res.status(400).json({ error: 'Attach an image.' });
       const out = await processAndSaveImage(req.file.buffer);
@@ -584,8 +585,8 @@ module.exports = {
       deleteProjectImage(proj.cover_image);
       await db.query('UPDATE projects SET cover_image=$1, updated_at=now() WHERE id=$2', [out.filename, proj.id]);
       res.json({ ok: true, cover_image: `/talent-media/${out.filename}` });
-    });
-    app.post('/api/talent/me/projects/:id/gallery', authRequired, requireDb, requireStudent, imageUpload.single('file'), async (req, res) => {
+    }));
+    app.post('/api/talent/me/projects/:id/gallery', authRequired, requireDb, requireStudent, imageUpload.single('file'), asyncRoute(async (req, res) => {
       const proj = await ownProject(req, res); if (!proj) return;
       if (!req.file) return res.status(400).json({ error: 'Attach an image.' });
       const gallery = proj.gallery || [];
@@ -595,8 +596,8 @@ module.exports = {
       const next = [...gallery, out.filename];
       await db.query('UPDATE projects SET gallery=$1, updated_at=now() WHERE id=$2', [JSON.stringify(next), proj.id]);
       res.json({ ok: true, gallery: next.map((f) => `/talent-media/${f}`) });
-    });
-    app.delete('/api/talent/me/projects/:id/gallery/:index', authRequired, requireDb, requireStudent, async (req, res) => {
+    }));
+    app.delete('/api/talent/me/projects/:id/gallery/:index', authRequired, requireDb, requireStudent, asyncRoute(async (req, res) => {
       const proj = await ownProject(req, res); if (!proj) return;
       const idx = Number(req.params.index);
       const gallery = proj.gallery || [];
@@ -605,10 +606,10 @@ module.exports = {
       const next = gallery.filter((_, i) => i !== idx);
       await db.query('UPDATE projects SET gallery=$1, updated_at=now() WHERE id=$2', [JSON.stringify(next), proj.id]);
       res.json({ ok: true, gallery: next.map((f) => `/talent-media/${f}`) });
-    });
+    }));
 
     /* ------------------------------- recruiter search (Phase 4) ------------------------------- */
-    app.get('/api/talent/search', authRequired, requireDb, requireRecruiter, searchRateLimit, async (req, res) => {
+    app.get('/api/talent/search', authRequired, requireDb, requireRecruiter, searchRateLimit, asyncRoute(async (req, res) => {
       const q = req.query;
       const splitList = (v) => (v ? String(v).split(',').map((s) => s.trim()).filter(Boolean) : []);
       const filters = {
@@ -638,12 +639,12 @@ module.exports = {
         results: results.map(({ cursor: _c, ...rest }) => rest),
         next_cursor: results.length === searchConfig.RESULTS_PER_PAGE ? results[results.length - 1].cursor : null,
       });
-    });
-    app.get('/api/talent/saved-searches', authRequired, requireDb, requireRecruiter, async (req, res) => {
+    }));
+    app.get('/api/talent/saved-searches', authRequired, requireDb, requireRecruiter, asyncRoute(async (req, res) => {
       const { rows } = await db.query('SELECT * FROM saved_searches WHERE recruiter_id = $1 ORDER BY created_at DESC', [req.user.id]);
       res.json({ saved_searches: rows });
-    });
-    app.post('/api/talent/saved-searches', authRequired, requireDb, requireRecruiter, async (req, res) => {
+    }));
+    app.post('/api/talent/saved-searches', authRequired, requireDb, requireRecruiter, asyncRoute(async (req, res) => {
       const { name, filters, notify_weekly } = req.body || {};
       if (!name || !String(name).trim()) return res.status(400).json({ error: 'Name this search.' });
       const { rows } = await db.query(
@@ -651,16 +652,16 @@ module.exports = {
         [req.user.id, String(name).trim().slice(0, 100), JSON.stringify(filters || {}), !!notify_weekly]
       );
       res.json({ ok: true, saved_search: rows[0] });
-    });
-    app.delete('/api/talent/saved-searches/:id', authRequired, requireDb, requireRecruiter, async (req, res) => {
+    }));
+    app.delete('/api/talent/saved-searches/:id', authRequired, requireDb, requireRecruiter, asyncRoute(async (req, res) => {
       await db.query('DELETE FROM saved_searches WHERE id = $1 AND recruiter_id = $2', [req.params.id, req.user.id]);
       res.json({ ok: true });
-    });
+    }));
 
     /* ------------------------------- public ------------------------------- */
     // Registered before /talent/profile/:handle so the literal path always
     // wins over the param route.
-    app.get('/api/talent/projects', requireDb, async (req, res) => {
+    app.get('/api/talent/projects', requireDb, asyncRoute(async (req, res) => {
       const q = String(req.query.q || '').trim();
       const params = [];
       let where = 'p.visible = true AND tp.published = true';
@@ -673,8 +674,8 @@ module.exports = {
         params
       );
       res.json({ projects: rows.map((r) => ({ ...projectPublicView(r), handle: r.handle })) });
-    });
-    app.get('/api/talent/profile/:handle', requireDb, async (req, res) => {
+    }));
+    app.get('/api/talent/profile/:handle', requireDb, asyncRoute(async (req, res) => {
       const profile = await getProfileByHandle(String(req.params.handle).toLowerCase());
       if (!profile || !profile.published) return res.status(404).json({ error: 'No published profile at this handle.' });
       const u = Users.byId(profile.user_id);
@@ -692,14 +693,14 @@ module.exports = {
         // Resume and any contact detail are never rendered here - Phase 5
         // owns the recruiter contact-request/reveal flow this waits for.
       });
-    });
-    app.get('/api/talent/profile/:handle/projects/:projectId', requireDb, async (req, res) => {
+    }));
+    app.get('/api/talent/profile/:handle/projects/:projectId', requireDb, asyncRoute(async (req, res) => {
       const profile = await getProfileByHandle(String(req.params.handle).toLowerCase());
       if (!profile || !profile.published) return res.status(404).json({ error: 'Not found.' });
       const { rows } = await db.query('SELECT * FROM projects WHERE id = $1 AND user_id = $2 AND visible = true', [req.params.projectId, profile.user_id]);
       if (!rows[0]) return res.status(404).json({ error: 'Not found.' });
       res.json({ name: Users.byId(profile.user_id)?.name, handle: profile.handle, project: projectPublicView(rows[0]) });
-    });
+    }));
 
     /* --------------------------------- pages ---------------------------------
      * Literal paths (/talent/search, /talent/projects) are registered before
@@ -711,7 +712,7 @@ module.exports = {
     // still index and rank these pages - same pattern server.js's
     // certPageWithOg already uses for /cert, extended with a real <title>
     // rewrite and Person/CreativeWork JSON-LD, not just Open Graph tags.
-    app.get('/talent/:handle/projects/:projectId', async (req, res) => {
+    app.get('/talent/:handle/projects/:projectId', asyncRoute(async (req, res) => {
       let html = fs.readFileSync(path.join(__dirname, 'public', 'talent-project.html'), 'utf8');
       try {
         if (db.enabled()) {
@@ -745,8 +746,8 @@ ${ld}`;
         }
       } catch (e) { console.error('[talent] SEO render failed for project page:', e.message); }
       res.type('html').send(html);
-    });
-    app.get('/talent/:handle', async (req, res) => {
+    }));
+    app.get('/talent/:handle', asyncRoute(async (req, res) => {
       let html = fs.readFileSync(path.join(__dirname, 'public', 'talent-profile.html'), 'utf8');
       try {
         if (db.enabled()) {
@@ -777,6 +778,6 @@ ${ld}`;
         }
       } catch (e) { console.error('[talent] SEO render failed for profile page:', e.message); }
       res.type('html').send(html);
-    });
+    }));
   },
 };

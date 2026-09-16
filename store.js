@@ -763,6 +763,11 @@ async function initFromPostgres() {
     return;
   }
 
+  // The Prisma cutover stopped running the legacy migrations, but Talent's
+  // standalone relational tables still need their own schema. Await only
+  // those migrations before the server or grading worker can start.
+  await require('./migrations/run').runTalentMigrations(db.getPool());
+
   // Feedback predates the normalized Prisma schema and uses one JSONB payload
   // per row. Ensure that table exists before Prisma loads reviews/tickets so
   // an environment cannot boot with an in-memory-only support queue.

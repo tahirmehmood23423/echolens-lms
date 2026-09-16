@@ -11,6 +11,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const express = require('express');
+const demo = require('./demo/context');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -53,7 +54,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DEFAULT_JWT_SECRET = 'echolens-dev-secret-change-in-production';
 const JWT_SECRET = process.env.JWT_SECRET || DEFAULT_JWT_SECRET;
-const COOKIE = 'el_token';
+const COOKIE = demo.enabled ? 'el_demo_token' : 'el_token';
 // NODE_ENV=production alone is not trusted as "this is really Render" - this
 // repo's own local .env sets NODE_ENV=production unconditionally (no
 // comment explaining why), so a plain `node server.js` on a laptop reads as
@@ -198,6 +199,14 @@ app.use((req, res, next) => {
   next();
 });
 
+if (demo.enabled) {
+  app.use(require('./demo/read-only').middleware);
+  app.get('/', (req, res) => res.type('html').send(require('./demo/landing')()));
+  app.get('/api/demo/info', (req, res) => res.json({ read_only: true, accounts: require('./demo/accounts'), password: 'admin' }));
+  app.get('/demo-sample.pdf', (req, res) => res.sendFile(path.join(UPLOAD_DIR, 'demo-sample.pdf')));
+} else {
+  require('./demo/proxy').register(app);
+}
 app.use(express.json({ limit: '1mb' })); // cap request bodies to blunt large-payload DoS
 app.use(cookieParser());
 
@@ -269,7 +278,7 @@ function isDeactivatedAmbassador(u) {
 function authRequired(req, res, next) {
   const u = currentUser(req);
   if (!u || isDeactivatedAmbassador(u)) return res.status(401).json({ error: 'Please sign in to continue.' });
-  req.user = u; touchActivity(u); next();
+  req.user = u; if (!demo.enabled) touchActivity(u); next();
 }
 function adminRequired(req, res, next) { if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin access only.' }); next(); }
 // Talent Marketplace: a recruiter must be BOTH the right role AND verified
@@ -431,6 +440,7 @@ app.get('/api/auth/me', authRequired, (req, res) => {
   const u = req.user;
   res.json({
     id: u.id, name: u.name, role: u.role, username: u.username, email: u.email, reg_no: u.reg_no,
+    demo_read_only: demo.enabled,
     avatar: u.avatar || null, signature: u.signature || null,
     profile: u.profile || {}, gamify: ['student', 'free'].includes(u.role) ? gamifyFor(u) : null,
     ai_enabled: ['admin', 'instructor'].includes(u.role) && ai.enabled(),
@@ -1085,8 +1095,10 @@ function checkAmbassadorReportSchedule() {
     .then(({ generated, period }) => { Settings.setAmbassadorReportLastRun(runKey); console.log(`Ambassador reports: generated ${generated} for ${period}.`); })
     .catch((e) => console.error('Ambassador report generation failed:', e.message));
 }
-setTimeout(checkAmbassadorReportSchedule, 10 * 1000);
-setInterval(checkAmbassadorReportSchedule, 60 * 60 * 1000);
+if (!demo.enabled) {
+  setTimeout(checkAmbassadorReportSchedule, 10 * 1000);
+  setInterval(checkAmbassadorReportSchedule, 60 * 60 * 1000);
+}
 
 // Shared across HR, Finance, the Admissions Office and admin - see
 // ambassadorReportsAccess. Only the sign-off names (below) stay HR-only.
@@ -2097,8 +2109,10 @@ app.get('/api/admin/backup.zip', authRequired, adminRequired, (req, res) => {
   if (fs.existsSync(UPLOAD_DIR)) archive.directory(UPLOAD_DIR, 'uploads');
   archive.finalize();
 });
-store.backupNow(); // one on boot
-setInterval(() => store.backupNow(), 12 * 3600 * 1000); // and every 12 hours
+if (!demo.enabled) {
+  store.backupNow(); // one on boot
+  setInterval(() => store.backupNow(), 12 * 3600 * 1000); // and every 12 hours
+}
 
 
 /* ---------------------------------- quests ---------------------------------- */
@@ -4695,7 +4709,7 @@ async function sendFreeEnrollmentDigest() {
   const lines = rows.map((r, i) => `${i + 1}. ${r.user.name} <${r.user.email || 'no email'}> - ${r.enrollment.track_key} (${r.enrollment.enrolled_at})`).join('\n');
   await mailer.notify(supportAdminEmails(), `EchoLens open-web enrollment report - ${rows.length} new`, `Open-web free-course enrollments received in the last 24 hours:\n\n${lines}\n\nView the complete report in the admin portal: ${APP_URL}/dashboard#view=admin-students`);
 }
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && !demo.enabled) {
   const confirmTimer = setInterval(() => { sweepEnrollmentConfirmations().catch((e) => console.error('[enrolment] sweep failed:', e.message)); }, 60_000);
   confirmTimer.unref();
   const digestTimer = setInterval(() => { sendFreeEnrollmentDigest().catch((e) => console.error('[enrolment digest] failed:', e.message)); }, 24 * 60 * 60 * 1000);
@@ -4726,7 +4740,7 @@ app.get('/api/open/progress', authRequired, openLearnerRequired, asyncRoute(asyn
   // Repair certificates for completions that finished while the grading worker
   // or mail process was restarting. This is idempotent and keeps the learner's
   // progress page authoritative without requiring a second submission.
-  if (prog.passed && !prog.certificate) {
+  if (!demo.enabled && prog.passed && !prog.certificate) {
     const issued = OpenQuest.maybeCertify(req.user.id, track);
     if (issued) { await store.pendingPersist(); prog = OpenQuest.progress(req.user.id, track); }
   }
@@ -4967,8 +4981,12 @@ if (looksLikeProductionDeploy && !db.enabled()) {
     process.exit(1);
   }
 
-  gradingWorker.start();
-  app.listen(PORT, () => {
+  if (!demo.enabled) gradingWorker.start();
+  const listener = app.listen(PORT, demo.enabled ? '127.0.0.1' : undefined, () => {
+    if (demo.enabled) {
+      if (process.send) process.send({ type: 'ready', port: listener.address().port });
+      return;
+    }
     console.log(`EchoLens LMS v12.3 running on http://localhost:${PORT}`);
     console.log(`Data store: ${store.isUsingPostgres() ? 'Postgres (DATABASE_URL)' : `JSON file (${store.DB_PATH})`}`);
     // Live-class video provider: JaaS (8x8.vc, no time cap) vs the free public

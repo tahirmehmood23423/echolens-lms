@@ -799,6 +799,7 @@ async function initFromPostgres() {
 function pendingPersist() { return pendingPersistPromise; }
 
 function save() {
+  if (require('./demo/context').locked) throw new Error('Read-only demo: sample records cannot be changed.');
   if (db.enabled() && postgresReady) {
     pendingPersistPromise = queuePersistToPostgres().catch((err) => {
       console.error('[store] Postgres persist failed:', err.message);

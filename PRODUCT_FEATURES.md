@@ -6,6 +6,14 @@
 
 EchoLens is a gamified learning-management and operations platform. It combines a public course and events website, learner accounts, a full student portal, an administrator console, department workspaces, an in-browser coding environment, AI-assisted assessment, certificates, admissions, support tickets, and operational reporting.
 
+## Client demonstration (`/demo`)
+
+- Public demo entry with short, shareable logins for administrator, instructor, student, free learner, academic coordinator, HR, finance, admissions, staff, ambassador, recruiter, and department head portals. Credentials are listed in `DEMO_ACCOUNTS.md`.
+- The existing portal screens use isolated, fictional records and the product course catalogue; live users, payments, private files and provider credentials are not loaded.
+- Clients can browse, search, open forms and view sample documents. The server blocks mutations, uploads, certificate issuance, password changes and external actions for every demo role, including admin.
+- Demo sessions and browser drafts are separate from normal portal sessions. Sample certificates are marked DEMO; AI reports are prewritten examples, and live AI, compiler execution, mail and meetings are disabled.
+- Available after deployment, with no new provider credentials or production database accounts required. The demo worker starts on demand and stops after 20 minutes of inactivity.
+
 ## Public open web (`/open`)
 
 Visitors can use the open website without an account to:

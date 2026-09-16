@@ -1,0 +1,238 @@
+[
+  {
+    "username": "admin",
+    "viewport": "desktop",
+    "views": [
+      "overview",
+      "grades",
+      "jobs",
+      "settings",
+      "challenges",
+      "hackathons",
+      "events",
+      "admin-users",
+      "admin-catalogue",
+      "admin-teachers",
+      "admin-students",
+      "admin-enrollments",
+      "admin-open-courses",
+      "admin-analytics",
+      "admin-mailer",
+      "admin-finance",
+      "admin-announcements",
+      "admin-feedback",
+      "admin-logs",
+      "admin-departments",
+      "admin-recruiters",
+      "showcase-moderation"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [
+      {
+        "url": "/demo/api/certificates/issue",
+        "status": 403
+      }
+    ],
+    "saveBlocked": "Read-only demo: explore the pages and forms, but changes, uploads and external actions are disabled."
+  },
+  {
+    "username": "teacher",
+    "viewport": "desktop",
+    "views": [
+      "overview",
+      "courses",
+      "students",
+      "assignments",
+      "grades",
+      "attendance",
+      "schedule",
+      "messages",
+      "resources",
+      "jobs",
+      "analytics",
+      "my-department",
+      "settings",
+      "showcase-moderation"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "student",
+    "viewport": "desktop",
+    "views": [
+      "overview",
+      "courses",
+      "assignments",
+      "quizzes",
+      "progress",
+      "certificates",
+      "talent-profile",
+      "hiring-interest",
+      "schedule",
+      "messages",
+      "leaderboard",
+      "resources",
+      "jobs",
+      "settings",
+      "announcements",
+      "challenges",
+      "hackathons",
+      "events"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "free",
+    "viewport": "desktop",
+    "views": [],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "coord",
+    "viewport": "desktop",
+    "views": [
+      "overview",
+      "courses",
+      "assignments",
+      "quizzes",
+      "progress",
+      "certificates",
+      "schedule",
+      "messages",
+      "leaderboard",
+      "resources",
+      "jobs",
+      "settings",
+      "announcements",
+      "challenges",
+      "hackathons",
+      "events",
+      "admin-users",
+      "admin-teachers",
+      "admin-students",
+      "admin-enrollments",
+      "admin-analytics"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "hr",
+    "viewport": "desktop",
+    "views": [
+      "settings",
+      "dept-hr"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "finance",
+    "viewport": "desktop",
+    "views": [
+      "settings",
+      "dept-finance"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "admit",
+    "viewport": "desktop",
+    "views": [
+      "settings",
+      "dept-student-coordinator"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "staff",
+    "viewport": "desktop",
+    "views": [
+      "settings",
+      "dept-staff"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "amb",
+    "viewport": "desktop",
+    "views": [
+      "settings",
+      "dept-ambassador"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "recruit",
+    "viewport": "desktop",
+    "views": [
+      "settings",
+      "recruiter"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "head",
+    "viewport": "desktop",
+    "views": [
+      "settings",
+      "dept-staff"
+    ],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  },
+  {
+    "username": "admin",
+    "viewport": "mobile",
+    "views": [],
+    "leaked": [],
+    "errors": [],
+    "failed": [
+      {
+        "url": "/demo/api/certificates/issue",
+        "status": 403
+      }
+    ],
+    "saveBlocked": "Read-only demo: explore the pages and forms, but changes, uploads and external actions are disabled."
+  },
+  {
+    "username": "student",
+    "viewport": "mobile",
+    "views": [],
+    "leaked": [],
+    "errors": [],
+    "failed": [],
+    "saveBlocked": null
+  }
+]

@@ -9,6 +9,7 @@
     "seed": "node store.js --seed",
     "migrate": "node migrations/run.js",
     "migrate:talent": "node migrations/run.js --talent",
+    "demo:schema": "node scripts/build-demo-schema.cjs",
     "migrate:import": "node migrations/import-json.js",
     "validate:catalogue": "node scripts/validate-trending-tech.js",
     "validate:catalogue:release": "node scripts/validate-trending-tech.js --release",
@@ -20,6 +21,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1095.0",
+    "@electric-sql/pglite": "0.4.3",
     "@prisma/adapter-pg": "^7.9.0",
     "@prisma/client": "^7.9.0",
     "archiver": "^7.0.1",
@@ -39,8 +41,5 @@
     "prisma": "^7.9.0",
     "qrcode": "^1.5.4",
     "sharp": "^0.35.3"
-  },
-  "devDependencies": {
-    "@electric-sql/pglite": "^0.4.3"
   }
 }

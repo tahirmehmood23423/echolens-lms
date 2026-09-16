@@ -323,7 +323,7 @@ module.exports = {
     fs.mkdirSync(PROJECTS_DIR, { recursive: true });
     app.use('/talent-media', express.static(PROJECTS_DIR));
 
-    if (db.enabled()) {
+    if (db.enabled() && !require('./demo/context').enabled) {
       setInterval(() => refreshAllSearchCaches().catch((e) => console.error('[talent] search cache sweep failed:', e.message)), searchConfig.CACHE_REFRESH_MINUTES * 60 * 1000);
       setInterval(() => runWeeklyDigests(APP_URL).catch((e) => console.error('[talent] weekly digest run failed:', e.message)), 60 * 60 * 1000); // hourly check; only acts once 7 days have passed per saved search
     }
@@ -634,7 +634,7 @@ module.exports = {
       }
       const rows = await searchProfiles(filters, cursor);
       const results = await decorateSearchResults(rows);
-      db.query('INSERT INTO search_log (recruiter_id, filters, result_count) VALUES ($1,$2,$3)', [req.user.id, JSON.stringify(filters), results.length]).catch(() => {});
+      if (!require('./demo/context').enabled) db.query('INSERT INTO search_log (recruiter_id, filters, result_count) VALUES ($1,$2,$3)', [req.user.id, JSON.stringify(filters), results.length]).catch(() => {});
       res.json({
         results: results.map(({ cursor: _c, ...rest }) => rest),
         next_cursor: results.length === searchConfig.RESULTS_PER_PAGE ? results[results.length - 1].cursor : null,

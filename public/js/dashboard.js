@@ -6160,13 +6160,15 @@ function formIssueCert() {
       </div>
       <label class="field"><span>Course / hackathon / competition name</span><input name="title" required value="${esc(bd.title || bd.name)}"></label>
       <label class="field"><span>Detail line (optional)</span><input name="detail" placeholder="e.g. 8-week bootcamp &middot; Grade: A &middot; 94% attendance" value="Cohort: ${esc(bd.name)}"></label>
+      ${ME.role === 'admin' ? `<label class="field" style="display:flex;gap:10px;align-items:flex-start"><input name="allow_incomplete" type="checkbox" style="width:18px;height:18px;min-height:0;padding:0;flex:0 0 18px;margin:2px 0 0"><span>Issue even if the student has not submitted or completed the track</span></label>
+      <p class="hint">Admin override for this certificate only. The student's submissions, grades and track progress stay as they are.</p>` : ''}
       <p class="hint">The certificate carries a QR code that anyone can scan to verify it, your signature as instructor, the CEO signature, and a one-click Add-to-LinkedIn button for the student. The student is emailed their certificate link.</p>
       <button class="btn btn-primary btn-block">Issue certificate</button></form>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
     try {
-      const out = await api('/api/certificates/issue', { method: 'POST', body: JSON.stringify({ user_id: f.user_id.value, batch_id: bid(), kind: f.kind.value, title: f.title.value, completion_date: f.completion_date.value, detail: f.detail.value }) });
-      modalMsg(`Issued - serial ${out.cert.serial}. The student was emailed.`, true);
+      const out = await api('/api/certificates/issue', { method: 'POST', body: JSON.stringify({ user_id: f.user_id.value, batch_id: bid(), kind: f.kind.value, title: f.title.value, completion_date: f.completion_date.value, detail: f.detail.value, allow_incomplete: f.elements.namedItem('allow_incomplete')?.checked === true }) });
+      modalMsg(`${out.existing ? 'Already issued' : 'Issued'} - serial ${out.cert.serial}.`, true);
       window.open(out.url, '_blank');
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
@@ -6177,14 +6179,14 @@ function formIssueAllCerts() {
     <form id="f">
       <label class="field"><span>Certificate title</span><input name="title" required value="${esc(bd.title || bd.name)}"></label>
       <label class="field"><span>Completion date</span><input name="completion_date" type="date" value="${new Date().toISOString().slice(0, 10)}"></label>
-      <label class="field" style="flex-direction:row;gap:8px;align-items:center"><input name="only_completed" type="checkbox" checked disabled style="width:auto"><span>Only students who completed the full quest track</span></label>
-      <p class="hint">Each student gets a QR-verified certificate and an email with their link. Untick the box to certify everyone enrolled.</p>
+      <label class="field" style="display:flex;gap:10px;align-items:flex-start"><input name="only_completed" type="checkbox" checked ${ME.role === 'admin' ? '' : 'disabled'} style="width:18px;height:18px;min-height:0;padding:0;flex:0 0 18px;margin:2px 0 0"><span>Only students who completed the full quest track</span></label>
+      <p class="hint">${ME.role === 'admin' ? 'Untick to issue certificates to everyone enrolled, including students with no submissions. Their grades and track progress stay as they are.' : 'Only an admin can include students who have not completed the track.'} Each new certificate has a verification QR code and a link emailed to the student.</p>
       <button class="btn btn-primary btn-block">Issue certificates</button></form>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
     try {
       const out = await api(`/api/batches/${bid()}/certificates/issue-all`, { method: 'POST', body: JSON.stringify({ title: f.title.value, completion_date: f.completion_date.value, only_completed: f.only_completed.checked }) });
-      modalMsg(`Issued ${out.issued} certificate${out.issued === 1 ? '' : 's'}${out.skipped ? ` - skipped ${out.skipped} who have not completed the track` : ''}.`, true);
+      modalMsg(`Issued ${out.issued} certificate${out.issued === 1 ? '' : 's'}${out.existing ? ` - ${out.existing} already issued` : ''}${out.skipped ? ` - skipped ${out.skipped} who have not completed the track` : ''}.`, true);
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }

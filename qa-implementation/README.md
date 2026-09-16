@@ -3,6 +3,7 @@
 Open [implementation-report.html](implementation-report.html) for the completed local remediation report. The original audit in `../qa-audit/` is preserved; this directory contains the implementation, verification and remaining-work handoff.
 
 - [September 2026 Talent/certificate crash fix and rollout](talent-certificate-fix.md)
+- [Admin manual certificate override, checks and screenshots](certificate-override.md)
 - [All 35 issue dispositions](issue-matrix.html)
 - [Complete course/video inventory](course-video-review.html)
 - [Curriculum corrections and proposed outlines](curriculum-review.html)

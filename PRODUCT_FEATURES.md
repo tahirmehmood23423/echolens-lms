@@ -64,6 +64,7 @@ Authenticated learners can use the open site to:
 - Review assignment and capstone evidence in an admin queue, provide feedback, award grades, and preserve submission history.
 - Review AI grading context and reports; automated grading does not issue certificates when evidence requires manual verification.
 - Manage certificate issuance, public verification, partner/co-brand data, and certificate records.
+- Admin-only manual certificate override in the portal: issue to an enrolled learner without track submissions or completion, or include all enrolled learners in bulk issuance. Completion remains the default requirement; overrides are audited and do not change submissions, grades, or course progress.
 
 ### Admissions, finance, and registrations
 

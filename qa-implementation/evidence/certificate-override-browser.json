@@ -1,0 +1,17 @@
+[
+  {
+    "role": "admin",
+    "width": 1440,
+    "status": "PASS"
+  },
+  {
+    "role": "admin",
+    "width": 390,
+    "status": "PASS"
+  },
+  {
+    "role": "instructor",
+    "width": 1440,
+    "status": "PASS"
+  }
+]

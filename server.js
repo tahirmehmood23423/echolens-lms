@@ -2820,6 +2820,9 @@ app.post('/api/batches/:id/partner', authRequired, adminRequired, (req, res) => 
 // Issue one certificate (course completion / hackathon / competition).
 app.post('/api/certificates/issue', authRequired, teacherOrAdmin, asyncRoute(async (req, res) => {
   const { reg_no, user_id, batch_id, kind, title, completion_date, detail, partner } = req.body || {};
+  const allowIncomplete = req.body?.allow_incomplete === true;
+  if (allowIncomplete && req.user.role !== 'admin') return res.status(403).json({ error: 'Only an admin can issue a certificate before track completion.' });
+  let completionOverridden = false;
   const student = user_id ? Users.byId(user_id) : Users.byReg(String(reg_no || ''));
   if (!student) return res.status(404).json({ error: 'No student found for that registration number.' });
   if (batch_id) {
@@ -2828,7 +2831,10 @@ app.post('/api/certificates/issue', authRequired, teacherOrAdmin, asyncRoute(asy
     if (!canManageBatch(req.user, b)) return res.status(403).json({ error: 'You cannot issue certificates on this course.' });
     if (!Enrollments.all().some(e => e.user_id === student.id && e.batch_id === b.id)) return res.status(400).json({ error: 'This learner is not enrolled in the course.' });
     const progress = Quests.progress(student.id, b.id);
-    if (!progress?.completed) return res.status(400).json({ error: 'Course completion has not been established. Grade the configured assessments before issuing a course certificate.' });
+    if (!progress?.completed) {
+      if (!allowIncomplete) return res.status(400).json({ error: 'Course completion has not been established. Grade the required assessments or ask an admin to enable the manual certificate override.' });
+      completionOverridden = true;
+    }
   } else if (req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Only the admin issues certificates outside a course.' });
   }
@@ -2844,18 +2850,25 @@ app.post('/api/certificates/issue', authRequired, teacherOrAdmin, asyncRoute(asy
   // Defaults to the course's own WebEra-collaboration flag (if any); an
   // admin issuing by hand can still tick/untick it for this one certificate.
   const isPartner = partner !== undefined ? !!partner : !!(batch_id && Batches.byId(batch_id).partner);
-  const out = Certificates.issue({ user_id: student.id, batch_id, kind, title, completion_date, detail, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject, partner: isPartner });
+  const out = Certificates.issue({ user_id: student.id, batch_id, kind, title, completion_date, detail, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject, partner: isPartner, deferSave: true });
   if (out.error) return res.status(400).json({ error: out.error });
   const cert = out.cert;
-  if (student.email) {
+  if (!out.existing) {
+    if (completionOverridden) AuditLog.record({ actor_id: req.user.id, action: 'certificate_completion_override', target_type: 'certificate', target_id: cert.id, detail: { user_id: student.id, batch_id: Number(batch_id), serial: cert.serial, bulk: false }, deferSave: true });
+    store.persist();
+  }
+  await store.pendingPersist();
+  if (!out.existing && student.email) {
     mailer.notify(student.email, `Your certificate is ready - ${cert.title}`,
       `Congratulations ${student.name}!\n\nYour verified certificate for "${cert.title}" has been issued (serial ${cert.serial}).\n\nView, download and share it to LinkedIn from your profile, or open it directly: ${APP_URL}/cert?s=${cert.serial}`);
   }
-  await store.pendingPersist();
-  res.json({ ok: true, cert, url: `${APP_URL}/cert?s=${cert.serial}` });
+  res.json({ ok: true, cert, existing: !!out.existing, url: `${APP_URL}/cert?s=${cert.serial}` });
 }));
-// Issue for every student who COMPLETED the course's quest track.
-app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (req, res) => {
+// Completion is required by default; only an admin can explicitly include
+// enrolled learners whose track is incomplete (including no submissions).
+app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, asyncRoute(async (req, res) => {
+  const allowIncomplete = req.body?.only_completed === false;
+  if (allowIncomplete && req.user.role !== 'admin') return res.status(403).json({ error: 'Only an admin can issue certificates before track completion.' });
   const bd = Batches.decorate(req.batch);
   const title = (req.body || {}).title || bd.title || bd.name;
   const completion_date = (req.body || {}).completion_date;
@@ -2864,20 +2877,25 @@ app.post('/api/batches/:id/certificates/issue-all', authRequired, manageBatch, (
   const concepts = installed ? courseConcepts(req.batch.id) : [];
   const bodyPartner = (req.body || {}).partner;
   const isPartner = bodyPartner !== undefined ? !!bodyPartner : !!req.batch.partner;
-  const issued = [], skipped = [];
+  const issued = [], skipped = [], existing = [];
   for (const u of Enrollments.studentsForBatch(req.batch.id)) {
     const prog = installed ? Quests.progress(u.id, req.batch.id) : null;
-    if (!prog?.completed) { skipped.push(u.name); continue; }
+    if (!prog?.completed && !allowIncomplete) { skipped.push(u.name); continue; }
     const finalProject = installed ? finalProjectFor(req.batch.id, u.id) : null;
     const out = Certificates.issue({ user_id: u.id, batch_id: req.batch.id, kind: 'course', title, completion_date, detail: `Cohort: ${bd.name}`, instructor_id: instructorId, issued_by: req.user.id, concepts, final_project: finalProject, partner: isPartner, deferSave: true });
+    if (out.existing) { existing.push(u.name); continue; }
     if (out.ok) {
-      issued.push(u.name);
-      if (u.email) mailer.notify(u.email, `Your certificate is ready - ${title}`, `Congratulations ${u.name}! Your verified certificate for "${title}" is ready: ${APP_URL}/cert?s=${out.cert.serial}`);
+      if (!prog?.completed) AuditLog.record({ actor_id: req.user.id, action: 'certificate_completion_override', target_type: 'certificate', target_id: out.cert.id, detail: { user_id: u.id, batch_id: req.batch.id, serial: out.cert.serial, bulk: true }, deferSave: true });
+      issued.push({ student: u, cert: out.cert });
     }
   }
   if (issued.length) store.persist();
-  res.json({ ok: true, issued: issued.length, skipped: skipped.length, skipped_names: skipped.slice(0, 20) });
-});
+  await store.pendingPersist();
+  for (const { student: u, cert } of issued) {
+    if (u.email) mailer.notify(u.email, `Your certificate is ready - ${title}`, `Congratulations ${u.name}! Your verified certificate for "${title}" is ready: ${APP_URL}/cert?s=${cert.serial}`);
+  }
+  res.json({ ok: true, issued: issued.length, existing: existing.length, skipped: skipped.length, skipped_names: skipped.slice(0, 20) });
+}));
 app.get('/api/certificates/mine', authRequired, (req, res) => {
   res.json({ certificates: Certificates.forUser(req.user.id).map((c) => ({ ...Certificates.publicView(c), url: `${APP_URL}/cert?s=${c.serial}` })) });
 });

@@ -396,32 +396,12 @@ footer{background:var(--navy);color:#B9C1E4}
 }
 </style>
 <link rel="stylesheet" href="/css/workflow.css">
+<link rel="stylesheet" href="/css/public-navigation.css?v1">
 </head>
 <body>
 
 <!-- ================================ NAV ================================ -->
-<nav class="nav">
-  <div class="nav-in">
-    <a class="brand" href="/">
-      <img src="/img/logo.png" alt="EchoLens Digital logo">
-      <span>EchoLens<small>Digital</small></span>
-    </a>
-    <div class="nav-links" id="navLinks">
-      <a href="/courses">Live Tech Courses</a>
-      <a href="/open#free">Free Certified Courses</a>
-      <a href="/open#events">Events</a>
-      <a href="/open#announcements">Announcements</a>
-      <a href="/open#feedback">Feedback</a>
-      <a href="/compiler">Compiler</a>
-      <a href="#faq">FAQ</a>
-    </div>
-    <div class="nav-cta">
-      <a class="btn btn-outline btn-login" id="signinBtn" href="/login">Login</a>
-      <a class="btn btn-grad btn-start" href="/open">Get Started</a>
-      <button class="nav-burger" aria-label="Open menu" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
-    </div>
-  </div>
-</nav>
+<nav class="open-nav public-navigation" aria-label="Main navigation"><a class="public-brand" href="/open#home" aria-label="EchoLens Home"><img src="/img/logo.png" alt="EchoLens"><span>EchoLens<small>Digital</small></span></a><a class="nlink" href="/open#home" data-tab="home">Home</a><a class="nlink" href="/open#paid" data-tab="courses" data-catnav="paid">Live Tech Courses</a><a class="nlink" href="/open#free" data-tab="courses" data-catnav="free">Free Certified Courses</a><a class="nlink" href="/open#events" data-tab="events">Events</a><a class="nlink" href="/open#announcements" data-tab="announcements">Announcements</a><a class="nlink" href="/open#feedback" data-tab="feedback">Feedback</a><a class="nlink" href="/compiler">Compiler</a><a class="nlink" href="/#faq">FAQ</a><span class="public-nav-account"><a class="btn btn-ghost btn-sm" id="signinBtn" data-public-login href="/login">Login</a><a class="btn btn-primary btn-sm" href="/open#signup">Get Started</a></span></nav>
 
 <div class="wrap">
 
@@ -819,5 +799,6 @@ b = 20
 </footer>
 
 <script src="/js/landing.js?v1242"></script>
+<script src="/js/public-navigation.js?v1"></script>
 </body>
 </html>

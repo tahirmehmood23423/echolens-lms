@@ -16,7 +16,7 @@ const evidence = path.join(__dirname, 'evidence'), results = [];
     const ctx=await browser.newContext({viewport:{width,height:1000}});
     await ctx.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());
     const page=await ctx.newPage();page.setDefaultTimeout(15000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
-    const settle=()=>page.waitForFunction(()=>OPEN_READY&&!RESTORING_NAV);
+    const settle=()=>page.waitForFunction(()=>typeof OPEN_READY !== 'undefined' && OPEN_READY && !RESTORING_NAV);
     await page.goto(base+'/open');await settle();assert.ok(await page.locator('#tab-home').isVisible());
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     assert.ok(await page.locator('.home-learning-card').first().evaluate(el=>el.getBoundingClientRect().height<310));
@@ -42,6 +42,33 @@ const evidence = path.join(__dirname, 'evidence'), results = [];
     await page.keyboard.press('Escape');await settle();await page.locator('#courseHead .crumb a').first().click();await settle();assert.equal(page.url(),family);
     await page.getByRole('link',{name:'Home',exact:true}).click();await settle();assert.ok(await page.locator('#tab-home').isVisible());
     assert.deepEqual(errors,[]);results.push({width,passed:true});console.log('PASS comparison, filters, free family, registration draft and Back/Forward',width);await ctx.close();
+  }
+
+  for(const width of [1440,390]){
+    const ctx=await browser.newContext({viewport:{width,height:1000}});await ctx.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());
+    const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+    let expected;
+    for(const route of ['/','/courses','/courses/prompt-engineering-and-chatgpt-claude-mastery','/compiler','/login','/privacy','/registration-status','/reset-password','/recruiter-signup']){
+      await page.goto(base+route);await page.locator('.public-navigation').waitFor();
+      if (['/','/courses','/login'].includes(route)) await page.screenshot({path:path.join(evidence,'shared-navigation-'+(route==='/'?'landing':route.slice(1))+'-'+width+'.png'),fullPage:false});
+      const links=await page.locator('.public-navigation .nlink').evaluateAll(nodes=>nodes.map(n=>[n.textContent,n.getAttribute('href')]));
+      expected ||= links;assert.deepEqual(links,expected,route+' uses identical menu');
+      assert.equal(links[0][1],'/open#home');assert.equal(links[1][1],'/open#paid');
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),route+' fits viewport');
+      await page.locator('.public-navigation .nlink').first().click();await page.waitForFunction(()=>typeof OPEN_READY !== 'undefined' && OPEN_READY && !RESTORING_NAV);assert.ok(await page.locator('#tab-home').isVisible());
+      await page.goBack();await page.locator('.public-navigation').waitFor();assert.equal(new URL(page.url()).pathname,route);
+      await page.goForward();await page.waitForFunction(()=>typeof OPEN_READY !== 'undefined' && OPEN_READY && !RESTORING_NAV);
+    }
+    assert.deepEqual(errors,[]);console.log('PASS shared public navigation across 9 routes',width);results.push({width,publicRoutes:9,consistentNavigation:true});await ctx.close();
+  }
+
+  {
+    const ctx=await browser.newContext();const leaked=[];
+    await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.origin!==base)return r.abort();if(!u.pathname.startsWith('/demo'))leaked.push(u.pathname);return r.continue()});
+    const page=await ctx.newPage();await page.goto(base+'/demo/open#home');await page.waitForFunction(()=>typeof OPEN_READY!=='undefined'&&OPEN_READY&&!RESTORING_NAV);
+    await page.locator('.public-navigation [data-catnav=paid]').click();await page.waitForFunction(()=>!RESTORING_NAV);assert.equal(await page.locator('#cFree').inputValue(),'paid');
+    await page.locator('.public-navigation [data-tab=home]').click();await page.waitForFunction(()=>!RESTORING_NAV);assert.ok(await page.locator('#tab-home').isVisible());
+    assert.deepEqual(leaked,[]);console.log('PASS demo navigation remains scoped');await ctx.close();
   }
   fs.writeFileSync(path.join(evidence,'comparison-completed-results.json'),JSON.stringify(results,null,2));
 })().catch(e=>{console.error(e);console.error(logs.slice(-2000));process.exitCode=1}).finally(async()=>{if(browser)await browser.close();if(child.exitCode===null&&child.signalCode===null){const done=once(child,'exit');child.kill();await done}});

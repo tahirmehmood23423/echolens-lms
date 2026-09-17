@@ -431,9 +431,10 @@ function openTab(tab) {
   document.querySelectorAll('.open-nav .nlink[data-tab]').forEach((n) => {
     const active = inCoursesFamily
       // Paid courses are the same nav entry as the live/instructor-led list.
-      ? n.dataset.tab === 'courses' && (n.dataset.catnav || 'live') === (COURSE_NAV_MODE === 'paid' ? 'live' : COURSE_NAV_MODE)
+      ? n.dataset.tab === 'courses' && (n.dataset.catnav || 'paid') === (COURSE_NAV_MODE === 'live' ? 'paid' : COURSE_NAV_MODE)
       : n.dataset.tab === tab || (tab === 'eventDetail' && n.dataset.tab === 'events');
     n.classList.toggle('active', active);
+    if (active) n.setAttribute('aria-current','page'); else n.removeAttribute('aria-current');
   });
   if (tab !== 'eventDetail') stopEventCountdown();
   window.scrollTo({ top: 0 });

@@ -184,6 +184,7 @@ async function logout() { EL.drafts.flushAll(); EL.drafts.setAccount(null); try 
   // account settings, then jump straight there instead of the overview.
   if (DEPT_ROLES[ME.role]) {
     document.querySelectorAll('.nav-item, .nav-group').forEach((el) => (el.style.display = 'none'));
+    const home = document.querySelector('#nav a[href="/open#home"]'); if (home) home.style.display = '';
     const own = document.querySelector(`.nav-item[data-view="${DEPT_ROLES[ME.role].view}"]`);
     if (own) own.style.display = '';
     const settingsNav = document.querySelector('.nav-item[data-view="settings"]');

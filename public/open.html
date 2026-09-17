@@ -45,23 +45,11 @@
 <link rel="stylesheet" href="/css/styles.css?v1443">
 <style>body{background:#FBFAF7}</style>
 <link rel="stylesheet" href="/css/workflow.css?v1">
+<link rel="stylesheet" href="/css/public-navigation.css?v1">
 </head>
 <body>
 
-<nav class="open-nav">
-  <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
-  <a class="nlink active" data-tab="home" href="#home">Home</a>
-  <a class="nlink" data-tab="courses" data-catnav="live" onclick="navCourses('live')">Live Tech Courses</a>
-  <a class="nlink" data-tab="courses" data-catnav="free" onclick="navCourses('free')">Free Certified Courses</a>
-  <a class="nlink" data-tab="events" onclick="openTab('events')">Events</a>
-  <a class="nlink" data-tab="announcements" onclick="openTab('announcements')">Announcements</a>
-  <a class="nlink" data-tab="feedback" onclick="openTab('feedback')">Feedback</a>
-  <a class="nlink" href="/compiler">Compiler</a>
-  <a class="nlink" href="/#faq">FAQ</a>
-  <a class="nlink" data-tab="profile" onclick="openProfileTab()" id="profileNavLink" style="display:none">My Profile</a>
-  <span style="flex:1"></span>
-  <span id="userBox"></span>
-</nav>
+<nav class="open-nav public-navigation" aria-label="Main navigation"><a class="public-brand" href="/open#home" aria-label="EchoLens Home"><img src="/img/logo.png" alt="EchoLens"><span>EchoLens<small>Digital</small></span></a><a class="nlink" href="/open#home" data-tab="home">Home</a><a class="nlink" href="/open#paid" data-tab="courses" data-catnav="paid">Live Tech Courses</a><a class="nlink" href="/open#free" data-tab="courses" data-catnav="free">Free Certified Courses</a><a class="nlink" href="/open#events" data-tab="events">Events</a><a class="nlink" href="/open#announcements" data-tab="announcements">Announcements</a><a class="nlink" href="/open#feedback" data-tab="feedback">Feedback</a><a class="nlink" href="/compiler">Compiler</a><a class="nlink" href="/#faq">FAQ</a><span class="public-nav-account"><span id="userBox"></span></span></nav>
 
 <div class="open-wrap" id="appWrap">
 
@@ -234,6 +222,7 @@
 <script src="/js/draft-store.js?v1"></script>
 <script src="/js/workflow-ui.js?v2"></script>
 <script src="/js/coderunner.js?v1421"></script>
-<script src="/js/open.js?v1440"></script>
+<script src="/js/open.js?v1441"></script>
+<script src="/js/public-navigation.js?v1"></script>
 </body>
 </html>

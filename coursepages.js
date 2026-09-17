@@ -8,6 +8,7 @@
  * search engines have a static, indexable URL per course.
  */
 const store = require('./store');
+const publicNavigation = require('./public-navigation');
 
 const BASE = 'https://www.echolens.digital';
 // All enrolment goes through the in-site registration form (lands in the
@@ -128,26 +129,17 @@ ${jsonld.map(jsonScript).join('\n')}
   .btn-light{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:12px;font-weight:700;font-size:14.5px;cursor:pointer;background:#fff;color:#4F46E5;border:1.5px solid #D9DCEE;transition:.15s}
   .btn-light:hover{border-color:#7C3AED;color:#7C3AED}
 </style>
+<link rel="stylesheet" href="/css/public-navigation.css?v1">
 </head>
 <body>
-<nav class="open-nav">
-  <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
-  <a class="nlink" href="/courses">Live Tech Courses</a>
-  <a class="nlink" href="/open#free">Free Certified Courses</a>
-  <a class="nlink" href="/open#events">Events</a>
-  <a class="nlink" href="/open#announcements">Announcements</a>
-  <a class="nlink" href="/compiler">Compiler</a>
-  <a class="nlink" href="/#faq">FAQ</a>
-  <span style="flex:1"></span>
-  <a class="btn-light" style="padding:8px 16px;font-size:13.5px;margin-right:8px;text-decoration:none" href="/login">Login</a>
-  <a class="btn-grad" style="padding:8px 16px;font-size:13.5px;text-decoration:none" href="/open">Get Started</a>
-</nav>`;
+${publicNavigation.render()}`;
 }
 function pageFoot() {
   return `<footer class="cp-foot">
   <span>&copy; ${new Date().getFullYear()} EchoLens Digital - Pakistan's gamified AI &amp; tech academy.</span>
   <span><a href="/courses">All courses</a> &middot; <a href="/open">Free quests</a> &middot; <a href="/compiler">Compiler</a> &middot; <a href="mailto:${EMAIL}">${EMAIL}</a></span>
 </footer>
+<script src="/js/public-navigation.js?v1"></script>
 </body>
 </html>`;
 }
@@ -280,7 +272,7 @@ function renderCourse(c, all) {
 
   return pageHead({ title, description: metaDesc, canonical: url, keywords: kw, jsonld: [courseLd, crumbLd] }) + `
 <div class="cp-wrap">
-  <nav class="cp-crumb"><a href="/">Home</a> / <a href="/courses">Courses</a> / <span>${esc(c.title)}</span></nav>
+  <nav class="cp-crumb"><a href="/open#home">Home</a> / <a href="/courses">Courses</a> / <span>${esc(c.title)}</span></nav>
 
   <header class="cp-hero">
     <div class="cp-badges">${badges.join('')}</div>

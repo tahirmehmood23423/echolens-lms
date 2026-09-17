@@ -99,20 +99,11 @@
   body.cmp-dark .rpt-sec{background:#171E3D;border-color:#232B52}
   body.cmp-dark .rpt-body{color:#C7D1EC}
 </style>
+<link rel="stylesheet" href="/css/public-navigation.css?v1">
 </head>
 <body>
 
-<nav class="open-nav">
-  <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
-  <a class="nlink" href="/courses">Live Tech Courses</a>
-  <a class="nlink" href="/open#free">Free Certified Courses</a>
-  <a class="nlink" href="/open#events">Events</a>
-  <a class="nlink" href="/open#announcements">Announcements</a>
-  <a class="nlink active" href="/compiler">Compiler</a>
-  <a class="nlink" href="/#faq">FAQ</a>
-  <span style="flex:1"></span>
-  <span id="userBox"></span>
-</nav>
+<nav class="open-nav public-navigation" aria-label="Main navigation"><a class="public-brand" href="/open#home" aria-label="EchoLens Home"><img src="/img/logo.png" alt="EchoLens"><span>EchoLens<small>Digital</small></span></a><a class="nlink" href="/open#home" data-tab="home">Home</a><a class="nlink" href="/open#paid" data-tab="courses" data-catnav="paid">Live Tech Courses</a><a class="nlink" href="/open#free" data-tab="courses" data-catnav="free">Free Certified Courses</a><a class="nlink" href="/open#events" data-tab="events">Events</a><a class="nlink" href="/open#announcements" data-tab="announcements">Announcements</a><a class="nlink" href="/open#feedback" data-tab="feedback">Feedback</a><a class="nlink" href="/compiler">Compiler</a><a class="nlink" href="/#faq">FAQ</a><span class="public-nav-account"><span id="userBox"></span></span></nav>
 
 <div class="cmp-wrap" id="gateWrap" style="display:none">
   <div class="auth-gate-card">
@@ -566,5 +557,6 @@ async function run() {
   btn.textContent = 'Run';
 }
 </script>
+<script src="/js/public-navigation.js?v1"></script>
 </body>
 </html>

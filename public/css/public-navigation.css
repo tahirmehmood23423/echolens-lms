@@ -1,0 +1,14 @@
+.public-navigation{position:sticky;top:0;z-index:60;display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;padding:10px 4vw;background:#fff;border-bottom:1px solid #e5e8f3;font-family:Inter,system-ui,sans-serif;box-sizing:border-box;width:100%;line-height:1.5}
+.public-navigation .public-brand{display:flex;gap:8px;align-items:center;color:#152039;text-decoration:none;margin-right:10px}
+.public-navigation .public-brand img{height:30px;width:auto;margin:0}
+.public-brand>span{font-size:15px;font-weight:700;line-height:1.1}
+.public-brand small{display:block;font-size:10px;color:#68728a}
+.public-navigation .nlink{font-size:13px;font-weight:600;color:#657089;text-decoration:none;padding:8px 10px;border-radius:9px;cursor:pointer}
+.public-navigation .nlink:hover,.public-navigation .nlink.active{color:#6241de;background:#efecff}
+.public-nav-account{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.public-navigation a:focus-visible{outline:2px solid #6542db;outline-offset:3px}
+@media(max-width:700px){.public-navigation{padding:8px 4vw;gap:2px}.public-navigation .nlink{font-size:12px;padding:6px 8px}.public-nav-account{width:100%;margin-top:5px}.public-brand>span{font-size:13px}}
+.public-navigation .btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:8px 14px;border-radius:10px;text-decoration:none;font-size:12px;font-weight:600;line-height:1.4;border:1px solid #d9dced;color:#263248;background:white}
+.public-navigation .btn-primary{color:white;border-color:transparent;background:linear-gradient(110deg,#7440ee,#4c55ef)}
+.auth-body:has(>.public-navigation){display:block;padding:0 0 30px}
+.auth-body>.auth-wrap{margin:36px auto;padding:0 16px;box-sizing:border-box}

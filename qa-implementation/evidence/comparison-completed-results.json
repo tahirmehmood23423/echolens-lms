@@ -6,5 +6,15 @@
   {
     "width": 390,
     "passed": true
+  },
+  {
+    "width": 1440,
+    "publicRoutes": 9,
+    "consistentNavigation": true
+  },
+  {
+    "width": 390,
+    "publicRoutes": 9,
+    "consistentNavigation": true
   }
 ]

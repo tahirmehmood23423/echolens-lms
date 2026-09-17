@@ -459,6 +459,7 @@ function setCompareFocus(kind, silent) {
     const btn = $(id); if (!btn) return;
     btn.classList.toggle('active', k === COMPARE_FOCUS);
     btn.setAttribute('aria-selected', String(k === COMPARE_FOCUS));
+    btn.tabIndex = k === COMPARE_FOCUS ? 0 : -1;
   });
   // Only scroll on a real click, and only when the cards stack (phones),
   // where switching otherwise looks like nothing happened.
@@ -467,6 +468,13 @@ function setCompareFocus(kind, silent) {
   }
 }
 window.setCompareFocus = setCompareFocus;
+document.querySelector('.cmp-toggle')?.addEventListener('keydown', e => {
+  if (!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+  e.preventDefault();
+  const kind = e.key === 'Home' ? 'free' : e.key === 'End' ? 'paid' : COMPARE_FOCUS === 'free' ? 'paid' : 'free';
+  setCompareFocus(kind, true);
+  $(kind === 'free' ? 'cmpTabFree' : 'cmpTabPaid').focus();
+});
 // Real catalogue numbers, so the landing page never over-promises.
 function renderCompareCounts(counts) {
   const el = $('cmpTrustCount'); if (!el) return;
@@ -900,7 +908,7 @@ function drawCourses() {
   const tier = $('cTier').value, mode = $('cFree').value, q = $('cSearch').value.trim().toLowerCase();
   const filterKey=[tier,mode,q].join(':');
   if (filterKey !== COURSE_FILTER_KEY) { if (!RESTORING_NAV) COURSE_LIMIT=12; COURSE_FILTER_KEY=filterKey; }
-  if (!RESTORING_NAV && history.state?.v === 'courses' && !history.state.dialog) {
+  if (OPEN_READY && !RESTORING_NAV && history.state?.v === 'courses' && !history.state.dialog) {
     const state = {...history.state, mode:COURSE_NAV_MODE, filters:{search:q,tier,free:mode,family:FREE_SELECTED_FAMILY}, limit:COURSE_LIMIT};
     history.replaceState(state, '', openRoute(state)); updateOpenLoginLink();
   }

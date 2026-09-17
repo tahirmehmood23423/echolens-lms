@@ -18,7 +18,7 @@ EchoLens is a gamified learning-management and operations platform. It combines 
 
 Visitors can use the open website without an account to:
 
-- Land on a free-versus-paid comparison view (`/open#compare`, the default open-web view) that lists, side by side, what each course type includes: recorded lectures, graded assignments, AI grading, self-paced study and a verified certificate for free courses; live classes, multiple practice problems, instructor guidance, personalised feedback, compiler telemetry, full portal access and an endorsed certificate for paid courses. A toggle emphasises either card (and shows one at a time on phones), and each card links into the matching catalogue filter, with browser Back and Forward returning to the comparison.
+- Land on a free-versus-paid comparison view (`/open#compare`, the default view), with self-paced lessons, assignments, assessment feedback and completion-based certificates for free learning, and live classes, instructor guidance and cohort tools for paid courses. Both options include a learner account. AI grading depends on course configuration; evidence can require staff review. The responsive toggle supports keyboard navigation; links open the matching catalogue, and Back/Forward preserve filters, course context and registration drafts.
 - Browse the public course catalogue, free certified courses, paid courses, specialist tracks, course outlines, modules, lectures, prerequisites, environments, outcomes, capstones, pricing, duration, and availability.
 - See total open-web enrollment counts and enrollment counts on free-course cards.
 - Read public announcements, events, webinars, hackathons, resources, and feedback highlights.

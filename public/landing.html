@@ -397,11 +397,12 @@ footer{background:var(--navy);color:#B9C1E4}
 </style>
 <link rel="stylesheet" href="/css/workflow.css">
 <link rel="stylesheet" href="/css/public-navigation.css?v1">
+<link rel="stylesheet" href="/css/home-learning.css?v1">
 </head>
 <body>
 
 <!-- ================================ NAV ================================ -->
-<nav class="open-nav public-navigation" aria-label="Main navigation"><a class="public-brand" href="/open#home" aria-label="EchoLens Home"><img src="/img/logo.png" alt="EchoLens"><span>EchoLens<small>Digital</small></span></a><a class="nlink" href="/open#home" data-tab="home">Home</a><a class="nlink" href="/open#paid" data-tab="courses" data-catnav="paid">Live Tech Courses</a><a class="nlink" href="/open#free" data-tab="courses" data-catnav="free">Free Certified Courses</a><a class="nlink" href="/open#events" data-tab="events">Events</a><a class="nlink" href="/open#announcements" data-tab="announcements">Announcements</a><a class="nlink" href="/open#feedback" data-tab="feedback">Feedback</a><a class="nlink" href="/compiler">Compiler</a><a class="nlink" href="/#faq">FAQ</a><span class="public-nav-account"><a class="btn btn-ghost btn-sm" id="signinBtn" data-public-login href="/login">Login</a><a class="btn btn-primary btn-sm" href="/open#signup">Get Started</a></span></nav>
+<nav class="open-nav public-navigation" aria-label="Main navigation"><a class="public-brand" href="/" aria-label="EchoLens Home"><img src="/img/logo.png" alt="EchoLens"><span>EchoLens<small>Digital</small></span></a><a class="nlink" href="/" data-tab="home">Home</a><a class="nlink" href="/open#paid" data-tab="courses" data-catnav="paid">Live Tech Courses</a><a class="nlink" href="/open#free" data-tab="courses" data-catnav="free">Free Certified Courses</a><a class="nlink" href="/open#events" data-tab="events">Events</a><a class="nlink" href="/open#announcements" data-tab="announcements">Announcements</a><a class="nlink" href="/open#feedback" data-tab="feedback">Feedback</a><a class="nlink" href="/compiler">Compiler</a><a class="nlink" href="/#faq">FAQ</a><span class="public-nav-account"><a class="btn btn-ghost btn-sm" id="signinBtn" data-public-login href="/login">Login</a><a class="btn btn-primary btn-sm" href="/open#signup">Get Started</a></span></nav>
 
 <div class="wrap">
 
@@ -418,7 +419,7 @@ footer{background:var(--navy);color:#B9C1E4}
     <div class="hero-btns">
       <a class="btn btn-book" href="/open#register">Book Your Seat &nbsp;&rarr;</a>
       <a class="btn btn-grad" href="/open#signup">Start Free</a>
-      <a class="btn btn-outline" href="#courses">Explore Courses</a>
+      <a class="btn btn-outline" href="/open#courses">Explore Courses</a>
     </div>
     <div class="hero-proof">
       <div class="avatars">
@@ -473,6 +474,16 @@ footer{background:var(--navy);color:#B9C1E4}
     <svg class="gem-float gf2" viewBox="0 0 24 24"><defs><linearGradient id="gg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93C5FD"/><stop offset="1" stop-color="#4F46E5"/></linearGradient></defs><path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="url(#gg2)"/><path d="M6 3l6 6 6-6M2 9h20M12 9l0 12" stroke="rgba(255,255,255,.5)" stroke-width=".8" fill="none"/></svg>
   </div>
 </header>
+
+    <section id="learning-options" class="home-learning" aria-labelledby="home-learning-title">
+      <div class="home-section-head"><div><h2 id="home-learning-title">Free or paid? Choose your way to learn</h2><p>Both include a learner account and certificates when you meet the course requirements.</p></div><a href="/open#courses">All courses &rarr;</a></div>
+      <div class="home-learning-grid">
+        <article class="home-learning-card"><div class="home-card-title"><h3>Free courses</h3><span class="cmp-badge free">100% free</span></div><p>Flexible, self-paced learning.</p><ul><li>Recorded lessons and course resources</li><li>Assignments, projects and assessment feedback</li><li>Your courses, progress, submissions and support</li></ul><a class="btn btn-teal btn-block" href="/open#free">Explore free courses &rarr;</a></article>
+        <article class="home-learning-card paid"><div class="home-card-title"><h3>Paid courses</h3><span class="cmp-badge paid">Instructor-led</span></div><p>Structured learning with your cohort.</p><ul><li>Scheduled live classes and instructor guidance</li><li>Course assignments and personalised feedback</li><li>Cohort sessions, attendance and discussion tools</li></ul><a class="btn btn-primary btn-block" href="/open#paid">View paid courses &rarr;</a></article>
+      </div>
+      <p class="home-learning-note">Check each course's outline and availability. AI grading is available where enabled; project evidence can require staff review. Admissions confirms paid cohort dates and payment.</p>
+    </section>
+
 
 <!-- ================================ STATS ================================ -->
 <section class="stats" aria-label="Platform highlights">
@@ -717,7 +728,7 @@ b = 20
       <a class="btn btn-white" href="/open#signup">
         Start Free
       </a>
-      <a class="btn" style="border:1px solid rgba(255,255,255,.35);color:#fff" href="#courses">Explore Courses</a>
+      <a class="btn" style="border:1px solid rgba(255,255,255,.35);color:#fff" href="/open#courses">Explore Courses</a>
     </div>
   </div>
   <div class="cta-stats">

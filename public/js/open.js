@@ -254,6 +254,9 @@ function backToCatalogue() {
 
 /* -------------------------------- boot -------------------------------- */
 (async () => {
+  if (!location.pathname.startsWith('/demo/') && ['', '#home', '#compare'].includes(location.hash)) {
+    location.replace('/' + location.search + (location.hash === '#compare' ? '#learning-options' : '')); return;
+  }
   try { ME = await api('/api/auth/me'); } catch { ME = null; }
   EL.drafts.setAccount(ME?.id || null);
   drawUserBox();

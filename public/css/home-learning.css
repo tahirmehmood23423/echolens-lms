@@ -1,0 +1,15 @@
+.home-learning{margin:24px 0}
+.home-section-head{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:14px}
+.home-section-head h2{margin:0 0 5px}
+.home-section-head>a{white-space:nowrap;color:#7040ed;font-size:13px}
+.home-learning-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.home-learning-card{padding:18px 20px;background:#fff;border:1px solid #e5e8f3;border-radius:16px}
+.home-learning-card.paid{border-color:#bcb4f2;background:linear-gradient(130deg,#fff,#f6f4ff)}
+.home-card-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.home-card-title h3{font-size:21px;margin:0}
+.home-learning-card>p{font-size:13px;color:#657089;margin:4px 0 10px}
+.home-learning-card ul{padding-left:18px;margin:0 0 14px;font-size:13px;line-height:1.8}
+.home-learning-card .btn{min-height:42px;font-size:13px}
+.home-learning-note{font-size:11.5px;color:#657089;margin:10px 0 0;line-height:1.6}
+
+.home-learning{margin:24px 0 32px;scroll-margin-top:90px}.home-section-head h2{font-size:24px;line-height:1.3}.home-section-head p{font-size:14px;color:#657089}.home-card-title h3{color:#162039}.home-learning-card .cmp-badge{font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px;white-space:nowrap}.home-learning-card .cmp-badge.free{background:#e2f6ef;color:#08795d}.home-learning-card .cmp-badge.paid{background:#eeebff;color:#6940dd}.home-learning-card .btn{display:flex;align-items:center;justify-content:center;border-radius:10px;text-decoration:none;padding:10px 14px;font-weight:600;border:0}.home-learning-card .btn-teal{background:#079589;color:#fff}.home-learning-card .btn-primary{background:linear-gradient(110deg,#7040ed,#4664ed);color:white}.home-learning a:focus-visible{outline:2px solid #7040ed;outline-offset:3px}@media(max-width:700px){.home-learning-grid{grid-template-columns:1fr}.home-section-head{align-items:start}.home-learning-card{padding:16px}.home-card-title h3{font-size:20px}.home-section-head h2{font-size:21px}}

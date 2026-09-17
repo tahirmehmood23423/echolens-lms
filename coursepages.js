@@ -272,7 +272,7 @@ function renderCourse(c, all) {
 
   return pageHead({ title, description: metaDesc, canonical: url, keywords: kw, jsonld: [courseLd, crumbLd] }) + `
 <div class="cp-wrap">
-  <nav class="cp-crumb"><a href="/open#home">Home</a> / <a href="/courses">Courses</a> / <span>${esc(c.title)}</span></nav>
+  <nav class="cp-crumb"><a href="/">Home</a> / <a href="/courses">Courses</a> / <span>${esc(c.title)}</span></nav>
 
   <header class="cp-hero">
     <div class="cp-badges">${badges.join('')}</div>

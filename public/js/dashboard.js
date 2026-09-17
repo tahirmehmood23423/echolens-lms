@@ -980,9 +980,12 @@ async function renderAdminOpenCourses() {
       </label>
       <button class="btn btn-primary" id="ocAddBtn">Add students</button>
     </div></div>
+    <div class="card" style="margin-bottom:14px"><div class="card-head"><h3>Manage enrollment by email</h3></div><div class="card-body"><label class="field"><span>Existing learner email</span><input id="ocEmail" type="email" required placeholder="learner@example.com"></label><div style="display:flex;flex-wrap:wrap;gap:10px"><button class="btn btn-primary" id="ocEnrollEmail">Enroll by email</button><button class="btn btn-ghost" id="ocRemoveEmail">Remove by email</button></div><p class="hint">Complete free courses within three calendar months of enrollment. Restoring a removed enrollment starts a new window and preserves saved work. Active enrollments keep their deadline. Weekly inactivity and fortnightly completion reminders stop when completed or removed.</p></div></div>
     <div id="ocRoster"><div class="empty">Loading&hellip;</div></div>`;
   $('ocSelect').addEventListener('change', (e) => { OPEN_COURSE_ADMIN_KEY = e.target.value; loadOpenCourseRoster(); });
   $('ocAddBtn').addEventListener('click', () => formOpenCourseStudents());
+  $('ocEnrollEmail').addEventListener('click', () => manageFreeEnrollmentByEmail(false));
+  $('ocRemoveEmail').addEventListener('click', () => manageFreeEnrollmentByEmail(true));
   await loadOpenCourseRoster();
 }
 async function loadOpenCourseRoster() {
@@ -992,15 +995,27 @@ async function loadOpenCourseRoster() {
     const d = await api(`/api/admin/open-courses/${encodeURIComponent(OPEN_COURSE_ADMIN_KEY)}/students`);
     box.innerHTML = `<div class="card"><div class="card-head"><h3>Enrolled students</h3><span class="s" style="color:var(--muted)">${d.students.length} total</span></div>
       <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
-        <tr><th>Student</th><th>Reg no</th><th>Email</th><th>Enrolled</th><th>Status</th><th>Progress</th></tr>
+        <tr><th>Student</th><th>Reg no</th><th>Email</th><th>Enrolled</th><th>Deadline</th><th>Last opened</th><th>Status</th><th>Progress</th></tr>
         ${d.students.map((s) => `<tr>
           <td>${esc(s.name)}</td><td class="mono">${esc(s.reg_no || '—')}</td><td class="s">${esc(s.email || '—')}</td>
-          <td class="s">${esc((s.enrolled_at || '').slice(0, 10))}</td>
+          <td class="s">${esc((s.enrolled_at || '').slice(0, 10))}</td><td class="s">${s.expires_at ? esc(new Date(s.expires_at).toLocaleString('en-GB', { timeZone: 'Asia/Karachi', dateStyle: 'short', timeStyle: 'short' })) + ' PKT' : ''}</td><td class="s">${esc((s.last_opened_at || 'Not opened yet').slice(0, 16))}</td>
           <td>${s.active ? '<span class="s" style="color:var(--ok)">Active</span>' : `<span class="s" style="color:var(--muted)">${esc(s.confirmation_note || 'Confirming')}</span>`}</td>
           <td class="s">${s.completed ? 'Completed' : s.required_total != null ? `${s.required_passed}/${s.required_total} passed` : '—'}</td>
-        </tr>`).join('') || '<tr><td colspan="6" class="empty">Nobody is enrolled in this course yet - add students above.</td></tr>'}
+        </tr>`).join('') || '<tr><td colspan="8" class="empty">Nobody is enrolled in this course yet - add students above.</td></tr>'}
       </table></div></div>`;
   } catch (err) { box.innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
+}
+async function manageFreeEnrollmentByEmail(remove) {
+  const input = $('ocEmail'), email = input.value.trim();
+  if (!input.checkValidity() || !email) { input.reportValidity(); return; }
+  if (remove && !confirm('Remove this learner from the selected free course? Submitted work, grades and certificates will be preserved.')) return;
+  const button = $(remove ? 'ocRemoveEmail' : 'ocEnrollEmail'); button.disabled = true;
+  try {
+    const out = await api('/api/admin/open-courses/' + encodeURIComponent(OPEN_COURSE_ADMIN_KEY) + '/enroll-email', { method: remove ? 'DELETE' : 'POST', body: JSON.stringify({ email }) });
+    toast(remove ? 'Learner removed from this course.' : out.existing ? 'Already enrolled; deadline unchanged.' : 'Enrolled with a three-month completion window.', true);
+    await renderAdminOpenCourses();
+  } catch (err) { toast(err.message); }
+  finally { if (button.isConnected) button.disabled = false; }
 }
 function formOpenCourseStudents() {
   const key = OPEN_COURSE_ADMIN_KEY;
@@ -1008,7 +1023,7 @@ function formOpenCourseStudents() {
     <form id="f">
       <label class="field"><span>New students - one per line as "Full Name, email"</span><textarea name="names" placeholder="Ayesha Khan, ayesha@gmail.com&#10;Bilal Noor, bilal@gmail.com"></textarea></label>
       <p class="hint">A real, working email is required for each candidate - their generated username is just a login handle, not an inbox. A password and registration number are generated and mailed to that email automatically (or shown here once, if mail can't be delivered right now).</p>
-      <label class="field"><span>Existing learners - one reg no, username or email per line</span><textarea name="existing" placeholder="4821736"></textarea></label>
+      <label class="field"><span>Existing learners - one email, reg no or username per line</span><textarea name="existing" placeholder="learner@example.com"></textarea></label>
       <p class="hint">Enrolls learners who already have an EchoLens account. The usual two-courses-at-a-time limit still applies.</p>
       <button class="btn btn-primary btn-block">Add to course</button></form>
     <div id="credOut"></div>`);

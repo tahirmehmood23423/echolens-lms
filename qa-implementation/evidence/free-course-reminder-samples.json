@@ -1,0 +1,20 @@
+[
+  {
+    "kind": "inactive",
+    "to": "CEO_ADDRESS_PENDING",
+    "subject": "[SAMPLE] EchoLens - continue learning: Sample Free Certified Course",
+    "text": "SAMPLE ONLY - fictional learner; no real enrollment was changed.\n\nHi Fictional Demo Learner,\n\nYou have not opened this course for at least one week. Pick up where you left off and work on your next assignment.\n\nCourse: Sample Free Certified Course\nCompletion deadline: 3 December 2026 at 22:00 (Pakistan time)\nRemaining time: 77 days\n\nhttps://echolens.digital/open#course/fc01-c-basics\n\nCompleted courses stop receiving these reminders. Certificate eligibility depends on assessment and verification requirements.\n\n- EchoLens Digital"
+  },
+  {
+    "kind": "completion",
+    "to": "CEO_ADDRESS_PENDING",
+    "subject": "[SAMPLE] EchoLens - course completion reminder: Sample Free Certified Course",
+    "text": "SAMPLE ONLY - fictional learner; no real enrollment was changed.\n\nHi Fictional Demo Learner,\n\nKeep going with your free certified course. Open the lessons, complete your assignments and meet the course requirements to earn your certificate.\n\nCourse: Sample Free Certified Course\nCompletion deadline: 3 December 2026 at 22:00 (Pakistan time)\nRemaining time: 77 days\n\nhttps://echolens.digital/open#course/fc01-c-basics\n\nCompleted courses stop receiving these reminders. Certificate eligibility depends on assessment and verification requirements.\n\n- EchoLens Digital"
+  },
+  {
+    "kind": "expired",
+    "to": "CEO_ADDRESS_PENDING",
+    "subject": "[SAMPLE] EchoLens - free-course window ended: Sample Free Certified Course",
+    "text": "SAMPLE ONLY - fictional learner; no real enrollment was changed.\n\nHi Fictional Demo Learner,\n\nYour three-month free-course window has ended and your incomplete enrollment has been removed. Your submitted work and grades have been preserved. Contact support if you need help returning to the course.\n\nCourse: Sample Free Certified Course\nCompletion deadline: 9 September 2026 at 22:00 (Pakistan time)\nRemaining time: 0 days\n\nhttps://echolens.digital/open#course/fc01-c-basics\n\nCompleted courses stop receiving these reminders. Certificate eligibility depends on assessment and verification requirements.\n\n- EchoLens Digital"
+  }
+]

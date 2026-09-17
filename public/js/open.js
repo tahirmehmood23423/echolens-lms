@@ -196,8 +196,16 @@ function clearDialogRoute() {
   history.replaceState(state, '', openRoute(state)); updateOpenLoginLink();
 }
 async function ensureCourseLoaded(key) {
-  if (CUR?.track?.key === key) return;
+  if (CUR?.track?.key === key) { recordFreeCourseOpen(); return; }
   await openCourse(key, true);
+}
+const FREE_COURSE_OPEN_RECORDED = new Map();
+function recordFreeCourseOpen() {
+  if (!CUR?.track?.free || !CUR.enrollment?.active || location.pathname.startsWith('/demo/')) return;
+  const key = CUR.track.key, last = FREE_COURSE_OPEN_RECORDED.get(key) || 0;
+  if (Date.now() - last < 30 * 60 * 1000) return;
+  FREE_COURSE_OPEN_RECORDED.set(key, Date.now());
+  api('/api/open/activity', { method: 'POST', body: JSON.stringify({ track_key: key }) }).catch(() => FREE_COURSE_OPEN_RECORDED.delete(key));
 }
 async function restoreNav(state, revision = NAV_REVISION) {
   if (!state?.v) return;
@@ -971,6 +979,7 @@ async function openCourse(key, skipPush) {
   if (d.track.available !== false && ME && ['free', 'student'].includes(ME.role)) { try { progress = (await api('/api/open/progress?track=' + encodeURIComponent(key))).progress; } catch {} }
   if (request !== OPEN_COURSE_REQUEST) return;
   CUR = { ...d, progress };
+  recordFreeCourseOpen();
   // Whichever nav link you actually arrived through, a free course should
   // read as "Free Certified Courses" and a paid one as "Live Tech Courses" -
   // re-sync now that we know d.track.free (openTab('course') above ran
@@ -1454,13 +1463,16 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   const ctaAction = preview
     ? (reserved || !learner ? '' : `reserveSeat('${esc(t.key)}', this)`)
     : pendingSeat ? ''
+    : prog?.reenrollment_required ? "location.href='/open#feedback'"
     : !ME || (learner && !prog?.enrolled) ? 'enrollFreeCourse(this)' : 'continueLearning()';
   const ctaBtnLabel = preview
     ? (reserved ? 'Seat reserved' : !ME ? 'Sign in to reserve a seat' : !learner ? 'Coming soon' : 'Reserve your seat')
     : pendingSeat ? 'Confirming your seat'
+    : prog?.reenrollment_required ? 'Contact support to re-enroll'
     : !ME ? 'Sign in to enroll' : !learner ? 'Preview lessons' : !prog?.enrolled ? 'Enroll for free' : prog.passed ? 'Review the course' : 'Continue learning';
   const ctaSub = pendingSeat
     ? `${esc(seat.confirmation_note || '')} Enrolment is confirmed an hour after you join, and this course then counts as one of your two active courses.`
+    : prog?.reenrollment_required ? 'This enrollment has ended. Your saved work is preserved; an administrator can restore access with a new completion window.'
     : preview
     ? (reserved
       ? 'Your seat is held. We will email you the day this course opens - nothing else to do.'
@@ -1468,7 +1480,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
     : !ME
     ? 'Use your existing portal student or free learner account. No second account is needed.'
     : !learner ? 'Enrollment is available to learner accounts only. Staff can preview the course content.'
-    : !prog?.enrolled ? `Add ${esc(subj)} to My courses and learn at your own pace.`
+    : !prog?.enrolled ? `Add ${esc(subj)} to My courses and complete it within three calendar months.`
     : (prog && prog.passed
       ? 'You have completed every module - your certificate has been issued.'
       : `Keep going - ${doneMods}/${modules.length} modules complete.`);
@@ -1492,7 +1504,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
               </div>
             </div>
           </div>
-          ${seatNote}${holdNote}
+          ${seatNote}${holdNote}${seat?.expires_at && !prog?.passed ? `<div class="pace-note"><strong>Complete within three months.</strong> Deadline: ${esc(new Date(seat.expires_at).toLocaleString('en-GB', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }))} PKT &middot; ${seat.remaining_days} days remaining. Incomplete enrollment ends automatically; saved work is preserved.</div>` : !preview && learner && !prog?.enrolled ? '<p class="hint">Free enrollment includes a three-calendar-month completion window, weekly inactivity reminders and fortnightly completion reminders.</p>' : ''}
           <div class="curr-list">${rows}</div>
         </div>
       </div>
@@ -1680,6 +1692,7 @@ function svNavHtml() {
 // column isn't squeezed by a video competing for the same space; a small
 // link back to the video subpoint is offered instead when one exists.
 function openSolve(levelNo, pid, skipPush) {
+  recordFreeCourseOpen();
   EL.drafts.flushAll();
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   const p = lvl && (lvl.problems || []).find((x) => x.pid === pid);
@@ -1746,6 +1759,7 @@ function openSolve(levelNo, pid, skipPush) {
 // solving the quest, so it doesn't need to be on screen while they watch.
 // "Continue to the quest" hands off to the normal openSolve() workspace.
 function openSolveVideo(levelNo, skipPush) {
+  recordFreeCourseOpen();
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   if (!lvl || lvl.locked || !levelHasVideo(lvl)) return;
   COURSE_SCROLL_Y = window.scrollY;

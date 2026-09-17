@@ -35,6 +35,7 @@ const { sessionVersion, validSession, safeReturnPath } = require('./session-secu
 const uploadAccess = require('./upload-access');
 const { validateEvidenceInput } = require('./evidence-submission');
 const { deliverRegistrationMail } = require('./registration-delivery');
+const { createFreeCourseReminders } = require('./free-course-reminders');
 const { createAdmissionsReminders, validDate: validChallanDate } = require('./admissions-reminders');
 const asyncRoute = require('./async-route');
 const {
@@ -308,6 +309,7 @@ const admissionsReminders = createAdmissionsReminders(store, mailer, {
   phone: process.env.ADMISSIONS_EXTENSION_PHONE,
   financeEmail: FINANCE_EMAIL,
 });
+const freeCourseReminders = createFreeCourseReminders(store, mailer, { appUrl: process.env.APP_URL || 'https://echolens.digital' });
 function hrOnly(req, res, next) { if (['admin', 'hr'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function ambassadorOnly(req, res, next) { if (req.user.role !== 'ambassador') return res.status(403).json({ error: 'Not available for your role.' }); next(); }
 // Ambassador commission reports are shared reading across four departments -
@@ -2484,7 +2486,7 @@ app.get('/api/public/tracks/:key', (req, res) => {
       problems: l.problems.map((p, i) => ({ pid: i + 1, title: p.title, points: p.points || 100, difficulty: p.difficulty, locked: true })),
     };
   });
-  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, format:t.format||null, time_commitment:t.time_commitment||null, prerequisites:t.prerequisites||null, environment:t.environment||null, assessment:t.assessment||null, warnings:t.warnings||[], modules:t.modules||[], capstone:t.capstone||null, assignment_weight:t.assignment_weight||null, capstone_weight:t.capstone_weight||null, inline_video_only:!!t.inline_video_only, published:t.published!==false, available:!previewOnly, coming_soon:previewOnly, grading_mode:t.grading_mode||null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN, enrollment: seat ? { active: seat.active, enrolled_at: seat.enrolled_at, activates_at: seat.activates_at || null, confirmation_note: seat.confirmation_note || null } : null, staff_preview: staffPreview });
+  res.json({ track: { key: t.key, title: t.title, description: t.description, outcome: t.outcome || null, format:t.format||null, time_commitment:t.time_commitment||null, prerequisites:t.prerequisites||null, environment:t.environment||null, assessment:t.assessment||null, warnings:t.warnings||[], modules:t.modules||[], capstone:t.capstone||null, assignment_weight:t.assignment_weight||null, capstone_weight:t.capstone_weight||null, inline_video_only:!!t.inline_video_only, published:t.published!==false, available:!previewOnly, coming_soon:previewOnly, grading_mode:t.grading_mode||null, key_concepts: t.key_concepts || [], clos: t.clos || [], end_project: t.end_project || null, pass_mark: t.pass_mark, total_points: t.total_points, course_code: t.course_code || null, free: !!t.free, submission_mode: mode, friendly_grading: !!t.friendly_grading, default_language: t.default_language || null }, levels, open_levels: openN, enrollment: seat ? { active: seat.active, enrolled_at: seat.enrolled_at, expires_at: seat.expires_at, remaining_days: seat.remaining_days, activates_at: seat.activates_at || null, confirmation_note: seat.confirmation_note || null } : null, staff_preview: staffPreview });
 });
 
 /* ================================ v11 routes ================================ */
@@ -3645,7 +3647,7 @@ const KEY_LINKS = {
 app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
   const enrollment_counts = {};
   Users.all().forEach((u) => (u.profile?.free_course_enrollments || []).forEach((e) => {
-    if (e.track_key) enrollment_counts[e.track_key] = (enrollment_counts[e.track_key] || 0) + 1;
+    if (e.track_key && OpenQuest.enrollment(u.id, e.track_key)) enrollment_counts[e.track_key] = (enrollment_counts[e.track_key] || 0) + 1;
   }));
   res.json({
     catalogue: store.publicCatalogue().map((c) => ({ ...c, enrollment_count: enrollment_counts[c.track_key] || 0 })),
@@ -4642,6 +4644,35 @@ app.post('/api/admin/open-courses/:key/students', authRequired, adminRequired, a
   res.json({ ok: true, track: { key: t.key, title: t.title }, created, added, missing, invalid });
 }));
 
+app.post('/api/open/activity', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {
+  const out = OpenQuest.recordOpen(req.user.id, String(req.body.track_key || ''));
+  if (out.error) return res.status(out.status).json({ error: out.error });
+  await store.pendingPersist(); res.json(out);
+}));
+app.post('/api/admin/open-courses/:key/enroll-email', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const t = freePublishedTrack(req.params.key);
+  if (!t) return res.status(404).json({ error: 'Free course not found.' });
+  const email = String(req.body.email || '').trim().toLowerCase();
+  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid learner email.' });
+  const matches = Users.all().filter(u => ['free', 'student'].includes(u.role) && String(u.email || '').trim().toLowerCase() === email);
+  if (matches.length !== 1) return res.status(matches.length ? 409 : 404).json({ error: matches.length ? 'More than one learner uses this email. Resolve duplicate accounts first.' : 'No learner account uses this email. Use Add students to create an account first.' });
+  const out = OpenQuest.adminEnroll(matches[0].id, t.key);
+  if (out.error) return res.status(out.status || 400).json({ error: out.error });
+  if (!out.existing) AuditLog.record({ actor_id: req.user.id, action: 'free_course_admin_enroll', target_type: 'user', target_id: matches[0].id, detail: { track_key: t.key }, deferSave: true });
+  await store.pendingPersist(); res.json({ ok: true, existing: out.existing, enrollment: out.enrollment });
+}));
+app.delete('/api/admin/open-courses/:key/enroll-email', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const t = freePublishedTrack(req.params.key);
+  if (!t) return res.status(404).json({ error: 'Free course not found.' });
+  const email = String(req.body.email || '').trim().toLowerCase();
+  if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid learner email.' });
+  const matches = Users.all().filter(u => ['free', 'student'].includes(u.role) && String(u.email || '').trim().toLowerCase() === email);
+  if (matches.length !== 1) return res.status(matches.length ? 409 : 404).json({ error: matches.length ? 'Resolve duplicate learner emails first.' : 'Learner not found.' });
+  const out = OpenQuest.removeEnrollment(matches[0].id, t.key, 'admin', req.user.id);
+  if (out.error) return res.status(out.status).json({ error: out.error });
+  if (!out.existing) AuditLog.record({ actor_id: req.user.id, action: 'free_course_admin_remove', target_type: 'user', target_id: matches[0].id, detail: { track_key: t.key }, deferSave: true });
+  await store.pendingPersist(); res.json({ ok: true });
+}));
 app.post('/api/open/enrollments', authRequired, openLearnerRequired, learnerProfileRequired, asyncRoute(async (req, res) => {
   const out = OpenQuest.enroll(req.user.id, String(req.body.track_key || ''));
   if (out.error) return res.status(out.status).json({ error: out.error });
@@ -4724,7 +4755,7 @@ async function sendFreeEnrollmentDigest() {
   const rows = [];
   Users.all().forEach((u) => (u.profile?.free_course_enrollments || []).forEach((e) => {
     const at = Date.parse(e.enrolled_at || '');
-    if (at > lastFreeEnrollmentDigestAt && at <= now) rows.push({ user: u, enrollment: e });
+    if (!e.removed_at && at > lastFreeEnrollmentDigestAt && at <= now) rows.push({ user: u, enrollment: e });
   }));
   lastFreeEnrollmentDigestAt = now;
   if (!rows.length) return;
@@ -4766,7 +4797,12 @@ app.get('/api/open/progress', authRequired, openLearnerRequired, asyncRoute(asyn
     const issued = OpenQuest.maybeCertify(req.user.id, track);
     if (issued) { await store.pendingPersist(); prog = OpenQuest.progress(req.user.id, track); }
   }
-  res.json({ progress: { ...prog, enrolled: !!OpenQuest.enrollment(req.user.id, track) } });
+  const seat = OpenQuest.enrollment(req.user.id, track);
+  const prior = (req.user.profile?.free_course_enrollments || []).find(e => e.track_key === track)
+    || store.allData().open_submissions.find(s => s.user_id === req.user.id && s.track_key === track);
+  const ended = !!Quests.trackDef(track)?.free && !!prior && !seat;
+  res.json({ progress: { ...prog, enrolled: !!seat, reenrollment_required: ended,
+    enrollment_status: prior?.removed_at ? prior.removal_reason === 'expired' ? 'expired' : 'removed' : ended ? 'expired' : seat ? 'enrolled' : null } });
 }));
 
 /* ---------------- learner AI copilot for the quest workspaces ----------------
@@ -5006,6 +5042,7 @@ if (looksLikeProductionDeploy && !db.enabled()) {
   if (!demo.enabled) {
     gradingWorker.start();
     admissionsReminders.start();
+    freeCourseReminders.start();
   }
   const listener = app.listen(PORT, demo.enabled ? '127.0.0.1' : undefined, () => {
     if (demo.enabled) {

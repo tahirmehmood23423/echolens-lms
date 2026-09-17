@@ -32,7 +32,8 @@ Visitors can use the open website without an account to:
 Authenticated learners can use the open site to:
 
 - Enroll in free certified courses (free-account learners and portal students; staff accounts cannot enroll).
-- Hold up to two active free courses at once.
+- Hold up to two active free courses at once. Each enrollment has a three-calendar-month completion window from the course enrollment date (including existing enrollments). Incomplete enrollments expire automatically; submissions, grades and certificates are preserved. Admin restoration starts a new window.
+- Receive transactional free-course reminders after seven days without opening the enrolled course, then weekly while inactive, plus completion reminders every two weeks showing the deadline and days remaining. Completed, manually removed and suppressed recipients do not receive reminders; expired enrollments receive one window-ended notice.
 - See a seat confirmation window, course activation status, course progress, module gates, assignment results, capstone status, and certificate eligibility.
 - Submit assignments and capstones without leaving the portal.
 - View their profile, enrollment history, progress, certificates, and support tickets.
@@ -69,7 +70,7 @@ Authenticated learners can use the open site to:
 ### Course, assessment, and certification administration
 
 - Create and manage courses, batches, modules, lessons, quests, assignments, rubrics, expected outputs, resources, prerequisites, and environments.
-- Manage free open-web tracks and manually enroll eligible learners.
+- Manage free open-web tracks and manually enroll eligible learners. Enroll or remove an existing learner by email from Admin > Free-course students; restore removed enrollments with a fresh three-month window, inspect deadlines and last-opened timestamps, and preserve existing work. Duplicate learner emails require resolution before changes. Admin enrollment/removal and automatic expiry are audited.
 - Review assignment and capstone evidence in an admin queue, provide feedback, award grades, and preserve submission history.
 - Review AI grading context and reports; automated grading does not issue certificates when evidence requires manual verification.
 - Manage certificate issuance, public verification, partner/co-brand data, and certificate records.
@@ -90,6 +91,7 @@ Authenticated learners can use the open site to:
 - Feedback moderation, replies, deletion, public announcements, event announcements, and targeted learner notifications.
 - Transactional email delivery for OTP, welcome messages, password reset, enrollment confirmation, grades, certificates, support, registrations, and operational alerts.
 - Admissions challan follow-ups use the transactional email provider and persistent delivery records. Optional `ADMISSIONS_EXTENSION_PHONE` changes the extension contact number; the existing `FINANCE_EMAIL` supplies the contact email. Reminder controls are restricted to Admissions and authorized admins; demo accounts cannot send or change reminders.
+- Free-course reminder checks run hourly with persistent delivery claims, a 20-attempt run cap, suppression checks, a per-course 24-hour cooldown and failure protection. Uncertain delivery outcomes are not blindly retried. Expiry is enforced even without a mail provider; demo sessions never send reminders or record course opens.
 - Daily free open-web enrollment digest instead of one email per free enrollment.
 - Immediate paid-course/admissions enrollment and payment notifications.
 

@@ -4133,6 +4133,7 @@ const Analytics = {
 const { completion: freeCompletion, createAttempts } = require('./learning-attempts');
 const OpenAttempts = createAttempts({getData:()=>data,nextId,save,tracks:TRACKS,now});
 const pacing = require('./course-pacing');
+const freePolicy = require('./free-course-policy');
 
 const OpenQuest = {
   key(track_key, level, pid) { return `${track_key}:${level}:${pid}`; },
@@ -4146,23 +4147,30 @@ const OpenQuest = {
     const savedEnrollments = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
     const saved = savedEnrollments.find(e => e.track_key === track_key);
     if (saved) {
+      if (saved.removed_at || freePolicy.expired(saved, OpenQuest.progress(uid, track_key)?.passed)) return null;
       // `active` is what every gate reads: content, submissions and the CTA.
       // An enrolment saved before the confirmation rule existed has no
       // activates_at and stays open - see isEnrollmentActive.
       const active = pacing.isEnrollmentActive(saved);
-      return { ...saved, track_key, enrolled_at: saved.enrolled_at, active, confirmation_note: pacing.confirmationNote(saved) };
+      return { ...saved, expires_at: freePolicy.deadline(saved), remaining_days: freePolicy.remaining(saved), track_key, enrolled_at: saved.enrolled_at, active, confirmation_note: pacing.confirmationNote(saved) };
     }
     // Keep learners with existing submissions enrolled without rewriting work.
     const previous = data.open_submissions.find(s => s.user_id === u.id && s.track_key === track_key);
-    return previous ? { track_key, enrolled_at: previous.submitted_at, active: true, confirmation_note: null } : null;
+    if (!previous) return null;
+    const legacy = { track_key, enrolled_at: previous.submitted_at };
+    if (freePolicy.expired(legacy, OpenQuest.progress(uid, track_key)?.passed)) return null;
+    return { ...legacy, expires_at: freePolicy.deadline(legacy), remaining_days: freePolicy.remaining(legacy), active: true, confirmation_note: null };
   },
-  enroll(uid, track_key) {
+  enroll(uid, track_key, { restore = false } = {}) {
     const u = Users.byId(uid);
     if (!u || !['free', 'student'].includes(u.role)) return { error: 'Free-course enrollment is available to learner accounts only.', status: 403 };
     const t = TRACKS[track_key];
     if (!t?.free || t.published === false || !OFFICIAL_CATALOGUE.some(c => c.code === t.course_code && c.price_pkr === 0 && c.published !== false)) return { error: 'Choose a published free course.', status: 400 };
     const existing = OpenQuest.enrollment(uid, track_key);
     if (existing) return { enrollment: existing, existing: true };
+    const prior = (u.profile?.free_course_enrollments || []).find(e => e.track_key === track_key);
+    const oldWork = data.open_submissions.find(e => e.user_id === u.id && e.track_key === track_key);
+    if ((prior || oldWork) && !restore) return { error: 'This enrollment was removed or its three-month window ended. Contact support or an administrator to re-enroll.', status: 409 };
     // Two courses at a time. Checked against the learner's OTHER enrolments so
     // re-enrolling in something they already hold can never be blocked.
     const gate = pacing.canEnroll(OpenQuest.enrollments(uid).filter((e) => e.track_key !== track_key));
@@ -4171,9 +4179,9 @@ const OpenQuest = {
     // stamped by the sweep that emails the learner, so a confirmation is sent
     // exactly once even across restarts.
     const at = now();
-    const enrollment = { track_key, enrolled_at: at, activates_at: pacing.activatesAt(at), confirmed_at: null };
+    const enrollment = { track_key, enrolled_at: at, expires_at: freePolicy.deadline({ enrolled_at: at }), last_opened_at: null, reminders: { deliveries: [] }, activates_at: pacing.activatesAt(at), confirmed_at: null };
     const savedEnrollments = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
-    u.profile = { ...(u.profile || {}), free_course_enrollments: [...savedEnrollments, enrollment] };
+    u.profile = { ...(u.profile || {}), free_course_enrollments: [...savedEnrollments.filter(e => e.track_key !== track_key), { ...enrollment, history: prior ? [...(prior.history || []), Object.fromEntries(Object.entries(prior).filter(([key]) => key !== "history"))] : [] }] };
     save();
     // Read it back through enrollment() so a first enrolment and a repeat one
     // return the identical shape - callers must not have to care which it was.
@@ -4188,7 +4196,9 @@ const OpenQuest = {
       const t = TRACKS[track_key];
       if (!t?.free) return [];
       const progress = OpenQuest.progress(uid, track_key);
-      return [{ ...OpenQuest.enrollment(uid, track_key), track_key, title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, assignment_average: progress.assignment_average, capstone: progress.capstone ? { unlocked: progress.capstone.unlocked, submitted: progress.capstone.submitted, score: progress.capstone.score, passed: progress.capstone.passed } : null, weighted_score: progress.weighted_score, completed: progress.passed }];
+      const seat = OpenQuest.enrollment(uid, track_key);
+      if (!seat) return [];
+      return [{ ...seat, track_key, title: t.title, course_code: t.course_code, attempted: progress.attempted, required_passed: progress.required_passed, required_total: progress.required_total, assignment_average: progress.assignment_average, capstone: progress.capstone ? { unlocked: progress.capstone.unlocked, submitted: progress.capstone.submitted, score: progress.capstone.score, passed: progress.capstone.passed } : null, weighted_score: progress.weighted_score, completed: progress.passed }];
     });
   },
   /**
@@ -4208,7 +4218,7 @@ const OpenQuest = {
       const progress = OpenQuest.progress(u.id, track_key);
       out.push({
         id: u.id, name: u.name, email: u.email || null, reg_no: u.reg_no, username: u.username,
-        enrolled_at: enr.enrolled_at, active: enr.active, confirmation_note: enr.confirmation_note || null,
+        enrolled_at: enr.enrolled_at, expires_at: enr.expires_at, last_opened_at: enr.last_opened_at || null, remaining_days: enr.remaining_days, active: enr.active, confirmation_note: enr.confirmation_note || null,
         required_passed: progress?.required_passed ?? null, required_total: progress?.required_total ?? null,
         completed: !!progress?.passed,
       });
@@ -4225,7 +4235,29 @@ const OpenQuest = {
    * enrolment, so no separate notification path is needed here).
    */
   adminEnroll(uid, track_key) {
-    return OpenQuest.enroll(uid, track_key);
+    return OpenQuest.enroll(uid, track_key, { restore: true });
+  },
+  removeEnrollment(uid, track_key, reason = 'admin', actor_id = null, at = new Date().toISOString()) {
+    const u = Users.byId(uid);
+    if (!u || !['free', 'student'].includes(u.role)) return { error: 'Learner not found.', status: 404 };
+    const saved = u.profile?.free_course_enrollments || [];
+    let row = saved.find(e => e.track_key === track_key);
+    if (!row) { const old = data.open_submissions.find(e => e.user_id === u.id && e.track_key === track_key); if (old) row = { track_key, enrolled_at: old.submitted_at }; }
+    if (!row) return { error: 'This learner is not enrolled in the course.', status: 404 };
+    if (row.removed_at) return { ok: true, existing: true };
+    const removed = { ...row, expires_at: freePolicy.deadline(row), removed_at: at, removal_reason: reason, removed_by: actor_id };
+    u.profile = { ...(u.profile || {}), free_course_enrollments: [...saved.filter(e => e.track_key !== track_key), removed] };
+    save();
+    return { ok: true, enrollment: removed };
+  },
+  recordOpen(uid, track_key, { deferSave = false } = {}) {
+    const u = Users.byId(uid), seat = OpenQuest.enrollment(uid, track_key);
+    if (!seat?.active) return { error: 'An active free-course enrollment is required.', status: 403 };
+    const saved = u.profile?.free_course_enrollments || [];
+    const row = saved.find(e => e.track_key === track_key) || { ...seat };
+    row.last_opened_at = new Date().toISOString();
+    u.profile = { ...(u.profile || {}), free_course_enrollments: [...saved.filter(e => e.track_key !== track_key), row] };
+    if (!deferSave) save(); return { ok: true };
   },
   /* ---------------------- launch waitlist (staged courses) ----------------------
    * The trending-tech tracks are content-complete but have no lecture videos
@@ -4279,7 +4311,7 @@ const OpenQuest = {
     for (const u of data.users) {
       const saved = Array.isArray(u.profile?.free_course_enrollments) ? u.profile.free_course_enrollments : [];
       for (const e of saved) {
-        if (e.confirmed_at || !e.activates_at) continue;
+        if (e.removed_at || !OpenQuest.enrollment(u.id, e.track_key) || e.confirmed_at || !e.activates_at) continue;
         if (!pacing.isEnrollmentActive(e)) continue;
         const lastAttempt = pacing.parseTimestamp(e.confirmation_email_attempted_at);
         if (Number.isFinite(lastAttempt) && Date.now() - lastAttempt < 15 * 60 * 1000) continue;
@@ -4417,6 +4449,7 @@ const OpenQuest = {
     }
     const result = OpenAttempts.create(s,fields,pr,request_key,fingerprint);
     if (result.error) return result;
+    if (t.free) OpenQuest.recordOpen(user.id, track_key, { deferSave: true });
     save();
     return { submission:s,problem:pr,track:t,...result };
   },

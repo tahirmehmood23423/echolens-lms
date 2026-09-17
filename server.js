@@ -202,7 +202,7 @@ app.use((req, res, next) => {
 
 if (demo.enabled) {
   app.use(require('./demo/read-only').middleware);
-  app.get('/', (req, res) => res.type('html').send(require('./demo/landing')()));
+  app.get('/', (req, res) => res.type('html').send(require('./demo/landing')({ studentOnly: req.query.portal === 'student' })));
   app.get('/api/demo/info', (req, res) => res.json({ read_only: true, accounts: require('./demo/accounts'), password: 'admin' }));
   app.get('/demo-sample.pdf', (req, res) => res.sendFile(path.join(UPLOAD_DIR, 'demo-sample.pdf')));
 } else {

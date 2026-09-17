@@ -17,6 +17,9 @@
     history[method] = (state, unused, url) => original(state, unused, url == null ? url : scoped(url));
   }
   const pageUrl = new URL(location.href);
+  if (pageUrl.searchParams.get('portal') === 'student') sessionStorage.setItem('demo:student-tour', 'true');
+  else if (/^\/demo\/?$/.test(pageUrl.pathname)) sessionStorage.removeItem('demo:student-tour');
+  const studentTour = sessionStorage.getItem('demo:student-tour') === 'true';
   if (pageUrl.searchParams.has('returnTo')) {
     const target = new URL(scoped(pageUrl.searchParams.get('returnTo')));
     pageUrl.searchParams.set('returnTo', target.pathname + target.search + target.hash);
@@ -37,6 +40,7 @@
     const link = event.target.closest('a[href]');
     if (!link || link.hasAttribute('data-demo-exit') || /^(#|mailto:|tel:|javascript:)/i.test(link.getAttribute('href'))) return;
     link.href = scoped(link.href);
+    if (studentTour && /^\/demo\/?$/.test(new URL(link.href).pathname)) link.href = '/demo/?portal=student';
   }, true);
   document.addEventListener('submit', event => {
     if (event.target.action) event.target.action = scoped(event.target.action);
@@ -49,6 +53,7 @@
     banner.className = 'demo-notice';
     banner.setAttribute('aria-label', 'Read-only demo');
     banner.innerHTML = '<strong>Read-only demo · Sample data</strong><span>Changes and external actions are disabled.</span><a href="/demo/">Switch portal / credentials</a><a href="/" data-demo-exit>Exit demo</a>';
+    if (studentTour) banner.querySelector('a[href="/demo/"]').remove();
     document.body.append(banner);
   });
 })();

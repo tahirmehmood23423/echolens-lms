@@ -42,7 +42,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v1442">
+<link rel="stylesheet" href="/css/styles.css?v1443">
 <style>body{background:#FBFAF7}</style>
 <link rel="stylesheet" href="/css/workflow.css?v1">
 </head>
@@ -50,7 +50,7 @@
 
 <nav class="open-nav">
   <a href="/"><img src="/img/logo.png" alt="EchoLens"></a>
-  <a class="nlink active" data-tab="compare" href="#compare" onclick="openTab('compare');return false">Free vs Paid</a>
+  <a class="nlink active" data-tab="home" href="#home">Home</a>
   <a class="nlink" data-tab="courses" data-catnav="live" onclick="navCourses('live')">Live Tech Courses</a>
   <a class="nlink" data-tab="courses" data-catnav="free" onclick="navCourses('free')">Free Certified Courses</a>
   <a class="nlink" data-tab="events" onclick="openTab('events')">Events</a>
@@ -65,106 +65,41 @@
 
 <div class="open-wrap" id="appWrap">
 
-  <!-- ========================= FREE vs PAID COMPARISON ========================= -->
-  <!-- Landing view of /open: before a visitor filters the catalogue they need to
-       know what the two course types actually differ on. Both cards deep-link
-       into the same catalogue tab (#free / #paid), so Back returns here. -->
-  <section id="tab-compare" style="display:none">
-    <div class="cmp-head">
-      <span class="cmp-eyebrow">Two ways to learn</span>
-      <h1>Choose the learning experience for you</h1>
-      <p>Start for free and learn at your own pace, or unlock the full experience with live classes, expert guidance and a personalised portal.</p>
-      <div class="cmp-toggle" role="tablist" aria-label="Course type">
-        <button type="button" role="tab" id="cmpTabFree" aria-controls="cmpCardFree" aria-selected="true" class="active" onclick="setCompareFocus('free')">
-          <b>Free courses</b><span>Learn the basics</span>
-        </button>
-        <button type="button" role="tab" id="cmpTabPaid" aria-controls="cmpCardPaid" aria-selected="false" onclick="setCompareFocus('paid')">
-          <b>Paid courses</b><span>Go further, faster</span>
-        </button>
+  <section id="tab-home" class="open-home" style="display:none">
+    <header class="open-home-hero">
+      <div><span class="cmp-eyebrow">EchoLens learning hub</span><h1>Your next step starts here</h1><p>Explore courses, practice your skills and find your learning community.</p></div>
+      <div id="homePreview"></div>
+    </header>
+    <div class="stat-strip" id="homeStats"></div>
+    <section class="home-learning" aria-labelledby="home-learning-title">
+      <div class="home-section-head"><div><h2 id="home-learning-title">Free or paid? Choose your way to learn</h2><p>Both include a learner account and certificates when you meet the course requirements.</p></div><a href="#courses">All courses &rarr;</a></div>
+      <div class="home-learning-grid">
+        <article class="home-learning-card"><div class="home-card-title"><h3>Free courses</h3><span class="cmp-badge free">100% free</span></div><p>Flexible, self-paced learning.</p><ul><li>Recorded lessons and course resources</li><li>Assignments, projects and assessment feedback</li><li>Your courses, progress, submissions and support</li></ul><a class="btn btn-teal btn-block" href="#free">Explore free courses &rarr;</a></article>
+        <article class="home-learning-card paid"><div class="home-card-title"><h3>Paid courses</h3><span class="cmp-badge paid">Instructor-led</span></div><p>Structured learning with your cohort.</p><ul><li>Scheduled live classes and instructor guidance</li><li>Course assignments and personalised feedback</li><li>Cohort sessions, attendance and discussion tools</li></ul><a class="btn btn-primary btn-block" href="#paid">View paid courses &rarr;</a></article>
       </div>
-    </div>
-
-    <div class="cmp-grid" id="cmpGrid">
-      <article class="cmp-card" id="cmpCardFree" role="tabpanel" aria-labelledby="cmpTabFree" tabindex="-1">
-        <header class="cmp-card-head">
-          <div class="cmp-ic free"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v18H6.5A2.5 2.5 0 0 1 4 18.5v-13zM20 5.5A2.5 2.5 0 0 0 17.5 3H13v18h4.5a2.5 2.5 0 0 0 2.5-2.5v-13z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
-          <div class="grow">
-            <h2>Free courses</h2>
-            <p>Learn fundamental skills at your own pace</p>
-          </div>
-          <span class="cmp-badge free">100% free</span>
-        </header>
-        <ul class="cmp-list">
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M10 8.5 16 12l-6 3.5v-7z" fill="currentColor"/></svg></span><div><b>Recorded lectures</b><span>Self-paced video content you can watch inline</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13 3v5h5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><div><b>Assignments & projects</b><span>Practise with the tasks listed in your course curriculum</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.5 2.5M16.5 16.5 19 19M19 5l-2.5 2.5M7.5 16.5 5 19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.7"/></svg></span><div><b>Assessment feedback</b><span>AI grading where enabled; project evidence is reviewed by staff</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><div><b>Learn anytime</b><span>No fixed schedule; up to two free courses at once</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="5.5" stroke="currentColor" stroke-width="1.7"/><path d="M8.5 13.5 7 22l5-2.5L17 22l-1.5-8.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><div><b>Verified certificate</b><span>Earn a verified certificate after meeting course requirements</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 9.5h17M4.5 20 19.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><div><b>Your learner space</b><span>Your free account includes courses, progress, submissions and support</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-        </ul>
-        <div class="cmp-cta">
-          <a class="btn btn-ghost btn-block" href="#free" onclick="navCourses('free');return false">Explore free courses</a>
-          <p class="cmp-foot">No payment needed - a free learner account is enough.</p>
-        </div>
-      </article>
-
-      <article class="cmp-card paid" id="cmpCardPaid" role="tabpanel" aria-labelledby="cmpTabPaid" tabindex="-1">
-        <span class="cmp-flag">Learn with instructor support</span>
-        <header class="cmp-card-head">
-          <div class="cmp-ic paid"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18h16l1-10-5 3.5L12 5l-4 6.5L3 8l1 10z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
-          <div class="grow">
-            <h2>Paid courses</h2>
-            <p>Structured learning with expert support</p>
-          </div>
-          <span class="cmp-badge paid">Recommended</span>
-        </header>
-        <ul class="cmp-list">
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="12" height="12" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="m15 11 6-3.5v9L15 13v-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><div><b>Live classes</b><span>Instructor-led cohort sessions with attendance</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Multiple practice problems</b><span>Real-world projects, quests and a final capstone</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.7"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="m17 9 1.6 1.6L22 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Guidance at every step</b><span>Course chat, teacher support and announcements</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5.5c0 4.4-2.9 8-7 9.5-4.1-1.5-7-5.1-7-9.5V6l7-3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Personalised feedback</b><span>Assignments reviewed and graded by instructors</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Compiler telemetry</b><span>Work time, runs and attempts in your activity report</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 9.5h17M9 9.5V19" stroke="currentColor" stroke-width="1.7"/></svg></span><div><b>Full portal access</b><span>Dashboard, batches, gems, deadlines and leaderboard</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-          <li><span class="cmp-row-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="5.5" stroke="currentColor" stroke-width="1.7"/><path d="M8.5 13.5 7 22l5-2.5L17 22l-1.5-8.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><div><b>Verified certificate</b><span>Issued after meeting your course?s completion requirements</span></div><i class="cmp-yes" aria-label="Included"></i></li>
-        </ul>
-        <div class="cmp-cta">
-          <a class="btn btn-primary btn-block" href="#paid" onclick="navCourses('paid');return false">View paid courses &rarr;</a>
-          <p class="cmp-foot">Admissions confirms your seat after the fee challan is paid.</p>
-        </div>
-      </article>
-    </div>
-
-    <div class="cmp-banner">
-      <div class="cmp-banner-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="grow">
-        <h3>Go from learner to job-ready</h3>
-        <p>Build real skills with EchoLens, then register with Admissions for a seat in the next cohort.</p>
-      </div>
-      <button class="btn btn-light" onclick="openRegister()">Register for a course &rarr;</button>
-    </div>
-
-    <div class="cmp-trust">
-      <div><span class="cmp-trust-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4 2.5 8.5 12 13l9.5-4.5L12 4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M6.5 11v4.5c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5V11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><div><b>Skills for real opportunities</b><span>Build a portfolio that stands out</span></div></div>
-      <div><span class="cmp-trust-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20V7l8-3 8 3v13" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 20v-5h6v5M9 11h.01M15 11h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><div><b>Learn with instructor guidance</b><span>Practical, up-to-date content</span></div></div>
-      <div><span class="cmp-trust-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.7"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.6M18.5 20c0-2.2-.8-4-2.2-5.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><div><b id="cmpTrustCount">Trusted by our learners</b><span>Across universities and professions</span></div></div>
-    </div>
-
-    <p class="cmp-skip">Not sure yet? <a href="#courses" onclick="navCourses('live');return false">Browse the full catalogue</a> or <a href="#events" onclick="openTab('events');return false">explore events and hackathons</a>.</p>
+      <p class="home-learning-note">Check each course's outline and availability. AI grading is available where enabled; project evidence can require staff review. Admissions confirms paid cohort dates and payment.</p>
+    </section>
+    <section aria-labelledby="home-explore-title"><h2 id="home-explore-title">Explore EchoLens</h2><div class="home-explore-grid">
+      <a href="#events"><b>Events &amp; hackathons</b><span>Discover webinars, challenges and upcoming events.</span></a>
+      <a href="#announcements"><b>Announcements</b><span>Read course releases and the latest academy updates.</span></a>
+      <a href="/compiler"><b>Browser compiler</b><span>Open the coding workspace and practise your skills.</span></a>
+      <a href="#feedback"><b>Feedback &amp; support</b><span>Share your experience or ask for help.</span></a>
+    </div></section>
+    <div id="feedbackTeaser" style="display:none;margin:18px 0"></div>
+    <div id="actionStrip" style="display:flex;gap:10px;flex-wrap:wrap;margin:18px 0"></div>
+    <section aria-labelledby="home-journey-title"><h2 id="home-journey-title">Your learning journey</h2><div class="journey" id="homeJourney"></div></section>
   </section>
 
   <!-- ================== COURSES (the portal's main page) ================== -->
   <section id="tab-courses" style="display:none">
-    <a class="nlink" href="#compare">&larr; Compare free and paid courses</a>
+    <a class="nlink" href="#home">&larr; Home</a>
     <div style="display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:6px">
       <div>
         <h1 style="font-family:var(--font-display);font-size:28px;color:var(--ink)">Course catalogue</h1>
         <p class="s" style="color:var(--muted)" id="cohortLine">Free self-paced learning and instructor-led paid courses. Admissions confirms paid cohort dates.</p>
       </div>
-      <div id="homePreview" style="margin-left:auto"></div>
+
     </div>
-    <div class="stat-strip" id="homeStats" style="margin:12px 0 6px"></div>
-    <div id="feedbackTeaser" style="display:none;margin:0 0 14px"></div>
-    <div id="actionStrip" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px"></div>
     <div class="lc-filterbar">
       <select id="cTier" onchange="syncCourseFilters();drawCourses()"><option value="">All tiers</option><option>Bootcamp</option><option>Short Course</option><option>Specialist Track</option></select>
       <select id="cFree" onchange="syncCourseFilters();drawCourses()"><option value="">All types</option><option value="free">Free only</option><option value="paid">Paid only</option></select>
@@ -176,8 +111,6 @@
     <div class="filt-row" id="cPills"></div>
     <div id="pathBox"></div>
     <div id="courseTable"><div class="empty">Loading catalogue&hellip;</div></div>
-    <h3 style="font-family:var(--font-display);font-size:20px;color:var(--ink);margin:26px 0 12px">Your learning journey</h3>
-    <div class="journey" id="homeJourney"></div>
   </section>
 
   <!-- ============================ COURSE DETAIL ============================ -->
@@ -301,6 +234,6 @@
 <script src="/js/draft-store.js?v1"></script>
 <script src="/js/workflow-ui.js?v2"></script>
 <script src="/js/coderunner.js?v1421"></script>
-<script src="/js/open.js?v1439"></script>
+<script src="/js/open.js?v1440"></script>
 </body>
 </html>

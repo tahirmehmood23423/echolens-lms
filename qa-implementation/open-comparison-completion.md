@@ -1,5 +1,11 @@
 # Open-web comparison and course navigation completion
 
+## Home layout revision
+
+Home is now the default `/open#home` page and replaces the Free vs Paid navigation entry. It combines the course overview, learner progress where available, compact comparison cards, public-feature shortcuts, feedback highlights and learning journey. Comparison cards contain three concise points each, measure below 310px high in the browser checks, and stack on phones. Removed the comparison toggle; both options are immediately available. Old `/open#compare` links resolve to Home. Catalogue filters and registration history remain supported.
+
+The updated browser script passed at 1440px and 390px, checking compact card dimensions, viewport overflow, Home return links, both course journeys, free language refresh, registration drafts and Back/Forward. Updated screenshots show the Home layout.
+
 The existing free/paid comparison design remains the default `/open#compare` view. The catalogue now provides a return link. The mobile comparison toggle supports Arrow Left/Right and Home/End, with the selected control in the tab order.
 
 Fixed catalogue hydration overwriting saved history filters during refresh. A selected free language now survives refresh and course-return navigation. Registration forms retain their draft through Back/Forward and refresh; Escape returns to the underlying course.

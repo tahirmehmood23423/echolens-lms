@@ -128,8 +128,6 @@ let COURSE_NAV_MODE = 'live';
 function navCourses(mode, skipPush) {
   if (!skipPush) pushNav({ v: 'courses', mode });
   COURSE_NAV_MODE = mode;
-  // Coming back to #compare should land on the card the learner just left.
-  if (mode === 'free' || mode === 'paid') COMPARE_FOCUS = mode;
   $('cSearch').value = ''; $('cTier').value = '';
   $('cFree').value = mode === 'free' ? 'free' : mode === 'paid' ? 'paid' : '';
   FREE_SELECTED_FAMILY = null;
@@ -164,13 +162,13 @@ function openState(hash = location.hash) {
   if (parts[0] === 'course' && parts[1]) {
     let key; try { key = decodeURIComponent(parts[1]); } catch { return null; }
     state = {v: parts[4] === 'practice' ? 'solve' : parts[2] === 'lesson' ? 'video' : 'course', key, level:Number(parts[3]), pid:Number(parts[5])};
-  } else if (['courses','free','paid','home','quests'].includes(parts[0])) {
+  } else if (['courses','free','paid','quests'].includes(parts[0])) {
     state = {v:'courses', mode:['free','paid'].includes(parts[0]) ? parts[0] : 'live'};
     if (['search','tier','free','family'].some(k => params.has(k))) state.filters = {search:params.get('search') || '',tier:params.get('tier') || '',free:params.has('free') ? params.get('free') : (state.mode === 'live' ? '' : state.mode),family:params.get('family') || null};
-  } else if (['compare','events','profile','announcements','feedback'].includes(parts[0])) state = {v:parts[0]};
+  } else if (['home','compare','events','profile','announcements','feedback'].includes(parts[0])) state = {v:parts[0] === 'compare' ? 'home' : parts[0]};
   else if (parts[0] === 'register' || parts[0].startsWith('register-')) state = {v:'courses',mode:'paid',dialog:'register',code:parts[0].slice(9)};
   else if (parts[0] === 'signup') state = {v:'courses',mode:'free',dialog:'signup'};
-  else if (!route) state = {v:'compare'};
+  else if (!route) state = {v:'home'};
   if (state && ['register','signup'].includes(params.get('dialog'))) { state.dialog = params.get('dialog'); state.code = params.get('code') || ''; }
   return state || null;
 }
@@ -205,7 +203,7 @@ async function restoreNav(state, revision = NAV_REVISION) {
   if (!state?.v) return;
   if (!window.MODAL_LOCK) closeModal(true);
   if (state.v === 'ticket') { openTab('feedback'); await openSupportTicket(state.ticket, state.token); return; }
-  if (['compare','events','announcements','feedback'].includes(state.v)) openTab(state.v);
+  if (['home','events','announcements','feedback'].includes(state.v)) openTab(state.v);
   else if (state.v === 'profile') openProfileTab();
   else if (state.v === 'courses') {
     navCourses(state.mode || 'live', true);
@@ -272,7 +270,7 @@ function backToCatalogue() {
   loadEvents();
   if (ME) loadCerts();
   await catReady;
-  const initialState = history.state?.v && openRoute(history.state) === (location.hash || '#compare') ? history.state : (openState() || {v:'compare'});
+  const initialState = history.state?.v && openRoute(history.state) === (location.hash || '#home') ? history.state : (openState() || {v:'home'});
   history.replaceState(initialState, '', openRoute(initialState));
   OPEN_READY = true;
   await restoreOpenHistory(initialState);
@@ -416,14 +414,15 @@ function requireLearnerProfile() {
 
 /* -------------------------------- tabs -------------------------------- */
 function openTab(tab) {
+  if (tab === 'compare') tab = 'home';
   EL.drafts.flushAll();
-  if (['compare','courses','events','profile','announcements','feedback'].includes(tab)) OPEN_COURSE_REQUEST++;
-  if (['compare','events','profile','announcements','feedback'].includes(tab)) pushNav({v:tab});
-  ['compare', 'courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile', 'feedback'].forEach((t) => {
+  if (['home','courses','events','profile','announcements','feedback'].includes(tab)) OPEN_COURSE_REQUEST++;
+  if (['home','events','profile','announcements','feedback'].includes(tab)) pushNav({v:tab});
+  ['home', 'courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile', 'feedback'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
   if (tab === 'feedback') loadFeedback();
-  if (tab === 'compare') setCompareFocus(COMPARE_FOCUS, true);
+
   // 'courses'/'course'/'solve' all map to the same two nav links (Live Tech
   // Courses vs Free Certified Courses) - which of those two is "active"
   // depends on COURSE_NAV_MODE, not on the tab name, since both links open
@@ -446,42 +445,6 @@ function backToCourse() {
 }
 
 /* ---------------------------- free vs paid ---------------------------- */
-// The comparison landing (#compare). The toggle only decides which card is
-// emphasised (and, on phones, which one is shown) - it never navigates, so
-// Back from the catalogue always returns to this view, not to a half state.
-let COMPARE_FOCUS = 'free';
-function setCompareFocus(kind, silent) {
-  const grid = $('cmpGrid'); if (!grid) return;
-  COMPARE_FOCUS = kind === 'paid' ? 'paid' : 'free';
-  grid.classList.toggle('focus-free', COMPARE_FOCUS === 'free');
-  grid.classList.toggle('focus-paid', COMPARE_FOCUS === 'paid');
-  [['cmpTabFree', 'free'], ['cmpTabPaid', 'paid']].forEach(([id, k]) => {
-    const btn = $(id); if (!btn) return;
-    btn.classList.toggle('active', k === COMPARE_FOCUS);
-    btn.setAttribute('aria-selected', String(k === COMPARE_FOCUS));
-    btn.tabIndex = k === COMPARE_FOCUS ? 0 : -1;
-  });
-  // Only scroll on a real click, and only when the cards stack (phones),
-  // where switching otherwise looks like nothing happened.
-  if (!silent && window.matchMedia('(max-width: 900px)').matches) {
-    $(COMPARE_FOCUS === 'paid' ? 'cmpCardPaid' : 'cmpCardFree')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-window.setCompareFocus = setCompareFocus;
-document.querySelector('.cmp-toggle')?.addEventListener('keydown', e => {
-  if (!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
-  e.preventDefault();
-  const kind = e.key === 'Home' ? 'free' : e.key === 'End' ? 'paid' : COMPARE_FOCUS === 'free' ? 'paid' : 'free';
-  setCompareFocus(kind, true);
-  $(kind === 'free' ? 'cmpTabFree' : 'cmpTabPaid').focus();
-});
-// Real catalogue numbers, so the landing page never over-promises.
-function renderCompareCounts(counts) {
-  const el = $('cmpTrustCount'); if (!el) return;
-  const students = Number(counts?.open_web_enrollments || 0);
-  if (students > 0) el.textContent = 'Trusted by ' + students.toLocaleString() + '+ learners';
-}
-
 /* -------------------------------- home -------------------------------- */
 async function loadHomeStats() {
   renderHomePreview();
@@ -777,7 +740,7 @@ async function loadCatalogue() {
     const available = CATALOGUE.filter((course) => course.available !== false);
     const comingSoon = CATALOGUE.filter((course) => course.coming_soon);
     const totalOpenEnrollments = Number(d.counts?.open_web_enrollments || 0);
-    renderCompareCounts(d.counts);
+
     $('cohortLine').textContent = available.length + ' available courses | ' + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses | ' + totalOpenEnrollments.toLocaleString() + ' students enrolled in open-web courses.' + (comingSoon.length ? ' ' + comingSoon.length + ' new certified courses are open for syllabus preview and coming soon.' : '') + ' Paid cohorts are arranged by Admissions.';
     $('actionStrip').innerHTML = `
       <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;

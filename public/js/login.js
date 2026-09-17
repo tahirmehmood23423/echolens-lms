@@ -16,14 +16,14 @@ function msg(text, ok) {
 // Already signed in? Go straight to the dashboard.
 // Already signed in? Route by role: open (free) accounts live on the open
 // portal, everyone else on the LMS portal.
-(async () => { try { const me = await api('/api/auth/me'); location.href = destination(me.role); } catch {} })();
+(async () => { try { const me = await api('/api/auth/me'); location.replace(destination(me.role)); } catch {} })();
 
 $('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target; const btn = $('submit'); btn.disabled = true; msg('');
   try {
     const out = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ login: f.login.value.trim(), password: f.password.value }) });
-    location.href = destination(out.role);
+    location.replace(destination(out.role));
   } catch (err) { msg(err.message); btn.disabled = false; }
 });
 

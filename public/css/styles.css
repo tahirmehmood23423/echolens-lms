@@ -1864,3 +1864,115 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
   .cert-done-actions { flex-direction: column; }
   .cert-done-actions .btn { width: 100%; }
 }
+
+/* ============================================================
+   Free vs Paid comparison (/open#compare) - the landing view of
+   the open web. The toggle above the cards only *focuses* a card
+   (dims the other on desktop, shows one at a time on mobile); it
+   does not navigate, so Back/Forward stay tied to real tabs.
+   ============================================================ */
+.cmp-head { text-align: center; max-width: 720px; margin: 8px auto 26px; }
+.cmp-eyebrow { display: inline-block; background: var(--violet-soft); color: var(--primary-deep);
+  font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  padding: 6px 16px; border-radius: 999px; }
+.cmp-head h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 14px 0 10px; }
+.cmp-head > p { color: var(--muted); font-size: 15px; max-width: 58ch; margin: 0 auto; }
+.cmp-toggle { display: inline-flex; gap: 4px; margin-top: 22px; padding: 5px; background: var(--card);
+  border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); flex-wrap: wrap;
+  justify-content: center; }
+.cmp-toggle button { display: block; min-width: 190px; padding: 10px 22px; border: 0; border-radius: 12px;
+  background: transparent; font: inherit; color: var(--ink); cursor: pointer; text-align: center;
+  transition: background .18s, color .18s, box-shadow .18s; }
+.cmp-toggle button b { display: block; font-size: 15px; font-weight: 650; }
+.cmp-toggle button span { display: block; font-size: 12.5px; color: var(--muted); }
+.cmp-toggle button:hover { background: var(--bg); }
+.cmp-toggle button.active { background: var(--primary-grad); color: #fff; box-shadow: 0 8px 18px -8px rgba(var(--primary-shadow), .8); }
+.cmp-toggle button.active span { color: rgba(255, 255, 255, .85); }
+.cmp-toggle button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.cmp-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: start; }
+.cmp-card { position: relative; background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow-card); display: flex; flex-direction: column;
+  transition: box-shadow .2s, transform .2s, opacity .2s; }
+.cmp-card.paid { border: 2px solid transparent;
+  background: linear-gradient(var(--card), var(--card)) padding-box, var(--gem-grad) border-box;
+  box-shadow: var(--shadow-md); }
+/* Desktop shows both cards in full - the toggle only lifts the chosen one,
+   because dimming the other is exactly the column a visitor wants to read. */
+.cmp-grid.focus-free .cmp-card:not(.paid), .cmp-grid.focus-paid .cmp-card.paid {
+  box-shadow: var(--shadow-card-hover); transform: translateY(-2px); }
+.cmp-card:hover { box-shadow: var(--shadow-card-hover); }
+.cmp-card:focus { outline: none; }
+.cmp-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+/* restoreNav() focuses the view heading for screen readers - no visible ring. */
+.cmp-head h1:focus, .cmp-head h1:focus-visible { outline: none; }
+.cmp-flag { position: absolute; top: -12px; right: 18px; background: var(--ink); color: #fff;
+  font-size: 11.5px; font-weight: 600; padding: 5px 12px; border-radius: 999px; box-shadow: var(--shadow-sm); }
+.cmp-card-head { display: flex; gap: 14px; align-items: center; padding: 22px 22px 18px;
+  border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.cmp-card-head h2 { font-size: 21px; margin-bottom: 2px; }
+.cmp-card-head p { font-size: 13px; color: var(--muted); }
+.cmp-ic { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; flex: none; }
+.cmp-ic svg { width: 24px; height: 24px; }
+.cmp-ic.free { background: #E3F7F2; color: var(--teal-deep); }
+.cmp-ic.paid { background: var(--primary-grad); color: #fff; }
+.cmp-badge { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+.cmp-badge.free { background: #E3F7F2; color: var(--teal-deep); }
+.cmp-badge.paid { background: var(--primary-grad); color: #fff; }
+
+.cmp-list { list-style: none; padding: 6px 22px; margin: 0; flex: 1; }
+.cmp-list li { display: flex; gap: 13px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.cmp-list li:last-child { border-bottom: 0; }
+.cmp-list li > div { flex: 1; min-width: 0; }
+.cmp-list b { display: block; font-size: 14px; font-weight: 600; color: var(--ink); }
+.cmp-list span:not(.cmp-row-ic) { display: block; font-size: 12.5px; color: var(--muted); }
+.cmp-row-ic { width: 36px; height: 36px; border-radius: 11px; background: var(--bg); color: var(--navy);
+  display: grid; place-items: center; flex: none; }
+.cmp-row-ic svg { width: 19px; height: 19px; }
+.cmp-list li.off { opacity: .72; }
+.cmp-list li.off .cmp-row-ic { color: var(--muted-2); }
+.cmp-yes, .cmp-no { width: 22px; height: 22px; border-radius: 50%; flex: none; position: relative; }
+.cmp-yes { background: #E3F7F2; }
+.cmp-no { background: #F1F1F4; }
+.cmp-yes::after, .cmp-no::after { content: ''; position: absolute; inset: 0; background-repeat: no-repeat;
+  background-position: center; background-size: 12px 12px; }
+.cmp-yes::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230A9384' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 13 4 4L19 7'/%3E%3C/svg%3E"); }
+.cmp-no::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2398A2B8' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E"); }
+
+.cmp-cta { padding: 16px 22px 22px; }
+.cmp-foot { margin-top: 10px; font-size: 12px; color: var(--muted-2); text-align: center; }
+
+.cmp-banner { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 24px;
+  padding: 22px 24px; border-radius: var(--radius); color: #fff;
+  background: linear-gradient(120deg, var(--ink) 0%, var(--ink-2) 45%, var(--primary-deep) 100%);
+  box-shadow: var(--shadow-md); }
+.cmp-banner h3 { color: #fff; font-size: 20px; margin-bottom: 4px; }
+.cmp-banner p { font-size: 13.5px; color: rgba(255, 255, 255, .8); }
+.cmp-banner-ic { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; flex: none;
+  background: rgba(255, 255, 255, .14); color: #fff; }
+.cmp-banner-ic svg { width: 22px; height: 22px; }
+.cmp-banner .btn-light { background: #fff; color: var(--ink); border: 0; font-weight: 600; }
+.cmp-banner .btn-light:hover { background: #EEF0FE; }
+
+.cmp-trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 22px; }
+.cmp-trust > div { display: flex; gap: 12px; align-items: center; }
+.cmp-trust > div + div { border-left: 1px solid var(--line); padding-left: 14px; }
+.cmp-trust b { display: block; font-size: 13.5px; color: var(--ink); }
+.cmp-trust span:not(.cmp-trust-ic) { display: block; font-size: 12.5px; color: var(--muted); }
+.cmp-trust-ic { width: 38px; height: 38px; border-radius: 12px; background: var(--violet-soft);
+  color: var(--primary-deep); display: grid; place-items: center; flex: none; }
+.cmp-trust-ic svg { width: 20px; height: 20px; }
+.cmp-skip { margin: 18px 0 4px; text-align: center; font-size: 13px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .cmp-grid { grid-template-columns: minmax(0, 1fr); }
+  .cmp-trust { grid-template-columns: minmax(0, 1fr); }
+  .cmp-trust > div + div { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 14px; }
+  /* One card at a time on phones - the toggle above becomes the real switch. */
+  .cmp-grid.focus-free .cmp-card.paid, .cmp-grid.focus-paid .cmp-card:not(.paid) { display: none; }
+  .cmp-grid .cmp-card { transform: none; }
+  .cmp-toggle button { min-width: 0; flex: 1; padding: 10px 14px; }
+  .cmp-toggle { display: flex; width: 100%; }
+}

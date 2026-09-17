@@ -48,7 +48,13 @@ function openModal(title, bodyHTML) {
   modalMsg('');
   $('modal').classList.add('open'); EL.dialog.open($('modal'));
 }
-function closeModal() { if (window.MODAL_LOCK) return; $('modal').classList.remove('open'); EL.dialog.close(); }
+function closeModal(restoring = false) {
+  if (window.MODAL_LOCK) return;
+  $('modal').classList.remove('open'); EL.dialog.close();
+  if (!restoring && history.state?.dialog) {
+    if (history.state.dialogParent) history.back(); else clearDialogRoute();
+  }
+}
 function modalMsg(text, ok) {
   const el = $('modalMsg'); el.setAttribute('role', 'alert');
   if (!text) { el.className = 'form-msg'; el.textContent = ''; return; }
@@ -120,62 +126,133 @@ let CUR_EVENT = null;
 // a free course, however you got there, should highlight the free nav item).
 let COURSE_NAV_MODE = 'live';
 function navCourses(mode, skipPush) {
-  COURSE_NAV_MODE = mode;
-  openTab('courses');
-  setCoursePill(mode === 'free' ? 'free' : 'all');
   if (!skipPush) pushNav({ v: 'courses', mode });
+  COURSE_NAV_MODE = mode;
+  // Coming back to #compare should land on the card the learner just left.
+  if (mode === 'free' || mode === 'paid') COMPARE_FOCUS = mode;
+  $('cSearch').value = ''; $('cTier').value = '';
+  $('cFree').value = mode === 'free' ? 'free' : mode === 'paid' ? 'paid' : '';
+  FREE_SELECTED_FAMILY = null;
+  openTab('courses'); drawCourses();
 }
 
-/* --------------------------- back/forward history --------------------------- */
-// v26: the course browsing flow (courses list -> course curriculum -> a
-// level's video or quest) previously had zero integration with the browser's
-// own Back/Forward buttons - every "back" affordance jumped straight to a
-// fixed page instead of retracing the learner's actual path. pushNav() logs
-// each step as real history.pushState state (no URL change - these are all
-// still /open, just different in-page views), and the popstate listener
-// below replays that exact state on Back/Forward. RESTORING guards against
-// re-pushing a duplicate entry while a popstate-triggered navigation is
-// itself calling the same functions that normally push.
+/* Routes keep filters in shareable URLs and scroll/return context in history. */
 let RESTORING_NAV = false;
+let OPEN_COURSE_REQUEST = 0;
+let NAV_REVISION = 0;
+let OPEN_READY = false;
 function openRoute(state) {
   if (state.v === 'ticket') return '#ticket=' + encodeURIComponent(state.ticket) + '&token=' + encodeURIComponent(state.token || '');
-  if (state.v === 'courses') return state.mode === 'free' ? '#free' : '#courses';
-  if (['course','video','solve'].includes(state.v)) return '#course/' + encodeURIComponent(state.key) + (state.v !== 'course' ? '/lesson/' + state.level : '') + (state.v === 'solve' ? '/practice/' + state.pid : '');
-  return '#' + state.v;
+  let route = state.v === 'courses' ? (['free','paid'].includes(state.mode) ? state.mode : 'courses') : state.v;
+  if (['course','video','solve'].includes(state.v)) route = 'course/' + encodeURIComponent(state.key) + (state.v !== 'course' ? '/lesson/' + state.level : '') + (state.v === 'solve' ? '/practice/' + state.pid : '');
+  const params = new URLSearchParams();
+  if (state.v === 'courses' && state.filters) {
+    for (const [key,value] of Object.entries(state.filters)) if (value || key === 'free') params.set(key, value || '');
+  }
+  if (state.dialog) { params.set('dialog', state.dialog); if (state.code) params.set('code', state.code); }
+  return '#' + route + (params.size ? '?' + params : '');
 }
-function openState() {
-  if (location.hash.startsWith('#ticket=')) {
-    const params = new URLSearchParams(location.hash.slice(1));
+function openState(hash = location.hash) {
+  if (hash.startsWith('#ticket=')) {
+    const params = new URLSearchParams(hash.slice(1));
     const ticket = params.get('ticket'), token = params.get('token');
     if (ticket && token) return { v: 'ticket', ticket, token };
   }
-  const parts = location.hash.slice(1).split('/');
-  if (parts[0] === 'course' && parts[1]) { let key; try { key = decodeURIComponent(parts[1]); } catch { return null; } return {v: parts[4] === 'practice' ? 'solve' : parts[2] === 'lesson' ? 'video' : 'course', key, level:Number(parts[3]), pid:Number(parts[5])}; }
-  if (['courses','free'].includes(parts[0])) return {v:'courses',mode:parts[0] === 'free' ? 'free' : 'live'};
-  if (['events','profile','announcements','feedback'].includes(parts[0])) return {v:parts[0]};
-  return null;
+  const [route, query = ''] = hash.slice(1).split('?');
+  const parts = route.split('/'), params = new URLSearchParams(query);
+  let state;
+  if (parts[0] === 'course' && parts[1]) {
+    let key; try { key = decodeURIComponent(parts[1]); } catch { return null; }
+    state = {v: parts[4] === 'practice' ? 'solve' : parts[2] === 'lesson' ? 'video' : 'course', key, level:Number(parts[3]), pid:Number(parts[5])};
+  } else if (['courses','free','paid','home','quests'].includes(parts[0])) {
+    state = {v:'courses', mode:['free','paid'].includes(parts[0]) ? parts[0] : 'live'};
+    if (['search','tier','free','family'].some(k => params.has(k))) state.filters = {search:params.get('search') || '',tier:params.get('tier') || '',free:params.has('free') ? params.get('free') : (state.mode === 'live' ? '' : state.mode),family:params.get('family') || null};
+  } else if (['compare','events','profile','announcements','feedback'].includes(parts[0])) state = {v:parts[0]};
+  else if (parts[0] === 'register' || parts[0].startsWith('register-')) state = {v:'courses',mode:'paid',dialog:'register',code:parts[0].slice(9)};
+  else if (parts[0] === 'signup') state = {v:'courses',mode:'free',dialog:'signup'};
+  else if (!route) state = {v:'compare'};
+  if (state && ['register','signup'].includes(params.get('dialog'))) { state.dialog = params.get('dialog'); state.code = params.get('code') || ''; }
+  return state || null;
 }
-function pushNav(state) { if (!RESTORING_NAV && location.hash !== openRoute(state)) history.pushState(state, '', openRoute(state)); }
-let OPEN_COURSE_REQUEST = 0;
+function saveOpenScroll() {
+  if (history.state?.v && !RESTORING_NAV) history.replaceState({...history.state, scrollY:window.scrollY}, '', location.href);
+}
+function pushNav(state) {
+  if (RESTORING_NAV || (history.state?.v && openRoute(history.state) === openRoute(state))) return;
+  saveOpenScroll(); NAV_REVISION++;
+  history.pushState({...state, from:history.state?.v ? openRoute(history.state) : null}, '', openRoute(state));
+  updateOpenLoginLink();
+}
+function openLoginURL() {
+  const state = {...(history.state?.v ? history.state : openState())}; delete state.dialog; delete state.code;
+  return '/login?returnTo=' + encodeURIComponent(location.pathname + location.search + openRoute(state));
+}
+function updateOpenLoginLink() { document.querySelectorAll('[data-open-login]').forEach(a => { a.href = openLoginURL(); }); }
+function pushDialog(dialog, code) {
+  const state = {...(history.state?.v ? history.state : openState())};
+  pushNav({...state, dialog, code:code || '', dialogParent:true});
+}
+function clearDialogRoute() {
+  if (!history.state?.dialog) return;
+  const state = {...history.state}; delete state.dialog; delete state.code; delete state.dialogParent;
+  history.replaceState(state, '', openRoute(state)); updateOpenLoginLink();
+}
 async function ensureCourseLoaded(key) {
-  if (CUR && CUR.track && CUR.track.key === key) return;
+  if (CUR?.track?.key === key) return;
   await openCourse(key, true);
 }
-async function restoreNav(state) {
-  if (!state || !state.v) return;
+async function restoreNav(state, revision = NAV_REVISION) {
+  if (!state?.v) return;
+  if (!window.MODAL_LOCK) closeModal(true);
   if (state.v === 'ticket') { openTab('feedback'); await openSupportTicket(state.ticket, state.token); return; }
-  if (['events','announcements','feedback'].includes(state.v)) { openTab(state.v); return; }
-  if (state.v === 'profile') { openProfileTab(); return; }
-  if (state.v === 'courses') { navCourses(state.mode || COURSE_NAV_MODE, true);if(state.filters){$('cSearch').value=state.filters.search||'';$('cTier').value=state.filters.tier||'';$('cFree').value=state.filters.free||'';FREE_SELECTED_FAMILY=state.filters.family||null;drawCourses();}return; }
-  if (state.v === 'course') { await ensureCourseLoaded(state.key); openTab('course'); drawCourse(); return; }
-  if (state.v === 'video') { await ensureCourseLoaded(state.key); openSolveVideo(state.level, true); return; }
-  if (state.v === 'solve') { await ensureCourseLoaded(state.key); openSolve(state.level, state.pid, true); return; }
+  if (['compare','events','announcements','feedback'].includes(state.v)) openTab(state.v);
+  else if (state.v === 'profile') openProfileTab();
+  else if (state.v === 'courses') {
+    navCourses(state.mode || 'live', true);
+    if (state.filters) { $('cSearch').value=state.filters.search||''; $('cTier').value=state.filters.tier||''; $('cFree').value=state.filters.free||''; FREE_SELECTED_FAMILY=state.filters.family||null; }
+    COURSE_LIMIT = state.limit || 12; drawCourses();
+  } else if (['course','video','solve'].includes(state.v)) {
+    await ensureCourseLoaded(state.key);
+    if (revision !== NAV_REVISION || CUR?.track?.key !== state.key) return;
+    if (state.v === 'course') { COURSE_NAV_MODE = CUR.track.free ? 'free' : 'paid'; openTab('course'); drawCourse(); }
+    if (state.v === 'video') openSolveVideo(state.level, true);
+    if (state.v === 'solve') openSolve(state.level, state.pid, true);
+  }
+  if (revision !== NAV_REVISION) return;
+  window.scrollTo({top:state.scrollY || 0, behavior:'instant'});
+  if (state.dialog === 'register') openRegister(state.code);
+  if (state.dialog === 'signup') { if (!ME) gate(); else clearDialogRoute(); }
+  if (!state.dialog && !window.MODAL_LOCK) {
+    const heading = document.querySelector('#tab-' + (['video','solve'].includes(state.v) ? 'solve' : state.v) + ' h1');
+    if (heading) { heading.tabIndex = -1; heading.focus({preventScroll:true}); }
+  }
+  updateOpenLoginLink();
 }
-window.addEventListener('popstate', (e) => {
-  RESTORING_NAV = true;
+async function restoreOpenHistory(state) {
+  const revision = ++NAV_REVISION; OPEN_COURSE_REQUEST++; RESTORING_NAV = true;
   EL.drafts.flushAll();
-  Promise.resolve(restoreNav(e.state || openState())).catch(e => EL.error($('courseHead'),e,()=>restoreNav(openState()))).finally(() => { RESTORING_NAV = false; });
+  try { await restoreNav(state, revision); }
+  catch (error) { if (revision === NAV_REVISION) { toast(EL.errorMessage(error), true); EL.error($('courseHead'),error,()=>restoreOpenHistory(state)); } }
+  finally { if (revision === NAV_REVISION) RESTORING_NAV = false; }
+}
+function navigateOpen(state) { RESTORING_NAV = false; pushNav(state); return restoreOpenHistory(history.state || state); }
+window.addEventListener('popstate', e => { if (OPEN_READY) restoreOpenHistory(e.state?.v ? e.state : openState()); });
+window.addEventListener('pagehide', saveOpenScroll);
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+// Native hrefs also work when copied, opened in a new tab, or used without JS.
+document.addEventListener('click', e => {
+  const link = e.target.closest('a[href]');
+  if (!OPEN_READY || !link || link.hasAttribute('onclick') || e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || link.target || link.hasAttribute('download')) return;
+  const url = new URL(link.href, location.href);
+  if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search || !url.hash) return;
+  const state = openState(url.hash); if (!state) return;
+  e.preventDefault(); navigateOpen(state);
 });
+function backToCatalogue() {
+  const state = history.state?.catalogue || {v:'courses',mode:CUR?.track?.free ? 'free' : 'paid'};
+  if (history.state?.from === openRoute(state)) history.back();
+  else navigateOpen(state);
+}
 
 /* -------------------------------- boot -------------------------------- */
 (async () => {
@@ -194,23 +271,11 @@ window.addEventListener('popstate', (e) => {
   // public endpoint when signed out); joining them is what needs an account.
   loadEvents();
   if (ME) loadCerts();
-  // Deep links: /open#courses, #events, #announcements, #register, #signup
-  const initialState = history.state?.v ? history.state : openState();
-  if (initialState) { RESTORING_NAV = true; try { await catReady; await restoreNav(initialState); history.replaceState(initialState, '', openRoute(initialState)); } catch(e) { EL.error($('courseHead'),e,()=>restoreNav(initialState)); } finally { RESTORING_NAV = false; } return; }
-  const h = (location.hash || '').replace('#', '');
-  if (['courses', 'events', 'announcements', 'feedback'].includes(h)) openTab(h);
-  else if (h === 'home') openTab('courses'); // the old portal home page merged into Courses
-  else if (h === 'quests') openTab('courses'); // quests now live inside each course
-  else if (h === 'free') navCourses('free'); // browse the free courses openly; signing in is asked only on solving
-  else if (h === 'profile') openProfileTab();
-  // #register opens the in-site enrolment form; #register-<CODE> preselects
-  // that course. Wait for the catalogue so the course dropdown is populated.
-  else if (h === 'register' || h.startsWith('register-')) catReady.then(() => openRegister(h.startsWith('register-') ? h.slice('register-'.length) : undefined));
-  else if (h === 'signup' && !ME) gate();
-  // Baseline history entry so pressing Back from the very first course/video/
-  // solve page a learner opens in this tab has a sane 'courses' state to land
-  // on, instead of an unmanaged null state.
-  history.replaceState({ v: 'courses', mode: COURSE_NAV_MODE }, '');
+  await catReady;
+  const initialState = history.state?.v && openRoute(history.state) === (location.hash || '#compare') ? history.state : (openState() || {v:'compare'});
+  history.replaceState(initialState, '', openRoute(initialState));
+  OPEN_READY = true;
+  await restoreOpenHistory(initialState);
 })();
 
 function drawUserBox() {
@@ -220,7 +285,7 @@ function drawUserBox() {
        <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
        <a class="btn btn-teal btn-sm" href="${ME.role === 'free' ? '/dashboard#view=courses' : '/dashboard'}" style="margin-right:8px">${ME.role === 'free' ? 'My courses' : 'LMS Portal'}</a>
        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`
-    : `<a class="btn btn-ghost btn-sm" href="${esc(EL.loginURL())}" style="margin-right:8px" title="For enrolled students and staff">LMS Portal</a>
+    : `<a class="btn btn-ghost btn-sm" data-open-login href="${esc(openLoginURL())}" style="margin-right:8px" title="For enrolled students and staff">LMS Portal</a>
        <button class="btn btn-ghost btn-sm" style="margin-right:8px" onclick="gate()" title="Free account - for the compiler, free courses, events and hackathons">Sign in free</button>
        <button class="btn btn-primary btn-sm" onclick="openRegister()" title="Join a paid course - no account needed to register">Register for a course</button>`;
 }
@@ -239,16 +304,17 @@ function gateCardHtml(msg) {
   </div>`;
 }
 function gate(afterMsg) {
+  pushDialog('signup');
   // Three different doors, spelled out so nobody knocks on the wrong one:
   // free account (this modal), LMS Portal login (enrolled/staff), and
   // course registration (no account needed at all).
   openModal('Sign in to EchoLens - free', `
     <p class="s" style="color:var(--muted);margin-bottom:14px">${esc(afterMsg || 'A free account is only needed to USE things: the compiler, the free courses, and joining events or hackathons. Browsing courses, outlines and projects needs no account at all.')}</p>
     <button class="btn btn-primary btn-block" style="margin-bottom:10px" onclick="showSignup()">Create a free account with email</button>
-    <a class="btn btn-ghost btn-block" href="${esc(EL.loginURL())}">Already have an account? Sign in</a>
+    <a class="btn btn-ghost btn-block" href="${esc(openLoginURL())}">Already have an account? Sign in</a>
     <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px;font-size:12.5px;color:var(--muted);text-align:left">
-      <div style="margin-bottom:6px"><strong>Enrolled in a paid course, or staff?</strong> Use the same <a href="${esc(EL.loginURL())}">sign-in page</a> with your LMS Portal account.</div>
-      <div><strong>Just want to join a paid course?</strong> <a href="#" onclick="closeModal();openRegister();return false">Register here</a> - no account needed; our Admissions Office emails you the fee challan.</div>
+      <div style="margin-bottom:6px"><strong>Enrolled in a paid course, or staff?</strong> Use the same <a href="${esc(openLoginURL())}">sign-in page</a> with your LMS Portal account.</div>
+      <div><strong>Just want to join a paid course?</strong> <a href="#" onclick="openRegister();return false">Register here</a> - no account needed; our Admissions Office emails you the fee challan.</div>
     </div>
     <div id="signupArea" style="margin-top:14px"></div>`);
 }
@@ -351,12 +417,13 @@ function requireLearnerProfile() {
 /* -------------------------------- tabs -------------------------------- */
 function openTab(tab) {
   EL.drafts.flushAll();
-  if (['courses','events','profile','announcements','feedback'].includes(tab)) OPEN_COURSE_REQUEST++;
-  if (['events','profile','announcements','feedback'].includes(tab)) pushNav({v:tab});
-  ['courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile', 'feedback'].forEach((t) => {
+  if (['compare','courses','events','profile','announcements','feedback'].includes(tab)) OPEN_COURSE_REQUEST++;
+  if (['compare','events','profile','announcements','feedback'].includes(tab)) pushNav({v:tab});
+  ['compare', 'courses', 'course', 'solve', 'events', 'eventDetail', 'announcements', 'profile', 'feedback'].forEach((t) => {
     const el = $('tab-' + t); if (el) el.style.display = t === tab ? '' : 'none';
   });
   if (tab === 'feedback') loadFeedback();
+  if (tab === 'compare') setCompareFocus(COMPARE_FOCUS, true);
   // 'courses'/'course'/'solve' all map to the same two nav links (Live Tech
   // Courses vs Free Certified Courses) - which of those two is "active"
   // depends on COURSE_NAV_MODE, not on the tab name, since both links open
@@ -364,7 +431,8 @@ function openTab(tab) {
   const inCoursesFamily = ['courses', 'course', 'solve'].includes(tab);
   document.querySelectorAll('.open-nav .nlink[data-tab]').forEach((n) => {
     const active = inCoursesFamily
-      ? n.dataset.tab === 'courses' && (n.dataset.catnav || 'live') === COURSE_NAV_MODE
+      // Paid courses are the same nav entry as the live/instructor-led list.
+      ? n.dataset.tab === 'courses' && (n.dataset.catnav || 'live') === (COURSE_NAV_MODE === 'paid' ? 'live' : COURSE_NAV_MODE)
       : n.dataset.tab === tab || (tab === 'eventDetail' && n.dataset.tab === 'events');
     n.classList.toggle('active', active);
   });
@@ -372,9 +440,38 @@ function openTab(tab) {
   window.scrollTo({ top: 0 });
 }
 function backToCourse() {
-  if (CUR) { pushNav({ v: 'course', key: CUR.track.key }); openTab('course'); drawCourse(); }
+  if (CUR) { pushNav({ v: 'course', key: CUR.track.key, catalogue:history.state?.catalogue }); openTab('course'); drawCourse(); }
   else { pushNav({ v: 'courses', mode: COURSE_NAV_MODE }); openTab('courses'); }
   window.scrollTo({ top: COURSE_SCROLL_Y || 0 });
+}
+
+/* ---------------------------- free vs paid ---------------------------- */
+// The comparison landing (#compare). The toggle only decides which card is
+// emphasised (and, on phones, which one is shown) - it never navigates, so
+// Back from the catalogue always returns to this view, not to a half state.
+let COMPARE_FOCUS = 'free';
+function setCompareFocus(kind, silent) {
+  const grid = $('cmpGrid'); if (!grid) return;
+  COMPARE_FOCUS = kind === 'paid' ? 'paid' : 'free';
+  grid.classList.toggle('focus-free', COMPARE_FOCUS === 'free');
+  grid.classList.toggle('focus-paid', COMPARE_FOCUS === 'paid');
+  [['cmpTabFree', 'free'], ['cmpTabPaid', 'paid']].forEach(([id, k]) => {
+    const btn = $(id); if (!btn) return;
+    btn.classList.toggle('active', k === COMPARE_FOCUS);
+    btn.setAttribute('aria-selected', String(k === COMPARE_FOCUS));
+  });
+  // Only scroll on a real click, and only when the cards stack (phones),
+  // where switching otherwise looks like nothing happened.
+  if (!silent && window.matchMedia('(max-width: 900px)').matches) {
+    $(COMPARE_FOCUS === 'paid' ? 'cmpCardPaid' : 'cmpCardFree')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+window.setCompareFocus = setCompareFocus;
+// Real catalogue numbers, so the landing page never over-promises.
+function renderCompareCounts(counts) {
+  const el = $('cmpTrustCount'); if (!el) return;
+  const students = Number(counts?.open_web_enrollments || 0);
+  if (students > 0) el.textContent = 'Trusted by ' + students.toLocaleString() + '+ learners';
 }
 
 /* -------------------------------- home -------------------------------- */
@@ -672,6 +769,7 @@ async function loadCatalogue() {
     const available = CATALOGUE.filter((course) => course.available !== false);
     const comingSoon = CATALOGUE.filter((course) => course.coming_soon);
     const totalOpenEnrollments = Number(d.counts?.open_web_enrollments || 0);
+    renderCompareCounts(d.counts);
     $('cohortLine').textContent = available.length + ' available courses | ' + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses | ' + totalOpenEnrollments.toLocaleString() + ' students enrolled in open-web courses.' + (comingSoon.length ? ' ' + comingSoon.length + ' new certified courses are open for syllabus preview and coming soon.' : '') + ' Paid cohorts are arranged by Admissions.';
     $('actionStrip').innerHTML = `
       <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;
@@ -750,7 +848,11 @@ function freeLanguageButtonsHtml(byFamily) {
       <span class="oc-lang-count">${byFamily[f.key].length} courses</span>
     </button>`).join('')}</div>`;
 }
-function selectFreeFamily(key) { FREE_SELECTED_FAMILY = key; drawCourses(); }
+function selectFreeFamily(key) {
+  const state = history.state?.v === 'courses' ? history.state : {v:'courses', mode:'free'};
+  pushNav({...state, scrollY:0, filters:{...state.filters, free:'free', family:key}});
+  FREE_SELECTED_FAMILY = key; drawCourses();
+}
 window.selectFreeFamily = selectFreeFamily;
 // The six trending-tech tracks used to sit one click inside the "Trending Tech"
 // language button, where nobody found them. They are now a titled section of
@@ -796,7 +898,12 @@ function drawCourses() {
   if (!CATALOGUE.length) return;
   renderCoursePills();
   const tier = $('cTier').value, mode = $('cFree').value, q = $('cSearch').value.trim().toLowerCase();
-  if(openState()?.v==='courses')history.replaceState({v:'courses',mode:COURSE_NAV_MODE,filters:{search:q,tier,free:mode,family:FREE_SELECTED_FAMILY}},'',location.href);
+  const filterKey=[tier,mode,q].join(':');
+  if (filterKey !== COURSE_FILTER_KEY) { if (!RESTORING_NAV) COURSE_LIMIT=12; COURSE_FILTER_KEY=filterKey; }
+  if (!RESTORING_NAV && history.state?.v === 'courses' && !history.state.dialog) {
+    const state = {...history.state, mode:COURSE_NAV_MODE, filters:{search:q,tier,free:mode,family:FREE_SELECTED_FAMILY}, limit:COURSE_LIMIT};
+    history.replaceState(state, '', openRoute(state)); updateOpenLoginLink();
+  }
   const list = CATALOGUE.filter((c) =>
     (!tier || c.tier === tier) &&
     (!mode || (mode === 'free' ? c.price_pkr === 0 : c.price_pkr > 0)) &&
@@ -806,7 +913,6 @@ function drawCourses() {
   // sub-courses per language) rather than a flat grid, whenever every
   // filtered result is free - i.e. the "Free courses" pill, or a search
   // that happens to only match free courses.
-  const filterKey=[tier,mode,q].join(':');if(filterKey!==COURSE_FILTER_KEY){COURSE_LIMIT=12;COURSE_FILTER_KEY=filterKey;}
   const allFree = list.every((c) => c.price_pkr === 0);
   $('courseTable').innerHTML = allFree
     ? drawFreeFamilies(list)
@@ -833,10 +939,11 @@ const AMBASSADOR_REF_CODE = (() => {
 })();
 function openRegister(code, title) {
   if (code === 'PATH') { toast('Bundle enrollment is not available yet. Choose an individual course.', true); return; }
+  pushDialog('register', code);
   const options = CATALOGUE.filter((c) => c.price_pkr > 0).map((c) =>
     `<option value="${esc(c.code)}|${esc(c.title)}"${c.code === code ? ' selected' : ''}>${esc(c.code)} - ${esc(c.title)} (PKR ${c.price_pkr.toLocaleString()})</option>`).join('');
   openModal('Register for a course', `
-    <p class="s" style="color:var(--muted);margin-bottom:12px">Share your details and our Admissions Office will email you the fee challan with payment details and next steps. Registration deadline: 31 July 2026 · Batch starts 1 August 2026.</p>
+    <p class="s" style="color:var(--muted);margin-bottom:12px">Share your details and our Admissions Office will email you the fee challan with payment details and next steps. Admissions will confirm the next available cohort and your payment deadline.</p>
     <form id="regInterest">
       <input name="company" style="display:none" tabindex="-1" autocomplete="off">
       <label class="field"><span>Full name</span><input name="name" required value="${ME ? esc(ME.name) : ''}"></label>
@@ -848,6 +955,9 @@ function openRegister(code, title) {
       <label class="field"><span>Ambassador code (optional) - a valid 4-digit code gets you 10% off</span><input name="ambassador_code" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="e.g. 4821" value="${esc(AMBASSADOR_REF_CODE || '')}"${AMBASSADOR_REF_CODE ? ' readonly' : ''}></label>
       <button class="btn btn-primary btn-block">Submit registration</button>
     </form>`);
+  const registrationForm = $('regInterest');
+  EL.deferForm(registrationForm, ME?.id || 'visitor', 'Register for a course');
+  if (code) { const selected = Array.from(registrationForm.course.options).find(o=>o.value.split('|')[0]===code); if (selected) registrationForm.course.value=selected.value; }
   $('regInterest').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
     const [course_code, course_title] = f.course.value.split('|');
@@ -856,6 +966,8 @@ function openRegister(code, title) {
         method: 'POST',
         body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, course_code, course_title, ambassador_code: f.ambassador_code.value.trim(), company: f.company.value, request_key: f.dataset.requestKey || (f.dataset.requestKey = crypto.randomUUID()) }),
       });
+      try { sessionStorage.removeItem('el:onboarding:' + (ME?.id || 'visitor') + ':regInterest'); } catch {}
+      clearDialogRoute();
       openModal(out.existing ? 'Registration already saved' : 'Registration received', `
         <p>Your registration for <strong>${esc(course_title)}</strong> is saved. Reference: <strong>${esc(out.reference || '')}</strong>.</p>
         <p>Check your receipt for the challan, email status and next step. A saved registration does not mean an email has reached your inbox.</p>
@@ -868,11 +980,18 @@ function openRegister(code, title) {
 /* -------------------- course detail with quest locks -------------------- */
 async function openCourse(key, skipPush) {
   EL.drafts.flushAll();
+  if (!skipPush) {
+    RESTORING_NAV = false;
+    const catalogue = history.state?.v === 'courses' ? {...history.state, scrollY:window.scrollY} : history.state?.catalogue;
+    pushNav({v:'course', key, catalogue});
+  }
   const request = ++OPEN_COURSE_REQUEST;
   openTab('course');
   $('courseHead').innerHTML = '<div class="empty">Loading course&hellip;</div>';
   $('courseLevels').innerHTML = '';
-  const d = await api('/api/public/tracks/' + encodeURIComponent(key));
+  let d;
+  try { d = await api('/api/public/tracks/' + encodeURIComponent(key)); }
+  catch (error) { if (request === OPEN_COURSE_REQUEST) EL.error($('courseHead'),error,()=>openCourse(key,true)); return; }
   let progress = null;
   if (d.track.available !== false && ME && ['free', 'student'].includes(ME.role)) { try { progress = (await api('/api/open/progress?track=' + encodeURIComponent(key))).progress; } catch {} }
   if (request !== OPEN_COURSE_REQUEST) return;
@@ -881,13 +1000,12 @@ async function openCourse(key, skipPush) {
   // read as "Free Certified Courses" and a paid one as "Live Tech Courses" -
   // re-sync now that we know d.track.free (openTab('course') above ran
   // before this was known).
-  COURSE_NAV_MODE = d.track.free ? 'free' : 'live';
+  COURSE_NAV_MODE = d.track.free ? 'free' : 'paid';
   openTab('course');
   drawCourse();
   // A learner who finished while away from the page is congratulated the next
   // time they open the course, not silently left to spot a changed badge.
   maybeCelebrate();
-  if (!skipPush) pushNav({ v: 'course', key });
 }
 // How each course takes work: shown on the course page and drives the solve workspace.
 const MODE_LABEL = {
@@ -1155,7 +1273,7 @@ function drawCourse() {
     </div></div>`;
   $('courseHead').innerHTML = `
     <nav class="crumb">
-      <a onclick="openTab('courses')">${COURSE_NAV_MODE === 'free' ? 'Free Certified Courses' : 'Live Tech Courses'}</a>
+      <a href="${esc(openRoute(history.state?.catalogue || {v:'courses',mode:COURSE_NAV_MODE}))}" onclick="backToCatalogue();return false">${COURSE_NAV_MODE === 'free' ? 'Free Certified Courses' : 'Live Tech Courses'}</a>
       <svg class="crumb-sep" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="crumb-cur">${esc(t.title)}</span>
     </nav>
@@ -1595,7 +1713,7 @@ function openSolve(levelNo, pid, skipPush) {
   CUR_PROBLEM = { level: levelNo, pid, problem: p };
   CUR_VIDEO_LEVEL = null;
   openTab('solve');
-  if (!skipPush) pushNav({ v: 'solve', key: CUR.track.key, level: levelNo, pid });
+  if (!skipPush) pushNav({ v: 'solve', key: CUR.track.key, level: levelNo, pid, catalogue:history.state?.catalogue });
   $('svSplit').classList.remove('video-view');
   const unitLabel = 'Lesson';
   const moduleKey = lvl.module_no != null ? `module:${lvl.module_no}` : `week:${lvl.week != null ? lvl.week : lvl.no}`;
@@ -1658,7 +1776,7 @@ function openSolveVideo(levelNo, skipPush) {
   COURSE_SCROLL_Y = window.scrollY;
   CUR_VIDEO_LEVEL = levelNo;
   openTab('solve');
-  if (!skipPush) pushNav({ v: 'video', key: CUR.track.key, level: levelNo });
+  if (!skipPush) pushNav({ v: 'video', key: CUR.track.key, level: levelNo, catalogue:history.state?.catalogue });
   $('svSplit').classList.add('video-view');
   const unitLabel = 'Lesson';
   const moduleKey = lvl.module_no != null ? `module:${lvl.module_no}` : `week:${lvl.week != null ? lvl.week : lvl.no}`;

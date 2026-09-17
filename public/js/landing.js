@@ -110,3 +110,13 @@ if (loopForm) {
 document.querySelectorAll('#navLinks a').forEach((a) => {
   a.addEventListener('click', () => $('navLinks').classList.remove('open'));
 });
+
+/* Highlight a learning option without changing the course journey's history. */
+document.querySelectorAll('[data-learning-choice]').forEach(button=>{
+  button.addEventListener('click',()=>{
+    const choice=button.dataset.learningChoice;
+    document.querySelectorAll('[data-learning-choice]').forEach(b=>{const selected=b.dataset.learningChoice===choice;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected));});
+    document.querySelectorAll('.home-learning-card').forEach(card=>card.classList.toggle('selected',card.id==='learning-'+choice));
+    if(matchMedia('(max-width:700px)').matches)document.getElementById('learning-'+choice).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth',block:'start'});
+  });
+});

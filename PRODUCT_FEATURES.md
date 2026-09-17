@@ -18,7 +18,7 @@ EchoLens is a gamified learning-management and operations platform. It combines 
 
 Visitors can use the open website without an account to:
 
-- Open the main website Home page (`/`) for the academy introduction, compact free-versus-paid comparison, course highlights, learning journey, events and FAQ. Every public Home button and logo returns to `/`; portal sidebars also provide a Home link. `/open` serves the course, events and learner workflows; older `/open#home` and `/open#compare` links redirect to the main Home page. Catalogue filters and registration drafts survive Back/Forward, and public login links preserve the return destination.
+- Open the main website Home page (`/`) for the academy introduction, free-versus-paid comparison with a selector, feature icons, inclusion indicators, highlighted paid card and course links, course highlights, learning journey, events and FAQ. Every public Home button and logo returns to `/`; portal sidebars also provide a Home link. `/open` serves the course, events and learner workflows; older `/open#home` and `/open#compare` links redirect to the main Home page. Catalogue filters and registration drafts survive Back/Forward, and public login links preserve the return destination.
 - Browse the public course catalogue, free certified courses, paid courses, specialist tracks, course outlines, modules, lectures, prerequisites, environments, outcomes, capstones, pricing, duration, and availability.
 - See total open-web enrollment counts and enrollment counts on free-course cards.
 - Read public announcements, events, webinars, hackathons, resources, and feedback highlights.

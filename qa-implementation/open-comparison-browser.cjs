@@ -19,9 +19,12 @@ const evidence = path.join(__dirname, 'evidence'), results = [];
     const settle=()=>page.waitForFunction(()=>typeof OPEN_READY !== 'undefined' && OPEN_READY && !RESTORING_NAV);
     await page.goto(base+'/');await page.locator('#learning-options').waitFor();
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
-    assert.ok(await page.locator('.home-learning-card').first().evaluate(el=>el.getBoundingClientRect().height<310));
+    assert.ok(await page.locator('.home-learning-card').first().evaluate(el=>el.getBoundingClientRect().height<700));
 
-    await page.screenshot({path:path.join(evidence,'comparison-completed-'+width+'.png'),fullPage:true});
+    assert.equal(await page.locator('#learning-free li').count(),6);assert.equal(await page.locator('#learning-paid li').count(),7);
+    await page.locator('[data-learning-choice=free]').click();assert.equal(await page.locator('[data-learning-choice=free]').getAttribute('aria-pressed'),'true');
+    await page.locator('[data-learning-choice=paid]').click();assert.equal(await page.locator('[data-learning-choice=paid]').getAttribute('aria-pressed'),'true');
+    await page.locator('#learning-options').screenshot({path:path.join(evidence,'comparison-completed-'+width+'.png')});
     await page.locator('.home-learning-card.paid a').click();await settle();assert.equal(await page.locator('#cFree').inputValue(),'paid');
     await page.locator('#cSearch').fill('SC-01');await page.waitForFunction(()=>location.hash.includes('search=sc-01'));const catalogue=page.url();
     await page.locator('#courseTable .oc-btn').first().click();await page.locator('#courseHead .crumb').waitFor();const course=page.url();

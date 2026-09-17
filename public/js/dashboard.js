@@ -3564,6 +3564,7 @@ function coordRegRow(r) {
   const latest = r.challans && r.challans[0];
   const viewBtn = latest ? `<a class="btn btn-ghost btn-sm" href="/challan?s=${encodeURIComponent(latest.serial)}" target="_blank" rel="noopener">View challan</a>
     <a class="btn btn-ghost btn-sm" href="/api/admissions/challans/${encodeURIComponent(latest.serial)}/pdf">Download PDF</a>` : '';
+  const remindersBtn = latest ? `<button class="btn btn-ghost btn-sm" onclick="coordOpenReminders('${latest.serial}')">Email reminders</button>` : '';
   let action = `<button class="btn btn-primary btn-sm" onclick="coordOpenChallanForm(${r.id})">Generate challan</button>`;
   if (r.payment_stage === 'challan_issued') {
     action = `<span class="s" style="color:var(--muted)">Net ${money(latest.net_fee)} &middot; due ${esc(latest.deadline || '-')}</span>
@@ -3591,8 +3592,9 @@ function coordRegRow(r) {
       <div class="s" style="color:var(--muted)">${esc(r.course_title || r.course_code || '-')}${r.course_fee ? ` &middot; ${money(r.course_fee)}` : ''} &nbsp;${pipelineBadge(r.payment_stage)}</div>
       ${amb}
       ${r.status?.delivery ? `<p class="s" role="status">Email: ${esc(r.status.delivery.state.replaceAll("_", " "))}${r.status.delivery.state === "failed" ? " ? download the PDF or retry sending." : ""}</p>` : ""}
+      ${latest ? `<p class="s" style="color:var(--muted)">Follow-up emails: ${['paid_cleared', 'enrolled'].includes(r.payment_stage) || latest.status === 'paid' ? 'stopped — payment verified' : r.status?.challan_reminders?.enabled ? 'automatic reminders enabled' : 'off'}</p>` : ''}
     </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${action}${remindersBtn}</div>
   </div></div>`;
 }
 async function coordOpenChallanForm(regId) {
@@ -3609,11 +3611,13 @@ async function coordOpenChallanForm(regId) {
       </div>
       <label class="field"><span>Any other discount</span><select name="discount_category_id">${opts}</select></label>
       <label class="field"><span>Payment deadline</span><input name="deadline" type="date" required></label>
+      <label class="check" style="display:flex;gap:8px;align-items:flex-start;margin:12px 0"><input name="auto_reminders" type="checkbox" checked><span>Send automatic payment reminder emails</span></label>
+      <p class="hint">7, 4, 3 and 1 day before the deadline, on the deadline, and an extension follow-up the next day. Sends start at 9:00 AM Pakistan time after the challan email is accepted. Reminders stop when Finance verifies payment.</p>
       <button class="btn btn-primary btn-block">Generate challan</button></form>`);
   $('f').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
     try {
-      await api(`/api/admissions/registrations/${regId}/challan`, { method: 'POST', body: JSON.stringify({ discount_category_id: f.discount_category_id.value || null, deadline: f.deadline.value }) });
+      await api(`/api/admissions/registrations/${regId}/challan`, { method: 'POST', body: JSON.stringify({ discount_category_id: f.discount_category_id.value || null, deadline: f.deadline.value, auto_reminders: f.auto_reminders.checked }) });
       toast('Challan generated - review it, then send it to the student.'); closeModal(); renderCoordRegistrations();
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
@@ -3624,6 +3628,28 @@ async function coordSendChallan(serial,resend=false) {
     toast('Accepted by the email provider. Inbox delivery is not confirmed.');
     renderCoordRegistrations();
   } catch (e) { toast(e.message, true); }
+}
+async function coordOpenReminders(serial) {
+  try {
+    const { reminders: r } = await api(`/api/admissions/challans/${encodeURIComponent(serial)}/reminders`);
+    const labels = { provider_accepted: 'Accepted by email provider', scheduled: 'Scheduled', stopped: 'Stopped', off: 'Off', skipped: 'Skipped — earlier date', failed: 'Could not send', delivery_unknown: 'Delivery uncertain — check mail provider' };
+    openModal('Challan email reminders', `
+      <p class="s" role="status"><strong>${esc(r.reason)}</strong></p>
+      <p class="hint">Emails are checked every 15 minutes, starting at ${esc(r.send_time)} Pakistan time on each scheduled day. If the server was offline, only the latest due reminder is sent. Provider acceptance does not confirm inbox delivery.</p>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Follow-up</th><th>Date</th><th>Delivery</th></tr></thead><tbody>${r.steps.map(step => `<tr><td>${esc(step.label)}</td><td style="white-space:nowrap">${esc(step.date)}</td><td>${esc(labels[step.state] || step.state)}${step.at ? `<br><span class="s">${esc(new Date(step.at).toLocaleString('en-GB', { timeZone: 'Asia/Karachi' }))} PKT</span>` : ''}${step.retry_at ? `<br><span class="s">Retry after ${esc(new Date(step.retry_at).toLocaleString('en-GB', { timeZone: 'Asia/Karachi' }))} PKT</span>` : ''}</td></tr>`).join('')}</tbody></table></div>
+      <p class="hint">After the deadline, applicants are invited to request more time by texting <strong>${esc(r.phone)}</strong> or emailing <strong>${esc(r.finance_email)}</strong>. This does not automatically extend the deadline.</p>
+      <details style="margin:12px 0"><summary>Preview extension email</summary><p class="s"><strong>${esc(r.steps.at(-1)?.message.subject || '')}</strong></p><pre style="white-space:pre-wrap;font:inherit;font-size:13px">${esc(r.steps.at(-1)?.message.text || '')}</pre></details>
+      ${r.paid ? '' : `<button id="toggleChallanReminders" class="btn btn-primary btn-block">${r.enabled ? 'Pause automatic reminders' : 'Enable automatic reminders'}</button>`}`);
+    const button = $('toggleChallanReminders');
+    if (button) button.onclick = async () => {
+      button.disabled = true;
+      try {
+        await api(`/api/admissions/challans/${encodeURIComponent(serial)}/reminders`, { method: 'PATCH', body: JSON.stringify({ enabled: !r.enabled }) });
+        toast(r.enabled ? 'Automatic reminders paused.' : 'Automatic reminders enabled. Earlier dates are skipped.');
+        closeModal(); await renderCoordRegistrations();
+      } catch (error) { modalMsg(error.message); button.disabled = false; }
+    };
+  } catch (error) { toast(error.message, true); }
 }
 async function coordEnroll(regId) {
   const sel = $('batchSel' + regId);

@@ -35,6 +35,7 @@ const { sessionVersion, validSession, safeReturnPath } = require('./session-secu
 const uploadAccess = require('./upload-access');
 const { validateEvidenceInput } = require('./evidence-submission');
 const { deliverRegistrationMail } = require('./registration-delivery');
+const { createAdmissionsReminders, validDate: validChallanDate } = require('./admissions-reminders');
 const asyncRoute = require('./async-route');
 const {
   Users, Courses, Batches, Enrollments, Sessions, Lessons, Assignments, Submissions, Announcements, Admin, GemEvents, Challenges, Hackathons, AiReports, Quests, Chat, ChatReads, officialCatalogue, catalogueFee,
@@ -302,6 +303,11 @@ function studentCoordinatorOnly(req, res, next) { if (['admin', 'student_coordin
 const admissionsOnly = studentCoordinatorOnly;
 const ADMISSIONS_EMAIL = process.env.ADMISSIONS_EMAIL || 'admissions@echolens.digital';
 const FINANCE_EMAIL = process.env.FINANCE_EMAIL || 'finance@echolens.digital';
+const admissionsReminders = createAdmissionsReminders(store, mailer, {
+  appUrl: process.env.APP_URL || 'https://www.echolens.digital',
+  phone: process.env.ADMISSIONS_EXTENSION_PHONE,
+  financeEmail: FINANCE_EMAIL,
+});
 function hrOnly(req, res, next) { if (['admin', 'hr'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function ambassadorOnly(req, res, next) { if (req.user.role !== 'ambassador') return res.status(403).json({ error: 'Not available for your role.' }); next(); }
 // Ambassador commission reports are shared reading across four departments -
@@ -4067,13 +4073,29 @@ app.delete('/api/admissions/discount-categories/:id', authRequired, admissionsOn
 app.get('/api/admissions/bank-details', authRequired, admissionsOnly, (req, res) => res.json({ bank: Settings.bank() }));
 app.post('/api/admissions/bank-details', authRequired, admissionsOnly, (req, res) => res.json({ ok: true, bank: Settings.setBank(req.body || {}) }));
 
-app.post('/api/admissions/registrations/:id/challan', authRequired, admissionsOnly, (req, res) => {
-  const { discount_category_id, deadline } = req.body || {};
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(deadline || ''))) return res.status(400).json({ error: 'Set a deadline date for this challan.' });
+app.post('/api/admissions/registrations/:id/challan', authRequired, admissionsOnly, asyncRoute(async (req, res) => {
+  const { discount_category_id, deadline, auto_reminders = true } = req.body || {};
+  if (!validChallanDate(deadline)) return res.status(400).json({ error: 'Set a valid deadline date for this challan.' });
+  if (typeof auto_reminders !== 'boolean') return res.status(400).json({ error: 'Automatic reminders must be on or off.' });
   const out = Challans.generate({ registration_id: req.params.id, discount_category_id: discount_category_id || null, deadline, generated_by: req.user.id });
   if (out.error) return res.status(400).json({ error: out.error });
-  res.json({ ok: true, challan: out.challan });
+  if (!out.existing) await admissionsReminders.configure(out.challan.serial, auto_reminders, req.user.id);
+  await store.pendingPersist();
+  res.json({ ok: true, challan: out.challan, reminders: admissionsReminders.view(out.challan.serial) });
+}));
+app.get('/api/admissions/challans/:serial/reminders', authRequired, admissionsOnly, (req, res) => {
+  const reminders = admissionsReminders.view(req.params.serial);
+  if (!reminders) return res.status(404).json({ error: 'Challan not found.' });
+  res.json({ reminders });
 });
+app.patch('/api/admissions/challans/:serial/reminders', authRequired, admissionsOnly, asyncRoute(async (req, res) => {
+  if (typeof req.body?.enabled !== 'boolean') return res.status(400).json({ error: 'Choose whether automatic reminders are enabled.' });
+  const c = Challans.bySerial(req.params.serial);
+  if (!c) return res.status(404).json({ error: 'Challan not found.' });
+  const r = Registrations.byId(c.registration_id);
+  if (req.body.enabled && (c.status === 'paid' || ['paid_cleared', 'enrolled'].includes(r?.payment_stage))) return res.status(400).json({ error: 'Payment is verified; reminders have stopped.' });
+  res.json({ ok: true, reminders: await admissionsReminders.configure(c.serial, req.body.enabled, req.user.id) });
+}));
 app.post('/api/admissions/challans/:serial/send', authRequired, admissionsOnly, asyncRoute(async (req, res) => {
   const c = Challans.bySerial(req.params.serial);
   if (!c) return res.status(404).json({ error: 'Challan not found.' });
@@ -4981,7 +5003,10 @@ if (looksLikeProductionDeploy && !db.enabled()) {
     process.exit(1);
   }
 
-  if (!demo.enabled) gradingWorker.start();
+  if (!demo.enabled) {
+    gradingWorker.start();
+    admissionsReminders.start();
+  }
   const listener = app.listen(PORT, demo.enabled ? '127.0.0.1' : undefined, () => {
     if (demo.enabled) {
       if (process.send) process.send({ type: 'ready', port: listener.address().port });

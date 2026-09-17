@@ -78,6 +78,8 @@ Authenticated learners can use the open site to:
 
 - Paid-course registration intake with contact, city, WhatsApp, course, referral, and notes.
 - Registration receipts, private status links, challans, payment-stage tracking, payment confirmation, and enrollment activation.
+- Admissions-only automatic challan reminder controls: new challans default to follow-up emails 7, 4, 3 and 1 day before the deadline, on the deadline, and the next day. Checks begin at 9:00 AM Pakistan time; reminders start after the original challan email is accepted and stop after payment verification or enrollment.
+- Admissions can preview the extension email, inspect scheduled dates and delivery history, and pause or enable reminders per challan. Existing challans require individual enablement; earlier dates are skipped and an outage sends only the latest due reminder. The overdue email invites an extension request by text to `0314148929` or email to `finance@echolens.digital`, without changing the deadline automatically.
 - Admissions notifications for new registrations and payment-confirmed enrollments.
 - Finance views for fees, estimated revenue, invoices/challans, expenses, and payment records.
 
@@ -86,6 +88,7 @@ Authenticated learners can use the open site to:
 - Admin support-ticket queue with private ticket threads, request-more-information replies, learner responses, resolution, and automatic email updates.
 - Feedback moderation, replies, deletion, public announcements, event announcements, and targeted learner notifications.
 - Transactional email delivery for OTP, welcome messages, password reset, enrollment confirmation, grades, certificates, support, registrations, and operational alerts.
+- Admissions challan follow-ups use the transactional email provider and persistent delivery records. Optional `ADMISSIONS_EXTENSION_PHONE` changes the extension contact number; the existing `FINANCE_EMAIL` supplies the contact email. Reminder controls are restricted to Admissions and authorized admins; demo accounts cannot send or change reminders.
 - Daily free open-web enrollment digest instead of one email per free enrollment.
 - Immediate paid-course/admissions enrollment and payment notifications.
 

@@ -1,0 +1,17 @@
+[
+  {
+    "role": "student_coordinator",
+    "width": 1440,
+    "passed": true
+  },
+  {
+    "role": "student_coordinator",
+    "width": 390,
+    "passed": true
+  },
+  {
+    "role": "finance",
+    "width": 1440,
+    "passed": true
+  }
+]

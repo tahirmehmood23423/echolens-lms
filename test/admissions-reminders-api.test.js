@@ -1,0 +1,44 @@
+'use strict';
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs'); const os = require('node:os'); const path = require('node:path');
+const { fork } = require('node:child_process'); const { once } = require('node:events');
+test('Admissions configures and follows up real challans without exposing controls to other portals', { timeout: 60000 }, async t => {
+  const runtime = fs.mkdtempSync(path.join(os.tmpdir(), 'echolens-admissions-test-'));
+  const child = fork(path.join(__dirname, 'fixtures/admissions-reminders-server.cjs'), [], { env: { ...process.env, ECHOLENS_TEST_RUNTIME: runtime }, silent: true, execArgv: [] });
+  let logs = ''; child.stdout.on('data', c => { logs += c; }); child.stderr.on('data', c => { logs += c; });
+  t.after(async () => { if (child.exitCode === null && child.signalCode === null) { const done = once(child, 'exit'); child.kill(); await done; } assert.equal(path.dirname(runtime), os.tmpdir()); assert.ok(path.basename(runtime).startsWith('echolens-admissions-test-')); fs.rmSync(runtime, { recursive: true, force: true }); });
+  const ready = await new Promise((resolve, reject) => { const timer = setTimeout(() => reject(Error(logs)), 20000); child.once('message', r => { clearTimeout(timer); resolve(r); }); child.once('exit', () => { clearTimeout(timer); reject(Error(logs)); }); });
+  const base = 'http://127.0.0.1:' + ready.port;
+  const messages = () => JSON.parse(fs.readFileSync(path.join(runtime, 'mail.json')));
+  const saved = () => JSON.parse(fs.readFileSync(path.join(runtime, 'store.json')));
+  async function api(url, role = 'student_coordinator', method = 'GET', data) { const r = await fetch(base + url, { method, headers: { 'Content-Type': 'application/json', ...(role ? { Cookie: ready.cookies[role] } : {}) }, body: data ? JSON.stringify(data) : undefined }); return { status: r.status, data: await r.json() }; }
+  async function sweep(day) { const next = once(child, 'message'); child.send({ type: 'sweep', now: `2026-10-${day}T04:00:00Z` }); const [r] = await next; assert.equal(r.type, 'swept', r.error); return r.result; }
+  for (const role of [null, 'finance', 'hr', 'instructor', 'student', 'coordinator']) assert.equal((await api('/api/admissions/registrations/1/challan', role, 'POST', { deadline: '2026-10-25' })).status, role ? 403 : 401);
+  assert.equal((await api('/api/admissions/registrations/1/challan', 'student_coordinator', 'POST', { deadline: '2026-02-31' })).status, 400);
+  const created = await api('/api/admissions/registrations/1/challan', 'student_coordinator', 'POST', { deadline: '2026-10-25' });
+  assert.equal(created.status, 200); assert.equal(created.data.reminders.enabled, true);
+  const serial = created.data.challan.serial, route = `/api/admissions/challans/${serial}/reminders`;
+  assert.deepEqual(created.data.reminders.steps.map(s => s.date), ['2026-10-18', '2026-10-21', '2026-10-22', '2026-10-24', '2026-10-25', '2026-10-26']);
+  for (const role of [null, 'finance', 'hr', 'instructor', 'student', 'coordinator']) for (const method of ['GET', 'PATCH']) assert.equal((await api(route, role, method, method === 'PATCH' ? { enabled: true } : null)).status, role ? 403 : 401);
+  assert.equal((await api(route, 'admin')).status, 200);
+  assert.equal((await api(route, 'student_coordinator', 'PATCH', { enabled: 'true' })).status, 400);
+  await sweep('18'); assert.equal(messages().length, 0, 'draft challan does not send reminders');
+  assert.equal((await api(`/api/admissions/challans/${serial}/send`, 'student_coordinator', 'POST', {})).status, 200);
+  assert.equal(messages().length, 1);
+  await sweep('18'); await sweep('18'); assert.equal(messages().length, 2);
+  assert.equal((await api(route)).data.reminders.steps[0].state, 'provider_accepted');
+  assert.equal(saved().registrations[0].status.challan_reminders.history['2026-10-25:week'].state, 'provider_accepted');
+  await api(route, 'student_coordinator', 'PATCH', { enabled: false }); await sweep('21'); assert.equal(messages().length, 2);
+  await api(route, 'student_coordinator', 'PATCH', { enabled: true }); await sweep('21'); assert.equal(messages().length, 3);
+  await api('/api/finance/registrations/1/clear', 'finance', 'POST', {});
+  for (const day of ['22', '24', '25', '26']) await sweep(day);
+  assert.equal(messages().length, 3, 'Finance verification stops remaining reminders'); assert.equal((await api(route)).data.reminders.paid, true);
+  assert.equal((await api(route, 'student_coordinator', 'PATCH', { enabled: true })).status, 400);
+  const disabled = await api('/api/admissions/registrations/2/challan', 'student_coordinator', 'POST', { deadline: '2026-11-25', auto_reminders: false });
+  assert.equal(disabled.data.reminders.enabled, false);
+  const repeat = await api('/api/admissions/registrations/2/challan', 'student_coordinator', 'POST', { deadline: '2026-11-25', auto_reminders: true });
+  assert.equal(repeat.data.reminders.enabled, false, 'a repeat generation request does not overwrite a saved preference');
+  const publicView = await api('/api/verify-challan/' + serial, null);
+  assert.equal(publicView.status, 200); assert.doesNotMatch(JSON.stringify(publicView.data), /challan_reminders|provider_id/);
+});

@@ -1,20 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPPLHMV7TD"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  // Support-ticket links carry a private access token in the fragment
-  // (/open#ticket=<id>&token=<secret>), and Analytics would otherwise report
-  // the whole URL. Redact the token before the page_view is sent.
-  gtag('config', 'G-JPPLHMV7TD', {
-    page_location: location.href.replace(/([#&]token=)[^&]*/g, '$1redacted')
-  });
-</script>
+<!-- Cookie consent + consent-gated Google Analytics -->
+<script src="/js/consent.js?v1"></script>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

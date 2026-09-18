@@ -35,3 +35,10 @@
 .contact-form [hidden]{display:none}
 .contact-form .contact-error{color:#a52c36}
 @media(max-width:640px){.legal-wrap{padding:20px 16px}.legal-card{padding:24px 20px;border-radius:16px}.legal-card h1{font-size:29px}.legal-card h2{font-size:21px}.legal-card p,.legal-card li{font-size:14px}.legal-card th,.legal-card td{padding:8px}}
+
+/* Inline control inside body copy - reads as a link, behaves as a button
+   (an href="#" here would be a dead placeholder link). */
+.legal-inline-btn{font:inherit;color:var(--primary,#6D5DF6);background:none;border:0;padding:0;
+  text-decoration:underline;cursor:pointer}
+.legal-inline-btn:hover{opacity:.85}
+.legal-inline-btn:focus-visible{outline:2px solid var(--primary,#6D5DF6);outline-offset:2px}

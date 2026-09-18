@@ -409,6 +409,10 @@ async function persistAllToPostgres(snapshot) {
  * old 2-save()-calls pattern had under a naive per-call-site persist is
  * closed by construction, not by touching those 12 functions individually.
  */
+if (process.env.FLUSH_DISABLED === 'true') {
+  console.warn('[flush] disabled by env — skipping');
+  return { skipped: true };
+}
 async function persistAllToPostgresNormalized(snapshot) {
   const schemaMap = require('./schema-map');
   const { getPrismaClient, getQueryCount } = require('./prisma-client');

@@ -2629,6 +2629,18 @@ const Certificates = {
       issued_at: (c.issued_at || '').slice(0, 10),
     };
   },
+  // PUBLIC verification view. Verifying a certificate needs: who it was issued
+  // to, what for, and when. It does not need the learner's registration number
+  // (an identifier used across the portal) or the final-project descriptions.
+  // Anyone with the serial is unauthenticated, so this is the narrowest record
+  // that still answers "is this certificate genuine?".
+  verifyView(c) {
+    // concepts stay: they describe the COURSE syllabus, not the learner or
+    // their work, and the verification page's "Key Concepts Covered" section
+    // is a legitimate public part of the credential.
+    const { reg_no, final_project, ...rest } = Certificates.publicView(c);
+    return rest;
+  },
 };
 const Settings = {
   cert() { return data.settings && data.settings.cert ? data.settings.cert : empty().settings.cert; },

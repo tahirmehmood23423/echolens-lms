@@ -29,6 +29,7 @@ form.addEventListener('submit', async (e) => {
     company_size_band: f.company_size_band.value,
     hiring_note: f.hiring_note.value.trim(),
     override_requested: f.override_requested ? f.override_requested.checked : false,
+    age_declaration: f.age_confirm && f.age_confirm.checked ? 'adult' : '',
     override_reason: f.override_reason ? f.override_reason.value.trim() : '',
   };
   try {

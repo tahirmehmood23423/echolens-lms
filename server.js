@@ -857,6 +857,7 @@ app.post('/api/batches/:id/students', authRequired, adminRequired, async (req, r
     if (!(await emailDomainExists(email))) { invalid.push(`${raw} - that email domain does not receive mail`); continue; }
     if (Users.allByLogin(email).some((u) => ['student', 'free'].includes(u.role))) { invalid.push(`${raw} - a learner account with this email already exists (add them as an existing student instead)`); continue; }
     const { user, password } = Users.create({ name, role: 'student', email, username: email });
+    recordCreatedAccountAge(user.id, req.body, req.user.id, 'admin-batch-student');
     Enrollments.create(user.id, b.id);
     created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: mailer.configured });
     const bd = Batches.decorate(b);
@@ -2959,7 +2960,7 @@ app.delete('/api/certificates/:serial', authRequired, adminRequired, (req, res) 
 app.get('/api/verify/:serial', (req, res) => {
   const c = Certificates.bySerial(req.params.serial);
   if (!c) return res.status(404).json({ valid: false, error: 'No certificate exists for this serial. It may have been revoked.' });
-  res.json({ valid: true, certificate: Certificates.publicView(c), verify_url: `${APP_URL}/cert?s=${c.serial}` });
+  res.json({ valid: true, certificate: Certificates.verifyView(c), verify_url: `${APP_URL}/cert?s=${c.serial}` });
 });
 // PUBLIC verification for a fee challan - what its QR code opens.
 app.get('/api/verify-challan/:serial', (req, res) => {
@@ -3003,6 +3004,18 @@ const AGE_DECLARATION = {
 // exactly one of the two known answers is rejected rather than defaulted -
 // defaulting an unreadable answer to "adult" is the one mistake that would
 // make every other fail-closed check pointless.
+// Admin- and HR-created accounts never pass through the signup form, so the
+// creating staff member may record the answer on the learner's behalf. When
+// they do not, NOTHING is recorded and the account stays excluded by the
+// visibility predicate until the learner answers at next sign-in. Recording a
+// default here would be the one place a minor could silently become public.
+function recordCreatedAccountAge(userId, body, actorId, source) {
+  const choice = readAgeChoice(body);
+  if (!choice) return null;
+  return Users.recordAgeDeclaration(userId, {
+    version: AGE_DECLARATION.version, text: choice.text, source, is_minor: choice.is_minor, recorded_by: actorId,
+  });
+}
 function readAgeChoice(body) {
   const choice = String((body || {}).age_declaration || '').trim().toLowerCase();
   if (choice === 'adult') return { is_minor: false, text: AGE_DECLARATION.options.adult };
@@ -3031,6 +3044,9 @@ app.post('/api/auth/register-open', limitSignup, async (req, res) => {
   const { name, email, code } = req.body || {};
   if (!name || String(name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
+  if (readAgeChoice(req.body) === null || readAgeChoice(req.body).is_minor) {
+    return res.status(400).json({ error: 'Confirm that you are 18 or older. Recruiter accounts are for adults acting for an employer.' });
+  }
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
   const mailDown = signupMailDown();
   if (mailer.configured && !mailDown && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
@@ -3129,6 +3145,7 @@ app.post('/api/recruiters/signup', limitSignup, async (req, res) => {
     hiring_note: String(hiring_note).trim().slice(0, 1000),
     override_requested: overrideRequested, override_reason: overrideRequested ? String(override_reason).trim().slice(0, 500) : null,
   });
+  Users.recordAgeDeclaration(user.id, { version: AGE_DECLARATION.version, text: AGE_DECLARATION.options.adult, source: 'recruiter-signup', is_minor: false });
   setAuthCookie(res, sign(user));
   mailer.notify(user.email, 'Your EchoLens recruiter account is pending review',
     `${hi(user.name)},\n\nThanks for signing up to search verified student talent on EchoLens. Your account is now pending review by our team - we will email you as soon as a decision is made, usually within one business day.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Settings after signing in.`);
@@ -4248,6 +4265,11 @@ async function performRegistrationEnrollment(r, b) {
     if (!(await emailDomainExists(r.email))) return { error: 'That email domain does not receive mail - check with the student before enrolling.' };
     const created = Users.create({ name: r.name, role: 'student', email: r.email });
     u = created.user; password = created.password; freshAccount = true;
+    // performRegistrationEnrollment has no acting user in scope (it also runs
+    // from the payment-confirmation path), and the registration form asks no
+    // age question - so nothing is recorded here and the account stays
+    // excluded until the learner answers at first sign-in.
+    recordCreatedAccountAge(u.id, r, null, 'admissions-enrollment');
   }
   Enrollments.create(u.id, b.id);
   const bd = Batches.decorate(b);
@@ -4680,6 +4702,7 @@ app.post('/api/admin/open-courses/:key/students', authRequired, adminRequired, a
     if (!(await emailDomainExists(email))) { invalid.push(`${raw} - that email domain does not receive mail`); continue; }
     if (Users.allByLogin(email).some((u) => ['student', 'free'].includes(u.role))) { invalid.push(`${raw} - a learner account with this email already exists (add them as an existing student instead)`); continue; }
     const { user, password } = Users.create({ name, role: 'free', email, username: email });
+    recordCreatedAccountAge(user.id, req.body, req.user.id, 'admin-open-enrollment');
     const enrolled = OpenQuest.adminEnroll(user.id, t.key);
     if (enrolled.error) { invalid.push(`${raw} - account created, but could not enrol: ${enrolled.error}`); continue; }
     const emailed = mailer.configured && !mailDown;

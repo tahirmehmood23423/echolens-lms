@@ -8,7 +8,7 @@ const contact = '<a href="mailto:info@echolens.digital">info@echolens.digital</a
 const review = '<aside class="legal-review"><strong>Owner review pending.</strong> Highlighted fields need confirmed information before this page is ready for publication as a final policy.</aside>';
 const services = [
   ['Render', 'Application hosting and persistent-disk storage for private uploads and operational files.', 'https://render.com/privacy'],
-  ['PostgreSQL hosting provider', 'Database storage for account, learning and operational records. The current hosting provider and storage location need confirmation: ' + gap('DATABASE_HOST_AND_REGION'), null],
+  ['Supabase (PostgreSQL hosting)', 'Database storage for account, learning and operational records, hosted in the ap-southeast-1 (Singapore) region.', null],
   ['Google OAuth', 'When enabled and chosen, Google sign-in supplies an account identifier, name and email. Local password sign-in is handled by EchoLens.', 'https://policies.google.com/privacy'],
   ['Zoho ZeptoMail / configured SMTP provider', 'Transactional emails such as verification, password recovery, enrollment, reminders, grades and tickets. ZeptoMail is implemented; any different SMTP fallback provider needs confirmation: ' + gap('SMTP_PROVIDER'), 'https://www.zoho.com/privacy.html'],
   ['Brevo', 'When configured for live sending, bulk announcements and outreach using recipient contact details; bulk sending defaults to dry-run.', 'https://www.brevo.com/legal/privacypolicy/'],
@@ -26,7 +26,7 @@ const pages = {
   '/privacy-policy': {
     title: 'Privacy Policy', description: 'How EchoLens handles account, course, payment, uploaded-file and Talent Marketplace data, third-party services, cookies and privacy requests.',
     content: `${review}
-<p>This policy describes the EchoLens Digital learning and operations platform, identified in company materials as <strong>EchoLens (SMC-Private) Limited</strong>, Pakistan. Registered business address: ${gap('COMPANY_ADDRESS')}. Contact for privacy questions: ${contact} or <a href="/contact">Contact &amp; Support</a>.</p>
+<p>This policy describes the EchoLens Digital learning and operations platform, identified in company materials as <strong>EchoLens (SMC-Private) Limited</strong>, Pakistan. Registered business address: Cheema Road, Opposite Garden Town, Gujranwala, Punjab, Pakistan. Contact for privacy questions: ${contact} or <a href="/contact">Contact &amp; Support</a>.</p>
 <h2 id="data">Information collected and its purpose</h2>
 <p>The information requested depends on your account role and the features you use. Browsing the course catalogue does not require a learner account.</p>
 <ul>
@@ -61,7 +61,7 @@ ${services.map(([name, role, url]) => `<section class="legal-vendor"><h3>${name}
   '/terms': {
     title: 'Terms of Use', description: 'EchoLens account responsibilities, acceptable use, course materials, enrollment, payment-policy gaps and service terms.',
     content: `${review}
-<p>These draft terms address use of EchoLens Digital, the learning and operations platform identified in company materials as EchoLens (SMC-Private) Limited, Pakistan. Business address: ${gap('COMPANY_ADDRESS')}. Questions: ${contact}.</p>
+<p>These draft terms address use of EchoLens Digital, the learning and operations platform identified in company materials as EchoLens (SMC-Private) Limited, Pakistan. Business address: Cheema Road, Opposite Garden Town, Gujranwala, Punjab, Pakistan. Questions: ${contact}.</p>
 <h2>Accounts and responsibilities</h2><p>Provide accurate registration information, keep your sign-in credentials private, and report suspected account misuse. Use the permissions assigned to your role. Learner access, staff workspaces, recruiter access and public browsing have different permissions. Minimum account age and parent/guardian consent rules await confirmation: ${gap('MINIMUM_ACCOUNT_AGE_AND_PARENTAL_CONSENT')}.</p>
 <h2>Acceptable use</h2><p>Use the platform for lawful learning, teaching, recruitment and authorized administration. Do not impersonate another person, harass others, upload unlawful material, infringe intellectual-property rights, distribute malware, attempt unauthorized access, bypass assessment protections or falsify payment, attendance or certificate evidence. Submit work honestly and follow the assignment's rules about assistance and collaboration. Do not include credentials or unrelated personal data in compiler input or AI prompts.</p>
 <h2>Course materials and submitted work</h2><p>Course materials, platform branding and software belong to EchoLens or their respective rights holders. Enrollment provides access for learning; it does not transfer ownership or permission to redistribute protected materials. Respect any license attached to a resource. Submit or publish only content you have permission to use. The platform processes submitted work for assessment and feedback; choosing to publish Talent projects or Showcase posts makes the selected content visible through those features.</p>
@@ -71,7 +71,7 @@ ${services.map(([name, role, url]) => `<section class="legal-vendor"><h3>${name}
 <h2>Availability and warranties</h2><p>To the extent permitted by applicable law, the platform and learning materials are provided as available, without a promise of uninterrupted or error-free service. AI feedback and compiler output can be incorrect and should be assessed alongside the assignment requirements and instructor guidance. Nothing in these draft terms removes a right or warranty that applicable law does not allow to be excluded.</p>
 <h2>Limitation of liability</h2><p>Any limitation is subject to applicable law and does not exclude liability that cannot lawfully be excluded. Approved liability allocation and any limits require owner review: ${gap('APPROVED_LIABILITY_TERMS')}. This draft does not invent a financial liability cap.</p>
 <h2>Suspension and termination</h2><p>The app supports account-status changes, moderation, enrollment removal and automatic expiry of incomplete free-course enrollments. Access can be restricted for misuse or unauthorized activity. Removal of access does not itself erase all historical records. Account, enrollment or moderation concerns can be raised through <a href="/contact">Contact &amp; Support</a>. Approved termination notice and appeal terms: ${gap('TERMINATION_AND_APPEAL_TERMS')}.</p>
-<h2>Governing law and disputes</h2><p>Learner governing law, jurisdiction and dispute process: ${gap('LEARNER_GOVERNING_LAW_AND_DISPUTE_PROCESS')}.</p>
+<h2>Governing law and disputes</h2><p>These terms are governed by the laws of Pakistan, and the courts of Gujranwala, Punjab have jurisdiction over any dispute arising from them. Before starting formal proceedings, both sides will attempt to resolve the matter in good faith through <a href="/contact">Contact &amp; Support</a>.</p>
 <h2>Changes and questions</h2><p>These terms require review of the marked fields before final publication. Contact ${contact} for the current confirmed enrollment terms.</p>`,
   },
   '/about': {
@@ -82,7 +82,7 @@ ${services.map(([name, role, url]) => `<section class="legal-vendor"><h3>${name}
 <h2>Two ways to learn</h2><p><a href="/open#free">Free certified courses</a> offer self-paced learning, assignments, assessment feedback and certificates subject to completion requirements. <a href="/open#paid">Paid courses</a> add instructor-led cohort learning, live sessions, guidance and cohort tools. Both use a learner identity; the available assessment and AI features depend on the course and configuration.</p>
 <h2>Practice, feedback and progress</h2><p>The browser compiler lets learners write and run code alongside course assignments. Learners can submit code, notes, links and evidence files; instructors and authorized staff review work where required. The portal tracks progress, grades, gems, streaks and certificates. Public certificate verification supports checking a certificate's authenticity. A student demo uses fictional, isolated records so visitors can explore without accessing real learner data.</p>
 <h2>Who the platform serves</h2><p>The public site supports learners exploring courses, including students and people developing career skills. The LMS serves enrolled learners and instructors; Admissions, Finance and other authorized departments support enrollment and operations. The opt-in Talent Marketplace supports published learner profiles/projects and approved recruiter contact requests.</p>
-<h2>Our history and location</h2><p>Founded or launched: ${gap('FOUNDING_OR_LAUNCH_DATE')}. Registered business address: ${gap('COMPANY_ADDRESS')}. Pakistan is the country identified in company materials.</p>
+<h2>Our history and location</h2><p>EchoLens (SMC-Private) Limited was incorporated on 19 May 2026. Registered business address: Cheema Road, Opposite Garden Town, Gujranwala, Punjab, Pakistan.</p>
 <h2>Explore or get in touch</h2><p><a href="/">Compare free and paid learning on Home</a>, <a href="/demo/?portal=student">explore the isolated student demo</a>, or <a href="/contact">contact the team</a> at ${contact}.</p>`,
   },
   '/contact': {
@@ -90,7 +90,7 @@ ${services.map(([name, role, url]) => `<section class="legal-vendor"><h3>${name}
     content: `${review}
 <p>For course, account, compiler, payment, certificate or privacy questions, email ${contact} or use the support form below. You can also <a href="https://wa.me/923141479109" target="_blank" rel="noopener">message the public WhatsApp contact: 0314 1479109</a>.</p>
 <p>Finance questions: <a href="mailto:finance@echolens.digital">finance@echolens.digital</a>. Admissions: <a href="mailto:admissions@echolens.digital">admissions@echolens.digital</a>.</p>
-<p><strong>Business:</strong> EchoLens (SMC-Private) Limited, Pakistan.<br><strong>Registered address:</strong> ${gap('COMPANY_ADDRESS')}.</p>
+<p><strong>Business:</strong> EchoLens (SMC-Private) Limited, Pakistan.<br><strong>Registered address:</strong> Cheema Road, Opposite Garden Town, Gujranwala, Punjab, Pakistan.</p>
 <p>Support-ticket acknowledgments state that the team <strong>aims to resolve problems within 24–48 hours</strong>. This is an aim, rather than a guaranteed first-response or resolution time. Acknowledgment email delivery depends on the mail service; successful form submission creates a ticket even when email delivery is unavailable.</p>
 <h2>Send a support request</h2>
 <p>The form uses EchoLens's existing support-ticket system. For a privacy request, choose Account and describe the request without including passwords or identity-document copies.</p>

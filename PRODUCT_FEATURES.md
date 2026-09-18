@@ -132,6 +132,7 @@ Departments are isolated by role and permissions. HR/admin can manage department
 ## Integrations and infrastructure
 
 - PostgreSQL through Prisma/PG adapter for production persistence, migrations, JSON profile/evidence data, and durable records.
+- Admin flush health and failure alerts retain the complete Prisma error message, code and metadata. Failed-flush record dumps recursively redact sensitive fields; replay validation rejects redacted placeholders until original values are restored from a trusted source.
 - Startup installs the supplemental Talent Marketplace schema before accepting requests. Talent route failures return request errors without terminating the LMS or interrupting certificate services for learners and authorized staff.
 - Local JSON store/test mode for development and QA, with backup and persistence utilities.
 - ZeptoMail HTTPS Send Mail API for transactional email; SMTP fallback is supported through Nodemailer.

@@ -191,13 +191,7 @@ let lastFlushFailure = null; // { at, collection, op, code, constraint, message 
 // rather than a pattern match: a pattern (e.g. /key/i) would also catch
 // r2_key/thumb_key, which aren't sensitive and are exactly what's needed to
 // debug a showcase_images flush failure.
-const FLUSH_LOG_REDACT_FIELDS = new Set(['email', 'password_hash', 'whatsapp', 'phone', 'google_sub', 'signature', 'account_number', 'iban']);
-function redactRowForLog(row) {
-  if (!row || typeof row !== 'object') return row;
-  const out = {};
-  for (const [k, v] of Object.entries(row)) out[k] = FLUSH_LOG_REDACT_FIELDS.has(k) ? '[redacted]' : v;
-  return out;
-}
+const { redactRowForLog, failureDetails } = require('./flush-diagnostics');
 /** Summarizes the row(s) involved in a failed operation for the console.error line only - capped at 5 rows so one bad createMany() batch of hundreds doesn't flood the log. */
 function summarizeRowsForLog(rows) {
   if (!Array.isArray(rows) || !rows.length) return { count: 0, sample: '[]' };
@@ -212,6 +206,7 @@ function flushHealth() {
     lastFailure: lastFlushFailure ? {
       at: lastFlushFailure.at, collection: lastFlushFailure.collection, op: lastFlushFailure.op,
       code: lastFlushFailure.code, constraint: lastFlushFailure.constraint, message: lastFlushFailure.message,
+      meta: lastFlushFailure.meta,
     } : null,
   };
 }
@@ -297,8 +292,8 @@ function buildFailedFlushDump(snapshot, prevSnapshot, failureInfo) {
   for (const [name, value] of Object.entries(snapshot.seq || {})) if (prevSeq[name] !== value) seqChanges[name] = value;
   return {
     dumped_at: new Date().toISOString(),
-    note: 'Unpersisted diff at the moment of a fatal flush failure (bounded fail-fast). Rows are redacted the same way as the flush-failure log (see FLUSH_LOG_REDACT_FIELDS). To replay: hand-fix or remove whatever caused the failure below, then re-insert these rows through the normal application code path (not raw SQL) so ids/relations stay consistent - do not restore this file directly into Postgres.',
-    failure: failureInfo,
+    note: 'Unpersisted diff at fatal flush failure. Sensitive fields are recursively redacted. Replay must validate the entire dump with assertReplayableDump before any writes and refuse [redacted] placeholders. Restore original values from a trusted source before replay; never write placeholders or silently discard fields. Do not restore directly into Postgres.',
+    failure: redactRowForLog(failureInfo),
     collections,
     seq_changes: seqChanges,
   };
@@ -336,6 +331,7 @@ function sendFlushFailureAlert(failureInfo) {
     + `Collection: ${failureInfo.collection || 'unknown'}\n`
     + `Operation: ${failureInfo.op || 'unknown'}\n`
     + `Prisma error code: ${failureInfo.code || 'unknown'}\n`
+    + `Prisma error metadata: ${JSON.stringify(failureInfo.meta)}\n`
     + `Constraint/field: ${JSON.stringify(failureInfo.constraint)}\n`
     + `Time: ${failureInfo.at}\n`
     + `Message: ${failureInfo.message}\n\n`
@@ -572,13 +568,12 @@ async function persistAllToPostgresNormalized(snapshot) {
       at: new Date().toISOString(),
       collection: lastOp ? lastOp.collection : null,
       op: lastOp ? lastOp.op : null,
-      code: err.code || null,
+      ...failureDetails(err),
       constraint: (err.meta && (err.meta.target || err.meta.field_name || err.meta.constraint)) || null,
-      message: String(err.message || '').split('\n')[0].slice(0, 500),
     };
     console.error(
       `[store] FLUSH FAILED - consecutive failures: ${consecutiveFlushFailures}, last success: ${lastSuccessfulFlushAt || 'never (this process)'}\n` +
-      `  collection=${lastFlushFailure.collection} op=${lastFlushFailure.op} prisma_code=${lastFlushFailure.code} constraint=${JSON.stringify(lastFlushFailure.constraint)}\n` +
+      `  collection=${lastFlushFailure.collection} op=${lastFlushFailure.op} prisma_code=${lastFlushFailure.code} constraint=${JSON.stringify(lastFlushFailure.constraint)} meta=${JSON.stringify(lastFlushFailure.meta)}\n` +
       `  offending row(s) [${rowInfo.count} in this operation, redacted, first 5]: ${rowInfo.sample}\n` +
       `  ${lastFlushFailure.message}\n` +
       `  EVERY collection changed since the last successful flush was rolled back with this one (single-transaction flush) - not just this row.`

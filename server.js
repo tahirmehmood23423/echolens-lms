@@ -3044,9 +3044,6 @@ app.post('/api/auth/register-open', limitSignup, async (req, res) => {
   const { name, email, code } = req.body || {};
   if (!name || String(name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
-  if (readAgeChoice(req.body) === null || readAgeChoice(req.body).is_minor) {
-    return res.status(400).json({ error: 'Confirm that you are 18 or older. Recruiter accounts are for adults acting for an employer.' });
-  }
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
   const mailDown = signupMailDown();
   if (mailer.configured && !mailDown && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
@@ -3134,6 +3131,12 @@ app.post('/api/recruiters/signup', limitSignup, async (req, res) => {
   }
   if (overrideRequested && (!override_reason || !String(override_reason).trim())) {
     return res.status(400).json({ error: 'Tell us briefly why you do not have a company domain email.' });
+  }
+  // A recruiter account acts for an employer, so the only valid answer is
+  // adult. A minor answer is refused rather than recorded.
+  const recruiterAge = readAgeChoice(req.body);
+  if (!recruiterAge || recruiterAge.is_minor) {
+    return res.status(400).json({ error: 'Confirm that you are 18 or older. Recruiter accounts are for adults acting for an employer.' });
   }
   if (!(await emailDomainExists(email))) return res.status(400).json({ error: 'That email domain does not receive mail - check the spelling and try again.' });
   if (Users.allByLogin(email).some((u) => u.role === 'recruiter')) return res.status(400).json({ error: 'A recruiter account with this work email already exists - sign in instead.' });

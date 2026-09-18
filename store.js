@@ -1008,6 +1008,16 @@ const Users = {
     base: ['marketing_opt_in', 'phone', 'whatsapp', 'dob', 'gender', 'cnic', 'father_name', 'address', 'city', 'education', 'institute', 'university', 'degree', 'study_year', 'university_reg_no', 'emergency_contact', 'goal', 'links'],
     staff: ['designation', 'qualification', 'expertise', 'experience_years', 'joining_date', 'office_hours'],
   },
+  // The signup age/permission declaration. Deliberately NOT in PROFILE_FIELDS,
+  // so updateProfile() cannot overwrite it - a learner editing their profile
+  // must not be able to rewrite what they declared, or when. updateProfile
+  // spreads the existing profile, so this key survives every later edit.
+  recordAgeDeclaration(id, { version, text, source }) {
+    const u = Users.byId(id); if (!u) return null;
+    u.profile = { ...(u.profile || {}), age_declaration: { version, text, source, at: now() } };
+    save();
+    return u;
+  },
   updateProfile(id, profile) {
     const u = Users.byId(id); if (!u) return null;
     const allowed = [...Users.PROFILE_FIELDS.base, ...(['instructor', 'admin', 'coordinator', 'staff', 'ambassador', 'hr'].includes(u.role) ? Users.PROFILE_FIELDS.staff : [])];

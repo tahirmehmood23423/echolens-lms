@@ -343,6 +343,8 @@ function showSignup() {
         <label class="field"><span>Current study year</span><select name="study_year" required><option value="">Choose year</option><option value="1">1st year</option><option value="2">2nd year</option><option value="3">3rd year</option><option value="4">4th year</option><option value="5+">5th year or above</option><option value="graduated">Graduated</option><option value="other">Other</option></select></label>
       </div>
       <label class="field"><span>Learning or career goal (optional)</span><input name="goal" maxlength="300" placeholder="What would you like to achieve?"></label>
+      <label class="field"><span><input name="age_declaration" type="checkbox" style="width:auto" required> I am 18 or older, or I have my parent or guardian&rsquo;s permission to enroll. <span style="color:var(--danger)">*</span></span></label>
+      <p class="hint">EchoLens is open to school and university learners. We record this confirmation with your account; we do not contact your parent or guardian to check it.</p>
       <label class="field"><span><input name="marketing_opt_in" type="checkbox" style="width:auto"> Send optional course offers and webinar invitations</span></label><p class="hint">No password to choose - once your email is verified, we generate one and email it to you.</p>
       <button class="btn btn-primary btn-block" id="suBtn">Create account</button>
     </form>`;
@@ -371,7 +373,7 @@ function showSignup() {
       // system-generated password mailed to the now-verified address.
       const out = await api('/api/auth/register-open', {
         method: 'POST',
-        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, city: f.city.value.trim(), university: f.university.value.trim(), degree: f.degree.value.trim(), study_year: f.study_year.value, goal: f.goal.value.trim(), marketing_opt_in: f.marketing_opt_in.checked, code: f.code ? f.code.value.trim() : undefined }),
+        body: JSON.stringify({ name: f.name.value, email: f.email.value.trim(), whatsapp: f.whatsapp.value, city: f.city.value.trim(), university: f.university.value.trim(), degree: f.degree.value.trim(), study_year: f.study_year.value, goal: f.goal.value.trim(), marketing_opt_in: f.marketing_opt_in.checked, age_declaration: f.age_declaration.checked, code: f.code ? f.code.value.trim() : undefined }),
       });
       if (out.password) {
         // Two reasons the server hands back the password directly instead of

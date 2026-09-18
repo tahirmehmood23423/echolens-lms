@@ -2977,6 +2977,14 @@ app.get('/api/public/cert-image/:name', (req, res) => {
 // a password and emails it there, so the working inbox is confirmed for a
 // second time by the one place the credentials can ever be read from. Every
 // open user also becomes a lead the admin can download.
+// The signup age/permission declaration. The server keeps its own copy of the
+// wording rather than storing whatever the browser posted, so the record says
+// what the learner was actually shown. Bump the version when the wording
+// changes; existing accounts keep the version they agreed to.
+const AGE_DECLARATION = {
+  version: '2026-09-18',
+  text: 'I am 18 or older, or I have my parent or guardian’s permission to enroll.',
+};
 const LEARNER_STUDY_YEARS = new Set(['1', '2', '3', '4', '5+', 'graduated', 'other']);
 function learnerProfileInput(body) {
   const contact = String(body.whatsapp || body.phone || '').trim();
@@ -3004,9 +3012,11 @@ app.post('/api/auth/register-open', limitSignup, async (req, res) => {
   if (mailer.configured && !mailDown && !emailCodeValid(email, code)) return res.status(400).json({ error: 'Enter the 6-digit verification code we emailed you (request a new one if it expired).' });
   const learnerInput = learnerProfileInput(req.body || {});
   if (learnerInput.error) return res.status(400).json({ error: learnerInput.error });
+  if ((req.body || {}).age_declaration !== true) return res.status(400).json({ error: 'Confirm that you are 18 or older, or have a parent or guardian’s permission to enroll.' });
   if (Users.allByLogin(email).some((u) => ['student', 'free'].includes(u.role))) return res.status(400).json({ error: 'A learner account with this email already exists - sign in instead.' });
   const { user, password } = Users.create({ name: String(name).trim(), role: 'free', email: String(email).trim().toLowerCase(), username: String(email).trim().toLowerCase() });
   Users.updateProfile(user.id, learnerInput.profile);
+  Users.recordAgeDeclaration(user.id, { version: AGE_DECLARATION.version, text: AGE_DECLARATION.text, source: 'open-signup' });
   Leads.upsert({ name: user.name, email: user.email, whatsapp: learnerInput.profile.phone, source: 'open-signup', user_id: user.id });
   setAuthCookie(res, sign(Users.byId(user.id)));
   // mailDown: mail is known to be undeliverable right now (see signupMailDown

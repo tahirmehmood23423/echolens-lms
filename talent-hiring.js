@@ -76,7 +76,12 @@ module.exports = {
     app.post('/api/talent/profile/:handle/contact-request', authRequired, requireDb, requireRecruiter, contactRateLimit, asyncRoute(async (req, res) => {
       const { rows: profRows } = await db.query('SELECT * FROM talent_profiles WHERE handle = $1 AND published = true', [String(req.params.handle).toLowerCase()]);
       const profile = profRows[0];
-      if (!profile) return res.status(404).json({ error: 'No published profile at this handle.' });
+      // FAIL CLOSED: a recruiter cannot open a contact request against an
+      // account that has not declared it is an adult. Same 404 as an unknown
+      // handle, so the refusal does not reveal that a minor holds it.
+      if (!profile || !Users.isPubliclyVisible(Users.byId(profile.user_id))) {
+        return res.status(404).json({ error: 'No published profile at this handle.' });
+      }
       const { message } = req.body || {};
       if (!message || !String(message).trim()) return res.status(400).json({ error: 'Write a short message stating the role and company.' });
 

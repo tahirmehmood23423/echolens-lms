@@ -1738,7 +1738,12 @@ app.post('/api/admin/announcements', authRequired, adminRequired, (req, res) => 
 /* ----------------------------- public profiles ----------------------------- */
 app.get('/api/public/profile/:reg', (req, res) => {
   const u = Users.byReg(req.params.reg);
-  if (!u || !['student', 'free'].includes(u.role)) return res.status(404).json({ error: 'No profile found for that registration number.' });
+  // Same 404 whether the account does not exist, is not a learner, or is not
+  // publicly visible - a distinct "hidden" response would itself confirm that
+  // a minor holds that registration number.
+  if (!u || !['student', 'free'].includes(u.role) || !Users.isPubliclyVisible(u)) {
+    return res.status(404).json({ error: 'No profile found for that registration number.' });
+  }
   res.json(Users.publicView(u));
 });
 app.get('/u/:reg', (req, res) => res.sendFile(path.join(__dirname, 'public', 'profile.html')));

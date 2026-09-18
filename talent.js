@@ -661,6 +661,12 @@ module.exports = {
     /* ------------------------------- public ------------------------------- */
     // Registered before /talent/profile/:handle so the literal path always
     // wins over the param route.
+    // FAIL CLOSED: a published Talent profile is public only while its owner
+    // has declared they are not a minor. Applied to every handle-addressed
+    // endpoint and to the project listings, so a minor cannot be reached
+    // through a profile, a project, or a guessed handle.
+    const ownerVisible = (profile) => !!profile && Users.isPubliclyVisible(Users.byId(profile.user_id));
+
     app.get('/api/talent/projects', requireDb, asyncRoute(async (req, res) => {
       const q = String(req.query.q || '').trim();
       const params = [];
@@ -673,11 +679,12 @@ module.exports = {
          WHERE ${where} ORDER BY p.verified DESC, p.created_at DESC LIMIT $${params.length}`,
         params
       );
-      res.json({ projects: rows.map((r) => ({ ...projectPublicView(r), handle: r.handle })) });
+      res.json({ projects: rows.filter((r) => Users.isPubliclyVisible(Users.byId(r.user_id)))
+        .map((r) => ({ ...projectPublicView(r), handle: r.handle })) });
     }));
     app.get('/api/talent/profile/:handle', requireDb, asyncRoute(async (req, res) => {
       const profile = await getProfileByHandle(String(req.params.handle).toLowerCase());
-      if (!profile || !profile.published) return res.status(404).json({ error: 'No published profile at this handle.' });
+      if (!profile || !profile.published || !ownerVisible(profile)) return res.status(404).json({ error: 'No published profile at this handle.' });
       const u = Users.byId(profile.user_id);
       if (!u) return res.status(404).json({ error: 'No published profile at this handle.' });
       const skills = await skillsForUser(profile.user_id);
@@ -696,7 +703,7 @@ module.exports = {
     }));
     app.get('/api/talent/profile/:handle/projects/:projectId', requireDb, asyncRoute(async (req, res) => {
       const profile = await getProfileByHandle(String(req.params.handle).toLowerCase());
-      if (!profile || !profile.published) return res.status(404).json({ error: 'Not found.' });
+      if (!profile || !profile.published || !ownerVisible(profile)) return res.status(404).json({ error: 'Not found.' });
       const { rows } = await db.query('SELECT * FROM projects WHERE id = $1 AND user_id = $2 AND visible = true', [req.params.projectId, profile.user_id]);
       if (!rows[0]) return res.status(404).json({ error: 'Not found.' });
       res.json({ name: Users.byId(profile.user_id)?.name, handle: profile.handle, project: projectPublicView(rows[0]) });
@@ -752,7 +759,7 @@ ${ld}`;
       try {
         if (db.enabled()) {
           const profile = await getProfileByHandle(String(req.params.handle).toLowerCase());
-          const u = profile && profile.published ? Users.byId(profile.user_id) : null;
+          const u = profile && profile.published && ownerVisible(profile) ? Users.byId(profile.user_id) : null;
           if (profile && u) {
             const title = `${u.name}${profile.headline ? ' - ' + profile.headline : ''} | EchoLens Talent Marketplace`;
             const description = (profile.about || `${u.name}'s verified EchoLens talent profile - real course projects, certificates and skills.`).slice(0, 300);

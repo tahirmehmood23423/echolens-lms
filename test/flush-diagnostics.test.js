@@ -7,7 +7,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 test('actual health and alert functions expose full error details without connecting to a database', () => {
-  const source = fs.readFileSync(path.join(__dirname, '..', 'store.js'), 'utf8');
+  const source = fs.readFileSync(path.join(__dirname, '..', 'store.js'), 'utf8').replace(/\r\n/g, '\n');
   const health = source.slice(source.indexOf('function flushHealth()'), source.indexOf('/*\n * ------------------------- bounded fail-fast'));
   const alert = source.slice(source.indexOf('function sendFlushFailureAlert('), source.indexOf('function chunkRows('));
   const failure = { ...failureDetails(Object.assign(new Error('\nTransaction expired\nTimeout: 60000 ms'), {
@@ -15,6 +15,7 @@ test('actual health and alert functions expose full error details without connec
   })), at: '2026-09-18T00:00:00Z', collection: 'users', op: 'update', constraint: null };
   const messages = [];
   const context = vm.createContext({ lastSuccessfulFlushAt: null, consecutiveFlushFailures: 1,
+    require: module => require(path.join(__dirname, '..', module)), data: {}, lastPersistedSnapshot: {}, lastFlushTiming: null,
     lastFlushFailure: failure, DB_PATH: '/synthetic/store.json', FAIL_FAST_THRESHOLD: 3, path,
     process: { env: { MAIL_ALERT_TO: 'synthetic@qa.invalid' } },
     mailer: { notify: (...args) => messages.push(args) } });

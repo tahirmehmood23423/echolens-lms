@@ -198,8 +198,13 @@ function summarizeRowsForLog(rows) {
   return { count: rows.length, sample: JSON.stringify(rows.slice(0, 5).map(redactRowForLog)).slice(0, 2000) };
 }
 /** Admin-facing flush status - GET /api/admin/flush-health and systemHealth() both read this. Never includes row data (that's console.error-only, see above) - just enough to tell persistence is wedged and where to start looking. */
+let lastFlushTiming = null;
 function flushHealth() {
   return {
+    disabled: process.env.FLUSH_DISABLED === 'true',
+    pendingRecordCount: require('./normalized-flush-plan').pendingCounts(data, lastPersistedSnapshot || {}),
+    lastFlushDurationMs: lastFlushTiming?.totalMs ?? null,
+    lastFlushTiming,
     lastSuccessfulFlushAt,
     secondsSinceLastSuccessfulFlush: lastSuccessfulFlushAt ? Math.round((Date.now() - new Date(lastSuccessfulFlushAt).getTime()) / 1000) : null,
     consecutiveFlushFailures,
@@ -397,7 +402,7 @@ async function persistAllToPostgres(snapshot) {
  * save() more than once for one logical operation (Events.maybeCertify,
  * Challans.generate/markSent/markPaid all call save() twice via
  * Registrations._setStage()). This works because every one of those
- * functions is 100% synchronous internally (verified: no `await` appears
+ * functions is synchronous internally (verified: no `await` appears
  * anywhere in store.js outside this persistence/boot-load machinery) - all
  * of a function's `data` mutations complete before the JS event loop ever
  * gets around to running the async work a `save()` call queues, so by the
@@ -409,156 +414,31 @@ async function persistAllToPostgres(snapshot) {
  * old 2-save()-calls pattern had under a naive per-call-site persist is
  * closed by construction, not by touching those 12 functions individually.
  */
-if (process.env.FLUSH_DISABLED === 'true') {
-  console.warn('[flush] disabled by env — skipping');
-  return { skipped: true };
-}
-async function persistAllToPostgresNormalized(snapshot) {
-  const schemaMap = require('./schema-map');
+async function persistAllToPostgresNormalized(snapshot, captureMs = 0) {
+  if (process.env.FLUSH_DISABLED === 'true') {
+    console.warn('[flush] disabled by env - skipping; pending writes are not durable');
+    return { skipped: true };
+  }
+  const { prepareFlush, failedOperation } = require('./normalized-flush-plan');
   const { getPrismaClient, getQueryCount } = require('./prisma-client');
   const prisma = getPrismaClient();
   const prevSnapshot = lastPersistedSnapshot || {};
-  const nextSnapshot = {};
-  // PERF_DEBUG-gated diagnostics only (see prisma-client.js's getQueryCount
-  // and server.js's request-timing middleware, same gate) - counts what
-  // this one save() call actually did, to separate "rows that genuinely
-  // changed" from the seq/settings upserts below, which fire unconditionally
-  // on every save() regardless of what changed. No effect on behavior when
-  // PERF_DEBUG isn't set (perf stays null; every `if (perf)` below is skipped).
-  const perf = process.env.PERF_DEBUG
-    ? { t0: Date.now(), q0: getQueryCount(), creates: 0, createBatches: 0, updates: 0, deletes: 0, deleteBatches: 0, seqUpserts: 0, settingUpserts: 0 }
-    : null;
-  // A1: which collection/operation/rows were in flight the instant a throw
-  // happens inside the transaction below - read by the catch block if this
-  // flush fails, so the resulting log line points at the actual offending
-  // table and rows instead of a bare stack trace into prisma.$transaction's
-  // call site. Safe to track with one shared variable (not per-op state):
-  // everything in this function runs on one synchronous call stack between
-  // awaits, so exactly one operation is ever "in flight" at a time.
-  let lastOp = null;
-
+  const started = performance.now();
+  const queryStart = getQueryCount();
+  let plan, lastOp = null, preparationMs = 0, dbMs = 0;
   try {
-    await prisma.$transaction(async (tx) => {
-      // Inserts/updates in FK-safe order (parents before children). New rows
-      // for a table are collected and sent as ONE createMany() instead of one
-      // create() per row. Updates stay per-row: Prisma's updateMany() can only
-      // apply the SAME data to every matched row, which doesn't fit "each row
-      // has different values" - genuinely batching differing-per-row updates
-      // would need hand-rolled raw SQL per table (55 tables, several with
-      // JSON/Date/polymorphic columns - see schema-map.js's own history of
-      // column-mapping bugs found there), which isn't safe to ship without
-      // testing against the real schema. Left as-is pending PERF_DEBUG numbers
-      // showing whether updates (vs. the create/delete/seq/settings costs
-      // fixed here) are actually the remaining bottleneck.
-      for (const [key, table, model, columns] of schemaMap.COLLECTIONS) {
-        const records = snapshot[key] || [];
-        const prevRows = prevSnapshot[key] || new Map();
-        const nextRows = new Map();
-        const toCreate = [];
-        for (const rec of records) {
-          const json = JSON.stringify(rec);
-          nextRows.set(rec.id, json);
-          if (prevRows.get(rec.id) === json) continue; // unchanged since the last successful flush
-          const row = schemaMap.buildPrismaRow(table, columns, rec, `${key}#${rec.id}`);
-          if (prevRows.has(rec.id)) {
-            lastOp = { collection: key, op: 'update', rows: [rec] };
-            await tx[model].update({ where: { id: rec.id }, data: row }); if (perf) perf.updates++;
-          } else toCreate.push(row);
-        }
-        if (toCreate.length) {
-          lastOp = { collection: key, op: 'createMany', rows: records.filter((r) => !prevRows.has(r.id)) };
-          await tx[model].createMany({ data: toCreate });
-          if (perf) { perf.creates += toCreate.length; perf.createBatches++; }
-        }
-        nextSnapshot[key] = nextRows;
+    plan = prepareFlush(snapshot, prevSnapshot);
+    preparationMs = performance.now() - started;
+    const dbStarted = performance.now();
+    try {
+      if (plan.operations.length) {
+        // Step 2 keeps the existing whole-flush atomic boundary. Step 3 will
+        // group logical units before packing them into chunk transactions.
+        await prisma.$transaction(async (tx) => {
+          for (const operation of plan.operations) await operation.execute(tx);
+        }, { maxWait: 10000, timeout: 60000 });
       }
-      // Deletes in REVERSE FK-safe order (children before parents), so a
-      // parent row's delete never runs while a child row still references it.
-      // Batched as ONE deleteMany() per table instead of one delete() per row.
-      for (const [key, , model] of [...schemaMap.COLLECTIONS].reverse()) {
-        const prevRows = prevSnapshot[key] || new Map();
-        const nextRows = nextSnapshot[key] || new Map();
-        const idsToDelete = [];
-        for (const id of prevRows.keys()) if (!nextRows.has(id)) idsToDelete.push(id);
-        if (idsToDelete.length) {
-          lastOp = { collection: key, op: 'deleteMany', rows: idsToDelete.map((id) => ({ id })) };
-          await tx[model].deleteMany({ where: { id: { in: idsToDelete } } });
-          if (perf) { perf.deletes += idsToDelete.length; perf.deleteBatches++; }
-        }
-      }
-
-      // The pre-existing feedback table intentionally stores whole records as
-      // JSONB. Persist it in the same transaction as every normalized table;
-      // support-ticket creation and resolution must be durable before the API
-      // reports success or sends the corresponding lifecycle response.
-      {
-        const key = 'feedback', records = snapshot[key] || [], prevRows = prevSnapshot[key] || new Map();
-        const nextRows = new Map(), toCreate = [];
-        for (const rec of records) {
-          const json = JSON.stringify(rec); nextRows.set(rec.id, json);
-          if (prevRows.get(rec.id) === json) continue;
-          if (prevRows.has(rec.id)) {
-            lastOp = { collection: key, op: 'update', rows: [rec] };
-            await tx.feedbackRecord.update({ where: { id: BigInt(rec.id) }, data: { data: rec } });
-            if (perf) perf.updates++;
-          } else toCreate.push({ id: BigInt(rec.id), data: rec });
-        }
-        if (toCreate.length) {
-          lastOp = { collection: key, op: 'createMany', rows: records.filter((rec) => !prevRows.has(rec.id)) };
-          await tx.feedbackRecord.createMany({ data: toCreate });
-          if (perf) { perf.creates += toCreate.length; perf.createBatches++; }
-        }
-        const idsToDelete = [];
-        for (const id of prevRows.keys()) if (!nextRows.has(id)) idsToDelete.push(BigInt(id));
-        if (idsToDelete.length) {
-          lastOp = { collection: key, op: 'deleteMany', rows: idsToDelete.map((id) => ({ id: Number(id) })) };
-          await tx.feedbackRecord.deleteMany({ where: { id: { in: idsToDelete } } });
-          if (perf) perf.deletes += idsToDelete.length;
-        }
-        nextSnapshot[key] = nextRows;
-      }
-
-      // Registries: seq/settings use upsert (small, always-present keyed
-      // rows); issued_usernames/issued_regnos are append-only sets. Diffed
-      // against prevSnapshot.seq/.settings exactly like the collections loop
-      // above - only a key whose value actually changed since the last
-      // successful flush gets an upsert, instead of unconditionally upserting
-      // all 54 seq counters + 5 settings keys on every single save() call.
-      const prevSeq = prevSnapshot.seq || {};
-      const nextSeq = {};
-      for (const [name, value] of Object.entries(snapshot.seq || {})) {
-        nextSeq[name] = value;
-        if (prevSeq[name] === value) continue; // unchanged since the last successful flush
-        lastOp = { collection: 'seq', op: 'upsert', rows: [{ name, value }] };
-        await tx.seq.upsert({ where: { name }, create: { name, value }, update: { value } });
-        if (perf) perf.seqUpserts++;
-      }
-      nextSnapshot.seq = nextSeq;
-      const prevUsernames = new Set(prevSnapshot.issued_usernames || []);
-      const newUsernames = (snapshot.issued_usernames || []).filter((v) => !prevUsernames.has(v));
-      if (newUsernames.length) {
-        lastOp = { collection: 'issued_usernames', op: 'createMany', rows: newUsernames.map((value) => ({ value })) };
-        await tx.issuedUsername.createMany({ data: newUsernames.map((value) => ({ value })), skipDuplicates: true });
-      }
-      const prevRegnos = new Set(prevSnapshot.issued_regnos || []);
-      const newRegnos = (snapshot.issued_regnos || []).filter((v) => !prevRegnos.has(v));
-      if (newRegnos.length) {
-        lastOp = { collection: 'issued_regnos', op: 'createMany', rows: newRegnos.map((value) => ({ value })) };
-        await tx.issuedRegno.createMany({ data: newRegnos.map((value) => ({ value })), skipDuplicates: true });
-      }
-      const prevSettings = prevSnapshot.settings || {};
-      const nextSettings = {};
-      for (const [key, value] of Object.entries(snapshot.settings || {})) {
-        const json = JSON.stringify(value);
-        nextSettings[key] = json;
-        if (prevSettings[key] === json) continue; // unchanged since the last successful flush
-        const v = value === null ? schemaMap.Prisma.JsonNull : value;
-        lastOp = { collection: 'settings', op: 'upsert', rows: [{ key, value: v }] };
-        await tx.setting.upsert({ where: { key }, create: { key, value: v }, update: { value: v } });
-        if (perf) perf.settingUpserts++;
-      }
-      nextSnapshot.settings = nextSettings;
-    }, { maxWait: 10000, timeout: 60000 });
+    } finally { dbMs = performance.now() - dbStarted; }
   } catch (err) {
     // A1: loud, structured failure - logged and counted here, then
     // re-thrown unchanged. Rollback/propagation behavior is untouched
@@ -566,6 +446,9 @@ async function persistAllToPostgresNormalized(snapshot) {
     // *queue* alive for the next save() attempt, same as before); this
     // block only adds visibility on top of that, it does not swallow
     // anything new.
+    lastOp = failedOperation(err);
+    preparationMs = preparationMs || performance.now() - started;
+    recordFlushTiming(false);
     consecutiveFlushFailures += 1;
     const rowInfo = lastOp ? summarizeRowsForLog(lastOp.rows) : { count: 0, sample: '[]' };
     lastFlushFailure = {
@@ -611,30 +494,34 @@ async function persistAllToPostgresNormalized(snapshot) {
     throw err;
   }
 
-  if (perf) {
-    const ms = Date.now() - perf.t0;
-    const queries = getQueryCount() - perf.q0;
-    const seqTotal = Object.keys(snapshot.seq || {}).length;
-    const settingsTotal = Object.keys(snapshot.settings || {}).length;
-    console.log(`[perf] save(): ${ms}ms, ${queries} Postgres round trips total - `
-      + `${perf.creates} row creates in ${perf.createBatches} createMany batch(es), `
-      + `${perf.updates} row updates (still per-row), `
-      + `${perf.deletes} row deletes in ${perf.deleteBatches} deleteMany batch(es), `
-      + `${perf.seqUpserts}/${seqTotal} seq.upsert actually changed, `
-      + `${perf.settingUpserts}/${settingsTotal} setting.upsert actually changed`);
-  }
-
-  nextSnapshot.issued_usernames = (snapshot.issued_usernames || []).slice();
-  nextSnapshot.issued_regnos = (snapshot.issued_regnos || []).slice();
-  lastPersistedSnapshot = nextSnapshot;
+  lastPersistedSnapshot = plan.nextSnapshot;
   lastSuccessfulFlushAt = new Date().toISOString();
   consecutiveFlushFailures = 0;
+  recordFlushTiming(true);
+
+  function recordFlushTiming(ok) {
+    lastFlushTiming = {
+      ok, captureMs, preparationMs, scanSerializeMs: captureMs + preparationMs, dbMs,
+      totalMs: captureMs + performance.now() - started,
+      queries: getQueryCount() - queryStart, operations: plan?.operations.length || 0,
+      rowsWritten: ok ? plan.rowsWritten : {},
+    };
+    console.log('[flush] ' + JSON.stringify(lastFlushTiming));
+  }
 }
 
-/** Queues a Postgres persist of the current `data`, serialized after any persist already in flight. Returns a promise for *this* persist specifically (resolves/rejects on its own outcome), even though execution waits its turn in line. */
+/** Capture only when this serialized queue entry starts, after the caller's
+ * synchronous logical operation has completed. Later live mutations are
+ * isolated from this frozen snapshot and remain pending for the next flush.
+ */
 function queuePersistToPostgres() {
-  const thisOp = pgQueueTail.then(() => persistAllToPostgresNormalized(data));
-  pgQueueTail = thisOp.catch(() => {}); // keep the queue alive after a failure so later saves still get their turn
+  const thisOp = pgQueueTail.then(() => {
+    if (process.env.FLUSH_DISABLED === 'true') return persistAllToPostgresNormalized(null);
+    const started = performance.now();
+    const snapshot = require('./normalized-flush-plan').captureSnapshot(data);
+    return persistAllToPostgresNormalized(snapshot, performance.now() - started);
+  });
+  pgQueueTail = thisOp.catch(() => {});
   return thisOp;
 }
 

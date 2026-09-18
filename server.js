@@ -240,6 +240,9 @@ if (process.env.PERF_DEBUG) {
 // durable" guarantee, without touching any of the ~250 route handlers
 // that call res.json()/res.send() today.
 app.use((req, res, next) => {
+  // Recovery diagnostics must remain reachable while the last write failed.
+  // Their handlers below still require administrator authentication.
+  if (['/api/admin/flush-health', '/api/admin/list-dumps', '/api/admin/inspect-dump'].includes(req.path)) return next();
   const origJson = res.json.bind(res);
   const origSend = res.send.bind(res);
   // Both guards report failure via origJson specifically (never through
@@ -1572,9 +1575,11 @@ app.get('/api/admin/system-health', authRequired, staffView, (req, res) => {
 // (or polled by an external monitor later) without pulling the full
 // system-health payload. Also folded into systemHealth()'s own "Postgres
 // Flush" check above, so it shows up wherever admin already looks.
-app.get('/api/admin/flush-health', authRequired, staffView, (req, res) => {
-  if (!db.enabled()) return res.json({ enabled: false });
-  res.json({ enabled: true, ...store.flushHealth() });
+app.get('/api/admin/flush-health', authRequired, adminRequired, (req, res) => {
+  res.json({ enabled: db.enabled(), ...store.flushHealth() });
+});
+require('./flush-dump-admin').register(app, {
+  authRequired, adminRequired, directory: path.dirname(store.DB_PATH),
 });
 
 /* ------------------------- sessions / lessons / work ------------------------- */

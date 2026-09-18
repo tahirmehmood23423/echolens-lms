@@ -1,14 +1,76 @@
 
-.home-learning{margin:24px 0 32px;scroll-margin-top:100px;color:#151d42;background:radial-gradient(ellipse at center,#eef3ff80,transparent 70%);font-family:Inter,system-ui,sans-serif}
-.home-section-head{text-align:center;max-width:850px;margin:0 auto 24px}.learning-eyebrow{display:inline-block;padding:7px 24px;border-radius:99px;background:#eeebff;color:#7048e7;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase}.home-section-head h2{font-family:Fraunces,Georgia,serif;font-size:clamp(26px,3vw,38px);line-height:1.2;color:#10162f;margin:14px 0 10px;text-wrap:balance}.home-section-head>p{font-size:14px;line-height:1.6;color:#6b7693;max-width:730px;margin:auto}
-.learning-selector{display:flex;max-width:390px;margin:18px auto 0;border:1px solid #d3dbee;border-radius:13px;background:white}.learning-selector button{flex:1;min-width:0;padding:10px;border:0;border-radius:12px;background:transparent;color:#141c42;font:600 14px Inter,system-ui,sans-serif;cursor:pointer}.learning-selector span{display:block;margin-top:3px;font-size:11px;font-weight:400;color:#6b7693}.learning-selector button.active{background:linear-gradient(110deg,#7345ff,#17a9f5);color:white;box-shadow:0 5px 18px #714cff35}.learning-selector button.active span{color:#ffffffd9}
-.home-learning-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}.home-learning-card{min-width:0;display:flex;flex-direction:column;background:white;border:1px solid #e7edf8;border-radius:19px;overflow:hidden;box-shadow:0 8px 28px #c9d8ec25}.home-learning-card.paid{border:2px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(120deg,#00c6ed,#9854ff) border-box}.home-learning-card.selected{box-shadow:0 9px 30px #7154dc22}
-.home-card-title{display:flex;gap:13px;align-items:center;position:relative;padding:21px 19px;border-bottom:1px solid #e9edf7;min-height:102px}.home-card-title h3{font:600 25px/1.2 Fraunces,Georgia,serif;color:#121832;margin:0 0 6px}.home-card-title p{font-size:11px;line-height:1.5;color:#6b7693;margin:0}.learning-main-icon{display:grid;place-items:center;width:49px;height:49px;border-radius:13px;background:#d7f3e9;color:#03845f;flex-shrink:0}.learning-main-icon svg{width:26px;height:26px}.paid .learning-main-icon{color:white;background:linear-gradient(120deg,#7950ff,#4484ff)}
-.home-learning-card .cmp-badge{position:absolute;top:10px;right:12px;font-size:8px;font-weight:700;padding:4px 8px;border-radius:9px;white-space:nowrap}.home-learning-card .cmp-badge.free{background:#e5f6f3;color:#01887c}.home-learning-card .cmp-badge.paid{color:white;background:linear-gradient(110deg,#7943ff,#3c94fa);text-transform:uppercase}
-.home-learning-card ul{list-style:none;margin:0;padding:0 19px}.home-learning-card li{display:flex;align-items:center;gap:12px;min-height:65px;padding:11px 0;border-bottom:1px solid #edf0f8}.home-learning-card li:last-child{border-bottom:0}.home-learning-card li>div{flex:1;min-width:0}.home-learning-card li b{display:block;font-size:12px;font-weight:600;line-height:1.4;color:#18224b}.home-learning-card li div>span{display:block;font-size:10.5px;line-height:1.5;color:#6b7693;margin-top:3px}.learning-row-icon{display:grid;place-items:center;width:34px;height:34px;background:#f3f5fc;color:#3237d7;border-radius:9px;flex-shrink:0}.learning-row-icon svg{width:20px;height:20px}.learning-status{display:grid;place-items:center;flex:0 0 19px;height:19px;background:#d1f0e6;color:#04896a;border-radius:50%}.learning-status svg{width:13px;height:13px}.learning-status.excluded{color:#7b88a5;background:#e3e7ef}
-.learning-card-action{padding:16px 19px 19px;margin-top:auto}.home-learning-card .btn{display:flex;justify-content:center;align-items:center;gap:12px;min-height:45px;padding:10px 12px;border:1px solid #c2cde4;border-radius:10px;font-size:12px;font-weight:600;text-decoration:none;background:white;color:#152049}.home-learning-card .btn-primary{background:linear-gradient(110deg,#1bb6f4,#7950ff,#4180f7);color:white;border-color:transparent}.home-learning-card .btn svg{width:16px;height:16px}
-.learning-banner{display:flex;align-items:center;gap:16px;margin-top:20px;padding:19px 23px;color:white;background:linear-gradient(120deg,#111b43,#303a79 75%,#0c90a0);border-radius:17px}.learning-banner-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#ffffff15;flex-shrink:0}.learning-banner-icon svg{width:24px;height:24px}.learning-banner h3{font:600 22px/1.3 Fraunces,Georgia,serif;color:white;margin:0 0 4px}.learning-banner p{font-size:12px;line-height:1.5;color:#dae4f8;margin:0}.learning-banner a{display:flex;align-items:center;justify-content:center;gap:12px;margin-left:auto;padding:13px 18px;background:white;border-radius:10px;color:#101c3f;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap}.learning-banner a svg{width:16px;height:16px}
-.learning-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 10px}.learning-trust>div{display:flex;align-items:center;gap:12px}.learning-trust>div+div{border-left:1px solid #dae2f2;padding-left:16px}.learning-trust svg{width:23px;height:23px;flex-shrink:0;color:#4447bc}.learning-trust b{display:block;font-size:11px;line-height:1.5}.learning-trust small{display:block;font-size:10px;color:#6b7693;line-height:1.5}.home-learning-note{font-size:10px;color:#6b7693;line-height:1.6;text-align:center;margin:12px auto}.home-learning a:focus-visible,.home-learning button:focus-visible{outline:2px solid #6741dc;outline-offset:3px}
+.home-learning{margin:18px 0 24px;scroll-margin-top:100px;color:#151d42;background:radial-gradient(ellipse at center,#eef3ff80,transparent 70%);font-family:Inter,system-ui,sans-serif}
+.home-section-head{text-align:center;max-width:720px;margin:0 auto 16px}.learning-eyebrow{display:inline-block;padding:7px 24px;border-radius:99px;background:#eeebff;color:#7048e7;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase}.home-section-head h2{font-family:Fraunces,Georgia,serif;font-size:clamp(22px,2.4vw,30px);line-height:1.2;color:#10162f;margin:10px 0 7px;text-wrap:balance}.home-section-head>p{font-size:12.5px;line-height:1.55;color:#6b7693;max-width:620px;margin:auto}
+.learning-selector{display:flex;max-width:340px;margin:13px auto 0;border:1px solid #d3dbee;border-radius:13px;background:white}.learning-selector button{flex:1;min-width:0;padding:8px;border:0;border-radius:12px;background:transparent;color:#141c42;font:600 14px Inter,system-ui,sans-serif;cursor:pointer}.learning-selector span{display:block;margin-top:3px;font-size:11px;font-weight:400;color:#6b7693}.learning-selector button.active{background:linear-gradient(110deg,#7345ff,#17a9f5);color:white;box-shadow:0 5px 18px #714cff35}.learning-selector button.active span{color:#ffffffd9}
+
+/* Free vs instructor-led, as one compact comparison table. Two columns share
+   the same rows so equivalent features line up; the instructor-led column
+   stays visually highlighted, and the toggle above sets data-choice. */
+.learning-table-wrap{max-width:940px;margin:0 auto;overflow-x:auto}
+.learning-table{width:100%;border-collapse:separate;border-spacing:0;background:white;
+  border:1px solid #e7edf8;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px #c9d8ec25}
+.learning-table caption{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.learning-table th,.learning-table td{text-align:left;vertical-align:middle;padding:9px 14px;
+  border-bottom:1px solid #edf0f8;min-width:0}
+/* The rule between the two columns is what separates them, now that they are
+   cells in one table rather than two detached cards. */
+.learning-table .lt-paid{border-left:1px solid #e4e9f6}
+.learning-table thead,.learning-table tbody,.learning-table tfoot{display:block}
+.learning-table tr{display:grid;grid-template-columns:1fr 1fr;align-items:stretch}
+.learning-table tbody td{display:flex;align-items:center;gap:10px}
+.learning-table thead th{display:flex;align-items:center;gap:10px;position:relative;padding:14px;
+  background:#fbfcff;border-bottom:1px solid #e9edf7}
+.lt-head{min-width:0;flex:1;padding-right:76px}
+.lt-head b{display:block;font:600 17px/1.25 Fraunces,Georgia,serif;color:#121832}
+.lt-head>span{display:block;margin-top:2px;font-size:10.5px;line-height:1.45;color:#6b7693}
+.lt-text{flex:1;min-width:0}
+.lt-text b{display:block;font-size:11.5px;font-weight:600;line-height:1.35;color:#18224b}
+.lt-text>span{display:block;margin-top:1px;font-size:10px;line-height:1.4;color:#6b7693}
+.learning-table .learning-main-icon{width:38px;height:38px;border-radius:11px}
+.learning-table .learning-main-icon svg{width:20px;height:20px}
+.learning-table .lt-paid .learning-main-icon{color:white;background:linear-gradient(120deg,#7950ff,#4484ff)}
+.learning-table .learning-row-icon{width:27px;height:27px;border-radius:8px}
+.learning-table .learning-row-icon svg{width:15px;height:15px}
+.learning-table .learning-status{flex:0 0 16px;height:16px}
+.learning-table .learning-status svg{width:11px;height:11px}
+.learning-table .cmp-badge{position:absolute;top:8px;right:10px;font-size:8px;font-weight:700;
+  padding:3px 7px;border-radius:8px;white-space:nowrap}
+.learning-table .cmp-badge.free{background:#e5f6f3;color:#01887c}
+.learning-table .cmp-badge.paid{color:white;background:linear-gradient(110deg,#7943ff,#3c94fa);text-transform:uppercase}
+.learning-table tbody tr:last-child td{border-bottom:1px solid #edf0f8}
+.learning-table tfoot td{display:block;padding:12px 14px;border-bottom:0}
+.learning-table .btn{display:flex;justify-content:center;align-items:center;gap:8px;min-height:38px;
+  padding:8px 12px;border:1px solid #c2cde4;border-radius:9px;font-size:11.5px;font-weight:600;
+  text-decoration:none;background:white;color:#152049}
+.learning-table .btn-primary{background:linear-gradient(110deg,#1bb6f4,#7950ff,#4180f7);color:white;border-color:transparent}
+.learning-table .btn svg{width:14px;height:14px}
+.learning-table .portal-secondary{display:block;margin-top:7px;text-align:center;font-size:10.5px}
+.lt-blank{background:#fbfcfe}
+/* Highlight follows the toggle. The paid column carries a tinted wash and a
+   gradient edge; the free column gets the same treatment when chosen, so the
+   selection reads the same way the two cards did. */
+.learning-table[data-choice="paid"] .lt-paid{background:linear-gradient(180deg,#f7f5ff,#f6fbff)}
+.learning-table[data-choice="paid"] thead .lt-paid{box-shadow:inset 0 3px 0 0 #7950ff}
+.learning-table[data-choice="free"] .lt-free{background:linear-gradient(180deg,#f2fbf8,#f7fcff)}
+.learning-table[data-choice="free"] thead .lt-free{box-shadow:inset 0 3px 0 0 #0fbfa8}
+/* On phones the table shows ONE column at a time and the Free/Paid selector
+   above becomes the column switcher - side-scrolling a comparison to read the
+   other half is worse than showing the half you asked for. */
+@media(max-width:700px){
+  .learning-table-wrap{overflow-x:visible}
+  .learning-table tr{grid-template-columns:1fr}
+  .learning-table[data-choice="paid"] .lt-free,
+  .learning-table[data-choice="free"] .lt-paid{display:none}
+  .learning-table .lt-paid{border-left:0}
+  .lt-head{padding-right:84px}
+  .learning-table[data-choice="free"] .lt-free,
+  .learning-table[data-choice="paid"] .lt-paid{background:none}
+  .learning-table[data-choice="free"] thead .lt-free{box-shadow:inset 0 3px 0 0 #0fbfa8}
+  .learning-table[data-choice="paid"] thead .lt-paid{box-shadow:inset 0 3px 0 0 #7950ff}
+  .lt-blank{display:none}
+}
+.learning-banner{display:flex;align-items:center;gap:14px;max-width:940px;margin:16px auto 0;padding:15px 20px;color:white;background:linear-gradient(120deg,#111b43,#303a79 75%,#0c90a0);border-radius:17px}.learning-banner-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#ffffff15;flex-shrink:0}.learning-banner-icon svg{width:24px;height:24px}.learning-banner h3{font:600 22px/1.3 Fraunces,Georgia,serif;color:white;margin:0 0 4px}.learning-banner p{font-size:12px;line-height:1.5;color:#dae4f8;margin:0}.learning-banner a{display:flex;align-items:center;justify-content:center;gap:12px;margin-left:auto;padding:13px 18px;background:white;border-radius:10px;color:#101c3f;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap}.learning-banner a svg{width:16px;height:16px}
+.learning-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:940px;margin:16px auto}.learning-trust>div{display:flex;align-items:center;gap:12px}.learning-trust>div+div{border-left:1px solid #dae2f2;padding-left:16px}.learning-trust svg{width:23px;height:23px;flex-shrink:0;color:#4447bc}.learning-trust b{display:block;font-size:11px;line-height:1.5}.learning-trust small{display:block;font-size:10px;color:#6b7693;line-height:1.5}.home-learning-note{font-size:10px;color:#6b7693;line-height:1.6;text-align:center;margin:12px auto}.home-learning a:focus-visible,.home-learning button:focus-visible{outline:2px solid #6741dc;outline-offset:3px}
 @media(max-width:700px){.home-learning-grid{grid-template-columns:1fr}.home-section-head h2{font-size:28px}.home-card-title h3{font-size:24px}.home-learning-card li{min-height:64px}.learning-banner{flex-wrap:wrap;padding:18px}.learning-banner-icon{display:none}.learning-banner a{width:100%;margin:0}.learning-trust{grid-template-columns:1fr;gap:14px}.learning-trust>div+div{border:0;padding:0}.home-learning-note{text-align:left}}
 
 @media(max-width:700px){.home-learning-card{scroll-margin-top:220px}}

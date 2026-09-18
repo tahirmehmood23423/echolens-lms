@@ -236,7 +236,7 @@ async function logout() { EL.drafts.flushAll(); EL.drafts.setAccount(null); try 
   // lands here directly; anyone else just gets the normal overview.
   if (location.pathname === '/admin/recruiters' && ME.role === 'admin') { show('admin-recruiters'); return; }
   await restoreDashboard();
-  requireLearnerProfile();
+  if (!requireAgeDeclaration()) requireLearnerProfile();
   requireOnboarding(); // instructors must complete their first-login profile
   requireContractSubmission(false);
 })();
@@ -288,6 +288,35 @@ function closeTopSearch() { const out = $('topSearchResults'); if (out) { out.cl
 /* Learners complete one structured profile after sign-in. These details
  * support course delivery and future lead follow-up; promotional consent
  * remains a separate optional choice. */
+function requireAgeDeclaration() {
+  if (!ME || !ME.needs_age_declaration) return false;
+  openModal('One question before you continue', `
+    <form id="ageDeclForm">
+      <p class="s" style="color:var(--muted);margin-bottom:12px">EchoLens is open to school and university learners. Tell us which applies to you. We record your answer with your account; we do not contact your parent or guardian to check it.</p>
+      <fieldset style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 12px">
+        <legend class="s" style="padding:0 6px;color:var(--ink);font-weight:600">Your age</legend>
+        <label class="field" style="margin-bottom:6px"><span><input type="radio" name="age_declaration" value="adult" style="width:auto" required> I am 18 or older</span></label>
+        <label class="field" style="margin-bottom:0"><span><input type="radio" name="age_declaration" value="minor" style="width:auto" required> I am under 18 and have my parent or guardian&rsquo;s permission to enroll</span></label>
+      </fieldset>
+      <p class="hint" style="margin-bottom:12px">Accounts declared under 18 are kept out of public profiles, the Talent Marketplace and recruiter contact.</p>
+      <button class="btn btn-primary btn-block" id="ageDeclBtn">Save and continue</button>
+    </form>`);
+  window.MODAL_LOCK = true;
+  $('modalBox').querySelector('.close').style.display = 'none';
+  $('ageDeclForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('ageDeclBtn'); btn.disabled = true;
+    const picked = e.target.querySelector('input[name="age_declaration"]:checked');
+    try {
+      await api('/api/me/age-declaration', { method: 'POST', body: JSON.stringify({ age_declaration: picked ? picked.value : '' }) });
+      ME.needs_age_declaration = false;
+      window.MODAL_LOCK = false;
+      $('modalBox').querySelector('.close').style.display = '';
+      closeModal();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+  return true;
+}
 function requireLearnerProfile() {
   if (!['student', 'free'].includes(ME.role)) return;
   if (ME.learner_profile_complete) return;

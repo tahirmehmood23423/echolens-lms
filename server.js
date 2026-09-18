@@ -457,6 +457,12 @@ app.get('/api/auth/me', authRequired, (req, res) => {
     ai_enabled: ['admin', 'instructor'].includes(u.role) && ai.enabled(),
     onboarding_complete: u.onboarding_complete !== false,
     learner_profile_complete: Users.learnerProfileComplete(u),
+    // Learner accounts created before the age declaration existed have no
+    // is_minor, so they are hidden from every public surface until they
+    // answer. The portals prompt on load; staff and recruiters are not
+    // asked, because no public learner listing covers them.
+    needs_age_declaration: ['student', 'free'].includes(u.role) && !Users.isPubliclyVisible(u)
+      && !(u.profile && u.profile.age_declaration),
     recruiter: u.role === 'recruiter' ? recruiterView(u) : null,
   });
 });
@@ -3956,6 +3962,22 @@ app.post('/api/admin/feedback/:id/reply', authRequired, adminRequired, (req, res
 app.delete('/api/admin/feedback/:id', authRequired, adminRequired, (req, res) => {
   if (!Feedback.remove(req.params.id)) return res.status(404).json({ error: 'Feedback not found.' });
   res.json({ ok: true });
+});
+
+// Re-declaration for accounts that predate the signup question. Same storage
+// guarantees as signup: the server keeps its own copy of the wording, writes
+// through recordAgeDeclaration, and stamps version + time. A learner who has
+// already declared cannot silently overwrite it here.
+app.post('/api/me/age-declaration', authRequired, (req, res) => {
+  if (!['student', 'free'].includes(req.user.role)) return res.status(403).json({ error: 'The age declaration applies to learner accounts.' });
+  const existing = req.user.profile && req.user.profile.age_declaration;
+  if (existing && typeof existing.is_minor === 'boolean') return res.status(409).json({ error: 'This account has already answered. Contact support if it needs to change.' });
+  const choice = readAgeChoice(req.body);
+  if (!choice) return res.status(400).json({ error: 'Choose one: you are 18 or older, or you are under 18 and have a parent or guardian’s permission to enroll.' });
+  const user = Users.recordAgeDeclaration(req.user.id, {
+    version: AGE_DECLARATION.version, text: choice.text, source: 'self-redeclaration', is_minor: choice.is_minor,
+  });
+  res.json({ ok: true, is_minor: user.profile.age_declaration.is_minor });
 });
 
 app.post('/api/me/learner-profile', authRequired, (req, res) => {

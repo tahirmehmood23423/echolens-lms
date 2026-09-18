@@ -1012,11 +1012,30 @@ const Users = {
   // so updateProfile() cannot overwrite it - a learner editing their profile
   // must not be able to rewrite what they declared, or when. updateProfile
   // spreads the existing profile, so this key survives every later edit.
-  recordAgeDeclaration(id, { version, text, source }) {
+  // is_minor is the field the public-visibility predicate reads. It is only
+  // ever written here, never through updateProfile, so a learner cannot
+  // re-declare themselves an adult by editing their profile.
+  recordAgeDeclaration(id, { version, text, source, is_minor, recorded_by = null }) {
     const u = Users.byId(id); if (!u) return null;
-    u.profile = { ...(u.profile || {}), age_declaration: { version, text, source, at: now() } };
+    u.profile = {
+      ...(u.profile || {}),
+      age_declaration: { version, text, source, is_minor: is_minor === true, recorded_by, at: now() },
+    };
     save();
     return u;
+  },
+  // FAIL CLOSED. A profile, listing or contact request is allowed only when the
+  // account has explicitly declared it is NOT a minor. Missing, null, undefined,
+  // a legacy account that never declared, a half-written record - every one of
+  // those is treated as a minor and stays out of public view.
+  isPubliclyVisible(u) {
+    return !!u && u.profile && u.profile.age_declaration
+      ? u.profile.age_declaration.is_minor === false
+      : false;
+  },
+  lacksAgeDeclaration() {
+    return data.users.filter((u) => !(u.profile && u.profile.age_declaration
+      && typeof u.profile.age_declaration.is_minor === 'boolean'));
   },
   updateProfile(id, profile) {
     const u = Users.byId(id); if (!u) return null;

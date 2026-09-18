@@ -1,0 +1,37 @@
+.legal-body{background:#f7f8fd;color:#0f172a;font-family:Inter,system-ui,sans-serif;margin:0}
+.legal-wrap{max-width:1080px;margin:0 auto;padding:28px 24px 36px;box-sizing:border-box}
+.legal-crumb{font-size:13px;color:#657089;margin:0 0 18px}
+.legal-crumb a{color:#657089;text-decoration:none}
+.legal-card{background:#fff;border:1px solid #e6e8f3;border-radius:22px;padding:36px 40px;box-shadow:0 8px 24px rgba(79,70,229,.06);overflow-wrap:anywhere}
+.legal-card h1,.legal-card h2{font-family:Fraunces,Georgia,serif;color:#0f172a;line-height:1.25}
+.legal-card h1{font-size:36px;margin:0 0 10px}
+.legal-card h2{font-size:24px;margin:32px 0 12px}
+.legal-card h3{font-size:16px;color:#0f172a;margin:18px 0 6px}
+.legal-card p,.legal-card li{font-size:15px;line-height:1.8;color:#4b5568}
+.legal-card p{margin:0 0 16px}
+.legal-card ul{padding-left:24px}
+.legal-card li{margin:12px 0}
+.legal-card a{color:#6241de;text-decoration:underline;text-underline-offset:3px}
+.legal-card a:focus-visible,.legal-card button:focus-visible,.legal-crumb a:focus-visible{outline:2px solid #6542db;outline-offset:3px}
+.legal-card .legal-updated{font-size:13px;color:#657089}
+.legal-review{background:#fff8e8;border:1px solid #f0dcac;color:#62491a;border-radius:12px;padding:14px 16px;margin:22px 0;font-size:14px;line-height:1.7}
+.legal-gap{display:inline;background:#fff0c6;color:#62491a;border-radius:4px;padding:2px 4px;font-weight:600}
+.legal-vendor{border-bottom:1px solid #eef0f6}
+.legal-table-wrap{overflow-x:auto}
+.legal-card table{width:100%;border-collapse:collapse;text-align:left;font-size:14px;line-height:1.7}
+.legal-card caption{text-align:left;color:#657089;padding:0 0 12px}
+.legal-card th,.legal-card td{padding:12px;border:1px solid #e6e8f3;vertical-align:top}
+.legal-card th{background:#f7f8fd}
+.legal-skip{position:fixed;left:12px;top:-100px;z-index:100;background:#fff;color:#6241de;padding:12px;border-radius:8px}
+.legal-skip:focus{top:12px}
+.contact-form{display:grid;gap:10px;max-width:680px}
+.contact-form label{font-size:14px;font-weight:600;margin-top:8px}
+.contact-form input,.contact-form select,.contact-form textarea{font:inherit;color:#152039;background:#fff;width:100%;min-width:0;padding:12px;border:1px solid #d9dced;border-radius:10px;box-sizing:border-box}
+.contact-form textarea{resize:vertical}
+.contact-form input:focus,.contact-form select:focus,.contact-form textarea:focus{outline:2px solid #6542db;outline-offset:2px}
+.contact-form .btn{justify-self:start;min-height:44px;margin:4px 0}
+.contact-form .contact-note{font-size:13px;margin:8px 0}
+.contact-trap{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+.contact-form [hidden]{display:none}
+.contact-form .contact-error{color:#a52c36}
+@media(max-width:640px){.legal-wrap{padding:20px 16px}.legal-card{padding:24px 20px;border-radius:16px}.legal-card h1{font-size:29px}.legal-card h2{font-size:21px}.legal-card p,.legal-card li{font-size:14px}.legal-card th,.legal-card td{padding:8px}}

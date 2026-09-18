@@ -4941,7 +4941,7 @@ require('./showcase').register(app, { authRequired, teacherOrAdmin, APP_URL }); 
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
 app.get('/recruiter-signup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'recruiter-signup.html')));
-app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
+require('./legal-pages').register(app); // Legal/information pages; no persistence access.
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 // Same single-page app as /dashboard, unauthenticated at the HTML level
 // exactly like every other page here (see the api() helper's 401 handler

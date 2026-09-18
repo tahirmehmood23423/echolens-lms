@@ -12,7 +12,7 @@
       link.classList.toggle('active',Boolean(active));
       if (active) link.setAttribute('aria-current','page'); else link.removeAttribute('aria-current');
     });
-    nav.querySelectorAll('[data-public-login]').forEach(link => {
+    document.querySelectorAll('[data-public-login]').forEach(link => {
       const target = new URL(link.href,location.href);
       if (target.pathname.split('/').at(-1) === 'login' && !['login','reset-password'].includes(page[0])) link.href = target.pathname + '?returnTo=' + encodeURIComponent(location.pathname + location.search + location.hash);
     });

@@ -1,0 +1,154 @@
+'use strict';
+// Public information only. No store, database or persistence imports.
+const navigation = require('./public-navigation');
+const footer = require('./public-footer');
+const updated = '2026-09-18';
+const gap = key => `<span class="legal-gap">[[${key} — TAHIR TO FILL]]</span>`;
+const contact = '<a href="mailto:info@echolens.digital">info@echolens.digital</a>';
+const review = '<aside class="legal-review"><strong>Owner review pending.</strong> Highlighted fields need confirmed information before this page is ready for publication as a final policy.</aside>';
+const services = [
+  ['Render', 'Application hosting and persistent-disk storage for private uploads and operational files.', 'https://render.com/privacy'],
+  ['PostgreSQL hosting provider', 'Database storage for account, learning and operational records. The current hosting provider and storage location need confirmation: ' + gap('DATABASE_HOST_AND_REGION'), null],
+  ['Google OAuth', 'When enabled and chosen, Google sign-in supplies an account identifier, name and email. Local password sign-in is handled by EchoLens.', 'https://policies.google.com/privacy'],
+  ['Zoho ZeptoMail / configured SMTP provider', 'Transactional emails such as verification, password recovery, enrollment, reminders, grades and tickets. ZeptoMail is implemented; any different SMTP fallback provider needs confirmation: ' + gap('SMTP_PROVIDER'), 'https://www.zoho.com/privacy.html'],
+  ['Brevo', 'When configured for live sending, bulk announcements and outreach using recipient contact details; bulk sending defaults to dry-run.', 'https://www.brevo.com/legal/privacypolicy/'],
+  ['Groq / Google Gemini', 'When configured, AI assistance and assessment process prompts, submitted work, output and relevant evidence. Avoid placing unrelated personal information in AI prompts.', 'https://groq.com/privacy-policy/'],
+  ['8x8 JaaS / Jitsi Meet', 'Live-class audio, video and meeting participation. The app uses 8x8 JaaS when configured, with Jitsi Meet as a fallback.', 'https://www.8x8.com/legal/terms-and-conditions/privacy-policy'],
+  ['Google YouTube', 'Embedded course videos use the privacy-enhanced YouTube player. Loading or playing embedded media involves requests to Google and can involve provider storage.', 'https://policies.google.com/privacy'],
+  ['Google Analytics 4', 'Google tags embedded on existing site pages measure visits and usage, with browser/device, referral and technical information. The deployed Google settings determine further processing.', 'https://policies.google.com/privacy'],
+  ['Google Fonts', 'Delivers website fonts; browser requests disclose connection and request information to Google.', 'https://policies.google.com/privacy'],
+  ['Cloudflare R2', 'When configured, stores public Showcase image uploads. Other private uploads use the application upload directory.', 'https://www.cloudflare.com/privacypolicy/'],
+  ['Cloudflare cdnjs / jsDelivr', 'Deliver browser libraries, including compiler runtimes. Their servers receive connection and request information when libraries are loaded.', 'https://www.jsdelivr.com/terms/privacy-policy'],
+  ['Compiler Explorer (godbolt.org)', 'Remote compilation receives source code, associated files and execution input for supported native-language runs.', 'https://godbolt.org/#privacy'],
+  ['WhatsApp / Meta', 'Only when you choose the WhatsApp contact link, contact messages and account/connection data are handled by that service.', 'https://www.whatsapp.com/legal/privacy-policy'],
+];
+const pages = {
+  '/privacy-policy': {
+    title: 'Privacy Policy', description: 'How EchoLens handles account, course, payment, uploaded-file and Talent Marketplace data, third-party services, cookies and privacy requests.',
+    content: `${review}
+<p>This policy describes the EchoLens Digital learning and operations platform, identified in company materials as <strong>EchoLens (SMC-Private) Limited</strong>, Pakistan. Registered business address: ${gap('COMPANY_ADDRESS')}. Contact for privacy questions: ${contact} or <a href="/contact">Contact &amp; Support</a>.</p>
+<h2 id="data">Information collected and its purpose</h2>
+<p>The information requested depends on your account role and the features you use. Browsing the course catalogue does not require a learner account.</p>
+<ul>
+<li><strong>Identity, contact and education:</strong> name, email, username, registration number, phone/WhatsApp, city, address, institute/university, degree/program, study year, career goals and marketing preference. Profile or onboarding workflows can also include date of birth, gender, CNIC/B-form, parent/guardian and emergency-contact details. These support account administration, enrollment, learner support and applicable staff onboarding.</li>
+<li><strong>Authentication:</strong> password hashes, Google account identifiers when Google sign-in is used, session credentials and temporary verification/reset credentials. These support sign-in, account security and recovery; passwords are stored as hashes.</li>
+<li><strong>Admissions and payments:</strong> course registrations, referral information, contact details, notes, challan amounts, discounts, deadlines, payment status, references and proof of payment. Staff onboarding can include bank/payout documentation. These support admissions, fee verification and finance. Payments use challans and manual bank/payment verification.</li>
+<li><strong>Learning and assessment:</strong> enrollments, attendance, quiz answers, submitted code and execution output, assignment/capstone notes, evidence links and files, grades, feedback, AI reports, course progress and compiler interaction/activity records. Gems, badges, streaks and certificates support learning progress and gamification.</li>
+<li><strong>Uploaded material:</strong> avatars, signatures, resumes, coursework/evidence, project images, department/task attachments, signed contracts and onboarding documents, including identity and qualification documents where requested. Files support the specific workflow in which you upload them.</li>
+<li><strong>Communications and operations:</strong> support requests and replies, course/event/job chats and comments, feedback, announcements, moderation, staff/employment records, departments, tasks, ambassador referrals and commission records, and audit logs. These support communication, administration and accountability.</li>
+<li><strong>Talent Marketplace and recruitment:</strong> profiles, skills, education, experience, employment preferences, availability, salary visibility choices, social links, resumes and projects; recruiter/company details, searches, shortlists, notes, contact requests, messages and reports. These support recruitment features and abuse review.</li>
+<li><strong>Technical and usage information:</strong> IP addresses used for request limiting, browser/device and request information, page/referral and interaction data handled by analytics and service providers. These support security, delivery and understanding website usage. Browser storage also preserves filters and drafts.</li>
+</ul>
+<h2 id="visibility">Who can see your information</h2>
+<p>Private course evidence, payment files, tickets and department records are available to the account holder and authorized staff according to the feature's permissions. Certificate verification exposes certificate authenticity details and learner/course information. Public learner-profile URLs expose selected name, course and gamification information to visitors who know the URL; this is separate from publishing a Talent profile.</p>
+<p>Talent profiles and projects become public when published. Published fields include the profile description, skills, education, experience, employment preferences, links and verified learning information. Salary is displayed only if its visibility option is enabled. Email, phone and resume are withheld from public Talent pages and are revealed to an approved recruiter only after you accept that recruiter's specific contact request. Recruiter searches and contact disclosures are audited. Unpublishing removes the profile from public/search views, but does not erase prior disclosures or their audit history. Published Showcase posts can make their images, descriptions and related project information public.</p>
+<h2 id="vendors">External services</h2>
+<p>EchoLens supports the services below. Optional services process information when enabled and used. The owner must confirm which optional providers are active and any replacements: ${gap('ACTIVE_PROCESSORS_AND_LOCATIONS')}. Providers can process information in countries other than Pakistan according to their infrastructure and terms.</p>
+${services.map(([name, role, url]) => `<section class="legal-vendor"><h3>${name}</h3><p>${role}${url ? ` <a href="${url}" rel="noopener">Provider privacy information</a>.` : ''}</p></section>`).join('\n')}
+<p>Google Gemini, OAuth, YouTube, Analytics and Fonts use <a href="https://policies.google.com/privacy">Google's privacy information</a>. Jitsi's fallback service provides <a href="https://jitsi.org/meet-jit-si-privacy/">its own privacy information</a>; cdnjs delivery is covered by <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's information</a>. Provider links explain provider practices; they are not a claim that every supported integration is currently enabled.</p>
+<h2 id="advertising">Cookies, analytics and advertising</h2>
+<p>See our <a href="/cookie-policy">Cookie Policy</a> for session cookies, analytics and browser draft storage. Existing site pages contain Google Analytics tags. No AdSense advertising integration was identified in the reviewed application.</p>
+<p>If Google advertising is enabled, third-party advertising vendors, including Google, use cookies to select ads using your earlier visits to EchoLens and other websites. Google's advertising cookies allow Google and its partners to personalize ads using visits across sites. You can opt out of personalized advertising through <a href="https://www.google.com/settings/ads">Google Ads Settings</a>. You can also manage participating vendors' personalized-advertising choices at <a href="https://www.aboutads.info/choices">aboutads.info/choices</a>. Opting out of personalization does not necessarily stop all advertisements or essential cookies. Any additional ad networks must be identified here before being introduced.</p>
+<h2 id="retention">Retention, correction and deletion requests</h2>
+<p>Account, assessment, admissions, support, uploaded-file and audit records are retained by the application's storage and backup systems. An incomplete free-course enrollment expires after its three-calendar-month window; this does <strong>not</strong> delete submissions, grades or certificates. Talent contact-reveal audit history is retained even after unpublishing. The application does not implement a comprehensive automatic personal-data deletion schedule.</p>
+<p>Approved retention periods, backup retention and deletion handling: ${gap('DATA_RETENTION_AND_DELETION_POLICY')}. No fixed deletion turnaround is asserted while those details remain unconfirmed.</p>
+<p>Request access, correction or deletion by emailing ${contact} or submitting the <a href="/contact">support form</a>, identifying the account and the information involved. Do not send passwords or full identity documents in your initial request. The team may need to verify account ownership. Account removal alone does not guarantee that every related file, payment record, certificate or audit record has been erased.</p>
+<h2 id="children">Children and account eligibility — owner review required</h2>
+<p>Minimum account age: ${gap('MINIMUM_ACCOUNT_AGE')}. Parent/guardian consent and handling of school-age learners: ${gap('PARENTAL_CONSENT_AND_CHILDRENS_DATA_PRACTICE')}.</p>
+<p>Sign-up does not currently enforce a minimum-age check or parental-consent workflow. The platform's educational use can include school-age students. These practices need confirmation and review before a final children's-data policy is published. This page makes no COPPA or GDPR compliance claim.</p>
+<h2>Policy updates</h2><p>The last-updated date above identifies this draft's revision. Privacy questions or concerns can be sent to ${contact}.</p>`,
+  },
+  '/terms': {
+    title: 'Terms of Use', description: 'EchoLens account responsibilities, acceptable use, course materials, enrollment, payment-policy gaps and service terms.',
+    content: `${review}
+<p>These draft terms address use of EchoLens Digital, the learning and operations platform identified in company materials as EchoLens (SMC-Private) Limited, Pakistan. Business address: ${gap('COMPANY_ADDRESS')}. Questions: ${contact}.</p>
+<h2>Accounts and responsibilities</h2><p>Provide accurate registration information, keep your sign-in credentials private, and report suspected account misuse. Use the permissions assigned to your role. Learner access, staff workspaces, recruiter access and public browsing have different permissions. Minimum account age and parent/guardian consent rules await confirmation: ${gap('MINIMUM_ACCOUNT_AGE_AND_PARENTAL_CONSENT')}.</p>
+<h2>Acceptable use</h2><p>Use the platform for lawful learning, teaching, recruitment and authorized administration. Do not impersonate another person, harass others, upload unlawful material, infringe intellectual-property rights, distribute malware, attempt unauthorized access, bypass assessment protections or falsify payment, attendance or certificate evidence. Submit work honestly and follow the assignment's rules about assistance and collaboration. Do not include credentials or unrelated personal data in compiler input or AI prompts.</p>
+<h2>Course materials and submitted work</h2><p>Course materials, platform branding and software belong to EchoLens or their respective rights holders. Enrollment provides access for learning; it does not transfer ownership or permission to redistribute protected materials. Respect any license attached to a resource. Submit or publish only content you have permission to use. The platform processes submitted work for assessment and feedback; choosing to publish Talent projects or Showcase posts makes the selected content visible through those features.</p>
+<h2>Enrollment, assessments and certificates</h2><p>Free courses are self-paced and have course-specific assessment and completion requirements. Learners can hold up to two active free courses. Each free-course enrollment has a three-calendar-month completion window; incomplete enrollments expire while existing work is preserved. Admin restoration starts a fresh window. Paid cohort schedules and enrollment activation are confirmed through Admissions. Certificates depend on the applicable completion and review rules; the platform also supports audited admin overrides. Access or enrollment does not guarantee a job or any particular learning outcome.</p>
+<h2 id="payments">Payments, cancellations and refunds</h2><p>Paid-course registrations use fee challans, payment-stage tracking and manual payment verification. Check the selected course's current price and Admissions instructions before paying. Published learner cancellation, withdrawal and refund rules: ${gap('LEARNER_PAYMENT_CANCELLATION_AND_REFUND_POLICY')}. These terms do not assert a refund entitlement, refund period or non-refundable-fee rule while the policy remains unconfirmed; obtain the applicable confirmed terms from <a href="mailto:finance@echolens.digital">finance@echolens.digital</a> before payment.</p>
+<h2>External services and privacy</h2><p>Optional sign-in, mail, video, AI and execution services have their own terms. Native-language compiler runs can send your source and input to Compiler Explorer; AI features can send relevant work to configured AI providers. Read the <a href="/privacy-policy">Privacy Policy</a> and <a href="/cookie-policy">Cookie Policy</a> for the data involved. External links are provided for their relevant purpose.</p>
+<h2>Availability and warranties</h2><p>To the extent permitted by applicable law, the platform and learning materials are provided as available, without a promise of uninterrupted or error-free service. AI feedback and compiler output can be incorrect and should be assessed alongside the assignment requirements and instructor guidance. Nothing in these draft terms removes a right or warranty that applicable law does not allow to be excluded.</p>
+<h2>Limitation of liability</h2><p>Any limitation is subject to applicable law and does not exclude liability that cannot lawfully be excluded. Approved liability allocation and any limits require owner review: ${gap('APPROVED_LIABILITY_TERMS')}. This draft does not invent a financial liability cap.</p>
+<h2>Suspension and termination</h2><p>The app supports account-status changes, moderation, enrollment removal and automatic expiry of incomplete free-course enrollments. Access can be restricted for misuse or unauthorized activity. Removal of access does not itself erase all historical records. Account, enrollment or moderation concerns can be raised through <a href="/contact">Contact &amp; Support</a>. Approved termination notice and appeal terms: ${gap('TERMINATION_AND_APPEAL_TERMS')}.</p>
+<h2>Governing law and disputes</h2><p>Learner governing law, jurisdiction and dispute process: ${gap('LEARNER_GOVERNING_LAW_AND_DISPUTE_PROCESS')}.</p>
+<h2>Changes and questions</h2><p>These terms require review of the marked fields before final publication. Contact ${contact} for the current confirmed enrollment terms.</p>`,
+  },
+  '/about': {
+    title: 'About EchoLens', description: 'Learn about EchoLens Digital, its free certified courses, instructor-led learning, browser coding environment and student portal.',
+    content: `${review}
+<p><strong>EchoLens Digital</strong> is a gamified learning-management and operations platform. The public website introduces its courses and events, while learner accounts provide access to course work, progress and certificates. The company is identified in its materials as <strong>EchoLens (SMC-Private) Limited</strong>, Pakistan.</p>
+<h2>What you can learn</h2><p>The course catalogue covers artificial intelligence, data science, web development and design. It includes short bootcamps, longer courses and specialist tracks. Catalogue examples include AI automation with n8n and Make.com, prompt engineering, AI-assisted coding, Excel with AI, and Canva/content creation. Browse the <a href="/courses">course catalogue</a> for current outlines, prices and availability.</p>
+<h2>Two ways to learn</h2><p><a href="/open#free">Free certified courses</a> offer self-paced learning, assignments, assessment feedback and certificates subject to completion requirements. <a href="/open#paid">Paid courses</a> add instructor-led cohort learning, live sessions, guidance and cohort tools. Both use a learner identity; the available assessment and AI features depend on the course and configuration.</p>
+<h2>Practice, feedback and progress</h2><p>The browser compiler lets learners write and run code alongside course assignments. Learners can submit code, notes, links and evidence files; instructors and authorized staff review work where required. The portal tracks progress, grades, gems, streaks and certificates. Public certificate verification supports checking a certificate's authenticity. A student demo uses fictional, isolated records so visitors can explore without accessing real learner data.</p>
+<h2>Who the platform serves</h2><p>The public site supports learners exploring courses, including students and people developing career skills. The LMS serves enrolled learners and instructors; Admissions, Finance and other authorized departments support enrollment and operations. The opt-in Talent Marketplace supports published learner profiles/projects and approved recruiter contact requests.</p>
+<h2>Our history and location</h2><p>Founded or launched: ${gap('FOUNDING_OR_LAUNCH_DATE')}. Registered business address: ${gap('COMPANY_ADDRESS')}. Pakistan is the country identified in company materials.</p>
+<h2>Explore or get in touch</h2><p><a href="/">Compare free and paid learning on Home</a>, <a href="/demo/?portal=student">explore the isolated student demo</a>, or <a href="/contact">contact the team</a> at ${contact}.</p>`,
+  },
+  '/contact': {
+    title: 'Contact & Support', description: 'Contact EchoLens Digital by email, WhatsApp or its working support-ticket form for course, account, payment, certificate and privacy questions.',
+    content: `${review}
+<p>For course, account, compiler, payment, certificate or privacy questions, email ${contact} or use the support form below. You can also <a href="https://wa.me/923141479109" target="_blank" rel="noopener">message the public WhatsApp contact: 0314 1479109</a>.</p>
+<p>Finance questions: <a href="mailto:finance@echolens.digital">finance@echolens.digital</a>. Admissions: <a href="mailto:admissions@echolens.digital">admissions@echolens.digital</a>.</p>
+<p><strong>Business:</strong> EchoLens (SMC-Private) Limited, Pakistan.<br><strong>Registered address:</strong> ${gap('COMPANY_ADDRESS')}.</p>
+<p>Support-ticket acknowledgments state that the team <strong>aims to resolve problems within 24–48 hours</strong>. This is an aim, rather than a guaranteed first-response or resolution time. Acknowledgment email delivery depends on the mail service; successful form submission creates a ticket even when email delivery is unavailable.</p>
+<h2>Send a support request</h2>
+<p>The form uses EchoLens's existing support-ticket system. For a privacy request, choose Account and describe the request without including passwords or identity-document copies.</p>
+<form id="contactForm" class="contact-form" action="/api/public/support-tickets" method="post">
+<label for="contactName">Name</label><input id="contactName" name="name" autocomplete="name" minlength="2" maxlength="120" required>
+<label for="contactEmail">Email</label><input id="contactEmail" name="email" type="email" autocomplete="email" maxlength="254" required>
+<label for="contactCategory">Category</label><select id="contactCategory" name="category"><option value="account">Account or privacy</option><option value="course">Course or enrollment</option><option value="compiler">Compiler</option><option value="payment">Payment</option><option value="certificate">Certificate</option><option value="event">Event</option><option value="other">Other</option></select>
+<label for="contactSubject">Subject</label><input id="contactSubject" name="subject" minlength="5" maxlength="120" required>
+<label for="contactMessage">Message</label><textarea id="contactMessage" name="message" rows="6" minlength="10" maxlength="2000" required></textarea>
+<div class="contact-trap" aria-hidden="true"><label for="contactCompany">Leave this empty</label><input id="contactCompany" name="company" tabindex="-1" autocomplete="off"></div>
+<p class="contact-note">Your name, email and message are used to handle your request. Read the <a href="/privacy-policy">Privacy Policy</a>.</p>
+<button class="btn btn-primary" type="submit">Submit support request</button>
+<p id="contactStatus" role="status" aria-live="polite" tabindex="-1"></p>
+<a id="contactReply" hidden>Open your private ticket</a>
+</form>
+<noscript><p>To submit this interactive form, enable JavaScript. You can also <a href="mailto:info@echolens.digital">email info@echolens.digital</a> directly.</p></noscript>`,
+    script: '/js/contact.js',
+  },
+  '/cookie-policy': {
+    title: 'Cookie Policy', description: 'EchoLens session and Google sign-in cookies, Google Analytics, embedded services, advertising choices and browser draft storage.',
+    content: `${review}
+<p>This page explains cookies and browser storage used by EchoLens Digital. For the wider handling of personal information and external services, read the <a href="/privacy-policy">Privacy Policy</a>. Questions: ${contact}.</p>
+<h2>Cookies set by the application</h2>
+<div class="legal-table-wrap"><table><caption>Application cookie purposes and lifetimes</caption><thead><tr><th scope="col">Cookie</th><th scope="col">Purpose</th><th scope="col">Lifetime in code</th></tr></thead><tbody>
+<tr><td><code>el_token</code></td><td>Authenticates the normal account session.</td><td>Up to 7 days.</td></tr>
+<tr><td><code>el_demo_token</code></td><td>Authenticates an isolated demo session, separate from real accounts. The demo proxy scopes it to the demo path.</td><td>Up to 7 days.</td></tr>
+<tr><td><code>el_oauth_state</code></td><td>Checks that an optional Google sign-in callback belongs to the sign-in request.</td><td>10 minutes; cleared during callback handling.</td></tr>
+</tbody></table></div>
+<p>These cookies are HttpOnly and SameSite=Lax. Secure delivery is enabled by the application's production detection, with additional Secure handling in the demo proxy. Logging out clears the relevant session cookie. The code clears a legacy <code>el_back</code> cookie but no current setting of it was found.</p>
+<h2>Google Analytics and embedded services</h2><p>Existing pages embed Google Analytics 4 with measurement ID <code>G-JPPLHMV7TD</code>. Google Analytics can use cookies such as <code>_ga</code> and measurement-specific <code>_ga_*</code> cookies to distinguish visits and maintain analytics state. Their duration depends on Google and the configured analytics settings, rather than the seven-day app-session lifetime. The reviewed app has no site-wide analytics consent or cookie-preference interface.</p>
+<p>Embedded YouTube videos and live-class services can make third-party requests and use their own cookies/storage when loaded or used. YouTube embeds use the privacy-enhanced domain; this does not mean playing a video involves no third-party processing. Google sign-in involves Google when you choose it. Font and library CDNs receive browser requests; their inclusion alone is not evidence of an additional app-created cookie.</p>
+<h2>Advertising cookies</h2><p>No AdSense ad integration was found in the reviewed code. If advertising is enabled, vendors including Google use cookies to select advertisements using prior visits to this site and other sites; Google's ad cookies support personalization by Google and its partners. Manage personalized advertising through <a href="https://www.google.com/settings/ads">Google Ads Settings</a> and participating vendors through <a href="https://www.aboutads.info/choices">aboutads.info/choices</a>.</p>
+<h2>Local storage and session storage</h2><p>Browser storage preserves course filters, registration/sign-up and assignment drafts, editor/workflow state and submission deduplication identifiers. This is distinct from cookies. Demo browser drafts are isolated from normal portal drafts. Depending on the feature, stored drafts can include the information or code you typed. Clearing storage removes local drafts and preferences; it does not erase records already submitted to the server.</p>
+<h2>How to control cookies and storage</h2><p>Use your browser's site-data settings to inspect, delete or block cookies and local storage. Blocking session cookies can prevent sign-in and authenticated workflows. Sign out when using a shared device and clear saved drafts when appropriate. Google provides an <a href="https://tools.google.com/dlpage/gaoptout">Analytics opt-out browser add-on</a>; advertising opt-out links above address ad personalization, not all analytics or essential cookies.</p>
+<p>Confirmed third-party cookie settings and any consent mechanism to be introduced: ${gap('COOKIE_SETTINGS_AND_CONSENT_PRACTICE')}. This draft does not claim a consent mechanism is already implemented.</p>`,
+  },
+};
+function render(route) {
+  const page = pages[route];
+  if (!page) return null;
+  return `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${page.title} | EchoLens Digital</title><meta name="description" content="${page.description}">
+<link rel="canonical" href="https://www.echolens.digital${route}"><link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v1430"><link rel="stylesheet" href="/css/public-navigation.css?v1"><link rel="stylesheet" href="/css/public-footer.css?v1"><link rel="stylesheet" href="/css/legal-pages.css?v1">
+</head><body class="legal-body"><a class="legal-skip" href="#main">Skip to content</a>
+${navigation.render()}
+<main id="main" class="legal-wrap"><nav class="legal-crumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true"> / </span><span>${page.title}</span></nav>
+<article class="legal-card"><header><h1>${page.title}</h1><p class="legal-updated">Last updated: <time datetime="${updated}">18 September 2026</time></p></header>${page.content}</article></main>
+${footer.render()}
+<script src="/js/public-navigation.js?v1"></script>${page.script ? `<script src="${page.script}" defer></script>` : ''}
+</body></html>`;
+}
+function register(app) {
+  for (const route of Object.keys(pages)) app.get(route, (req, res) => res.type('html').send(render(route)));
+  // Keep existing privacy links working with the complete policy at a 200 URL.
+  app.get('/privacy', (req, res) => res.type('html').send(render('/privacy-policy')));
+}
+module.exports = { pages, render, register, services };

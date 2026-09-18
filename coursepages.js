@@ -9,6 +9,7 @@
  */
 const store = require('./store');
 const publicNavigation = require('./public-navigation');
+const publicFooter = require('./public-footer');
 
 const BASE = 'https://www.echolens.digital';
 // All enrolment goes through the in-site registration form (lands in the
@@ -130,15 +131,13 @@ ${jsonld.map(jsonScript).join('\n')}
   .btn-light:hover{border-color:#7C3AED;color:#7C3AED}
 </style>
 <link rel="stylesheet" href="/css/public-navigation.css?v1">
+<link rel="stylesheet" href="/css/public-footer.css?v1">
 </head>
 <body>
 ${publicNavigation.render()}`;
 }
 function pageFoot() {
-  return `<footer class="cp-foot">
-  <span>&copy; ${new Date().getFullYear()} EchoLens Digital - Pakistan's gamified AI &amp; tech academy.</span>
-  <span><a href="/courses">All courses</a> &middot; <a href="/open">Free quests</a> &middot; <a href="/compiler">Compiler</a> &middot; <a href="mailto:${EMAIL}">${EMAIL}</a></span>
-</footer>
+  return `${publicFooter.render()}
 <script src="/js/public-navigation.js?v1"></script>
 </body>
 </html>`;

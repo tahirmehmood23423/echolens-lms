@@ -1,0 +1,161 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "route": "/privacy-policy",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/terms",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/about",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/contact",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/cookie-policy",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/courses",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/open#free",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/compiler",
+      "scroll": 1440
+    },
+    {
+      "width": 1440,
+      "route": "/login",
+      "scroll": 1440
+    },
+    {
+      "width": 390,
+      "route": "/privacy-policy",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/terms",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/about",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/contact",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/cookie-policy",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/courses",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/open#free",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/compiler",
+      "scroll": 390
+    },
+    {
+      "width": 390,
+      "route": "/login",
+      "scroll": 390
+    },
+    {
+      "width": 320,
+      "route": "/privacy-policy",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/terms",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/about",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/contact",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/cookie-policy",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/courses",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/open#free",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/compiler",
+      "scroll": 320
+    },
+    {
+      "width": 320,
+      "route": "/login",
+      "scroll": 320
+    }
+  ],
+  "checks": [
+    "ticket creation and private reply",
+    "429 retains inputs",
+    "footer login preserves return",
+    "existing forgot-password action"
+  ],
+  "errors": []
+}

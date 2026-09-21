@@ -1,0 +1,37 @@
+-- ROLLBACK TEMPLATE - NOT READY TO RUN AS-IS. Copied unchanged from
+-- db/security/enable-rls.sql, still fully commented out.
+--
+-- BEFORE THIS CAN RUN YOU MUST:
+--   1. Disable the Supabase Data API, or remove `public` from
+--      Settings -> API -> Exposed schemas, FIRST. Otherwise rolling back
+--      reopens the exact hole you closed.
+--   2. Paste the table names from your SAVED STAGE 1 RESULT into the empty
+--      previously_unprotected text array below, e.g.
+--          ARRAY['courses', 'users']::text[]
+--      Only tables from that saved list. A table that already had RLS before
+--      you started must not be disabled here.
+--   3. Uncomment the block (remove the leading "-- " from each line).
+--
+-- The guard raises an exception if the array is still empty, so an
+-- accidentally-run empty template changes nothing.
+
+-- 4. ROLLBACK, deliberately commented out. Disable the unused Data API/remove
+-- public from its exposed schemas FIRST, so rollback cannot reopen the hole.
+-- Paste ONLY table names saved in the BEFORE result into the empty text array.
+-- Do not disable tables that were already protected before this change.
+-- BEGIN;
+-- SET LOCAL lock_timeout = '5s';
+-- DO $rollback_rls$
+-- DECLARE
+--     previously_unprotected constant text[] := ARRAY[]::text[];
+--     table_name text;
+-- BEGIN
+--     IF cardinality(previously_unprotected) = 0 THEN
+--         RAISE EXCEPTION 'Fill previously_unprotected from the saved BEFORE result first';
+--     END IF;
+--     FOREACH table_name IN ARRAY previously_unprotected LOOP
+--         EXECUTE format('ALTER TABLE %I.%I DISABLE ROW LEVEL SECURITY', 'public', table_name);
+--     END LOOP;
+-- END;
+-- $rollback_rls$;
+-- COMMIT;

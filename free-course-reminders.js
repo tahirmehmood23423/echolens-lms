@@ -12,14 +12,24 @@ function createFreeCourseReminders(store, mailer, options = {}) {
     const rows = [];
     for (const user of store.Users.all()) {
       if (!['free', 'student'].includes(user.role)) continue;
-      const saved = user.profile?.free_course_enrollments || [];
+      const existing = Array.isArray(user.profile?.free_course_enrollments) ? user.profile.free_course_enrollments : null;
+      const saved = existing || [];
       // Materialise submission-only legacy enrollments without resetting work.
       for (const submission of store.allData().open_submissions) {
         if (submission.user_id !== user.id || saved.some(e => e.track_key === submission.track_key)) continue;
         if (!store.Quests.trackDef(submission.track_key)?.free) continue;
         saved.push({ track_key: submission.track_key, enrolled_at: submission.submitted_at });
       }
-      user.profile = { ...(user.profile || {}), free_course_enrollments: saved };
+      // Only write the key when there is something to record, or it was already
+      // there. This sweep runs at boot and hourly over EVERY free/student user;
+      // assigning unconditionally stamped `free_course_enrollments: []` onto
+      // hundreds of profiles that never had it, and since the Postgres flush
+      // diffs rows by their serialized JSON, each of those became a "changed"
+      // row. That is what turned a no-op sweep into ~380 per-row UPDATEs inside
+      // the single 60s flush transaction and wedged persistence outright.
+      if (existing || saved.length) {
+        user.profile = { ...(user.profile || {}), free_course_enrollments: saved };
+      }
       for (const enrollment of saved) {
         const track = store.Quests.trackDef(enrollment.track_key);
         if (!track?.free) continue;

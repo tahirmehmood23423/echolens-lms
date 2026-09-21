@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
+const vm = require('node:vm');
 const { fork } = require('node:child_process');
 const { once } = require('node:events');
 const { captureSnapshot, prepareFlush, pendingCounts } = require('../normalized-flush-plan');
@@ -45,6 +46,37 @@ test('disabled flush leaves store exports usable; guard is inside the flush func
   vm.runInContext(source.slice(start, source.indexOf('/** Capture only when', start)), context);
   const result = await context.persistAllToPostgresNormalized(null);
   assert.equal(result.skipped, true);
+});
+
+test('a settled failed flush cannot poison later requests or clear a newer flush gate', async () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'store.js'), 'utf8').replace(/\r\n/g, '\n');
+  const persistenceGate = source.slice(source.indexOf('function pendingPersist()'), source.indexOf('function nextId('));
+  const deferred = () => {
+    let resolve, reject;
+    const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+    return { promise, resolve, reject };
+  };
+  const first = deferred(), second = deferred(), queued = [first.promise, second.promise];
+  const context = vm.createContext({
+    pendingPersistPromise: Promise.resolve(), postgresReady: true,
+    queuePersistToPostgres: () => queued.shift(),
+    db: { enabled: () => true }, DB_PATH: 'unused', data: {},
+    require: module => module === './demo/context' ? { locked: false } : require(module),
+    console: { error() {} }, Promise,
+  });
+  vm.runInContext(persistenceGate, context);
+  context.save();
+  const firstGate = context.pendingPersist();
+  context.save();
+  const secondGate = context.pendingPersist();
+  first.reject(new Error('P2028'));
+  await assert.rejects(firstGate, /P2028/);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(context.pendingPersist(), secondGate);
+  second.resolve();
+  await secondGate;
+  await new Promise(resolve => setImmediate(resolve));
+  await assert.doesNotReject(context.pendingPersist());
 });
 
 test('admin dump endpoints stay reachable when persistence fails; other roles cannot inspect them', { timeout: 45000 }, async t => {

@@ -687,9 +687,22 @@ function pendingPersist() { return pendingPersistPromise; }
 function save() {
   if (require('./demo/context').locked) throw new Error('Read-only demo: sample records cannot be changed.');
   if (db.enabled() && postgresReady) {
-    pendingPersistPromise = queuePersistToPostgres().catch((err) => {
+    const attempt = queuePersistToPostgres().catch((err) => {
       console.error('[store] Postgres persist failed:', err.message);
       throw err;
+    });
+    pendingPersistPromise = attempt;
+    // Clear the shared gate once THIS attempt settles, so a failure is reported
+    // to the requests that were waiting on it and to nobody else. The rejected
+    // promise used to stay parked here forever: server.js gates every response
+    // on pendingPersist(), so after one failed flush every later request - reads
+    // included - resolved against that same old rejection and 500ed
+    // ("Something went wrong while saving"). The failure is still surfaced, in
+    // the log above and in flushHealth(); what it no longer does is take the
+    // whole site down until a restart. Later writes remain unacknowledged until
+    // their own flush succeeds, which is the guarantee this gate is actually for.
+    attempt.then(() => {}, () => {}).then(() => {
+      if (pendingPersistPromise === attempt) pendingPersistPromise = Promise.resolve();
     });
     return;
   }

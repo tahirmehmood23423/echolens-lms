@@ -3,6 +3,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const policy = require('../free-course-policy');
 const { createFreeCourseReminders } = require('../free-course-reminders');
+const { captureSnapshot, prepareFlush } = require('../normalized-flush-plan');
 function fixture(count = 1) {
   const users = Array.from({ length: count }, (_, i) => ({ id: i + 1, role: 'free', name: 'Sample Learner', email: `learner${i}@qa.invalid`, profile: { free_course_enrollments: [{ track_key: 'sample', enrolled_at: '2026-01-01 09:00:00' }] } }));
   const track = { key: 'sample', title: 'Sample Course', free: true }, sent = [], suppressed = new Set();
@@ -66,4 +67,22 @@ test('hourly runs cap recipients and stop at three failures; concurrent sweeps s
   const f = fixture(5); const service = f.make({ maxPerRun: 2 });
   await Promise.all([service.run(), service.run()]); assert.equal(f.sent.length, 2);
   const g = fixture(5); g.mailer.send = async () => ({ sent: false }); assert.equal((await g.make().run()).attempted, 3);
+});
+test('an empty reminder sweep does not dirty every learner profile', async () => {
+  const users = Array.from({ length: 419 }, (_, i) => ({
+    id: i + 1, role: i % 2 ? 'free' : 'student', name: `Learner ${i}`, email: `learner${i}@qa.invalid`, profile: {},
+  }));
+  const data = { users, open_submissions: [], feedback: [], seq: {}, settings: {}, issued_usernames: [], issued_regnos: [] };
+  const baselinePlan = prepareFlush(captureSnapshot(data), {});
+  const store = {
+    Users: { all: () => users, byId: id => users.find(user => user.id === id) },
+    Quests: { trackDef: () => null }, allData: () => data,
+    persist() {}, pendingPersist: async () => {}, Suppressions: { has: () => false },
+    AuditLog: { record() {} }, OpenQuest: { progress: () => ({ passed: false }) },
+  };
+  await createFreeCourseReminders(store, { configured: false }, { clock: () => new Date('2026-01-08T09:00:00Z') }).run();
+  const after = prepareFlush(captureSnapshot(data), baselinePlan.nextSnapshot);
+  assert.equal(after.operations.length, 0);
+  assert.equal(after.rowsWritten.users, undefined);
+  assert.ok(users.every(user => !Object.hasOwn(user.profile, 'free_course_enrollments')));
 });

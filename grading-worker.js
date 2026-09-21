@@ -7,7 +7,18 @@ function createGradingWorker({attempts,persist,enabled,grade,onComplete,timeoutM
       const next=attempts.due();if(!next)return;
       if(!enabled()){attempts.fail(next.id,'Grading is unavailable. Your attempt is saved. Retry when the service returns or ask staff to review it.');await persist();return;}
       const a=attempts.start(next.id);if(!a)return;
-      await persist(); // Work must be durable before calling the provider.
+      // Work must be durable before calling the provider - but a persistence
+      // failure must not abandon the attempt. start() has already flipped it to
+      // 'processing', a state due() never re-selects and only recover() clears,
+      // and recover() runs once at worker start: letting this rejection reach
+      // the outer catch stranded the attempt until the next restart. Hand it
+      // back to the queue instead, so it retries with backoff.
+      try{ await persist(); }
+      catch(e){
+        log('Grading attempt '+a.id+': could not save before grading, requeuing: '+e.message);
+        attempts.fail(a.id,'Grading has not started yet. Your work is saved and will be graded automatically.',true);
+        return;
+      }
       let timeout;
       try{
         const result=await Promise.race([grade(a),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('Grading timed out')),timeoutMs);})]);

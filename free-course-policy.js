@@ -20,7 +20,7 @@ function remaining(enrollment, now = Date.now()) {
   const due = parseTimestamp(deadline(enrollment));
   return Number.isFinite(due) ? Math.max(0, Math.ceil((due - now) / DAY)) : null;
 }
-function messageFor(user, enrollment, track, kind, now = Date.now(), appUrl = 'https://echolens.digital') {
+function messageFor(user, enrollment, track, kind, now = Date.now(), appUrl = 'https://www.echolens.digital') {
   const days = remaining(enrollment, now);
   const date = new Date(deadline(enrollment)).toLocaleString('en-GB', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   const intro = kind === 'inactive' ? 'You have not opened this course for at least one week. Pick up where you left off and work on your next assignment.'

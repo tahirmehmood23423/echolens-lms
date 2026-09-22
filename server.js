@@ -312,7 +312,10 @@ const admissionsReminders = createAdmissionsReminders(store, mailer, {
   phone: process.env.ADMISSIONS_EXTENSION_PHONE,
   financeEmail: FINANCE_EMAIL,
 });
-const freeCourseReminders = createFreeCourseReminders(store, mailer, { appUrl: process.env.APP_URL || 'https://echolens.digital' });
+// www, matching APP_URL below and the admissions reminders above: the bare
+// apex is a separate DNS record that need not point anywhere, so defaulting to
+// it put a dead link in a reminder email whenever APP_URL was unset.
+const freeCourseReminders = createFreeCourseReminders(store, mailer, { appUrl: process.env.APP_URL || 'https://www.echolens.digital' });
 function hrOnly(req, res, next) { if (['admin', 'hr'].includes(req.user.role)) return next(); return res.status(403).json({ error: 'Not available for your role.' }); }
 function ambassadorOnly(req, res, next) { if (req.user.role !== 'ambassador') return res.status(403).json({ error: 'Not available for your role.' }); next(); }
 // Ambassador commission reports are shared reading across four departments -

@@ -2361,11 +2361,15 @@ async function renderCertificates() {
           <div class="s" style="color:var(--muted)">${esc(c.kind)} &middot; completed ${fmtDate(c.completion_date)} &middot; serial <span class="mono">${esc(c.serial)}</span></div>
         </div>
         <a class="btn btn-teal btn-sm" href="/cert?s=${esc(c.serial)}" target="_blank" rel="noopener">View &amp; download</a>
-        <button class="btn btn-ghost btn-sm" onclick="shareCertLinkedIn('${esc(c.serial)}','${esc(c.title).replace(/'/g, '&#39;')}','${esc(c.completion_date)}','${esc(c.org).replace(/'/g, '&#39;')}')">in&nbsp;Add to LinkedIn</button>
+        <button class="btn btn-ghost btn-sm" onclick="shareCertLinkedIn('${esc(c.serial)}','${esc(c.title).replace(/'/g, '&#39;')}','${esc(c.completion_date)}','${esc(c.org).replace(/'/g, '&#39;')}','${esc(c.url || '')}')">in&nbsp;Add to LinkedIn</button>
       </div>`).join('')}</div></div>`;
 }
-function shareCertLinkedIn(serial, title, date, org) {
-  const url = location.origin + '/cert?s=' + serial;
+// `canonicalUrl` is the server's own /api/certificates/mine `url`, built from
+// APP_URL. It must win over location.origin: this link is written permanently
+// into the learner's LinkedIn profile, so it cannot be allowed to record
+// whichever hostname of the site they happened to be signed in on.
+function shareCertLinkedIn(serial, title, date, org, canonicalUrl) {
+  const url = canonicalUrl || (location.origin + '/cert?s=' + serial);
   const y = (date || '').slice(0, 4), m = Number((date || '').slice(5, 7)) || 1;
   const add = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'
     + '&name=' + encodeURIComponent(title)

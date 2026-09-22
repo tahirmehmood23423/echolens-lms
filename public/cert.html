@@ -138,6 +138,13 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
     return;
   }
   const c = d.certificate;
+  // The canonical certificate URL comes from the SERVER (verify_url, built from
+  // APP_URL), never from location.origin. A learner who happened to be on
+  // another host for the same site - the bare apex instead of www, say - would
+  // otherwise mint a QR code and a LinkedIn credential link pointing at that
+  // host, permanently. Those links outlive the visit: they sit on a CV and on a
+  // LinkedIn profile, so they must not depend on which hostname was typed.
+  const certUrl = d.verify_url || (location.origin + '/cert?s=' + c.serial);
   // v18: the CEO signature is always the typed name in a script font below -
   // no uploaded signature image is used on the certificate anymore.
   const fmt = (x) => { try { return new Date(x + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); } catch { return x; } };
@@ -191,7 +198,7 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
       <div class="serial">Serial: ${esc(c.serial)} &nbsp;&middot;&nbsp; Issued ${esc(c.issued_at)}</div>
     </div>`;
 
-  new QRCode(document.getElementById('qrbox'), { text: location.origin + '/cert?s=' + c.serial, width: 78, height: 78, correctLevel: QRCode.CorrectLevel.M });
+  new QRCode(document.getElementById('qrbox'), { text: certUrl, width: 78, height: 78, correctLevel: QRCode.CorrectLevel.M });
 
   const conceptsHtml = (c.concepts && c.concepts.length) ? `
     <div class="ve-card">
@@ -220,7 +227,6 @@ const KIND_LINE = { course: 'has successfully completed the course', hackathon: 
 
   document.getElementById('extra').innerHTML = conceptsHtml + finalProjectHtml;
 
-  const certUrl = location.origin + '/cert?s=' + c.serial;
   const y = (c.completion_date || '').slice(0, 4), m = Number((c.completion_date || '').slice(5, 7)) || 1;
   document.getElementById('liBtn').href = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'
     + '&name=' + encodeURIComponent(c.title)

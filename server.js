@@ -4773,7 +4773,77 @@ app.post('/api/open/attempts/:id/retry',authRequired,openLearnerRequired,asyncRo
   if(out.error)return res.status(out.status||400).json({error:out.error});
   await store.pendingPersist();res.json({ok:true,attempt:learnerAttempt(out.attempt)});
 }));
-app.get('/api/admin/open-attempts',authRequired,adminRequired,(req,res)=>res.json({attempts:store.allData().open_attempts.filter(a=>['awaiting_review','failed'].includes(a.status)).map(a=>{const submission=store.allData().open_submissions.find(s=>s.id===a.submission_id),learner=Users.byId(a.user_id);return {...store.OpenAttempts.public(a),assessment_kind:submission?.assessment_kind||(a.level===0&&a.pid===0?'capstone':'assignment'),problem_title:submission?.problem_title||null,learner_name:learner?.name||null};})}));
+/**
+ * Every piece of free-course work that is still unmarked and needs a human.
+ *
+ * This used to list only 'awaiting_review' and 'failed' attempts, which hid the
+ * two states that actually strand a learner:
+ *
+ *  - an attempt still 'queued' or 'processing' long after the 8 h grading
+ *    window closed, so it is neither being graded nor reported as failed;
+ *  - an ungraded submission with no attempt row at all (OpenQuest.submit pushes
+ *    the submission before OpenAttempts.create, so a rejected create leaves one
+ *    behind) - invisible to every grading path there is.
+ *
+ * Both block the next module exactly as a failed attempt does, so both belong
+ * in the same queue. `reason` says which case each row is, and the summary
+ * counts them per course so "how much is unmarked?" is answerable at a glance.
+ */
+app.get('/api/admin/open-attempts',authRequired,adminRequired,(req,res)=>{
+  const data=store.allData(),rows=[];
+  const describe=(s,a)=>{
+    const learner=Users.byId(s?s.user_id:a.user_id),track=Quests.trackDef((s||a).track_key);
+    return {learner_name:learner?.name||null,learner_email:learner?.email||null,
+      course_code:track?.course_code||null,course_title:track?.title||(s||a).track_key,
+      problem_title:s?.problem_title||null,submitted_at:s?.submitted_at||a?.created_at||null};
+  };
+  for(const a of data.open_attempts){
+    const s=data.open_submissions.find(x=>x.id===a.submission_id);
+    // A graded submission is settled even if some later attempt failed - the
+    // learner is not blocked, so it is not this queue's business.
+    if(s&&s.score!=null)continue;
+    let reason=null;
+    if(a.status==='awaiting_review')reason='awaiting_review';
+    else if(a.status==='failed')reason='grading_failed';
+    else if(['queued','processing'].includes(a.status)&&!pacing.withinGradingWindow(a.created_at))reason='overdue';
+    if(!reason)continue;
+    rows.push({...store.OpenAttempts.public(a),reason,submission_id:a.submission_id,
+      assessment_kind:s?.assessment_kind||(a.level===0&&a.pid===0?'capstone':'assignment'),...describe(s,a)});
+  }
+  // Any attempt row at all, whatever its status: a submission whose only
+  // attempt failed is already listed above as grading_failed, and listing it
+  // again here as an orphan would double-count the backlog.
+  const claimed=new Set(data.open_attempts.map(a=>a.submission_id));
+  for(const s of data.open_submissions){
+    if(s.score!=null||claimed.has(s.id))continue;
+    if(!Quests.trackDef(s.track_key)?.free)continue;
+    rows.push({id:null,submission_id:s.id,user_id:s.user_id,track_key:s.track_key,level:s.level,pid:s.pid,
+      status:'no_attempt',reason:'no_attempt',payload:{error:'No grading attempt was ever recorded for this submission.',
+        code:s.code,language:s.language,file_url:s.file_url,file_name:s.file_name,files:s.files,evidence:s.evidence,tries:0},
+      assessment_kind:s.assessment_kind||(s.level===0&&s.pid===0?'capstone':'assignment'),...describe(s,null)});
+  }
+  rows.sort((a,b)=>String(a.submitted_at||'').localeCompare(String(b.submitted_at||'')));
+  const by_course={};
+  for(const r of rows){const k=r.course_code||r.track_key;(by_course[k]=by_course[k]||{course:r.course_title,total:0,awaiting_review:0,grading_failed:0,overdue:0,no_attempt:0})[r.reason]++;by_course[k].total++;}
+  res.json({attempts:rows,summary:{total:rows.length,
+    needs_marking:rows.filter(r=>r.reason!=='awaiting_review').length,by_course}});
+});
+/**
+ * Give an unmarked submission an attempt row so it can be marked like any
+ * other. Used for the 'no_attempt' and exhausted-'failed' rows above, whose
+ * work is otherwise unreachable by the grading route, which is keyed on an
+ * attempt id.
+ */
+app.post('/api/admin/open-submissions/:id/adopt',authRequired,adminRequired,asyncRoute(async (req,res)=>{
+  const s=store.allData().open_submissions.find(x=>x.id===Number(req.params.id));
+  if(!s)return res.status(404).json({error:'Submission not found.'});
+  if(s.score!=null)return res.status(409).json({error:'This submission is already graded.'});
+  const track=Quests.trackDef(s.track_key);
+  const problem=s.assessment_kind==='capstone'?track?.capstone:track?.levels.find(l=>l.no===s.level)?.problems.find(p=>p.pid===s.pid);
+  const attempt=store.OpenAttempts.adopt(s,problem||null);
+  await store.pendingPersist();
+  res.json({ok:true,attempt:store.OpenAttempts.public(attempt)});
+}));
 app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRoute(async (req,res)=>{
   const a=store.OpenAttempts.byId(req.params.id);if(!a)return res.status(404).json({error:'Attempt not found.'});
   if(a.status==='processing')return res.status(409).json({error:'This attempt is being graded. Wait until grading finishes.'});
@@ -4869,6 +4939,20 @@ const gradingWorker = require('./grading-worker').createGradingWorker({
     const certified=OpenQuest.maybeCertify(a.user_id,a.track_key);
     announceModuleUnlock(a.user_id,a.track_key);
     await announceCourseCompletion(a.user_id,a.track_key,certified).catch(e=>console.error('[certificate] email failed:',e.message));
+  },onFailed:async (a,reason)=>{
+    // An attempt that has stopped retrying blocks the learner's next module
+    // until a human marks it, so it has to reach one rather than wait to be
+    // noticed in the queue.
+    const learner=Users.byId(a.user_id),track=Quests.trackDef(a.track_key);
+    await mailer.notify(supportAdminEmails(),
+      `Grading failed - ${learner?.name || 'a learner'} is blocked on ${track?.course_code || a.track_key}`,
+      `Automatic grading gave up on this submission, so the learner's next module stays shut until someone marks it by hand.\n\n`
+      + `Learner: ${learner?.name || 'Learner #' + a.user_id}${learner?.email ? ` <${learner.email}>` : ''}\n`
+      + `Course: ${track?.title || a.track_key}${track?.course_code ? ` (${track.course_code})` : ''}\n`
+      + `Task: ${a.payload?.assessment_kind === 'capstone' ? 'Capstone' : `Lesson ${a.level}, practice ${a.pid}`}\n`
+      + `Attempt: #${a.id}, after ${a.payload?.tries || 0} automatic attempt(s)\n`
+      + `Last error: ${reason || a.payload?.error || 'unknown'}\n\n`
+      + `Mark it from the admin portal under Grades: ${APP_URL}/dashboard#view=grades`);
   },
 });
 app.get('/api/open/progress', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {

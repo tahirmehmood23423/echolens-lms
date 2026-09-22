@@ -7157,17 +7157,69 @@ async function regDelete(id) {
   catch (e) { toast(e.message, true); }
 }
 
+// How each unmarked row got here. Everything except 'awaiting_review' is work
+// the machine was supposed to mark and did not, so it reads as a fault to fix
+// rather than as a normal staff-review queue.
+const FREE_REVIEW_REASON={
+  awaiting_review:{label:'Awaiting staff review',tone:'var(--muted)'},
+  grading_failed:{label:'Automatic grading failed',tone:'var(--danger)'},
+  overdue:{label:'Overdue - never graded',tone:'var(--danger)'},
+  no_attempt:{label:'No grading attempt recorded',tone:'var(--danger)'},
+};
 async function renderFreeReviews(el){
   const d=await api('/api/admin/open-attempts');FREE_REVIEW_ATTEMPTS=d.attempts;
-  el.innerHTML='<div class="card"><div class="card-head"><h3>Free-course submissions needing review</h3></div><div class="card-body">'+(d.attempts.length?d.attempts.map(a=>`<div class="list-row"><div class="grow"><strong>${esc(a.track_key)} &middot; ${a.assessment_kind==='capstone'?'Capstone':`Lesson ${a.level} &middot; Practice ${a.pid}`}</strong><p>${esc(a.problem_title||'Saved assessment')} &middot; Attempt #${a.id} &middot; ${esc(a.learner_name||`Learner #${a.user_id}`)} &middot; ${esc(a.status==='awaiting_review'?'Awaiting review':'Automatic grading failed')}</p></div><button class="btn btn-primary" onclick="reviewFreeAttempt(${a.id})">Review</button></div>`).join(''):'No submissions need review.')+'</div></div>';
+  const s=d.summary||{total:0,needs_marking:0,by_course:{}};
+  const courses=Object.entries(s.by_course||{}).sort((a,b)=>b[1].total-a[1].total);
+  const summaryCard=`<div class="card" style="margin-bottom:14px"><div class="card-head"><h3>Unmarked free-course work</h3>
+      <span class="s" style="color:${s.needs_marking?'var(--danger)':'var(--muted)'}">${s.total} unmarked &middot; ${s.needs_marking} blocked on a failed grade</span></div>
+    <div class="card-body tight">${courses.length?courses.map(([code,c])=>`
+      <div class="list-row"><div class="grow"><div class="t">${esc(code)} &middot; ${esc(c.course)}</div>
+        <div class="s" style="color:var(--muted)">${c.total} unmarked${c.grading_failed?` &middot; ${c.grading_failed} grading failed`:''}${c.overdue?` &middot; ${c.overdue} overdue`:''}${c.no_attempt?` &middot; ${c.no_attempt} with no attempt`:''}${c.awaiting_review?` &middot; ${c.awaiting_review} awaiting review`:''}</div>
+      </div></div>`).join(''):'<div class="empty">Every submission is marked - no learner is waiting.</div>'}</div></div>`;
+  el.innerHTML=summaryCard+'<div class="card"><div class="card-head"><h3>Mark a submission</h3><span class="s" style="color:var(--muted)">Oldest first - each one blocks that learner\'s next module</span></div><div class="card-body tight">'
+    +(d.attempts.length?d.attempts.map(a=>{
+      const r=FREE_REVIEW_REASON[a.reason]||{label:a.status,tone:'var(--muted)'};
+      return `<div class="list-row"><div class="grow">
+        <div class="t">${esc(a.course_code||a.track_key)} &middot; ${a.assessment_kind==='capstone'?'Capstone':`Lesson ${a.level} &middot; Practice ${a.pid}`} &middot; ${esc(a.problem_title||'Saved assessment')}</div>
+        <div class="s" style="color:var(--muted)">${esc(a.learner_name||`Learner #${a.user_id}`)}${a.submitted_at?` &middot; submitted ${esc(String(a.submitted_at).slice(0,16))}`:''} &middot; <span style="color:${r.tone}">${esc(r.label)}</span>${a.payload&&a.payload.tries?` after ${a.payload.tries} tries`:''}</div>
+      </div><button class="btn btn-primary" onclick="reviewFreeAttempt(${a.submission_id})">Mark</button></div>`;
+    }).join(''):'<div class="empty">Nothing to mark.</div>')+'</div></div>';
 }
 let FREE_REVIEW_ATTEMPTS=[];
 function freeAttemptEvidenceHtml(a){
   const evidence=a.payload.evidence||{},links=evidence.links||[],files=evidence.files||a.payload.files||[];
   return `${links.map((url,index)=>`<a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener">Evidence link ${index+1}</a>`).join(' ')}${evidence.notes?`<p style="white-space:pre-wrap;margin-top:10px">${esc(evidence.notes)}</p>`:''}${a.payload.file_url?`<a class="btn btn-ghost btn-sm" href="${esc(a.payload.file_url)}" target="_blank" rel="noopener">Open submitted file</a>`:''}${files.filter(file=>file.url!==a.payload.file_url).map(file=>`<a class="btn btn-ghost btn-sm" href="${esc(file.url)}" target="_blank" rel="noopener">${esc(file.name||'Evidence file')}</a>`).join(' ')}`;
 }
-function reviewFreeAttempt(id){
-  const a=FREE_REVIEW_ATTEMPTS.find(item=>item.id===id);if(!a)return;
-  openModal(`Review ${a.assessment_kind==='capstone'?'capstone':'assignment'} attempt #${id}`,`<p>${esc(a.track_key)} &middot; ${a.assessment_kind==='capstone'?'Capstone':`Lesson ${a.level} &middot; Practice ${a.pid}`}</p>${a.payload.code?`<pre style="white-space:pre-wrap;max-height:300px;overflow:auto">${esc(a.payload.code)}</pre>`:''}${freeAttemptEvidenceHtml(a)}<form id="freeReviewForm"><label class="field"><span>Score (0?100)</span><input name="score" type="number" min="0" max="100" required></label><label class="field"><span>Feedback</span><textarea name="feedback" required></textarea></label><button class="btn btn-primary">Save review</button></form>`);
-  $('freeReviewForm').onsubmit=async event=>{event.preventDefault();const form=event.target,button=form.querySelector('button');button.disabled=true;try{await api('/api/admin/open-attempts/'+id+'/grade',{method:'POST',body:JSON.stringify({score:Number(form.score.value),feedback:form.feedback.value})});closeModal();show('grades');}catch(error){modalMsg(error.message);button.disabled=false;}};
+// Keyed on submission_id, not attempt id: a row with no attempt row has no
+// attempt id to be keyed on, and that is exactly the case most in need of
+// marking. The attempt is minted on save, so nothing is created for a
+// submission an admin only looked at.
+function reviewFreeAttempt(submissionId){
+  const a=FREE_REVIEW_ATTEMPTS.find(item=>item.submission_id===submissionId);if(!a)return;
+  const r=FREE_REVIEW_REASON[a.reason]||{label:a.status,tone:'var(--muted)'};
+  const why=a.payload&&a.payload.error?`<p class="s" style="color:var(--muted);margin-top:8px">Why it needs you: ${esc(a.payload.error)}</p>`:'';
+  openModal(`Mark ${a.assessment_kind==='capstone'?'capstone':'assignment'}${a.id?` &middot; attempt #${a.id}`:''}`,
+    `<p>${esc(a.course_code||a.track_key)} &middot; ${a.assessment_kind==='capstone'?'Capstone':`Lesson ${a.level} &middot; Practice ${a.pid}`} &middot; ${esc(a.learner_name||`Learner #${a.user_id}`)}</p>
+     <p class="s" style="color:${r.tone}">${esc(r.label)}</p>${why}
+     ${a.payload.code?`<pre style="white-space:pre-wrap;max-height:300px;overflow:auto">${esc(a.payload.code)}</pre>`:''}${freeAttemptEvidenceHtml(a)}
+     <form id="freeReviewForm"><label class="field"><span>Score (0-100)</span><input name="score" type="number" min="0" max="100" required></label>
+     <label class="field"><span>Feedback</span><textarea name="feedback" required></textarea></label>
+     <button class="btn btn-primary">Save mark</button></form>
+     <p class="hint">Saving opens the learner's next module as soon as this is the last unmarked task in theirs.</p>`);
+  $('freeReviewForm').onsubmit=async event=>{
+    event.preventDefault();const form=event.target,button=form.querySelector('button');button.disabled=true;
+    try{
+      // Only a row with no attempt at all needs one minted; a failed or overdue
+      // attempt still has a row the grading route accepts. Either way the mark
+      // travels the same path - and the same certificate and unlock checks - as
+      // every other grade.
+      let id=a.id;
+      if(!id){
+        const out=await api('/api/admin/open-submissions/'+a.submission_id+'/adopt',{method:'POST'});
+        id=out.attempt.id;
+      }
+      await api('/api/admin/open-attempts/'+id+'/grade',{method:'POST',body:JSON.stringify({score:Number(form.score.value),feedback:form.feedback.value})});
+      closeModal();show('grades');
+    }catch(error){modalMsg(error.message);button.disabled=false;}
+  };
 }

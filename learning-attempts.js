@@ -65,6 +65,26 @@ function createAttempts({getData,nextId,save,tracks,now=()=>new Date().toISOStri
       a.payload.retry_at=retryable&&a.payload.tries<MAX_AUTO_TRIES&&nextAt<deadline?new Date(nextAt).toISOString():null;
       return update(a,{status:a.payload.retry_at?'queued':'failed'});
     },
+    // Every ungraded submission that still has a live attempt row can be marked
+    // through the normal flow, which is keyed on an attempt id. Two cannot:
+    // a submission whose attempt was never created (OpenQuest.submit pushes the
+    // submission BEFORE OpenAttempts.create, so a rejected create leaves the
+    // submission behind), and one whose only attempts have all failed. Both
+    // leave a learner blocked on a grade that no longer has anywhere to come
+    // from. Minting the missing row puts them back in the same queue every
+    // other grade goes through, rather than adding a second way to grade.
+    adopt(sub,problem){
+      const live=rows().find(a=>a.submission_id===sub.id&&a.status!=='failed');
+      if(live)return live;
+      const a={id:nextId('open_attempts'),user_id:sub.user_id,submission_id:sub.id,request_key:'adopted-'+crypto.randomUUID(),
+        track_key:sub.track_key,level:sub.level,pid:sub.pid,status:'awaiting_review',
+        payload:{assessment_kind:sub.assessment_kind||'assignment',code:sub.code,language:sub.language,file_url:sub.file_url,
+          file_name:sub.file_name,files:sub.files,evidence:sub.evidence,output:sub.output,
+          problem:problem?JSON.parse(JSON.stringify(problem)):null,tries:0,adopted:true,
+          error:'Recovered for manual marking - automatic grading left no attempt on record.'},
+        created_at:sub.submitted_at||now(),updated_at:now()};
+      rows().push(a);sub.attempts=rows().filter(x=>x.submission_id===sub.id).length;save();return a;
+    },
     retry(id,uid){const a=byId(id);if(!a||a.user_id!==Number(uid))return {error:'Attempt not found.',status:404};if(a.status!=='failed')return {error:'Only failed attempts can be retried.',status:409};if(a.payload.tries>=MAX_TRIES)return {error:'Automatic retry limit reached. Request staff review or submit a new attempt.',status:409};a.payload.error=null;a.payload.retry_at=null;return {attempt:update(a,{status:'queued'})};},
     complete(id,score,feedback,grader='ai'){
       const a=byId(id);if(!a)return null;if(a.status==='completed')return a;

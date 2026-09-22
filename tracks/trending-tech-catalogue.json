@@ -8,6 +8,15 @@
     "outcome": "Ship a deployed, authenticated, database backed web application with typed end to end data flow and a passing smoke test suite.",
     "environment": "Node 20 LTS or newer, pnpm, Docker Desktop for a local PostgreSQL container, VS Code with the ESLint, Prisma and Tailwind extensions, and a free Vercel account.",
     "capstone": "A multi tenant task board. Google sign in, tenant scoped data, server actions for every mutation, streamed dashboard, Zod validated API, and a live Vercel deployment with a Playwright smoke suite running in CI.",
+    "capstone_criteria": [
+      "Google sign in works end to end, and a signed out visitor cannot reach task board data.",
+      "Data is tenant scoped: a user signed into one tenant can never read or mutate another tenant’s tasks.",
+      "Every mutation goes through a server action rather than a client side call to an unprotected route.",
+      "The dashboard streams, rendering incrementally instead of blocking on the slowest query.",
+      "Every API input is validated by a Zod schema, and an invalid payload is rejected before it reaches the database.",
+      "The application is deployed and reachable at a live Vercel URL.",
+      "A Playwright smoke suite runs in CI and passes on the submitted commit."
+    ],
     "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached.",
     "modules": [
       {
@@ -341,6 +350,16 @@
     "outcome": "Ship a grounded question answering service over a private document set, with measured retrieval quality, guardrails and a cost budget you can defend.",
     "environment": "Python 3.11 or newer with uv or venv, an OpenAI or Anthropic API key, a free Cohere key for re ranking, Docker for local Chroma or Qdrant, and a LangSmith account for tracing.",
     "capstone": "A grounded assistant over a 200 document corpus of the learner's choice. Hybrid retrieval, re ranking, citations, refusal behaviour, a 30 item evaluation set with recorded scores, PII redaction and a FastAPI endpoint with caching and per request cost logging.",
+    "capstone_criteria": [
+      "The corpus holds at least 200 documents, and the assistant answers only from it.",
+      "Retrieval is hybrid, combining dense and keyword search rather than relying on either alone.",
+      "Retrieved candidates are re ranked before they reach the model.",
+      "Every answer carries citations pointing back to the source documents.",
+      "The assistant refuses to answer when the corpus does not support one, instead of guessing.",
+      "A 30 item evaluation set is submitted with its scores recorded, not merely described.",
+      "PII is redacted before text reaches the model or the logs.",
+      "A FastAPI endpoint serves the assistant, with caching and per request cost logging in place."
+    ],
     "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached.",
     "modules": [
       {
@@ -674,6 +693,13 @@
     "outcome": "Solve an unseen medium difficulty problem in 35 minutes while explaining the approach aloud, and state the time and space complexity of your own solution without being asked twice.",
     "environment": "A LeetCode or NeetCode account, a local editor with a debugger, and a stopwatch. Interview practice is done out loud, not in silence.",
     "capstone": "A recorded 45 minute mock interview covering two unseen problems, one medium and one hard, graded on correctness, complexity analysis and communication rather than on speed alone.",
+    "capstone_criteria": [
+      "A recording of the full 45 minute interview is submitted and plays end to end.",
+      "Two unseen problems are attempted, one medium and one hard.",
+      "Each solution is correct, or the remaining gap is identified aloud by the candidate.",
+      "Time and space complexity is stated for each solution without having to be asked twice.",
+      "The approach is explained aloud while solving, not narrated afterwards."
+    ],
     "assessment": "12 timed problem sets at 10 marks each, 120 marks, worth 60 percent. Mock interview worth 40 percent. Marks are split evenly between a correct solution and a spoken explanation of the approach and its complexity. Positioning note. This course serves a different outcome from the other five. The others build shippable systems, this one prepares for hiring filters. It is scheduled alongside a build course rather than instead of one.",
     "modules": [
       {
@@ -884,7 +910,7 @@
               "code": "A3.8",
               "duration": "3 hours, timed",
               "points": 10,
-              "brief": "Solve Number of Islands and Course Schedule.",
+              "brief": "Solve Number of Islands and Course Schedule using depth first search, one over a grid of connected land masses and one over a prerequisite graph that may contain a cycle.",
               "deliverable": "Solutions to Number of Islands and Course Schedule.",
               "criteria": "A grid with three land masses returns exactly 3, and Course Schedule correctly reports false on a prerequisite cycle of length four.",
               "submission_text": "Repository folder plus a test case with a prerequisite cycle of length four."
@@ -999,6 +1025,15 @@
     "outcome": "Take an application from source to a monitored, autoscaling cluster deployment driven entirely by declarative files in Git.",
     "environment": "Docker Desktop or Podman, kind or minikube with at least 6 GB of RAM allocated, kubectl, Helm, Terraform, and an AWS free tier account with billing alerts switched on before the first lab.",
     "capstone": "A three tier application delivered end to end. Multi stage images, a Helm chart, an Argo CD application syncing from Git, Terraform provisioned infrastructure, Prometheus alerts and a Grafana dashboard, with a documented rollback that is actually performed once.",
+    "capstone_criteria": [
+      "All three tiers of the application are deployed and communicating with each other.",
+      "Container images are built with multi stage Dockerfiles rather than one fat stage.",
+      "A Helm chart packages the deployment and installs cleanly from scratch.",
+      "An Argo CD application syncs the cluster from Git, so a Git change alone drives a deployment.",
+      "The underlying infrastructure is provisioned by Terraform, not created by hand in a console.",
+      "Prometheus alerts are defined and a Grafana dashboard shows the service’s health.",
+      "A rollback is documented, and the evidence shows it was actually performed at least once."
+    ],
     "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached. Cost warning. Every cloud lab in Module 4 creates billable resources. Destroy each stack at the end of the session and confirm the bill is back to zero before the next lecture.",
     "modules": [
       {
@@ -1340,6 +1375,15 @@
     "outcome": "Build and operate a Go service that survives a load test, shuts down without dropping in flight requests, and has no data races under the race detector.",
     "environment": "Go 1.22 or newer, Docker for PostgreSQL and Redis, protoc with the Go plugins, and a load testing tool such as k6 or vegeta.",
     "capstone": "An order service exposing REST and gRPC, backed by PostgreSQL through a connection pool and sqlc generated queries, with Redis caching, structured logging, graceful shutdown, and a k6 report showing throughput and p99 latency before and after one optimisation.",
+    "capstone_criteria": [
+      "The order service exposes both a REST and a gRPC interface over the same core logic.",
+      "PostgreSQL is reached through a connection pool rather than a fresh connection per request.",
+      "Database queries are generated with sqlc rather than assembled by hand from strings.",
+      "Redis caching is in place and demonstrably removes repeat database reads.",
+      "Logging is structured and machine parseable, not free text print output.",
+      "Shutdown is graceful: in flight requests finish instead of being dropped.",
+      "A k6 report records throughput and p99 latency both before and after one named optimisation."
+    ],
     "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached.",
     "modules": [
       {
@@ -1673,6 +1717,14 @@
     "outcome": "Diagnose why a query is slow from its execution plan, fix it with the right index or rewrite, and prove the improvement with numbers.",
     "environment": "PostgreSQL 16 or newer in Docker, psql, pgAdmin or DBeaver, the pageinspect and pg stat statements extensions enabled, and a seed dataset of at least one million rows generated on day one.",
     "capstone": "A performance case study on a one million row schema. Five slow queries profiled with EXPLAIN ANALYZE, each fixed by indexing, rewriting or partitioning, with before and after timings, plan node evidence, and a written note on the write cost each new index adds.",
+    "capstone_criteria": [
+      "The schema holds at least one million rows, so the timings reflect real work.",
+      "Five genuinely slow queries are profiled with EXPLAIN ANALYZE before any change is made.",
+      "Each of the five is fixed by indexing, rewriting or partitioning, and the chosen approach is named.",
+      "Before and after timings are recorded for every one of the five queries.",
+      "Plan node evidence shows what changed in the execution plan, not just the wall clock.",
+      "A written note states the write cost that each new index adds."
+    ],
     "assessment": "12 assignments at 10 marks each, 120 marks, worth 60 percent. Capstone worth 40 percent. An assignment is marked only when every acceptance criterion passes on the learner's own machine and the evidence listed under submission is attached.",
     "modules": [
       {

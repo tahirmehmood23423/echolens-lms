@@ -1571,7 +1571,15 @@ function addCapstoneLink() {
 function openCapstone() {
   const t=CUR?.track,state=CUR?.progress?.capstone;if(!t?.capstone||!state?.unlocked)return;
   const cfg=t.capstone.submission||{},submission=state.submission;
+  // The capstone carries the same "What we're looking for" checklist every
+  // other task shows. It is 40% of the course, so leaving it out meant the
+  // biggest piece of work was the only one with no stated bar to clear.
+  const criteria=(t.capstone.criteria||[]).filter(Boolean);
   openModal(t.capstone.title,`<p class="s" style="line-height:1.65;color:var(--muted)">${esc(t.capstone.description)}</p>
+    ${criteria.length?`<div class="slv-block" style="margin-top:12px">
+      <div class="slv-block-head"><svg viewBox="0 0 24 24" fill="none">${ICONS.target}</svg>What we're looking for</div>
+      <ul class="slv-criteria">${criteria.map((c)=>`<li><svg viewBox="0 0 24 24" fill="none">${ICONS.check}</svg>${esc(c)}</li>`).join('')}</ul>
+    </div>`:''}
     <div class="task-status ${state.passed?'ok':'wait'}" style="margin-top:12px"><strong>${state.passed?`Passed at ${state.score}%`:submission?(state.score==null?'Awaiting staff review':`Scored ${state.score}%`):'Ready for submission'}</strong> &middot; ${state.pass_mark}% required &middot; ${t.capstone.weight}% of final result</div>
     <form id="capstoneEvidenceForm" style="margin-top:14px">
       <p class="s evidence-instructions">${esc(cfg.instructions||'Provide the capstone project URL and supporting evidence.')}</p>

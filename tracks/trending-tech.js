@@ -66,7 +66,11 @@ function capstoneFor(course) {
     title: `${course.title} Capstone`,
     description: course.capstone,
     deliverables: [course.capstone],
-    criteria: [],
+    // The capstone sentence lists its deliverables in prose; `capstone_criteria`
+    // is that same list split into separately checkable items. It is what the
+    // learner is shown as "What we're looking for" and what a grader marks
+    // against - an empty array here left both with nothing to go on.
+    criteria: (Array.isArray(course.capstone_criteria) ? course.capstone_criteria : []).filter(Boolean),
     weight: 40,
     points: 40,
     pass_mark: 60,
@@ -180,6 +184,10 @@ function validateTrendingTechCatalogue(items = tracks) {
     const problems = track.levels.flatMap((level) => level.problems || []);
     if (problems.length !== 12) errors.push(`${track.course_code}: expected 12 assignments.`);
     if (!track.capstone) errors.push(`${track.course_code}: capstone is missing.`);
+    // A capstone carrying no criteria is 40% of the course with nothing stated
+    // for the learner to aim at or a grader to mark against - see
+    // scripts/audit-rubrics.js, which flags the same gap as an error.
+    else if (!(track.capstone.criteria || []).length) errors.push(`${track.course_code}: capstone has no criteria - add capstone_criteria to the catalogue entry.`);
     for (const level of track.levels) {
       const prefix = `${track.course_code} lecture ${level.lecture_no || level.no}`;
       const id = youtubeVideoId(level.video_url);

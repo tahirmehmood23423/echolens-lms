@@ -4844,16 +4844,66 @@ app.post('/api/admin/open-submissions/:id/adopt',authRequired,adminRequired,asyn
   await store.pendingPersist();
   res.json({ok:true,attempt:store.OpenAttempts.public(attempt)});
 }));
-app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRoute(async (req,res)=>{
-  const a=store.OpenAttempts.byId(req.params.id);if(!a)return res.status(404).json({error:'Attempt not found.'});
-  if(a.status==='processing')return res.status(409).json({error:'This attempt is being graded. Wait until grading finishes.'});
-  if(a.status==='completed')return res.json({ok:true,existing:true,attempt:store.OpenAttempts.public(a)});
-  const score=Number(req.body.score);if(req.body.score==null||req.body.score===''||!Number.isFinite(score)||score<0||score>100||!String(req.body.feedback||'').trim())return res.status(400).json({error:'Provide a score from 0 to 100 and written feedback.'});
-  store.OpenAttempts.complete(a.id,score,req.body.feedback,'staff:'+req.user.id);
-  const certificate=OpenQuest.maybeCertify(a.user_id,a.track_key,req.user.id);
+/**
+ * Run the AI grader over one attempt. The automatic worker below and the
+ * admin's "Grade with AI" button share this single implementation: two copies
+ * would drift, and the whole point of the rubric work is that every grade is
+ * judged against the same material.
+ */
+async function aiGradeAttempt(a){
+  const p=a.payload,track=Quests.trackDef(a.track_key);
+  if(!p.problem)throw new Error('This attempt has no task on record, so it cannot be graded automatically. Mark it by hand.');
+  let text=p.code;
+  if(!text&&p.file_url){const parts=[];for(const url of [p.file_url,...(p.files||[]).map(f=>f.url)]){const x=await extractText(url);if(x.text)parts.push(x.text);}text=parts.join('\n\n');}
+  if(!text)throw new Error('No readable submission content');
+  // The rubric, the reference solution and the program's REAL output all go to
+  // the grader. Without the rubric it invented its own standard; without the
+  // output it guessed at behaviour from source and got it wrong.
+  const rubric=graderContext(p.problem,track);
+  return ai.autoGrade(a.user_id,{eventTitle:track?.title,problemTitle:p.problem.title,problemBrief:p.problem.description,passMark:rubric.passMark,code:p.code,language:p.language,text,criteria:rubric.criteria,solution:rubric.solution,expectedOutput:rubric.expectedOutput,sampleInput:rubric.sampleInput,output:p.output||null});
+}
+/** Everything a grade must trigger once it lands, whoever awarded it. */
+async function afterAdminGrade(a,actorId){
+  const certificate=OpenQuest.maybeCertify(a.user_id,a.track_key,actorId);
   announceModuleUnlock(a.user_id,a.track_key); // a staff grade opens the next module too
   await announceCourseCompletion(a.user_id,a.track_key,certificate).catch(e=>console.error('[certificate] email failed:',e.message));
-  await store.pendingPersist();res.json({ok:true,attempt:store.OpenAttempts.public(a),certificate:certificate?.cert||null});
+  await store.pendingPersist();
+  return certificate;
+}
+function gradableAttempt(req,res){
+  const a=store.OpenAttempts.byId(req.params.id);
+  if(!a){res.status(404).json({error:'Attempt not found.'});return null;}
+  if(a.status==='processing'){res.status(409).json({error:'This attempt is being graded. Wait until grading finishes.'});return null;}
+  if(a.status==='completed'){res.json({ok:true,existing:true,attempt:store.OpenAttempts.public(a)});return null;}
+  return a;
+}
+app.post('/api/admin/open-attempts/:id/grade',authRequired,adminRequired,asyncRoute(async (req,res)=>{
+  const a=gradableAttempt(req,res);if(!a)return;
+  // Feedback is optional. Requiring it meant a marker with nothing to add had
+  // to invent a sentence before the learner's module would open, which is a
+  // poor reason to keep someone waiting. The score is what unblocks them.
+  const score=Number(req.body.score);
+  if(req.body.score==null||req.body.score===''||!Number.isFinite(score)||score<0||score>100)return res.status(400).json({error:'Provide a score from 0 to 100.'});
+  const feedback=String(req.body.feedback||'').trim()||`Marked by staff. Score: ${Math.round(score)}%.`;
+  store.OpenAttempts.complete(a.id,score,feedback,'staff:'+req.user.id);
+  const certificate=await afterAdminGrade(a,req.user.id);
+  res.json({ok:true,attempt:store.OpenAttempts.public(a),certificate:certificate?.cert||null});
+}));
+/**
+ * Grade one attempt with the AI instead of reading it by hand - the manual
+ * escape hatch for work the automatic worker never got to. Recorded as an 'ai'
+ * grade, not a staff one, so a learner is scored identically whether the worker
+ * picked the attempt up on its own or an admin pressed the button.
+ */
+app.post('/api/admin/open-attempts/:id/ai-grade',authRequired,adminRequired,asyncRoute(async (req,res)=>{
+  if(!ai.enabled())return res.status(503).json({error:'AI grading is not configured on this server.'});
+  const a=gradableAttempt(req,res);if(!a)return;
+  let result;
+  try{result=await aiGradeAttempt(a);}
+  catch(e){return res.status(e.status||502).json({error:'AI grading failed: '+e.message});}
+  store.OpenAttempts.complete(a.id,result.score,result.feedback,'ai');
+  const certificate=await afterAdminGrade(a,req.user.id);
+  res.json({ok:true,attempt:store.OpenAttempts.public(a),score:a.payload.score,feedback:a.payload.feedback,certificate:certificate?.cert||null});
 }));
 /**
  * Tell a learner their next module is open, the moment the grade that opened it
@@ -4926,16 +4976,7 @@ if (process.env.NODE_ENV !== 'test' && !demo.enabled) {
 
 const gradingWorker = require('./grading-worker').createGradingWorker({
   attempts:store.OpenAttempts,persist:()=>store.pendingPersist(),enabled:()=>ai.enabled(),
-  grade:async a=>{
-    const p=a.payload,track=Quests.trackDef(a.track_key);let text=p.code;
-    if(!text&&p.file_url){const parts=[];for(const url of [p.file_url,...(p.files||[]).map(f=>f.url)]){const x=await extractText(url);if(x.text)parts.push(x.text);}text=parts.join('\n\n');}
-    if(!text)throw new Error('No readable submission content');
-    // The rubric, the reference solution and the program's REAL output all go to
-    // the grader. Without the rubric it invented its own standard; without the
-    // output it guessed at behaviour from source and got it wrong.
-    const rubric=graderContext(p.problem,track);
-    return ai.autoGrade(a.user_id,{eventTitle:track?.title,problemTitle:p.problem.title,problemBrief:p.problem.description,passMark:rubric.passMark,code:p.code,language:p.language,text,criteria:rubric.criteria,solution:rubric.solution,expectedOutput:rubric.expectedOutput,sampleInput:rubric.sampleInput,output:p.output||null});
-  },onComplete:async a=>{
+  grade:aiGradeAttempt,onComplete:async a=>{
     const certified=OpenQuest.maybeCertify(a.user_id,a.track_key);
     announceModuleUnlock(a.user_id,a.track_key);
     await announceCourseCompletion(a.user_id,a.track_key,certified).catch(e=>console.error('[certificate] email failed:',e.message));

@@ -45,7 +45,9 @@ test('the admin queue surfaces every unmarked state, and marking one frees the l
   // Adopting again reuses the row rather than forking the learner's work.
   assert.equal((await api('/api/admin/open-submissions/' + orphan + '/adopt', 'admin', 'POST')).data.attempt.id, adopted.data.attempt.id);
 
-  const graded = await api('/api/admin/open-attempts/' + adopted.data.attempt.id + '/grade', 'admin', 'POST', { score: 72, feedback: 'Marked by staff after automatic grading failed.' });
+  // A score with no feedback is enough: requiring prose kept learners waiting.
+  assert.equal((await api('/api/admin/open-attempts/' + adopted.data.attempt.id + '/grade', 'admin', 'POST', { feedback: 'words but no score' })).status, 400);
+  const graded = await api('/api/admin/open-attempts/' + adopted.data.attempt.id + '/grade', 'admin', 'POST', { score: 72 });
   assert.equal(graded.status, 200);
   const saved = JSON.parse(fs.readFileSync(path.join(runtime, 'store.json'))).open_submissions.find(s => s.id === orphan);
   assert.equal(saved.score, 72, 'the mark reaches the submission, which is what opens the next module');
@@ -57,4 +59,15 @@ test('the admin queue surfaces every unmarked state, and marking one frees the l
   assert.ok(!after.data.attempts.some(a => a.submission_id === orphan));
   // An already-marked submission cannot be adopted back into the queue.
   assert.equal((await api('/api/admin/open-submissions/' + orphan + '/adopt', 'admin', 'POST')).status, 409);
+
+  // "Grade with AI" is admin-only, and says so plainly when no provider is
+  // configured rather than leaving the marker staring at a dead button.
+  const stuck = after.data.attempts[0];
+  assert.equal((await api('/api/admin/open-attempts/' + stuck.id + '/ai-grade', 'student', 'POST')).status, 403);
+  const aiTry = await api('/api/admin/open-attempts/' + stuck.id + '/ai-grade', 'admin', 'POST');
+  assert.equal(aiTry.status, 503, 'this fixture runs with AI switched off');
+  assert.match(aiTry.data.error, /not configured/i);
+  // A refused AI grade must leave the attempt exactly as it was, still markable.
+  const untouched = await api('/api/admin/open-attempts');
+  assert.ok(untouched.data.attempts.some(a => a.submission_id === stuck.submission_id));
 });

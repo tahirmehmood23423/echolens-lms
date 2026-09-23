@@ -7194,6 +7194,16 @@ function freeAttemptEvidenceHtml(a){
 // attempt id to be keyed on, and that is exactly the case most in need of
 // marking. The attempt is minted on save, so nothing is created for a
 // submission an admin only looked at.
+// Both the AI button and the manual save need an attempt id to post to. Only a
+// row with no attempt at all needs one minted; a failed or overdue attempt
+// still has a row both routes accept. The adopt call is cached on the row so
+// grading with AI and then falling back to a manual mark cannot mint two.
+async function freeReviewAttemptId(a){
+  if(a.id)return a.id;
+  const out=await api('/api/admin/open-submissions/'+a.submission_id+'/adopt',{method:'POST'});
+  a.id=out.attempt.id;
+  return a.id;
+}
 function reviewFreeAttempt(submissionId){
   const a=FREE_REVIEW_ATTEMPTS.find(item=>item.submission_id===submissionId);if(!a)return;
   const r=FREE_REVIEW_REASON[a.reason]||{label:a.status,tone:'var(--muted)'};
@@ -7202,22 +7212,31 @@ function reviewFreeAttempt(submissionId){
     `<p>${esc(a.course_code||a.track_key)} &middot; ${a.assessment_kind==='capstone'?'Capstone':`Lesson ${a.level} &middot; Practice ${a.pid}`} &middot; ${esc(a.learner_name||`Learner #${a.user_id}`)}</p>
      <p class="s" style="color:${r.tone}">${esc(r.label)}</p>${why}
      ${a.payload.code?`<pre style="white-space:pre-wrap;max-height:300px;overflow:auto">${esc(a.payload.code)}</pre>`:''}${freeAttemptEvidenceHtml(a)}
+     <div style="margin:14px 0"><button class="btn btn-teal" id="freeAiGradeBtn" type="button">Grade with AI</button>
+       <span class="s" style="color:var(--muted);margin-left:8px">Marks it against the task's rubric - no need to read the code yourself.</span></div>
+     <div id="freeAiMsg"></div>
      <form id="freeReviewForm"><label class="field"><span>Score (0-100)</span><input name="score" type="number" min="0" max="100" required></label>
-     <label class="field"><span>Feedback</span><textarea name="feedback" required></textarea></label>
+     <label class="field"><span>Feedback <span class="s" style="color:var(--muted)">(optional)</span></span><textarea name="feedback" rows="3" placeholder="Leave blank to record the score on its own."></textarea></label>
      <button class="btn btn-primary">Save mark</button></form>
-     <p class="hint">Saving opens the learner's next module as soon as this is the last unmarked task in theirs.</p>`);
+     <p class="hint">Either way, the learner's next module opens as soon as this is the last unmarked task in theirs.</p>`);
+  $('freeAiGradeBtn').onclick=async()=>{
+    const button=$('freeAiGradeBtn'),msg=$('freeAiMsg');
+    button.disabled=true;button.textContent='Grading…';msg.innerHTML='';
+    try{
+      const id=await freeReviewAttemptId(a);
+      const out=await api('/api/admin/open-attempts/'+id+'/ai-grade',{method:'POST'});
+      closeModal();toast(`Graded with AI: ${out.score}%`);show('grades');
+    }catch(error){
+      // The AI is exactly what failed on these in the first place, so a second
+      // failure is expected often enough to keep the manual form right there.
+      msg.innerHTML=`<p class="s" style="color:var(--danger)">${esc(error.message)} - mark it by hand below.</p>`;
+      button.disabled=false;button.textContent='Try AI again';
+    }
+  };
   $('freeReviewForm').onsubmit=async event=>{
     event.preventDefault();const form=event.target,button=form.querySelector('button');button.disabled=true;
     try{
-      // Only a row with no attempt at all needs one minted; a failed or overdue
-      // attempt still has a row the grading route accepts. Either way the mark
-      // travels the same path - and the same certificate and unlock checks - as
-      // every other grade.
-      let id=a.id;
-      if(!id){
-        const out=await api('/api/admin/open-submissions/'+a.submission_id+'/adopt',{method:'POST'});
-        id=out.attempt.id;
-      }
+      const id=await freeReviewAttemptId(a);
       await api('/api/admin/open-attempts/'+id+'/grade',{method:'POST',body:JSON.stringify({score:Number(form.score.value),feedback:form.feedback.value})});
       closeModal();show('grades');
     }catch(error){modalMsg(error.message);button.disabled=false;}

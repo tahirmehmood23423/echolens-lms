@@ -266,6 +266,39 @@ app.use((req, res, next) => {
   next();
 });
 
+/**
+ * Wait for the write just made and report whether it truly reached Postgres.
+ *
+ * The RESPONSE is already gated on this by the gate above - but an email is
+ * not. mailer.notify() leaves the process the moment it is called, while
+ * store.save() has only *queued* the Postgres write. So a flush that then
+ * failed left a learner holding a real password for an account that existed
+ * only in this process's memory and was gone at the next restart: they receive
+ * working credentials, and they are not in the system. That is not a
+ * hypothetical ordering - it is the reported symptom.
+ *
+ * Any mail that hands out credentials, or tells someone an account exists, must
+ * therefore wait for that account to be durable and be dropped if it never is.
+ * Mail is the one side effect the database cannot roll back.
+ */
+async function accountIsDurable(what) {
+  try { await store.pendingPersist(); return true; }
+  catch (e) { console.error(`[account] ${what}: the write did not reach Postgres - withholding the credential email:`, e.message); return false; }
+}
+/**
+ * Send mail that hands out credentials for a just-created account, but only
+ * once that account is durable. Same guarantee as accountIsDurable, for the
+ * routes that fire and forget rather than reporting the failure to a caller.
+ */
+function mailCredentials(what, to, subject, text, attachments) {
+  return accountIsDurable(what).then((ok) => (ok ? mailer.notify(to, subject, text, attachments) : null));
+}
+/** The account did not save, so nothing may be sent and no session may stand. */
+function accountSaveFailed(res, extra = {}) {
+  res.clearCookie(COOKIE);
+  return res.status(503).json({ error: 'Your account could not be saved just now, so nothing was created and no email was sent. Please try again in a moment.', ...extra });
+}
+
 /* ------------------------------ auth helpers ------------------------------ */
 const sign = (u) => jwt.sign({ id: u.id, role: u.role, name: u.name, sv: sessionVersion(u, JWT_SECRET) }, JWT_SECRET, { expiresIn: '7d' });
 function setAuthCookie(res, token) { res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: isProd, maxAge: 7 * 24 * 60 * 60 * 1000 }); }
@@ -849,6 +882,9 @@ app.post('/api/batches/:id/students', authRequired, adminRequired, async (req, r
   if (!b) return res.status(404).json({ error: 'Course not found.' });
   const { names, existing } = req.body || {};
   const created = [], added = [], missing = [], invalid = [];
+  // Buffered, not sent inside the loop: every one of these carries a password,
+  // and none may go out until the whole batch is durable in Postgres.
+  const welcomes = [];
   for (const raw of Array.isArray(names) ? names : []) {
     // Each line: "Full Name, email@domain" - the email is mandatory so the
     // generated password and registration number can always be mailed to
@@ -864,14 +900,21 @@ app.post('/api/batches/:id/students', authRequired, adminRequired, async (req, r
     Enrollments.create(user.id, b.id);
     created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed: mailer.configured });
     const bd = Batches.decorate(b);
-    mailer.notify(email, 'Welcome to EchoLens - your account',
-      `${hi(user.name)},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);
+    welcomes.push([email, 'Welcome to EchoLens - your account',
+      `${hi(user.name)},\n\nYour EchoLens account is ready for ${bd.title || bd.name}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`]);
   }
   for (const raw of Array.isArray(existing) ? existing : []) {
     const u = Users.byLogin(String(raw).trim());
     if (u && u.role === 'student') { Enrollments.create(u.id, b.id); added.push({ name: u.name, reg_no: u.reg_no }); }
     else missing.push(String(raw).trim());
   }
+  if (welcomes.length && !await accountIsDurable('batch students')) {
+    // The accounts are not saved, so nobody may be told they have one. The
+    // admin is told plainly instead, because a silent 500 here reads as "it
+    // half worked" and invites a retry that would double-create.
+    return res.status(503).json({ error: `Those ${welcomes.length} account(s) could not be saved, so no welcome emails were sent. Nothing was created - try again in a moment.`, invalid });
+  }
+  for (const [to, subject, text] of welcomes) mailer.notify(to, subject, text);
   res.json({ ok: true, created, added, missing, invalid });
 });
 app.delete('/api/batches/:id/students/:uid', authRequired, adminRequired, (req, res) => {
@@ -930,7 +973,7 @@ app.post('/api/admin/users/:id/password', authRequired, adminRequired, (req, res
 const STAFF_ROLE_LABEL = { coordinator: 'Coordinator', hr: 'HR', finance: 'Finance', student_coordinator: 'Admissions Office', ambassador: 'Ambassador', instructor: 'Instructor', staff: 'Staff' };
 function mailStaffCredentials(user, password, role) {
   if (!user.email) return;
-  mailer.notify(user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
+  mailCredentials(`${role} account`, user.email, `Your EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account`,
     `${hi(user.name)},\n\nYour EchoLens ${STAFF_ROLE_LABEL[role] || 'portal'} account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login with your username or email, and change your password from Settings after your first login.`);
 }
 // The email is mandatory and must be exact: the account is generated FROM it
@@ -997,7 +1040,7 @@ app.post('/api/hr/ambassadors', authRequired, hrOnly, async (req, res) => {
   if (ambassadorsDept) DepartmentMembers.add(ambassadorsDept.id, user.id, req.user.id);
   let attachments;
   try { attachments = [await ambassadorQrAttachment(a.code)]; } catch { attachments = undefined; }
-  mailer.notify(a.email, 'Your EchoLens ambassador account',
+  mailCredentials('ambassador account', a.email, 'Your EchoLens ambassador account',
     `${hi(a.name)},\n\nWelcome aboard - you are now an EchoLens ambassador. Your portal account is ready:\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL}/login to see your duties, referrals and leaderboard rank.\n\nYour personal referral code is:\n\n    ${a.code}\n\nShare it (or the attached QR code, which opens the registration form with your code already filled in) with students: anyone who registers with it gets 10% off their course fee, and once they're enrolled you earn gems.\n\nEchoLens Digital`,
     attachments);
   res.json({ ok: true, ambassador: a, credentials: { name: user.name, username: user.username, password } });
@@ -3059,6 +3102,10 @@ app.post('/api/auth/register-open', limitSignup, async (req, res) => {
   Users.updateProfile(user.id, learnerInput.profile);
   Users.recordAgeDeclaration(user.id, { version: AGE_DECLARATION.version, text: ageChoice.text, source: 'open-signup', is_minor: ageChoice.is_minor });
   Leads.upsert({ name: user.name, email: user.email, whatsapp: learnerInput.profile.phone, source: 'open-signup', user_id: user.id });
+  // The password below is the only copy the learner will ever get, and the
+  // session cookie would sign them in to an account that may not exist - so
+  // neither is issued until this account is actually in Postgres.
+  if (!await accountIsDurable('open signup')) return accountSaveFailed(res);
   setAuthCookie(res, sign(Users.byId(user.id)));
   // mailDown: mail is known to be undeliverable right now (see signupMailDown
   // above) - skip the send entirely rather than let it fail against Zoho's
@@ -3152,6 +3199,7 @@ app.post('/api/recruiters/signup', limitSignup, async (req, res) => {
     override_requested: overrideRequested, override_reason: overrideRequested ? String(override_reason).trim().slice(0, 500) : null,
   });
   Users.recordAgeDeclaration(user.id, { version: AGE_DECLARATION.version, text: AGE_DECLARATION.options.adult, source: 'recruiter-signup', is_minor: false });
+  if (!await accountIsDurable('recruiter signup')) return accountSaveFailed(res);
   setAuthCookie(res, sign(user));
   mailer.notify(user.email, 'Your EchoLens recruiter account is pending review',
     `${hi(user.name)},\n\nThanks for signing up to search verified student talent on EchoLens. Your account is now pending review by our team - we will email you as soon as a decision is made, usually within one business day.\n\nSign in any time with:\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nYou can change your password from Settings after signing in.`);
@@ -4292,7 +4340,7 @@ async function performRegistrationEnrollment(r, b) {
     }
   }
   if (freshAccount) {
-    mailer.notify(r.email, 'Welcome to EchoLens - payment confirmed, your account is ready',
+    mailCredentials('paid enrolment account', r.email, 'Welcome to EchoLens - payment confirmed, your account is ready',
       `${hi(u.name)},\n\nYour payment has been verified and you are now enrolled in ${bd.title || bd.name}.\n\nRegistration number: ${u.reg_no}\nUsername: ${u.username}\nEmail: ${u.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.`);
   } else {
     mailer.notify(r.email, `Payment confirmed - you're enrolled in ${bd.title || bd.name}`,
@@ -4428,7 +4476,7 @@ app.post('/api/hr/staff', authRequired, hrOnly, async (req, res) => {
   const record = StaffRecords.create({ user_id: user.id, name: user.name, email: em, phone, position, employment_type, group_id });
   const dept = Departments.byName(record.employment_type === 'intern' ? 'Interns' : 'Staff');
   if (dept) DepartmentMembers.add(dept.id, user.id, req.user.id);
-  mailer.notify(em, 'Welcome to EchoLens - your staff account',
+  mailCredentials('staff account', em, 'Welcome to EchoLens - your staff account',
     `${hi(user.name)},\n\nYour EchoLens staff account is ready.\n\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email to see your team, instructions, and follow-ups.`);
   res.json({ ok: true, staff: record, credentials: { name: user.name, username: user.username, password } });
 });
@@ -4713,7 +4761,7 @@ app.post('/api/admin/open-courses/:key/students', authRequired, adminRequired, a
     if (enrolled.error) { invalid.push(`${raw} - account created, but could not enrol: ${enrolled.error}`); continue; }
     const emailed = mailer.configured && !mailDown;
     if (emailed) {
-      mailer.notify(email, 'Welcome to EchoLens - your account',
+      mailCredentials('admin free-course enrolment', email, 'Welcome to EchoLens - your account',
         `${hi(user.name)},\n\nAn EchoLens account has been created for you and you have been enrolled in ${t.title}.\n\nRegistration number: ${user.reg_no}\nUsername: ${user.username}\nEmail: ${user.email}\nPassword: ${password}\n\nSign in at ${APP_URL} with your username or email and change your password from Profile after your first login.\n\n${enrolled.enrollment.confirmation_note || 'The course is open now - start module 1 any time.'}`);
     }
     created.push({ name: user.name, username: user.username, reg_no: user.reg_no, password, email, emailed, mail_paused: mailer.configured && mailDown });

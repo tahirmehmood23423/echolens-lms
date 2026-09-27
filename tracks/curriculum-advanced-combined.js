@@ -501,7 +501,7 @@ module.exports = [
         "week": 2,
         "session": 3,
         "title": "Rule of Three / Five",
-        "video_url": "https://www.youtube.com/watch?v=z3QlnTRLNfw",
+        "video_url": "https://www.youtube.com/watch?v=2U1eHurVnXE",
         "topic": "Real-life analogy: If you sign a commercial lease for property, you must have clear contractual procedures for when you enter, when you sublease (copy), when you transfer ownership (move), and when you terminate the lease (destructor).\n\nIf a class manages raw heap memory or system resources, it must explicitly define the Rule of Five: Destructor, Copy Constructor, Copy Assignment Operator, Move Constructor, and Move Assignment Operator. This prevents memory leaks, dangling pointers, and shallow double-frees.",
         "problems": [
           {
@@ -791,7 +791,7 @@ module.exports = [
         "week": 2,
         "session": 2,
         "title": "Function Decorators & functools.wraps",
-        "video_url": "https://www.youtube.com/watch?v=FsAPt_9Bf3U",
+        "video_url": "https://www.youtube.com/watch?v=FXUUSfJO_J4",
         "topic": "Real-life analogy: Think of slipping a waterproof case onto a phone. The phone does exactly what it did before, but every interaction now passes through an added layer of protection.\n\nA decorator is a callable that takes a function and returns a replacement wrapping extra behaviour around it, applied with @decorator syntax. Wrapping the inner function with @functools.wraps(func) copies across the original name, docstring and signature so introspection still works.",
         "problems": [
           {
@@ -1011,7 +1011,7 @@ module.exports = [
         "week": 5,
         "session": 3,
         "title": "Asynchronous Programming with AsyncIO (async / await)",
-        "video_url": "https://www.youtube.com/watch?v=t5Bo1Je9EmE",
+        "video_url": "https://www.youtube.com/watch?v=0GVLtTnebNA",
         "topic": "Real-life analogy: Think of a chess grandmaster playing fifty opponents at once. Rather than standing at board one waiting for a reply, the master plays a move, walks to board two, and only returns to board one once that opponent has moved - one person, many games in flight.\n\nasyncio is single-threaded cooperative multitasking: a coroutine defined with async def gives up control at each await during I/O, and asyncio.gather() runs many coroutines concurrently on one event loop, ideal for thousands of simultaneous network calls.",
         "problems": [
           {
@@ -1103,7 +1103,7 @@ module.exports = [
         "week": 1,
         "session": 2,
         "title": "Function Constructors vs ES6 Classes & #private Fields",
-        "video_url": "https://www.youtube.com/watch?v=2ZphE5HcQPQ",
+        "video_url": "https://www.youtube.com/watch?v=sFDVXcqMlK8",
         "topic": "Real-life analogy: Think of a high-security briefcase. Its outer pockets are open for anyone to inspect, but the inner vault (#private) is sealed behind a hardware lock that cannot be picked from outside.\n\nES6 class syntax is sugar over the prototype system. A field declared with a # prefix is a hard private field enforced by the engine itself: it is invisible to Object.keys, JSON.stringify and reflection, and touching it from outside the class is a syntax error.",
         "problems": [
           {
@@ -1213,7 +1213,7 @@ module.exports = [
         "week": 3,
         "session": 1,
         "title": "Microtasks vs Macrotasks (queueMicrotask, MutationObserver)",
-        "video_url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ",
+        "video_url": "https://www.youtube.com/watch?v=eiC58R16hb8",
         "topic": "Real-life analogy: Think of a bank teller. They call the next ticket from the lobby (a macrotask), but before calling another ticket they must first finish every piece of desk paperwork already in front of them (the microtasks).\n\nThe event loop runs one macrotask (a setTimeout / setInterval callback, an I/O event), then drains the entire microtask queue (Promise callbacks, queueMicrotask) before it will paint or take the next macrotask. So a promise callback always runs before a setTimeout(fn, 0) queued at the same time.",
         "problems": [
           {
@@ -1547,7 +1547,12 @@ module.exports = [
         "week": 2,
         "session": 2,
         "title": "Advanced CSS Grid (areas, subgrid, auto-fit)",
-        "video_url": "https://www.youtube.com/watch?v=UwV4LtO0nHo",
+        "video_url": "https://www.youtube.com/watch?v=Br0nQZp2Emk",
+        "videos": [
+          { "title": "Grid Template Areas", "channel": "Coder Coder", "length": "7:06", "url": "https://www.youtube.com/watch?v=Br0nQZp2Emk" },
+          { "title": "Responsive Grids with auto-fit and minmax", "channel": "Coding2GO", "length": "6:14", "url": "https://www.youtube.com/watch?v=3T0gjtXRNC0" },
+          { "title": "Subgrid Alignment", "channel": "Coding2GO", "length": "4:21", "url": "https://www.youtube.com/watch?v=APxt2mKOsss" }
+        ],
         "topic": "Real-life analogy: Think of an architect using a modular floor-plan system. Named zones let you rearrange whole rooms by editing the plan, and subgrid keeps built-in cabinetry aligned to the building's master gridlines.\n\nAdvanced Grid uses grid-template-areas for readable placement, minmax() with auto-fit / auto-fill for fluid tracks, and subgrid to align nested items to a parent grid. Together they enable magazine-style responsive layouts.",
         "problems": [
           {
@@ -1569,7 +1574,11 @@ module.exports = [
         "week": 2,
         "session": 3,
         "title": "Modern Responsive Layout (clamp, container queries)",
-        "video_url": "https://www.youtube.com/watch?v=2rlWBZ17Wes",
+        "video_url": "https://www.youtube.com/watch?v=pYW3O0AxpI8",
+        "videos": [
+          { "title": "Fluid Layouts with min, max and clamp", "channel": "Coding2GO", "length": "5:17", "url": "https://www.youtube.com/watch?v=pYW3O0AxpI8" },
+          { "title": "CSS Container Queries", "channel": "Lazar Nikolov", "length": "5:17", "url": "https://www.youtube.com/watch?v=CHKUFsnABw4" }
+        ],
         "topic": "Real-life analogy: Think of a self-adjusting camera lens. Instead of switching between fixed prime lenses at set distances (breakpoints), a zoom lens (clamp) smoothly finds the perfect focal length for any subject at any distance.\n\nFluid layouts use clamp(), min() and max() to scale type and spacing continuously without breakpoints. Container queries (@container) let a component adapt to its own parent's width rather than the viewport, so the same component works in a narrow slot and a wide one.",
         "problems": [
           {
@@ -1657,7 +1666,7 @@ module.exports = [
         "week": 4,
         "session": 1,
         "title": "Sass / SCSS (variables, nesting, mixins)",
-        "video_url": "https://www.youtube.com/watch?v=roywYSEPSvc",
+        "video_url": "https://www.youtube.com/watch?v=6glgx4EViZQ",
         "topic": "Real-life analogy: Think of a professional kitchen's prep system. Instead of chopping the same onions for every dish, you prep reusable bases (variables), nest recipes within recipes (nesting), and keep master sauce formulas you pour into many plates (mixins).\n\nSass extends CSS with variables, nesting, partials, mixins and functions, compiled down to plain CSS. It reduces repetition and keeps large codebases modular and maintainable.",
         "problems": [
           {
@@ -1723,7 +1732,7 @@ module.exports = [
         "week": 5,
         "session": 1,
         "title": "Web Accessibility (a11y)",
-        "video_url": "https://www.youtube.com/watch?v=qr0ujkLLgmE",
+        "video_url": "https://www.youtube.com/watch?v=VyWRmepESoQ",
         "topic": "Real-life analogy: Think of adding ramps, braille signs and audio announcements to a public building. The same destination becomes reachable and usable by every visitor, not only those who can take the stairs.\n\nAccessibility uses semantic HTML, ARIA roles only where needed, keyboard focus management and sufficient colour contrast to serve all users. WCAG guidelines define measurable success criteria (AA contrast, visible focus, labelled controls).",
         "problems": [
           {

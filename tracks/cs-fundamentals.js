@@ -33,7 +33,11 @@ module.exports = [
   key_concepts: ['Python interpreter & print()', 'Dynamic variables & types', 'input() & type casting', 'String slicing & f-strings', 'Decision structures (if / elif / else)', 'Iteration with for & while loops', 'Lists & list comprehensions', 'Tuples & sets', 'Dictionaries & key-value lookups', 'Functions & default arguments', '*args, **kwargs & variable arguments', 'Lambda expressions & scope (LEGB)', 'Classes, objects & __init__', 'Inheritance & polymorphism', "File handling with 'with' & exceptions"],
   pass_mark: 60, titleNames: ['Python Starter', 'Pythonista'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'Python Interpreter & print()', video_url: 'https://www.youtube.com/watch?v=kqtD5dpn9C8',
+    { no: 1, week: 1, session: 1, title: 'Python Interpreter & print()', video_url: 'https://www.youtube.com/watch?v=i83VkP0LHPI',
+      videos: [
+        { title: 'Printing Values and Variables', channel: 'Programiz', length: '11:48', url: 'https://www.youtube.com/watch?v=i83VkP0LHPI' },
+        { title: 'Printing with sep and end', channel: 'Way To Programming', length: '4:20', url: 'https://www.youtube.com/watch?v=ZkyzkWqhQ-I' },
+      ],
       topic: "Real-life analogy: Think of a live simultaneous translator reading a speech line-by-line, speaking each sentence as it arrives - never waiting for the whole book to be printed and bound first.\n\nPython runs on a bytecode interpreter that executes your source one statement at a time, so there is no separate compile-and-link step to wait through. The print() function sends formatted text to standard output; its sep parameter sets what goes between multiple arguments (a space by default) and its end parameter sets what finishes the line (a newline by default).",
       problems: [
         { title: 'System Diagnostic Banner', points: 30, difficulty: 'Basic',
@@ -51,7 +55,7 @@ module.exports = [
           hint: 'count, price = input().split(); then total = int(count) * float(price).',
           solution: "An int count times a float price giving 50.0, with type(total) printing <class 'float'>." },
       ] },
-    { no: 3, week: 1, session: 3, title: 'User Input with input() & Type Casting', video_url: 'https://www.youtube.com/watch?v=kqtD5dpn9C8&t=548s',
+    { no: 3, week: 1, session: 3, title: 'User Input with input() & Type Casting', video_url: 'https://www.youtube.com/watch?v=DRBybZ6hsY0',
       topic: "Real-life analogy: Think of a microphone capturing raw audio as text. Before a synthesizer can play it back as musical notes, that text has to be converted into numerical pitch frequencies - the raw capture alone is not a number.\n\ninput() always returns a str, no matter what the user types. Before any arithmetic you must cast it with int() or float(); skipping the cast either raises a TypeError or silently does string work (\"20\" * 3) instead of maths.",
       problems: [
         { title: 'Age Verification Scanner', points: 40, difficulty: 'Core',
@@ -87,7 +91,7 @@ module.exports = [
           hint: 'total = 0; for n in range(1, N + 1): if n % 2 == 0: total += n.',
           solution: 'A range() loop summing only the even values from 1 to N, printing Even Sum: 30 for N = 10.' },
       ] },
-    { no: 7, week: 3, session: 1, title: 'Lists & List Comprehensions', video_url: 'https://www.youtube.com/watch?v=W8KRzm-HUcc',
+    { no: 7, week: 3, session: 1, title: 'Lists & List Comprehensions', video_url: 'https://www.youtube.com/watch?v=YlY2g2xrl6Q',
       topic: "Real-life analogy: Think of a digital shopping cart you can add to, remove from, reorder, or run a bulk discount across in a single pass.\n\nA list is a mutable, ordered sequence. A comprehension [expr for x in iterable if cond] builds a whole new list in one readable line, replacing the append-inside-a-loop pattern.",
       problems: [
         { title: 'Squares of Odds Generator', points: 40, difficulty: 'Core',
@@ -96,7 +100,7 @@ module.exports = [
           hint: '[n ** 2 for n in nums if n % 2].',
           solution: 'A single comprehension filtering odds and squaring them, printing [1, 9] for 1 2 3 4.' },
       ] },
-    { no: 8, week: 3, session: 2, title: 'Tuples & Sets', video_url: 'https://www.youtube.com/watch?v=W8KRzm-HUcc',
+    { no: 8, week: 3, session: 2, title: 'Tuples & Sets', video_url: 'https://www.youtube.com/watch?v=Mf7eFtbVxFM',
       topic: "Real-life analogy: Think of a sealed birth certificate that can never be edited (a tuple), and an automated party guestbook that silently refuses to write down a name it already has (a set).\n\nA tuple (x, y) is an immutable record - fixed the moment it is created. A set {a, b} stores only unique values and offers O(1) membership tests plus set algebra (union, intersection, difference).",
       problems: [
         { title: 'Duplicate Identifier Filter', points: 40, difficulty: 'Core',
@@ -180,7 +184,7 @@ module.exports = [
   key_concepts: ['JS engine & console.log()', 'Scoping with let, const & var', 'Primitive types & type conversion', 'Strict vs loose equality', 'Template literals & string methods', 'Iteration (for...of, for...in, while)', 'Array methods (map, filter, reduce)', 'Destructuring, spread & rest', 'JSON serialization & deep cloning', "Arrow functions & 'this'", 'Closures & private state', 'Higher-order functions & currying', 'Event loop, callbacks & call stack', 'Promises (.then, .catch, .finally)', 'async / await & the Fetch API'],
   pass_mark: 60, titleNames: ['Script Starter', 'Async Engineer'],
   levels: [
-    { no: 1, week: 1, session: 1, title: 'JS Runtime Engine & console.log()', video_url: 'https://www.youtube.com/watch?v=W6NZfCO5SIk',
+    { no: 1, week: 1, session: 1, title: 'JS Runtime Engine & console.log()', video_url: 'https://www.youtube.com/watch?v=yunwtshh7lA',
       topic: "Real-life analogy: Think of a live theatre prompter whispering each line to the actors in real time, handling backstage cues on the spot and jotting the stage status straight into the stage manager's notebook.\n\nJavaScript runs inside an engine - V8 in Chrome and Node.js, SpiderMonkey in Firefox - executing statements one after another on a single-threaded call stack. console.log() streams formatted diagnostic output to the developer console, and passing it several comma-separated arguments prints them on one line separated by spaces.",
       problems: [
         { title: 'System Startup Diagnostic Banner', points: 30, difficulty: 'Basic',
@@ -189,7 +193,7 @@ module.exports = [
           hint: 'console.log("[V8 Engine] Core Initialized"); then console.log("Status: Online,", "Mode: Production");',
           solution: 'Two console.log() calls, the second using comma-separated arguments to print the status and mode line.' },
       ] },
-    { no: 2, week: 1, session: 2, title: 'Variable Scoping (let, const, var) & Hoisting', video_url: 'https://www.youtube.com/watch?v=9M4XKi25I2M',
+    { no: 2, week: 1, session: 2, title: 'Variable Scoping (let, const, var) & Hoisting', video_url: 'https://www.youtube.com/watch?v=9WIJQDvt4Us',
       topic: "Real-life analogy: Think of var as a megaphone heard across the whole floor (function-scoped), let as a conversation inside a soundproof meeting room (block-scoped), and const as a permanent engraved metal plaque.\n\nModern JavaScript uses let (reassignable, block-scoped) and const (block-scoped, its binding fixed once assigned). var is hoisted to the top of its function and ignores { } block boundaries, which quietly leaks values across scopes and causes bugs.",
       problems: [
         { title: 'Block-Scoped Tax Calculator', points: 30, difficulty: 'Basic',
@@ -216,7 +220,7 @@ module.exports = [
           hint: 'console.log(`Loose: ${"0" == 0} | Strict: ${"0" === 0}`);',
           solution: 'A side-by-side == vs === comparison of "0" and 0, printing "Loose: true | Strict: false".' },
       ] },
-    { no: 5, week: 2, session: 2, title: 'Template Literals & String Methods', video_url: 'https://www.youtube.com/watch?v=9M4XKi25I2M&t=6679s',
+    { no: 5, week: 2, session: 2, title: 'Template Literals & String Methods', video_url: 'https://www.youtube.com/watch?v=J65D347sk2M',
       topic: "Real-life analogy: Think of a fill-in-the-blank invitation card where the name, the date and the RSVP link snap automatically into their pre-cut slots.\n\nTemplate literals use backticks and support multi-line text and ${expr} interpolation directly inside the string. Common string methods include includes(), slice(), trim() and replace() / replaceAll().",
       problems: [
         { title: 'Dynamic URL Query Builder', points: 40, difficulty: 'Core',
@@ -225,7 +229,7 @@ module.exports = [
           hint: '`Endpoint: https://${host}/${endpoint}?id=${id}`',
           solution: 'A template-literal URL interpolating host, endpoint and id into "https://api.site.com/users?id=101".' },
       ] },
-    { no: 6, week: 2, session: 3, title: 'Iteration (for...of, for...in, while)', video_url: 'https://www.youtube.com/watch?v=9M4XKi25I2M&t=9911s',
+    { no: 6, week: 2, session: 3, title: 'Iteration (for...of, for...in, while)', video_url: 'https://www.youtube.com/watch?v=Kn06785pkJg',
       topic: "Real-life analogy: Think of a bookshelf: for...of walks past every physical book in turn, while for...in reads the little index tags stuck to the shelf frame itself.\n\nfor...of iterates the values of an iterable (arrays, strings, sets). for...in iterates the enumerable keys of an object. while repeats its body as long as its condition stays truthy.",
       problems: [
         { title: 'Array Value Accumulator', points: 30, difficulty: 'Basic',
@@ -288,7 +292,7 @@ module.exports = [
           hint: 'const applyDiscount = discount => price => price - price * discount; then applyDiscount(0.10)(200).',
           solution: 'A curried applyDiscount(rate)(price) that returns 180 for a 10% discount on 200.' },
       ] },
-    { no: 13, week: 5, session: 1, title: 'Event Loop, Callbacks & the Call Stack', video_url: 'https://www.youtube.com/watch?v=8aGhZQkoFbQ',
+    { no: 13, week: 5, session: 1, title: 'Event Loop, Callbacks & the Call Stack', video_url: 'https://www.youtube.com/watch?v=eiC58R16hb8',
       topic: "Real-life analogy: Think of one busy chef (the call stack). When a dish needs 20 minutes in the oven (a Web API), the chef starts it and cooks other orders, only plating the baked dish once the timer rings and the queue hands it back.\n\nJavaScript runs on one thread. Asynchronous work is handed to the browser or Node APIs, and its callbacks wait in a task queue; the event loop only pushes a queued callback onto the call stack once the stack is empty - so setTimeout(fn, 0) still runs after all the synchronous code.",
       problems: [
         { title: 'Non-Blocking setTimeout Ordering', points: 40, difficulty: 'Core',
@@ -408,7 +412,7 @@ module.exports = [
           hint: '.card { box-sizing: border-box; padding: 20px; border: 2px solid #ccc; margin: 16px; }',
           solution: 'A card with 20px padding, a 2px border and a 16px margin, sized with border-box.' },
       ] },
-    { no: 10, week: 4, session: 1, title: 'Display & Positioning', video_url: 'https://www.youtube.com/watch?v=fF_NVrd1s14',
+    { no: 10, week: 4, session: 1, title: 'Display & Positioning', video_url: 'https://www.youtube.com/watch?v=jx5jmI0UlXU',
       topic: "Real-life analogy: Think of arranging furniture in a room. Some pieces sit in the natural flow line by line (block, inline), a rug shifts slightly from its spot (relative), a wall clock is pinned to an exact coordinate (absolute), and a ceiling fan stays put no matter where you stand (fixed).\n\nThe display property (block, inline, inline-block, none) controls flow, while position (static, relative, absolute, fixed, sticky) removes or anchors elements. Offsets top, right, bottom, left position an element relative to its containing block.",
       problems: [
         { title: 'Sticky Header', points: 40, difficulty: 'Core',
@@ -417,7 +421,7 @@ module.exports = [
           hint: 'nav { position: sticky; top: 0; } - sticky needs a top offset to know where to stick.',
           solution: 'A nav with position: sticky; top: 0 that pins to the top of the viewport on scroll.' },
       ] },
-    { no: 11, week: 4, session: 2, title: 'Flexbox Layout', video_url: 'https://www.youtube.com/watch?v=u044iM9xsWU',
+    { no: 11, week: 4, session: 2, title: 'Flexbox Layout', video_url: 'https://www.youtube.com/watch?v=fYq5PXgSsbE',
       topic: "Real-life analogy: Think of arranging books on an adjustable shelf. You choose the direction (row or column), how the gaps distribute between books (justify-content), and how they line up against the shelf edge (align-items).\n\nFlexbox lays out items along a single axis using display: flex on a container. Properties like justify-content, align-items, gap and flex control alignment, spacing, and how items grow or shrink.",
       problems: [
         { title: 'Centered Box', points: 30, difficulty: 'Basic',
@@ -453,7 +457,7 @@ module.exports = [
           hint: 'button { transition: transform 0.2s; } button:hover { transform: scale(1.1); }',
           solution: 'A button that scales up on :hover and back on leave, animated by a transition on its base rule.' },
       ] },
-    { no: 15, week: 5, session: 3, title: 'Building a Complete Responsive Landing Page', video_url: 'https://www.youtube.com/watch?v=X1dz0xRbSJc',
+    { no: 15, week: 5, session: 3, title: 'Building a Complete Responsive Landing Page', video_url: 'https://www.youtube.com/watch?v=hVdTQWASliE',
       topic: "Real-life analogy: Think of assembling a show-home for an open house. Every room you framed, painted and furnished across the course now comes together into one polished, walk-through-ready property.\n\nA landing page integrates semantic structure, the box model, Flexbox and Grid, responsive queries and motion into one cohesive deliverable. This capstone consolidates every fundamental skill into a portfolio-ready artifact.",
       problems: [
         { title: 'Hero Section', points: 60, difficulty: 'Boss',

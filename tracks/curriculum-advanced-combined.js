@@ -1323,7 +1323,7 @@ module.exports = [
         "week": 4,
         "session": 3,
         "title": "Async Generators & for-await-of",
-        "video_url": "https://www.youtube.com/watch?v=tmeKsb2Fras",
+        "video_url": "https://www.youtube.com/watch?v=J24rb6_5h9o",
         "topic": "Real-life analogy: Think of streaming a series instead of downloading the whole season first - each chunk arrives and plays as it lands, and you can stop watching at any point.\n\nAn async generator (async function*) yields values that are themselves awaited, so it can pause for I/O between items. It is consumed with for await (const item of stream), which pulls one item at a time and never buffers the whole sequence in memory.",
         "problems": [
           {

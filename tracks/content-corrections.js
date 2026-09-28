@@ -9,10 +9,8 @@ module.exports=function applyContentCorrections(track){
   if(track.key==='js-advanced'){
     const lesson=track.levels.find(l=>l.no===12);
     if(lesson){
-      lesson.video_url=null;
-      lesson.resource_url='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*';
-      lesson.resource_note='Read the JavaScript async-generator guide. A replacement video is awaiting review; the previous video taught Python.';
-      for(const p of lesson.problems)p.refs=[...(p.refs||[]),['MDN: JavaScript async generators',lesson.resource_url]];
+      const guide='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*';
+      for(const p of lesson.problems)p.refs=[...(p.refs||[]),['MDN: JavaScript async generators',guide]];
     }
   }
 };

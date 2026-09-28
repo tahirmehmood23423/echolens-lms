@@ -1445,7 +1445,10 @@ function capstoneCardHtml(t, prog) {
 // scrolling, viewport-height-capped box in the first place; a plain list of
 // short rows fits every module with no scrolling anywhere on this page.
 function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLevel, levelDone) {
-  const preview = t.available === false;
+  // A "coming soon" course is unclickable for everyone - except staff, who
+  // the API already hands every lesson unlocked (server.js staff_preview)
+  // so they can review the syllabus before launch.
+  const preview = t.available === false && !(CUR && CUR.staff_preview);
   const doneMods = modules.filter((mod) => mod.levels.every((l) => !l.locked && levelDone(l))).length;
   const pct = modules.length ? Math.round((doneMods / modules.length) * 100) : 0;
   // The server is the authority on which module is open (course-pacing.js):

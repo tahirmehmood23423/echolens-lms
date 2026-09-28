@@ -2529,7 +2529,10 @@ app.get('/api/public/tracks/:key', (req, res) => {
   const seat = t.free && viewer ? OpenQuest.enrollment(viewer.id, t.key) : null;
   const staffPreview = !!viewer && !['free', 'student'].includes(viewer.role);
   const freeOpen = staffPreview || !!(seat && seat.active);
-  const openN = previewOnly ? 0 : t.free ? (freeOpen ? t.levels.length : 0) : OPEN_LEVELS;
+  // A staged "coming soon" course (previewOnly) is fully locked for learners,
+  // but staff still need to review every lesson - video, brief, assignment -
+  // before launch, matching the comment below ("staff keep full visibility").
+  const openN = previewOnly ? (staffPreview ? t.levels.length : 0) : t.free ? (freeOpen ? t.levels.length : 0) : OPEN_LEVELS;
   const mode = Quests.tracks({ includeUnpublished: true }).find((x) => x.key === t.key)?.submission_mode || 'code';
   const levels = t.levels.map((l) => {
     if (l.no <= openN) {

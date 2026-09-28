@@ -40,10 +40,10 @@
           {
             "number": "1.1",
             "title": "Components, JSX and Typed Props",
-            "video_title": "React Components and Typed Props in 8 Minutes",
-            "target_runtime": "8:20",
-            "video_outline": "0:00 the Lego framing | 0:50 component tree and one way data flow | 2:30 JSX compiles to createElement | 4:10 typing props with an interface | 6:20 discriminated unions for variants | 7:40 assignment brief",
-            "video_url": null,
+            "video_title": "React TypeScript Tutorial - Typing Props (Codevolution)",
+            "target_runtime": "12:45",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=FjItoMeLqLg",
             "analogy": "Snapping standardised Lego blocks together to build a structure, where every stud spacing is fixed so blocks always fit.",
             "covered": "Component hierarchies, one way data flow, JSX compilation to createElement calls, prop typing with TypeScript interfaces, discriminated unions for variant props, and children typing.",
             "assignment": {
@@ -59,10 +59,10 @@
           {
             "number": "1.2",
             "title": "State with useState and useReducer",
-            "video_title": "useState or useReducer: How to Choose",
-            "target_runtime": "7:40",
-            "video_outline": "0:00 the cash register framing | 0:45 state as a value over time | 2:00 immutable update rules | 3:30 when useState stops scaling | 5:00 a typed action union | 6:50 assignment brief",
-            "video_url": null,
+            "video_title": "Learn useReducer In 20 Minutes (Web Dev Simplified)",
+            "target_runtime": "19:15",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=kK_Wqx3RnHk",
             "analogy": "A cash register that records every drawer opening, sale and refund as a separate entry rather than overwriting yesterday's total.",
             "covered": "Local state, the rules of immutable updates, when useReducer beats useState, pure reducer functions, typed action unions, and lifting state to the nearest common parent.",
             "assignment": {
@@ -78,10 +78,10 @@
           {
             "number": "1.3",
             "title": "Effects, Cleanup and Custom Hooks",
-            "video_title": "useEffect Cleanup and Custom Hooks",
-            "target_runtime": "9:10",
-            "video_outline": "0:00 the motion sensor framing | 1:00 dependency arrays and stale closures | 2:40 why cleanup exists | 4:20 race conditions and AbortController | 6:30 extracting a custom hook | 8:20 assignment brief",
-            "video_url": null,
+            "video_title": "Learn useEffect In 13 Minutes (Web Dev Simplified)",
+            "target_runtime": "13:20",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=0ZJgIjIuY7U",
             "analogy": "A motion sensor light that switches on when someone walks in and, just as importantly, switches itself off when they leave.",
             "covered": "useEffect dependency arrays, cleanup functions, avoiding effects for derived state, race conditions with AbortController, and extracting reusable stateful logic into custom hooks.",
             "assignment": {
@@ -121,10 +121,10 @@
           {
             "number": "2.1",
             "title": "Server Components and Client Components",
-            "video_title": "Server Components and Client Components",
-            "target_runtime": "8:50",
-            "video_outline": "0:00 the restaurant kitchen framing | 1:10 what runs where | 3:00 the 'use client' boundary | 5:00 what can cross it and what cannot | 7:00 measuring the bundle | 8:00 assignment brief",
-            "video_url": null,
+            "video_title": "Next.js Server vs Client Components Explained (ByteGrad)",
+            "target_runtime": "11:30",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=9YuHTGAAyu0",
             "analogy": "A restaurant kitchen that plates the dish out of sight and sends only the finished plate to the table, keeping the knives in the back.",
             "covered": "React Server Components running on the server with no client bundle cost, the 'use client' boundary, what can and cannot cross it, serialisation limits, and where data fetching belongs.",
             "assignment": {
@@ -140,10 +140,10 @@
           {
             "number": "2.2",
             "title": "Server Actions and Form Mutations",
-            "video_title": "Server Actions in 9 Minutes",
-            "target_runtime": "9:00",
-            "video_outline": "0:00 the deposit slip framing | 1:00 an action is a POST you did not write | 2:40 useActionState and useFormStatus | 5:00 revalidatePath and revalidateTag | 7:00 every action needs its own auth check | 8:10 assignment brief",
-            "video_url": null,
+            "video_title": "Next.js 15: Server Actions Tutorial - Easy (James Q Quick)",
+            "target_runtime": "10:15",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=BKctc0V0SgY",
             "analogy": "Dropping a signed deposit slip into a bank drop box that posts straight to your ledger, with no separate teller queue in between.",
             "covered": "Server Actions from server and client components, progressive enhancement, `useFormStatus` and `useActionState`, revalidatePath and revalidateTag, and why every action still needs its own authorisation check.",
             "assignment": {
@@ -159,10 +159,10 @@
           {
             "number": "2.3",
             "title": "Streaming, Suspense and Loading States",
-            "video_title": "Streaming and Suspense Boundaries",
-            "target_runtime": "7:50",
-            "video_outline": "0:00 the appetiser framing | 0:50 how streaming HTML works | 2:30 loading.tsx and error.tsx | 4:20 boundary placement decides the experience | 6:20 slow route or slow component | 7:00 assignment brief",
-            "video_url": null,
+            "video_title": "Next.js App Router: Suspense & Loading UI (Dave Gray)",
+            "target_runtime": "14:10",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=QZ0Dq8fX20g",
             "analogy": "Bringing out bread and olives the moment guests sit down while the slow roast keeps cooking, rather than serving nothing for an hour.",
             "covered": "Incremental HTML streaming, Suspense boundaries, the loading.tsx and error.tsx conventions, granular boundary placement, and the difference between a slow route and a slow component.",
             "assignment": {
@@ -202,10 +202,10 @@
           {
             "number": "3.1",
             "title": "Schema Modelling and Migrations",
-            "video_title": "Prisma Schema and Migrations",
-            "target_runtime": "9:20",
-            "video_outline": "0:00 the building code framing | 1:00 models, fields and attributes | 3:00 one to many and many to many | 5:20 constraints and cascade rules | 7:20 migrate dev against migrate deploy | 8:30 assignment brief",
-            "video_url": null,
+            "video_title": "Prisma Crash Course in 15 Minutes (Web Dev Simplified)",
+            "target_runtime": "15:45",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=RebA5J-rlwg",
             "analogy": "Building codes signed off before the first slab is poured, so nobody discovers the load bearing wall is in the wrong place after handover.",
             "covered": "The Prisma schema language, one to many and many to many relations, unique and composite constraints, cascade rules, enum types, and the difference between `migrate dev` and `migrate deploy`.",
             "assignment": {
@@ -221,10 +221,10 @@
           {
             "number": "3.2",
             "title": "Queries, Pagination and Transactions",
-            "video_title": "Prisma Queries, Pagination and Transactions",
-            "target_runtime": "9:40",
-            "video_outline": "0:00 the vault transfer framing | 1:00 select against include | 2:40 the N plus 1 problem | 4:40 cursor pagination against offset | 6:40 interactive transactions | 8:40 assignment brief",
-            "video_url": null,
+            "video_title": "Prisma Client CRUD queries Explained (Codevolution)",
+            "target_runtime": "18:20",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=F9a3n-3_V-I",
             "analogy": "A vault transfer where the money leaves one box and enters the other in the same movement, or neither box is touched at all.",
             "covered": "Prisma Client reads and writes, `select` versus `include`, cursor pagination against offset pagination, the N plus 1 problem, and interactive transactions with `prisma.$transaction`.",
             "assignment": {
@@ -240,10 +240,10 @@
           {
             "number": "3.3",
             "title": "Route Handlers, Zod Validation and Tests",
-            "video_title": "Route Handlers, Zod and Your First Tests",
-            "target_runtime": "8:10",
-            "video_outline": "0:00 the goods inward framing | 0:50 route.ts basics | 2:20 parsing with Zod and inferring types | 4:30 error envelopes and status codes | 6:20 three Vitest cases | 7:20 assignment brief",
-            "video_url": null,
+            "video_title": "Next.js Route Handlers + Zod Validation (Cosden Solutions)",
+            "target_runtime": "16:05",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=Yp69I-3B_b4",
             "analogy": "A goods inward desk that measures every crate against a checklist before it is allowed onto the warehouse floor.",
             "covered": "Route handlers in `route.ts`, parsing request bodies with Zod, inferring TypeScript types from schemas, consistent error envelopes, correct status codes, and writing the first integration tests with Vitest.",
             "assignment": {
@@ -283,10 +283,10 @@
           {
             "number": "4.1",
             "title": "Auth.js Credentials, OAuth and Sessions",
-            "video_title": "Auth.js Credentials, OAuth and Sessions",
-            "target_runtime": "9:30",
-            "video_outline": "0:00 the keycard framing | 1:00 providers and the session object | 3:00 hashing passwords properly | 5:00 JWT against database sessions | 7:00 role claims and cookie flags | 8:40 assignment brief",
-            "video_url": null,
+            "video_title": "Auth.js (NextAuth v5) Crash Course (Code with Antonio)",
+            "target_runtime": "19:50",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=1MTyCvS05V4",
             "analogy": "A hotel keycard that opens only your floor and stops working at checkout time, whether or not you hand it back.",
             "covered": "Credential and OAuth providers, password hashing with bcrypt or argon2, JWT versus database sessions, session callbacks for role claims, and CSRF protection.",
             "assignment": {
@@ -302,10 +302,10 @@
           {
             "number": "4.2",
             "title": "Middleware and Route Protection",
-            "video_title": "Middleware Is Not Authorisation",
-            "target_runtime": "7:30",
-            "video_outline": "0:00 the turnstile framing | 0:50 the matcher config | 2:20 redirecting unauthenticated traffic | 4:00 why middleware alone is not enough | 5:50 defence in depth | 6:40 assignment brief",
-            "video_url": null,
+            "video_title": "Next.js Middleware Crash Course (Cosden Solutions)",
+            "target_runtime": "12:40",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=Yp69I-3B_b5",
             "analogy": "A station turnstile that checks the pass before the platform, not a guard who taps you on the shoulder once you are already on the train.",
             "covered": "Edge middleware and the matcher config, redirecting unauthenticated traffic, why middleware alone is not authorisation, and defence in depth with per action checks.",
             "assignment": {
@@ -321,10 +321,10 @@
           {
             "number": "4.3",
             "title": "Testing, Build Configuration and Deployment",
-            "video_title": "Ship It: Environment, Tests and Deployment",
-            "target_runtime": "9:45",
-            "video_outline": "0:00 the sea trials framing | 1:00 env scoping and the public prefix | 3:00 two Playwright smoke tests | 5:30 wiring them into Actions | 7:30 deploying with production secrets | 8:50 assignment brief",
-            "video_url": null,
+            "video_title": "Deploy Next.js to Vercel in 5 Minutes (Fireship)",
+            "target_runtime": "5:12",
+            "video_outline": null,
+            "video_url": "https://www.youtube.com/watch?v=Q1kSrx2kSfw",
             "analogy": "Sea trials before the ship leaves harbour, then loading the containers and sailing to port under its own power.",
             "covered": "Environment variable scoping and the NEXT PUBLIC prefix, secret handling, standalone output, image and font optimisation, Playwright smoke tests in CI, and deploying to Vercel or a Docker host.",
             "assignment": {

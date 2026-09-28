@@ -3313,8 +3313,8 @@ app.get('/api/events', authRequired, (req, res) => {
       // Same redaction as the detail endpoint - the list payload must not
       // leak the exact ShipLens brief to devtools before the task opens.
       problems: !isAdmin && ev.series_kind === 'shiplens' ? Events.shipLensProblems(ev, ['submission', 'grading', 'closed'].includes(ev.shiplens_phase)) : ev.problems,
-      my_entry: Events.entryFor(ev.id, req.user.id),
-      my_progress: Events.entryFor(ev.id, req.user.id) ? Events.progressFor(ev, req.user.id) : null,
+      my_entry: Events.entryForUser(ev, req.user),
+      my_progress: Events.entryForUser(ev, req.user) ? Events.progressFor(ev, req.user.id) : null,
     }));
   res.json({ events: list, is_admin: isAdmin, can_play: ['free', 'student'].includes(req.user.role) });
 });
@@ -3326,7 +3326,7 @@ app.get('/api/events/:id', authRequired, (req, res) => {
   if (!ev) return res.status(404).json({ error: 'Event not found.' });
   const d = Events.decorate(ev);
   const isAdmin = req.user.role === 'admin';
-  const entry = Events.entryFor(ev.id, req.user.id);
+  const entry = Events.entryForUser(ev, req.user);
   const gate = Events.canParticipate(ev, req.user.id);
   const mySubs = {};
   if (entry) for (const p of (ev.problems.length ? ev.problems : [{ pid: null }])) {
@@ -3461,6 +3461,20 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
         attachments: [{ filename: `ShipLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' }],
       }, { kind: 'challan', reference: c.serial });
       if (delivery.state === 'provider_accepted') Challans.markSent(c.serial);
+      // A team of two: the second member gets their own copy of the same
+      // challan so either of them can pay, sign in later and see the team as
+      // enrolled - this courtesy copy sits outside deliverRegistrationMail's
+      // per-registration delivery tracking, which only tracks the lead's copy.
+      const mate = out.entry.team_details[1];
+      if (mate?.email) {
+        try {
+          await mailer.send({
+            to: mate.email, subject: `ShipLens fee challan - ${ev.title}`,
+            text: `Your teammate ${out.entry.team_details[0].name} registered your team for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The challan is attached. Pay PKR ${c.net_fee} by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions.\n\nSign in (or create an account) with this same email address to see your team's enrollment and submit your work.`,
+            attachments: [{ filename: `ShipLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' }],
+          });
+        } catch (error) { console.error('ShipLens challan delivery to teammate failed:', error.message); }
+      }
     } catch (error) { console.error('ShipLens challan delivery failed:', error.message); }
     // Same automatic fee-reminder cadence (7/4/3/1 days before, due day, then
     // an extension follow-up) already used for course-registration challans.
@@ -3488,7 +3502,7 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
 app.get('/api/events/:id/challan', authRequired, asyncRoute(async (req, res) => {
   const ev = Events.byId(req.params.id);
   if (!ev || ev.series_kind !== 'shiplens') return res.status(404).json({ error: 'ShipLens series not found.' });
-  const entry = Events.entryFor(ev.id, req.user.id);
+  const entry = Events.entryForUser(ev, req.user);
   if (!entry && !['admin', 'finance'].includes(req.user.role)) return res.status(403).json({ error: 'Register for this series first.' });
   const reg = entry ? Registrations.byId(entry.registration_id) : null;
   if (!reg?.challan_serial) return res.status(404).json({ error: 'Challan not found.' });

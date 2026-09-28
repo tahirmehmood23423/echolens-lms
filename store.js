@@ -3388,11 +3388,22 @@ const Events = {
     save();
   },
   entryFor(eid, uid) { return data.event_entries.find((e) => e.event_id === Number(eid) && e.user_id === Number(uid)) || null; },
+  // ShipLens registers under the team lead's account, but a second member
+  // never gets an entry of their own - they're just an email address in
+  // team_details. This resolves "am I part of this event" for EITHER member,
+  // by user id first (the lead, or anyone else) and by email second (a
+  // teammate signing in under their own account, whenever they made it).
+  entryForUser(ev, user) {
+    const own = Events.entryFor(ev.id, user.id);
+    if (own || ev.series_kind !== 'shiplens' || !user?.email) return own;
+    const email = String(user.email).trim().toLowerCase();
+    return data.event_entries.find((e) => e.event_id === ev.id && (e.team_details || []).some((m) => m.email === email)) || null;
+  },
   register({ event_id, user, payment_shot, team_details, challenge_pid }) {
     const ev = Events.byId(event_id); if (!ev) return { error: 'Event not found.' };
     const st = Events.status(ev);
     if (st === 'ended' || st === 'closed') return { error: 'Registration is closed for this event.' };
-    if (Events.entryFor(ev.id, user.id)) return { error: 'You are already registered for this event.' };
+    if (Events.entryForUser(ev, user)) return { error: 'You are already registered for this event.' };
     const isShipLens = ev.series_kind === 'shiplens';
     if (isShipLens && !['upcoming', 'registration'].includes(Events.shipLensPhase(ev))) return { error: 'Registration is closed for this ShipLens series.' };
     if (ev.entry === 'paid' && !isShipLens && !payment_shot) return { error: 'Upload a screenshot of your payment transaction to register.' };
@@ -3432,14 +3443,24 @@ const Events = {
     return e;
   },
   canParticipate(ev, uid) {
-    const e = Events.entryFor(ev.id, uid);
+    const user = Users.byId(uid);
+    const e = user ? Events.entryForUser(ev, user) : Events.entryFor(ev.id, uid);
     if (!e) return { ok: false, why: 'Register for this event first.' };
     if (ev.entry === 'paid' && e.payment_status !== 'confirmed') {
       return { ok: false, why: e.payment_status === 'rejected' ? 'Your payment could not be verified - contact Finance.' : ev.series_kind === 'shiplens' ? 'Your challan is ready. Pay it and send proof to Finance; your challenge unlocks after Finance confirms.' : 'Your payment is being verified by the admin.' };
     }
     return { ok: true, entry: e };
   },
+  // ShipLens submissions belong to the team's shared entry, not to whichever
+  // member happened to click submit - either teammate must see and resubmit
+  // the same one. Everything else keeps the plain per-user lookup.
   submissionFor(eid, uid, pid) {
+    const ev = Events.byId(eid);
+    if (ev?.series_kind === 'shiplens') {
+      const user = Users.byId(uid);
+      const entry = user ? Events.entryForUser(ev, user) : null;
+      if (entry) return data.event_submissions.find((s) => s.event_id === Number(eid) && s.entry_id === entry.id && (s.pid || null) === (pid ? Number(pid) : null)) || null;
+    }
     return data.event_submissions.find((s) => s.event_id === Number(eid) && s.user_id === Number(uid) && (s.pid || null) === (pid ? Number(pid) : null)) || null;
   },
   submit({ event_id, user, pid, code, language, output, file_url, file_name, link, github_link, render_link, vercel_link, note }) {
@@ -3504,7 +3525,14 @@ const Events = {
   // submission for problem-less events) and the average score reaches the
   // event's pass mark.
   progressFor(ev, uid) {
-    const mine = data.event_submissions.filter((s) => s.event_id === ev.id && s.user_id === Number(uid));
+    let mine;
+    if (ev.series_kind === 'shiplens') {
+      const user = Users.byId(uid);
+      const entry = user ? Events.entryForUser(ev, user) : null;
+      mine = entry ? data.event_submissions.filter((s) => s.event_id === ev.id && s.entry_id === entry.id) : [];
+    } else {
+      mine = data.event_submissions.filter((s) => s.event_id === ev.id && s.user_id === Number(uid));
+    }
     const total = ev.series_kind === 'shiplens' ? 1 : (ev.problems || []).length || 1;
     const graded = mine.filter((s) => s.score != null);
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;

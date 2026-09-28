@@ -4706,6 +4706,7 @@ async function renderHackathons() {
           ${ev.my_entry ? `<div class="s" style="color:var(--ok)">${ev.my_entry.payment_status === 'confirmed' ? 'Enrolled' : 'Challan issued · awaiting Finance confirmation'}</div>` : ''}</div>
         <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
         ${d.can_play && !ev.my_entry && ['upcoming', 'live'].includes(ev.status) ? `<button class="btn btn-primary btn-sm" onclick="formEventRegister(${ev.id})">Register</button>` : ''}
+        ${d.is_admin ? `<button class="btn btn-danger btn-sm" onclick="delShipLens(${ev.id})">Delete</button>` : ''}
       </div>`).join('') : '<div class="empty">No ShipLens series scheduled yet.</div>'}
     </div></div>`;
 }
@@ -6871,6 +6872,8 @@ function adminEventPanel(d) {
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
       ${[[5, '5 days left'], [4, '4 days left'], [3, '3 days left'], [2, '2 days left'], [1, '1 day left'], [0, 'Last day']].map(([days, label]) =>
         `<button class="btn btn-ghost btn-sm" onclick="shipLensRemind(${ev.id},${days})">${label}</button>`).join('')}
+      <span style="flex:1"></span>
+      <button class="btn btn-danger btn-sm" onclick="delShipLens(${ev.id})">Delete this series</button>
     </div>` : ''}
     <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}</div>
     <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
@@ -6923,6 +6926,17 @@ function wireAdminEventPanel(d) {
 async function shipLensRemind(eid, daysLeft) {
   try { const out = await api(`/api/admin/events/${eid}/remind`, { method: 'POST', body: JSON.stringify({ days_left: daysLeft }) }); toast(`Reminder sent to ${out.notified} people.`); }
   catch (e) { toast(e.message, true); }
+}
+// Admins can pull a ShipLens series at any point in its lifecycle - before,
+// during or after registration/submission/grading - no status check gates it.
+async function delShipLens(eid) {
+  if (!confirm('Delete this ShipLens series? This removes the event, all team registrations and all submissions - it cannot be undone.')) return;
+  try {
+    await api(`/api/admin/events/${eid}`, { method: 'DELETE' });
+    toast('ShipLens series deleted.');
+    closeModal();
+    renderHackathons();
+  } catch (e) { toast(e.message, true); }
 }
 async function evPay(entryId, eid, confirm) {
   try { await api(`/api/admin/event-entries/${entryId}/payment`, { method: 'POST', body: JSON.stringify({ confirm }) }); toast(confirm ? 'Payment confirmed - the participant was emailed.' : 'Payment rejected - the participant was emailed.'); openEvent(eid); }

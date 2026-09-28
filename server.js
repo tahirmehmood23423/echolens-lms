@@ -3389,7 +3389,20 @@ app.patch('/api/admin/events/:id', authRequired, adminRequired, (req, res) => {
   if (!ev) return res.status(404).json({ error: 'Event not found.' });
   res.json({ ok: true, event: Events.decorate(ev) });
 });
-app.delete('/api/admin/events/:id', authRequired, adminRequired, (req, res) => { Events.remove(req.params.id); res.json({ ok: true }); });
+app.delete('/api/admin/events/:id', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const ev = Events.byId(req.params.id);
+  // Deleting a ShipLens series must not leave its challans on the automatic
+  // fee-reminder cron - those registrations no longer point at a real event,
+  // so the reminders would otherwise keep emailing teams about it forever.
+  if (ev?.series_kind === 'shiplens') {
+    for (const entry of Events.entries(ev.id)) {
+      const reg = entry.registration_id ? Registrations.byId(entry.registration_id) : null;
+      if (reg?.challan_serial) { try { await admissionsReminders.configure(reg.challan_serial, false, req.user.id); } catch { /* already stopped */ } }
+    }
+  }
+  Events.remove(req.params.id);
+  res.json({ ok: true });
+}));
 // A manual "N days left to register" nudge for a ShipLens series - unlike the
 // automatic per-challan fee reminders (admissionsReminders), the admin picks
 // the moment and the step themselves.

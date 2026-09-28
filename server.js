@@ -3454,7 +3454,7 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
     try { await admissionsReminders.configure(c.serial, true, req.user.id); } catch (error) { console.error('ShipLens reminder setup failed:', error.message); }
     const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
     if (admins.length) mailer.notify(admins, `New ShipLens registration - ${ev.title}`,
-      `${req.user.name} (${req.user.email || 'no email'}) registered a team for "${ev.title}".\nChallenge: ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || '-'}\nChallan ${c.serial} for PKR ${c.net_fee} has been emailed to them; Finance confirms it once paid.`);
+      `${out.entry.team_details[0].name} (${out.entry.team_details[0].email}) registered a team for "${ev.title}".\nChallenge: ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || '-'}\nChallan ${c.serial} for PKR ${c.net_fee} has been emailed to the team lead; Finance confirms it once paid.`);
     return res.json({ ok: true, entry: out.entry, challan: { serial: c.serial, net_fee: c.net_fee, deadline: c.deadline } });
   }
   // Every event / hackathon / competition / webinar registration is reported

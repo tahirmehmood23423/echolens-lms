@@ -3406,7 +3406,6 @@ const Events = {
         year: String(m?.year || '').trim().slice(0, 40),
       }));
       if (team.some((m) => !m.name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email) || !m.whatsapp || !m.university || !m.year)) return { error: 'Complete the name, email, WhatsApp, university and year for every member.' };
-      if (team[0].email !== String(user.email || '').toLowerCase()) return { error: 'The team lead email must match your signed-in account.' };
       if (team.length === 2 && team[0].email === team[1].email) return { error: 'Team members must use different email addresses.' };
     }
     const e = {
@@ -4724,7 +4723,8 @@ const Challans = {
     addDiscount(discount_category_id);
     if (!r.ambassador_code) addDiscount(r.discount_category_id);
     const discount_amount = Math.min(gross, discounts.reduce((s, d) => s + d.amount, 0));
-    const student = Users.byLogin(r.email);
+    const shipLensEntry = shipLensEvent ? data.event_entries.find((e) => e.id === Number(r.status.shiplens_entry_id)) : null;
+    const student = shipLensEvent ? Users.byId(shipLensEntry?.user_id) : Users.byLogin(r.email);
     const bank = Settings.bank();
     const ch = {
       id: nextId('challans'), serial: Challans.serial(), registration_id: r.id,

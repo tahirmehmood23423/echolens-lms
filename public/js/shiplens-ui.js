@@ -28,7 +28,7 @@
     const member = (prefix, label, values = {}) => `
       <fieldset style="border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0"><legend style="font-weight:700">${label}</legend>
         <label class="field"><span>Full name</span><input name="${prefix}_name" value="${e(values.name || '')}" required maxlength="120"></label>
-        <label class="field"><span>Email</span><input name="${prefix}_email" type="email" value="${e(values.email || '')}" required maxlength="200" ${prefix === 'lead' ? 'readonly' : ''}></label>
+        <label class="field"><span>${prefix === 'lead' ? 'Email for the fee challan' : 'Email'}</span><input name="${prefix}_email" type="email" value="${e(values.email || '')}" required maxlength="200" autocomplete="email">${prefix === 'lead' ? '<small>You can use a different email from your signed-in account. Your challan will be sent here.</small>' : ''}</label>
         <label class="field"><span>WhatsApp number</span><input name="${prefix}_whatsapp" type="tel" value="${e(values.whatsapp || '')}" required maxlength="40"></label>
         <label class="field"><span>University</span><input name="${prefix}_university" value="${e(values.university || '')}" required maxlength="160"></label>
         <label class="field"><span>Year of study</span><input name="${prefix}_year" value="${e(values.year || '')}" required maxlength="40" placeholder="e.g. 2nd year"></label>

@@ -923,7 +923,9 @@
     // If the program reads input, collect it up-front (compiled programs run
     // remotely, so input is provided as stdin lines before the run).
     let stdin = '';
-    if (/\b(scanf|cin\s*>>|getline|gets|fgets|getchar|Scanner|nextInt|nextLine|nextDouble|fmt\.Scan(?:f|ln)?)\b/.test(code)) {
+    // `>>` is not a word character, so a trailing \b after `cin >>` never
+    // matched the normal `cin >> value` form and the input field never opened.
+    if (/\b(?:scanf|getline|gets|fgets|getchar|Scanner|nextInt|nextLine|nextDouble|fmt\.Scan(?:f|ln)?)\b|\bcin\s*>>/.test(code)) {
       term.print('This program reads input. Type ALL input lines below (press Enter after each, empty line to finish):\n');
       const lines = [];
       for (let i = 0; i < 30; i++) {

@@ -2510,7 +2510,8 @@ function drawEventList() {
         <span class="ev-kind ${evKindClass(ev)}">${evKindTag(ev)}</span>
         <h4>${esc(ev.title)}</h4>
         <div class="desc">${esc(ev.description || 'Join this event and start earning gems.')}</div>
-        ${ev.series_kind === 'shiplens' ? `<div class="s" style="margin-top:6px">${(ev.problems || []).map((p) => `${esc(p.difficulty)}: ${esc(p.title)}`).join(' · ')} · Teams of 1–2 · PKR ${Number(ev.fee_pkr).toLocaleString()}</div>` : ''}
+        ${ev.series_kind === 'shiplens' ? `<div class="s" style="margin-top:6px">${esc(ev.problems?.[0]?.difficulty || 'Project')}: ${esc(ev.problems?.[0]?.title || 'ShipLens project')} · Teams of 1–2 · PKR ${Number(ev.fee_pkr).toLocaleString()}</div>
+          <details onclick="event.stopPropagation()" style="margin-top:8px"><summary style="cursor:pointer;font-weight:700;color:var(--primary)">Preview project</summary>${ShipLensUI.projectCard(ev.problems?.[0], esc, ev.shiplens_schedule)}</details>` : ''}
         <div class="ev-meta">
           <span class="m">${star} ${evPoints(ev)} pts</span>
           <span class="m">${langI} ${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>
@@ -2931,7 +2932,7 @@ function renderEventDetail() {
     <h4>Input</h4><p>${esc(p.input_spec || 'No input is provided.')}</p>
     <h4>Output</h4><p>${esc(p.output_spec || 'No output should be produced.')}</p>` : '';
   const hasExample = p && (p.example_input || p.example_output);
-  const problemBlock = `${selector}<p>${body}</p>${ioBlock}
+  const problemBlock = ev.series_kind === 'shiplens' ? ShipLensUI.projectCard(p, esc, ev.shiplens_schedule) : `${selector}<p>${body}</p>${ioBlock}
     <details class="evd-ex"><summary>▾ Examples</summary>
       <div class="evd-ex-row"><div class="k">Input</div><div class="v">${hasExample ? esc(p.example_input || '(none)') : '(see the problem statement)'}</div></div>
       <div class="evd-ex-row"><div class="k">Output</div><div class="v">${hasExample ? esc(p.example_output || '(none)') : 'Produce the result described above.'}</div></div>

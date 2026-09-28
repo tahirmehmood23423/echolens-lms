@@ -3353,12 +3353,20 @@ app.get('/api/events/:id', authRequired, (req, res) => {
     is_admin: isAdmin,
   });
 });
+function shipLensProjectError(problems) {
+  if (!Array.isArray(problems) || problems.length !== 1) return 'ShipLens series must contain exactly one project.';
+  const project = problems[0];
+  if (['title', 'description', 'objective', 'deliverables', 'acceptance_criteria'].some((field) => !String(project[field] || '').trim())) return 'Complete the project title, full brief, objective, deliverables and judging criteria.';
+  if (project.visual_url && !/^https:\/\/[^\s]+$/i.test(String(project.visual_url))) return 'The optional visual reference must use HTTPS.';
+  return null;
+}
 app.post('/api/admin/events', authRequired, adminRequired, (req, res) => {
   const b = req.body || {};
   if (!b.title) return res.status(400).json({ error: 'Give the event a title.' });
   if (b.series_kind === 'shiplens') {
     if (b.kind !== 'competition' || b.entry !== 'paid' || b.scope !== 'both' || !(Number(b.fee_pkr) > 0)) return res.status(400).json({ error: 'ShipLens must be a paid competition visible in both the portal and open website.' });
-    if (!Array.isArray(b.problems) || b.problems.length !== 3 || b.problems.some((p) => !String(p.title || '').trim() || !String(p.description || '').trim())) return res.status(400).json({ error: 'Give ShipLens three project briefs: Basic, Intermediate and Advanced.' });
+    const error = shipLensProjectError(b.problems);
+    if (error) return res.status(400).json({ error });
   }
   if (['hackathon', 'competition', 'webinar'].includes(b.kind) && (!b.starts_at || !b.ends_at)) {
     return res.status(400).json({ error: 'Start and end date-times are required for this kind of event.' });
@@ -3368,6 +3376,15 @@ app.post('/api/admin/events', authRequired, adminRequired, (req, res) => {
   res.json({ ok: true, event: Events.decorate(ev), notified });
 });
 app.patch('/api/admin/events/:id', authRequired, adminRequired, (req, res) => {
+  const current = Events.byId(req.params.id);
+  if (current?.series_kind === 'shiplens') {
+    const b = req.body || {};
+    if ((b.kind && b.kind !== 'competition') || (b.entry && b.entry !== 'paid') || (b.scope && b.scope !== 'both') || (b.fee_pkr !== undefined && !(Number(b.fee_pkr) > 0))) return res.status(400).json({ error: 'ShipLens remains a paid competition on both the portal and open site.' });
+    if (b.problems !== undefined) {
+      const error = shipLensProjectError(b.problems);
+      if (error) return res.status(400).json({ error });
+    }
+  }
   const ev = Events.update(req.params.id, req.body || {});
   if (!ev) return res.status(404).json({ error: 'Event not found.' });
   res.json({ ok: true, event: Events.decorate(ev) });
@@ -3387,7 +3404,7 @@ app.post('/api/admin/events/:id/remind', authRequired, adminRequired, (req, res)
   if (emails.length) {
     const phrase = daysLeft === 0 ? 'Today is the last day' : `Only ${label} left`;
     mailer.notify(emails, `${label} to register - ${ev.title}`,
-      `${phrase} to register your team for ${ev.title}.\n\nRegistration closes ${String(ev.ends_at || '').replace('T', ' ')}. Choose your project tier (Basic, Intermediate or Advanced), register a team of one or two, and pay the entry fee to secure your spot.\n\nRegister here: ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
+      `${phrase} to register your team for ${ev.title}.\n\nRegistration closes ${String(ev.ends_at || '').replace('T', ' ')}. This series has one project: ${(ev.problems || [])[0]?.title || 'ShipLens project'}. Register a team of one or two and pay the entry fee to secure your spot. The full brief opens when the project window starts.\n\nRegister here: ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
   }
   res.json({ ok: true, notified: emails.length });
 });

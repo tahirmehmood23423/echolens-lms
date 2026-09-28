@@ -4697,7 +4697,7 @@ async function renderHackathons() {
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
   const d = await api('/api/events');
   const series = d.events.filter((ev) => ev.series_kind === 'shiplens');
-  el.innerHTML = `${d.is_admin ? '<div class="card"><div class="card-body"><strong>ShipLens monthly competition</strong><p class="s" style="color:var(--muted);margin:6px 0 12px">Schedule each series with three project levels, set its fee, and review teams and submissions here. Finance confirms challan payments.</p><button class="btn btn-primary btn-sm" onclick="formShipLens()">+ Schedule ShipLens series</button></div></div>' : ''}
+  el.innerHTML = `${d.is_admin ? '<div class="card"><div class="card-body"><strong>ShipLens monthly competition</strong><p class="s" style="color:var(--muted);margin:6px 0 12px">Schedule each series with one detailed project, set its difficulty and fee, and review teams and submissions here. Finance confirms challan payments.</p><button class="btn btn-primary btn-sm" onclick="formShipLens()">+ Schedule ShipLens series</button></div></div>' : ''}
     <div class="card"><div class="card-head"><h3>ShipLens series</h3></div><div class="card-body tight">
       ${series.length ? series.map((ev) => `<div class="list-row">
         <div class="when">${evStatusBadge(ev.status)}<small>${esc(String(ev.starts_at || '').replace('T', ' '))} → ${esc(String(ev.ends_at || '').replace('T', ' '))}</small></div>
@@ -6540,13 +6540,18 @@ function formEvent(seriesKind = null) {
     hint.textContent = 'The task opens automatically the day after registration closes, submissions stay open for 2 weeks after that, and results are due 2 weeks after submissions close.';
     f.elements.ends_at.closest('.form-grid').insertAdjacentElement('afterend', hint);
     evKindChanged('competition');
-    for (const [index, label] of ['Basic', 'Intermediate', 'Advanced'].entries()) {
-      evAddProb();
-      const row = document.querySelectorAll('.ev-prob-row')[index];
-      row.querySelector('.ep-title').placeholder = `${label} project title`;
-      row.querySelector('.ep-diff').value = ['Easy', 'Medium', 'Hard'][index];
-      row.querySelector('.ep-desc').placeholder = `Describe the ${label.toLowerCase()} project, deliverables and judging criteria`;
-    }
+    evAddProb(true);
+    const row = document.querySelector('.ev-prob-row');
+    document.querySelector('.ev-probs > .s').textContent = 'One project for this series';
+    row.querySelector('.ep-title').previousElementSibling.textContent = 'Project title';
+    row.querySelector('.ep-desc').previousElementSibling.textContent = 'Detailed project brief';
+    row.querySelector('.ep-title').placeholder = 'One clear project title';
+    row.querySelector('.ep-desc').placeholder = 'Explain the project context, what the student will build, key screens or features, and the intended users.';
+    row.querySelector('details').hidden = true;
+    const addTaskButton = $('evProbList').nextElementSibling;
+    if (addTaskButton) addTaskButton.hidden = true;
+    const removeTaskButton = row.querySelector('button[onclick]');
+    if (removeTaskButton) removeTaskButton.hidden = true;
   }
   $('evForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button:not([type="button"])') || f.querySelector('button');
@@ -6570,7 +6575,7 @@ function evKindChanged(kind) {
   document.querySelectorAll('.ev-webinar').forEach((el) => el.style.display = kind === 'webinar' ? '' : 'none');
   document.querySelectorAll('.ev-probs').forEach((el) => el.style.display = kind === 'webinar' ? 'none' : '');
 }
-function evAddProb() {
+function evAddProb(shipLens = false) {
   const list = $('evProbList');
   if (!list.querySelector('.ev-prob-row')) list.innerHTML = '';
   const row = document.createElement('div');
@@ -6594,11 +6599,29 @@ function evAddProb() {
     </details>
     <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove task</button>`;
   list.appendChild(row);
+  if (shipLens) row.insertAdjacentHTML('beforeend', `
+    <label class="field"><span>Project goal</span><textarea class="ep-objective" rows="2" required placeholder="What problem will the completed project solve?"></textarea></label>
+    <label class="field"><span>Required deliverables</span><textarea class="ep-deliverables" rows="3" required placeholder="List the pages, interactions, data, and final files students must produce. Use one item per line."></textarea></label>
+    <label class="field"><span>Judging / acceptance criteria</span><textarea class="ep-criteria" rows="3" required placeholder="Explain what a working submission must demonstrate. Use one criterion per line."></textarea></label>
+    <label class="field"><span>Visual reference image URL (optional)</span><input class="ep-visual" type="url" placeholder="https://.../mockup.png"><small>Use a public HTTPS image so students can see the intended layout or style.</small></label>
+    <img class="ep-visual-preview" alt="Project visual preview" style="display:none;width:100%;max-height:260px;object-fit:contain;border:1px solid var(--line);border-radius:10px;background:#f8fafc">`);
+  if (shipLens) {
+    const input = row.querySelector('.ep-visual');
+    const preview = row.querySelector('.ep-visual-preview');
+    input.addEventListener('change', () => {
+      preview.style.display = /^https:\/\/[^\s]+$/i.test(input.value.trim()) ? 'block' : 'none';
+      preview.src = preview.style.display === 'block' ? input.value.trim() : '';
+    });
+  }
 }
 function evReadProbs() {
   return [...document.querySelectorAll('.ev-prob-row')].map((r) => ({
     title: r.querySelector('.ep-title').value.trim(),
     description: r.querySelector('.ep-desc').value.trim(),
+    objective: r.querySelector('.ep-objective')?.value.trim() || null,
+    deliverables: r.querySelector('.ep-deliverables')?.value.trim() || null,
+    acceptance_criteria: r.querySelector('.ep-criteria')?.value.trim() || null,
+    visual_url: r.querySelector('.ep-visual')?.value.trim() || null,
     difficulty: r.querySelector('.ep-diff').value,
     points: r.querySelector('.ep-pts').value,
     input_spec: r.querySelector('.ep-input').value.trim(),
@@ -6660,7 +6683,7 @@ async function openEvent(id) {
       <div>Results by ${fmtDT(ev.shiplens_schedule.results_due_at)}</div>
     </div></div>` : '';
 
-  const shipLensProblems = ev.series_kind === 'shiplens' ? `<div class="pub-sec">Choose one project level</div>${probs.map((p) => `<div class="ev-problem"><strong>${esc(p.difficulty)}: ${esc(p.title)}</strong><div class="s" style="white-space:pre-line;margin-top:5px">${p.locked ? `Full brief opens on ${fmtDT(ev.shiplens_schedule?.task_opens_at)}.` : esc(p.description)}</div></div>`).join('')}${d.my_entry ? `<div class="s" style="color:var(--muted);margin-top:8px">Team of ${(d.my_entry.team_details || []).length} · ${esc(probs.find((p) => p.pid === d.my_entry.challenge_pid)?.title || '')}</div>` : ''}` : '';
+  const shipLensProblems = ev.series_kind === 'shiplens' ? `<div class="pub-sec">One project for this series</div>${probs.map((p) => ShipLensUI.projectCard(p, esc, ev.shiplens_schedule)).join('')}${d.my_entry ? `<div class="s" style="color:var(--muted);margin-top:8px">Team of ${(d.my_entry.team_details || []).length} · ${esc(probs[0]?.title || '')}</div>` : ''}` : '';
 
   const phaseWait = d.can_participate && ev.series_kind === 'shiplens' && ev.shiplens_phase !== 'submission'
     ? `<div class="task-status wait">${ev.shiplens_phase === 'pending' ? `Your task opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.`
@@ -6736,7 +6759,7 @@ async function openEventTask(eid, pid) {
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
       <span class="lc-diff ${esc(p.difficulty)}">${esc(p.difficulty)}</span>
       <span class="s" style="color:var(--muted)">${p.points} pts &middot; ${lang ? EV_LANG_LABEL[lang] : 'file / link submission'}${ev.auto_grade ? ' &middot; graded instantly' : ''}</span></div>
-    <div class="s" style="white-space:pre-line;line-height:1.6;margin-bottom:12px">${esc(p.description)}</div>
+    ${ev.series_kind === 'shiplens' ? ShipLensUI.projectCard(p, esc, ev.shiplens_schedule) : `<div class="s" style="white-space:pre-line;line-height:1.6;margin-bottom:12px">${esc(p.description)}</div>`}
     ${lang ? `
       <div class="task-ide card" style="margin-bottom:12px">
         <div class="ide-toolbar">

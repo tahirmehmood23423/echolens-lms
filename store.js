@@ -23,6 +23,7 @@ const bcrypt = require('bcryptjs');
 const db = require('./db');
 const mailer = require('./mailer');
 const { COLLECTIONS } = require('./migrations/collections');
+const { correctLegacyShipLensSeries } = require('./shiplens-content');
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'echolens.json');
 // (usernames are plain handles now - see uniqueUsername; no fake email domain)
@@ -804,6 +805,7 @@ function migrate() {
     if (!Array.isArray(data[t])) { data[t] = []; changed = true; }
     if (data.seq[t] === undefined) { data.seq[t] = 0; changed = true; }
   }
+  if (correctLegacyShipLensSeries(data)) changed = true;
   // v12: every existing user with an email becomes a lead so the list is complete.
   for (const u of data.users) {
     if (u.email && ['student', 'free'].includes(u.role) && !data.leads.some((l) => l.email === u.email.toLowerCase())) {
@@ -3284,6 +3286,10 @@ const Events = {
       pid: i + 1,
       title: String(p.title || `Task ${i + 1}`).slice(0, 200),
       description: String(p.description || '').slice(0, 8000),
+      objective: String(p.objective || '').slice(0, 2000) || null,
+      deliverables: String(p.deliverables || '').slice(0, 4000) || null,
+      acceptance_criteria: String(p.acceptance_criteria || '').slice(0, 4000) || null,
+      visual_url: /^https:\/\/[^\s]+$/i.test(String(p.visual_url || '')) ? String(p.visual_url).slice(0, 500) : null,
       points: Math.max(5, Math.min(500, Number(p.points) || 100)),
       difficulty: ['Easy', 'Medium', 'Hard'].includes(p.difficulty) ? p.difficulty : 'Easy',
       input_spec: String(p.input_spec || '').slice(0, 1000) || null,
@@ -3345,6 +3351,10 @@ const Events = {
       ev.problems = b.problems.slice(0, 40).map((p, i) => ({
         pid: i + 1, title: String(p.title || `Task ${i + 1}`).slice(0, 200),
         description: String(p.description || '').slice(0, 8000),
+        objective: String(p.objective || '').slice(0, 2000) || null,
+        deliverables: String(p.deliverables || '').slice(0, 4000) || null,
+        acceptance_criteria: String(p.acceptance_criteria || '').slice(0, 4000) || null,
+        visual_url: /^https:\/\/[^\s]+$/i.test(String(p.visual_url || '')) ? String(p.visual_url).slice(0, 500) : null,
         points: Math.max(5, Math.min(500, Number(p.points) || 100)),
         difficulty: ['Easy', 'Medium', 'Hard'].includes(p.difficulty) ? p.difficulty : 'Easy',
         input_spec: String(p.input_spec || '').slice(0, 1000) || null,
@@ -3597,7 +3607,7 @@ const Events = {
     return {
       id: d.id, kind: d.kind, title: d.title, description: d.description,
       series_kind: d.series_kind || null,
-      problems: isShipLens ? Events.shipLensProblems(ev, false) : undefined,
+      problems: isShipLens ? Events.shipLensProblems(ev, ['submission', 'grading', 'closed'].includes(d.shiplens_phase)) : undefined,
       shiplens_schedule: d.shiplens_schedule, shiplens_phase: d.shiplens_phase,
       entry: d.entry, fee_pkr: d.fee_pkr, pay_instructions: d.pay_instructions,
       starts_at: d.starts_at, ends_at: d.ends_at, deadline: d.deadline, duration_minutes: d.duration_minutes,

@@ -622,6 +622,7 @@ model AiReport {
 model Event {
   id              Int       @id @default(autoincrement())
   kind            String
+  seriesKind      String?   @map("series_kind")
   title           String
   description     String
   scope           String
@@ -671,6 +672,9 @@ model EventEntry {
   tier          String
   paymentStatus String   @map("payment_status")
   paymentShot   String?  @map("payment_shot")
+  teamDetails   Json?    @map("team_details")
+  challengePid  Int?     @map("challenge_pid")
+  registrationId Int?    @map("registration_id")
   registeredAt  DateTime @map("registered_at")
 
   event       Event             @relation(fields: [eventId], references: [id])
@@ -693,6 +697,8 @@ model EventSubmission {
   fileUrl     String?   @map("file_url")
   fileName    String?   @map("file_name")
   link        String?
+  githubLink  String?   @map("github_link")
+  deploymentLink String? @map("deployment_link")
   note        String?
   submittedAt DateTime  @map("submitted_at")
   aiScore     Int?      @map("ai_score")

@@ -3328,7 +3328,7 @@ app.get('/api/events/:id', authRequired, (req, res) => {
   const mySubs = {};
   if (entry) for (const p of (ev.problems.length ? ev.problems : [{ pid: null }])) {
     const s = Events.submissionFor(ev.id, req.user.id, p.pid);
-    if (s) mySubs[p.pid || 0] = { pid: s.pid, code: s.code, language: s.language, file_name: s.file_name, link: s.link, score: s.score, ai_feedback: s.ai_feedback, graded_by: s.graded_by === 'ai' ? 'ai' : (s.graded_by ? 'admin' : null), submitted_at: s.submitted_at, certified: s.certified };
+    if (s) mySubs[p.pid || 0] = { pid: s.pid, code: s.code, language: s.language, file_name: s.file_name, link: s.link, github_link: s.github_link, deployment_link: s.deployment_link, score: s.score, ai_feedback: s.ai_feedback, graded_by: s.graded_by === 'ai' ? 'ai' : (s.graded_by ? 'admin' : null), submitted_at: s.submitted_at, certified: s.certified };
   }
   // Meeting links (webinars) only for confirmed participants or staff.
   const showLink = isAdmin || (entry && gate.ok);
@@ -3347,6 +3347,10 @@ app.get('/api/events/:id', authRequired, (req, res) => {
 app.post('/api/admin/events', authRequired, adminRequired, (req, res) => {
   const b = req.body || {};
   if (!b.title) return res.status(400).json({ error: 'Give the event a title.' });
+  if (b.series_kind === 'shiplens') {
+    if (b.kind !== 'competition' || b.entry !== 'paid' || b.scope !== 'both' || !(Number(b.fee_pkr) > 0)) return res.status(400).json({ error: 'ShipLens must be a paid competition visible in both the portal and open website.' });
+    if (!Array.isArray(b.problems) || b.problems.length !== 3 || b.problems.some((p) => !String(p.title || '').trim() || !String(p.description || '').trim())) return res.status(400).json({ error: 'Give ShipLens three project briefs: Basic, Intermediate and Advanced.' });
+  }
   if (['hackathon', 'competition', 'webinar'].includes(b.kind) && (!b.starts_at || !b.ends_at)) {
     return res.status(400).json({ error: 'Start and end date-times are required for this kind of event.' });
   }
@@ -3374,17 +3378,35 @@ app.delete('/api/admin/events/:id/files/:name', authRequired, adminRequired, (re
 });
 // Registration. Paid events REQUIRE a payment screenshot (image) which the
 // admin verifies by eye before the participant can submit anything.
-app.post('/api/events/:id/register', authRequired, upload.single('file'), (req, res) => {
+app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncRoute(async (req, res) => {
   if (!['free', 'student'].includes(req.user.role)) return res.status(403).json({ error: 'Events are for learners.' });
   const ev = Events.byId(req.params.id);
   if (!ev) return res.status(404).json({ error: 'Event not found.' });
   let shot = null;
-  if (ev.entry === 'paid') {
+  if (ev.entry === 'paid' && ev.series_kind !== 'shiplens') {
     if (!requireImage(req, res, 5)) return;
     shot = `/uploads/${req.file.filename}`;
   }
-  const out = Events.register({ event_id: ev.id, user: req.user, payment_shot: shot });
+  let teamDetails = null;
+  if (ev.series_kind === 'shiplens') {
+    try { teamDetails = JSON.parse(req.body?.team_details || 'null'); } catch { return res.status(400).json({ error: 'Invalid team details.' }); }
+  }
+  const out = Events.register({ event_id: ev.id, user: req.user, payment_shot: shot, team_details: teamDetails, challenge_pid: req.body?.challenge_pid });
   if (out.error) return res.status(400).json({ error: out.error });
+  if (ev.series_kind === 'shiplens') {
+    const c = out.challan;
+    const registration = Registrations.byId(out.entry.registration_id);
+    try {
+      const pdf = await challanPdf(c, `${APP_URL}/challan?s=${c.serial}`);
+      const delivery = await deliverRegistrationMail(store, mailer, registration, {
+        to: c.student_email, subject: `ShipLens fee challan - ${ev.title}`,
+        text: `Your team registered for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The challan is attached. Pay PKR ${c.net_fee} by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions. You can download the challan from your ShipLens page.`,
+        attachments: [{ filename: `ShipLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' }],
+      }, { kind: 'challan', reference: c.serial });
+      if (delivery.state === 'provider_accepted') Challans.markSent(c.serial);
+    } catch (error) { console.error('ShipLens challan delivery failed:', error.message); }
+    return res.json({ ok: true, entry: out.entry, challan: { serial: c.serial, net_fee: c.net_fee, deadline: c.deadline } });
+  }
   // Every event / hackathon / competition / webinar registration is reported
   // to the Admissions Office, and the participant gets a confirmation email.
   const evKind = ev.kind || 'event';
@@ -3399,8 +3421,22 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), (req, 
     mailer.notify(admins, `Payment to verify - ${ev.title}`, `${req.user.name} registered for "${ev.title}" and uploaded a payment screenshot. Verify it from the Events tab in the admin portal.`);
   }
   res.json({ ok: true, ...out });
-});
+}));
+app.get('/api/events/:id/challan', authRequired, asyncRoute(async (req, res) => {
+  const ev = Events.byId(req.params.id);
+  if (!ev || ev.series_kind !== 'shiplens') return res.status(404).json({ error: 'ShipLens series not found.' });
+  const entry = Events.entryFor(ev.id, req.user.id);
+  if (!entry && !['admin', 'finance'].includes(req.user.role)) return res.status(403).json({ error: 'Register for this series first.' });
+  const reg = entry ? Registrations.byId(entry.registration_id) : null;
+  if (!reg?.challan_serial) return res.status(404).json({ error: 'Challan not found.' });
+  const c = Challans.bySerial(reg.challan_serial);
+  if (!c) return res.status(404).json({ error: 'Challan not found.' });
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.type('pdf').send(await challanPdf(c, `${APP_URL}/challan?s=${c.serial}`));
+}));
 app.post('/api/admin/event-entries/:id/payment', authRequired, adminRequired, (req, res) => {
+  const target = store.allData().event_entries.find((entry) => entry.id === Number(req.params.id));
+  if (target && Events.byId(target.event_id)?.series_kind === 'shiplens') return res.status(403).json({ error: 'Finance must verify ShipLens payments against the challan.' });
   const e = Events.confirmPayment(req.params.id, !!(req.body || {}).confirm, req.user.id);
   if (!e) return res.status(404).json({ error: 'Entry not found.' });
   const u = Users.byId(e.user_id);
@@ -3428,7 +3464,7 @@ app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (r
   const out = Events.submit({
     event_id: ev.id, user: req.user, pid: body.pid || null,
     code: body.code || null, language: body.language || null, output: body.output || null,
-    file_url, file_name, link: body.link || null, note: body.note || null,
+    file_url, file_name, link: body.link || null, github_link: body.github_link || null, deployment_link: body.deployment_link || null, note: body.note || null,
   });
   if (out.error) return res.status(400).json({ error: out.error });
   let graded = null, cert = null;
@@ -4277,6 +4313,12 @@ app.post('/api/finance/registrations/:id/clear', authRequired, financeOnly, (req
   if(Challans.bySerial(r.challan_serial)?.status==='paid')return res.json({ok:true,existing:true,registration:r});
   const c = Challans.markPaid(r.challan_serial, req.user.id);
   if (!c) return res.status(404).json({ error: 'Challan not found.' });
+  if (r.status?.shiplens_event_id) {
+    const ev = Events.byId(r.status.shiplens_event_id);
+    mailer.notify(r.email, `ShipLens enrollment confirmed - ${ev?.title || r.course_title}`,
+      `${hi(r.name)},\n\nFinance has confirmed payment for your team. You are enrolled in ${ev?.title || r.course_title}; sign in to view your selected project and submit your GitHub repository and live deployment links by the deadline.\n\n${APP_URL}/open`);
+    return res.json({ ok: true, registration: Registrations.byId(r.id) });
+  }
   // Payment confirmed. Enrollment stays a human step: several batches of the
   // same course can run at once, so the student moves to the Admissions
   // Office's "Ready to enroll" folder where a coordinator picks the batch.

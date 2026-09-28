@@ -3244,6 +3244,7 @@ const Events = {
     const ev = {
       id: nextId('events'),
       kind: EVENT_KINDS.includes(b.kind) ? b.kind : 'quest',
+      series_kind: b.series_kind === 'shiplens' ? 'shiplens' : null,
       title: String(b.title || '').slice(0, 200),
       description: String(b.description || '').slice(0, 8000),
       scope: EVENT_SCOPES.includes(b.scope) ? b.scope : 'both',
@@ -3327,20 +3328,42 @@ const Events = {
     save();
   },
   entryFor(eid, uid) { return data.event_entries.find((e) => e.event_id === Number(eid) && e.user_id === Number(uid)) || null; },
-  register({ event_id, user, payment_shot }) {
+  register({ event_id, user, payment_shot, team_details, challenge_pid }) {
     const ev = Events.byId(event_id); if (!ev) return { error: 'Event not found.' };
     const st = Events.status(ev);
     if (st === 'ended' || st === 'closed') return { error: 'Registration is closed for this event.' };
     if (Events.entryFor(ev.id, user.id)) return { error: 'You are already registered for this event.' };
-    if (ev.entry === 'paid' && !payment_shot) return { error: 'Upload a screenshot of your payment transaction to register.' };
+    const isShipLens = ev.series_kind === 'shiplens';
+    if (ev.entry === 'paid' && !isShipLens && !payment_shot) return { error: 'Upload a screenshot of your payment transaction to register.' };
+    let team = null;
+    if (isShipLens) {
+      if (!(ev.problems || []).some((p) => p.pid === Number(challenge_pid))) return { error: 'Choose a ShipLens challenge.' };
+      if (!Array.isArray(team_details) || ![1, 2].includes(team_details.length)) return { error: 'A ShipLens team must have one or two members.' };
+      team = team_details.map((m) => ({
+        name: String(m?.name || '').trim().slice(0, 120), email: String(m?.email || '').trim().toLowerCase().slice(0, 200),
+        whatsapp: String(m?.whatsapp || '').trim().slice(0, 40), university: String(m?.university || '').trim().slice(0, 160),
+        year: String(m?.year || '').trim().slice(0, 40),
+      }));
+      if (team.some((m) => !m.name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email) || !m.whatsapp || !m.university || !m.year)) return { error: 'Complete the name, email, WhatsApp, university and year for every member.' };
+      if (team[0].email !== String(user.email || '').toLowerCase()) return { error: 'The team lead email must match your signed-in account.' };
+      if (team.length === 2 && team[0].email === team[1].email) return { error: 'Team members must use different email addresses.' };
+    }
     const e = {
       id: nextId('event_entries'), event_id: ev.id, user_id: user.id,
-      name: user.name, reg_no: user.reg_no || null, tier: user.role === 'free' ? 'open' : 'portal',
+      name: team?.[0].name || user.name, reg_no: user.reg_no || null, tier: user.role === 'free' ? 'open' : 'portal',
       payment_status: ev.entry === 'paid' ? 'pending' : 'na',
-      payment_shot: ev.entry === 'paid' ? payment_shot : null,
+      payment_shot: ev.entry === 'paid' && !isShipLens ? payment_shot : null,
+      team_details: team, challenge_pid: isShipLens ? Number(challenge_pid) : null, registration_id: null,
       registered_at: now(),
     };
     data.event_entries.push(e); save();
+    if (isShipLens) {
+      const registration = Registrations.createShipLens(ev, e);
+      e.registration_id = registration.id;
+      const challan = Challans.generate({ registration_id: registration.id, deadline: String(ev.ends_at).slice(0, 10), generated_by: user.id });
+      if (challan.error) return { error: challan.error };
+      return { entry: e, challan: challan.challan, receipt_token: registration.status.receipt_token };
+    }
     return { entry: e };
   },
   confirmPayment(entryId, ok, by) {
@@ -3352,21 +3375,26 @@ const Events = {
     const e = Events.entryFor(ev.id, uid);
     if (!e) return { ok: false, why: 'Register for this event first.' };
     if (ev.entry === 'paid' && e.payment_status !== 'confirmed') {
-      return { ok: false, why: e.payment_status === 'rejected' ? 'Your payment was rejected - contact the admin.' : 'Your payment is being verified by the admin.' };
+      return { ok: false, why: e.payment_status === 'rejected' ? 'Your payment could not be verified - contact Finance.' : ev.series_kind === 'shiplens' ? 'Your challan is ready. Pay it and send proof to Finance; your challenge unlocks after Finance confirms.' : 'Your payment is being verified by the admin.' };
     }
     return { ok: true, entry: e };
   },
   submissionFor(eid, uid, pid) {
     return data.event_submissions.find((s) => s.event_id === Number(eid) && s.user_id === Number(uid) && (s.pid || null) === (pid ? Number(pid) : null)) || null;
   },
-  submit({ event_id, user, pid, code, language, output, file_url, file_name, link, note }) {
+  submit({ event_id, user, pid, code, language, output, file_url, file_name, link, github_link, deployment_link, note }) {
     const ev = Events.byId(event_id); if (!ev) return { error: 'Event not found.' };
     const st = Events.status(ev);
     if (st !== 'live') return { error: st === 'upcoming' ? 'This event has not started yet.' : 'This event is over - submissions are closed.' };
     const gate = Events.canParticipate(ev, user.id);
     if (!gate.ok) return { error: gate.why };
+    if (ev.series_kind === 'shiplens') {
+      if (Number(pid) !== gate.entry.challenge_pid) return { error: 'Submit to the challenge your team selected at registration.' };
+      if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(?:[/?#].*)?$/i.test(String(github_link || ''))) return { error: 'Add a valid GitHub repository URL.' };
+      if (!/^https:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(String(deployment_link || ''))) return { error: 'Add a live HTTPS deployment URL.' };
+    }
     if (pid && !(ev.problems || []).some((p) => p.pid === Number(pid))) return { error: 'Task not found on this event.' };
-    if (!code && !file_url && !link) return { error: 'Submit code, a file, or a link to your work.' };
+    if (!code && !file_url && !link && !github_link) return { error: 'Submit code, a file, or a link to your work.' };
     let s = Events.submissionFor(ev.id, user.id, pid);
     const fields = {
       code: code ? String(code).slice(0, 60000) : null,
@@ -3376,6 +3404,8 @@ const Events = {
       output: output ? String(output).slice(0, 4000) : null,
       file_url: file_url || null, file_name: file_name || null,
       link: link ? String(link).slice(0, 400) : null,
+      github_link: github_link ? String(github_link).slice(0, 400) : null,
+      deployment_link: deployment_link ? String(deployment_link).slice(0, 400) : null,
       note: note ? String(note).slice(0, 500) : null,
       submitted_at: now(),
     };
@@ -3409,7 +3439,7 @@ const Events = {
   // event's pass mark.
   progressFor(ev, uid) {
     const mine = data.event_submissions.filter((s) => s.event_id === ev.id && s.user_id === Number(uid));
-    const total = (ev.problems || []).length || 1;
+    const total = ev.series_kind === 'shiplens' ? 1 : (ev.problems || []).length || 1;
     const graded = mine.filter((s) => s.score != null);
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;
     const complete = graded.length >= total;
@@ -3447,7 +3477,9 @@ const Events = {
     return data.event_entries.filter((e) => e.event_id === Number(eid)).map((e) => {
       const u = Users.byId(e.user_id) || {};
       const ev = Events.byId(eid);
-      return { ...e, email: u.email || null, whatsapp: (u.profile || {}).phone || null, progress: ev ? Events.progressFor(ev, e.user_id) : null };
+      return { ...e, email: u.email || null, whatsapp: (u.profile || {}).phone || null,
+        challan_serial: e.registration_id ? Registrations.byId(e.registration_id)?.challan_serial || null : null,
+        progress: ev ? Events.progressFor(ev, e.user_id) : null };
     }).sort((a, b) => String(b.registered_at).localeCompare(a.registered_at));
   },
   board(eid) {
@@ -3506,6 +3538,7 @@ const Events = {
     const d = Events.decorate(ev);
     return {
       id: d.id, kind: d.kind, title: d.title, description: d.description,
+      series_kind: d.series_kind || null, problems: d.series_kind === 'shiplens' ? d.problems : undefined,
       entry: d.entry, fee_pkr: d.fee_pkr, pay_instructions: d.pay_instructions,
       starts_at: d.starts_at, ends_at: d.ends_at, deadline: d.deadline, duration_minutes: d.duration_minutes,
       pass_mark: d.pass_mark, auto_grade: d.auto_grade, auto_certificate: d.auto_certificate,
@@ -4497,6 +4530,21 @@ const Registrations = {
     data.registrations.push(r); save();
     return r;
   },
+  createShipLens(ev, entry) {
+    const lead = entry.team_details[0];
+    const r = {
+      id: nextId('registrations'), name: lead.name, email: lead.email, whatsapp: lead.whatsapp,
+      city: null, course_code: `SL-${ev.id}`, course_title: ev.title, note: null,
+      ambassador_code: null, ambassador_name: null,
+      status: { contacted: false, challan_sent: false, added_to_course: false, dedup_guard: 'v1',
+        receipt_token: crypto.randomBytes(32).toString('hex'), shiplens_event_id: ev.id, shiplens_entry_id: entry.id },
+      admin_note: null, discount_category_id: null, challan_serial: null, payment_stage: 'new',
+      enrolled_user_id: null, enrolled_batch_id: null, cleared_by: null, cleared_at: null,
+      created_at: now(), updated_at: now(),
+    };
+    data.registrations.push(r); save();
+    return r;
+  },
   all() { return data.registrations.slice().sort((a, b) => b.id - a.id); },
   byId(id) { return data.registrations.find((x) => x.id === Number(id)) || null; },
   update(id, b) {
@@ -4586,8 +4634,9 @@ const Challans = {
   },
   generate({ registration_id, discount_category_id, deadline, generated_by }) {
     const r = Registrations.byId(registration_id); if (!r) return { error: 'Registration not found.' };
-    const resolved = resolveOffering(r.course_code);
-    if (resolved.error) return { error: resolved.error };
+    const shipLensEvent = r.status?.shiplens_event_id ? Events.byId(r.status.shiplens_event_id) : null;
+    const resolved = shipLensEvent ? { offer: { price_pkr: shipLensEvent.fee_pkr } } : resolveOffering(r.course_code);
+    if (resolved.error || (r.status?.shiplens_event_id && !shipLensEvent)) return { error: resolved.error || 'ShipLens series not found.' };
     const existing = r.challan_serial && Challans.bySerial(r.challan_serial);
     if (existing) return { ok: true, challan: existing, existing: true };
     const course = Courses.byCode(r.course_code);
@@ -4612,7 +4661,7 @@ const Challans = {
       course_code: r.course_code, course_title: r.course_title || (course ? course.title : ''),
       student_name: r.name, student_email: r.email,
       student_id: student && student.reg_no ? String(student.reg_no) : 'REG-' + String(r.id).padStart(5, '0'),
-      gross_fee: gross, fee_parts: Challans.splitFee(gross),
+      gross_fee: gross, fee_parts: shipLensEvent ? [{ label: 'ShipLens competition entry fee', amount: gross }] : Challans.splitFee(gross),
       discount_category_id: discounts.length ? discounts[0].category_id : null,
       discounts,
       discount_label: discounts.map((d) => d.label).join(' + ') || null,
@@ -4642,7 +4691,11 @@ const Challans = {
     const c = Challans.bySerial(serial); if (!c) return null;
     if(c.status==='paid')return c;
     c.status = 'paid'; c.paid_confirmed_by = by; c.paid_confirmed_at = now(); save();
-    Registrations._setStage(c.registration_id, 'paid_cleared', { cleared_by: by, cleared_at: now() });
+    const registration = Registrations.byId(c.registration_id);
+    if (registration?.status?.shiplens_entry_id) {
+      Events.confirmPayment(registration.status.shiplens_entry_id, true, by);
+      Registrations._setStage(c.registration_id, 'enrolled', { cleared_by: by, cleared_at: now(), enrolled_user_id: data.event_entries.find((e) => e.id === registration.status.shiplens_entry_id)?.user_id || null });
+    } else Registrations._setStage(c.registration_id, 'paid_cleared', { cleared_by: by, cleared_at: now() });
     return c;
   },
   // Public view for the QR verification page - no internal ids.

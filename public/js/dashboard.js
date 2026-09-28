@@ -101,7 +101,7 @@ document.addEventListener('click', (e) => {
 const TITLES = {
   overview: 'Overview', courses: 'My courses', course: 'Course', schedule: 'Calendar',
   leaderboard: 'Leaderboard', announcements: 'Announcements', settings: 'Settings',
-  challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'Hackathons',
+  challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'ShipLens',
   events: 'Events', 'admin-analytics': 'Reports', 'admin-mailer': 'Email Leads',
   'admin-catalogue': 'Courses', 'admin-users': 'Users',
   assignments: 'Assignments', quizzes: 'Quizzes', progress: 'Progress',
@@ -4695,23 +4695,18 @@ function hackBadge(st) {
 async function renderHackathons() {
   const el = $('view-hackathons');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
-  const d = await api('/api/hackathons');
-  const adminBar = d.is_admin ? `<div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <span class="s" style="color:var(--muted)">Time-boxed events with prizes. Paid events collect a payment reference (JazzCash / Easypaisa / bank) that you confirm before teams can submit.</span>
-    <span style="flex:1"></span><button class="btn btn-primary btn-sm" onclick="formHackathon()">New hackathon</button></div></div>` : '';
-  el.innerHTML = `${adminBar}
-    <div class="card"><div class="card-head"><h3>Events</h3></div><div class="card-body tight">
-      ${d.hackathons.length ? d.hackathons.map((h) => `
-        <div class="list-row">
-          <div class="when">${hackBadge(h.status)}<small>${esc(String(h.starts_at).replace('T', ' '))} &rarr; ${esc(String(h.ends_at).replace('T', ' '))}</small></div>
-          <div class="grow">
-            <div class="t">${esc(h.title)} <span class="s" style="font-weight:500;color:var(--muted)">&middot; ${h.mode === 'team' ? 'teams up to ' + h.team_max : 'solo'} &middot; ${h.entry === 'paid' ? 'PKR ' + h.fee_pkr : 'free entry'}</span></div>
-            <div class="s">${h.theme ? esc(h.theme) + ' &middot; ' : ''}Prizes: ${h.prizes.first}/${h.prizes.second}/${h.prizes.third} gems &middot; ${h.entries} registered</div>
-            ${h.my_entry ? `<div class="s" style="color:var(--ok)">Registered as ${esc(h.my_entry.team_name)}${h.my_entry.payment_status === 'pending' ? ' - <span style="color:var(--gold)">payment under confirmation</span>' : ''}${h.my_entry.payment_status === 'rejected' ? ' - <span style="color:var(--danger)">payment rejected, contact admin</span>' : ''}</div>` : ''}
-          </div>
-          <button class="btn btn-ghost btn-sm" onclick="openHackathon(${h.id})">Open</button>
-          ${d.can_play && !h.my_entry && ['upcoming', 'live'].includes(h.status) ? `<button class="btn btn-teal btn-sm" onclick="formHackRegister(${h.id})">Register</button>` : ''}
-        </div>`).join('') : '<div class="empty">No events yet' + (d.is_admin ? ' - create the first hackathon.' : '. Watch this space.') + '</div>'}
+  const d = await api('/api/events');
+  const series = d.events.filter((ev) => ev.series_kind === 'shiplens');
+  el.innerHTML = `${d.is_admin ? '<div class="card"><div class="card-body"><strong>ShipLens monthly competition</strong><p class="s" style="color:var(--muted);margin:6px 0 12px">Schedule each series with three project levels, set its fee, and review teams and submissions here. Finance confirms challan payments.</p><button class="btn btn-primary btn-sm" onclick="formShipLens()">+ Schedule ShipLens series</button></div></div>' : ''}
+    <div class="card"><div class="card-head"><h3>ShipLens series</h3></div><div class="card-body tight">
+      ${series.length ? series.map((ev) => `<div class="list-row">
+        <div class="when">${evStatusBadge(ev.status)}<small>${esc(String(ev.starts_at || '').replace('T', ' '))} → ${esc(String(ev.ends_at || '').replace('T', ' '))}</small></div>
+        <div class="grow"><div class="t">${esc(ev.title)} · PKR ${Number(ev.fee_pkr).toLocaleString()}</div>
+          <div class="s">${(ev.problems || []).map((p) => `${esc(p.difficulty)}: ${esc(p.title)}`).join(' · ')} · ${ev.entries_count} team${ev.entries_count === 1 ? '' : 's'}</div>
+          ${ev.my_entry ? `<div class="s" style="color:var(--ok)">${ev.my_entry.payment_status === 'confirmed' ? 'Enrolled' : 'Challan issued · awaiting Finance confirmation'}</div>` : ''}</div>
+        <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
+        ${d.can_play && !ev.my_entry && ['upcoming', 'live'].includes(ev.status) ? `<button class="btn btn-primary btn-sm" onclick="formEventRegister(${ev.id})">Register</button>` : ''}
+      </div>`).join('') : '<div class="empty">No ShipLens series scheduled yet.</div>'}
     </div></div>`;
 }
 let CURRENT_HACK = null;
@@ -6468,7 +6463,8 @@ async function toggleEventPartner(id, on) {
 
 /* ------------------------------ create event ------------------------------ */
 let EV_PROBS = [];
-function formEvent() {
+function formShipLens() { formEvent('shiplens'); }
+function formEvent(seriesKind = null) {
   EV_PROBS = [];
   openModal('New event', `
     <form id="evForm">
@@ -6528,9 +6524,27 @@ function formEvent() {
       <button class="btn btn-primary btn-block">Create event</button>
     </form>`, true);
   evKindChanged('quest');
+  if (seriesKind === 'shiplens') {
+    const f = $('evForm');
+    const heading = $('modalTitle'); if (heading) heading.textContent = 'Schedule ShipLens series';
+    f.elements.kind.value = 'competition'; f.elements.scope.value = 'both'; f.elements.entry.value = 'paid';
+    f.elements.title.placeholder = 'ShipLens 1.0'; f.elements.compiler.value = 'none';
+    f.elements.auto_grade.checked = false; f.elements.auto_certificate.checked = true;
+    $('evPaid').style.display = '';
+    f.elements.starts_at.required = true; f.elements.ends_at.required = true; f.elements.fee_pkr.required = true;
+    evKindChanged('competition');
+    for (const [index, label] of ['Basic', 'Intermediate', 'Advanced'].entries()) {
+      evAddProb();
+      const row = document.querySelectorAll('.ev-prob-row')[index];
+      row.querySelector('.ep-title').placeholder = `${label} project title`;
+      row.querySelector('.ep-diff').value = ['Easy', 'Medium', 'Hard'][index];
+      row.querySelector('.ep-desc').placeholder = `Describe the ${label.toLowerCase()} project, deliverables and judging criteria`;
+    }
+  }
   $('evForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('button:not([type="button"])') || f.querySelector('button');
     const obj = {}; new FormData(f).forEach((v, k) => { if (v !== '') obj[k] = v; });
+    if (seriesKind === 'shiplens') obj.series_kind = 'shiplens';
     obj.auto_grade = f.auto_grade.checked; obj.auto_certificate = f.auto_certificate.checked; obj.partner = f.partner.checked;
     obj.problems = obj.kind === 'webinar' ? [] : evReadProbs();
     if (['quest', 'competition'].includes(obj.kind) && !obj.problems.length) { modalMsg('Add at least one task for a quest or competition.'); return; }
@@ -6551,7 +6565,7 @@ function evKindChanged(kind) {
 }
 function evAddProb() {
   const list = $('evProbList');
-  if (list.querySelector('.s')) list.innerHTML = '';
+  if (!list.querySelector('.ev-prob-row')) list.innerHTML = '';
   const row = document.createElement('div');
   row.className = 'ev-problem ev-prob-row';
   row.innerHTML = `
@@ -6606,14 +6620,15 @@ async function openEvent(id) {
     ? `<div class="task-status ok">You are in - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : '';
   openModal(ev.title, `
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <span class="kbadge ${esc(ev.kind)}">${EV_KIND_LABEL[ev.kind] || ev.kind}</span> ${evStatusBadge(ev.status)}
+      <span class="kbadge ${esc(ev.kind)}">${ev.series_kind === 'shiplens' ? 'ShipLens' : EV_KIND_LABEL[ev.kind] || ev.kind}</span> ${evStatusBadge(ev.status)}
       <span class="s" style="color:var(--muted)">${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) + ' &rarr; ' + esc(String(ev.ends_at || '').replace('T', ' ')) : ev.duration_minutes ? '~' + ev.duration_minutes + ' minutes' : ''} &middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; Pass mark ${ev.pass_mark}%${ev.auto_grade ? ' &middot; Graded instantly' : ''}${ev.auto_certificate ? ' &middot; auto certificate' : ''}</span></div>
     ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
+    ${ev.series_kind === 'shiplens' ? `<div class="pub-sec">Choose one project level</div>${probs.map((p) => `<div class="ev-problem"><strong>${esc(p.difficulty)}: ${esc(p.title)}</strong><div class="s" style="white-space:pre-line;margin-top:5px">${esc(p.description)}</div></div>`).join('')}${d.my_entry ? `<div class="task-status ${d.can_participate ? 'ok' : 'wait'}">Selected: ${esc(probs.find((p) => p.pid === d.my_entry.challenge_pid)?.title || 'Unknown')} · Team of ${(d.my_entry.team_details || []).length} · ${d.can_participate ? 'Enrolled' : 'Awaiting Finance payment confirmation'} · <a href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download challan</a></div>` : ''}` : ''}
     ${filesHtml}
     ${regBtn}${gateMsg}${passedMsg}${webinarHtml}
     ${d.can_participate && probs.length ? `
       <div class="pub-sec">Tasks</div>
-      ${probs.map((p) => {
+      ${probs.filter((p) => ev.series_kind !== 'shiplens' || p.pid === d.my_entry?.challenge_pid).map((p) => {
         const s = d.my_submissions[p.pid];
         return `<div class="ev-problem">
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -6648,8 +6663,11 @@ function eventSubmitFormHtml(ev, pid, sub) {
   return `
     ${sub ? `<div class="s" style="color:var(--muted);margin-bottom:8px">Last submitted ${esc((sub.submitted_at || '').slice(0, 16))}${sub.score != null ? ` &middot; scored <strong>${sub.score}%</strong>` : ' &middot; awaiting grade'}</div>` : ''}
     <form class="evSubForm" data-pid="${pid || ''}">
+      ${ev.series_kind === 'shiplens' ? `
+        <label class="field"><span>GitHub repository URL</span><input name="github_link" type="url" required placeholder="https://github.com/you/project" value="${esc(sub?.github_link || '')}"></label>
+        <label class="field"><span>Live deployment URL (Render, GitHub Pages, etc.)</span><input name="deployment_link" type="url" required placeholder="https://your-project.onrender.com" value="${esc(sub?.deployment_link || '')}"></label>` : `
       ${hasCompiler ? '' : `<label class="field"><span>Your work as a file (any document - PDF, Word, notebook, zip...)</span><input name="file" type="file"></label>`}
-      <label class="field"><span>Link to your project (optional${hasCompiler ? '' : ' if a file is attached'})</span><input name="link" type="url" placeholder="https://github.com/you/repo"></label>
+      <label class="field"><span>Link to your project (optional${hasCompiler ? '' : ' if a file is attached'})</span><input name="link" type="url" placeholder="https://github.com/you/repo"></label>`}
       <label class="field"><span>Note (optional)</span><input name="note" maxlength="500"></label>
       <button class="btn btn-primary">${sub ? 'Resubmit' : 'Submit'}</button>
     </form>`;
@@ -6746,16 +6764,19 @@ function formEventRegister(eid) {
     const ev = d.event;
     openModal(`Register: ${ev.title}`, `
       <form id="evReg">
-        ${ev.entry === 'paid' ? `
+        ${ev.series_kind === 'shiplens' ? ShipLensUI.fields(ev, esc, ME) : ev.entry === 'paid' ? `
           <p class="hint" style="margin:0 0 10px">${esc(ev.pay_instructions || `Send PKR ${ev.fee_pkr} to the academy's JazzCash / Easypaisa / bank account, take a screenshot of the transaction, and upload it below. The admin verifies the picture before you can participate.`)}</p>
           <label class="field"><span>Screenshot of your payment transaction (PNG / JPG)</span><input name="file" type="file" accept=".png,.jpg,.jpeg,.webp" required></label>` :
         '<p class="s" style="color:var(--muted);margin-bottom:10px">This event is free - register and you are in.</p>'}
         <button class="btn btn-primary btn-block">Register${ev.entry === 'paid' ? ' - upload payment proof' : ''}</button></form>`);
+    if (ev.series_kind === 'shiplens') ShipLensUI.wire($('evReg'));
     $('evReg').addEventListener('submit', async (e) => {
       e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
       try {
-        await api(`/api/events/${eid}/register`, { method: 'POST', body: new FormData(f) });
-        toast(ev.entry === 'paid' ? 'Registered - your payment screenshot is being verified by the admin.' : 'Registered - good luck!');
+        const body = new FormData(f);
+        if (ev.series_kind === 'shiplens') { const selected = ShipLensUI.read(f); body.set('challenge_pid', selected.challenge_pid); body.set('team_details', JSON.stringify(selected.team_details)); }
+        await api(`/api/events/${eid}/register`, { method: 'POST', body });
+        toast(ev.series_kind === 'shiplens' ? 'Team registered. Download the challan and send proof to Finance.' : ev.entry === 'paid' ? 'Registered - your payment screenshot is being verified by the admin.' : 'Registered - good luck!');
         closeModal(); openEvent(eid);
       } catch (err) { modalMsg(err.message); btn.disabled = false; }
     });
@@ -6766,17 +6787,18 @@ function formEventRegister(eid) {
 function adminEventPanel(d) {
   const ev = d.event;
   return `
-    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' ? ' &amp; payment verification' : ''}</div>
+    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}</div>
     <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
       ${(d.entries || []).map((e) => `
         <div class="list-row" style="padding:10px 4px">
           <div class="grow">
             <div class="t">${esc(e.name)} <span class="mono s" style="color:var(--muted)">${esc(e.reg_no || '')}</span> <span class="role-pill">${e.tier === 'open' ? 'Open site' : 'Portal'}</span></div>
             <div class="s" style="color:var(--muted)">${esc(e.email || 'no email')}${e.whatsapp ? ' &middot; WA ' + esc(e.whatsapp) : ''} &middot; ${esc((e.registered_at || '').slice(0, 16))}${e.progress && e.progress.avg != null ? ' &middot; avg ' + e.progress.avg + '%' + (e.progress.passed ? ' (passed)' : '') : ''}</div>
+            ${ev.series_kind === 'shiplens' ? `<div class="s">Challenge: ${esc((ev.problems || []).find((p) => p.pid === e.challenge_pid)?.title || 'Unknown')} · Team: ${(e.team_details || []).map((m) => `${esc(m.name)} (${esc(m.email)}, ${esc(m.whatsapp)}, ${esc(m.university)}, year ${esc(m.year)})`).join(' · ')}</div>${e.challan_serial ? `<a class="s" href="/challan?s=${encodeURIComponent(e.challan_serial)}" target="_blank" rel="noopener">Challan ${esc(e.challan_serial)}</a>` : ''}` : ''}
             ${ev.entry === 'paid' ? `<div class="s" style="margin-top:4px">Payment: <span class="pay-badge ${esc(e.payment_status)}">${{pending:'Pending verification',confirmed:'Confirmed',rejected:'Rejected',na:'Not required'}[e.payment_status] || esc(e.payment_status)}</span>
               ${e.payment_shot ? `<br><a href="${esc(e.payment_shot)}" target="_blank" rel="noopener"><img class="ev-shot" src="${esc(e.payment_shot)}" alt="payment screenshot"></a>` : ''}</div>` : ''}
           </div>
-          ${ev.entry === 'paid' && e.payment_status === 'pending' ? `
+          ${ev.entry === 'paid' && ev.series_kind !== 'shiplens' && e.payment_status === 'pending' ? `
             <button class="btn btn-teal btn-sm" onclick="evPay(${e.id},${ev.id},true)">Confirm</button>
             <button class="btn btn-danger btn-sm" onclick="evPay(${e.id},${ev.id},false)">Reject</button>` : ''}
         </div>`).join('') || '<div class="empty">No registrations yet.</div>'}
@@ -6791,6 +6813,8 @@ function adminEventPanel(d) {
             ${s.code ? `<details><summary class="s" style="cursor:pointer;color:var(--teal-deep)">View code</summary><pre class="cred-box" style="white-space:pre-wrap;max-height:200px;overflow:auto">${esc(s.code)}</pre></details>` : ''}
             ${s.file_url ? `<a class="s" href="${esc(s.file_url)}" target="_blank" rel="noopener">${esc(s.file_name || 'File')}</a> ` : ''}
             ${s.link ? `<a class="s" href="${esc(s.link)}" target="_blank" rel="noopener">Project link</a>` : ''}
+            ${s.github_link ? `<a class="s" href="${esc(s.github_link)}" target="_blank" rel="noopener">GitHub repository</a> ` : ''}
+            ${s.deployment_link ? `<a class="s" href="${esc(s.deployment_link)}" target="_blank" rel="noopener">Live deployment</a>` : ''}
           </div>
           <button class="btn btn-ghost btn-sm" onclick="evScore(${s.id},${ev.id})">Score</button>
         </div>`).join('') || '<div class="empty">No submissions yet.</div>'}

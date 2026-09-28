@@ -1,0 +1,139 @@
+{
+  "query": "Python asyncio async await gather tutorial 15 minutes",
+  "checked_at": "2026-09-27T07:00:26.859Z",
+  "results": [
+    {
+      "id": "3E-Ym2mbSCc",
+      "title": "asyncio in Python - Async/Await",
+      "channel": "2MinutesPy",
+      "duration": "2:03",
+      "description": "async #asyncawait #asynchronousprogramming #python #pythonprogramming In this video, we will talk about asynchronous ..."
+    },
+    {
+      "id": "Qb9s3UiMSTA",
+      "title": "Asyncio in Python - Full Tutorial",
+      "channel": "Tech With Tim",
+      "duration": "24:59",
+      "description": "Asynchronous programming allows our code to be more efficient by doing multiple things at once without any unnecessary ..."
+    },
+    {
+      "id": "lgoB3_-ejnI",
+      "title": "AsyncIO in Python | Python Tutorial - Day #96",
+      "channel": "CodeWithHarry",
+      "duration": "10:29",
+      "description": "Access the Playlist: https://www.youtube.com/playlist?list=PLu0W_9lII9agwh1XjRt242xIpHhPT2llg Link to the Repl: ..."
+    },
+    {
+      "id": "K56nNuBEd0c",
+      "title": "AsyncIO, await, and async - Concurrency in Python",
+      "channel": "Socratica",
+      "duration": "9:12",
+      "description": "Sign up for Socratica Courses: https://www.socratica.com/collections Socratica ..."
+    },
+    {
+      "id": "3E-ADzhr3W8",
+      "title": "Asyncio in Python",
+      "channel": "Yash Jain",
+      "duration": "15:13",
+      "description": "Welcome to another video of the Code Before You Sleep – Python Series! In this session, we're diving into one of the most ..."
+    },
+    {
+      "id": "KZpzuTHRUsQ",
+      "title": "Python Async Await Explained in 10 Minutes | asyncio Event Loop Tasks | Ep 18",
+      "channel": "CodeToAGI",
+      "duration": "8:21",
+      "description": "Async and await are behind every fast Python web server. After this video you will understand exactly how the event loop works ..."
+    },
+    {
+      "id": "0GVLtTnebNA",
+      "title": "Learn Python's AsyncIO in 15 minutes",
+      "channel": "Indently",
+      "duration": "14:02",
+      "description": "In this tutorial we will be looking at asyncio, which is a package from the standard Python library which allows us to do ..."
+    },
+    {
+      "id": "FUtoFzwaLpA",
+      "title": "45. Python asyncio | asynchronous | coroutine | async | await | tasks | Rajiv",
+      "channel": "The Python Gurukul",
+      "duration": "10:14",
+      "description": "asyncio is used as a foundation for multiple Python asynchronous frameworks that provide high-performance network and ..."
+    },
+    {
+      "id": "t5Bo1Je9EmE",
+      "title": "Python Asynchronous Programming - AsyncIO & Async/Await",
+      "channel": "Tech With Tim",
+      "duration": "25:57",
+      "description": "In today's video, I'll be talking to you about asynchronous programming in python. This Python Async tutorial will cover the 'async' ..."
+    },
+    {
+      "id": "vve5SHVE_F0",
+      "title": "Python Asyncio Crash Course: Complete Tutorial",
+      "channel": "Not Just Coders",
+      "duration": "54:12",
+      "description": "Python's asyncio can be confusing at first. What exactly is a coroutine? What does await actually do? How does the event loop run ..."
+    },
+    {
+      "id": "MFkat-jelj8",
+      "title": "Python Asyncio Tutorial: Master Asynchronous Programming in 2026",
+      "channel": "Coding with David",
+      "duration": "8:33",
+      "description": "Ever watch your scraper run one request at a time? This video shows how to use async await python with Python async ..."
+    },
+    {
+      "id": "oAkLSJNr5zY",
+      "title": "Python Tutorial: AsyncIO - Complete Guide to Asynchronous Programming with Animations",
+      "channel": "Corey Schafer",
+      "duration": "1:42:41",
+      "description": "In this video, we'll be learning all about AsyncIO in Python and how to write asynchronous code using the async/await syntax."
+    },
+    {
+      "id": "ngXbyui-weA",
+      "title": "Python Asynchronous Programming Tutorial: Asyncio, async & await Explained",
+      "channel": "Code with Josh",
+      "duration": "19:13",
+      "description": "Join my Full Python Course ~ https://www.zerotoknowing.com/join-now ***Get a 3-day Free Trial on me! Want to understand ..."
+    },
+    {
+      "id": "WUEFtCTy7PE",
+      "title": "async/await in Python Explained 🧠 #40 || Python ka Pitara || DeathCode",
+      "channel": "Death Code",
+      "duration": "31:28",
+      "description": "... Course python tutorial python python async async programming python python asyncio python async await python event loop ..."
+    },
+    {
+      "id": "nFn4_nA_yk8",
+      "title": "Python Asyncio, Requests, Aiohttp | Make faster API Calls",
+      "channel": "Patrick Collins",
+      "duration": "17:56",
+      "description": "python #asyncio #aiohttp Python, asynchronous programming, the event loop... what is all this stuff? We learn what python is ..."
+    },
+    {
+      "id": "-ri8ErXFa3g",
+      "title": "Learning Asyncio in python in 12 Minutes",
+      "channel": "Soumil Shah",
+      "duration": "12:14",
+      "description": "https://www.youtube.com/redirect?event=video_description&redir_token= ..."
+    },
+    {
+      "id": "lQ72U1Xv44c",
+      "title": "Python AsyncIO Tasks & asyncio.gather(): Parallel Async Pipelines | Python Tutorial #48",
+      "channel": "Python to Job",
+      "duration": "1:17",
+      "description": "Run hundreds of async jobs simultaneously: wrapping coroutines in Tasks with create_task(), aggregating results with ..."
+    },
+    {
+      "id": "6RbJYN7SoRs",
+      "title": "AsyncIO & Asynchronous Programming in Python",
+      "channel": "NeuralNine",
+      "duration": "12:28",
+      "description": "In this video we learn about asynchronous programming in Python. We will talk about the keywords async and await."
+    },
+    {
+      "id": "sLzRQnHle3Q",
+      "title": "asyncio gather and timeout | Python",
+      "channel": "Code Adhyayana",
+      "duration": "7:36",
+      "description": "Hi Everyone, In this video we are going to discuss below points. 1. Print total time of execution 2. Add one more function 3."
+    }
+  ]
+}

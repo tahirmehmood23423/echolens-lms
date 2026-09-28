@@ -1,0 +1,139 @@
+{
+  "query": "CSS clamp container queries tutorial",
+  "checked_at": "2026-09-27T07:00:27.943Z",
+  "results": [
+    {
+      "id": "heIxI6Yray4",
+      "title": "CSS Container Query Tutorial in Hindi / Urdu",
+      "channel": "YOOBABA",
+      "duration": "37:35",
+      "description": "In this tutorial you will learn css container query tutorial in hindi, urdu.You can learn how to create a container query and uses its ..."
+    },
+    {
+      "id": "fRhETHPJMqw",
+      "title": "Container Queries in CSS🔥The Future of Responsive Design 🚀",
+      "channel": "Thapa Technical",
+      "duration": "11:48",
+      "description": "Welcome to our CSS course update! In this video, we'll explore Container Queries, a game-changer in web design. We'll break ..."
+    },
+    {
+      "id": "pYW3O0AxpI8",
+      "title": "Stop using so many Media Queries - Use clamp() instead!",
+      "channel": "Coding2GO",
+      "duration": "5:17",
+      "description": "In this video, you'll learn how to use the three most powerful CSS functions for modern responsive design: min(), max() and ..."
+    },
+    {
+      "id": "oCJk4qa8kPs",
+      "title": "Stop Using Media Queries! Try This Modern CSS",
+      "channel": "CSSnippets",
+      "duration": "7:05",
+      "description": "You'll learn: ✓ What CSS container queries are and why they matter ✓ How container queries replace media queries for ..."
+    },
+    {
+      "id": "DHj7JhH8ins",
+      "title": "\"Smart\" design patterns with container queries",
+      "channel": "Kevin Powell",
+      "duration": "15:27",
+      "description": "Container queries are more than just a media query that looks at the parent, it also is aware of the font-size of the parent, which ..."
+    },
+    {
+      "id": "Yex1FuAYld0",
+      "title": "Dynamic and adaptable designs with CSS Container Queries",
+      "channel": "Chrome for Developers",
+      "duration": "0:58",
+      "description": "Unlock the power of dynamic layouts with CSS Container Queries. Learn how to adapt your web designs seamlessly to any ..."
+    },
+    {
+      "id": "CHKUFsnABw4",
+      "title": "CSS Container Queries in 5 minutes",
+      "channel": "Lazar Nikolov",
+      "duration": "5:17",
+      "description": "Let's learn CSS Container Queries in 5 minutes! Prefer an article? Read it here: https://creatures.sh/blog/css-container-queries/ ..."
+    },
+    {
+      "id": "TxtvkKe20Rs",
+      "title": "Introduction to Container Queries",
+      "channel": "Coding in Public",
+      "duration": "5:32",
+      "description": "Container queries provide much more flexibility for styling children. Here's a brief overview. Key Links - Github: ..."
+    },
+    {
+      "id": "2rlWBZ17Wes",
+      "title": "Learn how to use Media queries & Container queries",
+      "channel": "Kevin Powell",
+      "duration": "34:33",
+      "description": "A dive into the world of media queries and container queries, covering the basics of how each works, the differences between ..."
+    },
+    {
+      "id": "j9CxKmX7iZE",
+      "title": "Smart Sizing in CSS With Container Query Units",
+      "channel": "Envato Tuts+",
+      "duration": "23:03",
+      "description": "Love responsive web design? Container query units sound interesting? In this video, you'll learn how to size elements in CSS ..."
+    },
+    {
+      "id": "r9oB4OolaAs",
+      "title": "@container Queries Containment Module CSS Tutorial",
+      "channel": "Adam Khoury",
+      "duration": "9:21",
+      "description": "Code: https://www.adamkhoury.com/video/container-queries-containment-module-css-tutorial @container Queries tutorial."
+    },
+    {
+      "id": "8x8lxX5IGHY",
+      "title": "Master CSS container queries and boost your web design skills!",
+      "channel": "Optimistic Web",
+      "duration": "8:56",
+      "description": "In this CSS tutorial, we're diving deep into CSS container queries and exploring how to transform responsive web layout into ..."
+    },
+    {
+      "id": "1ZHvYVF6Q60",
+      "title": "CSS Container Queries | New CSS Features | Example Projects",
+      "channel": "Do Some Coding",
+      "duration": "19:04",
+      "description": "CSS Container Queries Explained | Modern Responsive Design Techniques Discover how to revolutionize your web ..."
+    },
+    {
+      "id": "8ArQw2GfRbA",
+      "title": "059: Container queries - The CSS Podcast",
+      "channel": "Chrome for Developers",
+      "duration": "15:45",
+      "description": "Link to podcast → https://goo.gle/3M9Yyb7 Container queries (also known as @container) are a new entrypoint for truly ..."
+    },
+    {
+      "id": "lY4BmKKzGQg",
+      "title": "We've been using container queries wrong",
+      "channel": "Kevin Powell",
+      "duration": "2:03",
+      "description": "I'll be talking and giving a workshop at Smashing Conf Amsterdam in April - Get a nice discount on tickets (including online) ..."
+    },
+    {
+      "id": "rIOIeoX6QNw",
+      "title": "CSS clamp() Function Explained in 5 mins. Complete Tutorial for Beginners",
+      "channel": "IFace",
+      "duration": "5:15",
+      "description": "If you're building your own SaaS, I built a production-ready AI SaaS foundation https://www.saasbymonday.io/ Learn how to ..."
+    },
+    {
+      "id": "Fhf2x70dd94",
+      "title": "🚀 What's New in CSS 2025 | :has(), Container Queries & More | Gravity Coding is Live 🔴",
+      "channel": "Gravity Coding",
+      "duration": "1:11:21",
+      "description": "Today we're diving into What's New in CSS 2025 – the latest features that are going to change the way we build websites."
+    },
+    {
+      "id": "dr8G283fLzg",
+      "title": "Truly Fluid Typography with One Line of CSS | Clamp()",
+      "channel": "Optimistic Web",
+      "duration": "1:00",
+      "description": "Related topics ----------------------------------------------------- - One line of CSS for better typography, - CSS clamp tutorial, - CSS clamp ..."
+    },
+    {
+      "id": "eHye3PxH4jU",
+      "title": "CSS Media Queries | Sigma Web Development Course - Tutorial #31",
+      "channel": "CodeWithHarry",
+      "duration": "11:37",
+      "description": "Latest Udemy Web dev Course With Certificate: https://goharry.in/webdev Access the Sigma web development course playlist: ..."
+    }
+  ]
+}

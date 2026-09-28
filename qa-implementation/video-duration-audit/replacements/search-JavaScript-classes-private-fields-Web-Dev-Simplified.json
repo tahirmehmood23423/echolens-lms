@@ -1,0 +1,125 @@
+{
+  "query": "JavaScript classes private fields Web Dev Simplified",
+  "checked_at": "2026-09-27T07:00:37.690Z",
+  "results": [
+    {
+      "id": "5AWRivBk0Gw",
+      "title": "What are Classes, Objects, and Constructors?",
+      "channel": "Web Dev Simplified",
+      "duration": "4:22",
+      "description": "Object Oriented Programming is one of the most common programming patterns, but it can be incredibly confusing with all the ..."
+    },
+    {
+      "id": "5fmifZZeJJ4",
+      "title": "Javascript Classes Explained | Javascript Factory Functions | es6 private variables properties",
+      "channel": "Dave Gray",
+      "duration": "31:19",
+      "description": "Web Dev Roadmap for Beginners (Free!): https://bit.ly/DaveGrayWebDevRoadmap In this video we explore the Javascript Class ..."
+    },
+    {
+      "id": "cRHQNNcYf6s",
+      "title": "JavaScript ES6 Modules",
+      "channel": "Web Dev Simplified",
+      "duration": "7:39",
+      "description": "With ES6 JavaScript changed from a programming language that many people dreaded using to one of the most popular and ..."
+    },
+    {
+      "id": "U2vxAEiaVRY",
+      "title": "Learn JavaScript CLASSES in 6 minutes! 🏭",
+      "channel": "Bro Code",
+      "duration": "6:09",
+      "description": "class = (ES6 feature) provides a more structured and cleaner way to // work with objects compared to traditional constructor ..."
+    },
+    {
+      "id": "bl98dm7vJt0",
+      "title": "JavaScript Getters and Setters | Mosh",
+      "channel": "Programming with Mosh",
+      "duration": "6:37",
+      "description": "JavaScript Getters and Setters Get the COMPLETE course (83% OFF - LIMITED TIME ONLY): http://bit.ly/2M1sp4B Subscribe for ..."
+    },
+    {
+      "id": "N-O4w6PynGY",
+      "title": "Lecture 11 : Classes & Objects | JavaScript Full Course",
+      "channel": "Shradha Khapra",
+      "duration": "1:00:43",
+      "description": "⭐️ Instagram : https://www.instagram.com/shradhakhapra/\n⭐️ LinkedIn : https://www.linkedin.com/in/shradha-khapra/\n\nNotes ..."
+    },
+    {
+      "id": "-hBJz2PPIVE",
+      "title": "Reference Vs Value In JavaScript",
+      "channel": "Web Dev Simplified",
+      "duration": "15:12",
+      "description": "One of the most important topics in programming is pass by reference vs value. It is something that is incredibly confusing to follow ..."
+    },
+    {
+      "id": "sFDVXcqMlK8",
+      "title": "ES6 Classes in JavaScript | JavaScript Classes Private Variables | JavaScript Tutorial",
+      "channel": "SFDC Stop",
+      "duration": "7:59",
+      "description": "Hello Trailblazers, In this video we're going to learn about ES6 Classes in JavaScript. We'll see how we used to define classes in ..."
+    },
+    {
+      "id": "uFbCTidM-xw",
+      "title": "JavaScript -  Selecting by Ids, Classes, and More | Sigma Web Development Course - Tutorial #68",
+      "channel": "CodeWithHarry",
+      "duration": "18:15",
+      "description": "Latest Udemy Web dev Course With Certificate: https://goharry.in/webdev Access the Sigma web development course playlist: ..."
+    },
+    {
+      "id": "Mu1m4ssFFmE",
+      "title": "Private and Public Fields in Class | The Complete JavaScript Course | Ep.83",
+      "channel": "Anurag Singh ProCodrr",
+      "duration": "16:48",
+      "description": "Starter Code: https://github.com/procodrr/javascript-course/tree/main/ep-83_how_to_make_private-class-properties/starter-code ..."
+    },
+    {
+      "id": "1N_CIRNUq-k",
+      "title": "JavaScript ES6 Classes and Sub Classes",
+      "channel": "Learn Web Dev with Norbert",
+      "duration": "25:36",
+      "description": "In this tutorial we are goin to Support The Channel by becoming a part of this community! Complete Course Playlist ..."
+    },
+    {
+      "id": "GKJh3vdat8A",
+      "title": "Watch This If You Don’t Understand Type Coercion",
+      "channel": "Web Dev Simplified",
+      "duration": "8:19",
+      "description": "JavaScript Simplified Course: https://javascriptsimplified.com Type coercion is a confusion topic for many JavaScript developers ..."
+    },
+    {
+      "id": "YTVeX9HctqM",
+      "title": "private fields and methods in JavaScript classes",
+      "channel": "Sagar S (Vishal)",
+      "duration": "2:47",
+      "description": "Join this channel to get access to perks: https://www.youtube.com/channel/UCoSpmr2KNOxjwE_B9ynUmig/join My Gear Camera ..."
+    },
+    {
+      "id": "kj0vL6t6fg4",
+      "title": "JavaScript Class Privates !",
+      "channel": "Code Canvas",
+      "duration": "9:02",
+      "description": "JavaScript #JavaScriptTutorial #LearnJavaScript Did you know that private variables and functions in classes may be created ..."
+    },
+    {
+      "id": "FOD408a0EzU",
+      "title": "How To Create/Use Functions - JavaScript Essentials",
+      "channel": "Web Dev Simplified",
+      "duration": "9:34",
+      "description": "JavaScript Simplified Course: https://javascriptsimplified.com Functions are one of the most important things to understand in ..."
+    },
+    {
+      "id": "In0nB0ABaUk",
+      "title": "JavaScript Form Validation",
+      "channel": "Web Dev Simplified",
+      "duration": "6:39",
+      "description": "Master DOM manipulation* with my *FREE DOM Manipulation Cheat Sheet* - _20+ methods_ ..."
+    },
+    {
+      "id": "mdrgj_XCVJ8",
+      "title": "JavaScript private class fields",
+      "channel": "Valentino Gagliardi",
+      "duration": "9:57",
+      "description": "In this video we'll shed some light on JavaScript private class fields and see how they compare to the TypeScript private modifier."
+    }
+  ]
+}

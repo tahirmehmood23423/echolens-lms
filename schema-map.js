@@ -76,7 +76,7 @@ const COLLECTIONS = [
   ]],
   ['event_entries', 'event_entries', 'eventEntry', ['id', 'event_id', 'user_id', 'name', 'reg_no', 'tier', 'payment_status', 'payment_shot', 'team_details', 'challenge_pid', 'registration_id', 'registered_at']],
   ['event_submissions', 'event_submissions', 'eventSubmission', [
-    'id', 'event_id', 'entry_id', 'user_id', 'pid', 'code', 'language', 'file_url', 'file_name', 'link', 'github_link', 'deployment_link', 'note',
+    'id', 'event_id', 'entry_id', 'user_id', 'pid', 'code', 'language', 'file_url', 'file_name', 'link', 'github_link', 'deployment_link', 'render_link', 'vercel_link', 'note',
     'submitted_at', 'ai_score', 'score', 'ai_feedback', 'graded_by', 'graded_at', 'certified',
   ]],
   ['event_comments', 'event_comments', 'eventComment', ['id', 'event_id', 'user_id', 'name', 'role', 'body', 'created_at']],

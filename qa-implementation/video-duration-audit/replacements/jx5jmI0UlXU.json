@@ -1,0 +1,19 @@
+{
+  "id": "jx5jmI0UlXU",
+  "url": "https://www.youtube.com/watch?v=jx5jmI0UlXU",
+  "checked_at": "2026-09-27T07:00:56.887Z",
+  "title": "Learn CSS Position In 9 Minutes",
+  "channel": "Web Dev Simplified",
+  "duration_seconds": 566,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "*Master CSS selectors* with my *FREE CSS Selector Cheat Sheet* - _30+ selectors_ 👉 https://webdevsimplified.com/specificity-cheat-sheet.html\n*Become a web developer* with my *FREE Web Development Roadmap* - _260+ videos, 120+ projects, 60+ articles_ 👉 https://webdevsimplified.com/web-dev-roadmap.html\n\nLearn CSS Today Course: https://courses.webdevsimplified.com/learn-css-today?utm_medium=video-description-no-mention&utm_source=youtube&utm_campaign=css-position\n\nChances are you have heard of relative and absolute position in CSS, but did you know there are still three other positions? In this video I will be covering all five CSS positions (static, relative, absolute, fixed, and sticky) by showing you examples of each position and comparing them with each other.\n\nThis video may be short, but I cover everything about each CSS position in this video, so you can learn everything you need to know about CSS position. By the end of this video you will have a deep understanding of the interactions between the different CSS positions, so you can effectively use them in your next project.\n\n\n📚 Materials/References:\n\nCSS Position Article: https://blog.webdevsimplified.com/2022-01/css-position\nSticky Position Tutorial: https://youtu.be/NzjU1GmKosQ\nCodePen Code: https://codepen.io/WebDevSimplified/pen/VNRMNP\n\n\n🧠 Concepts Covered:\n\n- All five CSS positions\n- How absolute position interacts with the other positions\n- How to use top/right/left/bottom to position elements\n- How the document flow works\n- When to use relative position\n\n\n🌎 Find Me Here:\n\nTwitter: https://twitter.com/DevSimplified\nGitHub: https://github.com/WebDevSimplified\nCodePen: https://codepen.io/WebDevSimplified\n\n\n#CSSPosition #CSS #WebDevelopment",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

@@ -1,0 +1,132 @@
+{
+  "query": "JavaScript var let const hoisting Web Dev Simplified",
+  "checked_at": "2026-09-27T07:00:09.142Z",
+  "results": [
+    {
+      "id": "EvfRXyKa_GI",
+      "title": "Learn JavaScript Hoisting In 5 Minutes",
+      "channel": "Web Dev Simplified",
+      "duration": "5:40",
+      "description": "JavaScript Simplified Course: https://javascriptsimplified.com Hoisting. It is the word everyone throws around when talking about ..."
+    },
+    {
+      "id": "9WIJQDvt4Us",
+      "title": "Differences Between Var, Let, and Const",
+      "channel": "Web Dev Simplified",
+      "duration": "8:37",
+      "description": "You have probably watched many different tutorials, and you may have noticed that some tutorials use var to declare variables ..."
+    },
+    {
+      "id": "Icev9Oxf0WA",
+      "title": "const, let and var in JavaScript | JavaScript Tutorial in Hindi #3",
+      "channel": "CodeWithHarry",
+      "duration": "12:58",
+      "description": "Link to the Repl - https://replit.com/@codewithharry/03varletconst Join Replit - https://join.replit.com/CodeWithHarry Download ..."
+    },
+    {
+      "id": "GUOvXAYDx_I",
+      "title": "JavaScript Tutorial in Hindi #43 Hoisting Explained | var vs let vs const | Interview Questions",
+      "channel": "Code Step By Step",
+      "duration": "10:32",
+      "description": "Sharpenar Tech Job-Ready Program Link ..."
+    },
+    {
+      "id": "_FmHfOqJ4SY",
+      "title": "Hoisting in JavaScript | JavaScript Tutorial in Hindi #89",
+      "channel": "CodeWithHarry",
+      "duration": "10:46",
+      "description": "Link to the Repl - https://replit.com/@codewithharry/89hoisting Join Replit - https://join.replit.com/CodeWithHarry Download Notes ..."
+    },
+    {
+      "id": "oUWRxJ19gfE",
+      "title": "Javascript Interview Questions ( Var, Let and Const ) - Hoisting, Scoping, Shadowing and more",
+      "channel": "RoadsideCoder",
+      "duration": "14:43",
+      "description": "My Frontend Interview Preparation Course - https://roadsidecoder.com/course-details (50% Discount) My Instagram ..."
+    },
+    {
+      "id": "BNC6slYCj50",
+      "title": "let & const in JS 🔥Temporal Dead Zone | | Namaste JavaScript Ep. 8",
+      "channel": "Akshay Saini",
+      "duration": "21:41",
+      "description": "let & const in JavaScript behave differently when they are Hoisted. Understanding the difference between var, let and const in JS ..."
+    },
+    {
+      "id": "yY0bKZNYmJs",
+      "title": "The story of let, const and var | Chai aur #javascript",
+      "channel": "Chai aur Code",
+      "duration": "16:41",
+      "description": "Visit https://chaicode.com for all related materials, community help, source code, etc.\nIn this video, we will see the story ..."
+    },
+    {
+      "id": "AEkbwaPniBQ",
+      "title": "JavaScript Hoisting Explained: var vs let vs const ",
+      "channel": "build with saad",
+      "duration": "10:21",
+      "description": "In this episode of JavaScript Under the Hood, we go deeper into one of the most misunderstood JavaScript concepts: Hoisting."
+    },
+    {
+      "id": "eQk5m5hkCbo",
+      "title": "Javascript Hoisting | const, let & var",
+      "channel": "Learn Coding",
+      "duration": "32:11",
+      "description": "Learn Web Development ..."
+    },
+    {
+      "id": "-9Q-25JNWcc",
+      "title": "Javascript Interview | Hoisting | var, let, const | Temporal dead zone.",
+      "channel": "Developer Daily",
+      "duration": "5:36",
+      "description": "Description: Are you preparing for a JavaScript interview and want to tackle hoisting questions with confidence? Look no further!"
+    },
+    {
+      "id": "VbHaL_J8Ex0",
+      "title": "Variable Hoisting with LET, CONST and VAR in JavaScript",
+      "channel": "Deeecode",
+      "duration": "3:43",
+      "description": "I recently learned that variables declared with let and const are also hoisted. I used to think it was only variables declared with ..."
+    },
+    {
+      "id": "UXYJGHhuGA8",
+      "title": "JavaScript Variables & Data Types Explained (var, let, const, mutable) | JavaScript Full Course #02",
+      "channel": "Coder Army",
+      "duration": "1:08:34",
+      "description": "Are you ready to build a rock-solid foundation in JavaScript? In this comprehensive, one-hour lecture, we go far beyond the ..."
+    },
+    {
+      "id": "AOIfIbobirc",
+      "title": "let , var and const in JavaScript | Hoisting in JavaScript | Shadowing in JavaScript all difference",
+      "channel": "Delicate Coding",
+      "duration": "16:41",
+      "description": "Variables let, const & var in JavaScript | JavaScript Tutorial In Hindi #hoisting #javascripttutorial #javascript #let #var #const ..."
+    },
+    {
+      "id": "AG4Nvag0hW8",
+      "title": "Javascript session1 | var, let, const and hoisting",
+      "channel": "Javascript Codeguru",
+      "duration": "26:21",
+      "description": "Learn the difference between var, let, and const in JavaScript! Understand how hoisting works and why it matters in your code."
+    },
+    {
+      "id": "zpR2zT-AlGE",
+      "title": "Understand Hoisting in JavaScript | Variable Declaration var vs let vs const",
+      "channel": "Technical Potpourri by Sudipta Deb",
+      "duration": "9:58",
+      "description": "Understand \"Hoisting\" in JavaScript is important and at the same time somewhat misleading. In this video, I will cover the Hoisting ..."
+    },
+    {
+      "id": "gYkP-MM2Jxo",
+      "title": "JavaScript Chapter 3 | Variables, var vs let vs const, Scope & Hoisting Part-3 (Beginners)",
+      "channel": "Hari Sharma",
+      "duration": "18:21",
+      "description": "Welcome to JavaScript Chapter 3 – Variables & Declarations! In this video, you'll learn what variables are, how to declare them in ..."
+    },
+    {
+      "id": "uCruthEKsCc",
+      "title": "JavaScript let var const Explained | Scoping, Hoisting, Assignment",
+      "channel": "Nishant Singh Chandel",
+      "duration": "24:09",
+      "description": "In this video, I'll explain let, var, and const in JavaScript like never before We'll cover everything — scoping, hoisting, ..."
+    }
+  ]
+}

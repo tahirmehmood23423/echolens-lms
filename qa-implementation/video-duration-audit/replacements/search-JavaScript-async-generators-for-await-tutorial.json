@@ -1,0 +1,146 @@
+{
+  "query": "JavaScript async generators for await tutorial",
+  "checked_at": "2026-09-28T05:13:57.574Z",
+  "results": [
+    {
+      "id": "6WclW4ThDUU",
+      "title": "JAVASCRIPT ASYNC AWAIT TUTORIAL - Use an API to make a programming joke generator | What is an API?",
+      "channel": "DThompsonDev",
+      "duration": "18:11",
+      "description": "What is an API? How to use ASYNC AWAIT? Async and Await are amazing ways to fetch an API without using promises! This is a ..."
+    },
+    {
+      "id": "J24rb6_5h9o",
+      "title": "Welcome to Async Generators in JavaScript",
+      "channel": "Andrew Burgess",
+      "duration": "10:53",
+      "description": "In a previous video we looked at iterators and generators in JavaScript but we didn't get to look at the async version of iterators ..."
+    },
+    {
+      "id": "670f71LTWpM",
+      "title": "Asynchronous JavaScript in ~10 Minutes - Callbacks, Promises, and Async/Await",
+      "channel": "James Q Quick",
+      "duration": "13:55",
+      "description": "The asynchronous nature of JavaScript to understanding the language. You'll find the use of callbacks, promises, and async/await ..."
+    },
+    {
+      "id": "zJImU5lMTNM",
+      "title": "JS: Async Function* - Harnessing Async Generators",
+      "channel": "YouRails",
+      "duration": "1:15",
+      "description": "Explore the power of async generator functions for efficient asynchronous programming. Discover how async function* ..."
+    },
+    {
+      "id": "d3jXofmQm44",
+      "title": "Lecture 12 : Callbacks, Promises & Async Await | JavaScript Full Course",
+      "channel": "Shradha Khapra",
+      "duration": "1:23:55",
+      "description": "Instagram : https://www.instagram.com/shradhakhapra/ ⭐️ LinkedIn : https://www.linkedin.com/in/shradha-khapra/ Notes ..."
+    },
+    {
+      "id": "GK0QD2JXhWM",
+      "title": "Advance JavaScript - Async & Await Tutorial in Hindi / Urdu",
+      "channel": "YOOBABA",
+      "duration": "25:49",
+      "description": "In this tutorial you will learn javascript async and await method tutorial in Hindi, Urdu.You can learn how to use async and await to ..."
+    },
+    {
+      "id": "H9nFFE5_VS4",
+      "title": "Master Async Await Javascript in an easy way",
+      "channel": "Nova Designs",
+      "duration": "5:52",
+      "description": "PDF VERSION (For Kofi Members): https://ko-fi.com/s/5346eef691 Learn the most important concepts of Async Await Javascript in ..."
+    },
+    {
+      "id": "9j1dZwFEJ-c",
+      "title": "JavaScript ASYNC/AWAIT is easy! ⏳",
+      "channel": "Bro Code",
+      "duration": "4:39",
+      "description": "javascript #tutorial #programming // Async/Await = Async = makes a function return a promise // Await = makes an async function ..."
+    },
+    {
+      "id": "uaXIwizjFEo",
+      "title": "Hardest JavaScript Output Question! 😱 Async Generator + for-await Explained",
+      "channel": "Build Heaven Dev",
+      "duration": "0:49",
+      "description": "This is one of the most advanced JavaScript output questions you will ever see! Async generators, promise unwrapping, mutations ..."
+    },
+    {
+      "id": "PaPsh0KaRws",
+      "title": "54. JAVASCRIPT : Async Generators & for-await-of Loops",
+      "channel": "Web Fusion with Bharadwaj",
+      "duration": "12:42",
+      "description": "Welcome to Code-with-Bharadwaj! Hi there! I'm Manu, and I'm excited to help you level up your coding skills."
+    },
+    {
+      "id": "EL3PKEHggrE",
+      "title": "Async-await and Fetch API in JavaScript || Complete Web Development Course",
+      "channel": "CodeHelp - by Babbar",
+      "duration": "39:11",
+      "description": "SUPREME 3.0 : https://www.codehelp.in/course/dsa-supreme-3.0 Find Your Code here: ..."
+    },
+    {
+      "id": "2pHQdjgSVUk",
+      "title": "Master Asynchronous JavaScript: Callbacks, Promises & Async/Await Made Easy 🚀 | Hindi | Day 21/100",
+      "channel": "Coder's Gyan",
+      "duration": "47:04",
+      "description": "Async JavaScript can be confusing — callbacks, promises, async/await 🤯. In this video, I’ll explain how they work, why we use ..."
+    },
+    {
+      "id": "V-rkx-PQna8",
+      "title": "JavaScript Generators & Iterators: Master Async Patterns",
+      "channel": "Elevate Learn",
+      "duration": "13:58",
+      "description": "Learn JavaScript generators and iterators to write cleaner, more efficient async code. This comprehensive tutorial covers iterator ..."
+    },
+    {
+      "id": "6nv3qy3oNkc",
+      "title": "async await | Namaste JavaScript - Season 02 - Ep 04",
+      "channel": "Akshay Saini",
+      "duration": "1:09:21",
+      "description": "Wanna dive deep into React JS with me? Checkout Namaste React - https://namastedev.com/namaste-react/?version=2 Use ..."
+    },
+    {
+      "id": "zgt5oTD3rRc",
+      "title": "Async JavaScript Fundamentals | Chai aur #javascript",
+      "channel": "Chai aur Code",
+      "duration": "19:12",
+      "description": "Visit https://chaicode.com for all related materials, community help, source code, etc.\n#javascript #hindi\nAll code is ..."
+    },
+    {
+      "id": "IJ6EgdiI_wU",
+      "title": "Learn JavaScript Generators In 12 Minutes",
+      "channel": "Web Dev Simplified",
+      "duration": "12:11",
+      "description": "JavaScript Simplified Course: https://javascriptsimplified.com Generator functions in JavaScript are a feature most people think is ..."
+    },
+    {
+      "id": "UULLEaLButA",
+      "title": "Async/Await Tutorial - How to Implement Async/Await in ES6",
+      "channel": "Grace Hopper Academy",
+      "duration": "11:01",
+      "description": "Learn more advanced front-end and full-stack development at: https://www.fullstackacademy.com Async and Await are native ..."
+    },
+    {
+      "id": "uq1B1eHdPpw",
+      "title": "Intro to Javascript Async/Await and Generators on Nodejs",
+      "channel": "CoderOne",
+      "duration": "21:28",
+      "description": "Written Tutorial: https://go.ipenywis.com/ipeny94787 Our Udemy Courses: Let's Create A Nodejs Desktop Chat ..."
+    },
+    {
+      "id": "0uQvNZ8th08",
+      "title": "JavaScript Async Generators Unleashed: Harnessing Asynchronous Power",
+      "channel": "Luca Del Puppo",
+      "duration": "4:19",
+      "description": "In the last few years, ECMAScript has introduced many new features in JavaScript. One of them is Async Generators. In this video ..."
+    },
+    {
+      "id": "gRLdHSabW3o",
+      "title": "Async/Await & Fetch API in JavaScript with Examples | Sigma Web Development Course - Tutorial #76",
+      "channel": "CodeWithHarry",
+      "duration": "23:41",
+      "description": "Latest Udemy Web dev Course With Certificate: https://goharry.in/webdev Access the Sigma web development course playlist: ..."
+    }
+  ]
+}

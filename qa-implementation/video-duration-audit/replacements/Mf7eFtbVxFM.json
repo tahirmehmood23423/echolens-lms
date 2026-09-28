@@ -1,0 +1,19 @@
+{
+  "id": "Mf7eFtbVxFM",
+  "url": "https://www.youtube.com/watch?v=Mf7eFtbVxFM",
+  "checked_at": "2026-09-27T07:01:42.153Z",
+  "title": "#6 Python Tutorial for Beginners | Tuple | Set in Python",
+  "channel": "Telusko",
+  "duration_seconds": 400,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "Check out our courses:\n\nAgentic AI Engineering with Python : https://go.telusko.com/agentic-ai-python\nCoupon: TELUSKO10   (10% Discount)\n\nMaster Java Spring Development : https://go.telusko.com/learn-master\nCoupon: TELUSKO10   (10% Discount)\n\nFor More Queries WhatsApp or Call on  :  +919008963671\n\nwebsite : https://telusko.com/\n\nUdemy Courses:\n\nJava Spring:- https://go.telusko.com/Udemyjavaspring\nJava:- https://go.telusko.com/udemyteluskojava\nSpring: https://go.telusko.com/udemyteluskospring\nJava For Programmers:- https://go.telusko.com/javaProgrammers\nPython : https://go.telusko.com/udemyteluskopython\nGit : https://go.telusko.com/udemyteluskogit\nDocker : https://go.telusko.com/udemyteluskodocker\n\nInstagram : https://www.instagram.com/navinreddyofficial/\nLinkedin : https://in.linkedin.com/in/navinreddy20\nWhatsApp : https://go.telusko.com/whatsapp\nDiscord : https://discord.gg/D8hWe9BqfF\n\n\nIn this lecture we will learn:\n- What are Tuples in Python\n- Tuples re immutable\n- Methods used with tuples\n- When to use tuples over lists?\n- What are Sets in Python?\n- Properties of Sets\n\n#1\nTuples:-\nTuple is almost similar to a list in which we can store multiple values.\n- Tuples are Immutable and we can change values in them.\n- To define a tuple, () round brackets are used.\n- We can fetch the values from a tuple using the index value that can be given in a square bracket.\n- Tuple will give an error when you tried to change a value in it.\n\n#2\n- count method is used to count the occurrences of an element in a tuple. It counts the number of times that an element is present in a tuple.\ne.g., If an element of value 5 is present two times in a tuple, then the count method returns 2.\n\n#3\n - We can use tuples when we want a list of multiple values but we do not want to change it.\n- Iteration in the tuple is faster than the list.\n\n#4\nSets:-\n- Set is a collection of unique elements.\n- To define the set, we use the {} curly brackets.\n- Set never follows the sequence.\n- When we print the set, then the sequence of values in output will be different from the sequence of input.\n- Duplicate values present in a set will be printed only once in an output.\n- Set uses the concept of Hash. Hash is used to improve the performance as it fetches the values as fast as possible.\n- Indexing is not supported in sets as it does not follow sequencing.\n- Values can not be changed in a set also because index value is not supported.\n\nGithub :- https://github.com/navinreddy20/Python-\n\nMore Learning : \n\nJava  :- https://bit.ly/3x6rr0N\nPython  :- https://bit.ly/3GRc7JX\nDjango  :- https://bit.ly/3MmoJK6\n\nJavaScript :- https://bit.ly/3tiAlHo\nNode JS :- https://bit.ly/3GT4liq\n\nRest Api  :-https://bit.ly/3MjhZwt\nServlet :- https://bit.ly/3Q7eA7k\nSpring Framework :- https://bit.ly/3xi7buh\nDesign Patterns in Java :- https://bit.ly/3MocXiq\nDocker :- https://bit.ly/3xjWzLA\n\nBlockchain Tutorial :- https://bit.ly/3NSbOkc\nCorda Tutorial:- https://bit.ly/3thbUKa\nHyperledger Fabric :- https://bit.ly/38RZCRB\n\nNoSQL Tutorial :- https://bit.ly/3aJpRuc   \nMysql Tutorial :- https://bit.ly/3thpr4L\n\nData Structures using Java :- https://bit.ly/3MuJa7S\nGit Tutorial :- https://bit.ly/3NXyCPu\n\nDonation:\nPayPal Id : navinreddy20\nhttps://www.telusko.com",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

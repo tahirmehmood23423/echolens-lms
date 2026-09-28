@@ -1,0 +1,19 @@
+{
+  "id": "0GVLtTnebNA",
+  "url": "https://www.youtube.com/watch?v=0GVLtTnebNA",
+  "checked_at": "2026-09-27T07:00:58.671Z",
+  "title": "Learn Python's AsyncIO in 15 minutes",
+  "channel": "Indently",
+  "duration_seconds": 841,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "In this tutorial we will be looking at asyncio, which is a package from the standard Python library which allows us to do asyncronous programming. It's very easy to learn, but can be a bit tricky to master. Any way, we will be covering how to use it in less than 15 minutes!\n\n▶ Become job-ready with Python:\nhttps://www.indently.io\n\n▶ Follow me on Instagram:\nhttps://www.instagram.com/indentlyreels\n\nDocumentation: \nhttps://docs.python.org/3/library/asyncio.html",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

@@ -1,0 +1,19 @@
+{
+  "id": "gOMW_n2-2Mw",
+  "url": "https://www.youtube.com/watch?v=gOMW_n2-2Mw",
+  "checked_at": "2026-09-27T07:00:48.182Z",
+  "title": "Python lists, sets, and tuples explained 🍍",
+  "channel": "Bro Code",
+  "duration_seconds": 905,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "#python #tutorial #course \n\nPython list set tuple tutorial example explained\n\n00:00:00 intro\n00:00:49 list\n00:09:40 set\n00:12:40 tuple\n00:14:22 conclusion\n\n#   List  = [] ordered and changeable. Duplicates OK\n#   Set   = {} unordered and immutable, but Add/Remove OK. NO duplicates\n#   Tuple = () ordered and unchangeable. Duplicates OK. FASTER",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

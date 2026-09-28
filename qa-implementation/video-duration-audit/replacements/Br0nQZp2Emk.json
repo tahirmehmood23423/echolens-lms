@@ -1,0 +1,20 @@
+{
+  "id": "Br0nQZp2Emk",
+  "url": "https://www.youtube.com/watch?v=Br0nQZp2Emk",
+  "checked_at": "2026-09-27T07:02:04.625Z",
+  "title": "How to use grid-template-areas to build bento grids in CSS",
+  "channel": "Coder Coder",
+  "duration_seconds": 426,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "💥 Want to learn how to build a website from scratch? Check out my course: https://coder-coder.com/responsive?utm_source=YouTube&utm_medium=videos&utm_campaign=YouTubeLinks&utm_content=grid-template-areas\n\nSource code: https://github.com/thecodercoder/css-layout/tree/main/08-bento-grid\n\n____________\n\n💻  LEARN TO CODE  💻\n\nMY COURSE:\n🟢 Responsive Design for Beginners -- Learn how to build a website from scratch -- https://coder-coder.com/responsive\n\nRECOMMENDED RESOURCES:\nTools and resources I use myself and highly recommend, with exclusive discounts (affiliate links help support this channel-- thank you!)\n\n🔷 Frontend Mentor Pro -- Practice building real-world projects (20% off 1-yr with code JESSCHAN10) -- https://www.frontendmentor.io/?via=jesschan\n🔷 Boot.dev -- Learn back-end development (25% off) -- https://www.boot.dev/?promo=CODERCODER\n\nOTHER STUFF:\n🟢 Coder Coder Dark -- My VS Code theme -- https://marketplace.visualstudio.com/items?itemName=CoderCoder.codercoder-dark-theme\n🟢 Coder Coder Merch -- get my hoodie, coffee cup, and more! -- https://coder-coder.com/merch\n\nSOCIALS:\nhttps://twitter.com/thecodercoder\nhttps://www.instagram.com/thecodercoder\n\n#css #javascript #html",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 1103,
+  "transcript_error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
+}

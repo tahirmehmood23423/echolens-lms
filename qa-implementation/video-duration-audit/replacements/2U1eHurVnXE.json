@@ -1,0 +1,20 @@
+{
+  "id": "2U1eHurVnXE",
+  "url": "https://www.youtube.com/watch?v=2U1eHurVnXE",
+  "checked_at": "2026-09-27T07:02:04.618Z",
+  "title": "Classes part 10 - Rule of Five - Have fun reducing memory allocations! | Modern Cpp Series Ep. 46",
+  "channel": "Mike Shah",
+  "duration_seconds": 1482,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "►Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L\n►Find full courses on: https://courses.mshah.io/\n►Join as Member to Support the channel: https://www.youtube.com/channel/UCA64pZbN5Mz5NxC3SO4qpDg/join\n\n►Lesson Description: In this lesson I discuss the rule of five (otherwise known as the law of 5 or the big 5). I first will recap a simple class data structure recapping the big 3 (constructor, destructor, and copy constructor), and showing where these special member functions are invoked. Then I will remind you of the idea of move semantics (i.e. the transfer of resources from one object to another). When used appropriately, move semantics can save significantly on performance by avoiding copies. Towards the end of the lesson, I will show you how copies are often made, and sometimes unknowingly (like in the case of a vector when it is getting resized as you add elements), and how move semantics can help significantly improve performance by reducing allocations.\n\n►YouTube Channel: https://www.youtube.com/c/MikeShah\n►Please like and subscribe to help the channel!",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 1103,
+  "transcript_error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
+}

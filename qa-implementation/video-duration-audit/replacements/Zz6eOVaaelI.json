@@ -1,0 +1,19 @@
+{
+  "id": "Zz6eOVaaelI",
+  "url": "https://www.youtube.com/watch?v=Zz6eOVaaelI",
+  "checked_at": "2026-09-27T07:01:01.758Z",
+  "title": "Learn Sass In 20 Minutes | Sass Crash Course",
+  "channel": "developedbyed",
+  "duration_seconds": 1182,
+  "status": "OK",
+  "embeddable": false,
+  "playable_in_embed": false,
+  "description": "Check out my courses here!\nhttps://developedbyed.com\n\nIn this mini crash course we are going to learn everything about Sass.\nWhat Sass allows us to do is write alot of cool things that we would normally wouldn't be able to do in normal CSS.\n\nWith Sass we can create variables, use imports and partials to separate our css code into smaller chunks, we can use mixins to create small functions that allow us to reuse css code, nesting allows us to write children elements directly inside the parent element and much more!\n\nWe will also look at a tool called Live Sass Compiler which is going to take our scss code and convert it to regular css with autoprefixer.\n\nIf you are interested in learning more about css and sass then take the time to watch this sass crash course covered in 20 minutes!\n\n❤Become a patreon for exclusive videos and more!\nhttps://www.patreon.com/dev_ed\nMicrophones I Use\nAudio-Technica AT2020 - https://geni.us/Re78 (Amazon)\nDeity V-Mic D3 Pro - https://geni.us/y0HjQbz (Amazon)\nBEHRINGER Audio Interface - https://geni.us/AcbCpd9 (Amazon)\n\nCamera Gear\nFujifilm X-T3 - https://geni.us/7IM1 (Amazon)\nFujinon XF18-55mmF2.8-4 - https://geni.us/sztaN (Amazon)\n\nPC Specs\nKingston SQ500S37/480G 480GB - https://geni.us/s7HWm (Amazon)\nGigabyte GeForce RTX 2070 - https://geni.us/uRw71gN (Amazon)\nAMD Ryzen 7 2700X - https://geni.us/NaBSC (Amazon)\nCorsair Vengeance LPX 16GB - https://geni.us/JDqK1KK (Amazon)\nASRock B450M PRO4 - https://geni.us/YAtI (Amazon) \nDeepCool ATX Mid Tower - https://geni.us/U8xJY (Amazon)\nDell Ultrasharp U2718Q 27-Inch 4K - https://geni.us/kXHE (Amazon)\nDell Ultra Sharp LED-Lit Monitor 25 2k - https://geni.us/bilekX (Amazon)\nLogitech G305 - https://geni.us/PIjyn (Amazon)\nLogitech MX Keys Advanced - https://geni.us/YBsCVX0 (Amazon)\n\nDISCLAIMERS:\nI am a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for us to earn fees by linking to Amazon.com and affiliated sites.\n\n\n\n📕 Things covered in this video:\n \n- How to add sass compiler to our project\n- How to link our sass to html\n- Sass variables\n- Mixins\n- Nesting\n- Extending\n- Operators\n- Partials and Imports\n\n📔 Materials used in this video:\n\n VSCode\n\n🛴 Follow me on:\n\nTwitter: https://twitter.com/deved94\nGithub: https://github.com/DevEdwin\n\n🎵 Music:\n\nOutro: \nLAKEY INSPIRED - Me 2 (Feat. Julian Avila)\nMusic By: https://soundcloud.com/lakeyinspired\n\nIntro:\nDj Quads\nTrack Name: \"Every Morning\"\nMusic By: Dj Quads @ https://soundcloud.com/aka-dj-quads\n\nCreative Commons — Attribution-ShareAlike 3.0 Unported— CC BY-SA 3.0 \nhttp://creativecommons.org/licenses/b...",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

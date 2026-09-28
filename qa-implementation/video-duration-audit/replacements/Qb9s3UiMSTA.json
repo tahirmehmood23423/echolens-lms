@@ -1,0 +1,22 @@
+{
+  "id": "Qb9s3UiMSTA",
+  "url": "https://www.youtube.com/watch?v=Qb9s3UiMSTA",
+  "checked_at": "2026-09-27T07:01:43.062Z",
+  "title": "Asyncio in Python - Full Tutorial",
+  "channel": "Tech With Tim",
+  "duration_seconds": 1498,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "Asynchronous programming allows our code to be more efficient by doing multiple things at once without any unnecessary waiting. Asyncio is your choice for running multiple tasks concurrently such as network requests or reading files, without using much CPU power. \n\nIf you want to land a developer job click here and view my free introduction course with Course Careers for becoming a developer in 2024: https://techwithtim.net/dev\n\nSkool community for free resources: https://www.skool.com/software-developer-academy/about\nDiscord server: https://discord.gg/twt\n\n🎞 Video Resources 🎞\nPython Async IO Docs: https://docs.python.org/3/library/asyncio.html\n\n⏳ Timestamps ⏳\n00:00 | What is Asyncio?\n00:48 | When to use Async IO?\n02:04 | #1 - The Event Loop\n02:47 | #2 - Coroutines\n09:52 | #3 - Tasks \n16:50 | #4 - Futures \n18:23 | #5 - Synchronization\n\nHashtags\n#techwithtim \n#asynchronousprogramming\n#python\n#pythonprogramming",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    },
+    {
+      "language": "en-CA"
+    }
+  ],
+  "transcript_bytes": 0
+}

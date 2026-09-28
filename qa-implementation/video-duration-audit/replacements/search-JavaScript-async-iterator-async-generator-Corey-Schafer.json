@@ -1,0 +1,132 @@
+{
+  "query": "JavaScript async iterator async generator Corey Schafer",
+  "checked_at": "2026-09-28T05:13:58.082Z",
+  "results": [
+    {
+      "id": "oAkLSJNr5zY",
+      "title": "Python Tutorial: AsyncIO - Complete Guide to Asynchronous Programming with Animations",
+      "channel": "Corey Schafer",
+      "duration": "1:42:41",
+      "description": "In this video, we'll be learning all about AsyncIO in Python and how to write asynchronous code using the async/await syntax."
+    },
+    {
+      "id": "jTYiNjvnHZY",
+      "title": "Python Tutorial: Iterators and Iterables - What Are They and How Do They Work?",
+      "channel": "Corey Schafer",
+      "duration": "23:08",
+      "description": "In this Python Programming Tutorial, we will be learning about iterators and iterables. There is a lot of confusion around these ..."
+    },
+    {
+      "id": "bD05uGo_sVI",
+      "title": "Python Tutorial: Generators - How to use them and the benefits you receive",
+      "channel": "Corey Schafer",
+      "duration": "11:14",
+      "description": "Python Generators are often considered a somewhat advanced topic, but they are actually very easy to understand once you start ..."
+    },
+    {
+      "id": "PN9HQoYW2vc",
+      "title": "Async Iterators  -Jamie McCrindle",
+      "channel": "LNUG (London Node User Group)",
+      "duration": "14:58",
+      "description": "Abstract An exploration of async iterators in NodeJS including when and why to use them, how they compare to other reactive ..."
+    },
+    {
+      "id": "C3Z9lJXI6Qw",
+      "title": "Python Coding Problem: Creating Your Own Iterators",
+      "channel": "Corey Schafer",
+      "duration": "13:47",
+      "description": "In this Python Coding Problem, we will be creating our own iterators from scratch. First, we will create an iterator using a class."
+    },
+    {
+      "id": "3ky4ZuWbPhM",
+      "title": "JavaScript Iterables: Protocols, Generators & Async Iteration Explained",
+      "channel": "CodeLucky",
+      "duration": "4:45",
+      "description": "Dive into the world of JavaScript iterables and master the art of efficient data handling! In this comprehensive video, we'll explore ..."
+    },
+    {
+      "id": "I5oDbp_U-fQ",
+      "title": "Async iterators (for await ... of) in JavaScript",
+      "channel": "Fun Fun Function",
+      "duration": "13:48",
+      "description": "Previous Iterators video ..."
+    },
+    {
+      "id": "J24rb6_5h9o",
+      "title": "Welcome to Async Generators in JavaScript",
+      "channel": "Andrew Burgess",
+      "duration": "10:53",
+      "description": "In a previous video we looked at iterators and generators in JavaScript but we didn't get to look at the async version of iterators ..."
+    },
+    {
+      "id": "lGg43tcQ5x4",
+      "title": "map for async iterators in JavaScript",
+      "channel": "Fun Fun Function",
+      "duration": "25:59",
+      "description": "Pusher - pub/sub, push etc (sponsored) http://pusher.funfunfunction.com (Patrons only) Official discussion topic for this episode ..."
+    },
+    {
+      "id": "-6fuZoXl6hw",
+      "title": "Remote Online Tech Talk: How to use Generators, Iterators, and Async Functions in JavaScript",
+      "channel": "Fullstack Academy",
+      "duration": "10:33",
+      "description": "In this video, Amrom Steinmetz introduces the concepts of generators and iterators in JavaScript. He explains how to use them to ..."
+    },
+    {
+      "id": "efrW5-IYoCU",
+      "title": "2 projects with Async JS | chai aur #javascript",
+      "channel": "Chai aur Code",
+      "duration": "41:07",
+      "description": "Visit https://chaicode.com for all related materials, community help, source code, etc.\n#javascript #hindi\nAll code is ..."
+    },
+    {
+      "id": "u2hwYeN1P-I",
+      "title": "Async Iterators for Big Data Sets",
+      "channel": "Steve Griffith - Prof3ssorSt3v3",
+      "duration": "10:58",
+      "description": "Iterators are great for looping through data sets. If you have an array then it has a built-in iterator. Objects can have a custom ..."
+    },
+    {
+      "id": "ZgYKTAAjC8A",
+      "title": "[Destination:Web ] Async Iterators in The Real World",
+      "channel": "Uber Engineering",
+      "duration": "30:19",
+      "description": "Adobe's Jon Kuperman shares best practices for building accessible web applications. Fortunately, there are several tools you ..."
+    },
+    {
+      "id": "Qb9s3UiMSTA",
+      "title": "Asyncio in Python - Full Tutorial",
+      "channel": "Tech With Tim",
+      "duration": "24:59",
+      "description": "Asynchronous programming allows our code to be more efficient by doing multiple things at once without any unnecessary ..."
+    },
+    {
+      "id": "wrI-Jb0oFyk",
+      "title": "Using async generators to stream data in JavaScript",
+      "channel": "Fun Fun Function",
+      "duration": "27:37",
+      "description": "Playlist for this series https://www.youtube.com/watch?v=W4brAobC2Hc&list=PL0zVEGEvSaeG2T5n8FuPGb11JHea7idb9 ..."
+    },
+    {
+      "id": "uBAE6Oql1fE",
+      "title": "Async/Await - Modern Concurrency in JavaScript",
+      "channel": "freeCodeCamp Talks",
+      "duration": "42:11",
+      "description": "Talk by Simon Sturmer. Slides: https://speakerdeck.com/sstur/async-and-await-bandungjs-mar-2017 Talk originally given at ..."
+    },
+    {
+      "id": "6kE8lrqfwHo",
+      "title": "Master Async JavaScript: What it is and How to Use it",
+      "channel": "Sheryians Coding School",
+      "duration": "1:18:37",
+      "description": "Asynchronous JavaScript is one of the most important topics in web development. It allows you to write code that can run in the ..."
+    },
+    {
+      "id": "CyAhHG-1AiI",
+      "title": "Async Iterators & Generators - HTTP203 Advent",
+      "channel": "Chrome for Developers",
+      "duration": "2:46",
+      "description": "Today, Surma talks about async iterators & generators in HTTP203. For more info: https://goo.gl/rBM420 NEW EPISODE OF ..."
+    }
+  ]
+}

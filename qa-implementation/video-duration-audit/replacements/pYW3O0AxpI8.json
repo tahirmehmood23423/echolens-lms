@@ -1,0 +1,19 @@
+{
+  "id": "pYW3O0AxpI8",
+  "url": "https://www.youtube.com/watch?v=pYW3O0AxpI8",
+  "checked_at": "2026-09-27T07:01:41.141Z",
+  "title": "Stop using so many Media Queries - Use clamp() instead!",
+  "channel": "Coding2GO",
+  "duration_seconds": 317,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "In this video, you’ll learn how to use the three most powerful CSS functions for modern responsive design: min(), max() and clamp().\nInstead of writing tons of media queries, you’ll let the browser do the math and create fluid sizes that just work.\nWe’ll go through practical examples like fluid text, cards and sidebars, so you can start using these functions in your next project right away.\n\nLearn More with My Courses\n\n👉 JavaScript Course: https://www.udemy.com/course/javascript-course-coding2go/?referralCode=CF16EB9F6548CB416253\n\n👉 HTML & CSS Complete Course: https://www.udemy.com/course/learn-html-and-css-in-7-days-web-developer-bootcamp/?couponCode=CODING2GO\n\nIn this CSS tutorial, we break down what min(), max() and clamp() actually do, how they are different, and when to use each one.\nYou’ll learn a simple mental model for all three functions and how to combine them with rem, vw and percentages to build truly responsive components without relying on dozens of breakpoints.\n\n👉 Check out my website: https://coding2go.com\n\nKey Concepts Covered\n\nHow CSS min(), max() and clamp() work\nMental model: smallest allowed size, largest allowed size, and safe range between min and max\nCreating fluid font sizes without media queries\nMaking responsive card and sidebar widths with min() and max()\nUsing clamp() for padding, gaps and section widths\nAvoiding common mistakes with mixed units and extreme screen sizes\n\nTopics in this video\nCSS, min(), max(), clamp(), css clamp tutorial, css min max functions, fluid typography, responsive css, modern css functions, css without media queries, responsive web design, css tips and tricks, html css beginner tutorial, css responsive layout, frontend development, Coding2GO",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

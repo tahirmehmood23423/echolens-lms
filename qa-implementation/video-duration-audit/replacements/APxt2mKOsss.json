@@ -1,0 +1,20 @@
+{
+  "id": "APxt2mKOsss",
+  "url": "https://www.youtube.com/watch?v=APxt2mKOsss",
+  "checked_at": "2026-09-27T07:02:07.435Z",
+  "title": "Learn CSS Subgrid for Perfect Alignment",
+  "channel": "Coding2GO",
+  "duration_seconds": 261,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "In this video, you’ll learn how CSS Subgrid fixes one of the most annoying layout problems in modern web design.\nWhenever you build card layouts, pricing sections, or feature grids, elements like buttons and text blocks often refuse to line up — simply because their content lengths differ.\n\nSubgrid solves this once and for all.\nWith one line of CSS, child elements can inherit the parent grid’s rows or columns, giving you perfectly aligned designs without hacks, wrappers, or manual height tricks.\n\n🎓 Learn More with My Courses\n\n👉 HTML & CSS Complete Course: https://www.udemy.com/course/learn-html-and-css-in-7-days-web-developer-bootcamp/?couponCode=CODING2GO\n\n👉 JavaScript Course: https://www.udemy.com/course/javascript-course-coding2go/?referralCode=CF16EB9F6548CB416253\n\nIn this CSS tutorial for 2025, we’ll walk through Subgrid step by step:\n• Why basic grid layouts break when content varies\n• How grid-template-rows: subgrid; lets children reuse the parent’s layout\n• How to align buttons, text blocks, and card elements across a full grid\n• What changes in your HTML and CSS to activate Subgrid\n• Real examples showing how Subgrid cleans up complex components\n\nYou’ll learn how to simplify your layouts, remove unnecessary wrappers, and build responsive components that stay visually consistent — no matter how much content they contain.\n\n👉 Visit my website: https://coding2go.com\n\n🧠 Key Concepts Covered\n\n• What CSS Subgrid is and why it matters\n• Using grid-template-rows: subgrid;\n• Using grid-template-columns: subgrid;\n• Building consistent card layouts\n• Eliminating alignment issues caused by dynamic content\n• Creating cleaner, more maintainable CSS\n• Responsive design with fewer layout hacks\n\n🏷️ Topics in this video\n\nCSS, CSS grid, CSS subgrid, grid-template-rows subgrid, grid-template-columns subgrid, responsive layout, card layout alignment, modern CSS tutorial, CSS tips and tricks, CSS update 2025, frontend development, web design, HTML CSS JavaScript, Coding2GO",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 1103,
+  "transcript_error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
+}

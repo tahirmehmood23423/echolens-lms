@@ -1,0 +1,19 @@
+{
+  "id": "9WIJQDvt4Us",
+  "url": "https://www.youtube.com/watch?v=9WIJQDvt4Us",
+  "checked_at": "2026-09-27T07:00:47.732Z",
+  "title": "Differences Between Var, Let, and Const",
+  "channel": "Web Dev Simplified",
+  "duration_seconds": 517,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "You have probably watched many different tutorials, and you may have noticed that some tutorials use var to declare variables while others use let or even const. It can get confusing quickly on what the differences are between the keywords, so in this video I am going to be explaining everything you need to know about var, let, and const. I will be going over their differences as well as explaining what situations you should use each keyword.\n\nIf you have any suggestions for a JavaScript topic, please let me know in the comments below.\n\nLet vs Const vs Var Article:\nhttps://blog.webdevsimplified.com/2020-01/var-vs-let-vs-const\n\nTwitter:\nhttps://twitter.com/DevSimplified\n\nGitHub:\nhttps://github.com/WebDevSimplified\n\nCodePen:\nhttps://codepen.io/WebDevSimplified\n\n\n#VarVsLet #JavaScript #WebDevelopment",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

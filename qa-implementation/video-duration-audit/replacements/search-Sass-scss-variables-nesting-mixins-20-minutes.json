@@ -1,0 +1,146 @@
+{
+  "query": "Sass scss variables nesting mixins 20 minutes",
+  "checked_at": "2026-09-27T07:00:28.512Z",
+  "results": [
+    {
+      "id": "dGICUpeqzLY",
+      "title": "Part 9 CSS Tutorial | SCSS | SCSS Variables | Nested Rules | Mixins | Extends | Includes in SCSS",
+      "channel": "Trinits Technologies",
+      "duration": "23:09",
+      "description": "Contents:- SCSS:- Variables Nested rules Mixins Extends includes."
+    },
+    {
+      "id": "VcRKZ9ioo6k",
+      "title": "SASS for CSS: Learn SASS the easy way #2 - Variables, Nesting, & Mixins",
+      "channel": "Coding Owls",
+      "duration": "7:44",
+      "description": "Hey! Night Owls!\nI hope you all are doing great.\nIn this second part of the series, We will understand some more features of ..."
+    },
+    {
+      "id": "ZzfMJK5mSvs",
+      "title": "CSS with SCSS - Learn SASS: Variables, Mixins, Imports, Functions (Live Stream)",
+      "channel": "Get __it Done!",
+      "duration": "1:36:47",
+      "description": "Learn SASS with me. People often ask me how I learn things. In this video I'll be figuring out how to use SASS and you'll see that ..."
+    },
+    {
+      "id": "NQA9PdGNIY0",
+      "title": "SASS/SCSS Tutorial #5 - Nesting",
+      "channel": "Omerko",
+      "duration": "3:50",
+      "description": "SASS/SCSS Tutorial is series that will give you knowledge on What is SASS, How to Use it and trough it you will learn each of it's ..."
+    },
+    {
+      "id": "urFkrlRGnDI",
+      "title": "SASS/SCSS in 12 Minutes (Variables, Functions, Mixins, Parent Selector, Nexted Styles)",
+      "channel": "Code, Data and Tech with Alex Merced",
+      "duration": "12:16",
+      "description": "Learn more at AlexMercedCoder.com."
+    },
+    {
+      "id": "_XU9PaUuSyo",
+      "title": "Sass Mixins Tutorial in Hindi / Urdu",
+      "channel": "YOOBABA",
+      "duration": "10:52",
+      "description": "In this tutorial you will learn sass mixins tutorial in Hindi, Urdu.You can learn what is sass mixins and how to pass variables in sass ..."
+    },
+    {
+      "id": "9MMfhBC0SiU",
+      "title": "15 - Sass / Scss | Installation, Variables, Nesting, Import & Partials, Mixin, Extend | Umar Ahmad",
+      "channel": "Umar Ahmad",
+      "duration": "1:21:34",
+      "description": "Sass #Scss #Introduction #Installation #Variables #Nesting #Import #Partials #Import #Mixin #Extend This is the practical session ..."
+    },
+    {
+      "id": "GLC80g8IELY",
+      "title": "Sass & SCSS Tutorial for Beginners - 6 - Mixins",
+      "channel": "thenewboston",
+      "duration": "5:08",
+      "description": "Website - https://thenewboston.net/ Discord - https://discord.gg/vMdcNnGfUx GitHub ..."
+    },
+    {
+      "id": "gSZ-lqqF2BQ",
+      "title": "Mixins and Sass variables - BigCommerce Developer Best Practices Series",
+      "channel": "BC with Kal Wiggins",
+      "duration": "11:11",
+      "description": "Let's talk about colors viarables and Sass mixins! CSS Variables and Sass mixins are each potent on their own. With some ..."
+    },
+    {
+      "id": "Zz6eOVaaelI",
+      "title": "Learn Sass In 20 Minutes | Sass Crash Course",
+      "channel": "developedbyed",
+      "duration": "19:42",
+      "description": "Check out my courses here! https://developedbyed.com In this mini crash course we are going to learn everything about Sass."
+    },
+    {
+      "id": "lNwnmUR-6Wg",
+      "title": "SASS/SCSS Tutorial #6 - Mixins",
+      "channel": "Omerko",
+      "duration": "6:25",
+      "description": "SASS/SCSS Tutorial is series that will give you knowledge on What is SASS, How to Use it and trough it you will learn each of it's ..."
+    },
+    {
+      "id": "JvtjW1rJZS8",
+      "title": "Variables & Mixins | Starting with Sass",
+      "channel": "Jesse Showalter",
+      "duration": "6:36",
+      "description": "This series is all about getting up and running with the basics os Sass. In today's episode, we will be covering Variables and ..."
+    },
+    {
+      "id": "uWPQ-CN7SSI",
+      "title": "Learn Sass In 20 Minutes | Crash Course",
+      "channel": "Vicode Media",
+      "duration": "19:10",
+      "description": "In this course we are going to learn sass in a very easy and fun way. SASS enables us to use things like variables, nested rules, ..."
+    },
+    {
+      "id": "VxseAIO1yeA",
+      "title": "Sass Variables and Nesting  |  Sass Tutorial in Hindi (2019) [#2]",
+      "channel": "UX Trendz",
+      "duration": "19:06",
+      "description": "Subscribe Now: http://bit.ly/2P58fbS Stay updated! In This Video You will Learn about What is Sass Variables and Nesting."
+    },
+    {
+      "id": "sQWanv1IIec",
+      "title": "How to create and use MIXINS in Sass (SCSS)",
+      "channel": "GeekLaunch",
+      "duration": "4:48",
+      "description": "Learn about the basics of mixins in Sass/SCSS. http://geeklaunch.net/ Follow GeekLaunch on Twitter: ..."
+    },
+    {
+      "id": "snTXLeR0mdE",
+      "title": "SASS SCSS Variables - Learn Quick & Easy.",
+      "channel": "maxcodes",
+      "duration": "10:17",
+      "description": "Learn how to use SCSS variables quick & easy in this basic SASS/SCSS video. Build an iOS To Do List App: ..."
+    },
+    {
+      "id": "3wXqwX4nu8I",
+      "title": "SASS Tutorial #5 - Mixins",
+      "channel": "Net Ninja",
+      "duration": "8:01",
+      "description": "Hey gang, in this SASS tutorial, I'll be showing you how we can use mixins to create re-usable chunks of CSS, whose behaviour ..."
+    },
+    {
+      "id": "ZhOHCE2yNtM",
+      "title": "Sass Variables and Mixins",
+      "channel": "Charishma S",
+      "duration": "10:15",
+      "description": "Basics of Sass variables and mixins."
+    },
+    {
+      "id": "gs6Z5SaUJMg",
+      "title": "Sass Tutorial For Beginner | Part-7 | Variable in Sass, Using Mixin, Using Google Fonts",
+      "channel": "Web Dev Lab",
+      "duration": "5:42",
+      "description": "Hello Everyone. I am very happy that you are here. Here I will teach you web development front to back end development."
+    },
+    {
+      "id": "tB-Hvsj3j-w",
+      "title": "How to use SCSS(SASS) | What is scss | learn scss in 20 Minutes",
+      "channel": "ProgrammingWithHT",
+      "duration": "18:56",
+      "description": "SCSS contains all the features of CSS and contains more features that are not present in CSS which makes it a good choice for ..."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "1A6SrPwmGpg",
+  "url": "https://www.youtube.com/watch?v=1A6SrPwmGpg",
+  "checked_at": "2026-09-27T07:01:02.492Z",
+  "title": "You Suck At Accessibility (But You Don't Have To)",
+  "channel": "Web Dev Simplified",
+  "duration_seconds": 803,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "Accessibility is incredibly difficult to get right. There are tons of competing standards, there are not good resources to learn from, and it is incredibly hard to test. All of this combine together to make for a miserable and difficult experience. In this video I will talk about why this is and most importantly give you actionable tips you can follow to easily make your websites more accessible.\n\n\n📚 Materials/References:\n\nMDN Accessibility Docs: https://developer.mozilla.org/en-US/docs/Web/Accessibility\nW3C Full Accessibility Docs: https://www.w3.org/WAI/standards-guidelines/\nW3C Beginner Accessibility Docs: https://www.w3.org/WAI/fundamentals/\n\n\n🌎 Find Me Here:\n\nMy Blog: https://blog.webdevsimplified.com\nMy Courses: https://courses.webdevsimplified.com\nPatreon: https://www.patreon.com/WebDevSimplified\nTwitter: https://twitter.com/DevSimplified\nDiscord: https://discord.gg/7StTjnR\nGitHub: https://github.com/WebDevSimplified\nCodePen: https://codepen.io/WebDevSimplified\n\n\n⏱️ Timestamps:\n\n00:00 - Introduction\n01:19 - Color Accessibility\n03:54 - Visual Hierarchy\n06:10 - Learning Resources\n07:05 - Screen Reader Tips\n\n\n#Accessibility #WDS #WebDevelopment",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

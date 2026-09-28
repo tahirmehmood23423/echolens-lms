@@ -1,0 +1,99 @@
+{
+  "id": "FXUUSfJO_J4",
+  "url": "https://www.youtube.com/watch?v=FXUUSfJO_J4",
+  "checked_at": "2026-09-27T07:01:40.070Z",
+  "title": "Decorators in Python - Advanced Python 13 - Programming Tutorial",
+  "channel": "Patrick Loeber",
+  "duration_seconds": 1284,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "Decorators in Python - Advanced Python 13 - Programming Tutorial\n\nIn this Python Advanced Tutorial, we will be learning about Decorators in Python. A decorator is a function that takes another function and extends the behavior of this function without explicitly modifying it. It's a very powerful tool for advanced programmers. In this tutorial, I show you the concept behind decorators, how you can write your own decorators, the difference between function and class decorators, and some typical use cases.\n\n~~~~~~~~~~~~~~ GREAT PLUGINS FOR YOUR CODE EDITOR ~~~~~~~~~~~~~~\n✅ Write cleaner code with Sourcery: https://sourcery.ai/?utm_source=youtube&utm_campaign=pythonengineer *\n\n📚 Get my FREE NumPy Handbook:\nhttps://www.python-engineer.com/numpybook\n\n📓 Notebooks available on Patreon:\nhttps://www.patreon.com/patrickloeber\n\n⭐  Join Our Discord : https://discord.gg/FHMg9tKFSN\n\nA written Tutorial can be found here:\nhttps://www.python-engineer.com/courses/advancedpython/13-decorators/\n\nYou can find me here:\nWebsite: https://www.python-engineer.com\nTwitter: https://twitter.com/patloeber\nGitHub: https://github.com/patrickloeber\n\n#Python\n\n----------------------------------------------------------------------------------------------------------\n* This is a sponsored link. By clicking on it you will not have any additional costs, instead you will support me and my project. Thank you so much for the support! 🙏",
+  "captions": [
+    {
+      "language": "it",
+      "kind": "asr"
+    },
+    {
+      "language": "id",
+      "kind": "asr"
+    },
+    {
+      "language": "en",
+      "kind": "asr"
+    },
+    {
+      "language": "bn",
+      "kind": "asr"
+    },
+    {
+      "language": "pt-BR",
+      "kind": "asr"
+    },
+    {
+      "language": "pa",
+      "kind": "asr"
+    },
+    {
+      "language": "pl",
+      "kind": "asr"
+    },
+    {
+      "language": "ta",
+      "kind": "asr"
+    },
+    {
+      "language": "te",
+      "kind": "asr"
+    },
+    {
+      "language": "ja",
+      "kind": "asr"
+    },
+    {
+      "language": "de-DE",
+      "kind": "asr"
+    },
+    {
+      "language": "nl-NL",
+      "kind": "asr"
+    },
+    {
+      "language": "ru",
+      "kind": "asr"
+    },
+    {
+      "language": "iw",
+      "kind": "asr"
+    },
+    {
+      "language": "ar",
+      "kind": "asr"
+    },
+    {
+      "language": "fr-FR",
+      "kind": "asr"
+    },
+    {
+      "language": "ko",
+      "kind": "asr"
+    },
+    {
+      "language": "ml",
+      "kind": "asr"
+    },
+    {
+      "language": "es-US",
+      "kind": "asr"
+    },
+    {
+      "language": "hi",
+      "kind": "asr"
+    },
+    {
+      "language": "uk",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

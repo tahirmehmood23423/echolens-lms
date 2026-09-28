@@ -1,0 +1,125 @@
+{
+  "query": "Python lists list comprehensions tutorial",
+  "checked_at": "2026-09-27T07:00:08.333Z",
+  "results": [
+    {
+      "id": "uhvljGKWges",
+      "title": "Lec-62: List Comprehension in Python 🐍 with Execution | Best Python Tutorials for Beginners",
+      "channel": "Gate Smashers",
+      "duration": "5:36",
+      "description": "Learn how to simplify your Python code using List Comprehension! In this video, Varun sir will break down what list ..."
+    },
+    {
+      "id": "iiDDZtzvMC8",
+      "title": "Tutorial 17- Python List Comprehension",
+      "channel": "Krish Naik",
+      "duration": "8:07",
+      "description": "Please join as a member in my channel to get additional benefits like materials in Data Science, live streaming for Members and ..."
+    },
+    {
+      "id": "iOUJDM1-9K0",
+      "title": "Tutorial 20- Become a Pro with Python List Comprehensions With 1 Line Of Code |Krish Naik Hindi",
+      "channel": "Krish Naik Hindi",
+      "duration": "13:50",
+      "description": "List Comprehension is a concise way of creating lists in Python. It is a compact way of generating a new list from an existing list, ..."
+    },
+    {
+      "id": "6bHDQtVfsCM",
+      "title": "Python List Comprehension (Visually Explained) | The Cleanest Way to Code | #Python Course 33",
+      "channel": "Data with Baraa",
+      "duration": "9:44",
+      "description": "Visually explained how Python List Comprehensions simplify loops and make your code cleaner and faster. List Comprehension ..."
+    },
+    {
+      "id": "YlY2g2xrl6Q",
+      "title": "Learn Python LIST COMPREHENSIONS in 10 minutes! 📃",
+      "channel": "Bro Code",
+      "duration": "10:20",
+      "description": "List comprehension = A concise way to create lists in Python # Compact and easier to read than traditional loops # [expression for ..."
+    },
+    {
+      "id": "OYnZETHs-4M",
+      "title": "What is List Comprehension in Python - Elegant way to Create Lists | Tutorial for Beginners",
+      "channel": "WsCube Tech",
+      "duration": "10:44",
+      "description": "In this Python tutorial for noobs, you will learn what is list comprehension in Python and how to use list comprehension in Python."
+    },
+    {
+      "id": "l8mWvDUwOt4",
+      "title": "List Comprehension in Python",
+      "channel": "b001",
+      "duration": "2:01",
+      "description": "Join my Patreon: https://www.patreon.com/b001io Discord: https://discord.gg/jA8SShU8zJ Follow me on Twitter: ..."
+    },
+    {
+      "id": "DUnY6l482Lk",
+      "title": "List Comprehensions - Visually Explained",
+      "channel": "Visually Explained",
+      "duration": "9:02",
+      "description": "... 04:54 - Generate a list from scratch 05:52 - Performance benefits 08:10 - Parallelize your code Python list comprehensions In ..."
+    },
+    {
+      "id": "twxE0dEp3qQ",
+      "title": "10 Python Comprehensions You SHOULD Be Using",
+      "channel": "Tech With Tim",
+      "duration": "21:35",
+      "description": "To learn programming and Python - check out Datacamp! Learn Python - https://datacamp.pxf.io/anvmQo Learn ..."
+    },
+    {
+      "id": "-_L0SHhFMC4",
+      "title": "List Comprehension in Python",
+      "channel": "Neso Academy",
+      "duration": "10:23",
+      "description": "Python Programming: List Comprehension in Python Topics discussed: 1. Introduction to List Comprehension. 2. The Syntex of ..."
+    },
+    {
+      "id": "eF6nK5bSlmg",
+      "title": "Introduction to Lists in Python | Python Tutorial - Day #22",
+      "channel": "CodeWithHarry",
+      "duration": "20:07",
+      "description": "Python is one of the most demanded programming languages in the job market. Surprisingly, it is equally easy to learn and master ..."
+    },
+    {
+      "id": "HmZSlcZASGw",
+      "title": "4 Types of List Comprehensions in Python Explained",
+      "channel": "Indently",
+      "duration": "12:42",
+      "description": "In today's video we're going to be exploring the 4 types of list comprehensions that we have in Python. Technically they're not all ..."
+    },
+    {
+      "id": "Eaz5e6M8tL4",
+      "title": "#5 Python Tutorial for Beginners | List in Python",
+      "channel": "Telusko",
+      "duration": "10:42",
+      "description": "Check out our courses: Agentic AI with Java : Live Cohort : https://go.telusko.com/agentic-ai-with-java-cohort Coupon: ..."
+    },
+    {
+      "id": "SNq4C988FjU",
+      "title": "List Comprehension - BEST Python feature !!! Fast and Efficient",
+      "channel": "Python Simplified",
+      "duration": "14:51",
+      "description": "In this tutorial, we will learn all about list comprehensions and how they can make our Python journey much easier and much ..."
+    },
+    {
+      "id": "AYIZdW-hQSg",
+      "title": "Map and Filter lists with List Comprehensions in Python",
+      "channel": "Coders Bring Change",
+      "duration": "2:14",
+      "description": "A big part of our work as programmers, is to take a list And convert it to a new list. The code for this requires a new list to be ..."
+    },
+    {
+      "id": "8eyj6itxHGY",
+      "title": "List in Python with Examples | Python Tutorial in Hindi 16",
+      "channel": "Rishabh Mishra",
+      "duration": "1:04:07",
+      "description": "List with Examples in Python - 16 ⭐Python Tutorial Playlist: ..."
+    },
+    {
+      "id": "3dt4OGnU5sM",
+      "title": "Python Tutorial: Comprehensions - How they work and why you should be using them",
+      "channel": "Corey Schafer",
+      "duration": "18:29",
+      "description": "Python comprehensions are a very natural and easy way to create lists, dicts, and sets. They are also a great alternative to using ..."
+    }
+  ]
+}

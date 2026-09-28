@@ -1,0 +1,19 @@
+{
+  "id": "2XaeLIu8_8I",
+  "url": "https://www.youtube.com/watch?v=2XaeLIu8_8I",
+  "checked_at": "2026-09-27T07:01:38.666Z",
+  "title": "C++ Rule of 3, 5 & 0 — When to Define Copy, Move & Destructor",
+  "channel": "Logic++",
+  "duration_seconds": 526,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "A complete walkthrough of one of C++'s most important class-design principles — when to define the special member functions and when to let the compiler handle them. We cover all three rules with examples and the compiler-generation rules that catch most developers off guard:\n\n- The 5 special member functions: destructor, copy constructor, copy assignment, move constructor, move assignment\n- Rule of Three — if you define any of {destructor, copy ctor, copy assignment}, you usually need all three\n- Why it matters: shallow copy, double-delete, dangling pointers, memory leaks\n- Rule of Five (C++11) — same idea, extended to move semantics\n- Live example: deep copy for a class holding a raw pointer\n- Rule of Zero — if you don't manage a resource directly, define none of them\n- Compiler-generation rules every interviewer asks about:\n    - Define a destructor → move ctor & move assignment are implicitly deleted\n    - Define a move ctor → copy operations are implicitly deleted\n    - Classes with const, reference, or unique_ptr members → compiler can't auto-generate copy\n- When to use which rule in real-world class design\n\n\nEssential for C++ interview prep and writing safe, modern C++ code.\n\n#cpp #cplusplus #ruleOfThree #cppTutorial #cppInterview\n#ruleOfFive #moveSemantics #oop #programming #coding\n#learnCpp #techInterview #interviewPrep #codingInterview #cpp11",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

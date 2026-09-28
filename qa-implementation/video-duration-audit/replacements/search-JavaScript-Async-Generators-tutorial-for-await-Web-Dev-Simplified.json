@@ -1,0 +1,139 @@
+{
+  "query": "JavaScript Async Generators tutorial for await Web Dev Simplified",
+  "checked_at": "2026-09-28T05:13:57.408Z",
+  "results": [
+    {
+      "id": "V_Kr9OSfDeU",
+      "title": "JavaScript Async Await",
+      "channel": "Web Dev Simplified",
+      "duration": "7:31",
+      "description": "One of the hardest things about writing good JavaScript is dealing with heavily nested asynchronous code. Promises were ..."
+    },
+    {
+      "id": "IJ6EgdiI_wU",
+      "title": "Learn JavaScript Generators In 12 Minutes",
+      "channel": "Web Dev Simplified",
+      "duration": "12:11",
+      "description": "JavaScript Simplified Course: https://javascriptsimplified.com Generator functions in JavaScript are a feature most people think is ..."
+    },
+    {
+      "id": "DHvZLI7Db8E",
+      "title": "JavaScript Promises In 10 Minutes",
+      "channel": "Web Dev Simplified",
+      "duration": "11:31",
+      "description": "Master JS array methods* with my *FREE JS Array Methods Cheat Sheet* - _20+ methods_ ..."
+    },
+    {
+      "id": "d3jXofmQm44",
+      "title": "Lecture 12 : Callbacks, Promises & Async Await | JavaScript Full Course",
+      "channel": "Shradha Khapra",
+      "duration": "1:23:55",
+      "description": "Instagram : https://www.instagram.com/shradhakhapra/ ⭐️ LinkedIn : https://www.linkedin.com/in/shradha-khapra/ Notes ..."
+    },
+    {
+      "id": "9j1dZwFEJ-c",
+      "title": "JavaScript ASYNC/AWAIT is easy! ⏳",
+      "channel": "Bro Code",
+      "duration": "4:39",
+      "description": "javascript #tutorial #programming // Async/Await = Async = makes a function return a promise // Await = makes an async function ..."
+    },
+    {
+      "id": "670f71LTWpM",
+      "title": "Asynchronous JavaScript in ~10 Minutes - Callbacks, Promises, and Async/Await",
+      "channel": "James Q Quick",
+      "duration": "13:55",
+      "description": "The asynchronous nature of JavaScript to understanding the language. You'll find the use of callbacks, promises, and async/await ..."
+    },
+    {
+      "id": "J24rb6_5h9o",
+      "title": "Welcome to Async Generators in JavaScript",
+      "channel": "Andrew Burgess",
+      "duration": "10:53",
+      "description": "In a previous video we looked at iterators and generators in JavaScript but we didn't get to look at the async version of iterators ..."
+    },
+    {
+      "id": "6WclW4ThDUU",
+      "title": "JAVASCRIPT ASYNC AWAIT TUTORIAL - Use an API to make a programming joke generator | What is an API?",
+      "channel": "DThompsonDev",
+      "duration": "18:11",
+      "description": "What is an API? How to use ASYNC AWAIT? Async and Await are amazing ways to fetch an API without using promises! This is a ..."
+    },
+    {
+      "id": "Kpn2ajSa92c",
+      "title": "Asynchronous Vs Synchronous Programming",
+      "channel": "Web Dev Simplified",
+      "duration": "7:34",
+      "description": "Asynchronous code can be incredibly confusing and frustrating for anyone learning programming. In this video I will explain what ..."
+    },
+    {
+      "id": "cuEtnrL9-H0",
+      "title": "Learn Fetch API In 6 Minutes",
+      "channel": "Web Dev Simplified",
+      "duration": "6:35",
+      "description": "Master JS array methods* with my *FREE JS Array Methods Cheat Sheet* - _20+ methods_ ..."
+    },
+    {
+      "id": "obaSQBBWZLk",
+      "title": "Are you bad, good, better or best with Async JS? JS Tutorial: Callbacks, Promises, Generators",
+      "channel": "LearnCode.academy",
+      "duration": "14:05",
+      "description": "The 4 levels of clean JS ASync programming: Javascript programming can get really ugly, really fast...but not if you know how to ..."
+    },
+    {
+      "id": "zgt5oTD3rRc",
+      "title": "Async JavaScript Fundamentals | Chai aur #javascript",
+      "channel": "Chai aur Code",
+      "duration": "19:12",
+      "description": "Visit https://chaicode.com for all related materials, community help, source code, etc.\n#javascript #hindi\nAll code is ..."
+    },
+    {
+      "id": "2pHQdjgSVUk",
+      "title": "Master Asynchronous JavaScript: Callbacks, Promises & Async/Await Made Easy 🚀 | Hindi | Day 21/100",
+      "channel": "Coder's Gyan",
+      "duration": "47:04",
+      "description": "Async JavaScript can be confusing — callbacks, promises, async/await 🤯. In this video, I’ll explain how they work, why we use ..."
+    },
+    {
+      "id": "gRLdHSabW3o",
+      "title": "Async/Await & Fetch API in JavaScript with Examples | Sigma Web Development Course - Tutorial #76",
+      "channel": "CodeWithHarry",
+      "duration": "23:41",
+      "description": "Latest Udemy Web dev Course With Certificate: https://goharry.in/webdev Access the Sigma web development course playlist: ..."
+    },
+    {
+      "id": "6nv3qy3oNkc",
+      "title": "async await | Namaste JavaScript - Season 02 - Ep 04",
+      "channel": "Akshay Saini",
+      "duration": "1:09:21",
+      "description": "Wanna dive deep into React JS with me? Checkout Namaste React - https://namastedev.com/namaste-react/?version=2 Use ..."
+    },
+    {
+      "id": "H9nFFE5_VS4",
+      "title": "Master Async Await Javascript in an easy way",
+      "channel": "Nova Designs",
+      "duration": "5:52",
+      "description": "PDF VERSION (For Kofi Members): https://ko-fi.com/s/5346eef691 Learn the most important concepts of Async Await Javascript in ..."
+    },
+    {
+      "id": "PoRJizFvM7s",
+      "title": "Async JS Crash Course - Callbacks, Promises, Async Await",
+      "channel": "Traversy Media",
+      "duration": "24:31",
+      "description": "In this crash course we will look at asynchronous JavaScript and cover callbacks, promises including promise.all as well as the ..."
+    },
+    {
+      "id": "exBgWAIeIeg",
+      "title": "Asynchronous JavaScript Crash Course",
+      "channel": "Codevolution",
+      "duration": "1:28:03",
+      "description": "Support UPI - https://support.codevolution.dev/ Support PayPal - https://www.paypal.me/Codevolution Github ..."
+    },
+    {
+      "id": "TtnodUZ7xnQ",
+      "title": "JavaScript Async Await 👨🏻‍💻 Tutorial in 1 Minute #shorts",
+      "channel": "ColorCode",
+      "duration": "0:58",
+      "description": "Full video: https://youtu.be/spvYqO_Kp9Q Full playlist here: ..."
+    }
+  ]
+}

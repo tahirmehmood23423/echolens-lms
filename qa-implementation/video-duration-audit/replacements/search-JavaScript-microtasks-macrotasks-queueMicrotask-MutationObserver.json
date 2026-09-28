@@ -1,0 +1,132 @@
+{
+  "query": "JavaScript microtasks macrotasks queueMicrotask MutationObserver",
+  "checked_at": "2026-09-27T07:00:27.453Z",
+  "results": [
+    {
+      "id": "eiC58R16hb8",
+      "title": "JavaScript Visualized - Event Loop, Web APIs, (Micro)task Queue",
+      "channel": "Lydia Hallie",
+      "duration": "12:35",
+      "description": "Learn how the browser event loop, task queue, microtask queue, and Web APIs work together to enable non-blocking, ..."
+    },
+    {
+      "id": "sLfnOl8MFNs",
+      "title": "Javascript Interview Question | Microtask vs Macrotask Queues",
+      "channel": "WeAreTechies",
+      "duration": "2:45",
+      "description": "Microtask Queue is like the Callback Queue, but Microtask Queue has higher priority. All the callback functions coming through ..."
+    },
+    {
+      "id": "fFd8OhrHfIM",
+      "title": "How Javascript Works? - Call Stack, Event Loop and Queues Explained",
+      "channel": "Piyush Garg",
+      "duration": "27:22",
+      "description": "Hey Everyone, In this video, we will explore How JavaScript Works! We'll dive into the Call Stack, Event Loop, and Queues to ..."
+    },
+    {
+      "id": "zyTfNKMY0VM",
+      "title": "Breaking down \"microtasks queue\" in JavaScript",
+      "channel": "xplodivity",
+      "duration": "3:54",
+      "description": "Build 16 Medium/Hard JavaScript projects for live coding Interview rounds Get it now- https://xplodivity.com/courses/16-js-projects ..."
+    },
+    {
+      "id": "xBRSTqBHZUM",
+      "title": "JavaScript Tutorial in Hindi #50 Event Loop | Call Stack, Microtask Queue & Callback Queue",
+      "channel": "Code Step By Step",
+      "duration": "7:01",
+      "description": "Learn one of the most important JavaScript concepts — Event Loop — in this detailed Hindi tutorial. In this video, we cover: What ..."
+    },
+    {
+      "id": "j-z8flppvPs",
+      "title": "Master JavaScript Event Loop in 15 Mins! 🚀 ( Interview Special )",
+      "channel": "Code Compile",
+      "duration": "15:31",
+      "description": "🌀 The Event Loop is responsible for coordinating between the Call Stack and the Callback Queue in JavaScript, ensuring that ..."
+    },
+    {
+      "id": "WJXjwpntThk",
+      "title": "9 JavaScript Runtime/Asynchronous Execution: Event Loop, Microtask, Macrotask, Call Stack, Web API",
+      "channel": "Dr Nitin Naik - Aston University, UK",
+      "duration": "9:32",
+      "description": "JavaScript Runtime Environment and Asynchronous Execution: Event Loop Microtask Macrotask V8 Engine Call Stack Web APIs ..."
+    },
+    {
+      "id": "ddmHIN3_Q2Q",
+      "title": "JavaScript Event Loop Explained: Promises, Microtasks & setTimeout | #DevInRealLife",
+      "channel": "Techly Yours",
+      "duration": "10:13",
+      "description": "Understand the JavaScript Event Loop beyond the basics in this practical deep dive. We’ll break down how synchronous code, the ..."
+    },
+    {
+      "id": "z7Okm7EL-jM",
+      "title": "Microtasks vs Macrotasks in JS Interviewer asked in every Interview.",
+      "channel": "Ria Gupta",
+      "duration": "18:50",
+      "description": "Confused about how JavaScript handles Microtasks and Macrotasks? In this video, I break down the Event Loop and explain ..."
+    },
+    {
+      "id": "M3sbOSJvhxg",
+      "title": "Node.js Tutorials - 43 - Microtask Queues",
+      "channel": "Codevolution",
+      "duration": "14:30",
+      "description": "Syncfusion components: https://syncf.co/3Emhvnv Support UPI - https://support.codevolution.dev/ Support Paypal ..."
+    },
+    {
+      "id": "LecFeWIAQKA",
+      "title": "20.4  Macro tasks, micro tasks, and their queues in Javascript",
+      "channel": "Code Clock",
+      "duration": "3:47",
+      "description": "javascript tutorial javascript for beginners learn javascript for beginners javascript basics javascript course javascript crash course ..."
+    },
+    {
+      "id": "CbyAsXUCwCU",
+      "title": "Javascript Microtasks Vs Macrotasks",
+      "channel": "Sheldons Frontend Show",
+      "duration": "12:53",
+      "description": "microtasks More in to detail about the queue. Job Queue, Task Queue, Event Queue, Promise Queue!?! Call the queues whatever ..."
+    },
+    {
+      "id": "qbGVW612GXg",
+      "title": "Mastering JS Event Loop",
+      "channel": "salman sayyed",
+      "duration": "5:05",
+      "description": "JavaScript Event Loop Explained – Synchronous vs Microtask vs Macrotask Ever wondered why Promise.then() executes before ..."
+    },
+    {
+      "id": "8zKuNo4ay8E",
+      "title": "Asynchronous JavaScript & EVENT LOOP from scratch 🔥 | Namaste JavaScript Ep.15",
+      "channel": "Akshay Saini",
+      "duration": "41:45",
+      "description": "In-depth explanation of Event Loop, Web APIs, MicroTask Callback Queue, and how JavaScript works asynchronously in the web ..."
+    },
+    {
+      "id": "G1eXLiN9eF8",
+      "title": "Microtask | Javascript | One Minute Javascript | 1 Min JS | Quick JS",
+      "channel": "Web Tech Talk ",
+      "duration": "1:39",
+      "description": "Microtask | Javascript | One Minute Javascript | 1 Min JS | Quick JS Understanding the Microtask Queue in JavaScript in 1 Minute!"
+    },
+    {
+      "id": "iSMg9W1CqDU",
+      "title": "Mutation Observer in JavaScript in Hindi | Advanced JavaScript tutorial in Hindi",
+      "channel": "Code Step By Step",
+      "duration": "18:44",
+      "description": "Instagram : code.steps In this javascript tutorial, we learn what is Mutation Observer in JavaScript in Hindi language. Advance ..."
+    },
+    {
+      "id": "vFJbKR6zfCE",
+      "title": "Event Loop in JavaScript | JavaScript Tutorial in Hindi #100",
+      "channel": "CodeWithHarry",
+      "duration": "12:54",
+      "description": "Link to the Repl - https://replit.com/@codewithharry/100eventloop#index.js Join Replit - https://join.replit.com/CodeWithHarry ..."
+    },
+    {
+      "id": "oHa-BRYDqv4",
+      "title": "Microtasks vs Macrotasks in JavaScript 🔬 | Event Loop Explained with Code Examples",
+      "channel": "Coding 4 Dev",
+      "duration": "3:27",
+      "description": "Ever wondered why Promise.then() runs before setTimeout() even with 0ms delay? In this video, we break down Microtasks vs ..."
+    }
+  ]
+}

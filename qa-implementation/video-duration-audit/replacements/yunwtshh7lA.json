@@ -1,0 +1,22 @@
+{
+  "id": "yunwtshh7lA",
+  "url": "https://www.youtube.com/watch?v=yunwtshh7lA",
+  "checked_at": "2026-09-27T07:00:47.305Z",
+  "title": "The JavaScript Console Explained for Absolute Beginners",
+  "channel": "Future Fullstack",
+  "duration_seconds": 459,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "This video introduces the JavaScript console, a built-in tool that gives you access to the Javascript engine - it lets you run code outside of a script and view log messages through console.log for debugging and testing.\n\n00:00 Introduction \n00:21 The Console\n03:14 Printing to the Console\n06:29 The Console Summary Card",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    },
+    {
+      "language": "en-US"
+    }
+  ],
+  "transcript_bytes": 0
+}

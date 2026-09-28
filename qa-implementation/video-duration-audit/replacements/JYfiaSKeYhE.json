@@ -1,0 +1,19 @@
+{
+  "id": "JYfiaSKeYhE",
+  "url": "https://www.youtube.com/watch?v=JYfiaSKeYhE",
+  "checked_at": "2026-09-27T07:01:00.450Z",
+  "title": "CSS Grid Course - The Only Grid Tutorial You'll Ever Need!",
+  "channel": "Coding2GO",
+  "duration_seconds": 1276,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "👉 Check out Miro today – the best visual collaboration tool for devs and teams: http://miro.pxf.io/3JK2ok\n\nLearn how to create responsive websites with this CSS Grid Beginner Course. display: grid; explained in 20 minutes by Coding2GO.\n\n*Learn More with My Courses*\n\n👉 Get My JavaScript Course: https://www.udemy.com/course/javascript-course-coding2go/?referralCode=CF16EB9F6548CB416253\n\n👉 HTML & CSS Complete Course: https://www.udemy.com/course/learn-html-and-css-in-7-days-web-developer-bootcamp/?couponCode=CODING2GO\n\nIn this CSS Grid Crash Course for beginners, you are going to learn about responsive web design by getting CSS Grid explained. How to use display: grid plays a major role in building flexible layouts, aligning elements, and making sure your website looks great on all screen sizes. You’ll learn everything from simple grid structures to more advanced tricks like grid-template-areas, repeat(), and fraction units.\n\n*Timestamps*\n00:00 Grid Basics\n03:42 Responsive Columns & Fractions\n05:05 Alignment (How to center a grid)\n06:32 Implicit Grids (auto-columns, auto-rows, auto-flow)\n08:10 Create Bento Grids with grid-template-areas\n14:10 Grid Stacking & Overlapping Grid-Items\n17:50 Grid Wrapping with repeat(), auto-fit & minmax()\n\n👉 Check out our website for more: https://coding2go.com\n\nKey Concepts:\nCSS Grid Basics: Use display: grid; to create responsive two-dimensional layouts\nGrid Rows and Columns: Learn how to define flexible rows and columns using grid-template-columns and grid-template-rows\nFraction Units (fr): Make your layout adapt to screen size using fluid measurements\nGrid Gap: Add spacing between grid items with gap\nGrid Item Placement: Use grid-column, grid-row, grid-area to position elements\nGrid Template Areas: Name your layout sections for readable, structured designs\nImplicit vs Explicit Grids: Understand how the browser auto-creates rows and columns\nResponsive Design: Use media queries with CSS Grid for fully responsive websites\nLearn about grid stacking and bento grids\nLearn grid wrapping and create responsive grids using repeat auto-fit minmax and fractions\n\nTopics of this video:\nCSS, CSS Grid, display grid, html, css tutorial, responsive web design, css layout, grid layout, grid-template-columns, grid-template-rows, grid-gap, grid-column, grid-row, grid-area, css grid for beginners, beginner tutorial, explained for beginners, beginner friendly, css grid course, css grid crash course, css grid tutorial, how to use css grid, responsive layout, make website responsive\n\nThis video was sponsored by Miro",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

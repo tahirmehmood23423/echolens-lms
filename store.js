@@ -833,6 +833,17 @@ function deadlineFromStart(startDate, week) {
   d.setDate(d.getDate() + (Number(week) || 1) * 7);
   return d.toISOString().slice(0, 10);
 }
+// Shifts a date or datetime-local string ('YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM')
+// by N days, keeping the same time of day. Used to derive the ShipLens task
+// release / submission / results dates from the registration deadline alone.
+function addDaysToDateTime(dt, days) {
+  if (!dt) return null;
+  const iso = String(dt).length === 10 ? `${dt}T00:00` : dt;
+  const d = new Date(iso);
+  if (isNaN(d)) return null;
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 16);
+}
 const LATE_PENALTY = 0.20; // late submissions lose 20% of earned gems
 
 // Tracks where the built-in compiler makes no sense: no-code automation,
@@ -3213,8 +3224,45 @@ const Events = {
     const en = String(ev.ends_at || '').replace('T', ' ');
     if (!ev.open) return 'closed';
     if (st && t < st) return 'upcoming';
+    // A ShipLens series stays "live" through registration, task release and
+    // submission - it only ends once the results-announcement window closes,
+    // otherwise the generic badge would say "Ended" the moment registration
+    // closes, right when the task is about to open.
+    if (ev.series_kind === 'shiplens') {
+      const resultsDue = String(Events.shipLensSchedule(ev).results_due_at || '').replace('T', ' ');
+      return !resultsDue || t <= resultsDue ? 'live' : 'ended';
+    }
     if (!en || t <= en) return 'live';
     return 'ended';
+  },
+  // ShipLens runs on a fixed cadence derived entirely from when registration
+  // closes (ev.ends_at): the task opens the next day, submissions are open
+  // for two weeks after that, and results are due two weeks after submissions
+  // close. Nothing here is stored - pushing back the registration deadline
+  // automatically pushes every later date with it.
+  shipLensSchedule(ev) {
+    const regCloses = ev.ends_at || null;
+    const taskOpensAt = addDaysToDateTime(regCloses, 1);
+    const submissionDeadline = addDaysToDateTime(taskOpensAt, 14);
+    const resultsDueAt = addDaysToDateTime(submissionDeadline, 14);
+    return { reg_opens: ev.starts_at || null, reg_closes: regCloses, task_opens_at: taskOpensAt, submission_deadline: submissionDeadline, results_due_at: resultsDueAt };
+  },
+  shipLensPhase(ev) {
+    const s = Events.shipLensSchedule(ev);
+    const t = new Date().toISOString().slice(0, 16).replace('T', ' ');
+    const at = (v) => String(v || '').replace('T', ' ');
+    if (s.reg_opens && t < at(s.reg_opens)) return 'upcoming';
+    if (!s.reg_closes || t <= at(s.reg_closes)) return 'registration';
+    if (t < at(s.task_opens_at)) return 'pending';
+    if (t <= at(s.submission_deadline)) return 'submission';
+    if (t <= at(s.results_due_at)) return 'grading';
+    return 'closed';
+  },
+  // The exact task brief stays hidden until it "opens" - before that,
+  // everyone (including the team that already picked it) only sees the
+  // title and difficulty they registered under, not the full spec.
+  shipLensProblems(ev, reveal) {
+    return (ev.problems || []).map((p) => reveal ? p : { pid: p.pid, title: p.title, difficulty: p.difficulty, points: p.points, description: null, locked: true });
   },
   decorate(ev) {
     return {
@@ -3223,6 +3271,8 @@ const Events = {
       entries_count: data.event_entries.filter((x) => x.event_id === ev.id).length,
       submissions_count: data.event_submissions.filter((x) => x.event_id === ev.id).length,
       comments_count: data.event_comments.filter((x) => x.event_id === ev.id).length,
+      shiplens_schedule: ev.series_kind === 'shiplens' ? Events.shipLensSchedule(ev) : undefined,
+      shiplens_phase: ev.series_kind === 'shiplens' ? Events.shipLensPhase(ev) : undefined,
     };
   },
   all() { return data.events.slice().sort((a, b) => b.id - a.id).map((e) => Events.decorate(e)); },
@@ -3334,6 +3384,7 @@ const Events = {
     if (st === 'ended' || st === 'closed') return { error: 'Registration is closed for this event.' };
     if (Events.entryFor(ev.id, user.id)) return { error: 'You are already registered for this event.' };
     const isShipLens = ev.series_kind === 'shiplens';
+    if (isShipLens && !['upcoming', 'registration'].includes(Events.shipLensPhase(ev))) return { error: 'Registration is closed for this ShipLens series.' };
     if (ev.entry === 'paid' && !isShipLens && !payment_shot) return { error: 'Upload a screenshot of your payment transaction to register.' };
     let team = null;
     if (isShipLens) {
@@ -3382,16 +3433,21 @@ const Events = {
   submissionFor(eid, uid, pid) {
     return data.event_submissions.find((s) => s.event_id === Number(eid) && s.user_id === Number(uid) && (s.pid || null) === (pid ? Number(pid) : null)) || null;
   },
-  submit({ event_id, user, pid, code, language, output, file_url, file_name, link, github_link, deployment_link, note }) {
+  submit({ event_id, user, pid, code, language, output, file_url, file_name, link, github_link, render_link, vercel_link, note }) {
     const ev = Events.byId(event_id); if (!ev) return { error: 'Event not found.' };
     const st = Events.status(ev);
     if (st !== 'live') return { error: st === 'upcoming' ? 'This event has not started yet.' : 'This event is over - submissions are closed.' };
     const gate = Events.canParticipate(ev, user.id);
     if (!gate.ok) return { error: gate.why };
     if (ev.series_kind === 'shiplens') {
+      const phase = Events.shipLensPhase(ev);
+      if (phase === 'registration' || phase === 'upcoming') return { error: 'Submissions open once registration closes and the task is released.' };
+      if (phase === 'pending') return { error: `The task opens on ${String(Events.shipLensSchedule(ev).task_opens_at || '').replace('T', ' ')}.` };
+      if (phase === 'grading' || phase === 'closed') return { error: 'The submission window for this series has closed.' };
       if (Number(pid) !== gate.entry.challenge_pid) return { error: 'Submit to the challenge your team selected at registration.' };
       if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(?:[/?#].*)?$/i.test(String(github_link || ''))) return { error: 'Add a valid GitHub repository URL.' };
-      if (!/^https:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(String(deployment_link || ''))) return { error: 'Add a live HTTPS deployment URL.' };
+      if (render_link && !/^https:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(String(render_link))) return { error: 'The Render link must be a valid HTTPS URL.' };
+      if (vercel_link && !/^https:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(String(vercel_link))) return { error: 'The Vercel link must be a valid HTTPS URL.' };
     }
     if (pid && !(ev.problems || []).some((p) => p.pid === Number(pid))) return { error: 'Task not found on this event.' };
     if (!code && !file_url && !link && !github_link) return { error: 'Submit code, a file, or a link to your work.' };
@@ -3405,7 +3461,8 @@ const Events = {
       file_url: file_url || null, file_name: file_name || null,
       link: link ? String(link).slice(0, 400) : null,
       github_link: github_link ? String(github_link).slice(0, 400) : null,
-      deployment_link: deployment_link ? String(deployment_link).slice(0, 400) : null,
+      render_link: render_link ? String(render_link).slice(0, 400) : null,
+      vercel_link: vercel_link ? String(vercel_link).slice(0, 400) : null,
       note: note ? String(note).slice(0, 500) : null,
       submitted_at: now(),
     };
@@ -3536,9 +3593,12 @@ const Events = {
   },
   publicView(ev) { // what the open site shows before registering
     const d = Events.decorate(ev);
+    const isShipLens = d.series_kind === 'shiplens';
     return {
       id: d.id, kind: d.kind, title: d.title, description: d.description,
-      series_kind: d.series_kind || null, problems: d.series_kind === 'shiplens' ? d.problems : undefined,
+      series_kind: d.series_kind || null,
+      problems: isShipLens ? Events.shipLensProblems(ev, false) : undefined,
+      shiplens_schedule: d.shiplens_schedule, shiplens_phase: d.shiplens_phase,
       entry: d.entry, fee_pkr: d.fee_pkr, pay_instructions: d.pay_instructions,
       starts_at: d.starts_at, ends_at: d.ends_at, deadline: d.deadline, duration_minutes: d.duration_minutes,
       pass_mark: d.pass_mark, auto_grade: d.auto_grade, auto_certificate: d.auto_certificate,

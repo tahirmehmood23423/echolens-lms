@@ -699,6 +699,8 @@ model EventSubmission {
   link        String?
   githubLink  String?   @map("github_link")
   deploymentLink String? @map("deployment_link")
+  renderLink  String?   @map("render_link")
+  vercelLink  String?   @map("vercel_link")
   note        String?
   submittedAt DateTime  @map("submitted_at")
   aiScore     Int?      @map("ai_score")

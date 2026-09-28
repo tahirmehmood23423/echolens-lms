@@ -1,0 +1,118 @@
+{
+  "query": "CSS fluid typography clamp container queries",
+  "checked_at": "2026-09-27T07:01:18.499Z",
+  "results": [
+    {
+      "id": "q-_cIlttYBc",
+      "title": "Fixing fluid typography",
+      "channel": "Kevin Powell",
+      "duration": "9:48",
+      "description": "Start writing CSS with confidence: ..."
+    },
+    {
+      "id": "mihwZK104r4",
+      "title": "Fluid Responsive Font Size with CSS",
+      "channel": "Daily CSS",
+      "duration": "5:44",
+      "description": "Struggling to make your website's headings and text responsive? In this video, I'll show you a simple yet powerful solution: one ..."
+    },
+    {
+      "id": "pYW3O0AxpI8",
+      "title": "Stop using so many Media Queries - Use clamp() instead!",
+      "channel": "Coding2GO",
+      "duration": "5:17",
+      "description": "In this video, you'll learn how to use the three most powerful CSS functions for modern responsive design: min(), max() and ..."
+    },
+    {
+      "id": "jDEJs9nSfP0",
+      "title": "Perfect Fluid Typography With CQI CSS Unit - No more VW!",
+      "channel": "Web Bae",
+      "duration": "3:32",
+      "description": "CQI and CQW units are so much better for fluid typography than the typical VW units that I see everywhere. All it takes is a little ..."
+    },
+    {
+      "id": "DHj7JhH8ins",
+      "title": "\"Smart\" design patterns with container queries",
+      "channel": "Kevin Powell",
+      "duration": "15:27",
+      "description": "Container queries are more than just a media query that looks at the parent, it also is aware of the font-size of the parent, which ..."
+    },
+    {
+      "id": "Q0fqFfRaOgg",
+      "title": "Learn CSS Clamp in 90 Seconds",
+      "channel": "onjsdev",
+      "duration": "1:36",
+      "description": "Join our channel to access exclusive benefits: https://www.youtube.com/@onjsdev/join In this video, I explained what the CSS ..."
+    },
+    {
+      "id": "rIOIeoX6QNw",
+      "title": "CSS clamp() Function Explained in 5 mins. Complete Tutorial for Beginners",
+      "channel": "IFace",
+      "duration": "5:15",
+      "description": "If you're building your own SaaS, I built a production-ready AI SaaS foundation https://www.saasbymonday.io/ Learn how to ..."
+    },
+    {
+      "id": "erqRw3E-vn4",
+      "title": "Responsive Typography with CSS Clamp",
+      "channel": "Tom Is Loading",
+      "duration": "8:37",
+      "description": "Today we're going to learn how we can use the CSS clamp function to create responsive, fluid typography! Project Links code: ..."
+    },
+    {
+      "id": "fRhETHPJMqw",
+      "title": "Container Queries in CSS🔥The Future of Responsive Design 🚀",
+      "channel": "Thapa Technical",
+      "duration": "11:48",
+      "description": "Welcome to our CSS course update! In this video, we'll explore Container Queries, a game-changer in web design. We'll break ..."
+    },
+    {
+      "id": "CHKUFsnABw4",
+      "title": "CSS Container Queries in 5 minutes",
+      "channel": "Lazar Nikolov",
+      "duration": "5:17",
+      "description": "Container Queries are a powerful tool for defining responsive design in CSS. Unlike Media Queries, which let you apply styles to ..."
+    },
+    {
+      "id": "Wrzmg55fJnk",
+      "title": "The ONLY Fluid Font Typography Calculator you need!",
+      "channel": "Imran Siddiq - Web Squadron",
+      "duration": "12:33",
+      "description": "Major upgrades with the option to select Classes, Tags and Scaling, Resetting Defaults, Real Time Previews, and Line Heights !"
+    },
+    {
+      "id": "t2JzGmqZhYQ",
+      "title": "Min Max Font Size Responsive Fluid Typography | Auto Resize Font | CSS Tricks | Clamp CSS Function",
+      "channel": "WebStylePress",
+      "duration": "13:38",
+      "description": "Fluid typography is adjusting font size fluidly as view port or screen size is changed. You can use only CSS to apply responsive ..."
+    },
+    {
+      "id": "dg488RrpNTc",
+      "title": "Truly Fluid Typography with 1 CSS PROPERTY!",
+      "channel": "DesignCourse",
+      "duration": "7:40",
+      "description": "https://bit.ly/2IPcPgA - Become a frontend developer (50% off limited time!) -- Want to learn UI/UX? https://designcourse.com ..."
+    },
+    {
+      "id": "DGl5Zl586i4",
+      "title": "How to make Fonts Responsive with my Clamp() Calculation Generator - New - Paste in One Go - Fluid",
+      "channel": "Imran Siddiq - Web Squadron",
+      "duration": "6:37",
+      "description": "The Clamp() function is amazing for responsive typography - and there are many online calculators to help you with the formula to ..."
+    },
+    {
+      "id": "P2zoO5Fw2Ks",
+      "title": "How to Create Fluid Typography with CSS Clamp | Responsive Type Scales for Custom Themes",
+      "channel": "VirtualAddiction",
+      "duration": "15:43",
+      "description": "Want your website's text to look great on any screen size—without juggling endless media queries? In this tutorial, we'll walk you ..."
+    },
+    {
+      "id": "wARbgs5Fmuw",
+      "title": "Simple solutions to responsive typography",
+      "channel": "Kevin Powell",
+      "duration": "9:21",
+      "description": "In this one, I look at two simple ways to make maintaining your site's typography much simpler! Links ✓ The codepen: ..."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "eiC58R16hb8",
+  "url": "https://www.youtube.com/watch?v=eiC58R16hb8",
+  "checked_at": "2026-09-27T07:00:50.069Z",
+  "title": "JavaScript Visualized - Event Loop, Web APIs, (Micro)task Queue",
+  "channel": "Lydia Hallie",
+  "duration_seconds": 754,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "Learn how the browser event loop, task queue, microtask queue, and Web APIs work together to enable non-blocking, asynchronous JavaScript. \n\n- https://www.patreon.com/LydiaHallie\n- https://buymeacoffee.com/lydiahallie\n- https://twitter.com/lydiahallie\n- https://www.linkedin.com/in/lydia-hallie/\n- https://instagram.com/theavocoder\n\nTimestamps:\n0:00 Intro\n0:32 Call Stack\n1:18 Single-threaded Problem\n2:01 Web APIs\n2:47 Callback-based APIs\n4:04 Task Queue\n4:39 setTimeout\n6:22 Microtask Queue\n8:40 Promisifying Callbacks\n8:57 Challenge\n10:52 Recap\n11:58 Outro",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

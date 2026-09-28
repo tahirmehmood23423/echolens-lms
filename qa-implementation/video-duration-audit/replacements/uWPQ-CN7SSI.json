@@ -1,0 +1,19 @@
+{
+  "id": "uWPQ-CN7SSI",
+  "url": "https://www.youtube.com/watch?v=uWPQ-CN7SSI",
+  "checked_at": "2026-09-27T07:01:40.100Z",
+  "title": "Learn Sass In 20 Minutes | Crash Course",
+  "channel": "Vicode Media",
+  "duration_seconds": 1150,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "In this course we are going to learn sass in a very easy and fun way. \nSASS enables us to use things like variables, nested rules, inline imports and more. It also helps to keep things organised and allows us to create style sheets faster. Sass is compatible with all versions of CSS.\n\nMicrophone I Use\nZINGYOU Desktop Microphone - https://amzn.to/3kJJq5b (Amazon)\n\nLaptop\nASUS VivoBook 15 Thin & Light Laptop - https://amzn.to/2ZZRtmD (Amazon)",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_error": "The operation was aborted due to timeout"
+}

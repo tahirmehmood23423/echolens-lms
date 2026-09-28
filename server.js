@@ -3310,6 +3310,9 @@ app.get('/api/events', authRequired, (req, res) => {
   const list = visible
     .map((ev) => ({
       ...ev,
+      // Same redaction as the detail endpoint - the list payload must not
+      // leak the exact ShipLens brief to devtools before the task opens.
+      problems: !isAdmin && ev.series_kind === 'shiplens' ? Events.shipLensProblems(ev, ['submission', 'grading', 'closed'].includes(ev.shiplens_phase)) : ev.problems,
       my_entry: Events.entryFor(ev.id, req.user.id),
       my_progress: Events.entryFor(ev.id, req.user.id) ? Events.progressFor(ev, req.user.id) : null,
     }));
@@ -3328,12 +3331,18 @@ app.get('/api/events/:id', authRequired, (req, res) => {
   const mySubs = {};
   if (entry) for (const p of (ev.problems.length ? ev.problems : [{ pid: null }])) {
     const s = Events.submissionFor(ev.id, req.user.id, p.pid);
-    if (s) mySubs[p.pid || 0] = { pid: s.pid, code: s.code, language: s.language, file_name: s.file_name, link: s.link, github_link: s.github_link, deployment_link: s.deployment_link, score: s.score, ai_feedback: s.ai_feedback, graded_by: s.graded_by === 'ai' ? 'ai' : (s.graded_by ? 'admin' : null), submitted_at: s.submitted_at, certified: s.certified };
+    if (s) mySubs[p.pid || 0] = { pid: s.pid, code: s.code, language: s.language, file_name: s.file_name, link: s.link, github_link: s.github_link, render_link: s.render_link, vercel_link: s.vercel_link, score: s.score, ai_feedback: s.ai_feedback, graded_by: s.graded_by === 'ai' ? 'ai' : (s.graded_by ? 'admin' : null), submitted_at: s.submitted_at, certified: s.certified };
   }
   // Meeting links (webinars) only for confirmed participants or staff.
   const showLink = isAdmin || (entry && gate.ok);
+  // The exact ShipLens task brief only opens the day after registration
+  // closes - the admin always sees the full spec, everyone else gets the
+  // redacted (title/difficulty only) version until then.
+  const problemsOut = ev.series_kind === 'shiplens' && !isAdmin
+    ? Events.shipLensProblems(ev, ['submission', 'grading', 'closed'].includes(d.shiplens_phase))
+    : d.problems;
   res.json({
-    event: { ...d, meeting_link: showLink ? d.meeting_link : null },
+    event: { ...d, problems: problemsOut, meeting_link: showLink ? d.meeting_link : null },
     my_entry: entry, can_participate: gate.ok, participate_msg: gate.ok ? null : gate.why,
     my_submissions: mySubs,
     my_progress: entry ? Events.progressFor(ev, req.user.id) : null,
@@ -3364,6 +3373,24 @@ app.patch('/api/admin/events/:id', authRequired, adminRequired, (req, res) => {
   res.json({ ok: true, event: Events.decorate(ev) });
 });
 app.delete('/api/admin/events/:id', authRequired, adminRequired, (req, res) => { Events.remove(req.params.id); res.json({ ok: true }); });
+// A manual "N days left to register" nudge for a ShipLens series - unlike the
+// automatic per-challan fee reminders (admissionsReminders), the admin picks
+// the moment and the step themselves.
+const SHIPLENS_REMINDER_STEPS = { 5: '5 days left', 4: '4 days left', 3: '3 days left', 2: '2 days left', 1: '1 day left', 0: 'Last day' };
+app.post('/api/admin/events/:id/remind', authRequired, adminRequired, (req, res) => {
+  const ev = Events.byId(req.params.id);
+  if (!ev || ev.series_kind !== 'shiplens') return res.status(404).json({ error: 'ShipLens series not found.' });
+  const daysLeft = Number((req.body || {}).days_left);
+  const label = SHIPLENS_REMINDER_STEPS[daysLeft];
+  if (!label) return res.status(400).json({ error: 'Choose a valid reminder step.' });
+  const emails = Leads.emailsFor('all');
+  if (emails.length) {
+    const phrase = daysLeft === 0 ? 'Today is the last day' : `Only ${label} left`;
+    mailer.notify(emails, `${label} to register - ${ev.title}`,
+      `${phrase} to register your team for ${ev.title}.\n\nRegistration closes ${String(ev.ends_at || '').replace('T', ' ')}. Choose your project tier (Basic, Intermediate or Advanced), register a team of one or two, and pay the entry fee to secure your spot.\n\nRegister here: ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
+  }
+  res.json({ ok: true, notified: emails.length });
+});
 // Admin attaches documents (rules PDF, datasets, briefs) to any event.
 app.post('/api/admin/events/:id/files', authRequired, adminRequired, upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Choose a file first.' });
@@ -3405,6 +3432,12 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
       }, { kind: 'challan', reference: c.serial });
       if (delivery.state === 'provider_accepted') Challans.markSent(c.serial);
     } catch (error) { console.error('ShipLens challan delivery failed:', error.message); }
+    // Same automatic fee-reminder cadence (7/4/3/1 days before, due day, then
+    // an extension follow-up) already used for course-registration challans.
+    try { await admissionsReminders.configure(c.serial, true, req.user.id); } catch (error) { console.error('ShipLens reminder setup failed:', error.message); }
+    const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
+    if (admins.length) mailer.notify(admins, `New ShipLens registration - ${ev.title}`,
+      `${req.user.name} (${req.user.email || 'no email'}) registered a team for "${ev.title}".\nChallenge: ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || '-'}\nChallan ${c.serial} for PKR ${c.net_fee} has been emailed to them; Finance confirms it once paid.`);
     return res.json({ ok: true, entry: out.entry, challan: { serial: c.serial, net_fee: c.net_fee, deadline: c.deadline } });
   }
   // Every event / hackathon / competition / webinar registration is reported
@@ -3464,7 +3497,7 @@ app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (r
   const out = Events.submit({
     event_id: ev.id, user: req.user, pid: body.pid || null,
     code: body.code || null, language: body.language || null, output: body.output || null,
-    file_url, file_name, link: body.link || null, github_link: body.github_link || null, deployment_link: body.deployment_link || null, note: body.note || null,
+    file_url, file_name, link: body.link || null, github_link: body.github_link || null, render_link: body.render_link || null, vercel_link: body.vercel_link || null, note: body.note || null,
   });
   if (out.error) return res.status(400).json({ error: out.error });
   let graded = null, cert = null;

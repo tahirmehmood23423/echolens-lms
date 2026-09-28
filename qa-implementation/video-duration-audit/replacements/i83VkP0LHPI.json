@@ -1,0 +1,19 @@
+{
+  "id": "i83VkP0LHPI",
+  "url": "https://www.youtube.com/watch?v=i83VkP0LHPI",
+  "checked_at": "2026-09-27T07:00:46.027Z",
+  "title": "Python Print Values & Variables in Python #2",
+  "channel": "Programiz",
+  "duration_seconds": 708,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "The print() function prints the given object to the standard output device (screen) or to the text stream file. \n🔥 Want to learn Python, the right way? Get my interactive Python course: https://bit.ly/right-python\n\nThis video also covers a concept called variables that allows us to store data so that we can use them later in our program. Here, we will learn to print variables and give good variable names so that our code is easier to understand.\n\n~\nRun Python Online: https://www.programiz.com/python-programming/online-compiler/\nPrograms in this video: https://bit.ly/python-variables-programs\nPython Variables (text-based tutorial): https://www.programiz.com/python-programming/variables-constants-literals\n\nWatch our videos and revise them with our Python App!\nDownload here for Android: https://bit.ly/learn-python-android\nDownload here for iOS: https://bit.ly/learn-python-ios\n\nTimestamps:\n0:00 Start\n0:30 How to print strings?\n1:34 How to print numbers (integers and floating-point numbers)?\n2:55 Variables in Python\n4:29 Change variable values\n6:01 Assigning numeric data to variables\n7:07 Print more than one data in a single print() function\n9:04 How to give good variable names?\n10:27 Recap on what we learned\n\nFind Programiz elsewhere:\nFacebook: https://www.facebook.com/programiz\nInstagram: https://www.instagram.com/_programiz/\nLinkedIn: https://www.linkedin.com/company/programiz/\nWebsite: https://www.programiz.com/\n -------------------------------------------------\n\nPython Print Values & Variables in Python #2\n\n#python #learnprogramming #programiz",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

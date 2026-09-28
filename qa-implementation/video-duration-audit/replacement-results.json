@@ -1,0 +1,536 @@
+{
+  "checked_at": "2026-09-27T11:56:16.089Z",
+  "replaced_lessons": 21,
+  "courses": 7,
+  "new_unique_videos": 24,
+  "retained_under_25_minute_lessons": 7,
+  "current_unique_videos": 138,
+  "current_lesson_video_references": 145,
+  "videos_at_or_above_25_minutes": 0,
+  "verification": "Live YouTube duration and embeddability metadata; title, description and chapter review, plus linked author code where available. App renderer checked for all new links. Full videos were not watched end to end.",
+  "replacements": [
+    {
+      "course": "CS-104: Fundamentals of Python",
+      "track": "cs104-python",
+      "module": 1,
+      "lesson": 1,
+      "lesson_title": "Python Interpreter & print()",
+      "old_url": "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+      "old_duration": "1:00:06",
+      "new_videos": [
+        {
+          "id": "i83VkP0LHPI",
+          "url": "https://www.youtube.com/watch?v=i83VkP0LHPI",
+          "title": "Python Print Values & Variables in Python #2",
+          "channel": "Programiz",
+          "duration_seconds": 708,
+          "duration": "11:48",
+          "checked_at": "2026-09-27T11:55:33.419Z",
+          "playable_in_embed": true
+        },
+        {
+          "id": "ZkyzkWqhQ-I",
+          "url": "https://www.youtube.com/watch?v=ZkyzkWqhQ-I",
+          "title": "PYTHON TUTORIAL: PYTHON SEP AND END",
+          "channel": "Way To Programming",
+          "duration_seconds": 260,
+          "duration": "04:20",
+          "checked_at": "2026-09-27T11:55:33.508Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "16:08",
+      "coverage": "Printing text, numbers and multiple values; companion explicitly covers sep and end used by the assignment."
+    },
+    {
+      "course": "CS-104: Fundamentals of Python",
+      "track": "cs104-python",
+      "module": 1,
+      "lesson": 3,
+      "lesson_title": "User Input with input() & Type Casting",
+      "old_url": "https://www.youtube.com/watch?v=kqtD5dpn9C8&t=548s",
+      "old_duration": "1:00:06",
+      "new_videos": [
+        {
+          "id": "DRBybZ6hsY0",
+          "url": "https://www.youtube.com/watch?v=DRBybZ6hsY0",
+          "title": "How to Take User Input in Python? #3",
+          "channel": "Programiz",
+          "duration_seconds": 522,
+          "duration": "08:42",
+          "checked_at": "2026-09-27T11:55:33.509Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "08:42",
+      "coverage": "Provider chapters cover input(), string input types, and int()/float() conversion."
+    },
+    {
+      "course": "CS-104: Fundamentals of Python",
+      "track": "cs104-python",
+      "module": 3,
+      "lesson": 7,
+      "lesson_title": "Lists & List Comprehensions",
+      "old_url": "https://www.youtube.com/watch?v=W8KRzm-HUcc",
+      "old_duration": "29:04",
+      "new_videos": [
+        {
+          "id": "YlY2g2xrl6Q",
+          "url": "https://www.youtube.com/watch?v=YlY2g2xrl6Q",
+          "title": "Learn Python LIST COMPREHENSIONS in 10 minutes! 📃",
+          "channel": "Bro Code",
+          "duration_seconds": 619,
+          "duration": "10:19",
+          "checked_at": "2026-09-27T11:55:33.510Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "10:19",
+      "coverage": "Provider examples show list comprehensions, squares and the optional filtering condition."
+    },
+    {
+      "course": "CS-104: Fundamentals of Python",
+      "track": "cs104-python",
+      "module": 3,
+      "lesson": 8,
+      "lesson_title": "Tuples & Sets",
+      "old_url": "https://www.youtube.com/watch?v=W8KRzm-HUcc",
+      "old_duration": "29:04",
+      "new_videos": [
+        {
+          "id": "Mf7eFtbVxFM",
+          "url": "https://www.youtube.com/watch?v=Mf7eFtbVxFM",
+          "title": "#6 Python Tutorial for Beginners | Tuple | Set in Python",
+          "channel": "Telusko",
+          "duration_seconds": 400,
+          "duration": "06:40",
+          "checked_at": "2026-09-27T11:55:35.261Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "06:40",
+      "coverage": "Provider lesson outline covers immutable tuples and sets with unique elements, matching duplicate removal."
+    },
+    {
+      "course": "CS-105: Fundamentals of JavaScript",
+      "track": "cs105-javascript",
+      "module": 1,
+      "lesson": 1,
+      "lesson_title": "JS Runtime Engine & console.log()",
+      "old_url": "https://www.youtube.com/watch?v=W6NZfCO5SIk",
+      "old_duration": "48:17",
+      "new_videos": [
+        {
+          "id": "yunwtshh7lA",
+          "url": "https://www.youtube.com/watch?v=yunwtshh7lA",
+          "title": "The JavaScript Console Explained for Absolute Beginners",
+          "channel": "Future Fullstack",
+          "duration_seconds": 459,
+          "duration": "07:39",
+          "checked_at": "2026-09-27T11:55:35.292Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "07:39",
+      "coverage": "Provider introduces the console as access to the JS engine and demonstrates console.log output."
+    },
+    {
+      "course": "CS-105: Fundamentals of JavaScript",
+      "track": "cs105-javascript",
+      "module": 1,
+      "lesson": 2,
+      "lesson_title": "Variable Scoping (let, const, var) & Hoisting",
+      "old_url": "https://www.youtube.com/watch?v=9M4XKi25I2M",
+      "old_duration": "8:54:03",
+      "new_videos": [
+        {
+          "id": "9WIJQDvt4Us",
+          "url": "https://www.youtube.com/watch?v=9WIJQDvt4Us",
+          "title": "Differences Between Var, Let, and Const",
+          "channel": "Web Dev Simplified",
+          "duration_seconds": 517,
+          "duration": "08:37",
+          "checked_at": "2026-09-27T11:55:35.316Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "08:37",
+      "coverage": "Dedicated comparison of var, let and const, scope and hoisting; linked author article provides supporting explanation."
+    },
+    {
+      "course": "CS-105: Fundamentals of JavaScript",
+      "track": "cs105-javascript",
+      "module": 2,
+      "lesson": 5,
+      "lesson_title": "Template Literals & String Methods",
+      "old_url": "https://www.youtube.com/watch?v=9M4XKi25I2M&t=6679s",
+      "old_duration": "8:54:03",
+      "new_videos": [
+        {
+          "id": "J65D347sk2M",
+          "url": "https://www.youtube.com/watch?v=J65D347sk2M",
+          "title": "String in JavaScript || Different Methods Of String of JavaScript | Template Literals",
+          "channel": "Mukesh otwani",
+          "duration_seconds": 1324,
+          "duration": "22:04",
+          "checked_at": "2026-09-27T11:55:35.339Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "22:04",
+      "coverage": "Provider explicitly teaches both string methods and template literals in one lesson."
+    },
+    {
+      "course": "CS-105: Fundamentals of JavaScript",
+      "track": "cs105-javascript",
+      "module": 2,
+      "lesson": 6,
+      "lesson_title": "Iteration (for...of, for...in, while)",
+      "old_url": "https://www.youtube.com/watch?v=9M4XKi25I2M&t=9911s",
+      "old_duration": "8:54:03",
+      "new_videos": [
+        {
+          "id": "Kn06785pkJg",
+          "url": "https://www.youtube.com/watch?v=Kn06785pkJg",
+          "title": "JavaScript Loops Made Easy",
+          "channel": "codeSTACKr",
+          "duration_seconds": 652,
+          "duration": "10:52",
+          "checked_at": "2026-09-27T11:55:36.275Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "10:52",
+      "coverage": "Provider explicitly lists for, for-in, for-of, while and do-while loops."
+    },
+    {
+      "course": "CS-105: Fundamentals of JavaScript",
+      "track": "cs105-javascript",
+      "module": 5,
+      "lesson": 13,
+      "lesson_title": "Event Loop, Callbacks & the Call Stack",
+      "old_url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ",
+      "old_duration": "26:52",
+      "new_videos": [
+        {
+          "id": "eiC58R16hb8",
+          "url": "https://www.youtube.com/watch?v=eiC58R16hb8",
+          "title": "JavaScript Visualized - Event Loop, Web APIs, (Micro)task Queue",
+          "channel": "Lydia Hallie",
+          "duration_seconds": 754,
+          "duration": "12:34",
+          "checked_at": "2026-09-27T11:55:36.499Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "12:34",
+      "coverage": "Chapters cover the call stack, Web APIs, callbacks, task queue and setTimeout execution order."
+    },
+    {
+      "course": "CS-106: Fundamentals of HTML & CSS",
+      "track": "cs106-html-css",
+      "module": 4,
+      "lesson": 10,
+      "lesson_title": "Display & Positioning",
+      "old_url": "https://www.youtube.com/watch?v=fF_NVrd1s14",
+      "old_duration": "28:14",
+      "new_videos": [
+        {
+          "id": "jx5jmI0UlXU",
+          "url": "https://www.youtube.com/watch?v=jx5jmI0UlXU",
+          "title": "Learn CSS Position In 9 Minutes",
+          "channel": "Web Dev Simplified",
+          "duration_seconds": 566,
+          "duration": "09:26",
+          "checked_at": "2026-09-27T11:55:36.610Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "09:26",
+      "coverage": "Provider demonstrates all five position values, document flow and offsets, including sticky positioning."
+    },
+    {
+      "course": "CS-106: Fundamentals of HTML & CSS",
+      "track": "cs106-html-css",
+      "module": 4,
+      "lesson": 11,
+      "lesson_title": "Flexbox Layout",
+      "old_url": "https://www.youtube.com/watch?v=u044iM9xsWU",
+      "old_duration": "34:04",
+      "new_videos": [
+        {
+          "id": "fYq5PXgSsbE",
+          "url": "https://www.youtube.com/watch?v=fYq5PXgSsbE",
+          "title": "Learn Flexbox in 15 Minutes",
+          "channel": "Web Dev Simplified",
+          "duration_seconds": 912,
+          "duration": "15:12",
+          "checked_at": "2026-09-27T11:55:36.832Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "15:12",
+      "coverage": "Dedicated flexbox tutorial with live layout and alignment examples."
+    },
+    {
+      "course": "CS-106: Fundamentals of HTML & CSS",
+      "track": "cs106-html-css",
+      "module": 5,
+      "lesson": 15,
+      "lesson_title": "Building a Complete Responsive Landing Page",
+      "old_url": "https://www.youtube.com/watch?v=X1dz0xRbSJc",
+      "old_duration": "1:15:25",
+      "new_videos": [
+        {
+          "id": "hVdTQWASliE",
+          "url": "https://www.youtube.com/watch?v=hVdTQWASliE",
+          "title": "Easy Fullscreen Landing Page With HTML & CSS",
+          "channel": "Traversy Media",
+          "duration_seconds": 1357,
+          "duration": "22:37",
+          "checked_at": "2026-09-27T11:55:37.383Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "22:37",
+      "coverage": "HTML/CSS landing-page build with fullscreen background and flexbox; author supplies project code."
+    },
+    {
+      "course": "Advanced C++ Programming",
+      "track": "cpp-advanced",
+      "module": 2,
+      "lesson": 6,
+      "lesson_title": "Rule of Three / Five",
+      "old_url": "https://www.youtube.com/watch?v=z3QlnTRLNfw",
+      "old_duration": "45:49",
+      "new_videos": [
+        {
+          "id": "2U1eHurVnXE",
+          "url": "https://www.youtube.com/watch?v=2U1eHurVnXE",
+          "title": "Classes part 10 - Rule of Five - Have fun reducing memory allocations! | Modern Cpp Series Ep. 46",
+          "channel": "Mike Shah",
+          "duration_seconds": 1482,
+          "duration": "24:42",
+          "checked_at": "2026-09-27T11:55:37.699Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "24:42",
+      "coverage": "Rule of Five lesson recaps copying/resource ownership and extends it with move semantics and allocation examples."
+    },
+    {
+      "course": "Advanced Python Programming",
+      "track": "python-advanced",
+      "module": 2,
+      "lesson": 5,
+      "lesson_title": "Function Decorators & functools.wraps",
+      "old_url": "https://www.youtube.com/watch?v=FsAPt_9Bf3U",
+      "old_duration": "30:27",
+      "new_videos": [
+        {
+          "id": "FXUUSfJO_J4",
+          "url": "https://www.youtube.com/watch?v=FXUUSfJO_J4",
+          "title": "Decorators in Python - Advanced Python 13 - Programming Tutorial",
+          "channel": "Patrick Loeber",
+          "duration_seconds": 1284,
+          "duration": "21:24",
+          "checked_at": "2026-09-27T11:55:37.861Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "21:24",
+      "coverage": "Function decorators and wrapping behaviour; author's accompanying written lesson includes functools.wraps."
+    },
+    {
+      "course": "Advanced Python Programming",
+      "track": "python-advanced",
+      "module": 5,
+      "lesson": 15,
+      "lesson_title": "Asynchronous Programming with AsyncIO (async / await)",
+      "old_url": "https://www.youtube.com/watch?v=t5Bo1Je9EmE",
+      "old_duration": "25:57",
+      "new_videos": [
+        {
+          "id": "0GVLtTnebNA",
+          "url": "https://www.youtube.com/watch?v=0GVLtTnebNA",
+          "title": "Learn Python's AsyncIO in 15 minutes",
+          "channel": "Indently",
+          "duration_seconds": 841,
+          "duration": "14:01",
+          "checked_at": "2026-09-27T11:55:37.959Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "14:01",
+      "coverage": "Dedicated asyncio tutorial on asynchronous programming and concurrent coroutines."
+    },
+    {
+      "course": "Advanced JavaScript Programming",
+      "track": "js-advanced",
+      "module": 1,
+      "lesson": 2,
+      "lesson_title": "Function Constructors vs ES6 Classes & #private Fields",
+      "old_url": "https://www.youtube.com/watch?v=2ZphE5HcQPQ",
+      "old_duration": "1:01:29",
+      "new_videos": [
+        {
+          "id": "sFDVXcqMlK8",
+          "url": "https://www.youtube.com/watch?v=sFDVXcqMlK8",
+          "title": "ES6 Classes in JavaScript | JavaScript Classes Private Variables | JavaScript Tutorial",
+          "channel": "SFDC Stop",
+          "duration_seconds": 479,
+          "duration": "07:59",
+          "checked_at": "2026-09-27T11:55:38.295Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "07:59",
+      "coverage": "Author's linked source code demonstrates function constructors, ES6 class syntax and a #color private field."
+    },
+    {
+      "course": "Advanced JavaScript Programming",
+      "track": "js-advanced",
+      "module": 3,
+      "lesson": 7,
+      "lesson_title": "Microtasks vs Macrotasks (queueMicrotask, MutationObserver)",
+      "old_url": "https://www.youtube.com/watch?v=8aGhZQkoFbQ",
+      "old_duration": "26:52",
+      "new_videos": [
+        {
+          "id": "eiC58R16hb8",
+          "url": "https://www.youtube.com/watch?v=eiC58R16hb8",
+          "title": "JavaScript Visualized - Event Loop, Web APIs, (Micro)task Queue",
+          "channel": "Lydia Hallie",
+          "duration_seconds": 754,
+          "duration": "12:34",
+          "checked_at": "2026-09-27T11:55:36.499Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "12:34",
+      "coverage": "Microtask queue chapter at 6:22 follows task queue and setTimeout, explaining scheduling priority."
+    },
+    {
+      "course": "Advanced CSS and Web Development",
+      "track": "web-advanced",
+      "module": 2,
+      "lesson": 5,
+      "lesson_title": "Advanced CSS Grid (areas, subgrid, auto-fit)",
+      "old_url": "https://www.youtube.com/watch?v=UwV4LtO0nHo",
+      "old_duration": "36:22",
+      "new_videos": [
+        {
+          "id": "Br0nQZp2Emk",
+          "url": "https://www.youtube.com/watch?v=Br0nQZp2Emk",
+          "title": "How to use grid-template-areas to build bento grids in CSS",
+          "channel": "Coder Coder",
+          "duration_seconds": 426,
+          "duration": "07:06",
+          "checked_at": "2026-09-27T11:55:38.726Z",
+          "playable_in_embed": true
+        },
+        {
+          "id": "3T0gjtXRNC0",
+          "url": "https://www.youtube.com/watch?v=3T0gjtXRNC0",
+          "title": "Create Responsive CSS Grid Layouts with GRID WRAPPING",
+          "channel": "Coding2GO",
+          "duration_seconds": 374,
+          "duration": "06:14",
+          "checked_at": "2026-09-27T11:55:38.965Z",
+          "playable_in_embed": true
+        },
+        {
+          "id": "APxt2mKOsss",
+          "url": "https://www.youtube.com/watch?v=APxt2mKOsss",
+          "title": "Learn CSS Subgrid for Perfect Alignment",
+          "channel": "Coding2GO",
+          "duration_seconds": 261,
+          "duration": "04:21",
+          "checked_at": "2026-09-27T11:55:39.267Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "17:41",
+      "coverage": "Three focused lessons cover grid-template-areas, repeat/auto-fit/minmax and subgrid respectively; combined runtime stays below 20 minutes."
+    },
+    {
+      "course": "Advanced CSS and Web Development",
+      "track": "web-advanced",
+      "module": 2,
+      "lesson": 6,
+      "lesson_title": "Modern Responsive Layout (clamp, container queries)",
+      "old_url": "https://www.youtube.com/watch?v=2rlWBZ17Wes",
+      "old_duration": "34:32",
+      "new_videos": [
+        {
+          "id": "pYW3O0AxpI8",
+          "url": "https://www.youtube.com/watch?v=pYW3O0AxpI8",
+          "title": "Stop using so many Media Queries - Use clamp() instead!",
+          "channel": "Coding2GO",
+          "duration_seconds": 317,
+          "duration": "05:17",
+          "checked_at": "2026-09-27T11:55:39.733Z",
+          "playable_in_embed": true
+        },
+        {
+          "id": "CHKUFsnABw4",
+          "url": "https://www.youtube.com/watch?v=CHKUFsnABw4",
+          "title": "CSS Container Queries in 5 minutes",
+          "channel": "Lazar Nikolov",
+          "duration_seconds": 317,
+          "duration": "05:17",
+          "checked_at": "2026-09-27T11:55:39.904Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "10:34",
+      "coverage": "Companion lessons cover fluid sizes with min/max/clamp and component container queries; combined runtime stays below 11 minutes."
+    },
+    {
+      "course": "Advanced CSS and Web Development",
+      "track": "web-advanced",
+      "module": 4,
+      "lesson": 10,
+      "lesson_title": "Sass / SCSS (variables, nesting, mixins)",
+      "old_url": "https://www.youtube.com/watch?v=roywYSEPSvc",
+      "old_duration": "46:26",
+      "new_videos": [
+        {
+          "id": "6glgx4EViZQ",
+          "url": "https://www.youtube.com/watch?v=6glgx4EViZQ",
+          "title": "Sass - Tutorial for Beginners in 11 MINUTES ! [ COMPLETE ]",
+          "channel": "Skills Factory",
+          "duration_seconds": 692,
+          "duration": "11:32",
+          "checked_at": "2026-09-27T11:55:40.187Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "11:32",
+      "coverage": "Sass compilation and reusable styling; chapters explicitly cover nesting, mixins, imports and directive inputs."
+    },
+    {
+      "course": "Advanced CSS and Web Development",
+      "track": "web-advanced",
+      "module": 5,
+      "lesson": 13,
+      "lesson_title": "Web Accessibility (a11y)",
+      "old_url": "https://www.youtube.com/watch?v=qr0ujkLLgmE",
+      "old_duration": "30:28",
+      "new_videos": [
+        {
+          "id": "VyWRmepESoQ",
+          "url": "https://www.youtube.com/watch?v=VyWRmepESoQ",
+          "title": "Web Accessibility Tutorial (A11y) - Keyboard Navigation, Aria Tags, Contrast, Semantics and more!",
+          "channel": "RoadsideCoder",
+          "duration_seconds": 1416,
+          "duration": "23:36",
+          "checked_at": "2026-09-27T11:55:40.815Z",
+          "playable_in_embed": true
+        }
+      ],
+      "total_duration": "23:36",
+      "coverage": "Chapters explicitly cover keyboard navigation, tabIndex, contrast, WCAG, semantic HTML and ARIA."
+    }
+  ]
+}

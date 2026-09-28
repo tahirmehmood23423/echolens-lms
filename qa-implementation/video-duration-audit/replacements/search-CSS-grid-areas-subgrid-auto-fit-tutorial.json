@@ -1,0 +1,132 @@
+{
+  "query": "CSS grid areas subgrid auto fit tutorial",
+  "checked_at": "2026-09-27T07:00:27.676Z",
+  "results": [
+    {
+      "id": "hkdc_qBgXDc",
+      "title": "Simple CSS SUBGRID Tricks to Solve Real-Life Layout Challenges",
+      "channel": "Optimistic Web",
+      "duration": "9:40",
+      "description": "Unlock the secret to flawless layouts with CSS Subgrid and transform your designs with the Subgrid Magic! *Take your CSS ..."
+    },
+    {
+      "id": "IIQa9f0REtM",
+      "title": "Easy and more consistent layouts using subgrid",
+      "channel": "Kevin Powell",
+      "duration": "8:01",
+      "description": "Grid is amazing, but it has it's limitations, many of which are solved with subgrid! Subgrid is only currently supported in Firefox, and ..."
+    },
+    {
+      "id": "APxt2mKOsss",
+      "title": "Learn CSS Subgrid for Perfect Alignment",
+      "channel": "Coding2GO",
+      "duration": "4:21",
+      "description": "In this video, you'll learn how CSS Subgrid fixes one of the most annoying layout problems in modern web design. Whenever you ..."
+    },
+    {
+      "id": "CtxCHZAGCFA",
+      "title": "Subgrid: Stress-free, flexible grid layouts",
+      "channel": "Chrome for Developers",
+      "duration": "0:59",
+      "description": "Learn how subgrid is a flexible grid that reduces the need for complex calculations you're used to with nested grids. Resources: ..."
+    },
+    {
+      "id": "1sN0ZD8zzjs",
+      "title": "Learn CSS Grid - #css #frontend #webdevelopment",
+      "channel": "Codecrumbs",
+      "duration": "0:15",
+      "description": ""
+    },
+    {
+      "id": "QAv7TsE18QM",
+      "title": "CSS Grid: Autofit & MinMax | Web Development Tutorials #43",
+      "channel": "CodeWithHarry",
+      "duration": "10:53",
+      "description": "Source Code & Notes: https://archive.codewithharry.com/videos/web-development-in-hindi-43 ▻This video is a part of this ..."
+    },
+    {
+      "id": "VETRVLw7vz8",
+      "title": "Grid: Auto-Fit, MinMax, Template Areas Explained || Episode - 31",
+      "channel": "CodeHelp - by Babbar",
+      "duration": "27:14",
+      "description": "Join DSA Supreme 2.0 Batch: https://www.thecodehelp.in/course/dsa-supreme-2.0\nFind Your Code here: https://www.codehelp.in/yt ..."
+    },
+    {
+      "id": "Br0nQZp2Emk",
+      "title": "How to use grid-template-areas to build bento grids in CSS",
+      "channel": "Coder Coder",
+      "duration": "7:07",
+      "description": "Want to learn how to build a website from scratch? Check out my course: ..."
+    },
+    {
+      "id": "v0o1kV-qfVI",
+      "title": "Learn GRID-AREA to Build Amazing BENTO GRIDS | CSS Tutorial",
+      "channel": "Coding2GO",
+      "duration": "5:56",
+      "description": "Build BENTO GRIDS with grid-template-areas and grid-area with HTML and CSS only. This is a CSS Grid beginner Tutorial ..."
+    },
+    {
+      "id": "zI7xLUE4Sco",
+      "title": "Easy One-line Responsive Layouts with CSS Grid, Auto-fit and MinMax 🔥",
+      "channel": "Deeecode",
+      "duration": "4:47",
+      "description": "Here is a one-line CSS code to help you achieve responsive layouts. This one-line includes css grid, auto-fit and the minmax ..."
+    },
+    {
+      "id": "12t2oPp4oPU",
+      "title": "CSS Subgrid | The Property that fixes nested grid ",
+      "channel": "THE DEV FIX",
+      "duration": "3:25",
+      "description": "CSS Subgrid | Align Nested Grids Tutorial for Beginners Learn how CSS Subgrid works in just 2 minutes! This beginner-friendly ..."
+    },
+    {
+      "id": "qTGbWfEEnKI",
+      "title": "Easily Structure your Layout with CSS Grid's 'grid-template-areas'",
+      "channel": "DesignCourse",
+      "duration": "12:05",
+      "description": "Today's Question: What's your biggest challenge you face as a designer/coder? -- In today's tutorial, I'm going to show you how to ..."
+    },
+    {
+      "id": "HOUMF5qMAbA",
+      "title": "CSS Grid - Unlock the Secrets of AUTO-FILL vs AUTO-FIT",
+      "channel": "Optimistic Web",
+      "duration": "6:33",
+      "description": "Get ready to unlock the secrets of CSS Grid like never before! This CSS tutorial delves deep into the ultimate showdown between ..."
+    },
+    {
+      "id": "oy2iUDT0mf8",
+      "title": "CSS Grid trick that’s worth remembering",
+      "channel": "Kevin Powell",
+      "duration": "0:18",
+      "description": "CSS Grid is great, and being able to stack content without position absolute is fantastic, including being able to use z-index ..."
+    },
+    {
+      "id": "ib4GJ6_sqMw",
+      "title": "Day 12 | Advanced CSS Grid Tutorial | Grid Areas, Auto-fill, Minmax & Alignment | CSS Course 2026",
+      "channel": "Code With Ilyasoft",
+      "duration": "6:38",
+      "description": "Take your CSS Grid skills beyond the basics with this Advanced CSS Grid tutorial covering Grid Areas, Auto-fill, Minmax, and Grid ..."
+    },
+    {
+      "id": "mMP2bZsPHxs",
+      "title": "CSS Grid Layout Tutorial: Automatic row sizes with grid-auto-rows property",
+      "channel": "nexTRIE",
+      "duration": "13:09",
+      "description": "In this CSS Grid layout tutorial, I will teach you how to use the grid-auto-rows property to automatically specify the size of your grid ..."
+    },
+    {
+      "id": "OZ6qKoq7RJU",
+      "title": "The magic of auto-fit and auto-fill (and the difference between them)",
+      "channel": "Kevin Powell",
+      "duration": "14:50",
+      "description": "Grid's auto-fit and auto-fill are super useful, and while the declaration is pretty long, and can seem complicated, it's not so bad ..."
+    },
+    {
+      "id": "83iQbQoEmHM",
+      "title": "Learn CSS Grid-Template-Areas in five minutes | CSS Grid Tutorial | Five Minute Fridays",
+      "channel": "CodeLab",
+      "duration": "3:55",
+      "description": "Hey Guys, Want to learn the coolest CSS Grid property? In this episode of Five-Minute Fridays episode we are going to be ..."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "sFDVXcqMlK8",
+  "url": "https://www.youtube.com/watch?v=sFDVXcqMlK8",
+  "checked_at": "2026-09-27T07:01:00.149Z",
+  "title": "ES6 Classes in JavaScript | JavaScript Classes Private Variables | JavaScript Tutorial",
+  "channel": "SFDC Stop",
+  "duration_seconds": 479,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "Hello Trailblazers, In this video we're going to learn about ES6 Classes in JavaScript. We'll see how we used to define classes in JavaScript before ES6 and how easy is to define a class now using ES6 syntax. We'll also learn about defining private variables in JavaScript Classes.\n\nCode Snippet:- https://gist.github.com/rahulmalhotra/2e697343b0cf999cd0c187da6d910575\n\nSubscribe to SFDC Stop:- https://www.youtube.com/c/sfdcstop?sub_confirmation=1\n\nInterested in learning about LWC ? Have a look at this playlist:- https://www.youtube.com/playlist?list=PLuL63vr-9xHyaEARj8crQe3v2TBQa_Cs8\n\nInterested in learning about Scratch Orgs and SFDX ? Have a look at the playlist:- https://www.youtube.com/playlist?list=PLuL63vr-9xHwW96U64tORGA0HT5j1m0Ff",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

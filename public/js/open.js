@@ -2891,12 +2891,17 @@ function renderEventDetail() {
 
   const shipLensEntry = ev.series_kind === 'shiplens' && d.my_entry
     ? `<div class="task-status ${d.can_participate ? 'ok' : 'wait'}" style="margin-top:12px">Selected project: <strong>${esc((ev.problems || []).find((item) => item.pid === d.my_entry.challenge_pid)?.title || 'Unknown')}</strong> · Team of ${(d.my_entry.team_details || []).length} · ${d.can_participate ? 'Finance confirmed payment' : 'Awaiting Finance confirmation'}<br><a href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download fee challan</a></div>` : '';
+  const fmtDT = (v) => v ? esc(String(v).replace('T', ' ')) : '—';
+  const shipLensSchedule = ev.series_kind === 'shiplens' && ev.shiplens_schedule
+    ? `<div class="evd-banner" style="margin-top:12px"><span>Registration closes ${fmtDT(ev.shiplens_schedule.reg_closes)} · Task opens ${fmtDT(ev.shiplens_schedule.task_opens_at)} · Submit by ${fmtDT(ev.shiplens_schedule.submission_deadline)} · Results by ${fmtDT(ev.shiplens_schedule.results_due_at)}</span></div>` : '';
 
   // problem statement block (shared by Overview + Problem Statement)
   const selector = (ev.problems || []).length > 1
     ? `<div class="evd-chips" style="margin-bottom:12px">${ev.problems.map((x) =>
         `<span class="evd-chip" style="cursor:pointer;${x.pid === CUR_EV_PID ? 'border-color:var(--primary);color:var(--primary)' : ''}" onclick="evSelectProblem(${x.pid})">${esc(x.title)}</span>`).join('')}</div>` : '';
-  const body = p ? esc(p.description || 'No description provided.') : esc(ev.description || 'See the instructions and documents for details.');
+  const body = p
+    ? (p.locked ? `The full brief for <strong>${esc(p.title)}</strong> opens on ${fmtDT(ev.shiplens_schedule?.task_opens_at)}, right after registration closes.` : esc(p.description || 'No description provided.'))
+    : esc(ev.description || 'See the instructions and documents for details.');
   const ioBlock = p && (p.input_spec || p.output_spec) ? `
     <h4>Input</h4><p>${esc(p.input_spec || 'No input is provided.')}</p>
     <h4>Output</h4><p>${esc(p.output_spec || 'No output should be produced.')}</p>` : '';
@@ -2957,7 +2962,7 @@ function renderEventDetail() {
     </div>
     ${banner}
     ${regBtn ? `<div style="margin:12px 0">${regBtn}</div>` : ''}
-    ${statusMsg}${shipLensEntry}
+    ${statusMsg}${shipLensEntry}${shipLensSchedule}
     <h3 style="margin-top:16px">Problem Statement</h3>
     ${problemBlock}
     <h3 style="margin-top:20px">Your Submissions</h3>
@@ -3005,6 +3010,15 @@ function renderEventWorkspace() {
       ${!d.my_entry && ['upcoming', 'live'].includes(ev.status) ? `<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' — PKR ' + ev.fee_pkr : ' — Free'}</button>` : ''}
     </div></div>`;
   }
+  // ShipLens: paid and confirmed, but the task/submission window has its own
+  // clock separate from Finance clearance.
+  if (ev.series_kind === 'shiplens' && ev.shiplens_phase !== 'submission') {
+    const s = ev.shiplens_schedule || {};
+    const msg = ev.shiplens_phase === 'pending' ? `Your task opens on ${esc(String(s.task_opens_at || '').replace('T', ' '))}.`
+      : ev.shiplens_phase === 'grading' ? `Submissions closed on ${esc(String(s.submission_deadline || '').replace('T', ' '))}. Results are due by ${esc(String(s.results_due_at || '').replace('T', ' '))}.`
+      : 'The submission window for this series has closed.';
+    return `<div class="evd-work"><div class="evd-sec"><h3>Workspace</h3><p class="muted">${msg}</p></div></div>`;
+  }
 
   // webinar: join link
   if (ev.kind === 'webinar') {
@@ -3051,7 +3065,8 @@ function renderEventWorkspace() {
       <form id="evFileForm">
         ${ev.series_kind === 'shiplens' ? `
           <label class="field"><span>GitHub repository URL</span><input name="github_link" type="url" required placeholder="https://github.com/you/project" value="${esc(sub?.github_link || '')}"></label>
-          <label class="field"><span>Live deployment URL (Render, GitHub Pages, etc.)</span><input name="deployment_link" type="url" required placeholder="https://your-project.onrender.com" value="${esc(sub?.deployment_link || '')}"></label>` : `
+          <label class="field"><span>Render deployment URL (optional)</span><input name="render_link" type="url" placeholder="https://your-project.onrender.com" value="${esc(sub?.render_link || '')}"></label>
+          <label class="field"><span>Vercel deployment URL (optional)</span><input name="vercel_link" type="url" placeholder="https://your-project.vercel.app" value="${esc(sub?.vercel_link || '')}"></label>` : `
         <label class="field"><span>Your work as a file (any document)</span><input name="file" type="file"></label>
         <label class="field"><span>Or a link to your project</span><input name="link" type="url" placeholder="https://github.com/you/repo"></label>`}
         <button class="ide2-submit btn-block" style="justify-content:center" id="evSubmitBtn">${sub ? 'Resubmit' : 'Submit for Grading'}</button>

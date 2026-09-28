@@ -1,0 +1,22 @@
+{
+  "id": "CHKUFsnABw4",
+  "url": "https://www.youtube.com/watch?v=CHKUFsnABw4",
+  "checked_at": "2026-09-27T07:02:06.037Z",
+  "title": "CSS Container Queries in 5 minutes",
+  "channel": "Lazar Nikolov",
+  "duration_seconds": 317,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "Container Queries are a powerful tool for defining responsive design in CSS. Unlike Media Queries, which let you apply styles to an element based on the viewport size, Container Queries let you apply styles to an element based on its own size. And the best thing is, it’s supported by all modern browsers! Let's learn CSS Container Queries in 5 minutes!\n\nPrefer an article? Read it here: https://creatures.sh/blog/css-container-queries/\n\n🔗 Links:\n👉 CodePen Example: https://codepen.io/nikolovlazar/pen/vYvYRWr\n👉 Browser support: https://caniuse.com/css-container-queries\n👉 Learn more: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_container_queries\n\n--\n\n🤝 Become a friend of the channel! Start your membership today and get extra benefits: https://youtube.com/@nikolovlazar/join\n💬 A bunch of us are hanging out at https://discord.creatures.sh/. Join us!\n🐦 Find me on the bird app: https://twitter.com/NikolovLazar\n🎥 What I use for coding and making videos: https://nikolovlazar.com/uses",
+  "captions": [
+    {
+      "language": "en"
+    },
+    {
+      "language": "hi"
+    }
+  ],
+  "transcript_bytes": 1103,
+  "transcript_error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
+}

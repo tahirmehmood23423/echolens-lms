@@ -1,0 +1,104 @@
+{
+  "query": "C++ rule of five Mike Shah",
+  "checked_at": "2026-09-27T07:01:38.532Z",
+  "results": [
+    {
+      "id": "2U1eHurVnXE",
+      "title": "Classes part 10 - Rule of Five - Have fun reducing memory allocations! | Modern Cpp Series Ep. 46",
+      "channel": "Mike Shah",
+      "duration": "24:43",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "E4MWxaUy3zo",
+      "title": "C++  Tutorial: Rule of 5  [move constructor, move assignment operator]",
+      "channel": "Professor Hank Stalica",
+      "duration": "29:46",
+      "description": "We continue our series on C++11 features you might have forgotten or never learned. Specifically, we will talk about the move ..."
+    },
+    {
+      "id": "2gUqyt5JTtM",
+      "title": "Introduction to std::move in C++ | Modern Cpp Series Ep. 32",
+      "channel": "Mike Shah",
+      "duration": "10:03",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "GVMmSmyZ_IA",
+      "title": "C++ Classes part 1 - Introduction to C++ class | Modern Cpp Series Ep. 37",
+      "channel": "Mike Shah",
+      "duration": "29:09",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "YMYRZ8061V8",
+      "title": "C++ on courses.mshah.io | Modern Cpp Series",
+      "channel": "Mike Shah",
+      "duration": "1:52",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "MGzV5_1lEM8",
+      "title": "Classes part 5 - Avoiding copies(Delete, copy ctor and pass by ref) | Modern Cpp Series Ep. 41",
+      "channel": "Mike Shah",
+      "duration": "12:42",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "2R5cjpi9Fzw",
+      "title": "Learn and understand (almost) everything about the fundamentals of C++ pointers in 96 minutes",
+      "channel": "Mike Shah",
+      "duration": "1:35:57",
+      "description": "Find full courses on: https://courses.mshah.io/ ▻C++ Playlist: ..."
+    },
+    {
+      "id": "EhinJ94emf8",
+      "title": "C++ Classes part 2 - Default Constructor, default destructor, and more! | Modern Cpp Series Ep. 38",
+      "channel": "Mike Shah",
+      "duration": "11:05",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "bvCEqS4S0sg",
+      "title": "Classes part 4 - The Rule of 3 (and the lesser known Law of the Big Two) | Modern Cpp Series Ep. 40",
+      "channel": "Mike Shah",
+      "duration": "12:37",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "nqeQOlqJeCo",
+      "title": "Classes part 15 - Inheritance calling different constructors | Modern Cpp Series Ep. 51",
+      "channel": "Mike Shah",
+      "duration": "11:21",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "RspbK8tfU0Y",
+      "title": "Rule Of Three And Rule Of Five In C++ Programming",
+      "channel": "CppNuts",
+      "duration": "4:57",
+      "description": "JOIN ME ————— YouTube https://www.youtube.com/channel/UCs6sf4iRhhE875T1QjG3wPQ/join Patreon ..."
+    },
+    {
+      "id": "00VUKm39Rew",
+      "title": "Classes part 13 - Introduction to Inheritance  | Modern Cpp Series Ep. 49",
+      "channel": "Mike Shah",
+      "duration": "14:13",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "xxoQKQbZEXY",
+      "title": "C++ Conference Talks - Feed Your YouTube Algorithm more C++ | Modern Cpp Series Ep. 96",
+      "channel": "Mike Shah",
+      "duration": "10:26",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    },
+    {
+      "id": "xtQ9reJhKV4",
+      "title": "Why some people hate C++ Exceptions - C++ Safety part 7 of n | Modern Cpp Series Ep. 240",
+      "channel": "Mike Shah",
+      "duration": "17:23",
+      "description": "Full C++ Series Playlist: https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L ▻Find full courses on: ..."
+    }
+  ]
+}

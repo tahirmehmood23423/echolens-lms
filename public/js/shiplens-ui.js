@@ -11,7 +11,7 @@
         <label class="field"><span>University</span><input name="${prefix}_university" value="${e(values.university || '')}" required maxlength="160"></label>
         <label class="field"><span>Year of study</span><input name="${prefix}_year" value="${e(values.year || '')}" required maxlength="40" placeholder="e.g. 2nd year"></label>
       </fieldset>`;
-    return `<p class="hint">Choose one of the three projects. One challan covers a team of one or two. Finance confirms payment before submissions open.</p>
+    return `<p class="hint">Choose one of the three difficulty levels - the full project brief opens the day after registration closes. One challan covers a team of one or two. Finance confirms payment before submissions open.</p>
       <label class="field"><span>Project challenge</span><select name="challenge_pid" required>
         ${(ev.problems || []).map((p) => `<option value="${p.pid}">${e(p.difficulty)} — ${e(p.title)}</option>`).join('')}
       </select></label>

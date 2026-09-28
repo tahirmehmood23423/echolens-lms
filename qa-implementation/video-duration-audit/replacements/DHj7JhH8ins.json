@@ -1,0 +1,19 @@
+{
+  "id": "DHj7JhH8ins",
+  "url": "https://www.youtube.com/watch?v=DHj7JhH8ins",
+  "checked_at": "2026-09-27T07:01:01.416Z",
+  "title": "\"Smart\" design patterns with container queries",
+  "channel": "Kevin Powell",
+  "duration_seconds": 926,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "Container queries are more than just a media query that looks at the parent, it also is aware of the font-size of the parent, which opens up some interesting possibilities that media queries simply don’t do.\n\n🔗 Links\n✅ I’ve got courses! https://kevinpowell.co/courses?utm_campaign=general&utm_source=youtube&utm_medium=smartcontainerqueries\n✅ My video on the basics of container queries: https://youtu.be/2rlWBZ17Wes\n✅ CSS Nesting: https://youtu.be/YnWPeA6l5UE\n✅ The code from this video: https://codepen.io/kevinpowell/pen/MWdEYoE/cc72a123f738cee9948b56b63cba1ee7\n\n⌚ Timestamps\n00:00 - Introduction\n00:12 - The classic example of container queries: the card\n00:45 - Container queries can do more!\n01:33 - The basics of container queries\n03:20 - Units matter more with container queries\n06:28 - Because units matter, we can make “smart” layouts\n14:30 - Little bonus with :has()\n\n#css\n\n--\n\nCome hang out with other dev's in my Discord Community\n💬 https://discord.gg/nTYCvrK\n\nKeep up to date with everything I'm up to\n✉ https://www.kevinpowell.co/newsletter\n\nCome hang out with me live every Monday on Twitch!\n📺 https://www.twitch.tv/kevinpowellcss\n\n---\n\nHelp support my channel\n👨‍🎓 Get a course: https://www.kevinpowell.co/courses\n👕 Buy a shirt: https://teespring.com/stores/making-the-internet-awesome\n💖 Support me on Patreon: https://www.patreon.com/kevinpowell\n\n---\n\nMy editor: VS Code - https://code.visualstudio.com/\n\n---\n\nI'm on some other places on the internet too!\n\nIf you'd like a behind the scenes and previews of what's coming up on my YouTube channel, make sure to follow me on Instagram and Twitter.\n\nTwitter: https://twitter.com/KevinJPowell\nCodepen: https://codepen.io/kevinpowell/\nGithub: https://github.com/kevin-powell\n\n---\n\nAnd whatever you do, don't forget to keep on making your corner of the internet just a little bit more awesome!",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

@@ -1,0 +1,146 @@
+{
+  "query": "C++ rule of five tutorial example copy assignment English",
+  "checked_at": "2026-09-27T07:01:17.648Z",
+  "results": [
+    {
+      "id": "F-7Rpt2D-zo",
+      "title": "Rule of Three in C++: Overloaded Assignment, Copy Constructor, Destructor",
+      "channel": "ReelLearning",
+      "duration": "8:30",
+      "description": "Concepts Covered: When and why you need to write - Overloaded Assignment, Copy Constructor and Destructor What C++ ..."
+    },
+    {
+      "id": "E4MWxaUy3zo",
+      "title": "C++  Tutorial: Rule of 5  [move constructor, move assignment operator]",
+      "channel": "Professor Hank Stalica",
+      "duration": "29:46",
+      "description": "We continue our series on C++11 features you might have forgotten or never learned. Specifically, we will talk about the move ..."
+    },
+    {
+      "id": "GExV4RPuvU4",
+      "title": "C++ Classes Copy Constructor, Assignment operator and Destructor Part 1",
+      "channel": "Satish Singhal",
+      "duration": "31:05",
+      "description": "This video describes that how all C++ classes are provided default copy constructor, assignment operator, and destructor."
+    },
+    {
+      "id": "l3aZ7Fo8hfg",
+      "title": "C++ Rule of the Big Three/Five: Master Object Lifetime Management",
+      "channel": "leetcode blind 75",
+      "duration": "2:12",
+      "description": "Calling all C++ programmers! Take control of object lifecycles and prevent memory-related pitfalls with this comprehensive guide ..."
+    },
+    {
+      "id": "2XaeLIu8_8I",
+      "title": "C++ Rule of 3, 5 & 0 — When to Define Copy, Move & Destructor",
+      "channel": "Logic++",
+      "duration": "8:46",
+      "description": "A complete walkthrough of one of C++'s most important class-design principles — when to define the special member functions ..."
+    },
+    {
+      "id": "JsaTQiYDBb0",
+      "title": "C++ Classes Rule of Five",
+      "channel": "Satish Singhal",
+      "duration": "32:53",
+      "description": "In C++ classes that have pointer as data members and deep copying and automatic deallocation of memory is required, the rule of ..."
+    },
+    {
+      "id": "xmTY9iRP4mQ",
+      "title": "C++ Rule of 3/5/0",
+      "channel": "Snip Code",
+      "duration": "7:12",
+      "description": ""
+    },
+    {
+      "id": "h64-dQFTvcw",
+      "title": "C++ Beginner Tutorial - Basics - #283 - Copy Assignment Operator #1",
+      "channel": "Mehmet Kont",
+      "duration": "3:42",
+      "description": "Hi, here we start to talk about the CopyAssignmentOperator. Part1. You should research the copy-and-swap idom online or in ..."
+    },
+    {
+      "id": "qAbYTKlP0ew",
+      "title": "C++ : How to actually implement the rule of five?",
+      "channel": "Hey Delphi",
+      "duration": "1:15",
+      "description": "C++ : How to actually implement the rule of five? To Access My Live Chat Page, On Google, Search for \"hows tech developer ..."
+    },
+    {
+      "id": "RspbK8tfU0Y",
+      "title": "Rule Of Three And Rule Of Five In C++ Programming",
+      "channel": "CppNuts",
+      "duration": "4:57",
+      "description": "JOIN ME ————— YouTube https://www.youtube.com/channel/UCs6sf4iRhhE875T1QjG3wPQ/join Patreon ..."
+    },
+    {
+      "id": "6AVJlpdtqs8",
+      "title": "C++ Beginner Tutorial - Basics - #285 - Copy Assignment Operator #3",
+      "channel": "Mehmet Kont",
+      "duration": "6:16",
+      "description": "Hi, here we start to talk about the CopyAssignmentOperator. Part3. You should research the copy-and-swap idom online or in ..."
+    },
+    {
+      "id": "aD6uxHWec-E",
+      "title": "Lec-45: Constructors in OOPs 🙊 C++ with Examples| C++ programming for Beginners",
+      "channel": "Gate Smashers",
+      "duration": "5:24",
+      "description": "In this video, Varun sir will explain what constructors are, why they're essential in object-oriented programming, and how they help ..."
+    },
+    {
+      "id": "ybIr-8MF-Tg",
+      "title": "Understanding Copy Assignment Operator Deletion with the Overloaded + Operator in C++",
+      "channel": "blogize",
+      "duration": "1:39",
+      "description": "Learn why the copy assignment operator gets deleted in C++ when overloading the binary + operator. Understand the mechanics ..."
+    },
+    {
+      "id": "f9xR0FBlCe4",
+      "title": "C++ Beginner Tutorial - Basics - #284 - Copy Assignment Operator #2",
+      "channel": "Mehmet Kont",
+      "duration": "14:19",
+      "description": "Hi, here we start to talk about the CopyAssignmentOperator. Part2. You should research the copy-and-swap idom online or in ..."
+    },
+    {
+      "id": "Gb3NHvCFyz0",
+      "title": "[Eng] copy constructor,assignment operator, the rule of three in C++",
+      "channel": "MW2026",
+      "duration": "9:49",
+      "description": "The rule of three if your class needs one of copy constructor or assignment operator or destructor be defined explicitly then it's ..."
+    },
+    {
+      "id": "6wVG4OJxvww",
+      "title": "Programming example: Copy assignment operator",
+      "channel": "Zyante ProgInCpp",
+      "duration": "5:30",
+      "description": "This video demonstrates the copy assignment operator, including errors made along the way."
+    },
+    {
+      "id": "7K3M6jwWm9I",
+      "title": "Lecture: Copy Assignment Operator in C++ || Advanced Object-Oriented Programming Series",
+      "channel": "Karan IITgn",
+      "duration": "6:11",
+      "description": "You can connect:\nInstagram: https://instagram.com/lodhi_rajput_karan\nLinkedin: https://www.linkedin.com/in/karan-lodhi-rajput ..."
+    },
+    {
+      "id": "RMTUX3Er0kQ",
+      "title": "C++ basics: Deep Copy Assignment Operator",
+      "channel": "Jeevan Pant",
+      "duration": "23:33",
+      "description": "Timeline 00:00 – Introduction 00:51 – Starter code overview 02:35 – Implementing the copy assignment operator 13:37 ..."
+    },
+    {
+      "id": "pKKXGxEapaU",
+      "title": "Difference between copy constructor and assignment operator in C++ (OOP tutorial for beginners)",
+      "channel": "CodeBeauty",
+      "duration": "46:23",
+      "description": "In this programming tutorial, we will learn the difference between an assignment operator and a copy constructor in C++. I'll teach ..."
+    },
+    {
+      "id": "DcKU7QTkN34",
+      "title": "Programming Interview: functions C++ generates automatically (constructor, copy, assignment)",
+      "channel": "saurabhschool",
+      "duration": "9:00",
+      "description": "This video lecture is produced by S. Saurabh. He is B.Tech from IIT and MS from USA. What are the functions that c++ generates ..."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+[
+  {"track":"cs104-python","lesson":1,"ids":["i83VkP0LHPI","ZkyzkWqhQ-I"],"coverage":"Printing text, numbers and multiple values; companion explicitly covers sep and end used by the assignment."},
+  {"track":"cs104-python","lesson":3,"ids":["DRBybZ6hsY0"],"coverage":"Provider chapters cover input(), string input types, and int()/float() conversion."},
+  {"track":"cs104-python","lesson":7,"ids":["YlY2g2xrl6Q"],"coverage":"Provider examples show list comprehensions, squares and the optional filtering condition."},
+  {"track":"cs104-python","lesson":8,"ids":["Mf7eFtbVxFM"],"coverage":"Provider lesson outline covers immutable tuples and sets with unique elements, matching duplicate removal."},
+  {"track":"cs105-javascript","lesson":1,"ids":["yunwtshh7lA"],"coverage":"Provider introduces the console as access to the JS engine and demonstrates console.log output."},
+  {"track":"cs105-javascript","lesson":2,"ids":["9WIJQDvt4Us"],"coverage":"Dedicated comparison of var, let and const, scope and hoisting; linked author article provides supporting explanation."},
+  {"track":"cs105-javascript","lesson":5,"ids":["J65D347sk2M"],"coverage":"Provider explicitly teaches both string methods and template literals in one lesson."},
+  {"track":"cs105-javascript","lesson":6,"ids":["Kn06785pkJg"],"coverage":"Provider explicitly lists for, for-in, for-of, while and do-while loops."},
+  {"track":"cs105-javascript","lesson":13,"ids":["eiC58R16hb8"],"coverage":"Chapters cover the call stack, Web APIs, callbacks, task queue and setTimeout execution order."},
+  {"track":"cs106-html-css","lesson":10,"ids":["jx5jmI0UlXU"],"coverage":"Provider demonstrates all five position values, document flow and offsets, including sticky positioning."},
+  {"track":"cs106-html-css","lesson":11,"ids":["fYq5PXgSsbE"],"coverage":"Dedicated flexbox tutorial with live layout and alignment examples."},
+  {"track":"cs106-html-css","lesson":15,"ids":["hVdTQWASliE"],"coverage":"HTML/CSS landing-page build with fullscreen background and flexbox; author supplies project code."},
+  {"track":"cpp-advanced","lesson":6,"ids":["2U1eHurVnXE"],"coverage":"Rule of Five lesson recaps copying/resource ownership and extends it with move semantics and allocation examples."},
+  {"track":"python-advanced","lesson":5,"ids":["FXUUSfJO_J4"],"coverage":"Function decorators and wrapping behaviour; author's accompanying written lesson includes functools.wraps."},
+  {"track":"python-advanced","lesson":15,"ids":["0GVLtTnebNA"],"coverage":"Dedicated asyncio tutorial on asynchronous programming and concurrent coroutines."},
+  {"track":"js-advanced","lesson":2,"ids":["sFDVXcqMlK8"],"coverage":"Author's linked source code demonstrates function constructors, ES6 class syntax and a #color private field."},
+  {"track":"js-advanced","lesson":7,"ids":["eiC58R16hb8"],"coverage":"Microtask queue chapter at 6:22 follows task queue and setTimeout, explaining scheduling priority."},
+  {"track":"web-advanced","lesson":5,"ids":["Br0nQZp2Emk","3T0gjtXRNC0","APxt2mKOsss"],"coverage":"Three focused lessons cover grid-template-areas, repeat/auto-fit/minmax and subgrid respectively; combined runtime stays below 20 minutes."},
+  {"track":"web-advanced","lesson":6,"ids":["pYW3O0AxpI8","CHKUFsnABw4"],"coverage":"Companion lessons cover fluid sizes with min/max/clamp and component container queries; combined runtime stays below 11 minutes."},
+  {"track":"web-advanced","lesson":10,"ids":["6glgx4EViZQ"],"coverage":"Sass compilation and reusable styling; chapters explicitly cover nesting, mixins, imports and directive inputs."},
+  {"track":"web-advanced","lesson":13,"ids":["VyWRmepESoQ"],"coverage":"Chapters explicitly cover keyboard navigation, tabIndex, contrast, WCAG, semantic HTML and ARIA."}
+]

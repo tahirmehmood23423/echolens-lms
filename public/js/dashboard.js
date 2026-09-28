@@ -4701,7 +4701,7 @@ async function renderHackathons() {
     <div class="card"><div class="card-head"><h3>ShipLens series</h3></div><div class="card-body tight">
       ${series.length ? series.map((ev) => `<div class="list-row">
         <div class="when">${evStatusBadge(ev.status)}<small>${esc(String(ev.starts_at || '').replace('T', ' '))} → ${esc(String(ev.ends_at || '').replace('T', ' '))}</small></div>
-        <div class="grow"><div class="t">${esc(ev.title)} · PKR ${Number(ev.fee_pkr).toLocaleString()}</div>
+        <div class="grow"><div class="t">${esc(ev.title)} · PKR ${Number(ev.fee_pkr).toLocaleString()} · <span class="s" style="color:var(--muted)">${esc(ev.shiplens_phase || '')}</span></div>
           <div class="s">${(ev.problems || []).map((p) => `${esc(p.difficulty)}: ${esc(p.title)}`).join(' · ')} · ${ev.entries_count} team${ev.entries_count === 1 ? '' : 's'}</div>
           ${ev.my_entry ? `<div class="s" style="color:var(--ok)">${ev.my_entry.payment_status === 'confirmed' ? 'Enrolled' : 'Challan issued · awaiting Finance confirmation'}</div>` : ''}</div>
         <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
@@ -6481,8 +6481,8 @@ function formEvent(seriesKind = null) {
       <div class="form-grid">
         <label class="field"><span>Entry</span><select name="entry" onchange="$('evPaid').style.display=this.value==='paid'?'':'none'">
           <option value="free">Free</option><option value="paid">Paid</option></select></label>
-        <label class="field ev-timed"><span>Starts</span><input name="starts_at" type="datetime-local"></label>
-        <label class="field ev-timed"><span>Ends</span><input name="ends_at" type="datetime-local"></label>
+        <label class="field ev-timed"><span id="evStartsLabel">Starts</span><input name="starts_at" type="datetime-local"></label>
+        <label class="field ev-timed"><span id="evEndsLabel">Ends</span><input name="ends_at" type="datetime-local"></label>
         <label class="field ev-quest"><span>Time to solve (minutes)</span><input name="duration_minutes" type="number" min="0" max="600" value="90" title="Open quests should be solvable in 60-90 minutes"></label>
         <label class="field"><span>Deadline (optional)</span><input name="deadline" type="date" title="Registration and submissions close at the end of this date - leave blank for no deadline"></label>
       </div>
@@ -6532,6 +6532,13 @@ function formEvent(seriesKind = null) {
     f.elements.auto_grade.checked = false; f.elements.auto_certificate.checked = true;
     $('evPaid').style.display = '';
     f.elements.starts_at.required = true; f.elements.ends_at.required = true; f.elements.fee_pkr.required = true;
+    f.elements.notify.value = 'all';
+    $('evStartsLabel').textContent = 'Registration opens';
+    $('evEndsLabel').textContent = 'Registration closes';
+    const hint = document.createElement('p');
+    hint.className = 'hint'; hint.style.margin = '-6px 0 12px';
+    hint.textContent = 'The task opens automatically the day after registration closes, submissions stay open for 2 weeks after that, and results are due 2 weeks after submissions close.';
+    f.elements.ends_at.closest('.form-grid').insertAdjacentElement('afterend', hint);
     evKindChanged('competition');
     for (const [index, label] of ['Basic', 'Intermediate', 'Advanced'].entries()) {
       evAddProb();
@@ -6623,10 +6630,14 @@ async function openEvent(id) {
       <span class="kbadge ${esc(ev.kind)}">${ev.series_kind === 'shiplens' ? 'ShipLens' : EV_KIND_LABEL[ev.kind] || ev.kind}</span> ${evStatusBadge(ev.status)}
       <span class="s" style="color:var(--muted)">${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) + ' &rarr; ' + esc(String(ev.ends_at || '').replace('T', ' ')) : ev.duration_minutes ? '~' + ev.duration_minutes + ' minutes' : ''} &middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; Pass mark ${ev.pass_mark}%${ev.auto_grade ? ' &middot; Graded instantly' : ''}${ev.auto_certificate ? ' &middot; auto certificate' : ''}</span></div>
     ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
-    ${ev.series_kind === 'shiplens' ? `<div class="pub-sec">Choose one project level</div>${probs.map((p) => `<div class="ev-problem"><strong>${esc(p.difficulty)}: ${esc(p.title)}</strong><div class="s" style="white-space:pre-line;margin-top:5px">${esc(p.description)}</div></div>`).join('')}${d.my_entry ? `<div class="task-status ${d.can_participate ? 'ok' : 'wait'}">Selected: ${esc(probs.find((p) => p.pid === d.my_entry.challenge_pid)?.title || 'Unknown')} · Team of ${(d.my_entry.team_details || []).length} · ${d.can_participate ? 'Enrolled' : 'Awaiting Finance payment confirmation'} · <a href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download challan</a></div>` : ''}` : ''}
+    ${ev.series_kind === 'shiplens' ? `<div class="pub-sec">Choose one project level</div>${probs.map((p) => `<div class="ev-problem"><strong>${esc(p.difficulty)}: ${esc(p.title)}</strong><div class="s" style="white-space:pre-line;margin-top:5px">${p.locked ? `Full brief opens on ${esc(String(ev.shiplens_schedule?.task_opens_at || '').replace('T', ' '))}.` : esc(p.description)}</div></div>`).join('')}${d.my_entry ? `<div class="task-status ${d.can_participate ? 'ok' : 'wait'}">Selected: ${esc(probs.find((p) => p.pid === d.my_entry.challenge_pid)?.title || 'Unknown')} · Team of ${(d.my_entry.team_details || []).length} · ${d.can_participate ? 'Enrolled' : 'Awaiting Finance payment confirmation'} · <a href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download challan</a></div>` : ''}${ev.shiplens_schedule ? `<div class="s" style="color:var(--muted);margin-top:8px">Registration closes ${esc(String(ev.shiplens_schedule.reg_closes || '').replace('T', ' '))} &middot; Task opens ${esc(String(ev.shiplens_schedule.task_opens_at || '').replace('T', ' '))} &middot; Submit by ${esc(String(ev.shiplens_schedule.submission_deadline || '').replace('T', ' '))} &middot; Results by ${esc(String(ev.shiplens_schedule.results_due_at || '').replace('T', ' '))}</div>` : ''}` : ''}
     ${filesHtml}
     ${regBtn}${gateMsg}${passedMsg}${webinarHtml}
-    ${d.can_participate && probs.length ? `
+    ${d.can_participate && ev.series_kind === 'shiplens' && ev.shiplens_phase !== 'submission' ? `
+      <div class="task-status wait">${ev.shiplens_phase === 'pending' ? `Your task opens on ${esc(String(ev.shiplens_schedule.task_opens_at || '').replace('T', ' '))}.`
+        : ev.shiplens_phase === 'grading' ? `Submissions closed. Results are due by ${esc(String(ev.shiplens_schedule.results_due_at || '').replace('T', ' '))}.`
+        : 'The submission window for this series has closed.'}</div>` : ''}
+    ${d.can_participate && probs.length && (ev.series_kind !== 'shiplens' || ev.shiplens_phase === 'submission') ? `
       <div class="pub-sec">Tasks</div>
       ${probs.filter((p) => ev.series_kind !== 'shiplens' || p.pid === d.my_entry?.challenge_pid).map((p) => {
         const s = d.my_submissions[p.pid];
@@ -6665,7 +6676,8 @@ function eventSubmitFormHtml(ev, pid, sub) {
     <form class="evSubForm" data-pid="${pid || ''}">
       ${ev.series_kind === 'shiplens' ? `
         <label class="field"><span>GitHub repository URL</span><input name="github_link" type="url" required placeholder="https://github.com/you/project" value="${esc(sub?.github_link || '')}"></label>
-        <label class="field"><span>Live deployment URL (Render, GitHub Pages, etc.)</span><input name="deployment_link" type="url" required placeholder="https://your-project.onrender.com" value="${esc(sub?.deployment_link || '')}"></label>` : `
+        <label class="field"><span>Render deployment URL (optional)</span><input name="render_link" type="url" placeholder="https://your-project.onrender.com" value="${esc(sub?.render_link || '')}"></label>
+        <label class="field"><span>Vercel deployment URL (optional)</span><input name="vercel_link" type="url" placeholder="https://your-project.vercel.app" value="${esc(sub?.vercel_link || '')}"></label>` : `
       ${hasCompiler ? '' : `<label class="field"><span>Your work as a file (any document - PDF, Word, notebook, zip...)</span><input name="file" type="file"></label>`}
       <label class="field"><span>Link to your project (optional${hasCompiler ? '' : ' if a file is attached'})</span><input name="link" type="url" placeholder="https://github.com/you/repo"></label>`}
       <label class="field"><span>Note (optional)</span><input name="note" maxlength="500"></label>
@@ -6787,6 +6799,14 @@ function formEventRegister(eid) {
 function adminEventPanel(d) {
   const ev = d.event;
   return `
+    ${ev.series_kind === 'shiplens' ? `
+    <div class="pub-sec">Schedule</div>
+    <div class="s" style="color:var(--muted);margin-bottom:10px">Registration closes ${esc(String(ev.shiplens_schedule?.reg_closes || '').replace('T', ' '))} &middot; Task opens ${esc(String(ev.shiplens_schedule?.task_opens_at || '').replace('T', ' '))} &middot; Submit by ${esc(String(ev.shiplens_schedule?.submission_deadline || '').replace('T', ' '))} &middot; Results by ${esc(String(ev.shiplens_schedule?.results_due_at || '').replace('T', ' '))} &middot; Phase: <strong>${esc(ev.shiplens_phase || '')}</strong></div>
+    <div class="pub-sec">Remind teams to register</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      ${[[5, '5 days left'], [4, '4 days left'], [3, '3 days left'], [2, '2 days left'], [1, '1 day left'], [0, 'Last day']].map(([days, label]) =>
+        `<button class="btn btn-ghost btn-sm" onclick="shipLensRemind(${ev.id},${days})">${label}</button>`).join('')}
+    </div>` : ''}
     <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}</div>
     <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
       ${(d.entries || []).map((e) => `
@@ -6814,7 +6834,8 @@ function adminEventPanel(d) {
             ${s.file_url ? `<a class="s" href="${esc(s.file_url)}" target="_blank" rel="noopener">${esc(s.file_name || 'File')}</a> ` : ''}
             ${s.link ? `<a class="s" href="${esc(s.link)}" target="_blank" rel="noopener">Project link</a>` : ''}
             ${s.github_link ? `<a class="s" href="${esc(s.github_link)}" target="_blank" rel="noopener">GitHub repository</a> ` : ''}
-            ${s.deployment_link ? `<a class="s" href="${esc(s.deployment_link)}" target="_blank" rel="noopener">Live deployment</a>` : ''}
+            ${s.render_link ? `<a class="s" href="${esc(s.render_link)}" target="_blank" rel="noopener">Render deployment</a> ` : ''}
+            ${s.vercel_link ? `<a class="s" href="${esc(s.vercel_link)}" target="_blank" rel="noopener">Vercel deployment</a>` : ''}
           </div>
           <button class="btn btn-ghost btn-sm" onclick="evScore(${s.id},${ev.id})">Score</button>
         </div>`).join('') || '<div class="empty">No submissions yet.</div>'}
@@ -6833,6 +6854,10 @@ function wireAdminEventPanel(d) {
     try { await api(`/api/admin/events/${d.event.id}/files`, { method: 'POST', body: new FormData(fu) }); toast('Attached.'); openEvent(d.event.id); }
     catch (err) { toast(err.message, true); btn.disabled = false; }
   });
+}
+async function shipLensRemind(eid, daysLeft) {
+  try { const out = await api(`/api/admin/events/${eid}/remind`, { method: 'POST', body: JSON.stringify({ days_left: daysLeft }) }); toast(`Reminder sent to ${out.notified} people.`); }
+  catch (e) { toast(e.message, true); }
 }
 async function evPay(entryId, eid, confirm) {
   try { await api(`/api/admin/event-entries/${entryId}/payment`, { method: 'POST', body: JSON.stringify({ confirm }) }); toast(confirm ? 'Payment confirmed - the participant was emailed.' : 'Payment rejected - the participant was emailed.'); openEvent(eid); }

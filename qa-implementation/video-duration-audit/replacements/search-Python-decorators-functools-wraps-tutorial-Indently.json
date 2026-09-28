@@ -1,0 +1,146 @@
+{
+  "query": "Python decorators functools wraps tutorial Indently",
+  "checked_at": "2026-09-27T07:00:26.194Z",
+  "results": [
+    {
+      "id": "DEKUHEgzAY0",
+      "title": "Every Decorator in Python Needs THIS: @wraps",
+      "channel": "Indently",
+      "duration": "6:46",
+      "description": "In today's video we're going to be learning why @wraps is a crucial part of creating decorators in Python. ▷ Become job-ready ..."
+    },
+    {
+      "id": "7Y59Oh3Sa38",
+      "title": "Python decorators explained in under 60 seconds #learnpython #python #pythonprogramming",
+      "channel": "Indently",
+      "duration": "0:55",
+      "description": "Python decorators explained in under 60 seconds. #Sponsored by Zed."
+    },
+    {
+      "id": "pS38GFwhPTY",
+      "title": "What is functools.wraps in Python 🐍",
+      "channel": "Rodrigo 🐍🚀",
+      "duration": "3:06",
+      "description": "This video was inspired by what I post on Twitter, so you can follow me at https://twitter.com/mathsppblog! If you want to learn more ..."
+    },
+    {
+      "id": "OKBnTXk5nFQ",
+      "title": "How To Make A Simple Function Decorator (Python Recipes)",
+      "channel": "Indently",
+      "duration": "6:14",
+      "description": "In this video I will be showing you how you can create a simple function decorator in Python! Decorators are some of Python's best ..."
+    },
+    {
+      "id": "-MHrG5Ep6yg",
+      "title": "HOW TO USE DECORATORS IN PYTHON 2022 (THE RIGHT WAY)",
+      "channel": "Indently",
+      "duration": "6:42",
+      "description": "In this video I will be showing you how you can use decorators in Python which can help make your code cleaner, and much ..."
+    },
+    {
+      "id": "rbEqoOIvFko",
+      "title": "functools.wraps for classes (intermediate) anthony explains #478",
+      "channel": "anthonywritescode",
+      "duration": "2:53",
+      "description": "functools.wraps is a best practice for writing decorators for functions -- but how do you use it for classes? - what is a decorator: ..."
+    },
+    {
+      "id": "qe6fcqTAevY",
+      "title": "Master Python Decorators & functools.wraps | Python Tutorial #40",
+      "channel": "Python to Job",
+      "duration": "1:36",
+      "description": "Master Python's most elegant metaprogramming tool: inner wrapper functions, timing execution, preserving docstrings and ..."
+    },
+    {
+      "id": "U-G-mSd4KAE",
+      "title": "Learn Python DECORATORS in 7 minutes! 🎊",
+      "channel": "Bro Code",
+      "duration": "7:22",
+      "description": "Decorator = A function that extends the behavior of another function # w/o modifying the base function # Pass the base function as ..."
+    },
+    {
+      "id": "PTBZ674EsvI",
+      "title": "Decorators in Python | Python Tutorial - Day #59",
+      "channel": "CodeWithHarry",
+      "duration": "13:05",
+      "description": "Access the Playlist: https://www.youtube.com/playlist?list=PLu0W_9lII9agwh1XjRt242xIpHhPT2llg Link to the Repl: ..."
+    },
+    {
+      "id": "FsAPt_9Bf3U",
+      "title": "Python Tutorial: Decorators - Dynamically Alter The Functionality Of Your Functions",
+      "channel": "Corey Schafer",
+      "duration": "30:28",
+      "description": "In this Python tutorial, we will be learning about decorators. Decorators are a way to dynamically alter the functionality of your ..."
+    },
+    {
+      "id": "2JwtHOi0T-g",
+      "title": "Python - Web development basic Series: Decorators in Depth: Stacking, Arguments & functools.wraps",
+      "channel": "Web Development Tutorials ",
+      "duration": "1:51",
+      "description": "Two decorators can genuinely stack on one function, a decorator can take its own real arguments via an extra wrapping layer, and ..."
+    },
+    {
+      "id": "n4SkpAGKqos",
+      "title": "Is THIS Decorator Style NEW In Python? (IIFE)",
+      "channel": "Indently",
+      "duration": "3:24",
+      "description": "What is this new funky decorator style??? Let's let's see how IIFE (which is common in JavaScript) looks like in Python. ▷ Become ..."
+    },
+    {
+      "id": "8MMW0rV4HRA",
+      "title": "functools.wraps: Stop Losing Function Names in Decorators",
+      "channel": "Interview Mentor App",
+      "duration": "1:43",
+      "description": "Learn why functools.wraps is essential for writing professional Python decorators. Without it, decorated functions silently lose their ..."
+    },
+    {
+      "id": "uG4FD0SZ-cQ",
+      "title": "Lec-69: Decorators in Python 🐍 with Example",
+      "channel": "Gate Smashers",
+      "duration": "6:34",
+      "description": "In this video, Varun sir will dive deep into one of Python's most powerful and elegant features: decorators. Whether you're a ..."
+    },
+    {
+      "id": "5G4xyp68sJY",
+      "title": "Python Programming Tutorial # 167 | How to use functools wraps Decorator in Python - English",
+      "channel": "Coding Is Thinking",
+      "duration": "4:44",
+      "description": "Python Programming Language language. Its design philosophy emphasizes code readability with the use of significant ..."
+    },
+    {
+      "id": "QH5fw9kxDQA",
+      "title": "Python Decorators: The Complete Guide",
+      "channel": "ArjanCodes",
+      "duration": "27:59",
+      "description": "Review code better and faster with my 3-Factor Framework: https://arjan.codes/diagnosis. Python decorators are a great way to ..."
+    },
+    {
+      "id": "ml93o8gmSgc",
+      "title": "Why use functools.wraps in Python decorators? #secret to Preserving Metadata in Python Decorators!",
+      "channel": "Python Peak",
+      "duration": "0:20",
+      "description": "Why use functools.wraps in Python decorators? It keeps original function information safe. This is important for debugging ..."
+    },
+    {
+      "id": "n-Rf3EJ_WaU",
+      "title": "What Are Python DECORATORS?? #python #programming #coding",
+      "channel": "b001",
+      "duration": "1:00",
+      "description": "Join the Byte Club to practice your Python skills! ($2.99/mo): ..."
+    },
+    {
+      "id": "DnKxKFXB4NQ",
+      "title": "The Single Most Useful Decorator in Python",
+      "channel": "mCoding",
+      "duration": "3:50",
+      "description": "The most useful decorator in Python is @cache. It's from the functools library (and a similar variant called @lru_cache too)."
+    },
+    {
+      "id": "nYDKH9fvlBY",
+      "title": "Python Decorators Tutorial",
+      "channel": "codebasics",
+      "duration": "10:25",
+      "description": "Video without background music: https://youtu.be/IVWZxr0kOyI In this tutorial, I will explain decorators in a very simple way by ..."
+    }
+  ]
+}

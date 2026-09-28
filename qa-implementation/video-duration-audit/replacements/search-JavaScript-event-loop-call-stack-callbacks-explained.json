@@ -1,0 +1,139 @@
+{
+  "query": "JavaScript event loop call stack callbacks explained",
+  "checked_at": "2026-09-27T07:00:10.161Z",
+  "results": [
+    {
+      "id": "j-z8flppvPs",
+      "title": "Master JavaScript Event Loop in 15 Mins! 🚀 ( Interview Special )",
+      "channel": "Code Compile",
+      "duration": "15:31",
+      "description": "🌀 The Event Loop is responsible for coordinating between the Call Stack and the Callback Queue in JavaScript, ensuring that ..."
+    },
+    {
+      "id": "eiC58R16hb8",
+      "title": "JavaScript Visualized - Event Loop, Web APIs, (Micro)task Queue",
+      "channel": "Lydia Hallie",
+      "duration": "12:35",
+      "description": "Learn how the browser event loop, task queue, microtask queue, and Web APIs work together to enable non-blocking, ..."
+    },
+    {
+      "id": "fFd8OhrHfIM",
+      "title": "How Javascript Works? - Call Stack, Event Loop and Queues Explained",
+      "channel": "Piyush Garg",
+      "duration": "27:22",
+      "description": "Hey Everyone, In this video, we will explore How JavaScript Works! We'll dive into the Call Stack, Event Loop, and Queues to ..."
+    },
+    {
+      "id": "vFJbKR6zfCE",
+      "title": "Event Loop in JavaScript | JavaScript Tutorial in Hindi #100",
+      "channel": "CodeWithHarry",
+      "duration": "12:54",
+      "description": "Link to the Repl - https://replit.com/@codewithharry/100eventloop#index.js Join Replit - https://join.replit.com/CodeWithHarry ..."
+    },
+    {
+      "id": "ByhtOgF6uYM",
+      "title": "How does JavaScript execute code + call stack | tea and #javascript",
+      "channel": "Chai aur Code",
+      "duration": "26:12",
+      "description": "Visit https://chaicode.com for all related materials, community help, source code, etc.\n#javascript #hindi\nAll code is ..."
+    },
+    {
+      "id": "8zKuNo4ay8E",
+      "title": "Asynchronous JavaScript & EVENT LOOP from scratch 🔥 | Namaste JavaScript Ep.15",
+      "channel": "Akshay Saini",
+      "duration": "41:45",
+      "description": "In-depth explanation of Event Loop, Web APIs, MicroTask Callback Queue, and how JavaScript works asynchronously in the web ..."
+    },
+    {
+      "id": "xBRSTqBHZUM",
+      "title": "JavaScript Tutorial in Hindi #50 Event Loop | Call Stack, Microtask Queue & Callback Queue",
+      "channel": "Code Step By Step",
+      "duration": "7:01",
+      "description": "Learn one of the most important JavaScript concepts — Event Loop — in this detailed Hindi tutorial. In this video, we cover: What ..."
+    },
+    {
+      "id": "51rsb5InYpM",
+      "title": "JavaScript Event Loop Explained | Call Stack, Web APIs & Callback Queue",
+      "channel": "Thedebugzone",
+      "duration": "5:16",
+      "description": "In this video, we will learn about the JavaScript Event Loop with simple explanations and practical examples.\n\nThe Event Loop ..."
+    },
+    {
+      "id": "lqLSNG_79lI",
+      "title": "JavaScript Event Loop: How it Works and Why it Matters in 5 Minutes",
+      "channel": "James Q Quick",
+      "duration": "7:20",
+      "description": "One of the most important concepts to learn in JavaScript! The Event Loop is core to how JavaScript handles asynchronous code."
+    },
+    {
+      "id": "K0ysMK6DVBI",
+      "title": "What is Event Loop,Callback & MicroTasks Queue & Understanding Call Stacks & Web APIs in Javascript",
+      "channel": "Coding Shiksha",
+      "duration": "10:58",
+      "description": "Visit my Online Free Media Tool Website https://freemediatools.com/ Buy Premium Scripts and Apps Here: ..."
+    },
+    {
+      "id": "8aGhZQkoFbQ",
+      "title": "What the heck is the event loop anyway? | Philip Roberts | JSConf EU",
+      "channel": "JSConf",
+      "duration": "26:53",
+      "description": "JavaScript programmers like to use words like, “event-loop”, “non-blocking”, “callback”, “asynchronous”, “single-threaded” and ..."
+    },
+    {
+      "id": "sPHvJ2D8yiA",
+      "title": "JavaScript Event Loop Explained in 5 Minutes | Call Stack, Callback Queue & Performance",
+      "channel": "Manohar Reddy",
+      "duration": "3:50",
+      "description": "Understanding the JavaScript Event Loop is essential for every backend developer and Node.js engineer. In this video, we break ..."
+    },
+    {
+      "id": "iGNJpUAfVoQ",
+      "title": "Javascript Event Loop, Call Stack and CallBack Queues",
+      "channel": "Coding Dreams",
+      "duration": "16:18",
+      "description": "I recently went to a Javascript meetup where one of the topic that was dicussed concerned with Event loop and there seemed to ..."
+    },
+    {
+      "id": "W-HQC_YUGBY",
+      "title": "Node js Event Loop in Hindi | Understanding Asynchronous Javascript | Callbacks in Javascript",
+      "channel": "Coder Dost",
+      "duration": "22:30",
+      "description": "Event Loop is most important topic of NodeJS. As understanding it can clarify how NodeJS works and what we mean by ..."
+    },
+    {
+      "id": "Oclz-wZ4eug",
+      "title": "Synchronous & Asynchronous JavaScript: Call Stack, Callback Queue, and Event Loop Explained",
+      "channel": "Logic Lab",
+      "duration": "4:45",
+      "description": "Is video mein hum JavaScript ke synchronous aur asynchronous programming ke concepts ko detail mein discuss karenge."
+    },
+    {
+      "id": "d3jXofmQm44",
+      "title": "Lecture 12 : Callbacks, Promises & Async Await | JavaScript Full Course",
+      "channel": "Shradha Khapra",
+      "duration": "1:23:55",
+      "description": "Instagram : https://www.instagram.com/shradhakhapra/ ⭐️ LinkedIn : https://www.linkedin.com/in/shradha-khapra/ Notes ..."
+    },
+    {
+      "id": "uaphx2xjDKc",
+      "title": "Learn ECMAScript 6 in Arabic #43 - Call Stack, Web API, Event Loop, Callback Queue",
+      "channel": "Elzero Web School",
+      "duration": "12:40",
+      "description": "Call Stack Web API Event Loop Callback Queue https://elzero.org/category/courses/ecmascript6/ ..."
+    },
+    {
+      "id": "VZg_NeGyAgw",
+      "title": "JavaScript Event Loop Explained | Call Stack, Web APIs, Callback Queue & Microtasks EP1 -Inteview Pl",
+      "channel": "Calcutta Coder",
+      "duration": "17:21",
+      "description": "Confused about how JavaScript handles asynchronous code? In this video, I explain the JavaScript Event Loop from scratch ..."
+    },
+    {
+      "id": "QMUSNmBwzpw",
+      "title": "Javascript EVENT LOOP FINALLY EXPLAINED | Call Stack, Callback Queue & Microtask Queue",
+      "channel": "LetsCodeWithJS",
+      "duration": "8:41",
+      "description": "Javascript Interview Questions Tricky Javascript Interview Question Hard JS Interview JS Interview Javascript Javascript Interview ..."
+    }
+  ]
+}

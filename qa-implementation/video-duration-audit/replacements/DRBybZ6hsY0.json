@@ -1,0 +1,19 @@
+{
+  "id": "DRBybZ6hsY0",
+  "url": "https://www.youtube.com/watch?v=DRBybZ6hsY0",
+  "checked_at": "2026-09-27T07:00:45.692Z",
+  "title": "How to Take User Input in Python? #3",
+  "channel": "Programiz",
+  "duration_seconds": 522,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "The Python input() function takes input from the user in string format and returns it.\n🔥 Want to learn Python, the right way? Get my interactive Python course: https://bit.ly/right-python\n\nIn this video, we will learn to convert these input values to integers and floating-point numbers using int() and float() functions.\n\n~\nRun Python Online: https://www.programiz.com/python-programming/online-compiler/\nPrograms in this video:https://github.com/programiz/python-course/blob/master/03-input.md\nPython Input and Output (text-based tutorial): https://www.programiz.com/python-programming/input-output-import\n\nWatch our videos and revise them with our Python App!\nDownload here for Android: https://bit.ly/learn-python-android\nDownload here for iOS: https://apple.co/3iPm6Sx\n\nTimestamps:\n0:00 Introduction\n0:51 Take input from the user\n2:49 Check the type of user input\n4:25 Convert strings to integers and floats\n6:31 Non-numeric strings to numbers\n7:25 Recap\n\nFind Programiz elsewhere:\nFacebook: https://www.facebook.com/programiz\nInstagram: https://www.instagram.com/_programiz/\nLinkedIn: https://www.linkedin.com/company/programiz\nWebsite: https://www.programiz.com\n-------------------------------------------------\n\nHow to Take User Input in Python? #3\n \n#python #learnprogramming  #programiz #pythoninput",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

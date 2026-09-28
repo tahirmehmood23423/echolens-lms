@@ -1,0 +1,20 @@
+{
+  "id": "3T0gjtXRNC0",
+  "url": "https://www.youtube.com/watch?v=3T0gjtXRNC0",
+  "checked_at": "2026-09-27T07:02:04.806Z",
+  "title": "Create Responsive CSS Grid Layouts with GRID WRAPPING",
+  "channel": "Coding2GO",
+  "duration_seconds": 374,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "WRAP GRIDS with CSS | Learn repeat(), minmax(), fractions, auto-fit and responsive web design with CSS Grid in only 6 Minutes. Coding2Go explains how to create responsive grid layouts with wrapping grids that look like flex-wrap or flex-grow and flex-shrink but in css grid without using flexbox. Wrap Grids to create responsive layouts that fit on every device. It adjusts the amount of columns automatically, by calculating how many columns fit next to each other. \n\n#cssgrid #csstricks #webdevelopment\n\nGet our HTML & CSS Course to learn more about Grid:\n👉 https://www.udemy.com/course/learn-html-and-css-in-7-days-web-developer-bootcamp/?couponCode=CODING2GO\n\nBecome a Member to Support our Channel:\n👉 https://www.youtube.com/channel/UCGpoeEhUBQBaaKZ_a8HB67Q/join\n\nCheckout our website:\n👉 https://www.coding2go.com\n\nHost Your Own Website With Hostinger:\n👉 https://www.hostinger.com/coding2go\n✌️ And get a huge discount with our code: CODING2GO\n\nCONCEPTS YOU WILL LEARN:\n✔ CSS Grid Layouts\n✔ Responsive Grid Layout\n✔ Responsive Web Design\n✔ CSS Responsive Grids\n✔ Grid Wrapping in CSS\n✔ Wrap css grids\n✔ flex-wrap in grid\n✔ flex-shrink in grid\n✔ flex-grow in grid layouts\n✔ CSS responsive grid layouts\n✔ css minmax() function\n✔ css auto-fit explained\n✔ css grid tutorial for beginners\n✔ grid wraping\n✔ wrap grid\n✔ flex-wrap for css grid\n✔ great mobile grids\n✔ make css grid responsive\n✔ css grid on smartphone\n✔ css grid for mobile\n✔ adjust grid columns automatically\n✔ auto-fit css grid columns\n✔ calculate grid columns for wrap\n✔ calculate grid columns automatically\n✔ wrap elements in a grid layout\n✔ how to wrap html elements in grid\n✔ How to create a responsive grid layout with css\n✔ How to use minmax() function in css\n✔ How to use auto-fit in css grids\n✔ How to use repeat() function in css\n✔ css repeat()\n✔ css repeat function\n✔ css auto-fit\n✔ minmax() css",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 1103,
+  "transcript_error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
+}

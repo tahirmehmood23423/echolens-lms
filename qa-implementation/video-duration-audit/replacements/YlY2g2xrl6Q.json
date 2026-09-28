@@ -1,0 +1,79 @@
+{
+  "id": "YlY2g2xrl6Q",
+  "url": "https://www.youtube.com/watch?v=YlY2g2xrl6Q",
+  "checked_at": "2026-09-27T07:00:45.924Z",
+  "title": "Learn Python LIST COMPREHENSIONS in 10 minutes! 📃",
+  "channel": "Bro Code",
+  "duration_seconds": 619,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "# List comprehension = A concise way to create lists in Python\n#                                        Compact and easier to read than traditional loops\n#                                        [expression for value in iterable if condition]\n\ndoubles = [x * 2 for x in range(1, 11)]\ntriples = [y * 3 for y in range(1, 11)]\nsquares = [z * z for z in range(1, 11)]\n\nfruits = [\"apple\", \"orange\", \"banana\", \"coconut\"]\nuppercase_words = [fruit.upper() for fruit in fruits]\nfruit_chars = [fruit[0] for fruit in fruits]",
+  "captions": [
+    {
+      "language": "it",
+      "kind": "asr"
+    },
+    {
+      "language": "id",
+      "kind": "asr"
+    },
+    {
+      "language": "en",
+      "kind": "asr"
+    },
+    {
+      "language": "bn",
+      "kind": "asr"
+    },
+    {
+      "language": "pt-BR",
+      "kind": "asr"
+    },
+    {
+      "language": "pa",
+      "kind": "asr"
+    },
+    {
+      "language": "pl",
+      "kind": "asr"
+    },
+    {
+      "language": "ta",
+      "kind": "asr"
+    },
+    {
+      "language": "ja",
+      "kind": "asr"
+    },
+    {
+      "language": "de-DE",
+      "kind": "asr"
+    },
+    {
+      "language": "ru",
+      "kind": "asr"
+    },
+    {
+      "language": "iw",
+      "kind": "asr"
+    },
+    {
+      "language": "ar",
+      "kind": "asr"
+    },
+    {
+      "language": "fr-FR",
+      "kind": "asr"
+    },
+    {
+      "language": "es-US",
+      "kind": "asr"
+    },
+    {
+      "language": "hi",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 0
+}

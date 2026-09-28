@@ -1,0 +1,20 @@
+{
+  "id": "ZkyzkWqhQ-I",
+  "url": "https://www.youtube.com/watch?v=ZkyzkWqhQ-I",
+  "checked_at": "2026-09-27T07:02:06.110Z",
+  "title": "PYTHON TUTORIAL: PYTHON SEP AND END",
+  "channel": "Way To Programming",
+  "duration_seconds": 260,
+  "status": "OK",
+  "embeddable": true,
+  "playable_in_embed": true,
+  "description": "The print function offers two arguments sep and end to change the way data is displayed on the screen. \n\nChapters: \n\nPrint function: 0:18\nParameters of print function: 0:58\nField separator and use of sep: 1:17\nOutput record separator and end: 2:41\n********************************************\nTo buy my books: https://www.amazon.in/Days-Ultimate-you-Parul-Prashar/dp/9381791767\n***********************************************\nMy other channels: https://www.youtube.com/channel/UC_H1nG5XRdmmUKCYa_16X9w\n***********************************************\nSocial media links:\nInstagram: https://www.instagram.com/mondaypositivitea/\nFacebook: https://www.facebook.com/ihavereadthatbook\n\n#pythonprogramming #pythontutorialforbeginners",
+  "captions": [
+    {
+      "language": "en",
+      "kind": "asr"
+    }
+  ],
+  "transcript_bytes": 1103,
+  "transcript_error": "Unexpected token '<', \"<html><hea\"... is not valid JSON"
+}

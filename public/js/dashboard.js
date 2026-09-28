@@ -6616,28 +6616,58 @@ async function openEvent(id) {
   const ev = d.event;
   const isAdmin = d.is_admin;
   const probs = ev.problems || [];
+  const fmtDT = (v) => v ? esc(String(v).replace('T', ' ')) : '—';
+  const checkI = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>';
+  const clockI = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
   const filesHtml = (ev.files || []).length ? `
     <div class="s" style="margin:8px 0"><strong>Documents &amp; datasets:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>${isAdmin ? ` <button class="btn btn-ghost btn-sm" onclick="evDelFile(${ev.id},'${esc(f.name).replace(/'/g, '&#39;')}')" title="Remove">&times;</button>` : ''}`).join(' &middot; ')}</div>` : '';
-  const regBtn = !d.my_entry && ['upcoming', 'live'].includes(ev.status) && ['free', 'student'].includes(ME.role)
-    ? `<button class="btn btn-teal" onclick="formEventRegister(${ev.id})">Register${ev.entry === 'paid' ? ' - PKR ' + ev.fee_pkr : ' - free'}</button>` : '';
-  const gateMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait">${esc(d.participate_msg)}</div>` : '';
+
+  // ---- gradient hero ----
+  const hero = `<div class="evd-hero">
+    <span class="ehd-badge">${ev.series_kind === 'shiplens' ? 'ShipLens' : EV_KIND_LABEL[ev.kind] || ev.kind}</span>
+    <h2>${esc(ev.title)}</h2>
+    ${ev.description ? `<div class="ehd-desc">${esc(ev.description.slice(0, 220))}${ev.description.length > 220 ? '…' : ''}</div>` : ''}
+    <div class="ehd-pills">
+      <span class="ehd-pill">${clockI}${ev.starts_at ? fmtDT(ev.starts_at) + ' → ' + fmtDT(ev.ends_at) : ev.duration_minutes ? '~' + ev.duration_minutes + ' min' : 'No deadline'}</span>
+      <span class="ehd-pill">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'}</span>
+      <span class="ehd-pill">Pass mark ${ev.pass_mark}%</span>
+      ${ev.auto_certificate ? `<span class="ehd-pill">${checkI}Auto certificate</span>` : ''}
+    </div>
+  </div>`;
+
+  // ---- registration / status card ----
+  const regOpenNow = ev.series_kind === 'shiplens' ? ['upcoming', 'registration'].includes(ev.shiplens_phase) : ['upcoming', 'live'].includes(ev.status);
+  const canRegister = !d.my_entry && regOpenNow && ['free', 'student'].includes(ME.role);
+  const regPill = d.my_entry
+    ? (d.can_participate ? `<span class="evd-reg-pill ok">${checkI}${ev.series_kind === 'shiplens' ? 'Enrolled' : 'Registered'}</span>`
+      : `<span class="evd-reg-pill wait">${clockI}Awaiting confirmation</span>`)
+    : `<span class="evd-reg-pill ${regOpenNow ? 'ok' : 'bad'}">${regOpenNow ? 'Registration Open' : 'Registration Closed'}</span>`;
+  const regCta = canRegister ? `<button type="button" class="evd-cta" onclick="formEventRegister(${ev.id})">Register — ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'}</button>`
+    : d.my_entry && ev.series_kind === 'shiplens' ? `<a class="evd-cta ghost" href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download fee challan</a>` : '';
   const passedMsg = d.my_progress && d.my_progress.passed
-    ? `<div class="task-status ok"><strong>Passed with ${d.my_progress.avg}%</strong>${ev.auto_certificate ? ' - your certificate is on your profile.' : ''}</div>` : '';
+    ? `<div class="task-status ok" style="margin-top:10px"><strong>Passed with ${d.my_progress.avg}%</strong>${ev.auto_certificate ? ' - your certificate is on your profile.' : ''}</div>` : '';
   const webinarHtml = ev.kind === 'webinar' && ev.meeting_link
-    ? `<div class="task-status ok">You are in - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : '';
-  openModal(ev.title, `
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-      <span class="kbadge ${esc(ev.kind)}">${ev.series_kind === 'shiplens' ? 'ShipLens' : EV_KIND_LABEL[ev.kind] || ev.kind}</span> ${evStatusBadge(ev.status)}
-      <span class="s" style="color:var(--muted)">${ev.starts_at ? esc(String(ev.starts_at).replace('T', ' ')) + ' &rarr; ' + esc(String(ev.ends_at || '').replace('T', ' ')) : ev.duration_minutes ? '~' + ev.duration_minutes + ' minutes' : ''} &middot; ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'} &middot; Pass mark ${ev.pass_mark}%${ev.auto_grade ? ' &middot; Graded instantly' : ''}${ev.auto_certificate ? ' &middot; auto certificate' : ''}</span></div>
-    ${ev.description ? `<p class="s" style="white-space:pre-line;margin-bottom:10px">${esc(ev.description)}</p>` : ''}
-    ${ev.series_kind === 'shiplens' ? `<div class="pub-sec">Choose one project level</div>${probs.map((p) => `<div class="ev-problem"><strong>${esc(p.difficulty)}: ${esc(p.title)}</strong><div class="s" style="white-space:pre-line;margin-top:5px">${p.locked ? `Full brief opens on ${esc(String(ev.shiplens_schedule?.task_opens_at || '').replace('T', ' '))}.` : esc(p.description)}</div></div>`).join('')}${d.my_entry ? `<div class="task-status ${d.can_participate ? 'ok' : 'wait'}">Selected: ${esc(probs.find((p) => p.pid === d.my_entry.challenge_pid)?.title || 'Unknown')} · Team of ${(d.my_entry.team_details || []).length} · ${d.can_participate ? 'Enrolled' : 'Awaiting Finance payment confirmation'} · <a href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download challan</a></div>` : ''}${ev.shiplens_schedule ? `<div class="s" style="color:var(--muted);margin-top:8px">Registration closes ${esc(String(ev.shiplens_schedule.reg_closes || '').replace('T', ' '))} &middot; Task opens ${esc(String(ev.shiplens_schedule.task_opens_at || '').replace('T', ' '))} &middot; Submit by ${esc(String(ev.shiplens_schedule.submission_deadline || '').replace('T', ' '))} &middot; Results by ${esc(String(ev.shiplens_schedule.results_due_at || '').replace('T', ' '))}</div>` : ''}` : ''}
-    ${filesHtml}
-    ${regBtn}${gateMsg}${passedMsg}${webinarHtml}
-    ${d.can_participate && ev.series_kind === 'shiplens' && ev.shiplens_phase !== 'submission' ? `
-      <div class="task-status wait">${ev.shiplens_phase === 'pending' ? `Your task opens on ${esc(String(ev.shiplens_schedule.task_opens_at || '').replace('T', ' '))}.`
-        : ev.shiplens_phase === 'grading' ? `Submissions closed. Results are due by ${esc(String(ev.shiplens_schedule.results_due_at || '').replace('T', ' '))}.`
-        : 'The submission window for this series has closed.'}</div>` : ''}
-    ${d.can_participate && probs.length && (ev.series_kind !== 'shiplens' || ev.shiplens_phase === 'submission') ? `
+    ? `<div class="task-status ok" style="margin-top:10px">You are in - <a href="${esc(ev.meeting_link)}" target="_blank" rel="noopener"><strong>Join the webinar</strong></a></div>` : '';
+  const regCard = `<div class="evd-reg-card" style="margin-bottom:14px">${regPill}${regCta}
+    ${d.my_entry && !d.can_participate && d.participate_msg ? `<div class="s" style="color:var(--muted);margin-top:10px;font-size:12px">${esc(d.participate_msg)}</div>` : ''}
+    ${passedMsg}${webinarHtml}
+  </div>`;
+
+  const scheduleBox = ev.series_kind === 'shiplens' && ev.shiplens_schedule ? `<div class="evd-schedule" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none"><path d="M8 2v4M16 2v4M3 8h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="rows">
+      <div>Registration closes ${fmtDT(ev.shiplens_schedule.reg_closes)}</div>
+      <div>Task opens ${fmtDT(ev.shiplens_schedule.task_opens_at)}</div>
+      <div>Submit by ${fmtDT(ev.shiplens_schedule.submission_deadline)}</div>
+      <div>Results by ${fmtDT(ev.shiplens_schedule.results_due_at)}</div>
+    </div></div>` : '';
+
+  const shipLensProblems = ev.series_kind === 'shiplens' ? `<div class="pub-sec">Choose one project level</div>${probs.map((p) => `<div class="ev-problem"><strong>${esc(p.difficulty)}: ${esc(p.title)}</strong><div class="s" style="white-space:pre-line;margin-top:5px">${p.locked ? `Full brief opens on ${fmtDT(ev.shiplens_schedule?.task_opens_at)}.` : esc(p.description)}</div></div>`).join('')}${d.my_entry ? `<div class="s" style="color:var(--muted);margin-top:8px">Team of ${(d.my_entry.team_details || []).length} · ${esc(probs.find((p) => p.pid === d.my_entry.challenge_pid)?.title || '')}</div>` : ''}` : '';
+
+  const phaseWait = d.can_participate && ev.series_kind === 'shiplens' && ev.shiplens_phase !== 'submission'
+    ? `<div class="task-status wait">${ev.shiplens_phase === 'pending' ? `Your task opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.`
+      : ev.shiplens_phase === 'grading' ? `Submissions closed. Results are due by ${fmtDT(ev.shiplens_schedule.results_due_at)}.`
+      : 'The submission window for this series has closed.'}</div>` : '';
+
+  const tasksSec = d.can_participate && probs.length && (ev.series_kind !== 'shiplens' || ev.shiplens_phase === 'submission') ? `
       <div class="pub-sec">Tasks</div>
       ${probs.filter((p) => ev.series_kind !== 'shiplens' || p.pid === d.my_entry?.challenge_pid).map((p) => {
         const s = d.my_submissions[p.pid];
@@ -6652,11 +6682,13 @@ async function openEvent(id) {
           </div>
           ${s && s.ai_feedback ? `<div class="s" style="margin-top:6px;color:var(--muted)">${esc(s.ai_feedback)}</div>` : ''}
         </div>`;
-      }).join('')}` : ''}
-    ${d.can_participate && !probs.length && ev.kind !== 'webinar' ? `
+      }).join('')}` : '';
+
+  const noProbSubmission = d.can_participate && !probs.length && ev.kind !== 'webinar' ? `
       <div class="pub-sec">Your submission</div>
-      <div class="ev-problem">${eventSubmitFormHtml(ev, null, d.my_submissions[0])}</div>` : ''}
-    ${d.board && d.board.length ? `
+      <div class="ev-problem">${eventSubmitFormHtml(ev, null, d.my_submissions[0])}</div>` : '';
+
+  const leaderboardSec = d.board && d.board.length ? `
       <div class="pub-sec">Leaderboard</div>
       <div class="card-body tight" style="max-height:30vh;overflow-y:auto">
         ${d.board.map((b, i) => `<div class="lb-row" style="padding:9px 4px">
@@ -6665,7 +6697,17 @@ async function openEvent(id) {
           ${b.passed ? '<span class="grade-chip ok">passed</span>' : ''}
           <strong style="min-width:44px;text-align:right">${b.avg != null ? b.avg + '%' : '—'}</strong>
         </div>`).join('')}
-      </div>` : ''}
+      </div>` : '';
+
+  openModal(ev.title, `
+    ${hero}
+    ${regCard}${scheduleBox}
+    ${shipLensProblems}
+    ${filesHtml}
+    ${phaseWait}
+    ${tasksSec}
+    ${noProbSubmission}
+    ${leaderboardSec}
     ${isAdmin ? adminEventPanel(d) : ''}`, true);
   wireAdminEventPanel(d);
 }

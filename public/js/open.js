@@ -2382,21 +2382,6 @@ const EV_THUMB = {
   webinar: { g: 'linear-gradient(135deg,#2A7BD1,#38BDF8)', glyph: '&#9673; live' },
 };
 const EV_LANG_GLYPH = { python: 'print(...)', javascript: 'console.log', typescript: 'type App', c: '#include', cpp: 'std::cout', java: 'class Main', go: 'fmt.Println', sql: 'SELECT *', web: '&lt;/&gt; html' };
-const EV_LANG_BADGE = {
-  python: { g: 'linear-gradient(135deg,#4B8BBE,#FFD43B)', t: 'Py' },
-  javascript: { g: 'linear-gradient(135deg,#F7DF1E,#D5B900)', t: 'JS' },
-  typescript: { g: 'linear-gradient(135deg,#3178C6,#235A97)', t: 'TS' },
-  c: { g: 'linear-gradient(135deg,#5C6BC0,#3949AB)', t: 'C' },
-  cpp: { g: 'linear-gradient(135deg,#00599C,#004482)', t: 'C++' },
-  java: { g: 'linear-gradient(135deg,#E76F00,#5382A1)', t: 'Java' },
-  go: { g: 'linear-gradient(135deg,#00ADD8,#007D9C)', t: 'Go' },
-  sql: { g: 'linear-gradient(135deg,#0FBFA8,#0C8F8F)', t: 'SQL' },
-  web: { g: 'linear-gradient(135deg,#F06529,#E44D26)', t: '{ }' },
-};
-function evLangBadgeHtml(lang) {
-  const b = EV_LANG_BADGE[lang]; if (!b) return '';
-  return `<span class="evd-lang-badge" style="background:${b.g}">${esc(b.t)}</span>`;
-}
 
 let EV_ALL = [];
 let EV_TAB = 'all';
@@ -2407,6 +2392,19 @@ const EV_PER = 6;
 function evPoints(ev) { const p = ev.problems || []; return p.length ? p.reduce((s, x) => s + (x.points || 0), 0) : 100; }
 function evDiff(ev) { const p = ev.problems || []; if (!p.length) return 'Easy'; const rank = { Easy: 1, Medium: 2, Hard: 3 }; return p.reduce((m, x) => rank[x.difficulty] > rank[m] ? x.difficulty : m, 'Easy'); }
 function evDurLabel(ev) { const m = ev.duration_minutes; if (!m) return null; return m < 60 ? `~${m} minute${m === 1 ? '' : 's'}` : `~${Math.round(m / 60)} hour${Math.round(m / 60) === 1 ? '' : 's'}`; }
+// A short, static "time left until this date" label for stat tiles - no
+// ticking clock, just a glance-able unit (mins/hours/days).
+function evTimeLeft(dt) {
+  if (!dt) return '—';
+  const ms = new Date(String(dt).replace(' ', 'T')).getTime() - Date.now();
+  if (isNaN(ms)) return '—';
+  if (ms <= 0) return 'Closed';
+  const mins = Math.round(ms / 60000);
+  if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'}`;
+  const hours = Math.round(mins / 60);
+  if (hours < 48) return `${hours} hour${hours === 1 ? '' : 's'}`;
+  return `${Math.round(hours / 24)} days`;
+}
 const DIFF_DOT = { Easy: '#1FA36B', Medium: '#D89A00', Hard: '#D14370' };
 
 async function loadEvents() {
@@ -2800,13 +2798,6 @@ function evCompact(dt) {
   const p = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
 }
-function evPrettyDate(dt) {
-  const d = new Date(String(dt).replace(' ', 'T'));
-  if (isNaN(d)) return '';
-  const mon = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  let h = d.getHours(); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-  return `${d.getDate()} ${mon[d.getMonth()]} ${d.getFullYear()} • ${h}:${String(d.getMinutes()).padStart(2, '0')} ${ap}`;
-}
 function evCalLink(ev) {
   const s = evCompact(ev.starts_at || ev.ends_at), e = evCompact(ev.ends_at || ev.starts_at);
   if (!s || !e) return null;
@@ -2826,74 +2817,108 @@ function renderEventDetail() {
   const langI = '<svg viewBox="0 0 24 24" fill="none"><path d="m8 8-4 4 4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const checkI = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>';
 
-  // ---- left sidebar: info card ----
-  const tags = [
-    `<span class="evd-tag"><span class="dot" style="width:7px;height:7px;border-radius:50%;background:${DIFF_DOT[diff]}"></span>${diff}</span>`,
-    `<span class="evd-tag">${points} pts</span>`,
-    `<span class="evd-tag">${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>`,
-    durL ? `<span class="evd-tag">${durL}</span>` : '',
-    ev.auto_grade ? `<span class="evd-tag">Instant Grading</span>` : '',
-    ev.auto_grade ? `<span class="evd-tag">10% Reduction</span>` : '',
-    ev.auto_certificate ? `<span class="evd-tag good">Certificate at ${ev.pass_mark}%+</span>` : '',
-    ev.deadline ? `<span class="evd-tag" style="color:#B23A3A">Due ${esc(new Date(ev.deadline + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))}</span>` : '',
-  ].join('');
-  const card = `<div class="evd-card">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px">
-      <span class="evd-badge ${esc(ev.kind)}" style="margin-bottom:0">${evKindTag(ev)}</span>
-      ${evLangBadgeHtml(ev.compiler)}
-    </div>
-    <h3>${esc(ev.title)}</h3>
-    <div class="cdesc">${esc((ev.description || '').slice(0, 150))}${(ev.description || '').length > 150 ? '…' : ''}</div>
-    <div class="evd-tags">${tags}</div>
-    <div class="evd-parts">${(ev.entries_count || 0).toLocaleString()} participants</div>
-    <div class="evd-prog"><div style="width:${prog && prog.avg != null ? Math.min(100, prog.avg) : 4}%"></div></div>
-  </div>`;
-
-  // ---- nav ----
-  const navDefs = [
+  // ---- icon rail (left) ----
+  const railDefs = [
     ['overview', 'Overview', '<circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/>'],
-    ['problem', 'Problem Statement', '<path d="M6 3h9l3 3v15H6z"/><path d="M9 9h6M9 13h6M9 17h4"/>'],
-    ['instructions', 'Instructions', '<path d="M9 6h9M9 12h9M9 18h9M4 6h.01M4 12h.01M4 18h.01"/>'],
-    ['submissions', 'Submissions', '<path d="M4 4h16v12H4z"/><path d="M8 20h8M12 16v4"/>'],
+    ['submissions', ev.kind === 'webinar' ? 'Join' : 'Submissions', '<path d="M4 4h16v12H4z"/><path d="M8 20h8M12 16v4"/>'],
     ['leaderboard', 'Leaderboard', '<path d="M8 21V9M16 21V5M4 21h16"/>'],
     ['discussion', 'Discussion', '<path d="M5 5h14v10H9l-4 4z"/>'],
   ];
   const cCount = (d.comments || []).length;
-  const nav = `<div class="evd-nav">${navDefs.map(([k, label, path]) =>
-    `<a onclick="evNavGo('${k}')" data-sec="${k}"><svg class="ic" viewBox="0 0 24 24">${path}</svg>${label}${k === 'discussion' && cCount ? `<span class="cnt">${cCount}</span>` : ''}</a>`).join('')}</div>`;
+  const rail = `<div class="evd-rail">${railDefs.map(([k, label, path]) =>
+    `<a onclick="evNavGo('${k}')" data-sec="${k}"><svg viewBox="0 0 24 24">${path}</svg>${label}${k === 'discussion' && cCount ? `<span class="cnt">${cCount}</span>` : ''}</a>`).join('')}</div>`;
 
-  // ---- countdown card ----
-  let countCard = '';
-  if (ev.ends_at) {
-    const cal = evCalLink(ev);
-    countCard = `<div class="evd-count">
-      <div class="lbl">Event ends in</div>
-      <div class="cd-grid">
-        <div class="cd-box"><b id="cd-d">--</b><span>Days</span></div>
-        <div class="cd-box"><b id="cd-h">--</b><span>Hours</span></div>
-        <div class="cd-box"><b id="cd-m">--</b><span>Mins</span></div>
-        <div class="cd-box"><b id="cd-s">--</b><span>Secs</span></div>
-      </div>
-      <div class="ends">${evPrettyDate(ev.ends_at)}</div>
-      ${cal ? `<a class="btn btn-ghost btn-sm btn-block cal" href="${esc(cal)}" target="_blank" rel="noopener">Add to calendar</a>` : ''}
-    </div>`;
-  } else if (ev.status === 'live') {
-    countCard = `<div class="evd-count"><div class="lbl">Status</div><div class="task-status ok" style="margin:0">Open now — no deadline. Solve any time.</div></div>`;
-  }
+  // ---- gradient hero banner ----
+  const heroPills = [
+    `<span class="ehd-pill"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>`,
+    `<span class="ehd-pill">${star}${points} pts</span>`,
+    `<span class="ehd-pill">${langI}${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>`,
+    durL ? `<span class="ehd-pill">${clock}${durL}</span>` : '',
+    ev.auto_certificate ? `<span class="ehd-pill">${checkI}Certificate at ${ev.pass_mark}%+</span>` : '',
+  ].join('');
+  const heroSub = ev.series_kind === 'shiplens' ? (p ? `${esc(diff)}: ${esc(p.title)}` : '') : '';
+  const hero = `<div class="evd-hero">
+    <span class="ehd-badge">${evKindTag(ev)}</span>
+    <h2>${esc(ev.title)}</h2>
+    ${heroSub ? `<div class="ehd-sub">${heroSub}</div>` : ''}
+    <div class="ehd-desc">${esc((ev.description || '').slice(0, 220))}${(ev.description || '').length > 220 ? '…' : ''}</div>
+    <div class="ehd-pills">${heroPills}</div>
+    <div class="ehd-glyph"><svg viewBox="0 0 24 24"><path d="M3 17l3-9 3 6 3-11 3 9 3-5 3 10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>`;
 
   // ---- middle column sections ----
+  const fmtDT = (v) => v ? esc(String(v).replace('T', ' ')) : '—';
   const banner = ev.auto_grade
     ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly, with a 10% reduction in score.</span></div>` : '';
-  const regBtn = !d.my_entry && ['upcoming', 'live'].includes(ev.status)
-    ? `<button class="btn btn-primary" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' — PKR ' + ev.fee_pkr : ' — Free'}</button>` : '';
-  const statusMsg = d.my_entry && !d.can_participate ? `<div class="task-status wait" style="margin-top:12px">${esc(d.participate_msg)}</div>`
-    : prog && prog.passed ? `<div class="task-status ok" style="margin-top:12px"><strong>Passed with ${prog.avg}%</strong> — your certificate is under Events › My certificates.</div>` : '';
 
-  const shipLensEntry = ev.series_kind === 'shiplens' && d.my_entry
-    ? `<div class="task-status ${d.can_participate ? 'ok' : 'wait'}" style="margin-top:12px">Selected project: <strong>${esc((ev.problems || []).find((item) => item.pid === d.my_entry.challenge_pid)?.title || 'Unknown')}</strong> · Team of ${(d.my_entry.team_details || []).length} · ${d.can_participate ? 'Finance confirmed payment' : 'Awaiting Finance confirmation'}<br><a href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download fee challan</a></div>` : '';
-  const fmtDT = (v) => v ? esc(String(v).replace('T', ' ')) : '—';
-  const shipLensSchedule = ev.series_kind === 'shiplens' && ev.shiplens_schedule
-    ? `<div class="evd-banner" style="margin-top:12px"><span>Registration closes ${fmtDT(ev.shiplens_schedule.reg_closes)} · Task opens ${fmtDT(ev.shiplens_schedule.task_opens_at)} · Submit by ${fmtDT(ev.shiplens_schedule.submission_deadline)} · Results by ${fmtDT(ev.shiplens_schedule.results_due_at)}</span></div>` : '';
+  // ---- overview stat tiles ----
+  const closesAt = ev.series_kind === 'shiplens' ? ev.shiplens_schedule?.reg_closes : ev.ends_at;
+  const statsRow = `<div class="ev-stats" style="margin-bottom:16px">
+    <div class="ev-stat c1"><span class="ev-stat-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><div><b>${(ev.entries_count || 0).toLocaleString()}</b><span>Total Participants</span></div></div>
+    <div class="ev-stat c2"><span class="ev-stat-ic">${clock}</span><div><b>${esc(evTimeLeft(closesAt))}</b><span>Closes In</span></div></div>
+    <div class="ev-stat c4"><span class="ev-stat-ic">${checkI}</span><div><b>${ev.auto_certificate ? ev.pass_mark + '%+' : '—'}</b><span>Certificate</span></div></div>
+  </div>`;
+
+  // ---- right sidebar: registration status + CTA ----
+  const regOpenNow = ev.series_kind === 'shiplens' ? ['upcoming', 'registration'].includes(ev.shiplens_phase) : ['upcoming', 'live'].includes(ev.status);
+  const canRegister = !d.my_entry && regOpenNow;
+  const regPill = d.my_entry
+    ? (d.can_participate ? `<span class="evd-reg-pill ok">${checkI}${ev.series_kind === 'shiplens' ? 'Enrolled' : 'Registered'}</span>`
+      : `<span class="evd-reg-pill ${d.participate_msg && /reject/i.test(d.participate_msg) ? 'bad' : 'wait'}">${clock}${d.participate_msg && /reject/i.test(d.participate_msg) ? 'Payment rejected' : 'Awaiting confirmation'}</span>`)
+    : `<span class="evd-reg-pill ${regOpenNow ? 'ok' : 'bad'}">${regOpenNow ? checkI : ''}${regOpenNow ? 'Registration Open' : 'Registration Closed'}</span>`;
+  const regCta = canRegister
+    ? `<button type="button" class="evd-cta" onclick="regOpenEvent(${ev.id})">Register — ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'}</button>`
+    : d.my_entry && ev.series_kind === 'shiplens'
+      ? `<a class="evd-cta ghost" href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download fee challan</a>` : '';
+  const regCard = `<div class="evd-reg-card">${regPill}${regCta}
+    ${d.my_entry && !d.can_participate && d.participate_msg ? `<div class="s" style="color:var(--muted);margin-top:10px;font-size:12px">${esc(d.participate_msg)}</div>` : ''}
+    ${prog && prog.passed ? `<div class="task-status ok" style="margin-top:10px"><strong>Passed with ${prog.avg}%</strong></div>` : ''}
+    ${ev.series_kind === 'shiplens' && d.my_entry ? `<div class="s" style="color:var(--muted);margin-top:10px;font-size:12px">Team of ${(d.my_entry.team_details || []).length} · ${esc((ev.problems || []).find((item) => item.pid === d.my_entry.challenge_pid)?.title || '')}</div>` : ''}
+  </div>`;
+
+  // ---- right sidebar: schedule box (ShipLens) / countdown (everything else) ----
+  const calI = '<path d="M8 2v4M16 2v4M3 8h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round"/>';
+  const cal = evCalLink(ev);
+  const calLink = cal ? `<a href="${esc(cal)}" target="_blank" rel="noopener" style="font-weight:700">Add to calendar</a>` : '';
+  const scheduleBox = ev.series_kind === 'shiplens' && ev.shiplens_schedule
+    ? `<div class="evd-schedule"><svg viewBox="0 0 24 24" fill="none">${calI}</svg><div class="rows">
+        <div>Registration closes ${fmtDT(ev.shiplens_schedule.reg_closes)}</div>
+        <div>Task opens ${fmtDT(ev.shiplens_schedule.task_opens_at)}</div>
+        <div>Submit by ${fmtDT(ev.shiplens_schedule.submission_deadline)}</div>
+        <div>Results by ${fmtDT(ev.shiplens_schedule.results_due_at)}</div>
+        ${calLink}
+      </div></div>`
+    : ev.ends_at ? `<div class="evd-schedule" style="background:var(--violet-soft);border-color:transparent"><svg viewBox="0 0 24 24" fill="none" style="color:var(--primary)">${calI}</svg><div class="rows" style="color:var(--primary-deep)">
+        <div>Ends ${fmtDT(ev.ends_at)}</div>
+        ${calLink}
+      </div></div>` : '';
+
+  // ---- right sidebar: workspace teaser ----
+  const workReady = d.can_participate && (ev.series_kind !== 'shiplens' || ev.shiplens_phase === 'submission');
+  const workMsg = !d.my_entry ? 'Register for this event to unlock the workspace and start submitting.'
+    : !d.can_participate ? (d.participate_msg || 'Waiting for access.')
+    : ev.series_kind === 'shiplens' && ev.shiplens_phase === 'pending' ? `Your task opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.`
+    : ev.series_kind === 'shiplens' && ['grading', 'closed'].includes(ev.shiplens_phase) ? 'The submission window for this series has closed.'
+    : 'Ready — head to Submissions to send your work.';
+  const cloudI = '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke-linecap="round" stroke-linejoin="round"/>';
+  const workCard = `<div class="evd-panel-card">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none">${cloudI}</svg></div>
+    <h4>Workspace</h4>
+    <p>${esc(workMsg)}</p>
+    ${workReady ? `<button type="button" class="evd-cta" onclick="evNavGo('submissions')">Go to Submissions</button>` : ''}
+  </div>`;
+
+  // ---- right sidebar: key details ----
+  const kdRow = (iconPath, label, val) => `<div class="evd-kd-row"><div class="ic"><svg viewBox="0 0 24 24" fill="none">${iconPath}</svg></div><div class="txt"><div class="lbl">${label}</div><div class="val">${val}</div></div></div>`;
+  const trophyI = '<path d="M8 4h8v4a4 4 0 0 1-8 0V4z" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 4H5a3 3 0 0 0 3 4M16 4h3a3 3 0 0 1-3 4" stroke-linecap="round"/><path d="M12 12v4M9 20h6M10 16h4v4h-4z" stroke-linecap="round" stroke-linejoin="round"/>';
+  const ticketI = '<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V8z" stroke-linecap="round" stroke-linejoin="round"/>';
+  const usersI = '<path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" stroke-linecap="round"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-linecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round"/>';
+  const keyDetailsCard = `<div class="evd-panel-card">
+    <h4 style="margin-bottom:10px">Key Details</h4>
+    ${kdRow(trophyI, 'Event Type', esc(evKindTag(ev)))}
+    ${kdRow(ticketI, 'Entry', ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free')}
+    ${ev.series_kind === 'shiplens' ? kdRow(usersI, 'Team size', '1–2 members') : kdRow(checkI, 'Pass mark', ev.pass_mark + '%')}
+  </div>`;
 
   // problem statement block (shared by Overview + Problem Statement)
   const selector = (ev.problems || []).length > 1
@@ -2946,28 +2971,20 @@ function renderEventDetail() {
     </div>`;
   }).join('') : '<p class="muted">No submissions yet — write your solution and submit it from the editor.</p>';
   const submissionsSec = `<div class="evd-sec" id="evdSec-submissions">
-    <h3>Your Submissions</h3>
-    ${subRows}
-    ${d.can_participate ? '<button class="btn btn-primary btn-block" style="margin-top:6px" onclick="evScrollWork()">+ New Submission</button>' : ''}
+    ${ev.kind === 'webinar' ? '' : `<h3>Your Submissions</h3>${subRows}`}
+    ${renderEventWorkspace()}
   </div>`;
 
   const overview = `<div class="evd-sec" id="evdSec-overview">
-    <div class="evd-titlerow"><h2>${esc(ev.title)}</h2><span class="evd-star" title="Featured">${star}</span></div>
-    <div class="evd-chips" style="margin:12px 0">
-      <span class="evd-chip">${star} ${points} points</span>
-      <span class="evd-chip">${langI} ${EV_LANG_LABEL[ev.compiler] || 'File / link'}</span>
-      <span class="evd-chip"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>
-      ${durL ? `<span class="evd-chip">${clock} ${durL}</span>` : ''}
-      ${ev.auto_grade ? `<span class="evd-chip">${checkI} Instant Grading</span>` : ''}
-    </div>
+    <h3 style="margin-bottom:14px">Overview</h3>
+    <p class="muted" style="margin-bottom:16px">${esc((ev.description || '').slice(0, 260))}${(ev.description || '').length > 260 ? '…' : ''}</p>
+    ${statsRow}
     ${banner}
-    ${regBtn ? `<div style="margin:12px 0">${regBtn}</div>` : ''}
-    ${statusMsg}${shipLensEntry}${shipLensSchedule}
-    <h3 style="margin-top:16px">Problem Statement</h3>
+    <h3 style="margin-top:6px;display:flex;align-items:center;gap:8px"><svg class="ic" viewBox="0 0 24 24" fill="none" width="17" height="17"><path d="M6 3h9l3 3v15H6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Problem Statement</h3>
     ${problemBlock}
     <h3 style="margin-top:20px">Your Submissions</h3>
     ${subRows}
-    ${d.can_participate ? '<button class="btn btn-primary btn-block" style="margin-top:6px" onclick="evScrollWork()">+ New Submission</button>' : ''}
+    ${d.can_participate ? '<button class="btn btn-primary btn-block" style="margin-top:6px" onclick="evNavGo(\'submissions\')">+ New Submission</button>' : ''}
   </div>`;
 
   // leaderboard
@@ -2982,18 +2999,21 @@ function renderEventDetail() {
   // discussion
   const discussionSec = `<div class="evd-sec" id="evdSec-discussion"><h3>Discussion</h3><div id="evDisc"></div></div>`;
 
-  const main = `<div class="evd-main">${overview}${problemSec}${instructionsSec}${submissionsSec}${leaderboardSec}${discussionSec}</div>`;
+  const tabDefs = [
+    ['overview', 'Overview'], ['problem', 'Problem Statement'], ['instructions', 'Instructions'],
+    ['submissions', ev.kind === 'webinar' ? 'Join' : 'Submissions'], ['leaderboard', 'Leaderboard'], ['discussion', 'Discussion'],
+  ];
+  const tabbar = `<div class="evd-tabbar ev-tabs">${tabDefs.map(([k, label]) =>
+    `<button type="button" class="ev-tab" onclick="evNavGo('${k}')" data-sec="${k}">${label}${k === 'discussion' && cCount ? ` (${cCount})` : ''}</button>`).join('')}</div>`;
 
-  // ---- right column: workspace ----
-  const work = renderEventWorkspace();
+  const main = `<div class="evd-main">${hero}${tabbar}${overview}${problemSec}${instructionsSec}${submissionsSec}${leaderboardSec}${discussionSec}</div>`;
+  const side = `<div class="evd-side2">${regCard}${scheduleBox}${workCard}${keyDetailsCard}</div>`;
 
-  $('evDetail').innerHTML =
-    `<div class="evd-side">${card}${nav}${countCard}</div>${main}${work}`;
+  $('evDetail').innerHTML = `<div class="ev-detail2">${rail}${main}${side}</div>`;
 
-  // wire editor + discussion + countdown
+  // wire editor + discussion
   wireEventWorkspace();
   renderDiscussion();
-  startEventCountdown();
   evNavGo('overview');
 }
 
@@ -3123,14 +3143,14 @@ function evToggleEditorTheme() {
 }
 
 function evSelectProblem(pid) { if (CUR_EVENT?.event?.series_kind === 'shiplens' && CUR_EVENT?.my_entry?.challenge_pid) return; CUR_EV_PID = pid; renderEventDetail(); }
-function evScrollWork() { const w = document.querySelector('.evd-work'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function evScrollWork() { evNavGo('submissions'); const w = document.querySelector('.evd-work'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 // The left nav switches the middle column between sections (one visible at a
 // time) so the page stays roughly one screen tall.
 function evNavGo(sec) {
   document.querySelectorAll('.evd-main > .evd-sec').forEach((s) => { s.style.display = s.id === 'evdSec-' + sec ? '' : 'none'; });
   evSetActiveNav(sec);
 }
-function evSetActiveNav(sec) { document.querySelectorAll('.evd-nav a').forEach((a) => a.classList.toggle('active', a.dataset.sec === sec)); }
+function evSetActiveNav(sec) { document.querySelectorAll('.evd-rail a, .evd-tabbar .ev-tab').forEach((a) => a.classList.toggle('active', a.dataset.sec === sec)); }
 
 function startEventCountdown() {
   stopEventCountdown();
@@ -3299,9 +3319,13 @@ async function deleteEventComment(cid) {
   } catch (err) { toast(err.message, true); }
 }
 function evBumpCommentCount() {
-  const link = document.querySelector('.evd-nav a[data-sec="discussion"]'); if (!link) return;
   const n = (CUR_EVENT.comments || []).length;
-  let cnt = link.querySelector('.cnt');
-  if (!n && cnt) { cnt.remove(); return; }
-  if (n) { if (!cnt) { cnt = document.createElement('span'); cnt.className = 'cnt'; link.appendChild(cnt); } cnt.textContent = n; }
+  const link = document.querySelector('.evd-rail a[data-sec="discussion"]');
+  if (link) {
+    let cnt = link.querySelector('.cnt');
+    if (!n && cnt) cnt.remove();
+    else if (n) { if (!cnt) { cnt = document.createElement('span'); cnt.className = 'cnt'; link.appendChild(cnt); } cnt.textContent = n; }
+  }
+  const tab = document.querySelector('.evd-tabbar .ev-tab[data-sec="discussion"]');
+  if (tab) tab.textContent = `Discussion${n ? ` (${n})` : ''}`;
 }

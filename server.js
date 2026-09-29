@@ -3530,6 +3530,14 @@ app.post('/api/admin/event-entries/:id/payment', authRequired, adminRequired, (r
   }
   res.json({ ok: true, entry: e });
 });
+app.delete('/api/admin/event-entries/:id', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const entry = store.allData().event_entries.find((item) => item.id === Number(req.params.id));
+  if (!entry) return res.status(404).json({ error: 'Registration not found.' });
+  const event = Events.byId(entry.event_id);
+  const removed = Events.removeEntry(entry.id);
+  await store.pendingPersist();
+  res.json({ ok: true, removed: { entry_id: removed.id, event_id: removed.event_id, team_size: removed.team_details?.length || 1, series_kind: event?.series_kind || null } });
+}));
 // Submissions: editor code, an uploaded file (any document), and/or a link -
 // per problem for quests/competitions, single for hackathons. When the event
 // has AI auto-grading on, the submission is graded immediately with a 10%

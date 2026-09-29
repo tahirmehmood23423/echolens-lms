@@ -6889,6 +6889,7 @@ function adminEventPanel(d) {
           ${ev.entry === 'paid' && ev.series_kind !== 'shiplens' && e.payment_status === 'pending' ? `
             <button class="btn btn-teal btn-sm" onclick="evPay(${e.id},${ev.id},true)">Confirm</button>
             <button class="btn btn-danger btn-sm" onclick="evPay(${e.id},${ev.id},false)">Reject</button>` : ''}
+          <button class="btn btn-danger btn-sm" onclick="evRemove(${e.id},${ev.id},${ev.series_kind === 'shiplens'})">${ev.series_kind === 'shiplens' ? 'Remove team' : 'Remove registration'}</button>
         </div>`).join('') || '<div class="empty">No registrations yet.</div>'}
     </div>
     <div class="pub-sec">Admin - submissions</div>
@@ -6941,6 +6942,17 @@ async function delShipLens(eid) {
 async function evPay(entryId, eid, confirm) {
   try { await api(`/api/admin/event-entries/${entryId}/payment`, { method: 'POST', body: JSON.stringify({ confirm }) }); toast(confirm ? 'Payment confirmed - the participant was emailed.' : 'Payment rejected - the participant was emailed.'); openEvent(eid); }
   catch (e) { toast(e.message, true); }
+}
+async function evRemove(entryId, eid, team) {
+  const promptText = team
+    ? 'Remove this whole team registration, its submissions and its challan? Both students can then register again. Their user accounts will remain.'
+    : 'Remove this student from the event and delete their submissions? Their user account will remain.';
+  if (!confirm(promptText)) return;
+  try {
+    await api(`/api/admin/event-entries/${entryId}`, { method: 'DELETE' });
+    toast(team ? 'Team removed. Its members can register again.' : 'Student registration removed.');
+    openEvent(eid);
+  } catch (e) { toast(e.message, true); }
 }
 async function evScore(sid, eid) {
   const score = prompt('Score (0-100):'); if (score == null) return;

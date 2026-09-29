@@ -3444,6 +3444,21 @@ const Events = {
     e.payment_status = ok ? 'confirmed' : 'rejected'; e.payment_by = by; e.payment_at = now(); save();
     return e;
   },
+  removeEntry(entryId) {
+    const entry = data.event_entries.find((x) => x.id === Number(entryId));
+    if (!entry) return null;
+    const registration = entry.registration_id ? Registrations.byId(entry.registration_id) : null;
+    if (registration) {
+      const challanIds = new Set(data.challans.filter((c) => c.registration_id === registration.id).map((c) => c.id));
+      data.challans = data.challans.filter((c) => c.registration_id !== registration.id);
+      data.expenses = data.expenses.filter((x) => !challanIds.has(x.challan_id));
+      data.registrations = data.registrations.filter((r) => r.id !== registration.id);
+    }
+    data.event_submissions = data.event_submissions.filter((s) => s.entry_id !== entry.id && !(s.event_id === entry.event_id && s.user_id === entry.user_id));
+    data.event_entries = data.event_entries.filter((e) => e.id !== entry.id);
+    save();
+    return entry;
+  },
   canParticipate(ev, uid) {
     const user = Users.byId(uid);
     const e = user ? Events.entryForUser(ev, user) : Events.entryFor(ev.id, uid);

@@ -7,7 +7,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 
 process.env.DB_PATH = path.join(os.tmpdir(), `echolens-shiplens-email-${crypto.randomUUID()}.json`);
-const { Users, Events, Registrations } = require('../store');
+const { Users, Events, Registrations, Challans } = require('../store');
 const { project } = require('../shiplens-content');
 
 test('ShipLens sends the challan to the entered contact email while retaining the signed-in owner', () => {
@@ -40,4 +40,30 @@ test('ShipLens fixes the fee at PKR 500 when events are created or edited', () =
     ends_at: '2099-01-01T00:00', problems: [project] }, owner.id);
   assert.equal(event.fee_pkr, 500);
   assert.equal(Events.update(event.id, { fee_pkr: 900 }).fee_pkr, 500);
+});
+
+test('removing a ShipLens team frees both members to register again', () => {
+  const lead = Users.createFixed({ name: 'Team Lead', role: 'free', username: 'shiplens.remove.lead',
+    email: 'remove-lead@example.com', password: 'TestPassword123!' });
+  const mate = Users.createFixed({ name: 'Teammate', role: 'free', username: 'shiplens.remove.mate',
+    email: 'remove-mate@example.com', password: 'TestPassword123!' });
+  const event = Events.create({ title: 'ShipLens removal check', kind: 'competition', series_kind: 'shiplens',
+    entry: 'paid', scope: 'both', fee_pkr: 500, starts_at: '2026-01-01T00:00',
+    ends_at: '2099-01-01T00:00', problems: [project] }, lead.id);
+  const team = [
+    { name: lead.name, email: lead.email, whatsapp: '03001234567', university: 'Example University', year: '2' },
+    { name: mate.name, email: mate.email, whatsapp: '03001234568', university: 'Example University', year: '2' },
+  ];
+  const out = Events.register({ event_id: event.id, user: lead, challenge_pid: 1, team_details: team });
+  const registrationId = out.entry.registration_id;
+  const challanSerial = Registrations.byId(registrationId).challan_serial;
+  assert.ok(Challans.bySerial(challanSerial));
+  assert.ok(Events.entryForUser(event, mate));
+  assert.ok(Events.removeEntry(out.entry.id));
+  assert.equal(Events.entryForUser(event, lead), null);
+  assert.equal(Events.entryForUser(event, mate), null);
+  assert.equal(Registrations.byId(registrationId), null);
+  assert.equal(Challans.bySerial(challanSerial), null);
+  const again = Events.register({ event_id: event.id, user: lead, challenge_pid: 1, team_details: team });
+  assert.equal(again.error, undefined);
 });

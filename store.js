@@ -3305,7 +3305,7 @@ const Events = {
       description: String(b.description || '').slice(0, 8000),
       scope: EVENT_SCOPES.includes(b.scope) ? b.scope : 'both',
       entry: b.entry === 'paid' ? 'paid' : 'free',
-      fee_pkr: Number(b.fee_pkr) || 0,
+      fee_pkr: b.series_kind === 'shiplens' ? 500 : Number(b.fee_pkr) || 0,
       pay_instructions: String(b.pay_instructions || '').slice(0, 1000) || null,
       starts_at: b.starts_at || null, ends_at: b.ends_at || null,
       // Admin-set cutoff date for open quests (and any event): submissions
@@ -3333,10 +3333,12 @@ const Events = {
   update(id, b) {
     const ev = Events.byId(id); if (!ev) return null;
     for (const k of ['title', 'description', 'pay_instructions', 'dataset_url', 'meeting_link']) if (b[k] !== undefined) ev[k] = String(b[k]).slice(0, 8000) || null;
+    if (ev.series_kind !== 'shiplens' && b.fee_pkr !== undefined) ev.fee_pkr = Number(b.fee_pkr) || 0;
+    if (ev.series_kind === 'shiplens') ev.fee_pkr = 500;
     if (b.kind !== undefined && EVENT_KINDS.includes(b.kind)) ev.kind = b.kind;
     if (b.scope !== undefined && EVENT_SCOPES.includes(b.scope)) ev.scope = b.scope;
     if (b.entry !== undefined) ev.entry = b.entry === 'paid' ? 'paid' : 'free';
-    if (b.fee_pkr !== undefined) ev.fee_pkr = Number(b.fee_pkr) || 0;
+    if (ev.series_kind !== 'shiplens' && b.fee_pkr !== undefined) ev.fee_pkr = Number(b.fee_pkr) || 0;
     if (b.starts_at !== undefined) ev.starts_at = b.starts_at || null;
     if (b.ends_at !== undefined) ev.ends_at = b.ends_at || null;
     if (b.deadline !== undefined) ev.deadline = /^\d{4}-\d{2}-\d{2}$/.test(String(b.deadline || '')) ? b.deadline : null;

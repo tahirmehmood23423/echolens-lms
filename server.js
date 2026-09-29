@@ -3367,7 +3367,7 @@ app.post('/api/admin/events', authRequired, adminRequired, (req, res) => {
   const b = req.body || {};
   if (!b.title) return res.status(400).json({ error: 'Give the event a title.' });
   if (b.series_kind === 'shiplens') {
-    if (b.kind !== 'competition' || b.entry !== 'paid' || b.scope !== 'both' || !(Number(b.fee_pkr) > 0)) return res.status(400).json({ error: 'ShipLens must be a paid competition visible in both the portal and open website.' });
+    if (b.kind !== 'competition' || b.entry !== 'paid' || b.scope !== 'both') return res.status(400).json({ error: 'ShipLens must be a paid competition visible in both the portal and open website.' });
     const error = shipLensProjectError(b.problems);
     if (error) return res.status(400).json({ error });
   }
@@ -3382,7 +3382,7 @@ app.patch('/api/admin/events/:id', authRequired, adminRequired, (req, res) => {
   const current = Events.byId(req.params.id);
   if (current?.series_kind === 'shiplens') {
     const b = req.body || {};
-    if ((b.kind && b.kind !== 'competition') || (b.entry && b.entry !== 'paid') || (b.scope && b.scope !== 'both') || (b.fee_pkr !== undefined && !(Number(b.fee_pkr) > 0))) return res.status(400).json({ error: 'ShipLens remains a paid competition on both the portal and open site.' });
+    if ((b.kind && b.kind !== 'competition') || (b.entry && b.entry !== 'paid') || (b.scope && b.scope !== 'both')) return res.status(400).json({ error: 'ShipLens remains a paid competition on both the portal and open site.' });
     if (b.problems !== undefined) {
       const error = shipLensProjectError(b.problems);
       if (error) return res.status(400).json({ error });
@@ -3458,25 +3458,26 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
     const registration = Registrations.byId(out.entry.registration_id);
     try {
       const pdf = await challanPdf(c, `${APP_URL}/challan?s=${c.serial}`);
+      const challanAttachment = { filename: `ShipLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' };
+      const recipients = [...new Set([c.student_email, ...out.entry.team_details.map((member) => member.email)]
+        .map((email) => String(email || '').trim().toLowerCase()).filter(Boolean))];
       const delivery = await deliverRegistrationMail(store, mailer, registration, {
         to: c.student_email, subject: `ShipLens fee challan - ${ev.title}`,
-        text: `Your team registered for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The challan is attached. Pay PKR ${c.net_fee} by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions. You can download the challan from your ShipLens page.`,
-        attachments: [{ filename: `ShipLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' }],
+        text: `Your team registered for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The PKR 500 challan is attached. Pay PKR 500 by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions. You can download the challan from your ShipLens page.`,
+        attachments: [challanAttachment],
       }, { kind: 'challan', reference: c.serial });
       if (delivery.state === 'provider_accepted') Challans.markSent(c.serial);
-      // A team of two: the second member gets their own copy of the same
-      // challan so either of them can pay, sign in later and see the team as
-      // enrolled - this courtesy copy sits outside deliverRegistrationMail's
-      // per-registration delivery tracking, which only tracks the lead's copy.
-      const mate = out.entry.team_details[1];
-      if (mate?.email) {
+      // Every team member receives the same PDF. The registration delivery
+      // record tracks the lead; teammate messages are individually accepted.
+      for (const recipient of recipients.filter((email) => email !== String(c.student_email || '').trim().toLowerCase())) {
         try {
           await mailer.send({
-            to: mate.email, subject: `ShipLens fee challan - ${ev.title}`,
-            text: `Your teammate ${out.entry.team_details[0].name} registered your team for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The challan is attached. Pay PKR ${c.net_fee} by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions.\n\nSign in (or create an account) with this same email address to see your team's enrollment and submit your work.`,
-            attachments: [{ filename: `ShipLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' }],
+            to: recipient, subject: `ShipLens fee challan - ${ev.title}`,
+            text: `Your teammate ${out.entry.team_details[0].name} registered your team for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The PKR 500 challan is attached. Pay PKR 500 by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions.\n\nSign in (or create an account) with this same email address to see your team's enrollment and submit your work.`,
+            attachments: [challanAttachment],
           });
-        } catch (error) { console.error('ShipLens challan delivery to teammate failed:', error.message); }
+          console.info(`[ShipLens challan] PDF accepted for ${recipient} (${c.serial}).`);
+        } catch (error) { console.error(`ShipLens challan delivery to ${recipient} failed:`, error.message); }
       }
     } catch (error) { console.error('ShipLens challan delivery failed:', error.message); }
     // Same automatic fee-reminder cadence (7/4/3/1 days before, due day, then

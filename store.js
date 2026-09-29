@@ -4330,8 +4330,8 @@ const OpenQuest = {
     if (!deferSave) save(); return { ok: true };
   },
   /* ---------------------- launch waitlist (staged courses) ----------------------
-   * The trending-tech tracks are content-complete but have no lecture videos
-   * yet, so they are catalogue previews rather than enrollable courses. A
+   * The trending-tech tracks are content-complete but most lecture videos
+   * are still missing, so they are catalogue previews rather than enrollable courses. A
    * learner can still reserve a seat: they are emailed the moment the course
    * opens. A reservation is NOT an enrollment - it grants no content and does
    * not consume one of the learner's two active-course slots, because there is

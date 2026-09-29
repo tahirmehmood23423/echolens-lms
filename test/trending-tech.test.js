@@ -16,9 +16,9 @@ const { Quests, OpenQuest, OpenAttempts, Users, Certificates } = store;
 
 test('Revision 3 catalogue contains the exact staged course structure', () => {
   const result = tracks.validateTrendingTechCatalogue(tracks);
-  assert.deepEqual(result.counts, { courses: 6, modules: 24, lectures: 72, assignments: 72, capstones: 6, videos_ready: 0 });
+  assert.deepEqual(result.counts, { courses: 6, modules: 24, lectures: 72, assignments: 72, capstones: 6, videos_ready: 12 });
   assert.equal(result.valid, false);
-  assert.equal(result.errors.length, 72);
+  assert.equal(result.errors.length, 60);
   assert.deepEqual(tracks.map((track) => track.course_code), ['TT-01', 'TT-02', 'TT-03', 'TT-04', 'TT-05', 'TT-06']);
   for (const track of tracks) {
     assert.equal(track.published, false);

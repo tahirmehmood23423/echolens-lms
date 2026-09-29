@@ -3,10 +3,9 @@
 /**
  * EchoLens Top Trending Tech Track — Revision 3.
  *
- * The catalogue source specifies 72 in-house videos but intentionally leaves
- * their watch URLs blank until production. These tracks therefore stay
- * unpublished. Replace each `video_url: null` in the JSON catalogue with the
- * matching EchoLens watch URL, run validateTrendingTechCatalogue(), and only
+ * The first track uses curated YouTube lectures; the remaining five tracks
+ * still lack lecture URLs. These tracks therefore stay unpublished. Complete
+ * the remaining `video_url: null` entries, validate the catalogue, and only
  * then change the track and catalogue entries to `published: true`.
  */
 const catalogue = require('./trending-tech-catalogue.json');

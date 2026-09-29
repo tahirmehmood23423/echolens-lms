@@ -1313,6 +1313,7 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .ev-kind.quest{color:#0A7A55}.ev-kind.hackathon{color:#7A46C9}.ev-kind.competition{color:#B25E00}.ev-kind.webinar{color:#2A7BD1}.ev-kind.live{color:#D14370}
 .ev-row h4{font-size:15.5px;color:var(--ink);margin:3px 0 3px;font-family:var(--font-display)}
 .ev-row .desc{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-row.shiplens-event-row .desc{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden;line-height:1.55}
 .ev-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:9px;font-size:12.5px;color:var(--muted);align-items:center}
 .ev-meta .m{display:inline-flex;align-items:center;gap:5px}
 .ev-meta svg{width:14px;height:14px;opacity:.8}
@@ -1359,6 +1360,9 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
 .evd-sec h4{font-size:12.5px;font-weight:700;color:var(--ink);margin:14px 0 4px}
 .evd-sec p{font-size:13.5px;color:var(--text);line-height:1.6;white-space:pre-line}
 .evd-sec .muted{color:var(--muted)}
+.evd-event-description{margin:0 0 18px;padding:16px 18px;background:#F7F8FC;border:1px solid var(--line);border-left:4px solid var(--primary);border-radius:12px}
+.evd-event-description h3{margin:0 0 8px;font-family:var(--font-display);font-size:15px;color:var(--ink)}
+.evd-event-description p{margin:0;font-size:14px;line-height:1.75;color:var(--text);white-space:pre-line;overflow-wrap:anywhere}
 .evd-ex{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
 .evd-ex summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 14px;
   font-size:13px;font-weight:600;color:var(--ink);background:var(--canvas)}

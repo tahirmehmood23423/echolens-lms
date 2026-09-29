@@ -2507,7 +2507,7 @@ function drawEventList() {
     const avg = ev.my_progress && ev.my_progress.avg != null
       ? `<span class="ev-avg">Average so far: ${ev.my_progress.avg}%</span>`
       : ev.entries_count ? `<span class="ev-avg">${ev.entries_count} joined</span>` : '';
-    return `<div class="ev-row" onclick="openOpenEvent(${ev.id})" style="cursor:pointer">
+    return `<div class="ev-row${ev.series_kind === 'shiplens' ? ' shiplens-event-row' : ''}" onclick="openOpenEvent(${ev.id})" style="cursor:pointer">
       ${evThumb(ev)}
       <div class="ev-body">
         <span class="ev-kind ${evKindClass(ev)}">${evKindTag(ev)}</span>
@@ -2981,7 +2981,9 @@ function renderEventDetail() {
 
   const overview = `<div class="evd-sec" id="evdSec-overview">
     <h3 style="margin-bottom:14px">Overview</h3>
-    <p class="muted" style="margin-bottom:16px">${esc((ev.description || '').slice(0, 260))}${(ev.description || '').length > 260 ? '…' : ''}</p>
+    ${ev.series_kind === 'shiplens'
+      ? `<section class="evd-event-description"><h3>About this ShipLens event</h3><p>${esc(ev.description || 'Event details will be announced soon.')}</p></section>`
+      : `<p class="muted" style="margin-bottom:16px">${esc((ev.description || '').slice(0, 260))}${(ev.description || '').length > 260 ? '…' : ''}</p>`}
     ${statsRow}
     ${banner}
     <h3 style="margin-top:6px;display:flex;align-items:center;gap:8px"><svg class="ic" viewBox="0 0 24 24" fill="none" width="17" height="17"><path d="M6 3h9l3 3v15H6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Problem Statement</h3>

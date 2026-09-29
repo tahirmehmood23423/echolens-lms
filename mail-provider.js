@@ -96,10 +96,20 @@ class SmtpProvider {
 
 class ZeptoApiProvider {
   constructor() { this.name = 'zeptomail-api'; this.kind = 'transactional'; this.token = String(process.env.ZEPTO_SEND_MAIL_TOKEN || '').replace(/^Zoho-enczapikey\s+/i, '').trim(); this.configured = !!this.token; }
-  async send({ to, subject, text, html }) {
+  async send({ to, subject, text, html, attachments }) {
     if (!this.configured) return { sent: false, skipped: true };
     const from = parseAddress(FROM, 'EchoLens');
-    const payload = JSON.stringify({ from: { address: from.email, name: from.name }, to: [{ email_address: { address: String(to), name: '' } }], subject, textbody: text, htmlbody: html || `<pre style="font-family:Arial,sans-serif;white-space:pre-wrap">${String(text || '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</pre>` });
+    const message = { from: { address: from.email, name: from.name }, to: [{ email_address: { address: String(to), name: '' } }], subject, textbody: text, htmlbody: html || `<pre style="font-family:Arial,sans-serif;white-space:pre-wrap">${String(text || '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</pre>` };
+    if (attachments?.length) {
+      message.attachments = attachments.map((attachment) => ({
+        name: String(attachment.filename || attachment.name || 'attachment'),
+        mime_type: String(attachment.contentType || attachment.mime_type || 'application/octet-stream'),
+        content: Buffer.isBuffer(attachment.content)
+          ? attachment.content.toString('base64')
+          : Buffer.from(attachment.content || '').toString('base64'),
+      }));
+    }
+    const payload = JSON.stringify(message);
     return new Promise((resolve, reject) => {
       const req = https.request({ hostname: 'api.zeptomail.com', path: '/v1.1/email', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Zoho-enczapikey ${this.token}`, 'Content-Length': Buffer.byteLength(payload) }, timeout: 15000 }, (res) => {
         let body = ''; res.on('data', (c) => { body += c; }); res.on('end', () => { if (res.statusCode >= 200 && res.statusCode < 300) resolve({ sent: true, id: body }); else { const e = new Error(`ZeptoMail API ${res.statusCode}: ${body}`); e.statusCode = res.statusCode; reject(e); } });

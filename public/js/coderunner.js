@@ -44,6 +44,35 @@
     // PyPI with micropip instead, exactly like `pip install` would on a
     // laptop.
     const MICROPIP_FALLBACK = { seaborn: 'seaborn' };
+    // The browser's event loop is already running, so asyncio.run(main())
+    // raises "cannot be called from a running event loop". Pyodide does allow
+    // top-level await, so rewrite each module-level asyncio.run(x) call to
+    // await (x) in place - only the call name changes, so line numbers in a
+    // traceback still match the learner's editor. Calls inside a function or
+    // class body are left alone (await is not legal there).
+    const PY_ASYNC_MAIN = [
+      'def _echo_async_main(src):',
+      '    import ast',
+      '    try: tree = ast.parse(src)',
+      '    except SyntaxError: return src',
+      '    spots = []',
+      '    class _V(ast.NodeVisitor):',
+      '        def visit_FunctionDef(self, node): pass',
+      '        visit_AsyncFunctionDef = visit_Lambda = visit_ClassDef = visit_FunctionDef',
+      '        def visit_Call(self, node):',
+      '            f = node.func',
+      '            if (isinstance(f, ast.Attribute) and f.attr == "run" and isinstance(f.value, ast.Name)',
+      '                    and f.value.id == "asyncio" and len(node.args) == 1 and not node.keywords',
+      '                    and f.lineno == f.end_lineno):',
+      '                spots.append((f.lineno, f.col_offset, f.end_col_offset))',
+      '            self.generic_visit(node)',
+      '    _V().visit(tree)',
+      '    lines = src.split("\\n")',
+      '    for lineno, start, end in sorted(spots, reverse=True):',
+      '        raw = lines[lineno - 1].encode("utf-8")',
+      '        lines[lineno - 1] = (raw[:start] + b"await " + raw[end:]).decode("utf-8")',
+      '    return "\\n".join(lines)',
+    ].join('\n');
     /* ---------------------- the Python-side runtime (v21) ----------------------
      * Two things every data-science lesson needs, installed into the
      * interpreter before the student's code runs:
@@ -259,9 +288,16 @@
             await py.runPythonAsync('_echo_install_plot_hook()');
           }
         } catch (rtErr) { /* the run still works, just without these extras */ }
+        let source = m.code;
+        if (/\basyncio\.run\s*\(/.test(source)) {
+          try {
+            await py.runPythonAsync(PY_ASYNC_MAIN);
+            source = py.globals.get('_echo_async_main')(source);
+          } catch (asyncErr) { /* run the code untouched */ }
+        }
         postMessage({ type: 'status', text: 'Running...' });
         try {
-          await py.runPythonAsync(m.code);
+          await py.runPythonAsync(source);
         } finally {
           // Figures the student never passed to plt.show() (and anything drawn
           // before an error) still belong on screen.
@@ -712,8 +748,24 @@
     const status = (text) => { try { onStatus && onStatus(text); } catch {} };
     term.clear();
     status('Running JavaScript...');
-    const prelude = 'const _echoText=v=>{try{return typeof v==="object"?JSON.stringify(v):String(v)}catch(_){return String(v)}};console={log:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),info:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),warn:(...a)=>postMessage({type:"out",text:"Warning: "+a.map(_echoText).join(" ")+"\\n"}),error:(...a)=>postMessage({type:"out",text:"Error: "+a.map(_echoText).join(" ")+"\\n"})};';
-    const source = `${prelude}\n${String(code)}\npostMessage({type:"done"});`;
+    // The learner's code runs inside an async wrapper so top-level `await`
+    // works, and "done" waits until every pending timer and fetch has
+    // settled - posting it straight after the synchronous part terminated the
+    // worker before any Promise / setTimeout / async output could print.
+    // The prelude stays on ONE line so error line numbers are `lineno - 1`.
+    const prelude = 'const _echoText=v=>{try{return typeof v==="object"?JSON.stringify(v):String(v)}catch(_){return String(v)}};console={log:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),info:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),warn:(...a)=>postMessage({type:"out",text:"Warning: "+a.map(_echoText).join(" ")+"\\n"}),error:(...a)=>postMessage({type:"out",text:"Error: "+a.map(_echoText).join(" ")+"\\n"})};'
+      + 'const _echoST=setTimeout,_echoCT=clearTimeout,_echoSI=setInterval,_echoCI=clearInterval,_echoFetch=self.fetch,_echoTimers=new Set(),_echoIntervals=new Set();let _echoMain=false,_echoFetches=0;'
+      + 'const _echoCheck=()=>{if(_echoMain)_echoST(()=>{if(!_echoTimers.size&&!_echoIntervals.size&&!_echoFetches)postMessage({type:"done"})},50)};'
+      + 'const _echoLine=e=>{const m=String(e&&e.stack||"").match(/blob:[^\\s)]*?:(\\d+):\\d+/);return m?Number(m[1])-1:null};'
+      + 'const _echoFail=e=>postMessage({type:"fail",text:"Uncaught "+(e&&e.name?e.name+": "+e.message:String(e)),line:_echoLine(e)});'
+      + 'self.addEventListener("unhandledrejection",ev=>{ev.preventDefault();_echoFail(ev.reason)});'
+      + 'self.setTimeout=(f,ms,...a)=>{const id=_echoST(()=>{_echoTimers.delete(id);try{if(typeof f==="function")f(...a)}finally{_echoCheck()}},ms);_echoTimers.add(id);return id};'
+      + 'self.clearTimeout=id=>{_echoTimers.delete(id);_echoCT(id);_echoCheck()};'
+      + 'self.setInterval=(f,ms,...a)=>{const id=_echoSI(f,ms,...a);_echoIntervals.add(id);return id};'
+      + 'self.clearInterval=id=>{_echoIntervals.delete(id);_echoCI(id);_echoCheck()};'
+      + 'if(_echoFetch)self.fetch=(...a)=>{_echoFetches++;return _echoFetch(...a).finally(()=>{_echoFetches--;_echoCheck()})};'
+      + '(async function(){';
+    const source = `${prelude}\n${String(code)}\n}).call(self).then(()=>{_echoMain=true;_echoCheck()},_echoFail);`;
     return new Promise((resolve) => {
       const scriptUrl = URL.createObjectURL(new Blob([source], { type: 'application/javascript' }));
       const scriptWorker = new Worker(scriptUrl);
@@ -734,6 +786,11 @@
       scriptWorker.onmessage = (event) => {
         if (event.data?.type === 'out') term.print(event.data.text);
         else if (event.data?.type === 'done') finish({ ok: true });
+        else if (event.data?.type === 'fail') {
+          const line = event.data.line > 0 ? event.data.line : null;
+          term.print(`${event.data.text}${line ? ` (line ${line})` : ''}\n`);
+          finish({ ok: false, errorLine: line });
+        }
       };
       scriptWorker.onerror = (event) => {
         event.preventDefault();

@@ -1140,16 +1140,6 @@ function lessonStudyGuideHtml(l) {
     ${l.video_outline ? `<p class="s" style="margin-top:8px"><strong>Outline:</strong> ${esc(l.video_outline)}</p>` : ''}
   </div>`;
 }
-function moduleResourcesHtml(l) {
-  const module = (CUR?.track?.modules || []).find((item) => item.no === l.module_no);
-  const resources = module?.resources || [];
-  if (!resources.length) return '';
-  return `<details class="slv-block" style="margin-top:16px"><summary><span class="slv-block-head" style="display:inline">Optional module deep dives</span></summary>
-    <div style="padding-top:10px">${resources.map((resource) => {
-      const embed = videoEmbedHtml(resource.url, resource.title, 960, true);
-      return embed || `<a class="btn btn-ghost btn-sm" href="${esc(resource.url)}" target="_blank" rel="noopener" style="margin:4px 6px 4px 0">${esc(resource.title)}</a>`;
-    }).join('')}</div></details>`;
-}
 function levelHasVideo(l) { return !!(l && (l.resource_url || l.video_url || (Array.isArray(l.videos) && l.videos.length))); }
 function topicDetailHtml(l) {
   const hasVideo = l.video_url || (Array.isArray(l.videos) && l.videos.length);
@@ -1836,7 +1826,6 @@ function openSolveVideo(levelNo, skipPush) {
       <div class="slv-head"><h2>${esc(lvl.title || '')}</h2></div>
       ${videoLinksHtml(lvl, true)}
       ${lessonStudyGuideHtml(lvl)}
-      ${moduleResourcesHtml(lvl)}
       ${watched
         ? `<div class="s" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;color:var(--teal);font-weight:700">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Video watched</div>`

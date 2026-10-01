@@ -3,8 +3,8 @@
 /**
  * EchoLens Top Trending Tech Track — Revision 3.
  *
- * All tracks have curated YouTube lectures and remain staged for admin review.
- * Publication is controlled separately from video readiness.
+ * All tracks have curated YouTube lectures and are published as free courses.
+ * `staged_catalogue` only keeps them listed on the admin video review page.
  */
 const catalogue = require('./trending-tech-catalogue.json');
 
@@ -91,11 +91,7 @@ const tracks = catalogue.map((course, courseIndex) => {
   const warnings = warningAt >= 0 ? [course.assessment.slice(warningAt).trim()] : [];
   const assessment = warningAt >= 0 ? course.assessment.slice(0, warningAt).trim() : course.assessment;
   let levelNo = 0;
-  const modules = course.modules.map((module) => ({
-    no: module.no,
-    title: module.title,
-    resources: module.resources.map((resource) => ({ ...resource, optional: true })),
-  }));
+  const modules = course.modules.map((module) => ({ no: module.no, title: module.title }));
   const levels = course.modules.flatMap((module) => module.lessons.map((lesson, lessonIndex) => {
     levelNo += 1;
     // Each three-lecture module spans two of the catalogue's eight weeks.
@@ -151,7 +147,7 @@ const tracks = catalogue.map((course, courseIndex) => {
     duration_weeks: 8,
     hours: meta.hours || 40,
     free: true,
-    published: false,
+    published: true,
     staged_catalogue: true,
     inline_video_only: true,
     friendly_grading: true,

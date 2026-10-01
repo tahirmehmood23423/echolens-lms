@@ -1,0 +1,22 @@
+{
+  "id": "poLBRs0kF08",
+  "url": "https://www.youtube.com/watch?v=poLBRs0kF08",
+  "checked_at": "2026-09-30T07:25:08.794Z",
+  "title": "Postgresql Architecture Wal Files |Write Ahead Log | Learnomate Technologies | Ankush Sir",
+  "channel": "Learnomate Technologies",
+  "duration_seconds": 409,
+  "views": 42816,
+  "comments": "121 Comments",
+  "comment_samples": [
+    "Intrested",
+    "Yes",
+    "Intrested",
+    "INTERESTED",
+    "Interesting"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In the realm of database management systems, PostgreSQL stands out as a robust and versatile option, renowned for its reliability and performance. Central to its architecture are Write-Ahead Logging (WAL) files, a critical component ensuring data integrity and recovery capabilities.\n\nWAL files serve as a fundamental mechanism for PostgreSQL's transactional model. When a change is made to the database, instead of immediately writing it to the data files on disk, PostgreSQL first writes the change to the WAL files in a sequential manner. This process, known as logging, ensures that modifications are recorded before they are applied to the main data files, making transactions durable even in the event of system failures.\n\n--------------------------------------------------------------------------------------------------------------------------------------------------\n𝐒𝐮𝐛𝐬𝐜𝐫𝐢𝐛𝐞 𝐓𝐨 𝐦𝐲 𝐩𝐞𝐫𝐬𝐨𝐧𝐚𝐥 𝐂𝐡𝐚𝐧𝐧𝐞𝐥\nhttps://www.youtube.com/@UCCdFiLd2TWkWi3tghZa1dKw \n\n-----------------------------------------------------------------------------------------------------------------------------------------\n𝐅𝐨𝐫 𝐦𝐨𝐫𝐞 𝐢𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧 𝐟𝐢𝐥𝐥-𝐮𝐩 𝐭𝐡𝐢𝐬 𝐟𝐨𝐫𝐦:\nhttps://forms.gle/rviG8fvRh5qQd6VAA\n\n𝐂𝐡𝐞𝐜𝐤 𝐨𝐮𝐭 𝐏𝐨𝐬𝐭𝐠𝐫𝐞𝐒𝐐𝐋 𝐒𝐲𝐥𝐥𝐚𝐛𝐮𝐬 𝐏𝐚𝐠𝐞 𝐇𝐞𝐫𝐞\nhttps://learnomate.org/training/postgresql-training/\n\n𝐏𝐨𝐬𝐭𝐠𝐫𝐞𝐒𝐐𝐋 𝐖𝐡𝐚𝐭𝐬𝐀𝐩𝐩 𝐂𝐨𝐦𝐦𝐮𝐧𝐢𝐭𝐲 𝐋𝐢𝐧𝐤\nhttps://whatsapp.com/channel/0029VaB5IiNBKfhvnSCwQi34\n\n𝐎𝐮𝐫 𝐇𝐞𝐥𝐩𝐟𝐮𝐥 𝐁𝐥𝐨𝐠 𝐨𝐧 𝐏𝐨𝐬𝐭𝐠𝐫𝐞𝐒𝐐𝐋\nhttps://learnomate.org/blogs/\n----------------------------------------------------------------------------------------------------------------------------------------------------\n𝐅𝐎𝐋𝐋𝐎𝐖 𝐔𝐒 :\n\nLinkedIn   :    / learnomatetechnologies   \n\nInstagram:    /     https://www.instagram.com/learnomate/\n\nFacebook :     https://www.facebook.com/learnomate\n\nYouTube  :     https://www.youtube.com/@learnomate\n\nTwitter     :   https://twitter.com/learnomatetech\n\nTelegram : https://t.me/OracleLearnomate \n\n---------------------------------------------------------------------------------------------------------------------------------------------------------\n𝐅𝐨𝐫 𝐌𝐨𝐫𝐞 𝐝𝐞𝐭𝐚𝐢𝐥𝐬 𝐂𝐨𝐧𝐭𝐚𝐜𝐭 𝐔𝐬:\n\n𝐄𝐦𝐚𝐢𝐥: info@learnomate.org \n\n𝐖𝐡𝐚𝐭𝐬𝐀𝐩𝐩/𝐌𝐨𝐛 𝐍𝐨:  +91 7822917585 / +91 7757062955\n--------------------------------------------------------------------------------------------------------------------------------------------------------\nIgnore Hashtag \n#PostgreSQL #MVCC #ConcurrencyControl #DatabaseConcurrency #PostgreSQLDatabase #MVCCMechanism #DatabasePerformance #DatabaseScalability #DatabaseTransactions #PostgreSQLTips #MVCCInPostgreSQL #DatabaseManagement #ConcurrencyManagement #DatabaseConcurrencyControl #MVCCExplained #DatabaseOptimization #PostgreSQLTutorial #MVCCConcepts #DatabaseDevelopment #DatabaseArchitecture #DatabaseConcurrencyHandling #PostgreSQLConcurrency #MVCCFeatures #DatabaseLocking",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

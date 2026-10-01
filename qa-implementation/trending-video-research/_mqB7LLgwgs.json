@@ -1,0 +1,22 @@
+{
+  "id": "_mqB7LLgwgs",
+  "url": "https://www.youtube.com/watch?v=_mqB7LLgwgs",
+  "checked_at": "2026-09-30T07:25:47.079Z",
+  "title": "Go's Built-in Package for Better Logging (using slog)",
+  "channel": "Better Stack",
+  "duration_seconds": 531,
+  "views": 14400,
+  "comments": "19 Comments",
+  "comment_samples": [
+    "Super underrated channel, I'm glad I'm here before you blow up!",
+    "Damn, I would have subscribed for this video alone if I wasn't already.",
+    "It's really incredible what's been added in the last several releases of go. Thanks for this really great breakdown of this newer package.",
+    "Very clear and effective demo. Thanks, team.",
+    "Very good. Thanks"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Go's built-in slog package transforms messy logs into clean, searchable JSON that your observability tools will love. In this video, I'll show you how to set up structured logging in Go, add custom attributes, handle errors properly, and even integrate with popular logging libraries like Zap. Whether you're debugging locally or managing production logs, slog will make your life easier and your debugging sessions shorter.\n\n👨🏻‍💻 Logging in Go with Slog: The Ultimate Guide: https://betterstack.com/community/guides/logging/logging-in-go/\n\n► HACKING SCALE NEWSLETTER\nhttps://newsletter.betterstack.com/\n\n► READ MORE\nMore about Better Stack: https://betterstack.com/\nCommunity pages: https://betterstack.com/community/\n\n► STAY TUNED\nGitHub: https://github.com/BetterStackHQ\nTwitter: https://twitter.com/betterstackhq\nLinkedIn: https://www.linkedin.com/company/betterstack\nInstagram: https://www.instagram.com/betterstackhq/\nTikTok: https://www.tiktok.com/@betterstack\n\n📌 𝗖𝗵𝗮𝗽𝘁𝗲𝗿𝘀:",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

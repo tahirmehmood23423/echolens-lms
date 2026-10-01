@@ -1,0 +1,22 @@
+{
+  "id": "FprFu75BoE4",
+  "url": "https://www.youtube.com/watch?v=FprFu75BoE4",
+  "checked_at": "2026-09-30T07:24:02.859Z",
+  "title": "POSTGRESQL JOINS [Complete guide in 12 mins]",
+  "channel": "cudidotdev",
+  "duration_seconds": 750,
+  "views": 12950,
+  "comments": "17 Comments",
+  "comment_samples": [
+    "This was a beautiful tutorial, explicit and concised.Thank You",
+    "Great explanation, easy to understand with good examples in just 12 mins 😊",
+    "Super instructive and clear explanation👍",
+    "Awesome and helpful content. Looking forward to your future videos",
+    "oh thank you so much best tutorial i found on youtube for joins"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Welcome to my first video on this channel! \n\nIn today's tutorial, we dive deep into Postgres joins, demystifying Inner, Left, Right, Full Outer, Self, Cross, and Natural Joins. By the end of this video, you'll have a comprehensive understanding of these joins and how to use them effectively.\n\n00:00 Introduction\n00:12 What are Relational databases?\n00:55 What are Primary and Foreign Keys?\n02:15 What is an INNER JOIN? how does it work? and how to write an inner join SQL query?\n04:46 What is a LEFT JOIN and RIGHT JOIN? What are the Differences and Use Cases?\n06:56 What is a FULL OUTER JOIN? Combining Left and Right Joins\n07:40 What is a SELF JOIN? Joining a Table with Itself\n09:42 What is a CROSS JOIN? Exploring All Possible Combinations\n10:21 What is a NATURAL JOIN? Simplifying Joins with Matching Column Names\n\n\n📂 GitHub Gists with SQL Code:\nhttps://gist.github.com/cudidotdev/2a76de8b5c528c98ab911b6eda981e79\n\n\n🎮 Check out my web games at https://cudi.dev/games. Enjoy the rest of your day!\n\nEmail: augustinemadu9@gmial.com\nGithub: https://github.com/cudilala\nTwitter: https://twitter.com/cudilala_\nLinkedIn: https://www.linkedin.com/in/augustine-madu-625168223/\n\n\n👍 If you found this tutorial helpful, please give it a like, share your thoughts, and ask questions in the comments below\n\n🔔 Consider subscribing for more insightful tutorials. Thank you for watching, and have a great day!\n\n\n📚 References:\n\nRelational database: https://cloud.google.com/learn/what-is-a-relational-database\nPostgreSQL joins: https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-joins\nPostgreSQL inner join: https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-inner-join\nPostgreSQL left join: https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-left-join\nPostgreSQL right join: https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-right-join\nPostgreSQL full outer join: https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-full-outer-join/\nPostgreSQL self join: https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-self-join/\nPostgreSQL cross join: https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-cross-join/\nPostgreSQL natural join: https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-natural-join/",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

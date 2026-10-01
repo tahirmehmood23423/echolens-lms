@@ -1,0 +1,86 @@
+{
+  "query": "monotonic stack algorithm explained",
+  "checked_at": "2026-09-30T07:21:49.090Z",
+  "results": [
+    {
+      "id": "Dq_ObZwTY_Q",
+      "title": "Monotonic Stack Data Structure Explained",
+      "channel": "AlgoMonster",
+      "duration": "5:43",
+      "views": "118,189 views",
+      "description": "LeetCode Pattern - Monotonic stack, Monotonic deque, Monotonic queue Next Greater Element II Daily Temperature Sliding ..."
+    },
+    {
+      "id": "DtJVwbbicjQ",
+      "title": "Monotonic Stack in 6 minutes | LeetCode Pattern",
+      "channel": "AlgoMasterIO",
+      "duration": "6:38",
+      "views": "77,614 views",
+      "description": "Master DSA Patterns: https://algomaster.io/ ▻ My DSA Playlist: ..."
+    },
+    {
+      "id": "AXNXcV8AYHQ",
+      "title": "Monotonic Stack Explained Simply | The Pattern Most People Miss",
+      "channel": "techiCAT",
+      "duration": "1:40",
+      "views": "134 views",
+      "description": "Monotonic Stack is one of the most powerful DSA patterns for coding interviews, yet many people fail to recognize when to use it."
+    },
+    {
+      "id": "jUwJC79Mc7s",
+      "title": "Master Monotonic Stack in 5 Minutes | DSA Pattern Explained 🔥",
+      "channel": "saurabh kumar",
+      "duration": "6:31",
+      "views": "100 views",
+      "description": "Learn the Monotonic Stack — one of the most powerful DSA patterns for solving problems like Next Greater Element, Stock Span, ..."
+    },
+    {
+      "id": "e7XQLtOQM3I",
+      "title": "L5. Next Greater Element | Stack and Queue Playlist",
+      "channel": "take U forward",
+      "duration": "18:25",
+      "views": "410,654 views",
+      "description": "Check out TUF+: https://takeuforward.org/plus?source=youtube Find DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions ..."
+    },
+    {
+      "id": "p7oXBIChwrs",
+      "title": "Stack - 9 | What are Monotonic Stacks?",
+      "channel": "CTO Bhaiya",
+      "duration": "10:18",
+      "views": "3,481 views",
+      "description": "Beginner to Advanced Playlist Monotonic Stack Explained | Next Greater Element | Stack Interview Pattern In this video, we ..."
+    },
+    {
+      "id": "15OuNilu0r0",
+      "title": "Monotonic Stack Explained: Solve Tricky Coding Problems Easily!",
+      "channel": "CodeLucky",
+      "duration": "8:47",
+      "views": "3,749 views",
+      "description": "Unlock the power of Monotonic Stacks and ace your coding interviews! This video provides a comprehensive introduction to ..."
+    },
+    {
+      "id": "cTBiBSnjO3c",
+      "title": "Daily Temperatures - Monotonic Stack - Leetcode 739 - Python",
+      "channel": "NeetCode",
+      "duration": "11:52",
+      "views": "392,231 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "YKggz_BceVk",
+      "title": "Next Greater Element - Monotonic Stack Algorithm Tutorial",
+      "channel": "CodeLucky",
+      "duration": "4:27",
+      "views": "115 views",
+      "description": "Learn how to solve the Next Greater Element problem using the Monotonic Stack technique! In this video, we break down the ..."
+    },
+    {
+      "id": "wDRUTfiDfe0",
+      "title": "132 Pattern Solved in O(n) — The Power of Monotonic Stack",
+      "channel": "CodingCraft",
+      "duration": "3:53",
+      "views": "419 views",
+      "description": "Welcome to CodingCraft! In this video, we solve the classic \"132 Pattern\" problem using a powerful Monotonic Stack approach."
+    }
+  ]
+}

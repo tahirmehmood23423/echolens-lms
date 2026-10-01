@@ -1,0 +1,110 @@
+{
+  "query": "SQL NULL semantics three valued logic",
+  "checked_at": "2026-09-30T07:25:00.355Z",
+  "results": [
+    {
+      "id": "u2Kdw1raQJ4",
+      "title": "Nulls and Three Valued Logic in SQL Programming",
+      "channel": "The SQL Professor",
+      "duration": "10:29",
+      "views": "183 views",
+      "description": "Null values are unknowns. Not blank, not zero, but unknown. This logic introduces some complexity that can trip up SQL ..."
+    },
+    {
+      "id": "-JcYgeVO8jo",
+      "title": "WHERE Clause vs NULL: How Three-Valued Logic Works in SQL",
+      "channel": "SQL Handbook",
+      "duration": "11:54",
+      "views": "211 views",
+      "description": "In this video, I talk about how NULLs behave in the WHERE clause in SQL — something that trips up a lot of people if it's not ..."
+    },
+    {
+      "id": "kVhAXhMJ1cs",
+      "title": "NULLs & COALESCE (Learn SQL)",
+      "channel": "DataPallas",
+      "duration": "15:23",
+      "views": "37 views",
+      "description": "An empty cell is not a value, so comparing it to one answers neither yes nor no. Why an equals sign against NULL matches ..."
+    },
+    {
+      "id": "2DOAzH7S91M",
+      "title": "Null: Databases for Developers #10",
+      "channel": "The Magic of SQL",
+      "duration": "7:42",
+      "views": "12,216 views",
+      "description": "The null value represents missing or unknown information. But using it brings complications to your SQL. In this video Chris ..."
+    },
+    {
+      "id": "RKUYYrmv6gw",
+      "title": "SQL - NULL Values - W3Schools.com",
+      "channel": "w3schools.com",
+      "duration": "2:16",
+      "views": "113,059 views",
+      "description": "... SQL NULL Values Intro 00:15 - What are NULL Values? 00:53 - SQL NULL Values Syntax 01:22 - SQL NULL Value Examples ..."
+    },
+    {
+      "id": "pn9OI3sSKFE",
+      "title": "Lec-80: How Aggregate Functions work on NULL Values | SQL | DBMS",
+      "channel": "Gate Smashers",
+      "duration": "7:23",
+      "views": "135,718 views",
+      "description": "Complete DBMS +. SQL Roadmap  : https://www.gatesmashers.com/roadmaps/dbms-sql MASTER COMPUTER SCIENCE ..."
+    },
+    {
+      "id": "R3v5o7d6K5E",
+      "title": "WHERE, OR, and Three Valued Logic",
+      "channel": "Jack",
+      "duration": "3:04",
+      "views": "321 views",
+      "description": "I hope this helps you in your 70-761 journey. I am using the database TSQLV4. TSQLV4 and all scripts can be downloaded from ..."
+    },
+    {
+      "id": "xhol4V9u-ic",
+      "title": "NULL Values in RDBMS",
+      "channel": "Neso Academy",
+      "duration": "7:17",
+      "views": "48,085 views",
+      "description": "DBMS: NULL Values in RDBMS Topics discussed: 1. Understanding the importance of NULL Values using an Analogy. 2."
+    },
+    {
+      "id": "2Ab3AR01E74",
+      "title": "SQL : How to apply 3-valued-logic to SQL queries?",
+      "channel": "Hey Delphi",
+      "duration": "1:29",
+      "views": "192 views",
+      "description": "SQL : How to apply 3-valued-logic to SQL queries? To Access My Live Chat Page, On Google, Search for \"hows tech developer ..."
+    },
+    {
+      "id": "6Twnw3sQChk",
+      "title": "NULL Functions in SQL",
+      "channel": "Neso Academy",
+      "duration": "15:03",
+      "views": "20,708 views",
+      "description": "DBMS: NULL Functions in SQL Topics discussed: 1. NULL Functions in SQL 2. ISNULL() Function in SQL 3. COALESCE() ..."
+    },
+    {
+      "id": "kh6XglXzdgw",
+      "title": "Ch 5.1 Handling Null Values",
+      "channel": "Madhuri Debnath",
+      "duration": "10:44",
+      "views": "137 views",
+      "description": "Database System and Concepts Advanced SQL Handling Null values in SQL 3-valued logic: True, False, and Unknown."
+    },
+    {
+      "id": "1ZrqQy-W8kA",
+      "title": "SQL, null values, Lesson 22",
+      "channel": "hammadshams",
+      "duration": "3:54",
+      "views": "4,056 views",
+      "description": "how to deal with null values in SQL."
+    },
+    {
+      "id": "_aGDzx3-uiQ",
+      "title": "NULL in Snowflake Explained | Why NOT IN Can Return ZERO Rows | Snowflake SQL Tutorial #6",
+      "channel": "TechBrothersIT",
+      "duration": "5:58",
+      "views": "183 views",
+      "description": "For three episodes a row has been going missing from our results. In Episode 3 it vanished from a NOT EQUAL comparison."
+    }
+  ]
+}

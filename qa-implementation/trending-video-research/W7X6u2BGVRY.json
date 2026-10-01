@@ -1,0 +1,22 @@
+{
+  "id": "W7X6u2BGVRY",
+  "url": "https://www.youtube.com/watch?v=W7X6u2BGVRY",
+  "checked_at": "2026-09-30T07:23:40.169Z",
+  "title": "How Docker Networking Actually Works",
+  "channel": "KodeKloud",
+  "duration_seconds": 541,
+  "views": 33463,
+  "comments": "30 Comments",
+  "comment_samples": [
+    "👉 Don't just watch it, build it. Open the free labs and run the commands in a real Docker playground: https://kode.wiki/4uqUWpB",
+    "Nice video, but you forgot to add the router, that uses NAT to translate the private IP of your laptop to your public IP of your router connection.",
+    "Nice explaination",
+    "One of the best ever video content I have seen explaining the docker networking concepts... Hats of to you team!!!",
+    "Docker Networking well explained 👌Diagram is amazing🙏"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🧪 Practice free in our Docker labs: https://kode.wiki/4uqUWpB\n\nEver wondered how a container talks to the internet, but you still can't reach it from your own browser? In this video we get absolute clarity on how Docker networking actually works, and why those two things behave so differently.\n\nWe break down Docker's default bridge network and trace a packet end to end: from the app inside the container, through the virtual Ethernet pair, across the bridge, and out to the internet. No jargon, just a clear mental model you'll keep for good.\n\n🎯 By the end of this video you'll understand:\n💠How a bridge network connects your container to the host\n💠How the virtual Ethernet pair wires the container to the bridge\n💠How NAT lets your container borrow the host identity to reach the internet\n💠Why the internet can't reach your container by default\n💠How publishing a port opens the door from the outside\n\n👉 Don't just watch it, build it. Open the free labs and run the commands in a real Docker playground: https://kode.wiki/4uqUWpB\n\n⏰ Timestamps below 👇\n00:00 - The Container Networking Problem\n00:22 - What Is a Bridge Network?\n01:15 - What We Mean by Host Machine\n01:53 - Virtual Ethernet Pair (The Virtual Cable)\n02:58 - Container IP, Bridge IP & The Gateway\n04:11 - Outbound Journey: Reaching the Internet with NAT\n06:00 - Inbound Journey: Why You Can't Reach the Container\n07:52 - The Two Rules That Explain Everything\n08:41 - Free Hands-On Docker Networking Lab\n\n🔔 Subscribe for more Docker and DevOps concepts explained the simple way.\n\n#Docker #DockerNetworking #Containers #DevOps #DockerTutorial #ContainerNetworking #DockerBridge #DockerForBeginners #Networking #NAT #PortMapping #Linux #CloudNative #DockerExplained #LearnDocker #KodeKloud",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

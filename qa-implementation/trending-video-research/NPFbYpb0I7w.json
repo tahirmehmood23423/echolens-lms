@@ -1,0 +1,22 @@
+{
+  "id": "NPFbYpb0I7w",
+  "url": "https://www.youtube.com/watch?v=NPFbYpb0I7w",
+  "checked_at": "2026-09-30T07:23:44.295Z",
+  "title": "Kubernetes Ingress in 5 mins",
+  "channel": "IBM Technology",
+  "duration_seconds": 340,
+  "views": 269560,
+  "comments": "144 Comments",
+  "comment_samples": [
+    "Can we take a second to appreciate how SMOOTH this guy is at writing backwards",
+    "Best 5 minutes video ever for Ingress",
+    "Very cool! in 5 minutes you are able to explain that better then a lot of time of anyone else :)",
+    "This is a good short video on Ingress and service but once you need to make one correction on ip addresses. 169 range IP address in not public address. It is reserved range.",
+    "One of the best videos I have seen. Within 5 minutes you explained a very valid points. God bless bro."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Watch introductory Kubernetes Explained video → https://youtu.be/aSrqRSk43lY\nLearn more about Kubernetes → http://ibm.biz/explore-kubernetes-guide\nLearn more about Kubernetes Ingress → http://ibm.biz/learn-more-about-ingress \nLearn more about Load Balancing → http://ibm.biz/load-balancing-guide\nRead the Kubernetes Ingress blog → http://ibm.biz/what-is-k8-ingress-blog\nCheck out IBM Cloud Kubernetes Service → http://ibm.biz/managed-k8s-service\n\n►  Earn a badge with FREE interactive Kubernetes labs → http://ibm.biz/interactive-k8s-hands-on-labs\n\nThere are several ways to expose your applications deployed in Kubernetes, but how do you know which option is best for you?\n\nIn this lightboard video, Sai Vennam with IBM Cloud, visually breaks down the four main options (ClusterIP, NodePort, LoadBalancer, and Ingress) in great detail and why using Kubernetes Ingress is the best option to use in production environments. \n\nTimestamps\n0:00 - Intro\n0:50 - ClusterIP\n1:10 - NodePort\n2:44 - LoadBalancer\n3:43 - Ingress\n5:10 - Benefits of Kubernetes Ingress\n\nGet started on IBM Cloud at no cost → http://ibm.biz/get-on-ibm-cloud\nSubscribe to see more videos like this in the future → http://ibm.biz/subscribe-now\n\n#Kubernetes #KubernetesIngress #LoadBalancer",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

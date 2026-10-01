@@ -1,0 +1,20 @@
+{
+  "id": "CMH6YIHLvAw",
+  "url": "https://www.youtube.com/watch?v=CMH6YIHLvAw",
+  "checked_at": "2026-09-30T07:23:48.485Z",
+  "title": "Automated Docker Image Scanning with Trivy and GitHub Actions!",
+  "channel": "Adrian Dolinay",
+  "duration_seconds": 619,
+  "views": 2447,
+  "comments": "3 Comments",
+  "comment_samples": [
+    "Really awesome! Thank you.",
+    "I have locally deployed DeepSeek R1 (70B parameters). My goal is to develop an autonomous code generation system that integrates code synthesis and automated error correction. This system will iterate until an error-free code is generated. For testing, the system will automatically install the required dependencies and streamline the code execution process. Can you create this project?",
+    "Thsi Video is confusing"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Tutorial on automating Trivy security scans of Docker Images using GitHub Actions. Learn about the process of setting up a CI/CD workflow in GitHub, configuring a YAML file, and using Trivy to scan for vulnerabilities in container images. Additionally, learn how to securely store and use personal access tokens, interpret workflow results, and commit scan outputs to a GitHub repository.\n\nYAML Script can be found in the following GitHub Repo: https://github.com/ad17171717/YouTube-Tutorials/blob/main/.github/workflows/trivy_scan.yml\n\nGitHub Actions Tutorial: https://youtu.be/IX1O4_MmUig?si=UIuo4IPQfeMyzRcB\n\nGitHub Actions Documentation: https://docs.github.com/en/actions\nTrivy Documentation: https://trivy.dev/latest/\nDocker Documentation: https://docs.docker.com/\n\nCONNECT:\nLinkedIn: https://www.linkedin.com/in/adrian-dolinay-frm-96a289106/\nGitHub: https://github.com/ad17171717\nX: https://twitter.com/DolinayG\nOdysee: https://odysee.com/@adriandolinay:0\nMedium: https://medium.com/@adriandolinay\n\nPODCAST:\nApple Podcasts: https://podcasts.apple.com/us/podcast/the-aspiring-stem-geek/id1765996824\nAudible: https://www.audible.com/podcast/The-Aspiring-STEM-Geek/B0DC73S9SN?eac_link=ONLefHtKpP93&ref=web_search_eac_asin_1&eac_selected_type=asin&eac_selected=B0DC73S9SN&qid=ZLZCJYZ17Q&eac_id=145-9930582-4977616_ZLZCJYZ17Q&sr=1-1\niHeart Radio: https://iheart.com/podcast/202676097/\nSpotify: https://open.spotify.com/show/60dPNJbDPaPw7ru8g5btxV?si=26e034e416f446d8\n\n|-Video Chapters-|\n0:00 - Intro\n0:14 - Overview of GitHub Actions\n0:25 - Overview of Trivy\n0:36 - Tutorial Overview\n0:47 - Creating a GitHub Actions Workflow\n1:14 - Setting Workflow Name and Triggers\n1:57 - Defining Jobs in the Workflow\n2:30 - Step 1: Checkout Action\n2:56 - Step 2: Retrieve Current Date\n3:14 - Step 3: Create Directory for Results\n3:38 - Step 4: Install Trivy\n3:57 - Step 5: Authenticate with GitHub Container Registry (GHCR)\n4:20 - How to Generate a Personal Access Token (PAT)\n6:38 - Step 6: Download Vulnerability Database\n6:49 - Step 7: Run Trivy Vulnerability Scan\n7:27 - Step 8: Verify Scan Results\n7:36 - Step 9: Commit Results to Repository\n8:03 - Pushing Changes to GitHub\n8:40 - Viewing Workflow Execution\n9:29 - Checking Scan Results\n9:49 - Conclusion",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,118 @@
+{
+  "query": "PostgreSQL page layout WAL explained",
+  "checked_at": "2026-09-30T07:24:06.329Z",
+  "results": [
+    {
+      "id": "UZ66jEj7Zh0",
+      "title": "Database Internals: Page Layout Explained (based on PostgreSQL)",
+      "channel": "Data Craze",
+      "duration": "18:42",
+      "views": "597 views",
+      "description": "Ever wondered what actually happens on disk when you run an INSERT command? It's not magic. It's engineering."
+    },
+    {
+      "id": "poLBRs0kF08",
+      "title": "Postgresql Architecture Wal Files |Write Ahead Log | Learnomate Technologies | Ankush Sir",
+      "channel": "Learnomate Technologies",
+      "duration": "6:49",
+      "views": "42,801 views",
+      "description": "In the realm of database management systems, PostgreSQL stands out as a robust and versatile option, renowned for its reliability ..."
+    },
+    {
+      "id": "cqORW8yzyFg",
+      "title": "What is Write Ahead logging? WAL Explained in System Design",
+      "channel": "Piyush Garg",
+      "duration": "11:16",
+      "views": "16,042 views",
+      "description": "Hey everyone, In this video, we are going to talk about Write Ahead Logging in system design. We will understand the problem ..."
+    },
+    {
+      "id": "MHAzvg3uEDA",
+      "title": "Write-Ahead Logging (WAL) Explained: The Key to Distributed Data Integrity",
+      "channel": "aloneguid",
+      "duration": "3:02",
+      "views": "5,076 views",
+      "description": "Data loss in distributed systems is a nightmare. Discover the solution: Write-Ahead Logging (WAL)! This video tackles the critical ..."
+    },
+    {
+      "id": "AxHmyUTfkVQ",
+      "title": "PostgreSQL WAL Explained Simply | Modern Data, Drawn",
+      "channel": "Modern Data, Drawn",
+      "duration": "6:47",
+      "views": "18 views",
+      "description": "Why PostgreSQL records changes in the write-ahead log before data pages reach disk. This paper-style visual guide builds the ..."
+    },
+    {
+      "id": "s3hKYMOpp3E",
+      "title": "Write-Ahead Logs. The secret to fast database queries.",
+      "channel": "Ben Dicken",
+      "duration": "11:11",
+      "views": "42,498 views",
+      "description": "Write-ahead logs boost database performance by turning expensive random disk writes into fast sequential ones. Instead of ..."
+    },
+    {
+      "id": "RaX6C_xYbV0",
+      "title": "2. WHAT IS PAGE IN POSTGRESQL || DBA FROM INDIA|| POSTGRESSQL||",
+      "channel": "DBA FROM INDIA ",
+      "duration": "5:14",
+      "views": "408 views",
+      "description": "Hi Everyone In this video I have given one small introduction about PAGE in PostgreSQL database. Keep an eye on this series ..."
+    },
+    {
+      "id": "XTrHECfPXZw",
+      "title": "Architecture of PostgreSQL: A Beginner’s Guide to DBA Internals",
+      "channel": "postgresdbabytes",
+      "duration": "11:49",
+      "views": "330 views",
+      "description": "To tune a database, you have to understand its heart. Today, we explore the PostgreSQL Process Architecture and Memory ..."
+    },
+    {
+      "id": "n2Fluyr3lbc",
+      "title": "PostgreSQL in 100 Seconds",
+      "channel": "Fireship",
+      "duration": "2:37",
+      "views": "1,290,985 views",
+      "description": "Try Postgres with Neon https://bit.ly/neon-fireship right now. Postgres is one of the most popular open-source SQL databases."
+    },
+    {
+      "id": "3V3cr3itCAU",
+      "title": "How a Database Actually Stores Data: Pages, B+Trees & WAL",
+      "channel": "The Blueprint Beaver",
+      "duration": "8:34",
+      "views": "36 views",
+      "description": "You run INSERT, press enter, and in under a millisecond the database says \"1 row added\". But where did that row physically go ..."
+    },
+    {
+      "id": "zYU6BJSoIJg",
+      "title": "5mins of Postgres E10: max_wal_size, Postgres full page writes and UUID vs BIGINT primary keys",
+      "channel": "pganalyze",
+      "duration": "5:36",
+      "views": "1,429 views",
+      "description": "In today's episode 10, we take a look at max_wal_size, full-page writes and why you might want to choose BIGINT instead of a ..."
+    },
+    {
+      "id": "SheRXGF0AVU",
+      "title": "Tutorial-42 | PostgreSQL: How to Safely Move WAL Files to a New Location",
+      "channel": "mynoteoracledba",
+      "duration": "16:09",
+      "views": "292 views",
+      "description": "In this video, I'll walk you through the step-by-step process of migrating PostgreSQL WAL (Write-Ahead Log) files from one ..."
+    },
+    {
+      "id": "m3DrTDDU0UM",
+      "title": "How PostgreSQL Really Works: Architecture, MVCC, WAL, Indexes & Replication",
+      "channel": "NIXOTECH Programming",
+      "duration": "9:20",
+      "views": "20 views",
+      "description": "PostgreSQL is much more than a database that runs SQL. In this video, we explore how PostgreSQL actually works ..."
+    },
+    {
+      "id": "P8rrhZTPEAQ",
+      "title": "99% of Developers Don't Get PostgreSQL",
+      "channel": "The Coding Gopher",
+      "duration": "12:40",
+      "views": "347,373 views",
+      "description": "Check out Supabase: https://supabase.plug.dev/qnxeTMY ❤️ Get 40% OFF CodeCrafters: ..."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "pIGRwMjhMaQ",
+  "url": "https://www.youtube.com/watch?v=pIGRwMjhMaQ",
+  "checked_at": "2026-09-30T07:23:18.537Z",
+  "title": "Chunking Strategies in RAG: Optimising Data for Advanced AI Responses",
+  "channel": "Mervin Praison",
+  "duration_seconds": 842,
+  "views": 141441,
+  "comments": "178 Comments",
+  "comment_samples": [
+    "This is a shorter version of Greg's video, thanks for sharing!",
+    "I have read 7 books and over a 100 videos on RAGing documents. In my assessment this is the hands-down BEST, no nonsense presentation on chunking strategy. I wish he would do one like this on chunking pdf files with tables and also on re-ranking vector search results.",
+    "Bro didn't waste a second! great explanation and editing.",
+    "Thank you for the video!\nI recently built my first RAG application and chunking + retrieval was the main challenge.",
+    "this is best high quality channel and videos no intor/no long stuff just to point thank you very much"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🚀 Dive deep into the world of RAG applications with our comprehensive guide on chunking strategies! Advanced Chunking Strategies in RAG: How to Optimi Data for Advanced AI Responses. Whether you're a beginner or an advanced user, this video is your go-to resource for optimizing data processing through effective chunking techniques. From data division and embeddings to storage in a Vector database, we cover it all. 📊\n\nDiscover why high-quality chunking is crucial for producing accurate AI responses and explore various methods, including character splitting, recursive splitting, document-based, semantic, and agentic chunking. 🧠💡\n\nSpecial thanks to Greg for sharing insights on different levels of chunking strategy. Don't miss our step-by-step tutorial on setting up and integrating chunking strategies with your RAG application for improved performance. 🛠️📈\n\n👍 If you find this video helpful, please LIKE and SHARE to support our content. Don't forget to SUBSCRIBE and hit the BELL icon for more AI and technology insights!\n\n*If you like this video:*\nTweet something positive or what you like about these tutorials on https://twitter.com/@MervinPraison \n\"@MervinPraison .......................\"\n\n🔗 Resources:\nPatreon: https://patreon.com/MervinPraison\nKo-fi: https://ko-fi.com/mervinpraison\nDiscord: https://discord.gg/nNZu5gGT59\nTwitter / X : https://twitter.com/mervinpraison\nLangChain Agents: https://www.youtube.com/watch?v=TGp07EB6vCo\nLangchain Vision API: https://www.youtube.com/watch?v=uUfMkn6SkJI\nLangchain OpenAI Assistants: https://www.youtube.com/watch?v=cbOw4Gijppk\nCode: https://mer.vin/2024/03/chunking-strategy/\n\nTimestamps:\n0:00 - Introduction to Chunking Strategies in RAG\n1:52 - Detailed Tutorial on Various Chunking Methods\n2:25 - Setup Instructions for Chunking Environment\n3:01 - Code Walkthrough for Character Text Splitting\n6:01 - Implementing Recursive Character Text Splitting\n7:00 - Exploring Document Text Splitting Techniques\n8:26 - Introduction to Semantic Chunking with Embeddings\n9:45 - Advanced Agentic Chunking for Optimised Grouping\n13:50 - Conclusion\n\n\n#Advanced #Chunking #Strategy  #AdvancedChunking #SemanticChunking #SemanticSplitting #SemanticSplitter #CharacterSplitting #CharacterChunking #CharacterTextSplitter #RecursiveTextSplitter #RecursiveCharacterTextSplitter #RecursiveSplitter #CharacterSplitter #AgenticSplitting #Agentic #AgentSplitting #LevelOfChunking #LevelsOfChunking #LevelsOfSplitting #LevelsOfTextSplitting #RAG #TextSplittingRAG #RAGTextSplitting #ChunkOptimisation #OptimisingChunk",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "c8H0w4yBL10",
+  "url": "https://www.youtube.com/watch?v=c8H0w4yBL10",
+  "checked_at": "2026-09-30T07:25:04.401Z",
+  "title": "This is your last video about Golang Structs!",
+  "channel": "Flo Woelki",
+  "duration_seconds": 957,
+  "views": 59811,
+  "comments": "96 Comments",
+  "comment_samples": [
+    "4:07 - don't use floats for money, you will lose pennies over time.",
+    "hi Flo, thank you so much, I'm a software engineer from Indonesia. I'm so grateful these channel exists so people overseas like me can learn these advanced programming languages better. you really help people to grow their skills. ❤",
+    "Best place to learn and explore go. Great work brother. Lots of love from India !",
+    "Hey Flo, danke für deine tolle Arbeit. Deine Videos helfen mir sehr im Studium, sowohl durch das Wissen, das du vermittelst, als auch durch deine angenehme Sprache. Außerdem beruhigt mich dein deutscher Akzent irgendwie :D Weiter so!",
+    "This is my first video of yours for go, I just started about two weeks ago and this is so good that ai am going to binge watch them all right now"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Mastering Structs in Golang is really important and that's why this video tries to cover everything you need to know about Structs in Go. Also, if you want to get into HTMX and Go, feel free to check out this video here: https://youtu.be/8z8VrlVOIyM\n\n\n📝 Description\nIn this in-depth Golang tutorial, we cover everything you need to know about structs. We dive into the syntax, anonymous structs, nested structs, and the use of pointers. We also explore how to implement methods with structs and how to work with tags. Additionally, mastering advanced techniques with Structs is also important and that's why we will also cover things like Tags, Composition, and Embedded Structs. This video is perfect for those who want to master Golang's powerful features and understand how to use them effectively in their programming journey. \n\n\n⏳ Timestamps:\n00:00 - Introduction\n00:32 - What are Structs?\n01:19 - Structs Basics\n04:45 - Struct Pointers\n09:37 - Advanced Structs\n15:31 - Outro\n\n\n👋 Hey there!\nIf you are new to this channel: Hey 👋 my name is Flo and I am a professional software engineer with a passion for coding in Golang, TypeScript, JavaScript, and Rust. This channel is where I share that passion and dive into the exciting world of software engineering. Plus, I love using Emojis and paper-based animations (so have a look for that, if you want to find my videos).\n\n\n📨 Support and Connect!\nBecome a member. https://www.youtube.com/@FloWoelki/membership\nDiscord: https://discord.gg/TnA7drJ\nX / Twitter: https://x.com/FlorianWoelki\nLinkedIn: https://www.linkedin.com/in/florian-woelki/\nGitHub: https://github.com/FlorianWoelki\n\n\n📝 Copyright Notice\nThe original Go Gopher was designed by Renée French (Source: https://go.dev/blog/gopher License details: https://creativecommons.org/licenses/by/4.0/). The gopher appearing in this video and thumbnail is modified from the original design.\n\n\n#golang #go #structs",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

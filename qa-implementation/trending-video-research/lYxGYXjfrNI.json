@@ -1,0 +1,22 @@
+{
+  "id": "lYxGYXjfrNI",
+  "url": "https://www.youtube.com/watch?v=lYxGYXjfrNI",
+  "checked_at": "2026-09-30T07:23:21.602Z",
+  "title": "Advanced RAG 03 - Hybrid Search BM25 & Ensembles",
+  "channel": "Sam Witteveen",
+  "duration_seconds": 407,
+  "views": 42506,
+  "comments": "39 Comments",
+  "comment_samples": [
+    "Very thankful for these videos, please continue with the series",
+    "Thanks Sam, this title caught my eye as something I could use in my POC for better search results.  Really appreciate you sharing.",
+    "Best video on this topic",
+    "concise, interesting and useful content as always.  Super series this, very interesting. Many thanks!",
+    "Great thank you !!! This hybrid approach is quite interesting."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Colab: https://drp.li/biRYp\n\nFor more tutorials on using LLMs and building Agents, check out my Patreon:\nPatreon: https://www.patreon.com/SamWitteveen\nTwitter: https://twitter.com/Sam_Witteveen\n\nMy Links:\nLinkedin: https://www.linkedin.com/in/samwitteveen/\n\nGithub:\nhttps://github.com/samwit/langchain-tutorials  (updated)\nhttps://github.com/samwit/llm-tutorials\n\n00:00 Intro\n00:06 BM 25\n01:25 Code Time\n\n#langchain #openai #llm",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

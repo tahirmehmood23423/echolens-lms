@@ -1,0 +1,22 @@
+{
+  "id": "B9uR2gLM80E",
+  "url": "https://www.youtube.com/watch?v=B9uR2gLM80E",
+  "checked_at": "2026-09-30T07:23:53.879Z",
+  "title": "Go Concurrency Explained: Go Routines & Channels",
+  "channel": "Melkey",
+  "duration_seconds": 470,
+  "views": 179058,
+  "comments": "195 Comments",
+  "comment_samples": [
+    "I hope you all enjoyed this GO LANG video!\nYour comments mean the world to me. We are SO CLOSE to 5k subs!",
+    "Just a tip: instead of modifying the fetch function to use channels and go routines, should probably just encapsulate the function call inside ankther function and handle channel communication from there\n\ngo func() {\n  fetch(...)\n  ...\n}\n\nThis way you don't change the fetch function behaviour and it can be used both with and without go routines",
+    "7:37, dude i scared me",
+    "Great video for those unfamiliar with goroutines! One way to estimate how much faster this will make your code is like this: the first way of running it just one after another in a loop will take the time to call a + the time to call b + time to call c etc. When using goroutines, these are all running at the same time, however you're waiting for the collection of them to finish (using wg.Wait()). This means you will be held back by the slowest single call whether its a or b or c etc.",
+    "Great video.\nJust mentioning that the speed gain is much more visible if you don't only test for 4 API calls, but for a 100 or 1000."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🚀Goroutines: We'll start by demystifying the power of goroutines. Learn how to create lightweight concurrent threads of execution, allowing your programs to handle multiple tasks simultaneously.\n\n🚀Channels: Discover the magic of channels, Go's built-in communication mechanism for safely passing data between goroutines. We'll explore both buffered and unbuffered channels and understand when to use each.\n\n🚀Concurrency Patterns: Explore essential concurrency patterns, including fan-out/fan-in, worker pools, and more. These patterns will supercharge your code's efficiency while maintaining clarity and readability.\n\n25% FEM Membership with course:\nhttps://frontendmasters.com/courses/complete-go/?code=MELKEY25&utm_source=melkey\n\n\nReal API Integration: The real-world application of concurrency is where the magic happens. Watch as we integrate real API calls using goroutines and channels, fetching data faster than ever before.\n\n\n### Twitch\nI stream live on Twitch every weekend\nTwitch : https://www.twitch.tv/melkey\nJoin the amazing community on Discord\nDiscord: https://discord.gg/melkeydevhouse\nI post memes and host Twitter Tech Spaces\nTwitter: https://twitter.com/MelkeyDev\n\n\nSUBSCRIBE OR GET LAID OFF\n╔═╦╗╔╦╗╔═╦═╦╦╦╦╗╔═╗\n║╚╣║║║╚╣╚╣╔╣╔╣║╚╣═╣ \n╠╗║╚╝║║╠╗║╚╣║║║║║═╣\n╚═╩══╩═╩═╩═╩╝╚╩═╩═╝\n\n\n#coding #neovim  #typescript  #programming #vim #softwareengineering #codinglife #webdesign #webdevelopment #webdev #javascript #rustlang #rust #twitch #twitchstreamer #programmerhumor #codinghumor #software #softwareengineer #softwaredeveloper #softwaredevelopment #gymbro #gym #programmerhumor #programming #coding",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

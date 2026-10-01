@@ -1,0 +1,86 @@
+{
+  "query": "LangServe deploy FastAPI RAG tutorial",
+  "checked_at": "2026-09-30T07:24:54.857Z",
+  "results": [
+    {
+      "id": "P9JeprHiJRA",
+      "title": "FastAPI File Uploads: The RAG Ingestion Pattern You Need",
+      "channel": "Analytics Vidhya",
+      "duration": "3:57",
+      "views": "911 views",
+      "description": "Description: This video explains three additional methods for sending data to an API beyond URL parameters and JSON bodies: ..."
+    },
+    {
+      "id": "Arf7UwWjGyc",
+      "title": "RAG in Production - LangChain & FastAPI",
+      "channel": "Coding Crash Courses",
+      "duration": "11:52",
+      "views": "18,825 views",
+      "description": "In this video, I'll demonstrate the compelling reasons for integrating LangChain with FastAPI to effectively bring your application ..."
+    },
+    {
+      "id": "jRI5WvRdMLw",
+      "title": "LangServe: Deploy LangChain to Production (FAST & Official API Tutorial)",
+      "channel": "STARP AI",
+      "duration": "5:33",
+      "views": "89 views",
+      "description": "Are you a LangChain developer or backend engineer who needs to deploy your sophisticated chain locally? LangServe is the ..."
+    },
+    {
+      "id": "Agh9G-iIFrQ",
+      "title": "FastAPI + LangServe: The Secret to Deploying Your LLM App",
+      "channel": "Datahat -- Simplified AI",
+      "duration": "10:06",
+      "views": "1,275 views",
+      "description": "In this video, we dive into the deployment of Large Language Model (LLM) applications using FastAPI and LangServe, a powerful ..."
+    },
+    {
+      "id": "gSyD3l5RRE8",
+      "title": "Retrieval remotely using LangServe (LangChain Server) and FastAPI in few minutes!",
+      "channel": "AI Tech Explained Right",
+      "duration": "3:25",
+      "views": "1,222 views",
+      "description": "Hi everyone I hope you're doing well and welcome back to the AI Tech explained Right channel, a place for AI professinals and ..."
+    },
+    {
+      "id": "HKmnwZdF2gQ",
+      "title": "Build a FREE AI Assistant with RAG (No API Cost!) — LangChain + Ollama + FastAPI Tutorial",
+      "channel": "Python Dev & AI",
+      "duration": "8:40",
+      "views": "437 views",
+      "description": "Build a 100% free, local AI chatbot with RAG — no OpenAI API key needed. Full Python tutorial inside. In this video, we build a ..."
+    },
+    {
+      "id": "FhGNGYKvZ20",
+      "title": "Build and Deploy RAG-as-a-Service | Full Stack AI App Tutorial (Step-by-Step)",
+      "channel": "Ahmad Ali",
+      "duration": "1:26",
+      "views": "379 views",
+      "description": "Learn how to build and deploy RAG-as-a-Service, turning Retrieval-Augmented Generation (RAG) into a full-stack, ..."
+    },
+    {
+      "id": "eHqI3NgQL7o",
+      "title": "RAG Fundamental - Part V (Turn RAG into API via FastAPI)",
+      "channel": "Doeun Kongden",
+      "duration": "9:30",
+      "views": "124 views",
+      "description": "Build a Production-Ready RAG Pipeline with ChromaDB, Llama 3.2 & FastAPI Welcome to this step-by-step video series on ..."
+    },
+    {
+      "id": "R2q14zd0Gh8",
+      "title": "Building an AI Study Assistant | RAG + LangGraph + FastAPI + Streamlit",
+      "channel": "piyush raj",
+      "duration": "2:09",
+      "views": "224 views",
+      "description": "I built EduPilot — an AI Study & Assessment Assistant that turns study material into an interactive learning workflow. In this demo, I ..."
+    },
+    {
+      "id": "7U82wfZEP9s",
+      "title": "LangServe by Langchain - APIs have never been EASIER",
+      "channel": "Michael Daigler",
+      "duration": "5:22",
+      "views": "8,983 views",
+      "description": "In this video I go over Langchain's new tool LangServe - the easiest and best way to deploy any LangChain chain/agent/runnable."
+    }
+  ]
+}

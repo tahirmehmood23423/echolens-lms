@@ -1,0 +1,86 @@
+{
+  "query": "Kubernetes configmaps secrets HPA tutorial",
+  "checked_at": "2026-09-30T07:21:20.367Z",
+  "results": [
+    {
+      "id": "FAnQTgr04mU",
+      "title": "Kubernetes ConfigMap and Secret as Kubernetes Volumes | Demo",
+      "channel": "TechWorld with Nana",
+      "duration": "16:54",
+      "views": "235,764 views",
+      "description": "Demo of using ConfigMap and Secret as Kubernetes Volumes | Kubernetes ConfigMap | Kubernetes Secrets | Kubernetes ..."
+    },
+    {
+      "id": "JD-cgnGeRhk",
+      "title": "Kubernetes ConfigMaps vs Secrets Explained (With Step-by-Step Demo)",
+      "channel": "SubnetSavy",
+      "duration": "2:52",
+      "views": "438 views",
+      "description": "Kubernetes #ConfigMap #Secret #DevOps #CloudNative #KubernetesTutorial #k3d #kubectl #YAML #devopstools Explore ..."
+    },
+    {
+      "id": "Q9fHJLSyd7Q",
+      "title": "Day 19/40 - kubernetes configmap and secret - CKA Full Course 2024",
+      "channel": "Tech Tutorials with Piyush",
+      "duration": "17:09",
+      "views": "21,848 views",
+      "description": "Welcome to day 19/40 of the Certified Kubernetes Administrator (CKA) series! In this video, we will explore config maps, secrets, ..."
+    },
+    {
+      "id": "9WMt7OGhfOE",
+      "title": "Kubernetes Namespaces, ConfigMaps, Secrets, Resource Limits & HPA (Episode 3)",
+      "channel": "TechFlow-Stackyra",
+      "duration": "8:31",
+      "views": "9 views",
+      "description": "Theory is done. Production is next. In Episode 3 you get the five essentials every real Kubernetes cluster needs: Namespaces to ..."
+    },
+    {
+      "id": "EKDmz49BhX8",
+      "title": "ConfigMap in Kubernetes: Solving Problems with Environment Variables and Creating ConfigMaps",
+      "channel": "DevOps Pro",
+      "duration": "15:30",
+      "views": "21,247 views",
+      "description": "Hello folks, Welcome to DevOps Pro! In this video, we'll explore how ConfigMaps in Kubernetes can solve problems with ..."
+    },
+    {
+      "id": "tWc3wfC8sOc",
+      "title": "Credentials and Configs in Kubernetes Secrets and ConfigMaps",
+      "channel": "Christian Lempa",
+      "duration": "19:54",
+      "views": "26,110 views",
+      "description": "Kubernetes ConfigMaps and Secrets Tutorial // In this tutorial we will use ConfigMap and Secret objects in my Cluster to deploy ..."
+    },
+    {
+      "id": "C0yT7FbLh2Y",
+      "title": "Master Kubernetes ConfigMaps! (Day 11): Engaging Live Demo for Starters | Hindi Guide",
+      "channel": "The DevOps Hut",
+      "duration": "18:33",
+      "views": "385 views",
+      "description": "नमस्ते दोस्तों! \"Zero to Hero in Kubernetes\" सीरीज के Day 11 में आपका स्वागत है! Day ..."
+    },
+    {
+      "id": "c8LBjmFPjM4",
+      "title": "ConfigMaps and Secrets in Kubernetes",
+      "channel": "Pavan Elthepu",
+      "duration": "16:35",
+      "views": "19,721 views",
+      "description": "In this video, we'll learn how to create configMap and secret volumes and use them in pods with complete hands-on. ▻ Manifests: ..."
+    },
+    {
+      "id": "SY0ByJc7LsI",
+      "title": "Use ConfigMaps to Inject Data into Kubernetes Pods",
+      "channel": "networkandcode",
+      "duration": "12:06",
+      "views": "1,283 views",
+      "description": "This video explains how to create and use ConfigMaps in Kubernetes to inject configuration data into pods as environment ..."
+    },
+    {
+      "id": "Krpb44XR0bk",
+      "title": "Kubernetes Components explained! Pods, Services, Secrets, ConfigMap | Kubernetes Tutorial 14",
+      "channel": "TechWorld with Nana",
+      "duration": "18:12",
+      "views": "324,823 views",
+      "description": "Kubernetes Pods | Kubernetes Services | Kubernetes Secrets | Kubernetes ConfigMap | Kubernetes Volumes | Kubernetes ..."
+    }
+  ]
+}

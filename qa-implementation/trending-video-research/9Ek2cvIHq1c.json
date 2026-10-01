@@ -1,0 +1,22 @@
+{
+  "id": "9Ek2cvIHq1c",
+  "url": "https://www.youtube.com/watch?v=9Ek2cvIHq1c",
+  "checked_at": "2026-09-30T07:25:42.377Z",
+  "title": "AI Agent Guardrails Simplified - Prompt Injection, PII & More",
+  "channel": "Applied with AI - Sanjay Kumar",
+  "duration_seconds": 665,
+  "views": 12217,
+  "comments": "55 Comments",
+  "comment_samples": [
+    "This is truly an amazing video! \nI have a simple request - could you please add some real world use cases or case studies for the topics you are explaining? Incorporating examples of how these concepts are implemented in real life would be very helpful for our understanding.",
+    "excellent brother... i love the way you are explained... keep going ...thank you",
+    "Very clear explanations 🎉 with examples and implementations! Great one, keep doing it bro 🎉🎉🎉",
+    "amazing video :face-red-heart-shape:. Looking forward",
+    "Excellent knowledge-sharing session on Input Guardrails! 👏 The explanation was clear, practical, and very useful for understanding how to build safer and more reliable AI agents. Thanks for sharing your expertise and helping the community learn. 🙏"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Your AI agent doesn't need to be hacked to fail — sometimes a single sentence is enough. In this video, I break down the first of three guardrail layers every production AI agent needs, and show you exactly how to detect and block the most common input-side failures using Python.\n\nWhat's covered in this video:\n✅ The 3-layer guardrail architecture every agent needs (input → output → tool-calling)\n✅ Prompt injection — detecting attacks with an open-source ML classifier\n✅ PII detection & masking — identifying and redacting sensitive data before it reaches the LLM\n✅ Content moderation — flagging toxic/harmful input in real time\n✅ Topic/scope restriction — keeping your agent inside its intended domain\n✅ Full working Python notebook demos for every guardrail, using Groq + gpt-oss-120b\n\nTools & libraries used:\n\nMicrosoft Presidio (PII detection & anonymization)\nProtectAI DeBERTa (prompt injection detection)\nDetoxify (content moderation)\nZero-shot classification / LLM-based scope guardrails\nGroq API (gpt-oss-120b)\nPydantic (structured validation)\n\n⏱️ Timestamps:\n00:00 Intro\n01:18 Agent Guardrails\n02:31 Mask Sensitive Data\n05:24 Detect Prompt Injection\n07:05 Content Safety\n08:23 Scope Validation\n10:33 What Next?\n\n🧡 If this helped, a like and subscribe helps this channel a lot — new videos on applied AI engineering every week.\n\n#AIAgents #PromptInjection #LLMSecurity #AIEngineering #Python #GenAI #AgentGuardrails #aisecurity #agent #productionai",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

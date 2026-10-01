@@ -1,0 +1,54 @@
+{
+  "query": "RAG semantic caching observability cost",
+  "checked_at": "2026-09-30T07:20:41.747Z",
+  "results": [
+    {
+      "id": "H53L_yHs9jE",
+      "title": "Optimize RAG Resource Use With Semantic Cache",
+      "channel": "Qdrant Vector Search",
+      "duration": "8:43",
+      "views": "9,968 views",
+      "description": "A cache is a high-speed memory that efficiently stores frequently accessed data. Semantic Cache is a specific type of cache that ..."
+    },
+    {
+      "id": "u57EnkQaUTY",
+      "title": "What is Prompt Caching? Optimize LLM Latency with AI Transformers",
+      "channel": "IBM Technology",
+      "duration": "9:06",
+      "views": "116,352 views",
+      "description": "Ready to become a certified watsonx Generative AI Engineer? Register now and use code IBMTechYT20 for 20% off of your exam ..."
+    },
+    {
+      "id": "j9wVKM89XFU",
+      "title": "Caching Strategies to Slash Your LLM Bill | Prompt & Semantic Caching Explained with Demo",
+      "channel": "MadeForCloud",
+      "duration": "18:23",
+      "views": "2,714 views",
+      "description": "Stop overpaying for your LLM API calls! If you are building AI applications, you've likely noticed that costs scale quickly."
+    },
+    {
+      "id": "CZjuLtw0BM8",
+      "title": "Production RAG Observability: Monitoring Latency, Costs & Hallucinations",
+      "channel": "CodersArts",
+      "duration": "7:16",
+      "views": "242 views",
+      "description": "rag #LLMOps #AIobservability Building a Retrieval-Augmented Generation (RAG) prototype is easy, but running it at scale in ..."
+    },
+    {
+      "id": "QA3h4H5jqJw",
+      "title": "Optimizing RAG with Semantic Caching & LLM Memory - Tyler Hutcherson",
+      "channel": "Optimized AI Conference",
+      "duration": "13:59",
+      "views": "851 views",
+      "description": "Tyler Hutcherson, Applied AI Engineering Lead at Redis, explores how semantic caching and LLM memory can significantly ..."
+    },
+    {
+      "id": "oPPzAQ4KpAQ",
+      "title": "FinOps for LLMs Explained | Cut AI Costs Without Sacrificing Quality",
+      "channel": "NeuralCanvas",
+      "duration": "6:55",
+      "views": "98 views",
+      "description": "Your LLM application works... But can you afford to run it at scale? A few extra tool calls, longer prompts, or inefficient model ..."
+    }
+  ]
+}

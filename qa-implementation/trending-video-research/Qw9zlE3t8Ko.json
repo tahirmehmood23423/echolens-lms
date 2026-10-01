@@ -1,0 +1,22 @@
+{
+  "id": "Qw9zlE3t8Ko",
+  "url": "https://www.youtube.com/watch?v=Qw9zlE3t8Ko",
+  "checked_at": "2026-09-30T07:24:16.530Z",
+  "title": "Docker Compose in 12 Minutes",
+  "channel": "Jake Wright",
+  "duration_seconds": 720,
+  "views": 1262274,
+  "comments": "906 Comments",
+  "comment_samples": [
+    "This is the 50th or so video I've watched on containers and the FIRST one that made sense",
+    "In 12 minutes I learned more than the tutorials I was reading for the whole day.",
+    "Straight to the point. Great attention to details in the video production as well. Love it!",
+    "9 years later, and no matter how many updates Docker has gone through, this is still an exelllent guide. It is very easy-to-follow, focused on the subject, and clear.\n\nGreat work.",
+    "5yrs later and this video is still relevant. Straight to the point.  Nothing beats a great content."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Learn how to use Docker Compose to run multi-container applications easily. This is the second video in this Docker series.\n\nLearn Docker in 12 Minutes: https://youtu.be/YFl2mCHdv24\nDeploy Docker Containers with Docker Cloud https://youtu.be/F82K07NmRpk\n\nSource code https://github.com/jakewright/tutorials/tree/master/docker/02-docker-compose\n\nSupport this channel at https://www.patreon.com/jakewright\n\n----------------------------------------\nMORE TUTORIALS\n\nLearn HTML in 12 Minutes: https://youtu.be/bWPMSSsVdPk\nLearn CSS in 12 Minutes: https://youtu.be/0afZj1G0BIE\nLearn JavaScript in 12 Minutes: https://youtu.be/Ukg_U3CnJWI\nLearn PHP in 15 Minutes: https://youtu.be/ZdP0KM49IVk\n\n----------------------------------------\nI deploy Docker containers to a Digital Ocean VPS. Get $10 credit with this link: https://m.do.co/c/791d593997b2\n----------------------------------------\n\nSUBSCRIBE FOR MORE\nhttp://youtube.com/subscription_center?add_user=jaketvee\n\nTWITTER http://twitter.com/jakewrightuk\nFACEBOOK https://www.facebook.com/jakewrightuk\nINSTAGRAM http://instagram.com/jakewrightuk\nSNAPCHAT jakewrightuk\n\nhttp://jakewright.net",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

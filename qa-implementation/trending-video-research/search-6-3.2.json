@@ -1,0 +1,126 @@
+{
+  "query": "PostgreSQL nested loop hash merge join work_mem",
+  "checked_at": "2026-09-30T07:22:04.780Z",
+  "results": [
+    {
+      "id": "pJWCwfv983Q",
+      "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
+      "channel": "The Magic of SQL",
+      "duration": "15:55",
+      "views": "98,849 views",
+      "description": "There are three key algorithms use to combine rows from two tables: * Nested Loops * Hash Join * Merge Join Learn how these ..."
+    },
+    {
+      "id": "-htbah3eCYg",
+      "title": "How nested loop, hash, and merge joins work.",
+      "channel": "Arpit Bhayani",
+      "duration": "11:08",
+      "views": "79,376 views",
+      "description": "Applied AI Course: https://arpitbhayani.me/applied-ai System Design for SDE-2 and above: https://arpitbhayani.me/masterclass ..."
+    },
+    {
+      "id": "Nh80WuM8Izc",
+      "title": "Postgres Join Strategies - Nested Loop Join, Hash Join, Merge Join",
+      "channel": "Lift And Shift Dev",
+      "duration": "12:51",
+      "views": "5,026 views",
+      "description": "In this video, I share with you how Postgres Join strategies work. I will explain in details step by step how these 3 join algorithms ..."
+    },
+    {
+      "id": "UgWUoqrqBog",
+      "title": "How Joins Execute: Nested Loop, Hash, Merge - PostgreSQL for Developers",
+      "channel": "The Software Mentor",
+      "duration": "1:52",
+      "views": "6 views",
+      "description": "How Joins Execute: Nested Loop, Hash, Merge - part of PostgreSQL for Developers. PostgreSQL from the inside out ..."
+    },
+    {
+      "id": "59C8c7p_hII",
+      "title": "Hash Match Join Internals in SQL Server",
+      "channel": "Bert Wagner",
+      "duration": "5:37",
+      "views": "31,856 views",
+      "description": "Hash Match Joins can join almost any data thrown at them. In this video learn about how the hash match join algorithm works and ..."
+    },
+    {
+      "id": "rT4eI3p3tVk",
+      "title": "Query Processing: Nested-Loop joins and Merge join",
+      "channel": "Fundamentals of database systems",
+      "duration": "16:17",
+      "views": "51,938 views",
+      "description": "To access the translated content: 1. The translated content of this course is available in regional languages. For details please ..."
+    },
+    {
+      "id": "hFnAYS_UuJo",
+      "title": "Oracle Performance Tuning - Nested Loop | Sort Merge | Hash Join",
+      "channel": "Saurabh Kumar",
+      "duration": "8:19",
+      "views": "33,201 views",
+      "description": "Nested Loop, Hash Join and Sort Merge Join methods in Oracle with explanation."
+    },
+    {
+      "id": "FTtwDH0Duvk",
+      "title": "How Database Joins Actually Work — Nested Loops, Hash Joins, and Sort-Merge Joins Explained",
+      "channel": "State & Flow",
+      "duration": "10:02",
+      "views": "156 views",
+      "description": "Every time you write a SQL JOIN, your database secretly picks from a handful of algorithms. The wrong choice can turn a 50ms ..."
+    },
+    {
+      "id": "RHBdjXssGg4",
+      "title": "Join Methods: Nested Loop, Hash, Sort, Merge, Adaptive",
+      "channel": "Franck Pachot",
+      "duration": "12:46",
+      "views": "1,721 views",
+      "description": "Here is a replay of the live demo I did at POUG 2018 to explain the join methods. sql monitor to show the execution plan in real ..."
+    },
+    {
+      "id": "uLbGGcopbzI",
+      "title": "How SQL Joins Actually Work — Nested Loop, Hash and Merge, From Zero",
+      "channel": "Internal Engineering",
+      "duration": "19:24",
+      "views": "70 views",
+      "description": "Same query, same data, on a real PostgreSQL database: one way takes 10.7 SECONDS, the other 10.5 MILLISECONDS ..."
+    },
+    {
+      "id": "IFUB8iw46RI",
+      "title": "Merge Join Internals in SQL Server",
+      "channel": "Bert Wagner",
+      "duration": "7:16",
+      "views": "26,333 views",
+      "description": "Without additional optimizations, SQL Server's Merge Join algorithm is the fastest physical join operator available. In this episode ..."
+    },
+    {
+      "id": "3sRYNOTIXvc",
+      "title": "Query Processing : Nested loop join",
+      "channel": "WIT Solapur - Professional Learning Community",
+      "duration": "10:13",
+      "views": "30,676 views",
+      "description": "Mrs. Manisha A. Nirgude, Asst. Professor, Department of Information Technology, Walchand Institute of Technology, Solapur ..."
+    },
+    {
+      "id": "akk2t7G8f4g",
+      "title": "How do I tune a SQL statement that uses a Nested Loops join instead of a Hash Join?",
+      "channel": "Maria Colgan (SQLMaria)",
+      "duration": "6:24",
+      "views": "10,758 views",
+      "description": "At one point or another during your career as a database performance expert, you will face a situation where the optimizer picks ..."
+    },
+    {
+      "id": "T0R5lqD6be4",
+      "title": "Query Processing : Merge Join",
+      "channel": "WIT Solapur - Professional Learning Community",
+      "duration": "10:30",
+      "views": "17,582 views",
+      "description": "Mrs. Manisha A. Nirgude, Asst. Professor, Department of Information Technology, Walchand Institute of Technology, Solapur ..."
+    },
+    {
+      "id": "7Pss_v8uNS4",
+      "title": "Nested Loop, Hash Join, Merge Join — planner chọn kiểu gì và khi nào chọn sai",
+      "channel": "Open learn Hub",
+      "duration": "4:34",
+      "views": "32 views",
+      "description": "Nối hai bảng nghe đơn giản đến mức không ai nghĩ có gì để nói. Nhưng bên trong có BA cách thực thi khác hẳn nhau — và nếu ..."
+    }
+  ]
+}

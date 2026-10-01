@@ -1,0 +1,134 @@
+{
+  "query": "longest common subsequence neetcode",
+  "checked_at": "2026-09-30T07:24:59.066Z",
+  "results": [
+    {
+      "id": "Ua0GhsJSlWM",
+      "title": "Longest Common Subsequence - Dynamic Programming - Leetcode 1143",
+      "channel": "NeetCode",
+      "duration": "18:25",
+      "views": "424,368 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "MNykgz1_ONQ",
+      "title": "Longest Common Subsequence - Leetcode 1143 - Dynamic Programming (Python)",
+      "channel": "Greg Hogg",
+      "duration": "9:21",
+      "views": "20,387 views",
+      "description": "Master Data Structures & Algorithms for FREE at https://AlgoMap.io/ Code solutions in Python, Java, C++ and JS for this can be ..."
+    },
+    {
+      "id": "BFmTwUN-h4g",
+      "title": "Longest Common Subsequence Explained | Dynamic Programming Made Easy | LeetCode 1143",
+      "channel": "Baa Code Education",
+      "duration": "2:38",
+      "views": "102 views",
+      "description": "Learn how to solve the Longest Common Subsequence (LCS) problem step by step using Dynamic Programming. This is the ..."
+    },
+    {
+      "id": "4ClOkX0SWW4",
+      "title": "Longest Common Subsequence Problem Visually Explained | Leetcode 1143 | Dynamic Programming",
+      "channel": "ByteQuest",
+      "duration": "5:39",
+      "views": "23,233 views",
+      "description": "In this video, we break down the Longest Common Subsequence Problem (LeetCode 1143) using Dynamic Programming."
+    },
+    {
+      "id": "7uQ1Lehw7_k",
+      "title": "Longest Common Subsequence - LeetCode 1143 - Python - Visually Explained",
+      "channel": "Hello Byte",
+      "duration": "5:47",
+      "views": "4,618 views",
+      "description": "In this video, we break down a classic algorithm problem — the Longest Common Subsequence (LCS). Using a step-by-step ..."
+    },
+    {
+      "id": "P6RZZMu_maU",
+      "title": "Leetcode 128 - LONGEST CONSECUTIVE SEQUENCE",
+      "channel": "NeetCode",
+      "duration": "9:24",
+      "views": "653,947 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "-RDzMJ33nx8",
+      "title": "Distinct Subsequences - Dynamic Programming - Leetcode 115 - Python",
+      "channel": "NeetCode",
+      "duration": "11:33",
+      "views": "76,545 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ... ... very similar to some other dynamic programming problems involving subsequences particularly longest common subsequence ..."
+    },
+    {
+      "id": "99RVfqklbCE",
+      "title": "Is Subsequence - Leetcode 392",
+      "channel": "NeetCode",
+      "duration": "8:29",
+      "views": "76,370 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ... ... before you solve some of those harder dynamic programming problems problems like longest common subsequence which is a ..."
+    },
+    {
+      "id": "4Mo_fn2fHu0",
+      "title": "Longest Common Subsequence - Leetcode 1143 - Blind 75 Explained - Dynamic Programming - Python",
+      "channel": "Off By One",
+      "duration": "10:55",
+      "views": "482 views",
+      "description": "In this video, I will be showing you how to solve Longest Common Subsequence, Leetcode 1143 , in O(n*m) time and O(n*m) ..."
+    },
+    {
+      "id": "cjWnW0hdF1Y",
+      "title": "Longest Increasing Subsequence - Dynamic Programming - Leetcode 300",
+      "channel": "NeetCode",
+      "duration": "18:13",
+      "views": "552,454 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "DB7J_qBA9Nk",
+      "title": "112. Longest Common Subsequence - Neetcode 150",
+      "channel": "Timothy Roch",
+      "duration": "11:44",
+      "views": "2 views",
+      "description": ""
+    },
+    {
+      "id": "0sWShKIJoo4",
+      "title": "Longest Common Prefix - Leetcode 14 - Python",
+      "channel": "NeetCode",
+      "duration": "6:31",
+      "views": "329,716 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 ⭐ BLIND-75 PLAYLIST: ..."
+    },
+    {
+      "id": "wiGpQwVHdE0",
+      "title": "Longest Substring Without Repeating Characters - Leetcode 3 - Python",
+      "channel": "NeetCode",
+      "duration": "6:46",
+      "views": "889,898 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "UvaieLMKN2Y",
+      "title": "Longest Common Subsequence | LeetCode | Intuitions, Dynamic Programming",
+      "channel": "Tanishq Chaudhary",
+      "duration": "13:12",
+      "views": "431 views",
+      "description": "Google Interview Question. I explain the intuitions & the iterative and recursive dynamic programming solutions for the Longest ..."
+    },
+    {
+      "id": "LAKWWDX3sGw",
+      "title": "Longest common subsequence | Leetcode #1143",
+      "channel": "Techdose",
+      "duration": "18:45",
+      "views": "64,183 views",
+      "description": "This video shows how to solve the longest common subsequence problem efficiently. This is a famous question of dynamic ..."
+    },
+    {
+      "id": "06dIUJwdHlQ",
+      "title": "Find the Length of the Longest Common Prefix - Leetcode 3043 - Python",
+      "channel": "NeetCodeIO",
+      "duration": "15:49",
+      "views": "16,872 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews ‍   LinkedIn: ..."
+    }
+  ]
+}

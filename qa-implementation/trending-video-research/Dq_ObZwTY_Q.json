@@ -1,0 +1,22 @@
+{
+  "id": "Dq_ObZwTY_Q",
+  "url": "https://www.youtube.com/watch?v=Dq_ObZwTY_Q",
+  "checked_at": "2026-09-30T07:25:03.179Z",
+  "title": "Monotonic Stack Data Structure Explained",
+  "channel": "AlgoMonster",
+  "duration_seconds": 343,
+  "views": 118211,
+  "comments": "92 Comments",
+  "comment_samples": [
+    "Very well explained, would be easier to learn without the moving background.",
+    "the discussion starts with 'Monotonically decreasing stack' with no explanation to the intuition behind why this DS was chosen.",
+    "It's a god level explanation of monotonic stack.\nA request from your rest subscriber: Don't have that running background in the tutorial it's irritating .",
+    "first time heard about Monotonic Stack, thanks for explaining it so properly",
+    "Wow! Thanks for walking through the example, it was very insightful"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "LeetCode Pattern - Monotonic stack, Monotonic deque, Monotonic queue\nNext Greater Element II\nDaily Temperature\nSliding Window Maximum\n☑️Full solution: https://algo.monster/problems/valid_palindrome\n🟪 Check out AlgoMonster: https://algo.monster\n🥷 Discord: https://discord.gg/NzM4te47DT\n\n #100secondsofcode  #leetcode  #leetcodesolution #python #coding #programming \n\nIntro and intuition: (0:00)\nExample walk through: (0:35)\nImplementation: (4:26)\n\n╔═╦╗╔╦╗╔═╦═╦╦╦╦╗╔═╗\n║╚╣║║║╚╣╚╣╔╣╔╣║╚╣═╣ \n╠╗║╚╝║║╠╗║╚╣║║║║║═╣\n╚═╩══╩═╩═╩═╩╝╚╩═╩═╝",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,70 @@
+{
+  "query": "PostgreSQL pages tuples WAL internals",
+  "checked_at": "2026-09-30T07:22:03.021Z",
+  "results": [
+    {
+      "id": "UZ66jEj7Zh0",
+      "title": "Database Internals: Page Layout Explained (based on PostgreSQL)",
+      "channel": "Data Craze",
+      "duration": "18:42",
+      "views": "597 views",
+      "description": "Ever wondered what actually happens on disk when you run an INSERT command? It's not magic. It's engineering."
+    },
+    {
+      "id": "TBmDBw1IIoY",
+      "title": "PostgreSQL Internals in Action: MVCC",
+      "channel": "Denis Magda",
+      "duration": "16:06",
+      "views": "18,340 views",
+      "description": "PostgreSQL uses MVCC (Multi-Version Concurrency Control) to execute transactions and queries in parallel over a consistent ..."
+    },
+    {
+      "id": "r6rN8NMLgKY",
+      "title": "PostgreSQL Internals - Heap Only Tuple and Index-Only Scans",
+      "channel": "Landon Wilkins",
+      "duration": "13:41",
+      "views": "749 views",
+      "description": "Contents - Chapter 7. Heap Only Tuple and Index-Only Scans Source: The Internals of PostgreSQL for database administrators ..."
+    },
+    {
+      "id": "X45v3o4VFSI",
+      "title": "Ep 1 | Your Row Is Where You Think It Is. It's Also Somewhere Else | Postgres, SketchedOut",
+      "channel": "SketchedOut",
+      "duration": "8:17",
+      "views": "16 views",
+      "description": "Same UPDATE statement. Same row. Same table. Runs in 3 milliseconds this morning. 400 milliseconds this afternoon. Nothing ..."
+    },
+    {
+      "id": "kdy9om0eYGc",
+      "title": "Postgres Internals #2: Vacuuming | Freezing and Wraparound | Data Layout",
+      "channel": "Mihir Deshpande",
+      "duration": "8:48",
+      "views": "70 views",
+      "description": "In this video, we learn how PostgreSQL cleans up old row versions created by MVCC. We cover how tuples are stored on disk, ..."
+    },
+    {
+      "id": "poLBRs0kF08",
+      "title": "Postgresql Architecture Wal Files |Write Ahead Log | Learnomate Technologies | Ankush Sir",
+      "channel": "Learnomate Technologies",
+      "duration": "6:49",
+      "views": "42,801 views",
+      "description": "In the realm of database management systems, PostgreSQL stands out as a robust and versatile option, renowned for its reliability ..."
+    },
+    {
+      "id": "OFedzQWz5fA",
+      "title": "How Postgres Actually Stores Your Data on Disk",
+      "channel": "Why This in Tech?",
+      "duration": "7:00",
+      "views": "2,513 views",
+      "description": "Ever wondered what happens when you hit 'save' in your database? We dive deep into the Postgres storage engine, exploring ..."
+    },
+    {
+      "id": "RaX6C_xYbV0",
+      "title": "2. WHAT IS PAGE IN POSTGRESQL || DBA FROM INDIA|| POSTGRESSQL||",
+      "channel": "DBA FROM INDIA ",
+      "duration": "5:14",
+      "views": "408 views",
+      "description": "Hi Everyone In this video I have given one small introduction about PAGE in PostgreSQL database. Keep an eye on this series ..."
+    }
+  ]
+}

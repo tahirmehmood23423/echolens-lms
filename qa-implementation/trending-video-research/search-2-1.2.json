@@ -1,0 +1,86 @@
+{
+  "query": "Langchain chunking strategies",
+  "checked_at": "2026-09-30T07:20:39.282Z",
+  "results": [
+    {
+      "id": "pIGRwMjhMaQ",
+      "title": "Chunking Strategies in RAG: Optimising Data for Advanced AI Responses",
+      "channel": "Mervin Praison",
+      "duration": "14:02",
+      "views": "141,429 views",
+      "description": "Dive deep into the world of RAG applications with our comprehensive guide on chunking strategies! Advanced Chunking ..."
+    },
+    {
+      "id": "ZTOtxiWb2bE",
+      "title": "Chunking Strategies Explained",
+      "channel": "Redis",
+      "duration": "8:25",
+      "views": "13,013 views",
+      "description": "Are you interested in building LLM applications that actually work? Your chunking strategy makes all the difference. In this video ..."
+    },
+    {
+      "id": "CmmkNAUGin8",
+      "title": "Advanced Chunking Techniques: Semantic & LLM-Based Chunking (Simply!) Explained",
+      "channel": "Weaviate vector database",
+      "duration": "1:25",
+      "views": "7,084 views",
+      "description": "Fixed-size chunking is breaking your RAG system When you split text into arbitrary 200-word chunks, you're destroying the ... ... learn about how professional rack applications chunk their text in our last video we talked about some basic chunking strategies ..."
+    },
+    {
+      "id": "Lk6D1huUK0s",
+      "title": "Why Your RAG Gives Wrong Answers (And 4 Chunking Strategies to Fix It) | LangChain Text Splitters",
+      "channel": "Venelin Valkov",
+      "duration": "17:54",
+      "views": "6,093 views",
+      "description": "Your RAG system keeps giving wrong answers, and it might be your chunking strategy. Using naive text splitting destroys context ..."
+    },
+    {
+      "id": "7FDYeTCTADY",
+      "title": "Chunking Strategies | LLMops Masters | Euron",
+      "channel": "Code Commander",
+      "duration": "5:50",
+      "views": "84 views",
+      "description": "Euron - https://euron.one/ Course Link : https://euron.one/course/llmops-masters Call or WhatsApp us at: +919110665931 ..."
+    },
+    {
+      "id": "5bLSMAlbD04",
+      "title": "Mastering Chunking Strategies For High-Performance RAG Applications",
+      "channel": "XPLORE AI",
+      "duration": "6:06",
+      "views": "3,775 views",
+      "description": "Are your AI responses hallucinating or missing the point? The problem might not be your LLM—it's your chunking strategy."
+    },
+    {
+      "id": "WAiscGs8Yr4",
+      "title": "RAG Chunking: Strategies for Splitting and Structuring Documents",
+      "channel": "Logical Lenses",
+      "duration": "13:59",
+      "views": "7,413 views",
+      "description": "Retrieval-Augmented Generation (RAG) depends on one invisible step — chunking. The way we split information decides what an ..."
+    },
+    {
+      "id": "tLMViADvSNE",
+      "title": "Every RAG Strategy Explained in 13 Minutes (No Fluff)",
+      "channel": "Cole Medin",
+      "duration": "12:51",
+      "views": "141,943 views",
+      "description": "Retrieval Augmented Generation is THE way to give your AI agents the ability to search and leverage your documents and ... ... different ways for us to one do the data preparation different chunking strategies and then also the way that we search the vector ..."
+    },
+    {
+      "id": "Cbor7impJ60",
+      "title": "LangChain Text Splitters & Chunking",
+      "channel": "Analytics Vidhya",
+      "duration": "4:20",
+      "views": "756 views",
+      "description": "Description Why can't you just upload a 100-page PDF to an LLM? In this video, we explore the critical step of Document Splitting ..."
+    },
+    {
+      "id": "FQVXOgngdCI",
+      "title": "How to Chunk Text for RAG the RIGHT Way (Chunk Size, Overlap, LangChain Code)",
+      "channel": "The AI Stack",
+      "duration": "9:57",
+      "views": "24 views",
+      "description": "Chunking is one of the most underrated steps in building a great RAG (Retrieval Augmented Generation) pipeline. Split your text ..."
+    }
+  ]
+}

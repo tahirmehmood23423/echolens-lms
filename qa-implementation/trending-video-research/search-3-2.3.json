@@ -1,0 +1,78 @@
+{
+  "query": "heap priority queue data structure explained",
+  "checked_at": "2026-09-30T07:20:46.933Z",
+  "results": [
+    {
+      "id": "XycnarZEBvQ",
+      "title": "Heaps Visually Explained (Priority Queues)",
+      "channel": "ByteQuest",
+      "duration": "12:03",
+      "views": "56,818 views",
+      "description": "in this video, I have explained how the Heap Data structure works using a visual representation of Max Heap. I have included the ..."
+    },
+    {
+      "id": "pLIajuc31qk",
+      "title": "Heaps, heapsort, and priority queues - Inside code",
+      "channel": "Inside code",
+      "duration": "19:01",
+      "views": "156,818 views",
+      "description": "Source code: https://gist.github.com/syphh/50adc4e9c7e6efc3c5b4555018e47ddd Learn graph theory algorithms: ... The second application is the priority queue. You probably know the queue data structure, a data structure that works on the First ..."
+    },
+    {
+      "id": "m9SVfOYTaBQ",
+      "title": "Priority Queue Explained in Hindi l Data Structure",
+      "channel": "5 Minutes Engineering",
+      "duration": "4:37",
+      "views": "246,555 views",
+      "description": "Myself Shridhar Mankar a Engineer l YouTuber l Educational Blogger l Educator l Podcaster. My Aim- To Make Engineering ..."
+    },
+    {
+      "id": "7z_HXFZqXqc",
+      "title": "Learn Priority Queue data structures in 5 minutes 🥇",
+      "channel": "Bro Code",
+      "duration": "5:01",
+      "views": "265,922 views",
+      "description": "Priority queues data structures and algorithms tutorial example explained #priority #queue #java."
+    },
+    {
+      "id": "uuot9ItgTEI",
+      "title": "L-3.13: Introduction to Heap Tree with examples | Max Min Heap",
+      "channel": "Gate Smashers",
+      "duration": "7:45",
+      "views": "1,299,858 views",
+      "description": "In this video, Varun sir will explain the concept of Heap Trees in the simplest way possible. Whether you're a beginner or just ..."
+    },
+    {
+      "id": "yntfI_jqNms",
+      "title": "Priority Queue & Heap | Data Structures & Algorithms",
+      "channel": "JomaClass",
+      "duration": "14:13",
+      "views": "4,657 views",
+      "description": "All JomaClass videos from 2020 are now free to watch. If you enjoy please consider donating here: https://support.joma.io/ This ..."
+    },
+    {
+      "id": "gU1M4I-gp8c",
+      "title": "Priority Queue | Insertion and Deletion in Priority Queue | GATECSE | DAA",
+      "channel": "THE GATEHUB",
+      "duration": "10:04",
+      "views": "117,405 views",
+      "description": "priority queue insertion and deletion || priority queue insertion and deletion algorithm || priority queue example || priority ..."
+    },
+    {
+      "id": "wGSQ486Y4sc",
+      "title": "Heaps & Priority Queues in Python",
+      "channel": "NeuralNine",
+      "duration": "15:57",
+      "views": "108,360 views",
+      "description": "Today we learn how to use heaps in Python. Heaps are efficient implementations of priority queues."
+    },
+    {
+      "id": "LJL3cUbeQrg",
+      "title": "Priority queue||Priority Queue Using Heap",
+      "channel": "Technical Ari",
+      "duration": "8:10",
+      "views": "26,952 views",
+      "description": "In this video, I would like to discuss Priority Queue and How can we implement Priority Queue using Heap. ... the priority queue then we are discussing about how can we implement the priority queue using heap data structure let's start."
+    }
+  ]
+}

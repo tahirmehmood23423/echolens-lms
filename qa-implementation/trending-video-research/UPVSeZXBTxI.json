@@ -1,0 +1,22 @@
+{
+  "id": "UPVSeZXBTxI",
+  "url": "https://www.youtube.com/watch?v=UPVSeZXBTxI",
+  "checked_at": "2026-09-30T07:24:02.622Z",
+  "title": "Graceful Shutdown in Go: Key Patterns you need to know!",
+  "channel": "Flo Woelki",
+  "duration_seconds": 1053,
+  "views": 10375,
+  "comments": "21 Comments",
+  "comment_samples": [
+    "Xin chào Fio! Tôi thấy có vấn đề về mặt logic trong việc xử lý việc đóng máy chủ. Khi chúng ta gửi tín hiệu tắt máy chủ thì máy chủ cần 2 làm việcc: 1 là ngừng nhận yêu cầu (phản hồi lại máy chủ đang bận), và 2 là kiểm tra xem tất cả các yêu cầu đã được xử lý xong, nếu còn yêu cầu chưa xử lý xong thì máy chủ phải chờ.... và các tacs vụ như lưu trữ,... cần hoàn tất thì máy chủ mới hoàn tất việc tắt.",
+    "Why using signal.Notify and having to select between both ctx.Done and stop, instead of using signal.NotifyContext, which would make it so only waiting for ctx.Done?",
+    "Need more Go content",
+    "func server.Shutdown() can return any error returned from closing server connections, not only ctx's deadline expired error. what will happen if you try to call server.Close() after server.Shutdown() returned this kind of error?",
+    "Great one Flo!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, we will look at how to gracefully shut down your server in Go. If you want to learn more about the concurrency features of Go, feel free to check out this video here: https://youtu.be/y2jP45S9BHk\n\n\n📝 Description\nIn this video, we will explore graceful shutdown in Go and demonstrate how to properly handle server lifecycle through practical implementation. We'll build an HTTP server that showcases why graceful shutdowns are essential for preventing data loss, corrupted transactions, and memory leaks. You will learn the following things:\n• What graceful shutdown is and why it matters for production applications\n• How to implement graceful shutdown using Go's built-in server lifecycle methods\n• Understanding context usage and timeout handling during shutdown\n• How to capture and handle OS signals like SIGINT and SIGTERM\n• Building a robust server startup and shutdown mechanism that completes active requests safely\n\n\n⏳ Timestamps:\n00:00 - Introduction\n00:11 - What is a Graceful Shutdown?\n00:45 - API design\n02:10 - createServer\n04:25 - runServer\n15:24 - Testing\n17:10 - Outro\n\n\n👋 Hey there!\nIf you are new to this channel: Hey 👋 my name is Flo and I am a professional software engineer with a passion for coding in Golang, TypeScript, JavaScript, and Rust. This channel is where I share that passion and dive into the exciting world of software engineering.\n\n\n📨 Support and Connect!\nBecome a member. https://www.youtube.com/@FloWoelki/membership\nDiscord: https://discord.gg/TnA7drJ\nX / Twitter: https://x.com/FlorianWoelki\nLinkedIn: https://www.linkedin.com/in/florian-woelki/\nGitHub: https://github.com/FlorianWoelki\n\n\n📝 Copyright Notice\nThe original Go Gopher was designed by Renée French (Source: https://go.dev/blog/gopher License details: https://creativecommons.org/licenses/by/4.0/). The gopher appearing in this video and thumbnail is modified from the original design.\n\n\n#go #server #graceful",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

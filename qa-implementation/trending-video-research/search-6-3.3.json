@@ -1,0 +1,510 @@
+{
+  "query": "Postgres table partitioning tutorial",
+  "checked_at": "2026-09-30T07:22:06.234Z",
+  "results": [
+    {
+      "id": "oJj-pltxBUM",
+      "title": "PostgreSQL Partitioning Tutorial",
+      "channel": "Code with Lucian",
+      "duration": "11:43",
+      "views": "87,296 views",
+      "description": "Fix: The maximum table size is 32TB and not 32GB. (for default 8 K blocks) 0:00 - Introduction 0:59 - Which Tables Need ..."
+    },
+    {
+      "id": "LtMcn3bII8g",
+      "title": "Table Partitioning in PostgreSQL : Boost Performance with Partitioned Tables",
+      "channel": "InterviewBuddies",
+      "duration": "9:03",
+      "views": "2,875 views",
+      "description": "In this video, learn how to take your PostgreSQL skills to the next level with table partitioning! Discover how partitioned tables can ..."
+    },
+    {
+      "id": "NETh2JTUVWw",
+      "title": "Partitioning in Postgres and the risk of high partition counts",
+      "channel": "pganalyze",
+      "duration": "5:22",
+      "views": "4,664 views",
+      "description": "Find the article on our blog here:* https://pganalyze.com/blog/5mins-postgres-partitioning In E78 of “5mins of Postgres”, we're ..."
+    },
+    {
+      "id": "hDi4qGSvNoU",
+      "title": "Postgres scales … when you do this!",
+      "channel": "Supabase",
+      "duration": "9:59",
+      "views": "10,040 views",
+      "description": "Partitioning tables: https://supabase.com/docs/guides/database/partitions Table partitioning in Postgres is a powerful database ..."
+    },
+    {
+      "id": "HAmdxoo17U4",
+      "title": "PostgreSQL : How to create Table partitions",
+      "channel": "FV Hive Productions",
+      "duration": "19:25",
+      "views": "479 views",
+      "description": "CREATE TABLE students ( batch_date date NOT NULL, name varchar(30) NOT NULL, age varchar(20) ) PARTITION BY RANGE ..."
+    },
+    {
+      "id": "tO3oEo9h-EE",
+      "title": "Mastering SQL - Postgresql: Partitioning Tables and Indexes - Sub Partitioning",
+      "channel": "itversity",
+      "duration": "5:51",
+      "views": "523 views",
+      "description": "Subpartitioning, also known as nested or multi-level partitioning, is a powerful tool for managing complex datasets in PostgreSQL."
+    },
+    {
+      "id": "Zh3FM5VeQl4",
+      "title": "PostgreSQL Table Types Explained — Regular, Temp, Unlogged, Partitioned & More",
+      "channel": "IntelligentSupplychain",
+      "duration": "2:38",
+      "views": "95 views",
+      "description": "Welcome to IntelligentSupply Chain! Let's discover the major #supplychainmanagement #problems and their ..."
+    },
+    {
+      "id": "LUOABmmFfRY",
+      "title": "How to Create Partitions in PostgreSQL || Partitions Explained || PostgreSQL Full Playlist #25",
+      "channel": "Knowledge 360",
+      "duration": "15:40",
+      "views": "1,999 views",
+      "description": "... PostgreSQL, Table Partitioning PostgreSQL, Range Partitioning, List Partitioning, Hash Partitioning, PostgreSQL Tutorial, SQL ..."
+    },
+    {
+      "id": "MiZFtM84x44",
+      "title": "Postgres: Partitioning + FDW / foreign partitions",
+      "channel": "GitLab Unfiltered",
+      "duration": "8:25",
+      "views": "2,381 views",
+      "description": "Quick demo of using postgres declarative partitioning in combination with foreign data wrappers to push partitions to a foreign ..."
+    },
+    {
+      "id": "feyeQfLNT_8",
+      "title": "Lec-11: Database Partitioning vs Sharding | System Design with Real Life Examples",
+      "channel": "Gate Smashers",
+      "duration": "5:12",
+      "views": "11,207 views",
+      "description": "In this lecture, Varun sir will explain what database partitioning means, what database sharding means, how they are different, ..."
+    },
+    {
+      "id": "6vLSMwOJXiE",
+      "title": "Database Partitioning Deep Dive: Supabase, Neon, and PostgreSQL",
+      "channel": "Theo in Tech | Backend Engineering",
+      "duration": "19:13",
+      "views": "181 views",
+      "description": "Free Custom Backend Architecture Review ..."
+    },
+    {
+      "id": "uaD0fSZUGuY",
+      "title": "How to create a partitioned table in Postgres",
+      "channel": "randomtutorial",
+      "duration": "4:18",
+      "views": "19,363 views",
+      "description": "A quick tutorial on how to create a partitioned table in Postgres. Blog: http://bearsnack.co.uk https://twitter.com/mokadillion."
+    },
+    {
+      "id": "XYlQKFY5F3E",
+      "title": "Curious about simplifying your data management with Postgres Table Partitioning?",
+      "channel": "TechBits",
+      "duration": "5:35",
+      "views": "1,512 views",
+      "description": "Curious about simplifying your data management and improving efficiency? Join me as we dive into the world of Postgres ..."
+    },
+    {
+      "id": "YON9PliOYFk",
+      "title": "5 Secrets for making PostgreSQL run BLAZING FAST. How to improve database performance.",
+      "channel": "Dreams of Code",
+      "duration": "8:12",
+      "views": "221,583 views",
+      "description": "There's an approach in here for everyone! PostgreSQL is one of the most versatile SQL databases but often does not provide ..."
+    },
+    {
+      "id": "pQpRz5sR-n8",
+      "title": "Make Your Postgres Database FASTER with Table Partitions",
+      "channel": "Theo in Tech | Backend Engineering",
+      "duration": "15:21",
+      "views": "273 views",
+      "description": "Free Custom Backend Architecture Review ..."
+    },
+    {
+      "id": "HqdkbjNGs40",
+      "title": "Table Partitioning | SQL",
+      "channel": "Data Science",
+      "duration": "4:01",
+      "views": "830 views",
+      "description": "Database Design https://www.youtube.com/channel/UCBtOvx6gen_SlIjKtWdQZmw This chapter ends with some database ..."
+    },
+    {
+      "id": "hvYYy1h29XU",
+      "title": "The Secret Behind Fast Databases | PostgreSQL Partitioning",
+      "channel": "Datawithsatya",
+      "duration": "10:54",
+      "views": "18 views",
+      "description": "Your PostgreSQL table starts with a few thousand rows... Everything is fast. Then the data grows to **10 million... 50 million... even ..."
+    },
+    {
+      "id": "RYTQmErsahs",
+      "title": "Mastering SQL - PostgreSQL: Managing Hash Partitioning in Tables",
+      "channel": "itversity",
+      "duration": "6:05",
+      "views": "1,324 views",
+      "description": "In this tutorial, you'll explore hash partitioning in PostgreSQL, an essential technique for managing large datasets. Learn how to ..."
+    },
+    {
+      "id": "-bywMReYrQE",
+      "title": "Discover the Power of Postgres Declarative Partitioning",
+      "channel": "TechBits",
+      "duration": "5:08",
+      "views": "1,336 views",
+      "description": "Discover the Power of Postgres Declarative Partitioning! Dive into the world of advanced database management with our ..."
+    },
+    {
+      "id": "9GHGi-3_cf0",
+      "title": "Mastering SQL - PostgreSQL: Manipulating Data in Partitioned Tables",
+      "channel": "itversity",
+      "duration": "3:53",
+      "views": "456 views",
+      "description": "Learn how to manipulate data in partitioned tables in PostgreSQL! This tutorial demonstrates how to handle inserts, updates, and ..."
+    },
+    {
+      "id": "vaxoe7UWyOY",
+      "title": "Databases: PostgreSQL table partitioning problem",
+      "channel": "Roel Van de Paar",
+      "duration": "2:20",
+      "views": "12 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "cwL9iAaKHSw",
+      "title": "Mastering SQL - PostgreSQL: Partitioning Tables and Indexes Overview",
+      "channel": "itversity",
+      "duration": "1:15",
+      "views": "691 views",
+      "description": "Discover the power of table partitioning in PostgreSQL! This video provides an in-depth overview of partitioning strategies, their ..."
+    },
+    {
+      "id": "ahabU0ywRBw",
+      "title": "Mastering SQL - PostgreSQL: Real-World Usage Scenarios for Partitioning Tables and Indexes",
+      "channel": "itversity",
+      "duration": "3:02",
+      "views": "390 views",
+      "description": "In this tutorial, we dive into real-world usage scenarios for partitioning in PostgreSQL. Discover how partitioning can optimize ..."
+    },
+    {
+      "id": "9bY56oLo5T0",
+      "title": "SQL : How to migrate an existing Postgres Table to partitioned table as transparently as possible?",
+      "channel": "Hey Delphi",
+      "duration": "1:27",
+      "views": "63 views",
+      "description": "SQL : How to migrate an existing Postgres Table to partitioned table as transparently as possible? To Access My Live Chat Page, ..."
+    },
+    {
+      "id": "YdzPC6NSnj8",
+      "title": "Databases: When should we use table partitioning in Postgresql? (2 Solutions!!)",
+      "channel": "Roel Van de Paar",
+      "duration": "1:53",
+      "views": "11 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "ztQtNmSYmEo",
+      "title": "Postgres: Partitioning + FDW + reference tables using logical replication",
+      "channel": "GitLab Unfiltered",
+      "duration": "11:17",
+      "views": "392 views",
+      "description": "Part 1: https://www.youtube.com/watch?v=MiZFtM84x44 Part 2: https://www.youtube.com/watch?v=nt4Khi9Gr3o&feature=youtu.be ..."
+    },
+    {
+      "id": "bvEiDEwItVA",
+      "title": "Mastering SQL - PostgreSQL: Range Partitioning of Tables and Indexes",
+      "channel": "itversity",
+      "duration": "2:17",
+      "views": "626 views",
+      "description": "Learn how to implement Range Partitioning in PostgreSQL for efficient table management and improved query performance."
+    },
+    {
+      "id": "4WKTQ6KjE7s",
+      "title": "Scaling Postgres Episode 20 | Declarative Partitioning | Permissions | Trigger Speed",
+      "channel": "Scaling Postgres",
+      "duration": "14:41",
+      "views": "2,385 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "8eHyvfUSdP4",
+      "title": "Vertical Partition In Postgresql | What is a vertical Partition in Postgresql?",
+      "channel": "mynoteoracledba",
+      "duration": "2:46",
+      "views": "645 views",
+      "description": "What is a table partition? - As a simple definition The table Partition is a process of dividing large data tables into small ..."
+    },
+    {
+      "id": "nt4Khi9Gr3o",
+      "title": "Postgres: Partitioning + FDW and schema migrations",
+      "channel": "GitLab Unfiltered",
+      "duration": "5:50",
+      "views": "434 views",
+      "description": "Follow-up to https://www.youtube.com/watch?v=MiZFtM84x44 to checkout how we can do schema migrations. Very basic ..."
+    },
+    {
+      "id": "vkJeStxXSzc",
+      "title": "5mins of Postgres E18: Partition pruning, prepared statements and generic vs custom query plans",
+      "channel": "pganalyze",
+      "duration": "5:55",
+      "views": "628 views",
+      "description": "Today, we'll talk about partition pruning and prepared statements in Postgres and run a performance test using the pgbench tool."
+    },
+    {
+      "id": "Np_YqhNRGVE",
+      "title": "Postgresql Tutorials | Dense Rank in Postgresql | partition by clause in postgresql",
+      "channel": "Training2SQL MSBI",
+      "duration": "7:33",
+      "views": "1,537 views",
+      "description": "This video talks about Dense Rank in Postgresql partition by clause in postgresql dense_rank in postgresql postgresql rank ..."
+    },
+    {
+      "id": "rPATsEzz30U",
+      "title": "Scaling Postgres Episode 171 Practical Partitioning | Understanding pg_repack | Explaining Buffers",
+      "channel": "Scaling Postgres",
+      "duration": "16:46",
+      "views": "1,010 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "ELNxlr1ofVY",
+      "title": "Limits of table partitioning (in PostgreSQL)",
+      "channel": "Roel Van de Paar",
+      "duration": "2:01",
+      "views": "15 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "9sUyVSZ-7qE",
+      "title": "Scaling Postgres Episode 73 | BRIN Indexes | Partition Enhancements | Tips | Standbys",
+      "channel": "Scaling Postgres",
+      "duration": "14:14",
+      "views": "1,251 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "yyoJkOYEHDY",
+      "title": "#table #partitioning  #partman #implementation on #postgres  10 #onlineclasses  #trainvideo",
+      "channel": "Info Tech Consultant 2.0 ",
+      "duration": "13:34",
+      "views": "159 views",
+      "description": "Table partitioning demo #citus #extension #installation & #implementation on #postgres 10 #onlineclasses #trainvideo ..."
+    },
+    {
+      "id": "9UBkrNG1f9Q",
+      "title": "Partial Indexes for Partitioned Tables in Oracle Database 12.1 Onward",
+      "channel": "ORACLE-BASE.com",
+      "duration": "3:55",
+      "views": "1,874 views",
+      "description": "In this video we'll demonstrate partial indexes for partitioned tables, introduced in Oracle database 12.1. Partial Indexes for ..."
+    },
+    {
+      "id": "aWMdFAZI6MA",
+      "title": "Declarative Partitioning - PostgreSQL for Developers",
+      "channel": "The Software Mentor",
+      "duration": "1:43",
+      "views": "6 views",
+      "description": "Declarative Partitioning - part of PostgreSQL for Developers. PostgreSQL from the inside out - fundamentals through internals and ..."
+    },
+    {
+      "id": "kz1NM92mpMw",
+      "title": "Efficiently Manage PostgreSQL Table Partitioning by Date",
+      "channel": "vlogize",
+      "duration": "2:07",
+      "views": "17 views",
+      "description": "Discover how to manage and maintain a PostgreSQL table partitioned by date, ensuring efficient data handling for large datasets."
+    },
+    {
+      "id": "FexqjucMXQU",
+      "title": "How to Effectively Create a Date Partitioned Table in PostgreSQL",
+      "channel": "vlogize",
+      "duration": "1:40",
+      "views": "36 views",
+      "description": "Struggling with creating date partitioned tables in PostgreSQL? Discover the step-by-step solution to overcome partitioning ..."
+    },
+    {
+      "id": "Tg2HxR0uDn4",
+      "title": "Mastering SQL - PostgreSQL: Managing List Partitions for Tables",
+      "channel": "itversity",
+      "duration": "5:57",
+      "views": "1,009 views",
+      "description": "Learn how to efficiently manage List Partitions in PostgreSQL! This tutorial walks you through adding, detaching, and dropping ..."
+    },
+    {
+      "id": "xraV5pQS0WA",
+      "title": "Databases: Postgresql: Partition table by hour",
+      "channel": "Roel Van de Paar",
+      "duration": "2:19",
+      "views": "17 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "2pe61MS2bdk",
+      "title": "Time-series in vanilla Postgres: partition maintenance that scales",
+      "channel": "myDBA",
+      "duration": "3:55",
+      "views": "14 views",
+      "description": "Time-series tables grow fast, and manual partition maintenance doesn't scale. Postgres native range partitioning keeps queries ..."
+    },
+    {
+      "id": "5NTciIs-clk",
+      "title": "Scaling Postgres Episode 88 Partitioning | Logical Replication Upgrade | Columnar Compress | HAProxy",
+      "channel": "Scaling Postgres",
+      "duration": "14:35",
+      "views": "562 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "m9x3rEqBLxo",
+      "title": "Scaling Postgres Episode 82 Faster Partitions | Count Speed | Extensions | Education",
+      "channel": "Scaling Postgres",
+      "duration": "12:57",
+      "views": "460 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "j4SgQT4tj80",
+      "title": "Postgres Partitioning for Large Rails Tables | Talk.rb",
+      "channel": "TalkRb",
+      "duration": "17:48",
+      "views": "79 views",
+      "description": "This source discusses the challenges of managing a large PostgreSQL table, specifically an 'audits' table that grew to billions of ..."
+    },
+    {
+      "id": "D3b7GG9NFUQ",
+      "title": "PostgreSQL Partitioning Inheritance Vs Declarative way",
+      "channel": "dbalogger",
+      "duration": "9:22",
+      "views": "4 views",
+      "description": "Declarative way was introduced in PostgreSQL v10, simplifies table partitioning compared to older Inheritance way. This video ..."
+    },
+    {
+      "id": "qr5z9_AGfPM",
+      "title": "MySQL vs PostgreSQL for hash-based table partitioning",
+      "channel": "Peter Schneider",
+      "duration": "2:47",
+      "views": "29 views",
+      "description": "MySQL vs PostgreSQL for hash-based table partitioning I hope you found a solution that worked for you :) The Content (except ..."
+    },
+    {
+      "id": "e6kAsucxEYk",
+      "title": "PostgreSQL Range Partitioning for Better Performance",
+      "channel": "DbSchema Database Designer",
+      "duration": "3:26",
+      "views": "387 views",
+      "description": "Learn how to improve PostgreSQL performance with range partitioning. In this step-by-step tutorial, I show you how to: • Create a ..."
+    },
+    {
+      "id": "R7-RzdtpaBo",
+      "title": "Databases: Postgresql update a partitioned table, where update affects multiple partitions",
+      "channel": "Roel Van de Paar",
+      "duration": "1:33",
+      "views": "8 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "rmtlWdk2CNE",
+      "title": "How to Partition an Existing Table in PostgreSQL",
+      "channel": "vlogize",
+      "duration": "1:02",
+      "views": "443 views",
+      "description": "Disclaimer/Disclosure: Some of the content was synthetically produced using various Generative AI (artificial intelligence) tools; so ..."
+    },
+    {
+      "id": "QLtKe-fTmmI",
+      "title": "Vertical Table Partitioning SQL Server",
+      "channel": "Keshav Singh",
+      "duration": "13:23",
+      "views": "7,707 views",
+      "description": "http://www.youtube.com/user/masterkeshav In this blog I have explained the concept of vertical table partitioning."
+    },
+    {
+      "id": "ROegHgv2TZU",
+      "title": "Postgresql Tutorials | Rank in postgresql | postgresql rank examples | row partition in postgres",
+      "channel": "Training2SQL MSBI",
+      "duration": "9:01",
+      "views": "3,273 views",
+      "description": "This video talks about Rank in postgresql postgresql rank examples row partition in postgres RANK() OVER(ORDER BY marks ..."
+    },
+    {
+      "id": "rMTgfgmZzNo",
+      "title": "What are tablespaces Postgres | Postgres Tutorial",
+      "channel": "Redincs Technology",
+      "duration": "2:49",
+      "views": "1,609 views",
+      "description": "PostgreSQL Database Essential Training: https://cutt.ly/postgres Private Database Mastery Level-Up Coaching: ..."
+    },
+    {
+      "id": "zR953orMxc4",
+      "title": "Replicating Partition Tables from PostgreSQL using IBM Change Data Capture (CDC)",
+      "channel": "Aftereplix",
+      "duration": "3:20",
+      "views": "53 views",
+      "description": "Discover how to replicate data from different partition tables on PostgreSQL database to any target in near real-time using IBM ..."
+    },
+    {
+      "id": "ZbcYmnu1Hmw",
+      "title": "Postgres Releases, PostgreSQL Survey, Partitioning vs. Sharding, Bulk Loading | Scaling Postgres 277",
+      "channel": "Scaling Postgres",
+      "duration": "19:05",
+      "views": "912 views",
+      "description": "... Partitioning and Sharding in Postgres 07:38 - Walking with the Elephants 08:31 - Mastering PostgreSQL Table Partitioning ... ... post is mastering postgresql table partitioning this is from fragland.dev and this is an overall post talking about partitioning table ..."
+    },
+    {
+      "id": "m0DqC-TB2nE",
+      "title": "Postgres partition tables 1 million rows",
+      "channel": "Roel Van de Paar",
+      "duration": "1:25",
+      "views": "59 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "XH6FoPc8SyY",
+      "title": "Scaling Postgres Episode 36 | Sharding | Giving Back | SCRAM | Partitioning Evolution",
+      "channel": "Scaling Postgres",
+      "duration": "10:52",
+      "views": "744 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "be6PLMKKSto",
+      "title": "The Basics of Database Sharding and Partitioning in System Design",
+      "channel": "Aced (formerly Exponent)",
+      "duration": "6:02",
+      "views": "138,295 views",
+      "description": "Make sure you're interview-ready with Exponent's system design interview prep course: http://bit.ly/3YTjsjH Learn the basics of ..."
+    },
+    {
+      "id": "YeQlolZlCBE",
+      "title": "Table partitioning in SQL Server||SQLSERVER||Table Partitioning||  part 1||#sqlserver #partitioning",
+      "channel": "Sql Is Easy",
+      "duration": "5:01",
+      "views": "3,919 views",
+      "description": "it is the database process where very large tables are divided into multiple smaller parts. By splitting a large table into smaller, ..."
+    },
+    {
+      "id": "x1i0pHUfqc0",
+      "title": "Setting up a Postgresql Partition with foreign key",
+      "channel": "Roel Van de Paar",
+      "duration": "2:15",
+      "views": "52 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "Sjzb_vmBuAE",
+      "title": "TPS Benchmark, Partition-wise Join, Partition Billions, Posgres 16 Features | Scaling Postgres 279",
+      "channel": "Scaling Postgres",
+      "duration": "16:00",
+      "views": "671 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "Ms1kXPYkJEc",
+      "title": "Mastering PostgreSQL: How to Create Partition Tables Dynamically",
+      "channel": "vlogize",
+      "duration": "1:44",
+      "views": "28 views",
+      "description": "Learn how to dynamically create partition tables in PostgreSQL for efficient database management. This guide provides ..."
+    }
+  ]
+}

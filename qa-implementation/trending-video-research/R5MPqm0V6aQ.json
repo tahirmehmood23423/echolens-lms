@@ -1,0 +1,22 @@
+{
+  "id": "R5MPqm0V6aQ",
+  "url": "https://www.youtube.com/watch?v=R5MPqm0V6aQ",
+  "checked_at": "2026-10-01T05:21:14.244Z",
+  "title": "RAG Reranking Explained: How To Improve RAG Results",
+  "channel": "pixegami",
+  "duration_seconds": 864,
+  "views": 17224,
+  "comments": "17 Comments",
+  "comment_samples": [
+    "Very well explained to get started, now I can dive deeper into this",
+    "That was a such a great explanation of reranking. Both in terms of intuition and implementation.",
+    "I really dont comment a lot on Youtube but this channel is incredible. Please keep posting videos on those technical details more. I loved it",
+    "I'm currently using a re-ranking model (cross-encoder/ms-marco-MiniLM-L6-v2) to improve the RAG for my Saas. Thank you for this video!",
+    "Great work as always! Would also love a video in the future talking about balancing speed and performance (and perhaps also costs) in RAG/LLM systems, since it is hard to navigate some tradeoffs, and would love to hear your personal experiences."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Reranking can improve the results of your RAG application by up to 10-30%. This video explains how reranking works, walks through how to implement it in Python (using an example RAG app), and measuring how it effects the results.\n\n👉 Links\n🎥 Intro to RAG: https://youtu.be/tcqEUSNCn8I\n🎥 Build a Simple RAG Pipeline: https://youtu.be/gcqp3Fbv4_o\n🔗 Code: https://github.com/pixegami/simple-rag-pipeline\n🔗 Cohere API: https://cohere.com\n\n📚 Chapters\n00:00 Introduction\n01:20 Project Overview\n04:02 The Problem With Vector Search\n07:00 Add Reranking to RAG Pipeline\n08:25 Implement Reranking via API\n10:08 Testing the Improvement\n13:00 Reranking Trade-Offs\n\n#pixegami",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

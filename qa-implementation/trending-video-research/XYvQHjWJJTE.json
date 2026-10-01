@@ -1,0 +1,22 @@
+{
+  "id": "XYvQHjWJJTE",
+  "url": "https://www.youtube.com/watch?v=XYvQHjWJJTE",
+  "checked_at": "2026-09-30T07:23:50.627Z",
+  "title": "Distributed Tracing in Microservices | System Design",
+  "channel": "ByteMonk",
+  "duration_seconds": 421,
+  "views": 55054,
+  "comments": "20 Comments",
+  "comment_samples": [
+    "Great Explanation with visuals. It's very clear. Thank you",
+    "We also use distributed tracing using open telemetry and APM. On the other hand, tools like coralogix and loki can be used as well for getting metrics and traces of a flow.",
+    "Amazing video. Short & to the point",
+    "Super Content, Loved It!!!!",
+    "I wish you were my university professor - my studing would be much easier :D"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Explore the power of Distributed Tracing in this comprehensive less than 10-minute video. Learn how this crucial technique provides valuable insights into the performance of distributed systems and helps identify and troubleshoot issues. Discover the benefits of using tools like OpenTelemetry, Micrometer, and APM solutions like New Relic and Splunk. With real-life examples and practical applications, this video is a must-watch for developers and operators looking to optimize their distributed systems. Don't miss out on gaining the knowledge and skills to deliver reliable and high-performing applications which you may also bring up during System design interviews.\n\n#DistributedTracing #APM #NewRelic #Splunk \n\nReferences:\n1. New Relic: https://newrelic.com/\n2. Splunk: https://dev.splunk.com/enterprise/docs/welcome/\n3. Open Telemetry: https://logz.io/learn/opentelemetry-guide/\n4. What is Distributed Tracing? https://docs.logz.io/user-guide/distributed-tracing/what-is-tracing\n5. Jaeger: https://www.jaegertracing.io/docs/1.45/\n\n\nSystem Design Interview Basics Playlist: \n►https://www.youtube.com/playlist?list=PLJq-63ZRPdBt423WbyAD1YZO0Ljo1pzvY\n\nAWS Certification: \n►AWS Certified Cloud Practioner: https://youtu.be/wF1pldkQrOY\n►AWS Certified Solution Architect Associate: https://youtu.be/GzomXNLFgkk\n►AWS Certified Solution Architect Professional: https://youtu.be/KFZrBxSA9tI",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

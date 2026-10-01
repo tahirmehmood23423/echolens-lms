@@ -1,0 +1,134 @@
+{
+  "query": "backtracking pruning algorithm explained",
+  "checked_at": "2026-09-30T07:21:49.983Z",
+  "results": [
+    {
+      "id": "p9m2LHBW81M",
+      "title": "Solve ANY Backtracking Problem on Leetcode (Template + Explanation)",
+      "channel": "Bitflip",
+      "duration": "7:26",
+      "views": "110,963 views",
+      "description": "Learn how to actually solve recursive backtracking problems and avoid common mistakes. I'll walk you through the 4-step ..."
+    },
+    {
+      "id": "Ak-fxEwAR14",
+      "title": "Backtracking was HARD until I learned it this way | Backtracking tutorial",
+      "channel": "AlgoMonster",
+      "duration": "5:51",
+      "views": "56,765 views",
+      "description": "https://algo.monster/problems/backtracking Interactive visualizer Backtracking has a reputation for making software engineers ..."
+    },
+    {
+      "id": "DKCbsiDBN6c",
+      "title": "6 Introduction to Backtracking - Brute Force Approach",
+      "channel": "Abdul Bari",
+      "duration": "8:15",
+      "views": "1,787,267 views",
+      "description": "Introduction to Backtracking PATREON : https://www.patreon.com/bePatron?u=20475192 Courses on Udemy ..."
+    },
+    {
+      "id": "vqxV-pmMWG4",
+      "title": "Backtracking & Pruning - Escaping Dead Ends Intelligently",
+      "channel": "Ahmad Rashad",
+      "duration": "4:58",
+      "views": "5 views",
+      "description": "You already know how to solve one of the hardest problems in computer science. You just don't realize it yet. Every time you walk ..."
+    },
+    {
+      "id": "51Zy1ULau1s",
+      "title": "Backtracking made easy | Algorithmic Paradigms | Real life example | Study Algorithms",
+      "channel": "Nikhil Lohia",
+      "duration": "15:13",
+      "views": "59,442 views",
+      "description": "Super helpful resources available here: https://nikoo28.github.io/all-my-links/ To see more videos like this, you can buy me a ..."
+    },
+    {
+      "id": "L0NxT2i-LOY",
+      "title": "Recursive Backtracking - DSA Course in Python Lecture 14",
+      "channel": "Greg Hogg",
+      "duration": "12:59",
+      "views": "100,372 views",
+      "description": "Master Data Structures & Algorithms for FREE at https://AlgoMap.io/ Code solutions in Python, Java, C++ and JS for this can be ..."
+    },
+    {
+      "id": "Zq4upTEaQyM",
+      "title": "The Backtracking Blueprint: The Legendary 3 Keys To Backtracking Algorithms",
+      "channel": "Back To Back SWE",
+      "duration": "13:44",
+      "views": "563,767 views",
+      "description": "0/1 Code & Problem Statement ..."
+    },
+    {
+      "id": "I8ioZh7a_Y8",
+      "title": "Backtracking | Algorithm Design Techniques | 11th Computer - Chapter 3 - Lec 10",
+      "channel": "Academics with AB",
+      "duration": "6:33",
+      "views": "12,197 views",
+      "description": "This topic is part of Chapter 3: Problem Solving and Algorithms from the 1st Year Computer Science syllabus. In this video, we ..."
+    },
+    {
+      "id": "gBC_Fd8EE8A",
+      "title": "Backtracking (Think Like a Programmer)",
+      "channel": "V. Anton Spraul",
+      "duration": "13:02",
+      "views": "399,544 views",
+      "description": "Backtracking is used when you need to find the correct series of choices that will solve a problem. The example I use here is ..."
+    },
+    {
+      "id": "A74Pt51iPaM",
+      "title": "#backtracking Introduction | Lec 82 | Design & Analysis of Algorithm",
+      "channel": "CSE Guru",
+      "duration": "10:59",
+      "views": "9,512 views",
+      "description": "backtracking #backtrack #nqueen #nqueenproblem #branchandbound #cseguru #algorithm #ada #cseguruadavideos ..."
+    },
+    {
+      "id": "RtpJOGvfo7E",
+      "title": "Backtracking Algorithm in 120 Seconds",
+      "channel": "Code Munchies",
+      "duration": "2:48",
+      "views": "45,416 views",
+      "description": "Today we explore 90. Subsets II where we explore a backtracking algorithm in coding. Don't miss the opportunity to learn about ..."
+    },
+    {
+      "id": "FMjrB6in3L0",
+      "title": "BackTracking Visually Explained | Combination Sum Leetcode 39",
+      "channel": "ByteQuest",
+      "duration": "4:33",
+      "views": "5,757 views",
+      "description": "In this video, we'll explore the concept of backtracking through a classic problem—LeetCode's Combination Sum. Starting with a ..."
+    },
+    {
+      "id": "aeO-UYsWW_0",
+      "title": "Introduction to Backtracking || Backtracking  Algorithm || DAA",
+      "channel": "THE GATEHUB",
+      "duration": "9:35",
+      "views": "255,848 views",
+      "description": "introduction to backtracking algorithm || introduction to backtracking - branch and bound || introduction to backtracking ..."
+    },
+    {
+      "id": "kyLxTdsT8ws",
+      "title": "6.2 Sum Of Subsets Problem - Backtracking",
+      "channel": "Abdul Bari",
+      "duration": "12:19",
+      "views": "2,003,028 views",
+      "description": "Sum of Subsets problem PATREON : https://www.patreon.com/bePatron?u=20475192 Courses on Udemy ..."
+    },
+    {
+      "id": "dEs_kbvu_0s",
+      "title": "Lec-25: Alpha Beta Pruning in Hindi with Example | Artificial Intelligence",
+      "channel": "Gate Smashers",
+      "duration": "16:21",
+      "views": "2,118,781 views",
+      "description": "MASTER COMPUTER SCIENCE | INTERVIEWS | EXAMS Gate Smashers — Learn Computer Science through free lectures, ..."
+    },
+    {
+      "id": "-47nFq_9_zk",
+      "title": "Backtracking General Method | DAA | Design & Analysis of Algorithms  | Lec-52 | Bhanu Priya",
+      "channel": "Education 4u",
+      "duration": "10:30",
+      "views": "220,681 views",
+      "description": "Design & Analysis of Algorithms ( DAA ) Introduction to backtracking algorithm general method & its applications ..."
+    }
+  ]
+}

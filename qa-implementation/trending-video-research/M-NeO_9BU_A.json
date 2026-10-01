@@ -1,0 +1,22 @@
+{
+  "id": "M-NeO_9BU_A",
+  "url": "https://www.youtube.com/watch?v=M-NeO_9BU_A",
+  "checked_at": "2026-09-30T07:23:37.102Z",
+  "title": "Bottom Up vs Top Down Dynamic Programming vs Recursion | Fibonacci Sequence",
+  "channel": "Algorithms With Brenton",
+  "duration_seconds": 446,
+  "views": 33289,
+  "comments": "23 Comments",
+  "comment_samples": [
+    "Important correction for a mistake pointed out by Vijay below, sorry for that - unfortunately I don't seem to be able to edit this part and I have decided against cutting it out as the general idea is still explained.\n\nThe memoized code with the cache does not correctly use the cache for recursive calls, the simplest way to fix it is probably by passing around the cache and defaulting it for the initial call.\n\ndef fib_memoized(n, cache={}):\n  if n <= 1:\n    return n\n  elif n in cache:\n    return cache[n]\n  else:\n    return fib_memoized(n-1, cache) + fib_memoized(n-2, cache)",
+    "I dont know why a video with this quality is so underrated. Good job!",
+    "such a greaat video, simple, concise and gives all the needed basics. Thank you!",
+    "This is such a good video - extremely clear and concise",
+    "Great video, excellent explanation. James Zheng needs to watch this."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video we look at the performance problems that occur when using recursion with reference to the Fibonacci Sequence. To address this we look at top down dynamic programming (memoization) and bottom up dynamic programming (tabulation) and compare and contrast their respective pros and cons.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

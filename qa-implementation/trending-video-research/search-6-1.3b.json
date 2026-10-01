@@ -1,0 +1,126 @@
+{
+  "query": "PostgreSQL recursive CTE explained",
+  "checked_at": "2026-09-30T07:23:47.549Z",
+  "results": [
+    {
+      "id": "Rp3EcF9nx6U",
+      "title": "Recursive CTE | Recursive SQL Queries | SQL Tutorial in Hindi 17",
+      "channel": "Rishabh Mishra",
+      "duration": "16:30",
+      "views": "126,987 views",
+      "description": "SQL Full Course Playlist 👇\nhttps://www.youtube.com/playlist?list=PLdOKnrf8EcP17p05q13WXbHO5Z_JfXNpw\n\nLike, Share & Subscribe ..."
+    },
+    {
+      "id": "T1OxtVsObeE",
+      "title": "Recursive CTE | What is Recursive CTE in SQL | Recursive SQL Queries",
+      "channel": "Engineer The Data",
+      "duration": "8:08",
+      "views": "316 views",
+      "description": "Please Like, Share & Subscribe. A Common Table Expression (CTE) in SQL is a temporary, named result set defined using the ..."
+    },
+    {
+      "id": "VBja7KnzOs8",
+      "title": "Our Most Power Query Yet!  Recursive CTE's (Common Table Expressions) | Essential SQL",
+      "channel": "Essential SQL (EssentialSQL)",
+      "duration": "9:13",
+      "views": "25,323 views",
+      "description": "If you're having troubles understanding how SQL recursive common table expressions work, then you'll want to watch this video."
+    },
+    {
+      "id": "LJC8277LONg",
+      "title": "SQL WITH Clause | Clearly Explained | CTEs vs Subqueries vs Temp Tables | Recursive CTEs",
+      "channel": "Maven Analytics",
+      "duration": "13:15",
+      "views": "164,563 views",
+      "description": "7-day email course to get you started with data analytics: https://mavenanalytics.io/newsletter/still-a-real-career 7-day AI analyst ..."
+    },
+    {
+      "id": "uTT9XPFz324",
+      "title": "PostgreSQL Recursive Queries Explained! (Real-World Supply Chain Example)",
+      "channel": "IntelligentSupplychain",
+      "duration": "2:36",
+      "views": "76 views",
+      "description": "Welcome to IntelligentSupply Chain! Struggling with hierarchical data in SQL? How do you query an org chart or a complex Bill of ..."
+    },
+    {
+      "id": "B2ng2lOMNf8",
+      "title": "SQL Recursive CTE Explained Using a Simple Example.",
+      "channel": "The Code Samples",
+      "duration": "3:29",
+      "views": "1,508 views",
+      "description": "In this tutorial, we will learn how to use Recursive Common Table Expressions (CTEs) to create a simple query that prints ..."
+    },
+    {
+      "id": "TCBnzs2DM8w",
+      "title": "📊 SQL Recursive CTE Explained | Build Employee-Manager Hierarchy with Step-by-Step Execution!",
+      "channel": "Sriw World of Coding",
+      "duration": "4:12",
+      "views": "1,631 views",
+      "description": "Learn how to handle hierarchical data in SQL using Recursive CTEs! In this video, we walk through a real-world ..."
+    },
+    {
+      "id": "ewmEHQSQYRM",
+      "title": "Recursive CTE | Leetcode Hard SQL Problem 5 | Complex SQL 12",
+      "channel": "Ankit Bansal",
+      "duration": "12:34",
+      "views": "57,999 views",
+      "description": "In the first part of this video we are going to discuss how recursive CTE works. In second part we will discuss a leet code SQL hard ..."
+    },
+    {
+      "id": "gn7qLNR-wkg",
+      "title": "Recursive CTE (Common Table Expression) | Advance SQL Tutorial in Hindi",
+      "channel": "Rishabh Mishra",
+      "duration": "16:30",
+      "views": "15,458 views",
+      "description": "Recursive CTE (Common Table Expression) | Advance SQL Tutorial in Hindi\nSQL Full Course Playlist 👇\nhttps://www.youtube.com ..."
+    },
+    {
+      "id": "dqZ1J5SiQFc",
+      "title": "#24 - What is Recursive CTE with two interview-level examples | SQL Tutorial | Praveen",
+      "channel": "Zero to Hero Club",
+      "duration": "15:43",
+      "views": "738 views",
+      "description": "Topic Covered with Timestamp:\n\n00:14 - What is Recursive CTE and its syntax\n03:16 - How to print this type of pattern ..."
+    },
+    {
+      "id": "lphobRiAA4s",
+      "title": "Recursive CTE Explained | SQL for Data Engineering",
+      "channel": "Data Engineered",
+      "duration": "6:29",
+      "views": "38 views",
+      "description": "DataEngineering #SQL #RecursiveCTE #postgresql The sql scripts used in discussion are available in the below link."
+    },
+    {
+      "id": "HUy-DLsavhY",
+      "title": "How do SQL Recursive CTE queries work",
+      "channel": "Vlad Mihalcea",
+      "duration": "7:58",
+      "views": "8,932 views",
+      "description": "In this video, you are going to learn how SQL Recursive CTE queries work. This video is part of my HIgh-Performance SQL video ..."
+    },
+    {
+      "id": "_bACoyg2NI4",
+      "title": "Recursive SQL",
+      "channel": "CT Stamford",
+      "duration": "3:10",
+      "views": "18,744 views",
+      "description": "Example of recursive SQL using Db2."
+    },
+    {
+      "id": "WHBH0yz35_8",
+      "title": "SQL WITH Clause with examples | SQL CTE (Common Table Expression) | SQL Tutorial in Hindi 16",
+      "channel": "Rishabh Mishra",
+      "duration": "11:21",
+      "views": "306,103 views",
+      "description": "SQL Full Course Playlist 👇\nhttps://www.youtube.com/playlist?list=PLdOKnrf8EcP17p05q13WXbHO5Z_JfXNpw\n\nLike, Share & Subscribe ..."
+    },
+    {
+      "id": "K1WeoKxLZ5o",
+      "title": "Advanced SQL Tutorial | CTE (Common Table Expression)",
+      "channel": "Alex The Analyst",
+      "duration": "3:44",
+      "views": "499,989 views",
+      "description": "Take my Full MySQL Course Here: https://bit.ly/3tqOipr In today's Advanced SQL lesson we walk through how to use CTEs."
+    }
+  ]
+}

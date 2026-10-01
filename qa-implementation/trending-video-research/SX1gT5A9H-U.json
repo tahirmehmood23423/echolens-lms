@@ -1,0 +1,22 @@
+{
+  "id": "SX1gT5A9H-U",
+  "url": "https://www.youtube.com/watch?v=SX1gT5A9H-U",
+  "checked_at": "2026-09-30T07:23:52.177Z",
+  "title": "Golang: The Last Interface Explanation You'll Ever Need",
+  "channel": "Flo Woelki",
+  "duration_seconds": 1077,
+  "views": 108301,
+  "comments": "151 Comments",
+  "comment_samples": [
+    "As I understand\n\nIn Go (Golang), there are no \"classes\" like in Python, Java, or C++. Instead, Go uses:\n+ structs: These are used to group data together (like fields or attributes).\n+ methods: These are functions that are attached to a struct. They can work with the data inside the struct.\n\nGo also has interfaces, which are just a list of method names.\nTo \"implement\" an interface, a struct needs to have all the methods listed in that interface.\n\nWhen you call a method from an interface, you can pass a variable of a struct type — as long as that struct has already implemented the needed methods.",
+    "When creating your interfaces, all this is easy to understand. It's when you are using imports (even from the standard library), is when it gets hard. There is no clear way to tell (that I'm aware of) what interface a stuct implements without digging through the code finding what functions an interface implements, and then checking if the struct you want to use implements those same ones",
+    "I was pessimistic going into this video, but this is actually great. Thank you",
+    "I've been struggling with how interfaces work for a while now and I think this video finally got it to click for me. Thank you.",
+    "Hey Flo, just wanted to say how much I like your teaching style. Your videos are great! Please cover more advanced Golang topics such as Go concurrency patterns and best practices. Thank you!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Interfaces are common, easy and important to use in Golang. Next to interfaces, structs are also really important. I've also made a video about them, so feel free to check out this video as well: https://youtu.be/c8H0w4yBL10\n\n\n📝 Description\nThis time we're tackling interfaces, a vital component of Go and a must-have in every Go developer's toolkit. We'll start off with the basics of defining and implementing interfaces and move on to more advanced topics like implicit interface implementation, the empty interface, and type assertions. We'll also explore the practical application of interfaces through a use case involving a Shape interface with an `Area()` method. This will provide a clear demonstration of methods attached to structs.\n\n\n⏳ Timestamps:\n00:00 - Definition of defer\n00:35 - Why interfaces are important\n01:42 - Practical example of interfaces\n08:38 - The interface type\n11:33 - Interface composition\n14:29 - Errors and interfaces\n17:22 - Outro\n\n\n👋 Hey there!\nIf you are new to this channel: Hey 👋 my name is Flo and I am a professional software engineer with a passion for coding in Golang, TypeScript, JavaScript, and Rust. This channel is where I share that passion and dive into the exciting world of software engineering. Plus, I love using Emojis and paper-based animations (so have a look for that, if you want to find my videos).\n\n\n📨 Support and Connect!\nBecome a member. https://www.youtube.com/@FloWoelki/membership\nDiscord: https://discord.gg/TnA7drJ\nX / Twitter: https://x.com/FlorianWoelki\nLinkedIn: https://www.linkedin.com/in/florian-woelki/\nGitHub: https://github.com/FlorianWoelki\n\n\n📝 Copyright Notice\nThe original Go Gopher was designed by Renée French (Source: https://go.dev/blog/gopher License details: https://creativecommons.org/licenses/by/4.0/). The gopher appearing in this video and thumbnail is modified from the original design.\n\n\n#golang #go #interface",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,102 @@
+{
+  "query": "Docker multi stage build layer cache image optimization",
+  "checked_at": "2026-09-30T07:21:24.168Z",
+  "results": [
+    {
+      "id": "_Q9KSFUZH0c",
+      "title": "Docker Multi-Stage Builds - Fast and Efficient Dockerfiles",
+      "channel": "Depot",
+      "duration": "6:31",
+      "views": "17,815 views",
+      "description": "Use BuildKit's multi-stage build function to create super tiny and efficient dockerfiles for better caching and faster deployments."
+    },
+    {
+      "id": "IZSaPJdEops",
+      "title": "Optimizing Docker Images with Multi-Stage Builds | Caching & Dependencies | Hindi",
+      "channel": "EducationForever",
+      "duration": "4:39",
+      "views": "13 views",
+      "description": "In this chapter 6.4, we deep dive into optimizing Docker images using multi-stage builds and best practices for handling ..."
+    },
+    {
+      "id": "1tHCVIO8Q04",
+      "title": "Docker Layers and Multistage Builds | Docker Optimization | Reduce Layer Size",
+      "channel": "Cloud With Raj",
+      "duration": "8:07",
+      "views": "19,064 views",
+      "description": "In this video, we will explain one of the docker best practices - multistage builds. We will start by briefly explaining what is ..."
+    },
+    {
+      "id": "t779DVjCKCs",
+      "title": "Docker Image BEST Practices - From 1.2GB to 10MB",
+      "channel": "Better Stack",
+      "duration": "7:15",
+      "views": "436,576 views",
+      "description": "Want to dramatically reduce your Docker image size? In this comprehensive guide, I'll show you how to shrink your Docker ..."
+    },
+    {
+      "id": "YXdvT02AYqE",
+      "title": "Optimize Docker Images with Multi-Stage Builds | Hands-On Tutorial",
+      "channel": "Cloudlearn - Interactive Cloud & Security Training",
+      "duration": "17:08",
+      "views": "125 views",
+      "description": "Hey guys, welcome to CloudLearn. In today's video, we are tackling one of the most common problems in Docker — shipping ..."
+    },
+    {
+      "id": "70x5-DlGWe0",
+      "title": "How to Reduce Docker Image Size by 90% Using Multi-Stage Builds",
+      "channel": "LearnITGuide Tutorials",
+      "duration": "10:18",
+      "views": "407 views",
+      "description": "Stop shipping gigabyte-sized Docker images. Learn how the Docker Union File System works, why layers bloat your builds, and ..."
+    },
+    {
+      "id": "MxNbGSQtWgQ",
+      "title": "🚀 Multi-Stage Build & Image Optimization Platform",
+      "channel": "Tech with Nu",
+      "duration": "15:06",
+      "views": "27 views",
+      "description": "In this video, you'll learn how to optimize Docker images for real-world production systems using practical, easy-to-understand ..."
+    },
+    {
+      "id": "2KzDMD5Qk2k",
+      "title": "How to make smaller Docker containers (including multi-stage build demo!)",
+      "channel": "DevOps Directive",
+      "duration": "4:29",
+      "views": "11,461 views",
+      "description": "If not careful, containers can become much larger than necessary which makes them annoying to download/upload from/to a ..."
+    },
+    {
+      "id": "BRrGXUffB8k",
+      "title": "Create Layered Jars & Layered Docker images with Spring Boot 2.3 | Multi stage docker file",
+      "channel": "Techno Town Techie",
+      "duration": "9:24",
+      "views": "2,205 views",
+      "description": "You will learn how to create layered jars and layered spring boot docker image by using Spring Boot 2.3.0 and will learn how to ..."
+    },
+    {
+      "id": "HBoOJgwA4Co",
+      "title": "Docker Multi-Stage Builds Explained | Shrink Images from 2GB to 100MB [Docker HomeLab EP7 | 2025]",
+      "channel": "LearnwithDevOpsEngineer",
+      "duration": "10:30",
+      "views": "72 views",
+      "description": "Why This Matters Bloated Docker images slow down builds, clog CI/CD pipelines, and cost $$$ in storage and bandwidth."
+    },
+    {
+      "id": "nWXvzINx10I",
+      "title": "Docker and Go: Complete Containerization Tutorial 2025 - Multi-Stage Builds & Optimization",
+      "channel": "CodeLucky",
+      "duration": "9:15",
+      "views": "78 views",
+      "description": "Master Docker containerization for Go applications in 2025! This comprehensive tutorial covers everything from basic Dockerfiles ..."
+    },
+    {
+      "id": "vIfS9bZVBaw",
+      "title": "Learn Multi-Stage Builds Easy With Examples - Docker Development Tips & Tricks",
+      "channel": "Manuel Castellin",
+      "duration": "12:55",
+      "views": "10,399 views",
+      "description": "Multi-stage builds are a powerful tool for developing Docker containers. Learning this technique has many benefits, from better ..."
+    }
+  ]
+}

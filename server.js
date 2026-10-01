@@ -2510,6 +2510,18 @@ app.get('/api/public/info', (req, res) => {
   });
 });
 app.get('/api/public/tracks', (req, res) => res.json({ tracks: Quests.tracks(), open_levels: OPEN_LEVELS }));
+// Admin review includes every staged lesson without enrollment or pacing gates.
+app.get('/api/admin/course-videos', authRequired, adminRequired, (req, res) => {
+  res.setHeader('Cache-Control', 'private, no-store');
+  const courses = Quests.tracks({ includeUnpublished: true }).filter(t => t.staged_catalogue).map(item => {
+    const track = Quests.trackDef(item.key);
+    return { key: track.key, code: track.course_code, title: track.title, published: track.published !== false,
+      lessons: track.levels.map(level => ({ no: level.no, lecture_no: level.lecture_no, title: level.title,
+        module: level.module_title, coverage: level.video_review?.coverage || level.video_outline,
+        review: level.video_review, videos: level.videos?.length ? level.videos : [{ url: level.video_url, title: level.video_title, length: level.video_runtime }] })) };
+  });
+  res.json({ courses });
+});
 app.get('/api/public/tracks/:key', (req, res) => {
   const t = Quests.trackDef(req.params.key);
   const previewOnly = !!(t && t.published === false && t.staged_catalogue);
@@ -5335,6 +5347,13 @@ app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 
 // /admin/recruiters URL Phase 1 asks for without a second HTML file to
 // keep in sync with the rest of the admin shell.
 app.get('/admin/recruiters', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+app.get('/admin/course-videos', (req, res) => {
+  const viewer = currentUser(req);
+  if (!viewer) return res.redirect('/login?returnTo=%2Fadmin%2Fcourse-videos');
+  if (viewer.role !== 'admin') return res.status(403).send('Admin access only.');
+  res.setHeader('Cache-Control', 'private, no-store');
+  return res.sendFile(path.join(__dirname, 'public', 'admin-course-videos.html'));
+});
 app.get('/grade', (req, res) => res.sendFile(path.join(__dirname, 'public', 'grade.html')));
 // v18: /cert carries OpenGraph tags for the specific certificate, so pasting
 // (or prefilling) the link on LinkedIn/WhatsApp shows the certificate as a

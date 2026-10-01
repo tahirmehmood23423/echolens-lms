@@ -1,0 +1,22 @@
+{
+  "id": "wj6-w0DLKRw",
+  "url": "https://www.youtube.com/watch?v=wj6-w0DLKRw",
+  "checked_at": "2026-09-30T07:24:13.777Z",
+  "title": "Golang Microservices: Caching with Redis",
+  "channel": "Mario Carrion",
+  "duration_seconds": 500,
+  "views": 14557,
+  "comments": "26 Comments",
+  "comment_samples": [
+    "¡Gracias Mario por el video publicado!",
+    "your channel is so cool, thanks for all",
+    "Auto subscribed",
+    "For something that only 40 people at most will be using can i use a global [map]",
+    "So if I need to use the redis connection on another file I would need to initialize a new connection? Wouldn't be better to reuse the same connection?"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Let me share with you some tips for using Redis when building Web Services, backed by PostgreSQL! What are the pros? What are the cons? What are the guidelines and best practices?\n\n* Example code: https://github.com/MarioCarrion/videos/tree/main/2021/03/11-golang-microservices-caching-redis\n* Previous episode: \"Building Microservices in Golang: REST APIs - OpenAPI / Swagger\" https://youtu.be/HwtOAc0M08o\n* \"Building Microservices in Golang : Caching with memcached\" https://youtu.be/yKI-sy70PwA\n* Blog post: https://mariocarrion.com/2020/08/27/go-implementing-complex-pipelines-part-5.html\n\n* Playlist \"Golang Tools and Packages\": https://www.youtube.com/playlist?list=PL7yAAGMOat_HEEOvH99agDs_5g51A0Ls3\n* Playlist \"Building Microservices in Go/Golang\": https://www.youtube.com/playlist?list=PL7yAAGMOat_Fn8sAXIk0WyBfK_sT1pohu\n\n* Technical/Non-technical Books - list built by Mario Carrion on Amazon: https://www.amazon.com/shop/rubycarrion?listId=P8KAGIWTNH3X&ref=cm_sw_em_r_inf_list_own_rubycarrion_dp_CwlFWm0Y6V3ya (affiliate link)\n\n00:00 Start\n00:17 What are going to be doing?\n00:47 What is Redis?\n02:30 Demo time!\n07:55 Parting words\n\n---\n\nWho am I:\n\nHello👋🏼! I'm Mario, a Hands-on Software Architect and Lead Backend Engineer with more than 16 years of professional experience building all kinds of software including on-premise Industrial Automation Systems, Linux Accessibility Desktop and Browser Components as well as Distributed Advertising Microservices.\n\nEvery week I will share with you different topics I've learned while working for small startups and large companies including the processes I've followed over the years for successfully delivering complex enterprise systems from start to end.\n\nSubscribe if you like Software Development, Software Architecture and Systems Design!\n\nKeep it up. Don't give up!\n\n#golang #microservices #programming\n\n--- Our affiliate links below\n\nShop our favorite products → https://www.amazon.com/shop/rubycarrion\nVlogging setup → https://rubycarrion.com/camerasforvlogging/\nShop now and save at BestBuy → https://bestbuy.7tiv.net/2bB4g\nDJI Osmo Action In Stock, Unleash Your Other Side → https://click.dji.com/AIwI1huLYJ51YBmF82L_FQ?pm=link&as=0001&ch=rubycarriondjiosmoaction\nGet a 30 day FREE trial of Epidemic Sound → https://www.epidemicsound.com/referral/szx441/\nTry Amazon Prime 30-Day FREE trial → https://amzn.to/3s0el1R\nI love getting Cash Back and think you will too! Join for free and get $20 when you spend $20 → https://www.rakuten.com/r/RUBYRA132?eeid=28187\nSign up to start using vidIQ to grow your YouTube channel for FREE → https://vidiq.com/rubycarrion\n\n--- Our Vlog Channel \n\nhttps://www.youtube.com/c/RubyCarrion/videos",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

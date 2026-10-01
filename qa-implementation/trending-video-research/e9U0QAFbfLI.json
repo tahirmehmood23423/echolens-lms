@@ -1,0 +1,22 @@
+{
+  "id": "e9U0QAFbfLI",
+  "url": "https://www.youtube.com/watch?v=e9U0QAFbfLI",
+  "checked_at": "2026-09-30T07:23:18.993Z",
+  "title": "Cosine Similarity, Clearly Explained!!!",
+  "channel": "StatQuest with Josh Starmer",
+  "duration_seconds": 613,
+  "views": 185751,
+  "comments": "500 Comments",
+  "comment_samples": [
+    "To learn more about Lightning: https://lightning.ai/\nSupport StatQuest by buying my books The StatQuest Illustrated Guide to Machine Learning, The StatQuest Illustrated Guide to Neural Networks and AI, or a Study Guide or Merch!!! https://statquest.org/statquest-store/",
+    "The explanation is so clean. I was clapping for him from my room. How can someone be so good at their job!",
+    "You are EXCEPTIONALLY good at CLEARLY describing complex topics!!!  Thank you!",
+    "Bombastic, ermm, BAM-BASTIC EXPLANATION!!",
+    "QUADRUPLE BAM!!! Thanks for such fun yet pragmatic explainers."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "The Cosine Similarity is a useful metric for determining, among other things, how similar or different two text phrases are. I'll be honest, the first time I saw the equation for The Cosine Similarity, I was scared. However, it turns out to be really quite simple, and this StatQuest walks you through it, one-step-at-a-time. BAM!!!\n\nEnglish\nThis video has been dubbed using an artificial voice via https://aloud.area120.google.com to increase accessibility. You can change the audio track language in the Settings menu.\n\nSpanish\nEste video ha sido doblado al español con voz artificial con https://aloud.area120.google.com para aumentar la accesibilidad. Puede cambiar el idioma de la pista de audio en el menú Configuración.\n\nPortuguese\nEste vídeo foi dublado para o português usando uma voz artificial via https://aloud.area120.google.com para melhorar sua acessibilidade. Você pode alterar o idioma do áudio no menu Configurações.\n\nFor a complete index of all the StatQuest videos, check out:\nhttps://statquest.org/video-index/\n\nIf you'd like to support StatQuest, please consider...\n\nPatreon: https://www.patreon.com/statquest\n...or...\nYouTube Membership: https://www.youtube.com/channel/UCtYLUTtgS3k1Fg4y5tAhLbw/join\n\n...buying one of my books, a study guide, a t-shirt or hoodie, or a song from the StatQuest store...\nhttps://statquest.org/statquest-store/\n\n...or just donating to StatQuest!\nhttps://www.paypal.me/statquest\n\nLastly, if you want to keep up with me as I research and create new StatQuests, follow me on twitter:\nhttps://twitter.com/joshuastarmer\n\n0:00 Awesome song and introduction\n1:46 Visualizing the Cosine Similarity for two phrases\n6:19 The equation for the Cosine Similarity\n\n#StatQuest #DubbedWithAloud",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

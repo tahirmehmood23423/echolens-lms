@@ -1,0 +1,22 @@
+{
+  "id": "dcicL7Nmahg",
+  "url": "https://www.youtube.com/watch?v=dcicL7Nmahg",
+  "checked_at": "2026-10-01T05:20:54.368Z",
+  "title": "Data Validation on Next.js API Route Handlers with Zod",
+  "channel": "Sakura Dev",
+  "duration_seconds": 942,
+  "views": 3349,
+  "comments": "19 Comments",
+  "comment_samples": [
+    "Youre the best",
+    "Awesome ❤❤",
+    "Great video..",
+    "what if you want to display specific error msg to the front end base on status code. how can we do that?",
+    "What is your vscode theme?"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "This video is about data validation on Next.js API route handlers with Zod.\n\nI start the video by explaining why data validation is necessary on Next.js API route handlers. Even though server actions are introduced in Next.js, API endpoints are still needed for feeding third-party apps and microservices.\n\nI then demonstrate how to set up data validation on a post API route handler that registers a new user. Here are the steps involved:\n\n1- Create an API endpoint: Create a directory named API inside the app directory and create a route file (e.g., register/route.ts) inside it.\n\n2- Define a post function: This function will handle the post request to the API endpoint.\nAccess the request body: Use the request.json() function to access the body of the request.\n\n3- Create a Zod schema: Use Zod to create a schema that defines the expected structure and constraints of the data in the request body. In this example, the schema expects fields like first name, last name, email, phone number, and password.\n\n4- Validate the request body: Use the Zod schema to validate the request body. If the validation fails, return an error message as the API response.\n\n5- Access validated data: If the validation is successful, you can access the validated data with type safety inside the post function.\n\nI also cover how to:\n\n- Use validator package to validate phone numbers.\n- Add custom error messages to the Zod schema.\n- Check if two fields have the same value in the Zod schema.\n\nOverall, this video provides a comprehensive guide on how to implement data validation on Next.js API route handlers using Zod. By following these steps, you can ensure that your API endpoints receive well-formatted data and prevent potential errors in your application.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

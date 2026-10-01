@@ -1,0 +1,22 @@
+{
+  "id": "Yb3_4PZX0B0",
+  "url": "https://www.youtube.com/watch?v=Yb3_4PZX0B0",
+  "checked_at": "2026-09-30T07:23:47.327Z",
+  "title": "Let's do GitOps in Kubernetes! ArgoCD Tutorial",
+  "channel": "Christian Lempa",
+  "duration_seconds": 1080,
+  "views": 90787,
+  "comments": "73 Comments",
+  "comment_samples": [
+    "my favourite tech nerd is back 🔥",
+    "Very handy tool! Will take a look at it",
+    "Another Great video Christian.  You always do an excellent job covering the issues one may encounter on these builds!",
+    "Few tools which integrate nicely with Argo\n- helm (also creating Argo application resources as helm charts gives some benefits)\n- renovate (like watchtower for docker but this one watches your repo and auto commits updates to docker image/helm chart versions)\n- reloader (for when you apply new version of configmap and need your app to restart)\nI have been running Argo in production for over 2 years now, even for self hosted k3s kubernetes it is IMO the best way to deploy your apps.",
+    "Great, big thanks! Yesterday I was thinking in to deploy ArgoCD into my home lab. :D"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "We start taking a look at CI-CD, especially the CD part with the free and open-source Argo CD. In this video, we will automate the deployment of a Nginx Web server on my Kubernetes Cluster. #Kubernetes #GitOps #ArgoCD\n\nDOCS: https://github.com/christianlempa/videos/tree/main/argocd-tutorial\n\nDatree-**: http://datree.io\n\nInstall Kubernetes /k3s in your Home Lab: https://youtu.be/UdjhFLV1yt8\n\n\nFollow me:\n\nTWITTER: https://twitter.com/christianlempa\nINSTAGRAM: https://instagram.com/christianlempa\nDISCORD: https://discord.gg/christian-lempa-s-tech-community-702179729767268433\nGITHUB: https://github.com/christianlempa\nPATREON: https://www.patreon.com/christianlempa\nMY EQUIPMENT: https://kit.co/christianlempa\n\n\nTimestamps:\n\n00:00 - Introduction\n00:59 - Advertisement-*\n01:14 - What is CI-CD?\n03:57 - Install Argo CD in Kubernetes\n07:38 - Login to Argo CD Web interface\n09:12 - Create and link a Git Repository\n10:33 - Add Kubernetes Manifests\n11:31 - Verify files with Datree.io-*\n12:45 - Create an Application in Argo CD\n15:24 - Synchronization and Updating\n\n________________\nAll links with \"*\" are affiliate links.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

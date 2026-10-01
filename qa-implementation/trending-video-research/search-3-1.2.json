@@ -1,0 +1,46 @@
+{
+  "query": "fixed dynamic sliding window algorithm explained",
+  "checked_at": "2026-09-30T07:20:42.581Z",
+  "results": [
+    {
+      "id": "y2d0VHdvfdc",
+      "title": "Sliding Window in 7 minutes | LeetCode Pattern",
+      "channel": "AlgoMasterIO",
+      "duration": "7:38",
+      "views": "308,278 views",
+      "description": "... https://github.com/ashishps1/awesome-leetcode-resources In this video, I talk about the sliding window algorithm and explain it ... ... sliding Windows there are two main types of sliding Windows fixed sliding window and dynamic sliding window the fixed sliding ..."
+    },
+    {
+      "id": "dOonV4byDEg",
+      "title": "Sliding Window Technique",
+      "channel": "Profound Academy",
+      "duration": "6:18",
+      "views": "143,331 views",
+      "description": "The Sliding Window technique is a key tool in algorithmic problem-solving that can significantly speed up calculations and ..."
+    },
+    {
+      "id": "uqGxFk0cEdI",
+      "title": "Lec-12: Sliding Window 🪟 Technique | Data Structure",
+      "channel": "Gate Smashers",
+      "duration": "13:10",
+      "views": "163,208 views",
+      "description": "MASTER COMPUTER SCIENCE | INTERVIEWS | EXAMS Gate Smashers — Learn Computer Science through free lectures, ..."
+    },
+    {
+      "id": "bEXpndufk-k",
+      "title": "Sliding Window | Dynamic Programming",
+      "channel": "Learn Then Code",
+      "duration": "10:11",
+      "views": "609 views",
+      "description": "Hello folks, \nIn this video we have covered:\n1. What is Sliding window technique?\n2. What is the difference between dynamic ..."
+    },
+    {
+      "id": "56TxHMG0qhQ",
+      "title": "Maximum Average Subarray (LeetCode 643) | Sliding Window Algorithm | Full solution with animations",
+      "channel": "Nikhil Lohia",
+      "duration": "13:22",
+      "views": "56,624 views",
+      "description": "Super helpful resources: https://nikoo28.github.io/all-my-links/ Actual problem on HackerRank: ..."
+    }
+  ]
+}

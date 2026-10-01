@@ -1,0 +1,16 @@
+{
+  "id": "WxRV_VL0yEw",
+  "url": "https://www.youtube.com/watch?v=WxRV_VL0yEw",
+  "checked_at": "2026-09-30T07:25:49.954Z",
+  "title": "PostgreSQL Deadlock Explained with Python – Simulating and Fixing Deadlocks",
+  "channel": "Turtle Code",
+  "duration_seconds": 250,
+  "views": 270,
+  "comments": "0 Comments",
+  "comment_samples": [],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, we explore deadlocks in PostgreSQL and learn how to simulate a real deadlock scenario using Python.\n\nFirst, we briefly explain what a deadlock is and why it happens in relational databases. Then, step by step, we create a simple PostgreSQL table and use Python with psycopg2 to run two concurrent transactions that intentionally cause a deadlock.\n\n0:00 - What We Are Going to Build\n0:05 - What Is a Deadlock?\n0:22 - How PostgreSQL Handles Deadlocks\n0:50 - Simulating a Deadlock with Python\n3:52 - Free Python Courses\n\nSource Code:\nhttps://github.com/turtlecode/postgresql-python-examples/blob/main/deadlock-simulation.py\n\nYou’ll see:\n\n🔸 How PostgreSQL row-level locks work\n🔸 Why inconsistent lock ordering leads to deadlocks\n🔸 How PostgreSQL detects and automatically resolves deadlocks\n🔸 Where deadlocks are logged in PostgreSQL (Windows example included)\n\nAfter reproducing the deadlock, we analyze the PostgreSQL log output to clearly understand what went wrong.\nFinally, we fix the issue by applying a best practice locking strategy, showing how a small change in transaction order can completely prevent deadlocks.\n\nThis video is ideal for:\n\n🔹 Python developers working with PostgreSQL\n🔹 Backend developers and DBAs\n🔹 Anyone who wants to understand database locking and concurrency in practice\n\nIf you want to learn more Python through practical, real-world examples, check out the Courses section on the channel — there are many free Python tutorials available.\n\n✔️ Free Courses:\nhttps://www.youtube.com/@turtlecode/courses\n\n✔️ Join Channel:\nhttps://www.youtube.com/channel/UChc8lo6K1HPM4_WDjsMSH6g/join\n\nDon’t forget to subscribe and join the channel to support the content and continue learning together 🚀",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "aTlQBofihJQ",
+  "url": "https://www.youtube.com/watch?v=aTlQBofihJQ",
+  "checked_at": "2026-09-30T07:23:43.567Z",
+  "title": "Kubernetes Probes- livenessProbe, readinessProbe, startupProbe |How to use kubernetes probes-part 14",
+  "channel": "Rahul Wagh",
+  "duration_seconds": 1081,
+  "views": 37433,
+  "comments": "75 Comments",
+  "comment_samples": [
+    "This is by far the best video on the probes that I can find on youtube.\nThank you so much.",
+    "Thank you so much dear Rahul . love  from Nagpur Maharashtra",
+    "Thanks Rahul. You are  the best mentor when it comes to Cloud and DevOps.",
+    "you are the best teaching in youtube:yt:",
+    "it's best content on K8s and helm charts .. really useful .. Good work.."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "▬▬▬▬▬▬  🎉 🔥 Udemy Course - AWS Networking Zero to Hero!🔥 🎉▬▬▬▬▬▬  \n🚀 AWS Networking Masterclass! -  https://www.udemy.com/course/aws-networking-zero-to-hero-masterclass/?referralCode=9A38DC3CAF2B02863FF5\n\n▬▬▬▬▬▬  🎉 🔥 Udemy Course -  Master Azure Like a Pro!🔥 🎉▬▬▬▬▬▬  \n🚀 Master Azure Like a Pro! -  https://www.udemy.com/course/azure-cloud-zero-to-hero/?referralCode=241EFDDC7859120A5175\n\n▬▬▬▬▬▬  🙍🏻‍♂️Join YouTube Membership  ▬▬▬▬▬▬ \nJoin this channel to get access to perks:\nhttps://www.youtube.com/channel/UC7p4oXcPbgk_yTSHK7QlkSg/join\n\n▬▬▬▬▬▬  🙍🏻‍♂️ Members Only Videos  ▬▬▬▬▬▬ \nMember Only videos - https://www.youtube.com/playlist?list=UUMO7p4oXcPbgk_yTSHK7QlkSg\n\n▬▬▬▬▬▬  🗓️ Book Me for Consultation  ▬▬▬▬▬▬ \nCalender - https://tidycal.com/rahulwagh17\n\n ▬▬▬▬▬▬ * Instruction's Guides * ▬▬▬▬▬▬ \n\n\nHow to implement Kubernetes liveness, Readiness and Startup probes - https://jhooq.com/kubernetes-liveness-readiness-startup-probes/\n\nGitHub - https://github.com/rahulwagh/spring-boot-docker\n\nMaintaining a healthy Kubernetes cluster is really challenging especially if you have not configured the Liveness, Readiness, and Startup Probes correctly for your containers deployed under Kubernetes containers.\n\nIf I have to put it in a simple way -\n\n1. Liveness probes - It is responsible for restarting your container if it senses a deadlock.\n2. Readiness probes - This probe will tell when the container is ready to start traffic.\n3. Startup probes - It tells when the container application has started.\n\n\n\nIn this lab session, we are going to see - \n\n1. What are Kubernetes Probes?\n2. How to create Kubernetes liveness probes?\n3. How to create Kubernetes Readiness probes?\n3. How to create Kubernetes Startup probes?\n\n\n▬▬▬▬▬▬ ⭐️ 🕘Timestamps ⭐️ ▬▬▬▬▬▬ \n0:00 Intro\n0:24 liveness probe\n3:17 readiness probe \n4:24 startup probe \n\n\nFor more details on Kubernetes probes please refer to - https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/\n\nTo learn more on DevOps visit - https://jhooq.com\n\n\nDisclaimer/Policy: All the content/instructions are solely mine. The source is completely open-source.\n\nVideo is copyrighted and can not be re-distributed on any platform.\n\n\n\n#devops #kubernetes #kubernetesprobes #probes",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

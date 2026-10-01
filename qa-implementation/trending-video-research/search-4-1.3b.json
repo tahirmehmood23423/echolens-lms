@@ -1,0 +1,126 @@
+{
+  "query": "Docker Compose tutorial 10 minutes",
+  "checked_at": "2026-09-30T07:23:48.998Z",
+  "results": [
+    {
+      "id": "Qw9zlE3t8Ko",
+      "title": "Docker Compose in 12 Minutes",
+      "channel": "Jake Wright",
+      "duration": "12:00",
+      "views": "1,262,274 views",
+      "description": "Learn how to use Docker Compose to run multi-container applications easily. This is the second video in this Docker series."
+    },
+    {
+      "id": "g7pyTl0o6Ac",
+      "title": "Docker Compose Tutorial - 6 Minutes",
+      "channel": "DevOps Journey",
+      "duration": "6:02",
+      "views": "3,936 views",
+      "description": "Learn the basics of Docker-compose with our flask webserver docker-compose application. Join our Discord Community of ..."
+    },
+    {
+      "id": "DM65_JyGxCo",
+      "title": "Docker Compose will BLOW your MIND!! (a tutorial)",
+      "channel": "NetworkChuck",
+      "duration": "16:26",
+      "views": "905,927 views",
+      "description": "We don't live in Docker containers, keep yourself safe with Bitdefender Premium Security: https://bit.ly/BitdefenderNC (59% ..."
+    },
+    {
+      "id": "NYmlRE7jLco",
+      "title": "Docker Compose in 9 minutes",
+      "channel": "AiCore",
+      "duration": "8:57",
+      "views": "524 views",
+      "description": "Learn more at https://www.theaicore.com."
+    },
+    {
+      "id": "DQdB7wFEygo",
+      "title": "The Only Docker Tutorial You Need To Get Started",
+      "channel": "The Coding Sloth",
+      "duration": "11:53",
+      "views": "1,438,056 views",
+      "description": "Check out Docker before I put you in a container. Download Docker Desktop: https://dockr.ly/3EbT6ol The Docker Suite of ..."
+    },
+    {
+      "id": "vQmk9moF8vw",
+      "title": "Introduction to docker compose | Docker",
+      "channel": "Hitesh Choudhary",
+      "duration": "9:57",
+      "views": "32,162 views",
+      "description": "Welcome to a youtube channel dedicated to programming and coding related tutorials. We talk about tech, write code, discuss ..."
+    },
+    {
+      "id": "oYMv1j3YgAY",
+      "title": "Docker compose in five minutes.",
+      "channel": "Dispatch",
+      "duration": "5:30",
+      "views": "722 views",
+      "description": "In this video we will run cats vs app demo using docker compose. This is diverse stack involving three five different services ..."
+    },
+    {
+      "id": "gAkwW2tuIqE",
+      "title": "Learn Docker in 7 Easy Steps - Full Beginner's Tutorial",
+      "channel": "Fireship",
+      "duration": "11:02",
+      "views": "2,567,488 views",
+      "description": "A complete introduction to Docker. Learn how to Dockerize a Node.js and run manage multiple containers with Docker Compose."
+    },
+    {
+      "id": "Ofae28_lkxM",
+      "title": "#15 Docker Compose",
+      "channel": "Telusko",
+      "duration": "12:45",
+      "views": "4,135 views",
+      "description": "Check out our courses: Mastering Agentic AI with Java: Spring AI, LangChain4j, MCP & ADK: https://go.telusko.com/agentic-ai ..."
+    },
+    {
+      "id": "guG2PEHqAHw",
+      "title": "Learn Docker in 10 Minutes – Full Beginner Guide",
+      "channel": "Arif Logs",
+      "duration": "12:40",
+      "views": "550 views",
+      "description": "Docker has quickly become an essential technology for software engineers. This is the video, I share everything you need to know ..."
+    },
+    {
+      "id": "wdjPuDMeHS4",
+      "title": "Docker tutorial in Hindi #15 Compose file",
+      "channel": "Code Step By Step",
+      "duration": "6:49",
+      "views": "33,680 views",
+      "description": "Instragram Id : code.steps Here we will learn how to use compose file in Docker in the Hindi language. This docker course is ..."
+    },
+    {
+      "id": "AuCOX0Kclf4",
+      "title": "Docker In 10 Minutes | What Is Docker And How It Works?| Docker Tutorial For Beginners | Simplilearn",
+      "channel": "Simplilearn",
+      "duration": "10:37",
+      "views": "28,382 views",
+      "description": "\"️   Cloud Architect Masters Program ..."
+    },
+    {
+      "id": "iYAw1jGtIy4",
+      "title": "Learn Docker In 10 Minutes | Introduction To Docker | Docker Commands | Docker Tutorial",
+      "channel": "Coding with Kazim",
+      "duration": "9:47",
+      "views": "770 views",
+      "description": "Subscribe ➽ @CodingWithKazim Stay updated! Welcome to our 'Learn Docker In 10 Minutes' tutorial! In this beginner-friendly ..."
+    },
+    {
+      "id": "MVIcrmeV_6c",
+      "title": "Docker Compose Tutorial - Docker in Practice || Docker Tutorial 9",
+      "channel": "TechWorld with Nana",
+      "duration": "13:01",
+      "views": "211,600 views",
+      "description": "In this Docker Compose Tutorial you will learn what Docker Compose is, why it's useful and how to use it. ▻ Subscribe to me on ..."
+    },
+    {
+      "id": "BTXfR76WmCw",
+      "title": "Complete Docker Compose Tutorial (with Docker Networking)",
+      "channel": "Monis Yousuf",
+      "duration": "14:18",
+      "views": "30,599 views",
+      "description": "In this Docker Compose Tutorial, we build a multi-container app along with an explanation of how docker networking works, how ..."
+    }
+  ]
+}

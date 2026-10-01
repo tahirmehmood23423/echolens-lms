@@ -1,0 +1,22 @@
+{
+  "id": "pEMhPBQMNjg",
+  "url": "https://www.youtube.com/watch?v=pEMhPBQMNjg",
+  "checked_at": "2026-09-30T07:23:23.910Z",
+  "title": "Building a LangGraph ReAct Mini Agent",
+  "channel": "Sam Witteveen",
+  "duration_seconds": 887,
+  "views": 38567,
+  "comments": "64 Comments",
+  "comment_samples": [
+    "This video is so underrated",
+    "Bro this is the most simplified and clear video of ReAct so far! Amazing job thank you",
+    "Oh Sam, thank you so so much. This solution is crazy simple. The agent never enters in loops unlike the solution I develop with pure langchain. The agent used to get stuck in loops when asking simple questions like hi or hello\n\nThanks again",
+    "I think this is the by far most the best ReACT agent video I have seen.",
+    "One of the best and simplest most react agent pattern explanation. \nGreat work. Amazing."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video I go through how to build a ReAct Mini Agent With LangGraph's ReAct Function Calling Pattern\n\nColab: https://drp.li/SYckW\n\nFor more tutorials on using LLMs and building Agents, check out my Patreon:\nPatreon: https://www.patreon.com/SamWitteveen\nTwitter: https://twitter.com/Sam_Witteveen\n\n🕵️ Interested in building LLM Agents? Fill out the form below\nBuilding LLM Agents Form: https://drp.li/dIMes\n\n👨‍💻Github:\nhttps://github.com/samwit/langchain-tutorials (updated)\nhttps://github.com/samwit/llm-tutorials\n\n⏱️Time Stamps:\n00:00 What & Why of the ReAct Pattern\n00:09 Creating ReAct Agents\n01:26 Code Time: Create ReAct Agents with Function Calling\n09:18 Advanced: Adding in Custom Tools\n10:07 Advanced: Adding our own Node and own Graph",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

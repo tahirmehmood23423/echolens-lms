@@ -1,0 +1,18 @@
+{
+  "id": "psEeEPtiops",
+  "url": "https://www.youtube.com/watch?v=psEeEPtiops",
+  "checked_at": "2026-10-01T05:20:57.694Z",
+  "title": "Next.js Middleware Explained Simply 🔥 | Protect Routes & Authentication",
+  "channel": "RKS",
+  "duration_seconds": 690,
+  "views": 54,
+  "comments": "1 Comment",
+  "comment_samples": [
+    "Wow nice one"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🚀 Learn Next.js Middleware the EASY way!\n\nIn this video, you'll understand how Middleware works in Next.js using a real authentication and protected route example.\n\n✅ What You’ll Learn:\n✔ Next.js Middleware\n✔ Route Protection\n✔ Authentication Basics\n✔ Redirect Unauthorized Users\n✔ App Router Structure\n✔ Login → Dashboard Flow\n✔ Real World Security Concepts\n\n🔥 Perfect for beginners learning Next.js fundamentals.\n\n📌 Topics Covered:\n\n* Middleware.ts\n* Protected Routes\n* Authentication\n* Cookies\n* Login Flow\n* Dashboard Protection\n* App Router\n* Layouts\n\n⏱ Timestamps\n00:00 Introduction\n00:40 Why Middleware?\n01:50 Project Setup\n03:10 Protect Dashboard Route\n05:00 Authentication Flow\n07:20 Middleware Explained\n09:00 Common Mistakes\n11:00 Real World Usage\n\n🚀 NEXT VIDEO:\nComplete Next.js Authentication System\n(JWT + Role Based Access)\n\n#nextjs #middleware #reactjs #webdevelopment #authentication #javascript #nextjstutorial",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

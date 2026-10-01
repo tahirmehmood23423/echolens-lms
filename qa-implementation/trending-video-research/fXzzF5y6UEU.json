@@ -1,0 +1,22 @@
+{
+  "id": "fXzzF5y6UEU",
+  "url": "https://www.youtube.com/watch?v=fXzzF5y6UEU",
+  "checked_at": "2026-09-30T07:25:05.799Z",
+  "title": "Golang Context Explained - How To Use With Timeout",
+  "channel": "Melkey",
+  "duration_seconds": 502,
+  "views": 26165,
+  "comments": "38 Comments",
+  "comment_samples": [
+    "I hope you all loved this video! Leave a like, comment, like + subscribe. It means the world to me. Let me know what video you want to see in the future!",
+    "But are we still waiting for 400ms? We are just not returning the result but an error right? Or how do we reach the ctx.Err() check before the 400ms run out?",
+    "Great video!\nHowever, example could be better - since the function still blocks until the time it takes for the API call. I.e. if API call blocked for an hour, you'd need to wait for the whole hour, only to encounter deadline exceeded error.\n^ Nevertheless, this vid presents a good starting point!",
+    "A video that is 8 minutes long with a trash thumbnail, ends up with a trash example. This channel is cooked lmao.",
+    "You should have used a goroutine with a select statement and check the ctx.Done() or the result. What are you doing in the example is just waiting for the result and throwing away if the time is exceed."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🔍 If you're a Go developer looking to improve your understanding of context management and concurrency control, you're in the right place.\n\n25% FEM Membership with course:\nhttps://frontendmasters.com/courses/complete-go/?code=MELKEY25&utm_source=melkey\n\n\nIn this video, we break down the fundamentals of the Golang Context package, exploring its core concepts, practical applications, and best practices. Whether you're a beginner or an experienced Go developer, this tutorial has something valuable to offer.\n\n### Twitch\nI stream live on Twitch every weekend\nTwitch : https://www.twitch.tv/melkey\nJoin the amazing community on Discord\nDiscord: https://discord.gg/melkeydevhouse\nI post memes and host Twitter Tech Spaces\nTwitter: https://twitter.com/MelkeyDev\n\n\nSUBSCRIBE OR GET LAID OFF\n╔═╦╗╔╦╗╔═╦═╦╦╦╦╗╔═╗\n║╚╣║║║╚╣╚╣╔╣╔╣║╚╣═╣ \n╠╗║╚╝║║╠╗║╚╣║║║║║═╣\n╚═╩══╩═╩═╩═╩╝╚╩═╩═╝\n\n\n#coding #neovim  #typescript  #programming #vim #softwareengineering #codinglife #webdesign #webdevelopment #webdev #javascript #rustlang #rust #twitch #twitchstreamer #programmerhumor #codinghumor #software #softwareengineer #softwaredeveloper #softwaredevelopment #gymbro #gym #programmerhumor #programming #coding #golang #go #goprogramming",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "N9LhKjPibuU",
+  "url": "https://www.youtube.com/watch?v=N9LhKjPibuU",
+  "checked_at": "2026-09-30T07:25:03.252Z",
+  "title": "Build a Microservice with Go #2 - Routes & Handlers",
+  "channel": "Net Ninja",
+  "duration_seconds": 650,
+  "views": 30744,
+  "comments": "18 Comments",
+  "comment_samples": [
+    "This complete session went over my head",
+    "the first video of the series was very informative. this video seems like assumes the viewers already know everything.",
+    "I wish I'd had this series to learn from when I was learning Go.\n\nRob Pike said something like 'simplicity is complicated' and I took it at the time to mean keeping a solution simple and clean can be hard to do but worth the effort. With a minimum amount of boilerplate code,  straight forward, thought out and clear design and pragmatic use of tooling this series gives us a blueprint to start creating APIs in Go that is easy to follow, adopt and modify.\n\nThanks for the hard work that has gone into this. Its made to look easy but there's a lot in it !",
+    "I started learning htmx and now I connect this with golang <3",
+    "Thanks man. Really helpful."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this Go tutorial series, you'll learn how to make a microservice using Go, Chi (a lightweight router) & Redis.\n\n🚀🥷🏼 Get early access to this entire course now on Net Ninja Pro:\nhttps://www.netninja.dev/p/make-a-microservice-with-golang\n\n🔥🥷🏼 Check out Dreams of Code on YouTube:\nhttps://www.youtube.com/@dreamsofcode\n\n📂🥷🏼 Access the course files on GitHub:\nhttps://github.com/dreamsofcode-io/golang-microservice-course-nn\n\n💻🥷🏼 Go Crash Course:\nOn Net Ninja Pro - https://netninja.dev/p/learn-go-golang\nOn YouTube - https://www.youtube.com/watch?v=etSN4X_fCnM&list=PL4cUxeGkcC9gC88BEo9czgyS72A3doDeM",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

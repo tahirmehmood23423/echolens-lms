@@ -1,0 +1,22 @@
+{
+  "id": "gBh__1eFwVI",
+  "url": "https://www.youtube.com/watch?v=gBh__1eFwVI",
+  "checked_at": "2026-09-30T07:23:57.608Z",
+  "title": "[Backend #6] A clean way to implement database transaction in Golang",
+  "channel": "TECH SCHOOL",
+  "duration_seconds": 1193,
+  "views": 59640,
+  "comments": "81 Comments",
+  "comment_samples": [
+    "What an amazing video. My mind blew when you set up those channels to test the transactions in a realistic way, thank you so much!",
+    "Awesome work, I love your Golang lessons.  Subbed.",
+    "Thanks a lot for your videos, they are amazing useful.",
+    "Thanx a lot for your effort. Your lessons are really helpful... Waiting for the next ones...",
+    "Thank you for your very valuable lessons"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In a real-world application, we often have to perform a db transaction that combines some operations from several tables. Today we will learn a clean way to implement it in Golang.\n- Join us on Discord: https://bit.ly/techschooldc\n- Get the course on Udemy: https://bit.ly/backendudemy\n- Buy us a coffee: https://www.buymeacoffee.com/techschool\n- Full series playlist: https://bit.ly/backendmaster\n- Github repository: https://github.com/techschool/simplebank\n- Read it on DEV: https://dev.to/techschoolguru/a-clean-way-to-implement-database-transaction-in-golang-2ba\n\n---\n\nIn this backend master class, we’re going to learn everything about how to design, develop, and deploy a complete backend system from scratch using PostgreSQL, Golang and Docker.\n\nTECH SCHOOL - From noob to pro\nhttp://youtube.com/c/TECHSCHOOLGURU\nAt Tech School, we believe that everyone deserves a good and free education. We create high-quality courses and tutorials in Information Technology. If you like the videos, please feel free to share and subscribe to support the channel or buy us a coffee: https://www.buymeacoffee.com/techschool",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,126 @@
+{
+  "query": "Github Actions Trivy docker image registry scan",
+  "checked_at": "2026-09-30T07:21:53.938Z",
+  "results": [
+    {
+      "id": "CMH6YIHLvAw",
+      "title": "Automated Docker Image Scanning with Trivy and GitHub Actions!",
+      "channel": "Adrian Dolinay",
+      "duration": "10:19",
+      "views": "2,447 views",
+      "description": "Tutorial on automating Trivy security scans of Docker Images using GitHub Actions. Learn about the process of setting up a CI/CD ..."
+    },
+    {
+      "id": "pZumqxTwLNw",
+      "title": "Docker vulnerability scanning tool | Trivy",
+      "channel": "kubernetesWay",
+      "duration": "7:14",
+      "views": "20,604 views",
+      "description": "Trivy is an opensource security vulnerability scanning tool, In this video, we will be showing how to scan a docker image using ..."
+    },
+    {
+      "id": "GGWinWTHqCY",
+      "title": "Security Scanning in your CI/CD pipeline through GitHub Actions with Trivy",
+      "channel": "Aqua Security Open Source",
+      "duration": "11:31",
+      "views": "7,800 views",
+      "description": "This video showcases how you can integrate Trivy security scanning in your CI/CD pipeline: * filesystem scanning * container ..."
+    },
+    {
+      "id": "99tiVZLMujs",
+      "title": "Trivy Docker Desktop Extension for unlimited vulnerability scanning",
+      "channel": "Aqua Security Open Source",
+      "duration": "6:05",
+      "views": "8,347 views",
+      "description": "In this video, we show you how to get started with Trivy's Docker Desktop extension to * Scan local and remote images for ..."
+    },
+    {
+      "id": "aLQTg1SHMyg",
+      "title": "Trivy GitHub Explained: Container Scans, Secret Detection, and CI Security",
+      "channel": "Alex Hitt",
+      "duration": "5:05",
+      "views": "28 views",
+      "description": "trivy by aquasecurity: https://github.com/aquasecurity/trivy Trivy is an open-source security scanner for container images, local ..."
+    },
+    {
+      "id": "EwduKvCeFzw",
+      "title": "Continuous Security Scanning with Docker Trivy & GitHub Actions | 10-Minute DevOps Use Case",
+      "channel": "LearnwithDevOpsEngineer",
+      "duration": "10:06",
+      "views": "347 views",
+      "description": "In this video, I walk you through how to set up continuous security scanning for Docker images using Trivy and GitHub Actions."
+    },
+    {
+      "id": "RgZyX-e6W9E",
+      "title": "Push Docker Images to GitHub Container Registry • #docker  #containers #github  #githubactions",
+      "channel": "Brian Morrison",
+      "duration": "14:42",
+      "views": "68,690 views",
+      "description": "Learn how to push Docker images to GitHubs built-in image registry, both manually, and automatically with GitHub Actions."
+    },
+    {
+      "id": "Sh1FP68rs3M",
+      "title": "Automating AquaSec Trivy scan with GitHub Action",
+      "channel": "webpwnized",
+      "duration": "14:56",
+      "views": "2,750 views",
+      "description": "... in GitHub Scan Docker images with Trivy in GitHub Aqua Security Trivy GitHub workflow GitHub Actions for container security ..."
+    },
+    {
+      "id": "nXTNEpLT3N4",
+      "title": "Security Scans for Docker Images using Trivy!",
+      "channel": "Adrian Dolinay",
+      "duration": "5:48",
+      "views": "2,017 views",
+      "description": "Tutorial on running security scan with Trivy on Docker images. Learn how to run a scan on a Docker image, filter for vulnerabilities ..."
+    },
+    {
+      "id": "00btzVYYmkE",
+      "title": "CI/CD from Zero to Production 🚀 | Docker, GitHub Actions, Trivy, Blue-Green & Rollback",
+      "channel": "AI Engineering with Arvind",
+      "duration": "10:03",
+      "views": "116 views",
+      "description": "In this project, I built a production-inspired CI/CD pipeline from zero to production using free and local infrastructure. The goal was ..."
+    },
+    {
+      "id": "CEWWmRHXbcU",
+      "title": "Trivy EP07 |Fix Docker Image Vulnerabilities Using Trivy | Patch & Push Secure Images to Docker Hub",
+      "channel": "Shubham gour",
+      "duration": "13:41",
+      "views": "910 views",
+      "description": "theshubhamgour In this video, you'll learn how to fix vulnerabilities in Docker images that are already pushed to Docker Hub ..."
+    },
+    {
+      "id": "bRfGDCIdzOs",
+      "title": "Docker image scan using trivy | Trivy Git repo scan| Devsecops series part 6 | superman trivy",
+      "channel": "BK Bharathi",
+      "duration": "14:00",
+      "views": "240 views",
+      "description": "trivy #devsecops #trivyscan #tamil Repo link : https://github.com/bharathikalai/devsecops Watsapp channel ..."
+    },
+    {
+      "id": "dwce6Yl9N9Q",
+      "title": "Trivy Vulnerability Scanner Tool For DevSecOps 🔥🔥",
+      "channel": "DevOps Shack",
+      "duration": "15:27",
+      "views": "39,716 views",
+      "description": "Trivy Vulnerability Scanner Tool For DevSecOps In this video I will show you how to install and implement Trivy . Connect to ..."
+    },
+    {
+      "id": "OqZlKbTRWOY",
+      "title": "Sign Your Container Images with Cosign, GitHub Actions and GitHub Container Registry (How To)",
+      "channel": "CoderDave",
+      "duration": "11:53",
+      "views": "8,035 views",
+      "description": "Signing your container images is a great way to step up the container security game, and make sure your developers and users ..."
+    },
+    {
+      "id": "x7f9x30W_dI",
+      "title": "Build and Push Docker Images with GitHub Actions",
+      "channel": "Rishab in Cloud",
+      "duration": "13:14",
+      "views": "40,511 views",
+      "description": "Build and Push Docker images to Docker Hub using GitHub Actions as CI/CD. Previous Part - https://youtu.be/-GPCdrUTtss ..."
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "query": "RAG grounding prompting citations tutorial",
+  "checked_at": "2026-09-30T07:24:53.725Z",
+  "results": [
+    {
+      "id": "KPhBeSls_1s",
+      "title": "Secure AI Agents: RAG Advisors - Grounded Answers with Citations | S07E04",
+      "channel": "Prompt Vidya AI",
+      "duration": "4:39",
+      "views": "4 views",
+      "description": "Section 7, Lecture 4 of Secure AI Agents with Java and Spring Boot. The chunks are scoped. Now they meet the model - the third ..."
+    },
+    {
+      "id": "XcAf8JCZg2o",
+      "title": "Build a RAG Based AI with Citations | Retrieval Augmented Generation | Stopping hallucination in AI",
+      "channel": "SAMEER SHRINATH",
+      "duration": "4:13",
+      "views": "504 views",
+      "description": "In this video, I'll walk you through how to create a RAG (Retrieval-Augmented Generation) AI system that fetches data from ..."
+    },
+    {
+      "id": "hGy7RWRJYPM",
+      "title": "Grounded Answer Engine with Inline Citations on Azure",
+      "channel": "Joyjeet Majumdar",
+      "duration": "4:05",
+      "views": "8 views",
+      "description": "Your RAG answers cite reference four when you only sent three chunks — and shipping that unverified is how you serve confident ..."
+    },
+    {
+      "id": "YZmCy-cGmbs",
+      "title": "Citation Grounding for RAG: Reduce Hallucinations in Python",
+      "channel": "Professor Py: AI Engineering",
+      "duration": "7:16",
+      "views": "72 views",
+      "description": "Citation grounding: force source-only answers with inline citations to eliminate LLM hallucinations. Build a simple, auditable ..."
+    },
+    {
+      "id": "zBSkeiYBdGI",
+      "title": "How to Build Faithful RAG Citations for Multi-Source Answers | Lesson 11",
+      "channel": "shenyi-dev",
+      "duration": "1:10",
+      "views": "26 views",
+      "description": "In Lesson 11 of RAG Formation, we turn citations from decoration into a testable evidence contract. The practical outcome is a ..."
+    },
+    {
+      "id": "TEHAOJdbEkA",
+      "title": "RAG Prompt Engineering That Actually Works (Rewrite • Retrieve • Synthesize)",
+      "channel": "AdvSkill Learning",
+      "duration": "5:34",
+      "views": "91 views",
+      "description": "In this episode of GenAI Explained, we cover RAG Prompt Engineering That Actually Works—a production-style approach to ..."
+    },
+    {
+      "id": "iatpEibrq78",
+      "title": "Day 25: Advanced Prompting for RAG - System Prompts That Prevent Hallucination",
+      "channel": "Hands On Course Demo",
+      "duration": "3:09",
+      "views": "19 views",
+      "description": "Today's Build We're building a sophisticated prompt engineering framework that transforms raw retrieval into reliable answers: ..."
+    },
+    {
+      "id": "AQypKc8zZ4k",
+      "title": "How to Make a RAG Prompt Handle Missing Facts Without Guessing | Lesson 10",
+      "channel": "shenyi-dev",
+      "duration": "1:11",
+      "views": "21 views",
+      "description": "In Lesson 10 of RAG Formation, we turn “answer only from evidence” into a prompt rule precise enough to test. The practical ..."
+    },
+    {
+      "id": "dKoLXHS2SWU",
+      "title": "8. Generation in RAG: context construction, grounding, citations and answer constraints",
+      "channel": "PHAROS AI Factory Project",
+      "duration": "7:43",
+      "views": "7 views",
+      "description": "Speaker: George Drosatos (ATHENA RC) This methodology session explains how retrieved evidence is transformed into a ..."
+    },
+    {
+      "id": "6rN9S92AAHs",
+      "title": "RAG Prompt Design: Package Context for Better LLM Answers | Module 2.3",
+      "channel": "KryptoMindz Technologies",
+      "duration": "6:38",
+      "views": "15 views",
+      "description": "Retrieval gets evidence into your RAG pipeline, but it does not automatically create accurate answers. The real challenge is ..."
+    },
+    {
+      "id": "rSMZDDlU1rc",
+      "title": "Prompt Budgeting and Grounded Prompting — The Layer Most RAG Builders Skip",
+      "channel": "AI with Chaithra",
+      "duration": "5:11",
+      "views": "37 views",
+      "description": "Great retrieval. Clean chunks. Well-assembled context. And then the prompt is built without a budget and the model hallucinates ..."
+    },
+    {
+      "id": "icYt-kteUpQ",
+      "title": "How Can AI Prove Its Answer? 🤯 | RAG Citations Explained",
+      "channel": "AI Code & Mode",
+      "duration": "1:27",
+      "views": "35 views",
+      "description": "AI gave you an answer… but can it show you where that answer came from? That's where RAG Citations and Grounded ..."
+    },
+    {
+      "id": "pIGRwMjhMaQ",
+      "title": "Chunking Strategies in RAG: Optimising Data for Advanced AI Responses",
+      "channel": "Mervin Praison",
+      "duration": "14:02",
+      "views": "141,436 views",
+      "description": "Dive deep into the world of RAG applications with our comprehensive guide on chunking strategies! Advanced Chunking ..."
+    },
+    {
+      "id": "2I4iL8jHafs",
+      "title": "Grounding LLMs with RAG: From Naive to Agentic & Graph Architectures",
+      "channel": "The Savvy Scholar",
+      "duration": "7:46",
+      "views": "59 views",
+      "description": "Tired of Large Language Models (LLMs) hallucinating or giving outdated answers? Learn how Retrieval-Augmented Generation ..."
+    },
+    {
+      "id": "9jFyel1Cwsk",
+      "title": "Ep11 · RAG From Scratch (Part 2) — Grounded, Cited Answers From Your Docs (Python)",
+      "channel": "software-engineer-blog",
+      "duration": "6:20",
+      "views": "9 views",
+      "description": "This is the half of RAG that actually answers the question. Last episode we built RETRIEVAL — pulling back the few passages that ..."
+    },
+    {
+      "id": "pzDBXuhLGCw",
+      "title": "RAG: Retrieval-Augmented Answers Grounded in Your Own Content - AI + Drupal Series",
+      "channel": "Web Development Tutorials ",
+      "duration": "3:35",
+      "views": "5 views",
+      "description": "A model answering from its training data guesses about your site. RAG fixes that: embed the question, retrieve the most similar ..."
+    },
+    {
+      "id": "nFAG5sm1ibA",
+      "title": "How RAG Actually Works — Connecting AI to Real Knowledge",
+      "channel": "AI Systems with Andy",
+      "duration": "12:43",
+      "views": "93 views",
+      "description": "Large Language Models are fluent — but by default, they do not look things up. They answer based on patterns learned during ..."
+    }
+  ]
+}

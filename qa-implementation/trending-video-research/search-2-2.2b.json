@@ -1,0 +1,118 @@
+{
+  "query": "LangChain LCEL streaming",
+  "checked_at": "2026-09-30T07:23:27.934Z",
+  "results": [
+    {
+      "id": "9OuwPeDaUIY",
+      "title": "LangChain Streaming Explained | Real-Time LLM Responses (Step-by-Step)",
+      "channel": "Learn2Grow",
+      "duration": "4:58",
+      "views": "1,300 views",
+      "description": "In this video, I explain how LangChain streaming works and how you can stream LLM responses in real time instead of waiting for ..."
+    },
+    {
+      "id": "L07Kwpjppd4",
+      "title": "Langchain LCEL Intuitively Explained + Notebook Examples | Langchain Tutorial",
+      "channel": "M&M Tech",
+      "duration": "8:19",
+      "views": "1,207 views",
+      "description": "In this video, I provide an intuitive explanation of LangChain Expression Language (LCEL). You'll discover how to create various ..."
+    },
+    {
+      "id": "piK5WTXAEAQ",
+      "title": "Build a Streaming LangChain Agent in Next.js with useStream",
+      "channel": "LangChain",
+      "duration": "7:19",
+      "views": "7,154 views",
+      "description": "Learn how to build a minimal LangChain agent inside a Next.js app using the useStream hook. We'll stream responses, render ..."
+    },
+    {
+      "id": "x2EawYUTK4w",
+      "title": "Agentic AI — How To Chain LLMs in LangChain (Stream, Batch & Parallel)",
+      "channel": "Techfluencer's Quest",
+      "duration": "19:33",
+      "views": "73 views",
+      "description": "DESCRIPTION LangChain tutorial, fully hands-on: how to chain LLM calls and build real Agentic AI workflows. This is Lesson 3 ..."
+    },
+    {
+      "id": "E9oFkaBSTuM",
+      "title": "LangChain Expression Language (LCEL) Explained | LangChain Tutorial",
+      "channel": "CodeCraft Academy",
+      "duration": "2:21",
+      "views": "149 views",
+      "description": "Want to build cleaner, more powerful AI applications with LangChain? In this video, you'll learn everything about LangChain ..."
+    },
+    {
+      "id": "xTmU8ZImUO8",
+      "title": "LangChain Explained in 10 Minutes (Components Breakdown + Build Your First AI Chatbot)",
+      "channel": "KodeKloud",
+      "duration": "12:28",
+      "views": "255,542 views",
+      "description": "Try LangChain Hands-on Labs for Free: https://kode.wiki/462mo31 Building a company chatbot that remembers conversations, ..."
+    },
+    {
+      "id": "UxHys0KwHag",
+      "title": "Chains vs. LCEL vs. LangGraph — Which One Should You Use?",
+      "channel": "CodeCraft Academy",
+      "duration": "3:21",
+      "views": "45 views",
+      "description": "LangChain has three different ways to build applications — legacy Chains, modern LCEL, and LangGraph — and it's genuinely ..."
+    },
+    {
+      "id": "uLqya_oRdts",
+      "title": "Stop Using LangChain Chains the Hard Way! Master LCEL Runnables",
+      "channel": "CodeCraft Academy",
+      "duration": "2:10",
+      "views": "115 views",
+      "description": "What actually happens when you write prompt | model | parser in LangChain? In this video, we break down the Runnable Protocol ..."
+    },
+    {
+      "id": "vJOGC8QJZJQ",
+      "title": "LangChain vs LangGraph vs LangSmith",
+      "channel": "codebasics",
+      "duration": "10:16",
+      "views": "297,144 views",
+      "description": "In this video, we will understand the difference between LangChain, LangGraph and LangSmith. They are part of the same echo ..."
+    },
+    {
+      "id": "hrEWqm8JA-w",
+      "title": "The Future of Agent UIs: Streaming Subagents in Real Time",
+      "channel": "LangChain",
+      "duration": "8:40",
+      "views": "15,981 views",
+      "description": "Today's AI agents don't run in a straight line anymore. They plan, delegate, and spin up multiple subagents in parallel. But most ..."
+    },
+    {
+      "id": "1bUy-1hGZpI",
+      "title": "What is LangChain?",
+      "channel": "IBM Technology",
+      "duration": "8:08",
+      "views": "782,625 views",
+      "description": "Learn about IBM watsonx→ https://ibm.biz/BdvkK8 LangChain became immensely popular when it was launched in 2022, but ..."
+    },
+    {
+      "id": "SkESR04TerI",
+      "title": "LangChain Ep.1 — ChatModel, Messages, invoke vs stream (Python Tutorial)",
+      "channel": "yuexiang liu",
+      "duration": "6:07",
+      "views": "7 views",
+      "description": "LangChain Series · Episode 1 Before agents and RAG, you need the basics: how LangChain talks to an LLM. In this episode we ..."
+    },
+    {
+      "id": "wC6Y5XqUOvc",
+      "title": "Streaming LangChain Agent",
+      "channel": "Telnyx",
+      "duration": "3:52",
+      "views": "29 views",
+      "description": "Code Sample: github.com/team-telnyx/telnyx-code-examples/tree/main/langchain-streaming-agent."
+    },
+    {
+      "id": "zFIjfnmV6Og",
+      "title": "LangChain 02: Prompt Templates & Chains Explained",
+      "channel": "TechWhistle",
+      "duration": "4:41",
+      "views": "781 views",
+      "description": "LangChain's LCEL pipe operator turns your messy f-string prompts into modular, streaming-ready AI pipelines — and it takes less ..."
+    }
+  ]
+}

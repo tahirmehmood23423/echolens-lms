@@ -1,0 +1,158 @@
+{
+  "query": "embeddings semantic similarity cosine explained",
+  "checked_at": "2026-09-30T07:20:39.245Z",
+  "results": [
+    {
+      "id": "bj_hkrXgtNE",
+      "title": "Semantic Search in NLP | Sentence Embedding & Cosine Similarity with Examples",
+      "channel": "Gate Smashers",
+      "duration": "9:10",
+      "views": "5,494 views",
+      "description": "MASTER COMPUTER SCIENCE | INTERVIEWS | EXAMS Gate Smashers — Learn Computer Science through free lectures, ..."
+    },
+    {
+      "id": "e9U0QAFbfLI",
+      "title": "Cosine Similarity, Clearly Explained!!!",
+      "channel": "StatQuest with Josh Starmer",
+      "duration": "10:14",
+      "views": "185,725 views",
+      "description": "The Cosine Similarity is a useful metric for determining, among other things, how similar or different two text phrases are. I'll be ..."
+    },
+    {
+      "id": "nbJVJ1RPBEg",
+      "title": "RAG Tutorial 2026 #5: Cosine Similarity for Vector Search Explained",
+      "channel": "Harish Neel | AI",
+      "duration": "7:30",
+      "views": "33,073 views",
+      "description": "Production AI Course (paid): https://harishneel.com/six-figure-rag Email: teamharishneel@gmail.com Understand cosine ..."
+    },
+    {
+      "id": "48vNzQnp6Us",
+      "title": "Embeddings and Cosine Similarity in LLM",
+      "channel": "AI with Sakthivel",
+      "duration": "10:37",
+      "views": "909 views",
+      "description": "In this video, we delve into the concept of embeddings and explore how they can be used for tasks like measuring the similarity ..."
+    },
+    {
+      "id": "z7UFjmqmw1o",
+      "title": "Vector Embedding & Cosine Similarity Explained in 10 Minutes",
+      "channel": "CodexaAI",
+      "duration": "6:59",
+      "views": "257 views",
+      "description": "n this video, we break down one of the most important concepts in AI and machine learning — vector embeddings — in a simple ..."
+    },
+    {
+      "id": "zcUGLp5vwaQ",
+      "title": "Understand Cosine Similarity | 2 Minute Tutorial",
+      "channel": "Daniel Krei",
+      "duration": "2:09",
+      "views": "34,814 views",
+      "description": "This is a quick introduction to cosine similarity - one of the most important similarity measures in machine learning! Cosine ..."
+    },
+    {
+      "id": "xTaDx3tbYMs",
+      "title": "5. Cosine Similarity vs. Euclidean Distance vs. Dot Product: Choosing the Right Metric for AI Search",
+      "channel": "SH AI Academy",
+      "duration": "6:14",
+      "views": "5,860 views",
+      "description": "Whether you're building a recommendation system, implementing RAG for LLMs, or working on image search, the metric you ..."
+    },
+    {
+      "id": "YF8BbMJIgCo",
+      "title": "Cosine Similarity is Just Direction, Not Distance",
+      "channel": "DataMListic",
+      "duration": "5:10",
+      "views": "3,324 views",
+      "description": "Two sentences with the same meaning but no shared words still need to land near each other when a machine reads them."
+    },
+    {
+      "id": "wgfSDrqYMJ4",
+      "title": "What are Word Embeddings?",
+      "channel": "IBM Technology",
+      "duration": "8:38",
+      "views": "286,841 views",
+      "description": "Want to play with the technology yourself? Explore our interactive demo → https://ibm.biz/BdKet3 Learn more about the ..."
+    },
+    {
+      "id": "v5SDQ5AVkL0",
+      "title": "AI's Secret? Cosine Similarity Explained.",
+      "channel": "BlackBoard AI",
+      "duration": "3:55",
+      "views": "5,079 views",
+      "description": "Have you ever wondered how Google knows that an article about car maintenance is relevant to your search for how to change ..."
+    },
+    {
+      "id": "VXCAteKOj-I",
+      "title": "Cosine Similarity Explained 🤯 | How AI Finds Similar Meaning (Step-by-Step)",
+      "channel": "Tejav Academy",
+      "duration": "6:11",
+      "views": "45 views",
+      "description": "How does AI find the most relevant answer from millions of results? In this video, we break down one of the most important ..."
+    },
+    {
+      "id": "gl1r1XV0SLw",
+      "title": "What is a Vector Database? Powering Semantic Search & AI Applications",
+      "channel": "IBM Technology",
+      "duration": "9:49",
+      "views": "976,205 views",
+      "description": "Ready to become a certified Qiskit Developer? Register now and use code IBMTechYT20 for 20% off of your exam ..."
+    },
+    {
+      "id": "OATCgQtNX2o",
+      "title": "Text embeddings & semantic search",
+      "channel": "Hugging Face",
+      "duration": "3:30",
+      "views": "61,050 views",
+      "description": "Learn how Transformer models can be used to represent documents and queries as vectors called embeddings. In this video, we ..."
+    },
+    {
+      "id": "m_CooIRM3UI",
+      "title": "Cosine similarity, cosine distance explained | Math, Statistics for data science, machine learning",
+      "channel": "codebasics",
+      "duration": "12:28",
+      "views": "95,620 views",
+      "description": "Cosine similarity, cosine distance explained in a way that high school student can also understand it easily. If you have ..."
+    },
+    {
+      "id": "T_NO4kXo77c",
+      "title": "Vector Database Explained : How Tokens, Embeddings, Semantic Search, Cosine Similarity & RAG Work",
+      "channel": "TechWithKoushik",
+      "duration": "15:15",
+      "views": "42 views",
+      "description": "Vector databases turn words into meaning AI can measure and compare. The hidden infrastructure behind RAG, semantic search, ..."
+    },
+    {
+      "id": "dN0lsF2cvm4",
+      "title": "Vector Databases simply explained! (Embeddings & Indexes)",
+      "channel": "AssemblyAI",
+      "duration": "4:23",
+      "views": "688,675 views",
+      "description": "Vector Databases simply explained. Learn what vector databases and vector embeddings are and how they work. Then I'll go ..."
+    },
+    {
+      "id": "dmUJ_DmkYIE",
+      "title": "How AI Finds Meaning Between Words | Word Embeddings & Cosine Similarity Explained",
+      "channel": "Sum It Up",
+      "duration": "5:16",
+      "views": "31 views",
+      "description": "How does AI understand that “king” and “queen” are related—or that “dog” is closer to “puppy” than “car”? The answer lies in word ..."
+    },
+    {
+      "id": "viZrOnJclY0",
+      "title": "Word Embedding and Word2Vec, Clearly Explained!!!",
+      "channel": "StatQuest with Josh Starmer",
+      "duration": "16:12",
+      "views": "604,606 views",
+      "description": "Words are great, but if we want to use them as input to a neural network, we have to convert them to numbers. One of the most ..."
+    },
+    {
+      "id": "T5bZiVcX3t8",
+      "title": "Cosine Similarity Explained Visually | Vector Search Course #7",
+      "channel": "Engineering Visualized",
+      "duration": "4:28",
+      "views": "274 views",
+      "description": "How does AI know that \"dog\" is more similar to \"wolf\" than it is to \"car\"? The answer isn't based on matching words—it's based on ..."
+    }
+  ]
+}

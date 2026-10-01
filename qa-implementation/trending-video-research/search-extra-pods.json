@@ -1,0 +1,102 @@
+{
+  "query": "Kubernetes deployment replicaset pods explained",
+  "checked_at": "2026-09-30T07:24:56.282Z",
+  "results": [
+    {
+      "id": "iC-WxZGhFqs",
+      "title": "Kubernetes Pods, ReplicaSets, and Deployments in 5 Minutes",
+      "channel": "Containers from the Couch",
+      "duration": "4:57",
+      "views": "31,069 views",
+      "description": "Register for a free hands-on Amazon EKS Workshop: ..."
+    },
+    {
+      "id": "4JWmCme_tfs",
+      "title": "Kubernetes Tutorial: Pods, ReplicaSets & Deployments EXPLAINED",
+      "channel": "thisisrv",
+      "duration": "18:00",
+      "views": "237 views",
+      "description": "📌 Video 5 of the Complete Kubernetes Course Playlist\nKubernetes Tutorial: Pods, ReplicaSets & Deployments EXPLAINED\nIn this ..."
+    },
+    {
+      "id": "fCMPpVLWnpA",
+      "title": "5 Minutes to Mastering ReplicaSets in Kubernetes | Visually Explained",
+      "channel": "SKSecOps",
+      "duration": "5:01",
+      "views": "1,411 views",
+      "description": "In just 5 minutes, you'll master ReplicaSets in Kubernetes with a simple and visual explanation. A ReplicaSet makes sure your ..."
+    },
+    {
+      "id": "xLdPlhrSBmY",
+      "title": "DevOps Tutorial #116: Kubernetes Deployments, Pods, ReplicaSets & Scaling with kubectl (2025)",
+      "channel": "The Techzeen",
+      "duration": "18:08",
+      "views": "4,274 views",
+      "description": "Struggling to understand Kubernetes Pods, Deployments & Scaling? This beginner-friendly DevOps Tutorial in Hindi/Urdu makes ..."
+    },
+    {
+      "id": "HB8FdWiXz28",
+      "title": "Kubernetes ReplicaSets Explained: Maintaining Pod Replicas for Beginners",
+      "channel": "CodeLucky",
+      "duration": "4:33",
+      "views": "298 views",
+      "description": "Master Kubernetes ReplicaSets and learn how to maintain the desired number of pod replicas in your cluster!"
+    },
+    {
+      "id": "y_vy9NVeCzo",
+      "title": "Kubernetes Deployment Tutorial - yaml explained + Demo",
+      "channel": "Cloud With Raj",
+      "duration": "19:39",
+      "views": "110,739 views",
+      "description": "Kubernetes deployment in detail 2. Understand kubernetes deployment yaml 3. Understand kubernetes replicaset 4. Detailed ..."
+    },
+    {
+      "id": "l929w_D5BXw",
+      "title": "KCNA 11 | Deployments & Rolling Updates: Zero-Downtime Releases and Rollbacks",
+      "channel": "Zero2Certified",
+      "duration": "8:29",
+      "views": "No views",
+      "description": "ReplicaSets and Deployments explained: desired replicas, the Deployment manifest, rolling updates with maxSurge and ..."
+    },
+    {
+      "id": "Krpb44XR0bk",
+      "title": "Kubernetes Components explained! Pods, Services, Secrets, ConfigMap | Kubernetes Tutorial 14",
+      "channel": "TechWorld with Nana",
+      "duration": "18:12",
+      "views": "324,820 views",
+      "description": "Kubernetes Pods | Kubernetes Services | Kubernetes Secrets | Kubernetes ConfigMap | Kubernetes Volumes | Kubernetes ..."
+    },
+    {
+      "id": "GqC7uqNLgx0",
+      "title": "Kubernetes Deployment Explained | Pods, ReplicaSets, Rolling Updates & Rollbacks",
+      "channel": "VictoryDeveloper",
+      "duration": "5:41",
+      "views": "51 views",
+      "description": "Learn Kubernetes Deployment from the ground up in this practical beginner-friendly tutorial. In this video, you'll understand how ..."
+    },
+    {
+      "id": "qmDzcu5uY1I",
+      "title": "Kubernetes YAML File Explained - Deployment and Service | Kubernetes Tutorial 19",
+      "channel": "TechWorld with Nana",
+      "duration": "14:37",
+      "views": "352,646 views",
+      "description": "Learn configuration file syntax using Kubernetes Deployment YAML | YAML for Kubernetes ▻ Subscribe To Me On Youtube: ..."
+    },
+    {
+      "id": "6IPu3WU_M0o",
+      "title": "Kubernetes Basics: Pods, Nodes, Containers, Deployments & Clusters",
+      "channel": "Anton Putra",
+      "duration": "8:06",
+      "views": "75,253 views",
+      "description": "... Nodes 2:33 Kubernetes Persistent Volumes 3:29 Kubernetes Containers 4:26 Kubernetes Pods 5:56 Kubernetes Deployment ..."
+    },
+    {
+      "id": "zFcVQ0CMihY",
+      "title": "What Is ReplicaSet in Kubernetes? | ReplicaSet Explained With Demo With .NET App",
+      "channel": "Harshalkumar Jain",
+      "duration": "6:17",
+      "views": "102 views",
+      "description": "In this video, we will understand ReplicaSet in Kubernetes and see how it works behind a Kubernetes Deployment. Until now, we ..."
+    }
+  ]
+}

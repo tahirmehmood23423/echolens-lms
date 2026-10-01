@@ -1,0 +1,126 @@
+{
+  "query": "DFS graph cycle detection topological sort",
+  "checked_at": "2026-09-30T07:20:49.114Z",
+  "results": [
+    {
+      "id": "3tkcfvCNtM8",
+      "title": "L- 6.8:Topological Sorting with examples | Topological Sorting using DFS",
+      "channel": "Gate Smashers",
+      "duration": "11:33",
+      "views": "669,725 views",
+      "description": "In this video, Varun sir has discussed about Topological Sorting—a key concept in graph theory, especially useful for tasks like ..."
+    },
+    {
+      "id": "lvMseLfP0Jw",
+      "title": "Graph Cycle Detection: DFS, Union Find & Topological Sort Explained!",
+      "channel": "CodeLucky",
+      "duration": "6:14",
+      "views": "704 views",
+      "description": "Unlock the secrets of cycle detection in graphs! This beginner-friendly video breaks down everything you need to know about ..."
+    },
+    {
+      "id": "0WIINUY12Yg",
+      "title": "Topological Sorting in Graph | using DFS | Lecture 117",
+      "channel": "Shradha Khapra",
+      "duration": "15:58",
+      "views": "58,664 views",
+      "description": "This lecture was made with a lot of love❤️\n\n📌 New DSA Sheet Link: https://dsa.apnacollege.in/\n\nShare your progress on Twitter ..."
+    },
+    {
+      "id": "ChxA6H2253I",
+      "title": "Lec-64: Topological Order/ Sort in DAG(Direct Acyclic Graph)",
+      "channel": "Gate Smashers",
+      "duration": "6:44",
+      "views": "150,341 views",
+      "description": "MASTER COMPUTER SCIENCE | INTERVIEWS | EXAMS Gate Smashers — Learn Computer Science through free lectures, ..."
+    },
+    {
+      "id": "5lZ0iJMrUMk",
+      "title": "G-21. Topological Sort Algorithm | DFS",
+      "channel": "take U forward",
+      "duration": "13:30",
+      "views": "749,290 views",
+      "description": "Check out TUF+:https://takeuforward.org/plus?source=youtube Find DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions ..."
+    },
+    {
+      "id": "AK7BuT5MgU0",
+      "title": "6.8 Cycle detection in Directed Graph |Data Structures and Algorithms Tutorials",
+      "channel": "Jenny's Lectures CS IT",
+      "duration": "10:36",
+      "views": "267,773 views",
+      "description": "Jennys Lectures DSA with Java Course Enrollment link: ..."
+    },
+    {
+      "id": "iTBaI90lpDQ",
+      "title": "G-23. Detect a Cycle in Directed Graph | Topological Sort | Kahn's Algorithm | BFS",
+      "channel": "take U forward",
+      "duration": "6:17",
+      "views": "384,091 views",
+      "description": "Check out TUF+:https://takeuforward.org/plus?source=youtube Find DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions ..."
+    },
+    {
+      "id": "sLtMwI1ty2E",
+      "title": "LEC-66 : How to Find Cycle in Directed Graph using DFS",
+      "channel": "Gate Smashers",
+      "duration": "9:30",
+      "views": "7,677 views",
+      "description": "Master how to detect cycles in a directed graph using DFS in a simple and intuitive way. This quick guide explains the concept to ..."
+    },
+    {
+      "id": "AcppN5XFt24",
+      "title": "Detect a Cycle in Directed Graph using DFS | Lecture 116",
+      "channel": "Shradha Khapra",
+      "duration": "15:59",
+      "views": "33,555 views",
+      "description": "This lecture was made with a lot of love❤️\n\n📌 New DSA Sheet Link: https://dsa.apnacollege.in/\n\nShare your progress on Twitter ..."
+    },
+    {
+      "id": "9twcmtQj4DU",
+      "title": "G-19. Detect cycle in a directed graph using DFS | Java | C++",
+      "channel": "take U forward",
+      "duration": "17:22",
+      "views": "524,353 views",
+      "description": "Check out TUF+:https://takeuforward.org/plus?source=youtube Find DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions ..."
+    },
+    {
+      "id": "4sgsuaKgtqI",
+      "title": "Topological Sort using DFS | Cycle Detection + Topo Order Explained | Graph Series",
+      "channel": "Arun Tyagi",
+      "duration": "19:08",
+      "views": "14 views",
+      "description": "Learn how to detect cycles and find topological order using Depth First Search with 3 states. This is the DFS alternative to Kahn's ..."
+    },
+    {
+      "id": "dis_c84ejhQ",
+      "title": "6.10 Topological Sorting (with Examples) | How to find all Topological Orderings of a Graph",
+      "channel": "Jenny's Lectures CS IT",
+      "duration": "14:18",
+      "views": "831,492 views",
+      "description": "Explore more Course on Jenny's lectures Website : https://www.jennyslectures.com/ Placement Oriented Jenny's Lectures ..."
+    },
+    {
+      "id": "hy7lViJNkzg",
+      "title": "DSA Python - Topological Sort Using DFS | GFG Problem | Directed Acyclic Graph - Part 135 [Hindi]",
+      "channel": "Code and Debug",
+      "duration": "17:10",
+      "views": "3,842 views",
+      "description": "Welcome to Part 135 of Code & Debug's DSA Python Course 2025! In this video, we dive deep into Topological Sorting of a ..."
+    },
+    {
+      "id": "0dJmTuMrUZM",
+      "title": "Detect cycle in a directed graph",
+      "channel": "Techdose",
+      "duration": "7:47",
+      "views": "162,915 views",
+      "description": "This video shows a very elegant and easy method to detect if a directed graph contains cycle or not. This is a basic graph problem ..."
+    },
+    {
+      "id": "HainTpBLuGc",
+      "title": "Topological Sorting DFS Method | Decrease & Conquer Tech. | L 120 | Design & Analysis of Algorithm",
+      "channel": "CSE Guru",
+      "duration": "11:41",
+      "views": "63,049 views",
+      "description": "topologicalsorting #topologicalsequence #dfsmethod #topological #graph #graphtraversal #traversal #techniques #bfssearch ..."
+    }
+  ]
+}

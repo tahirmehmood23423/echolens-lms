@@ -1,0 +1,22 @@
+{
+  "id": "LJC8277LONg",
+  "url": "https://www.youtube.com/watch?v=LJC8277LONg",
+  "checked_at": "2026-09-30T07:24:16.490Z",
+  "title": "SQL WITH Clause | Clearly Explained | CTEs vs Subqueries vs Temp Tables | Recursive CTEs",
+  "channel": "Maven Analytics",
+  "duration_seconds": 794,
+  "views": 164537,
+  "comments": "165 Comments",
+  "comment_samples": [
+    "would you mind to share the databased? so that we can practice what you've teach? Thank you!",
+    "First 1minute 33 secounds I already knew this is the person who will teach me SQL in a way so I can understand!\nThank You very much  <3",
+    "Best SQL tutorial I have ever seen; Brilliant!",
+    "thanks  a lot for the clear explanation it was very helpful",
+    "Finally, I can now see and understand subqueries. Thank you."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "7-day email course to get you started with data analytics: https://mavenanalytics.io/newsletter/still-a-real-career\n7-day AI analyst challenge: https://mavenanalytics.io/newsletter/ai-analyst-challenge\n\nSQL Pocket Guide author Alice Zhao compares the advantages of CTEs vs subqueries vs temp tables, introduces recursive CTEs and shares practical tips for when to use each one.\n\n⏱️ Timestamps ⏱️\n0:00: Intro\n0:19: CTE basics\n3:29: CTEs vs subqueries\n4:11: More complex CTE examples\n8:22: CTEs vs temp tables\n9:10: Recursive CTEs\n11:20: Window function example\n12:09: Practical tips for when to use each one",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

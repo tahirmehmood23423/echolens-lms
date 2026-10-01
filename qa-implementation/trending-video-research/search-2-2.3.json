@@ -1,0 +1,110 @@
+{
+  "query": "RAG hybrid search reranking explained",
+  "checked_at": "2026-09-30T07:20:40.225Z",
+  "results": [
+    {
+      "id": "lYxGYXjfrNI",
+      "title": "Advanced RAG 03 - Hybrid Search BM25 & Ensembles",
+      "channel": "Sam Witteveen",
+      "duration": "6:47",
+      "views": "42,502 views",
+      "description": "Colab: https://drp.li/biRYp For more tutorials on using LLMs and building Agents, check out my Patreon: Patreon: ..."
+    },
+    {
+      "id": "K1F8BIgcoNk",
+      "title": "Rerank for better RAG (Explained)",
+      "channel": "vectorize",
+      "duration": "13:39",
+      "views": "50,461 views",
+      "description": "Code: https://github.com/trancethehuman/ai-workshop-code/tree/main/projects/rag-stuff Tools used: Vectorize: ..."
+    },
+    {
+      "id": "YF6l0kXtmV8",
+      "title": "Advanced RAG Techniques: How to Hit 90%+ Accuracy with Hybrid Search & Re-ranking",
+      "channel": "SH AI Academy",
+      "duration": "8:50",
+      "views": "593 views",
+      "description": "Is your RAG system giving you irrelevant results or missing the context? A basic vector-search-only approach often fails in the real ..."
+    },
+    {
+      "id": "F5TlaHXNAaI",
+      "title": "Hybrid Search: BM25 + Vector Search Combined in Retrieval Augmented Generation",
+      "channel": "Yash Jain",
+      "duration": "16:33",
+      "views": "1,227 views",
+      "description": "GitHub: https://github.com/yashjainio\n\nWelcome back to the Retrieval Augmented Generation (RAG) series!\n\n🚀 In this video ..."
+    },
+    {
+      "id": "R5MPqm0V6aQ",
+      "title": "RAG Reranking Explained: How To Improve RAG Results",
+      "channel": "pixegami",
+      "duration": "14:25",
+      "views": "17,150 views",
+      "description": "Reranking can improve the results of your RAG application by up to 10-30%. This video explains how reranking works, walks ..."
+    },
+    {
+      "id": "J3naLwk0ilg",
+      "title": "Optimising production RAG:the hybrid search & re-ranking pipeline",
+      "channel": "AI learner",
+      "duration": "7:26",
+      "views": "224 views",
+      "description": "Building a basic Retrieval-Augmented Generation (RAG) prototype over the weekend is easy. But when you try to deploy that ..."
+    },
+    {
+      "id": "_i_69xycMOw",
+      "title": "Hybrid Search Explained: Why RAG Needs Keywords + Vectors",
+      "channel": "Schovia",
+      "duration": "9:53",
+      "views": "741 views",
+      "description": "Hybrid search combines keyword search and vector search to improve retrieval quality in Retrieval-Augmented Generation (RAG)."
+    },
+    {
+      "id": "33rgqrJccZY",
+      "title": "Stop Using Basic RAG: Hybrid Search, Chunking, & Re-ranking Explained",
+      "channel": "Cloud Codes",
+      "duration": "9:38",
+      "views": "395 views",
+      "description": "Language models have frozen parametric memory—they cannot naturally recall anything after their training cutoff date. RAG ..."
+    },
+    {
+      "id": "OU0-S4Ai9Ro",
+      "title": "Ep 11 | Hybrid Search + Re-Ranking: The RAG Retrieval Stack That Actually Works",
+      "channel": "@TechLifeWithAI",
+      "duration": "7:21",
+      "views": "4 views",
+      "description": "Episode 11 of the series \"AI Engineering for Experienced Developers\". Vector search alone misses exact keyword matches."
+    },
+    {
+      "id": "Ue359Q6IoIw",
+      "title": "RAG #7: RAG Hybrid Search - When Should You Use Hybrid Search in RAG? #rag",
+      "channel": "Praveen Reddy Learnings",
+      "duration": "12:32",
+      "views": "653 views",
+      "description": "RAG #7: RAG Hybrid Search - When Should You Use Hybrid Search in RAG? #rag."
+    },
+    {
+      "id": "lD3_VF5bmWg",
+      "title": "BM25 Algorithm and Hybrid Search: AI Explained",
+      "channel": "Tejas Kumar",
+      "duration": "9:45",
+      "views": "12,676 views",
+      "description": "In this clip from the ConTejas Code Podcast, I explain MCP (Model Context Protocol) with examples and detail. Full episode: ..."
+    },
+    {
+      "id": "Hn0UK2l1Nkw",
+      "title": "Hybrid Search RAG in 10 Minutes | BM25 + Vector Search with LangChain & ChromaDB (FREE)",
+      "channel": "Siddharth Kharche ",
+      "duration": "4:42",
+      "views": "3,438 views",
+      "description": "Learn how to build a powerful Hybrid Search RAG system that combines keyword-based search (BM25) and semantic vector ..."
+    },
+    {
+      "id": "jV24fBWtZQk",
+      "title": "Advanced RAG: Hybrid Retrieval, Re-Ranking, and Context Selection",
+      "channel": "StackOps AI",
+      "duration": "15:11",
+      "views": "711 views",
+      "description": "GitHub Repo: https://github.com/stackopsai2025-ops/rag Most Retrieval-Augmented Generation (RAG) failures in production are ..."
+    }
+  ]
+}

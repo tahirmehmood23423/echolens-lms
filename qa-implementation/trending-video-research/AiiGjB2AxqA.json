@@ -1,0 +1,22 @@
+{
+  "id": "AiiGjB2AxqA",
+  "url": "https://www.youtube.com/watch?v=AiiGjB2AxqA",
+  "checked_at": "2026-10-01T05:21:00.251Z",
+  "title": "Deploying Next.js to Vercel",
+  "channel": "Vercel",
+  "duration_seconds": 381,
+  "views": 63141,
+  "comments": "39 Comments",
+  "comment_samples": [
+    "i thought you said \"Hey Emily\" at the beginning 💀",
+    "I love Vercel but you guys need to do something about the pricing! It's insane",
+    "I really would like to see more Next.js begginer tutorials for the latest version of Next.",
+    "Wasn't aware about preview deployment it's Good!",
+    "Nice. It 's for testing and sharing with friends. But for real cases we need to deploy in dedicated hosting panel or server. so can you please make a video for deploying on dedicated server and also data fetching which  data should server side and seo meta tags manage for all pages. Thank you"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Learn how to deploy your Next.js application to Vercel by starting with a template, using the Vercel CLI, or pushing commits to your git repository.\n\n0:00 – Introduction\n0:13 – Deploying a Next.js template\n2:05 – Pushes changes to GitHub\n4:11 – Deploying with the Vercel CLI\n5:44 – Conclusion\n\n◆ Templates: https://vercel.com/templates/next.js\n◆ Docs: https://vercel.com/docs/frameworks/nextjs\n\n#nextjs #react",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

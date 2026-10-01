@@ -1,0 +1,110 @@
+{
+  "query": "PostgreSQL MVCC vacuum deadlocks explained",
+  "checked_at": "2026-09-30T07:22:07.168Z",
+  "results": [
+    {
+      "id": "BJxkfY9ZaJg",
+      "title": "MVCC in PostgreeSQL | PostgreSQL Concurrency with MVCC  | Learnomate Technologies",
+      "channel": "Learnomate Technologies",
+      "duration": "8:34",
+      "views": "12,408 views",
+      "description": "\"PostgreSQL Concurrency with MVCC\" explores the Multi-Version Concurrency Control (MVCC) mechanism within PostgreSQL ..."
+    },
+    {
+      "id": "TBmDBw1IIoY",
+      "title": "PostgreSQL Internals in Action: MVCC",
+      "channel": "Denis Magda",
+      "duration": "16:06",
+      "views": "18,348 views",
+      "description": "PostgreSQL uses MVCC (Multi-Version Concurrency Control) to execute transactions and queries in parallel over a consistent ..."
+    },
+    {
+      "id": "Q6oN_sND1Bo",
+      "title": "PostgreSQL MVCC Explained  How It Really Works | PostgreSQL DBA Interview |Learnomate Technologies |",
+      "channel": "Learnomate Technologies",
+      "duration": "14:16",
+      "views": "780 views",
+      "description": "Ever wondered how PostgreSQL allows multiple users to read and write data at the same time without blocking each other?"
+    },
+    {
+      "id": "iM71d2krbS4",
+      "title": "Multiversion Concurrency Control (MVCC) Explained in Simple Terms",
+      "channel": "Cameron McKenzie",
+      "duration": "5:29",
+      "views": "35,501 views",
+      "description": "What is MVCC? What is Multi Version Concurrency Control? Well, the name sounds intimidating, but it's actually a simple ..."
+    },
+    {
+      "id": "xnps3zQCcZc",
+      "title": "PostgreSQL Understanding Vacuum 06/12",
+      "channel": "Code with Lucian",
+      "duration": "11:37",
+      "views": "23,025 views",
+      "description": "If you found this video helpful, you could check the full course on Udemy. In this course, you'll find tips for tuning PostgreSQL 12 ..."
+    },
+    {
+      "id": "IRRYaIAM1Zw",
+      "title": "How Does PostgreSQL Use MVCC and Locks in Read Committed?",
+      "channel": "Shubh Patel",
+      "duration": "13:28",
+      "views": "1,294 views",
+      "description": "In this video, we explore how PostgreSQL handles concurrency using MVCC (Multi-Version Concurrency Control) and locks."
+    },
+    {
+      "id": "qLNZvEv9vww",
+      "title": "What is the vacuum process in PostgreSQL? | Different Types of Vacuum in PostgreSQL? | Ankush Sir",
+      "channel": "Learnomate Technologies",
+      "duration": "9:25",
+      "views": "7,548 views",
+      "description": "In the YouTube video, Ankush Sir provides a detailed explanation of the vacuum process in PostgreSQL. He discusses how ..."
+    },
+    {
+      "id": "i12uM6w-F9A",
+      "title": "How PostgreSQL 17 optimized VACUUM operations",
+      "channel": "ABCloudz",
+      "duration": "3:23",
+      "views": "210 views",
+      "description": "Learn how PostgreSQL 17 improves VACUUM performance with a new internal memory structure called TidStore. In this video ..."
+    },
+    {
+      "id": "aD-xzGdFjek",
+      "title": "Part 15 : PostgreSQL : What is Vacuum and autovacuum.",
+      "channel": "E-MultiSkills Database  services",
+      "duration": "17:46",
+      "views": "16,354 views",
+      "description": "( 24*7) on Call Support for PostgreSQL/Open Source databases."
+    },
+    {
+      "id": "WSdg_Km4rIg",
+      "title": "Understand MVCC without breaking your brain",
+      "channel": "ankush",
+      "duration": "8:25",
+      "views": "8,411 views",
+      "description": "Ever wondered how databases handle multiple transactions at once without chaos? Join me in this straightforward video as we ..."
+    },
+    {
+      "id": "ELN-IAl5qIk",
+      "title": "Tutorial 30-What is a vacuum in PostgreSQL | PostgreSQL Vacuum",
+      "channel": "mynoteoracledba",
+      "duration": "7:23",
+      "views": "8,473 views",
+      "description": "In this session, we are going to discuss a brief explanation about the vacuum in PostgreSQL what is a vacuum? The VACUUM ..."
+    },
+    {
+      "id": "3yhjHZ0nXf8",
+      "title": "MVCC in Postgresql Explained in Hindi",
+      "channel": "Postgres learning",
+      "duration": "15:23",
+      "views": "486 views",
+      "description": "postgresql #postgresdatabase #pgadmin #postgresinstallation #postgresqltutorial ---| MVCC concept And explanation |--- MVCC ..."
+    },
+    {
+      "id": "4W3JrS7N5Cs",
+      "title": "Postgres MVCC Explained | Interview Podcast",
+      "channel": "StepUP Tech Academy (SUTA)",
+      "duration": "3:09",
+      "views": "11 views",
+      "description": "What is MVCC in Postgres, and how do you manage its impact? Understand row versions and snapshots, why MVCC helps ..."
+    }
+  ]
+}

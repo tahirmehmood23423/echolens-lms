@@ -1,0 +1,78 @@
+{
+  "query": "Terraform tutorial 15 minutes",
+  "checked_at": "2026-09-30T07:23:30.802Z",
+  "results": [
+    {
+      "id": "l5k1ai_GBDE",
+      "title": "Terraform explained in 15 mins | Terraform Tutorial for Beginners",
+      "channel": "TechWorld with Nana",
+      "duration": "18:15",
+      "views": "2,191,224 views",
+      "description": "Terraform explained for Beginners | Terraform Tutorial for Beginners | Terraform Architecture explained Understand what ..."
+    },
+    {
+      "id": "tomUWcQ0P3k",
+      "title": "Terraform in 100 Seconds",
+      "channel": "Fireship",
+      "duration": "2:18",
+      "views": "822,304 views",
+      "description": "Terraform is an Infrastructure as Code (IAC) tool that can provision resources in the cloud. Learn how to setup terraform and ..."
+    },
+    {
+      "id": "8Ikfos0vl28",
+      "title": "Terraform tutorial for beginners | Understand Terraform in 15 mins",
+      "channel": "Cloud with Shruti",
+      "duration": "18:29",
+      "views": "845 views",
+      "description": "Terraform for beginners | Understand Terraform in 15 minutes | Understand the Terraform Architecture New to Terraform?"
+    },
+    {
+      "id": "lo0M1FCgC-I",
+      "title": "What is Terraform? A Beginner's Guide to Infrastructure as Code [HINDI]",
+      "channel": "M Prashant",
+      "duration": "7:45",
+      "views": "87,598 views",
+      "description": "Terraform in simple words\nTerraform for DevOps\nDevOps for beginners\nTerraform for Beginners\n\n#TerraformTutorial\n#DevOps ..."
+    },
+    {
+      "id": "lqot1dIOTrs",
+      "title": "Terraform Course - Automate your AWS cloud infrastructure | Terraform explained in 15 mins",
+      "channel": "S3CloudHub",
+      "duration": "13:52",
+      "views": "13,363 views",
+      "description": "Learn Terraform in this complete course for beginners. Terraform is an open-source infrastructure as a code software tool."
+    },
+    {
+      "id": "vIROhFhJghw",
+      "title": "What is Terraform in 3 Minutes (2026) | Terraform Tutorial for Beginners",
+      "channel": "Tech With Diego",
+      "duration": "3:25",
+      "views": "9,354 views",
+      "description": "What is Terraform and how does it work? This Terraform tutorial for beginners is a complete introduction to Terraform, covering ..."
+    },
+    {
+      "id": "-Q-CD0m6jdI",
+      "title": "Terraform explained in 15 minutes | Basics",
+      "channel": "Arora's Life",
+      "duration": "15:37",
+      "views": "712 views",
+      "description": "Hello Guys, In this video I have explained the basics of terraform which everyone should know before getting started with terraform ..."
+    },
+    {
+      "id": "NJaXqU26uWA",
+      "title": "Terraform in 15 minutes For Beginners (Hindi)",
+      "channel": "Cloud Learning",
+      "duration": "19:34",
+      "views": "1,997 views",
+      "description": "Hi, Start your Journey with Aws Solution Architect Associate, Trainer Supported Course. Get the benefit of Special Offer. Course ..."
+    },
+    {
+      "id": "HmxkYNv1ksg",
+      "title": "Terraform Explained",
+      "channel": "IBM Technology",
+      "duration": "8:44",
+      "views": "325,826 views",
+      "description": "Learn more about infrastructure as code: http://ibm.biz/learn-infrastructure-as-code Checkout IBM Cloud Schematics: ..."
+    }
+  ]
+}

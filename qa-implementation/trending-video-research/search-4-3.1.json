@@ -1,0 +1,46 @@
+{
+  "query": "Github Actions pipeline tutorial",
+  "checked_at": "2026-09-30T07:21:52.726Z",
+  "results": [
+    {
+      "id": "YLtlz88zrLg",
+      "title": "CI/CD Tutorial using GitHub Actions - Automated Testing & Automated Deployments",
+      "channel": "Tom Shaw",
+      "duration": "6:13",
+      "views": "435,315 views",
+      "description": "STARTER PROJECT SOURCE CODE: https://github.com/IAmTomShaw/github-actions-demo-project Want to automate your ..."
+    },
+    {
+      "id": "BQrohJ3PT7I",
+      "title": "How to use GitHub Actions | GitHub for Beginners",
+      "channel": "GitHub",
+      "duration": "8:04",
+      "views": "58,074 views",
+      "description": "Welcome back to GitHub for Beginners! In this episode, Kedasha and Glenda teach you everything you need to know to get ..."
+    },
+    {
+      "id": "mFFXuXjVgkU",
+      "title": "Github Actions CI/CD - Everything you need to know to get started",
+      "channel": "DevOps Journey",
+      "duration": "12:21",
+      "views": "406,904 views",
+      "description": "I finally made a Github Actions tutorial! In this video, I go over everything you need to know to get started with Github actions."
+    },
+    {
+      "id": "sZ_Z8l95g4s",
+      "title": "GitHub Actions - Create a Simple GitHub Workflow",
+      "channel": "InterviewPro",
+      "duration": "6:39",
+      "views": "13,015 views",
+      "description": "Ready to create your first GitHub workflow? In this step-by-step tutorial, we'll walk you through the process of setting up a basic ..."
+    },
+    {
+      "id": "zPwMnGMEL3Y",
+      "title": "Deploying my DevOps Portfolio Website using GitHub Actions on AWS (Hindi)",
+      "channel": "TrainWithShubham",
+      "duration": "19:51",
+      "views": "53,742 views",
+      "description": "Last Day to Enrol for DevOps English Cohort: https://bit.ly/devops-english-batch In this video, we will be deploying a live DevOps ..."
+    }
+  ]
+}

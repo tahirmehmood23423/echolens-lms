@@ -1,0 +1,22 @@
+{
+  "id": "P7EUFtjeAmI",
+  "url": "https://www.youtube.com/watch?v=P7EUFtjeAmI",
+  "checked_at": "2026-09-30T07:24:09.914Z",
+  "title": "Postgres Explain Explained - How Databases Prepare Optimal Query Plans to Execute SQL",
+  "channel": "Hussein Nasser",
+  "duration_seconds": 617,
+  "views": 31455,
+  "comments": "28 Comments",
+  "comment_samples": [
+    ":_lb1::_lb2::_goal::_indexing::_db3: :_sql:\n\nLearn the fundamentals of database systems to understand and build performant backend apps \n\nCheck out my udemy Introduction to Database Engineering \nhttps://husseinnasser.com/courses \n\n:_db3::_tcp::_lb3::_lb2::_indexing::_sql:",
+    "Thank you! would be great to post an extended version of it with details about planning JOINS and calculations.",
+    "excellent video. Although according to the documentation the 'cost' isn't actually milliseconds but 'aribtrary unit of disk fetches'.",
+    "a video on simple and extended flow in postgreSQL please... \nyour videos are great, 🔥",
+    "thank you man <3"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In This video I'll go through how Explain works in PostgreSQL, explain is the command that you add to the beginning of your SQL to return details about how the database is going to execute the statement. \n\n\n🎙️Listen to the Backend Engineering Podcast\nhttps://husseinnasser.com/podcast \n\n🏭 Backend Engineering Videos\nhttps://backend.husseinnasser.com\n\n💾 Database Engineering Videos\nhttps://www.youtube.com/playlist?list=PLQnljOFTspQXjD0HOzN7P2tgzu7scWpl2\n\n🏰 Load Balancing and Proxies Videos\nhttps://www.youtube.com/playlist?list=PLQnljOFTspQVMeBmWI2AhxULWEeo7AaMC\n\n🏛️ Software Archtiecture Videos\nhttps://www.youtube.com/playlist?list=PLQnljOFTspQXNP6mQchJVP3S-3oKGEuw9\n\n📩 Messaging Systems\nhttps://www.youtube.com/playlist?list=PLQnljOFTspQVcumYRWE2w9kVxxIXy_AMo\n\nBecome a Member \nhttps://www.youtube.com/channel/UC_ML5xP23TOWKUcc-oAE_Eg/join\n\nSupport me on PayPal\nhttps://bit.ly/33ENps4\n\nJoin our Thriving Backend Community on Discord \nhttps://discord.com/invite/CsFbFce \n\nStay Awesome,\nHussein",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

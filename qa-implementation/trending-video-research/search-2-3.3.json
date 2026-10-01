@@ -1,0 +1,118 @@
+{
+  "query": "LangGraph state nodes conditional edges tutorial",
+  "checked_at": "2026-09-30T07:20:40.915Z",
+  "results": [
+    {
+      "id": "DF_dZcguV84",
+      "title": "Conditional Edges in LangGraph",
+      "channel": "Analytics Vidhya",
+      "duration": "8:01",
+      "views": "293 views",
+      "description": "Description: Learn how to make your AI workflows \"smart\" using branching. We build a classifier node that identifies user intent ..."
+    },
+    {
+      "id": "n9GUF9E2Mg4",
+      "title": "LangGraph #3: Basics Explained: State, Nodes, Edges & Conditional Edges",
+      "channel": "Ali Hamza",
+      "duration": "9:08",
+      "views": "413 views",
+      "description": "Welcome to this beginner-friendly tutorial on LangGraph, the powerful graph-based framework for building intelligent, stateful ..."
+    },
+    {
+      "id": "EKxoCVbXZwY",
+      "title": "LangGraph conditional edges",
+      "channel": "AI Agents by BUSINESS24 AI",
+      "duration": "9:40",
+      "views": "4,259 views",
+      "description": "In LangGraph, we can use conditional edges in our flow engineering to control the flow based on some conditions. In this video ..."
+    },
+    {
+      "id": "5Td120JwoxY",
+      "title": "LangGraph #9: Conditional edges – LangGraph Route Nodes by State #LangGraph #Python",
+      "channel": "Mehdi Hosseini Moghadam",
+      "duration": "4:53",
+      "views": "1 view",
+      "description": "LangGraph #9: Conditional edges This video covers conditional edges in LangGraph, a core concept for building dynamic state ..."
+    },
+    {
+      "id": "WwHzqmD7gjM",
+      "title": "LangGraph Tutorial | Routing | Command and Conditional Edges",
+      "channel": "AI with Sri",
+      "duration": "17:52",
+      "views": "308 views",
+      "description": "A quick introduction to Command and Conditional Edges in LangGraph. Powerful tools for routing control when building agents."
+    },
+    {
+      "id": "ILVZg9kvKqA",
+      "title": "LangGraph Tutorial - Implementing Conditional Edges in Graphs for Dynamic Navigation",
+      "channel": "Mohamed Naji Aboo",
+      "duration": "11:56",
+      "views": "1,216 views",
+      "description": "In this second video of our LangGraph series, we dive into conditional edges and demonstrate how to add flexibility to ..."
+    },
+    {
+      "id": "J-dd_8At7sU",
+      "title": "LangGraph Conditional Edges: Route by State",
+      "channel": "The Seams",
+      "duration": "1:13",
+      "views": "2 views",
+      "description": "A fixed graph always takes the same route. A conditional edge breaks that: it reads the current state and returns the name of ..."
+    },
+    {
+      "id": "zsPQJGm4jIo",
+      "title": "How LangGraph Agents Make Decisions — Conditional Routing Tutorial",
+      "channel": "ByteSpringForge",
+      "duration": "4:31",
+      "views": "20 views",
+      "description": "Most LangGraph tutorials demonstrate a simple linear flow, but real AI agents make decisions dynamically. In this video, you'll ..."
+    },
+    {
+      "id": "ROjysVfi1Ew",
+      "title": "LangGraph State, Nodes & Edges EXPLAINED | Build Agentic AI Workflows | Part 2",
+      "channel": "GenAgentic AI",
+      "duration": "11:43",
+      "views": "53 views",
+      "description": "LangGraph State, Nodes & Edges — Part 2 If you want to truly understand LangGraph and Agentic AI, you need to understand ..."
+    },
+    {
+      "id": "9NnJJL1CPXc",
+      "title": "Conditional Edges: LangGraph Agent Orchestration for Next.js",
+      "channel": "Evan Thacker",
+      "duration": "6:06",
+      "views": "27 views",
+      "description": "The provided document offers a comprehensive analysis of the Conditional Edge as a foundational element within the LangGraph ..."
+    },
+    {
+      "id": "8j6FSYTjQPU",
+      "title": "🔄 Mastering State in LangGraph with Conditionals | Dynamic Flow Control Tutorial",
+      "channel": "TECH' EM",
+      "duration": "14:13",
+      "views": "47 views",
+      "description": "Title: Mastering State in LangGraph with Conditionals | Dynamic Flow Control Tutorial Description: Learn how to harness the ..."
+    },
+    {
+      "id": "qmw8A35v0MA",
+      "title": "LangGraph #9: Mastering Conditional Edges in LangGraph | Router Node Explained",
+      "channel": "Ali Hamza",
+      "duration": "13:28",
+      "views": "74 views",
+      "description": "Learn how to use Conditional Edges in LangGraph to build intelligent, dynamic workflows. In this video, we implement a Router ..."
+    },
+    {
+      "id": "coKCXQ6kfwQ",
+      "title": "LangGraph Conditional Edges for Controllable Agent Architectures",
+      "channel": "Evan Thacker",
+      "duration": "7:19",
+      "views": "93 views",
+      "description": "The source provides a comprehensive architectural analysis of LangGraph, a library built on LangChain designed to create ..."
+    },
+    {
+      "id": "2xgMjmNWA7I",
+      "title": "Ep-7. Build a Conditional Edge in LangGraph",
+      "channel": "Saurav Prateek",
+      "duration": "2:38",
+      "views": "1,012 views",
+      "description": "In the seventh episode of this playlist, we will build a conditional edge that decides whether to go ahead and generate answers or ..."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "bXsUuownnoQ",
+  "url": "https://www.youtube.com/watch?v=bXsUuownnoQ",
+  "checked_at": "2026-10-01T05:34:54.661Z",
+  "title": "Graph Valid Tree - Leetcode 261 - Python",
+  "channel": "NeetCode",
+  "duration_seconds": 851,
+  "views": 175704,
+  "comments": "133 Comments",
+  "comment_samples": [
+    "💡 GRAPH PLAYLIST: https://www.youtube.com/watch?v=EgI5nU9etnU&list=PLot-Xpze53ldBT_7QA8NVot219jFNr_GI",
+    "This was indirectly the best video explaining how to find a loop in an undirected graph",
+    "Another use case of union find. In love with the algorithm!!",
+    "With your kind of explanation skills, I wish someday you create videos on System Design preparation videos.",
+    "It's possible to solve this problem using basic tree properties - it's connected and has |V|-1 edges, so doing a single traversal to check if graph is connected combined with check that len(edges) == n - 1 should suffice."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🚀 https://neetcode.io/ - A better way to prepare for Coding Interviews\n\nProblem Link: https://neetcode.io/problems/valid-tree\n\n0:00 - Read the problem\n2:45 - Drawing Explanation\n10:06 - Coding Explanation\n\nleetcode 261\nThis question was identified as a facebook interview question from here: https://github.com/xizhengszhang/Leetcode_company_frequency\n\n#graph #tree  #python\nDisclosure: Some of the links above may be affiliate links, from which I may earn a small commission.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

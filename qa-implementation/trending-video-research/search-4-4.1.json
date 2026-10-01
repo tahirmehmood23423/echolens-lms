@@ -1,0 +1,142 @@
+{
+  "query": "Terraform plan apply destroy tutorial",
+  "checked_at": "2026-09-30T07:21:54.145Z",
+  "results": [
+    {
+      "id": "rDZ1bup3vQE",
+      "title": "Terraform Commands | Terraform Plan & Plan out | APPLY | DESTROY",
+      "channel": "S3CloudHub",
+      "duration": "10:11",
+      "views": "4,021 views",
+      "description": "This session explained the terraform command & how and when to use also demonstrated plan and plan out the ..."
+    },
+    {
+      "id": "P18Zg0LYR7o",
+      "title": "Terraform Workflow - init - write - plan  - apply - destroy |",
+      "channel": "TechnologyFirst",
+      "duration": "11:47",
+      "views": "2,724 views",
+      "description": "In this video, we go through the basic terraform workflow with an example, init - write - plan - apply - destroy. Please Subscribe to ..."
+    },
+    {
+      "id": "9-PQd2nHkRQ",
+      "title": "Plan, Apply, Destroy and Import | Terraform Associate 004 — Ep. 06",
+      "channel": "Tech Certification Hub",
+      "duration": "17:27",
+      "views": "11 views",
+      "description": "English lesson for Terraform Associate 004 on reading plans, lifecycle settings, replacement, import and moved blocks. Includes ..."
+    },
+    {
+      "id": "COno3-VkQ2U",
+      "title": "Terraform - Using the terraform destroy Command",
+      "channel": "Bryan Krausen",
+      "duration": "4:38",
+      "views": "555 views",
+      "description": "... the terraform destroy command and its role in the Terraform workflow. Watch as I visually demonstrate how the terraform plan ..."
+    },
+    {
+      "id": "V4wC3Z3-8Jo",
+      "title": "DevOps Tutorial #93: Terraform Workflow Explained | init, plan, apply, destroy | 2025 | (Hindi/Urdu)",
+      "channel": "The Techzeen",
+      "duration": "8:18",
+      "views": "2,765 views",
+      "description": "Curious how Terraform actually works behind the scenes? In this theoretical DevOps tutorial, I've explained the Terraform ..."
+    },
+    {
+      "id": "TGT_ARF7URY",
+      "title": "Terraform In Action plan, apply, destroy",
+      "channel": "Cyrus Wong",
+      "duration": "6:36",
+      "views": "140 views",
+      "description": ""
+    },
+    {
+      "id": "51WplGcyej4",
+      "title": "Terraform Init Plan Apply Destroy | Terraform Bootcamp | What is Terraform | Terraform BootCamp | 06",
+      "channel": "LogicOps Lab",
+      "duration": "12:41",
+      "views": "1,459 views",
+      "description": "Terraform Init Plan Apply Destroy | AWS Terraform Tutorial | Terraform BootCamp | 06 Hey folks, Welcome back to the 6th video in ..."
+    },
+    {
+      "id": "O1M5V6dMONU",
+      "title": "Terraform - Destroy Resources on AWS",
+      "channel": "ADV-IT",
+      "duration": "4:50",
+      "views": "2,795 views",
+      "description": "terraform #hashicorp #aws terraform destroy Full course: https://www.udemy.com/course/terraformcertified/?"
+    },
+    {
+      "id": "omaeUCMTstc",
+      "title": "#08 Terraform commands | Terraform Plan | Terraform Apply | Terraform Validate | PART 1",
+      "channel": "S3CloudHub",
+      "duration": "6:20",
+      "views": "4,335 views",
+      "description": "Terraformcommands #TerraformPlan #TerraformApply #TerraformValidate Code Reference: ..."
+    },
+    {
+      "id": "dmK6MgQEAbg",
+      "title": "Getting Started with Terraform for Azure: Demo on Plan, Apply, Destroy Operations",
+      "channel": "Refactored",
+      "duration": "6:26",
+      "views": "11,180 views",
+      "description": "Watch how to Plan, Apply, and Destroy Azure objects using Terraform. Please click the like button and subscribe to Skylines ..."
+    },
+    {
+      "id": "7W5D3Mx-oP8",
+      "title": "#09 Terraform Command  Demo | Terraform Plan out | Terraform Apply | PART 2",
+      "channel": "S3CloudHub",
+      "duration": "3:52",
+      "views": "2,569 views",
+      "description": "Terraformcommands #TerraformPlan #TerraformApply #TerraformValidate Code Reference: ..."
+    },
+    {
+      "id": "A2jD7Bl689U",
+      "title": "terraform destroy | terraform apply | terraform aws tutorials | terraform plan | terraform course",
+      "channel": "BackLog Stories",
+      "duration": "17:47",
+      "views": "50 views",
+      "description": "terraform destroy | terraform apply | terraform aws tutorials | terraform plan | terraform course Terraform Framework Design: ..."
+    },
+    {
+      "id": "hBkQt5lbSw0",
+      "title": "Terraform Destroy Command: Learn 3 Ways to Terminate Resources | Terraform Tutorials in Hindi",
+      "channel": "DevOps Pro",
+      "duration": "6:14",
+      "views": "5,242 views",
+      "description": "English Video Link - https://youtu.be/tlgy6x7zX_A\n\nHello folks, Welcome to DevOps Pro! \n\nIn this informative video, \"Terraform ..."
+    },
+    {
+      "id": "-CfDd7PnK14",
+      "title": "4.Terraform init,plan ,apply and destroy commands",
+      "channel": "A Cloud BootCamp",
+      "duration": "16:46",
+      "views": "2,142 views",
+      "description": "Hey folks, Welcome back to the 4th video in the series \"Terraform for Cloud engineers | Terraform Bootcamp\". In this video, we are ..."
+    },
+    {
+      "id": "Dt4plj1zKjU",
+      "title": "Terraform Plan and Apply: Beginner’s Guide",
+      "channel": "Talking tech with Techielass",
+      "duration": "4:28",
+      "views": "271 views",
+      "description": "Learn the difference between terraform plan and terraform apply in this beginner-friendly tutorial. See how each command works, ..."
+    },
+    {
+      "id": "baguWiEAeS8",
+      "title": "Terraform #8  Apply and Destroy commands",
+      "channel": "Dipesh Bhoir & Life",
+      "duration": "1:55",
+      "views": "109 views",
+      "description": "Terraform #8 terraform apply and terraform destroy commands Welcome to our comprehensive Terraform tutorial series!"
+    },
+    {
+      "id": "rt5AoEFnK9M",
+      "title": "Terraform Lifecycle Explained Simply | Init Plan Apply Destroy | DevOps for Beginners 🚀",
+      "channel": "AI Era",
+      "duration": "5:00",
+      "views": "45 views",
+      "description": "Most people memorize Terraform commands. But very few actually understand how Terraform works. In this video, we break down ..."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "H53L_yHs9jE",
+  "url": "https://www.youtube.com/watch?v=H53L_yHs9jE",
+  "checked_at": "2026-09-30T07:23:29.449Z",
+  "title": "Optimize RAG Resource Use With Semantic Cache",
+  "channel": "Qdrant Vector Search",
+  "duration_seconds": 522,
+  "views": 9968,
+  "comments": "5 Comments",
+  "comment_samples": [
+    "On point. Thank you.",
+    "Super great explaination",
+    "We cache the question and answer pairs? What if eventually we cache all possible questions that might be asked in a domain, and every answer can be retrieved from the cache, what then is the RAG approach for?",
+    "I do have a question about it: What if I was to add another LLM layer after the cache returnable? To kind of change the answer, to do not feel that we are always getting the same answer. What are the downsides of doing that, and how could I do it properly?"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "A cache is a high-speed memory that efficiently stores frequently accessed data. Semantic Cache is a specific type of cache that has gained popularity in RAG-based applications; in this video, let's see how it works!\n\nExample: https://github.com/infoslack/qdrant-example/blob/main/semantic-cache.ipynb",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

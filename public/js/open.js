@@ -1119,13 +1119,13 @@ function videoLinksHtml(l, large) {
   const maxWidth = large ? 960 : 640;
   if (Array.isArray(l.videos) && l.videos.length) {
     return l.videos.map((v) => {
-      const embed = videoEmbedHtml(v.url, v.title, maxWidth, CUR?.track?.inline_video_only);
-      if (embed) return embed;
+      const embed = videoEmbedHtml(v.url, v.title, maxWidth, CUR?.track?.inline_video_only && !CUR?.staff_preview);
+      if (embed) return `<p class="s" style="margin-top:16px"><strong>${v.optional ? 'Optional companion: ' : ''}${esc(v.title || l.title)}</strong>${v.channel ? ' &mdash; ' + esc(v.channel) : ''}${v.length ? ' (' + esc(v.length) + ')' : ''}</p>` + embed;
       return `<a href="${esc(v.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;margin-right:8px;display:inline-flex;gap:6px;align-items:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${esc(v.channel)} - ${esc(v.title)}${v.length ? ` (${esc(v.length)})` : ''}</a>`;
     }).join('');
   }
-  const embed = videoEmbedHtml(l.video_url, l.video_title || l.title, maxWidth, CUR?.track?.inline_video_only);
+  const embed = videoEmbedHtml(l.video_url, l.video_title || l.title, maxWidth, CUR?.track?.inline_video_only && !CUR?.staff_preview);
   if (embed) return embed;
   return l.video_url ? `<a href="${esc(l.video_url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch topic video</a>` : '';

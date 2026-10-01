@@ -1,0 +1,102 @@
+{
+  "query": "Postgres deadlocks explained",
+  "checked_at": "2026-09-30T07:24:57.835Z",
+  "results": [
+    {
+      "id": "WxRV_VL0yEw",
+      "title": "PostgreSQL Deadlock Explained with Python – Simulating and Fixing Deadlocks",
+      "channel": "Turtle Code",
+      "duration": "4:11",
+      "views": "270 views",
+      "description": "In this video, we explore deadlocks in PostgreSQL and learn how to simulate a real deadlock scenario using Python. First, we ..."
+    },
+    {
+      "id": "9Zw3ay3_tCQ",
+      "title": "Database Deadlocks Easily Explained",
+      "channel": "Software Developer Diaries",
+      "duration": "13:17",
+      "views": "6,339 views",
+      "description": "Let's learn what database deadlocks are, how they occur within database transactions, and how to avoid database deadlocks and ..."
+    },
+    {
+      "id": "Juq20LYXpSU",
+      "title": "Database Locks Explained | With Real-World E-Commerce Example",
+      "channel": "Redhwan Nacef",
+      "duration": "7:55",
+      "views": "15,459 views",
+      "description": "I hit a Database concurrency issue in an e-commerce platform I am working on which I solved with database locking. I thought I ..."
+    },
+    {
+      "id": "QB-1tPVxNek",
+      "title": "Understanding and Visualizing Database Deadlocks: A Practical SQL Guide",
+      "channel": "Better Dev with Anubhav",
+      "duration": "12:59",
+      "views": "4,744 views",
+      "description": "In this informative video, we delve into the concept of database deadlocks using a simple SQL query. Through a practical ..."
+    },
+    {
+      "id": "AgPzAR_DI08",
+      "title": "PostgreSQL. Locks Explained - Table and row level",
+      "channel": "JaneExplainsIT",
+      "duration": "6:50",
+      "views": "932 views",
+      "description": "In this video, we explore how locks work in PostgreSQL. You'll learn what locks are, why they exist, and how they affect your ..."
+    },
+    {
+      "id": "rWFH6PLOIEI",
+      "title": "L-4.1: DEADLOCK concept | Example | Necessary condition | Operating System",
+      "channel": "Gate Smashers",
+      "duration": "12:21",
+      "views": "2,722,156 views",
+      "description": "Complete OS Roadmap : https://www.gatesmashers.com/roadmaps/operating-systems Dining Philosophers Problem in OS is a ..."
+    },
+    {
+      "id": "P8rrhZTPEAQ",
+      "title": "99% of Developers Don't Get PostgreSQL",
+      "channel": "The Coding Gopher",
+      "duration": "12:40",
+      "views": "347,377 views",
+      "description": "Check out Supabase: https://supabase.plug.dev/qnxeTMY ❤️ Get 40% OFF CodeCrafters: ..."
+    },
+    {
+      "id": "oEbXlSH8hyE",
+      "title": "Everything you should know about deadlock in three minutes or less",
+      "channel": "Chris Kanich",
+      "duration": "2:50",
+      "views": "24,063 views",
+      "description": "This video is about deadlock deadlock is when a program can't make any forward progress due to broken locking this is about the ..."
+    },
+    {
+      "id": "x_00_Vc7hO4",
+      "title": "Solving Common Backend Issues: Deadlocks & Queues",
+      "channel": "Software Developer Diaries",
+      "duration": "3:33",
+      "views": "7,188 views",
+      "description": "Slow applications can be a result of things such as database Deadlocks that are caused by bulky database transactions."
+    },
+    {
+      "id": "7qUBV2bAbsQ",
+      "title": "SQL Server deadlock example",
+      "channel": "kudvenkat",
+      "duration": "5:14",
+      "views": "156,655 views",
+      "description": "Text version of the video http://csharp-video-tutorials.blogspot.com/2015/08/sql-server-deadlock-example.html Healthy diet is very ..."
+    },
+    {
+      "id": "5uTLRZEbBmU",
+      "title": "SQL Server deadlock analysis and prevention",
+      "channel": "kudvenkat",
+      "duration": "8:58",
+      "views": "115,387 views",
+      "description": "sql server deadlock analysis read sql server deadlock log Read and analyze sql server deadlock log Text version of the video ..."
+    },
+    {
+      "id": "wEsPL50Uiyo",
+      "title": "This is why understanding database concurrency control is important",
+      "channel": "Web Dev Cody",
+      "duration": "9:05",
+      "views": "195,627 views",
+      "description": "the two articles I found https://on-systems.tech/blog/128-preventing-read-committed-sql-concurrency-errors/ ..."
+    }
+  ]
+}

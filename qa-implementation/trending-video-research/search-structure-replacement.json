@@ -1,0 +1,110 @@
+{
+  "query": "LLM structured output pydantic tutorial",
+  "checked_at": "2026-10-01T05:21:11.492Z",
+  "results": [
+    {
+      "id": "rjEMU15ZONM",
+      "title": "Structured Output from LLMs Using Pydantic (Beginner’s Guide)",
+      "channel": "Code with Felix",
+      "duration": "17:02",
+      "views": "329 views",
+      "description": "langchain #python #langgraph #coding #aiagents #programming #pydantic #aiagents In this video, I explain how to extract ..."
+    },
+    {
+      "id": "BEbDDrxQNjo",
+      "title": "1.5 Structured Outputs and Schema Enforcement with Pydantic and JSON Schema | LLM Fundamentals",
+      "channel": "Adsorp AI Hindi",
+      "duration": "11:55",
+      "views": "25 views",
+      "description": "Guarantee type-safe output generation from LLMs using Pydantic models and JSON Schema enforcement. Learn how to ..."
+    },
+    {
+      "id": "xpvFinvqRCA",
+      "title": "Structured Output from LLMs: Grammars, Regex, and State Machines",
+      "channel": "Efficient NLP",
+      "duration": "17:20",
+      "views": "12,136 views",
+      "description": "Try Voice Writer - speak your thoughts and let AI handle the grammar: https://voicewriter.io Structured outputs are essential for ..."
+    },
+    {
+      "id": "3xUW1Do9zOs",
+      "title": "Instructor and Pydantic - Structured LLM outputs for easy data extraction!",
+      "channel": "BugBytes",
+      "duration": "16:30",
+      "views": "5,708 views",
+      "description": "Join our channel to get access to perks: https://www.youtube.com/channel/UCTwxaBjziKfy6y_uWu30orA/join ☕️ Buy me a ..."
+    },
+    {
+      "id": "XIdQ6gO3Anc",
+      "title": "Pydantic Tutorial • Solving Python's Biggest Problem",
+      "channel": "pixegami",
+      "duration": "11:07",
+      "views": "514,389 views",
+      "description": "Learn how to use Pydantic in this short tutorial! Pydantic is the most widely used data validation library for Python. It lets you ..."
+    },
+    {
+      "id": "4gqCZZktl4Q",
+      "title": "Stop Returning Raw LLM Strings: FastAPI + Pydantic + Claude Structured Output",
+      "channel": "Edward Blake",
+      "duration": "17:41",
+      "views": "98 views",
+      "description": "Most AI integrations call the LLM, get a string back, and pass it straight to the client. That's not an API — it's a hope. Here's the ..."
+    },
+    {
+      "id": "c2rU4YFX-34",
+      "title": "Structured Outputs in Pydantic AI | Type‑Safe LLM Responses",
+      "channel": "Yash Jain",
+      "duration": "7:22",
+      "views": "228 views",
+      "description": "Welcome to another video of the Pydantic AI Series! 🌙\n\nIn this session, we’re exploring Structured Outputs in Pydantic AI ..."
+    },
+    {
+      "id": "s-DbHnE49PU",
+      "title": "Building Type-Safe LLM Agents With Pydantic AI: Setting Up & Getting Structured Output From LLMs",
+      "channel": "Real Python",
+      "duration": "13:11",
+      "views": "845 views",
+      "description": "Download your free Python Cheat Sheet here: https://realpython.com/cheatsheet Free Python Skill Test with instant level + ..."
+    },
+    {
+      "id": "FZdni7nsy7w",
+      "title": "1.5 Structured Outputs and Schema Enforcement with Pydantic and JSON Sc... | LLM Foundations",
+      "channel": "Adsorp AI",
+      "duration": "9:32",
+      "views": "24 views",
+      "description": "Tame the probabilistic nature of LLMs by enforcing strict, deterministic schema validation using Pydantic and JSON Schema."
+    },
+    {
+      "id": "Ibno_G3tCZM",
+      "title": "OpenAI Structured Outputs + Pydantic: Type-Safe JSON from Any LLM Call",
+      "channel": "ByteBuilder",
+      "duration": "8:47",
+      "views": "392 views",
+      "description": "Stop using json.loads() on LLM responses. OpenAI Structured Outputs guarantee valid, schema-compliant JSON from every API ..."
+    },
+    {
+      "id": "Xvp0V-SQULw",
+      "title": "How to Generate Structured Output from LLMs— Pydantic, JSON Schema & TypedDict",
+      "channel": "Soumyaranjan Nayak",
+      "duration": "17:38",
+      "views": "70 views",
+      "description": "Welcome back to Soumya AI Vision! Today we go beyond simple text generation and learn how to extract real, structured data ..."
+    },
+    {
+      "id": "MfRSkBTNoQU",
+      "title": "Pydantic AI - Structured Output Types (Pydantic Models)!",
+      "channel": "BugBytes",
+      "duration": "7:31",
+      "views": "2,499 views",
+      "description": "Pydantic AI playlist! https://www.youtube.com/playlist?list=PL-2EBeDYMIbSWGoDzOFm33_5W_ShO-VIi ▷ Django & HTMX FULL ..."
+    },
+    {
+      "id": "AkXU0NBV2aE",
+      "title": "LangChain Structured Output Explained | Pydantic + with_structured_output() | Part 4",
+      "channel": "CodeCraft Academy",
+      "duration": "2:19",
+      "views": "124 views",
+      "description": "Stop manually parsing LLM responses! In Part 4 of the LangChain Fundamentals series, you'll learn how Structured Output helps ..."
+    }
+  ]
+}

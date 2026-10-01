@@ -1,0 +1,118 @@
+{
+  "query": "PostgreSQL GIN GiST BRIN partial indexes",
+  "checked_at": "2026-09-30T07:22:04.368Z",
+  "results": [
+    {
+      "id": "_HG2eB27j00",
+      "title": "PostgreSQL indexes. B-Tree, GIN, BRIN. What's the difference? Easy explanation.",
+      "channel": "JaneExplainsIT",
+      "duration": "5:06",
+      "views": "6,372 views",
+      "description": "The difference between PostgreSQL indexes, pros and cons of using different types."
+    },
+    {
+      "id": "8s35iHLGHww",
+      "title": "How to Choose PostgreSQL Indexes: B-Tree, Hash, BRIN, GIN & GiST",
+      "channel": "JaneExplainsIT",
+      "duration": "13:05",
+      "views": "2,013 views",
+      "description": "In this video, we'll briefly look at how different PostgreSQL indexes work and mainly focus on how to choose the right index for ..."
+    },
+    {
+      "id": "rcMVaKR8czY",
+      "title": "PostgreSQL Partial Indexes 08/12",
+      "channel": "Code with Lucian",
+      "duration": "4:02",
+      "views": "5,014 views",
+      "description": "If you found this video helpful, you could check the full course on Udemy. In this course, you'll find tips for tuning PostgreSQL 12 ..."
+    },
+    {
+      "id": "zw4-Hpm7ysk",
+      "title": "PostgreSQL indexes. GiST index. Easy explanation. Full-text search and spatial data.",
+      "channel": "JaneExplainsIT",
+      "duration": "8:08",
+      "views": "2,301 views",
+      "description": "GiST index in PostgreSQL - how does it work internally and what are its advantages and disadvantages? How is it used with ..."
+    },
+    {
+      "id": "URgcvTRoYS4",
+      "title": "PostgreSQL indexes. GIN vs GiST for full-text search",
+      "channel": "JaneExplainsIT",
+      "duration": "8:44",
+      "views": "1,138 views",
+      "description": "In this video, I'll compare GIN and GiST indexes for full-text search. I'll show you how they work and explain the differences in ..."
+    },
+    {
+      "id": "sY2auWXW0Fw",
+      "title": "5mins of Postgres E48: Benchmarking multi column, covering and hash indexes in Postgres",
+      "channel": "pganalyze",
+      "duration": "5:33",
+      "views": "1,743 views",
+      "description": "Today, we talk about benchmarking multi-column vs. multiple combined indexes in Postgres, and whether B-Tree or hash indexes ..."
+    },
+    {
+      "id": "9eqKRT5K8hI",
+      "title": "PostgreSQL indexes. B-Tree or Hash. What is better? How it works?",
+      "channel": "JaneExplainsIT",
+      "duration": "5:50",
+      "views": "2,164 views",
+      "description": "PostgreSQL: Hash index. We'll see how it works under the hood and understand if it's better than B tree index. So, what is a hash ..."
+    },
+    {
+      "id": "7Hy2mNuqdjk",
+      "title": "5mins of Postgres E38: BRIN indexes, tuning pages_per_range & determining correlation with pg_stats",
+      "channel": "pganalyze",
+      "duration": "5:16",
+      "views": "1,154 views",
+      "description": "We talk about tuning a Postgres BRIN index and how to decide whether to use BRIN based on pg_stats statistics and the ..."
+    },
+    {
+      "id": "4Dusemyd31M",
+      "title": "BRIN & Correlation, Poor Partitioning, 10 Beginner Tips, Table & Index Usage | Scaling Postgres 276",
+      "channel": "Scaling Postgres",
+      "duration": "15:58",
+      "views": "1,009 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "JtXHTQUKPLM",
+      "title": "5mins of Postgres E6: Optimizing Postgres Text Search with Trigrams and GiST indexes",
+      "channel": "pganalyze",
+      "duration": "5:22",
+      "views": "4,957 views",
+      "description": "Today, we're looking at optimizing Postgres text search with trigrams and take a closer look at GiST indexes. Find the article on ..."
+    },
+    {
+      "id": "t-sk0bWOJ3A",
+      "title": "SQL : How to use a GIST or GIN index with an hstore column in Postgresql?",
+      "channel": "Hey Delphi",
+      "duration": "1:24",
+      "views": "159 views",
+      "description": "SQL : How to use a GIST or GIN index with an hstore column in Postgresql? To Access My Live Chat Page, On Google, Search for ..."
+    },
+    {
+      "id": "OqxJlVH6rbk",
+      "title": "Scaling Postgres Episode 71 | Indexing Documents | GIN Indexes | Data Science | Generated Columns",
+      "channel": "Scaling Postgres",
+      "duration": "13:23",
+      "views": "6,206 views",
+      "description": "To get the show notes as well as get notified of new episodes, visit: ..."
+    },
+    {
+      "id": "3o1l9tGuIHQ",
+      "title": "Lesson #9 - How to create a GIN Index? -  Deep Dive Into PostgreSQL Indexes Course",
+      "channel": "Percona",
+      "duration": "3:17",
+      "views": "7,683 views",
+      "description": "We present the Deep Dive Into #PostgreSQL Indexes course. In this lesson, Ibrar will talk about How to create and use a GIN ..."
+    },
+    {
+      "id": "XjCLIg8leys",
+      "title": "41. Using a GIN Index",
+      "channel": "NvN",
+      "duration": "10:04",
+      "views": "2,745 views",
+      "description": ""
+    }
+  ]
+}

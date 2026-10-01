@@ -1,0 +1,22 @@
+{
+  "id": "cUfLrn3TM3M",
+  "url": "https://www.youtube.com/watch?v=cUfLrn3TM3M",
+  "checked_at": "2026-09-30T07:24:11.382Z",
+  "title": "LangGraph Explained for Beginners",
+  "channel": "KodeKloud",
+  "duration_seconds": 801,
+  "views": 219642,
+  "comments": "54 Comments",
+  "comment_samples": [
+    "🧪Try LangGraph Hands-On Labs for Free - https://kode.wiki/41WTH62",
+    "\"Complicated is the perfect definition\", loved that intro😂",
+    "Great work! I really hope you guys get the reach you deserve",
+    "This is amazing, densely packed, easy to reference code, sandbox env to play around. Thanks a lot 🙏",
+    "Amazing channel bro! Don't stop your content man"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🧪Try LangGraph Hands-On Labs for Free - https://kode.wiki/41WTH62\n\nLearn how LangGraph transforms simple LangChain chatbots into powerful AI agents with StateGraph, loops, and conditional workflows!\n\nIn this comprehensive video, we'll show you exactly how to build a production-ready AI Research Assistant that searches the web, evaluates trustworthiness, extracts facts, and generates intelligent reports using nodes, edges, and shared state management.\n\nReady to build your own stateful AI workflows? Access our FREE interactive labs where you can experiment with real LangGraph implementations, create your own StateGraph architectures, and see agentic AI workflows in action!\n\n🧪Try LangGraph Hands-On Labs for Free - https://kode.wiki/41WTH62\n\n📚 What You'll Learn:\n• LangChain vs LangGraph: When to use each framework\n• How StateGraph works with nodes, edges, and persistent memory\n• State management patterns for production AI agents\n• LangGraph Workflow Demo\n\n⏱️ Timestamps:\n00:00 - Introduction to LangGraph\n00:20 - LangChain vs LangGraph: What’s the real difference?\n01:19 - Deep Research Assistant Use Case Example\n01:53 - Traditional approach pain points\n02:21 - Orchestration in LangGraph\n03:08 - What is StateGraph?\n03:39 - LangGraph Workflow\n04:42 - LangGraph Adoption in Business Requirements\n05:16 - Demo - Installing LangGraph Ecosystem\n05:50 - Demo - Sequential Workflow vs Stateful Workflow\n06:29 - Demo - Chunking Strategy and Embedding\n07:37 - Demo - StateGraph\n08:29 - Demo - Nodes, Edges and Routing\n09:38 - Demo - Loops and Iterations\n10:15 - Demo - Tool Integration\n10:45 - Demo - Memory and State\n11:27 - Demo - Build Your Own Research Assistant\n12:52 - Conclusion & Free Lab Access\n\n🔔 Subscribe for more AI tutorials!\n\n\n#LangGraph #LangChain #StateGraph #AIagents #AgenticAI #AIworkflows #AIautomation #LLM #OpenAI #Python  #AutonomousAgents #workflowautomation #kodekloud",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

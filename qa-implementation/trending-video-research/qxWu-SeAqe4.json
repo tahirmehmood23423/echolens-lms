@@ -1,0 +1,22 @@
+{
+  "id": "qxWu-SeAqe4",
+  "url": "https://www.youtube.com/watch?v=qxWu-SeAqe4",
+  "checked_at": "2026-09-30T07:23:38.183Z",
+  "title": "0/1 Knapsack Problem Explained Visually",
+  "channel": "ByteQuest",
+  "duration_seconds": 489,
+  "views": 153151,
+  "comments": "78 Comments",
+  "comment_samples": [
+    "Probably you've heared it before but you are THE best",
+    "That's exactly what every student wants, for knapsack problem",
+    "Absolutely fun to learn things this way.\n\nThis is one of the best explanations i have ever seen.",
+    "i have seen many vedioes of knapsack but i could'nt get any of them,this is best explaination ever,thanku so much:)",
+    "You literally saved my life before my exam tomorrow with such ease of understanding thank you so much I deeply appreciate you!!!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, we dive deep into the 0/1 Knapsack Problem using dynamic programming. We start by building a table to track the maximum profit achievable for different knapsack capacities. \nThen, we fill the table step by step, explaining how to include or exclude items based on their weight and profit. \nFinally, we backtrack through the table to determine which items are included in the optimal solution.\n\nBy the end of this video, you'll understand:\n✅ How to construct and fill the DP table\n✅ How to find the selected items efficiently\n✅ The time and space complexity of the approach\n\n\n\n📌 Topics Covered:\n\n0:00  Introduction ✅\n0:43  Naïve Approach and its pitfalls ✅\n1:12  Dynamic Programming Approach ✅\n\n\n\nvideo on Fractional Knapsack problem (greedy method):- https://youtu.be/ujHQlfR3qfo\n\nvideo on introduction to Dynamic Programming:- https://youtu.be/9uusvK3HRk0\n\ncode for animations:-https://github.com/ByteQuest0/Animation_codes/tree/main/2025/Knapsack\n\ncode (GitHub) for implementation:-https://github.com/ByteQuest0/Implemention_codes/blob/main/Dynamic%20Programming/knapsack.py\n\nTools used to make this video:- ManimGL (python library for animation), Premier Pro for video editing, a TTS tool.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

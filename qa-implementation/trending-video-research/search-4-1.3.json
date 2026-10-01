@@ -1,0 +1,158 @@
+{
+  "query": "Docker Compose healthcheck depends_on tutorial",
+  "checked_at": "2026-09-30T07:21:51.344Z",
+  "results": [
+    {
+      "id": "tEzsHSIdUdU",
+      "title": "72 | Control Startup Order How depends_on and healthcheck works | Docker Compose | Urdu",
+      "channel": "Muhammad Habib",
+      "duration": "16:05",
+      "views": "30 views",
+      "description": "Welcome to our comprehensive guide on Docker. Docker is a popular containerization platform that allows developers to package ..."
+    },
+    {
+      "id": "pCY6khpKqM4",
+      "title": "Docker Compose Control Container Order with depends_on",
+      "channel": "WittCode",
+      "duration": "4:17",
+      "views": "1,814 views",
+      "description": "I made DevPayHub for solo devs. Payments & users handled. https://devpayhub.com Learn how to control Docker container ..."
+    },
+    {
+      "id": "fjzsmVHPhl0",
+      "title": "The API Raced Postgres and Crashed — Docker Compose Explained",
+      "channel": "TheCodeForge",
+      "duration": "10:22",
+      "views": "26 views",
+      "description": "The API container exited within 10 seconds with ECONNREFUSED because Postgres wasn't ready — `depends_on` only waits ..."
+    },
+    {
+      "id": "D8JwmDDg0ns",
+      "title": "Optional depends_on with Docker Compose v2.20.2+",
+      "channel": "Nick Janetakis",
+      "duration": "5:44",
+      "views": "937 views",
+      "description": "Technically this was possible with earlier versions but it was classified as a bug, now it's a feature. Hit the subscribe button to ..."
+    },
+    {
+      "id": "ayw9L5EC8_g",
+      "title": "depends_on without a healthcheck took staging down for 3 hours | Docker #Shorts",
+      "channel": "TheCodeForge",
+      "duration": "1:06",
+      "views": "14 views",
+      "description": "depends_on without a healthcheck took staging down for 3 hours. Root cause: The docker-compose.yml used plain depends_on: ..."
+    },
+    {
+      "id": "m4SD2txMN7c",
+      "title": "Understanding the Difference Between Links and depends_on in Docker Compose",
+      "channel": "blogize",
+      "duration": "1:43",
+      "views": "49 views",
+      "description": "Summary: Learn the key differences between the 'links' and 'depends_on' options in Docker Compose files for better service ..."
+    },
+    {
+      "id": "CsIZy4mBM5A",
+      "title": "Docker Healthchecks & Restart Policies Explained | Make Containers Production-Ready | Cloud & Devops",
+      "channel": "DheerajTechInsight",
+      "duration": "16:47",
+      "views": "1,729 views",
+      "description": "A container can be running and still be broken. In this video, I explain how production systems detect failures early and recover ..."
+    },
+    {
+      "id": "1nxxlkxqktU",
+      "title": "How (and Why) to Add a Docker Container Health Check? | | Dockerfile HEALTHCHECK CMD Command",
+      "channel": "Tech with Lian",
+      "duration": "9:36",
+      "views": "3,709 views",
+      "description": "Video content/commands/project download links are: Video content file: ..."
+    },
+    {
+      "id": "I970ql9ZQbQ",
+      "title": "Understanding Docker-Compose Health Checks: Why Is My Container Failing?",
+      "channel": "vlogize",
+      "duration": "1:54",
+      "views": "111 views",
+      "description": "For example, the original title of the Question was: docker-compose healthcheck always says error but there are no error logs Also ..."
+    },
+    {
+      "id": "LDb6aRvEVPw",
+      "title": "Docker Compose File Explained: services, volumes, depends_on, deploy | #16",
+      "channel": "Techno Bytes Unlocked",
+      "duration": "12:34",
+      "views": "2 views",
+      "description": "... Lab: Author a Compose File Tags: docker compose tutorial, docker compose file explained, compose depends_on healthcheck, ..."
+    },
+    {
+      "id": "-8YkUVPaqq4",
+      "title": "MySQL : Docker Compose: Depends_On with an external container?",
+      "channel": "Hey Delphi",
+      "duration": "1:12",
+      "views": "104 views",
+      "description": "MySQL : Docker Compose: Depends_On with an external container? To Access My Live Chat Page, On Google, Search for \"hows ..."
+    },
+    {
+      "id": "HmsN86Hfzac",
+      "title": "Fixing the Elasticsearch Docker Compose Error for Kibana Dependency",
+      "channel": "blogize",
+      "duration": "1:33",
+      "views": "41 views",
+      "description": "Summary: Learn how to resolve the Docker Compose error related to Elasticsearch dependency for Kibana, ensuring smooth ..."
+    },
+    {
+      "id": "8SRxbnDUZiI",
+      "title": "🐳 Docker Health Checks: Monitor & Auto-Restart Unhealthy Containers!",
+      "channel": "CodeLucky",
+      "duration": "6:28",
+      "views": "633 views",
+      "description": "Learn how to use Docker health checks to monitor the health of your containers and automatically restart them if they become ..."
+    },
+    {
+      "id": "ty0jMQTZB1k",
+      "title": "Docker Compose Profiles: One compose.yml for Dev, Test, and Prod",
+      "channel": "Learn In Minutes",
+      "duration": "5:50",
+      "views": "232 views",
+      "description": "Support the channel on Patreon: https://www.patreon.com/15345164/join Ever felt like you're drowning in ..."
+    },
+    {
+      "id": "D5YjjIojs9U",
+      "title": "Docker Compose: The App, Not the Container",
+      "channel": "Devops Ascent",
+      "duration": "9:07",
+      "views": "17 views",
+      "description": "Ep 4 — Docker Compose: The App, Not the Container One command. Multiple containers. Your whole app. Episode 4 of the ..."
+    },
+    {
+      "id": "ZowjOhpAcIc",
+      "title": "Deploying the containerized application with Docker Compose || Docker Tutorial 12",
+      "channel": "TechWorld with Nana",
+      "duration": "9:57",
+      "views": "112,932 views",
+      "description": "How to deploy your containerized application with Docker Compose. In this video I show how to deploy an application, which we ..."
+    },
+    {
+      "id": "sUIfSLMuDDo",
+      "title": "Your First Docker Container: PostgreSQL with Docker Compose",
+      "channel": "Ben Swordfire",
+      "duration": "6:23",
+      "views": "1,334 views",
+      "description": "In this beginner tutorial, we'll build your first Docker container using PostgreSQL and Docker Compose. You'll learn how to: ..."
+    },
+    {
+      "id": "rVruSQ9HndM",
+      "title": "#Docker Health Check in Docker Services - 56 #ITInAmeerpet #easylearning",
+      "channel": "AH",
+      "duration": "16:19",
+      "views": "433 views",
+      "description": "Docker & Kubernetes -Training part - 56 #Docker #kubernetes #devops #devopstraining #devopscompletecourse #devopsforfree ..."
+    },
+    {
+      "id": "nppydSJD7cs",
+      "title": "Cortex API Build 01 Lesson 07: Docker Compose FastAPI + Postgres Tutorial",
+      "channel": "Hands On Course Demo",
+      "duration": "1:51",
+      "views": "13 views",
+      "description": "Learn how to containerize a real FastAPI + PostgreSQL API using Docker & Docker Compose — no manual database setup ..."
+    }
+  ]
+}

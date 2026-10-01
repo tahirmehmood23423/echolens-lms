@@ -1,0 +1,139 @@
+{
+  "query": "Langchain chunking strategies",
+  "checked_at": "2026-09-30T07:19:49.468Z",
+  "results": [
+    {
+      "id": "pIGRwMjhMaQ",
+      "title": "Chunking Strategies in RAG: Optimising Data for Advanced AI Responses",
+      "channel": "Mervin Praison",
+      "duration": "14:02",
+      "description": "Dive deep into the world of RAG applications with our comprehensive guide on chunking strategies! Advanced Chunking ..."
+    },
+    {
+      "id": "ZTOtxiWb2bE",
+      "title": "Chunking Strategies Explained",
+      "channel": "Redis",
+      "duration": "8:25",
+      "description": "Are you interested in building LLM applications that actually work? Your chunking strategy makes all the difference. In this video ..."
+    },
+    {
+      "id": "SEWS9P4ODmc",
+      "title": "Text Splitters in LangChain | Generative AI using LangChain | Video 11 | CampusX",
+      "channel": "CampusX",
+      "duration": "59:01",
+      "description": "Code - https://github.com/campusx-official/langchain-text-splitters\n\nNotes: https://learnwith.campusx.in/s/store/courses ..."
+    },
+    {
+      "id": "8OJC21T2SL4",
+      "title": "The 5 Levels Of Text Splitting For Retrieval",
+      "channel": "Greg Kamradt",
+      "duration": "1:09:00",
+      "description": "Get Code: https://fullstackretrieval.com/ https://www.chunkviz.com/ Greg's Info: - Twitter: https://twitter.com/GregKamradt ..."
+    },
+    {
+      "id": "9ztE_pX7Ltc",
+      "title": "Only 5% Engineers Understand Chunking for RAG | AI Interview Series",
+      "channel": "Think in Models",
+      "duration": "25:31",
+      "description": "You'll learn: Why chunking is critical for RAG performance Different chunking strategies (fixed, semantic, sliding window) When ... ... you want to test much more smarter chunking strategies But you need to start somewhere right So this is where you start already ..."
+    },
+    {
+      "id": "7FDYeTCTADY",
+      "title": "Chunking Strategies | LLMops Masters | Euron",
+      "channel": "Code Commander",
+      "duration": "5:50",
+      "description": "Euron - https://euron.one/ Course Link : https://euron.one/course/llmops-masters Call or WhatsApp us at: +919110665931 ..."
+    },
+    {
+      "id": "-hsaiU6fmtQ",
+      "title": "RAG Chunking Strategies [Top 11] | Semantic Chunking to LLM Chunking | Learn RAG from Scratch",
+      "channel": "FreeBirds Crew - Data Science and GenAI",
+      "duration": "26:11",
+      "description": "Welcome to the FreeBirds Crew! In this second video of our Learn RAG from Scratch Playlist, we dive deep into chunking ..."
+    },
+    {
+      "id": "CmmkNAUGin8",
+      "title": "Advanced Chunking Techniques: Semantic & LLM-Based Chunking (Simply!) Explained",
+      "channel": "Weaviate vector database",
+      "duration": "1:25",
+      "description": "Fixed-size chunking is breaking your RAG system When you split text into arbitrary 200-word chunks, you're destroying the ... ... learn about how professional rack applications chunk their text in our last video we talked about some basic chunking strategies ..."
+    },
+    {
+      "id": "FQVXOgngdCI",
+      "title": "How to Chunk Text for RAG the RIGHT Way (Chunk Size, Overlap, LangChain Code)",
+      "channel": "The AI Stack",
+      "duration": "9:57",
+      "description": "Chunking is one of the most underrated steps in building a great RAG (Retrieval Augmented Generation) pipeline. Split your text ..."
+    },
+    {
+      "id": "7NRodhkQppM",
+      "title": "10 Chunking Strategies for RAG - Every Method Explained (With Pros & Cons)",
+      "channel": "Ai Abhi",
+      "duration": "24:13",
+      "description": "Same documents. Same LLM. Same question. Two completely different answers. The only thing I changed? How I split the ..."
+    },
+    {
+      "id": "tIKzLken0b0",
+      "title": "Chunking Strategies | LLMops Masters | Euron",
+      "channel": "Euron",
+      "duration": "5:50",
+      "description": "Euron - https://euron.one/ Android- https://play.google.com/store/apps/details?id=com.euron.one&hl=en IOS ..."
+    },
+    {
+      "id": "bm_0jH5ve8U",
+      "title": "Chunking Strategies for RAG | Free AI Engineer Course | 8 Weeks",
+      "channel": "Padho with Pratyush",
+      "duration": "28:53",
+      "description": "Chunking is the hidden reason 80% of RAG systems fail in production. In this tutorial you'll learn 4 chunking strategies with ..."
+    },
+    {
+      "id": "5bLSMAlbD04",
+      "title": "Mastering Chunking Strategies For High-Performance RAG Applications",
+      "channel": "XPLORE AI",
+      "duration": "6:06",
+      "description": "Are your AI responses hallucinating or missing the point? The problem might not be your LLM—it's your chunking strategy."
+    },
+    {
+      "id": "eJuNeyguGGc",
+      "title": "RAG Document Chunking in Python – 4 Strategies Explained with Real Code",
+      "channel": "The AI Stack",
+      "duration": "8:19",
+      "description": "RAG Chunking Strategies in Python | LangChain, HuggingFace & ChromaDB In this hands-on Generative AI tutorial, we will learn ..."
+    },
+    {
+      "id": "tLMViADvSNE",
+      "title": "Every RAG Strategy Explained in 13 Minutes (No Fluff)",
+      "channel": "Cole Medin",
+      "duration": "12:51",
+      "description": "Retrieval Augmented Generation is THE way to give your AI agents the ability to search and leverage your documents and ... ... different ways for us to one do the data preparation different chunking strategies and then also the way that we search the vector ..."
+    },
+    {
+      "id": "Lk6D1huUK0s",
+      "title": "Why Your RAG Gives Wrong Answers (And 4 Chunking Strategies to Fix It) | LangChain Text Splitters",
+      "channel": "Venelin Valkov",
+      "duration": "17:54",
+      "description": "Your RAG system keeps giving wrong answers, and it might be your chunking strategy. Using naive text splitting destroys context ..."
+    },
+    {
+      "id": "bmsDMheNHGo",
+      "title": "7 Production Chunking Strategies Every AI Engineer Should Know",
+      "channel": "Code with Poohja",
+      "duration": "10:19",
+      "description": "This video explains the most important RAG chunking strategies used in production AI systems, including Recursive Chunking, ..."
+    },
+    {
+      "id": "Cbor7impJ60",
+      "title": "LangChain Text Splitters & Chunking",
+      "channel": "Analytics Vidhya",
+      "duration": "4:20",
+      "description": "Description Why can't you just upload a 100-page PDF to an LLM? In this video, we explore the critical step of Document Splitting ..."
+    },
+    {
+      "id": "WAiscGs8Yr4",
+      "title": "RAG Chunking: Strategies for Splitting and Structuring Documents",
+      "channel": "Logical Lenses",
+      "duration": "13:59",
+      "description": "Retrieval-Augmented Generation (RAG) depends on one invisible step — chunking. The way we split information decides what an ..."
+    }
+  ]
+}

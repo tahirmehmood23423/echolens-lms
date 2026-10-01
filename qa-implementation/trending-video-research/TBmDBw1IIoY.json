@@ -1,0 +1,22 @@
+{
+  "id": "TBmDBw1IIoY",
+  "url": "https://www.youtube.com/watch?v=TBmDBw1IIoY",
+  "checked_at": "2026-09-30T07:24:14.755Z",
+  "title": "PostgreSQL Internals in Action: MVCC",
+  "channel": "Denis Magda",
+  "duration_seconds": 966,
+  "views": 18349,
+  "comments": "62 Comments",
+  "comment_samples": [
+    "Thank you. It is best video about pg mvcc i ever seen",
+    "This is the first video that I have seen in your channel, but if other videos are simple like that then I don't understand why you have only 3.66 thousand of subscribers.",
+    "This was one of the best things i ever saw about postgres. Thank you!",
+    "Oh my God. Really needed this",
+    "I love this postgresql internal playlist. More please!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "PostgreSQL uses MVCC (Multi-Version Concurrency Control) to execute transactions and queries in parallel over a consistent view/snapshot of data. Each user record may exist in multiple versions simultaneously, with each version visible to a particular set of transactions.\n\nYou'll learn how MVCC functions internally by running various hands-on experiments.\n\n0:00 Introduction to PostgreSQL MVCC\n0:55 Exploring hidden columns\n4:09 Generating multiple versions for the same row\n6:45 Looking into PostgreSQL pages with pageinspect\n9:12 Creating a custom function for advanced analysis\n12:59 Garbage collecting all versions with vacuum\n\nStep-by-step instructions. Repeat on your end:\nhttps://github.com/dmagda/DevMastersDb/blob/main/postgres/postgres_mvcc_backstage.md\n\nInterested in diving deeper into databases? Stay connected with me here:\n* Medium: https://medium.com/@magda7817\n* Twitter: https://twitter.com/denismagda",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

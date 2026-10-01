@@ -1,0 +1,118 @@
+{
+  "query": "Dijkstra shortest path algorithm explained",
+  "checked_at": "2026-09-30T07:20:50.020Z",
+  "results": [
+    {
+      "id": "bZkzH5x0SKU",
+      "title": "Dijkstras Shortest Path Algorithm Explained | With Example | Graph Theory",
+      "channel": "FelixTechTips",
+      "duration": "8:24",
+      "views": "1,144,256 views",
+      "description": "I explain Dijkstra's Shortest Path Algorithm with the help of an example. This algorithm can be used to calculate the shortest ..."
+    },
+    {
+      "id": "Gd92jSu_cZk",
+      "title": "L-4.10: Dijkstra's Algorithm - Single Source Shortest Path - Greedy Method",
+      "channel": "Gate Smashers",
+      "duration": "15:49",
+      "views": "3,885,299 views",
+      "description": "Complete DAA Roadmap  : https://www.gatesmashers.com/roadmaps/design-and-analysis-of-algorithms In this video, Varun sir ..."
+    },
+    {
+      "id": "XB4MIexjvY0",
+      "title": "3.6 Dijkstra Algorithm - Single Source Shortest Path - Greedy Method",
+      "channel": "Abdul Bari",
+      "duration": "18:35",
+      "views": "4,902,480 views",
+      "description": "Dijkstra Algorithm for Single Source Shortest Path Procedure Examples Time Complexity Drawbacks PATREON ..."
+    },
+    {
+      "id": "4UMlxaAFGSA",
+      "title": "Dijkstra Algorithm - Single Source Shortest Path - Greedy Method with example in hindi/urdu",
+      "channel": "NoBody WareHouse",
+      "duration": "9:56",
+      "views": "386,472 views",
+      "description": "Dijkstra Algorithm for Single Source Shortest Path Procedure Examples."
+    },
+    {
+      "id": "EFg3u_E6eHU",
+      "title": "How Dijkstra's Algorithm Works",
+      "channel": "Spanning Tree",
+      "duration": "8:31",
+      "views": "2,083,617 views",
+      "description": "Dijkstra's Algorithm allows us to find the shortest path between two vertices in a graph. Here, we explore the intuition behind the ..."
+    },
+    {
+      "id": "vpmY9_hV0lQ",
+      "title": "Explain Dijkstra's Shortest Path Algorithm with Example in Hindi | Data Structure",
+      "channel": "CS Engineering Gyan",
+      "duration": "7:53",
+      "views": "338,832 views",
+      "description": "Dijkstra's Shortest Path Algorithm in Hindi with Example in Data Structure\nWhat is Dijkstra's Algorithm in Data Structure ..."
+    },
+    {
+      "id": "CmIQ29cUGiE",
+      "title": "Dijkstra's Shortest Path Algorithm Visually Explained | How it Works | With Examples",
+      "channel": "ByteQuest",
+      "duration": "10:34",
+      "views": "37,922 views",
+      "description": "Master Dijkstra's Algorithm in 10 minutes — see every step visualised and learn how to use priority queues to find shortest paths ..."
+    },
+    {
+      "id": "pVfj6mxhdMw",
+      "title": "Graph Data Structure 4. Dijkstra’s Shortest Path Algorithm",
+      "channel": "Computer Science Lessons",
+      "duration": "10:52",
+      "views": "1,613,128 views",
+      "description": "This is the fourth in a series of computer science videos about the graph data structure. This is an explanation of Dijkstra's ..."
+    },
+    {
+      "id": "_lHSawdgXpI",
+      "title": "Dijkstra's algorithm in 3 minutes",
+      "channel": "Michael Sambol",
+      "duration": "2:46",
+      "views": "2,124,828 views",
+      "description": "Step by step instructions showing how to run Dijkstra's algorithm on a graph."
+    },
+    {
+      "id": "0W8WoRaw5Es",
+      "title": "Dijkstra's Shortest Path Algorithm Visually Explained",
+      "channel": "Hello Byte",
+      "duration": "9:06",
+      "views": "9,647 views",
+      "description": "Learn Dijkstra's Algorithm step by step with visuals and a Python implementation. Perfect for pathfinding, network routing, and ..."
+    },
+    {
+      "id": "jihfxiGmxGc",
+      "title": "Lec-42 Dijkstra Algorithm In Hindi | Single Source Shortest Path | Operation Research",
+      "channel": "Start Practicing",
+      "duration": "15:16",
+      "views": "819,304 views",
+      "description": "#dijkstraalgorithminhindi #dijkstraalgorithmshortestpath\n#singlesourceshortestpathusingdijkstra\n\nConnect with me\nInstagram ..."
+    },
+    {
+      "id": "n-0nyQ_RsaU",
+      "title": "Weighted Graph | Dijkstra's Algorithm for Shortest Path | Graph Theory | Ganitya",
+      "channel": "Ganitya",
+      "duration": "12:50",
+      "views": "73,217 views",
+      "description": "Weighted Graph | Dijkstra's Algorithm for Shortest Path with Examples | Graph Theory | Ganitya\n\nThis Video is Equally helpful ..."
+    },
+    {
+      "id": "GazC3A4OQTE",
+      "title": "Dijkstra's Algorithm - Computerphile",
+      "channel": "Computerphile",
+      "duration": "10:43",
+      "views": "1,452,186 views",
+      "description": "Dijkstra's Algorithm finds the shortest path between two points. Dr Mike Pound explains how it works. How Sat Nav Works: ..."
+    },
+    {
+      "id": "p9fPBS2S_Vk",
+      "title": "Shortest Path Routing Algorithm || Dijkstra's  algorithm || Computer Networks",
+      "channel": "Sudhakar Atchala",
+      "duration": "11:44",
+      "views": "342,516 views",
+      "description": "DijkstrasAlgorithm #ShortestPath #ComputerNetworks #RoutingAlgorithm #networkingbasics."
+    }
+  ]
+}

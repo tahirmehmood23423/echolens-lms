@@ -1,0 +1,94 @@
+{
+  "query": "PostgreSQL work_mem statistics query planner",
+  "checked_at": "2026-09-30T07:25:00.521Z",
+  "results": [
+    {
+      "id": "vz1HRLGR4xo",
+      "title": "work_mem explained: the setting that OOMs servers",
+      "channel": "myDBA",
+      "duration": "3:50",
+      "views": "17 views",
+      "description": "work_mem looks like a simple memory limit, but it's the Postgres setting that's taken down more production servers than almost ..."
+    },
+    {
+      "id": "1KJryLXOlMU",
+      "title": "Your PostgreSQL work_mem Is a 400 GB Memory Bomb",
+      "channel": "PostgreSQL Mechanics",
+      "duration": "6:56",
+      "views": "1,570 views",
+      "description": "PostgreSQL database work_mem can silently demand hundreds of GB and OOM your server. One line of config. Up to 400 GB of ..."
+    },
+    {
+      "id": "pj7Fxr8cUJI",
+      "title": "How PostgreSQL generates all possible query execution plans before choosing the best one.",
+      "channel": "Arpit Bhayani",
+      "duration": "8:33",
+      "views": "28,944 views",
+      "description": "Applied AI Course: https://arpitbhayani.me/applied-ai System Design for SDE-2 and above: https://arpitbhayani.me/masterclass ..."
+    },
+    {
+      "id": "LRKoFD6rENM",
+      "title": "PostgreSQL Temp Files: Fix Them with work_mem Tuning",
+      "channel": "OpenSource DB",
+      "duration": "15:20",
+      "views": "38 views",
+      "description": "How Temporary Files Impact PostgreSQL Query Performance and How Optimizing work_mem Improves It #postgresql #tempfiles ..."
+    },
+    {
+      "id": "DmqE8T9oCEk",
+      "title": "Databases: How to limit work_mem on PostgreSQL?",
+      "channel": "Roel Van de Paar",
+      "duration": "1:20",
+      "views": "95 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "P7EUFtjeAmI",
+      "title": "Postgres Explain Explained - How Databases Prepare Optimal Query Plans to Execute SQL",
+      "channel": "Hussein Nasser",
+      "duration": "10:17",
+      "views": "31,453 views",
+      "description": "In This video I'll go through how Explain works in PostgreSQL, explain is the command that you add to the beginning of your SQL ..."
+    },
+    {
+      "id": "nrYT5ygwvdg",
+      "title": "5mins of Postgres E15: Tuning Deterministic Query Planner, Extended Statistics, Join Collapse Limits",
+      "channel": "pganalyze",
+      "duration": "5:35",
+      "views": "540 views",
+      "description": "Today, we'll talk about optimizing with the Postgres deterministic query planner, have a look at using extended statistics, and ..."
+    },
+    {
+      "id": "6Fnz1ChJFRg",
+      "title": "SQL : Setting work_mem in Postgres for specific queries",
+      "channel": "Hey Delphi",
+      "duration": "1:41",
+      "views": "77 views",
+      "description": "SQL : Setting work_mem in Postgres for specific queries To Access My Live Chat Page, On Google, Search for \"hows tech ..."
+    },
+    {
+      "id": "IX3UAOunF_E",
+      "title": "work_mem configuration in Postgres #postgresql #postgres",
+      "channel": "KloudDB",
+      "duration": "4:14",
+      "views": "363 views",
+      "description": "How to configure work_mem in Postgres ? * work_mem can trigger OOM ?"
+    },
+    {
+      "id": "uMLpTWipGbQ",
+      "title": "Performance Tuning in PostgreSQL | Ankush Sir | Learnomate Technologies",
+      "channel": "Learnomate Technologies",
+      "duration": "10:02",
+      "views": "3,100 views",
+      "description": "In this video, you'll get the definitive guide to mastering PostgreSQL performance tuning."
+    },
+    {
+      "id": "D4rph7Lfz68",
+      "title": "PostgreSQL Memory System 05/12",
+      "channel": "Code with Lucian",
+      "duration": "3:00",
+      "views": "12,190 views",
+      "description": "If you found this video helpful, you could check the full course on Udemy. In this course, you'll find tips for tuning PostgreSQL 12 ..."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "z4HdPOLP8nc",
+  "url": "https://www.youtube.com/watch?v=z4HdPOLP8nc",
+  "checked_at": "2026-09-30T07:25:45.287Z",
+  "title": "Optimizing Resource Utilization with Horizontal Pod Autoscaling (HPA) in Kubernetes | AKS",
+  "channel": "Nirav Gandhi",
+  "duration_seconds": 438,
+  "views": 29942,
+  "comments": "35 Comments",
+  "comment_samples": [
+    "Can you pls make more AKS, ACR production/enterprise scale videos?",
+    "Why there is warning sign in the newly created pod? That is also showing status as pending!!!",
+    "Thanks a lot!!!",
+    "Thank you .This really help me understand the whole aks concept with example .Appreciate .Also could you please share the PPT aswell.",
+    "Excellent, Keep up 🙂"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Horizontal Pod Autoscaling (HPA) is a Kubernetes feature that automatically adjusts the number of replicas of a deployment based on metrics such as CPU utilization or memory usage. HPA enables a cluster to scale the number of pods running in a deployment based on the workload demand, ensuring that the required resources are available to meet the application's performance needs. This helps to improve the efficiency and resource utilization of the cluster, as well as providing a self-healing mechanism to ensure that applications remain highly available even in the event of pod failures.\n\nIntroduction to Horizontal Pod Autoscaling (HPA) in Kubernetes\nSetting Up Horizontal Pod Autoscaling (HPA) on a Kubernetes Cluster\nUsing Horizontal Pod Autoscaling (HPA) to Scale Your Applications in Kubernetes\nA Practical Guide to Horizontal Pod Autoscaling (HPA) in Kubernetes\nOptimizing Resource Utilization with Horizontal Pod Autoscaling (HPA) in Kubernetes\n\nJoin the group: https://t.me/sqlbrainbox \nBook 1:1 Call: https://topmate.io/nirav_gandhi\nFollow me on LinkedIn: https://www.linkedin.com/in/niravgandhisql/\n\n#k8s #kubernetes #aks",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

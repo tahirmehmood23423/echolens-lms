@@ -1,0 +1,22 @@
+{
+  "id": "6ZnyEApgFYg",
+  "url": "https://www.youtube.com/watch?v=6ZnyEApgFYg",
+  "checked_at": "2026-09-30T07:23:34.772Z",
+  "title": "Binary Tree Level Order Traversal - BFS - Leetcode 102",
+  "channel": "NeetCode",
+  "duration_seconds": 575,
+  "views": 297484,
+  "comments": "140 Comments",
+  "comment_samples": [
+    "This is the first time I was able to solve a tree-based leetcode medium problem on my own. Clearly, I am making progress every day. Thank you, man!!!",
+    "ooo I got the BFS part but really the key to the problem is to know when each level ends thanks",
+    "Please make more such videos! Your explanation is super easy to be grasped. Thanks a lot for putting on the effort",
+    "It is actually totally fine to do Depth First Search for this problem, because it is not necessary that we actually TRAVERSE the list level-by-level, despite the problem name \"Level Order Traversal\". We only need to output the list of node lists organized by level and ordered left-to-right.",
+    "I usually see your solutions after trying out myself. Almost always get a new way to solve. Keep it up!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🚀 https://neetcode.io/ - A better way to prepare for Coding Interviews\n\n🐦 Twitter: https://twitter.com/neetcode1\n🥷 Discord: https://discord.gg/ddjKRXPqtk\n\n🐮 Support the channel: https://www.patreon.com/NEETcode\n\nCoding Solutions: https://www.youtube.com/playlist?list=PLot-Xpze53leF0FeHz2X0aG3zd0mr1AW_\nDynamic Programming Playlist: https://www.youtube.com/watch?v=73r3KWiEvyk&list=PLot-Xpze53lcvx_tjrr_m2lgD2NsRHlNO&index=1\nTree Playlist: https://www.youtube.com/watch?v=OnSn2XEQ4MY&list=PLot-Xpze53ldg4pN6PfzoJY7KsKcxF1jg&index=2\nLinked List Playlist: https://www.youtube.com/watch?v=G0_I-ZF0S38&list=PLot-Xpze53leU0Ec0VkBhnf4npMRFiNcB&index=2\nProblem Link: https://neetcode.io/problems/level-order-traversal-of-binary-tree\n\n0:00 - Read the problem\n\n\nleetcode 102\nThis question was identified as an interview question from here: https://github.com/xizhengszhang/Leetcode_company_frequency\n\n\n#sorted #array  #python",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

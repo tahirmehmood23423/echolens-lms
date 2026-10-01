@@ -1,0 +1,22 @@
+{
+  "id": "ZaCFsFES5yQ",
+  "url": "https://www.youtube.com/watch?v=ZaCFsFES5yQ",
+  "checked_at": "2026-10-01T05:20:55.264Z",
+  "title": "Prisma Migrations: A Step-by-Step Guide",
+  "channel": "Prisma",
+  "duration_seconds": 733,
+  "views": 17004,
+  "comments": "25 Comments",
+  "comment_samples": [
+    "Prisma Migrate comes with quite a few commands and many options. Which ones do you run the most often?\n\nIf you want to dig into the docs, you can do so here: https://www.prisma.io/docs/orm/prisma-migrate",
+    "Thanks for the video.",
+    "nice video! I could understand prisma migrate clearly in this video explanation. Also it would be nice if the face camera could be smaller or moved somewhere else because its covering some of the texts in the terminal",
+    "thanks for the helpful video,",
+    "Thanks for this, I’m engineering my AI to be less destructive with my data, but right now it likes to run forces and resets"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "If you're using Prisma ORM, there's a good change that you'll also be using Prisma Migrate. But what are migrations and how do we work with them in Prisma?\n\nLet's have a look at how to work with Prisma Migrate by getting our first migration done, how we would work with a deployment migration, and how we would resolve a failed migration.\n\n📚 Learn more about Prisma\n• Website: https://www.prisma.io\n• Docs: https://www.prisma.io/docs\n• Quickstart: https://pris.ly/qstart\n• Docs: https://www.prisma.io/postgres\n\n——————————————————\n\n👋 Connect with the Prisma Community\n• Discord: https://discord.gg/KQyTW2H5ca\n• GitHub: https://www.github.com/prisma/prisma/discussions\n\n——————————————————\n\n💬 Follow Prisma on social media\n• Twitter: https://twitter.com/prisma\n• LinkedIn: https://www.linkedin.com/company/prisma-io\n\n——————————————————\n\n✅ Subscribe to Prisma's YouTube channel\nhttps://www.youtube.com/channel/UCptAHlN1gdwD89tFM3ENb6w?sub_confirmation=1",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

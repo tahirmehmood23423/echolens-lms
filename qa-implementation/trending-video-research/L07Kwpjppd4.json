@@ -1,0 +1,21 @@
+{
+  "id": "L07Kwpjppd4",
+  "url": "https://www.youtube.com/watch?v=L07Kwpjppd4",
+  "checked_at": "2026-09-30T07:23:21.407Z",
+  "title": "Langchain LCEL Intuitively Explained + Notebook Examples | Langchain Tutorial",
+  "channel": "M&M Tech",
+  "duration_seconds": 499,
+  "views": 1207,
+  "comments": "7 Comments",
+  "comment_samples": [
+    "Thank you so much for making it so simple and easy to understand! You’ve just gained a new follower!",
+    "superb ! deserves more views and likes",
+    "Hello.. I just found your channel and I'm very grateful about these langchain videos. I've never ever understood LCEL before no matter who I watched and I honestly did from this video. It made so much sense to me and please please please could you do a video on all of the different runnables that LCEL has and the difference between them? Thank you so much!",
+    "What a superb explanation!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, I provide an intuitive explanation of LangChain Expression Language (LCEL). You'll discover how to create various types of chains in LCEL, gaining a comprehensive understanding of this powerful tool. \n\nTimestamps :\n00:00 Intro\n00:39 Runnables & Pipe Operator\n02:04 Demo - Classic example\n03:14 Demo - Create custom runnable\n04:30 Demo - Multiple input chain\n06:53 Demo - Concurrent chains (RunnableParallel)\n07:50 Recap\n\nMusic credit : \nMusic track: Teapot by Lukrembo\nSource: https://freetouse.com/music\nVlog Music for Video (Free Download)\n\n#langchain #LCEL #generativeai #genai #python #llm #gpt #openai #ai #artificialintelligence #nlp #tutorial #explained #chatgpt",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

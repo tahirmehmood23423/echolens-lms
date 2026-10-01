@@ -1,0 +1,19 @@
+{
+  "id": "AdCAx_zfzQk",
+  "url": "https://www.youtube.com/watch?v=AdCAx_zfzQk",
+  "checked_at": "2026-09-30T07:23:50.789Z",
+  "title": "Golang: Heap Allocation using escape analysis",
+  "channel": "Satyajit Das",
+  "duration_seconds": 210,
+  "views": 1309,
+  "comments": "2 Comments",
+  "comment_samples": [
+    "It was really good and easy. Thankyou.  😊",
+    "awesome video, thanks!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video I show how to perform escape analysis on a Go program to check its Heap Allocation. This might give indication on how one can improve performance of a Go program. \n\nCommand:\ngo build -gcflags=-m . \n\nLink to Blog Post:\nhttps://tennexas.com/how-to-check-improve-performance-in-go/\n\n\nIf you want in-depth tutorial on Docker & Kubernetes along with gRPC, fully explained from end-to-end, then check out this course on Microservices: https://www.justforlearning.com/courses/build-your-first-microservices-based-app-using-go-grpc-kubernetes-docker\n\nThis is not free but if you are a student or can't afford it then feel free to email to justforlearnings@gmail.com explaining why and I will be able to give it for free. But in condition that you will be finishing the course completely within a month. :)",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

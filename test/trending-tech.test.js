@@ -16,15 +16,23 @@ const { Quests, OpenQuest, OpenAttempts, Users, Certificates } = store;
 
 test('Revision 3 catalogue contains the exact staged course structure', () => {
   const result = tracks.validateTrendingTechCatalogue(tracks);
-  assert.deepEqual(result.counts, { courses: 6, modules: 24, lectures: 72, assignments: 72, capstones: 6, videos_ready: 12 });
-  assert.equal(result.valid, false);
-  assert.equal(result.errors.length, 60);
+  assert.deepEqual(result.counts, { courses: 6, modules: 24, lectures: 72, assignments: 72, capstones: 6, videos_ready: 72 });
+  assert.equal(result.valid, true);
+  assert.equal(result.errors.length, 0);
   assert.deepEqual(tracks.map((track) => track.course_code), ['TT-01', 'TT-02', 'TT-03', 'TT-04', 'TT-05', 'TT-06']);
   for (const track of tracks) {
     assert.equal(track.published, false);
     assert.equal(track.levels.flatMap((level) => level.problems).reduce((sum, problem) => sum + problem.points, 0), 120);
     assert.equal(track.capstone.weight, 40);
     assert.equal(track.assignment_weight, 60);
+    for (const level of track.levels) {
+      assert.equal(level.videos[0].url, level.video_url);
+      for (const video of level.videos) {
+        assert.ok(video.duration_seconds > 0 && video.duration_seconds < 1200, video.title);
+        assert.equal(video.playable_in_embed, true);
+        assert.match(video.checked_at, /^\d{4}-\d{2}-\d{2}T/);
+      }
+    }
     assert.doesNotMatch(JSON.stringify(track), /\u2022|link to be pasted on publish/);
   }
 });

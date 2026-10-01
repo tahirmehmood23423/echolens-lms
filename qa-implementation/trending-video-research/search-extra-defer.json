@@ -1,0 +1,158 @@
+{
+  "query": "Golang defer explained",
+  "checked_at": "2026-09-30T07:24:56.521Z",
+  "results": [
+    {
+      "id": "VP1R_m482eU",
+      "title": "Defer Functions In Golang: Everything You Need To Know",
+      "channel": "Flo Woelki",
+      "duration": "12:17",
+      "views": "8,517 views",
+      "description": "The defer keyword in Go is a powerful feature you must know! Structs are also really common in Golang and that's why I highly ..."
+    },
+    {
+      "id": "QDUgWHKb2Tk",
+      "title": "The Defer Keyword in Golang Explained | What is the defer keyword in Golang? #golang",
+      "channel": "Hello World",
+      "duration": "6:10",
+      "views": "7,777 views",
+      "description": "Hey everyone, In this video we are going to learn about Defer keyword in Golang. In Golang, the defer keyword is used to delay ..."
+    },
+    {
+      "id": "iqXVKW0r8NI",
+      "title": "Understanding defer in Go",
+      "channel": "Gary Clarke",
+      "duration": "9:32",
+      "views": "625 views",
+      "description": "Go provides a keyword called defer that lets you schedule a function call to run later. When you defer a function, Go delays ..."
+    },
+    {
+      "id": "jiy584-vv38",
+      "title": "Defer in golang",
+      "channel": "Hitesh Choudhary",
+      "duration": "10:27",
+      "views": "46,813 views",
+      "description": "Welcome to a youtube channel dedicated to programming and coding related tutorials. We talk about tech, write code, discuss ..."
+    },
+    {
+      "id": "a4ymglnMSiE",
+      "title": "The Hidden Power of Go's Defer Statement You Need to Know",
+      "channel": "Nick Phillips",
+      "duration": "3:01",
+      "views": "274 views",
+      "description": "Learn how to use the defer statement in Golang."
+    },
+    {
+      "id": "T7Si0dTg30g",
+      "title": "How defer keyword works in Go [Go for beginners #13]",
+      "channel": "Codetuber",
+      "duration": "7:37",
+      "views": "482 views",
+      "description": "In this Go tutorial (Golang), we will be trying to understand the usage of defer keyword in Go. Links: Github Link for Code: ..."
+    },
+    {
+      "id": "tUWzl0aRxO0",
+      "title": "Defer, Panic and Recover in Go — Golang Zero to Hero Full Course [11]",
+      "channel": "Daily Code Buffer",
+      "duration": "7:07",
+      "views": "5,896 views",
+      "description": "In this course, we will get started with the Go programming language. There is no prior knowledge of Go required. We will set up a ..."
+    },
+    {
+      "id": "G5h_C-dhi20",
+      "title": "Go Tutorial (Golang) 23 - Defer Keyword in Golang",
+      "channel": "ProgrammingKnowledge",
+      "duration": "10:28",
+      "views": "1,896 views",
+      "description": "In this video we will see the Defer Keyword in Golang. Understanding defer in Go. Documentation - https://blog.golang.org/ About ..."
+    },
+    {
+      "id": "0XOGc557-SA",
+      "title": "Defer function - Lesson 14 | Go | Full Course | CloudNative | Go Tutorial | Golang",
+      "channel": "Giuseppe Scaramuzzino",
+      "duration": "3:29",
+      "views": "595 views",
+      "description": "Lesson 14 of the complete Go course | Go | Full Course | CloudNative | go for beginners | Complete free tutorial | Golang ..."
+    },
+    {
+      "id": "U73hN4_6b_E",
+      "title": "Defer Function Call | Golang",
+      "channel": "Telusko",
+      "duration": "6:35",
+      "views": "8,625 views",
+      "description": "In this video will see some advance part of Go Defer statement is used to execute a function call just before the surrounding ..."
+    },
+    {
+      "id": "JuN4aK_fjaE",
+      "title": "[Golang] panic, defer and recover",
+      "channel": "Panpito",
+      "duration": "3:45",
+      "views": "2,190 views",
+      "description": "Overview of these keywords Happy coding! Twitter: https://twitter.com/Panpit0 ..."
+    },
+    {
+      "id": "2yPazOSx3Ig",
+      "title": "Golang Tutorials -21- Golang Defer | How to use defer in golang | Dr Vipin Classes",
+      "channel": "Dr Vipin Classes",
+      "duration": "7:36",
+      "views": "411 views",
+      "description": "Golang Interview Question: What is Defer in golang | How to use defer in golang | Dr Vipin Classes About this video: In this video, ..."
+    },
+    {
+      "id": "u-o727TSO6Q",
+      "title": "Defer in Go Explained Simply | Golang Defer Keyword with Example | Day 10",
+      "channel": "Code with Shivam",
+      "duration": "9:18",
+      "views": "681 views",
+      "description": "Learn Defer in Go (Golang) in a simple and beginner-friendly way In Day 10 of our Golang learning series, we explain: What is ..."
+    },
+    {
+      "id": "szVkFUc_ifs",
+      "title": "Mastering the Defer Statement in Go with Code Examples",
+      "channel": "Code & Learn",
+      "duration": "5:45",
+      "views": "1,713 views",
+      "description": "Hello Everyone! Welcome to lesson 37 of our GoLang course. In this lesson, we are going to learn about the defer statement used ..."
+    },
+    {
+      "id": "tPvqsdo6918",
+      "title": "Defer in Golang | GOLANG BEGINNER COURSE",
+      "channel": "code Explainer",
+      "duration": "13:25",
+      "views": "130 views",
+      "description": "Question Link : Code linK : Golang Beginner Course Playlist ..."
+    },
+    {
+      "id": "nZCb91VTlhY",
+      "title": "The defer keyword in Go",
+      "channel": "Jantcu",
+      "duration": "15:45",
+      "views": "344 views",
+      "description": "The video explains what the \"defer\" keyword is in the Go programming language and goes through a couple quick examples of ..."
+    },
+    {
+      "id": "NLpyWlNESIM",
+      "title": "What is defer function call in go lang in Hindi | Urdu",
+      "channel": "aswani gupta",
+      "duration": "9:37",
+      "views": "303 views",
+      "description": "In this video I explained what is Defer function calll? How to declare defer function call in Go language which is developed by ..."
+    },
+    {
+      "id": "3TyOYqujg1U",
+      "title": "Using defer + recover to handle panics in Go",
+      "channel": "Ardan Labs",
+      "duration": "6:37",
+      "views": "2,500 views",
+      "description": "In traditional languages we use an 'except' or 'catch' to get an error. In Go, we are going to use 'defer' and a built-in function ..."
+    },
+    {
+      "id": "5-Mgo28xJFY",
+      "title": "Go Control Flow, Closures and defer, Properly Explained",
+      "channel": "Ghaznix",
+      "duration": "9:26",
+      "views": "49 views",
+      "description": "Control Flow and defer. Episode 3 of 28. Chapters 0:00 Cold Open 0:47 if and for 1:54 switch 2:46 Functions 3:29 Multiple Returns ..."
+    }
+  ]
+}

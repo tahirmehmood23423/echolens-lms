@@ -1,0 +1,22 @@
+{
+  "id": "5fp6e5nhJRk",
+  "url": "https://www.youtube.com/watch?v=5fp6e5nhJRk",
+  "checked_at": "2026-09-30T07:23:25.926Z",
+  "title": "RAGAS: How to Evaluate a RAG Application Like a Pro for Beginners",
+  "channel": "Mervin Praison",
+  "duration_seconds": 517,
+  "views": 65961,
+  "comments": "52 Comments",
+  "comment_samples": [
+    "Please I need to see a video with RAGAS generating questions, context, answers and ground truth",
+    "This is amazing! That's the first vídeo that i actually learned everything. Please, keep doing this series!",
+    "Great for a beginner like me! Rlly need to see a video with RAGAS generating questions, context, answers and ground truth. Can’t wait!",
+    "best explanation, it was lucid and short:eyes-pink-heart-shape:",
+    "need to know more! can't wait for the next video"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Welcome to an in-depth tutorial on RAGAS, your go-to framework for evaluating and testing retrieval-augmented generation (RAG) applications. 🌐🛠️ Today, we're diving into how RAGAS can enhance your AI's performance by precisely assessing both the retrieval and generation aspects of language models. Evaluate a RAG application. RAGAS: How to Evaluate a RAG Application Like a Pro for Beginners\n\n🔹 What is RAGAS?\nRAGAS stands for Retrieval-Augmented Generation Application System, designed to test the effectiveness of language and embedding models by simulating real-world queries and assessing the responses.\n\n🔹 Tutorial Overview:\nInstallation: Easy steps to get RAGAS up and running on your system.\nCore Components: Understanding the critical components of RAGAS, including data ingestion, chunk conversion, and response generation.\nPractical Demonstration: Walkthrough of a sample testing scenario to show how you can implement RAGAS to evaluate your AI models.\nEvaluation Metrics: Detailed explanation of key metrics like faithfulness and answer correctness, ensuring your model's outputs are accurate and reliable.\n\n🔹 Why Watch This Video?\nEnhance AI Performance: Learn to pinpoint strengths and weaknesses in your AI models.\nStreamlined Testing: Discover how to systematically test and improve the retrieval and generation capabilities of your language models.\n\n🔔 Don't forget to subscribe and hit the bell icon to stay updated on all things Artificial Intelligence. Like this video to help it reach more AI enthusiasts like you!\n\n🔗 Resources:\nSponsor a Video: https://mer.vin/contact/\nDo a Demo of Your Product: https://mer.vin/contact/\nPatreon: https://patreon.com/MervinPraison\nKo-fi: https://ko-fi.com/mervinpraison\nDiscord: https://discord.gg/nNZu5gGT59\nTwitter / X : https://twitter.com/mervinpraison\nCode: https://mer.vin/2024/05/ragas-basics-to-evaluate-rag/\n\nTimestamps:\n0:00 - Introduction to RAGAS\n0:38 - How RAGAS Works: From Data Ingestion to Response Generation\n1:40 - Starting with RAGAS: Installation Guide\n2:46 - Configuring RAGAS: Step-by-Step Code Walkthrough\n3:47 - Evaluating AI with RAGAS: Understanding Metrics\n5:30 - Practical Example: Running RAGAS in Action\n6:01 - Results Analysis: Interpreting Output Data\n7:31 - What's Next? Upcoming Detailed Tutorials on RAGAS\n\n#RAGAS #Evaluate #RAG #Application",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

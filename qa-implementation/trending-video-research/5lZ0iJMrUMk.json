@@ -1,0 +1,22 @@
+{
+  "id": "5lZ0iJMrUMk",
+  "url": "https://www.youtube.com/watch?v=5lZ0iJMrUMk",
+  "checked_at": "2026-09-30T07:23:33.688Z",
+  "title": "G-21. Topological Sort Algorithm | DFS",
+  "channel": "take U forward",
+  "duration_seconds": 809,
+  "views": 749316,
+  "comments": "389 Comments",
+  "comment_samples": [
+    "Hi, hope you are well.\n\n\nFind DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions company wise, Aptitude, SQL and many other time saving features under one affordable subscription. Have a hassle free one stop solution for up-skilling and preparing yourself.\n\n\nCheckout: https://takeuforward.org/plus?source=youtube",
+    "Many coder who know all this things but cannot explain well, but u r the different beast who can do both single handedly !!!!",
+    "Hey Striver, Thank you for the amazing content. But I request if you could add some problems on Union Find  as well. Thanks in advance!!!",
+    "Revising through this playlist before an interview is a bliss.\nINTUITION : incase you faced some trouble , taking in consideration the graph 1->2->3->4\nwe start with the dfs(1) we keep calling it for the adjacent nodes and at the very end we reach dfs(4) WHICH DOES NOT HAS ANY ADJ NODE, thus we put it in the stack stating that there is no node it needs to point after completion we push 3 in the stack stating that all the nodes pointed by 3 must already be the stack, same way we go up and at the end we push 1 in the stack stating that all the nodes pointed by 1 are already in the stack in a linear order.\nLinear order if a node v points to u then v comes first then u.",
+    "this algorithm had confused me so much but after watching this video it feels like i was confused for such a basic thing:face-blue-covering-eyes:"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Check out TUF+:https://takeuforward.org/plus?source=youtube\n\n\nFind DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions company wise, Aptitude, SQL, AI doubt support and many other features that will help you to stay focussed inside one platform under one affordable subscription. Have a hassle free one stop solution for up-skilling and preparing.\n\nCheckout the problem link 👇🏼\nTopological Sort Algorithm | DFS\nhttps://takeuforward.org/plus/dsa/problems/topological-sort-or-kahns-algorithm\n\nAlso our other social’s: https://linktr.ee/takeUforward\n\n\nCheck out takeUforward website for the sheet and other free resources: takeuforward.org\n\nJoin our Discord Channel - https://discord.gg/GgyQAGEdbG",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

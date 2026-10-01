@@ -1,0 +1,22 @@
+{
+  "id": "wgfSDrqYMJ4",
+  "url": "https://www.youtube.com/watch?v=wgfSDrqYMJ4",
+  "checked_at": "2026-09-30T07:24:11.147Z",
+  "title": "What are Word Embeddings?",
+  "channel": "IBM Technology",
+  "duration_seconds": 518,
+  "views": 286862,
+  "comments": "60 Comments",
+  "comment_samples": [
+    "The speed of innovation is honestly inspiring. It's amazing to watch this all happen in real time.",
+    "The fact that we have such a great lecturer teaching us these technologies for free is amazing. Thank you IBM and Martin!",
+    "A complete summary to understand in a fast way the embeddings, starting with how NLP helps machines understand human language and then the embeddings are useful in several NLP's tasks such as:\n- Text classification\n- NER (Named Entity Recognition Entity)\n- Words similarity\n- Q&A\nTypes of embeddings:\n- Frecuency based embeddings \n*TF-IDF (Words within a specific document, but are rare across the entire corpus)\n- Prediction based: Excel separating words with close meanings embeddings\n- Contextual: The representation of a word changes based on its surrounding model\n\nModels to generate embeddings:\n- Word2bec\n*CBOW (Continous Bag Of Words), predicts a target word based on its surrounding context words\n*Skip-Gram: Opposite of CBOW\n- GLOVE (Global Vectors for Word Representation): Co-occurrence statistics\n\nIs amazing the amount of information that we can learn in only eight minutes and of course from there we will have more of all (types of embeddings, models, so on).\n\nThank u Martin, you are a master",
+    "I recently worked on a NLP problem where I implemented word embedding, this video explains a lot of topics very clearly ❤",
+    "Here I was thinking IBM was dead. Great vid"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Want to play with the technology yourself? Explore our interactive demo → https://ibm.biz/BdKet3\nLearn more about the technology → https://ibm.biz/BdKetT\n\nWord Embeddings the means of turning natural language into numerical vectors for machine learning tasks. Martin Keen explains how this process works, the varies means of creating vectors like GLOVE, word2vec, CBOW, and the impact of new transformer models are having on completing natural language processing (NLP) tasks.\n\nAI news moves fast. Sign up for a monthly newsletter for AI updates from IBM → https://ibm.biz/BdKetQ",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

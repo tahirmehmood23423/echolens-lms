@@ -1,0 +1,134 @@
+{
+  "query": "LLM function calling tools JSON schema explained",
+  "checked_at": "2026-09-30T07:20:40.705Z",
+  "results": [
+    {
+      "id": "WkW5kvUdUa0",
+      "title": "🛠️ Give Your LLM Real Tools | Function Calling & Tool Schema in Agentic AI (Lab 3)",
+      "channel": "Super Data Science",
+      "duration": "5:46",
+      "views": "210 views",
+      "description": "Full Course HERE https://community.superdatascience.com/c/agentic-ai-1-fundamentals In this hands-on lesson, we move ..."
+    },
+    {
+      "id": "h8gMhXYAv1k",
+      "title": "What is Tool Calling? Connecting LLMs to Your Data",
+      "channel": "IBM Technology",
+      "duration": "4:57",
+      "views": "58,058 views",
+      "description": "Download the AI model guide to learn more → https://ibm.biz/BdGide Learn more about Tool Calling → https://ibm.biz/BdGidb ..."
+    },
+    {
+      "id": "kK-_gL7Vsc0",
+      "title": "What is JSON Schema",
+      "channel": "Automation Step by Step",
+      "duration": "5:49",
+      "views": "122,423 views",
+      "description": "website - https://automationstepbystep.com/ What is JSON Schema How to create JSON Schema from JSON Demo To validate ..."
+    },
+    {
+      "id": "xNankGt8dZE",
+      "title": "Ep 19 | Function Calling Explained: How LLMs Actually Use Tools",
+      "channel": "@TechLifeWithAI",
+      "duration": "7:09",
+      "views": "14 views",
+      "description": "Episode 19 of the series \"AI Engineering for Experienced Developers\". Function calling is the mechanism that turns a language ..."
+    },
+    {
+      "id": "Y8t4fYqIDgs",
+      "title": "Function Calling Explained Simply | How LLMs Use Tools | Agentic AI Series",
+      "channel": "Coding with Neeraj",
+      "duration": "9:55",
+      "views": "414 views",
+      "description": "Try sululu for free - https://sululu.fun/ Repo - https://github.com/TestZucky/agentic_ai_series Welcome to Episode 12 of the ..."
+    },
+    {
+      "id": "QiRdYCNXAxk",
+      "title": "How LLM Tool Calling Works",
+      "channel": "Tommy Eberle",
+      "duration": "16:01",
+      "views": "7,414 views",
+      "description": "In this video, I explain how tool calling works with LLMs. Tool Calling is a fundamental concept for understanding AI Agents."
+    },
+    {
+      "id": "kwvA2Cxntuw",
+      "title": "LLMs Can Use Tools, Just Like You and I - LLM Function Calling Explained",
+      "channel": "Gary Explains",
+      "duration": "7:58",
+      "views": "25,802 views",
+      "description": "Discover the power of LLM Tool Calling (also known as function calling). In this video, you'll learn how Large Language Models ..."
+    },
+    {
+      "id": "iANwo0lcO8E",
+      "title": "How AI Agents Use Tools — Function Calling Deep Dive (JSON Schemas · AI Agents E4)",
+      "channel": "MedStudyHub",
+      "duration": "11:27",
+      "views": "62 views",
+      "description": "Ask GPT-2.5 (2019) to book you a flight. It writes a lovely paragraph about how flights work. It writes zero flights. Ask Claude 5 ..."
+    },
+    {
+      "id": "K9AjaqOXg5E",
+      "title": "How does Function calling actually work in Agentic System | AI Architect Interview Guide",
+      "channel": "Ashutosh Tripathi",
+      "duration": "10:35",
+      "views": "24 views",
+      "description": "How does LLM tool calling actually work under the hood? In this Agentic AI Architect interview deep dive, we break down the ..."
+    },
+    {
+      "id": "9DThnOIue4I",
+      "title": "LLM Function Calling Explained | Tool Integration & Structured Outputs | AI/ML Class 10",
+      "channel": "Fusionpact",
+      "duration": "3:21",
+      "views": "70 views",
+      "description": "Welcome to Class 10 of FusionPact's AI/ML Daily Sessions. In this session, we focus on LLM Function Calling and Tool Integration ..."
+    },
+    {
+      "id": "Qor2VZoBib0",
+      "title": "How does OpenAI Function Calling work?",
+      "channel": "Learn Data with Mark",
+      "duration": "5:21",
+      "views": "52,571 views",
+      "description": "In this video, we're going to dig into OpenAI function calling. We'll explore what's happening under the hood before working ..."
+    },
+    {
+      "id": "4an8Ib5dF2s",
+      "title": "Tool Calling Explained: How LLMs Use Functions",
+      "channel": "Agent Engineering",
+      "duration": "11:43",
+      "views": "12 views",
+      "description": "Tool Calling Explained: How LLMs Use Functions. In this video we cover how you describe a tool to the model with a schema, ..."
+    },
+    {
+      "id": "zRdzLfoTwvQ",
+      "title": "The Power Of Function Calling Ussing OpenAI API Tutorial #2",
+      "channel": "Krish Naik",
+      "duration": "18:16",
+      "views": "25,442 views",
+      "description": "https://github.com/krishnaik06/OPENAI-API-Tutorials In an API call, you can describe functions to gpt-3.5-turbo-0613 and ..."
+    },
+    {
+      "id": "sD6czjVekxk",
+      "title": "Inside Function Calling: How LLMs Take Real-World Actions",
+      "channel": "Suyash Pawar",
+      "duration": "10:40",
+      "views": "748 views",
+      "description": "How do LLMs actually take actions in the real world? In this video, we break down the step-by-step process of Function Calling ..."
+    },
+    {
+      "id": "TKelv4nBz5U",
+      "title": "How LLMs Actually Call Tools ?",
+      "channel": "Agentic Economics",
+      "duration": "7:57",
+      "views": "420 views",
+      "description": "Tool calling is the one mechanism that transforms an LLM from a text predictor into an autonomous agent. This video goes deep ..."
+    },
+    {
+      "id": "Z-_9D9c9GLg",
+      "title": "Build AI Function Calling with Python & SQLite | LLM Tools Explained for Beginners (Part1)",
+      "channel": "Javed Wasim — AI & Tech",
+      "duration": "7:26",
+      "views": "43 views",
+      "description": "In this video, we build a simple AI function-calling tool using Python, an LLM, SQLite, and Gradio. You'll learn how an AI assistant ..."
+    }
+  ]
+}

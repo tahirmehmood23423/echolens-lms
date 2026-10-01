@@ -1,0 +1,18 @@
+{
+  "id": "EKxoCVbXZwY",
+  "url": "https://www.youtube.com/watch?v=EKxoCVbXZwY",
+  "checked_at": "2026-09-30T07:23:25.117Z",
+  "title": "LangGraph conditional edges",
+  "channel": "AI Agents by BUSINESS24 AI",
+  "duration_seconds": 580,
+  "views": 4259,
+  "comments": "2 Comments",
+  "comment_samples": [
+    "I'm lazy... any repo? I like this useful example of a conditional edge for a processing trigger for future actions... which i assume we'll see in your next video :)"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In LangGraph, we can use conditional edges in our flow engineering to control the flow based on some conditions. In this video, we use conditional edges to build a cycle and wait until a file is created in our source folder.\n\n01:03 Install LangGraph and import Graph from langgraph.graph\n01:38 Create functions representing LangGraph nodes\n02:47 Create routing_function for LangGraph conditional edges\n03:56 Create node for watch conditional route\n04:38 Create node for process conditional route\n06:41 Create a conditional edge in LangGraph graph\n08:09 Use streaming functionality of LangGraph",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

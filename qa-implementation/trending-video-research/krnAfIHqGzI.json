@@ -1,0 +1,22 @@
+{
+  "id": "krnAfIHqGzI",
+  "url": "https://www.youtube.com/watch?v=krnAfIHqGzI",
+  "checked_at": "2026-09-30T07:24:03.426Z",
+  "title": "Combine SQL Queries With UNION, INTERSECT, EXCEPT",
+  "channel": "Becoming a Data Scientist",
+  "duration_seconds": 303,
+  "views": 59109,
+  "comments": "39 Comments",
+  "comment_samples": [
+    "Finally someone who simplify an explanation. I found that most IT guys try to show their flex more than teaching others and end up losing the listener completely. Thanks for being straight to the point and not over complicate things!",
+    "Very well done! Concise, to the point and no fluff. A+ 🙂",
+    "I just found your channel now, too bad you don't upload new videos any more. You explained these queries very well. I'll definitely watch more of your videos.",
+    "this is perfect explanation im crying this is too good to be real, thank you",
+    "wayyy better than my teacher! thanks for the video4"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Step-by-step tutorial shows you how to combine your SQL queries (columns) with UNION, INTERSECT, and EXCEPT!\n\nQueries:\n1) Get the combined unique values in 2 columns: SELECT column FROM table1 UNION SELECT column FROM table 2\n2) Get the unique values that are present in 2 columns: SELECT column FROM table1 INTERSECT SELECT column FROM table 2\n3) Get the values that aren't present in 2 columns: SELECT column FROM table 1 EXCEPT SELECT column FROM table 2\n\nGet the Northwind Database: https://www.youtube.com/watch?v=nbIicI7K6Kk\n\nSupport the Channel:\n1) Subscribe: https://www.becomingads.com/o/youtube\n2) DataCamp: https://www.becomingads.com/o/datacamp\n3) Udacity: https://www.becomingads.com/o/udacity",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

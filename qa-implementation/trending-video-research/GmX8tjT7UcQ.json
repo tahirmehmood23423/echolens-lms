@@ -1,0 +1,18 @@
+{
+  "id": "GmX8tjT7UcQ",
+  "url": "https://www.youtube.com/watch?v=GmX8tjT7UcQ",
+  "checked_at": "2026-09-30T07:25:05.542Z",
+  "title": "Understanding Explain and Explain Analyze in PostgreSQL",
+  "channel": "InterviewBuddies",
+  "duration_seconds": 491,
+  "views": 3206,
+  "comments": "2 Comments",
+  "comment_samples": [
+    "Great share!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, we break down the difference between EXPLAIN and EXPLAIN ANALYZE in PostgreSQL in the simplest way possible.\n👉 EXPLAIN is like asking PostgreSQL: “How are you planning to run this query?” It shows the execution plan, the steps PostgreSQL thinks it will take, and the estimated cost at each step — but it doesn’t actually run the query.\n👉 EXPLAIN ANALYZE goes a step further: it not only shows the plan, but also executes the query and provides the real execution times, row counts, and resource usage. This lets you compare the database’s estimates with what actually happened.\n💡 Think of it this way:\nEXPLAIN = “Here’s the map I’ll follow.”\nEXPLAIN ANALYZE = “Here’s the map, and here’s how long each turn really took when I drove it.”\nThis video will help you understand why both commands are important: EXPLAIN for predicting performance, and EXPLAIN ANALYZE for validating and tuning queries in real-world conditions.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -3,10 +3,8 @@
 /**
  * EchoLens Top Trending Tech Track — Revision 3.
  *
- * The first track uses curated YouTube lectures; the remaining five tracks
- * still lack lecture URLs. These tracks therefore stay unpublished. Complete
- * the remaining `video_url: null` entries, validate the catalogue, and only
- * then change the track and catalogue entries to `published: true`.
+ * All tracks have curated YouTube lectures and remain staged for admin review.
+ * Publication is controlled separately from video readiness.
  */
 const catalogue = require('./trending-tech-catalogue.json');
 
@@ -115,6 +113,8 @@ const tracks = catalogue.map((course, courseIndex) => {
       video_runtime: lesson.target_runtime,
       video_outline: lesson.video_outline,
       video_url: lesson.video_url,
+      videos: (lesson.videos || []).map(video => ({ ...video })),
+      video_review: lesson.video_review || null,
       analogy: lesson.analogy,
       covered: lesson.covered,
       topic: `Analogy: ${lesson.analogy}\n\nCovered: ${lesson.covered}`,

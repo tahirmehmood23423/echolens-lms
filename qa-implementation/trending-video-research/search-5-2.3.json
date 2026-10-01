@@ -1,0 +1,134 @@
+{
+  "query": "Golang mutex context cancellation tutorial",
+  "checked_at": "2026-09-30T07:21:58.008Z",
+  "results": [
+    {
+      "id": "v7DKtAluvYA",
+      "title": "Mutex in golang",
+      "channel": "Hitesh Choudhary",
+      "duration": "5:41",
+      "views": "39,508 views",
+      "description": "Welcome to a youtube channel dedicated to programming and coding related tutorials. We talk about tech, write code, discuss ..."
+    },
+    {
+      "id": "egIDsv1RO88",
+      "title": "How You Should Use Mutexes And Atomic Values In Golang?!",
+      "channel": "Anthony GG",
+      "duration": "15:50",
+      "views": "19,714 views",
+      "description": "Join my Discord community for free education https://discord.com/invite/bDy8t4b3Rz ▻ Become a Patreon for more exclusive ..."
+    },
+    {
+      "id": "I4gk1yjqSvk",
+      "title": "Golang Tutorial - Mutex - 27",
+      "channel": "Coder's Gyan",
+      "duration": "14:07",
+      "views": "6,290 views",
+      "description": "👉 Step into the world of full-stack development with our detailed MERN Stack With Microservices course! Transform your ideas ..."
+    },
+    {
+      "id": "QiHGaktioVE",
+      "title": "Go Live: Mastering Mutexes Like a Pro!",
+      "channel": "The Coding Gopher",
+      "duration": "4:20",
+      "views": "3,155 views",
+      "description": "Join for perks like gopher emojis and video requests: https://www.youtube.com/channel/UC-mTIBh__DzAqW495JHXy5A/join ..."
+    },
+    {
+      "id": "jfAidm_wER4",
+      "title": "02 golang mutex tutorial",
+      "channel": "golang-tutorials",
+      "duration": "2:42",
+      "views": "181 views",
+      "description": "... contains golang mutex tutorial. code available at : https://github.com/svrajput/golang-basic/tree/main/19-sync-package-mutex."
+    },
+    {
+      "id": "sML5mXkW3G0",
+      "title": "Golang Mutex vs Channels: Concurrency Interview Tips",
+      "channel": "programmerCave",
+      "duration": "7:22",
+      "views": "721 views",
+      "description": "Master Golang concurrency by understanding when to use mutexes versus channels in this essential tutorial for beginners and ..."
+    },
+    {
+      "id": "KkOWm9khbkE",
+      "title": "Mutex in Golang: Synchronization Made Easy",
+      "channel": "Go Guru",
+      "duration": "8:11",
+      "views": "1,380 views",
+      "description": "In concurrent programming, synchronization is crucial to prevent race conditions and ensure data consistency. One of the most ..."
+    },
+    {
+      "id": "JlmYLPxwVzQ",
+      "title": "Go (Golang) sync.Mutex Tutorial",
+      "channel": "Golang Cafe",
+      "duration": "14:37",
+      "views": "6,018 views",
+      "description": "Go (Golang) sync.Mutex Tutorial In this episode we are going to see how easy is to use a sync.Mutex when working with shared ..."
+    },
+    {
+      "id": "pT-RE4aoSKM",
+      "title": "Go Mutexes in 5 Minutes",
+      "channel": "The Coding Gopher",
+      "duration": "4:25",
+      "views": "438 views",
+      "description": "In this video, we dive into how to use mutexes in Go for synchronizing goroutines and preventing race conditions in concurrent ..."
+    },
+    {
+      "id": "cLznDBdNwSQ",
+      "title": "Race Condition in Golang: Synchronization using Mutex",
+      "channel": "Freecoder - Learn Coding as an Expert",
+      "duration": "3:02",
+      "views": "346 views",
+      "description": "What's up freecoders, In this lecture, we will show you how to fix the race condition, you need to ensure that access to the shared ..."
+    },
+    {
+      "id": "o6cRuIFlgjs",
+      "title": "Mutex in Golang | Go Mutex | Golang Tutorial Beginners",
+      "channel": "Rohit Menon",
+      "duration": "4:14",
+      "views": "1,459 views",
+      "description": "Simple Example of using Mutex in Go Program. A Mutex, or a mutual exclusion is a mechanism that allows us to prevent ..."
+    },
+    {
+      "id": "LqxbtX5TGOs",
+      "title": "#32 Golang Mutex Lock: Safeguarding Your Shared Resources #golang",
+      "channel": "Code Sprint",
+      "duration": "3:41",
+      "views": "321 views",
+      "description": "golang #golangtutorial #golanguage A mutex, short for \"mutual exclusion,\" is a synchronization primitive in Golang that is used to ..."
+    },
+    {
+      "id": "lANVMuKjJVc",
+      "title": "Golang Tutorials -49- Golang Concurrency Synchronization using Mutex | Golang Sync Mutex",
+      "channel": "Dr Vipin Classes",
+      "duration": "10:08",
+      "views": "469 views",
+      "description": "Concurrency Synchronizationin in Golang using Mutex | Golang Sync Mutex | Dr Vipin Classes About this video: In this video, ..."
+    },
+    {
+      "id": "BZr9Q2eaBZY",
+      "title": "01 golang mutex concept",
+      "channel": "golang-tutorials",
+      "duration": "4:26",
+      "views": "1,180 views",
+      "description": "This video explains golang mutex concept."
+    },
+    {
+      "id": "l-k6UUyvsVU",
+      "title": "Golang Mutex Example",
+      "channel": "Satyajit Das",
+      "duration": "5:50",
+      "views": "304 views",
+      "description": "In this video I give an example of mutex implementation. Mutex are useful to avoid race conditions in your program."
+    },
+    {
+      "id": "cjMdUmfzQWs",
+      "title": "Go Mutex Tutorial",
+      "channel": "TutorialEdge",
+      "duration": "8:58",
+      "views": "22,677 views",
+      "description": "For the price of a ☕ every month, sign up and gain access to a growing list of premium courses on my site ..."
+    }
+  ]
+}

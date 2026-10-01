@@ -1,0 +1,19 @@
+{
+  "id": "7XfBLutnxC8",
+  "url": "https://www.youtube.com/watch?v=7XfBLutnxC8",
+  "checked_at": "2026-09-30T07:23:26.108Z",
+  "title": "Guardrails AI Explained: Make Your LLM Outputs 100% RELIABLE and SAFE",
+  "channel": "STARP AI",
+  "duration_seconds": 352,
+  "views": 6909,
+  "comments": "3 Comments",
+  "comment_samples": [
+    "Hey, \nI had an interview, I needed to do a quick study on things I hadn't used and this quick video on guardrails helped me do it in a better way. Appreciation for the video, you deserve a ton amount of subscribers.",
+    "watching this AI made video about the unpredectability of AI is nuts"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "What is Guardrails AI? We explain Guardrails - the framework for validating and correcting AI outputs automatically.\nLLMs are powerful but unpredictable. Guardrails provides the quality assurance layer making your AI production-ready by ensuring outputs are safe, structured, and compliant every time. Learn how this framework uses validators and automatic retry logic to enforce rules like factual grounding and toxicity screening.\nWhat You'll Learn:\n• Validating LLM outputs programmatically\n• Ensuring AI safety and compliance\n• Production AI quality control",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

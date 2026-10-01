@@ -1,0 +1,22 @@
+{
+  "id": "BkzgYfygDy8",
+  "url": "https://www.youtube.com/watch?v=BkzgYfygDy8",
+  "checked_at": "2026-09-30T07:25:52.125Z",
+  "title": "Golang Context Package: It's More Than You Think!",
+  "channel": "Alex Mux",
+  "duration_seconds": 506,
+  "views": 38274,
+  "comments": "35 Comments",
+  "comment_samples": [
+    "Alex, you need to make a comeback. Your videos are so simple to understand and to the point.",
+    "I'm so glad when channels like this one randomly show up on my recommended. Instant sub from me. Fantastic explanation!",
+    "So simple, thanks so much!",
+    "Excellent explanation",
+    "Amazing video! Made so easy to understand"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "We tackle the Go context package. We  cover timeouts with goroutines, how to use contexts in your own code, how to use contexts with common packages and how you can use contexts as a way to pass around data and avoid expensive network calls.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

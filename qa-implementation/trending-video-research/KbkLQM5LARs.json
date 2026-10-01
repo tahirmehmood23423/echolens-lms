@@ -1,0 +1,19 @@
+{
+  "id": "KbkLQM5LARs",
+  "url": "https://www.youtube.com/watch?v=KbkLQM5LARs",
+  "checked_at": "2026-10-01T05:21:17.426Z",
+  "title": "Transaction Isolation Levels and Anomalies in PostgreSQL",
+  "channel": "JaneExplainsIT",
+  "duration_seconds": 576,
+  "views": 1388,
+  "comments": "3 Comments",
+  "comment_samples": [
+    "thanks",
+    "thank you"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Transaction isolation levels are one of those topics that many developers use every day — but don’t really understand.\nIn this video, I break them down using transaction anomalies:\nwhat they mean, what’s strange about them, and how they define each isolation level.\nBy the end, you’ll understand how anomalies and isolation levels are connected,\nand why databases behave the way they do under concurrent transactions.\n\nTimestamps\n0:00 Intro & Definition\n1:44 Anomalies\n5:10 Isolation levels",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

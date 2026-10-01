@@ -1,0 +1,142 @@
+{
+  "query": "Golang error handling wrapping defer",
+  "checked_at": "2026-09-30T07:21:56.764Z",
+  "results": [
+    {
+      "id": "5_VzbaAe1Nw",
+      "title": "Golang Error Handling Example: defer panic recover",
+      "channel": "Satyajit Das",
+      "duration": "4:44",
+      "views": "281 views",
+      "description": "This video shows a quick overview of error handling in Go specifically regarding defer, panic and recover. If you want in-depth ..."
+    },
+    {
+      "id": "qQit545z3_8",
+      "title": "Go Defer, Panic & Recover: Error Handling Tutorial",
+      "channel": "programmerCave",
+      "duration": "6:02",
+      "views": "158 views",
+      "description": "Unlock the secrets of error handling in Golang with this in-depth tutorial on defer, panic, and recover—essential for beginners and ..."
+    },
+    {
+      "id": "MRbhtMptago",
+      "title": "What's the proper way to wrap errors in Go?",
+      "channel": "Boldly Go",
+      "duration": "11:16",
+      "views": "7,545 views",
+      "description": "errors.New()? fmt.Errorf()? errors.Errorf()? errors.Wrapf()? Which should you use? In this video, I dive into the history of the various ..."
+    },
+    {
+      "id": "t9HEhZ8YdsA",
+      "title": "Wrapping and Unwrapping Errors in GoLang: A Comprehensive Guide",
+      "channel": "Go Guru",
+      "duration": "10:54",
+      "views": "208 views",
+      "description": "In this video, we dive into the world of error handling in GoLang and explore the concepts of wrapping and unwrapping errors ..."
+    },
+    {
+      "id": "37rQlN4_xds",
+      "title": "Sentinel Errors and Error Wrapping/Unwrapping in Go with Code Examples",
+      "channel": "Code & Learn",
+      "duration": "9:56",
+      "views": "3,646 views",
+      "description": "Video Overview: Hello Everyone! In this tutorial, we are going to look at Sentinel errors in Go along with wrapping and unwrapping ..."
+    },
+    {
+      "id": "cP2qjO2CkGM",
+      "title": "Defer, Panic & Recover - Error Handling Patterns - Go Tutorial #20:",
+      "channel": "Codegiz — Built by Claude AI",
+      "duration": "10:37",
+      "views": "10 views",
+      "description": "Learn Go's defer, panic, and recover mechanisms for cleanup and error handling. In this lesson you'll learn: Using defer for ..."
+    },
+    {
+      "id": "vIt-gutcWjo",
+      "title": "errors.AsType in Go 1.26 makes Error Handling better!",
+      "channel": "Flo Woelki",
+      "duration": "10:28",
+      "views": "10,238 views",
+      "description": "In this video, we will look at how Go 1.26 silently improved the error inspection with the new errors.AsType function. If you're ..."
+    },
+    {
+      "id": "yEWRfjD8jX4",
+      "title": "From Panic to Recovery: Understanding Defer in Golang",
+      "channel": "Go Guru",
+      "duration": "6:39",
+      "views": "1,635 views",
+      "description": "In this video, we will explore how to use defer statements in Golang to gracefully handle panics and recover from errors ..."
+    },
+    {
+      "id": "Uju5EAdqcSc",
+      "title": "Error Handling: errors.New, Wrapping & Custom Types | Go Tutorial #19",
+      "channel": "Codegiz — Built by Claude AI",
+      "duration": "13:29",
+      "views": "29 views",
+      "description": "Learn error handling in Go! This lesson covers everything from basic error creation to custom error types. What you'll learn: ..."
+    },
+    {
+      "id": "d2DySHJ7oVk",
+      "title": "The secret to making Golang error handling a breeze",
+      "channel": "Earthly",
+      "duration": "13:46",
+      "views": "24,085 views",
+      "description": "Earthly ➤ https://earthly.dev In this video, we delve into Golang's unique approach to error handling. We highlight how Go's error ..."
+    },
+    {
+      "id": "YgMtY0IJoAc",
+      "title": "Golang Course | Lesson 8 | Errors Recover, Defer, Panic",
+      "channel": "FreelancersGate",
+      "duration": "18:12",
+      "views": "22,783 views",
+      "description": "Today we will learn more about Errors Defer, Recover, Panic If you like the content, Please Become a Patreon to support us: ..."
+    },
+    {
+      "id": "hxTHMcqrtFQ",
+      "title": "Go lang tutorial - 18 - Errors and Error handling, panic, defer and recover in Go",
+      "channel": "Braintemple Tutorial TV",
+      "duration": "14:43",
+      "views": "153 views",
+      "description": "Go lang tutorial - 18 - Errors and Error handling, panic, recover in Go."
+    },
+    {
+      "id": "5DUuyWxXnC0",
+      "title": "All about the Go errors package",
+      "channel": "Boldly Go",
+      "duration": "16:14",
+      "views": "3,173 views",
+      "description": "Confused by As vs Is? Why would you want to Unwrap an error? And where's the related Wrap function? I answer these, and other ..."
+    },
+    {
+      "id": "JuN4aK_fjaE",
+      "title": "[Golang] panic, defer and recover",
+      "channel": "Panpito",
+      "duration": "3:45",
+      "views": "2,190 views",
+      "description": "Overview of these keywords Happy coding! Twitter: https://twitter.com/Panpit0 ..."
+    },
+    {
+      "id": "gZmeeHM_1Uc",
+      "title": "Error Handling in Go: Best Practices and Strategies",
+      "channel": "Go Guru",
+      "duration": "17:03",
+      "views": "1,279 views",
+      "description": "In this comprehensive tutorial, we delve deep into the world of error handling in Go (Golang) and equip you with the knowledge ..."
+    },
+    {
+      "id": "3I-TdWWvMx8",
+      "title": "Go Programming (golang) - 14: Defer and Panic",
+      "channel": "digerati",
+      "duration": "7:42",
+      "views": "2,958 views",
+      "description": "Learn Go programming, from beginner to pro! We learn why and when to use the defer keyword in Go, and take a brief look at the ..."
+    },
+    {
+      "id": "YVkfdtV0fq8",
+      "title": "#27 Golang - Error Handling - Understanding Panic and Recover",
+      "channel": "codeHeim",
+      "duration": "6:46",
+      "views": "6,540 views",
+      "description": "Welcome to our comprehensive tutorial on error handling in Go, focusing on the pivotal concepts of panic and recover."
+    }
+  ]
+}

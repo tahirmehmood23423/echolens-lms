@@ -1,0 +1,22 @@
+{
+  "id": "3QESpVGiiB8",
+  "url": "https://www.youtube.com/watch?v=3QESpVGiiB8",
+  "checked_at": "2026-09-30T07:23:54.401Z",
+  "title": "Advanced Golang: Goroutines & Channels",
+  "channel": "Tiago",
+  "duration_seconds": 1051,
+  "views": 35057,
+  "comments": "25 Comments",
+  "comment_samples": [
+    "Thank you so much for showing the errors and ways things can go wrong! Very insightful! :]",
+    "Thanks for the indepth explanation of the concept",
+    "Thanks for sharing Bud.",
+    "Ótimo vídeo! Mais um inscrito.",
+    "Great video! Thanks"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "https://www.selfmadeengineer.com/\n\nIn this video I explain how Goroutines, Channels and Wait Groups work in Golang by going through a real world example.\n\n🌱 Check the \"Golang Essentials\" Playlist here: https://www.youtube.com/playlist?list=PLYEESps429vo2vvoUuAA6-fEDVgeqx3HW\n\n👉 Support me on PATREON for more content like thishttps://www.patreon.com/TiagoTaquelim\n\n📢 We're building a Discord community, come and join\nhttps://discord.com/invite/3JhkwjQHjc\n\n📚 Resources\nArticle: https://dave.cheney.net/2016/12/22/never-start-a-goroutine-without-knowing-how-it-will-stop\nGo Book: https://www.gopl.io/\nTour of Go: https://go.dev/tour/concurrency/1\n\n#golang \n\nVideo titles ideas (for the algo):\nGo Concurrency: Go Routines & Channels\nGoroutines in Golang\nChannels and Goroutines\nHow Goroutines work in golang",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "Rp3EcF9nx6U",
+  "url": "https://www.youtube.com/watch?v=Rp3EcF9nx6U",
+  "checked_at": "2026-09-30T07:24:05.244Z",
+  "title": "Recursive CTE | Recursive SQL Queries | SQL Tutorial in Hindi 17",
+  "channel": "Rishabh Mishra",
+  "duration_seconds": 989,
+  "views": 126987,
+  "comments": "177 Comments",
+  "comment_samples": [
+    "Informative & helpful for all sql learner's👌💯",
+    "Thanks. Good explanation.",
+    "bhaiya hands of to you is time me aap jese teacher, tutor, mentor milna mushkil he aap free me shikha rhe he and notes bhi de rhe he... aage bhi aise hi shikhate rheye ga and aap plz jaldi se germany regarding video banao kese ja shkte he aapne kese job crack ki etc",
+    "Power bi videos please...",
+    "Basically its like for loop"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "SQL Full Course Playlist 👇\nhttps://www.youtube.com/playlist?list=PLdOKnrf8EcP17p05q13WXbHO5Z_JfXNpw\n\nLike, Share & Subscribe :)\n⭐ Subscribe for more data science related tutorials: https://bit.ly/3Fc7Gc6\n\n⭐ Download PDF: https://rb.gy/k3htx \n\nQuery to create Employee table:\n\nCREATE TABLE employees (\nemp_id serial PRIMARY KEY,\nemp_name VARCHAR NOT NULL,\nmanager_id INT )\n\nINSERT INTO employees (\nemp_id, emp_name, manager_id)\nVALUES\n(1, 'Madhav', NULL),\n(2, 'Sam', 1),\n(3, 'Tom', 2),\n(4, 'Arjun', 6),\n(5, 'Shiva', 4),\n(6, 'Keshav', 1),\n(7, 'Damodar', 5);\n\n📢 GitHub link (all files): https://bit.ly/3Y7SRPr 📢\n\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n\n⭐CHAPTERS⭐\n\n00:00  Intro\n00:16  What is Recursive CTE\n01:21  Recursive CTE Syntax\n02:36  Example 1\n08:35  Example 2\n\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n👉Also Watch\n\n👉Introduction to SQL - What Is SQL + Database | SQL Tutorial In Hindi 1\nhttps://www.youtube.com/watch?v=yH1zCq-iaeU\n\n👉SQL CTE (Common Table Expression) | SQL Tutorial In Hindi 16\nhttps://youtu.be/WHBH0yz35_8\n\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n\n📣Want to connect with me? Check out these links:📣\n\n👉Instagram: https://www.instagram.com/rishabhnmishra/\n👉LinkedIn: https://www.linkedin.com/in/rishabhnmishra/\n👉Twitter: https://twitter.com/rishabhnmishra  \n\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n\n⭐Related video:\n🔖 Data Analyst Roadmap 2023: https://www.youtube.com/watch?v=p9vjhj7_A4o\n\n🔖 Most Asked SQL Questions for Job interview: https://www.youtube.com/watch?v=AZzTHWF7tEc \n\n🔖 What Does a Data Analyst Actually Do?: https://www.youtube.com/watch?v=ZFZc8-PugcA \n\n🔖 5 Minimum Skills to Get a Data Analyst Job: https://www.youtube.com/watch?v=JJdD_oM1CmQ\n\n🔖 Business Analyst Vs Data Analyst: https://www.youtube.com/watch?v=9XmD2o5Slb8 \n\n🔖 How I Learned Data Science Skills & Switched Career : https://www.youtube.com/watch?v=qvKspeuyBfQ \n\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n\nHope you liked this video and learned something new :)\nSee you in next video, until then Bye-Bye!\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nRelated keywords:\n\nrecursive sql queries, recursive CTE , sql recursion, recursive sql, how does a recursive CTE work, how recursion works, sql, server, interview questions, answers, freshers, experienced, SQL, sql tutorial, recursive sql queries, sql recursion, recursive sql, Learn to write SQL Queries, rishabh mishra sql, sql query writing, recursive cte, practice sql queries, practice complex sql queries, complex sql queries, learn sql, recursive sql queries, recursive CTE , sql recursion, recursive sql, common table expression, recursive sql query in Oracle, recursive sql query in MySQL, sql by rishabh mishra,recursive sql query in Microsoft SQL Server, recursive sql query in PostgreSQL, recursive cte, sql server tutorial, cte reference itself, recursive cte ordering hierarchical result, recursive cte with level",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

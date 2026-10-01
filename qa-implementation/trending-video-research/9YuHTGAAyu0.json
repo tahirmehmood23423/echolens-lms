@@ -1,0 +1,22 @@
+{
+  "id": "9YuHTGAAyu0",
+  "url": "https://www.youtube.com/watch?v=9YuHTGAAyu0",
+  "checked_at": "2026-10-01T05:20:52.130Z",
+  "title": "Server Components in Client Components?? (React / Next.js)",
+  "channel": "ByteGrad",
+  "duration_seconds": 409,
+  "views": 30988,
+  "comments": "79 Comments",
+  "comment_samples": [
+    "👉 NEW React & Next.js Course: https://bytegrad.com/courses/professional-react-nextjs",
+    "Very nicely explained. Thanks for this video!",
+    "This is something every Next developer should know because you’re bound to run into implementing dark mode or using React Query. If you’re running into hydration errors, I’d just add to return {children} inside a fragment until the client component is mounted.",
+    "this is absolutely beautiful!",
+    "One thing to note, it doesn't necessarily need to be passed through the children, but to be more exact, the server component must be passed through the client component props. (that includes the children component as well)"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "👉 NEW React & Next.js Course: https://bytegrad.com/courses/professional-react-nextjs\nHi, I'm Wesley. I'm a brand ambassador for Kinde (paid sponsorship).\n👉 Add authentication to your app FAST: https://bit.ly/3QOe1Bh\n\n👉 NEW React & Next.js Course: https://bytegrad.com/courses/professional-react-nextjs\n👉 Professional JavaScript Course: https://bytegrad.com/courses/professional-javascript\n👉 Professional CSS Course: https://bytegrad.com/courses/professional-css\n\n👉 Discord: all my courses have a private Discord where I actively participate\n🔔 Email newsletter (BIG update soon): https://email.bytegrad.com\n\n⏱️ Timestamps:\n0:00 Intro\n0:47 Client C. in Server C.\n1:52 Server C. in Client C.\n4:29 Context Provider Example\n\n#webdevelopment #programming #coding .\n.\nTOP resource to LEARN AI for Developers - https://datacamp.pxf.io/RGyxrR (paid sponsorship & ByteGrad Sp. z o.o. gets commission)",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

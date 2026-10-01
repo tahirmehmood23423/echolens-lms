@@ -1,0 +1,19 @@
+{
+  "id": "FA5XuXx0PC8",
+  "url": "https://www.youtube.com/watch?v=FA5XuXx0PC8",
+  "checked_at": "2026-09-30T07:24:12.911Z",
+  "title": "Postgres Concurrency Control: SELECT FOR UPDATE",
+  "channel": "Attila Toth",
+  "duration_seconds": 533,
+  "views": 899,
+  "comments": "2 Comments",
+  "comment_samples": [
+    "Thanks Attila! Great breakdown of a concept.",
+    "good video"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "How SELECT FOR UPDATE works, how to use it, and when you should not.\n\n\n---\n#PostgreSQL #SQL #databasetips #LearnSQL",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

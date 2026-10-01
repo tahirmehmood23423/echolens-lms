@@ -1,0 +1,22 @@
+{
+  "id": "y9bV8ypChms",
+  "url": "https://www.youtube.com/watch?v=y9bV8ypChms",
+  "checked_at": "2026-10-01T05:20:52.102Z",
+  "title": "Loading UI, Suspense, and Streaming in NextJs 13",
+  "channel": "Hamed Bahram",
+  "duration_seconds": 1182,
+  "views": 33629,
+  "comments": "110 Comments",
+  "comment_samples": [
+    "Great video! I've been diving into Next.js recently, and this tutorial on Loading UI, Suspense, and Streaming is incredibly helpful. The way you explain and demonstrate these concepts makes it easy to understand and implement them in my own projects. The use of suspense for lazy loading and code splitting is a game-changer for optimizing performance. I also appreciate the insights on streaming data and how it can enhance the user experience. Your explanations are clear and concise, making it easy to follow along. Thank you for sharing this valuable content! Looking forward to more Next.js tutorials from you. Keep up the fantastic work!",
+    "Thank you Hamed! Thanks to your videos, I understood a lot about nextjs and how it works",
+    "your Next 13 video is really amazing I was watching last 2 months I gonna love it.",
+    "Hamed thank you so much im new to nextJs and you are literally the best , your channel is a treasure for anyone that wants to learn nextJs .",
+    "Thanks a lot, man! Needed this so much!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, we'll look at adding a loading UI to our routes using the `loading.js` file. We'll also use the new Suspense component from React to add a custom loading UI to any component. We'll also talk about the support for streaming in NextJs 13 App router.\n\n👉🏼 The Ultimate NextJs Course\n🔗 https://www.hamedbahram.io/courses/nextjs\n\nChapters\n0:00 Intro\n1:00 Loading UI\n6:25 Suspense\n11:20 Loading UI in route groups\n15:08 Streaming\n19:30 Outro",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

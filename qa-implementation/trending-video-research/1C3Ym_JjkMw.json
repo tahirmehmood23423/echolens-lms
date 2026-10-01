@@ -1,0 +1,22 @@
+{
+  "id": "1C3Ym_JjkMw",
+  "url": "https://www.youtube.com/watch?v=1C3Ym_JjkMw",
+  "checked_at": "2026-09-30T07:24:13.320Z",
+  "title": "Beginner's Guide to Redis with Go!",
+  "channel": "TutorialEdge",
+  "duration_seconds": 687,
+  "views": 18067,
+  "comments": "16 Comments",
+  "comment_samples": [
+    "Hey Eliot, thanks for another clear, practical, and no-nonsense Go guide! I've always found your videos and courses extremely helpful, going beyond the typical beginner/hello world stuff. This is invaluable for real-world work scenarios, and today's is no exception.",
+    "nice tutorial Elliot, short and simple",
+    "Short and Simple , Thanks",
+    "Good explanation, thank you",
+    "nice. i like that things look so simple in golang"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Welcome Gophers! In this video, we'll be looking at how you can connect into a Redis instance in Go and do some fun stuff like getting and setting values!\n\n👨‍💻 Sign up and gain access to a growing list of premium courses on my site - https://tutorialedge.net/pricing/ \n\n✅ Subscribe and hit that 🔔 to get notified for all the latest tutorials!\n\nThe text version of this tutorial can be found here - https://tutorialedge.net/golang/go-redis-tutorial/\n\n🤓 https://twitter.com/Elliot_f\n‎💻 https://tutorialedge.net\n\n🎥 Recording Setup\n\nMicrophone - https://amzn.to/3hvASys\nMic Boom - https://amzn.to/3o0cW8Q\nMouse - https://amzn.to/2WZMoZs\n\nMonitor 1 - https://amzn.to/38IUlYy\nMonitor 2 - https://amzn.to/3rBTZf7\nMount - https://amzn.to/3o3185V\nUSB-C Hub - https://amzn.to/3o2xRbw",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

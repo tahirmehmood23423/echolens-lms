@@ -1,0 +1,118 @@
+{
+  "query": "Prometheus alerting rules PromLabs",
+  "checked_at": "2026-09-30T07:24:04.968Z",
+  "results": [
+    {
+      "id": "NEMsO1qeI1s",
+      "title": "Don't Make These 6 Prometheus Monitoring Mistakes | Prometheus Best Practices & Pitfalls",
+      "channel": "Prometheus Monitoring with Julius | PromLabs",
+      "duration": "10:43",
+      "views": "27,043 views",
+      "description": "In this video, I go through some of the biggest pitfalls you can run into when you're new to Prometheus, and I also explain how to ..."
+    },
+    {
+      "id": "mXvuKAb6ZwY",
+      "title": "Relabeling in Prometheus | Relabeling Architecture and Flow, Configuration, Examples, Debugging",
+      "channel": "Prometheus Monitoring with Julius | PromLabs",
+      "duration": "10:52",
+      "views": "13,287 views",
+      "description": "In this video, I explain the concept of relabeling in Prometheus, a powerful tool for filtering and transforming your flows of labeled ..."
+    },
+    {
+      "id": "EbQvjyLHw0g",
+      "title": "Prometheus Alerting Rules",
+      "channel": "SBCODE",
+      "duration": "7:54",
+      "views": "7,096 views",
+      "description": "Prometheus Course : https://sbcode.net/prometheus/ Course Coupons : https://sbcode.net/coupons ..."
+    },
+    {
+      "id": "uzQPkrgKOqI",
+      "title": "Route Prometheus Alert Manager to  Slack",
+      "channel": "Low Orbit Flux",
+      "duration": "12:53",
+      "views": "124 views",
+      "description": "Full Prometheus + Grafana Monitoring Stack Tutorial: https://www.youtube.com/watch?v=_e3RxscTbcs Become a member of my ..."
+    },
+    {
+      "id": "HtWyQZyj20o",
+      "title": "Install Prometheus Alertmanager",
+      "channel": "SBCODE",
+      "duration": "7:04",
+      "views": "1,010 views",
+      "description": "Prometheus Course : https://sbcode.net/prometheus/ Course Coupons : https://sbcode.net/coupons ..."
+    },
+    {
+      "id": "9joXN3ipABg",
+      "title": "Alerting Rules in Prometheus | Prometheus Tutorial for Beginners | Prometheus Alertmanager Tutorial",
+      "channel": "DevOps Hint",
+      "duration": "13:26",
+      "views": "5,547 views",
+      "description": "In this Video we are going to cover Alerting Rules in Prometheus | Prometheus Tutorial for Beginners | Prometheus Alertmanager ..."
+    },
+    {
+      "id": "h78tYrW8IJU",
+      "title": "Prometheus Alertmanager",
+      "channel": "Pavan Elthepu",
+      "duration": "13:55",
+      "views": "19,647 views",
+      "description": "Get Notified When Something Goes Wrong with Prometheus Alertmanager! #Prometheus #alerting #Monitoring #DevOps ..."
+    },
+    {
+      "id": "dGMhynriydE",
+      "title": "Exposing Custom Host Metrics Using the Prometheus Node Exporter | \"textfile\" Collector Module",
+      "channel": "Prometheus Monitoring with Julius | PromLabs",
+      "duration": "4:12",
+      "views": "17,535 views",
+      "description": "In this video, I explain how to use the Node Exporter's \"textfile\" collector module to expose custom host metrics. The textfile ..."
+    },
+    {
+      "id": "0qCqXxf97Gk",
+      "title": "Master Prometheus Alerts: Quick Guide to Email Notifications & Alert Manager Setup!",
+      "channel": "Vikas Jha",
+      "duration": "11:02",
+      "views": "24,567 views",
+      "description": "Courses https://techbloomeracademy.com/store/ . connect on Fiverr for job support: https://www.fiverr.com/automateanythin ."
+    },
+    {
+      "id": "2E6GH9rAUwU",
+      "title": "How to trigger Alerts from Alert Manager (Prometheus) to Slack Channel #prometheus #sre #devops",
+      "channel": "Avinashkumar - The Learning Destination",
+      "duration": "12:24",
+      "views": "5,622 views",
+      "description": "This tutorial help you to setup incoming webhook between Alert Manager & Slack so you can trigger the Alert notification to Slack ..."
+    },
+    {
+      "id": "2fDFLc7Yovc",
+      "title": "Ep4 Prometheus Alerts to Slack | Real-Time Alertmanager Integration Monitoring & Alerting",
+      "channel": "LearnwithDevOpsEngineer",
+      "duration": "16:29",
+      "views": "725 views",
+      "description": "What You'll Learn: What are Prometheus alerts and how they work Writing alert rules in alert_rules.yml Setting up Alertmanager ..."
+    },
+    {
+      "id": "kY6tXBFdf9c",
+      "title": "Master Prometheus Monitoring: How to Fix Server Down Alerts & Set Up Alert Manager!",
+      "channel": "Vikas Jha",
+      "duration": "9:15",
+      "views": "19,647 views",
+      "description": "Courses https://techbloomeracademy.com/store/ . connect on Fiverr for job support: https://www.fiverr.com/automateanythin . ... we are going to use this expression in our alerting rules now if you want to follow alerting rules prometheus documentation then ..."
+    },
+    {
+      "id": "7uy_yovtyqw",
+      "title": "Understanding Counter Rates and Increases in PromQL | Reset Handling, Extrapolation, Edge Cases",
+      "channel": "Prometheus Monitoring with Julius | PromLabs",
+      "duration": "10:53",
+      "views": "35,692 views",
+      "description": "In this video, I explain the exact value calculation behaviors of the rate(), irate(), and increase() functions in PromQL for computing ..."
+    },
+    {
+      "id": "IoCz7NJ-LT0",
+      "title": "Prometheus Alertmanager | Hands on Demo Grouping, Inhibition, and Silences on Alertmanager",
+      "channel": "Tech with Lian",
+      "duration": "11:56",
+      "views": "2,473 views",
+      "description": "To Exercise Files, scan down below for the link to the GitHub repo. MD file: ..."
+    }
+  ]
+}

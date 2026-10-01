@@ -999,10 +999,11 @@ async function renderAdminOpenCourses() {
   const d = await api('/api/public/catalogue');
   const tracks = (d.catalogue || []).filter((c) => c.price_pkr === 0 && c.available && c.track_key)
     .map((c) => ({ key: c.track_key, title: c.title, course_code: c.code }));
-  if (!tracks.length) { el.innerHTML = '<div class="empty">No free courses are open for enrolment right now.</div>'; return; }
+  const videoReview = '<div class="card" style="margin-bottom:14px"><div class="card-body"><a class="btn btn-primary" href="/admin/course-videos">Review upcoming course videos</a><p class="hint">Open every lecture video, compare runtimes and engagement, and preview upcoming lessons.</p></div></div>';
+  if (!tracks.length) { el.innerHTML = videoReview + '<div class="empty">No free courses are open for enrolment right now.</div>'; return; }
   if (!OPEN_COURSE_ADMIN_KEY || !tracks.some((t) => t.key === OPEN_COURSE_ADMIN_KEY)) OPEN_COURSE_ADMIN_KEY = tracks[0].key;
   const analytics = `<div class="card" style="margin-bottom:14px"><div class="card-head"><h3>Free-course progress report</h3><span class="s" style="color:var(--muted)">${report.totals.enrolled} enrollments · ${report.totals.certificates} certificates</span></div><div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl"><tr><th>Course</th><th>Enrolled</th><th>Lectures covered</th><th>Completed</th><th>Completion</th><th>Certificates</th></tr>${report.courses.map((c) => `<tr><td><strong>${esc(c.code || '')}</strong> ${esc(c.title)}</td><td>${c.enrolled}</td><td>${c.lectures_covered}${c.lectures_total ? ' / ' + c.lectures_total : ''}</td><td>${c.completed}</td><td>${c.completion_rate}%</td><td>${c.certificates}</td></tr>`).join('')}</table></div></div>`;
-  el.innerHTML = analytics + `
+  el.innerHTML = videoReview + analytics + `
     <div class="card" style="margin-bottom:14px"><div class="card-body" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
       <label class="field" style="flex:1;min-width:240px;margin:0"><span>Free course</span>
         <select id="ocSelect">${tracks.map((t) => `<option value="${esc(t.key)}"${t.key === OPEN_COURSE_ADMIN_KEY ? ' selected' : ''}>${esc(t.title)}${t.course_code ? ' (' + esc(t.course_code) + ')' : ''}</option>`).join('')}</select>

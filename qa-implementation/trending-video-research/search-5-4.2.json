@@ -1,0 +1,78 @@
+{
+  "query": "Golang Redis caching tutorial",
+  "checked_at": "2026-09-30T07:22:00.577Z",
+  "results": [
+    {
+      "id": "oaJq1mQ3dFI",
+      "title": "Redis Caching in Node.js",
+      "channel": "Traversy Media",
+      "duration": "17:42",
+      "views": "255,423 views",
+      "description": "In this video I will show you how to setup caching with Node.js & Redis and look at how it is beneficial."
+    },
+    {
+      "id": "G1rOthIU-uo",
+      "title": "Redis in 100 Seconds",
+      "channel": "Fireship",
+      "duration": "2:26",
+      "views": "1,024,854 views",
+      "description": "Use the special link https://redis.info/fireship (or code: MATRIX200) to try Redis Enterprise Cloud to get a $200 credit, become part ..."
+    },
+    {
+      "id": "z_NbVtbgBJw",
+      "title": "What Is Redis Really About? Why Is It So Popular?",
+      "channel": "ByteByteGo",
+      "duration": "9:01",
+      "views": "132,735 views",
+      "description": "Subscribe to our weekly newsletter to get a Free System Design PDF (368 pages): https://newsletter.bytebytego.com."
+    },
+    {
+      "id": "m_RIEG8gyoA",
+      "title": "What is Redis? ✅ #backend #caching",
+      "channel": "Build with Akshit",
+      "duration": "1:01",
+      "views": "179,396 views",
+      "description": "Let's try to understand what exactly this redis is in one minute right so in simple sentence reddis is just a cache database layer so ..."
+    },
+    {
+      "id": "1C3Ym_JjkMw",
+      "title": "Beginner's Guide to Redis with Go!",
+      "channel": "TutorialEdge",
+      "duration": "11:27",
+      "views": "18,066 views",
+      "description": "Welcome Gophers! In this video, we'll be looking at how you can connect into a Redis instance in Go and do some fun stuff like ..."
+    },
+    {
+      "id": "Mw7p403tMNM",
+      "title": "Redis with Go Tutorial for Beginners: go-redis, Caching, Pipelines and the Connection Pool",
+      "channel": "Elite Dev News",
+      "duration": "17:13",
+      "views": "8 views",
+      "description": "A beginner tutorial on using Redis from Go with go-redis v9. By the end, you'll store data, cache it properly, and keep it fast in ..."
+    },
+    {
+      "id": "Tt5zIKVMMbs",
+      "title": "Distributed Caching In ASP.NET Core With Redis | Introduction",
+      "channel": "Milan Jovanović",
+      "duration": "18:19",
+      "views": "86,965 views",
+      "description": "Get the source code for this video for FREE → https://the-dotnet-weekly.ck.page/redis-cache ☄️ Master the Modular Monolith ..."
+    },
+    {
+      "id": "Tqaqdfxi-J4",
+      "title": "What is Redis Cache?",
+      "channel": "Redis",
+      "duration": "6:19",
+      "views": "113,359 views",
+      "description": "In this first video in a three-part series, we'll explore what caching is, how it works, and how Redis can help! Stay tuned for future ..."
+    },
+    {
+      "id": "jqI4g8_11eY",
+      "title": "Cache ALL THE THINGS using Redis with Golang / Go | #feurious",
+      "channel": "Donald Feury (dak425)",
+      "duration": "13:16",
+      "views": "10,545 views",
+      "description": "Artist/Thumbnail Creator: https://jawhaj.art Blog: https://donaldfeury.xyz/topics Memberships: ..."
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "query": "Golang chi router net http REST tutorial",
+  "checked_at": "2026-09-30T07:21:58.960Z",
+  "results": [
+    {
+      "id": "rEPJ2eFO7QU",
+      "title": "HTTP Routing in Golang: A Beginner's Guide to Mux and Handlers",
+      "channel": "smolbit",
+      "duration": "5:31",
+      "views": "4,004 views",
+      "description": "Learn how to build and configure HTTP routes in Golang with this comprehensive guide. Starting with creating a server, we'll ..."
+    },
+    {
+      "id": "Tvb41gxFFRY",
+      "title": "REST API in Go Tutorial for Beginners: chi Router, Middleware and Timeouts",
+      "channel": "Elite Dev News",
+      "duration": "15:18",
+      "views": "9 views",
+      "description": "A beginner tutorial on building a REST API in Go with the chi router. Routing, middleware, JSON, a Postgres database, and a ..."
+    },
+    {
+      "id": "N9LhKjPibuU",
+      "title": "Build a Microservice with Go #2 - Routes & Handlers",
+      "channel": "Net Ninja",
+      "duration": "10:51",
+      "views": "30,744 views",
+      "description": "In this Go tutorial series, you'll learn how to make a microservice using Go, Chi (a lightweight router) & Redis. Get early ..."
+    },
+    {
+      "id": "RkmvVFZJJvs",
+      "title": "Go Gin REST API Tutorial",
+      "channel": "TutorialEdge",
+      "duration": "14:02",
+      "views": "61,823 views",
+      "description": "For the price of a ☕ every month, sign up and gain access to a growing list of premium courses on my site ..."
+    },
+    {
+      "id": "CLdxwJCvTZE",
+      "title": "Golang Microservices: REST APIs - HTTP Handlers",
+      "channel": "Mario Carrion",
+      "duration": "11:14",
+      "views": "5,371 views",
+      "description": "Let me share with you another tip when building microservices in Go! Implementing REST APIs, first HTTP Handlers, then using ..."
+    },
+    {
+      "id": "H7tbjKFSg58",
+      "title": "The standard library now has all you need for advanced routing in Go.",
+      "channel": "Dreams of Code",
+      "duration": "13:52",
+      "views": "251,594 views",
+      "description": "Use my link https://sponsr.is/tld_dreamsofcode and code APPDEVFOO5 and get a .dev, .app, or .foo domain name for only $5!"
+    }
+  ]
+}

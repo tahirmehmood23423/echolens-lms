@@ -1,0 +1,102 @@
+{
+  "query": "LLM guardrails PII redaction tutorial",
+  "checked_at": "2026-09-30T07:24:59.956Z",
+  "results": [
+    {
+      "id": "fV_EuLO2KOE",
+      "title": "LLM Guardrails Without Writing Code: PII Redaction with Presidio in Tyk AI Studio",
+      "channel": "Tyk API Management",
+      "duration": "10:50",
+      "views": "19 views",
+      "description": "Description** A guardrail in Tyk AI Studio is a filter that runs a detection provider instead of a script. You pick the provider, tick what ..."
+    },
+    {
+      "id": "08-pjh_cA0g",
+      "title": "PII Redaction Explained in 60 Seconds",
+      "channel": "Lyzr AI",
+      "duration": "1:12",
+      "views": "1,940 views",
+      "description": "Companies want to use AI on emails, documents, support tickets, logs — everything. But here's the problem: All of that data ..."
+    },
+    {
+      "id": "l5K4r_TJz_8",
+      "title": "How to implement LLM guardrails for RAG applications",
+      "channel": "IBM Developer",
+      "duration": "7:15",
+      "views": "12,190 views",
+      "description": "Learn how to use the contextual grounding checks that come with the guardrails functionality in watsonx Flows Engine."
+    },
+    {
+      "id": "jESZJ1odLuQ",
+      "title": "PII redaction in LLM prompts: regex, a detection service, or not sending it at all",
+      "channel": "DemoToProd",
+      "duration": "1:04",
+      "views": "20 views",
+      "description": "In the demo, whatever the user typed went straight to the provider. In production that same text carries customer names, card ..."
+    },
+    {
+      "id": "ptRhf5pUEr0",
+      "title": "WSO2 AI Guardrails: PII Masking, Prompt Injection & Safety",
+      "channel": "WSO2",
+      "duration": "8:50",
+      "views": "276 views",
+      "description": "Generative AI offers incredible potential, but it comes with real risks like data leakage and prompt attacks. In this video, we ..."
+    },
+    {
+      "id": "epV3BPAMPtM",
+      "title": "PII Redaction for LLM Logs in Python",
+      "channel": "Professor Py: AI Engineering",
+      "duration": "7:14",
+      "views": "170 views",
+      "description": "PII redaction for model logs: build a practical redaction pipeline that detects and masks emails and phone numbers. Follow ..."
+    },
+    {
+      "id": "WNAFa5TkV3k",
+      "title": "Protect Your Sensitive Data: PII Redaction with Microsoft Foundry and Azure AI Language Service",
+      "channel": "MadeForCloud",
+      "duration": "12:25",
+      "views": "2,118 views",
+      "description": "In this video, I will show you how to safely process invoices and business documents using the latest Microsoft Foundry platform."
+    },
+    {
+      "id": "zBV-xAWNEKk",
+      "title": "Learn to Build Production-Ready LLM Guardrails From Scratch!",
+      "channel": "Pavan Belagatti",
+      "duration": "11:55",
+      "views": "8,306 views",
+      "description": "Learn how to build production-ready LLM guardrails from scratch to secure your AI applications! In this complete tutorial, we'll ..."
+    },
+    {
+      "id": "9Ek2cvIHq1c",
+      "title": "Agent Guardrails Explained — Prompt Injection, PII Leaks & More - Part 1: Input Guardrails",
+      "channel": "Applied with AI - Sanjay Kumar",
+      "duration": "11:05",
+      "views": "12,217 views",
+      "description": "Your AI agent doesn't need to be hacked to fail — sometimes a single sentence is enough. In this video, I break down the ..."
+    },
+    {
+      "id": "Q9I8sMfq-FM",
+      "title": "Building LLM apps that don't suck - Guardrails",
+      "channel": "Matt Pocock",
+      "duration": "1:02",
+      "views": "40,929 views",
+      "description": "Become a TypeScript Wizard with my TypeScript course: https://www.totaltypescript.com Follow Matt on Twitter ..."
+    },
+    {
+      "id": "TZQhjnpvHSY",
+      "title": "Automating PII Detection & Document Redaction with AI | Privacy & Compliance Agent Demo | Quadrant",
+      "channel": "Quadrant Technologies",
+      "duration": "2:44",
+      "views": "217 views",
+      "description": "In this demo, we walk you through Quadrant's Privacy & Compliance AI Agent an intelligent, Azure-native platform built to ..."
+    },
+    {
+      "id": "7XfBLutnxC8",
+      "title": "Guardrails AI Explained: Make Your LLM Outputs 100% RELIABLE and SAFE",
+      "channel": "STARP AI",
+      "duration": "5:53",
+      "views": "6,902 views",
+      "description": "What is Guardrails AI? We explain Guardrails - the framework for validating and correcting AI outputs automatically. LLMs are ..."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "egIDsv1RO88",
+  "url": "https://www.youtube.com/watch?v=egIDsv1RO88",
+  "checked_at": "2026-09-30T07:23:55.017Z",
+  "title": "How You Should Use Mutexes And Atomic Values In Golang?!",
+  "channel": "Anthony GG",
+  "duration_seconds": 949,
+  "views": 19714,
+  "comments": "28 Comments",
+  "comment_samples": [
+    "► Join my Discord community for free education 👉 https://discord.com/invite/bDy8t4b3Rz\r\n► Become a Patreon for exclusive tutorials👉 https://www.patreon.com/anthonygg_\r\n► Buy me a coffee 👉 https://donate.stripe.com/aEU2a6ayH2uCa3u4gg\r\n\r\nThanks for watching <3",
+    "Hands down. This is one of the most informative golang videos i have come across in the last 5-6 years. Thanks sir. your style of explaining by writing code on fly is tough to do which shows your command in the language but very informative for us. Pls keep up your great work and share your great knowledge on other languages like c++ and Rust too.",
+    "This is the best mutex explanation ive seem. Makes perfect sense now thanks man",
+    "Mutex is slower than Atomic, b/c it blocks other gorountines. Just go with Atomic",
+    "I haven't subscribed until now. I've been watching for over a year. How do you only have ~75k subscribers?! You deserve so much more!!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "► Join my Discord community for free education 👉 https://discord.com/invite/bDy8t4b3Rz\n► Become a Patreon for more exclusive content 👉 https://www.patreon.com/anthonygg_\n► Buy my a coffee 👉 https://donate.stripe.com/aEU2a6ayH2u...\n► Follow me on Twitter 👉 https://twitter.com/anthdm\n► Follow me on GitHub 👉 https://github.com/anthdm\n\nIn this Golang tutorial, I'm going to teach you everything you need to know about mutexes and atomic values in Golang.\n\n#golang",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

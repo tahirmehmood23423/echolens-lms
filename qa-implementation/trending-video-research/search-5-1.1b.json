@@ -1,0 +1,110 @@
+{
+  "query": "Golang escape analysis pointers stack heap",
+  "checked_at": "2026-09-30T07:24:03.379Z",
+  "results": [
+    {
+      "id": "AdCAx_zfzQk",
+      "title": "Golang: Heap Allocation using escape analysis",
+      "channel": "Satyajit Das",
+      "duration": "3:31",
+      "views": "1,309 views",
+      "description": "In this video I show how to perform escape analysis on a Go program to check its Heap Allocation. This might give indication on ..."
+    },
+    {
+      "id": "F4YISvNxn3o",
+      "title": "Go Memory Management: Pointers, Stack vs. Heap, Garbage Collector Explained & How to Prevent Leaks",
+      "channel": "programmerCave",
+      "duration": "7:53",
+      "views": "1,101 views",
+      "description": "Welcome to the definitive guide on Go (Golang) memory management! If you want to write fast, efficient, and robust Go ..."
+    },
+    {
+      "id": "Ff2qB4XySOk",
+      "title": "Escape Analysis in Go — Stack vs Heap & How the Compiler Decides",
+      "channel": "nihonsensei",
+      "duration": "8:51",
+      "views": "305 views",
+      "description": "Escape Analysis in Go is one of the most misunderstood concepts. At runtime, every variable must live somewhere in memory ..."
+    },
+    {
+      "id": "VebiTHE_7Mk",
+      "title": "Escape Analysis Explained: Stack vs Heap Memory Optimization",
+      "channel": "CodeLucky",
+      "duration": "3:56",
+      "views": "160 views",
+      "description": "Ever wondered how your compiler decides where to store variables? In this video, we break down **Escape Analysis**, ..."
+    },
+    {
+      "id": "QcSNm9D_0ck",
+      "title": "Go Stack Heap Pointers",
+      "channel": "Martin Carlisle Go",
+      "duration": "9:56",
+      "views": "14 views",
+      "description": "Introduces the concept of stack memory (local variables) vs heap memory (structs that will live past the end of the function), ..."
+    },
+    {
+      "id": "HEfAFpdILpA",
+      "title": "Interfaces 101 : Heap Escape Analysis",
+      "channel": "Ardan Labs",
+      "duration": "6:08",
+      "views": "4,679 views",
+      "description": "Episode 2! - Watch and learn how you can benchmark your code, view optimizations created by the compiler and pinpoint the ..."
+    },
+    {
+      "id": "egA5-qXq-qE",
+      "title": "Escape from Escape Analysis of Golang",
+      "channel": "ICSE",
+      "duration": "10:10",
+      "views": "300 views",
+      "description": "https://2020.icse-conferences.org/details/icse-2020-Software-Engineering-in-Practice/1/Escape-from-Escape-Analysis-of-Golang."
+    },
+    {
+      "id": "ZpVet_2d_NA",
+      "title": "Understanding Memory Allocation in GoLang: Heap vs Stack Explained",
+      "channel": "vlogize",
+      "duration": "1:53",
+      "views": "18 views",
+      "description": "Discover how memory allocation works in GoLang with insights on `heap` and `stack`. Learn about pointers, escape analysis, and ..."
+    },
+    {
+      "id": "5OJRqkYbK-4",
+      "title": "Stack vs Heap Memory - Simple Explanation",
+      "channel": "Alex Hyett",
+      "duration": "5:28",
+      "views": "457,679 views",
+      "description": "These videos are only possible due to supporters like you. Help me make more unsponsored videos like this: - Patreon: ..."
+    },
+    {
+      "id": "2XEQsJLsLN0",
+      "title": "Golang pointers explained, once and for all",
+      "channel": "JamieGo",
+      "duration": "13:49",
+      "views": "46,387 views",
+      "description": "This video is about pointers explained in #golang, along with some basic memory allocation concepts, stack and heap allocations ..."
+    },
+    {
+      "id": "VHuQi_1t5qQ",
+      "title": "Mastering Go Pointers",
+      "channel": "Pastel Sketchbook",
+      "duration": "13:24",
+      "views": "77 views",
+      "description": "Memory mechanics, escape analysis, and idiomatic mental models for Go developers."
+    },
+    {
+      "id": "3xXoScUnTR4",
+      "title": "Golang - Escape Analysis",
+      "channel": "Engenharia - Qive",
+      "duration": "17:52",
+      "views": "343 views",
+      "description": "Comentando um pouco sobre análise de escape em Go Códigos: [main.go] https://play.golang.org/p/Th-yn2_l6XW [main_test.go] ..."
+    },
+    {
+      "id": "quO9s_snflY",
+      "title": "1.2 Memory Layout in Go: Pointers, Semantics & Zero Values | Memory, Pointers, and Tooling",
+      "channel": "Adsorp AI",
+      "duration": "17:29",
+      "views": "No views",
+      "description": "Dive deep into Go's predictable memory layout and contrast it with Python's dynamic PyObject allocation model. Learn how stack ..."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "Arf7UwWjGyc",
+  "url": "https://www.youtube.com/watch?v=Arf7UwWjGyc",
+  "checked_at": "2026-09-30T07:25:43.594Z",
+  "title": "RAG in Production - LangChain & FastAPI",
+  "channel": "Coding Crash Courses",
+  "duration_seconds": 711,
+  "views": 18825,
+  "comments": "74 Comments",
+  "comment_samples": [
+    "Thankful for channels like this that go above and beyond the standard tutorials 💪🏾",
+    "Another helpful video! please create more videos of langchain in production",
+    "a hero not wearing cape.. Thanks man",
+    "Great content, subscribed",
+    "Best best best!!!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, I'll demonstrate the compelling reasons for integrating LangChain with FastAPI to effectively bring your application into production.\n\nCode: https://github.com/Coding-Crashkurse/Advanced-LangChain-with-FastAPI\n\nTimestamps:\n0:00 Biggest mistakes \n1:40 API Code\n7:10 Digest for row-wise update\n8:10 Asynchronous vs. Synchronous\n10:30 Making requests to the endpoints",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

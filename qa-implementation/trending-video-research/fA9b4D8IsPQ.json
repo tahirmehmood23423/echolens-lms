@@ -1,0 +1,22 @@
+{
+  "id": "fA9b4D8IsPQ",
+  "url": "https://www.youtube.com/watch?v=fA9b4D8IsPQ",
+  "checked_at": "2026-09-30T07:25:43.034Z",
+  "title": "Getting Started with LangSmith (1/8): Tracing",
+  "channel": "LangChain",
+  "duration_seconds": 500,
+  "views": 48213,
+  "comments": "14 Comments",
+  "comment_samples": [
+    "Thank you very much",
+    "Thank you",
+    "Thanks you",
+    "Let's go Robert!!!",
+    "Such a good video!!!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "- Code: https://github.com/xuro-langchain/eli5\n- Learn more about LangSmith: https://www.langchain.com/langsmith/?utm_medium=social&utm_source=youtube&utm_campaign=q2-2025_onboarding-videos_co\n- Get started with LangSmith for free: https://smith.langchain.com/?utm_medium=social&utm_source=youtube&utm_campaign=q2-2025_onboarding-videos_co\n- Docs: https://docs.smith.langchain.com/?utm_medium=social&utm_source=youtube&utm_campaign=q2-2025_onboarding-videos_co\n- Learn how to use observe and evaluate agents on LangChain Academy: https://academy.langchain.com/courses/intro-to-langsmith/?utm_medium=social&utm_source=youtube&utm_campaign=q4-2025_youtube-academy-links_aw",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

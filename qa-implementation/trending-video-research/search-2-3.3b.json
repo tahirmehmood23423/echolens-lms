@@ -1,0 +1,62 @@
+{
+  "query": "LangGraph state machine LangChain tutorial",
+  "checked_at": "2026-09-30T07:23:29.296Z",
+  "results": [
+    {
+      "id": "UoByfZnQR8c",
+      "title": "Build a Stateful AI Agent with LangGraph | State Machines Explained Step-by-Step",
+      "channel": "Pavithra’s Podcast",
+      "duration": "15:34",
+      "views": "112 views",
+      "description": "Want to build AI agents that can remember context, track progress, and make decisions across multiple steps? In this video, I'll ..."
+    },
+    {
+      "id": "qAF1NjEVHhY",
+      "title": "LangChain vs LangGraph: A Tale of Two Frameworks",
+      "channel": "IBM Technology",
+      "duration": "9:55",
+      "views": "654,968 views",
+      "description": "Want to learn more about AI agents and assistants? Register for Virtual Agents Day here → https://ibm.biz/BdaAVa Download the ..."
+    },
+    {
+      "id": "jc8gSY3yYq0",
+      "title": "LangGraph Tutorial: Mastering State and Memory Management for AI Agents",
+      "channel": "Analytics Vidhya",
+      "duration": "12:16",
+      "views": "2,470 views",
+      "description": "In this lesson of our LangGraph Foundations series, we explore the critical concepts of State and Memory Management. LLM ..."
+    },
+    {
+      "id": "GFwfbeG4qwo",
+      "title": "LangGraph vs. LangChain: State Machines vs. Linear Chains in Production",
+      "channel": "CodeForData",
+      "duration": "2:56",
+      "views": "15 views",
+      "description": "Deep-dive technical breakdown of LangGraph vs. LangChain: State Machines vs. Linear Chains in Production in production ..."
+    },
+    {
+      "id": "A4p8AOu2rMM",
+      "title": "LangGraph Explained in 4 minutes (LangGraph Tutorial)",
+      "channel": "CodeHead",
+      "duration": "4:30",
+      "views": "69,212 views",
+      "description": "... is langgraph what is langsmith what is langchain langchain tutorial langgraph tutorial langsmith tutorial langgraph explained ..."
+    },
+    {
+      "id": "AVsCAkaeEn4",
+      "title": "LangGraph State Explained – Building Stateful AI Workflows with LangChain & LangGraph",
+      "channel": "TECH' EM",
+      "duration": "13:41",
+      "views": "220 views",
+      "description": "... LangGraph, LangChain, LangGraph State, LangGraph Tutorial, LangChain Agents, LangGraph LangChain, State Machines ..."
+    },
+    {
+      "id": "cUfLrn3TM3M",
+      "title": "LangGraph Explained for Beginners",
+      "channel": "KodeKloud",
+      "duration": "13:21",
+      "views": "219,586 views",
+      "description": "Try LangGraph Hands-On Labs for Free - https://kode.wiki/41WTH62 Learn how LangGraph transforms simple LangChain ..."
+    }
+  ]
+}

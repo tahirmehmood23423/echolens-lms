@@ -1,0 +1,20 @@
+{
+  "id": "pCY6khpKqM4",
+  "url": "https://www.youtube.com/watch?v=pCY6khpKqM4",
+  "checked_at": "2026-09-30T07:23:42.393Z",
+  "title": "Docker Compose Control Container Order with depends_on",
+  "channel": "WittCode",
+  "duration_seconds": 257,
+  "views": 1814,
+  "comments": "7 Comments",
+  "comment_samples": [
+    "Just now I faced the same issue",
+    "How to say good without using the g word? Very practical example and a good (here it is) explanation sir",
+    "Hi, is it possible to control the build order within the docker-compose file as well?"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "👨🏻‍💻 I made DevPayHub for solo devs. Payments & users handled.\nhttps://devpayhub.com \n\nLearn how to control Docker container startup and shutdown order with the Docker Compose depends_on and healthcheck attributes. To demonstrate, we will connect a Node Docker container to a Postgres Docker container.\n\n📚 My Courses\n https://www.udemy.com/user/wittcode/\n💻  My Software\nhttps://chromewebstore.google.com/search/wittcode\n👨‍💻 Download Code \nhttps://wittcode.com\n\n⌛ Timestamps\n0:00 - Introduction\n0:14 - Project Overview\n0:39 - depends_on\n0:48 - depends_on Short Syntax\n2:09 - depends_on Long Syntax and service_healthy\n2:49 - healthcheck\n3:54 - Outro",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

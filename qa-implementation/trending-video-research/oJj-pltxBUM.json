@@ -1,0 +1,22 @@
+{
+  "id": "oJj-pltxBUM",
+  "url": "https://www.youtube.com/watch?v=oJj-pltxBUM",
+  "checked_at": "2026-09-30T07:24:11.356Z",
+  "title": "PostgreSQL Partitioning Tutorial",
+  "channel": "Code with Lucian",
+  "duration_seconds": 703,
+  "views": 87296,
+  "comments": "27 Comments",
+  "comment_samples": [
+    "Great introduction to partitions in postgres, they are quite helpful for large tables and also for archiving data.",
+    "Great video!\nVery straight to the point.",
+    "Thank you for making a very informative video on partitioning. Can you teach us how to do vertical partitioning in Postgres as well (or point us to where we can find that info)? Thank you",
+    "Thank you! efficient and clear tutorial!",
+    "Thanks!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Fix: The maximum table size is 32TB and not 32GB. (for default 8 K blocks)\n\n0:00  -  Introduction\n0:59  -  Which Tables Need Partitioning?\n3:05  -  How should the Tables be Partitioned?\n4:52  -  Declarative vs. Inheritance Partitioning\n5:37  -  Creating a Partitioned Table\n9:58  -  Partitioning Methods\n\n🐘 Want to go deeper into PostgreSQL scaling?\nGet 40% off the complete course using the link below.\nhttps://codewithlucian.com/postgresql-ha/postgresql-partitioning?placement=description",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

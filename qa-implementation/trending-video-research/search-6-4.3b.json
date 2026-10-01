@@ -1,0 +1,126 @@
+{
+  "query": "Postgres MVCC vacuum explained",
+  "checked_at": "2026-09-30T07:24:07.691Z",
+  "results": [
+    {
+      "id": "TBmDBw1IIoY",
+      "title": "PostgreSQL Internals in Action: MVCC",
+      "channel": "Denis Magda",
+      "duration": "16:06",
+      "views": "18,340 views",
+      "description": "PostgreSQL uses MVCC (Multi-Version Concurrency Control) to execute transactions and queries in parallel over a consistent ..."
+    },
+    {
+      "id": "BJxkfY9ZaJg",
+      "title": "MVCC in PostgreeSQL | PostgreSQL Concurrency with MVCC  | Learnomate Technologies",
+      "channel": "Learnomate Technologies",
+      "duration": "8:34",
+      "views": "12,403 views",
+      "description": "\"PostgreSQL Concurrency with MVCC\" explores the Multi-Version Concurrency Control (MVCC) mechanism within PostgreSQL ..."
+    },
+    {
+      "id": "iM71d2krbS4",
+      "title": "Multiversion Concurrency Control (MVCC) Explained in Simple Terms",
+      "channel": "Cameron McKenzie",
+      "duration": "5:29",
+      "views": "35,496 views",
+      "description": "What is MVCC? What is Multi Version Concurrency Control? Well, the name sounds intimidating, but it's actually a simple ..."
+    },
+    {
+      "id": "xnps3zQCcZc",
+      "title": "PostgreSQL Understanding Vacuum 06/12",
+      "channel": "Code with Lucian",
+      "duration": "11:37",
+      "views": "23,023 views",
+      "description": "If you found this video helpful, you could check the full course on Udemy. In this course, you'll find tips for tuning PostgreSQL 12 ..."
+    },
+    {
+      "id": "qLNZvEv9vww",
+      "title": "What is the vacuum process in PostgreSQL? | Different Types of Vacuum in PostgreSQL? | Ankush Sir",
+      "channel": "Learnomate Technologies",
+      "duration": "9:25",
+      "views": "7,548 views",
+      "description": "In the YouTube video, Ankush Sir provides a detailed explanation of the vacuum process in PostgreSQL. He discusses how ..."
+    },
+    {
+      "id": "Q6oN_sND1Bo",
+      "title": "PostgreSQL MVCC Explained  How It Really Works | PostgreSQL DBA Interview |Learnomate Technologies |",
+      "channel": "Learnomate Technologies",
+      "duration": "14:16",
+      "views": "778 views",
+      "description": "Ever wondered how PostgreSQL allows multiple users to read and write data at the same time without blocking each other?"
+    },
+    {
+      "id": "IRRYaIAM1Zw",
+      "title": "How Does PostgreSQL Use MVCC and Locks in Read Committed?",
+      "channel": "Shubh Patel",
+      "duration": "13:28",
+      "views": "1,294 views",
+      "description": "In this video, we explore how PostgreSQL handles concurrency using MVCC (Multi-Version Concurrency Control) and locks."
+    },
+    {
+      "id": "5Sy97Uzvj90",
+      "title": "TOP-4 databases MVCC architectures explained",
+      "channel": "PAVLOG and CYBERTEC - PostgreSQL Services & Support",
+      "duration": "5:11",
+      "views": "30 views",
+      "description": "How PostgreSQL's MVCC model differs from the MVCC models of MySQL (InnoDB), Oracle Database, and Microsoft SQL Server."
+    },
+    {
+      "id": "aD-xzGdFjek",
+      "title": "Part 15 : PostgreSQL : What is Vacuum and autovacuum.",
+      "channel": "E-MultiSkills Database  services",
+      "duration": "17:46",
+      "views": "16,354 views",
+      "description": "( 24*7) on Call Support for PostgreSQL/Open Source databases."
+    },
+    {
+      "id": "GEztokgB9N0",
+      "title": "Postgres Transactions and MVCC Explained - Every Row Is a Ghost",
+      "channel": "Pattern Repetition",
+      "duration": "10:17",
+      "views": "66 views",
+      "description": "Every UPDATE in Postgres quietly leaves a dead copy of your old row behind. That one design choice, MVCC, is how Postgres ..."
+    },
+    {
+      "id": "Uw5BlonJkaA",
+      "title": "Why Postgres Never Freezes | MVCC Explained Simply",
+      "channel": "The Production Engineer",
+      "duration": "6:43",
+      "views": "44 views",
+      "description": "Ever wondered why PostgreSQL doesn't freeze when thousands of users try to update the same data at the same time? In this ..."
+    },
+    {
+      "id": "3yhjHZ0nXf8",
+      "title": "MVCC in Postgresql Explained in Hindi",
+      "channel": "Postgres learning",
+      "duration": "15:23",
+      "views": "485 views",
+      "description": "postgresql #postgresdatabase #pgadmin #postgresinstallation #postgresqltutorial ---| MVCC concept And explanation |--- MVCC ..."
+    },
+    {
+      "id": "WSdg_Km4rIg",
+      "title": "Understand MVCC without breaking your brain",
+      "channel": "ankush",
+      "duration": "8:25",
+      "views": "8,410 views",
+      "description": "Ever wondered how databases handle multiple transactions at once without chaos? Join me in this straightforward video as we ..."
+    },
+    {
+      "id": "s287bL28SiU",
+      "title": "PostgreSQL MVCC Explained! 🐘 #shorts",
+      "channel": "developerOS India",
+      "duration": "7:28",
+      "views": "37 views",
+      "description": "Ever wondered how PostgreSQL handles concurrent reads and writes without locking your tables? Meet Multi-Version ..."
+    },
+    {
+      "id": "4W3JrS7N5Cs",
+      "title": "Postgres MVCC Explained | Interview Podcast",
+      "channel": "StepUP Tech Academy (SUTA)",
+      "duration": "3:09",
+      "views": "10 views",
+      "description": "What is MVCC in Postgres, and how do you manage its impact? Understand row versions and snapshots, why MVCC helps ..."
+    }
+  ]
+}

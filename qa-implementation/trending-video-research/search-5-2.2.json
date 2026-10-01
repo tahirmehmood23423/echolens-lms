@@ -1,0 +1,102 @@
+{
+  "query": "Golang select timeout channels tutorial",
+  "checked_at": "2026-09-30T07:21:57.770Z",
+  "results": [
+    {
+      "id": "qKS5cJ57Lfk",
+      "title": "Go Channels & select: Buffers, Timeouts, Fan-in/Fan-out | Learn Go #25",
+      "channel": "Cyrus",
+      "duration": "9:31",
+      "views": "4 views",
+      "description": "Channels drawn as pipes between goroutines: sending and receiving, buffered channels, closing and ranging, one-way channel ..."
+    },
+    {
+      "id": "hX7EX9ukbmw",
+      "title": "Golang Graceful Shutdown Tutorial | HTTP Server & Context Timeout",
+      "channel": "Shourov Roy",
+      "duration": "9:29",
+      "views": "217 views",
+      "description": "In this video, we dive deep into implementing a production-grade Graceful Shutdown for Go (Golang) HTTP servers. What ..."
+    },
+    {
+      "id": "3QESpVGiiB8",
+      "title": "Advanced Golang: Goroutines & Channels",
+      "channel": "Tiago",
+      "duration": "17:31",
+      "views": "35,052 views",
+      "description": "https://www.selfmadeengineer.com/ In this video I explain how Goroutines, Channels and Wait Groups work in Golang by going ..."
+    },
+    {
+      "id": "WqSWZuGS9pc",
+      "title": "I am done with Golang",
+      "channel": "The PrimeTime",
+      "duration": "11:42",
+      "views": "524,728 views",
+      "description": "Blacksmith is the fastest way to run your Github Actions. 2x faster job runs, 4x faster on caches, and 40x faster on Docker builds, ..."
+    },
+    {
+      "id": "2SgX1wTTuRI",
+      "title": "Master GoLang Concurrency: Channels, Select & Mutexes in 15 Minutes!",
+      "channel": "Rahul Bharati",
+      "duration": "14:26",
+      "views": "573 views",
+      "description": "Go's concurrency model is powerful, but improper handling can lead to race conditions, deadlocks, and memory leaks. In under ..."
+    },
+    {
+      "id": "kBz8d-rRDkk",
+      "title": "How to implement a context that gets cancelled WithTimeOut and WithDeadline in Go(Golang)-Part-1",
+      "channel": "Learn Golang, Rust and more ",
+      "duration": "14:30",
+      "views": "407 views",
+      "description": "How to create and cancel a golang context in a goroutine #context #golanguage #golang #concurrency #goprogramming ..."
+    },
+    {
+      "id": "VHrj_m1TyXA",
+      "title": "Golang Tutorials -29- Golang Timeout | Dr Vipin Classes",
+      "channel": "Dr Vipin Classes",
+      "duration": "6:23",
+      "views": "524 views",
+      "description": "Golang Interview Question: How to use timeout in golang | Dr Vipin Classes About this video: In this video, I explained about ..."
+    },
+    {
+      "id": "fXzzF5y6UEU",
+      "title": "Golang Context Explained - How To Use With Timeout",
+      "channel": "Melkey",
+      "duration": "8:22",
+      "views": "26,165 views",
+      "description": "If you're a Go developer looking to improve your understanding of context management and concurrency control, you're in the ..."
+    },
+    {
+      "id": "mcl3zU5wat4",
+      "title": "Mastering select and for-select | Essential Tools for Concurrency in Go",
+      "channel": "Code & Learn",
+      "duration": "9:57",
+      "views": "4,047 views",
+      "description": "Video Overview: Unlock the Power of Concurrency in Go with select and for-select Statements In this video, we dive deep into the ..."
+    },
+    {
+      "id": "r5yQqZrRiYg",
+      "title": "Non-Blocking Channel Operations - Go Tutorial for Beginners #26",
+      "channel": "Codegiz — Built by Claude AI",
+      "duration": "9:29",
+      "views": "9 views",
+      "description": "Learn how to use the select statement in Go for multiplexing channel operations! This lesson covers non-blocking operations, ..."
+    },
+    {
+      "id": "i5HEE5Ikv3w",
+      "title": "Channels and Deadlock in golang",
+      "channel": "Hitesh Choudhary",
+      "duration": "18:39",
+      "views": "38,053 views",
+      "description": "Welcome to a youtube channel dedicated to programming and coding related tutorials. We talk about tech, write code, discuss ..."
+    },
+    {
+      "id": "Z1ARHdmfdMc",
+      "title": "GO Tutorial 2025 - Build Faster Apps with Concurrency | Golang Routines & Channels Explained",
+      "channel": "Leena",
+      "duration": "13:58",
+      "views": "703 views",
+      "description": "Want to build a powerful applications? Learn concurrency in Go In this tutorial, you'll learn about threads and some ..."
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "query": "two dimensional dynamic programming knapsack LCS",
+  "checked_at": "2026-09-30T07:21:50.398Z",
+  "results": [
+    {
+      "id": "qxWu-SeAqe4",
+      "title": "0/1 Knapsack Problem Explained Visually",
+      "channel": "ByteQuest",
+      "duration": "8:10",
+      "views": "153,151 views",
+      "description": "In this video, we dive deep into the 0/1 Knapsack Problem using dynamic programming. We start by building a table to track the ..."
+    },
+    {
+      "id": "i8NqAEsZn54",
+      "title": "L-5.3: 0/1 Knapsack Problem |Dynamic Programming |Recursive Equation |Recursion Tree Time Complexity",
+      "channel": "Gate Smashers",
+      "duration": "17:04",
+      "views": "1,138,809 views",
+      "description": "Struggling with the 0/1 Knapsack Problem? In this video, Varun sir will start with the problem statement, derive the recursive ..."
+    },
+    {
+      "id": "J1l6bPZ_mN4",
+      "title": "Knapsack 0/1 problem by dynamic Programming in Hindi",
+      "channel": "Xtra Lectures",
+      "duration": "8:11",
+      "views": "204,160 views",
+      "description": "Dynamic programming is based on the principle of optimality (also coined by Bellman). The principle of optimality states that ..."
+    },
+    {
+      "id": "07ID3xLB4XQ",
+      "title": "When To Use 2D Over 1D Tables In Dynamic Programming | Longest Common Subsequence Problem",
+      "channel": "Algorithms With Brenton",
+      "duration": "8:02",
+      "views": "3,614 views",
+      "description": "In this video we look at when 2-dimensional tables need to be used over 1-dimensional tables for bottom up dynamic ..."
+    },
+    {
+      "id": "WNkqbqyvR_0",
+      "title": "01 Knapsack Tabulation Dynamic Programming | How to build DP table",
+      "channel": "Techdose",
+      "duration": "18:34",
+      "views": "64,141 views",
+      "description": "This video explains the concept about how to approach a dynamic programming problem to solve using tabular DP."
+    },
+    {
+      "id": "gHVtY5raAQg",
+      "title": "Knapsack 2 Atcoder Tutorial With Code: Dynamic Programming | CP Course| EP 96",
+      "channel": "Luv",
+      "duration": "18:05",
+      "views": "46,953 views",
+      "description": "DP Playlist : https://youtube.com/playlist?list=PLauivoElc3gimdmLcIIpafEkzGs4tCQmi ALL CP/DSA RESOURCES ..."
+    },
+    {
+      "id": "M79iHjAG1tg",
+      "title": "L-4.2: Knapsack Problem With Example| Greedy Techniques| Algorithm",
+      "channel": "Gate Smashers",
+      "duration": "11:41",
+      "views": "2,112,138 views",
+      "description": "In the knapsack problem, you need to pack a set of items, with given values and sizes (such as weights or volumes), into a ..."
+    },
+    {
+      "id": "cJ21moQpofY",
+      "title": "0/1 Knapsack problem | Dynamic Programming",
+      "channel": "WilliamFiset",
+      "duration": "13:29",
+      "views": "307,011 views",
+      "description": "Overview of the 0/1 Knapsack problem using dynamic programming Algorithms repository: ..."
+    }
+  ]
+}

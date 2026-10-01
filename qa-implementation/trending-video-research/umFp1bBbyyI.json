@@ -1,0 +1,20 @@
+{
+  "id": "umFp1bBbyyI",
+  "url": "https://www.youtube.com/watch?v=umFp1bBbyyI",
+  "checked_at": "2026-09-30T07:24:15.664Z",
+  "title": "LGTM Grafana Stack: OpenTelemetry Tracing for API & Database Spans",
+  "channel": "Daniel Blanco",
+  "duration_seconds": 564,
+  "views": 3755,
+  "comments": "6 Comments",
+  "comment_samples": [
+    "Great video, thank you for diving into the details. Especially that query link!",
+    "Awesome! Thanks a lot for sharing.",
+    "Nice overview. Thanks for sharing"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Discover the power of the LGTM stack (Loki, Grafana, Tempo, Mimir)! In this video, I’ll demonstrate:\n\nUsing Grafana to process app logs from Loki.\nBuilding visuals from application metrics stored in Mimir (Prometheus).\nLeveraging Tempo metrics with data links to traces.\nTracing slow spans to pinpoint API and database performance issues with Tempo.\n\nWatch as I break down each span for precise insights into your system. Perfect for modern monitoring and troubleshooting!\n\n👉 Learn to optimize your stack with OpenTelemetry tracing!\n\nGithhub - d-blanco/fastapi-otlp-prometheus",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

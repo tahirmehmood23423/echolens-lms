@@ -1,0 +1,19 @@
+{
+  "id": "UZ66jEj7Zh0",
+  "url": "https://www.youtube.com/watch?v=UZ66jEj7Zh0",
+  "checked_at": "2026-09-30T07:24:05.762Z",
+  "title": "Database Internals: Page Layout Explained (based on PostgreSQL)",
+  "channel": "Data Craze",
+  "duration_seconds": 1122,
+  "views": 597,
+  "comments": "3 Comments",
+  "comment_samples": [
+    "I like your videos. This comment is to support the channel",
+    "Great video. One suggestion , your Picture-in-Picture webcam input covers large amount of screen, hiding parts the editor and the main screen. You might want to lower the size of that"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Ever wondered what actually happens on disk when you run an INSERT command?\n\nIt’s not magic. It’s engineering. And understanding it is the difference between a \"database user\" and a \"database engineer\".\n\nIn this video, we leave the SQL layer behind and dive deep into the physical storage of PostgreSQL. We’ll look at the famous 8KB page, see how tuples are arranged like a game of Tetris, and meet the silent heroes responsible for performance: FSM and VM.\n\nTIMELINE:\n00:00:00 Intro\n00:00:23 Welcome\n00:01:19 PGDATA\n00:03:08 Main Table File\n00:04:21 Free Space Map\n00:05:19 Visibility Map\n00:06:25 Initialization Fork\n00:07:50 Page Layout\n00:11:17 SQL Examples\n00:16:26 Summary\n\nSUMMARY:\n👉 Pages are fixed-size: PostgreSQL typically uses 8KB pages. Your rows (tuples) must fit in here, or special mechanisms kick in.\n👉 The \"Tetris\" of Storage: Items (row data) grow from the end of the page backwards, while pointers grow from the start. The empty space in the middle where the battle for efficiency happens.\n👉 FSM & VM are critical: The Free Space Map prevents slow full-table scans during inserts, while the Visibility Map powers the ultra-fast Index-Only Scans.\n\nRESOURCES:\n📝 Full Article: https://datacraze.io/database-file-layout/\n📩 Data Craze Newsletter: https://datacraze.io/news\n🧑‍💻 Github Script: https://github.com/datacraze/youtube-code/blob/main/04_database_file_layout.sql\n📚 PGData Documentation: https://www.postgresql.org/docs/current/storage-file-layout.html#PGDATA-CONTENTS-TABLE\n#PostgreSQL #DatabaseInternals #DataEngineering #SystemDesign #Backend",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

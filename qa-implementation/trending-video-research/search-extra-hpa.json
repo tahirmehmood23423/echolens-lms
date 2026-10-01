@@ -1,0 +1,94 @@
+{
+  "query": "Kubernetes horizontal pod autoscaler explained",
+  "checked_at": "2026-09-30T07:24:55.179Z",
+  "results": [
+    {
+      "id": "_TOUyblXlDo",
+      "title": "How Kubernetes Horizontal Pod Autoscaler Really Works in 2026",
+      "channel": "LearnITGuide Tutorials",
+      "duration": "8:51",
+      "views": "411 views",
+      "description": "Stop guessing your replica counts. Learn how the Kubernetes Horizontal Pod Autoscaler (HPA) calculates metrics, handles ..."
+    },
+    {
+      "id": "Dor5xNHS_IY",
+      "title": "What Is a Kubernetes Horizontal Pod Autoscaler?",
+      "channel": "Nick True",
+      "duration": "6:35",
+      "views": "265 views",
+      "description": "What's covered: - What's the purpose of a Horizontal Pod Autoscaler (HPA)? - How HPAs work. Interested in mastering ..."
+    },
+    {
+      "id": "8dNZ2oRNmn8",
+      "title": "KCNA 30 | Kubernetes Autoscaling & Serverless: HPA, VPA, KEDA & Knative",
+      "channel": "Zero2Certified",
+      "duration": "10:53",
+      "views": "No views",
+      "description": "How workloads and clusters scale automatically: Horizontal and Vertical Pod Autoscalers, Cluster Autoscaler and Karpenter, ... We will see the three kinds of autoscaling in Kubernetes. Start with the horizontal pod autoscaler: more pods. Then the vertical ..."
+    },
+    {
+      "id": "c-tsJrcB50I",
+      "title": "Horizontal POD Autoscaler setup in Kubernetes | Auto Scaling |",
+      "channel": "Ashok IT",
+      "duration": "14:11",
+      "views": "18,336 views",
+      "description": "kubernetes #pod #autoscaling #ashokit In this video we have explained how to setup Horizontal Pod Autoscaler in Kubernetes ..."
+    },
+    {
+      "id": "z4HdPOLP8nc",
+      "title": "Optimizing Resource Utilization with Horizontal Pod Autoscaling (HPA) in Kubernetes | AKS",
+      "channel": "Nirav Gandhi",
+      "duration": "7:18",
+      "views": "29,942 views",
+      "description": "Horizontal Pod Autoscaling (HPA) is a Kubernetes feature that automatically adjusts the number of replicas of a deployment ..."
+    },
+    {
+      "id": "negy0ON6nAg",
+      "title": "Kubernetes HPA & VPA Explained | Horizontal Pod Autoscaler | Vertical POD Autoscaler",
+      "channel": "TechWorld with Sahana ",
+      "duration": "11:24",
+      "views": "916 views",
+      "description": "Learn Kubernetes Horizontal Pod Autoscaling (HPA) like a real DevOps Engineer — explained with production-level examples, ..."
+    },
+    {
+      "id": "hsJ2qtwoWZw",
+      "title": "Kubernetes Autoscaling: HPA vs. VPA vs. Keda vs. CA vs. Karpenter vs. Fargate",
+      "channel": "Anton Putra",
+      "duration": "14:38",
+      "views": "62,104 views",
+      "description": "... 0:00 Intro 1:24 Horizontal Pod Autoscaler (HPA) 5:03 Horizontal Pod Autoscaler Prometheus (Custom Metrics) 7:35 Vertical Pod ..."
+    },
+    {
+      "id": "jyBDbm1FHiM",
+      "title": "Autoscaling in Kubernetes",
+      "channel": "Pavan Elthepu",
+      "duration": "19:07",
+      "views": "45,950 views",
+      "description": "In this chapter, we'll learn how different auto-scalers (Horizontal Pod Autoscaler, Vertical Pod Autoscaler, Cluster Autoscaler) work ... ... that kubernetes offers a resource named horizontal pod Auto scaler with horizontal pod Auto scaler we can instruct kubernetes ..."
+    },
+    {
+      "id": "cjU9FFGmtck",
+      "title": "HPA vs VPA Explained | Kubernetes Pod Autoscaling Concepts",
+      "channel": "Amitabh Soni",
+      "duration": "4:27",
+      "views": "510 views",
+      "description": "Kubernetes #HPA #VPA #Autoscaling #DevOps #CloudComputing #KubernetesBasics #SystemDesign #K8s HPA vs VPA ..."
+    },
+    {
+      "id": "1OFu2AsMWes",
+      "title": "Kubernetes Explained How Containers Run at Scale",
+      "channel": "CaliZenOwais",
+      "duration": "8:07",
+      "views": "No views",
+      "description": "What is Kubernetes, and why is it used by so many modern companies? In this video, we explain Kubernetes in a simple and ..."
+    },
+    {
+      "id": "KNexvhb_DuY",
+      "title": "Kubernetes Horizontal Pod Autoscaler (HPA)",
+      "channel": "Containers from the Couch",
+      "duration": "1:01",
+      "views": "3,997 views",
+      "description": "Register for a free hands-on Amazon EKS Workshop: ..."
+    }
+  ]
+}

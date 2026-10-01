@@ -1,0 +1,22 @@
+{
+  "id": "-htbah3eCYg",
+  "url": "https://www.youtube.com/watch?v=-htbah3eCYg",
+  "checked_at": "2026-10-01T05:21:14.359Z",
+  "title": "How nested loop, hash, and merge joins work.",
+  "channel": "Arpit Bhayani",
+  "duration_seconds": 667,
+  "views": 79463,
+  "comments": "72 Comments",
+  "comment_samples": [
+    "Database internals are just amazing. Thanks for explaining.",
+    "1.Nested Join - nested for loop - O(N * N)\n\t- easiest to implement\n\t- time consuming for large dataset\n\t- better with either small datasets or index on join attributes\n2.Merge Join - sort them first and compare - O(NlogN) + O(NlogN)\n\t- Efficient for large datasets\n\t- pre-join preprartion required (sorting)\n\t- scanning of relation happens once while joining\n\t- can leverage indexes if available to make it faster\n3.Hash Join - using hashing - not good for range queries\n\t- creating a hashtable for the query you are searching ( user_id is the key)\n\t- used for equi joins\n\t- efficient for large datasets \n\t- requires additional memory \n\t- pre join prepration required -> hash table construction\n\t- Hash function should distribute data evenly\n\n\nSQL Engine : Take a look at data , look statistics across all table using cardinality",
+    "Bro I was thinking about it a few days back as how it works internally, thanks a lot",
+    "The biggest take away is, this gives some better algorithms to use when you need to join data coming from two different services and then augument it with your own DB's data and present it. Manual joins as we call them.",
+    "Hash join is something that we also do in application level code when large data is to be processed. Good to know various others ways as well✌️"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Applied AI Course: https://arpitbhayani.me/applied-ai\nSystem Design for SDE-2 and above: https://arpitbhayani.me/masterclass\nSystem Design for Beginners: https://arpitbhayani.me/sys-design\n\nPresentation Tool - https://github.com/arpitbbhayani/deckrun\nClaude Skill Used - ape-present from https://github.com/arpitbbhayani/ape-skills\n\nBuild Your Own Redis / DNS / BitTorrent / SQLite - with CodeCrafters.\nSign up and get 40% off - https://app.codecrafters.io/join?via=arpitbbhayani\n\n# Recommended videos and playlists\n\nIf you liked this video, you will find the following videos and playlists helpful\n\nRedis Internals: https://www.youtube.com/watch?v=h30k7YixrMo&list=PLsdq-3Z1EPT0eElcdOON9fdaeaQjlyXDt\nRedis Internals Reading Material: https://docs.google.com/document/d/1lHKI6bia3ZEPoAKgXWIm_SKv_Sii1qtN3EYMEdxKpEQ/edit?tab=t.0\n\nSystem Design: https://www.youtube.com/watch?v=o7qLKfILuD8&list=PLsdq-3Z1EPT27BuTnJ_trF7BsaTpYLqst\nDesigning Microservices: https://www.youtube.com/watch?v=JPj6mhVLQN0&list=PLsdq-3Z1EPT0ug8eizS71G6LZb6-4FAFt\nDatabase Engineering: https://www.youtube.com/watch?v=-htbah3eCYg&list=PLsdq-3Z1EPT2C-Da7Jscr7NptGcIZgQ2l&pp=gAQBiAQB\nConcurrency In-depth: https://www.youtube.com/watch?v=2PjlaUnrAMQ&list=PLsdq-3Z1EPT3VjDhjMb5yBsgn0wn2-fjp\nResearch paper dissections: https://www.youtube.com/watch?v=LXhgFAZroG8&list=PLsdq-3Z1EPT2XEJ0AmF02LBK1RFNd-jK8\nOutage Dissections: https://www.youtube.com/watch?v=LeT_s-UFw-U&list=PLsdq-3Z1EPT3_Z97svMs6S2y7tv1PcUmc\n\nHash Table Internals: https://www.youtube.com/watch?v=jjW8w8ED3Ns&list=PLsdq-3Z1EPT2UnueESBLReaVSLIo_BuAc\nBittorrent Internals: https://www.youtube.com/watch?v=v7cR0ZolaUA&list=PLsdq-3Z1EPT1rNeq2GXpnivaWINnOaCd0\n\n# Things you will find amusing\n\nBookshelf: https://arpitbhayani.me/bookshelf\nPapershelf: https://arpitbhayani.me/papershelf\n\n# Other socials\n\nI keep writing and sharing my practical experience and learnings every day, so if you resonate, then follow along. I keep it no fluff.\n\nLinkedIn: https://linkedin.com/in/arpitbhayani\nTwitter: https://twitter.com/arpit_bhayani\n\nThank you for watching and supporting! It means a ton.\n\nI am on a mission to bring out the best engineering stories from around the world and make you all fall in love with engineering. If you resonate with this, then follow along. I always keep it no-fluff.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "rgp_iCVS8ys",
+  "url": "https://www.youtube.com/watch?v=rgp_iCVS8ys",
+  "checked_at": "2026-10-01T05:20:49.374Z",
+  "title": "Learn React Hooks: useReducer - Simply Explained!",
+  "channel": "Cosden Solutions",
+  "duration_seconds": 828,
+  "views": 125986,
+  "comments": "118 Comments",
+  "comment_samples": [
+    "Hope you enjoyed the video! I also have a learning platform that will teach you way more than this video. You'll learn everything from JS/TS, React and design patterns, data fetching with React Query, state management with Redux/Zustand, navigation with React Router/Tanstack Router, and even full-stack frameworks like Next.js. Check it out at https://cosdencode.com",
+    "honestly, you're underrated. i learned more things from you than my college course.",
+    "Thank you so much Cosden! I've seen so many videos but it's just amazing how you are making this so simple.",
+    "I think if you find yourself having to update 4+ instances of state that all depend on each other in some capacity, its time to use useReducer",
+    "Dude, you are soooo underrated. 600 views? this video deserves a million views. can't even tell you how many different videos i watched about useReducer and finally you found a way to explain it perfectly. Finally got it 🙏🙏\nthank you thank you thank you.."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "✨ Cosden Code  → https://cosdencode.com\n📥 Import React (Newsletter) → https://cosden.solutions/newsletter?s=ytd\n\nJoin The Discord! → https://discord.cosdensolutions.io\nSource Code → https://github.com/cosdensolutions/code/tree/master/videos/long/learn-react-hooks-useReducer\n\nIn this video we will learn about React hooks, starting with useReducer. This powerful React hook will allow you to enhance how you manage and mutate state in your React application. You will learn the difference between useReducer and useState, how to create your reducer function, how to define your actions and return a mutated copy of the state in your application.\n\nIn this new React world, hooks are here to stay, so it's best to learn them! In this tutorial I demonstrate the useReducer React hook, and I explain it very simply and in a way that is easy to understand. Enjoy!",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

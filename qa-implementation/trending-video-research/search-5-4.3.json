@@ -1,0 +1,110 @@
+{
+  "query": "Golang slog graceful shutdown tutorial",
+  "checked_at": "2026-09-30T07:22:00.924Z",
+  "results": [
+    {
+      "id": "hX7EX9ukbmw",
+      "title": "Golang Graceful Shutdown Tutorial | HTTP Server & Context Timeout",
+      "channel": "Shourov Roy",
+      "duration": "9:29",
+      "views": "217 views",
+      "description": "In this video, we dive deep into implementing a production-grade Graceful Shutdown for Go (Golang) HTTP servers. What ..."
+    },
+    {
+      "id": "UPVSeZXBTxI",
+      "title": "Graceful Shutdown in Go: Key Patterns you need to know!",
+      "channel": "Flo Woelki",
+      "duration": "17:34",
+      "views": "10,374 views",
+      "description": "In this video, we will look at how to gracefully shut down your server in Go. If you want to learn more about the concurrency ..."
+    },
+    {
+      "id": "lak8Xw1GNl0",
+      "title": "How to Gracefully Shutdown a Go Server",
+      "channel": "cdruc",
+      "duration": "8:53",
+      "views": "3,381 views",
+      "description": "Learn how to design a graceful shutdown process for your Go server. In this video, we cover: - Handling ongoing requests during ..."
+    },
+    {
+      "id": "V2fQf2AgQz0",
+      "title": "Go Graceful Shutdown: OS Signals Handling Tutorial",
+      "channel": "programmerCave",
+      "duration": "6:05",
+      "views": "210 views",
+      "description": "Master graceful shutdown in Golang by handling OS signals like SIGINT and SIGTERM, crucial for building robust production ..."
+    },
+    {
+      "id": "J7Igi4SVh5k",
+      "title": "Handling Graceful shutdown in Go #golang #programming",
+      "channel": "Code With Cypert",
+      "duration": "2:50",
+      "views": "2,569 views",
+      "description": "Graceful shutdowns help keep your application in a healthy state and help minimize data loss. Reliability is important, so learn ..."
+    },
+    {
+      "id": "SiGxu2N9ndU",
+      "title": "Create A Golang Web Server with Proper Graceful Shutdown From Scratch",
+      "channel": "Learn Fast Make Things",
+      "duration": "10:42",
+      "views": "13,044 views",
+      "description": "Learn to make your own web server in Golang. This coding walk-through will show you how to make your own web server with a ..."
+    },
+    {
+      "id": "Pvw75CJPx-M",
+      "title": "Golang channels and graceful shutdown using signals.",
+      "channel": "Gerald Yerden",
+      "duration": "4:19",
+      "views": "2,285 views",
+      "description": "... let's see print line gracefully shut down because this is usually where you would handle your graceful shutdown in general like ..."
+    },
+    {
+      "id": "VXxe7-b5euo",
+      "title": "Golang Microservices: Graceful Shutdown",
+      "channel": "Mario Carrion",
+      "duration": "11:56",
+      "views": "6,266 views",
+      "description": "Let's implement Graceful Shutdown for HTTP servers in Go. Also I discuss the way I like to organize main to clearly indicate how to ..."
+    },
+    {
+      "id": "vnFdRo8aiJI",
+      "title": "Go Logging Tutorial: Master Structured Logging with slog - Best Practices for Production",
+      "channel": "CodeLucky",
+      "duration": "9:56",
+      "views": "647 views",
+      "description": "Master Go logging with this comprehensive tutorial on structured logging best practices! Learn how to implement effective logging ..."
+    },
+    {
+      "id": "pC5myftH41Q",
+      "title": "05 - Golang - server singleton and graceful shutdown",
+      "channel": "Paweł Walus - Order of Devs",
+      "duration": "10:00",
+      "views": "103 views",
+      "description": "Singleton implementation using Golang and graceful shutdown of web server === gitlab repository this project: ..."
+    },
+    {
+      "id": "_mqB7LLgwgs",
+      "title": "Go's Built-in Package for Better Logging (using slog)",
+      "channel": "Better Stack",
+      "duration": "8:51",
+      "views": "14,400 views",
+      "description": "Go's built-in slog package transforms messy logs into clean, searchable JSON that your observability tools will love. In this video ..."
+    },
+    {
+      "id": "BteDmfuVfdA",
+      "title": "You're Using the Wrong Logging Package | Golang for Devs",
+      "channel": "Chris Elder",
+      "duration": "9:13",
+      "views": "1,784 views",
+      "description": "There are way too many logging packages in Go to choose from, so let me narrow down the selection for you."
+    },
+    {
+      "id": "niQb0TZatF4",
+      "title": "DAY-7 | How to Shutdown Your HTTP Server Gracefully | Master Golang Interviews",
+      "channel": "Backend Knights",
+      "duration": "18:04",
+      "views": "195 views",
+      "description": "Question: How to gracefully shutdown your HTTP server."
+    }
+  ]
+}

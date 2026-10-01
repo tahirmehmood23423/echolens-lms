@@ -1,0 +1,62 @@
+{
+  "query": "Prometheus metrics alertmanager tutorial",
+  "checked_at": "2026-09-30T07:21:55.226Z",
+  "results": [
+    {
+      "id": "9joXN3ipABg",
+      "title": "Alerting Rules in Prometheus | Prometheus Tutorial for Beginners | Prometheus Alertmanager Tutorial",
+      "channel": "DevOps Hint",
+      "duration": "13:26",
+      "views": "5,547 views",
+      "description": "In this Video we are going to cover Alerting Rules in Prometheus | Prometheus Tutorial for Beginners | Prometheus Alertmanager ..."
+    },
+    {
+      "id": "h78tYrW8IJU",
+      "title": "Prometheus Alertmanager",
+      "channel": "Pavan Elthepu",
+      "duration": "13:55",
+      "views": "19,648 views",
+      "description": "Get Notified When Something Goes Wrong with Prometheus Alertmanager! #Prometheus #alerting #Monitoring #DevOps ..."
+    },
+    {
+      "id": "KffdZ-eougU",
+      "title": "Prometheus Alertmanager Tutorial: Setup Kubernetes Cluster Alerts for Beginners",
+      "channel": "CodeLucky",
+      "duration": "7:41",
+      "views": "1,466 views",
+      "description": "Learn how to set up Prometheus Alertmanager for Kubernetes monitoring! In this comprehensive tutorial, you'll discover how to ..."
+    },
+    {
+      "id": "fhx0ehppMGM",
+      "title": "Understanding Prometheus Metric Types | Meaning and Usage (Gauge, Counter, Summary, Histogram)",
+      "channel": "Prometheus Monitoring with Julius | PromLabs",
+      "duration": "11:19",
+      "views": "85,530 views",
+      "description": "This video explains the four different metric types in Prometheus: Gauges, Counters, Summaries, and Histograms. It goes into the ..."
+    },
+    {
+      "id": "oH_dbf_SQsY",
+      "title": "Complete Kubernetes Monitoring Setup: Prometheus + Grafana + Alertmanager + Slack Integration",
+      "channel": "Lens - Kubernetes and LLM observability",
+      "duration": "9:11",
+      "views": "1,277 views",
+      "description": "Learn how to set up a complete monitoring stack for Kubernetes! This step-by-step tutorial shows you how to deploy Prometheus ..."
+    },
+    {
+      "id": "XSgyow6LNDs",
+      "title": "Introduction to Alert Manager for Prometheus on Kubernetes",
+      "channel": "That DevOps Guy",
+      "duration": "13:37",
+      "views": "31,826 views",
+      "description": "Subscribe to show your support! https://goo.gl/1Ty1Q2 . Patreon http://patreon.com/marceldempers Hello folks! In this video ..."
+    },
+    {
+      "id": "QKkrsY-sndg",
+      "title": "How to Setup Prometheus alertmanager with Pagerduty and Slack",
+      "channel": "Arvind Konar",
+      "duration": "9:08",
+      "views": "10,970 views",
+      "description": "How to Setup Prometheus alertmanager with Pagerduty and Slack Github Link to all configs ..."
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "query": "one dimensional dynamic programming memoization tabulation",
+  "checked_at": "2026-09-30T07:21:50.075Z",
+  "results": [
+    {
+      "id": "5dRGRueKU3M",
+      "title": "4 Principle  of Optimality  - Dynamic Programming introduction",
+      "channel": "Abdul Bari",
+      "duration": "14:52",
+      "views": "1,677,503 views",
+      "description": "Introduction to Dynamic Programming Greedy vs Dynamic Programming Memoization vs Tabulation PATREON ..."
+    },
+    {
+      "id": "07ID3xLB4XQ",
+      "title": "When To Use 2D Over 1D Tables In Dynamic Programming | Longest Common Subsequence Problem",
+      "channel": "Algorithms With Brenton",
+      "duration": "8:02",
+      "views": "3,614 views",
+      "description": "In this video we look at when 2-dimensional tables need to be used over 1-dimensional tables for bottom up dynamic ..."
+    },
+    {
+      "id": "4KdfomRGDAE",
+      "title": "Understanding Dynamic Programming - Tabulation vs. Memoization | Learn Algorithms with Phanto",
+      "channel": "AI-Powered Coder",
+      "duration": "13:55",
+      "views": "11,399 views",
+      "description": "Dynamic programming is a technique used to solve programming problems. In this video we explain what dynamic programming ..."
+    },
+    {
+      "id": "p4VRynhZYIE",
+      "title": "Tabulation vs Memoization in Dynamic Programming",
+      "channel": "Snippet Nuggets",
+      "duration": "14:11",
+      "views": "3,169 views",
+      "description": "Timestamps: Introduction to DP: 0:00 Tabulation and Memoization definition: 1:55 Tabulation: 2:39 Memoization: 5:13 Tabulation ..."
+    },
+    {
+      "id": "M-NeO_9BU_A",
+      "title": "Bottom Up vs Top Down Dynamic Programming vs Recursion | Fibonacci Sequence",
+      "channel": "Algorithms With Brenton",
+      "duration": "7:26",
+      "views": "33,288 views",
+      "description": "In this video we look at the performance problems that occur when using recursion with reference to the Fibonacci Sequence."
+    },
+    {
+      "id": "0BhhiQGDbEA",
+      "title": "L-5.1: Introduction to Dynamic Programming | Greedy Vs Dynamic Programming | Algorithm(DAA)",
+      "channel": "Gate Smashers",
+      "duration": "9:08",
+      "views": "1,184,198 views",
+      "description": "Confused between Greedy Algorithms and Dynamic Programming? In this video, Varun sir will explain the key differences with ..."
+    },
+    {
+      "id": "sWnBVPRA0yQ",
+      "title": "5 steps to solve any Dynamic Programming problem",
+      "channel": "Sahil & Sarra",
+      "duration": "8:43",
+      "views": "151,364 views",
+      "description": "Try my free email crash course to crush technical interviews: https://instabyte.io/ ▻ For more content like this, subscribe to our ..."
+    },
+    {
+      "id": "IiJuSf5ow2Q",
+      "title": "Dynamic Programming: Memoization vs  Tabulation | DSA #38",
+      "channel": "Bonaventure Ogeto",
+      "duration": "9:29",
+      "views": "223 views",
+      "description": "Welcome to our Data Structures and Algorithms series! In this series, we'll break down essential concepts in computer science, ..."
+    },
+    {
+      "id": "nmBnDFaJpFc",
+      "title": "Dynamic Programming for Beginners | Memoization vs Tabulation Explained(Episode 1)",
+      "channel": "CODE ERA",
+      "duration": "8:47",
+      "views": "10 views",
+      "description": "In this video, we start a brand new series on Dynamic Programming (DP) — one of the most important and most feared topics in ..."
+    }
+  ]
+}

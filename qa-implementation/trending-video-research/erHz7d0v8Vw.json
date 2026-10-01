@@ -1,0 +1,22 @@
+{
+  "id": "erHz7d0v8Vw",
+  "url": "https://www.youtube.com/watch?v=erHz7d0v8Vw",
+  "checked_at": "2026-09-30T07:23:57.681Z",
+  "title": "#55 Golang - Get Started with gRPC in Golang – Server & Client",
+  "channel": "codeHeim",
+  "duration_seconds": 937,
+  "views": 10581,
+  "comments": "8 Comments",
+  "comment_samples": [
+    "Man. What would I do without you?",
+    "Just the exact minimal explanation and example to understand the concept. Thank you codeHeim. Keep it up!",
+    "Clear and Concise . Thank you very much!!",
+    "thanks man I finally get it",
+    "Great video. Can you turn on soft wrap in your code editor so text will always be visible?"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Welcome to this episode on gRPC with Golang! In this video, we’ll walk you through building scalable microservices using gRPC, a high-performance RPC framework. You'll learn to create both a server and a client in Go, using Protocol Buffers for message serialization and HTTP/2 for efficient communication.\n\nWhat you'll learn:\n- Why gRPC is faster and more efficient than REST\n- How to install and set up gRPC and Protobuf in Go\n- Defining proto files for message and service definitions\n- Generating Go code from Protocol Buffers\n- Implementing CRUD operations (Create, Read, Update, Delete)\n- Setting up a gRPC server and connecting a client\n- Running and testing your gRPC API\n\nWhether you're building microservices or efficient APIs, gRPC is a powerful tool for your Go projects. Make sure to follow along as we implement everything step by step!\n\n📚 Topics covered:  \n1. Setting up gRPC and Protocol Buffers  \n2. Defining and compiling proto files  \n3. Implementing gRPC server in Go  \n4. Creating and testing a client for gRPC  \n\n🔗 Related resources:  \n- gRPC: https://grpc.io/\n- Original video: https://www.codeheim.io/courses/Episode-55-Get-Started-with-gRPC-in-Golang--Server--Client-66e69b7d8b9a776c5a770228\n- Source code: https://github.com/code-heim/go_55_grpc\n\nTimestamps:\n00:00-01:13: Introduction & gRPC vs REST\n01:13-01:54: Package installation  \n01:54-04:51: Protobuf definition\n04:51-06:49: Generating Go code from Protocol Buffers\n06:49-12:20: Server Implementation  \n12:20-14:33: Client Implementation\n14:33-15:15: Server and client testing \n15:15-15:37: Conclusion\n\nIf you enjoyed this video, like, share, and subscribe for more Golang tutorials!\n\n#golang #grpc #protobuf #microservices #webdevelopment #apidesign #golang \n\n-------------------------------------------------------------------------------------------------------------------------\n\nBuy my book 'Functional Programming with Go' here: \n\n- Amazon India: https://amzn.to/3VTUlxl\n- Amazon US: https://www.amazon.com/Functional-Programming-Go-implementation-English/dp/9355519877\n- BPB Online (BPB): https://in.bpbonline.com/products/functional-programming-with-go",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

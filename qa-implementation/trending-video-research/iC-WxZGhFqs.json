@@ -1,0 +1,22 @@
+{
+  "id": "iC-WxZGhFqs",
+  "url": "https://www.youtube.com/watch?v=iC-WxZGhFqs",
+  "checked_at": "2026-09-30T07:25:44.667Z",
+  "title": "Kubernetes Pods, ReplicaSets, and Deployments in 5 Minutes",
+  "channel": "Containers from the Couch",
+  "duration_seconds": 297,
+  "views": 31069,
+  "comments": "15 Comments",
+  "comment_samples": [
+    "This is the most straightforward k8s deployment explanation video on the internet",
+    "I'm from Brazil and I couldn't find an explanation as good as this one, using a pod inside a ReplicaSet and inside a Deployment. Thank you",
+    "Thanks, excellent overview!",
+    "I wish I had watched this playlist before learning, so useful!",
+    "Thank you so much! That's perfect explanation."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Register for a free hands-on Amazon EKS Workshop: https://aws-experience.com/emea/smb/events/series/get-hands-on-with-amazon-eks?trk=48871b39-140d-4ddf-98a2-7f1e696166e1&sc_channel=el\n When should you use a Kubernetes Pod, ReplicaSet or Deployment? In this 5 minute video, learn about basic Kubernetes components and the K8s control loop, along with real Kubernetes configuration YAML. Although pods are the smallest deployable unit of computing within Kubernetes, they are not usually deployed by themselves. Instead, Deployments are a higher-level abstraction used to manage Pods and ReplicaSets. Kubernetes uses a controller model to handle these resources.\n\n0:00 Intro to Pods\n0:45 Pod Configuration\n2:10 ReplicaSets and Deployments\n3:50 The Controller/Control Loop\n\n#Kubernetes #Containers #DevOps",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

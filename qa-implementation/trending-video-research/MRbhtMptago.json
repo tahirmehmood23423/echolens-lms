@@ -1,0 +1,22 @@
+{
+  "id": "MRbhtMptago",
+  "url": "https://www.youtube.com/watch?v=MRbhtMptago",
+  "checked_at": "2026-09-30T07:23:52.745Z",
+  "title": "What's the proper way to wrap errors in Go?",
+  "channel": "Boldly Go",
+  "duration_seconds": 676,
+  "views": 7545,
+  "comments": "17 Comments",
+  "comment_samples": [
+    "Very clear explanation. The historical context is a great help for understanding the options and also for putting old code and advice in context.",
+    "Every Go programmer should be subscribed to this channel",
+    "Great video. Thanks",
+    "I find delving on past libraries not so useful, would have liked a discussion on As vs Is and how to do stack traces without the old lib. Also would have liked bigger font for code, more code time and less face time. Thanks for the video.",
+    "Hi Jonathan. Thanks for the explanation. New to Go. This video helped. I've learnt something (dopamine=+1). In my case I needed, not so much a traditional stack trace as, an error with a flat array of errors - bunch of parallel calls, get array of errors back (or nil, or [], not sure yet :) ). So I initially started using wrap() from pkg, but then stumbled on stack-overflow question, mentioned in the video, which led me to this video :) for some reason I thought it was important to share all this... Thanks for contributing to the world's body of knowledge and pushing the expert levels up."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "errors.New()? fmt.Errorf()? errors.Errorf()? errors.Wrapf()?  Which should you use?\n\nIn this video, I dive into the history of the various ways to wrap errors in Go, and describe which method(s) you should be using now.\n\nRelated answer on StackOverflow: https://stackoverflow.com/a/61955455/13860",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

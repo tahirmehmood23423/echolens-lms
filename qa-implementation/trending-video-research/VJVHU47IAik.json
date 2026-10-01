@@ -1,0 +1,16 @@
+{
+  "id": "VJVHU47IAik",
+  "url": "https://www.youtube.com/watch?v=VJVHU47IAik",
+  "checked_at": "2026-09-30T07:23:19.086Z",
+  "title": "Qdrant Essentials | Combine Search & Filtering with Qdrant Filterable HNSW",
+  "channel": "Qdrant Vector Search",
+  "duration_seconds": 286,
+  "views": 2794,
+  "comments": "0 Comments",
+  "comment_samples": [],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Unlock powerful filtering in vector search with Qdrant’s “filterable HNSW” feature.\n\nIn this module from Day 2 of the Essentials course, you’ll learn how Qdrant enables efficient, accurate search by combining the graph-based index of Hierarchical Navigable Small World (HNSW) with metadata filters so you don’t lose precision when narrowing your result set.  ￼\n\nYou’ll discover:\n • Why naive filtering breaks HNSW graphs (points get disconnected, search accuracy drops).  \n • How Qdrant’s “filterable HNSW” builds additional link structures during the index build to preserve connectivity even when filters are applied.  ￼\n • When to use filterable HNSW vs. simpler pre-filtering or post-filtering strategies, depending on metadata cardinality and use-case size.  ￼\n • Best practices: choose filters that maintain graph connectivity, design payload indexes to support high-performant queries, and monitor trade-offs between speed and recall.\n\n🔗 Explore the full tutorial: https://qdrant.tech/course/essentials/day-2/filterable-hnsw/\n\n👉 This video is part of a structured online course you can access for free at https://qdrant.tech/course/essentials/",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

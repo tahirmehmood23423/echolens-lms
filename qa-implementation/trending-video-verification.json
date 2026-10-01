@@ -1,0 +1,23 @@
+{
+  "completed_on": "2026-10-01",
+  "courses": 6,
+  "lessons": 72,
+  "newly_filled_lessons": 60,
+  "optional_companion_videos": 24,
+  "total_video_links": 96,
+  "maximum_video_duration_seconds": 1193,
+  "duration_policy": "Every individual video is strictly shorter than 1200 seconds; main plus optional companion runtimes can exceed 20 minutes.",
+  "youtube_evidence": "Public watch-page runtime, embeddability, views and comment counts; titles, descriptions, available chapters and sampled top comments reviewed. No complete end-to-end viewing claim.",
+  "checks": {
+    "catalogue_tests": "8 passed",
+    "admin_access_and_browser_test": "passed with VIDEO_REVIEW_BROWSER=1",
+    "admin_api": "6 courses, 72 lessons, 96 video links; no-store response",
+    "access_control": "Anonymous API request 401; non-admin roles 403; signed-out page redirects to login; learner lesson content stays locked",
+    "browser": "96 preview controls, inline iframe open/close, course filter, topic search, 96-row CSV download, 390px layout, and Go pgx lesson deep link passed",
+    "javascript_syntax": "passed for server and changed browser scripts",
+    "git_diff_check": "passed"
+  },
+  "admin_path": "/admin/course-videos",
+  "admin_dashboard_entry": "Free Courses > Review upcoming course videos",
+  "publication": "Courses remain staged. Changes are local; no deployment or production database mutation performed."
+}

@@ -1,0 +1,142 @@
+{
+  "query": "Postgres btree composite indexes explained",
+  "checked_at": "2026-09-30T07:22:03.438Z",
+  "results": [
+    {
+      "id": "9eqKRT5K8hI",
+      "title": "PostgreSQL indexes. B-Tree or Hash. What is better? How it works?",
+      "channel": "JaneExplainsIT",
+      "duration": "5:50",
+      "views": "2,164 views",
+      "description": "PostgreSQL: Hash index. We'll see how it works under the hood and understand if it's better than B tree index. So, what is a hash ..."
+    },
+    {
+      "id": "_HG2eB27j00",
+      "title": "PostgreSQL indexes. B-Tree, GIN, BRIN. What's the difference? Easy explanation.",
+      "channel": "JaneExplainsIT",
+      "duration": "5:06",
+      "views": "6,371 views",
+      "description": "The difference between PostgreSQL indexes, pros and cons of using different types."
+    },
+    {
+      "id": "-qNSXK7s7_w",
+      "title": "Database Indexing Explained (with PostgreSQL)",
+      "channel": "Hussein Nasser",
+      "duration": "18:19",
+      "views": "402,431 views",
+      "description": "Get my Fundamentals of Database Engineering udemy course to learn more , link redirects to udemy with coupon applied ..."
+    },
+    {
+      "id": "8s35iHLGHww",
+      "title": "How to Choose PostgreSQL Indexes: B-Tree, Hash, BRIN, GIN & GiST",
+      "channel": "JaneExplainsIT",
+      "duration": "13:05",
+      "views": "2,013 views",
+      "description": "In this video, we'll briefly look at how different PostgreSQL indexes work and mainly focus on how to choose the right index for ..."
+    },
+    {
+      "id": "NI9wYuVIYcA",
+      "title": "B-Tree Indexes",
+      "channel": "Ivan talks about computers",
+      "duration": "4:33",
+      "views": "155,802 views",
+      "description": "In this video, I'd like to take a look at B-tree indexes and show how knowing them can help design better database tables and ..."
+    },
+    {
+      "id": "eKpGIyfr1AI",
+      "title": "B-Tree & B+Tree Indexing Explained | Database Indexing for Interviews",
+      "channel": "Kartikeya Sharma",
+      "duration": "12:38",
+      "views": "1,115 views",
+      "description": "In this video, I explain B-Trees and B+Trees – the backbone of modern database indexing. You'll learn: How B-Trees work for ..."
+    },
+    {
+      "id": "xXtig5uLQS4",
+      "title": "How does indexing work in Databases in Hindi ( How to optimize SQL Queries in Hindi )",
+      "channel": "Engineering Digest",
+      "duration": "7:32",
+      "views": "230,172 views",
+      "description": "Get 1 to 1 coaching with me: https://topmate.io/engineeringdigest Donate: https://paypal.me/engineeringdigest Perks: ..."
+    },
+    {
+      "id": "K1a2Bk8NrYQ",
+      "title": "Understanding B-Trees: The Data Structure Behind Modern Databases",
+      "channel": "Spanning Tree",
+      "duration": "12:39",
+      "views": "1,176,453 views",
+      "description": "B-trees are a popular data structure for storing large amounts of data, frequently seen in databases and file systems. But how do ..."
+    },
+    {
+      "id": "EZ3jBam2IEA",
+      "title": "Database Design 39 - Indexes (Clustered, Nonclustered, Composite Index)",
+      "channel": "Caleb Curry",
+      "duration": "13:28",
+      "views": "195,191 views",
+      "description": "Start your software dev career - https://calcur.tech/dev-fundamentals FREE Courses (100+ hours) ..."
+    },
+    {
+      "id": "BHCSL_ZifI0",
+      "title": "DB Indexing in System Design Interviews - B-tree, Geospatial, Inverted Index, and more!",
+      "channel": "Hello Interview",
+      "duration": "14:16",
+      "views": "263,601 views",
+      "description": "Full written breakdown: https://hellointerview.com/youtube/db-indexing/description ..."
+    },
+    {
+      "id": "xyP1iaIMpN4",
+      "title": "How Database Indexes Actually Work: B+ Trees Explained (PostgreSQL vs MySQL)",
+      "channel": "The Coding Cactus",
+      "duration": "17:45",
+      "views": "28 views",
+      "description": "Ever wondered what CREATE INDEX actually builds? In this video we open up a database index and look inside, with ..."
+    },
+    {
+      "id": "fW-y-r7CgNI",
+      "title": "Are Multi-Column Indexes a good idea?",
+      "channel": "Supabase",
+      "duration": "11:22",
+      "views": "16,296 views",
+      "description": "Indexing can greatly improve the performance of database queries over a large dataset. Postgres supports Indexing multiple ..."
+    },
+    {
+      "id": "inA2TotDKCI",
+      "title": "System Design: Database Indexing Explained — B-Tree vs Hash Index & Composite Index",
+      "channel": "Coding With Aaditya",
+      "duration": "11:42",
+      "views": "104 views",
+      "description": "System Design: Database Indexing Explained — B-Tree vs Hash Index & Composite Index In this video, we break down Database ..."
+    },
+    {
+      "id": "YTLv_S02NSI",
+      "title": "Composite Indexes Explained: Column Order, Skip Scan & ASC/DESC (PostgreSQL vs MySQL)",
+      "channel": "The Coding Cactus",
+      "duration": "13:33",
+      "views": "17 views",
+      "description": "Same index, same table… so why is one query fast and the other hundreds of times slower? In Part 2 we open up multi-column ..."
+    },
+    {
+      "id": "23zC9rD-B1g",
+      "title": "B-Tree Explained 💾 How PostgreSQL & MySQL Search at Scale",
+      "channel": "EasyDev",
+      "duration": "7:36",
+      "views": "114 views",
+      "description": "Ever wondered how PostgreSQL or MySQL can find a single row among millions in just a few disk reads? The answer is the ..."
+    },
+    {
+      "id": "eCXsPCuJGWs",
+      "title": "PostgreSQL Indexes Explained | Speed Up Queries 100x | EXPLAIN, Index Scan & Performance",
+      "channel": "Ajay yadav",
+      "duration": "13:39",
+      "views": "484 views",
+      "description": "PostgreSQL Indexes Explained | Speed Up Queries 100x Learn how PostgreSQL Indexes improve query performance and make ..."
+    },
+    {
+      "id": "teMXE6hzva0",
+      "title": "How SQL Indexes Actually Work (Step-by-Step)",
+      "channel": "Milan Jovanović",
+      "duration": "16:08",
+      "views": "39,367 views",
+      "description": "Get the source code for this video for FREE → https://the-dotnet-weekly.ck.page/indexing Want to master Clean Architecture?"
+    }
+  ]
+}

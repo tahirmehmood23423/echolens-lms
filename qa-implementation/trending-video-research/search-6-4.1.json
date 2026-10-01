@@ -1,0 +1,126 @@
+{
+  "query": "PostgreSQL transaction isolation levels ACID",
+  "checked_at": "2026-09-30T07:22:05.796Z",
+  "results": [
+    {
+      "id": "G8wDjV0N9tk",
+      "title": "Transaction Isolation Levels With PostgreSQL as an example",
+      "channel": "mkdev",
+      "duration": "8:18",
+      "views": "40,215 views",
+      "description": "In this video, Boris Strelnikov will explain which transaction isolation levels exist in databases and what you should be aware of as ..."
+    },
+    {
+      "id": "KbkLQM5LARs",
+      "title": "Transaction Isolation Levels and Anomalies in PostgreSQL",
+      "channel": "JaneExplainsIT",
+      "duration": "9:36",
+      "views": "1,378 views",
+      "description": "Transaction isolation levels are one of those topics that many developers use every day — but don't really understand. In this ..."
+    },
+    {
+      "id": "-gxyut1VLcs",
+      "title": "Isolation Levels in Database Management Systems",
+      "channel": "Edredo for Learners",
+      "duration": "10:20",
+      "views": "183,311 views",
+      "description": "IMPORTANT LINKS: 1) Official Website: http://www.techtud.com/ 2) Virtual GATE: http://virtualgate.in/login/index.php Both of the ..."
+    },
+    {
+      "id": "HyoxHAqhOPs",
+      "title": "Database isolation levels in 90 seconds #database #isolation #oracle #postgres #sql",
+      "channel": "Backpressure-dev",
+      "duration": "1:31",
+      "views": "11 views",
+      "description": ""
+    },
+    {
+      "id": "0Mfm_sclq0E",
+      "title": "SQL Transaction Isolation Levels Explained Simply",
+      "channel": "NPC Codes",
+      "duration": "4:58",
+      "views": "900 views",
+      "description": "Learn how isolation levels like READ COMMITTED and SERIALIZABLE affect data consistency in SQL. Understand dirty reads ..."
+    },
+    {
+      "id": "BwaFhBCPDdc",
+      "title": "Topic 06, Part 08 - ACID Transactions and Transaction Isolation Levels",
+      "channel": "Dr. Daniel Soper",
+      "duration": "19:17",
+      "views": "2,628 views",
+      "description": "Dr. Soper discusses ACID transactions and the four different transaction isolation levels (Read Uncommitted, Read Committed, ..."
+    },
+    {
+      "id": "K_Z3KtbGWmU",
+      "title": "1_10 Understanding PostgreSQL Transaction Isolation Levels",
+      "channel": "Александар Којић",
+      "duration": "6:25",
+      "views": "17 views",
+      "description": "https://github.com/acakojic/postgresql-learning/blob/main/transactions/isolation-levels/1_10_postgresql_isolation_levels_intro."
+    },
+    {
+      "id": "CTCAo89fcQw",
+      "title": "Transaction Isolation Levels",
+      "channel": "Bharath thippireddy",
+      "duration": "5:12",
+      "views": "95,661 views",
+      "description": "http://www.bharaththippireddy.com/2020/05/new-course-devops-tools-and-aws-for.html."
+    },
+    {
+      "id": "GAe5oB742dw",
+      "title": "ACID Properties in Databases With Examples",
+      "channel": "ByteByteGo",
+      "duration": "4:57",
+      "views": "308,798 views",
+      "description": "Get a Free System Design PDF with 158 pages by subscribing to our weekly newsletter: https://bit.ly/bytebytegoytTopic Animation ..."
+    },
+    {
+      "id": "w3BBvjN8PP4",
+      "title": "What is transactional isolation? | Transaction Isolation Levels #1",
+      "channel": "Artem Codes",
+      "duration": "2:56",
+      "views": "281 views",
+      "description": "If you're a Backend Engineer or a specialist working with databases, you've likely come across transaction isolation levels ..."
+    },
+    {
+      "id": "xZu051pv-ag",
+      "title": "DB Isolation Levels Explained (ACID) | Dirty Reads → Serializable | Spring Boot @Transactional",
+      "channel": "Jatin Goyal",
+      "duration": "17:36",
+      "views": "7 views",
+      "description": "Ever wondered why applications break only under high traffic ? Or why two users sometimes book the same seat, see wrong ..."
+    },
+    {
+      "id": "SnDJ7MPmu84",
+      "title": "Mastering Database Isolation Levels: ACID Properties Explained with Examples",
+      "channel": "Better Dev with Anubhav",
+      "duration": "14:27",
+      "views": "2,933 views",
+      "description": "Learn about Database Isolation Levels: Explore the concepts of ACID properties, particularly focusing on Isolation Levels in ..."
+    },
+    {
+      "id": "lfof2Ij-TxI",
+      "title": "Isolation Levels and Anomalies - PostgreSQL for Developers",
+      "channel": "The Software Mentor",
+      "duration": "2:20",
+      "views": "6 views",
+      "description": "Isolation Levels and Anomalies - part of PostgreSQL for Developers. PostgreSQL from the inside out - fundamentals through ..."
+    },
+    {
+      "id": "9wmTZUSJk5w",
+      "title": "Database Transactions Explained: ACID, Isolation Levels & Real-World Pitfalls",
+      "channel": "The Trending Tech Show",
+      "duration": "18:06",
+      "views": "25 views",
+      "description": "Ever wondered what really happens when you hit \"commit\" in your database? In this episode of The Trending Tech Show, Alex ..."
+    },
+    {
+      "id": "rn6ne48kKTg",
+      "title": "PostgreSQL Crash Course: Day 1 | ACID, Transactions, Isolation, MVCC",
+      "channel": "MSDataPulse",
+      "duration": "14:34",
+      "views": "268 views",
+      "description": "Welcome to Day 1 of our PostgreSQL Crash Course series on MSdatapulse! In this video, we dive into the fundamentals of: ..."
+    }
+  ]
+}

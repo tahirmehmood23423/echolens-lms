@@ -1,0 +1,146 @@
+{
+  "query": "embeddings semantic similarity explained",
+  "checked_at": "2026-09-30T07:19:49.440Z",
+  "results": [
+    {
+      "id": "bj_hkrXgtNE",
+      "title": "Semantic Search in NLP | Sentence Embedding & Cosine Similarity with Examples",
+      "channel": "Gate Smashers",
+      "duration": "9:10",
+      "description": "MASTER COMPUTER SCIENCE | INTERVIEWS | EXAMS Gate Smashers — Learn Computer Science through free lectures, ..."
+    },
+    {
+      "id": "OATCgQtNX2o",
+      "title": "Text embeddings & semantic search",
+      "channel": "Hugging Face",
+      "duration": "3:30",
+      "description": "Learn how Transformer models can be used to represent documents and queries as vectors called embeddings. In this video, we ..."
+    },
+    {
+      "id": "wgfSDrqYMJ4",
+      "title": "What are Word Embeddings?",
+      "channel": "IBM Technology",
+      "duration": "8:38",
+      "description": "Want to play with the technology yourself? Explore our interactive demo → https://ibm.biz/BdKet3 Learn more about the ..."
+    },
+    {
+      "id": "2sxL0955aVU",
+      "title": "Cosine Similarity Explained for AI Engineers | Embeddings & Semantic Search",
+      "channel": "WishInfinite",
+      "duration": "39:23",
+      "description": "osine Similarity is one of the most important mathematical concepts for understanding how modern AI compares vectors, ..."
+    },
+    {
+      "id": "95eQCwQpS4k",
+      "title": "Introduction to Word Embedding | Static vs Dynamic Embedding | Deep Learning",
+      "channel": "Gate Smashers",
+      "duration": "9:30",
+      "description": "Understand the fundamentals of Word Embedding in Deep Learning and how words are converted into meaningful vector ..."
+    },
+    {
+      "id": "gl1r1XV0SLw",
+      "title": "What is a Vector Database? Powering Semantic Search & AI Applications",
+      "channel": "IBM Technology",
+      "duration": "9:49",
+      "description": "Ready to become a certified Qiskit Developer? Register now and use code IBMTechYT20 for 20% off of your exam ..."
+    },
+    {
+      "id": "viZrOnJclY0",
+      "title": "Word Embedding and Word2Vec, Clearly Explained!!!",
+      "channel": "StatQuest with Josh Starmer",
+      "duration": "16:12",
+      "description": "Words are great, but if we want to use them as input to a neural network, we have to convert them to numbers. One of the most ..."
+    },
+    {
+      "id": "lPTcTh5sRug",
+      "title": "How AI Turns Words Into Vectors: Embeddings",
+      "channel": "BlackBoard AI",
+      "duration": "3:35",
+      "description": "Ever wondered how a computer learns the meaning of words like king and queen? How does an AI know that king is more related ..."
+    },
+    {
+      "id": "OlhNZg4gOvA",
+      "title": "Sentence Transformers: Sentence Embedding, Sentence Similarity, Semantic Search and Clustering |Code",
+      "channel": "Pradip Nichite",
+      "duration": "32:54",
+      "description": "Learn How to use Sentence Transformers to perform Sentence Embedding, Sentence Similarity, Semantic search, and Clustering."
+    },
+    {
+      "id": "48vNzQnp6Us",
+      "title": "Embeddings and Cosine Similarity in LLM",
+      "channel": "AI with Sakthivel",
+      "duration": "10:37",
+      "description": "In this video, we delve into the concept of embeddings and explore how they can be used for tasks like measuring the similarity ..."
+    },
+    {
+      "id": "o3XN4dImESE",
+      "title": "What is semantic search?",
+      "channel": "Redis",
+      "duration": "3:30",
+      "description": "Traditional search matches words — but what if your AI app could match meaning instead? In this video, @RaphaelDeLio ..."
+    },
+    {
+      "id": "z7UFjmqmw1o",
+      "title": "Vector Embedding & Cosine Similarity Explained in 10 Minutes",
+      "channel": "CodexaAI",
+      "duration": "6:59",
+      "description": "n this video, we break down one of the most important concepts in AI and machine learning — vector embeddings — in a simple ..."
+    },
+    {
+      "id": "nbJVJ1RPBEg",
+      "title": "RAG Tutorial 2026 #5: Cosine Similarity for Vector Search Explained",
+      "channel": "Harish Neel | AI",
+      "duration": "7:30",
+      "description": "Production AI Course (paid): https://harishneel.com/six-figure-rag Email: teamharishneel@gmail.com Understand cosine ..."
+    },
+    {
+      "id": "hVM8qGRTaOA",
+      "title": "What Are Word Embeddings?",
+      "channel": "Under The Hood",
+      "duration": "19:33",
+      "description": "word2vec #llm Converting text into numbers is the first step in training any machine learning model for NLP tasks. While one-hot ..."
+    },
+    {
+      "id": "KlmtlH7M4U0",
+      "title": "17.How AI Understands Meaning: Embeddings & Similarity Search Explained",
+      "channel": "AI Academy",
+      "duration": "11:01",
+      "description": "Ever wondered how AI actually \"understands\" what you mean instead of just matching keywords? In this video, we break down ..."
+    },
+    {
+      "id": "dN0lsF2cvm4",
+      "title": "Vector Databases simply explained! (Embeddings & Indexes)",
+      "channel": "AssemblyAI",
+      "duration": "4:23",
+      "description": "Vector Databases simply explained. Learn what vector databases and vector embeddings are and how they work. Then I'll go ..."
+    },
+    {
+      "id": "dmUJ_DmkYIE",
+      "title": "How AI Finds Meaning Between Words | Word Embeddings & Cosine Similarity Explained",
+      "channel": "Sum It Up",
+      "duration": "5:16",
+      "description": "How does AI understand that “king” and “queen” are related—or that “dog” is closer to “puppy” than “car”? The answer lies in word ..."
+    },
+    {
+      "id": "rw1YfQQttfo",
+      "title": "Embeddings & Vector Databases Explained",
+      "channel": "LearnThatStack",
+      "duration": "10:01",
+      "description": "Embeddings turn meaning into math. Vector databases make that math searchable at scale. If you're building anything with AI ..."
+    },
+    {
+      "id": "gSsbctskmuo",
+      "title": "Understanding Vector Embeddings & Semantic Similarity",
+      "channel": "Kavya Goyal",
+      "duration": "6:27",
+      "description": "In this video, we explore the fundamentals of vector embeddings and how semantic similarity functions within an n-dimensional ..."
+    },
+    {
+      "id": "v5SDQ5AVkL0",
+      "title": "AI's Secret? Cosine Similarity Explained.",
+      "channel": "BlackBoard AI",
+      "duration": "3:55",
+      "description": "Have you ever wondered how Google knows that an article about car maintenance is relevant to your search for how to change ..."
+    }
+  ]
+}

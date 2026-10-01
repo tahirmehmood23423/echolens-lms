@@ -1,0 +1,134 @@
+{
+  "query": "Golang pointers structs escape analysis",
+  "checked_at": "2026-09-30T07:21:56.285Z",
+  "results": [
+    {
+      "id": "AdCAx_zfzQk",
+      "title": "Golang: Heap Allocation using escape analysis",
+      "channel": "Satyajit Das",
+      "duration": "3:31",
+      "views": "1,309 views",
+      "description": "In this video I show how to perform escape analysis on a Go program to check its Heap Allocation. This might give indication on ..."
+    },
+    {
+      "id": "v-ttLYKqaO8",
+      "title": "Learn golang pointers in 179.001 seconds",
+      "channel": "Kantan Coding",
+      "duration": "3:11",
+      "views": "24,641 views",
+      "description": "Get your free Go Concurrency Handbook https://gohandbook.subscribepage.io ✓ 21 focused pages ✓ The 3 Essential ..."
+    },
+    {
+      "id": "c8H0w4yBL10",
+      "title": "This is your last video about Golang Structs!",
+      "channel": "Flo Woelki",
+      "duration": "15:57",
+      "views": "59,803 views",
+      "description": "Mastering Structs in Golang is really important and that's why this video tries to cover everything you need to know about Structs in ..."
+    },
+    {
+      "id": "NMTN543WVQY",
+      "title": "Structs in golang",
+      "channel": "Hitesh Choudhary",
+      "duration": "8:11",
+      "views": "56,665 views",
+      "description": "Welcome to a youtube channel dedicated to programming and coding related tutorials. We talk about tech, write code, discuss ..."
+    },
+    {
+      "id": "gOWDv2M0AqU",
+      "title": "Golang: what to return? A slice of structs vs a slice of pointers?",
+      "channel": "Andrii Kushch",
+      "duration": "1:18",
+      "views": "1,397 views",
+      "description": "In this video, I would like to answer a question: what is better to return from the function in go, slice with pointers, or slice with ..."
+    },
+    {
+      "id": "YJB_oB5jqro",
+      "title": "Go Pointers Explained: Master Memory Management in Golang",
+      "channel": "Coding Fullstack",
+      "duration": "14:48",
+      "views": "135 views",
+      "description": "Unlock the power of Go pointers in this comprehensive tutorial! Learn how to efficiently manage memory and write ..."
+    },
+    {
+      "id": "5qtVvttJ0W0",
+      "title": "Pointers as struct in go | Pointers as struct in golang",
+      "channel": "CodeNakshatra",
+      "duration": "3:18",
+      "views": "33 views",
+      "description": "Pointers as struct in go | Pointers as struct in golang New Vlog Channel- ..."
+    },
+    {
+      "id": "2XEQsJLsLN0",
+      "title": "Golang pointers explained, once and for all",
+      "channel": "JamieGo",
+      "duration": "13:49",
+      "views": "46,387 views",
+      "description": "This video is about pointers explained in #golang, along with some basic memory allocation concepts, stack and heap allocations ..."
+    },
+    {
+      "id": "F4YISvNxn3o",
+      "title": "Go Memory Management: Pointers, Stack vs. Heap, Garbage Collector Explained & How to Prevent Leaks",
+      "channel": "programmerCave",
+      "duration": "7:53",
+      "views": "1,101 views",
+      "description": "Welcome to the definitive guide on Go (Golang) memory management! If you want to write fast, efficient, and robust Go ..."
+    },
+    {
+      "id": "t8qgT6ogZdY",
+      "title": "How to declare and use pointers to struct in Golang 1.20",
+      "channel": "java frm",
+      "duration": "2:17",
+      "views": "29 views",
+      "description": "In this video we are going to generate source code for the GoLang Program, How to declare and use pointers to struct using ..."
+    },
+    {
+      "id": "QcSNm9D_0ck",
+      "title": "Go Stack Heap Pointers",
+      "channel": "Martin Carlisle Go",
+      "duration": "9:56",
+      "views": "14 views",
+      "description": "Introduces the concept of stack memory (local variables) vs heap memory (structs that will live past the end of the function), ..."
+    },
+    {
+      "id": "Ff2qB4XySOk",
+      "title": "Escape Analysis in Go — Stack vs Heap & How the Compiler Decides",
+      "channel": "nihonsensei",
+      "duration": "8:51",
+      "views": "305 views",
+      "description": "Escape Analysis in Go is one of the most misunderstood concepts. At runtime, every variable must live somewhere in memory ..."
+    },
+    {
+      "id": "U8FiCPEjQJY",
+      "title": "Go Basics: 4. Pointers, struct, Arrays and structs in Go",
+      "channel": "Coding School Free",
+      "duration": "16:20",
+      "views": "63 views",
+      "description": "Pointers, struct, Arrays and structs in Go in detail."
+    },
+    {
+      "id": "3dVg36s-dAs",
+      "title": "Go Pointers Explained: Master Memory Management in Golang",
+      "channel": "Go with Ishmael",
+      "duration": "10:54",
+      "views": "38 views",
+      "description": "Welcome to another beginner-friendly Golang tutorial! In this video, we break down Go pointers step by step, helping you ..."
+    },
+    {
+      "id": "egA5-qXq-qE",
+      "title": "Escape from Escape Analysis of Golang",
+      "channel": "ICSE",
+      "duration": "10:10",
+      "views": "300 views",
+      "description": "https://2020.icse-conferences.org/details/icse-2020-Software-Engineering-in-Practice/1/Escape-from-Escape-Analysis-of-Golang."
+    },
+    {
+      "id": "3N8Ud_hiRoQ",
+      "title": "GO (golang) Tutorial for Beginners - #Day-29 :  GO pointers to Structs",
+      "channel": "Abhishek Tirkey",
+      "duration": "10:50",
+      "views": "8 views",
+      "description": "Title: GO pointers and Functions in Go Language | Go Programming Tutorial Description: In Go, pointers to structs allow you to ..."
+    }
+  ]
+}

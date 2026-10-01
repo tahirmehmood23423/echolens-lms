@@ -1,0 +1,22 @@
+{
+  "id": "LSFCmSQc5R8",
+  "url": "https://www.youtube.com/watch?v=LSFCmSQc5R8",
+  "checked_at": "2026-09-30T07:23:58.640Z",
+  "title": "#74 Golang - PostgreSQL with PGX in Go: Step-by-Step Tutorial",
+  "channel": "codeHeim",
+  "duration_seconds": 655,
+  "views": 9424,
+  "comments": "9 Comments",
+  "comment_samples": [
+    "Clear and to the point! Short and valuable video! I would like to see more videos like this! 🙂👍",
+    "Thanks!",
+    "Bro hexagonal architecture small project would be great with database table having fields with default type null.Also , keep up the good work",
+    "A tutorial on using k8s client go",
+    "Thank you…💯"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Buy my book 'Functional Programming with Go' here:  https://bit.ly/fp-with-go\n\n\n\nIn this episode, we dive deep into the pgx package, one of the most powerful PostgreSQL drivers and toolkits for Go developers. Whether you're just starting with PostgreSQL in Go or looking to level up your database skills, this episode has got you covered.  \n\nHere's what you'll learn:  \n✅ How to set up and connect to a PostgreSQL database using pgx  \n✅ The difference between single connections and connection pooling  \n✅ How to perform INSERT, SELECT, UPDATE, and DELETE operations  \n✅ Managing transactions effectively to ensure data integrity  \n✅ Querying multiple rows and mapping them to Go structs  \n✅ Handling advanced features like parameterized queries and error handling  \n\nBy the end of this video, you’ll have a solid understanding of the pgx package and be ready to use it in your own Golang projects!  \n\n💡 Don’t forget to like, comment, and subscribe for more Golang tutorials, and hit the 🔔 to stay updated on new videos.  \n\nTimestamps:\n00:00 Introduction  \n00:41 Installing and Setting Up pgx  \n00:51 Creating Tables \n01:24 Connection Pooling with pgx  \n03:17 Insert Data into PostgreSQL  \n04:07 Using Transactions with pgx  \n05:51 Querying Multiple Rows  \n08:03 Querying a Single Row  \n08:55 Updating Records  \n09:48 Deleting Records  \n10:32 Wrap-Up  \n\n📚 Resources:  \n- 📹 Original video: https://www.codeheim.io/courses/Episode-74-PostgreSQL-with-PGX-in-Go-Step-by-Step-Tutorial-6797cbb854f54d75ff66f4ef\n- 📝 Source code: https://github.com/code-heim/go_74_pgx\n- PGX Documentation: https://github.com/jackc/pgx\n\nThanks for watching, and see you in the next episode! 🚀",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

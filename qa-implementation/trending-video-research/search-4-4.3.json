@@ -1,0 +1,94 @@
+{
+  "query": "Grafana OpenTelemetry distributed tracing tutorial",
+  "checked_at": "2026-09-30T07:21:55.475Z",
+  "results": [
+    {
+      "id": "ui6L3OUSa8E",
+      "title": "Grafana Tempo and Opentelemetry Traces",
+      "channel": "DevOps and AI Courses - Learn with Aref Karimi",
+      "duration": "2:18",
+      "views": "4,822 views",
+      "description": "Learn about Grafana Tempo and its role in collecting, processing and visualising Opentelemetry Traces. To see the full course, ..."
+    },
+    {
+      "id": "bXXipz5DtzA",
+      "title": "Distributed Tracing #grafana #distributedTracing #GrafanaTempo #opentelemetry #observability",
+      "channel": "Datahovel",
+      "duration": "1:07",
+      "views": "13,812 views",
+      "description": "This video explains distributed tracing in 1 minute. #shorts #grafana #distributedTracing #GrafanaTempo #opentelemetry ..."
+    },
+    {
+      "id": "a6F0s5aozJU",
+      "title": "Grafana Dashboard for Prometheus via OpenTelemetry",
+      "channel": "KrakenD API Gateway",
+      "duration": "3:20",
+      "views": "8,016 views",
+      "description": "The new Grafana Dashboard allows you to connect to a Prometheus data source and show plenty of KrakenD metrics. This video ..."
+    },
+    {
+      "id": "XYvQHjWJJTE",
+      "title": "Distributed Tracing in Microservices | System Design",
+      "channel": "ByteMonk",
+      "duration": "7:02",
+      "views": "55,051 views",
+      "description": "Explore the power of Distributed Tracing in this comprehensive less than 10-minute video. Learn how this crucial technique ..."
+    },
+    {
+      "id": "ZIN7H00ulQw",
+      "title": "OpenTelemetry Golang Tutorial (Tracing in Grafana & Kubernetes & Tempo)",
+      "channel": "Anton Putra",
+      "duration": "12:40",
+      "views": "36,232 views",
+      "description": "Mentorship/On-the-Job Support/Consulting - https://calendly.com/antonputra/youtube or me@antonputra.com ..."
+    },
+    {
+      "id": "hLvwoow3XTk",
+      "title": "OpenTelemetry: Simplifying Hybrid Cloud Monitoring",
+      "channel": "IBM Technology",
+      "duration": "5:40",
+      "views": "94,626 views",
+      "description": "Download the guide: Maximize the value of hybrid cloud in the generative AI era → https://ibm.biz/Bda9h4 Learn more about the ..."
+    },
+    {
+      "id": "FNcBtd4lGlM",
+      "title": "This .NET Monitoring Setup Changes Everything: Grafana + OpenTelemetry",
+      "channel": "Milan Jovanović",
+      "duration": "11:11",
+      "views": "38,383 views",
+      "description": "Want to master Clean Architecture? Go here: https://bit.ly/3PupkOJ Want to unlock Modular Monoliths? Go here: ..."
+    },
+    {
+      "id": "HrRrJ5wTtdk",
+      "title": "A practical introduction to OpenTelemetry for .NET developers (+ Aspire Dashboard)",
+      "channel": "Milan Jovanović",
+      "duration": "14:15",
+      "views": "54,657 views",
+      "description": "Get the source code for this video for FREE → https://the-dotnet-weekly.ck.page/opentelemetry ☄️ Master the Modular Monolith ..."
+    },
+    {
+      "id": "1q3YzX2DDM4",
+      "title": "Exploring logs, metrics, and traces with Grafana | Grafana for Beginners Ep. 7",
+      "channel": "Grafana",
+      "duration": "12:57",
+      "views": "66,079 views",
+      "description": "Exploring logs, metrics, and traces for the first time could be an overwhelming experience if you don't know where to start."
+    },
+    {
+      "id": "SdB3ud7cVK4",
+      "title": "🚀 Application Monitoring with Grafana & OpenTelemetry | Full Beginner Guide 2026",
+      "channel": "Bhoopesh Sharma",
+      "duration": "2:44",
+      "views": "330 views",
+      "description": "... Dashboard for Kubernetes Pods grafana opentelemetry application monitoring observability grafana tutorial distributed tracing ..."
+    },
+    {
+      "id": "WSW1urIXsfA",
+      "title": "Open Source Observability Explained - The Grafana Stack",
+      "channel": "Grafana",
+      "duration": "19:32",
+      "views": "106,063 views",
+      "description": "Wish you could have open source observability explained to you? Senior Developer Advocate Nicole van der Hoeven explains ..."
+    }
+  ]
+}

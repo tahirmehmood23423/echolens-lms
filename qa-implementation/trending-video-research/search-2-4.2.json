@@ -1,0 +1,94 @@
+{
+  "query": "LLM guardrails PII redaction structured output",
+  "checked_at": "2026-09-30T07:20:41.985Z",
+  "results": [
+    {
+      "id": "fV_EuLO2KOE",
+      "title": "LLM Guardrails Without Writing Code: PII Redaction with Presidio in Tyk AI Studio",
+      "channel": "Tyk API Management",
+      "duration": "10:50",
+      "views": "17 views",
+      "description": "Description** A guardrail in Tyk AI Studio is a filter that runs a detection provider instead of a script. You pick the provider, tick what ..."
+    },
+    {
+      "id": "7XfBLutnxC8",
+      "title": "Guardrails AI Explained: Make Your LLM Outputs 100% RELIABLE and SAFE",
+      "channel": "STARP AI",
+      "duration": "5:53",
+      "views": "6,902 views",
+      "description": "What is Guardrails AI? We explain Guardrails - the framework for validating and correcting AI outputs automatically. LLMs are ..."
+    },
+    {
+      "id": "9Ek2cvIHq1c",
+      "title": "Agent Guardrails Explained — Prompt Injection, PII Leaks & More - Part 1: Input Guardrails",
+      "channel": "Applied with AI - Sanjay Kumar",
+      "duration": "11:05",
+      "views": "12,217 views",
+      "description": "Your AI agent doesn't need to be hacked to fail — sometimes a single sentence is enough. In this video, I break down the ..."
+    },
+    {
+      "id": "zBV-xAWNEKk",
+      "title": "Learn to Build Production-Ready LLM Guardrails From Scratch!",
+      "channel": "Pavan Belagatti",
+      "duration": "11:55",
+      "views": "8,309 views",
+      "description": "Learn how to build production-ready LLM guardrails from scratch to secure your AI applications! In this complete tutorial, we'll ..."
+    },
+    {
+      "id": "-IxuY2JBztg",
+      "title": "Structured Outputs Explained Simply | Get Reliable JSON from LLMs | Agentic AI Series",
+      "channel": "Coding with Neeraj",
+      "duration": "4:24",
+      "views": "347 views",
+      "description": "Try sululu for free - https://sululu.fun/ Welcome to Episode 13 of the Agentic AI Masterclass! LLMs are great at generating ..."
+    },
+    {
+      "id": "xpvFinvqRCA",
+      "title": "Structured Output from LLMs: Grammars, Regex, and State Machines",
+      "channel": "Efficient NLP",
+      "duration": "17:20",
+      "views": "12,101 views",
+      "description": "Try Voice Writer - speak your thoughts and let AI handle the grammar: https://voicewriter.io Structured outputs are essential for ..."
+    },
+    {
+      "id": "c2rU4YFX-34",
+      "title": "Structured Outputs in Pydantic AI | Type‑Safe LLM Responses",
+      "channel": "Yash Jain",
+      "duration": "7:22",
+      "views": "227 views",
+      "description": "Welcome to another video of the Pydantic AI Series! 🌙\n\nIn this session, we’re exploring Structured Outputs in Pydantic AI ..."
+    },
+    {
+      "id": "c9O72YmuUuc",
+      "title": "Part 7 | AI Output Can Be Dangerous — Output Guardrails Explained | AI Security",
+      "channel": "Pentest Diaries",
+      "duration": "16:36",
+      "views": "",
+      "description": ""
+    },
+    {
+      "id": "6mixCpOp3YI",
+      "title": "LLM Security: Essential Guardrails for AI Applications | The New Default",
+      "channel": "Monterail",
+      "duration": "13:26",
+      "views": "378 views",
+      "description": "How do you protect an LLM application from prompt injection, data exfiltration, and jailbreaks? This video breaks down the ..."
+    },
+    {
+      "id": "rsaLl1ITIAk",
+      "title": "🧱 Structured Outputs in Agentic AI | Control LLM Responses with Classes",
+      "channel": "Super Data Science",
+      "duration": "6:18",
+      "views": "220 views",
+      "description": "Full Course HERE https://community.superdatascience.com/c/agentic-ai-1-fundamentals In this hands-on lesson, we explore ..."
+    },
+    {
+      "id": "7D5_bxlf3jA",
+      "title": "Trustworthy AI Agents: Guardrail, PII Detection & Toxicity Control | Complete Agent Architect Course",
+      "channel": "Lyzr AI",
+      "duration": "4:57",
+      "views": "353 views",
+      "description": "You can't deploy agents at scale unless you trust them. In this critical session, we explore how to make AI agents safe and ..."
+    }
+  ]
+}

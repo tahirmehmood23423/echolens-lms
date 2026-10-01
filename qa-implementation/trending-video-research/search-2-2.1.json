@@ -1,0 +1,150 @@
+{
+  "query": "RAG prompt injection prevention grounding",
+  "checked_at": "2026-09-30T07:20:40.135Z",
+  "results": [
+    {
+      "id": "5ZA1lTxTH3c",
+      "title": "Securing AI Agents: How to Prevent Hidden Prompt Injection Attacks",
+      "channel": "IBM Technology",
+      "duration": "10:08",
+      "views": "32,515 views",
+      "description": "Ready to become a certified watsonx Generative AI Engineer - Associate? Register now and use code IBMTechYT20 for 20% off ..."
+    },
+    {
+      "id": "Trm6MDYl00U",
+      "title": "Bonus 3 | How to Secure LLM Applications — Prompt Injection, RAG Security & AI Guardrails Explained",
+      "channel": "Pentest Diaries",
+      "duration": "2:01",
+      "views": "",
+      "description": ""
+    },
+    {
+      "id": "5QhxXd2PxDY",
+      "title": "rag prompt injection explained your knowledge base is an attacker",
+      "channel": "NovatronIT",
+      "duration": "3:35",
+      "views": "4 views",
+      "description": "Your knowledge base is an attacker — how RAG pipelines get hijacked from the inside. Retrieval-augmented generation pastes ..."
+    },
+    {
+      "id": "3IrcGrfXiI8",
+      "title": "Prompt Injection Attacks Explained | AI Security, RAG Protection & Secure AI Agents",
+      "channel": "Micro Learning",
+      "duration": "7:56",
+      "views": "11 views",
+      "description": "As organizations rapidly adopt Generative AI, securing Large Language Models (LLMs), AI Agents, and Retrieval-Augmented ..."
+    },
+    {
+      "id": "-PtntA-4uwM",
+      "title": "Guardrails: Hallucinations, Prompt Injection & Unsafe Outputs in Retrieval Augmented Generation",
+      "channel": "Yash Jain",
+      "duration": "17:40",
+      "views": "167 views",
+      "description": "GitHub: https://github.com/yashjainio\n\nWelcome back to the Retrieval Augmented Generation (RAG) series!\n\n🚀 In this video ..."
+    },
+    {
+      "id": "jrHRe9lSqqA",
+      "title": "What Is a Prompt Injection Attack?",
+      "channel": "IBM Technology",
+      "duration": "10:57",
+      "views": "297,883 views",
+      "description": "Get the guide to cybersecurity in the GAI era → https://ibm.biz/BdmJg3 Learn more about cybersecurity for AI ..."
+    },
+    {
+      "id": "-qrLeOpisCc",
+      "title": "I Tested Prompt Injection in My Local RAG App | Guardrails Blocked It",
+      "channel": "phoebenoubissiCloud",
+      "duration": "16:18",
+      "views": "7 views",
+      "description": "this video, I test a prompt injection attempt inside my local RAG AI app and show how the guardrail blocks it. This is an important ..."
+    },
+    {
+      "id": "R-YVuXiyM44",
+      "title": "Indirect Prompt Injection: RAG's Hidden Threat | AiSecurityDIR",
+      "channel": "AiSecurityDIR",
+      "duration": "6:16",
+      "views": "105 views",
+      "description": "Learn about indirect prompt injection in this educational video from AiSecurityDIR - The Manager's Guide to AI Security. Read the ..."
+    },
+    {
+      "id": "C5D3IxohAyQ",
+      "title": "AI Security 101: LLMs, RAG, Agents & Prompt Injection",
+      "channel": "Sec with Arian",
+      "duration": "14:32",
+      "views": "1,859 views",
+      "description": "AI doesn't just add a feature to your application — it changes the attack surface completely. Once your app includes a component ..."
+    },
+    {
+      "id": "rI8-StjFmlU",
+      "title": "LLM Security Explained | Prevent Prompt Injection, Jailbreaks & Prompt Hacking",
+      "channel": "Micro Learning",
+      "duration": "6:40",
+      "views": "37 views",
+      "description": "Learn how to secure Large Language Models (LLMs) against prompt hacking, prompt injection, jailbreak attacks, and other ..."
+    },
+    {
+      "id": "tB6zqje_rY8",
+      "title": "Prompt Injection ATTACKs : How Enterprises Secure AI Agents",
+      "channel": "NitMonk",
+      "duration": "12:45",
+      "views": "381 views",
+      "description": "Join WhatsApp Community for All Resources and Study Material - https://chat.whatsapp.com/D73Mf1aDyIZHHMCgd32XHg ..."
+    },
+    {
+      "id": "oI4Ud6Jk3IM",
+      "title": "Ultimate Guide to Prompt Injection: Step by Step Tutorial",
+      "channel": "Aikido Security",
+      "duration": "18:50",
+      "views": "8,600 views",
+      "description": "Can you socially engineer an AI model? In this episode of The Vulnerability Report by Aikido Security, McKenzie breaks down ..."
+    },
+    {
+      "id": "4xcbXDjnjS4",
+      "title": "How to stop LLM Hallucinations: Grounding via RAG Explained with LangChain & RAGAS",
+      "channel": "Crazymuse",
+      "duration": "3:10",
+      "views": "9,094 views",
+      "description": "Have you ever had an AI confidently give you a completely wrong answer? Welcome to the world of LLM hallucinations — where ..."
+    },
+    {
+      "id": "ovQ07u--tqU",
+      "title": "RAG Security: Context Injection Attacks Explained | AiSecurityDIR",
+      "channel": "AiSecurityDIR",
+      "duration": "7:49",
+      "views": "406 views",
+      "description": "Learn about RAG security and context injection attacks in this educational video from AiSecurityDIR - The Manager's Guide to AI ..."
+    },
+    {
+      "id": "YgWeKmxytus",
+      "title": "Protect Your AI Products: How to Prevent Prompt Injection Attacks",
+      "channel": "James Phoenix",
+      "duration": "4:49",
+      "views": "769 views",
+      "description": "Ever wondered if AI could be manipulated as easily as a computer program? Discover how prompt injection can reverse engineer ..."
+    },
+    {
+      "id": "b4CLXwAZtpE",
+      "title": "Prompt Injection Explained: The Most Dangerous AI Attack of 2025",
+      "channel": "Prabh Nair",
+      "duration": "17:05",
+      "views": "7,507 views",
+      "description": "AI systems can now read websites, emails, documents, tickets, PDFs, and even trigger actions through plugins. That means one ..."
+    },
+    {
+      "id": "PLyEKcRn1Po",
+      "title": "What Is Prompt Injection Attack | Hacking LLMs With Prompt Injection | Jailbreaking AI | Simplilearn",
+      "channel": "Simplilearn",
+      "duration": "7:51",
+      "views": "6,227 views",
+      "description": "Cybersecurity Expert Masters Program ..."
+    },
+    {
+      "id": "1iWslEFnB68",
+      "title": "Secure AI Agents: Hallucination, Grounding and Why RAG Exists | S02E05",
+      "channel": "Prompt Vidya AI",
+      "duration": "4:52",
+      "views": "5 views",
+      "description": "Section 2, Lecture 5 of Secure AI Agents with Java and Spring Boot. Ask a model about TrustDesk's leave policy and it will answer ..."
+    }
+  ]
+}

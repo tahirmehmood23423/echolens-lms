@@ -1,0 +1,78 @@
+{
+  "query": "LangSmith tracing cost tutorial",
+  "checked_at": "2026-09-30T07:24:55.221Z",
+  "results": [
+    {
+      "id": "EdzAH5_PppM",
+      "title": "Langsmith Tutorial: Observability and Tracing for AI Agents",
+      "channel": "Clyep",
+      "duration": "10:44",
+      "views": "708 views",
+      "description": "In this video, we walk through how to add tracing and observability to an LLM-powered application using LangSmith. AI agents ..."
+    },
+    {
+      "id": "VBZgp1sHosE",
+      "title": "Keep model costs in check with LangSmith LLM Gateway",
+      "channel": "LangChain",
+      "duration": "4:33",
+      "views": "1,554 views",
+      "description": "Reining in LLM spend gets harder once your team has started using multiple agents calling multiple models. Without the proper ..."
+    },
+    {
+      "id": "YBErIomQ7N4",
+      "title": "Using LangSmith Studio WITHOUT building your agent on LangGraph",
+      "channel": "LangChain",
+      "duration": "17:13",
+      "views": "8,824 views",
+      "description": "Note: LangGraph Studio is now LangSmith Studio. LangSmith Observability & Evaluation and LangSmith Studio provide generally ..."
+    },
+    {
+      "id": "KPcEhLoh-Wc",
+      "title": "What is LangSmith?",
+      "channel": "LangChain",
+      "duration": "5:33",
+      "views": "8,699 views",
+      "description": "LangSmith is LangChain's platform for building, testing, deploying, and monitoring agents across every stage of the agent ..."
+    },
+    {
+      "id": "Jy8QAAsbMIw",
+      "title": "How to use LangChain and LangSmith with n8n Tutorial",
+      "channel": "Solomon Christ AI + Automation Mastery",
+      "duration": "16:25",
+      "views": "5,435 views",
+      "description": "How to use LangChain and LangSmith with n8n *Join my AI + Automation Newsletter:* ..."
+    },
+    {
+      "id": "qDWBGyqUqdI",
+      "title": "Create a Dataset from Production Traces in LangSmith",
+      "channel": "LangChain",
+      "duration": "9:08",
+      "views": "3,916 views",
+      "description": "Building examples from production traces is a powerful way to create realistic datasets for agent evaluation. In this video, we will ..."
+    },
+    {
+      "id": "fA9b4D8IsPQ",
+      "title": "Getting Started with LangSmith (1/8): Tracing",
+      "channel": "LangChain",
+      "duration": "8:21",
+      "views": "48,210 views",
+      "description": "Code: https://github.com/xuro-langchain/eli5 - Learn more about LangSmith: ..."
+    },
+    {
+      "id": "XE5-hb-H-OY",
+      "title": "Build an Online LLM-as-a-Judge with the LangSmith CLI and a Coding Agent",
+      "channel": "LangChain",
+      "duration": "5:08",
+      "views": "3,594 views",
+      "description": "Chat LangChain gets thousands of traces a day, which is far too many to read by hand. In this walkthrough we set up an online ..."
+    },
+    {
+      "id": "EPrpesJNl1w",
+      "title": "Agentic AI | Session8 | Video3 | LangSmith Tracing",
+      "channel": "Venkata Reddy AI Classes",
+      "duration": "16:57",
+      "views": "194 views",
+      "description": "Code link: https://colab.research.google.com/drive/1IZ4Ttii9vBSMv0sIvbhT75r6VFu8-GHA Material File Link: ..."
+    }
+  ]
+}

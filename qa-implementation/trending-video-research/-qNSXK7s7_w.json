@@ -1,0 +1,22 @@
+{
+  "id": "-qNSXK7s7_w",
+  "url": "https://www.youtube.com/watch?v=-qNSXK7s7_w",
+  "checked_at": "2026-09-30T07:24:07.503Z",
+  "title": "Database Indexing Explained (with PostgreSQL)",
+  "channel": "Hussein Nasser",
+  "duration_seconds": 1098,
+  "views": 402437,
+  "comments": "259 Comments",
+  "comment_samples": [
+    "Get my Fundamentals of Database Engineering udemy course to learn more , link redirects to udemy with coupon applied https://database.husseinnasser.com :_lb1:",
+    "9:08 \"5080\" \nA good example of how difficult it is to get good benchmarks.  ID=5000 was fetched, but why was fetching 5080 so fast while fetching 7080 was slow again? Because PostgreSQL stores rows in pages, which are 8KB blocks of diskspace. Hussain made rows of 2 integer and three(?) characters so one 8KB block can hold about 1000 rows. When the database fetched the page that 5000 was in, that page was cached by the operating system (not the database)  had inadvertently instantly cached 1000 rows around id=5000. \n\n14:04 \"The primary key is usually stored with every single index\"\nI have never heard of that behavior. Primary keys are always indexed but as far as I am aware they are never automatically added to every index you create. ht index contains tuple and row information to enable a lookup but not the PK.\nI get the feeling you're seeing the ID rather quicky because the pages were already in cache from the previous queries.\n\nAnd about the LIKe not using an index; that's a good topic for a separate video: Trigram indexes.",
+    "Me: Man I'm really interested in (insert subject here). I wonder if there's a video on this.\nHussein has entered the chat",
+    "I was just wasting time in youtube and suddenly your video pop up to my screen. Good information summarized. Thanks man! Take my like and keep uploading videos!!!",
+    "Simplicity in your explanations, Hussein :_heart: An index is a data structure that you build and assign on top of an existing table that basically looks through your table and then tries to analyze it and summarizes so that it can create kind of shortcuts:) This one line itself took away so much of \"mystery\" around indexing :_idea:"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Get my Fundamentals of Database Engineering udemy course to learn more , link redirects to udemy with coupon applied https://database.husseinnasser.com \n\nThis is a practical video on Database Indexing where I explain what is an index, why do we need it and how it can improve the performance of the queries. Also how (if used incorrectly) it can slow down your queries\n\n\nintro 0:00 \nWhat is an index 0:30 \nDescribe Table 2:15 \nSELECT [ID] WHERE ID 4:00 \nSELECT [NAME] WHERE ID 6:30\nSELECT [ID] WHERE [NAME] (No index) 9:20\nSELECT [ID] WHERE NAME LIKE 11:12 \nCREATE INDEX ON [NAME] 12:00\nSELECT [ID] WHERE NAME (Indexed) 12:50\nSELECT [1D] WHERE NAME LIKE (Indexed) 14:30 \nSummary 16:00 \n\nSupport my work on PayPal\nhttps://bit.ly/33ENps4\n \nBecome a Member on YouTube\nhttps://www.youtube.com/channel/UC_ML5xP23TOWKUcc-oAE_Eg/join\n\n🧑‍🏫 Courses I Teach\nhttps://husseinnasser.com/courses \n\n🏭 Backend Engineering Videos in Order\nhttps://backend.husseinnasser.com\n\n\n\n💾 Database Engineering Videos\nhttps://www.youtube.com/playlist?list=PLQnljOFTspQXjD0HOzN7P2tgzu7scWpl2\n\n🏰 Load Balancing and Proxies Videos\nhttps://www.youtube.com/playlist?list=PLQnljOFTspQVMeBmWI2AhxULWEeo7AaMC\n\n🏛️ Software Archtiecture Videos\nhttps://www.youtube.com/playlist?list=PLQnljOFTspQXNP6mQchJVP3S-3oKGEuw9\n\n📩 Messaging Systems\nhttps://www.youtube.com/playlist?list=PLQnljOFTspQVcumYRWE2w9kVxxIXy_AMo\n\nBecome a Member \nhttps://www.youtube.com/channel/UC_ML5xP23TOWKUcc-oAE_Eg/join\n\nSupport me on PayPal\nhttps://bit.ly/33ENps4\n\nStay Awesome,\nHussein",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

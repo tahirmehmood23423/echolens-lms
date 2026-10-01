@@ -1,0 +1,22 @@
+{
+  "id": "FAnQTgr04mU",
+  "url": "https://www.youtube.com/watch?v=FAnQTgr04mU",
+  "checked_at": "2026-09-30T07:23:44.854Z",
+  "title": "Kubernetes ConfigMap and Secret as Kubernetes Volumes | Demo",
+  "channel": "TechWorld with Nana",
+  "duration_seconds": 1014,
+  "views": 235762,
+  "comments": "168 Comments",
+  "comment_samples": [
+    "► Reference to YAML Configs: https://gitlab.com/nanuchi/kubernetes-tutorial-series-youtube/-/tree/master/configmap-and-secret-volumes\n\n0:13 - Configuration Files usages in pods\n1:13 - ConfigMap and Secret creating individual values (key-value pairs) for env variables\n2:40 - ConfigMap and Secret creating files for mounting them into the pod\n14:44 - Summary\n\n👉🏼 For any questions/issues/feedback, please leave me a comment and I will get back to you as soon as possible. \nPlease don't forget to subscribe and give me a thumbs up if you liked my video 😊🙏",
+    "I signed up for java but they are also giving me work related to devops. This video is a life saver.😅",
+    "Nana the life saver of kubernetes developers",
+    "No doubt, when we talk about kubernetes your channel is the best",
+    "Putting a like before even watching., 👍👍👍"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Demo of using ConfigMap and Secret as Kubernetes Volumes | Kubernetes ConfigMap | Kubernetes Secrets | Kubernetes Volumes\n\n► Subscribe To Me On Youtube: https://bit.ly/2z5rvTV\n\nConfigMap and Secret components are usually used for creating individual values, which are passed as environment variables in the pod configuration.\nBut ConfigMap and Secret are also volume types, which people don't realize in the beginning. Using them as volumes is actually a common requirement, e.g. think of applications that take configuration files as parameter on startup. Like prometheus, elastic search or your own java application taking a properties file or certificate file. The question is how to pass these config files to Kubernetes Pods?\n\nIn this video I show you how to create these configMap and secret volumes and how to use them in pods. I give you some real-life use cases and show you the syntax of using volumes in a pod configuration.\n\n► Reference to YAML Configs: https://gitlab.com/nanuchi/kubernetes-tutorial-series-youtube/-/tree/master/configmap-and-secret-volumes\n► Kubernetes Volumes Explained: https://youtu.be/0swOh5C3OVM\n\n▬▬▬▬▬▬ T I M E S T A M P S\n0:00 - Intro\n0:13 - Configuration Files usages in pods\n1:13 - ConfigMap and Secret creating individual values (key-value pairs) for env variables\n2:40 - ConfigMap and Secret creating files for mounting them into the pod\n14:44 - Summary\n\n-------------------------------------------------------------------------------------------------------\nFull Kubernetes and Docker tutorial              ►  https://bit.ly/2YGeRp9\nDevOps Tools, like Ansible                              ►  https://bit.ly/2W9UEq6\nComplete K8s Application Setup                   ►  https://youtu.be/EQNO_kM96Mo\nKubernetes Components explained              ►  https://www.youtube.com/watch?v=Krpb44XR0bk&t=364s\n\nFor any questions/issues/feedback, please leave me a comment and I will get back to you as soon as possible. Also please let me know what you want to learn about Docker & Kubernetes or another technology.\n\n#kubernetes #kubernetestutorial #devops #techworldwithnana\n-------------------------------------------------------------------------------------------------------\n\n▬▬▬▬▬▬ Connect with me 👋   ▬▬▬▬▬▬ \nJoin private Facebook group      ►  https://bit.ly/32UVSZP\nDon't forget to subscribe             ►  https://bit.ly/3mO4jxT\nDEV                                                 ►  https://bit.ly/3h2fqiO\nINSTAGRAM                                  ►  https://bit.ly/2F3LXYJ\nTWITTER                                        ►  https://bit.ly/3i54PUB\nLINKEDIN                                       ►  https://bit.ly/3hWOLVT\n\n\nLegal Notice:\nKubernetes and the Kubernetes logo are trademarks or registered trademarks of The Linux Foundation in the United States and/or other countries. The Linux Foundation and other parties may also have trademark rights in other terms used herein. This video is not accredited, certified, affiliated with, nor endorsed by Kubernetes or The Linux Foundation.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

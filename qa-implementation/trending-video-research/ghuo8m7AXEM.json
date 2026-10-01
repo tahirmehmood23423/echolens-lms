@@ -1,0 +1,22 @@
+{
+  "id": "ghuo8m7AXEM",
+  "url": "https://www.youtube.com/watch?v=ghuo8m7AXEM",
+  "checked_at": "2026-09-30T07:25:47.748Z",
+  "title": "How to do Performance Testing with k6",
+  "channel": "Alex Hyett",
+  "duration_seconds": 595,
+  "views": 153727,
+  "comments": "65 Comments",
+  "comment_samples": [
+    "Great content!  \n\nI expect that your channel will explode once programmers realize the succint value that you are providing.\n\nThis is the 3rd of your videos that I've seen and I'm a fan.",
+    "So good! It's concise, and has code, only 8 mins!",
+    "Hey Alex this is great content, keep it coming",
+    "The hardest thing when we want to teach somebody is to make it simple. And you've already done it in the best way! Thank you",
+    "k6 is good, but your explanation is great!!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "These videos are only possible due to supporters like you. Help me make more unsponsored videos like this:\n\n- Patreon: https://www.patreon.com/alexhyett\n- Ko-Fi: https://ko-fi.com/alexhyett\n- Buy Me A Coffee: https://www.buymeacoffee.com/alexhyett\n\nThank you to my supporters: https://www.alexhyett.com/supporters/\n\n---\n\nPerformance testing is an important part of getting your application production ready. You don't want to wait until you have a sudden spike in traffic to realise that your application can't handle the load. In this video I cover the difference types of performance testing and how to do them using k6.\n\n📝 Video Transcript: https://www.alexhyett.com/performance-testing/\n\n📨 Free Newsletter: https://www.alexhyett.com/newsletter/ — Join my free weekly newsletter for advice, technology and more\n🎓 Courses: https://www.alexhyett.com/courses/ — Like the way I teach? You might like my courses too!\n👨‍💻 All Code: https://git.alexhyett.com/alexhyettdev/youtube-code — Links to all the code for my YouTube videos can be found here.\n\n⏳ CHAPTERS\n00:00 - Introduction\n00:55 - Installing k6\n01:21 - Simple k6 test\n02:30 - Test API\n02:49 - Support me on Patreon\n03:03 - Pick the right environment\n03:48 - Load Test\n06:41 - Stress Test\n07:49 - Spike Test\n08:35 - Soak Test\n09:33 - Check out k6 docs\n\n🔗 SOCIAL LINKS\n🐘 Mastodon — https://social.alexhyett.com/@alex \n💼 LinkedIn — https://www.linkedin.com/in/alexhyett/\n☁️ Bluesky — https://bsky.app/profile/alexhyett.com\n\n🧑‍💻 WHO AM I\nI’m Alex, a Software Developer and YouTube working in the UK. I make videos about software development to help developers with the skills they need to be senior developers. \n\nAs well as this YouTube Channel, I also write articles on my website (https://alexhyett.com) as well as write a regular newsletter that contains some thoughts to help aspiring developers.\n\n#coding #programming #developer",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

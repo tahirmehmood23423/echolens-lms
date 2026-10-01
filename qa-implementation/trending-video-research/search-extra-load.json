@@ -1,0 +1,62 @@
+{
+  "query": "Go API load testing k6 tutorial",
+  "checked_at": "2026-09-30T07:24:57.647Z",
+  "results": [
+    {
+      "id": "ghuo8m7AXEM",
+      "title": "How to do Performance Testing with k6",
+      "channel": "Alex Hyett",
+      "duration": "9:55",
+      "views": "153,723 views",
+      "description": "These videos are only possible due to supporters like you. Help me make more unsponsored videos like this: - Patreon: ..."
+    },
+    {
+      "id": "r-Jte8Y8zag",
+      "title": "Getting started with API Load Testing (Stress, Spike, Load, Soak)",
+      "channel": "Nick Chapsas",
+      "duration": "14:20",
+      "views": "214,384 views",
+      "description": "Become a Patreon and get source code access: https://www.patreon.com/nickchapsas Check out my courses: ..."
+    },
+    {
+      "id": "0UpohPTYUxY",
+      "title": "K6.io API Load Testing : Introduction and Installation with sample script",
+      "channel": "TechieQA",
+      "duration": "9:25",
+      "views": "1,014 views",
+      "description": "dharmatechieqa #techieqa @techieqa Here I have explained the new tool for load testing with K6.io. You should be aware of ..."
+    },
+    {
+      "id": "brasMBAezJY",
+      "title": "Website Performance + Load Testing with K6 (k6.io) in 5 MINUTES!",
+      "channel": "DevOps Directive",
+      "duration": "5:26",
+      "views": "25,459 views",
+      "description": "Is your site ready for its big break? Making it to the front page of a site like Reddit or Hacker News can bring a swell of new visitors ..."
+    },
+    {
+      "id": "9JPbnYUeKuM",
+      "title": "Is Your API ACTUALLY Ready for User Traffic?",
+      "channel": "Tech Vision",
+      "duration": "6:59",
+      "views": "168,214 views",
+      "description": "Get my NestJS Course Here: https://go.tech-vision.io/nestjs-course-yt-vid-29 Receive Weekly Dev Guides Here: ..."
+    },
+    {
+      "id": "sEstRVCh4bM",
+      "title": "Create A K6 Performance Load Test for API Calls",
+      "channel": "The Test Lead",
+      "duration": "5:45",
+      "views": "4,857 views",
+      "description": "Medium article: https://medium.com/@thetestlead/create-a-k6-performance-load-test-for-api-calls-6a5775f80dda ..."
+    },
+    {
+      "id": "RYyPduBqGM4",
+      "title": "AI-Powered K6 Testing: No Code, No Hassle, Just ChatGPT! 🦾🚀",
+      "channel": "Execute Automation",
+      "duration": "10:31",
+      "views": "18,332 views",
+      "description": "In this video, we will demonstrate a much simpler way to perform your K6 testing without writing a single line of code. We leverage ..."
+    }
+  ]
+}

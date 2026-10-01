@@ -1,0 +1,142 @@
+{
+  "query": "PostgreSQL joins union intersect except null",
+  "checked_at": "2026-09-30T07:22:01.625Z",
+  "results": [
+    {
+      "id": "ULyuvDFijkE",
+      "title": "Combining Queries in PostgreSQL || UNION INTERSECT EXCEPT Operators || PostgreSQL Full Playlist #38",
+      "channel": "Knowledge 360",
+      "duration": "5:56",
+      "views": "334 views",
+      "description": "knowledge360 #akramsohail #akramsohailproject You Are Hearty Welcomed To My Channel Knowledge 360. Here I post ..."
+    },
+    {
+      "id": "Uu4GfSHy3_4",
+      "title": "29-SET Operators in SQL | Union | Union All | Intersect | Except or Minus | Examples | SQL Tutorial",
+      "channel": "CodeEra",
+      "duration": "8:30",
+      "views": "74,651 views",
+      "description": "Are you new to SQL and looking to learn the basics quickly? Look no further! This tutorial is designed for beginners and will teach ..."
+    },
+    {
+      "id": "krnAfIHqGzI",
+      "title": "Combine SQL Queries With UNION, INTERSECT, EXCEPT",
+      "channel": "Becoming a Data Scientist",
+      "duration": "5:04",
+      "views": "59,109 views",
+      "description": "Step-by-step tutorial shows you how to combine your SQL queries (columns) with UNION, INTERSECT, and EXCEPT! Queries: 1) ..."
+    },
+    {
+      "id": "FprFu75BoE4",
+      "title": "POSTGRESQL JOINS [Complete guide in 12 mins]",
+      "channel": "cudidotdev",
+      "duration": "12:31",
+      "views": "12,950 views",
+      "description": "Welcome to my first video on this channel! In today's tutorial, we dive deep into Postgres joins, demystifying Inner, Left, Right, Full ..."
+    },
+    {
+      "id": "EtxU30ouQ_g",
+      "title": "SQL JOIN NULL Results Explained — Why Is My Data Missing?",
+      "channel": "CodeToCareer",
+      "duration": "3:16",
+      "views": "35 views",
+      "description": "SQL JOIN returning NULL values? Wondering why your data is missing? You're not alone! ‍   In this video, we break down SQL ..."
+    },
+    {
+      "id": "Gz9nhdx449k",
+      "title": "SQL Joins with NULL Values | Inner, Outer, Left, Right & Cross Joins | Data Engineering Interviews",
+      "channel": "Akash",
+      "duration": "9:51",
+      "views": "2,400 views",
+      "description": "SQL Joins with NULL Values | Master Inner, Outer, Left, Right & Cross Joins SQL joins can get tricky—especially when NULL ..."
+    },
+    {
+      "id": "Of2Z6hL0ETE",
+      "title": "Advanced SQL Joins (Visually Explained) | ANTI, CROSS | #SQL Course 9",
+      "channel": "Data with Baraa",
+      "duration": "19:17",
+      "views": "87,221 views",
+      "description": "Visually explained how advanced SQL joins like ANTI and CROSS work to compare and combine datasets. Subscribe, Like ..."
+    },
+    {
+      "id": "iQJC8ZyrlJQ",
+      "title": "SQL : In PostgreSQL (and maybe other engines), why does the UNION statement consider NULL values the",
+      "channel": "Hey Delphi",
+      "duration": "1:36",
+      "views": "1 view",
+      "description": "SQL : In PostgreSQL (and maybe other engines), why does the UNION statement consider NULL values the same, while the ..."
+    },
+    {
+      "id": "Yh4CrPHVBdE",
+      "title": "6 SQL Joins you MUST know! (Animated + Practice)",
+      "channel": "Anton Putra",
+      "duration": "9:47",
+      "views": "635,987 views",
+      "description": "UPDATED video - https://youtu.be/9prkapPewGs To practice SQL, run the following commands: docker run --detach --name ..."
+    },
+    {
+      "id": "-_hzzBs_Gqo",
+      "title": "Postresql Tutorials | Left Joins in Postgresql | postgresql joins tutorials",
+      "channel": "Training2SQL MSBI",
+      "duration": "7:26",
+      "views": "1,782 views",
+      "description": "... Not Null Constraints in Postgresql | postgresql not null example|sql not null https://www.youtube.com/watch?v=NIUxX9ohTkM ..."
+    },
+    {
+      "id": "V3xjmBi1QQE",
+      "title": "SQL SELF JOIN | UNION & UNION ALL in SQL | SQL Tutorial in Hindi 12",
+      "channel": "Rishabh Mishra",
+      "duration": "8:19",
+      "views": "365,429 views",
+      "description": "SQL Full Course Playlist 👇\nhttps://www.youtube.com/playlist?list=PLdOKnrf8EcP17p05q13WXbHO5Z_JfXNpw\n\nLike, Share & Subscribe ..."
+    },
+    {
+      "id": "aFCZ8QiLU0o",
+      "title": "PostgreSQL JOINS Explained | INNER JOIN, LEFT JOIN, RIGHT JOIN & FULL JOIN for Beginners",
+      "channel": "Ajay yadav",
+      "duration": "11:24",
+      "views": "148 views",
+      "description": "Learn how to combine data from multiple tables using PostgreSQL JOINs. In this beginner-friendly tutorial, you'll understand the ..."
+    },
+    {
+      "id": "CFoYF8vhZjo",
+      "title": "Union, Union all, Intersect & Except in PostgreSQL | 2022 | Class - 16",
+      "channel": "Play With SQL",
+      "duration": "11:48",
+      "views": "560 views",
+      "description": "PostgreSQL Union: The UNION operator removes duplicates. PostgreSQL Union All: This operator combines result sets from ..."
+    },
+    {
+      "id": "_fRXjmfRESk",
+      "title": "SQL Set Operator | union, union all, intersect and minus operator | oracle database",
+      "channel": "Learn Coding",
+      "duration": "13:37",
+      "views": "159,008 views",
+      "description": "Oracle Database Full Course https://youtube.com/playlist?list=PLqleLpAMfxGDslJolGldBWcdT1FSIhJ1L Don't forget to tag ..."
+    },
+    {
+      "id": "su-fxrvKTCk",
+      "title": "MySQL UNIONS are easy",
+      "channel": "Bro Code",
+      "duration": "4:14",
+      "views": "106,427 views",
+      "description": "MySQL #tutorial #course Union tutorial example explained -- NO DUPLICATES SELECT first_name, last_name FROM employees ..."
+    },
+    {
+      "id": "bonJEipf3VU",
+      "title": "Lec-83: Difference between Joins, Nested Subquery and Correlated Subquery | Most Imp Concept of SQL",
+      "channel": "Gate Smashers",
+      "duration": "15:57",
+      "views": "569,307 views",
+      "description": "Complete DBMS +. SQL Roadmap  : https://www.gatesmashers.com/roadmaps/dbms-sql MASTER COMPUTER SCIENCE ..."
+    },
+    {
+      "id": "tCWYlUlcUiw",
+      "title": "SQL Interview with Sample Data with Joins Inner,left,right,full joins?",
+      "channel": "SRTechnologies Ravindra Reddy",
+      "duration": "16:03",
+      "views": "22,863 views",
+      "description": "As part of this video, explaining the joins and how it works with different kinds of data.. Taken some sample data with 2 tables and ..."
+    }
+  ]
+}

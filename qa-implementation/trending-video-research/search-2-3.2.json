@@ -1,0 +1,150 @@
+{
+  "query": "ReAct agent reasoning acting loop explained",
+  "checked_at": "2026-09-30T07:20:40.977Z",
+  "results": [
+    {
+      "id": "NkrgiuuXESY",
+      "title": "ReAct Explained: The Core Loop Behind AI Agents #AIAgents #LLM #ReAct #AgenticAI #PromptEngineering",
+      "channel": "AI Learning Hub",
+      "duration": "5:31",
+      "views": "8 views",
+      "description": "Most \"AI agents\" aren't magic. They run one surprisingly simple loop — and once you see it, agents stop feeling like a black box."
+    },
+    {
+      "id": "ID-IdhiYvBA",
+      "title": "Demystifying ReAct Agents: How AI Reasoning and Acting Actually Works",
+      "channel": "The Savvy Scholar",
+      "duration": "8:36",
+      "views": "191 views",
+      "description": "How do AI agents actually \"think\" and execute tasks? In this deep dive, we explore the ReAct (Reasoning + Acting) ..."
+    },
+    {
+      "id": "vFdIrZyKEwQ",
+      "title": "ReAct AI Agents, clearly explained!",
+      "channel": "Akshay Pachaar",
+      "duration": "5:45",
+      "views": "25,090 views",
+      "description": "agent #ai #llm #gpt ReAct (reasoning and action) agents, clearly explained! ReACT, is a framework that combines the reasoning ..."
+    },
+    {
+      "id": "7LsMd9icgVU",
+      "title": "ReAct Prompting: Synergizing Reasoning and Acting in LLMs",
+      "channel": "AI Explained in 5 Minutes",
+      "duration": "5:51",
+      "views": "149 views",
+      "description": "ReAct Prompting: Synergizing Reasoning and Acting in LLMs This comprehensive guide explores ReAct Prompting, ..."
+    },
+    {
+      "id": "NK4-Kv_9PIE",
+      "title": "The ReAct Loop Explained: How AI Agents Think and Act",
+      "channel": "Agent Engineering",
+      "duration": "11:10",
+      "views": "5 views",
+      "description": "The ReAct Loop Explained: How AI Agents Think and Act. In this video we cover the thought, action, observation cycle that sits at ..."
+    },
+    {
+      "id": "pEMhPBQMNjg",
+      "title": "Building a LangGraph ReAct Mini Agent",
+      "channel": "Sam Witteveen",
+      "duration": "14:47",
+      "views": "38,567 views",
+      "description": "In this video I go through how to build a ReAct Mini Agent With LangGraph's ReAct Function Calling Pattern Colab: ..."
+    },
+    {
+      "id": "2ihEirLXeas",
+      "title": "AI Agents + LLM Reasoning: Transforming Autonomous Workflows",
+      "channel": "IBM Technology",
+      "duration": "13:58",
+      "views": "27,838 views",
+      "description": "Ready to become a certified watsonx AI Assistant Engineer? Register now and use code IBMTechYT20 for 20% off of your exam ..."
+    },
+    {
+      "id": "AryOxmm9TGI",
+      "title": "Agentic Patterns #5: ReAct | The Agent Loop Explained",
+      "channel": "AI TL;DR",
+      "duration": "6:18",
+      "views": "679 views",
+      "description": "This is the pattern that started the Agent Revolution. Pattern #5 is ReAct (Reason + Act). We break down the fundamental ..."
+    },
+    {
+      "id": "WBgI9ce_7wM",
+      "title": "AI Agentic Design Patterns: ReAct Explained | Reasoning + Acting in AI Agents",
+      "channel": "CodeCraft Academy",
+      "duration": "6:50",
+      "views": "2,442 views",
+      "description": "What is the ReAct pattern in AI Agents? ReAct (Reason + Act) is one of the most important agentic design patterns used in modern ..."
+    },
+    {
+      "id": "QczejEN_LsA",
+      "title": "#11 ReAct Framework Explained 🤖 | How AI Agents Reason & Act",
+      "channel": "Tech With Mala",
+      "duration": "14:52",
+      "views": "965 views",
+      "description": "AI agents don't just generate text — they reason and take actions. In this video, you'll understand the ReAct framework, a powerful ..."
+    },
+    {
+      "id": "YZ814GD3-EQ",
+      "title": "ReAct Explained | The AI Reasoning Loop Behind Modern AI Agents",
+      "channel": "NeuralCanvas",
+      "duration": "6:40",
+      "views": "125 views",
+      "description": "Modern AI Agents don't just generate responses—they think, reason, take actions, observe results, and improve continuously."
+    },
+    {
+      "id": "jCq0mcxlq2E",
+      "title": "Loop Engineering: Your First ReAct Agent Loop in Python",
+      "channel": "AI with Ruchi",
+      "duration": "13:47",
+      "views": "624 views",
+      "description": "AI agents can look complicated when you start with frameworks like LangGraph or LangChain. So in this video, we're removing ..."
+    },
+    {
+      "id": "lvUoeOtyz44",
+      "title": "Agentic AI Patterns for Production — ReAct, Code-Act & Tool-Use Loop Explained",
+      "channel": "Mactores",
+      "duration": "5:54",
+      "views": "1,419 views",
+      "description": "Most AI agents fail in production. Not because the model is bad, but because the architecture is wrong. I've been building ..."
+    },
+    {
+      "id": "YZk4fLS_wQY",
+      "title": "Agentic AI #2 — Inside the Agent Loop: ReAct and How Agents Actually Think",
+      "channel": "LLMwork",
+      "duration": "9:06",
+      "views": "6 views",
+      "description": "A plain language model is a one-shot guesser: text in, text out, no way to check itself against the real world. So how does an agent ..."
+    },
+    {
+      "id": "dqntk78xtYA",
+      "title": "How AI Agents Actually Think: The ReAct Pattern Explained (No Hype Architecture Guide)",
+      "channel": "Understanding AIML",
+      "duration": "4:57",
+      "views": "18 views",
+      "description": "In this theoretical deep-dive, we break down the engineering anatomy of autonomous AI agents. Learn how LLMs evolve from ..."
+    },
+    {
+      "id": "9NISz_XfgaU",
+      "title": "The ReAct Loop: How AI Agents Actually Think Before Acting",
+      "channel": "AI Insights Hub",
+      "duration": "2:35",
+      "views": "7 views",
+      "description": "Every AI agent that browses the web, writes code, or handles multi-step tasks is built on one core pattern: the ReAct loop ..."
+    },
+    {
+      "id": "30G13kiyAWs",
+      "title": "The Loop Every AI Agent Runs — ReAct Explained (Yao 2022 · AI Agents E3)",
+      "channel": "MedStudyHub",
+      "duration": "11:42",
+      "views": "36 views",
+      "description": "October 2022. A paper drops on arXiv titled *ReAct: Synergizing Reasoning and Acting in Language Models*. Ten pages. Almost ..."
+    },
+    {
+      "id": "3JnwMvz6k3I",
+      "title": "Build a ReAct LLM Agent From Scratch in Python (No Frameworks!)",
+      "channel": "Understanding AIML",
+      "duration": "6:44",
+      "views": "15 views",
+      "description": "In this hands-on tutorial, we bypass high-level frameworks like LangChain to build a production-grade Reasoning & Acting ..."
+    }
+  ]
+}

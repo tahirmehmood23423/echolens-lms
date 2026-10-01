@@ -1,0 +1,22 @@
+{
+  "id": "QiRdYCNXAxk",
+  "url": "https://www.youtube.com/watch?v=QiRdYCNXAxk",
+  "checked_at": "2026-09-30T07:23:23.573Z",
+  "title": "How LLM Tool Calling Works",
+  "channel": "Tommy Eberle",
+  "duration_seconds": 960,
+  "views": 7414,
+  "comments": "14 Comments",
+  "comment_samples": [
+    "Finally someone who actually explains how it works. The one bit that you don't quite touch on is exactly how OpenAI is determining how the response from the LLM should be a tool call. I assume all they can do is parse the output and if it looks like a tool call then it is. You really have to trust your inputs as prompt injection would be easy. Those people who run in unsafe mode... 😬",
+    "I spent an hour on this video. Your way of explaining is excellent and you directly predict the question that comes to the viewer's mind at the right time. You are a natural. May God bless you.",
+    "This is the best explanation, thank you very much.",
+    "Thanks for the informative content!",
+    "Great explanation, thank you! :)"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, I explain how tool calling works with LLMs.\n\nTool Calling is a fundamental concept for understanding AI Agents. LLMs like gpt-4o and Claude Sonnet are unable to execute code or do anything other output tokens. AI Agents need a way to interact with real world systems, and tool calling is the way that this is accomplished.\n\nIn this video, I explain how tool calling works at a high level. I walk through a series of prompts that showcase the main concepts of tool calling, and then I give some code examples in typescript. I also explain how tool calling fits into MCP (Model Context Protocol) and how to hook up an MCP Server's tools into an OpenAI API request.\n\nTool calling is not nearly as scary as it seems - I hope you all enjoy the video!",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

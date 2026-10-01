@@ -1,0 +1,22 @@
+{
+  "id": "DK7WqcL9Qq4",
+  "url": "https://www.youtube.com/watch?v=DK7WqcL9Qq4",
+  "checked_at": "2026-10-01T05:20:52.076Z",
+  "title": "Next.js Forms Are Different Now (Server Actions, useActionState, Form Component, Form Backend)",
+  "channel": "ByteGrad",
+  "duration_seconds": 852,
+  "views": 22174,
+  "comments": "75 Comments",
+  "comment_samples": [
+    "Man I still remember your react hook form tutorial it was fire, then this. The industry we are in is crazy on how things changes.",
+    "Thank you so much .. your video was really such a savior to one of my use cases, I went into a rabbit hole of trials and finally arrived to this amazing video with a great solution to a multidimensional problem .. knowledge is power .. thanks again for sharing .. keep it up bro",
+    "great tutorial thank you",
+    "hey man\nthank you for your tutorials!\ncan you maybe create a video on how you would implement Recaptcha with Next.js form actions and especially using useActionState hook?\nI would be curious to see your approach, as it seemed like a bit of a challange on our current project",
+    "Thanks! Needed this! Unfortunately Basin's free-plan made it a no go for me. :("
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "👉 Basin for form backend: https://tinyurl.com/5a269a27 (sponsored)\n👉 NEW React & Next.js Course: https://bytegrad.com/courses/professional-react-nextjs\n\nHi, I'm Wesley. I'm a brand ambassador for Kinde (paid sponsorship).\n👉 Check out Kinde for auth and more https://bit.ly/3QOe1Bh\n👉 Work with me: support@bytegrad.com\n\n👉 NEW React & Next.js Course: https://bytegrad.com/courses/professional-react-nextjs\n👉 Professional JavaScript Course: https://bytegrad.com/courses/professional-javascript\n👉 Professional CSS Course: https://bytegrad.com/courses/professional-css\n\n👉 Web development roadmap 2024 & 2025: https://email.bytegrad.com\n👉 Email newsletter (BIG update soon): https://email.bytegrad.com\n👉 Discord: all my courses have a private Discord\n\n⏱️ Timestamps:\n00:00 Next.js form options\n00:42 Why use forms (data & search)\n01:04 HTML-form\n01:37 Server action\n02:44 useActionState\n05:45 Form component (NEW!)\n09:18 Form backend (WOW!)\n\n#webdevelopment #reactjs #nextjs\n\nNote that my videos may contain mistakes. Always verify yourself that your code is safe and does what you want it to do for your specific situation. You agree by watching the videos that you are solely responsible for any mistakes in your code.\n\nThis channel and all its content is owned & operated by ByteGrad Sp. z o.o. with Tax ID: PL6762676561 and KRS-number: 0001125554 .\n.\nTOP resource to LEARN AI for Developers - https://datacamp.pxf.io/RGyxrR (paid sponsorship & ByteGrad Sp. z o.o. gets commission)",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

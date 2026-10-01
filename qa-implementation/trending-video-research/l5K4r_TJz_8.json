@@ -1,0 +1,18 @@
+{
+  "id": "l5K4r_TJz_8",
+  "url": "https://www.youtube.com/watch?v=l5K4r_TJz_8",
+  "checked_at": "2026-09-30T07:25:50.931Z",
+  "title": "How to implement LLM guardrails for RAG applications",
+  "channel": "IBM Developer",
+  "duration_seconds": 434,
+  "views": 12190,
+  "comments": "1 Comment",
+  "comment_samples": [
+    "great"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Learn how to use the contextual grounding checks that come with the guardrails functionality in watsonx Flows Engine. With watsonx Flows Engine, you can build AI applications for several use cases, including retrieval augmented generation (RAG) applications. These checks are designed to detect hallucinations in responses, especially in RAG applications, where the model pulls data from various sources to craft its answers. Guardrails can help you identify responses that are factually incorrect or irrelevant to a user’s query, helping to maintain the reliability of AI-driven applications.\n\nSee the full tutorial: \nhttps://developer.ibm.com/tutorials/awb-how-to-implement-llm-guardrails-for-rag-applications/\n\n____________________________________________\n\nIBM Developer — write better code, boost your skills, and build something new: https://ibm.biz/ibm-developer-yt\n\nSubscribe to see more developer content: https://ibm.biz/ibm-developer-yt-subscribe\n\nFollow IBM Developer on LinkedIn: https://ibm.biz/ibm-developer-linkedin-yt\n\nMore from IBM Developer:\nCommunity: https://developer.ibm.com/community/\nBlog: https://developer.ibm.com/blogs/\nCall for Code: https://developer.ibm.com/callforcode/\n\n#RAG \n#LLM\n#AI \n#IBMDeveloper\n#Developer",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

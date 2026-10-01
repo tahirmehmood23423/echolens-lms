@@ -1,0 +1,158 @@
+{
+  "query": "PostgreSQL composite multi column index",
+  "checked_at": "2026-09-30T07:24:58.609Z",
+  "results": [
+    {
+      "id": "fW-y-r7CgNI",
+      "title": "Are Multi-Column Indexes a good idea?",
+      "channel": "Supabase",
+      "duration": "11:22",
+      "views": "16,296 views",
+      "description": "Indexing can greatly improve the performance of database queries over a large dataset. Postgres supports Indexing multiple ..."
+    },
+    {
+      "id": "YTLv_S02NSI",
+      "title": "Composite Indexes Explained: Column Order, Skip Scan & ASC/DESC (PostgreSQL vs MySQL)",
+      "channel": "The Coding Cactus",
+      "duration": "13:33",
+      "views": "17 views",
+      "description": "Same index, same table… so why is one query fast and the other hundreds of times slower? In Part 2 we open up multi-column ..."
+    },
+    {
+      "id": "-qNSXK7s7_w",
+      "title": "Database Indexing Explained (with PostgreSQL)",
+      "channel": "Hussein Nasser",
+      "duration": "18:19",
+      "views": "402,431 views",
+      "description": "Get my Fundamentals of Database Engineering udemy course to learn more , link redirects to udemy with coupon applied ..."
+    },
+    {
+      "id": "BIlFTFrEFOI",
+      "title": "SQL indexing best practices | How to make your database FASTER!",
+      "channel": "CockroachDB",
+      "duration": "4:08",
+      "views": "315,330 views",
+      "description": "Learn about best practices for using indexes in SQL, and how they can be used to speed up your queries, make your database ..."
+    },
+    {
+      "id": "VTfqotHW2Go",
+      "title": "Databases: Postgresql multi-column GIN index",
+      "channel": "Roel Van de Paar",
+      "duration": "1:39",
+      "views": "64 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "MYb0wiiDO_0",
+      "title": "Understanding the Performance Differences of Single vs. Multi-Column Indexes in PostgreSQL",
+      "channel": "vlogize",
+      "duration": "1:52",
+      "views": "35 views",
+      "description": "This guide explores the performance differences between single-column and multi-column indexes in PostgreSQL, guiding ..."
+    },
+    {
+      "id": "je-2g-ogKxI",
+      "title": "Databases: How does MySQL or PostgreSQL deal with multi-column indexes in ActiveRecord?",
+      "channel": "Roel Van de Paar",
+      "duration": "1:31",
+      "views": "2 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "teMXE6hzva0",
+      "title": "How SQL Indexes Actually Work (Step-by-Step)",
+      "channel": "Milan Jovanović",
+      "duration": "16:08",
+      "views": "39,367 views",
+      "description": "Get the source code for this video for FREE → https://the-dotnet-weekly.ck.page/indexing Want to master Clean Architecture?"
+    },
+    {
+      "id": "EZ3jBam2IEA",
+      "title": "Database Design 39 - Indexes (Clustered, Nonclustered, Composite Index)",
+      "channel": "Caleb Curry",
+      "duration": "13:28",
+      "views": "195,191 views",
+      "description": "Start your software dev career - https://calcur.tech/dev-fundamentals FREE Courses (100+ hours) ..."
+    },
+    {
+      "id": "8s35iHLGHww",
+      "title": "How to Choose PostgreSQL Indexes: B-Tree, Hash, BRIN, GIN & GiST",
+      "channel": "JaneExplainsIT",
+      "duration": "13:05",
+      "views": "2,013 views",
+      "description": "In this video, we'll briefly look at how different PostgreSQL indexes work and mainly focus on how to choose the right index for ..."
+    },
+    {
+      "id": "xXtig5uLQS4",
+      "title": "How does indexing work in Databases in Hindi ( How to optimize SQL Queries in Hindi )",
+      "channel": "Engineering Digest",
+      "duration": "7:32",
+      "views": "230,224 views",
+      "description": "Get 1 to 1 coaching with me: https://topmate.io/engineeringdigest Donate: https://paypal.me/engineeringdigest Perks: ..."
+    },
+    {
+      "id": "hfJHT2jRek8",
+      "title": "How to Add an Index in PostgreSQL",
+      "channel": "vlogize",
+      "duration": "1:17",
+      "views": "223 views",
+      "description": "Learn how to create indexes in PostgreSQL to optimize database performance and speed up queries. This guide covers the ..."
+    },
+    {
+      "id": "F0AvP2Qpksk",
+      "title": "PostgreSQL Combined vs Independent Indexes 09/12",
+      "channel": "Code with Lucian",
+      "duration": "1:53",
+      "views": "7,727 views",
+      "description": "Should you use multiple individual indexes for each field or a concatenation of multiple fields? If you found this video helpful, you ..."
+    },
+    {
+      "id": "ykw2aC4hxNM",
+      "title": "why the postgresql did not using the multi-column index",
+      "channel": "Peter Schneider",
+      "duration": "2:19",
+      "views": "8 views",
+      "description": "why the postgresql did not using the multi-column index I hope you found a solution that worked for you :) The Content (except ..."
+    },
+    {
+      "id": "sY2auWXW0Fw",
+      "title": "5mins of Postgres E48: Benchmarking multi column, covering and hash indexes in Postgres",
+      "channel": "pganalyze",
+      "duration": "5:33",
+      "views": "1,743 views",
+      "description": "Today, we talk about benchmarking multi-column vs. multiple combined indexes in Postgres, and whether B-Tree or hash indexes ..."
+    },
+    {
+      "id": "t0grczCICMk",
+      "title": "MySQL: INDEXES are awesome",
+      "channel": "Bro Code",
+      "duration": "6:26",
+      "views": "108,717 views",
+      "description": "... time -- Single column index CREATE INDEX last_name_idx ON customers (last_name); -- Multi column index CREATE INDEX ..."
+    },
+    {
+      "id": "f8zOpi20YpM",
+      "title": "Databases: Postgres multicolumn vs combined single column indexes",
+      "channel": "Roel Van de Paar",
+      "duration": "1:24",
+      "views": "17 views",
+      "description": "https://amzn.to/4aLHbLD You're literally one click away from a better setup — grab it now! As an Amazon Associate I earn ..."
+    },
+    {
+      "id": "wyE_F_ggRFs",
+      "title": "SQL : Postgresql: multicolumn indexes vs single column index",
+      "channel": "Hey Delphi",
+      "duration": "1:34",
+      "views": "42 views",
+      "description": "SQL : Postgresql: multicolumn indexes vs single column index To Access My Live Chat Page, On Google, Search for \"hows tech ..."
+    },
+    {
+      "id": "Y7AeEoJVUrE",
+      "title": "When composite index would be used by Oracle (SQL PLSQL Tricky Interview Questions)",
+      "channel": "Oracle SQL and PLSQL Tricky Interview Questions",
+      "duration": "7:19",
+      "views": "4,924 views",
+      "description": "trickyinterviewquestions If there is a composite index on any columns then will oracle use it if we give only few of these columns in ..."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course video review | EchoLens</title>
+  <link rel="stylesheet" href="/css/admin-course-videos.css">
+  <script src="/js/admin-course-videos.js" defer></script>
+</head>
+<body>
+  <main>
+    <a href="/dashboard#view=admin-open-courses">&larr; Admin dashboard</a>
+    <h1>Upcoming course videos</h1>
+    <p>Preview every lecture without enrollment. Open a video here or on YouTube to review the teaching and comments.</p>
+    <p class="muted">Selections use topic relevance, runtime, views and sampled comment feedback. Every clip is under 20 minutes. Companion clips are optional. Full videos have not been watched end to end; engagement figures show the date checked.</p>
+    <div class="filters">
+      <label>Course<select id="course"><option value="">All courses</option></select></label>
+      <label>Search topics or videos<input id="search" type="search" placeholder="e.g. Go, RAG, joins"></label>
+      <button id="download" type="button" disabled>Download all links (CSV)</button>
+    </div>
+    <p id="status" role="status">Loading videos…</p>
+    <div id="lessons"></div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,86 @@
+{
+  "query": "Go interfaces composition tutorial",
+  "checked_at": "2026-09-30T07:21:56.472Z",
+  "results": [
+    {
+      "id": "SX1gT5A9H-U",
+      "title": "Golang: The Last Interface Explanation You'll Ever Need",
+      "channel": "Flo Woelki",
+      "duration": "17:58",
+      "views": "108,307 views",
+      "description": "Interfaces are common, easy and important to use in Golang. Next to interfaces, structs are also really important. I've also made a ..."
+    },
+    {
+      "id": "4OVJ-ir9hL8",
+      "title": "Practical Explanation of Golang INTERFACES",
+      "channel": "Tiago",
+      "duration": "8:27",
+      "views": "16,204 views",
+      "description": "In this video I'll give you a practical explanation with real-world examples of how to use interfaces in Go, so you can become a ..."
+    },
+    {
+      "id": "lbW-KVdIXaY",
+      "title": "Go (Golang) Tutorial #22 - Interfaces",
+      "channel": "Net Ninja",
+      "duration": "5:37",
+      "views": "84,889 views",
+      "description": "In this final Golang tutorial of the series, we'll learn about interfaces! ‍   View this course in full without ads on Net Ninja Pro: ..."
+    },
+    {
+      "id": "EGRXKV6j-v0",
+      "title": "Interfaces - Go Lang Programming Tutorial: Part 20",
+      "channel": "LucidProgramming",
+      "duration": "8:14",
+      "views": "39,306 views",
+      "description": "In this video, we cover interfaces in the Go programming language. The “syllabus” for this series of videos is inspired by the ..."
+    },
+    {
+      "id": "lh_Uv2imp14",
+      "title": "Golang Tutorial #22 - Interfaces",
+      "channel": "Tech With Tim",
+      "duration": "12:19",
+      "views": "115,447 views",
+      "description": "In this golang programming tutorial I will be convering go interfaces. Interfaces in golang are a way to group structs that have ..."
+    },
+    {
+      "id": "Oo1G7jjYcQU",
+      "title": "Go Interfaces : The Nil Trap & Best Practices | Golang Interview Prep",
+      "channel": "programmerCave",
+      "duration": "7:40",
+      "views": "122 views",
+      "description": "This deep-dive tutorial explains Go Interfaces, the fundamental tool for polymorphism and flexible code design in Golang, perfect ..."
+    },
+    {
+      "id": "Nr2FcSMVK6w",
+      "title": "Interfaces in Go are SO GOOD - Go / Golang Interface Tutorial",
+      "channel": "Donald Feury (dak425)",
+      "duration": "18:05",
+      "views": "13,184 views",
+      "description": "Artist/Thumbnail Creator: https://jawhaj.art Blog: https://donaldfeury.xyz/topics Memberships: ..."
+    },
+    {
+      "id": "hwFBHwxamR8",
+      "title": "This Will Make Everyone Understand Golang Interfaces IN HINDI",
+      "channel": "Go Guru",
+      "duration": "16:38",
+      "views": "5,860 views",
+      "description": "In this Golang tutorial, I will teach what is interfaces, why we use them, what we can achieve from interfaces, advantages and ..."
+    },
+    {
+      "id": "3gjSkgVOQFA",
+      "title": "Write Better GO Code: Composition",
+      "channel": "Alex Mux",
+      "duration": "4:07",
+      "views": "8,347 views",
+      "description": "In Golang what is composition and how to use it to write better code?"
+    },
+    {
+      "id": "-FN7h2xM0W8",
+      "title": "Go Tutorial (Golang) 17 - Composition in Golang",
+      "channel": "ProgrammingKnowledge",
+      "duration": "9:16",
+      "views": "3,437 views",
+      "description": "Structs are the way to create user-defined types in Golang. One of the most useful data structures in computer science is the hash ..."
+    }
+  ]
+}

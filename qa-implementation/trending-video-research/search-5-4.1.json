@@ -1,0 +1,30 @@
+{
+  "query": "Golang grpc protobuf tutorial",
+  "checked_at": "2026-09-30T07:22:00.343Z",
+  "results": [
+    {
+      "id": "6Ol6zeocR28",
+      "title": "gRPC: The Tutorial I Wish I Had (Golang)",
+      "channel": "HuseyinCodes",
+      "duration": "13:46",
+      "views": "5,991 views",
+      "description": "Learn gRPC from scratch in this complete Go tutorial. We'll cover the core concepts (Protocol Buffers, HTTP/2, streaming patterns) ..."
+    },
+    {
+      "id": "erHz7d0v8Vw",
+      "title": "#55 Golang - Get Started with gRPC in Golang – Server & Client",
+      "channel": "codeHeim",
+      "duration": "15:38",
+      "views": "10,581 views",
+      "description": "Welcome to this episode on gRPC with Golang! In this video, we'll walk you through building scalable microservices using gRPC, ..."
+    },
+    {
+      "id": "NoDRq6Twkts",
+      "title": "Getting Started with Protocol Buffers in Go - Tutorial",
+      "channel": "TutorialEdge",
+      "duration": "10:05",
+      "views": "69,810 views",
+      "description": "For the price of a ☕ every month, sign up and gain access to a growing list of premium courses on my site ..."
+    }
+  ]
+}

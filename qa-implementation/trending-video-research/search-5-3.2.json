@@ -1,0 +1,126 @@
+{
+  "query": "Golang pgxpool connection pooling tutorial",
+  "checked_at": "2026-09-30T07:21:59.232Z",
+  "results": [
+    {
+      "id": "LSFCmSQc5R8",
+      "title": "#74 Golang - PostgreSQL with PGX in Go: Step-by-Step Tutorial",
+      "channel": "codeHeim",
+      "duration": "10:55",
+      "views": "9,419 views",
+      "description": "Buy my book 'Functional Programming with Go' here: https://bit.ly/fp-with-go In this episode, we dive deep into the pgx package, ..."
+    },
+    {
+      "id": "HPQxNmbsd6k",
+      "title": "Go + Postgres: The Complete Production Database Guide (Connection Pool + pgx + sqlc + Outbox)",
+      "channel": "deferstech",
+      "duration": "8:08",
+      "views": "246 views",
+      "description": "A 5-second database restart causes a 10-minute outage. 100 connections storm Postgres simultaneously. This video covers ..."
+    },
+    {
+      "id": "hquJPAztawI",
+      "title": "PostgreSQL with Go Tutorial for Beginners: pgx, Connection Pools, and sqlc",
+      "channel": "Elite Dev News",
+      "duration": "15:47",
+      "views": "148 views",
+      "description": "A beginner tutorial on using PostgreSQL from Go with pgx and sqlc. By the end, you'll be able to open a connection pool, run ..."
+    },
+    {
+      "id": "sDaogJq-_7E",
+      "title": "High-Concurrency PostgreSQL with pgx Connection Pooling (Production Deep Dive)",
+      "channel": "Lets learn with Ajay",
+      "duration": "17:27",
+      "views": "45 views",
+      "description": "Series: High-Performance Go Microservices & Concurrency | Episode 5 of 10 Full Playlist: ..."
+    },
+    {
+      "id": "jOz_rrZlStE",
+      "title": "Golang Pgx Pool Dynamic Configuration: Smart Token Management for IAM Authentication",
+      "channel": "vlogize",
+      "duration": "2:39",
+      "views": "47 views",
+      "description": "Discover how to implement dynamic connection pooling in Golang with Pgx while effectively handling IAM authentication tokens."
+    },
+    {
+      "id": "GTeCtIoV2Tw",
+      "title": "Connection Pooling in PostgresSQL with NodeJS (Performance Numbers)",
+      "channel": "Hussein Nasser",
+      "duration": "12:01",
+      "views": "102,756 views",
+      "description": "Connection pooling is a pattern of creating a pool of available connections (usually TCP) and allow multiple clients to share the ..."
+    },
+    {
+      "id": "ddKm7a7xOpk",
+      "title": "PgBouncer Tutorial",
+      "channel": "Code with Lucian",
+      "duration": "19:06",
+      "views": "72,817 views",
+      "description": "0:00 - Introduction 0:53 - Fundamental concepts of connection pooling 3:16 - Building a PgBouncer Setup 5:15 - Installing and ..."
+    },
+    {
+      "id": "toWx754nHX4",
+      "title": "Database Connection Pooling Explained: Boost App Scalability!",
+      "channel": "CodeLucky",
+      "duration": "4:31",
+      "views": "3,167 views",
+      "description": "Learn about database connection pooling and how it drastically improves the performance and scalability of your applications!"
+    },
+    {
+      "id": "eXEqXEYsSVo",
+      "title": "#54 Golang - Concurrency - Resource Management with sync.Pool",
+      "channel": "codeHeim",
+      "duration": "7:21",
+      "views": "4,776 views",
+      "description": "In this video, we explore how to use sync.Pool in Go to manage resources efficiently. By reusing expensive-to-create objects like ..."
+    },
+    {
+      "id": "DNx2AgAQ0wE",
+      "title": "DAY-5 | Connection Pooling | Master Golang Interviews",
+      "channel": "Backend Knights",
+      "duration": "9:27",
+      "views": "185 views",
+      "description": "Question: Connection Pooling."
+    },
+    {
+      "id": "t5ffWcsJcSg",
+      "title": "Use Connection Pooling to Improve your Application Performance",
+      "channel": "Kamran Ahmed",
+      "duration": "1:24",
+      "views": "11,539 views",
+      "description": "... up So next time if your API is slowing down under load take a look at the connections and see if connection pooling can make a."
+    },
+    {
+      "id": "Vq34xPYZwXg",
+      "title": "Database Connection Pooling: Why It Matters? Essential OS-Level Insights",
+      "channel": "Denis Magda",
+      "duration": "5:26",
+      "views": "14,895 views",
+      "description": "Database connection pooling is a method to reduce costs associated with opening and closing connections by maintaining a pool ..."
+    },
+    {
+      "id": "yLRvnj30NkA",
+      "title": "PGBouncer in Postresql | Connection Pooling",
+      "channel": "Abhishek Goyal",
+      "duration": "1:43",
+      "views": "734 views",
+      "description": "Your PostgreSQL database is overloaded. Thousands of clients are trying to connect simultaneously. The obvious solution?"
+    },
+    {
+      "id": "rcoBTlvvOqA",
+      "title": "Connection Pooling Explained: Boost Database Performance!",
+      "channel": "CodeLucky",
+      "duration": "2:53",
+      "views": "480 views",
+      "description": "Learn all about connection pooling and how it can drastically improve your database performance! This video breaks down the ..."
+    },
+    {
+      "id": "y3oAiv4hfIo",
+      "title": "System Design | Postgres Pooling saves the day",
+      "channel": "Chai aur Code",
+      "duration": "19:51",
+      "views": "18,300 views",
+      "description": "Visit https://chaicode.com for udemy course and cohort\n\nWelcome to chai aur code, a coding/programming dedicated channel in ..."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "9joXN3ipABg",
+  "url": "https://www.youtube.com/watch?v=9joXN3ipABg",
+  "checked_at": "2026-09-30T07:23:49.642Z",
+  "title": "Alerting Rules in Prometheus | Prometheus Tutorial for Beginners | Prometheus Alertmanager Tutorial",
+  "channel": "DevOps Hint",
+  "duration_seconds": 805,
+  "views": 5547,
+  "comments": "2 Comments",
+  "comment_samples": [
+    "when start connect prometheus to grafana and use the grafana alerting ruls to send notification",
+    "What script you are using on promtool directory please help i am stuck inbetween of creation"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this Video we are going to cover Alerting Rules in Prometheus | Prometheus Tutorial for Beginners | Prometheus Alertmanager Tutorial\n#AlertingRulesinPrometheus #prometheus #prometheustutorial\n0:00 What is Alert Manager in Prometheus\n6:00 Alerting Rules in Prometheus",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

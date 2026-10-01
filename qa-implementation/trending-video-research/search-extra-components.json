@@ -1,0 +1,118 @@
+{
+  "query": "connected components DFS graph neetcode",
+  "checked_at": "2026-09-30T07:24:59.115Z",
+  "results": [
+    {
+      "id": "8f1XPm4WOUc",
+      "title": "Number of Connected Components in an Undirected Graph - Union Find - Leetcode 323 - Python",
+      "channel": "NeetCode",
+      "duration": "15:59",
+      "views": "281,602 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Problem Link: ..."
+    },
+    {
+      "id": "utDu3Q7Flrw",
+      "title": "Top 5 Most Common Graph Algorithms for Coding Interviews",
+      "channel": "NeetCode",
+      "duration": "13:01",
+      "views": "409,377 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "bXsUuownnoQ",
+      "title": "Graph Valid Tree - Leetcode 261 - Python",
+      "channel": "NeetCode",
+      "duration": "14:11",
+      "views": "175,593 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Problem Link: https://neetcode.io/problems/valid-tree 0:00 ..."
+    },
+    {
+      "id": "4Q_k1OB4PtY",
+      "title": "148 - Connected Components | Find Connected Components in Graph Using DFS | Data Structure",
+      "channel": "Rapid Tutor",
+      "duration": "7:47",
+      "views": "698 views",
+      "description": "GraphTheory #ConnectedComponents #DFS #BFS #DSA #GraphTraversal #Algorithms #UndirectedGraph ..."
+    },
+    {
+      "id": "ACzkVtewUYA",
+      "title": "G-7. Number of Provinces | C++ | Java | Connected Components",
+      "channel": "take U forward",
+      "duration": "15:29",
+      "views": "622,005 views",
+      "description": "Check out TUF+:https://takeuforward.org/plus?source=youtube Find DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions ..."
+    },
+    {
+      "id": "I6v0itcISSY",
+      "title": "Connected Components in Graphs",
+      "channel": "take U forward",
+      "duration": "5:55",
+      "views": "118,991 views",
+      "description": "Check out TUF+:https://takeuforward.org/plus?source=youtube Find DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions ..."
+    },
+    {
+      "id": "mQeF6bN8hMk",
+      "title": "Clone Graph - Depth First Search - Leetcode 133",
+      "channel": "NeetCode",
+      "duration": "11:48",
+      "views": "370,849 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "8ryn-J1OI_U",
+      "title": "Strongly Connected Components: Kosaraju's Algorithm Step by Step | DSA Course L109",
+      "channel": "The Modern SDE",
+      "duration": "8:56",
+      "views": "No views",
+      "description": "Lecture 109 of the Complete DSA Course in Java by Engineer X · Part 6: Graph Algorithms. In this lecture • What a strongly ..."
+    },
+    {
+      "id": "qWGh4S86Exw",
+      "title": "Number of Connected Components in an Undirected Graph - Leetcode 323 - Blind 75 Explained  - Graphs",
+      "channel": "Off By One",
+      "duration": "16:37",
+      "views": "625 views",
+      "description": "In this video, I will be showing you how to solve Number of Connected Components in an Undirected Graph, Leetcode 323, with ..."
+    },
+    {
+      "id": "FXWRE67PLL0",
+      "title": "Redundant Connection - Union Find - Leetcode 684 - Python",
+      "channel": "NeetCode",
+      "duration": "16:04",
+      "views": "136,489 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "V8qIqJxCioo",
+      "title": "Kosaraju's Algorithm for Strongly Connected Components (SCC)",
+      "channel": "take U forward",
+      "duration": "18:21",
+      "views": "115,531 views",
+      "description": "Check out TUF+:https://takeuforward.org/plus?source=youtube Find DSA, LLD, OOPs, Core Subjects, 1000+ Premium Questions ..."
+    },
+    {
+      "id": "NDInpfnTMos",
+      "title": "Connected Components | LeetCode 323 (Medium)",
+      "channel": "Destination FAANG",
+      "duration": "9:55",
+      "views": "1,271 views",
+      "description": "Master LeetCode 323, Number of Connected Components in an Undirected Graph, with a practical graph interview walkthrough."
+    },
+    {
+      "id": "7gv3aEHcs2U",
+      "title": "G-04 Connected Components In a Graph || BFS || DFS",
+      "channel": "Aryan Mittal",
+      "duration": "14:33",
+      "views": "3,395 views",
+      "description": "In this video, I'll talk about how to find Connected Component in a Graph, that is one of the most important concepts in Graphs."
+    },
+    {
+      "id": "gbpqFFAYBBY",
+      "title": "Graph DFS Pattern: Island Counting & Connected Components | DSA 90 Patterns | Thita.ai",
+      "channel": "Thita AI",
+      "duration": "4:51",
+      "views": "229 views",
+      "description": "Learn how to solve Island Counting and Connected Components problems using the Graph DFS pattern. This is a must-know ..."
+    }
+  ]
+}

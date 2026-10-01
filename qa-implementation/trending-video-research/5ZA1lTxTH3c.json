@@ -1,0 +1,22 @@
+{
+  "id": "5ZA1lTxTH3c",
+  "url": "https://www.youtube.com/watch?v=5ZA1lTxTH3c",
+  "checked_at": "2026-09-30T07:23:20.762Z",
+  "title": "Securing AI Agents: How to Prevent Hidden Prompt Injection Attacks",
+  "channel": "IBM Technology",
+  "duration_seconds": 607,
+  "views": 32513,
+  "comments": "60 Comments",
+  "comment_samples": [
+    "Kudos to IBM to barely putting any effort into obscuring the inconvenient truth that prompt injection is essentially unpatchable and can only be somewhat reliably avoided by introducing a second AI agent (which can theoretically also be  prompt injected). Thanks for barely pulling the wool over our eyes!",
+    "Amazing, first time I practically understood how the prompt injection could derail the intent . 🙏",
+    "Amazing thanks guys ! Jeff with his white paper was the king 😆",
+    "Do  a video of all types of AI attacks",
+    "brilliant way to demonstrate indirect prompt injection!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Ready to become a certified watsonx Generative AI Engineer - Associate? Register now and use code IBMTechYT20 for 20% off of your exam → https://ibm.biz/Bdbk9d\n\nLearn more about Prompt Injection Attacks here → https://ibm.biz/BdbkLW\n\nAn AI agent bought the wrong book and the reason might surprise you 🤖. Jeff Crume and Martin Keen break down prompt injection attacks, AI security flaws, and how browser‑based agents can be misled. Learn practical ways to secure AI agents and keep your data safe.\n\nAI news moves fast. Sign up for a monthly newsletter for AI updates from IBM → https://ibm.biz/Bdbk9c\n\n#aiagents #promptinjection #aisecurity #aithreats",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

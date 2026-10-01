@@ -1,0 +1,134 @@
+{
+  "query": "word embeddings explained IBM",
+  "checked_at": "2026-09-30T07:24:53.772Z",
+  "results": [
+    {
+      "id": "wgfSDrqYMJ4",
+      "title": "What are Word Embeddings?",
+      "channel": "IBM Technology",
+      "duration": "8:38",
+      "views": "286,836 views",
+      "description": "Want to play with the technology yourself? Explore our interactive demo → https://ibm.biz/BdKet3 Learn more about the ..."
+    },
+    {
+      "id": "viZrOnJclY0",
+      "title": "Word Embedding and Word2Vec, Clearly Explained!!!",
+      "channel": "StatQuest with Josh Starmer",
+      "duration": "16:12",
+      "views": "604,608 views",
+      "description": "Words are great, but if we want to use them as input to a neural network, we have to convert them to numbers. One of the most ..."
+    },
+    {
+      "id": "95eQCwQpS4k",
+      "title": "Introduction to Word Embedding | Static vs Dynamic Embedding | Deep Learning",
+      "channel": "Gate Smashers",
+      "duration": "9:30",
+      "views": "8,952 views",
+      "description": "Understand the fundamentals of Word Embedding in Deep Learning and how words are converted into meaningful vector ..."
+    },
+    {
+      "id": "pO_6Jk0QtKw",
+      "title": "Word Embedding - Natural  Language Processing| Deep Learning",
+      "channel": "Krish Naik",
+      "duration": "15:10",
+      "views": "220,289 views",
+      "description": "A word embedding is a learned representation for text where words that have the same meaning have a similar representation."
+    },
+    {
+      "id": "hVM8qGRTaOA",
+      "title": "What Are Word Embeddings?",
+      "channel": "Under The Hood",
+      "duration": "19:33",
+      "views": "136,745 views",
+      "description": "word2vec #llm Converting text into numbers is the first step in training any machine learning model for NLP tasks. While one-hot ..."
+    },
+    {
+      "id": "5sLYAQS9sWQ",
+      "title": "How Large Language Models Work",
+      "channel": "IBM Technology",
+      "duration": "5:34",
+      "views": "1,666,022 views",
+      "description": "Learn in-demand Machine Learning skills now → https://ibm.biz/BdK65D Learn about watsonx → https://ibm.biz/BdvxRj Large ..."
+    },
+    {
+      "id": "gl1r1XV0SLw",
+      "title": "What is a Vector Database? Powering Semantic Search & AI Applications",
+      "channel": "IBM Technology",
+      "duration": "9:49",
+      "views": "976,219 views",
+      "description": "Ready to become a certified Qiskit Developer? Register now and use code IBMTechYT20 for 20% off of your exam ..."
+    },
+    {
+      "id": "lPTcTh5sRug",
+      "title": "How AI Turns Words Into Vectors: Embeddings",
+      "channel": "BlackBoard AI",
+      "duration": "3:35",
+      "views": "87,410 views",
+      "description": "Ever wondered how a computer learns the meaning of words like king and queen? How does an AI know that king is more related ..."
+    },
+    {
+      "id": "pFOKxJO4gu8",
+      "title": "Word Embedding Python | RNN | Detailed Explanation",
+      "channel": "Learn With Jay",
+      "duration": "10:09",
+      "views": "18,358 views",
+      "description": "Word Embedding (Python) is a technique to convert words into a vector representation. Computers cannot directly understand ..."
+    },
+    {
+      "id": "hQwFeIupNP0",
+      "title": "What is Word2Vec? A Simple Explanation | Deep Learning Tutorial 41 (Tensorflow, Keras & Python)",
+      "channel": "codebasics",
+      "duration": "18:28",
+      "views": "244,081 views",
+      "description": "A very simple explanation of word2vec. This video gives an intuitive understanding of how word2vec algorithm works and how it ..."
+    },
+    {
+      "id": "IdjxPZh4MGs",
+      "title": "Word Embeddings Explained | How Words Become Meaningful Vectors",
+      "channel": "Hidden weights",
+      "duration": "4:37",
+      "views": "64 views",
+      "description": "What if we could represent words as numbers while also capturing their meaning? In this video, we introduce Word Embeddings ..."
+    },
+    {
+      "id": "sZGuyTLjsco",
+      "title": "Converting words to numbers, Word Embeddings | Deep Learning Tutorial 39 (Tensorflow & Python)",
+      "channel": "codebasics",
+      "duration": "11:32",
+      "views": "139,236 views",
+      "description": "Machine learning models don't understand words. They should be converted to numbers before they are fed to RNN or any other ..."
+    },
+    {
+      "id": "ZXiruGOCn9s",
+      "title": "What are Transformers (Machine Learning Model)?",
+      "channel": "IBM Technology",
+      "duration": "5:51",
+      "views": "817,479 views",
+      "description": "Learn more about Transformers → http://ibm.biz/ML-Transformers Learn more about AI → http://ibm.biz/more-about-ai Check out ..."
+    },
+    {
+      "id": "GmXkCCa4eVA",
+      "title": "Word Embeddings - EXPLAINED!",
+      "channel": "CodeEmporium",
+      "duration": "10:06",
+      "views": "17,653 views",
+      "description": "Let's talk word embeddings in NLP! SPONSOR Get 20% off and be apart of a Premium Software Engineering Community for ..."
+    },
+    {
+      "id": "5MaWmXwxFNQ",
+      "title": "A Complete Overview of Word Embeddings",
+      "channel": "AssemblyAI",
+      "duration": "17:17",
+      "views": "137,104 views",
+      "description": "NLP has seen some big leaps over the last couple of years thanks to word embeddings but what are they? How are they made ..."
+    },
+    {
+      "id": "UqRCEmrv1gQ",
+      "title": "Word2Vec - Skipgram and CBOW",
+      "channel": "The Semicolon",
+      "duration": "7:21",
+      "views": "261,123 views",
+      "description": "Word2Vec #SkipGram #CBOW #DeepLearning Word2Vec is a very popular algorithm for generating word embeddings."
+    }
+  ]
+}

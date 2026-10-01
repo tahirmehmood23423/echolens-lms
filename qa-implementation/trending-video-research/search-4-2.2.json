@@ -1,0 +1,118 @@
+{
+  "query": "Kubernetes services ingress routing explained",
+  "checked_at": "2026-09-30T07:21:52.557Z",
+  "results": [
+    {
+      "id": "NPFbYpb0I7w",
+      "title": "Kubernetes Ingress in 5 mins",
+      "channel": "IBM Technology",
+      "duration": "5:41",
+      "views": "269,561 views",
+      "description": "Watch introductory Kubernetes Explained video → https://youtu.be/aSrqRSk43lY Learn more about Kubernetes ..."
+    },
+    {
+      "id": "d83eSnlJlNc",
+      "title": "What is Kubernetes Ingress in just 4 minutes",
+      "channel": "SKSecOps",
+      "duration": "4:07",
+      "views": "31,401 views",
+      "description": "Kubernetes Ingress Simplified! Are you confused about how Kubernetes handles external traffic? In this video, I break down ..."
+    },
+    {
+      "id": "uGsR9fuBVqU",
+      "title": "Kubernetes Ingress in 6 Minutes",
+      "channel": "The Coding Gopher",
+      "duration": "6:40",
+      "views": "3,194 views",
+      "description": "In this video, we explore Kubernetes Ingress in depth, a resource for efficiently managing and routing external traffic ..."
+    },
+    {
+      "id": "-2VKSYffdYM",
+      "title": "Kubernetes Ingress Explained: From Beginner to Expert",
+      "channel": "DevOps Pro",
+      "duration": "12:26",
+      "views": "51,855 views",
+      "description": "Hello folks, Welcome to DevOps Pro! \n\nLearn everything you need to know about Kubernetes Ingress and how to use it with path ..."
+    },
+    {
+      "id": "J8jAzqbXxjE",
+      "title": "Kubernetes Networking Explained",
+      "channel": "Mischa van den Burg",
+      "duration": "18:18",
+      "views": "65,897 views",
+      "description": "Apply to join KubeCraft & land your DevOps job: https://kubecraft.click/98afed Download your free DevOps Career Roadmap here: ..."
+    },
+    {
+      "id": "k8bxtsWe9qw",
+      "title": "MetalLB and NGINX Ingress // Setup External Access for Kubernetes Applications",
+      "channel": "Engineering with Morris",
+      "duration": "10:41",
+      "views": "66,626 views",
+      "description": "Learn how to install MetalLB Load Balancer and NGINX Ingress controller in Kubernetes. GitHub Project: ..."
+    },
+    {
+      "id": "NFApeJRXos4",
+      "title": "Kubernetes Services networking",
+      "channel": "Project Calico",
+      "duration": "7:13",
+      "views": "126,621 views",
+      "description": "Services are one of the key Kubernetes primitives you need to understand to glue microservices together and expose your ..."
+    },
+    {
+      "id": "RQbc_Yjb9ls",
+      "title": "Kubernetes NodePort vs LoadBalancer vs Ingress",
+      "channel": "Anton Putra",
+      "duration": "6:27",
+      "views": "142,105 views",
+      "description": "Mentorship/On-the-Job Support/Consulting - https://calendly.com/antonputra/youtube or me@antonputra.com UPDATED ..."
+    },
+    {
+      "id": "9iSHxXtUw-Q",
+      "title": "Kubernetes Ingress vs Services: Finally Explained!",
+      "channel": "Systems Design Lab",
+      "duration": "9:38",
+      "views": "68 views",
+      "description": "This video provides a comprehensive exploration of fundamental Kubernetes networking concepts. We examine how Services ..."
+    },
+    {
+      "id": "sjaOsHoF6KY",
+      "title": "Kubernetes Networking: NodePort, LoadBalancer, Ingress, or Gateway API?",
+      "channel": "SystemBlueprint and Anton Putra",
+      "duration": "13:16",
+      "views": "24,881 views",
+      "description": "Confused by NodePort, LoadBalancer, Ingress, and the new Gateway API? You aren't alone. In this video, we break down the ..."
+    },
+    {
+      "id": "2RuXW0ZiSUU",
+      "title": "Kubernetes Ingress Tutorial: HTTP/HTTPS Routing & SSL Termination Explained",
+      "channel": "CodeLucky",
+      "duration": "5:41",
+      "views": "369 views",
+      "description": "Master Kubernetes Ingress in this comprehensive beginner-friendly tutorial! Learn how to implement HTTP/HTTPS routing and ..."
+    },
+    {
+      "id": "ax8BMMdnczQ",
+      "title": "Kubernetes Networking Explained: Services, Ingress & DNS Made Simple (2025)",
+      "channel": "SubnetSavy",
+      "duration": "3:48",
+      "views": "57 views",
+      "description": "Kubernetes #DevOps #SubnetSavy, #kubernetes #networking, #kubernetestips #kubernetestroubleshooting #homelab ..."
+    },
+    {
+      "id": "2-oFNrAd8w0",
+      "title": "Ingress in Kubernetes Explained | Setup & Path-Based Routing Tutorial",
+      "channel": "Automation tools",
+      "duration": "5:03",
+      "views": "148 views",
+      "description": "In this video, we'll explore what Ingress in Kubernetes is, why it's important, and how to configure it to expose your applications ..."
+    },
+    {
+      "id": "NPB99SamA2s",
+      "title": "Kubernetes Ingress in AKS | Path-Based Routing with Kubernetes-Part14",
+      "channel": "Free Training Cloud & Devops",
+      "duration": "9:42",
+      "views": "30 views",
+      "description": "In this hands-on Azure Kubernetes Service (AKS) tutorial, we'll learn how **Kubernetes Ingress** can route traffic to multiple ..."
+    }
+  ]
+}

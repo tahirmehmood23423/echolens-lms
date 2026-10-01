@@ -1,0 +1,22 @@
+{
+  "id": "G8wDjV0N9tk",
+  "url": "https://www.youtube.com/watch?v=G8wDjV0N9tk",
+  "checked_at": "2026-09-30T07:24:12.198Z",
+  "title": "Transaction Isolation Levels With PostgreSQL as an example",
+  "channel": "mkdev",
+  "duration_seconds": 497,
+  "views": 40216,
+  "comments": "35 Comments",
+  "comment_samples": [
+    "I am a university student in Canada and this is just what I needed to prepare for my upcoming exam on databases. Very concise and easily understandable. Спасибо!",
+    "Thanks for video.\nIt seems that example of lost updated is incorrect.\nIn both sessions you update table orders setting total to  100 + 1. You can apply this update as many time as you want and you will get 101 value of total column.  Maybe you wanted to incremet value like \"total = total + 1\" ?",
+    "This has been incredibly helpful, thanks for the short and concise explanation.",
+    "Nice video, but I didn't understand the serialization anomaly example",
+    "The best, full, clear and shortest explanation I've ever seen. Thanks!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, Boris Strelnikov will explain which transaction isolation levels exist in databases and what you should be aware of as a developer. \n\nYou will see dirty read, lost update, non-repeatable read, phantoms and serialization anomaly - most of them demoed inside PostgreSQL database.\n\nYou can hire Boris as your programming mentor or get a consultation from him here: https://mkdev.me/en/mentors/risentveber\n\nCheck out mkdev dispatch, bi-weekly newsletter about DevOps and Cloud Native -  https://mkdev.me/dispatch\n\nDevOps Accents is our monthly podcast, where 3 mkdev founders chat about DevOps, Cloud and Life: https://mkdev.me/podcast\n\nAt mkdev we provide all range of IT services, from trainings and workshops to audit and consulting. \n\nCheck out our website: https://mkdev.me/en/b or contact us at team@mkdev.me\n\n#databases #rdbms #postgresql #transactionisolation #acid",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

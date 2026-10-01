@@ -1,0 +1,22 @@
+{
+  "id": "t779DVjCKCs",
+  "url": "https://www.youtube.com/watch?v=t779DVjCKCs",
+  "checked_at": "2026-09-30T07:23:40.091Z",
+  "title": "Docker Image BEST Practices - From 1.2GB to 10MB",
+  "channel": "Better Stack",
+  "duration_seconds": 435,
+  "views": 436577,
+  "comments": "251 Comments",
+  "comment_samples": [
+    "Some fun corrections in this video:\n1. I pronounce Alpine as \"Al-peen\" as that's how the Formula 1 team does 🤣\n2. Nginx is \"engine X\".... I've just always said it this way\n3. Alpine wasn't purpose built for containers but it works great with them!\n\nAlso as I said in the video try not to use .env files in an image. Especially if you publish it!",
+    "asked openclaw to reduce my container size, it formatted my hard drive.",
+    "Shrinked my image from 3.2GB to 500mb, thanks!",
+    "Note that alpine use musl instead of glibc. For python based projects, you are generally advised to avoid it since many packages won't work.",
+    "Alpine was/is not made with containers in mind, but with embedded systems in mind instead. It was created in 2005 waay before containers started"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Want to dramatically reduce your Docker image size? In this comprehensive guide, I'll show you how to shrink your Docker images from gigabytes to just megabytes using proven optimization techniques. Learn about multi-stage builds, Alpine images, layer caching, and professional tools that can help streamline your containerization process. Perfect for developers looking to improve deployment times, reduce costs, and enhance security.\n\nDistroless: https://github.com/GoogleContainerTools/distroless\nDive: https://github.com/wagoodman/dive\nSlim: https://github.com/slimtoolkit/slim\n\n► HACKING SCALE NEWSLETTER\nhttps://newsletter.betterstack.com/\n\n► READ MORE\nMore about Better Stack: https://betterstack.com/\nCommunity pages: https://betterstack.com/community/\n\n► STAY TUNED\nGitHub: https://github.com/BetterStackHQ\nTwitter: https://twitter.com/betterstackhq\nLinkedIn: https://www.linkedin.com/company/betterstack\nInstagram: https://www.instagram.com/betterstackhq/\nTikTok: https://www.tiktok.com/@betterstack\n\n📌 𝗖𝗵𝗮𝗽𝘁𝗲𝗿𝘀:",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

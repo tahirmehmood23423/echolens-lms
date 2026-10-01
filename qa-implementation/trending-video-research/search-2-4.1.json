@@ -1,0 +1,102 @@
+{
+  "query": "RAG evaluation Ragas tutorial metrics",
+  "checked_at": "2026-09-30T07:20:41.635Z",
+  "results": [
+    {
+      "id": "7_LTU0LA374",
+      "title": "RAG Evaluation: Precision, Recall, Faithfulness, RAGAS Explained Clearly",
+      "channel": "Logical Lenses",
+      "duration": "12:19",
+      "views": "29,444 views",
+      "description": "Evaluating RAG systems requires more than checking how similar an answer is to a reference. Traditional metrics like BLEU, ..."
+    },
+    {
+      "id": "5fp6e5nhJRk",
+      "title": "RAGAS: How to Evaluate a RAG Application Like a Pro for Beginners",
+      "channel": "Mervin Praison",
+      "duration": "8:38",
+      "views": "65,951 views",
+      "description": "Welcome to an in-depth tutorial on RAGAS, your go-to framework for evaluating and testing retrieval-augmented generation ..."
+    },
+    {
+      "id": "7KLzDljc6QE",
+      "title": "RAG Evaluation Explained — RAGAS Metrics + 20 Interview Q&A You Must Know",
+      "channel": "AmanAI Lab",
+      "duration": "14:59",
+      "views": "1,295 views",
+      "description": "RAG (Retrieval-Augmented Generation) Explained from Scratch — the complete foundation every AI Engineer needs before building ..."
+    },
+    {
+      "id": "-dIm4EyUrrM",
+      "title": "RAG #10: RAG Retrieval Evaluation Metrics Explained: Recall@K, Precision@K, MRR, MAP, NDCG #rag",
+      "channel": "Praveen Reddy Learnings",
+      "duration": "11:19",
+      "views": "1,983 views",
+      "description": "RAG Retrieval Evaluation Metrics Explained: Recall@K, Precision@K, MRR, MAP, NDCG #rag."
+    },
+    {
+      "id": "f8zMrSysnjY",
+      "title": "RAG Evaluation Metrics Tutorial",
+      "channel": "Analytics Vidhya",
+      "duration": "5:50",
+      "views": "1,747 views",
+      "description": "Description: In this video, you will learn how to evaluate the performance of your Graph RAG system using RAGAS, the leading ..."
+    },
+    {
+      "id": "cRz0BWkuwHg",
+      "title": "Key Metrics and Evaluation Methods for RAG",
+      "channel": "What's AI by Louis-François Bouchard",
+      "duration": "10:43",
+      "views": "34,440 views",
+      "description": "Build Your First Scalable Product with LLMs: https://academy.towardsai.net/courses/beginner-to-advanced-llm-dev?ref=1f9b29 ..."
+    },
+    {
+      "id": "nAN7DO4Arm8",
+      "title": "RAG Evaluation Explained in 120 Seconds | RAGAS Framework",
+      "channel": "sayanteka chakraborty",
+      "duration": "2:02",
+      "views": "3,681 views",
+      "description": "In this video, we break down the RAGAS framework—one of the most popular evaluation frameworks for RAG systems—and ..."
+    },
+    {
+      "id": "ahDqIQb3_8w",
+      "title": "How to Evaluate RAG Models Using RAGAS – Easy Step-by-Step Guide",
+      "channel": "Yash Jain",
+      "duration": "15:47",
+      "views": "2,347 views",
+      "description": "📂 GitHub Repository:\n🔗 https://github.com/yashjaincodex/rag-evaluation-ragas-youtube\n\nIn this session, we’re learning how to ..."
+    },
+    {
+      "id": "eX9MjwZWREk",
+      "title": "RAGAS Explained: AI Evaluation, Hallucination Detection & RAG Metrics (2026)",
+      "channel": "The Techzeen",
+      "duration": "5:58",
+      "views": "292 views",
+      "description": "RAGAS Tutorial | Eval-Driven Development for RAG Systems | AI Evaluation, Hallucination Detection & Response Quality Metrics ..."
+    },
+    {
+      "id": "1M24UHWL41A",
+      "title": "RAG Retrieval Metrics Explained: Recall, Precision, MRR & NDCG",
+      "channel": "KodeKloud",
+      "duration": "1:36",
+      "views": "7,028 views",
+      "description": "Evaluating a RAG system goes beyond just testing outputs. You need to measure retrieval quality using metrics like Recall@K, ..."
+    },
+    {
+      "id": "iAF0l_2jQS4",
+      "title": "The RAG Evaluation Framework Every AI Team Needs",
+      "channel": "Analytics Vidhya",
+      "duration": "10:24",
+      "views": "423 views",
+      "description": "Description Building a RAG system is only half the battle. How do you prove it actually works? In this video, we dive into the ..."
+    },
+    {
+      "id": "-_52DIIOsCE",
+      "title": "AI Agent Evaluation with RAGAS",
+      "channel": "James Briggs",
+      "duration": "19:42",
+      "views": "38,445 views",
+      "description": "RAGAS (RAG ASsessment) is an evaluation framework for RAG pipelines. Here, we see how to use RAGAS for evaluating an AI ..."
+    }
+  ]
+}

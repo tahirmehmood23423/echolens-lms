@@ -1,0 +1,21 @@
+{
+  "id": "9eqKRT5K8hI",
+  "url": "https://www.youtube.com/watch?v=9eqKRT5K8hI",
+  "checked_at": "2026-10-01T05:21:16.749Z",
+  "title": "PostgreSQL indexes. B-Tree or Hash. What is better? How it works?",
+  "channel": "JaneExplainsIT",
+  "duration_seconds": 349,
+  "views": 2182,
+  "comments": "7 Comments",
+  "comment_samples": [
+    "Amazing!\nreally, loved it😘",
+    "Thanku so much it really helpful ❤\nIt was very point to point I  like that min time max output",
+    "❤",
+    "Very helpful video, thanks! Do you known any real-world examples where hash index is really better than b-tree?"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "PostgreSQL: Hash index. We’ll see how it works under the hood and understand if it’s better than B tree index.\nSo, what is a hash index, and when should you use one?\n\n#postgresql #hashindex #sql #it",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

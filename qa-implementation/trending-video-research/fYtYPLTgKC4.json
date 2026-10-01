@@ -1,0 +1,16 @@
+{
+  "id": "fYtYPLTgKC4",
+  "url": "https://www.youtube.com/watch?v=fYtYPLTgKC4",
+  "checked_at": "2026-10-01T05:20:56.130Z",
+  "title": "Lesson 7 Advanced Prisma features and operations",
+  "channel": "Stephen Lewis",
+  "duration_seconds": 886,
+  "views": 11,
+  "comments": "0 Comments",
+  "comment_samples": [],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "We went through Prisma, optimizing our code with includes for eager loading, set Prisma error handlers in place for graceful error handling, messed with Prisma methods such as transaction, writing raw queries, Prisma raw, going over basic standard security practices for putting user input directly into raw queries, using the aggregate count, the message group by, the message count as well, the aggregate count and the message count, building pagination so that we control the flow of data for our database.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "Nh80WuM8Izc",
+  "url": "https://www.youtube.com/watch?v=Nh80WuM8Izc",
+  "checked_at": "2026-09-30T07:24:10.443Z",
+  "title": "Postgres Join Strategies - Nested Loop Join, Hash Join, Merge Join",
+  "channel": "Lift And Shift Dev",
+  "duration_seconds": 771,
+  "views": 5026,
+  "comments": "7 Comments",
+  "comment_samples": [
+    "Merge join explaination is wrong. Second ist has to be sorted",
+    "Isn't the merge join at the end incorrect since the second set wasn't sorted first? From what I'm seeing, merge join requires both sets to be sorted first.",
+    "Very easy to understand, thank u a lot",
+    "Good explanation ❤ Although the merge join indeed needs an update version😂",
+    "In the merge join, you did not pick/match employe id 4. Why you are not considering that record. as per condition it should be part of the result.  Can you please update on this?"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, I share with you how Postgres Join strategies work. I will explain in details step by step how these 3 join algorithms operate: Nested Loop Join, Hash Join and Merge Join.\n\n#postgres  #queryplan #liftandshiftdev #postgresql #backend #database #sql #joinstrategies #mergejoin #hashjoin #nestedloopjoin\n\nMedium blog: https://medium.com/geekculture/postgresql-join-strategies-overview-748c7ec88ea2\nSupport the channel: paypal.me/liftandshiftdev",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

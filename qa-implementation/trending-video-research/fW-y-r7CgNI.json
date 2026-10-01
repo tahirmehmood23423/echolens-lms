@@ -1,0 +1,22 @@
+{
+  "id": "fW-y-r7CgNI",
+  "url": "https://www.youtube.com/watch?v=fW-y-r7CgNI",
+  "checked_at": "2026-09-30T07:25:48.472Z",
+  "title": "Are Multi-Column Indexes a good idea?",
+  "channel": "Supabase",
+  "duration_seconds": 681,
+  "views": 16296,
+  "comments": "20 Comments",
+  "comment_samples": [
+    "Thumbnail said don’t use them. 😅 but watched your whole video and the conclusion is do use them sparingly",
+    "Conclusion: Single column indexes are faster. The final multi-column index made the 1st query from 0.008ms to 3.5ms and the 2nd query form 1ms to 30ms just to save some disk space.",
+    "Love your work, thank u for supabase 😊",
+    "thanks !!! 🔥🔥",
+    "God bless you"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Indexing can greatly improve the performance of database queries over a large dataset. Postgres supports Indexing multiple columns, which can be more performant and space efficient, than multiple single-column Indexes. In this video, Jon Meyers demonstrates how to create a Multi-column Index and discusses some of the design considerations and tradeoffs that need to be made. \n\nManaging Indexes in PostgreSQL: https://supabase.com/docs/guides/database/postgres/indexes\n\n00:00 An inefficient query\n01:00 Improving performance by not over-fetching data\n02:03 Single-column Indexes to reduce query time\n04:21 An extremely inefficient query using an Index\n06:08 Designing a Multi-column Index to satisfy multiple queries\n07:22 The sequence of columns is important in Multi-Column Indexes\n09:46 Which is more space efficient?\n10:53 Maybe a single Covering Index would be better\n\n💻 Videos to watch next:\n▶ Make your queries 43,240x faster: https://www.youtube.com/watch?v=bBu_V8CfWgM\n▶ The FASTEST possible way to query data: https://www.youtube.com/watch?v=bLxJDXqr5sI\n▶ Learn Postgres (playlist): https://youtube.com/playlist?list=PL5S4mPUpp4Ote6F9ScnXevuOyCnvzahRV&feature=shared\n\n👇 Learn more about Supabase 👇\n\n🕸 Website: https://supabase.com/\n🏁 Get started: https://app.supabase.com/\n📄 Docs: https://supabase.com/docs\n\n🔔 Subscribe for more tutorials and feature updates from Supabase: https://www.youtube.com/channel/UCNTVzV1InxHV-YR0fSajqPQ?sub_confirmation=1\n\n📱 Connect with Us:\n🐙 Github: https://www.github.com/supabase \n💬 Discord: https://discord.supabase.com/\n🐦 Twitter: https://www.twitter.com/supabase/\n▶ Instagram (follow for memes): https://www.instagram.com/supabasecom/ \n\n\nABOUT SUPABASE:\nSupabase is the open source Firebase alternative. Supabase provides a full Postgres database for every project with pgvector, backups, realtime, and more. Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.\n\nBuild in a weekend, scale to millions.\n\n#Supabase #AppDevelopment #RealtimeApps #DeveloperTools",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

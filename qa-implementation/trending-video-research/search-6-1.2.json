@@ -1,0 +1,78 @@
+{
+  "query": "SQL window functions explained",
+  "checked_at": "2026-09-30T07:22:01.965Z",
+  "results": [
+    {
+      "id": "rIcB4zMYMas",
+      "title": "SQL Window Functions | Clearly Explained | PARTITION BY, ORDER BY, ROW_NUMBER, RANK, DENSE_RANK",
+      "channel": "Maven Analytics",
+      "duration": "7:52",
+      "views": "394,184 views",
+      "description": "7-day email course to get you started with data analytics: https://mavenanalytics.io/newsletter/still-a-real-career 7-day AI analyst ..."
+    },
+    {
+      "id": "Nz4vDHE-eJo",
+      "title": "SQL Window Functions EXPLAINED: The Only Tutorial You'll Ever Need!",
+      "channel": "Zero Analyst",
+      "duration": "18:49",
+      "views": "2,491 views",
+      "description": "Struggling to understand SQL Window Functions? In this beginner-friendly tutorial, we break down complex concepts like RANK() ..."
+    },
+    {
+      "id": "fpPIOiGFh38",
+      "title": "Window Function in SQL - Day - 27 - SQL - From Basic to Advance",
+      "channel": "Satish Dhawale",
+      "duration": "13:13",
+      "views": "56,355 views",
+      "description": "Window Function in SQL - Day - 27 - SQL - From Basic to Advance #SD47 In this video covers SQL window functions, showing ..."
+    },
+    {
+      "id": "y1KCM8vbYe4",
+      "title": "SQL Window Functions in 10 Minutes",
+      "channel": "Colt Steele",
+      "duration": "10:13",
+      "views": "138,885 views",
+      "description": "https://www.udemy.com/course/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/?couponCode=SQL_YT_21897312."
+    },
+    {
+      "id": "7NBt0V8ebGk",
+      "title": "Window Functions in MySQL | Intermediate MySQL",
+      "channel": "Alex The Analyst",
+      "duration": "13:29",
+      "views": "277,749 views",
+      "description": "Full MySQL Course: https://www.analystbuilder.com/courses/mysql-for-data-analytics In this lesson we are going to take a look at ..."
+    },
+    {
+      "id": "xFeOVIIRyvQ",
+      "title": "SQL Window Functions: Explained (with examples)",
+      "channel": "Database Star",
+      "duration": "9:11",
+      "views": "38,813 views",
+      "description": "Get my free SQL Cheat Sheets: https://databasestar.mykajabi.com/lpkj-sql-cheat-sheets/?video=xFeOVIIRyvQ Go from zero to ..."
+    },
+    {
+      "id": "vjnghhHzlko",
+      "title": "PostgreSQL Window Functions Explained EASY",
+      "channel": "JaneExplainsIT",
+      "duration": "8:00",
+      "views": "352 views",
+      "description": "In this video, I explain how Postgres window function actually work in simple terms. We'll break down their structure(PARTITION ..."
+    },
+    {
+      "id": "rGCAHal5ArM",
+      "title": "Video - 79 | MySQL - WINDOW FUNCTIONS with Example | MPrashant",
+      "channel": "MPrashant TECH",
+      "duration": "18:17",
+      "views": "19,538 views",
+      "description": "#mprashant #mysql #sql  @MPrashant\n\nMySQL window functions\nMySQL ROW_NUMBER\nMYSQL RANK()\nMYSQL DENSE_RANK()\nMYSQL LEAD() LAG ..."
+    },
+    {
+      "id": "NNpFHQl_GT0",
+      "title": "Rank() vs Dense_Rank() Window Function() | SQL Interview🎙Questions🙋🙋‍♀️",
+      "channel": "Gate Smashers",
+      "duration": "7:39",
+      "views": "111,716 views",
+      "description": "MASTER COMPUTER SCIENCE | INTERVIEWS | EXAMS Gate Smashers — Learn Computer Science through free lectures, ..."
+    }
+  ]
+}

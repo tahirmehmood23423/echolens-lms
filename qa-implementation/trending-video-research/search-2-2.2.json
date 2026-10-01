@@ -1,0 +1,102 @@
+{
+  "query": "LangChain LCEL streaming RunnableParallel tutorial",
+  "checked_at": "2026-09-30T07:20:39.945Z",
+  "results": [
+    {
+      "id": "gCupaCBgreQ",
+      "title": "Runnables Explained - Langchain Tutorial( 2025) - Build Chat Apps, RAG & Agents - Urdu/Hindi",
+      "channel": "Learn And Earn",
+      "duration": "12:37",
+      "views": "249 views",
+      "description": "What you'll learn Runnable basics: invoke, batch, stream Custom Runnable Code Link ..."
+    },
+    {
+      "id": "Qw_1LZEc6sg",
+      "title": "Ep: 11 -  Runnables and Chains in LangChain Explained  | LangChain Playlist",
+      "channel": "coder zero",
+      "duration": "17:49",
+      "views": "1,020 views",
+      "description": "Welcome to another exciting episode of the LangChain Playlist! GitHub Code Repository: ..."
+    },
+    {
+      "id": "L07Kwpjppd4",
+      "title": "Langchain LCEL Intuitively Explained + Notebook Examples | Langchain Tutorial",
+      "channel": "M&M Tech",
+      "duration": "8:19",
+      "views": "1,207 views",
+      "description": "In this video, I provide an intuitive explanation of LangChain Expression Language (LCEL). You'll discover how to create various ..."
+    },
+    {
+      "id": "wyGB3rhGLxc",
+      "title": "Langchain Tutorial | Runnables | RunnableLambda, RunnableParallel & Graph Visualization Tutorial",
+      "channel": "Mohamed Naji Aboo",
+      "duration": "15:46",
+      "views": "1,079 views",
+      "description": "Dive deep into LangChain's powerful Runnables in this comprehensive tutorial! If you're looking to leverage LangChain for ..."
+    },
+    {
+      "id": "E9oFkaBSTuM",
+      "title": "LangChain Expression Language (LCEL) Explained | LangChain Tutorial",
+      "channel": "CodeCraft Academy",
+      "duration": "2:21",
+      "views": "149 views",
+      "description": "Want to build cleaner, more powerful AI applications with LangChain? In this video, you'll learn everything about LangChain ..."
+    },
+    {
+      "id": "zFIjfnmV6Og",
+      "title": "LangChain 02: Prompt Templates & Chains Explained",
+      "channel": "TechWhistle",
+      "duration": "4:41",
+      "views": "781 views",
+      "description": "LangChain's LCEL pipe operator turns your messy f-string prompts into modular, streaming-ready AI pipelines — and it takes less ..."
+    },
+    {
+      "id": "uLqya_oRdts",
+      "title": "Stop Using LangChain Chains the Hard Way! Master LCEL Runnables",
+      "channel": "CodeCraft Academy",
+      "duration": "2:10",
+      "views": "115 views",
+      "description": "What actually happens when you write prompt | model | parser in LangChain? In this video, we break down the Runnable Protocol ..."
+    },
+    {
+      "id": "cftdr7xCZSU",
+      "title": "LangChain RunnableSequence vs RunnableParallel | Python Tutorial",
+      "channel": "Naveen Tech Hub",
+      "duration": "5:01",
+      "views": "73 views",
+      "description": "Learn the difference between LangChain RunnableSequence and RunnableParallel in just 5 minutes—with working Python ..."
+    },
+    {
+      "id": "pDvBqh_mu84",
+      "title": "Langchain Tutorial | Langchain Expression Language | LCEL Tutorial",
+      "channel": "Mohamed Naji Aboo",
+      "duration": "14:42",
+      "views": "298 views",
+      "description": "Dive into LangChain Expression Language (LCEL) with this comprehensive tutorial focused on using Runnable modules like ..."
+    },
+    {
+      "id": "v9G-h6Ygokk",
+      "title": "LangChain Expression Language (LCEL)",
+      "channel": "James Briggs",
+      "duration": "18:11",
+      "views": "3,599 views",
+      "description": "This chapter will introduce LangChain's Expression Langauge (LCEL). We'll focus on understanding how LCEL works under the ..."
+    },
+    {
+      "id": "Zbf5Hyv2DSY",
+      "title": "LCEL, Legacy Chains & Runnables 🔥 | LangChain Series #7",
+      "channel": "GenAgentic AI",
+      "duration": "18:17",
+      "views": "182 views",
+      "description": "LCEL, LEGACY CHAINS & RUNNABLES | LANGCHAIN SERIES #7 In this video, we understand one of the most important ..."
+    },
+    {
+      "id": "fs3RGI6VbEA",
+      "title": "LangChain Runnables Explained | Build Custom Runnable & LCEL Pipeline",
+      "channel": "Mohamed Naji Aboo",
+      "duration": "6:12",
+      "views": "78 views",
+      "description": "In this video, you'll learn one of the most important concepts in LangChain—Runnables. Almost every major LangChain ..."
+    }
+  ]
+}

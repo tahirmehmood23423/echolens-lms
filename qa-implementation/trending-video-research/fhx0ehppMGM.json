@@ -1,0 +1,22 @@
+{
+  "id": "fhx0ehppMGM",
+  "url": "https://www.youtube.com/watch?v=fhx0ehppMGM",
+  "checked_at": "2026-09-30T07:25:07.635Z",
+  "title": "Understanding Prometheus Metric Types | Meaning and Usage (Gauge, Counter, Summary, Histogram)",
+  "channel": "Prometheus Monitoring with Julius | PromLabs",
+  "duration_seconds": 679,
+  "views": 85530,
+  "comments": "25 Comments",
+  "comment_samples": [
+    "The Prometheus CO-FOUNDER  is out here explaining these concepts, and doing them so well. What a legend! Easiest sub ever. Thanks Julius!!!",
+    "We recently started using it in our production, thank you so much for your work and for these videos. Hope to see them more 🙏",
+    "Honestly, reading the prometheus documentation there's so many functions, its hard to know where to start at, but this video is a great start to know the most useful functions for a beginner.",
+    "hey julius... your way of explaining is super simple and on-point. the way you speak steadily and clearly..it made the concepts so easy to understand. keep bringing more videos on grafana and prometheus.",
+    "Thanks for this video.\nWould like to know more about native histogram."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "This video explains the four different metric types in Prometheus: Gauges, Counters, Summaries, and Histograms. It goes into the meaning of each type, explains how to use each type in instrumentation, and how they show up in the exposition format. It also touches on what you have to watch out for when querying each metric type with PromQL.\n\nCheck my Prometheus training courses if you want to learn Prometheus in a structured way from the ground up:\n\n    https://training.promlabs.com/\n\nHistograms vs. Summaries in the Prometheus documentation:\n\n    https://prometheus.io/docs/practices/histograms/\n\nChapters:\n00:00 Introduction\n00:25 Gauges\n01:00 Gauge Instrumentation Methods\n01:40 Gauges in the Exposition Format\n01:50 Querying Gauges\n02:05 Gauges Containing Timestamps\n02:18 Counters\n02:44 Counter Resets\n02:56 Counter Instrumentation Methods\n03:48 Counters in the Exposition Format\n03:58 Querying Counters (absolute values vs. rates)\n04:53 Summaries\n05:05 Constructing Summaries\n05:15 Summary Instrumentation Methods\n05:37 Summaries in the Exposition Format\n06:01 Querying Summaries\n06:45 Histograms\n07:10 Cumulative Histograms\n07:48 Constructing Histograms\n07:58 Histogram Instrumentation Methods\n08:08 Histograms in the Exposition Format\n09:05 Querying Histograms (percentile calculation using histogram_quantile() )\n10:10 Average Request Latencies\n10:29 Native Histograms\n11:04 Outro & PromLabs Prometheus Trainings\n\n---------------------------------------------------------------------------\nCREDITS: \"Subscribe Button\" by MrNumber112 https://youtu.be/Fps5vWgKdl0",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

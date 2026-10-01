@@ -1,0 +1,22 @@
+{
+  "id": "y2d0VHdvfdc",
+  "url": "https://www.youtube.com/watch?v=y2d0VHdvfdc",
+  "checked_at": "2026-09-30T07:23:28.735Z",
+  "title": "Sliding Window in 7 minutes | LeetCode Pattern",
+  "channel": "AlgoMasterIO",
+  "duration_seconds": 458,
+  "views": 308318,
+  "comments": "108 Comments",
+  "comment_samples": [
+    "Thanks for watching guys!\n\nIf you want to practice more patterns and problems, check out https://algomaster.io",
+    "mistake at 3:28 , we should add the 'i' the value and remove the 'i-k' th value in last for loop\nfor(int i = k; i < n; i++){\r\n            sum += nums[i];\r\n            sum -= nums[i-k];\r\n            maxSum = Math.max(maxSum, sum);\r\n        }",
+    "Best series for a quick revision of techniques 1  hr before an interview",
+    "honestly so good. im currently doing strivers and then ill do your sheet too. as a gen z person so used to watching reels, i have such low attention san, so your short clear videos are a godsend. thank you so much. its a gift to be able to be as clear and concise as you.",
+    "Please make video like this for other pattern in DSA"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "► Master DSA Patterns: https://algomaster.io/\n► My DSA Playlist: https://www.youtube.com/watch?v=g1nAxNKcP0M&list=PLK63NuByH5o9odyBT7nfYkHZyvGQ5oVp2\n\nGitHub repository: https://github.com/ashishps1/awesome-leetcode-resources\n\nIn this video, I talk about the sliding window algorithm and explain it using leetcode examples.\n\nSubscribe for more such videos: https://www.youtube.com/@algomaster-io/subscribe\n\n📩 Join 120,000+ Software Engineers: https://blog.algomaster.io/\n(You also get a FREE System Design Interview Handbook in your inbox by subscribing)\n\nStay in touch:\n💬 Discord: https://discord.gg/rCtXvbFx9Z\n👨‍💻 Linkedin: https://www.linkedin.com/company/algomaster-io\n📷 Instagram: https://www.instagram.com/algo.master.io/",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

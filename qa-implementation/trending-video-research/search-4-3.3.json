@@ -1,0 +1,70 @@
+{
+  "query": "ArgoCD GitOps tutorial",
+  "checked_at": "2026-09-30T07:21:54.998Z",
+  "results": [
+    {
+      "id": "Yb3_4PZX0B0",
+      "title": "Let's do GitOps in Kubernetes! ArgoCD Tutorial",
+      "channel": "Christian Lempa",
+      "duration": "18:01",
+      "views": "90,787 views",
+      "description": "We start taking a look at CI-CD, especially the CD part with the free and open-source Argo CD. In this video, we will automate the ..."
+    },
+    {
+      "id": "eqiqQN1CCmM",
+      "title": "EP-1 | GITOPS & ARGO CD CRASH COURSE | WHAT IS GITOPS ? |#devops #argocd #gitops #kubernetes #cicd",
+      "channel": "Abhishek.Veeramalla",
+      "duration": "19:54",
+      "views": "160,469 views",
+      "description": "Join our 24*7 Doubts clearing group (Discord Server) www.youtube.com/abhishekveeramalla/join Udemy Course (End to End ..."
+    },
+    {
+      "id": "1hF-HRq5Mww",
+      "title": "What is GitOps | GitOps explained with ArgoCD project",
+      "channel": "Cloud Champ",
+      "duration": "15:51",
+      "views": "26,106 views",
+      "description": "GitOps Explained | Understand what is GitOps? | Benefits of GitOps | GitOps Project to deploy Game on Kubernetes using ArgoCD ..."
+    },
+    {
+      "id": "f5EpcWp0THw",
+      "title": "What is GitOps, How GitOps works and Why it's so useful",
+      "channel": "TechWorld with Nana",
+      "duration": "11:33",
+      "views": "464,866 views",
+      "description": "What GitOps is, how GitOps works and the benefits of using GitOps in 10 minutes. ▻ FREE E-Book \"Kubernetes Backup ..."
+    },
+    {
+      "id": "2pvGL0zqf9o",
+      "title": "Argo CD Tutorial: App of Apps in 8 Minutes",
+      "channel": "Akuity",
+      "duration": "7:57",
+      "views": "47,290 views",
+      "description": "In this hands-on Argo CD tutorial, Nicholas Mura (Developer Advocate at Akuity) demonstrates the App of Apps Pattern in Argo ..."
+    },
+    {
+      "id": "GlG6Xr2HH1g",
+      "title": "Demystifying GitOps: A Beginner-Friendly Explanation | KodeKloud",
+      "channel": "KodeKloud",
+      "duration": "8:01",
+      "views": "47,787 views",
+      "description": "GitOps is a way to do Continuous Deployment, it works by using Git as a single source of truth for declarative infrastructure and ..."
+    },
+    {
+      "id": "p-kAqxuJNik",
+      "title": "What is ArgoCD",
+      "channel": "IBM Technology",
+      "duration": "4:34",
+      "views": "66,407 views",
+      "description": "Implement a CI/CD Pipeline with Tekton and ArgoCD → https://ibm.biz/BdPSEY You've probably heard phrases like \"single ..."
+    },
+    {
+      "id": "xRIre6L_gAo",
+      "title": "GitOps CRASH COURSE For Beginners | ArgoCD & FluxCD | Vishakha Sadhwani",
+      "channel": "Vishakha Sadhwani",
+      "duration": "10:24",
+      "views": "12,041 views",
+      "description": "Project link: github.com/vishakhasadhwani/devops-ai-playbook End-To-End DevOps + AIOps Project: ..."
+    }
+  ]
+}

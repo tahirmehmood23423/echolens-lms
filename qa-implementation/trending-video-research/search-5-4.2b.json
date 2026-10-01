@@ -1,0 +1,46 @@
+{
+  "query": "Golang Redis caching TutorialEdge",
+  "checked_at": "2026-09-30T07:23:26.013Z",
+  "results": [
+    {
+      "id": "1C3Ym_JjkMw",
+      "title": "Beginner's Guide to Redis with Go!",
+      "channel": "TutorialEdge",
+      "duration": "11:27",
+      "views": "18,066 views",
+      "description": "Welcome Gophers! In this video, we'll be looking at how you can connect into a Redis instance in Go and do some fun stuff like ..."
+    },
+    {
+      "id": "wj6-w0DLKRw",
+      "title": "Golang Microservices: Caching with Redis",
+      "channel": "Mario Carrion",
+      "duration": "8:20",
+      "views": "14,557 views",
+      "description": "Let me share with you some tips for using Redis when building Web Services, backed by PostgreSQL! What are the pros?"
+    },
+    {
+      "id": "TGsqX6rtjkk",
+      "title": "Caching & Edge Computing Explained: CDN, Redis",
+      "channel": "programmerCave",
+      "duration": "8:46",
+      "views": "198 views",
+      "description": "Accelerate your backend development skills and give your streaming platform or web application a competitive edge! In this video ..."
+    },
+    {
+      "id": "Mw7p403tMNM",
+      "title": "Redis with Go Tutorial for Beginners: go-redis, Caching, Pipelines and the Connection Pool",
+      "channel": "Elite Dev News",
+      "duration": "17:13",
+      "views": "8 views",
+      "description": "A beginner tutorial on using Redis from Go with go-redis v9. By the end, you'll store data, cache it properly, and keep it fast in ..."
+    },
+    {
+      "id": "oaJq1mQ3dFI",
+      "title": "Redis Caching in Node.js",
+      "channel": "Traversy Media",
+      "duration": "17:42",
+      "views": "255,426 views",
+      "description": "In this video I will show you how to setup caching with Node.js & Redis and look at how it is beneficial."
+    }
+  ]
+}

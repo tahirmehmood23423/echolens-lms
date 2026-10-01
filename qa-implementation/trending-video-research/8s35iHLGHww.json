@@ -1,0 +1,22 @@
+{
+  "id": "8s35iHLGHww",
+  "url": "https://www.youtube.com/watch?v=8s35iHLGHww",
+  "checked_at": "2026-09-30T07:24:07.947Z",
+  "title": "How to Choose PostgreSQL Indexes: B-Tree, Hash, BRIN, GIN & GiST",
+  "channel": "JaneExplainsIT",
+  "duration_seconds": 785,
+  "views": 2014,
+  "comments": "9 Comments",
+  "comment_samples": [
+    "Super helpful tutorial, keep up the great work! I'll be one of the first 100 subs!",
+    "АААА ЖЕНЩИНА😱😱😱\n\nСпасибо за материал, очень трудно найти похожий по качеству в ру сегменте",
+    "The only video I needed to understand the indexes at high level. Thank you!",
+    "it would be nice to add bloom index also.",
+    "Thank you so much Love from Banaglaore"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "In this video, we’ll briefly look at how different PostgreSQL indexes work and mainly focus on how to choose the right index for your query and data.\nWe’ll compare:\n• B-Tree\n• Hash\n• BRIN\n• GIN\n• GiST\n\nAnd consider 4 important factors influencing your decision.\n\n⏱️ Timestamps\n00:00 Intro\n00:25 How to Choose the Right Index\n01:40 B-Tree Index\n03:27 GiST Index\n6:22 GIN Index\n8:28 Hash Index\n10:08 BRIN Index\n12:46 Final Thoughts\n\n#postgresql #database #backend #programming #postgres",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

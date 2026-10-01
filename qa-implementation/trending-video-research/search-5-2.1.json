@@ -1,0 +1,126 @@
+{
+  "query": "Golang goroutines channels worker pool",
+  "checked_at": "2026-09-30T07:21:57.588Z",
+  "results": [
+    {
+      "id": "ZWMiKQXmh9s",
+      "title": "#18 Golang - Building an Efficient Worker Pool: Mastering Concurrency in Go",
+      "channel": "codeHeim",
+      "duration": "9:27",
+      "views": "34,799 views",
+      "description": "Dive deep into the world of concurrency with our comprehensive guide to creating a robust Worker Pool in Go. ‍   What You'll ..."
+    },
+    {
+      "id": "B9uR2gLM80E",
+      "title": "Go Concurrency Explained: Go Routines & Channels",
+      "channel": "Melkey",
+      "duration": "7:50",
+      "views": "179,052 views",
+      "description": "Goroutines: We'll start by demystifying the power of goroutines. Learn how to create lightweight concurrent threads of execution, ..."
+    },
+    {
+      "id": "RDQOLT5dJRQ",
+      "title": "#66 Golang - Concurrency - Worker Pool Management with Tunny",
+      "channel": "codeHeim",
+      "duration": "9:39",
+      "views": "3,554 views",
+      "description": "Learn how to manage concurrency efficiently in Golang with the tunny library! In this episode, we explore how to create and use a ..."
+    },
+    {
+      "id": "mxo4RBChN4M",
+      "title": "Goroutines in Golang Explained 🔥 Goroutines and Channels in Golang #golanguage #backend #development",
+      "channel": "Hello World",
+      "duration": "17:37",
+      "views": "16,686 views",
+      "description": "Hey everyone, In this video we are going to learn about goroutines and channels in Golang in Hindi. This is a part of the ..."
+    },
+    {
+      "id": "pY6P7wqYBUA",
+      "title": "Ep: 05 | Concurrency in GO | Golang | Go Workers Pool and Channels",
+      "channel": "Kunal Garg",
+      "duration": "8:03",
+      "views": "197 views",
+      "description": "Ep: 05 | Concurrency in GO | Golang | Go Workers Pool and Channels In this video, I'll dive deep into Concurrency vs Parallelism ..."
+    },
+    {
+      "id": "kH9xSdUgmhM",
+      "title": "Golang Interview Question – Worker Pool Problem",
+      "channel": "Masita",
+      "duration": "3:11",
+      "views": "96 views",
+      "description": "Struggling with Go concurrency questions in interviews? You're not alone. In this video, we break down one of the most commonly ..."
+    },
+    {
+      "id": "PyXK_PR6GrE",
+      "title": "Go Worker Pools in 3 Minutes",
+      "channel": "The Coding Gopher",
+      "duration": "4:42",
+      "views": "2,443 views",
+      "description": "In this video, we explore how to implement worker pools in Go, using WaitGroups to manage concurrency effectively. Worker ..."
+    },
+    {
+      "id": "7-WCDyLPT7I",
+      "title": "Golang Concurrency Tutorial: Worker Pool Explained with Real Example | Learn IT Tech",
+      "channel": "Learn IT Tech",
+      "duration": "14:09",
+      "views": "361 views",
+      "description": "In this video, we'll break down a complete example of **Golang concurrency** using a simple but powerful concept — the ..."
+    },
+    {
+      "id": "E7vI2IqyJdI",
+      "title": "Go Worker Pool Explained in golang | Golang Concurrency #todospecial #shorts #golang #coding",
+      "channel": "Todospecial",
+      "duration": "4:08",
+      "views": "31 views",
+      "description": "1000 jobs hain, but kya humein 1000 goroutines create karni chahiye? NO! In this short, you'll understand the Worker Pool pattern ..."
+    },
+    {
+      "id": "lcN4xU_3BkA",
+      "title": "Go Concurrency: Master the Worker Pool Pattern for Efficient Job Processing",
+      "channel": "CodeLucky",
+      "duration": "3:02",
+      "views": "581 views",
+      "description": "Unlock the power of concurrency in Go with the worker pool pattern! This video provides a beginner-friendly guide to efficiently ..."
+    },
+    {
+      "id": "1iBj5qVyfQA",
+      "title": "WorkerPools in Go Tutorial",
+      "channel": "TutorialEdge",
+      "duration": "11:38",
+      "views": "23,911 views",
+      "description": "For the price of a ☕ every month, sign up and gain access to a growing list of premium courses on my site ..."
+    },
+    {
+      "id": "TXGrh7qKz4Q",
+      "title": "10. worker pool context",
+      "channel": "Java & Golang",
+      "duration": "6:45",
+      "views": "No views",
+      "description": "добавляем контекст в воркеры."
+    },
+    {
+      "id": "gecwyMUAxdA",
+      "title": "Concurrency Worker Pool Pattern in Go",
+      "channel": "deferstech",
+      "duration": "9:33",
+      "views": "163 views",
+      "description": "Goroutines are cheap. The work they do is not. This is the lesson behind the Worker Pool pattern — one of the most ..."
+    },
+    {
+      "id": "p6o-DDjhljY",
+      "title": "Goroutines explained",
+      "channel": "Awesome",
+      "duration": "3:11",
+      "views": "20,225 views",
+      "description": "Goroutines briefly explained. Topics: - Concurrency in Go; - Working with Go; - Goroutines explained; - Go channels explained."
+    },
+    {
+      "id": "3QESpVGiiB8",
+      "title": "Advanced Golang: Goroutines & Channels",
+      "channel": "Tiago",
+      "duration": "17:31",
+      "views": "35,056 views",
+      "description": "https://www.selfmadeengineer.com/ In this video I explain how Goroutines, Channels and Wait Groups work in Golang by going ..."
+    }
+  ]
+}

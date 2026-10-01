@@ -1,0 +1,22 @@
+{
+  "id": "0ZJgIjIuY7U",
+  "url": "https://www.youtube.com/watch?v=0ZJgIjIuY7U",
+  "checked_at": "2026-10-01T05:20:49.453Z",
+  "title": "Learn useEffect In 13 Minutes",
+  "channel": "Web Dev Simplified",
+  "duration_seconds": 818,
+  "views": 922911,
+  "comments": "795 Comments",
+  "comment_samples": [
+    "I knew he was going to be good when he starred directly into my soul",
+    "You have the gift of breaking down any difficult topics in a way that everyone can understand.\nI wish there was a super like button on YouTube 👍",
+    "I paid money for a full react course on udemy and after every hook I \"learn\" from there, I come to your channel to see it reexplained better. 😅",
+    "dude I wish I had met this channel sooner. You're amazing",
+    "One note at 5:00 for people newer to React.  If you try to update state with setState (setResourceType in this case), but the value is the same as the current state, it won't trigger a rerender.  This is because of the way the React team has chosen to implement useState (it helps to prevent unnecessary rerenders).  This can become an issue when your state is an array (or an object), as you can mutate the array, try to update state, and it may not trigger a rerender because React thinks the array is the same (since the array reference is the same).  You can solve this issue by using the spread operator (...) to create a truly new array or object: setState([...array]) or setState({...object}).  More info on that at if you Google something like \"usestate update not always triggering rerender component\""
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🚨 IMPORTANT:\n\nFull React Course: https://courses.webdevsimplified.com/learn-react-today\n1 Year Free Hosting: https://www.atlantic.net/webdevsimplified\nUse code KYLE for an additional $50\n\nIn this video I cover everything you need to know about the useEffect hook. I compare this hook to the old way of doing things with lifecycle methods in class components so you can understand how to start using hooks effectively in your projects. This is part of a series of React videos where I cover all the important hooks in React.\n\n\n📚 Materials/References:\n\nuseState Video: https://youtu.be/O6P86uwfdR0\nuseEffect Blog Article: https://blog.webdevsimplified.com/2020-04/use-effect/\nReact Hooks Playlist: https://www.youtube.com/playlist?list=PLZlA0Gpn_vH8EtggFGERCwMY5u5hOjf-h\n\n\n🧠 Concepts Covered:\n\n- How to use hooks in React\n- How to convert class lifecycle methods to function effects with useEffect\n- How to use the useEffect hook\n\n\n🌎 Find Me Here:\n\nMy Blog: https://blog.webdevsimplified.com\nMy Courses: https://courses.webdevsimplified.com\nPatreon: https://www.patreon.com/WebDevSimplified\nTwitter: https://twitter.com/DevSimplified\nDiscord: https://discord.gg/7StTjnR\nGitHub: https://github.com/WebDevSimplified\nCodePen: https://codepen.io/WebDevSimplified\n\n\n#ReactJs #WDS #useEffect",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

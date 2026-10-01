@@ -1,0 +1,22 @@
+{
+  "id": "p2PH_YPCsis",
+  "url": "https://www.youtube.com/watch?v=p2PH_YPCsis",
+  "checked_at": "2026-09-30T07:23:42.017Z",
+  "title": "Docker Volumes explained in 6 minutes",
+  "channel": "TechWorld with Nana",
+  "duration_seconds": 363,
+  "views": 348554,
+  "comments": "365 Comments",
+  "comment_samples": [
+    "0:21 - When do we need Docker Volumes?\n1:02 - What is Docker Volumes?\n2:04 - 3 Docker Volumes Types\n4:14 - Docker Volumes in docker-compose file\n\n\n👉🏼 For any questions/issues/feedback, please leave me a comment and I will get back to you as soon as possible. \n👉🏼 Also please let me know what you want to learn about Docker & Kubernetes.\n\n\nPlease don't forget to subscribe and give me a thumbs up if you liked my video 🤓",
+    "I really like the way you deliver information in a short, sharp way. It really cuts through some of the complexities of the subject matter",
+    "Great video.\n\nNot sure why the official volume docs don't follow a similar structure like this.",
+    "Not only she explained what volumes are , she even explained how to replicate a database using volumes in just 6 minutes!!!! HOLY MOLY . Ty !",
+    "As a beginner i read volumes concept in docker document but didn't understood clearly but with your tutorial it understood clearly,way you delivered this concept is awesome . \"short and sharp\" teaching. Thank you so much :)"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Understand Docker Volumes in 6 minutes. Docker Volumes in Docker-Compose\n\n► Subscribe To Me On Youtube: https://bit.ly/2z5rvTV\n\nIn this video you will learn:\n0:00 - Intro\n0:21 - When do we need Docker Volumes?\n1:02 - What is Docker Volumes?\n2:04 - 3 Docker Volumes Types\n4:14 - Docker Volumes in docker-compose file\n\nThis gives you a short but thorough understanding what Docker Volumes are. \n⭐️ For a Demo please refer to https://youtu.be/SBUCYJgg4Mk \n\nFor any questions/issues/feedback, please leave me a comment and I will get back to you as soon as possible.\n\n#devops #techworldwithnana #docker #dockertutorials\n-----------------------------------------------------------------------------------\n\n✅ Follow me\non Youtube: https://www.youtube.com/channel/UCdngmbVKX1Tgre699-XLlUA\non DEV: https://dev.to/techworld_with_nana\non Instagram: https://www.instagram.com/nanuchij/\non Twitter: https://twitter.com/Njuchi_/\non Tumblr: https://www.tumblr.com/blog/techworld-with-nana\n\n\nLegal Notice:\nDocker and the Docker logo are trademarks or registered trademarks of Docker, Inc. in the United States and/or other countries. Docker, Inc. and other parties may also have trademark rights in other terms used herein. This video is not accredited, certified, affiliated with, nor endorsed by Docker, Inc.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

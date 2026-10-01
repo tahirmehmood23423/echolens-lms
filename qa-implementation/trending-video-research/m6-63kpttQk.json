@@ -1,0 +1,19 @@
+{
+  "id": "m6-63kpttQk",
+  "url": "https://www.youtube.com/watch?v=m6-63kpttQk",
+  "checked_at": "2026-09-30T07:24:13.850Z",
+  "title": "The Skip Locked feature in Postgres 9.5",
+  "channel": "PG Casts by Hashrocket",
+  "duration_seconds": 217,
+  "views": 4923,
+  "comments": "2 Comments",
+  "comment_samples": [
+    "I love how there's only one comment on this video. \nMy search exactly for this topic and I found this video just started to watch looks good so far thanks for making this content.",
+    "Can we use this to lock multiple rows for say 10 and have the same results?"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Our topic this episode is the new skip locked feature in PostgreSQL 9.5. This episode is brought to you by Hashrocket, a consultancy with expertise in PostgreSQL - visit us at https://hashrocket.com and www.pgcasts.com\n\n\n\nTranscript:\n\n\n\nThe most obvious use for `skip locked` is multiple workers consuming jobs from\na single source. So our example will be a simple job queue.\n\nWe will create simple `jobs` table with `id` and `payload` columns.\n\n```sql\ncreate table jobs(\n  id serial primary key,\n  payload json not null\n);\n```\n\nNow let's add a few jobs.\n\n```sql\ninsert into jobs(payload) values\n  ('{\"type\": \"send_welcome\", \"to\": \"john@example.com\"}'),\n  ('{\"type\": \"send_password_reset\", \"to\": \"sally@example.com\"}'),\n  ('{\"type\": \"send_welcome_email\", \"to\": \"jane@example.com\"}'),\n  ('{\"type\": \"send_welcome_email\", \"to\": \"sam@example.com\"}'),\n  ('{\"type\": \"send_password_reset\", \"to\": \"bill@example.com\"}');\n```\n\nLet's take a look at the table.\n\n```sql\ntable jobs;\n```\n\nA worker would typically do the following. First, start a transaction.\n\n```sql\nbegin;\n```\n\nPostgreSQL's row locking functionality only works inside of a transaction.\n\nNext, select a row with a `for update` clause.\n\n```sql\nselect * from jobs limit 1 for update;\n```\n\nNow the worker application would execute the job which in this case is to send\nan email. Once completed, the job is deleted.\n\n```sql\ndelete from jobs where id=1;\n```\n\nAnd finally, commit the transaction.\n\n```sql\ncommit;\n```\n\nThis works fine for a single worker. But happens if we have multiple workers?\n\n```sql\n-- Run in two connections at the same time\nbegin;\nselect * from jobs limit 1 for update;\n```\n\nThe second worker is blocked trying to read the locked row.\n\nOnly when the first worker completes can the second begin.\n\n```sql\n-- In the first connection\ndelete from jobs where id=2;\ncommit;\n```\n\nWith this style of row locking our workers are serialized, and there isn't any\npoint to having more than one worker.\n\n```sql\n-- In the second connection\ndelete from jobs where id=3;\ncommit;\n```\n\n`skip locked` is a new feature in Postgres 9.5 that solves this issue. It\npurposely bypasses the isolation between transactions that Postgres normally\nprovides and skips rows that other transactions have locked.\n\nLet's try this again.\n\n```sql\n-- Run in two connections at the same time\nbegin;\nselect * from jobs limit 1 for update skip locked;\n```\n\nBoth connections were able to select and lock different rows. Now we can have\nmultiple workers consuming from the same job queue at the same time.\n\nThanks for watching.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "mcl3zU5wat4",
+  "url": "https://www.youtube.com/watch?v=mcl3zU5wat4",
+  "checked_at": "2026-09-30T07:24:13.874Z",
+  "title": "Mastering select and for-select | Essential Tools for Concurrency in Go",
+  "channel": "Code & Learn",
+  "duration_seconds": 597,
+  "views": 4047,
+  "comments": "4 Comments",
+  "comment_samples": [
+    "This was quick and to-the-point. Love it. Keep uploading!",
+    "really good bro",
+    "thanks",
+    "🙏"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🔍 Video Overview: Unlock the Power of Concurrency in Go with select and for-select Statements\n\nIn this video, we dive deep into the select and for-select statements—two powerful tools that are essential for mastering concurrency in Go. You'll learn how select helps manage multiple goroutines by handling multiple channel operations, and how for-select can be used to continuously monitor channels efficiently.\n\nWhat You'll Learn:\n\nThe fundamentals of the select statement and how it differs from the traditional switch. Practical examples demonstrating select in real-world scenarios. How to use for-select loops to build responsive and efficient concurrent applications. Common pitfalls and best practices when working with concurrency in Go.\n\nWhether you’re a beginner looking to understand the basics or an experienced developer wanting to refine your skills, this video will equip you with the knowledge to take full advantage of Go’s concurrency model.\n\nPlease feel free to ask any questions you may have, by posting a comment under the video or reaching out to the Discord server. Thanks! and happy coding!\n\nDon't forget to like, comment, and subscribe for more Go programming tips!\n\n📌 Stay Connected:\n- Discord Community: [https://discord.gg/HUNg7PBX66]\n\n🙏 Attributions:\n- Gopher Images: [https://github.com/egonelbre/gophers]",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

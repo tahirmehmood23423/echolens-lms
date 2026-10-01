@@ -1,0 +1,22 @@
+:root { color-scheme: light; font-family: system-ui, sans-serif; color: #16243b; background: #f4f7fb; }
+body { margin: 0; }
+main { max-width: 1120px; margin: auto; padding: 28px 20px 60px; }
+h1 { font-size: clamp(26px, 4vw, 36px); margin-bottom: 10px; }
+p { line-height: 1.6; }
+a { color: #1c56a0; }
+.muted, .metrics { color: #50617b; font-size: 14px; }
+.filters { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; margin: 24px 0; }
+label { display: grid; gap: 6px; flex: 1; min-width: min(260px, 100%); font-size: 14px; font-weight: 600; }
+input, select, button { font: inherit; padding: 11px 12px; border-radius: 8px; border: 1px solid #bdcada; background: white; color: inherit; }
+select, input { width: 100%; box-sizing: border-box; }
+button { cursor: pointer; }
+button:hover, a:hover { color: #074c91; }
+button:disabled { cursor: default; opacity: .5; }
+article { border: 1px solid #d5dfea; background: #fff; border-radius: 14px; margin-bottom: 18px; padding: 20px; }
+article h2 { font-size: 20px; margin: 6px 0; }
+.course-label { font-size: 13px; font-weight: 700; color: #4d6380; }
+.video { padding: 15px 0; border-top: 1px solid #e4eaf2; }
+.video h3 { font-size: 16px; margin: 0 0 5px; }
+.actions { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.player { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 8px; margin-top: 16px; background: #071626; }
+:focus-visible { outline: 3px solid #1672d5; outline-offset: 3px; }

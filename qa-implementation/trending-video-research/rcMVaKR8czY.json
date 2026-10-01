@@ -1,0 +1,16 @@
+{
+  "id": "rcMVaKR8czY",
+  "url": "https://www.youtube.com/watch?v=rcMVaKR8czY",
+  "checked_at": "2026-09-30T07:24:08.863Z",
+  "title": "PostgreSQL Partial Indexes 08/12",
+  "channel": "Code with Lucian",
+  "duration_seconds": 242,
+  "views": 5014,
+  "comments": "0 Comments",
+  "comment_samples": [],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "If you found this video helpful, you could check the full course on Udemy. In this course, you’ll find tips for tuning PostgreSQL 12 like a pro.\n\nUse the link below to get a 60% OFF.\n\nPostgreSQL High-Performance Tuning Guide - Full Course \nhttps://www.udemy.com/course/postgresql-high-performance-tuning-guide/?couponCode=B54C271F4D6F18CB5A8B\n\nWhile we usually create indexes for all records, it's possible to create an index for a subset of records.\nAn index created on a subset of data will be smaller than one created without a filter. This will result in an improvement in performance when the index has to be scanned.",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

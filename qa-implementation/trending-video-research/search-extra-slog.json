@@ -1,0 +1,94 @@
+{
+  "query": "Golang structured logging slog tutorial",
+  "checked_at": "2026-09-30T07:24:56.434Z",
+  "results": [
+    {
+      "id": "KTGHn62a4tI",
+      "title": "#22 Golang - Structured Logging with slog",
+      "channel": "codeHeim",
+      "duration": "9:35",
+      "views": "9,118 views",
+      "description": "Dive deep into the world of structured logging in Go with our comprehensive guide on slog! Structured logging is a game-changer ..."
+    },
+    {
+      "id": "_mqB7LLgwgs",
+      "title": "Go's Built-in Package for Better Logging (using slog)",
+      "channel": "Better Stack",
+      "duration": "8:51",
+      "views": "14,400 views",
+      "description": "Go's built-in slog package transforms messy logs into clean, searchable JSON that your observability tools will love. In this video ..."
+    },
+    {
+      "id": "vnFdRo8aiJI",
+      "title": "Go Logging Tutorial: Master Structured Logging with slog - Best Practices for Production",
+      "channel": "CodeLucky",
+      "duration": "9:56",
+      "views": "647 views",
+      "description": "Master Go logging with this comprehensive tutorial on structured logging best practices! Learn how to implement effective logging ..."
+    },
+    {
+      "id": "ReWtK-HUbQQ",
+      "title": "#26 Golang - Structured Logging with slog - Part 2",
+      "channel": "codeHeim",
+      "duration": "14:16",
+      "views": "2,557 views",
+      "description": "In this episode, we dive deeper into the world of logging with \"slog\", building on the basics we covered in Episode 22. What You'll ..."
+    },
+    {
+      "id": "htbGdhW3JdQ",
+      "title": "Software Architecture in Golang: Structured Logging using slog (Observability)",
+      "channel": "Mario Carrion",
+      "duration": "10:46",
+      "views": "8,704 views",
+      "description": "Welcome to another Software Architecture in Go/Golang video, in this video I cover Structured Logging using the new slog ..."
+    },
+    {
+      "id": "gVL-Ilbj168",
+      "title": "Golang: Structured Logging using slog",
+      "channel": "Golang Express",
+      "duration": "3:26",
+      "views": "4,867 views",
+      "description": "Welcome to a concise overview of structured logging in Go. This video discusses the specifics of structured logs, highlighting how ..."
+    },
+    {
+      "id": "a2hWCvaAA80",
+      "title": "Structured logging in Go with Slog! Golang LOGGING like a 10x ENGINEER",
+      "channel": "samvcodes",
+      "duration": "10:41",
+      "views": "9,258 views",
+      "description": "In this video, I discuss structured logging in Golang with the new standard library package slog. I dive into how you can set up your ..."
+    },
+    {
+      "id": "IsPa11N5pzI",
+      "title": "Really simple Go structured logging with tracing",
+      "channel": "Kai Hendry",
+      "duration": "4:22",
+      "views": "3,124 views",
+      "description": "https://github.com/kaihendry/slogd - structured logging duration (time taken) * https://github.com/kaihendry/slogfest * The \"slog\" ..."
+    },
+    {
+      "id": "jNN9Vdr6DHQ",
+      "title": "Structured Logging in Go",
+      "channel": "Tech Funda",
+      "duration": "15:31",
+      "views": "15 views",
+      "description": ""
+    },
+    {
+      "id": "ORrjd9_IKac",
+      "title": "Go Middleware Logging Explained: Clean Access Logs with slog",
+      "channel": "Mustafa Özyurt",
+      "duration": "3:56",
+      "views": "174 views",
+      "description": "In this video, I explain how HTTP middleware works in Go by building clean request/access logs. We'll use chi middleware, httplog ..."
+    },
+    {
+      "id": "8v5On0GLI-A",
+      "title": "Logging in Golang - Lesson 18 | Go | Full Course | CloudNative | Go Tutorial | Golang",
+      "channel": "Giuseppe Scaramuzzino",
+      "duration": "7:19",
+      "views": "1,348 views",
+      "description": "Lesson 18 of the complete Go course | Go | Full Course | CloudNative | go for beginners | Complete free tutorial | Golang ⌚ What ..."
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "query": "linked list fast slow pointers cycle detection",
+  "checked_at": "2026-09-30T07:20:45.609Z",
+  "results": [
+    {
+      "id": "b139yf7Ik-E",
+      "title": "Fast and Slow Pointers in 6 Minutes | LeetCode Pattern",
+      "channel": "AlgoMasterIO",
+      "duration": "6:09",
+      "views": "47,571 views",
+      "description": "Master DSA Patterns: https://algomaster.io/ ▻ My DSA Playlist: ..."
+    },
+    {
+      "id": "qxTZz4GTTTI",
+      "title": "Linked List Patterns You MUST Know: Fast & Slow Pointers Explained!",
+      "channel": "Code & Complexity",
+      "duration": "3:42",
+      "views": "523 views",
+      "description": "Are you preparing for DSA interviews or trying to master Linked Lists? In this video, I break down the Fast & Slow Pointer ..."
+    },
+    {
+      "id": "3U0sqkemi-o",
+      "title": "Fast & Slow Pointer Explained | Linked List Middle + Cycle Detection (Java)",
+      "channel": "Smart Programming",
+      "duration": "16:13",
+      "views": "960 views",
+      "description": "In this video, we will learn the Fast & Slow Pointer (Two Pointer Technique) in Data Structures & Algorithms using Java with ..."
+    },
+    {
+      "id": "OQtvTZxA7-k",
+      "title": "Linked List Cycle (LeetCode 141) | Full solution with demo | Floyd Warshall | Study Algorithms",
+      "channel": "Nikhil Lohia",
+      "duration": "16:14",
+      "views": "28,318 views",
+      "description": "A really interesting problem where you are required to determine if there is a cycle in a linked list. A loop/cycle is formed if one of ..."
+    },
+    {
+      "id": "f-JWjs8NtFQ",
+      "title": "Lec-29: How to find a Cycle in Linked List | 2 Pointer Algorithm | DS for Beginners",
+      "channel": "Gate Smashers",
+      "duration": "6:43",
+      "views": "42,918 views",
+      "description": "MASTER COMPUTER SCIENCE | INTERVIEWS | EXAMS Gate Smashers — Learn Computer Science through free lectures, ..."
+    },
+    {
+      "id": "mPeFux1gjSM",
+      "title": "Linked List Cycle 🧩- Fast and Slow Pointers (Floyd's Tortoise and Hare) 🐢🐇 with Intuition 🎯Python",
+      "channel": "DKodeTree",
+      "duration": "9:39",
+      "views": "255 views",
+      "description": "Tortoise and Hare Cycle Detection Made Simple! LeetCode 141 - How to Detect Loop in a Linked List with the Intuition behind ..."
+    },
+    {
+      "id": "gBTe7lFR3vc",
+      "title": "Linked List Cycle - Floyd's Tortoise and Hare - Leetcode 141 - Python",
+      "channel": "NeetCode",
+      "duration": "10:44",
+      "views": "345,279 views",
+      "description": "https://neetcode.io/ - A better way to prepare for Coding Interviews Twitter: https://twitter.com/neetcode1 Discord: ..."
+    },
+    {
+      "id": "ZOoSl72MBfY",
+      "title": "Linked List Cycle - Floyd's Tortoise and Hare - Leetcode 141",
+      "channel": "Engineering Digest",
+      "duration": "6:32",
+      "views": "3,690 views",
+      "description": "0:26 - HashMap Approach 02:26 - Floyd's Cycle Detection Algorithm 03:22 - Floyd's Cycle Detection Algorithm Proof 04:28 - Code ..."
+    },
+    {
+      "id": "vlrxs-LPni4",
+      "title": "Linked List Cycle II | Complete Intuition | Leetcode - 142 | Amazon | Microsoft",
+      "channel": "codestorywithMIK",
+      "duration": "16:53",
+      "views": "28,050 views",
+      "description": "Whatsapp Community Link : https://www.whatsapp.com/channel/0029Va6kVSjICVfiVdsHgi1A\nThis is the 5th Video of our Playlist ..."
+    },
+    {
+      "id": "CVPhZHylPsg",
+      "title": "Linked List Cycle | HashSet & Fast Slow Pointer | Floyd's Cycle Detection Algorithm| Java Python c++",
+      "channel": "RisingBrain",
+      "duration": "12:44",
+      "views": "1,548 views",
+      "description": "In this video, we'll solve the Linked List Cycle I problem using both the HashSet and Fast & Slow Pointer (Floyd's Cycle Detection) ..."
+    },
+    {
+      "id": "jcZtMh_jov0",
+      "title": "Detect & Remove Cycle in a Linked List | Floyd's Cycle Detection Algorithm | DSA-One Course #39",
+      "channel": "Anuj Kumar Sharma",
+      "duration": "15:45",
+      "views": "124,289 views",
+      "description": "Hey guys, In this video, We're going to learn Floyd's cycle Detection Algorithm. This algorithm is used to detect and remove cycle ..."
+    },
+    {
+      "id": "ELW33Zu1-x4",
+      "title": "Fast & Slow Pointer : The Ultimate Guide in 3 minutes #linkedlist",
+      "channel": "1LineCode",
+      "duration": "3:16",
+      "views": "285 views",
+      "description": "Fast & Slow Pointer : The Ultimate Guide in 3 minutes In this video, we'll dive deep into the Fast and Slow Pointers (also known as ..."
+    },
+    {
+      "id": "FChXAl9JjCg",
+      "title": "Find Length of Cycle in a Linked List | Floyds Algo | Detailed Explanation Under Few Minutes",
+      "channel": "Code & Complexity",
+      "duration": "6:24",
+      "views": "250 views",
+      "description": "Ever wondered how to find the length of a cycle in a linked list without using extra space? In this video, we reveal a brilliant yet ..."
+    }
+  ]
+}

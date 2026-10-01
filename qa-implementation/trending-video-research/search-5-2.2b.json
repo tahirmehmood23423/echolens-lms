@@ -1,0 +1,102 @@
+{
+  "query": "Golang select timeout",
+  "checked_at": "2026-09-30T07:23:45.018Z",
+  "results": [
+    {
+      "id": "fXzzF5y6UEU",
+      "title": "Golang Context Explained - How To Use With Timeout",
+      "channel": "Melkey",
+      "duration": "8:22",
+      "views": "26,165 views",
+      "description": "If you're a Go developer looking to improve your understanding of context management and concurrency control, you're in the ..."
+    },
+    {
+      "id": "VHrj_m1TyXA",
+      "title": "Golang Tutorials -29- Golang Timeout | Dr Vipin Classes",
+      "channel": "Dr Vipin Classes",
+      "duration": "6:23",
+      "views": "524 views",
+      "description": "Golang Interview Question: How to use timeout in golang | Dr Vipin Classes About this video: In this video, I explained about ..."
+    },
+    {
+      "id": "x-joKvtCtnE",
+      "title": "GO-PG 10: Timeouts and connection options advanced.",
+      "channel": "BeBetterSoftwareEngineer",
+      "duration": "9:34",
+      "views": "469 views",
+      "description": "... timeout that we are going to talk about is rate timeout so whenever you are running the rate queries write all the select queries ..."
+    },
+    {
+      "id": "nQ87XqwuZ60",
+      "title": "7. Go Concurrency : Timeout",
+      "channel": "Coffee Click",
+      "duration": "7:57",
+      "views": "171 views",
+      "description": "coffeeclick6696 #golang #concurrency Lets create timeout scenario with go channel and select."
+    },
+    {
+      "id": "mcl3zU5wat4",
+      "title": "Mastering select and for-select | Essential Tools for Concurrency in Go",
+      "channel": "Code & Learn",
+      "duration": "9:57",
+      "views": "4,047 views",
+      "description": "Video Overview: Unlock the Power of Concurrency in Go with select and for-select Statements In this video, we dive deep into the ..."
+    },
+    {
+      "id": "BkzgYfygDy8",
+      "title": "Golang Context Package: It's More Than You Think!",
+      "channel": "Alex Mux",
+      "duration": "8:26",
+      "views": "38,276 views",
+      "description": "We tackle the Go context package. We cover timeouts with goroutines, how to use contexts in your own code, how to use contexts ..."
+    },
+    {
+      "id": "4Lr0WlD14vU",
+      "title": "Go lang Back end  : Connection Timeouts",
+      "channel": "theEssentials",
+      "duration": "4:38",
+      "views": "124 views",
+      "description": ""
+    },
+    {
+      "id": "1c7ttSJDMAI",
+      "title": "Select - Go Programming Tutorial #10",
+      "channel": "NeuralNine",
+      "duration": "6:03",
+      "views": "11,217 views",
+      "description": "In this episode we learn about the select keyword in Go. ◾◾◾◾◾◾◾◾◾◾◾◾◾◾◾◾◾ Programming Books & Merch ..."
+    },
+    {
+      "id": "r5yQqZrRiYg",
+      "title": "Non-Blocking Channel Operations - Go Tutorial for Beginners #26",
+      "channel": "Codegiz — Built by Claude AI",
+      "duration": "9:29",
+      "views": "9 views",
+      "description": "Learn how to use the select statement in Go for multiplexing channel operations! This lesson covers non-blocking operations, ..."
+    },
+    {
+      "id": "POPKrSXpLaU",
+      "title": "Golang Tutorials -28- Golang Select Case for Channel | Golang Channel Select Case | Dr Vipin Classes",
+      "channel": "Dr Vipin Classes",
+      "duration": "8:06",
+      "views": "458 views",
+      "description": "Golang Interview Question: Select Case for Channels in Golang | How can we use select case for channels in golang About this ..."
+    },
+    {
+      "id": "qKS5cJ57Lfk",
+      "title": "Go Channels & select: Buffers, Timeouts, Fan-in/Fan-out | Learn Go #25",
+      "channel": "Cyrus",
+      "duration": "9:31",
+      "views": "4 views",
+      "description": "Channels drawn as pipes between goroutines: sending and receiving, buffered channels, closing and ranging, one-way channel ..."
+    },
+    {
+      "id": "hX7EX9ukbmw",
+      "title": "Golang Graceful Shutdown Tutorial | HTTP Server & Context Timeout",
+      "channel": "Shourov Roy",
+      "duration": "9:29",
+      "views": "217 views",
+      "description": "In this video, we dive deep into implementing a production-grade Graceful Shutdown for Go (Golang) HTTP servers. What ..."
+    }
+  ]
+}

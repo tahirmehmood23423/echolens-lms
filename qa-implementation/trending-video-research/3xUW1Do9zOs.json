@@ -1,0 +1,22 @@
+{
+  "id": "3xUW1Do9zOs",
+  "url": "https://www.youtube.com/watch?v=3xUW1Do9zOs",
+  "checked_at": "2026-10-01T05:21:28.355Z",
+  "title": "Instructor and Pydantic - Structured LLM outputs for easy data extraction!",
+  "channel": "BugBytes",
+  "duration_seconds": 989,
+  "views": 5708,
+  "comments": "18 Comments",
+  "comment_samples": [
+    "☕ Buy a coffee: https://ko-fi.com/bugbytes\n▶ LlamaIndex video: https://youtu.be/Rpg9TQtqqhE\r\n▶ Pydantic Playlist: https://youtube.com/playlist?list=PL-2EBeDYMIbT1M9S9PEFlqJ9SgFYYbIKp",
+    "As always Awesome",
+    "good thank",
+    "Thanks. Can i use other models and how can i define more for example extract data as vendor only using from part of the inv.?",
+    "Ideas Related to This Topic:\nExtract data from both the front and back of a driver's license in a structured format.\nFrom the front of the card: capture key details such as the holder's name, date of birth, license number, and expiration date.\nFrom the back of the card: identify the types of vehicles the license holder is permitted to drive, along with any endorsements or restrictions."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "🙏 Join our channel to get access to perks:\nhttps://www.youtube.com/channel/UCTwxaBjziKfy6y_uWu30orA/join\n\n☕️ 𝗕𝘂𝘆 𝗺𝗲 𝗮 𝗰𝗼𝗳𝗳𝗲𝗲:\nTo support the channel and encourage new videos, please consider buying a coffee here:\nhttps://ko-fi.com/bugbytes\n\nIn this video, we'll look at instructor, the most popular Python package from getting Structured Outputs from LLMs - enabling you to use AI to extract insights and information from raw text more easily.\n\n📌 𝗖𝗵𝗮𝗽𝘁𝗲𝗿𝘀:\n00:00 Intro to instructor\n02:55 Reading PDF text with pypdf\n06:39 Installing instructor\n07:13 Defining Pydantic model class\n09:07 Using instructor with OpenAI\n\n𝗦𝗼𝗰𝗶𝗮𝗹 𝗠𝗲𝗱𝗶𝗮:\n📖 Blog: https://bugbytes.io/posts/\n👾 Github: https://github.com/bugbytes-io/\n\n📚 𝗙𝘂𝗿𝘁𝗵𝗲𝗿 𝗿𝗲𝗮𝗱𝗶𝗻𝗴 𝗮𝗻𝗱 𝗶𝗻𝗳𝗼𝗿𝗺𝗮𝘁𝗶𝗼𝗻:\nPypdf: https://pypi.org/project/pypdf/\nInstructor: https://python.useinstructor.com/\nDevtools: https://docs.pydantic.dev/latest/integrations/devtools/\n\n#python #llms #openai #pydantic",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "mFFXuXjVgkU",
+  "url": "https://www.youtube.com/watch?v=mFFXuXjVgkU",
+  "checked_at": "2026-09-30T07:23:45.973Z",
+  "title": "Github Actions CI/CD - Everything you need to know to get started",
+  "channel": "DevOps Journey",
+  "duration_seconds": 741,
+  "views": 406909,
+  "comments": "169 Comments",
+  "comment_samples": [
+    "Update: Make sure you are using v4 of Superlinter. My repo is up to date. Everything still works the same as the video.",
+    "I like how this info is condensed in 12 short minutes complete with a live coding lab session.",
+    "I usually never comment, I consume the information and move on. But as I keep on coming across these heroes on Youtube who make new concepts so easy to digest, I feel they deserve a praise. Great work man!",
+    "I have learned new thing today and it will help us to check syntax errors, formatting problems, and potential security vulnerabilities. Thanks for uploading this.",
+    "Thank you for your Github Actions tutorial. I trully enjoyed it."
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "I finally made a Github Actions tutorial! In this video, I go over everything you need to know to get started with Github actions.  Video includes an explanation of what Github Actions is and a lab you can follow along with.\n\n👨‍💻 Join our Discord Community of DevOps Engineers: https://discord.com/invite/NW98QYW\n\n🛍️ Amazon Store (homelab/youtube setup): https://www.amazon.com/shop/devopsjourney\n\n☕ Buy me a coffee: https://www.buymeacoffee.com/bradmorg\n\n📁 Code Available Here: https://github.com/devopsjourney1/mygitactions\n\n📘 Chapters:\n0:00 Introduction to GitHub actions\n1:00 Github actions workflow file walkthrough\n2:36 Github actions Lab - Creating Repo and setting up Action\n4:20 Github actions Lab  - Running and Troubleshooting workflows",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "DdkIpIv1KUs",
+  "url": "https://www.youtube.com/watch?v=DdkIpIv1KUs",
+  "checked_at": "2026-10-01T05:20:56.706Z",
+  "title": "NextJS 15: NextAuth 5 (Auth.js) Demo - Basic Credentials",
+  "channel": "Phaethon",
+  "duration_seconds": 971,
+  "views": 368,
+  "comments": "0 Comments",
+  "comment_samples": [],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "Learn how to implement basic credentials authentication using NextAuth.js v5 (Auth.js) with Next.js 15. This tutorial covers Server Actions, Server Components, page protection, and role-based authorization to secure your app effectively.\n\nDownload Starting Project: https://github.com/Pastelmood/NextAuth-Demo/blob/project-starting/snapshot/starting-project.zip",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

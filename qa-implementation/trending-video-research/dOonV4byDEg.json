@@ -1,0 +1,22 @@
+{
+  "id": "dOonV4byDEg",
+  "url": "https://www.youtube.com/watch?v=dOonV4byDEg",
+  "checked_at": "2026-10-01T05:21:14.442Z",
+  "title": "Sliding Window Technique",
+  "channel": "Profound Academy",
+  "duration_seconds": 378,
+  "views": 143594,
+  "comments": "62 Comments",
+  "comment_samples": [
+    "Clear and concise.  Thank you for teaching me these techniques.",
+    "Hidden gem of YouTube.",
+    "Nice explanation 👌",
+    "Why do you not have a lot of subscribers? You definitely deserve way more. I learn better with these animations. This feels like to me 3 blue 1 brown channel. Thank you very much !!!",
+    "One of the most clear explanations out there. Thanks!!"
+  ],
+  "comments_error": null,
+  "status": "OK",
+  "playable_in_embed": true,
+  "description": "The Sliding Window technique is a key tool in algorithmic problem-solving that can significantly speed up calculations and improve performance. This technique is often used in competitive programming and algorithmic interviews at top tech companies. Mastering it can give you a significant edge.\n\n💻 Practice: https://profound.academy/algorithms-data-structures/R1FvlthxYQc9PRMnepZr\n📚 Full DSA Course: https://profound.academy/algorithms-data-structures\n🎓 Teach with Profound Academy: https://profound.academy\nhttps://www.instagram.com/profound.academy.inc\nhttps://www.facebook.com/profound.academy.inc\nhttps://www.linkedin.com/company/profound-academy-inc\n\n\nChapters:\n0:00 Sliding Window Technique Introduction\n0:27 Maximum Sum Subarray of Size K\n0:38 Naive Approach - O(NK)\n1:22 Introducing the Main Idea Behind the Sliding Window Technique\n2:23 Sliding Window Implementation\n3:18 Hands-on Practice on Profound Academy\n3:30 Dynamic Size Sliding Window\n4:34 Dynamic Sliding Window Implementation\n5:00 Simulating the Algorithm\n5:43 Time Complexity Analysis\n\n#SlidingWindow #Algorithms #CodingInterview #Programming #ProblemSolving #CompetitiveProgramming #Coding #DataStructures #AlgorithmicInterviews #Python \n#Algorithm #DataStructures #Algorithms #ProblemSolving #AlgorithmicInterview #InterviewPreparation #DataStructuresInterview #InterviewQuestions #TechInterview #TechInterviews #DSA #GoogleInterview #FAANG",
+  "source": "Public YouTube watch page: ytInitialPlayerResponse and ytInitialData"
+}

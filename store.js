@@ -4220,6 +4220,7 @@ const Analytics = {
 const { completion: freeCompletion, createAttempts } = require('./learning-attempts');
 const OpenAttempts = createAttempts({getData:()=>data,nextId,save,tracks:TRACKS,now});
 const pacing = require('./course-pacing');
+const { gradeQuiz } = require('./tracks/trending-tech-assessments');
 const freePolicy = require('./free-course-policy');
 
 const OpenQuest = {
@@ -4479,7 +4480,7 @@ const OpenQuest = {
   find(uid, track_key, level, pid) {
     return data.open_submissions.find((s) => s.user_id === Number(uid) && s.track_key === track_key && s.level === Number(level) && s.pid === Number(pid)) || null;
   },
-  submit({ user, track_key, level, pid, code, language, output, file_url, file_name, files, evidence, assessment_kind = 'assignment', request_key, fingerprint }) {
+  submit({ user, track_key, level, pid, code, language, output, file_url, file_name, files, evidence, quiz_answers, assessment_kind = 'assignment', request_key, fingerprint }) {
     if (!['free', 'student'].includes(Users.byId(user.id)?.role)) return { error: 'Practice submissions are for learner accounts only.', status: 403 };
     const t = TRACKS[track_key];
     if (!t || t.published === false) return { error: 'Course not found.' };
@@ -4496,7 +4497,7 @@ const OpenQuest = {
     if (kind === 'capstone') {
       if (!t.capstone) return { error: 'This course does not have a capstone.', status: 400 };
       const policy = freeCompletion(t, data.open_submissions.filter((s) => s.user_id === Number(user.id) && s.track_key === track_key));
-      if (!policy.assignments_passed) return { error: 'Pass all twelve required assignments before submitting the capstone.', status: 409 };
+      if (!policy.assignments_passed) return { error: 'Pass all required lecture quizzes and assignments before submitting the capstone.', status: 409 };
       level = 0; pid = 0;
       pr = { ...t.capstone, title: t.capstone.title, description: t.capstone.description, grading_mode: 'staff' };
     } else {
@@ -4514,8 +4515,12 @@ const OpenQuest = {
       pr = lvl.problems.find((p) => p.pid === Number(pid));
       if (!pr) return { error: 'Task not found.' };
     }
+    // A quiz is marked here, on the server, against the answer key that never
+    // leaves it - the result is final the moment it is submitted.
+    const quizResult = pr.grading_mode === 'quiz' ? gradeQuiz(pr.quiz, quiz_answers) : null;
+    if (quizResult?.error) return { error: quizResult.error, status: 400 };
     const hasEvidence = !!(evidence && ((evidence.links || []).length || (evidence.files || []).length || String(evidence.notes || '').trim()));
-    if (!code && !file_url && !hasEvidence) return { error: 'Submit code, a link, a note, or at least one evidence file.' };
+    if (!quizResult && !code && !file_url && !hasEvidence) return { error: 'Submit code, a link, a note, or at least one evidence file.' };
     let s = OpenQuest.find(user.id, track_key, level, pid);
     const fields = {
       assessment_kind: kind,
@@ -4527,6 +4532,7 @@ const OpenQuest = {
       file_url: file_url || null, file_name: file_name || null,
       files: Array.isArray(files) && files.length ? files : null, // extra files beyond the first (multi-file courses)
       evidence: evidence || null,
+      quiz: quizResult ? { answers: quiz_answers.slice(), correct: quizResult.correct, total: quizResult.total } : null,
       submitted_at: now(),
     };
     if (!s) {
@@ -4536,9 +4542,13 @@ const OpenQuest = {
     }
     const result = OpenAttempts.create(s,fields,pr,request_key,fingerprint);
     if (result.error) return result;
+    if (quizResult && !result.existing) {
+      OpenAttempts.complete(result.attempt.id, quizResult.score, `${quizResult.correct} of ${quizResult.total} correct.`, 'quiz');
+      if (s.score != null && s.score === quizResult.score) s.quiz = fields.quiz;
+    }
     if (t.free) OpenQuest.recordOpen(user.id, track_key, { deferSave: true });
     save();
-    return { submission:s,problem:pr,track:t,...result };
+    return { submission:s,problem:pr,track:t,...result,quiz_result:quizResult&&!result.existing?quizResult:null };
   },
   progress(uid, track_key) {
     const t = TRACKS[track_key]; if (!t) return null;
@@ -4552,7 +4562,7 @@ const OpenQuest = {
     const capstoneSubmission = mine.find((s) => s.assessment_kind === 'capstone' || (s.level === 0 && s.pid === 0));
     const byKey = {};
     const policy = freeCompletion(t,mine);
-    for (const s of assignmentMine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, grade_pending: !!s.grade_pending, grade_due_by: s.grade_due_by || null, file_name: s.file_name, evidence:s.evidence||null, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public) };
+    for (const s of assignmentMine) byKey[`${s.level}:${s.pid}`] = { score: s.score, gems: s.gems, feedback: s.feedback, submitted_at: s.submitted_at, grade_pending: !!s.grade_pending, grade_due_by: s.grade_due_by || null, file_name: s.file_name, evidence:s.evidence||null, quiz:s.quiz||null, code:s.code, language:s.language, has_code: !!s.code, attempts: s.attempts || 1, history:OpenAttempts.list(uid,track_key,s.level,s.pid).map(OpenAttempts.public) };
     const totalProblems = t.levels.reduce((a, l) => a + l.problems.length, 0);
     const graded = assignmentMine.filter((s) => s.score != null);
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null;

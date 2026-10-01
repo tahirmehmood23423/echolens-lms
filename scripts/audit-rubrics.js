@@ -88,6 +88,8 @@ function run() {
   for (const t of tracks) {
     for (const level of t.levels || []) {
       for (const p of level.problems || []) {
+        // Quizzes are marked against a fixed key; the AI grader never sees them.
+        if (p.grading_mode === 'quiz') continue;
         problems += 1;
         findings.push(...auditProblem(t, level, p));
       }

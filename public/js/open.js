@@ -1038,7 +1038,10 @@ const MODE_LABEL = {
   'excel-ai': 'Workbook submissions (.xlsx / .csv) with an AI copilot linked to your sheet',
   multi: 'PDF or image submissions - multiple files per quest',
   evidence: 'Project evidence - links, notes and supporting files reviewed by staff',
+  mixed: 'Lecture quizzes checked instantly, compiler coding tasks and a staff-reviewed capstone',
 };
+// A track can mix assessment types; the problem's own mode wins.
+function problemMode(p) { return (p && p.submission && p.submission.mode) || CUR.track.submission_mode; }
 function courseOutlineHtml(t) {
   const isBootcamp = (t.course_code || '').startsWith('BC');
   const unit = isBootcamp ? 'Class' : 'Lecture';
@@ -1761,7 +1764,7 @@ function openSolve(levelNo, pid, skipPush) {
       <div class="slv-eyebrow">${unitLabel} ${lvl.no} &middot; ${esc(lvl.title || '')}<span style="flex:1"></span><span class="lc-diff ${DIFF(p.difficulty)}">${DIFF(p.difficulty)}</span></div>
       <div class="slv-head">
         <h2>${esc(p.title)}</h2>
-        <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} ${p.grading_mode === 'staff' ? 'marks' : 'gems'}${p.duration ? ` &middot; ${esc(p.duration)}` : ''}</span>
+        <span class="slv-gems"><svg viewBox="0 0 24 24" fill="none">${ICONS.gem}</svg>${p.points} ${['staff', 'quiz'].includes(p.grading_mode) ? 'marks' : 'gems'}${p.duration ? ` &middot; ${esc(p.duration)}` : ''}</span>
       </div>
       ${levelHasVideo(lvl) ? `<button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;gap:6px;align-items:center" onclick="openSolveVideo(${lvl.no})">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${lvl.resource_url ? 'Read lesson guide' : 'Watch the topic video'}</button>` : ''}
@@ -1917,6 +1920,8 @@ function svCertNote() { return CUR.track.free ? (CUR.track.capstone ? ' Pass eve
 // with a visible penalty attached, and how grading works internally isn't
 // something a beginner needs to know to trust their result.
 function svGradingNote() {
+  if (CUR_PROBLEM?.problem?.grading_mode === 'quiz') return 'Answers are checked the moment you submit. Retake it as often as you like - your best score counts.' + svCertNote();
+  if (CUR_PROBLEM?.problem?.grading_mode === 'staff' && problemMode(CUR_PROBLEM.problem) === 'code') return 'Your code is saved immediately and reviewed by staff. Your best score is preserved.' + svCertNote();
   if (CUR_PROBLEM?.problem?.grading_mode === 'staff') return 'Your evidence is saved immediately and sent to staff for review. Your best score is preserved.' + svCertNote();
   return CUR.track.friendly_grading
     ? 'Your work is saved before grading. Gems reflect your best result.' + svCertNote()
@@ -1955,9 +1960,42 @@ function svEvidenceArea(sub) {
   form.files.addEventListener('change',(event)=>{const names=[...event.target.files].map(file=>file.name);$('svFileList').textContent=names.length?`${names.length} file${names.length===1?'':'s'} attached: ${names.join(', ')}`:'';});
 }
 
+// Multiple-choice quiz: answers go to the server, which holds the key and
+// marks them instantly. The last result (with explanations) is shown below.
+function svQuizArea(sub, readOnly) {
+  const questions = (CUR_PROBLEM.problem.quiz && CUR_PROBLEM.problem.quiz.questions) || [];
+  const last = sub && sub.quiz ? sub.quiz.answers || [] : [];
+  $('svWorkArea').innerHTML = `<div class="card"><div class="card-head"><h3>${readOnly ? 'Quiz preview' : 'Lecture quiz'}</h3><span class="s" style="color:var(--muted)">${questions.length} questions &middot; checked instantly</span></div><div class="card-body">
+    <form id="svQuizForm">
+      ${questions.map((q, i) => `<fieldset class="quiz-q" style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 12px">
+        <legend class="s" style="font-weight:700;padding:0 6px">${i + 1}. ${esc(q.question)}</legend>
+        ${q.options.map((o, oi) => `<label class="s" style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;cursor:pointer"><input type="radio" name="q${i}" value="${oi}"${last[i] === oi ? ' checked' : ''}${readOnly ? ' disabled' : ''} style="width:auto;margin-top:3px"><span>${esc(o)}</span></label>`).join('')}
+        <div class="quiz-feedback s" id="svQuizFb${i}" style="margin-top:4px"></div>
+      </fieldset>`).join('')}
+      <div id="svQuizScore" class="s" style="margin:0 0 12px"></div>
+      ${readOnly ? '<p class="hint">Staff preview - quizzes are answered from learner accounts.</p>' : `<button class="btn lc-btn-solve" type="submit" id="svSubmitBtn">${sub ? 'Retake quiz' : 'Submit answers'}</button><p class="hint" style="margin-top:10px">${svGradingNote()}</p>`}
+    </form></div></div><div id="svResults" style="margin-top:16px"></div>`;
+  if (readOnly) return;
+  const form = $('svQuizForm');
+  form.addEventListener('submit', (event) => { event.preventDefault(); submitSolve(form); });
+}
+function svShowQuizResult(result) {
+  if (!result || !Array.isArray(result.results)) return;
+  const questions = (CUR_PROBLEM.problem.quiz && CUR_PROBLEM.problem.quiz.questions) || [];
+  result.results.forEach((r, i) => {
+    const box = $('svQuizFb' + i); if (!box) return;
+    const right = questions[i] ? questions[i].options[r.correct_option] : '';
+    box.innerHTML = r.correct
+      ? `<span style="color:var(--teal);font-weight:700">Correct.</span> ${esc(r.explanation || '')}`
+      : `<span style="color:var(--danger);font-weight:700">Not quite.</span> The answer is <strong>${esc(right)}</strong>. ${esc(r.explanation || '')}`;
+  });
+  const passed = result.score >= Number(CUR_PROBLEM.problem.pass_mark || 60);
+  if ($('svQuizScore')) $('svQuizScore').innerHTML = `<strong style="color:${passed ? 'var(--teal)' : 'var(--danger)'}">${result.correct} of ${result.total} correct (${result.score}%)</strong> &middot; ${passed ? 'Passed.' : 'Below the pass mark - review the explanations and retake it.'}`;
+}
+
 function drawWorkArea() {
   const isLearner = !ME || ['free', 'student'].includes(ME.role);
-  const mode = CUR.track.submission_mode;
+  const mode = problemMode(CUR_PROBLEM && CUR_PROBLEM.problem);
 
   // shared code-editor shell (dark, line-numbered) - staff omit Dataset/Submit
   const codeIde = (opts) => `
@@ -2001,6 +2039,10 @@ function drawWorkArea() {
     </div>`;
 
   const codeLike = mode === 'code' || mode === 'code-ai';
+  if (mode === 'quiz') {
+    svQuizArea(isLearner ? CUR.progress && CUR.progress.submissions[`${CUR_PROBLEM.level}:${CUR_PROBLEM.pid}`] : null, !isLearner);
+    return;
+  }
   if (!isLearner) {
     // Staff can read and run everything, but submissions are for learners.
     $('svWorkArea').innerHTML = codeLike
@@ -2300,12 +2342,21 @@ async function runSolve() {
 }
 async function submitSolve(fileForm) {
   if (!ME) { gate('Sign in free to submit this task, earn gems, and collect certificates.'); return; }
-  const mode = CUR.track.submission_mode;
+  const mode = problemMode(CUR_PROBLEM && CUR_PROBLEM.problem);
   const fd = new FormData();
   fd.set('track_key', CUR.track.key);
   fd.set('level', CUR_PROBLEM.level);
   fd.set('pid', CUR_PROBLEM.pid);
-  if (mode === 'prompt') {
+  if (mode === 'quiz') {
+    const count = ((CUR_PROBLEM.problem.quiz && CUR_PROBLEM.problem.quiz.questions) || []).length;
+    const answers = [];
+    for (let i = 0; i < count; i++) {
+      const picked = fileForm && fileForm.querySelector(`input[name="q${i}"]:checked`);
+      if (!picked) { toast(`Answer question ${i + 1} first.`, true); return; }
+      answers.push(Number(picked.value));
+    }
+    fd.set('answers', JSON.stringify(answers));
+  } else if (mode === 'prompt') {
     // The Prompt Lab workbook (every prompt + model output) is the submission.
     const entries = SV_LAB[labKey()] || [];
     if (!entries.length) { toast('Run at least one prompt in the lab first - the workbook is what gets graded.', true); return; }
@@ -2344,7 +2395,8 @@ async function submitSolve(fileForm) {
     const out = await api('/api/open/submit', { method: 'POST', body: fd });
     try{sessionStorage.removeItem(pendingKey);}catch{}
     if(!CUR_PROBLEM||CUR.track.key+':'+CUR_PROBLEM.level+':'+CUR_PROBLEM.pid!==submitContext)return;
-    if (out.graded) toast(`Graded ${out.submission.score}% · ${out.submission.gems} gems earned.`);
+    if (out.quiz_result) { toast(out.note); svShowQuizResult(out.quiz_result); }
+    else if (out.graded) toast(`Graded ${out.submission.score}% · ${out.submission.gems} gems earned.`);
     else toast(out.note || 'Attempt saved. Check submission history for its status.');
     // Refresh progress and views
     try { CUR.progress = (await api('/api/open/progress?track=' + encodeURIComponent(CUR.track.key))).progress; } catch {}
@@ -2355,7 +2407,7 @@ async function submitSolve(fileForm) {
     // It still matters for the staff-graded path, where the result is instant.
     if (CUR.progress && CUR.progress.certificate) loadCerts();
     maybeCelebrate();
-    if ($('svSubmitBtn')) { $('svSubmitBtn').disabled = false; $('svSubmitBtn').textContent = 'Resubmit'; }
+    if ($('svSubmitBtn')) { $('svSubmitBtn').disabled = false; $('svSubmitBtn').textContent = mode === 'quiz' ? 'Retake quiz' : 'Resubmit'; }
   } catch (e) {
     if (!e.handled) toast(e.message, true);
     if (btn) { btn.disabled = false; btn.textContent = 'Submit for grading'; }

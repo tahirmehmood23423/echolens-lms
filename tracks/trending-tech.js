@@ -7,6 +7,7 @@
  * `staged_catalogue` only keeps them listed on the admin video review page.
  */
 const catalogue = require('./trending-tech-catalogue.json');
+const assessments = require('./trending-tech-assessments');
 
 const META = [
   { code: 'TT-01', key: 'tt-nextjs-typescript', language: 'web' },
@@ -85,11 +86,70 @@ function capstoneFor(course) {
   };
 }
 
+// Every lecture is assessed by an auto-checked quiz. A coding task is added
+// only where the browser compiler can genuinely do the work; otherwise the
+// catalogue's original hands-on project (Docker, cloud, a real Next.js app...)
+// stays available as optional practice that never blocks progress.
+function lectureProblems(lesson, assignment) {
+  const questions = assessments.quizzes[assignment.code] || [];
+  const quiz = {
+    pid: 1,
+    code: `Q${assignment.code.slice(1)}`,
+    title: `Lecture ${lesson.number} quiz`,
+    points: 10,
+    difficulty: 'Core',
+    description: `${questions.length} multiple-choice questions on "${lesson.title}". Answers are checked instantly - score ${60}% or more to pass. You can retake it; your best score counts.`,
+    criteria: [`Score at least 60% (${Math.ceil(questions.length * 0.6)} of ${questions.length} correct).`],
+    submission: { mode: 'quiz' },
+    quiz: { questions },
+    grading_mode: 'quiz',
+    required: true,
+    pass_mark: 60,
+  };
+  const task = assessments.tasks[assignment.code];
+  if (task) {
+    return [quiz, {
+      pid: 2,
+      code: assignment.code,
+      title: task.title,
+      duration: assignment.duration,
+      points: 10,
+      difficulty: 'Core',
+      description: task.description,
+      criteria: task.criteria,
+      hint: task.hint || null,
+      language: task.language,
+      submission: { mode: 'code' },
+      grading_mode: 'staff',
+      required: true,
+      pass_mark: 60,
+    }];
+  }
+  return [quiz, {
+    pid: 2,
+    code: assignment.code,
+    title: `Optional project: ${assignment.code}`,
+    duration: assignment.duration,
+    points: 10,
+    difficulty: 'Core',
+    description: `${assignment.brief}\n\nThis project needs tools outside the browser (your own machine or a cloud account), so it is optional practice and does not affect your progress or certificate.`,
+    deliverable: assignment.deliverable,
+    criteria: [assignment.criteria],
+    submission_text: assignment.submission_text,
+    submission: evidenceSubmission(assignment.submission_text),
+    grading_mode: 'staff',
+    required: false,
+    optional: true,
+    pass_mark: 60,
+  }];
+}
+
 const tracks = catalogue.map((course, courseIndex) => {
   const meta = META[courseIndex];
   const warningAt = course.assessment.indexOf('Cost warning.');
   const warnings = warningAt >= 0 ? [course.assessment.slice(warningAt).trim()] : [];
-  const assessment = warningAt >= 0 ? course.assessment.slice(0, warningAt).trim() : course.assessment;
+  const codingTasks = course.modules.flatMap((module) => module.lessons).filter((lesson) => assessments.tasks[lesson.assignment.code]).length;
+  const assessment = `Every lecture ends with a 5-question quiz that is checked instantly (pass mark 60%).${codingTasks ? ` ${codingTasks} lectures also have a coding task you solve in the EchoLens compiler, reviewed by staff.` : ''} Lecture assessments are worth 60 percent and the capstone 40 percent. Hands-on projects that need your own machine or a cloud account are optional practice.`;
   let levelNo = 0;
   const modules = course.modules.map((module) => ({ no: module.no, title: module.title }));
   const levels = course.modules.flatMap((module) => module.lessons.map((lesson, lessonIndex) => {
@@ -114,22 +174,7 @@ const tracks = catalogue.map((course, courseIndex) => {
       analogy: lesson.analogy,
       covered: lesson.covered,
       topic: `Analogy: ${lesson.analogy}\n\nCovered: ${lesson.covered}`,
-      problems: [{
-        pid: 1,
-        code: assignment.code,
-        title: assignment.code,
-        duration: assignment.duration,
-        points: 10,
-        difficulty: 'Core',
-        description: assignment.brief,
-        deliverable: assignment.deliverable,
-        criteria: [assignment.criteria],
-        submission_text: assignment.submission_text,
-        submission: evidenceSubmission(assignment.submission_text),
-        grading_mode: 'staff',
-        required: true,
-        pass_mark: 60,
-      }],
+      problems: lectureProblems(lesson, assignment),
     };
   }));
   return {
@@ -152,7 +197,7 @@ const tracks = catalogue.map((course, courseIndex) => {
     inline_video_only: true,
     friendly_grading: true,
     grading_mode: 'staff',
-    submission: 'evidence',
+    submission: 'mixed',
     default_language: meta.language,
     pass_mark: 60,
     assignment_weight: 60,
@@ -176,8 +221,8 @@ function validateTrendingTechCatalogue(items = tracks) {
   for (const track of items) {
     if (track.modules.length !== 4) errors.push(`${track.course_code}: expected 4 modules.`);
     if (track.levels.length !== 12) errors.push(`${track.course_code}: expected 12 lectures.`);
-    const problems = track.levels.flatMap((level) => level.problems || []);
-    if (problems.length !== 12) errors.push(`${track.course_code}: expected 12 assignments.`);
+    const quizzes = track.levels.flatMap((level) => (level.problems || []).filter((problem) => problem.grading_mode === 'quiz'));
+    if (quizzes.length !== 12) errors.push(`${track.course_code}: expected 12 lecture quizzes.`);
     if (!track.capstone) errors.push(`${track.course_code}: capstone is missing.`);
     // A capstone carrying no criteria is 40% of the course with nothing stated
     // for the learner to aim at or a grader to mark against - see
@@ -189,7 +234,14 @@ function validateTrendingTechCatalogue(items = tracks) {
       if (!id) errors.push(`${prefix}: provide a direct YouTube watch, share, or embed URL.`);
       else if (ids.has(id)) errors.push(`${prefix}: video duplicates ${ids.get(id)}.`);
       else ids.set(id, prefix);
-      if ((level.problems || []).length !== 1 || level.problems[0].points !== 10) errors.push(`${prefix}: expected one 10-mark assignment.`);
+      const quiz = (level.problems || []).find((problem) => problem.grading_mode === 'quiz');
+      const questions = quiz?.quiz?.questions || [];
+      if (!quiz || !quiz.required) errors.push(`${prefix}: expected one required quiz.`);
+      else if (questions.length < 5) errors.push(`${prefix}: the quiz needs at least 5 questions.`);
+      for (const q of questions) {
+        if (!Array.isArray(q.options) || q.options.length < 2 || new Set(q.options).size !== q.options.length) errors.push(`${prefix} Q${q.id}: options must be distinct.`);
+        if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer >= (q.options || []).length) errors.push(`${prefix} Q${q.id}: answer index is out of range.`);
+      }
     }
   }
   return {
@@ -199,7 +251,10 @@ function validateTrendingTechCatalogue(items = tracks) {
       courses: items.length,
       modules: items.reduce((sum, track) => sum + track.modules.length, 0),
       lectures: items.reduce((sum, track) => sum + track.levels.length, 0),
-      assignments: items.reduce((sum, track) => sum + track.levels.flatMap((level) => level.problems || []).length, 0),
+      quizzes: items.reduce((sum, track) => sum + track.levels.flatMap((level) => (level.problems || []).filter((problem) => problem.grading_mode === 'quiz')).length, 0),
+      questions: items.reduce((sum, track) => sum + track.levels.flatMap((level) => (level.problems || []).filter((problem) => problem.grading_mode === 'quiz').flatMap((problem) => problem.quiz.questions)).length, 0),
+      coding_tasks: items.reduce((sum, track) => sum + track.levels.flatMap((level) => (level.problems || []).filter((problem) => problem.submission?.mode === 'code')).length, 0),
+      optional_projects: items.reduce((sum, track) => sum + track.levels.flatMap((level) => (level.problems || []).filter((problem) => problem.optional)).length, 0),
       capstones: items.filter((track) => track.capstone).length,
       videos_ready: items.reduce((sum, track) => sum + track.levels.filter((level) => youtubeVideoId(level.video_url)).length, 0),
     },

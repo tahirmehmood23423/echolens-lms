@@ -16,14 +16,21 @@ const { Quests, OpenQuest, OpenAttempts, Users, Certificates } = store;
 
 test('Revision 3 catalogue contains the exact published course structure', () => {
   const result = tracks.validateTrendingTechCatalogue(tracks);
-  assert.deepEqual(result.counts, { courses: 6, modules: 24, lectures: 72, assignments: 72, capstones: 6, videos_ready: 72 });
+  assert.deepEqual(result.counts, { courses: 6, modules: 24, lectures: 72, quizzes: 72, questions: 360, coding_tasks: 31, optional_projects: 41, capstones: 6, videos_ready: 72 });
   assert.equal(result.valid, true);
   assert.equal(result.errors.length, 0);
   assert.deepEqual(tracks.map((track) => track.course_code), ['TT-01', 'TT-02', 'TT-03', 'TT-04', 'TT-05', 'TT-06']);
   for (const track of tracks) {
     assert.equal(track.published, true);
     assert.ok(track.modules.every((module) => !module.resources), 'optional module deep dives are not shipped');
-    assert.equal(track.levels.flatMap((level) => level.problems).reduce((sum, problem) => sum + problem.points, 0), 120);
+    for (const level of track.levels) {
+      const [quiz, second] = level.problems;
+      assert.equal(quiz.grading_mode, 'quiz');
+      assert.equal(quiz.required, true);
+      assert.equal(quiz.quiz.questions.length, 5);
+      // Every lecture has either a required compiler task or an optional project.
+      assert.ok(second.submission.mode === 'code' ? second.required && second.language : second.optional && !second.required);
+    }
     assert.equal(track.capstone.weight, 40);
     assert.equal(track.assignment_weight, 60);
     for (const level of track.levels) {
@@ -76,7 +83,7 @@ test('release validation rejects a YouTube video that disables embedding', async
 
 test('capstone completion uses 60 percent assignment average and 40 percent capstone score', () => {
   const track = tracks[0];
-  const submissions = track.levels.map((level) => ({ assessment_kind: 'assignment', level: level.no, pid: 1, score: 80 }));
+  const submissions = track.levels.flatMap((level) => level.problems.filter((problem) => problem.required).map((problem) => ({ assessment_kind: 'assignment', level: level.no, pid: problem.pid, score: 80 })));
   let progress = completion(track, submissions);
   assert.equal(progress.assignments_passed, true);
   assert.equal(progress.capstone.unlocked, true);
@@ -137,7 +144,7 @@ test('learner capstone waits for assignments, enters staff review, and gates its
   // moments ago is deliberately not visible yet, so seeding "now" would leave
   // the capstone locked for a reason this test is not about.
   const released = new Date(Date.now() - 24 * 3600_000).toISOString();
-  for (const level of track.levels) data.open_submissions.push({ id: ++id, user_id: 901, track_key: track.key, assessment_kind: 'assignment', level: level.no, pid: 1, problem_title: level.problems[0].title, points: 10, score: 80, gems: 8, attempts: 1, submitted_at: released });
+  for (const level of track.levels) for (const problem of level.problems.filter((item) => item.required)) data.open_submissions.push({ id: ++id, user_id: 901, track_key: track.key, assessment_kind: 'assignment', level: level.no, pid: problem.pid, problem_title: problem.title, points: 10, score: 80, gems: 8, attempts: 1, submitted_at: released });
   data.seq.open_submissions = id;
   assert.equal(OpenQuest.progress(901, track.key).capstone.unlocked, true);
   const submitted = OpenQuest.submit({ user: Users.byId(901), track_key: track.key, assessment_kind: 'capstone', evidence: { links: ['https://example.com/project'], notes: 'Reviewer access is documented.', files: [] }, request_key: 'capstone-request-0001', fingerprint: 'capstone-fingerprint' });
@@ -151,4 +158,38 @@ test('learner capstone waits for assignments, enters staff review, and gates its
   assert.ok(issued.cert);
   assert.equal(Certificates.publicView(issued.cert).final_project.items[0].problem_title, track.capstone.title);
   assert.equal(JSON.stringify(Certificates.publicView(issued.cert)).includes('example.com/project'), false);
+});
+
+test('quiz answers are graded on the server and the key never reaches learners', () => {
+  const { publicQuiz, gradeQuiz } = require('../tracks/trending-tech-assessments');
+  const quiz = tracks[2].levels[0].problems[0].quiz;
+  const shown = JSON.stringify(publicQuiz(quiz));
+  assert.doesNotMatch(shown, /"answer"|explanation/);
+  assert.equal(gradeQuiz(quiz, quiz.questions.map((q) => q.answer)).score, 100);
+  assert.equal(gradeQuiz(quiz, quiz.questions.map((q, i) => (i < 3 ? q.answer : (q.answer + 1) % q.options.length))).score, 60);
+  assert.match(gradeQuiz(quiz, [0]).error, /Answer all 5/);
+  assert.match(gradeQuiz(quiz, [0, 0, 0, 0, 7]).error, /every question/);
+});
+
+test('a module of quizzes is graded instantly and opens the next module', () => {
+  const track = tracks.find((t) => t.course_code === 'TT-04');
+  const data = store.allData();
+  data.users.push({ id: 950, role: 'student', name: 'Quiz Learner', profile: {} });
+  assert.equal(OpenQuest.enroll(950, track.key).existing, false);
+  const u = Users.byId(950);
+  u.profile.free_course_enrollments = u.profile.free_course_enrollments.map((e) => ({ ...e, activates_at: new Date(Date.now() - 3600_000).toISOString() }));
+  const wrong = OpenQuest.submit({ user: u, track_key: track.key, level: 1, pid: 1, quiz_answers: [0], request_key: 'quiz-request-bad-0001', fingerprint: 'bad' });
+  assert.equal(wrong.status, 400);
+  const optional = OpenQuest.submit({ user: u, track_key: track.key, level: 1, pid: 2, evidence: { links: ['https://example.com/x'], notes: null, files: [] }, request_key: 'quiz-request-opt-0001', fingerprint: 'opt' });
+  assert.equal(optional.attempt.status, 'awaiting_review', 'optional projects still go to staff');
+  for (const level of track.levels.filter((l) => l.module_no === 1)) {
+    const quiz = level.problems[0].quiz;
+    const out = OpenQuest.submit({ user: u, track_key: track.key, level: level.no, pid: 1, quiz_answers: quiz.questions.map((q) => q.answer), request_key: `quiz-request-${level.no}-000001`, fingerprint: `q${level.no}` });
+    assert.equal(out.attempt.status, 'completed');
+    assert.equal(out.submission.score, 100);
+    assert.equal(out.quiz_result.correct, 5);
+  }
+  const modules = OpenQuest.progress(950, track.key).modules;
+  assert.equal(modules[0].status, 'complete', 'the ungraded optional project does not hold the module');
+  assert.equal(modules[1].status, 'available');
 });

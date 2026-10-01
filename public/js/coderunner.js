@@ -744,7 +744,7 @@
     }
     return typescriptPromise;
   }
-  function runJavaScript(code, { term, onStatus }) {
+  function runJavaScript(code, { term, onStatus, extraPrelude }) {
     const status = (text) => { try { onStatus && onStatus(text); } catch {} };
     term.clear();
     status('Running JavaScript...');
@@ -753,7 +753,7 @@
     // settled - posting it straight after the synchronous part terminated the
     // worker before any Promise / setTimeout / async output could print.
     // The prelude stays on ONE line so error line numbers are `lineno - 1`.
-    const prelude = 'const _echoText=v=>{try{return typeof v==="object"?JSON.stringify(v):String(v)}catch(_){return String(v)}};console={log:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),info:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),warn:(...a)=>postMessage({type:"out",text:"Warning: "+a.map(_echoText).join(" ")+"\\n"}),error:(...a)=>postMessage({type:"out",text:"Error: "+a.map(_echoText).join(" ")+"\\n"})};'
+    const prelude = (extraPrelude || '') + 'const _echoText=v=>{try{if(v&&v.$$jsx&&typeof renderToString==="function")return renderToString(v);return typeof v==="object"?JSON.stringify(v):String(v)}catch(_){return String(v)}};console={log:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),info:(...a)=>postMessage({type:"out",text:a.map(_echoText).join(" ")+"\\n"}),warn:(...a)=>postMessage({type:"out",text:"Warning: "+a.map(_echoText).join(" ")+"\\n"}),error:(...a)=>postMessage({type:"out",text:"Error: "+a.map(_echoText).join(" ")+"\\n"})};'
       + 'const _echoST=setTimeout,_echoCT=clearTimeout,_echoSI=setInterval,_echoCI=clearInterval,_echoFetch=self.fetch,_echoTimers=new Set(),_echoIntervals=new Set();let _echoMain=false,_echoFetches=0;'
       + 'const _echoCheck=()=>{if(_echoMain)_echoST(()=>{if(!_echoTimers.size&&!_echoIntervals.size&&!_echoFetches)postMessage({type:"done"})},50)};'
       + 'const _echoLine=e=>{const m=String(e&&e.stack||"").match(/blob:[^\\s)]*?:(\\d+):\\d+/);return m?Number(m[1])-1:null};'
@@ -800,15 +800,101 @@
       };
     });
   }
+  // Type checking needs the standard library declarations (lib.es2022.d.ts,
+  // lib.dom.d.ts and everything they reference). They are fetched from the
+  // same CDN as the compiler on the first run, parsed once, and reused.
+  const TS_LIB_URL = 'https://cdn.jsdelivr.net/npm/typescript@5.9.3/lib/';
+  const TS_ROOT_LIBS = ['lib.es2022.d.ts', 'lib.dom.d.ts'];
+  const tsLibText = new Map();
+  const tsLibSource = new Map();
+  let tsLibsPromise = null;
+  function loadTypeScriptLibs(status) {
+    if (!tsLibsPromise) {
+      status && status('Loading TypeScript type definitions (first run only)...');
+      tsLibsPromise = (async () => {
+        let pending = TS_ROOT_LIBS.slice();
+        while (pending.length) {
+          const texts = await Promise.all(pending.map(async (name) => {
+            const r = await fetch(TS_LIB_URL + name);
+            if (!r.ok) throw new Error('Could not load ' + name);
+            return [name, await r.text()];
+          }));
+          const next = new Set();
+          for (const [name, text] of texts) {
+            tsLibText.set(name, text);
+            for (const m of text.matchAll(/\/\/\/\s*<reference\s+lib="([^"]+)"/g)) {
+              const ref = 'lib.' + m[1].toLowerCase() + '.d.ts';
+              if (!tsLibText.has(ref)) next.add(ref);
+            }
+          }
+          pending = [...next].filter((name) => !tsLibText.has(name));
+        }
+      })().catch((e) => { tsLibsPromise = null; throw e; });
+    }
+    return tsLibsPromise;
+  }
+  // Ambient types for the small JSX runtime below: components are plain
+  // functions returning JSX.Element, and renderToString() prints the markup.
+  const TS_JSX_TYPES = [
+    'declare namespace JSX {',
+    '  interface Element { readonly type: unknown; readonly props: Record<string, unknown> }',
+    '  interface IntrinsicElements { [tag: string]: Record<string, unknown> }',
+    '  interface ElementChildrenAttribute { children: {} }',
+    '}',
+    'declare const React: { createElement(type: unknown, props: unknown, ...children: unknown[]): JSX.Element; Fragment: symbol };',
+    'declare function renderToString(element: unknown): string;',
+  ].join('\n');
+  // Runtime half of the same contract. It is prepended to the one-line
+  // prelude, so it must stay free of newlines too.
+  const TS_JSX_RUNTIME = 'const React={Fragment:Symbol("Fragment"),createElement:(type,props,...children)=>({$$jsx:true,type,props:{...(props||{}),children:children.flat(Infinity)}})};'
+    + 'function renderToString(el){const esc=v=>String(v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;"})[c]);if(el==null||el===false||el===true)return "";if(Array.isArray(el))return el.map(renderToString).join("");if(typeof el!=="object")return esc(el);if(typeof el.type==="function")return renderToString(el.type(el.props));if(el.type===React.Fragment)return renderToString(el.props.children);const {children,...attrs}=el.props;const a=Object.entries(attrs).filter(([k,v])=>v!=null&&v!==false&&typeof v!=="function").map(([k,v])=>" "+(k==="className"?"class":k)+"=\\""+esc(v===true?"":v)+"\\"").join("");return "<"+el.type+a+">"+renderToString(children)+"</"+el.type+">"}'
+    + 'var exports={},module={exports};const require=n=>{if(n==="react")return {default:React,...React};throw new Error("The package \\""+n+"\\" is not available in the browser compiler.")};';
+  // Strict checking, top-level await allowed (the file is always a module),
+  // and JSX only when the source actually contains JSX - a .tsx file would
+  // reject generic arrow functions and <Type>value assertions.
+  function typeCheck(ts, code, fileName) {
+    const options = {
+      strict: true, noEmit: true, target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext,
+      moduleDetection: ts.ModuleDetectionKind.Force, jsx: ts.JsxEmit.React, lib: TS_ROOT_LIBS, skipLibCheck: true,
+      types: [],
+    };
+    const files = { ['/' + fileName]: String(code), '/echo-jsx.d.ts': TS_JSX_TYPES };
+    const host = {
+      getSourceFile(name, languageVersion) {
+        const base = name.split('/').pop();
+        if (files[name] != null) return ts.createSourceFile(name, files[name], languageVersion, true);
+        if (tsLibText.has(base)) {
+          if (!tsLibSource.has(base)) tsLibSource.set(base, ts.createSourceFile('/lib/' + base, tsLibText.get(base), languageVersion, true));
+          return tsLibSource.get(base);
+        }
+        return undefined;
+      },
+      getDefaultLibFileName: () => '/lib/lib.d.ts', getDefaultLibLocation: () => '/lib',
+      writeFile() {}, getCurrentDirectory: () => '/', getDirectories: () => [], getCanonicalFileName: (f) => f,
+      useCaseSensitiveFileNames: () => true, getNewLine: () => '\n',
+      fileExists: (f) => files[f] != null || tsLibText.has(f.split('/').pop()), readFile: (f) => files[f],
+    };
+    const program = ts.createProgram(['/' + fileName, '/echo-jsx.d.ts'], options, host);
+    const main = program.getSourceFile('/' + fileName);
+    return [...program.getSyntacticDiagnostics(main), ...program.getSemanticDiagnostics(main)];
+  }
   async function runTypeScript(code, opts) {
     const status = (text) => { try { opts.onStatus && opts.onStatus(text); } catch {} };
     const ts = await loadTypeScript(status);
-    status('Checking TypeScript...');
-    const result = ts.transpileModule(String(code), {
-      fileName: 'main.ts', reportDiagnostics: true,
-      compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None, jsx: ts.JsxEmit.ReactJSX },
-    });
-    const errors = (result.diagnostics || []).filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
+    const usesJsx = /<\/[A-Za-z][\w.]*\s*>|\/>/.test(String(code));
+    const fileName = usesJsx ? 'main.tsx' : 'main.ts';
+    let diagnostics, typeChecked = true;
+    try {
+      await loadTypeScriptLibs(status);
+      status('Checking types...');
+      diagnostics = typeCheck(ts, code, fileName);
+    } catch (libErr) {
+      // Offline or CDN trouble: fall back to the syntax-only check rather
+      // than refusing to run the learner's code at all.
+      typeChecked = false;
+      diagnostics = ts.transpileModule(String(code), { fileName, reportDiagnostics: true, compilerOptions: { target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.React } }).diagnostics || [];
+    }
+    const errors = diagnostics.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
     if (errors.length) {
       opts.term.clear();
       for (const diagnostic of errors) {
@@ -820,11 +906,15 @@
       const first = errors[0], position = first.file && first.start != null ? first.file.getLineAndCharacterOfPosition(first.start) : null;
       return { ok: false, errorLine: position ? position.line + 1 : null };
     }
-    status('TypeScript check passed. Running JavaScript...');
-    // The generated JavaScript can shift line numbers after interfaces and
-    // type annotations are removed, so syntax diagnostics above point to the
-    // original source while runtime output remains in the terminal.
-    const executed = await runJavaScript(result.outputText, opts);
+    status(typeChecked ? 'Type check passed. Running JavaScript...' : 'Syntax check passed (type definitions could not load). Running JavaScript...');
+    // CommonJS output keeps `export` statements runnable in the worker. The
+    // generated JavaScript can shift line numbers after types are removed, so
+    // diagnostics above point to the original source while runtime output
+    // remains in the terminal.
+    const output = ts.transpileModule(String(code), {
+      fileName, compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React },
+    }).outputText;
+    const executed = await runJavaScript(output, { ...opts, extraPrelude: TS_JSX_RUNTIME });
     return executed.ok ? executed : { ...executed, errorLine: null };
   }
 

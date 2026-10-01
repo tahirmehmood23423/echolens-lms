@@ -1,0 +1,128 @@
+'use strict';
+// TT-02 Applied Generative AI and Retrieval Augmented Generation.
+// Quiz rows: [question, options, index of the correct option, explanation].
+module.exports = {
+  quizzes: {
+    'A2.1': [
+      ['What is an embedding?', ['A compressed copy of the original text', 'A dense vector whose geometry places similar meanings close together', 'A database index type', 'An encrypted token'], 1, 'Embeddings map text to vectors where distance tracks meaning.'],
+      ['Cosine similarity between two vectors measures...', ['the difference in their lengths', 'the angle between them, ignoring magnitude', 'how many dimensions they share', 'the number of equal words'], 1, 'Cosine is the dot product of the normalised vectors.'],
+      ['If vectors are L2-normalised, cosine similarity equals...', ['their Euclidean distance', 'their dot product', 'zero', 'their sum'], 1, 'With unit length, the cosine is exactly the dot product.'],
+      ['A pairwise similarity matrix for 200 tickets has how many cells?', ['200', '400', '20,000', '40,000'], 3, 'It is n × n = 200 × 200.'],
+      ['Why look at the score gap between rank five and rank six?', ['It shows the embedding dimension', 'A clear gap suggests a natural cut-off between relevant and irrelevant results', 'It measures latency', 'It has no meaning'], 1, 'Gaps help choose top-k or a similarity threshold.'],
+    ],
+    'A2.2': [
+      ['Why are documents split into chunks before indexing?', ['Embedding models and prompts have size limits, and small focused chunks retrieve more precisely', 'To compress them', 'Because vector databases reject long text for licensing reasons', 'To translate them'], 0, 'Chunking balances context limits against retrieval precision.'],
+      ['What is chunk overlap for?', ['To double the index size on purpose', 'To keep context that straddles a boundary present in both neighbouring chunks', 'To remove duplicates', 'To speed up embedding'], 1, 'Overlap prevents a sentence split from losing meaning.'],
+      ['A recursive character splitter tries separators in which order?', ['Characters, then words, then paragraphs', 'Paragraphs, then lines, then sentences/words, falling back to characters', 'Random order', 'Only fixed character counts'], 1, 'It prefers the largest natural boundary that fits.'],
+      ['Why keep fenced code blocks whole?', ['Code cannot be embedded', 'A half code block loses meaning and can mislead the model', 'Markdown forbids splitting', 'It reduces cost to zero'], 1, 'Structure-aware splitting keeps code intact.'],
+      ['What metadata most helps later citation and filtering?', ['The chunk colour', 'A source identifier and heading path', 'The embedding model\'s licence', 'The current time only'], 1, 'Source and section let answers cite exactly where text came from.'],
+    ],
+    'A2.3': [
+      ['What does a vector database primarily do?', ['Run SQL joins', 'Store vectors and return the nearest neighbours to a query vector', 'Train models', 'Serve web pages'], 1, 'Nearest-neighbour search over embeddings is its core job.'],
+      ['Metadata filtering such as department = HR is applied to...', ['narrow the candidate set so only matching chunks are returned', 'change the embedding model', 'sort results alphabetically', 'encrypt the data'], 0, 'Filters restrict the search space by structured fields.'],
+      ['Approximate nearest neighbour (ANN) indexes trade...', ['a little recall for much faster search', 'speed for exactness always', 'storage for security', 'nothing'], 0, 'ANN (e.g. HNSW) is fast but may miss a few true neighbours.'],
+      ['Why store a source id with every chunk?', ['To delete or update all chunks of one document precisely', 'To make vectors smaller', 'Because Chroma requires a colour', 'For no reason'], 0, 'Deleting by source id removes exactly that document\'s chunks.'],
+      ['If you change the embedding model, existing vectors...', ['still work perfectly', 'must be re-embedded because the vector spaces differ', 'are converted automatically', 'become encrypted'], 1, 'Vectors from different models are not comparable.'],
+    ],
+    'A2.4': [
+      ['What is grounding in RAG?', ['Training the model from scratch', 'Requiring answers to be based on, and cite, the retrieved context', 'Lowering the temperature to zero', 'Removing stop words'], 1, 'Grounded answers are traceable to provided sources.'],
+      ['Why define a fixed refusal string for unanswerable questions?', ['It saves tokens only', 'It makes "I don\'t know" behaviour testable and stops the model inventing answers', 'Models require it', 'It improves embeddings'], 1, 'A fixed string is easy to assert in tests.'],
+      ['Prompt injection via a retrieved chunk means...', ['the chunk is too long', 'text inside retrieved data tries to override the system instructions', 'the embedding failed', 'the user typed SQL'], 1, 'Retrieved content is untrusted data, not instructions.'],
+      ['A good defence against indirect injection is to...', ['put retrieved text above the system prompt', 'clearly delimit retrieved content and instruct the model to treat it as data only', 'increase temperature', 'remove all citations'], 1, 'Delimiting plus explicit instructions reduces (not eliminates) risk.'],
+      ['Requiring document identifiers in every claim helps because...', ['it makes answers shorter', 'reviewers and code can verify each claim against its source', 'it is required by HTTP', 'it hides hallucinations'], 1, 'Citations make faithfulness checkable.'],
+    ],
+    'A2.5': [
+      ['In LangChain, LCEL composes components using...', ['the pipe operator |', 'XML files', 'SQL', 'decorators only'], 0, 'retriever | prompt | model | parser builds a runnable chain.'],
+      ['What does a string output parser do at the end of a chain?', ['Embeds text', 'Converts the model message into a plain string', 'Retrieves documents', 'Counts tokens'], 1, 'It extracts the text content from the chat message.'],
+      ['Why stream tokens to the user?', ['It reduces total cost', 'Time-to-first-token drops, so the response feels faster', 'It improves accuracy', 'It is required for RAG'], 1, 'Users see output while generation continues.'],
+      ['What does tracing (e.g. LangSmith) show?', ['Only the final answer', 'Each step\'s inputs, outputs and timing as separate spans', 'The model weights', 'Network packets'], 1, 'Spans reveal where latency and errors come from.'],
+      ['"Warm connection" in a latency test means...', ['the GPU is hot', 'connections and caches are already established, excluding first-call setup costs', 'temperature is high', 'the model is fine-tuned'], 1, 'Cold-start effects distort first measurements.'],
+    ],
+    'A2.6': [
+      ['BM25 is a...', ['dense embedding model', 'lexical keyword-ranking function based on term frequency and document length', 'vector database', 'reranker neural net'], 1, 'BM25 scores exact term matches.'],
+      ['Why combine BM25 with dense retrieval (hybrid search)?', ['Lexical search catches exact terms like codes and names that embeddings may blur', 'It halves latency', 'Dense retrieval cannot rank', 'BM25 is newer'], 0, 'They have complementary failure modes.'],
+      ['Reciprocal rank fusion scores a document by...', ['adding raw scores', 'summing 1 / (k + rank) across result lists', 'taking the maximum embedding value', 'random choice'], 1, 'RRF uses ranks, so incompatible score scales do not matter.'],
+      ['What does a cross-encoder reranker do?', ['Embeds the corpus offline', 'Scores each (query, candidate) pair jointly to reorder a small candidate set', 'Deletes duplicates', 'Translates queries'], 1, 'Joint scoring is accurate but too slow for the whole corpus.'],
+      ['Recall@3 is the fraction of questions where...', ['the answer has three words', 'a relevant document appears in the top three results', 'three documents are relevant', 'the model answers in three seconds'], 1, 'It measures whether retrieval surfaces the right source.'],
+    ],
+    'A2.7': [
+      ['What is function (tool) calling?', ['The model executes Python on its own', 'The model returns a structured request naming a tool and arguments, which your code executes', 'A way to train models', 'A database trigger'], 1, 'Your code runs the tool and feeds the result back.'],
+      ['Why give tools typed JSON schemas?', ['For styling', 'So the model produces valid, checkable arguments', 'To speed up the GPU', 'Schemas are optional decoration'], 1, 'Schemas constrain and document the arguments.'],
+      ['A SQL tool should build its query with...', ['string concatenation of model output', 'parameterised queries', 'eval()', 'f-strings of user text'], 1, 'Parameters prevent SQL injection from model or user text.'],
+      ['When a tool fails, the agent should receive...', ['a raw stack trace', 'a handled, descriptive error result it can reason about', 'nothing', 'the database password'], 1, 'Handled errors let the model recover or explain.'],
+      ['Which tool should handle "what is 17.5% of 2,340"?', ['The SQL tool', 'An arithmetic tool, because models are unreliable at exact maths', 'Neither - guess', 'The embedding model'], 1, 'Delegate exact computation to code.'],
+    ],
+    'A2.8': [
+      ['ReAct agents alternate between...', ['training and testing', 'reasoning steps and tool actions with observations', 'reading and deleting', 'embedding and chunking'], 1, 'Thought → Action → Observation loops.'],
+      ['Why set a hard step limit?', ['To guarantee termination and bound cost on unanswerable tasks', 'To make answers longer', 'Models require exactly six steps', 'To disable tools'], 0, 'Without a cap an agent can loop forever.'],
+      ['A token budget protects against...', ['slow disks', 'runaway cost and context overflow', 'SQL injection', 'network outages'], 1, 'Each step consumes tokens; budgets cap spend.'],
+      ['An observation in ReAct is...', ['the model\'s plan', 'the result returned by the tool that was called', 'the user\'s first message', 'a log level'], 1, 'Observations feed the next reasoning step.'],
+      ['What is the right outcome for a deliberately unanswerable question?', ['Invent an answer', 'Stop at the limit and report that it could not answer', 'Loop until timeout', 'Crash'], 1, 'Graceful termination is the expected behaviour.'],
+    ],
+    'A2.9': [
+      ['In LangGraph, an agent workflow is modelled as...', ['a single prompt', 'a graph of nodes with edges, including conditional edges', 'a SQL table', 'a cron job'], 1, 'Nodes do work; edges decide where to go next.'],
+      ['A conditional edge from a tester node back to a writer node implements...', ['a retry loop on failure', 'parallel execution', 'a database join', 'caching'], 0, 'Routing back on failure creates a fix-and-retest loop.'],
+      ['What does checkpointing give you?', ['Faster models', 'Saved graph state so a run can resume after a crash or restart', 'Smaller prompts', 'Free tokens'], 1, 'Persisted state lets execution continue where it stopped.'],
+      ['Graph state is...', ['the shared data passed between and updated by nodes', 'the GPU memory', 'the model weights', 'the HTML output'], 0, 'Nodes read and write the shared state.'],
+      ['Why also cap loop iterations in a writer/tester graph?', ['To prevent endless failing cycles', 'Graphs cannot loop', 'For styling', 'It is not needed'], 0, 'A recursion limit stops infinite retries.'],
+    ],
+    'A2.10': [
+      ['A golden set is...', ['the most expensive model', 'a fixed set of questions with known good answers/sources used for evaluation', 'the training data', 'a cache'], 1, 'It gives a stable benchmark across changes.'],
+      ['Faithfulness measures whether...', ['the answer is short', 'the answer\'s claims are supported by the retrieved context', 'the query is polite', 'retrieval was fast'], 1, 'Unsupported claims lower faithfulness.'],
+      ['Context recall measures whether...', ['the model remembers past chats', 'the retrieved context contains the information needed for the reference answer', 'the cache was hit', 'chunks are short'], 1, 'It evaluates the retrieval step.'],
+      ['To learn what a change did, you should change...', ['several parameters at once', 'one parameter at a time and re-run the same set', 'the golden set each run', 'nothing'], 1, 'Isolating one change attributes the metric movement.'],
+      ['Why compare metrics with your own judgement on some cases?', ['LLM-judged metrics can be wrong, so spot checks keep them honest', 'To make the table longer', 'Metrics are always perfect', 'It is required by law'], 0, 'Automated judges have biases and blind spots.'],
+    ],
+    'A2.11': [
+      ['A guardrail on output is...', ['a check applied to the model response before it reaches the user', 'a GPU setting', 'a vector index', 'a prompt for creativity'], 0, 'Output guardrails filter or fix responses.'],
+      ['Which technique reliably redacts card numbers in text?', ['Asking the model nicely', 'Pattern matching (e.g. regex plus a Luhn check) in code', 'Lowering temperature', 'Using a bigger model'], 1, 'Deterministic code is auditable; prompts are not.'],
+      ['Enforcing a JSON response schema helps because...', ['downstream code can parse and validate responses reliably', 'it makes answers creative', 'it reduces tokens to zero', 'browsers need it'], 0, 'Schema validation catches malformed output.'],
+      ['Topic restriction means...', ['refusing questions outside the system\'s domain', 'answering everything', 'restricting users by country', 'limiting tokens'], 0, 'Off-domain questions (e.g. medical) get a safe refusal.'],
+      ['Why log blocked events?', ['For audit and to tune guardrails from real attacks', 'To slow the system', 'To leak data', 'It is pointless'], 0, 'Logs show what was blocked and why.'],
+    ],
+    'A2.12': [
+      ['Exact-match caching returns a stored response when...', ['any similar question arrives', 'the identical request (normalised) is seen again', 'the server restarts', 'the user is new'], 1, 'Exact match keys on the precise input.'],
+      ['Rate limiting protects a paid LLM endpoint from...', ['slow disks', 'abuse and runaway cost from too many requests', 'schema errors', 'DNS failures'], 1, 'It caps requests per client per window.'],
+      ['Per-request cost is estimated from...', ['response time only', 'prompt and completion token counts multiplied by per-token prices', 'the number of users', 'server CPU'], 1, 'Tokens drive LLM pricing.'],
+      ['Which HTTP status signals the client is rate limited?', ['200', '404', '429', '500'], 2, '429 Too Many Requests.'],
+      ['A cache hit should be dramatically faster because...', ['it skips the model call entirely', 'it uses a bigger GPU', 'it streams more tokens', 'it compresses the prompt'], 0, 'No model inference is needed on a hit.'],
+    ],
+  },
+  tasks: {
+    'A2.1': {
+      language: 'python',
+      title: 'Ticket similarity search (TF-IDF in the compiler)',
+      description: 'In the Python compiler, create at least 20 short support tickets across 4 themes (refunds, login, shipping, billing - at least 5 refund tickets). Vectorise them with scikit-learn `TfidfVectorizer`, compute the pairwise cosine similarity matrix, and plot a histogram of the off-diagonal scores with matplotlib. Then query "refund requested" and print the top six tickets with their scores and the gap between rank five and rank six.',
+      criteria: ['A similarity matrix of shape (n, n) is computed and printed.', 'A histogram of similarity scores is displayed.', 'The top five results for "refund requested" are refund tickets.', 'The score gap between rank five and rank six is printed.'],
+      hint: 'Fit the vectorizer on the tickets, then transform the query with the same vectorizer before cosine_similarity.',
+    },
+    'A2.2': {
+      language: 'python',
+      title: 'Structure-aware chunker',
+      description: 'Write a chunker for a markdown document (include a sample of at least 1,500 words in your code, with headings and at least two ``` fenced code blocks). Approximate tokens as words. Produce chunks of about 400 tokens with 50 tokens of overlap, splitting on paragraph then sentence boundaries, never inside a fenced code block. Each chunk carries metadata: source id and heading path (e.g. "Install > Linux"). Print five sample chunks, including one that contains a code block.',
+      criteria: ['No chunk splits a fenced code block.', 'No chunk ends mid-sentence (except a code block end).', 'Consecutive chunks overlap by roughly 50 tokens.', 'Every chunk has a source id and heading path in its metadata.'],
+      hint: 'First split the document into blocks (heading, paragraph, code fence) and track the current heading path; then pack whole blocks into chunks.',
+    },
+    'A2.6': {
+      language: 'python',
+      title: 'Hybrid retrieval with rank fusion',
+      description: 'Using a small corpus of at least 15 documents written in your code, implement BM25 scoring yourself (k1=1.5, b=0.75) and a "dense" baseline using TF-IDF cosine similarity (scikit-learn). Fuse the two ranked lists with reciprocal rank fusion (k=60), take 10 candidates and keep the top 3. On an evaluation set of at least 8 questions with known relevant document ids, print a table of recall@3 for the dense baseline and for the hybrid pipeline.',
+      criteria: ['BM25 is implemented from its formula, not imported.', 'Reciprocal rank fusion combines the two rankings.', 'A results table shows recall@3 for both pipelines on the same questions.', 'Hybrid recall@3 is at least the dense baseline.'],
+      hint: 'RRF score = sum over lists of 1 / (60 + rank). Include questions that use exact codes or names - that is where BM25 helps.',
+    },
+    'A2.7': {
+      language: 'python',
+      title: 'Typed tools with a handled failure path',
+      description: 'Write two tools: `sql_total(customer_id: int)` that runs a parameterised query on an in-memory sqlite3 orders table you create and seed, and `calculate(expression: str)` that safely evaluates + - * / on numbers (no eval). Describe both with JSON-schema style dictionaries. Write a `dispatch(call)` function that takes a model-style tool call ({"name": ..., "arguments": {...}}), validates the arguments against the schema, runs the tool, and returns {"ok": True, "result": ...} or {"ok": False, "error": ...}. Demonstrate: total order value for customer 45, a calculation, an unknown tool, and a bad argument type.',
+      criteria: ['The SQL tool uses a parameterised query (? placeholder).', 'Both tools have typed schemas that dispatch() validates against.', 'The customer 45 total is correct for your seeded data.', 'Failures return a handled error dictionary, never a stack trace.'],
+      hint: 'For safe arithmetic, use the ast module and allow only BinOp / UnaryOp / Constant nodes.',
+    },
+    'A2.11': {
+      language: 'python',
+      title: 'Output guardrail layer',
+      description: 'Write `guard(response: str, question: str) -> dict` that: redacts card numbers (13-19 digits, validated with the Luhn check) and national identifiers (use the Pakistani CNIC format 12345-1234567-1) as [REDACTED]; blocks off-topic questions (e.g. medical) and requests for secrets/configuration with a fixed refusal; always returns a dict matching the schema {"answer": str, "blocked": bool, "reason": str|None}; and appends each blocked event to a log list. Run at least five cases including two attack attempts and print the log.',
+      criteria: ['Valid card numbers and CNICs are redacted; random digit strings that fail Luhn are not.', 'The secret request and the off-topic medical question are both blocked and logged.', 'Every result validates against the response schema.', 'The blocked-event log is printed.'],
+      hint: 'Luhn: double every second digit from the right, subtract 9 when over 9, and check the total mod 10 is 0.',
+    },
+  },
+};

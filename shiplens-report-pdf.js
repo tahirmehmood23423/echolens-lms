@@ -1,13 +1,64 @@
 const PDFDocument = require('pdfkit');
+
 function shiplensReportPdf({ event, entries, challans, generatedAt = new Date() }) {
-  const doc = new PDFDocument({ size: 'A4', margin: 36 }), chunks = [];
-  doc.on('data', c => chunks.push(c));
-  const done = new Promise(resolve => doc.on('end', () => resolve(Buffer.concat(chunks))));
-  const byReg = new Map(challans.map(c => [c.registration_id, c]));
-  const members = entries.flatMap(e => (e.team_details || [{ name: e.name, email: e.email }]).map((m, i) => { const c = byReg.get(e.registration_ids?.[i] || (i === 0 ? e.registration_id : null)); return { ...m, team: e.team_name || `Team ${e.id}`, challan: c?.serial || '-', payment: c?.status || 'not issued', fee: c?.net_fee ?? '-' }; }));
-  const paid = members.filter(m => m.payment === 'paid').length;
-  doc.fontSize(18).fillColor('#123').text('ShipLens candidates and finance report').fontSize(11).text(event?.title || 'All ShipLens teams').text(`Generated ${generatedAt.toISOString().slice(0, 16).replace('T', ' ')} UTC`).moveDown().text(`Candidates: ${members.length}   Paid: ${paid}   Remaining: ${members.length - paid}   Teams: ${entries.length}`).moveDown();
-  members.forEach((m, i) => { if (doc.y > 720) doc.addPage(); doc.fontSize(10).fillColor('#123').text(`${i + 1}. ${m.name || '-'} | ${m.email || '-'} | WhatsApp: ${m.whatsapp || '-'}`).fontSize(9).fillColor('#456').text(`Team: ${m.team} | University: ${m.university || '-'} | Year: ${m.year || '-'} | Challan: ${m.challan} | Fee: ${m.fee} PKR | Payment: ${String(m.payment).toUpperCase()}`).moveDown(.45).strokeColor('#ccd').moveTo(36, doc.y).lineTo(559, doc.y).stroke(); });
-  doc.end(); return done;
+  const doc = new PDFDocument({ size: 'A4', layout: 'landscape', margin: 28, bufferPages: true });
+  const chunks = [];
+  doc.on('data', (chunk) => chunks.push(chunk));
+  const done = new Promise((resolve) => doc.on('end', () => resolve(Buffer.concat(chunks))));
+  const byReg = new Map(challans.map((c) => [c.registration_id, c]));
+  const rows = entries.flatMap((entry) => {
+    const team = entry.team_details || [{ name: entry.name, email: entry.email, whatsapp: entry.whatsapp }];
+    const teamLabel = team.map((m) => m.name).filter(Boolean).join(' + ') || `Team ${entry.id}`;
+    return team.map((member, index) => {
+      const registrationId = entry.registration_ids?.[index] || (index === 0 ? entry.registration_id : null);
+      const challan = byReg.get(registrationId);
+      return {
+        team: teamLabel, member: member.name || '-', email: member.email || '-', whatsapp: member.whatsapp || '-',
+        university: member.university || '-', year: member.year || '-', project: entry.challenge_title || '-',
+        serial: challan?.serial || '-', amount: challan ? Number(challan.net_fee).toLocaleString('en-US') : '-',
+        payment: challan?.status === 'paid' ? 'PAID' : challan ? 'UNPAID' : 'NOT ISSUED',
+      };
+    });
+  });
+  const paid = rows.filter((r) => r.payment === 'PAID').length;
+  const columns = [
+    ['Team (both partners)', 104, 'team'], ['Candidate', 78, 'member'], ['Email', 112, 'email'],
+    ['WhatsApp', 68, 'whatsapp'], ['University', 80, 'university'], ['Year', 34, 'year'],
+    ['Project', 76, 'project'], ['Challan', 100, 'serial'], ['PKR', 44, 'amount'], ['Payment', 60, 'payment'],
+  ];
+  const rowHeight = 34, x0 = 28;
+  function drawHeader() {
+    doc.font('Helvetica-Bold').fontSize(8).fillColor('#fff');
+    let x = x0;
+    columns.forEach(([label, width]) => {
+      doc.rect(x, doc.y, width, 25).fill('#123b52');
+      doc.fillColor('#fff').text(label, x + 4, doc.y + 7, { width: width - 8, height: 16, ellipsis: true });
+      x += width;
+    });
+    doc.y += 25;
+  }
+  doc.font('Helvetica-Bold').fontSize(17).fillColor('#123b52').text('ShipLens candidates & finance report');
+  doc.font('Helvetica').fontSize(10).fillColor('#345').text(event?.title || 'All ShipLens teams');
+  doc.fontSize(8).fillColor('#567').text(`Generated ${generatedAt.toISOString().slice(0, 16).replace('T', ' ')} UTC`);
+  doc.moveDown(0.5).font('Helvetica-Bold').fontSize(9).fillColor('#123b52')
+    .text(`Teams: ${entries.length}   Candidates: ${rows.length}   Paid: ${paid}   Remaining: ${rows.length - paid}`);
+  doc.moveDown(0.55);
+  drawHeader();
+  rows.forEach((row, index) => {
+    if (doc.y + rowHeight > doc.page.height - 28) { doc.addPage({ size: 'A4', layout: 'landscape', margin: 28 }); drawHeader(); }
+    const y = doc.y, fill = index % 2 ? '#f0f5f7' : '#ffffff';
+    let x = x0;
+    columns.forEach(([, width, key]) => {
+      doc.rect(x, y, width, rowHeight).fill(fill).stroke('#cfdae0');
+      doc.font(key === 'payment' ? 'Helvetica-Bold' : 'Helvetica').fontSize(7.2)
+        .fillColor(key === 'payment' && row.payment === 'PAID' ? '#167044' : '#263943')
+        .text(String(row[key]), x + 4, y + 5, { width: width - 8, height: rowHeight - 9, ellipsis: true, lineBreak: true });
+      x += width;
+    });
+    doc.y = y + rowHeight;
+  });
+  doc.end();
+  return done;
 }
+
 module.exports = { shiplensReportPdf };

@@ -3387,16 +3387,31 @@ app.get('/api/admin/shiplens-report.pdf', authRequired, adminRequired, asyncRout
 }));
 app.post('/api/admin/shiplens/:id/reconcile', authRequired, adminRequired, asyncRoute(async (req, res) => {
   const ev = Events.byId(req.params.id); if (!ev || ev.series_kind !== 'shiplens') return res.status(404).json({ error: 'ShipLens series not found.' });
-  let created = 0;
+  let created = 0, sent = 0;
   for (const entry of Events.entries(ev.id)) {
-    if (!entry.team_details || entry.team_details.length < 2 || entry.registration_ids?.length >= 2) continue;
-    const r = Registrations.createShipLens(ev, { ...entry, team_details: [entry.team_details[1]] });
-    r.status.shiplens_member_index = 1; r.status.shiplens_entry_id = entry.id;
-    const made = Challans.generate({ registration_id: r.id, deadline: String(ev.ends_at).slice(0, 10), generated_by: req.user.id });
-    entry.registration_ids = [entry.registration_id, r.id]; entry.challan_serials = [entry.challan_serial, made.challan.serial]; store.persist(); created++;
-    try { const pdf = await challanPdf(made.challan, `${APP_URL}/challan?s=${made.challan.serial}`); await mailer.send({ to: r.email, subject: `ShipLens individual fee challan - ${ev.title}`, text: `Your team already registered for ${ev.title}. Please pay your separate challan ${made.challan.serial} for PKR ${made.challan.net_fee} by ${made.challan.deadline} and send proof to ${FINANCE_EMAIL}. Both partners must pay before the team can submit.`, attachments: [{ filename: `ShipLens-Challan-${made.challan.serial}.pdf`, content: pdf, contentType: 'application/pdf' }] }); Challans.markSent(made.challan.serial); } catch (error) { console.error('ShipLens partner challan delivery failed:', error.message); }
+    if (!entry.team_details || entry.team_details.length < 2) continue;
+    const member = entry.team_details[1];
+    let registration = entry.registration_ids?.[1] ? Registrations.byId(entry.registration_ids[1]) : null;
+    let challan = registration?.challan_serial ? Challans.bySerial(registration.challan_serial) : null;
+    if (!registration) {
+      registration = Registrations.createShipLens(ev, { ...entry, team_details: [member] });
+      registration.status.shiplens_member_index = 1; registration.status.shiplens_entry_id = entry.id;
+      const generated = Challans.generate({ registration_id: registration.id, deadline: String(ev.ends_at).slice(0, 10), generated_by: req.user.id });
+      if (generated.error) continue;
+      challan = generated.challan;
+      entry.registration_ids = [entry.registration_id, registration.id];
+      entry.challan_serials = [entry.challan_serials?.[0] || null, challan.serial];
+      store.persist(); created++;
+    }
+    if (!challan || challan.status === 'paid' || registration.status?.partner_challan_resent_at) continue;
+    try {
+      const pdf = await challanPdf(challan, `${APP_URL}/challan?s=${challan.serial}`);
+      await mailer.send({ to: registration.email, subject: `ShipLens individual fee challan - ${ev.title}`, text: `Your team already registered for ${ev.title}. This is your own challan ${challan.serial} for PKR ${challan.net_fee}, payable by ${challan.deadline}. Please pay it and send proof to ${FINANCE_EMAIL}. Both partners must pay before your team can submit.`, attachments: [{ filename: `ShipLens-Challan-${challan.serial}.pdf`, content: pdf, contentType: 'application/pdf' }] });
+      registration.status.partner_challan_resent_at = new Date().toISOString();
+      store.persist(); Challans.markSent(challan.serial); sent++;
+    } catch (error) { console.error(`ShipLens partner challan delivery to ${registration.email} failed:`, error.message); }
   }
-  res.json({ ok: true, repaired: created });
+  res.json({ ok: true, created, sent });
 }));
 app.post('/api/admin/events', authRequired, adminRequired, (req, res) => {
   const b = req.body || {};

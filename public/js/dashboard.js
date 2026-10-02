@@ -6876,14 +6876,14 @@ function adminEventPanel(d) {
       <span style="flex:1"></span>
       <button class="btn btn-danger btn-sm" onclick="delShipLens(${ev.id})">Delete this series</button>
     </div>` : ''}
-    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}${ev.series_kind === 'shiplens' ? ` <a class="btn btn-teal btn-sm" style="float:right" href="/api/admin/shiplens-report.pdf?event_id=${ev.id}" target="_blank" rel="noopener">Download candidates &amp; finance PDF</a>` : ''}</div>
+    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}${ev.series_kind === 'shiplens' ? ` <span style="float:right;display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="shipLensResendMissing(${ev.id})">Send missing partner challans</button><a class="btn btn-teal btn-sm" href="/api/admin/shiplens-report.pdf?event_id=${ev.id}" target="_blank" rel="noopener">Download candidates &amp; finance PDF</a></span>` : ''}</div>
     <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
       ${(d.entries || []).map((e) => `
         <div class="list-row" style="padding:10px 4px">
           <div class="grow">
             <div class="t">${esc(e.name)} <span class="mono s" style="color:var(--muted)">${esc(e.reg_no || '')}</span> <span class="role-pill">${e.tier === 'open' ? 'Open site' : 'Portal'}</span></div>
             <div class="s" style="color:var(--muted)">${esc(e.email || 'no email')}${e.whatsapp ? ' &middot; WA ' + esc(e.whatsapp) : ''} &middot; ${esc((e.registered_at || '').slice(0, 16))}${e.progress && e.progress.avg != null ? ' &middot; avg ' + e.progress.avg + '%' + (e.progress.passed ? ' (passed)' : '') : ''}</div>
-            ${ev.series_kind === 'shiplens' ? `<div class="s">Challenge: ${esc((ev.problems || []).find((p) => p.pid === e.challenge_pid)?.title || 'Unknown')} · Team: ${(e.team_details || []).map((m) => `${esc(m.name)} (${esc(m.email)}, ${esc(m.whatsapp)}, ${esc(m.university)}, year ${esc(m.year)})`).join(' · ')}</div>${e.challan_serial ? `<a class="s" href="/challan?s=${encodeURIComponent(e.challan_serial)}" target="_blank" rel="noopener">Challan ${esc(e.challan_serial)}</a>` : ''}` : ''}
+            ${ev.series_kind === 'shiplens' ? `<div class="s">Challenge: ${esc((ev.problems || []).find((p) => p.pid === e.challenge_pid)?.title || 'Unknown')} · Team: ${(e.team_details || []).map((m) => `${esc(m.name)} (${esc(m.email)}, ${esc(m.whatsapp)}, ${esc(m.university)}, year ${esc(m.year)})`).join(' · ')}</div>${(e.challan_serials || [e.challan_serial]).filter(Boolean).map(serial => `<a class="s" style="margin-right:8px" href="/challan?s=${encodeURIComponent(serial)}" target="_blank" rel="noopener">Challan ${esc(serial)}</a>`).join('')}` : ''}
             ${ev.entry === 'paid' ? `<div class="s" style="margin-top:4px">Payment: <span class="pay-badge ${esc(e.payment_status)}">${{pending:'Pending verification',confirmed:'Confirmed',rejected:'Rejected',na:'Not required'}[e.payment_status] || esc(e.payment_status)}</span>
               ${e.payment_shot ? `<br><a href="${esc(e.payment_shot)}" target="_blank" rel="noopener"><img class="ev-shot" src="${esc(e.payment_shot)}" alt="payment screenshot"></a>` : ''}</div>` : ''}
           </div>
@@ -6928,6 +6928,14 @@ function wireAdminEventPanel(d) {
 async function shipLensRemind(eid, daysLeft) {
   try { const out = await api(`/api/admin/events/${eid}/remind`, { method: 'POST', body: JSON.stringify({ days_left: daysLeft }) }); toast(`Reminder sent to ${out.notified} people.`); }
   catch (e) { toast(e.message, true); }
+}
+async function shipLensResendMissing(eid) {
+  if (!confirm('Email an individual challan to each legacy team partner whose payment is still outstanding?')) return;
+  try {
+    const out = await api(`/api/admin/shiplens/${eid}/reconcile`, { method: 'POST', body: JSON.stringify({}) });
+    toast(`Sent ${out.sent} partner challan${out.sent === 1 ? '' : 's'}; created ${out.created} missing record${out.created === 1 ? '' : 's'}.`);
+    openEvent(eid);
+  } catch (e) { toast(e.message, true); }
 }
 // Admins can pull a ShipLens series at any point in its lifecycle - before,
 // during or after registration/submission/grading - no status check gates it.

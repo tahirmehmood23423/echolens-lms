@@ -3366,7 +3366,14 @@ app.get('/api/events/:id', authRequired, (req, res) => {
     board: Events.board(ev.id).slice(0, 50),
     comments: Events.comments(ev.id),
     entries: isAdmin ? Events.entries(ev.id).map((item) => {
-      const ids = item.registration_ids || [item.registration_id];
+      // Older ShipLens entries may only contain the lead registration id.
+      // Recover every member registration from its durable entry linkage so
+      // historical challans also appear in Admin and count in the KPIs.
+      const linkedIds = Registrations.all()
+        .filter((r) => Number(r.status?.shiplens_event_id) === Number(ev.id) || Number(r.status?.shiplens_entry_id) === Number(item.id))
+        .sort((a, b) => Number(a.status?.shiplens_member_index || 0) - Number(b.status?.shiplens_member_index || 0))
+        .map((r) => r.id);
+      const ids = [...new Set([...(item.registration_ids || []), item.registration_id, ...linkedIds].filter(Boolean))];
       const memberChallans = ids.map((id) => { const registration = id ? Registrations.byId(id) : null; const challan = registration?.challan_serial ? Challans.bySerial(registration.challan_serial) : null; return challan ? { serial: challan.serial, status: challan.status, net_fee: challan.net_fee } : null; });
       return { ...item, member_challans: memberChallans, paid_candidates: memberChallans.filter((c) => c?.status === 'paid').length };
     }) : undefined,
@@ -3385,7 +3392,10 @@ app.get('/api/admin/shiplens-report.pdf', authRequired, adminRequired, asyncRout
   const selected = req.query.event_id ? Events.byId(req.query.event_id) : null;
   const events = selected ? [selected] : Events.all().filter(e => e.series_kind === 'shiplens');
   const entries = events.flatMap(e => Events.entries(e.id).map(entry => ({ ...entry, challenge_title: (e.problems || []).find(p => p.pid === entry.challenge_pid)?.title || '-' })));
-  const ids = new Set(entries.flatMap(e => e.registration_ids || [e.registration_id]).filter(Boolean));
+  const ids = new Set(entries.flatMap(e => {
+    const linked = Registrations.all().filter((r) => Number(r.status?.shiplens_event_id) === Number(e.event_id) || Number(r.status?.shiplens_entry_id) === Number(e.id)).map((r) => r.id);
+    return [...(e.registration_ids || []), e.registration_id, ...linked];
+  }).filter(Boolean));
   const pdf = await shiplensReportPdf({ event: selected, entries, challans: Challans.all().filter(c => ids.has(c.registration_id)) });
   res.setHeader('Content-Type', 'application/pdf'); res.setHeader('Content-Disposition', 'attachment; filename="ShipLens-candidates-finance-report.pdf"'); res.send(pdf);
 }));

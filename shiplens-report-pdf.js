@@ -11,7 +11,7 @@ function shiplensReportPdf({ event, entries, challans, generatedAt = new Date() 
     const teamLabel = team.map((m) => m.name).filter(Boolean).join(' + ') || `Team ${entry.id}`;
     return team.map((member, index) => {
       const registrationId = entry.registration_ids?.[index] || (index === 0 ? entry.registration_id : null);
-      const challan = byReg.get(registrationId);
+      const challan = entry.member_challans ? entry.member_challans[index] : byReg.get(registrationId);
       return {
         team: teamLabel, member: member.name || '-', email: member.email || '-', whatsapp: member.whatsapp || '-',
         university: member.university || '-', year: member.year || '-', project: entry.challenge_title || '-',

@@ -591,6 +591,30 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .review-share-box .rsb-head{font-weight:700;color:var(--teal-deep);margin-bottom:8px}
 @media (max-width:640px){.modal.wide{max-width:100%}.code-editor{min-height:170px;font-size:12.5px}}
 
+/* ShipLens admin analysis page */
+.sl-page{max-width:1440px;margin:0 auto;padding:4px 2px 34px;color:var(--text)}
+.sl-page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:4px 0 22px;padding:4px 2px}
+.sl-page-head h1{font-family:var(--font-display);font-size:clamp(25px,3vw,36px);line-height:1.15;color:var(--ink);margin:8px 0 5px}
+.sl-page-head p{margin:0;color:var(--muted);font-size:13.5px}
+.sl-page-head .btn-ghost{padding-left:0}
+.sl-eyebrow{margin-top:17px;color:var(--teal-deep);font-size:10px;font-weight:800;letter-spacing:.14em}
+.sl-head-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sl-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:15px}
+.sl-kpi{min-width:0;background:var(--card);border:1px solid #e8edf4;border-radius:15px;padding:17px 19px;box-shadow:0 5px 18px rgba(20,36,70,.045)}
+.sl-kpi>span,.sl-kpi small{display:block;color:var(--muted);font-size:12px}
+.sl-kpi strong{display:block;margin:8px 0 3px;color:var(--ink);font-size:30px;letter-spacing:-.04em;line-height:1}
+.sl-kpi strong em{font-style:normal;font-size:15px;color:var(--muted);letter-spacing:0}
+.sl-kpi.paid{border-top:3px solid var(--ok)}.sl-kpi.paid strong{color:var(--ok)}
+.sl-kpi.due{border-top:3px solid var(--gold)}.sl-kpi.due strong{color:#a96b00}
+.sl-progress-card{background:var(--card);border:1px solid #e8edf4;border-radius:15px;padding:17px 19px;margin-bottom:22px;box-shadow:0 5px 18px rgba(20,36,70,.04)}
+.sl-progress-card>div:first-child,.sl-progress-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sl-progress-card>div:first-child strong{font-size:13px;color:var(--ink)}.sl-progress-card>div:first-child span,.sl-progress-foot span{font-size:12px;color:var(--muted)}
+.sl-progress{height:8px;background:#edf1f6;border-radius:20px;overflow:hidden;margin:13px 0 11px}.sl-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#16b990,#36c5ac);transition:width .25s ease}
+.sl-detail-content{min-width:0}.sl-detail-content .evd-hero{border-radius:18px;margin-bottom:16px}.sl-detail-content .pub-sec{margin:23px 0 11px}.sl-detail-content .card-body{background:#fff;border:1px solid #e8edf4;border-radius:13px;padding:8px 15px}.sl-detail-content .list-row{gap:14px;border-bottom:1px solid #eef1f5}.sl-detail-content .list-row:last-child{border-bottom:0}
+.sl-member-payments{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.sl-member-payments>span{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:6px 9px;background:#f6f8fa;border:1px solid #e9edf2;border-radius:8px;font-size:11px}.sl-member-payments b{font-size:9px;letter-spacing:.04em}.sl-member-payments b.paid{color:#167044}.sl-member-payments b.due{color:#a96b00}
+@media(max-width:900px){.sl-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.sl-page-head{align-items:flex-start;flex-direction:column}.sl-head-actions{width:100%}.sl-head-actions .btn{flex:1}.sl-kpis{gap:9px}.sl-kpi{padding:14px}.sl-kpi strong{font-size:25px}.sl-progress-foot{align-items:flex-start;flex-direction:column}.sl-detail-content .card-body{padding:6px 9px}.sl-detail-content .list-row{align-items:flex-start;flex-wrap:wrap}}
+
 /* --------------------------- v10: task workspace --------------------------- */
 .task-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
 .task-grid{display:grid;grid-template-columns:2fr 3fr;gap:20px;align-items:start}

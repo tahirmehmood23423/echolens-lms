@@ -3365,7 +3365,11 @@ app.get('/api/events/:id', authRequired, (req, res) => {
     my_progress: entry ? Events.progressFor(ev, req.user.id) : null,
     board: Events.board(ev.id).slice(0, 50),
     comments: Events.comments(ev.id),
-    entries: isAdmin ? Events.entries(ev.id) : undefined,
+    entries: isAdmin ? Events.entries(ev.id).map((item) => {
+      const ids = item.registration_ids || [item.registration_id];
+      const memberChallans = ids.map((id) => { const registration = id ? Registrations.byId(id) : null; const challan = registration?.challan_serial ? Challans.bySerial(registration.challan_serial) : null; return challan ? { serial: challan.serial, status: challan.status, net_fee: challan.net_fee } : null; });
+      return { ...item, member_challans: memberChallans, paid_candidates: memberChallans.filter((c) => c?.status === 'paid').length };
+    }) : undefined,
     submissions: isAdmin ? Events.submissionsForAdmin(ev.id) : undefined,
     is_admin: isAdmin,
   });

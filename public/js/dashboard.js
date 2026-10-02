@@ -102,7 +102,7 @@ const TITLES = {
   overview: 'Overview', courses: 'My courses', course: 'Course', schedule: 'Calendar',
   leaderboard: 'Leaderboard', announcements: 'Announcements', settings: 'Settings',
   challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'ShipLens',
-  events: 'Events', 'admin-analytics': 'Reports', 'admin-mailer': 'Email Leads',
+  events: 'Events', 'shiplens-detail': 'ShipLens team & finance', 'admin-analytics': 'Reports', 'admin-mailer': 'Email Leads',
   'admin-catalogue': 'Courses', 'admin-users': 'Users',
   assignments: 'Assignments', quizzes: 'Quizzes', progress: 'Progress',
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
@@ -126,6 +126,7 @@ async function restoreDashboard() {
     if (state.view === 'task' && Number(state.batch) > 0) { await openCourse(Number(state.batch), 'Quest'); openTask(Number(state.qid),Number(state.pid)); }
     else if (state.view === 'course' && Number(state.batch) > 0) await openCourse(Number(state.batch), state.tab);
     else if (state.view === 'job' && Number(state.id) > 0) await openJob(Number(state.id));
+    else if (state.view === 'shiplens-detail' && Number(state.id) > 0) await openEvent(Number(state.id));
     else await show(TITLES[state.view] ? state.view : (DEPT_ROLES[ME.role]?.view || 'overview'));
   } catch(e) { EL.error(document.querySelector('.view.active'),e,restoreDashboard); }
   finally { DASH_RESTORING = false; }
@@ -6724,16 +6725,48 @@ async function openEvent(id) {
         </div>`).join('')}
       </div>` : '';
 
-  openModal(ev.title, `
+  const detailMarkup = `
     ${hero}
-    ${regCard}${scheduleBox}
+    ${isAdmin && ev.series_kind === 'shiplens' ? '' : regCard}${scheduleBox}
     ${shipLensProblems}
     ${filesHtml}
     ${phaseWait}
     ${tasksSec}
     ${noProbSubmission}
     ${leaderboardSec}
-    ${isAdmin ? adminEventPanel(d) : ''}`, true);
+    ${isAdmin ? adminEventPanel(d) : ''}`;
+  if (isAdmin && ev.series_kind === 'shiplens') {
+    document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
+    $('view-shiplens-detail').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach((nav) => nav.classList.toggle('active', nav.dataset.view === 'hackathons'));
+    $('pageTitle').textContent = `${ev.title} | ShipLens`;
+    $('sidebar').classList.remove('open');
+    dashboardRoute({ view: 'shiplens-detail', id: ev.id });
+    renderEventDetail(d, detailMarkup);
+  } else {
+    openModal(ev.title, detailMarkup, true);
+    wireAdminEventPanel(d);
+  }
+}
+function renderEventDetail(d, detailMarkup = '') {
+  const ev = d.event;
+  const entries = d.entries || [];
+  const teams = entries.length;
+  const candidates = entries.reduce((sum, entry) => sum + Math.max(1, entry.team_details?.length || 0), 0);
+  const paid = entries.reduce((sum, entry) => sum + (entry.member_challans || []).filter((c) => c?.status === 'paid').length, 0);
+  const outstanding = Math.max(0, candidates - paid);
+  const pct = candidates ? Math.round(paid / candidates * 100) : 0;
+  $('view-shiplens-detail').innerHTML = `<div class="sl-page">
+    <div class="sl-page-head"><div><button class="btn btn-ghost btn-sm" onclick="show('hackathons')">Back to ShipLens series</button><div class="sl-eyebrow">ADMINISTRATION / FINANCE OVERVIEW</div><h1>${esc(ev.title)}</h1><p>${esc(ev.description || 'Review registered teams, candidate challans and submissions.')}</p></div><div class="sl-head-actions"><a class="btn btn-teal" href="/api/admin/shiplens-report.pdf?event_id=${ev.id}" target="_blank" rel="noopener">Download finance report</a></div></div>
+    <div class="sl-kpis">
+      <article class="sl-kpi"><span>Teams registered</span><strong>${teams}</strong><small>Shared project groups</small></article>
+      <article class="sl-kpi"><span>Total candidates</span><strong>${candidates}</strong><small>Individual team members</small></article>
+      <article class="sl-kpi paid"><span>Challans paid</span><strong>${paid}<em> / ${candidates}</em></strong><small>${pct}% of candidates have paid</small></article>
+      <article class="sl-kpi due"><span>Payments outstanding</span><strong>${outstanding}</strong><small>Candidate challans remaining</small></article>
+    </div>
+    <div class="sl-progress-card"><div><strong>Payment collection</strong><span>${paid} of ${candidates} candidates paid</span></div><div class="sl-progress"><i style="width:${pct}%"></i></div><div class="sl-progress-foot"><span>${pct}% collected by candidate count</span><button class="btn btn-ghost btn-sm" onclick="shipLensResendMissing(${ev.id})">Email missing partner challans</button></div></div>
+    <div class="sl-detail-content">${detailMarkup || `<div class="empty">Loading series…</div>`}</div>
+  </div>`;
   wireAdminEventPanel(d);
 }
 function eventSubmitFormHtml(ev, pid, sub) {
@@ -6876,7 +6909,7 @@ function adminEventPanel(d) {
       <span style="flex:1"></span>
       <button class="btn btn-danger btn-sm" onclick="delShipLens(${ev.id})">Delete this series</button>
     </div>` : ''}
-    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}${ev.series_kind === 'shiplens' ? ` <span style="float:right;display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="shipLensResendMissing(${ev.id})">Send missing partner challans</button><a class="btn btn-teal btn-sm" href="/api/admin/shiplens-report.pdf?event_id=${ev.id}" target="_blank" rel="noopener">Download candidates &amp; finance PDF</a></span>` : ''}</div>
+    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}${ev.series_kind === 'shiplens' ? ` <a class="btn btn-teal btn-sm" style="float:right" href="/api/admin/shiplens-report.pdf?event_id=${ev.id}" target="_blank" rel="noopener">Download candidates &amp; finance PDF</a>` : ''}</div>
     <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
       ${(d.entries || []).map((e) => `
         <div class="list-row" style="padding:10px 4px">
@@ -6884,6 +6917,7 @@ function adminEventPanel(d) {
             <div class="t">${esc(e.name)} <span class="mono s" style="color:var(--muted)">${esc(e.reg_no || '')}</span> <span class="role-pill">${e.tier === 'open' ? 'Open site' : 'Portal'}</span></div>
             <div class="s" style="color:var(--muted)">${esc(e.email || 'no email')}${e.whatsapp ? ' &middot; WA ' + esc(e.whatsapp) : ''} &middot; ${esc((e.registered_at || '').slice(0, 16))}${e.progress && e.progress.avg != null ? ' &middot; avg ' + e.progress.avg + '%' + (e.progress.passed ? ' (passed)' : '') : ''}</div>
             ${ev.series_kind === 'shiplens' ? `<div class="s">Challenge: ${esc((ev.problems || []).find((p) => p.pid === e.challenge_pid)?.title || 'Unknown')} · Team: ${(e.team_details || []).map((m) => `${esc(m.name)} (${esc(m.email)}, ${esc(m.whatsapp)}, ${esc(m.university)}, year ${esc(m.year)})`).join(' · ')}</div>${(e.challan_serials || [e.challan_serial]).filter(Boolean).map(serial => `<a class="s" style="margin-right:8px" href="/challan?s=${encodeURIComponent(serial)}" target="_blank" rel="noopener">Challan ${esc(serial)}</a>`).join('')}` : ''}
+            ${ev.series_kind === 'shiplens' ? `<div class="sl-member-payments">${(e.team_details || []).map((m, i) => { const c = e.member_challans?.[i]; return `<span><strong>${esc(m.name)}</strong> · ${esc(c?.serial || 'Challan missing')} <b class="${c?.status === 'paid' ? 'paid' : 'due'}">${c?.status === 'paid' ? 'PAID' : c ? 'UNPAID' : 'NOT ISSUED'}</b></span>`; }).join('')}</div>` : ''}
             ${ev.entry === 'paid' ? `<div class="s" style="margin-top:4px">Payment: <span class="pay-badge ${esc(e.payment_status)}">${{pending:'Pending verification',confirmed:'Confirmed',rejected:'Rejected',na:'Not required'}[e.payment_status] || esc(e.payment_status)}</span>
               ${e.payment_shot ? `<br><a href="${esc(e.payment_shot)}" target="_blank" rel="noopener"><img class="ev-shot" src="${esc(e.payment_shot)}" alt="payment screenshot"></a>` : ''}</div>` : ''}
           </div>
@@ -6944,8 +6978,7 @@ async function delShipLens(eid) {
   try {
     await api(`/api/admin/events/${eid}`, { method: 'DELETE' });
     toast('ShipLens series deleted.');
-    closeModal();
-    renderHackathons();
+    show('hackathons');
   } catch (e) { toast(e.message, true); }
 }
 async function evPay(entryId, eid, confirm) {

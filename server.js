@@ -25,6 +25,7 @@ const ai = require('./ai');
 const mailer = require('./mailer');
 const jaas = require('./jaas');
 const { challanPdf } = require('./challan-pdf');
+const { shiplensReportPdf } = require('./shiplens-report-pdf');
 const { certificatePng } = require('./cert-image');
 const { graderContext } = require('./problem-rubric');
 const { ambassadorReportPdf } = require('./ambassador-report-pdf');
@@ -3376,6 +3377,27 @@ function shipLensProjectError(problems) {
   if (project.visual_url && !/^https:\/\/[^\s]+$/i.test(String(project.visual_url))) return 'The optional visual reference must use HTTPS.';
   return null;
 }
+app.get('/api/admin/shiplens-report.pdf', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const selected = req.query.event_id ? Events.byId(req.query.event_id) : null;
+  const events = selected ? [selected] : Events.all().filter(e => e.series_kind === 'shiplens');
+  const entries = events.flatMap(e => Events.entries(e.id).map(entry => ({ ...entry, challenge_title: (e.problems || []).find(p => p.pid === entry.challenge_pid)?.title || '-' })));
+  const ids = new Set(entries.flatMap(e => e.registration_ids || [e.registration_id]).filter(Boolean));
+  const pdf = await shiplensReportPdf({ event: selected, entries, challans: Challans.all().filter(c => ids.has(c.registration_id)) });
+  res.setHeader('Content-Type', 'application/pdf'); res.setHeader('Content-Disposition', 'attachment; filename="ShipLens-candidates-finance-report.pdf"'); res.send(pdf);
+}));
+app.post('/api/admin/shiplens/:id/reconcile', authRequired, adminRequired, asyncRoute(async (req, res) => {
+  const ev = Events.byId(req.params.id); if (!ev || ev.series_kind !== 'shiplens') return res.status(404).json({ error: 'ShipLens series not found.' });
+  let created = 0;
+  for (const entry of Events.entries(ev.id)) {
+    if (!entry.team_details || entry.team_details.length < 2 || entry.registration_ids?.length >= 2) continue;
+    const r = Registrations.createShipLens(ev, { ...entry, team_details: [entry.team_details[1]] });
+    r.status.shiplens_member_index = 1; r.status.shiplens_entry_id = entry.id;
+    const made = Challans.generate({ registration_id: r.id, deadline: String(ev.ends_at).slice(0, 10), generated_by: req.user.id });
+    entry.registration_ids = [entry.registration_id, r.id]; entry.challan_serials = [entry.challan_serial, made.challan.serial]; store.persist(); created++;
+    try { const pdf = await challanPdf(made.challan, `${APP_URL}/challan?s=${made.challan.serial}`); await mailer.send({ to: r.email, subject: `ShipLens individual fee challan - ${ev.title}`, text: `Your team already registered for ${ev.title}. Please pay your separate challan ${made.challan.serial} for PKR ${made.challan.net_fee} by ${made.challan.deadline} and send proof to ${FINANCE_EMAIL}. Both partners must pay before the team can submit.`, attachments: [{ filename: `ShipLens-Challan-${made.challan.serial}.pdf`, content: pdf, contentType: 'application/pdf' }] }); Challans.markSent(made.challan.serial); } catch (error) { console.error('ShipLens partner challan delivery failed:', error.message); }
+  }
+  res.json({ ok: true, repaired: created });
+}));
 app.post('/api/admin/events', authRequired, adminRequired, (req, res) => {
   const b = req.body || {};
   if (!b.title) return res.status(400).json({ error: 'Give the event a title.' });
@@ -3472,8 +3494,7 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
     try {
       const pdf = await challanPdf(c, `${APP_URL}/challan?s=${c.serial}`);
       const challanAttachment = { filename: `ShipLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' };
-      const recipients = [...new Set([c.student_email, ...out.entry.team_details.map((member) => member.email)]
-        .map((email) => String(email || '').trim().toLowerCase()).filter(Boolean))];
+      const recipients = out.entry.team_details.map((member) => String(member.email || '').trim().toLowerCase()).filter(Boolean);
       const delivery = await deliverRegistrationMail(store, mailer, registration, {
         to: c.student_email, subject: `ShipLens fee challan - ${ev.title}`,
         text: `Your team registered for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The PKR 500 challan is attached. Pay PKR 500 by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions. You can download the challan from your ShipLens page.`,
@@ -3482,12 +3503,14 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
       if (delivery.state === 'provider_accepted') Challans.markSent(c.serial);
       // Every team member receives the same PDF. The registration delivery
       // record tracks the lead; teammate messages are individually accepted.
-      for (const recipient of recipients.filter((email) => email !== String(c.student_email || '').trim().toLowerCase())) {
+      for (let i = 0; i < recipients.length; i++) {
+        const recipient = recipients[i], memberChallan = out.challans[i] || c;
         try {
+          const memberPdf = i === 0 ? pdf : await challanPdf(memberChallan, `${APP_URL}/challan?s=${memberChallan.serial}`);
           await mailer.send({
             to: recipient, subject: `ShipLens fee challan - ${ev.title}`,
-            text: `Your teammate ${out.entry.team_details[0].name} registered your team for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The PKR 500 challan is attached. Pay PKR 500 by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions.\n\nSign in (or create an account) with this same email address to see your team's enrollment and submit your work.`,
-            attachments: [challanAttachment],
+            text: `Your team registered for ${ev.title}. This is your individual challan ${memberChallan.serial} for PKR ${memberChallan.net_fee}. Pay by ${memberChallan.deadline}, then send proof to ${FINANCE_EMAIL}. Both team members must pay before the team can submit.`,
+            attachments: [{ filename: `ShipLens-Challan-${memberChallan.serial}.pdf`, content: memberPdf, contentType: 'application/pdf' }],
           });
           console.info(`[ShipLens challan] PDF accepted for ${recipient} (${c.serial}).`);
         } catch (error) { console.error(`ShipLens challan delivery to ${recipient} failed:`, error.message); }
@@ -3499,7 +3522,7 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
     const admins = store.allData().users.filter((u) => u.role === 'admin' && u.email).map((u) => u.email);
     if (admins.length) mailer.notify(admins, `New ShipLens registration - ${ev.title}`,
       `${out.entry.team_details[0].name} (${out.entry.team_details[0].email}) registered a team for "${ev.title}".\nChallenge: ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || '-'}\nChallan ${c.serial} for PKR ${c.net_fee} has been emailed to the team lead; Finance confirms it once paid.`);
-    return res.json({ ok: true, entry: out.entry, challan: { serial: c.serial, net_fee: c.net_fee, deadline: c.deadline } });
+    return res.json({ ok: true, entry: out.entry, challans: out.challans.map((x) => ({ serial: x.serial, net_fee: x.net_fee, deadline: x.deadline })) });
   }
   // Every event / hackathon / competition / webinar registration is reported
   // to the Admissions Office, and the participant gets a confirmation email.

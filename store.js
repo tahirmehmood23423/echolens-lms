@@ -3431,11 +3431,15 @@ const Events = {
     };
     data.event_entries.push(e); save();
     if (isShipLens) {
-      const registration = Registrations.createShipLens(ev, e);
-      e.registration_id = registration.id;
-      const challan = Challans.generate({ registration_id: registration.id, deadline: String(ev.ends_at).slice(0, 10), generated_by: user.id });
-      if (challan.error) return { error: challan.error };
-      return { entry: e, challan: challan.challan, receipt_token: registration.status.receipt_token };
+      const registrations = e.team_details.map((member, index) => {
+        const r = Registrations.createShipLens(ev, { ...e, team_details: [member] });
+        r.status.shiplens_member_index = index; r.status.shiplens_entry_id = e.id; save(); return r;
+      });
+      const generated = registrations.map(r => Challans.generate({ registration_id: r.id, deadline: String(ev.ends_at).slice(0, 10), generated_by: user.id }));
+      if (generated.some(x => x.error)) return { error: 'Could not generate the team challans.' };
+      const challans = generated.map(x => x.challan);
+      e.registration_id = registrations[0].id; e.registration_ids = registrations.map(r => r.id); e.challan_serials = challans.map(c => c.serial); save();
+      return { entry: e, registrations, challans, challan: challans[0], receipt_token: registrations[0].status.receipt_token };
     }
     return { entry: e };
   },
@@ -3463,7 +3467,8 @@ const Events = {
     const user = Users.byId(uid);
     const e = user ? Events.entryForUser(ev, user) : Events.entryFor(ev.id, uid);
     if (!e) return { ok: false, why: 'Register for this event first.' };
-    if (ev.entry === 'paid' && e.payment_status !== 'confirmed') {
+    const teamPaid = ev.series_kind === 'shiplens' && e.registration_ids?.length ? e.registration_ids.every(id => Registrations.byId(id)?.payment_stage === 'enrolled') : e.payment_status === 'confirmed';
+    if (ev.entry === 'paid' && !teamPaid) {
       return { ok: false, why: e.payment_status === 'rejected' ? 'Your payment could not be verified - contact Finance.' : ev.series_kind === 'shiplens' ? 'Your challan is ready. Pay it and send proof to Finance; your challenge unlocks after Finance confirms.' : 'Your payment is being verified by the admin.' };
     }
     return { ok: true, entry: e };

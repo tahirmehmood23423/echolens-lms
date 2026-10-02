@@ -6876,7 +6876,7 @@ function adminEventPanel(d) {
       <span style="flex:1"></span>
       <button class="btn btn-danger btn-sm" onclick="delShipLens(${ev.id})">Delete this series</button>
     </div>` : ''}
-    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}</div>
+    <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}${ev.series_kind === 'shiplens' ? ` <a class="btn btn-teal btn-sm" style="float:right" href="/api/admin/shiplens-report.pdf?event_id=${ev.id}" target="_blank" rel="noopener">Download candidates &amp; finance PDF</a>` : ''}</div>
     <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
       ${(d.entries || []).map((e) => `
         <div class="list-row" style="padding:10px 4px">

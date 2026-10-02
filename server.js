@@ -3512,26 +3512,24 @@ app.post('/api/events/:id/register', authRequired, upload.single('file'), asyncR
     const registration = Registrations.byId(out.entry.registration_id);
     try {
       const pdf = await challanPdf(c, `${APP_URL}/challan?s=${c.serial}`);
-      const challanAttachment = { filename: `ShipLens-Challan-${c.serial}.pdf`, content: pdf, contentType: 'application/pdf' };
       const recipients = out.entry.team_details.map((member) => String(member.email || '').trim().toLowerCase()).filter(Boolean);
-      const delivery = await deliverRegistrationMail(store, mailer, registration, {
-        to: c.student_email, subject: `ShipLens fee challan - ${ev.title}`,
-        text: `Your team registered for ${ev.title}. Your selected project is ${(ev.problems || []).find((p) => p.pid === out.entry.challenge_pid)?.title || 'ShipLens'}. The PKR 500 challan is attached. Pay PKR 500 by ${c.deadline}, then send payment proof to ${FINANCE_EMAIL}. Finance will confirm your payment and unlock submissions. You can download the challan from your ShipLens page.`,
-        attachments: [challanAttachment],
-      }, { kind: 'challan', reference: c.serial });
-      if (delivery.state === 'provider_accepted') Challans.markSent(c.serial);
-      // Every team member receives the same PDF. The registration delivery
-      // record tracks the lead; teammate messages are individually accepted.
+      // Every member receives an individual PDF and serial. The lead uses the
+      // delivery helper so retries are idempotent; the teammate is independent.
       for (let i = 0; i < recipients.length; i++) {
         const recipient = recipients[i], memberChallan = out.challans[i] || c;
         try {
           const memberPdf = i === 0 ? pdf : await challanPdf(memberChallan, `${APP_URL}/challan?s=${memberChallan.serial}`);
-          await mailer.send({
+          const memberRegistration = out.registrations?.[i] || (i === 0 ? registration : Registrations.byId(memberChallan.registration_id));
+          const message = {
             to: recipient, subject: `ShipLens fee challan - ${ev.title}`,
             text: `Your team registered for ${ev.title}. This is your individual challan ${memberChallan.serial} for PKR ${memberChallan.net_fee}. Pay by ${memberChallan.deadline}, then send proof to ${FINANCE_EMAIL}. Both team members must pay before the team can submit.`,
             attachments: [{ filename: `ShipLens-Challan-${memberChallan.serial}.pdf`, content: memberPdf, contentType: 'application/pdf' }],
-          });
-          console.info(`[ShipLens challan] PDF accepted for ${recipient} (${c.serial}).`);
+          };
+          const sent = i === 0
+            ? await deliverRegistrationMail(store, mailer, memberRegistration, message, { kind: 'challan', reference: memberChallan.serial })
+            : await mailer.send(message);
+          if (sent?.state === 'provider_accepted' || sent?.sent) Challans.markSent(memberChallan.serial);
+          console.info(`[ShipLens challan] PDF accepted for ${recipient} (${memberChallan.serial}).`);
         } catch (error) { console.error(`ShipLens challan delivery to ${recipient} failed:`, error.message); }
       }
     } catch (error) { console.error('ShipLens challan delivery failed:', error.message); }
@@ -4130,7 +4128,16 @@ app.post('/api/public/register-interest', limitLead, asyncRoute(async (req, res)
   await deliverRegistrationMail(store, mailer, r, { to: r.email, subject: 'EchoLens - registration received', text: 'Your registration for ' + r.course_title + ' is saved. Keep this private receipt to check your next step: ' + APP_URL + '/registration-status#' + Registrations.receiptToken(r) }, { kind: 'confirmation', reference: String(r.id) });
   res.json({ ok: true, reference: `EL-R-${r.id}`, receipt_url: `/registration-status#${Registrations.receiptToken(r)}`, message: 'Registration saved. Keep your private receipt link to check the next step.' });
 }));
-app.get('/api/admin/registrations', authRequired, staffView, (req, res) => res.json({ registrations: Registrations.all(), pending: Registrations.pendingCount() }));
+app.get('/api/admin/registrations', authRequired, staffView, (req, res) => {
+  // Keep the Admin view in sync with Finance: challan status is the source of
+  // truth for payment verification and must travel with every registration.
+  const registrations = Registrations.all().map((r) => ({
+    ...r,
+    challans: Challans.forRegistration(r.id),
+    challan: r.challan_serial ? Challans.bySerial(r.challan_serial) : null,
+  }));
+  res.json({ registrations, pending: Registrations.pendingCount() });
+});
 app.get('/registration-status', (req, res) => res.sendFile(path.join(__dirname, 'public', 'registration-status.html')));
 app.post('/api/public/registration-status', limitLead, (req, res) => {
   const r = Registrations.byReceipt(req.body?.token);

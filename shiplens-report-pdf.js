@@ -29,13 +29,17 @@ function shiplensReportPdf({ event, entries, challans, generatedAt = new Date() 
   const rowHeight = 34, x0 = 28;
   function drawHeader() {
     doc.font('Helvetica-Bold').fontSize(8).fillColor('#fff');
+    // Keep one fixed baseline for every cell. Using doc.y while drawing each
+    // cell makes PDFKit advance the cursor after every label, creating the
+    // diagonal/stair-step header seen in the exported report.
+    const y = doc.y;
     let x = x0;
     columns.forEach(([label, width]) => {
-      doc.rect(x, doc.y, width, 25).fill('#123b52');
-      doc.fillColor('#fff').text(label, x + 4, doc.y + 7, { width: width - 8, height: 16, ellipsis: true });
+      doc.rect(x, y, width, 25).fill('#123b52');
+      doc.fillColor('#fff').text(label, x + 4, y + 7, { width: width - 8, height: 16, ellipsis: true });
       x += width;
     });
-    doc.y += 25;
+    doc.y = y + 25;
   }
   doc.font('Helvetica-Bold').fontSize(17).fillColor('#123b52').text('ShipLens candidates & finance report');
   doc.font('Helvetica').fontSize(10).fillColor('#345').text(event?.title || 'All ShipLens teams');

@@ -15,7 +15,7 @@ store.persist();
 const sent = [];
 const mailer = require('../../mailer');
 mailer.configured = true;
-mailer.send = async () => ({ sent: true });
+mailer.send = async (message) => { sent.push(message); return { sent: true }; };
 mailer.notify = async (to, subject, text) => { sent.push({ to: Array.isArray(to) ? to.join(',') : to, subject, text }); return { sent: [] }; };
 
 // The failure switch: when armed, the durability gate reports the write never

@@ -61,4 +61,26 @@ test('a signup whose write fails sends no credentials and reports the failure', 
   assert.equal(recovered.status, 200);
   const afterHeal = await ask('mail');
   assert.equal(afterHeal.sent.filter(m => m.to === 'recovered@gmail.com' && /your password/i.test(m.subject)).length, 1);
+
+  const resetRequest = await post('/api/auth/forgot-password', { email: 'RECOVERED@gmail.com' });
+  assert.equal(resetRequest.status, 200);
+  const resetBody = await resetRequest.json();
+  assert.equal(resetBody.token, undefined);
+  assert.equal(resetBody.dev_link, undefined);
+  const mailbox = await ask('mail');
+  const pinMail = mailbox.sent.find(m => /recovery PIN/.test(m.subject));
+  const pin = pinMail.text.match(/\b(\d{6})\b/)[1];
+  assert.equal((await post('/api/auth/reset-password', { token: pin, password: 'NewPassword123!' })).status, 400);
+  assert.equal((await post('/api/auth/verify-reset-pin', { email: 'recovered@gmail.com', pin: 'wrong' })).status, 400);
+  const verified = await post('/api/auth/verify-reset-pin', { email: 'recovered@gmail.com', pin });
+  assert.equal(verified.status, 200);
+  const { token } = await verified.json();
+  assert.equal((await post('/api/auth/reset-password', { token, password: 'short' })).status, 400);
+  const reset = await post('/api/auth/reset-password', { token, password: 'NewPassword123!' });
+  assert.equal(reset.status, 200);
+  assert.equal((await post('/api/auth/reset-password', { token, password: 'AnotherPassword!' })).status, 400);
+  assert.equal((await post('/api/auth/login', { login: 'recovered@gmail.com', password: 'NewPassword123!' })).status, 200);
+  const credentials = afterHeal.sent.find(m => m.to === 'recovered@gmail.com' && /your password/i.test(m.subject));
+  const oldPassword = credentials.text.match(/Password: (\S+)/)[1];
+  assert.equal((await post('/api/auth/login', { login: 'recovered@gmail.com', password: oldPassword })).status, 401);
 });

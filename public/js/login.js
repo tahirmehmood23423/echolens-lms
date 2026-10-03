@@ -34,12 +34,61 @@ function toggleForgot() {
   $('forgotLink').textContent = open ? 'Back to sign in' : 'Forgot your password?';
   if (open) $('forgotForm').querySelector('input[name="email"]').focus();
 }
+let recoveryEmail = '', recoveryToken = '';
 $('forgotForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target; const btn = $('forgotSubmit'); btn.disabled = true; msg('');
   try {
     const out = await api('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email: f.email.value.trim(),returnTo:destination('free') }) });
-    msg(out.dev_link ? `${out.message} ${out.dev_link}` : out.message, true);
+    recoveryEmail = f.email.value.trim();
+    recoveryToken = '';
+    $('pinForm').hidden = false;
+    $('pinForm').reset();
+    $('recoveryPasswordForm').hidden = true;
+    btn.textContent = 'Resend PIN';
+    msg(out.message, true);
+    $('pinForm').elements.pin.focus();
   } catch (err) { msg(err.message); }
+  btn.disabled = false;
+});
+
+$('forgotForm').elements.email.addEventListener('input', () => {
+  recoveryToken = ''; recoveryEmail = '';
+  $('pinForm').hidden = true;
+  $('recoveryPasswordForm').hidden = true;
+});
+$('pinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('pinSubmit'); btn.disabled = true; msg('');
+  try {
+    const out = await api('/api/auth/verify-reset-pin', { method: 'POST', body: JSON.stringify({ email: recoveryEmail, pin: e.target.elements.pin.value }) });
+    recoveryToken = out.token;
+    $('pinForm').hidden = true;
+    $('forgotForm').hidden = true;
+    $('recoveryPasswordForm').hidden = false;
+    $('recoveryPasswordForm').elements.password.focus();
+    msg('Email verified. Choose your new password.', true);
+  } catch (err) { msg(err.message); }
+  btn.disabled = false;
+});
+$('recoveryPasswordForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, btn = $('recoverySubmit');
+  if (f.elements.password.value !== f.elements.confirm.value) return msg('Passwords do not match.');
+  btn.disabled = true; msg('');
+  try {
+    await api('/api/auth/reset-password', { method: 'POST', body: JSON.stringify({ token: recoveryToken, password: f.elements.password.value }) });
+    recoveryToken = ''; f.reset();
+    $('forgotBox').style.display = 'none';
+    $('forgotLink').textContent = 'Forgot your password?';
+    $('forgotForm').hidden = false; f.hidden = true;
+    $('loginForm').elements.login.value = recoveryEmail;
+    $('loginForm').elements.password.value = '';
+    $('loginForm').elements.password.focus();
+    msg('Password changed. Sign in with your new password.', true);
+  } catch (err) {
+    msg(err.message);
+    $('forgotForm').hidden = false;
+  }
   btn.disabled = false;
 });

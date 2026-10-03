@@ -505,52 +505,54 @@ app.get('/api/auth/me', authRequired, (req, res) => {
   });
 });
 
-/* v18: self-service password reset for open (free) accounts - portal
- * students/staff still go through the admin (see login.html), on purpose:
- * paid-course accounts stay admin-supervised. Tokens are one-time, 30-minute,
- * in-memory - the same lightweight pattern as EMAIL_CODES below. */
-const RESET_TOKENS = new Map(); // token -> { userId, expires }
-function pruneResetTokens() { const t = Date.now(); for (const [k, v] of RESET_TOKENS) if (v.expires < t) RESET_TOKENS.delete(k); }
+// Free-account recovery requires inbox verification before a reset grant is issued.
+const recovery = require('./password-recovery')();
+const limitResetVerify = rateLimit('reset-verify', { max: 20, windowMs: 15 * 60000 });
 app.post('/api/auth/forgot-password', limitEmailSend, async (req, res) => {
-  const { email } = req.body || {};
+  const email = String(req.body?.email || '').trim().toLowerCase();
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
-  pruneResetTokens();
-  // One reply for every outcome so this endpoint can't be used to probe which
-  // emails have accounts. Self-service covers free open-website accounts only;
-  // LMS portal passwords are reset by the academy - and the message says so
-  // instead of pretending an email went out.
-  const genericMsg = 'If that email has a free EchoLens account, a reset link is on its way - check your inbox and spam folder. LMS portal passwords are reset by the academy: WhatsApp 0314 1479109 or info@echolens.digital.';
-  const u = Users.allByLogin(String(email).trim()).find((x) => x.role === 'free') || null;
-  if (!u) return res.json({ ok: true, message: genericMsg });
-  const token = crypto.randomBytes(24).toString('hex');
-  RESET_TOKENS.set(token, { userId: u.id, expires: Date.now() + 30 * 60000, return_to:safeReturnPath(req.body.returnTo,APP_URL,'/open#free') });
-  const link = `${APP_URL}/reset-password?token=${token}`;
-  if (mailer.configured) {
-    mailer.notify(u.email, 'Reset your EchoLens password',
-      `${hi(u.name)},\n\nReset your password here (this link expires in 30 minutes):\n${link}\n\nIf you didn't ask for this, you can ignore this email - your password is unchanged.`);
-    return res.json({ ok: true, message: genericMsg });
+  if (!mailer.configured) return res.status(503).json({ error: 'Email recovery is temporarily unavailable. Please try again later.' });
+  const message = 'If that email has a free EchoLens account, a verification PIN is on its way. Check your inbox and spam folder. The PIN expires in 10 minutes.';
+  const u = Users.allByLogin(email).find(x => x.role === 'free' && String(x.email).toLowerCase() === email);
+  if (u) {
+    const pin = recovery.issue(email, u.id, safeReturnPath(req.body.returnTo, APP_URL, '/open#free'));
+    if (pin) {
+      try {
+        const result = await mailer.send({ to: u.email, subject: 'Your EchoLens password recovery PIN',
+          text: `${hi(u.name)},\n\nYour password recovery verification PIN is: ${pin}\n\nEnter it on the sign-in page to verify your email, then choose a new password. This PIN expires in 10 minutes. Do not share it.\n\nIf you did not request this, ignore this email. Your password is unchanged.` });
+        if (!result?.sent) recovery.cancel(email);
+      } catch (err) {
+        recovery.cancel(email);
+        console.error('Password recovery email failed:', err.message);
+      }
+    }
   }
-  // No SMTP on this server. In development, hand the link back so the flow is
-  // testable; in production NEVER leak it - returning it would let anyone
-  // take over any free account - just log the gap loudly for the operator.
-  if (isProd) {
-    console.error(`forgot-password: SMTP is not configured - reset email NOT sent for user #${u.id}. Set SMTP_HOST/SMTP_USER/SMTP_PASS.`);
-    return res.json({ ok: true, message: genericMsg });
-  }
-  res.json({ ok: true, message: 'Email is not configured on this server - use this link directly:', dev_link: link });
+  res.json({ ok: true, message });
 });
-app.post('/api/auth/reset-password', (req, res) => {
+app.post('/api/auth/verify-reset-pin', limitResetVerify, (req, res) => {
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  const token = recovery.verify(email, String(req.body?.pin || '').trim());
+  if (!token) return res.status(400).json({ error: 'Invalid or expired PIN. After five incorrect attempts, request a new PIN.' });
+  res.json({ ok: true, token });
+});
+app.post('/api/auth/reset-password', limitResetVerify, async (req, res) => {
   const { token, password } = req.body || {};
-  pruneResetTokens();
-  const rec = token && RESET_TOKENS.get(String(token));
-  if (!rec) return res.status(400).json({ error: 'This reset link is invalid or has expired - request a new one.' });
-  if (!password || String(password).length < 8) return res.status(400).json({ error: 'Choose a password of at least 8 characters.' });
+  const rec = recovery.get(String(token || ''));
+  if (!rec) return res.status(400).json({ error: 'Your verification has expired or was already used. Request a new PIN.' });
+  if (typeof password !== 'string' || password.length < 8 || Buffer.byteLength(password, 'utf8') > 72) return res.status(400).json({ error: 'Choose a password of at least 8 characters and at most 72 UTF-8 bytes.' });
   const u = Users.byId(rec.userId);
-  if (!u) return res.status(404).json({ error: 'Account not found.' });
-  Users.setPassword(u.id, String(password));
-  RESET_TOKENS.delete(String(token));
-  setAuthCookie(res, sign(u));
-  res.json({ ok: true, role: u.role, return_to:rec.return_to||'/open#free' });
+  if (!u || u.role !== 'free') return res.status(400).json({ error: 'This account cannot be reset here.' });
+  recovery.consume(String(token));
+  const previousHash = u.password_hash;
+  try {
+    Users.setPassword(u.id, password);
+    await store.pendingPersist();
+  } catch (err) {
+    u.password_hash = previousHash;
+    return res.status(503).json({ error: 'Your password could not be saved. Request a new PIN and try again.' });
+  }
+  res.clearCookie(COOKIE);
+  res.json({ ok: true });
 });
 
 /* ---------------------------------- me ---------------------------------- */
@@ -3971,26 +3973,9 @@ async function emailDomainExists(email) {
   }
 }
 const EMAIL_CODES = new Map(); // email -> { code, expires, tries }
-/**
- * TEMPORARY: Zoho's transactional mailbox hit its daily send limit on
- * 2026-09-14 (resets ~24h later). Until it resets, a verification code or
- * welcome email sent through it never arrives - which was silently blocking
- * every open-course signup behind a code field nobody could ever fill in.
- *
- * While this is active, open signup behaves exactly like the existing
- * "no SMTP configured" path below: no code is requested, no mail is
- * attempted, and the generated password is returned in the API response
- * once so the student can still sign in later.
- *
- *   SIGNUP_MAIL_DOWN=false   turn it off immediately (Zoho has recovered)
- *   SIGNUP_MAIL_DOWN=true    force it on, ignoring the auto window
- *   unset                    auto: on for 24h from this process starting
- */
-const SIGNUP_MAIL_DOWN_OVERRIDE = process.env.SIGNUP_MAIL_DOWN;
-const SIGNUP_MAIL_DOWN_AUTO_UNTIL = Date.now() + 24 * 3600_000;
+// Operators can explicitly pause signup email during a provider outage.
 function signupMailDown() {
-  if (SIGNUP_MAIL_DOWN_OVERRIDE != null) return SIGNUP_MAIL_DOWN_OVERRIDE.toLowerCase() === 'true';
-  return Date.now() < SIGNUP_MAIL_DOWN_AUTO_UNTIL;
+  return String(process.env.SIGNUP_MAIL_DOWN || 'false').toLowerCase() === 'true';
 }
 app.post('/api/auth/email-code', limitEmailSend, async (req, res) => {
   const { email } = req.body || {};

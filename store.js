@@ -3241,21 +3241,20 @@ const Events = {
   // closes (ev.ends_at): the task opens the next day, submissions are open
   // for two weeks after that, and results are due two weeks after submissions
   // close. Pushing back the registration deadline automatically pushes every
-  // later date with it. The only stored override is an admin-extended
-  // submission deadline, which can only ever lengthen the two-week window.
+  // later date with it. The only stored override is an admin-set submission
+  // deadline, used exactly as chosen.
   shipLensSchedule(ev) {
     const regCloses = ev.ends_at || null;
     const taskOpensAt = addDaysToDateTime(regCloses, 1);
-    const defaultDeadline = addDaysToDateTime(taskOpensAt, 14);
-    const extended = ev.shiplens_submission_deadline || null;
-    const submissionDeadline = extended && defaultDeadline && extended > defaultDeadline ? extended : defaultDeadline;
+    const submissionDeadline = ev.shiplens_submission_deadline || addDaysToDateTime(taskOpensAt, 14);
     const resultsDueAt = addDaysToDateTime(submissionDeadline, 14);
     return { reg_opens: ev.starts_at || null, reg_closes: regCloses, task_opens_at: taskOpensAt, submission_deadline: submissionDeadline, results_due_at: resultsDueAt };
   },
-  // Admin pushes back a ShipLens deadline. 'registration' moves ends_at, so
-  // the task release (and everything after it) follows the new date; it is
+  // Admin sets a ShipLens deadline to an exact date - later or earlier, so a
+  // mistaken extension can be undone. 'registration' moves ends_at, so the
+  // task release (and everything after it) follows the new date; it is
   // refused once the brief has been released, since that would re-hide it.
-  // 'submission' only lengthens the submission window (results move with it).
+  // 'submission' sets the submission close exactly (results move with it).
   extendShipLens(id, { target, until }) {
     const ev = Events.byId(id);
     if (!ev || ev.series_kind !== 'shiplens') return { error: 'ShipLens series not found.' };
@@ -3265,15 +3264,17 @@ const Events = {
     const phase = Events.shipLensPhase(ev);
     if (target === 'registration') {
       if (!['upcoming', 'registration', 'pending'].includes(phase)) return { error: 'The task has already been released - extend the submission deadline instead.' };
-      if (s.reg_closes && at <= String(s.reg_closes).slice(0, 16)) return { error: 'The new registration deadline must be later than the current one.' };
       if (ev.starts_at && at <= String(ev.starts_at).slice(0, 16)) return { error: 'Registration must close after it opens.' };
       ev.ends_at = at;
+      // A new registration close re-derives every later date, so an old
+      // submission override must not linger from the previous plan.
+      ev.shiplens_submission_deadline = null;
       // Unpaid challans are payable until registration closes - keep their
       // pay-by date in step so fee reminders quote the extended date.
       const regIds = new Set(data.registrations.filter((r) => Number(r.status?.shiplens_event_id) === ev.id).map((r) => r.id));
       for (const ch of data.challans) if (regIds.has(Number(ch.registration_id)) && ch.status !== 'paid') ch.deadline = at.slice(0, 10);
     } else if (target === 'submission') {
-      if (s.submission_deadline && at <= String(s.submission_deadline).slice(0, 16)) return { error: 'The new submission deadline must be later than the current one.' };
+      if (s.task_opens_at && at <= String(s.task_opens_at).slice(0, 16)) return { error: `The submission deadline must be after the task opens (${String(s.task_opens_at).replace('T', ' ')}).` };
       ev.shiplens_submission_deadline = at;
     } else return { error: 'Choose which deadline to extend.' };
     save();

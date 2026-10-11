@@ -27,9 +27,15 @@ test('extending registration moves the task release and every later date', () =>
   assert.equal(Events.shipLensPhase(Events.byId(ev.id)), 'registration');
 });
 
-test('registration extension must be later and is refused once the task is released', () => {
+test('a registration deadline can be moved back to undo an extension, and is refused once the task is released', () => {
   const ev = series('2099-01-01T10:00');
-  assert.match(Events.extendShipLens(ev.id, { target: 'registration', until: '2098-12-01T10:00' }).error, /later/);
+  Events.extendShipLens(ev.id, { target: 'submission', until: '2099-03-01T00:00' });
+  Events.extendShipLens(ev.id, { target: 'registration', until: '2099-01-15T10:00' });
+  const back = Events.extendShipLens(ev.id, { target: 'registration', until: '2098-12-20T10:00' });
+  assert.equal(back.error, undefined);
+  assert.equal(back.schedule.reg_closes, '2098-12-20T10:00');
+  assert.equal(back.schedule.submission_deadline, Events.shipLensSchedule({ ends_at: '2098-12-20T10:00' }).submission_deadline,
+    'an old submission override is cleared so dates re-derive from registration');
   const released = series('2026-01-02T00:00'); // task window long over
   assert.match(Events.extendShipLens(released.id, { target: 'registration', until: '2099-01-01T00:00' }).error, /already been released/);
 });
@@ -42,7 +48,9 @@ test('extending submission reopens the window without moving the task release', 
   assert.equal(out.schedule.task_opens_at, before.task_opens_at);
   assert.equal(out.schedule.submission_deadline, '2099-02-01T00:00');
   assert.equal(Events.shipLensPhase(Events.byId(ev.id)), 'submission');
-  assert.match(Events.extendShipLens(ev.id, { target: 'submission', until: '2099-01-01T00:00' }).error, /later/);
+  const earlier = Events.extendShipLens(ev.id, { target: 'submission', until: '2099-01-10T00:00' });
+  assert.equal(earlier.schedule.submission_deadline, '2099-01-10T00:00', 'the exact chosen date, even if earlier');
+  assert.match(Events.extendShipLens(ev.id, { target: 'submission', until: '2025-01-01T00:00' }).error, /after the task opens/);
 });
 
 test('rejects bad input and non-ShipLens events', () => {

@@ -3519,12 +3519,19 @@ app.post('/api/admin/shiplens/:id/payment-notice', authRequired, adminRequired, 
     .filter((x) => { const k = String(x.member.email).trim().toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   const link = `${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`;
   const schedule = `Registration closes: ${fmt(s.reg_closes)}\nTask opens: ${fmt(s.task_opens_at)}\nSubmit by: ${fmt(s.submission_deadline)}\nResults by: ${fmt(s.results_due_at)}`;
+  // Preview: tell the admin the exact date and audience before anything is sent.
+  if ((req.body || {}).preview) {
+    return res.json({ ok: true, preview: true, recipients: targets.length,
+      deadline_label: action === 'fee' ? 'Pay by' : regStage ? 'Registration closes' : 'Submit by',
+      deadline: action === 'fee' ? fmt(s.reg_closes) : fmt(regStage ? s.reg_closes : s.submission_deadline),
+      task_opens_at: fmt(s.task_opens_at), submission_deadline: fmt(s.submission_deadline) });
+  }
   // Sequential and off the request path, so a large series does not hold the response.
   (async () => {
     for (const { member, challan } of targets) {
       if (action === 'fee') {
         await mailer.notify(member.email, `Fee reminder - ${ev.title}`,
-          `Hi ${member.name || 'there'},\n\nYou are registered for ${ev.title}, but your entry fee is still unpaid.\n\nChallan: ${challan.serial}\nAmount: PKR ${challan.net_fee}\nPay by: ${challan.deadline || fmt(s.reg_closes).slice(0, 10)}\n\nView or download your challan: ${APP_URL}/challan?s=${encodeURIComponent(challan.serial)}\n\nAfter paying, send the proof to ${FINANCE_EMAIL}. Both partners must pay before your team can submit.\n\n${schedule}\n\n${link}`);
+          `Hi ${member.name || 'there'},\n\nYou are registered for ${ev.title}, but your entry fee is still unpaid.\n\nChallan: ${challan.serial}\nAmount: PKR ${challan.net_fee}\nPay by: ${fmt(s.reg_closes)}\n\nView or download your challan: ${APP_URL}/challan?s=${encodeURIComponent(challan.serial)}\n\nAfter paying, send the proof to ${FINANCE_EMAIL}. Both partners must pay before your team can submit.\n\n${schedule}\n\n${link}`);
       } else {
         await mailer.notify(member.email, `Deadline extended - ${ev.title}`,
           `Hi ${member.name || 'there'},\n\nThanks - your fee for ${ev.title} is confirmed. The ${regStage ? 'registration deadline has been extended to ' + fmt(s.reg_closes) + ', so your project brief will now be shared on ' + fmt(s.task_opens_at) : 'submission deadline has been extended to ' + fmt(s.submission_deadline)}.\n\nUpdated schedule:\n${schedule}\n\n${link}`);

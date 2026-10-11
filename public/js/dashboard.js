@@ -6902,13 +6902,13 @@ function adminEventPanel(d) {
     ${ev.series_kind === 'shiplens' ? `
     <div class="pub-sec">Schedule</div>
     <div class="s" style="color:var(--muted);margin-bottom:10px">Registration closes ${esc(String(ev.shiplens_schedule?.reg_closes || '').replace('T', ' '))} &middot; Task opens ${esc(String(ev.shiplens_schedule?.task_opens_at || '').replace('T', ' '))} &middot; Submit by ${esc(String(ev.shiplens_schedule?.submission_deadline || '').replace('T', ' '))} &middot; Results by ${esc(String(ev.shiplens_schedule?.results_due_at || '').replace('T', ' '))} &middot; Phase: <strong>${esc(ev.shiplens_phase || '')}</strong></div>
-    <div class="pub-sec">Extend deadline</div>
+    <div class="pub-sec">Change deadline</div>
     <form id="slExtend" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px">
       <label class="field" style="margin:0"><span>Deadline</span><select name="target">
         ${['upcoming', 'registration', 'pending'].includes(ev.shiplens_phase) ? '<option value="registration">Registration (task release moves with it)</option>' : ''}
         <option value="submission">Submission</option></select></label>
       <label class="field" style="margin:0"><span>New date &amp; time</span><input name="until" type="datetime-local" required></label>
-      <button class="btn btn-teal btn-sm">Extend &amp; notify teams</button>
+      <button class="btn btn-teal btn-sm">Set date &amp; notify teams</button>
     </form>
     <div class="pub-sec">Payment reminders</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
@@ -6974,8 +6974,8 @@ function wireAdminEventPanel(d) {
       e.preventDefault(); const btn = ext.querySelector('button');
       const target = ext.target.value; const until = ext.until.value;
       if (!confirm(target === 'registration'
-        ? `Extend registration to ${until.replace('T', ' ')}? The task will be shared the day after, and the submission and results dates move with it.`
-        : `Extend the submission deadline to ${until.replace('T', ' ')}?`)) return;
+        ? `Set the registration deadline to ${until.replace('T', ' ')}?\n\nThe task will be shared the day after, and the submission and results dates are recalculated from it. Every registered team member will be emailed this date.`
+        : `Set the submission deadline to ${until.replace('T', ' ')}?\n\nEvery registered team member will be emailed this date.`)) return;
       btn.disabled = true;
       try {
         const out = await api(`/api/admin/events/${d.event.id}/extend`, { method: 'POST', body: JSON.stringify({ target, until }) });
@@ -6995,10 +6995,13 @@ async function shipLensRemind(eid, daysLeft) {
   catch (e) { toast(e.message, true); }
 }
 async function shipLensPaymentNotice(eid, action) {
-  if (!confirm(action === 'fee'
-    ? 'Email a fee reminder with their own challan to every registered member who has not paid yet?'
-    : 'Email every member who has paid the current deadline (set it first with Extend deadline above)? The date is not changed.')) return;
   try {
+    // Ask the server first so the dialog shows the exact date that will be mailed.
+    const p = await api(`/api/admin/shiplens/${eid}/payment-notice`, { method: 'POST', body: JSON.stringify({ action, preview: true }) });
+    if (!p.recipients) return toast(action === 'fee' ? 'No unpaid members to remind.' : 'No paid members to notify.', true);
+    if (!confirm(`${action === 'fee' ? 'Fee reminder' : 'Deadline email'} to ${p.recipients} ${action === 'fee' ? 'unpaid' : 'paid'} member${p.recipients === 1 ? '' : 's'}.\n\n`
+      + `${p.deadline_label}: ${p.deadline}\nTask opens: ${p.task_opens_at}\nSubmit by: ${p.submission_deadline}\n\n`
+      + 'If this date is wrong, cancel and change it with Change deadline first. Send now?')) return;
     const out = await api(`/api/admin/shiplens/${eid}/payment-notice`, { method: 'POST', body: JSON.stringify({ action }) });
     toast(action === 'fee' ? `Fee reminder sent to ${out.notified} unpaid member${out.notified === 1 ? '' : 's'}.`
       : `Deadline ${String(out.deadline || '').replace('T', ' ')} emailed to ${out.notified} paid member${out.notified === 1 ? '' : 's'}.`);

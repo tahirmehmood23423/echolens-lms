@@ -72,7 +72,7 @@ const COLLECTIONS = [
   ['events', 'events', 'event', [
     'id', 'kind', 'series_kind', 'title', 'description', 'scope', 'entry', 'fee_pkr', 'pay_instructions', 'starts_at', 'ends_at',
     'deadline', 'duration_minutes', 'pass_mark', 'auto_grade', 'auto_certificate', 'compiler', 'dataset_url', 'files',
-    'problems', 'prizes', 'meeting_link', 'open', 'created_by', 'created_at',
+    'problems', 'prizes', 'meeting_link', 'open', 'shiplens_submission_deadline', 'created_by', 'created_at',
   ]],
   ['event_entries', 'event_entries', 'eventEntry', ['id', 'event_id', 'user_id', 'name', 'reg_no', 'tier', 'payment_status', 'payment_shot', 'team_details', 'challenge_pid', 'registration_id', 'registered_at']],
   ['event_submissions', 'event_submissions', 'eventSubmission', [

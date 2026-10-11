@@ -652,6 +652,9 @@ model Event {
   prizes          Json      @default("{}")
   meetingLink     String?   @map("meeting_link")
   open            Boolean   @default(true)
+  // Admin-extended ShipLens submission deadline, same raw "YYYY-MM-DDTHH:MM"
+  // shape as ends_at but kept as text (store.js Events.extendShipLens).
+  shiplensSubmissionDeadline String? @map("shiplens_submission_deadline")
   createdBy       Int       @map("created_by")
   createdAt       DateTime  @map("created_at")
 

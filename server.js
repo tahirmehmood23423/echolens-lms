@@ -3481,6 +3481,62 @@ app.post('/api/admin/events/:id/remind', authRequired, adminRequired, (req, res)
   }
   res.json({ ok: true, notified: emails.length });
 });
+// Admin pushes back a ShipLens deadline. Extending registration moves the
+// task release with it (the brief opens the day after the new close), so
+// every registered team member is told when the task will now be shared.
+app.post('/api/admin/events/:id/extend', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  const out = Events.extendShipLens(req.params.id, { target: b.target, until: b.until });
+  if (out.error) return res.status(out.error.includes('not found') ? 404 : 400).json({ error: out.error });
+  const ev = out.event; const s = out.schedule; const fmt = (v) => String(v || '').replace('T', ' ');
+  const emails = [...new Set(Events.entries(ev.id).flatMap((e) => [e.email, ...(e.team_details || []).map((m) => m.email)])
+    .filter(Boolean).map((e) => String(e).trim().toLowerCase()))];
+  if (emails.length) {
+    const what = b.target === 'registration'
+      ? `The registration deadline has been extended to ${fmt(s.reg_closes)}. Your project brief will now be shared on ${fmt(s.task_opens_at)}.`
+      : `The submission deadline has been extended to ${fmt(s.submission_deadline)}.`;
+    mailer.notify(emails, `Deadline extended - ${ev.title}`,
+      `${what}\n\nUpdated schedule:\nRegistration closes: ${fmt(s.reg_closes)}\nTask opens: ${fmt(s.task_opens_at)}\nSubmit by: ${fmt(s.submission_deadline)}\nResults by: ${fmt(s.results_due_at)}\n\nOpen the series: ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
+  }
+  res.json({ ok: true, event: Events.decorate(ev), notified: emails.length });
+});
+// Payment-aware ShipLens emails, one member at a time (each partner has their
+// own challan): 'fee' reminds every registered member whose challan is still
+// unpaid; 'extend_week' pushes the deadline back 7 days and tells only the
+// members who have already paid.
+app.post('/api/admin/shiplens/:id/payment-notice', authRequired, adminRequired, (req, res) => {
+  const ev = Events.byId(req.params.id);
+  if (!ev || ev.series_kind !== 'shiplens') return res.status(404).json({ error: 'ShipLens series not found.' });
+  const action = (req.body || {}).action;
+  if (!['fee', 'extend_week'].includes(action)) return res.status(400).json({ error: 'Choose a reminder to send.' });
+  let extended = null;
+  if (action === 'extend_week') {
+    extended = Events.extendShipLens(ev.id, { target: 'auto', days: 7 });
+    if (extended.error) return res.status(400).json({ error: extended.error });
+  }
+  const s = Events.shipLensSchedule(ev); const fmt = (v) => String(v || '').replace('T', ' ');
+  const members = require('./shiplens-finance').shipLensFinanceEntries(Events.entries(ev.id), Registrations.all(), Challans.all())
+    .flatMap((e) => (e.team_details || []).map((m, i) => ({ member: m, challan: e.member_challans?.[i] ? Challans.bySerial(e.member_challans[i].serial) : null })))
+    .filter((x) => x.member.email);
+  const seen = new Set();
+  const targets = members.filter((x) => (action === 'fee' ? x.challan && x.challan.status !== 'paid' : x.challan?.status === 'paid'))
+    .filter((x) => { const k = String(x.member.email).trim().toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  const link = `${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`;
+  const schedule = `Registration closes: ${fmt(s.reg_closes)}\nTask opens: ${fmt(s.task_opens_at)}\nSubmit by: ${fmt(s.submission_deadline)}\nResults by: ${fmt(s.results_due_at)}`;
+  // Sequential and off the request path, so a large series does not hold the response.
+  (async () => {
+    for (const { member, challan } of targets) {
+      if (action === 'fee') {
+        await mailer.notify(member.email, `Fee reminder - ${ev.title}`,
+          `Hi ${member.name || 'there'},\n\nYou are registered for ${ev.title}, but your entry fee is still unpaid.\n\nChallan: ${challan.serial}\nAmount: PKR ${challan.net_fee}\nPay by: ${challan.deadline || fmt(s.reg_closes).slice(0, 10)}\n\nView or download your challan: ${APP_URL}/challan?s=${encodeURIComponent(challan.serial)}\n\nAfter paying, send the proof to ${FINANCE_EMAIL}. Both partners must pay before your team can submit.\n\n${schedule}\n\n${link}`);
+      } else {
+        await mailer.notify(member.email, `Deadline extended by 1 week - ${ev.title}`,
+          `Hi ${member.name || 'there'},\n\nThanks - your fee for ${ev.title} is confirmed. The ${extended.target === 'registration' ? 'registration deadline has been extended by 1 week, so your project brief will now be shared on ' + fmt(s.task_opens_at) : 'submission deadline has been extended by 1 week to ' + fmt(s.submission_deadline)}.\n\nUpdated schedule:\n${schedule}\n\n${link}`);
+      }
+    }
+  })().catch((e) => console.error('ShipLens payment notice failed:', e.message));
+  res.json({ ok: true, notified: targets.length, target: extended?.target || null, event: Events.decorate(Events.byId(ev.id)) });
+});
 // Admin attaches documents (rules PDF, datasets, briefs) to any event.
 app.post('/api/admin/events/:id/files', authRequired, adminRequired, upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Choose a file first.' });

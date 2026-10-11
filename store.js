@@ -3240,14 +3240,54 @@ const Events = {
   // ShipLens runs on a fixed cadence derived entirely from when registration
   // closes (ev.ends_at): the task opens the next day, submissions are open
   // for two weeks after that, and results are due two weeks after submissions
-  // close. Nothing here is stored - pushing back the registration deadline
-  // automatically pushes every later date with it.
+  // close. Pushing back the registration deadline automatically pushes every
+  // later date with it. The only stored override is an admin-extended
+  // submission deadline, which can only ever lengthen the two-week window.
   shipLensSchedule(ev) {
     const regCloses = ev.ends_at || null;
     const taskOpensAt = addDaysToDateTime(regCloses, 1);
-    const submissionDeadline = addDaysToDateTime(taskOpensAt, 14);
+    const defaultDeadline = addDaysToDateTime(taskOpensAt, 14);
+    const extended = ev.shiplens_submission_deadline || null;
+    const submissionDeadline = extended && defaultDeadline && extended > defaultDeadline ? extended : defaultDeadline;
     const resultsDueAt = addDaysToDateTime(submissionDeadline, 14);
     return { reg_opens: ev.starts_at || null, reg_closes: regCloses, task_opens_at: taskOpensAt, submission_deadline: submissionDeadline, results_due_at: resultsDueAt };
+  },
+  // Admin pushes back a ShipLens deadline. 'registration' moves ends_at, so
+  // the task release (and everything after it) follows the new date; it is
+  // refused once the brief has been released, since that would re-hide it.
+  // 'submission' only lengthens the submission window (results move with it).
+  // `days` (instead of `until`) pushes the current deadline back by that many
+  // days; 'auto' picks registration while it can still move, else submission.
+  extendShipLens(id, { target, until, days }) {
+    const ev = Events.byId(id);
+    if (!ev || ev.series_kind !== 'shiplens') return { error: 'ShipLens series not found.' };
+    if (target === 'auto') target = ['upcoming', 'registration', 'pending'].includes(Events.shipLensPhase(ev)) ? 'registration' : 'submission';
+    if (days) {
+      const current = Events.shipLensSchedule(ev)[target === 'registration' ? 'reg_closes' : 'submission_deadline'];
+      const d = new Date(String(current || '').slice(0, 16) + 'Z'); // wall-clock math, no host timezone shift
+      if (isNaN(d)) return { error: 'This series has no deadline to extend.' };
+      d.setUTCDate(d.getUTCDate() + Number(days));
+      until = d.toISOString().slice(0, 16);
+    }
+    const at = String(until || '').trim().slice(0, 16);
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(at) || isNaN(new Date(at))) return { error: 'Choose a valid new date and time.' };
+    const s = Events.shipLensSchedule(ev);
+    const phase = Events.shipLensPhase(ev);
+    if (target === 'registration') {
+      if (!['upcoming', 'registration', 'pending'].includes(phase)) return { error: 'The task has already been released - extend the submission deadline instead.' };
+      if (s.reg_closes && at <= String(s.reg_closes).slice(0, 16)) return { error: 'The new registration deadline must be later than the current one.' };
+      if (ev.starts_at && at <= String(ev.starts_at).slice(0, 16)) return { error: 'Registration must close after it opens.' };
+      ev.ends_at = at;
+      // Unpaid challans are payable until registration closes - keep their
+      // pay-by date in step so fee reminders quote the extended date.
+      const regIds = new Set(data.registrations.filter((r) => Number(r.status?.shiplens_event_id) === ev.id).map((r) => r.id));
+      for (const ch of data.challans) if (regIds.has(Number(ch.registration_id)) && ch.status !== 'paid') ch.deadline = at.slice(0, 10);
+    } else if (target === 'submission') {
+      if (s.submission_deadline && at <= String(s.submission_deadline).slice(0, 16)) return { error: 'The new submission deadline must be later than the current one.' };
+      ev.shiplens_submission_deadline = at;
+    } else return { error: 'Choose which deadline to extend.' };
+    save();
+    return { event: ev, target, previous: s, schedule: Events.shipLensSchedule(ev) };
   },
   shipLensPhase(ev) {
     const s = Events.shipLensSchedule(ev);

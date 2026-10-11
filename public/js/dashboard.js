@@ -6902,6 +6902,19 @@ function adminEventPanel(d) {
     ${ev.series_kind === 'shiplens' ? `
     <div class="pub-sec">Schedule</div>
     <div class="s" style="color:var(--muted);margin-bottom:10px">Registration closes ${esc(String(ev.shiplens_schedule?.reg_closes || '').replace('T', ' '))} &middot; Task opens ${esc(String(ev.shiplens_schedule?.task_opens_at || '').replace('T', ' '))} &middot; Submit by ${esc(String(ev.shiplens_schedule?.submission_deadline || '').replace('T', ' '))} &middot; Results by ${esc(String(ev.shiplens_schedule?.results_due_at || '').replace('T', ' '))} &middot; Phase: <strong>${esc(ev.shiplens_phase || '')}</strong></div>
+    <div class="pub-sec">Extend deadline</div>
+    <form id="slExtend" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px">
+      <label class="field" style="margin:0"><span>Deadline</span><select name="target">
+        ${['upcoming', 'registration', 'pending'].includes(ev.shiplens_phase) ? '<option value="registration">Registration (task release moves with it)</option>' : ''}
+        <option value="submission">Submission</option></select></label>
+      <label class="field" style="margin:0"><span>New date &amp; time</span><input name="until" type="datetime-local" required></label>
+      <button class="btn btn-teal btn-sm">Extend &amp; notify teams</button>
+    </form>
+    <div class="pub-sec">Payment reminders</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" onclick="shipLensPaymentNotice(${ev.id},'fee')">Fee reminder to unpaid (${(d.entries || []).flatMap((e) => e.member_challans || []).filter((c) => c && c.status !== 'paid').length})</button>
+      <button class="btn btn-ghost btn-sm" onclick="shipLensPaymentNotice(${ev.id},'extend_week')">Extend 1 week &amp; notify paid (${(d.entries || []).flatMap((e) => e.member_challans || []).filter((c) => c?.status === 'paid').length})</button>
+    </div>
     <div class="pub-sec">Remind teams to register</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
       ${[[5, '5 days left'], [4, '4 days left'], [3, '3 days left'], [2, '2 days left'], [1, '1 day left'], [0, 'Last day']].map(([days, label]) =>
@@ -6952,6 +6965,24 @@ function adminEventPanel(d) {
     </div>`;
 }
 function wireAdminEventPanel(d) {
+  const ext = $('slExtend');
+  if (ext) {
+    const s = d.event.shiplens_schedule || {};
+    const sync = () => { ext.until.value = String((ext.target.value === 'registration' ? s.reg_closes : s.submission_deadline) || '').slice(0, 16); };
+    ext.target.addEventListener('change', sync); sync();
+    ext.addEventListener('submit', async (e) => {
+      e.preventDefault(); const btn = ext.querySelector('button');
+      const target = ext.target.value; const until = ext.until.value;
+      if (!confirm(target === 'registration'
+        ? `Extend registration to ${until.replace('T', ' ')}? The task will be shared the day after, and the submission and results dates move with it.`
+        : `Extend the submission deadline to ${until.replace('T', ' ')}?`)) return;
+      btn.disabled = true;
+      try {
+        const out = await api(`/api/admin/events/${d.event.id}/extend`, { method: 'POST', body: JSON.stringify({ target, until }) });
+        toast(`Deadline extended - ${out.notified} team member${out.notified === 1 ? '' : 's'} notified.`); openEvent(d.event.id);
+      } catch (err) { toast(err.message, true); btn.disabled = false; }
+    });
+  }
   const fu = $('evFileUp');
   if (fu) fu.addEventListener('submit', async (e) => {
     e.preventDefault(); const btn = fu.querySelector('button'); btn.disabled = true;
@@ -6962,6 +6993,17 @@ function wireAdminEventPanel(d) {
 async function shipLensRemind(eid, daysLeft) {
   try { const out = await api(`/api/admin/events/${eid}/remind`, { method: 'POST', body: JSON.stringify({ days_left: daysLeft }) }); toast(`Reminder sent to ${out.notified} people.`); }
   catch (e) { toast(e.message, true); }
+}
+async function shipLensPaymentNotice(eid, action) {
+  if (!confirm(action === 'fee'
+    ? 'Email a fee reminder with their own challan to every registered member who has not paid yet?'
+    : 'Extend the deadline by 1 week (registration while it is still open, otherwise submission) and email every member who has paid?')) return;
+  try {
+    const out = await api(`/api/admin/shiplens/${eid}/payment-notice`, { method: 'POST', body: JSON.stringify({ action }) });
+    toast(action === 'fee' ? `Fee reminder sent to ${out.notified} unpaid member${out.notified === 1 ? '' : 's'}.`
+      : `${out.target === 'registration' ? 'Registration' : 'Submission'} deadline extended by 1 week - ${out.notified} paid member${out.notified === 1 ? '' : 's'} notified.`);
+    if (action !== 'fee') openEvent(eid);
+  } catch (e) { toast(e.message, true); }
 }
 async function shipLensResendMissing(eid) {
   if (!confirm('Email an individual challan to each legacy team partner whose payment is still outstanding?')) return;

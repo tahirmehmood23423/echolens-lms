@@ -53,22 +53,15 @@ test('rejects bad input and non-ShipLens events', () => {
   assert.match(Events.extendShipLens(plain.id, { target: 'submission', until: '2099-03-01T00:00' }).error, /not found/);
 });
 
-test('extending by a week picks registration while open, otherwise submission, and moves unpaid challan dates', () => {
-  const owner = Users.createFixed({ name: 'Week Lead', role: 'free', username: 'shiplens.week',
-    email: 'week@example.com', password: 'TestPassword123!' });
+test('a registration extension uses the exact chosen date and moves unpaid challan pay-by dates', () => {
+  const owner = Users.createFixed({ name: 'Date Lead', role: 'free', username: 'shiplens.date',
+    email: 'date@example.com', password: 'TestPassword123!' });
   const ev = series('2099-01-01T10:00');
   const reg = Events.register({ event_id: ev.id, user: owner, challenge_pid: 1,
-    team_details: [{ name: 'Week Lead', email: 'week@example.com', whatsapp: '03001234567', university: 'Uni', year: '2' }] });
+    team_details: [{ name: 'Date Lead', email: 'date@example.com', whatsapp: '03001234567', university: 'Uni', year: '2' }] });
   assert.equal(reg.error, undefined);
-  const out = Events.extendShipLens(ev.id, { target: 'auto', days: 7 });
+  const out = Events.extendShipLens(ev.id, { target: 'registration', until: '2099-01-03T18:30' });
   assert.equal(out.error, undefined);
-  assert.equal(out.target, 'registration');
-  assert.equal(out.schedule.reg_closes, '2099-01-08T10:00');
-  assert.equal(Challans.bySerial(reg.challan.serial).deadline, '2099-01-08');
-
-  const closed = series('2026-01-02T00:00');
-  const before = Events.shipLensSchedule(closed).submission_deadline;
-  const later = Events.extendShipLens(closed.id, { target: 'auto', days: 7 });
-  assert.equal(later.target, 'submission');
-  assert.ok(later.schedule.submission_deadline > before);
+  assert.equal(out.schedule.reg_closes, '2099-01-03T18:30');
+  assert.equal(Challans.bySerial(reg.challan.serial).deadline, '2099-01-03');
 });

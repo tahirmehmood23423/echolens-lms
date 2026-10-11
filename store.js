@@ -3256,19 +3256,9 @@ const Events = {
   // the task release (and everything after it) follows the new date; it is
   // refused once the brief has been released, since that would re-hide it.
   // 'submission' only lengthens the submission window (results move with it).
-  // `days` (instead of `until`) pushes the current deadline back by that many
-  // days; 'auto' picks registration while it can still move, else submission.
-  extendShipLens(id, { target, until, days }) {
+  extendShipLens(id, { target, until }) {
     const ev = Events.byId(id);
     if (!ev || ev.series_kind !== 'shiplens') return { error: 'ShipLens series not found.' };
-    if (target === 'auto') target = ['upcoming', 'registration', 'pending'].includes(Events.shipLensPhase(ev)) ? 'registration' : 'submission';
-    if (days) {
-      const current = Events.shipLensSchedule(ev)[target === 'registration' ? 'reg_closes' : 'submission_deadline'];
-      const d = new Date(String(current || '').slice(0, 16) + 'Z'); // wall-clock math, no host timezone shift
-      if (isNaN(d)) return { error: 'This series has no deadline to extend.' };
-      d.setUTCDate(d.getUTCDate() + Number(days));
-      until = d.toISOString().slice(0, 16);
-    }
     const at = String(until || '').trim().slice(0, 16);
     if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(at) || isNaN(new Date(at))) return { error: 'Choose a valid new date and time.' };
     const s = Events.shipLensSchedule(ev);

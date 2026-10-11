@@ -6913,7 +6913,7 @@ function adminEventPanel(d) {
     <div class="pub-sec">Payment reminders</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
       <button class="btn btn-ghost btn-sm" onclick="shipLensPaymentNotice(${ev.id},'fee')">Fee reminder to unpaid (${(d.entries || []).flatMap((e) => e.member_challans || []).filter((c) => c && c.status !== 'paid').length})</button>
-      <button class="btn btn-ghost btn-sm" onclick="shipLensPaymentNotice(${ev.id},'extend_week')">Extend 1 week &amp; notify paid (${(d.entries || []).flatMap((e) => e.member_challans || []).filter((c) => c?.status === 'paid').length})</button>
+      <button class="btn btn-ghost btn-sm" onclick="shipLensPaymentNotice(${ev.id},'deadline')">Email deadline to paid (${(d.entries || []).flatMap((e) => e.member_challans || []).filter((c) => c?.status === 'paid').length})</button>
     </div>
     <div class="pub-sec">Remind teams to register</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
@@ -6997,12 +6997,11 @@ async function shipLensRemind(eid, daysLeft) {
 async function shipLensPaymentNotice(eid, action) {
   if (!confirm(action === 'fee'
     ? 'Email a fee reminder with their own challan to every registered member who has not paid yet?'
-    : 'Extend the deadline by 1 week (registration while it is still open, otherwise submission) and email every member who has paid?')) return;
+    : 'Email every member who has paid the current deadline (set it first with Extend deadline above)? The date is not changed.')) return;
   try {
     const out = await api(`/api/admin/shiplens/${eid}/payment-notice`, { method: 'POST', body: JSON.stringify({ action }) });
     toast(action === 'fee' ? `Fee reminder sent to ${out.notified} unpaid member${out.notified === 1 ? '' : 's'}.`
-      : `${out.target === 'registration' ? 'Registration' : 'Submission'} deadline extended by 1 week - ${out.notified} paid member${out.notified === 1 ? '' : 's'} notified.`);
-    if (action !== 'fee') openEvent(eid);
+      : `Deadline ${String(out.deadline || '').replace('T', ' ')} emailed to ${out.notified} paid member${out.notified === 1 ? '' : 's'}.`);
   } catch (e) { toast(e.message, true); }
 }
 async function shipLensResendMissing(eid) {

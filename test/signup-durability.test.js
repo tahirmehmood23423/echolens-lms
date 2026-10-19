@@ -14,11 +14,11 @@ test('a signup whose write fails sends no credentials and reports the failure', 
   t.after(async () => { if (child.exitCode === null && child.signalCode === null) { const exited = once(child, 'exit'); child.kill(); await exited; } fs.rmSync(runtime, { recursive: true, force: true }); });
   const ready = await new Promise((resolve, reject) => { const timer = setTimeout(() => reject(Error(logs)), 25000); child.once('message', d => { clearTimeout(timer); resolve(d); }); child.once('exit', () => { clearTimeout(timer); reject(Error(logs)); }); });
   // The fixture answers with its own verb: break -> broken, heal -> healed.
-  const REPLY = { break: 'broken', heal: 'healed', mail: 'mail' };
-  const ask = (type) => new Promise((resolve, reject) => {
+  const REPLY = { break: 'broken', heal: 'healed', mail: 'mail', promote: 'promoted' };
+  const ask = (type, extra) => new Promise((resolve, reject) => {
     const timer = setTimeout(() => { child.off('message', on); reject(Error(`no ${REPLY[type]} reply`)); }, 10000);
     const on = (m) => { if (m?.type === REPLY[type]) { clearTimeout(timer); child.off('message', on); resolve(m); } };
-    child.on('message', on); child.send({ type });
+    child.on('message', on); child.send({ type, ...extra });
   });
   const post = (url, body) => fetch('http://127.0.0.1:' + ready.port + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   // Signup is code-gated when mail is up; the fixture captures the code mail,
@@ -83,4 +83,17 @@ test('a signup whose write fails sends no credentials and reports the failure', 
   const credentials = afterHeal.sent.find(m => m.to === 'recovered@gmail.com' && /your password/i.test(m.subject));
   const oldPassword = credentials.text.match(/Password: (\S+)/)[1];
   assert.equal((await post('/api/auth/login', { login: 'recovered@gmail.com', password: oldPassword })).status, 401);
+
+  // An open-web learner who later enrolled in a paid course is now a student;
+  // they must still receive a PIN and be able to reset.
+  await ask('promote', { email: 'recovered@gmail.com' });
+  assert.equal((await post('/api/auth/forgot-password', { email: 'recovered@gmail.com' })).status, 200);
+  const pinMails = (await ask('mail')).sent.filter(m => m.to === 'recovered@gmail.com' && /recovery PIN/.test(m.subject));
+  assert.equal(pinMails.length, 2, 'a promoted student gets a fresh PIN mail');
+  const studentPinMail = pinMails[1];
+  const studentPin = studentPinMail.text.match(/\b(\d{6})\b/)[1];
+  const studentVerified = await post('/api/auth/verify-reset-pin', { email: 'recovered@gmail.com', pin: studentPin });
+  assert.equal(studentVerified.status, 200);
+  assert.equal((await post('/api/auth/reset-password', { token: (await studentVerified.json()).token, password: 'StudentPassword123!' })).status, 200);
+  assert.equal((await post('/api/auth/login', { login: 'recovered@gmail.com', password: 'StudentPassword123!' })).status, 200);
 });

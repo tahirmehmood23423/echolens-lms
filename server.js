@@ -505,25 +505,30 @@ app.get('/api/auth/me', authRequired, (req, res) => {
   });
 });
 
-// Free-account recovery requires inbox verification before a reset grant is issued.
+// Learner recovery requires inbox verification before a reset grant is issued.
+// Open-web accounts become 'student' once a paid registration is enrolled
+// (performRegistrationEnrollment), so both learner roles must be covered or
+// those learners silently never receive a PIN. Staff still reset via admin.
+const RECOVERABLE_ROLES = ['free', 'student'];
 const recovery = require('./password-recovery')();
 const limitResetVerify = rateLimit('reset-verify', { max: 20, windowMs: 15 * 60000 });
 app.post('/api/auth/forgot-password', limitEmailSend, async (req, res) => {
   const email = String(req.body?.email || '').trim().toLowerCase();
   if (!isEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!mailer.configured) return res.status(503).json({ error: 'Email recovery is temporarily unavailable. Please try again later.' });
-  const message = 'If that email has a free EchoLens account, a verification PIN is on its way. Check your inbox and spam folder. The PIN expires in 10 minutes.';
-  const u = Users.allByLogin(email).find(x => x.role === 'free' && String(x.email).toLowerCase() === email);
+  const message = 'If that email has an EchoLens learner account, a verification PIN is on its way. Check your inbox and spam folder. The PIN expires in 10 minutes.';
+  const u = Users.allByLogin(email).find(x => RECOVERABLE_ROLES.includes(x.role) && String(x.email).toLowerCase() === email);
+  if (!u) console.warn('[recovery] PIN requested for an email with no learner account');
   if (u) {
-    const pin = recovery.issue(email, u.id, safeReturnPath(req.body.returnTo, APP_URL, '/open#free'));
+    const pin = recovery.issue(email, u.id, safeReturnPath(req.body.returnTo, APP_URL, u.role === 'free' ? '/open#free' : '/dashboard'));
     if (pin) {
       try {
         const result = await mailer.send({ to: u.email, subject: 'Your EchoLens password recovery PIN',
           text: `${hi(u.name)},\n\nYour password recovery verification PIN is: ${pin}\n\nEnter it on the sign-in page to verify your email, then choose a new password. This PIN expires in 10 minutes. Do not share it.\n\nIf you did not request this, ignore this email. Your password is unchanged.` });
-        if (!result?.sent) recovery.cancel(email);
+        if (!result?.sent) { recovery.cancel(email); console.error(`[recovery] PIN mail not sent for user ${u.id}`, result); }
       } catch (err) {
         recovery.cancel(email);
-        console.error('Password recovery email failed:', err.message);
+        console.error(`[recovery] PIN mail failed for user ${u.id}:`, err.message);
       }
     }
   }
@@ -541,7 +546,7 @@ app.post('/api/auth/reset-password', limitResetVerify, async (req, res) => {
   if (!rec) return res.status(400).json({ error: 'Your verification has expired or was already used. Request a new PIN.' });
   if (typeof password !== 'string' || password.length < 8 || Buffer.byteLength(password, 'utf8') > 72) return res.status(400).json({ error: 'Choose a password of at least 8 characters and at most 72 UTF-8 bytes.' });
   const u = Users.byId(rec.userId);
-  if (!u || u.role !== 'free') return res.status(400).json({ error: 'This account cannot be reset here.' });
+  if (!u || !RECOVERABLE_ROLES.includes(u.role)) return res.status(400).json({ error: 'This account cannot be reset here.' });
   recovery.consume(String(token));
   const previousHash = u.password_hash;
   try {

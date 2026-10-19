@@ -42,5 +42,7 @@ process.on('message', (m) => {
   if (m?.type === 'break') { flushBroken = true; process.send({ type: 'broken' }); }
   if (m?.type === 'heal') { flushBroken = false; process.send({ type: 'healed' }); }
   if (m?.type === 'mail') process.send({ type: 'mail', sent });
+  // Paid enrollment turns an open-web account into a student (performRegistrationEnrollment).
+  if (m?.type === 'promote') { for (const u of store.allData().users) if (u.email === m.email) u.role = 'student'; process.send({ type: 'promoted' }); }
 });
 require('../../server');

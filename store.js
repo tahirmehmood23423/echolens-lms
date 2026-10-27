@@ -2305,7 +2305,7 @@ const OFFICIAL_CATALOGUE = [
   // needed to watch) | 'signin' (free with sign-in) | undefined (paid; Level 1
   // of the quest is free for signed-in community members).
   { code: 'BC-01', title: 'AI Automation with n8n & Make.com', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['high_demand'], summary: 'Build real business automations that connect apps, data and AI - workflows agencies bill $30-70/hour for.' },
-  { code: 'BC-02', title: 'Prompt Engineering & ChatGPT/Claude Mastery', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['high_demand'], summary: 'Structured prompting, tool use and reusable prompt systems that make AI dependable daily.' },
+  { code: 'BC-02', title: 'Prompt Engineering & ChatGPT/Claude Mastery', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 4000, badges: ['high_demand'], summary: 'Structured prompting, tool use and reusable prompt systems that make AI dependable daily.' },
   { code: 'BC-05', title: 'AI-Assisted Coding with Cursor, Claude & Copilot', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['new', 'high_demand'], summary: 'Agentic IDEs, AI pair programming and review workflows that multiply what one developer can ship.' },
   { code: 'BC-07', title: 'Excel + AI for Office Professionals', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: ['new'], summary: 'Clean data, build reports and automate repetitive office work by pairing Excel with AI assistants.' },
   { code: 'BC-08', title: 'Canva & AI Content Creation', tier: 'Bootcamp', weeks: 2, hours: 8, price_pkr: 5000, badges: [], summary: 'Design social posts, brand kits and marketing visuals quickly with Canva + AI tools.' },

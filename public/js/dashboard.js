@@ -3530,9 +3530,10 @@ let COORD_REGS = [];
 function coordTab(tab) { COORD_TAB = tab; renderDeptStudentCoordinator(); }
 async function renderDeptStudentCoordinator() {
   const el = $('view-dept-student-coordinator');
-  const tabs = [['registrations', 'Registrations & challans'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['queries', 'Student queries'], ['instructors', 'Instructors'], ['ambassador-reports', 'Ambassador reports']];
+  const tabs = [['registrations', 'Registrations & challans'], ['export', 'Download lists'], ['discounts', 'Discount categories'], ['bank', 'Bank details'], ['queries', 'Student queries'], ['instructors', 'Instructors'], ['ambassador-reports', 'Ambassador reports']];
   el.innerHTML = deptHeaderHtml('Admissions Office Portal') + deptTabBarHtml(tabs, COORD_TAB, 'coordTab') + '<div id="coordTabBody"><div class="empty">Loading&hellip;</div></div>';
   if (COORD_TAB === 'registrations') renderCoordRegistrations();
+  else if (COORD_TAB === 'export') renderCoordExport();
   else if (COORD_TAB === 'discounts') renderCoordDiscounts();
   else if (COORD_TAB === 'bank') renderCoordBank();
   else if (COORD_TAB === 'instructors') renderInstructorAssignmentPanel('coordTabBody', { canEditTag: false, canAssign: true });
@@ -3566,6 +3567,68 @@ async function renderCoordRegistrations() {
       <button type="button" class="btn btn-primary btn-sm" onclick="coordOpenManualRegForm()">+ Add registration manually</button>
     </div>`
     + (rows.length ? rows.map(coordRegRow).join('') : `<div class="empty">Nothing in "${esc(folderLabel)}" right now.</div>`);
+}
+// Downloadable contact list: filter every registration (website + manual +
+// ShipLens) by the date the form was filled and, optionally, one course or
+// ShipLens series, preview it, then download the same filter as a PDF.
+let EXPORT_ROWS = null;
+async function renderCoordExport() {
+  const box = $('coordTabBody');
+  const d = await api('/api/admissions/registrations');
+  const byCourse = new Map();
+  d.registrations.forEach((r) => { if (r.course_code && !byCourse.has(r.course_code)) byCourse.set(r.course_code, r.course_title || r.course_code); });
+  const courseOpts = ['<option value="all">All courses &amp; ShipLens series</option>',
+    ...[...byCourse.entries()].sort((a, b) => a[1].localeCompare(b[1]))
+      .map(([code, title]) => `<option value="${esc(code)}">${esc(title)}${code.startsWith('SL-') ? ' (ShipLens)' : ''}</option>`)].join('');
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:14px"><div class="card-body">
+      <span class="s" style="color:var(--muted)">Download the contact list (name, email, contact number) of students who filled the registration form - filter by the date range they applied in, and by one course or ShipLens series, or leave it as "All".</span>
+      <form id="exportFilters" class="form-grid" style="margin-top:12px">
+        <label class="field"><span>From (form filled on/after)</span><input type="date" name="from"></label>
+        <label class="field"><span>To (form filled on/before)</span><input type="date" name="to"></label>
+        <label class="field" style="grid-column:span 2"><span>Course or ShipLens series</span><select name="course_code">${courseOpts}</select></label>
+      </form>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button type="button" class="btn btn-primary btn-sm" onclick="coordExportShowList()">Show list</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="coordExportDownload()">Download PDF</button>
+      </div>
+    </div></div>
+    <div id="exportPreview"></div>`;
+  EXPORT_ROWS = d.registrations;
+}
+function coordExportFilterRows() {
+  const f = $('exportFilters');
+  const from = f.from.value || null, to = f.to.value || null, course = f.course_code.value || 'all';
+  return (EXPORT_ROWS || []).filter((r) => {
+    const day = String(r.created_at || '').slice(0, 10);
+    if (from && day < from) return false;
+    if (to && day > to) return false;
+    if (course !== 'all' && r.course_code !== course) return false;
+    return true;
+  });
+}
+function coordExportShowList() {
+  const rows = coordExportFilterRows();
+  const preview = $('exportPreview');
+  preview.innerHTML = `<div class="card"><div class="card-head"><h3>Matching students</h3><span class="s" style="color:var(--muted)">${rows.length} total</span></div>
+    <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+      <tr><th>Name</th><th>Email</th><th>Contact number</th><th>Course</th><th>Registered</th><th>Challan</th></tr>
+      ${rows.map((r) => `<tr>
+        <td>${esc(r.name)}</td><td class="s">${esc(r.email)}</td><td class="s">${esc(r.whatsapp)}</td>
+        <td class="s">${esc(r.course_title || r.course_code || '-')}</td>
+        <td class="s">${esc(String(r.created_at || '').slice(0, 10))}</td>
+        <td class="s">${r.challans && r.challans[0] ? esc(r.challans[0].serial) : 'Not issued'}</td>
+      </tr>`).join('') || '<tr><td colspan="6" class="empty">No registrations match this filter.</td></tr>'}
+    </table></div></div>`;
+  preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function coordExportDownload() {
+  const f = $('exportFilters');
+  const params = new URLSearchParams();
+  if (f.from.value) params.set('from', f.from.value);
+  if (f.to.value) params.set('to', f.to.value);
+  if (f.course_code.value) params.set('course_code', f.course_code.value);
+  window.open(`/api/admissions/registrations-report.pdf?${params.toString()}`, '_blank');
 }
 // Students who registered outside the website (e.g. a Google Form) never
 // reach Registrations.create() on their own - this lets Admissions log them

@@ -26,6 +26,7 @@ const mailer = require('./mailer');
 const jaas = require('./jaas');
 const { challanPdf } = require('./challan-pdf');
 const { shiplensReportPdf } = require('./shiplens-report-pdf');
+const { registrationsReportPdf } = require('./registrations-report-pdf');
 const { certificatePng } = require('./cert-image');
 const { graderContext } = require('./problem-rubric');
 const { ambassadorReportPdf } = require('./ambassador-report-pdf');
@@ -4641,6 +4642,26 @@ app.get('/api/admissions/registrations', authRequired, admissionsOnly, (req, res
   });
   res.json({ registrations: rows, admissions_email: ADMISSIONS_EMAIL, finance_email: FINANCE_EMAIL });
 });
+// Downloadable list of registrations/challans for a date range (when the
+// student filled the form) and, optionally, one course or ShipLens series -
+// contact details for follow-up, mirroring the ShipLens finance report.
+app.get('/api/admissions/registrations-report.pdf', authRequired, admissionsOnly, asyncRoute(async (req, res) => {
+  const from = /^\d{4}-\d{2}-\d{2}$/.test(req.query.from || '') ? req.query.from : null;
+  const to = /^\d{4}-\d{2}-\d{2}$/.test(req.query.to || '') ? req.query.to : null;
+  const courseCode = String(req.query.course_code || '').trim();
+  let registrations = Registrations.all().map((r) => ({ ...r, challans: Challans.forRegistration(r.id) }));
+  if (from) registrations = registrations.filter((r) => String(r.created_at || '').slice(0, 10) >= from);
+  if (to) registrations = registrations.filter((r) => String(r.created_at || '').slice(0, 10) <= to);
+  let courseLabel = 'All courses';
+  if (courseCode && courseCode !== 'all') {
+    registrations = registrations.filter((r) => r.course_code === courseCode);
+    courseLabel = registrations[0]?.course_title || courseCode;
+  }
+  const pdf = await registrationsReportPdf({ registrations, from, to, courseLabel });
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename="EchoLens-registrations-list.pdf"');
+  res.send(pdf);
+}));
 // Manual fallback for cleared payments that could not auto-enroll (e.g. no
 // batch was open when Finance confirmed).
 app.post('/api/admissions/registrations/:id/enroll', authRequired, admissionsOnly, asyncRoute(async (req, res) => {

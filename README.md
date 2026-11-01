@@ -474,6 +474,12 @@ echolens-lms/
     img/logo.png         (keep your existing logo here)
 ```
 
+## ShipLens project submissions
+
+The public ShipLens page is `/shiplens` (redirecting to `/open#shiplens`); the signed-in dashboard has a ShipLens view. Both read the current series, project and schedule from the event API, so an edition can be updated without changing the page design.
+
+A registered team with confirmed payment can submit during the series submission window. The form accepts a GitHub repository, at least one HTTPS live deployment, an optional walkthrough video, final commit and reviewer notes, and an optional ZIP or PDF attachment up to 50 MB. The team can update its submission during the window; leaving the attachment field empty keeps the existing file. Files use `UPLOAD_DIR`, so production needs the persistent disk configuration above. Submitted projects stay in the event review flow; submitting does not automatically publish a public project gallery.
+
 ## Security notes
 
 Bcrypt-hashed passwords, HTTP-only signed cookies, server-side role and course-ownership checks on every protected route (coordinators are blocked from all writes), output escaping in the browser, authenticated file access, 50 MB upload limit. Set a strong `JWT_SECRET` and `NODE_ENV=production` in production.

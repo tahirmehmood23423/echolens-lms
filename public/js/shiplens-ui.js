@@ -3,14 +3,14 @@
   function projectCard(project, escapeHtml, schedule) {
     if (!project) return '';
     const e = escapeHtml;
-    if (project.locked) return `<div class="shiplens-project" style="padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--bg,#f7f8fc)">
+    if (project.locked) return `<div class="shiplens-project" style="padding:18px;border:1px solid #cce9e7;border-radius:14px;background:#f1fbfa">
       <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--primary)">${e(project.difficulty || 'Project')} level</span>
       <h3 style="margin:6px 0">${e(project.title || 'ShipLens project')}</h3>
       <p style="margin:0;line-height:1.6">The full project brief and visual reference open ${schedule?.task_opens_at ? 'on ' + e(String(schedule.task_opens_at).replace('T', ' ')) : 'when the task window starts'}.</p>
     </div>`;
     const block = (label, value) => value ? `<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--card,#fff)"><strong>${label}</strong><p style="white-space:pre-line;margin:6px 0 0;line-height:1.6">${e(value)}</p></div>` : '';
     return `<div class="shiplens-project" style="display:grid;gap:10px;margin:12px 0">
-      <div style="padding:14px;border-radius:12px;background:linear-gradient(135deg,#17264b,#4f46e5);color:white">
+      <div style="padding:18px;border-radius:14px;background:radial-gradient(circle at 90% 15%,#138d92,transparent 40%),linear-gradient(135deg,#001c2c,#005862);color:white">
         <span style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;opacity:.8">${e(project.difficulty || 'Project')} level</span>
         <h3 style="margin:5px 0;color:white">${e(project.title || 'ShipLens project')}</h3>
         <p style="white-space:pre-line;line-height:1.6;margin:0;color:#fff">${e(project.description || '')}</p>

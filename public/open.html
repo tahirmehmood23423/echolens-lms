@@ -30,7 +30,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v1443">
+<link rel="stylesheet" href="/css/styles.css?v1450">
+<link rel="stylesheet" href="/css/shiplens.css?v2">
 <style>body{background:#FBFAF7}</style>
 <link rel="stylesheet" href="/css/workflow.css?v1">
 <link rel="stylesheet" href="/css/public-navigation.css?v1">
@@ -38,7 +39,7 @@
 </head>
 <body>
 
-<nav class="open-nav public-navigation" aria-label="Main navigation"><a class="public-brand" href="/" aria-label="EchoLens Home"><img src="/img/logo.png" alt="EchoLens"><span>EchoLens<small>Digital</small></span></a><a class="nlink" href="/" data-tab="home">Home</a><a class="nlink" href="/open#paid" data-tab="courses" data-catnav="paid">Live Tech Courses</a><a class="nlink" href="/open#free" data-tab="courses" data-catnav="free">Free Certified Courses</a><a class="nlink" href="/open#events" data-tab="events">Events</a><a class="nlink" href="/open#announcements" data-tab="announcements">Announcements</a><a class="nlink" href="/open#feedback" data-tab="feedback">Feedback</a><a class="nlink" href="/compiler">Compiler</a><a class="nlink" href="/#faq">FAQ</a><span class="public-nav-account"><span id="userBox"></span></span></nav>
+<nav class="open-nav public-navigation" aria-label="Main navigation"><a class="public-brand" href="/" aria-label="EchoLens Home"><img src="/img/logo.png" alt="EchoLens"><span>EchoLens<small>Digital</small></span></a><a class="nlink" href="/" data-tab="home">Home</a><a class="nlink" href="/open#paid" data-tab="courses" data-catnav="paid">Live Tech Courses</a><a class="nlink" href="/open#free" data-tab="courses" data-catnav="free">Free Certified Courses</a><a class="nlink" href="/open#events" data-tab="events">Events</a><a class="nlink" href="/open#shiplens" data-tab="events" data-shiplens-nav="true">ShipLens</a><a class="nlink" href="/open#announcements" data-tab="announcements">Announcements</a><a class="nlink" href="/open#feedback" data-tab="feedback">Feedback</a><a class="nlink" href="/compiler">Compiler</a><a class="nlink" href="/#faq">FAQ</a><span class="public-nav-account"><span id="userBox"></span></span></nav>
 
 <div class="open-wrap" id="appWrap">
 
@@ -135,6 +136,7 @@
       </div>
     </div>
     <div class="ev-tabs" id="evTabs"></div>
+    <div id="shipLensHub" class="shiplens-hub" hidden></div>
     <div class="ev-stats" id="evStats"></div>
     <div class="ev-filterbar">
       <div class="search-box">
@@ -153,7 +155,7 @@
 
   <!-- ============================= EVENT DETAIL ============================= -->
   <section id="tab-eventDetail" style="display:none">
-    <button class="btn btn-ghost btn-sm" onclick="openTab('events')" style="margin-bottom:14px">&larr; Back to events</button>
+    <button class="btn btn-ghost btn-sm" onclick="backToEventList()" style="margin-bottom:14px">&larr; Back to events</button>
     <div id="evDetail"></div>
   </section>
 
@@ -222,8 +224,8 @@
 <script src="/js/draft-store.js?v1"></script>
 <script src="/js/workflow-ui.js?v2"></script>
 <script src="/js/coderunner.js?v1422"></script>
-<script src="/js/shiplens-ui.js?v3"></script>
-<script src="/js/open.js?v1449"></script>
+<script src="/js/shiplens-ui.js?v4"></script>
+<script src="/js/open.js?v1450"></script>
 <script src="/js/public-navigation.js?v1"></script>
 </body>
 </html>

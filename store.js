@@ -3529,6 +3529,7 @@ const Events = {
       if (phase === 'grading' || phase === 'closed') return { error: 'The submission window for this series has closed.' };
       if (Number(pid) !== gate.entry.challenge_pid) return { error: 'Submit to the challenge your team selected at registration.' };
       if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(?:[/?#].*)?$/i.test(String(github_link || ''))) return { error: 'Add a valid GitHub repository URL.' };
+      if (!render_link && !vercel_link) return { error: 'Add at least one live deployment URL.' };
       if (render_link && !/^https:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(String(render_link))) return { error: 'The Render link must be a valid HTTPS URL.' };
       if (vercel_link && !/^https:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(String(vercel_link))) return { error: 'The Vercel link must be a valid HTTPS URL.' };
     }
@@ -3541,7 +3542,8 @@ const Events = {
       // What the learner's program actually printed when they ran it. The
       // grader compares this against the brief's expected output.
       output: output ? String(output).slice(0, 4000) : null,
-      file_url: file_url || null, file_name: file_name || null,
+      file_url: file_url || (ev.series_kind === 'shiplens' ? s?.file_url : null) || null,
+      file_name: file_name || (ev.series_kind === 'shiplens' ? s?.file_name : null) || null,
       link: link ? String(link).slice(0, 400) : null,
       github_link: github_link ? String(github_link).slice(0, 400) : null,
       render_link: render_link ? String(render_link).slice(0, 400) : null,

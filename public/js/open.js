@@ -141,6 +141,11 @@ let NAV_REVISION = 0;
 let OPEN_READY = false;
 function openRoute(state) {
   if (state.v === 'ticket') return '#ticket=' + encodeURIComponent(state.ticket) + '&token=' + encodeURIComponent(state.token || '');
+  if (state.v === 'events' && state.shiplens) {
+    const params = new URLSearchParams();
+    if (state.dialog) { params.set('dialog', state.dialog); if (state.code) params.set('code', state.code); }
+    return '#shiplens' + (params.size ? '?' + params : '');
+  }
   let route = state.v === 'courses' ? (['free','paid'].includes(state.mode) ? state.mode : 'courses') : state.v;
   if (['course','video','solve'].includes(state.v)) route = 'course/' + encodeURIComponent(state.key) + (state.v !== 'course' ? '/lesson/' + state.level : '') + (state.v === 'solve' ? '/practice/' + state.pid : '');
   const params = new URLSearchParams();
@@ -165,7 +170,8 @@ function openState(hash = location.hash) {
   } else if (['courses','free','paid','quests'].includes(parts[0])) {
     state = {v:'courses', mode:['free','paid'].includes(parts[0]) ? parts[0] : 'live'};
     if (['search','tier','free','family'].some(k => params.has(k))) state.filters = {search:params.get('search') || '',tier:params.get('tier') || '',free:params.has('free') ? params.get('free') : (state.mode === 'live' ? '' : state.mode),family:params.get('family') || null};
-  } else if (['home','compare','events','profile','announcements','feedback'].includes(parts[0])) state = {v:parts[0] === 'compare' ? 'home' : parts[0]};
+  } else if (parts[0] === 'shiplens') state = {v:'events',shiplens:true};
+  else if (['home','compare','events','profile','announcements','feedback'].includes(parts[0])) state = {v:parts[0] === 'compare' ? 'home' : parts[0]};
   else if (parts[0] === 'register' || parts[0].startsWith('register-')) state = {v:'courses',mode:'paid',dialog:'register',code:parts[0].slice(9)};
   else if (parts[0] === 'signup') state = {v:'courses',mode:'free',dialog:'signup'};
   else if (!route) state = {v:'home'};
@@ -211,7 +217,9 @@ async function restoreNav(state, revision = NAV_REVISION) {
   if (!state?.v) return;
   if (!window.MODAL_LOCK) closeModal(true);
   if (state.v === 'ticket') { openTab('feedback'); await openSupportTicket(state.ticket, state.token); return; }
+  if (state.v === 'events') EV_TAB = state.shiplens ? 'hackathons' : 'all';
   if (['home','events','announcements','feedback'].includes(state.v)) openTab(state.v);
+  if (state.v === 'events') { renderEvTabs(); drawEventList(); }
   else if (state.v === 'profile') openProfileTab();
   else if (state.v === 'courses') {
     navCourses(state.mode || 'live', true);
@@ -480,7 +488,7 @@ function openTab(tab) {
     const active = inCoursesFamily
       // Paid courses are the same nav entry as the live/instructor-led list.
       ? n.dataset.tab === 'courses' && (n.dataset.catnav || 'paid') === (COURSE_NAV_MODE === 'live' ? 'paid' : COURSE_NAV_MODE)
-      : n.dataset.tab === tab || (tab === 'eventDetail' && n.dataset.tab === 'events');
+      : n.dataset.tab === tab && (tab !== 'events' || Boolean(n.dataset.shiplensNav) === (EV_TAB === 'hackathons')) || (tab === 'eventDetail' && n.dataset.tab === 'events' && Boolean(n.dataset.shiplensNav) === (CUR_EVENT?.event?.series_kind === 'shiplens'));
     n.classList.toggle('active', active);
     if (active) n.setAttribute('aria-current','page'); else n.removeAttribute('aria-current');
   });
@@ -2480,8 +2488,43 @@ function renderEvTabs() {
     const n = EV_ALL.filter((e) => evTabFilter(k, e)).length;
     return `<button class="ev-tab ${EV_TAB === k ? 'active' : ''}" onclick="setEvTab('${k}')">${label}${n ? ` (${n})` : ''}</button>`;
   }).join('');
+  const shipLensMode = EV_TAB === 'hackathons';
+  $('tab-events').classList.toggle('shiplens-mode', shipLensMode);
+  $('shipLensHub').hidden = !shipLensMode;
+  if (shipLensMode) renderShipLensHub();
+  if ($('tab-events').style.display !== 'none') document.querySelectorAll('.open-nav .nlink[data-tab="events"]').forEach((link) => {
+    const active = Boolean(link.dataset.shiplensNav) === shipLensMode;
+    link.classList.toggle('active', active);
+    if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+  });
 }
-function setEvTab(k) { EV_TAB = k; EV_PAGE = 1; renderEvTabs(); drawEventList(); }
+function setEvTab(k) { EV_TAB = k; EV_PAGE = 1; renderEvTabs(); drawEventList(); pushNav({v:'events',shiplens:k === 'hackathons'}); }
+
+function shipLensDate(value) {
+  if (!value) return 'To be announced';
+  const date = new Date(String(value).replace(' ', 'T'));
+  return Number.isNaN(date.getTime()) ? esc(String(value)) : esc(date.toLocaleDateString('en-PK', {day:'numeric',month:'long',year:'numeric'}));
+}
+function renderShipLensHub() {
+  const rows = EV_ALL.filter((event) => event.series_kind === 'shiplens');
+  const cards = rows.length ? rows.map((event) => {
+    const project = event.problems?.[0];
+    const closes = event.shiplens_schedule?.reg_closes || event.ends_at;
+    const phase = event.shiplens_phase || event.status || 'upcoming';
+    const phaseLabel = {registration:'Registration open',submission:'Build window open',pending:'Brief opens soon',grading:'Under review',closed:'Completed'}[phase] || 'Upcoming';
+    return `<article class="sl-showcase-card">
+      <div class="sl-showcase-art" aria-hidden="true"><span class="sl-showcase-orbit"></span><span class="sl-showcase-window"><span class="sl-showcase-window-bar"></span><span class="sl-showcase-code">&lt; / &gt;</span><span class="sl-showcase-lines"></span></span></div>
+      <div class="sl-showcase-copy"><span class="sl-edition">${esc(event.title)}</span><span class="sl-phase">${esc(phaseLabel)}</span><h3>${esc(project?.title || event.title)}</h3><p>${esc((event.description || '').slice(0, 170))}${(event.description || '').length > 170 ? '…' : ''}</p></div>
+      <div class="sl-showcase-foot"><span>Registration: ${shipLensDate(closes)}</span><span>Team: 1–2</span><button type="button" onclick="openOpenEvent(${Number(event.id)})" aria-label="View ${esc(event.title)}">View challenge <span aria-hidden="true">↗</span></button></div>
+    </article>`;
+  }).join('') : '<div class="sl-empty">No ShipLens series is open for browsing yet. Check back for the next brief.</div>';
+  $('shipLensHub').innerHTML = `<div class="sl-hero">
+    <div class="sl-hero-copy"><span class="sl-hero-kicker">Monthly build competition</span><h1>Ship<span>Lens</span></h1><h2>Build. Compete. Ship. Stand out.</h2><p>Turn a real brief into a working, portfolio-ready project. Build with a team of one or two, publish your code, deploy your work and defend your decisions.</p><div class="sl-hero-actions"><button type="button" class="sl-primary-link" onclick="document.getElementById('slChallengeList').scrollIntoView({behavior:'smooth'})">Explore challenges <span aria-hidden="true">→</span></button><button type="button" class="sl-secondary-link" onclick="document.getElementById('slHow').scrollIntoView({behavior:'smooth'})">How it works</button></div></div>
+    <div class="sl-hero-visual" aria-hidden="true"><div class="sl-visual-ring"></div><div class="sl-visual-laptop"><div class="sl-visual-screen"><span>&lt;ship /&gt;</span><i></i><i></i><i></i></div></div><span class="sl-float sl-float-build">&lt;/&gt; Build</span><span class="sl-float sl-float-ship">↗ Ship</span><span class="sl-float sl-float-win">✦ Compete</span></div>
+  </div>
+  <div class="sl-benefits" id="slHow"><div><b>◎</b><strong>Real-world challenges</strong><span>Work from a practical brief with clear deliverables.</span></div><div><b>▤</b><strong>Show your work</strong><span>Share source code and a live project reviewers can explore.</span></div><div><b>◇</b><strong>Earn recognition</strong><span>Receive judging feedback and compete for recognition.</span></div><div><b>♧</b><strong>Grow with the community</strong><span>Build alongside peers and learn by shipping.</span></div></div>
+  <div class="sl-section-head" id="slChallengeList"><div><span>THE CURRENT SERIES</span><h2>ShipLens challenges</h2></div><p>Dates and project details come from each live competition.</p></div><div class="sl-showcase-grid">${cards}</div>`;
+}
 
 function renderEvStats() {
   const quests = EV_ALL.filter((e) => e.kind === 'quest').length;
@@ -2825,7 +2868,15 @@ function evCurProblem() { const ps = (CUR_EVENT && CUR_EVENT.event.problems) || 
 function evDraftKey(eid, pid) { return `echoev:${eid}:${pid || 0}:${(ME && ME.id) || 0}`; }
 
 async function openOpenEvent(id) {
-  if (!ME) { gate('You can browse every event and hackathon freely - joining one needs a free account, so your submissions, gems and certificates have somewhere to live.'); return; }
+  if (!ME) {
+    const publicEvent = EV_ALL.find((event) => Number(event.id) === Number(id));
+    if (publicEvent?.series_kind !== 'shiplens') { gate('Join with a free account to enter an event and save your submissions.'); return; }
+    CUR_EVENT = {event:publicEvent,my_entry:null,can_participate:false,participate_msg:'Sign in to register or submit.',my_submissions:{},my_progress:null,board:[],comments:[]};
+    CUR_EV_PID = publicEvent.problems?.[0]?.pid || null;
+    renderEventDetail();
+    openTab('eventDetail');
+    return;
+  }
   try {
     const d = await api(`/api/events/${id}`);
     CUR_EVENT = d;
@@ -2835,6 +2886,7 @@ async function openOpenEvent(id) {
     openTab('eventDetail');
   } catch (e) { toast(e.message, true); }
 }
+function backToEventList() { navigateOpen({v:'events',shiplens:CUR_EVENT?.event?.series_kind === 'shiplens'}); }
 
 function evCompact(dt) {
   if (!dt) return null;
@@ -2874,19 +2926,24 @@ function renderEventDetail() {
     `<a onclick="evNavGo('${k}')" data-sec="${k}"><svg viewBox="0 0 24 24">${path}</svg>${label}${k === 'discussion' && cCount ? `<span class="cnt">${cCount}</span>` : ''}</a>`).join('')}</div>`;
 
   // ---- gradient hero banner ----
-  const heroPills = [
+  const heroPills = (ev.series_kind === 'shiplens' ? [
+    `<span class="ehd-pill">Team: 1–2 members</span>`,
+    `<span class="ehd-pill">Entry: PKR ${Number(ev.fee_pkr || 0).toLocaleString()}</span>`,
+    ev.shiplens_schedule?.submission_deadline ? `<span class="ehd-pill">Submit by ${shipLensDate(ev.shiplens_schedule.submission_deadline)}</span>` : '',
+  ] : [
     `<span class="ehd-pill"><span class="dot" style="background:${DIFF_DOT[diff]}"></span>${diff}</span>`,
     `<span class="ehd-pill">${star}${points} pts</span>`,
     `<span class="ehd-pill">${langI}${EV_LANG_SHORT[ev.compiler] || 'Submission'}</span>`,
     durL ? `<span class="ehd-pill">${clock}${durL}</span>` : '',
     ev.auto_certificate ? `<span class="ehd-pill">${checkI}Certificate at ${ev.pass_mark}%+</span>` : '',
-  ].join('');
+  ]).join('');
   const heroSub = ev.series_kind === 'shiplens' ? (p ? `${esc(diff)}: ${esc(p.title)}` : '') : '';
-  const hero = `<div class="evd-hero">
+  const hero = `<div class="evd-hero${ev.series_kind === 'shiplens' ? ' sl-detail-hero' : ''}">
     <span class="ehd-badge">${evKindTag(ev)}</span>
     <h2>${esc(ev.title)}</h2>
     ${heroSub ? `<div class="ehd-sub">${heroSub}</div>` : ''}
     <div class="ehd-desc">${esc((ev.description || '').slice(0, 220))}${(ev.description || '').length > 220 ? '…' : ''}</div>
+    ${ev.series_kind === 'shiplens' ? '<div class="sl-detail-mantra">Build it <span>→</span> Ship it <span>→</span> Defend it</div>' : ''}
     <div class="ehd-pills">${heroPills}</div>
     <div class="ehd-glyph"><svg viewBox="0 0 24 24"><path d="M3 17l3-9 3 6 3-11 3 9 3-5 3 10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>`;
@@ -2898,7 +2955,11 @@ function renderEventDetail() {
 
   // ---- overview stat tiles ----
   const closesAt = ev.series_kind === 'shiplens' ? ev.shiplens_schedule?.reg_closes : ev.ends_at;
-  const statsRow = `<div class="ev-stats" style="margin-bottom:16px">
+  const statsRow = ev.series_kind === 'shiplens' ? `<div class="ev-stats" style="margin-bottom:16px">
+    <div class="ev-stat c1"><span class="ev-stat-ic">◎</span><div><b>${(ev.entries_count || 0).toLocaleString()}</b><span>Registered teams</span></div></div>
+    <div class="ev-stat c2"><span class="ev-stat-ic">◷</span><div><b>${shipLensDate(ev.shiplens_schedule?.submission_deadline)}</b><span>Project deadline</span></div></div>
+    <div class="ev-stat c4"><span class="ev-stat-ic">✦</span><div><b>${esc(({registration:'Registration',pending:'Brief release',submission:'Build window',grading:'Judging',closed:'Completed'})[ev.shiplens_phase] || 'Upcoming')}</b><span>Current phase</span></div></div>
+  </div>` : `<div class="ev-stats" style="margin-bottom:16px">
     <div class="ev-stat c1"><span class="ev-stat-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><div><b>${(ev.entries_count || 0).toLocaleString()}</b><span>Total Participants</span></div></div>
     <div class="ev-stat c2"><span class="ev-stat-ic">${clock}</span><div><b>${esc(evTimeLeft(closesAt))}</b><span>Closes In</span></div></div>
     <div class="ev-stat c4"><span class="ev-stat-ic">${checkI}</span><div><b>${ev.auto_certificate ? ev.pass_mark + '%+' : '—'}</b><span>Certificate</span></div></div>
@@ -2910,7 +2971,7 @@ function renderEventDetail() {
   const regPill = d.my_entry
     ? (d.can_participate ? `<span class="evd-reg-pill ok">${checkI}${ev.series_kind === 'shiplens' ? 'Enrolled' : 'Registered'}</span>`
       : `<span class="evd-reg-pill ${d.participate_msg && /reject/i.test(d.participate_msg) ? 'bad' : 'wait'}">${clock}${d.participate_msg && /reject/i.test(d.participate_msg) ? 'Payment rejected' : 'Awaiting confirmation'}</span>`)
-    : `<span class="evd-reg-pill ${regOpenNow ? 'ok' : 'bad'}">${regOpenNow ? checkI : ''}${regOpenNow ? 'Registration Open' : 'Registration Closed'}</span>`;
+    : `<span class="evd-reg-pill ${regOpenNow || ev.series_kind === 'shiplens' && ev.shiplens_phase === 'submission' ? 'ok' : 'bad'}">${regOpenNow ? checkI : ''}${regOpenNow ? 'Registration Open' : ev.series_kind === 'shiplens' && ev.shiplens_phase === 'submission' ? 'Build window open' : 'Registration Closed'}</span>`;
   const regCta = canRegister
     ? `<button type="button" class="evd-cta" onclick="regOpenEvent(${ev.id})">Register — ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'}</button>`
     : d.my_entry && ev.series_kind === 'shiplens'
@@ -2940,7 +3001,7 @@ function renderEventDetail() {
 
   // ---- right sidebar: workspace teaser ----
   const workReady = d.can_participate && (ev.series_kind !== 'shiplens' || ev.shiplens_phase === 'submission');
-  const workMsg = !d.my_entry ? 'Register for this event to unlock the workspace and start submitting.'
+  const workMsg = !d.my_entry ? ev.series_kind === 'shiplens' && !regOpenNow ? 'Registration is closed. Registered builders can sign in to submit their projects.' : 'Register for this event to unlock the workspace and start submitting.'
     : !d.can_participate ? (d.participate_msg || 'Waiting for access.')
     : ev.series_kind === 'shiplens' && ev.shiplens_phase === 'pending' ? `Your task opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.`
     : ev.series_kind === 'shiplens' && ['grading', 'closed'].includes(ev.shiplens_phase) ? 'The submission window for this series has closed.'
@@ -2995,6 +3056,7 @@ function renderEventDetail() {
     <p class="muted">${ev.series_kind === 'shiplens' ? 'Build your selected project with a team of one or two, then submit a GitHub repository and a live deployment link. Finance must confirm your challan payment first.' : `Reach the pass mark of <strong>${ev.pass_mark}%</strong> to clear this ${EV_KIND_LABEL[ev.kind].toLowerCase()}.${ev.auto_certificate ? ' A verified certificate is issued automatically when you pass.' : ''}${ev.entry === 'paid' ? ` Entry fee: PKR ${ev.fee_pkr}.` : ' This event is free to enter.'}`}</p>
     ${ev.dataset_url ? '<h4>Dataset</h4><p class="muted">A dataset is loaded into the editor automatically when you run your code.</p>' : ''}
     ${files}
+    ${ev.series_kind === 'shiplens' ? `<h4>Full series rules and requirements</h4><div class="sl-rules">${esc(ev.description || '')}</div>` : ''}
   </div>`;
 
   // submissions
@@ -3003,7 +3065,7 @@ function renderEventDetail() {
   const subRows = subs.length ? subs.map((s, i) => {
     const passed = s.score != null && s.score >= ev.pass_mark;
     const cls = s.score == null ? 'wait' : passed ? 'ok' : 'bad';
-    const label = s.score == null ? 'Grading' : passed ? 'Accepted' : 'Wrong Answer';
+    const label = s.score == null ? (ev.series_kind === 'shiplens' ? 'Under review' : 'Grading') : passed ? 'Accepted' : (ev.series_kind === 'shiplens' ? 'Needs revision' : 'Wrong Answer');
     const icon = s.score == null ? '<path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>'
       : passed ? '<path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>'
       : '<path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>';
@@ -3011,10 +3073,11 @@ function renderEventDetail() {
       <span class="sub-ic ${cls}"><svg viewBox="0 0 24 24" fill="none">${icon}</svg></span>
       <div class="grow"><div class="st">Submission #${subs.length - i}${i === 0 ? ' (Latest)' : ''}</div><div class="sub-when">Submitted ${esc(s.submitted_at)}</div>${s.graded_by === 'ai' ? '<div class="sub-when">10% reduction applied</div>' : ''}</div>
       <span class="sub-tag ${cls}">${label}</span>
+      ${ev.series_kind === 'shiplens' ? `<div class="sl-sub-links">${s.github_link ? `<a href="${esc(s.github_link)}" target="_blank" rel="noopener">GitHub repository ↗</a>` : ''}${s.render_link ? `<a href="${esc(s.render_link)}" target="_blank" rel="noopener">Live deployment ↗</a>` : ''}${s.vercel_link ? `<a href="${esc(s.vercel_link)}" target="_blank" rel="noopener">Vercel deployment ↗</a>` : ''}${s.link ? `<a href="${esc(s.link)}" target="_blank" rel="noopener">Walkthrough video ↗</a>` : ''}${s.file_url ? `<a href="${esc(s.file_url)}" target="_blank" rel="noopener">${esc(s.file_name || 'Project attachment')} ↗</a>` : ''}${s.note ? `<span>${esc(s.note)}</span>` : ''}</div>` : ''}
       ${s.score != null ? `<span class="sub-score">${s.score}/100 pts</span>` : ''}
       ${s.pid ? `<button class="sub-link" onclick="evSelectProblem(${s.pid});evScrollWork()">View details ›</button>` : ''}
     </div>`;
-  }).join('') : '<p class="muted">No submissions yet — write your solution and submit it from the editor.</p>';
+  }).join('') : `<p class="muted">${ev.series_kind === 'shiplens' ? 'No project submitted yet. Add your repository and live deployment below.' : 'No submissions yet — write your solution and submit it from the editor.'}</p>`;
   const submissionsSec = `<div class="evd-sec" id="evdSec-submissions">
     ${ev.kind === 'webinar' ? '' : `<h3>Your Submissions</h3>${subRows}`}
     ${renderEventWorkspace()}
@@ -3023,14 +3086,14 @@ function renderEventDetail() {
   const overview = `<div class="evd-sec" id="evdSec-overview">
     <h3 style="margin-bottom:14px">Overview</h3>
     ${ev.series_kind === 'shiplens'
-      ? `<section class="evd-event-description"><h3>About this ShipLens event</h3><p>${esc(ev.description || 'Event details will be announced soon.')}</p></section>`
+      ? `<section class="evd-event-description"><h3>About the challenge</h3><p>${esc((ev.description || 'Event details will be announced soon.').split(/\n\s*\n/)[0])}</p><button type="button" onclick="evNavGo('instructions')">Read full rules →</button></section>`
       : `<p class="muted" style="margin-bottom:16px">${esc((ev.description || '').slice(0, 260))}${(ev.description || '').length > 260 ? '…' : ''}</p>`}
     ${statsRow}
+    ${ev.series_kind === 'shiplens' ? '<div class="sl-steps"><div><b>01</b><strong>Register</strong><span>Join solo or as a pair and complete payment.</span></div><div><b>02</b><strong>Build</strong><span>Use the released brief to make a working project.</span></div><div><b>03</b><strong>Upload & submit</strong><span>Send your repository, live link and optional attachment.</span></div><div><b>04</b><strong>Get reviewed</strong><span>Reviewers score the project and share feedback.</span></div></div>' : ''}
     ${banner}
     <h3 style="margin-top:6px;display:flex;align-items:center;gap:8px"><svg class="ic" viewBox="0 0 24 24" fill="none" width="17" height="17"><path d="M6 3h9l3 3v15H6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Problem Statement</h3>
-    ${problemBlock}
-    <h3 style="margin-top:20px">Your Submissions</h3>
-    ${subRows}
+    ${ev.series_kind === 'shiplens' ? `<div class="sl-project-preview"><span>${esc(p?.difficulty || 'Project')} challenge</span><h4>${esc(p?.title || ev.title)}</h4><p>${p?.locked ? 'The full brief opens when the build window starts.' : esc((p?.description || '').slice(0, 320)) + ((p?.description || '').length > 320 ? '…' : '')}</p><button type="button" onclick="evNavGo('problem')">${p?.locked ? 'See release date' : 'Read the full brief'} →</button></div>` : problemBlock}
+    ${ME ? '<h3 style="margin-top:20px">Your Submissions</h3>' + subRows : ''}
     ${d.can_participate ? '<button class="btn btn-primary btn-block" style="margin-top:6px" onclick="evNavGo(\'submissions\')">+ New Submission</button>' : ''}
   </div>`;
 
@@ -3047,7 +3110,7 @@ function renderEventDetail() {
   const discussionSec = `<div class="evd-sec" id="evdSec-discussion"><h3>Discussion</h3><div id="evDisc"></div></div>`;
 
   const tabDefs = [
-    ['overview', 'Overview'], ['problem', 'Problem Statement'], ['instructions', 'Instructions'],
+    ['overview', 'Overview'], ['problem', ev.series_kind === 'shiplens' ? 'Full Brief' : 'Problem Statement'], ['instructions', ev.series_kind === 'shiplens' ? 'Rules' : 'Instructions'],
     ['submissions', ev.kind === 'webinar' ? 'Join' : 'Submissions'], ['leaderboard', 'Leaderboard'], ['discussion', 'Discussion'],
   ];
   const tabbar = `<div class="evd-tabbar ev-tabs">${tabDefs.map(([k, label]) =>
@@ -3056,7 +3119,7 @@ function renderEventDetail() {
   const main = `<div class="evd-main">${hero}${tabbar}${overview}${problemSec}${instructionsSec}${submissionsSec}${leaderboardSec}${discussionSec}</div>`;
   const side = `<div class="evd-side2">${regCard}${scheduleBox}${workCard}${keyDetailsCard}</div>`;
 
-  $('evDetail').innerHTML = `<div class="ev-detail2">${rail}${main}${side}</div>`;
+  $('evDetail').innerHTML = `<div class="ev-detail2${ev.series_kind === 'shiplens' ? ' sl-event-detail' : ''}">${rail}${main}${side}</div>`;
 
   // wire editor + discussion
   wireEventWorkspace();
@@ -3072,7 +3135,7 @@ function renderEventWorkspace() {
 
   // not able to participate yet
   if (!d.can_participate) {
-    const why = d.my_entry ? esc(d.participate_msg || 'Waiting for access.') : 'Register for this event to unlock the workspace and start submitting.';
+    const why = d.my_entry ? esc(d.participate_msg || 'Waiting for access.') : ev.series_kind === 'shiplens' && !['upcoming', 'registration'].includes(ev.shiplens_phase) ? 'Registration has closed. Registered builders can sign in to submit their projects.' : 'Register for this event to unlock the workspace and start submitting.';
     return `<div class="evd-work"><div class="evd-sec"><h3>Workspace</h3><p class="muted">${why}</p>
       ${!d.my_entry && ['upcoming', 'live'].includes(ev.status) ? `<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="regOpenEvent(${ev.id})">Register${ev.entry === 'paid' ? ' — PKR ' + ev.fee_pkr : ' — Free'}</button>` : ''}
     </div></div>`;
@@ -3128,15 +3191,21 @@ function renderEventWorkspace() {
 
   // file / link submission
   return `<div class="evd-work">
-    <div class="evd-sec"><h3>Submit your work</h3>
+    <div class="evd-sec"><h3>${ev.series_kind === 'shiplens' ? 'Upload your ShipLens project' : 'Submit your work'}</h3>
+      ${ev.series_kind === 'shiplens' ? '<p class="muted sl-upload-intro">Add your source repository and at least one live deployment. You can also attach a project archive or PDF for the judges.</p>' : ''}
       <form id="evFileForm">
         ${ev.series_kind === 'shiplens' ? `
           <label class="field"><span>GitHub repository URL</span><input name="github_link" type="url" required placeholder="https://github.com/you/project" value="${esc(sub?.github_link || '')}"></label>
           <label class="field"><span>Render deployment URL (optional)</span><input name="render_link" type="url" placeholder="https://your-project.onrender.com" value="${esc(sub?.render_link || '')}"></label>
-          <label class="field"><span>Vercel deployment URL (optional)</span><input name="vercel_link" type="url" placeholder="https://your-project.vercel.app" value="${esc(sub?.vercel_link || '')}"></label>` : `
+          <label class="field"><span>Vercel deployment URL (optional)</span><input name="vercel_link" type="url" placeholder="https://your-project.vercel.app" value="${esc(sub?.vercel_link || '')}"></label>
+          <p class="hint">Add at least one working deployment link. Another HTTPS host can go in the Render field.</p>
+          <label class="field"><span>Walkthrough video URL (if your brief asks for one)</span><input name="link" type="url" placeholder="https://www.youtube.com/watch?v=..." value="${esc(sub?.link || '')}"></label>
+          <label class="field"><span>Final commit hash and reviewer notes</span><textarea name="note" maxlength="500" placeholder="Paste the final commit hash and any notes for the judges">${esc(sub?.note || '')}</textarea></label>
+          <label class="field"><span>Project archive or report (optional, ZIP or PDF, up to 50 MB)</span><input name="file" type="file" accept=".zip,.pdf"></label>
+          ${sub?.file_name ? `<p class="hint">Current attachment: ${esc(sub.file_name)}. Leave the field empty to keep it.</p>` : ''}` : `
         <label class="field"><span>Your work as a file (any document)</span><input name="file" type="file"></label>
         <label class="field"><span>Or a link to your project</span><input name="link" type="url" placeholder="https://github.com/you/repo"></label>`}
-        <button class="ide2-submit btn-block" style="justify-content:center" id="evSubmitBtn">${sub ? 'Resubmit' : 'Submit for Grading'}</button>
+        <button class="ide2-submit btn-block" style="justify-content:center" id="evSubmitBtn">${ev.series_kind === 'shiplens' ? (sub ? 'Update project submission' : 'Submit project') : (sub ? 'Resubmit' : 'Submit for Grading')}</button>
       </form>
     </div>
     ${feedback}
@@ -3276,6 +3345,7 @@ async function evSubmitFile(form) {
   if (p) fd.set('pid', p.pid);
   if (!fd.get('file') || !fd.get('file').size) fd.delete('file');
   if (!fd.get('link')) fd.delete('link');
+  if (ev.series_kind === 'shiplens' && !fd.get('render_link') && !fd.get('vercel_link')) { toast('Add at least one live deployment link.', true); return; }
   if (ev.series_kind !== 'shiplens' && !fd.has('file') && !fd.get('link')) { toast('Attach a file or paste a link first.', true); return; }
   const btn = $('evSubmitBtn'); btn.disabled = true; btn.textContent = 'Submitting…';
   try {
@@ -3303,6 +3373,7 @@ function certGapMsg(prog, ev) {
 
 /* -------- registration (modal) -------- */
 function regOpenEvent(eid) {
+  if (!ME) { gate('Sign in or create a free account to register for ShipLens.'); return; }
   const ev = CUR_EVENT.event;
   openModal(`Register: ${ev.title}`, `
     <form id="regForm">
@@ -3329,6 +3400,7 @@ function regOpenEvent(eid) {
 function renderDiscussion() {
   const d = CUR_EVENT, box = $('evDisc'); if (!box) return;
   const comments = d.comments || [];
+  if (!ME) { box.innerHTML = '<p class="muted">Sign in to read and join the discussion.</p>'; return; }
   const form = `<form class="disc-form" id="discForm">
       <textarea name="body" placeholder="Ask a question or share a tip…" required></textarea>
       <button class="btn btn-primary" style="align-self:flex-start">Post</button>

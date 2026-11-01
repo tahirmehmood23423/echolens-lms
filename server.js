@@ -3356,7 +3356,7 @@ app.get('/api/events/:id', authRequired, (req, res) => {
   const mySubs = {};
   if (entry) for (const p of (ev.problems.length ? ev.problems : [{ pid: null }])) {
     const s = Events.submissionFor(ev.id, req.user.id, p.pid);
-    if (s) mySubs[p.pid || 0] = { pid: s.pid, code: s.code, language: s.language, file_name: s.file_name, link: s.link, github_link: s.github_link, render_link: s.render_link, vercel_link: s.vercel_link, score: s.score, ai_feedback: s.ai_feedback, graded_by: s.graded_by === 'ai' ? 'ai' : (s.graded_by ? 'admin' : null), submitted_at: s.submitted_at, certified: s.certified };
+    if (s) mySubs[p.pid || 0] = { pid: s.pid, code: s.code, language: s.language, file_url: s.file_url, file_name: s.file_name, link: s.link, note: s.note, github_link: s.github_link, render_link: s.render_link, vercel_link: s.vercel_link, score: s.score, ai_feedback: s.ai_feedback, graded_by: s.graded_by === 'ai' ? 'ai' : (s.graded_by ? 'admin' : null), submitted_at: s.submitted_at, certified: s.certified };
   }
   // Meeting links (webinars) only for confirmed participants or staff.
   const showLink = isAdmin || (entry && gate.ok);
@@ -3664,19 +3664,48 @@ app.delete('/api/admin/event-entries/:id', authRequired, adminRequired, asyncRou
 // has AI auto-grading on, the submission is graded immediately with a 10%
 // reduction, and a certificate is issued automatically at the pass mark.
 app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (req, res) => {
-  if (!['free', 'student'].includes(req.user.role)) return res.status(403).json({ error: 'Events are for learners.' });
+  const discardUpload = () => { if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} } };
+  if (!['free', 'student'].includes(req.user.role)) { discardUpload(); return res.status(403).json({ error: 'Events are for learners.' }); }
   const ev = Events.byId(req.params.id);
-  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  if (!ev) { discardUpload(); return res.status(404).json({ error: 'Event not found.' }); }
   const body = req.body || {};
   let file_url = null, file_name = null;
   if (req.file) { file_url = `/uploads/${req.file.filename}`; file_name = req.file.originalname; }
-  if (body.link && !/^https?:\/\//i.test(String(body.link))) return res.status(400).json({ error: 'Links must start with http:// or https://' });
+  if (ev.series_kind === 'shiplens' && req.file) {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const header = Buffer.alloc(5);
+    try {
+      const fd = fs.openSync(req.file.path, 'r');
+      try { fs.readSync(fd, header, 0, header.length, 0); } finally { fs.closeSync(fd); }
+    } catch {
+      discardUpload();
+      return res.status(400).json({ error: 'Could not read the ShipLens attachment.' });
+    }
+    const isPdf = ext === '.pdf' && header.toString('ascii') === '%PDF-';
+    const isZip = ext === '.zip' && header[0] === 0x50 && header[1] === 0x4b && [[3, 4], [5, 6], [7, 8]].some(([a, b]) => header[2] === a && header[3] === b);
+    if (!isPdf && !isZip) {
+      discardUpload();
+      return res.status(400).json({ error: 'ShipLens attachments must be valid ZIP or PDF files.' });
+    }
+  }
+  if (body.link && !/^https?:\/\//i.test(String(body.link))) {
+    discardUpload();
+    return res.status(400).json({ error: 'Links must start with http:// or https://' });
+  }
+  const previousFile = ev.series_kind === 'shiplens' && req.file
+    ? Events.submissionFor(ev.id, req.user.id, body.pid || null)?.file_url : null;
   const out = Events.submit({
     event_id: ev.id, user: req.user, pid: body.pid || null,
     code: body.code || null, language: body.language || null, output: body.output || null,
     file_url, file_name, link: body.link || null, github_link: body.github_link || null, render_link: body.render_link || null, vercel_link: body.vercel_link || null, note: body.note || null,
   });
-  if (out.error) return res.status(400).json({ error: out.error });
+  if (out.error) {
+    discardUpload();
+    return res.status(400).json({ error: out.error });
+  }
+  if (previousFile?.startsWith('/uploads/') && previousFile !== file_url) {
+    try { fs.unlinkSync(path.join(UPLOAD_DIR, path.basename(previousFile))); } catch {}
+  }
   let graded = null, cert = null;
   if (ev.auto_grade && ai.enabled()) {
     try {
@@ -5455,6 +5484,7 @@ app.get('/open', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'open.html'));
   }
 });
+app.get('/shiplens', (req, res) => res.redirect(302, '/open#shiplens'));
 app.get('/compiler', (req, res) => res.sendFile(path.join(__dirname, 'public', 'compiler.html')));
 require('./coursepages').register(app); // SEO landing page per course: /courses and /courses/:slug
 require('./talent').register(app, { authRequired, requireRecruiter, APP_URL, UPLOAD_DIR }); // Talent Marketplace: student profiles, projects, search (Phases 2-4)

@@ -4759,21 +4759,39 @@ function hackBadge(st) {
 }
 async function renderHackathons() {
   const el = $('view-hackathons');
-  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  el.innerHTML = '<div class="empty">Loading ShipLens...</div>';
   const d = await api('/api/events');
   const series = d.events.filter((ev) => ev.series_kind === 'shiplens');
-  el.innerHTML = `${d.is_admin ? '<div class="card"><div class="card-body"><strong>ShipLens monthly competition</strong><p class="s" style="color:var(--muted);margin:6px 0 12px">Schedule each series with one detailed project, set its difficulty and fee, and review teams and submissions here. Finance confirms challan payments.</p><button class="btn btn-primary btn-sm" onclick="formShipLens()">+ Schedule ShipLens series</button></div></div>' : ''}
-    <div class="card"><div class="card-head"><h3>ShipLens series</h3></div><div class="card-body tight">
-      ${series.length ? series.map((ev) => `<div class="list-row">
-        <div class="when">${evStatusBadge(ev.status)}<small>${esc(String(ev.starts_at || '').replace('T', ' '))} → ${esc(String(ev.ends_at || '').replace('T', ' '))}</small></div>
-        <div class="grow"><div class="t">${esc(ev.title)} · PKR ${Number(ev.fee_pkr).toLocaleString()} · <span class="s" style="color:var(--muted)">${esc(ev.shiplens_phase || '')}</span></div>
-          <div class="s">${(ev.problems || []).map((p) => `${esc(p.difficulty)}: ${esc(p.title)}`).join(' · ')} · ${ev.entries_count} team${ev.entries_count === 1 ? '' : 's'}</div>
-          ${ev.my_entry ? `<div class="s" style="color:var(--ok)">${ev.my_entry.payment_status === 'confirmed' ? 'Enrolled' : 'Challan issued · awaiting Finance confirmation'}</div>` : ''}</div>
-        <button class="btn btn-teal btn-sm" onclick="openEvent(${ev.id})">Open</button>
-        ${d.can_play && !ev.my_entry && ['upcoming', 'live'].includes(ev.status) ? `<button class="btn btn-primary btn-sm" onclick="formEventRegister(${ev.id})">Register</button>` : ''}
-        ${d.is_admin ? `<button class="btn btn-danger btn-sm" onclick="delShipLens(${ev.id})">Delete</button>` : ''}
-      </div>`).join('') : '<div class="empty">No ShipLens series scheduled yet.</div>'}
-    </div></div>`;
+  const joined = series.filter((ev) => ev.my_entry).length;
+  const submitted = series.filter((ev) => ev.my_progress?.submitted).length;
+  const reviewed = series.filter((ev) => ev.my_progress?.graded).length;
+  const dateLabel = (value) => {
+    if (!value) return 'To be announced';
+    const date = new Date(String(value).replace(' ', 'T'));
+    return Number.isNaN(date.getTime()) ? esc(value) : esc(date.toLocaleDateString('en-PK', {day:'numeric',month:'long',year:'numeric'}));
+  };
+  const cards = series.length ? series.map((ev) => {
+    const project = ev.problems?.[0];
+    const phase = {registration:'Registration open',pending:'Brief opens soon',submission:'Build window open',grading:'Under review',closed:'Completed'}[ev.shiplens_phase] || 'Upcoming';
+    const mayRegister = d.can_play && !ev.my_entry && ['upcoming','registration'].includes(ev.shiplens_phase);
+    const progress = ev.my_entry ? ev.my_progress?.graded ? 'Reviewed' : ev.my_progress?.submitted ? 'Project submitted' : 'Joined - project pending' : '';
+    return `<article class="sl-dash-card">
+      <div class="sl-dash-card-top"><span class="sl-edition">${esc(ev.title)}</span><span class="sl-phase">${esc(phase)}</span></div>
+      <h3>${esc(project?.title || ev.title)}</h3>
+      <p>${esc((ev.description || '').split(/\n\s*\n/)[0].slice(0, 190))}</p>
+      <div class="sl-dash-card-meta"><span>Team: 1-2</span><span>Entry: PKR ${Number(ev.fee_pkr || 0).toLocaleString()}</span><span>Submit by ${dateLabel(ev.shiplens_schedule?.submission_deadline)}</span></div>
+      ${progress ? `<div class="sl-dash-progress">${esc(progress)}</div>` : ''}
+      <div class="sl-dash-card-actions"><button class="btn btn-teal btn-sm" onclick="openEvent(${Number(ev.id)})">${ev.my_entry ? 'Continue challenge' : 'View challenge'}</button>
+      ${mayRegister ? `<button class="btn btn-ghost btn-sm" onclick="formEventRegister(${Number(ev.id)})">Register</button>` : ''}
+      ${d.is_admin ? `<button class="btn btn-ghost btn-sm" onclick="delShipLens(${Number(ev.id)})">Delete</button>` : ''}</div>
+    </article>`;
+  }).join('') : '<div class="sl-empty">No ShipLens series is scheduled yet.</div>';
+  el.innerHTML = `<div class="sl-dash">
+    <div class="sl-dash-hero"><div><span class="sl-hero-kicker">ECHOLENS MONTHLY BUILD SERIES</span><h1>Ship<span>Lens</span></h1><p>Build from a real brief. Deploy your work. Show what you can ship.</p><a href="/open#shiplens">Explore the public ShipLens page &rarr;</a></div><div class="sl-dash-hero-mark" aria-hidden="true">&lt; / &gt;</div></div>
+    ${d.is_admin ? `<div class="sl-dash-admin"><div><strong>Series administration</strong><p>Schedule each edition, review teams, payment and project submissions.</p></div><button class="btn btn-teal btn-sm" onclick="formShipLens()">+ Schedule series</button></div>` : `<div class="sl-dash-kpis"><div><b>${joined}</b><span>Joined challenges</span></div><div><b>${submitted}</b><span>Projects submitted</span></div><div><b>${reviewed}</b><span>Projects reviewed</span></div></div>`}
+    <div class="sl-section-head"><div><span>YOUR BUILD JOURNEY</span><h2>ShipLens series</h2></div><p>Deadlines and project names update with each edition.</p></div>
+    <div class="sl-dash-grid">${cards}</div>
+  </div>`;
 }
 let CURRENT_HACK = null;
 async function openHackathon(id) {
@@ -6711,16 +6729,21 @@ async function openEvent(id) {
   const filesHtml = (ev.files || []).length ? `
     <div class="s" style="margin:8px 0"><strong>Documents &amp; datasets:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>${isAdmin ? ` <button class="btn btn-ghost btn-sm" onclick="evDelFile(${ev.id},'${esc(f.name).replace(/'/g, '&#39;')}')" title="Remove">&times;</button>` : ''}`).join(' &middot; ')}</div>` : '';
 
-  // ---- gradient hero ----
-  const hero = `<div class="evd-hero">
+  // ---- event hero ----
+  const hero = `<div class="evd-hero${ev.series_kind === 'shiplens' ? ' sl-detail-hero' : ''}">
     <span class="ehd-badge">${ev.series_kind === 'shiplens' ? 'ShipLens' : EV_KIND_LABEL[ev.kind] || ev.kind}</span>
     <h2>${esc(ev.title)}</h2>
-    ${ev.description ? `<div class="ehd-desc">${esc(ev.description.slice(0, 220))}${ev.description.length > 220 ? '…' : ''}</div>` : ''}
+    ${ev.series_kind === 'shiplens' && probs[0] ? `<div class="ehd-sub">${esc(probs[0].title)}</div>` : ''}
+    ${ev.description ? `<div class="ehd-desc">${esc(ev.description.slice(0, 220))}${ev.description.length > 220 ? '...' : ''}</div>` : ''}
     <div class="ehd-pills">
-      <span class="ehd-pill">${clockI}${ev.starts_at ? fmtDT(ev.starts_at) + ' → ' + fmtDT(ev.ends_at) : ev.duration_minutes ? '~' + ev.duration_minutes + ' min' : 'No deadline'}</span>
-      <span class="ehd-pill">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'}</span>
-      <span class="ehd-pill">Pass mark ${ev.pass_mark}%</span>
-      ${ev.auto_certificate ? `<span class="ehd-pill">${checkI}Auto certificate</span>` : ''}
+      ${ev.series_kind === 'shiplens' ? `
+        <span class="ehd-pill">Team: 1-2 members</span>
+        <span class="ehd-pill">Entry: PKR ${Number(ev.fee_pkr || 0).toLocaleString()}</span>
+        <span class="ehd-pill">Submit by ${fmtDT(ev.shiplens_schedule?.submission_deadline)}</span>`
+      : `<span class="ehd-pill">${clockI}${ev.starts_at ? fmtDT(ev.starts_at) + ' to ' + fmtDT(ev.ends_at) : ev.duration_minutes ? '~' + ev.duration_minutes + ' min' : 'No deadline'}</span>
+        <span class="ehd-pill">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'}</span>
+        <span class="ehd-pill">Pass mark ${ev.pass_mark}%</span>
+        ${ev.auto_certificate ? `<span class="ehd-pill">${checkI}Auto certificate</span>` : ''}`}
     </div>
   </div>`;
 
@@ -6730,7 +6753,7 @@ async function openEvent(id) {
   const regPill = d.my_entry
     ? (d.can_participate ? `<span class="evd-reg-pill ok">${checkI}${ev.series_kind === 'shiplens' ? 'Enrolled' : 'Registered'}</span>`
       : `<span class="evd-reg-pill wait">${clockI}Awaiting confirmation</span>`)
-    : `<span class="evd-reg-pill ${regOpenNow ? 'ok' : 'bad'}">${regOpenNow ? 'Registration Open' : 'Registration Closed'}</span>`;
+    : `<span class="evd-reg-pill ${regOpenNow || ev.series_kind === 'shiplens' && ev.shiplens_phase === 'submission' ? 'ok' : 'bad'}">${regOpenNow ? 'Registration Open' : ev.series_kind === 'shiplens' && ev.shiplens_phase === 'submission' ? 'Build window open' : 'Registration Closed'}</span>`;
   const regCta = canRegister ? `<button type="button" class="evd-cta" onclick="formEventRegister(${ev.id})">Register — ${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'}</button>`
     : d.my_entry && ev.series_kind === 'shiplens' ? `<a class="evd-cta ghost" href="/api/events/${ev.id}/challan" target="_blank" rel="noopener">Download fee challan</a>` : '';
   const passedMsg = d.my_progress && d.my_progress.passed
@@ -6840,11 +6863,16 @@ function eventSubmitFormHtml(ev, pid, sub) {
       ${ev.series_kind === 'shiplens' ? `
         <label class="field"><span>GitHub repository URL</span><input name="github_link" type="url" required placeholder="https://github.com/you/project" value="${esc(sub?.github_link || '')}"></label>
         <label class="field"><span>Render deployment URL (optional)</span><input name="render_link" type="url" placeholder="https://your-project.onrender.com" value="${esc(sub?.render_link || '')}"></label>
-        <label class="field"><span>Vercel deployment URL (optional)</span><input name="vercel_link" type="url" placeholder="https://your-project.vercel.app" value="${esc(sub?.vercel_link || '')}"></label>` : `
+        <label class="field"><span>Vercel deployment URL (optional)</span><input name="vercel_link" type="url" placeholder="https://your-project.vercel.app" value="${esc(sub?.vercel_link || '')}"></label>
+        <p class="hint">Add at least one live deployment link. Another HTTPS host can go in the Render field.</p>
+        <label class="field"><span>Walkthrough video URL (if your brief asks for one)</span><input name="link" type="url" placeholder="https://www.youtube.com/watch?v=..." value="${esc(sub?.link || '')}"></label>
+        <label class="field"><span>Final commit hash and reviewer notes</span><textarea name="note" maxlength="500" placeholder="Paste the final commit hash and any notes for the judges">${esc(sub?.note || '')}</textarea></label>
+        <label class="field"><span>Project archive or report (optional, ZIP or PDF, up to 50 MB)</span><input name="file" type="file" accept=".zip,.pdf"></label>
+        ${sub?.file_name ? `<p class="hint">Current attachment: ${esc(sub.file_name)}. Leave the field empty to keep it.</p>` : ''}` : `
       ${hasCompiler ? '' : `<label class="field"><span>Your work as a file (any document - PDF, Word, notebook, zip...)</span><input name="file" type="file"></label>`}
       <label class="field"><span>Link to your project (optional${hasCompiler ? '' : ' if a file is attached'})</span><input name="link" type="url" placeholder="https://github.com/you/repo"></label>`}
-      <label class="field"><span>Note (optional)</span><input name="note" maxlength="500"></label>
-      <button class="btn btn-primary">${sub ? 'Resubmit' : 'Submit'}</button>
+      ${ev.series_kind === 'shiplens' ? '' : '<label class="field"><span>Note (optional)</span><input name="note" maxlength="500"></label>'}
+      <button class="btn btn-primary">${ev.series_kind === 'shiplens' ? (sub ? 'Update project submission' : 'Submit project') : (sub ? 'Resubmit' : 'Submit')}</button>
     </form>`;
 }
 async function openEventTask(eid, pid) {
@@ -6919,6 +6947,7 @@ function wireEventSubForms(eid) {
     e.preventDefault(); const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
     const fd = new FormData(f);
     if (f.dataset.pid) fd.set('pid', f.dataset.pid);
+    if (EV_CUR?.event?.series_kind === 'shiplens' && !fd.get('render_link') && !fd.get('vercel_link')) { modalMsg('Add at least one live deployment link.'); btn.disabled = false; return; }
     if (f.dataset.code) {
       const code = $('evCode').value;
       if (!code.trim()) { modalMsg('Write your solution in the editor first.'); btn.disabled = false; return; }
@@ -7012,7 +7041,7 @@ function adminEventPanel(d) {
             <div class="s" style="color:var(--muted)">${esc((s.submitted_at || '').slice(0, 16))}${s.language ? ' &middot; ' + esc(s.language) : ''}${s.note ? ' &middot; &ldquo;' + esc(s.note) + '&rdquo;' : ''}</div>
             ${s.code ? `<details><summary class="s" style="cursor:pointer;color:var(--teal-deep)">View code</summary><pre class="cred-box" style="white-space:pre-wrap;max-height:200px;overflow:auto">${esc(s.code)}</pre></details>` : ''}
             ${s.file_url ? `<a class="s" href="${esc(s.file_url)}" target="_blank" rel="noopener">${esc(s.file_name || 'File')}</a> ` : ''}
-            ${s.link ? `<a class="s" href="${esc(s.link)}" target="_blank" rel="noopener">Project link</a>` : ''}
+            ${s.link ? `<a class="s" href="${esc(s.link)}" target="_blank" rel="noopener">${ev.series_kind === 'shiplens' ? 'Walkthrough video' : 'Project link'}</a>` : ''}
             ${s.github_link ? `<a class="s" href="${esc(s.github_link)}" target="_blank" rel="noopener">GitHub repository</a> ` : ''}
             ${s.render_link ? `<a class="s" href="${esc(s.render_link)}" target="_blank" rel="noopener">Render deployment</a> ` : ''}
             ${s.vercel_link ? `<a class="s" href="${esc(s.vercel_link)}" target="_blank" rel="noopener">Vercel deployment</a>` : ''}

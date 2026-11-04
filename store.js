@@ -1402,6 +1402,60 @@ const Courses = {
   remove(id) { data.courses = data.courses.filter((c) => c.id !== Number(id)); save(); },
 };
 
+/* ------------------------- upcoming (admin-created) courses ------------------------- */
+const upcoming = require('./upcoming-courses');
+const UpcomingCourses = {
+  rows() {
+    if (!data.settings) data.settings = empty().settings;
+    if (!Array.isArray(data.settings.upcoming_courses)) data.settings.upcoming_courses = [];
+    return data.settings.upcoming_courses;
+  },
+  all() { return UpcomingCourses.rows().slice().sort((a, b) => b.id - a.id).map((c) => ({ ...c, phase: upcoming.phase(c) })); },
+  byId(id) { return UpcomingCourses.rows().find((c) => c.id === Number(id)) || null; },
+  byCode(code) { const k = String(code || '').trim().toUpperCase(); return k ? UpcomingCourses.rows().find((c) => c.code === k) || null : null; },
+  /** Public list: published and registration not yet closed, soonest start first. */
+  listed() {
+    const today = upcoming.todayPk();
+    return UpcomingCourses.rows().filter((c) => upcoming.isListed(c, today))
+      .sort((a, b) => String(a.classes_start || a.reg_closes).localeCompare(String(b.classes_start || b.reg_closes)))
+      .map((c) => upcoming.publicView(c, today));
+  },
+  // Admissions makes batches, challans and enrolments against data.courses,
+  // so every upcoming course keeps a matching row there.
+  syncCourse(c) {
+    const fields = { code: c.code, title: c.title, tier: 'Upcoming Course', level: c.level, weeks: c.weeks || null, hours: c.hours || null, price_pkr: c.price_pkr, summary: c.tagline || String(c.description || '').slice(0, 300) || null, badges: [], free_mode: null };
+    const row = Courses.byCode(c.code);
+    if (row) Object.assign(row, fields); else data.courses.push({ id: nextId('courses'), ...fields, created_at: now() });
+  },
+  create(b, by) {
+    const rec = upcoming.normalize(b);
+    const err = upcoming.validate(rec); if (err) return { error: err };
+    const rows = UpcomingCourses.rows();
+    const id = rows.reduce((m, c) => Math.max(m, c.id), 0) + 1;
+    let code = String(b.code || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 20) || ('UC-' + (100 + id));
+    if (UpcomingCourses.byCode(code) || OFFICIAL_CATALOGUE.some((o) => o.code === code) || (Courses.byCode(code) && !b.code)) code = 'UC-' + (100 + id) + '-' + crypto.randomInt(10, 99);
+    else if (Courses.byCode(code)) return { error: 'That course code is already used by another course. Choose another or leave it empty.' };
+    Object.assign(rec, { id, code, created_by: by || null, created_at: now(), updated_at: now() });
+    rows.push(rec); UpcomingCourses.syncCourse(rec); save();
+    return { course: { ...rec, phase: upcoming.phase(rec) } };
+  },
+  update(id, b) {
+    const prev = UpcomingCourses.byId(id); if (!prev) return { error: 'Course not found.', status: 404 };
+    const rec = upcoming.normalize(b, prev);
+    const err = upcoming.validate(rec); if (err) return { error: err };
+    rec.code = prev.code; rec.id = prev.id; rec.updated_at = now();
+    Object.assign(prev, rec); UpcomingCourses.syncCourse(prev); save();
+    return { course: { ...prev, phase: upcoming.phase(prev) } };
+  },
+  // The data.courses row stays: registrations, challans and batches may
+  // still point at it.
+  remove(id) {
+    const rows = UpcomingCourses.rows(), i = rows.findIndex((c) => c.id === Number(id));
+    if (i < 0) return false;
+    rows.splice(i, 1); save(); return true;
+  },
+};
+
 /* ------------------------------- batches ------------------------------- */
 function batchCode() {
   let code;
@@ -2391,16 +2445,22 @@ const FREE_FAMILIES = [
 // track is not ready for enrollment. This keeps staged courses visible while
 // preserving the stronger `published` gate used by enrollment, submissions,
 // recommendations and certification.
+//
+// Paid courses: the fixed paid catalogue is no longer advertised. The only
+// paid courses listed are the admin-created upcoming courses
+// (upcoming-courses.js), and each only until its registration closes.
 function publicCatalogue() {
   const trackByCode = {};
   for (const track of Quests.tracks({ includeUnpublished: true })) if (track.course_code) trackByCode[track.course_code] = track;
-  return OFFICIAL_CATALOGUE
+  const free = OFFICIAL_CATALOGUE
+    .filter((course) => !(Number(course.price_pkr) > 0))
     .filter((course) => course.published !== false || trackByCode[course.code]?.staged_catalogue)
     .map((course) => {
       const track = trackByCode[course.code];
       const available = course.published !== false && (!track || track.published !== false);
       return { ...course, track_key: track?.key || null, available, coming_soon: !available };
     });
+  return [...UpcomingCourses.listed(), ...free];
 }
 // The Web Developer Path bundle - the recommended beginner-to-job route.
 const LEARNING_PATHS = [
@@ -2416,11 +2476,30 @@ const LEARNING_PATHS = [
 // immediately, with no restart required, and can never drift from the
 // public listing for an official course code.
 function catalogueFee(code, fallbackCourse) {
+  const up = UpcomingCourses.byCode(code);
+  if (up) return Number(up.price_pkr) || 0;
   const c = OFFICIAL_CATALOGUE.find((x) => x.code === String(code || '').toUpperCase());
   if (c) return Number(c.price_pkr) || 0;
   return fallbackCourse ? Number(fallbackCourse.price_pkr) || 0 : 0;
 }
-function resolveOffering(code) { return require('./offering-policy').resolveOffering(code, OFFICIAL_CATALOGUE, data.courses); }
+// Staff-side resolution (Admissions adding a student, challans for existing
+// registrations): every offering we have ever sold still resolves, so older
+// registrations keep working after their course left the website.
+function resolveOffering(code) {
+  const up = UpcomingCourses.byCode(code);
+  if (up) return { offer: { code: up.code, title: up.title, price_pkr: Number(up.price_pkr) || 0 } };
+  return require('./offering-policy').resolveOffering(code, OFFICIAL_CATALOGUE, data.courses);
+}
+// Public website registration: only an admin-created course whose
+// registration window is open today.
+function resolvePublicOffering(code) {
+  const up = UpcomingCourses.byCode(code);
+  if (!up) return { error: 'Choose one of the upcoming courses currently open for registration.' };
+  const p = upcoming.phase(up);
+  if (p === 'upcoming') return { error: `Registration for ${up.title} opens on ${up.reg_opens}.` };
+  if (p !== 'open') return { error: `Registration for ${up.title} has closed.` };
+  return { offer: { code: up.code, title: up.title, price_pkr: Number(up.price_pkr) || 0 } };
+}
 function loadOfficialCatalogue() {
   let added = 0;
   for (const c of OFFICIAL_CATALOGUE) {
@@ -5498,7 +5577,7 @@ module.exports = {
   AmbassadorGemEvents, AmbassadorReports, Contracts, ONBOARDING_ROLES, CONTRACT_ROLES,
   Departments, DepartmentMembers, DepartmentTasks, DepartmentAnnouncements,
   Companies, AuditLog,
-  seed, DB_PATH, allData: () => data, resolveOffering,
+  seed, DB_PATH, allData: () => data, resolveOffering, resolvePublicOffering, UpcomingCourses,
   initFromPostgres, pendingPersist, flushHealth,
   isUsingPostgres: () => db.enabled(),
   // Exported for direct testing (see the Batch 2 test harness); not

@@ -251,6 +251,7 @@ img{display:block}
 .course-price{font-size:15px;font-weight:800}
 .course-price small{font-weight:600;color:var(--muted);font-size:11.5px}
 .btn-enroll{background:var(--grad);color:#fff;text-align:center;padding:10px;border-radius:var(--r-sm);font-size:13.5px;font-weight:700;box-shadow:0 5px 14px rgba(99,60,235,.25)}
+.btn-enroll.off{background:#E5E7EB;color:#4B5563;box-shadow:none}
 .btn-enroll:hover{box-shadow:0 7px 18px rgba(99,60,235,.34)}
 
 /* ---------- compiler ---------- */
@@ -506,73 +507,17 @@ footer{background:var(--navy);color:#B9C1E4}
 </section>
 
 <!-- ================================ COURSES ================================ -->
-<section class="sec" id="courses">
+<section class="sec" id="courses" style="display:none">
   <div class="sec-head-row">
     <div>
-      <h2>Popular Courses &amp; Bootcamps</h2>
-      <p>Instructor-led live classes, real projects and verified certificates.</p>
+      <h2>Upcoming Live Courses</h2>
+      <p>Instructor-led live classes with real projects and verified certificates. Each course is listed until its registration closes.</p>
     </div>
     <a class="view-all" href="/courses">View all courses &rarr;</a>
   </div>
-  <div class="course-grid">
-
-    <article class="course">
-      <div class="course-art" style="background:linear-gradient(135deg,#1B1145,#4B21B0)">
-        <span class="course-tier">Specialist Track</span>
-        <svg viewBox="0 0 24 24"><defs><linearGradient id="cg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C4B5FD"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs><path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="url(#cg1)"/><path d="M6 3l6 6 6-6M2 9h20M12 9l0 12" stroke="rgba(255,255,255,.5)" stroke-width=".8" fill="none"/></svg>
-      </div>
-      <div class="course-body">
-        <h3><a href="/courses/generative-ai-engineering">Generative AI Engineering</a></h3>
-        <div class="course-meta">8 Weeks <i></i> 32 Hours <i></i> Live Classes</div>
-        <p>Production LLM systems: retrieval-augmented generation, evaluation and deployment.</p>
-        <div class="course-price">PKR 22,500 <small>full track</small></div>
-        <a class="btn-enroll" href="/open#register">Enroll Now</a>
-      </div>
-    </article>
-
-    <article class="course">
-      <div class="course-art" style="background:linear-gradient(135deg,#0E2A5C,#2563EB)">
-        <span class="course-tier">Specialist Track</span>
-        <svg viewBox="0 0 24 24"><defs><linearGradient id="cg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93C5FD"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs><path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="url(#cg2)"/><path d="M6 3l6 6 6-6M2 9h20M12 9l0 12" stroke="rgba(255,255,255,.5)" stroke-width=".8" fill="none"/></svg>
-      </div>
-      <div class="course-body">
-        <h3><a href="/courses/machine-learning-fundamentals">Machine Learning Fundamentals</a></h3>
-        <div class="course-meta">8 Weeks <i></i> 32 Hours <i></i> Live Classes</div>
-        <p>Classical ML done rigorously: feature engineering, model selection and honest evaluation.</p>
-        <div class="course-price">PKR 21,500 <small>full track</small></div>
-        <a class="btn-enroll" href="/open#register">Enroll Now</a>
-      </div>
-    </article>
-
-    <article class="course">
-      <div class="course-art" style="background:linear-gradient(135deg,#3A0E4F,#9333EA)">
-        <span class="course-tier">Specialist Track</span>
-        <svg viewBox="0 0 24 24"><defs><linearGradient id="cg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9D5FF"/><stop offset="1" stop-color="#9333EA"/></linearGradient></defs><path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="url(#cg3)"/><path d="M6 3l6 6 6-6M2 9h20M12 9l0 12" stroke="rgba(255,255,255,.5)" stroke-width=".8" fill="none"/></svg>
-      </div>
-      <div class="course-body">
-        <h3><a href="/courses/ai-agents-and-automation-engineering">AI Agents &amp; Automation Engineering</a></h3>
-        <div class="course-meta">8 Weeks <i></i> 32 Hours <i></i> Live Classes</div>
-        <p>Multi-step, tool-calling AI agents that plan, act and integrate with real business systems.</p>
-        <div class="course-price">PKR 23,000 <small>full track</small></div>
-        <a class="btn-enroll" href="/open#register">Enroll Now</a>
-      </div>
-    </article>
-
-    <article class="course">
-      <div class="course-art" style="background:linear-gradient(135deg,#0B3B33,#0D9488)">
-        <span class="course-tier">Flagship Track</span>
-        <svg viewBox="0 0 24 24"><defs><linearGradient id="cg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5EEAD4"/><stop offset="1" stop-color="#0D9488"/></linearGradient></defs><path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="url(#cg4)"/><path d="M6 3l6 6 6-6M2 9h20M12 9l0 12" stroke="rgba(255,255,255,.5)" stroke-width=".8" fill="none"/></svg>
-      </div>
-      <div class="course-body">
-        <h3><a href="/courses/full-stack-javascript-react-node-and-postgresql">Full-Stack JavaScript: React, Node &amp; PostgreSQL</a></h3>
-        <div class="course-meta">8 Weeks <i></i> 32 Hours <i></i> Live Classes</div>
-        <p>Our premium flagship: build and deploy a complete production web application on the 2026 stack.</p>
-        <div class="course-price">PKR 25,000 <small>full track</small></div>
-        <a class="btn-enroll" href="/open#register">Enroll Now</a>
-      </div>
-    </article>
-
-  </div>
+  <!-- Filled by loadUpcomingCourses() in landing.js from /api/public/upcoming-courses.
+       The section stays hidden when no course is taking registrations. -->
+  <div class="course-grid" id="upcomingGrid"></div>
 </section>
 
 <!-- ================================ COMPILER ================================ -->
@@ -767,7 +712,7 @@ b = 20
   <div class="foot-bottom"><div class="foot-bottom-in"><span>&copy; 2026 EchoLens Digital. All rights reserved.</span><a href="/privacy">Privacy</a><span>EchoLens (SMC-Private) Limited</span><span>Made with &#9829; in Pakistan</span></div></div>
 </footer>
 
-<script src="/js/landing.js?v1444"></script>
+<script src="/js/landing.js?v1445"></script>
 <script src="/js/public-navigation.js?v1"></script>
 </body>
 </html>

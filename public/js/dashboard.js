@@ -103,7 +103,7 @@ const TITLES = {
   leaderboard: 'Leaderboard', announcements: 'Announcements', settings: 'Settings',
   challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'ShipLens',
   events: 'Events', 'shiplens-detail': 'ShipLens team & finance', 'admin-analytics': 'Reports', 'admin-mailer': 'Email Leads',
-  'admin-catalogue': 'Courses', 'admin-users': 'Users',
+  'admin-catalogue': 'Courses', 'admin-upcoming': 'Upcoming Courses', 'admin-users': 'Users',
   assignments: 'Assignments', quizzes: 'Quizzes', progress: 'Progress',
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
   students: 'Students', grades: 'Grades', attendance: 'Attendance', analytics: 'Analytics',
@@ -149,7 +149,7 @@ function show(view) {
     leaderboard: renderLeaderboard, announcements: renderAnnouncements, settings: renderSettings,
     challenges: renderChallenges, copilot: renderCopilot, hackathons: renderHackathons,
     events: renderEvents, 'admin-analytics': renderAnalytics, 'admin-mailer': renderAdminMailer,
-    'admin-catalogue': renderCatalogue, 'admin-users': renderUsers,
+    'admin-catalogue': renderCatalogue, 'admin-upcoming': renderAdminUpcoming, 'admin-users': renderUsers,
     assignments: renderAssignments, quizzes: renderQuizzesGlobal, progress: renderProgress,
     certificates: renderCertificates, messages: renderMessages, resources: renderResources,
     students: renderTeacherStudents, grades: renderTeacherGrades, attendance: renderTeacherAttendance,
@@ -7560,3 +7560,97 @@ function reviewFreeAttempt(submissionId){
     }catch(error){modalMsg(error.message);button.disabled=false;}
   };
 }
+
+
+/* ------------------------- upcoming courses (admin) -------------------------
+ * Admin-created paid courses - the only paid courses the public website shows.
+ * Each is listed on the home page, /open and /courses while it is published
+ * and its registration has not closed, and disappears by itself afterwards.
+ * Registrations land in Admissions exactly like every other course.
+ */
+let UPCOMING_ADMIN = [];
+const UP_PHASE = { draft: ['Draft - hidden', 'var(--muted)'], upcoming: ['Listed - registration not open yet', '#B45309'], open: ['Live - registration open', 'var(--ok)'], closed: ['Registration closed - hidden', 'var(--muted)'] };
+async function renderAdminUpcoming() {
+  const el = $('view-admin-upcoming');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/admin/upcoming-courses');
+  UPCOMING_ADMIN = d.courses;
+  el.innerHTML = `
+    <div class="card"><div class="card-head"><h3>Upcoming courses</h3><button class="btn btn-primary btn-sm" onclick="formUpcoming()">Create course</button></div>
+      <div class="card-body">
+        <p class="s" style="color:var(--muted);margin-bottom:12px">These are the only paid courses shown on the website. A published course appears on the home page, Live Tech Courses and /courses with its full syllabus, outcomes, prerequisites, duration and class dates, and is removed automatically the day after its registration closes. Registrations arrive in the Admissions Office like any other course.</p>
+      </div>
+      <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
+        <tr><th>Code</th><th>Course</th><th>Fee (PKR)</th><th>Registration</th><th>Classes</th><th>Status</th><th>Registrations</th><th></th></tr>
+        ${d.courses.map((c) => `<tr>
+          <td class="mono">${esc(c.code)}</td><td>${esc(c.title)}</td><td>${Number(c.price_pkr).toLocaleString()}</td>
+          <td>${esc(c.reg_opens || 'now')} &rarr; ${esc(c.reg_closes)}</td>
+          <td>${esc(c.classes_start || '—')}${c.classes_end ? ' &rarr; ' + esc(c.classes_end) : ''}</td>
+          <td><span style="color:${UP_PHASE[c.phase][1]};font-weight:600">${UP_PHASE[c.phase][0]}</span></td>
+          <td>${c.registrations}</td>
+          <td style="text-align:right;white-space:nowrap">
+            ${c.phase !== 'draft' && c.phase !== 'closed' ? `<a class="btn btn-ghost btn-sm" href="/courses/${esc(upSlug(c.title))}" target="_blank" rel="noopener">View page</a>` : ''}
+            <button class="btn btn-ghost btn-sm" onclick="formUpcoming(${c.id})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="delUpcoming(${c.id})">Delete</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No upcoming courses yet. Create one to show it on the website.</td></tr>'}
+      </table></div></div>`;
+}
+function upSlug(s) { return String(s || '').toLowerCase().replace(/&/g, ' and ').replace(/\+/g, ' plus ').replace(/[/.]/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+function upSyllabusText(list) { return (list || []).map((m) => [m.title, ...(m.topics || []).map((t) => '- ' + t)].join('\n')).join('\n'); }
+function formUpcoming(id) {
+  const c = UPCOMING_ADMIN.find((x) => x.id === id) || { published: true, mode: 'Online (live)', level: 'All levels' };
+  const v = (k) => esc(c[k] == null ? '' : c[k]);
+  const opt = (list, cur) => list.map((x) => `<option${x === cur ? ' selected' : ''}>${esc(x)}</option>`).join('');
+  openModal(id ? 'Edit upcoming course' : 'Create upcoming course', `
+    <form id="upForm">
+      <label class="field"><span>Course title</span><input name="title" required value="${v('title')}" placeholder="e.g. Generative AI Engineering - January 2027 cohort"></label>
+      <label class="field"><span>One-line summary (shown on cards)</span><input name="tagline" maxlength="300" value="${v('tagline')}"></label>
+      <label class="field"><span>About the course</span><textarea name="description" rows="4">${v('description')}</textarea></label>
+      <div class="form-grid">
+        <label class="field"><span>Fee (PKR)</span><input name="price_pkr" type="number" min="1" required value="${v('price_pkr')}"></label>
+        <label class="field"><span>Duration (e.g. 8 weeks)</span><input name="duration" value="${v('duration')}"></label>
+        <label class="field"><span>Weeks</span><input name="weeks" type="number" min="0" value="${v('weeks')}"></label>
+        <label class="field"><span>Total hours</span><input name="hours" type="number" min="0" value="${v('hours')}"></label>
+        <label class="field"><span>Format</span><select name="mode">${opt(['Online (live)', 'On-campus', 'Hybrid'], c.mode)}</select></label>
+        <label class="field"><span>Level</span><select name="level">${opt(['Beginner', 'Intermediate', 'Advanced', 'All levels'], c.level)}</select></label>
+        <label class="field"><span>Instructor (optional)</span><input name="instructor" value="${v('instructor')}"></label>
+        <label class="field"><span>Seats (optional)</span><input name="seats" type="number" min="0" value="${v('seats')}"></label>
+        ${id ? '' : '<label class="field"><span>Course code (optional)</span><input name="code" maxlength="20" placeholder="auto, e.g. UC-101"></label>'}
+      </div>
+      <h4 style="margin:10px 0 6px">Registration window</h4>
+      <div class="form-grid">
+        <label class="field"><span>Registration opens</span><input name="reg_opens" type="date" value="${v('reg_opens')}"></label>
+        <label class="field"><span>Registration closes (course leaves the website after this day)</span><input name="reg_closes" type="date" required value="${v('reg_closes')}"></label>
+      </div>
+      <h4 style="margin:10px 0 6px">Classes</h4>
+      <div class="form-grid">
+        <label class="field"><span>Classes start</span><input name="classes_start" type="date" value="${v('classes_start')}"></label>
+        <label class="field"><span>Classes end</span><input name="classes_end" type="date" value="${v('classes_end')}"></label>
+        <label class="field"><span>Class days</span><input name="class_days" value="${v('class_days')}" placeholder="e.g. Mon, Wed, Fri"></label>
+        <label class="field"><span>Class time</span><input name="class_time" value="${v('class_time')}" placeholder="e.g. 7:00 - 9:00 PM PKT"></label>
+      </div>
+      <label class="field"><span>Class dates - one per line: date then session title</span><textarea name="class_dates" rows="4" placeholder="2027-01-05 Orientation and setup&#10;2027-01-07 Python refresher">${esc((c.class_dates || []).map((d) => d.date + (d.title ? ' ' + d.title : '')).join('\n'))}</textarea></label>
+      <label class="field"><span>Prerequisites - one per line</span><textarea name="prerequisites" rows="3">${esc((c.prerequisites || []).join('\n'))}</textarea></label>
+      <label class="field"><span>Learning outcomes - one per line</span><textarea name="outcomes" rows="4">${esc((c.outcomes || []).join('\n'))}</textarea></label>
+      <label class="field"><span>Syllabus - a line per module, topics under it starting with "-"</span><textarea name="syllabus" rows="8" placeholder="Week 1: Foundations&#10;- Topic one&#10;- Topic two&#10;Week 2: Building with APIs&#10;- Topic three">${esc(upSyllabusText(c.syllabus))}</textarea></label>
+      <label class="field" style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="published"${c.published ? ' checked' : ''} style="width:auto"> <span>Published - show on the website while registration is open</span></label>
+      <button class="btn btn-primary btn-block">${id ? 'Save changes' : 'Create course'}</button>
+    </form>`, true);
+  $('upForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button'); btn.disabled = true; modalMsg('');
+    const body = {};
+    for (const k of ['title', 'tagline', 'description', 'price_pkr', 'duration', 'weeks', 'hours', 'mode', 'level', 'instructor', 'seats', 'reg_opens', 'reg_closes', 'classes_start', 'classes_end', 'class_days', 'class_time', 'class_dates', 'prerequisites', 'outcomes', 'syllabus']) body[k] = f[k].value;
+    if (f.code) body.code = f.code.value;
+    body.published = f.published.checked;
+    try {
+      await api(id ? '/api/admin/upcoming-courses/' + id : '/api/admin/upcoming-courses', { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+      closeModal(); toast(id ? 'Course updated.' : 'Course created.'); renderAdminUpcoming();
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function delUpcoming(id) {
+  const c = UPCOMING_ADMIN.find((x) => x.id === id);
+  if (!c || !confirm(`Delete "${c.title}"? It is removed from the website. Existing registrations and challans are kept.`)) return;
+  try { await api('/api/admin/upcoming-courses/' + id, { method: 'DELETE' }); toast('Course deleted.'); renderAdminUpcoming(); }
+  catch (err) { toast(err.message, true); }
+}
+window.formUpcoming = formUpcoming; window.delUpcoming = delUpcoming;

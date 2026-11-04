@@ -806,9 +806,11 @@ async function loadCatalogue() {
     const comingSoon = CATALOGUE.filter((course) => course.coming_soon);
     const totalOpenEnrollments = Number(d.counts?.open_web_enrollments || 0);
 
-    $('cohortLine').textContent = available.length + ' available courses | ' + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses | ' + totalOpenEnrollments.toLocaleString() + ' students enrolled in open-web courses.' + (comingSoon.length ? ' ' + comingSoon.length + ' new certified courses are open for syllabus preview and coming soon.' : '') + ' Paid cohorts are arranged by Admissions.';
-    $('actionStrip').innerHTML = `
-      <button class="btn btn-primary" onclick="openRegister()">Register for a paid course</button>`;
+    const upcomingOpen = CATALOGUE.filter((c) => c.upcoming && c.registration_open);
+    const upcomingAll = CATALOGUE.filter((c) => c.upcoming);
+    $('cohortLine').textContent = (upcomingAll.length ? upcomingAll.length + ' upcoming live course' + (upcomingAll.length === 1 ? '' : 's') + ' (' + upcomingOpen.length + ' open for registration) | ' : '') + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses | ' + totalOpenEnrollments.toLocaleString() + ' students enrolled in open-web courses.' + (comingSoon.filter(c=>!c.upcoming).length ? ' ' + comingSoon.filter(c=>!c.upcoming).length + ' new certified courses are open for syllabus preview and coming soon.' : '');
+    $('actionStrip').innerHTML = upcomingOpen.length ? `
+      <button class="btn btn-primary" onclick="openRegister()">Register for an upcoming course</button>` : '';
     const p = (d.paths || [])[0];
     $('pathBox').innerHTML = p ? `
       <div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
@@ -828,7 +830,7 @@ async function loadCatalogue() {
 }
 const BADGE_LABEL = { free: 'FREE', new: 'NEW', coming_soon: 'COMING SOON', high_demand: 'HIGH DEMAND', flagship: 'FLAGSHIP' };
 const BADGE_CLASS = { free: 'quest', new: 'webinar', coming_soon: 'webinar', high_demand: 'competition', flagship: 'hackathon' };
-const COURSE_PILLS = [['all', 'All'], ['Bootcamp', 'Bootcamps'], ['Short Course', 'Short Courses'], ['Specialist Track', 'Specialist Tracks'], ['free', 'Free courses']];
+const COURSE_PILLS = [['all', 'All'], ['Upcoming Course', 'Upcoming live courses'], ['free', 'Free courses']];
 function setCoursePill(kind) {
   if (kind === 'free') { $('cFree').value = 'free'; $('cTier').value = ''; }
   else if (kind === 'all') { $('cFree').value = ''; $('cTier').value = ''; }
@@ -844,7 +846,53 @@ function renderCoursePills() {
     return `<button type="button" class="filt-pill${active ? ' active' : ''}" onclick="setCoursePill('${k}')">${esc(label)}</button>`;
   }).join('');
 }
+// Admin-created upcoming course: dates instead of week/hour totals, and a
+// details view with the full syllabus rather than a quest track.
+function fmtDayPk(d) { if (!d) return ''; const t = new Date(d + 'T00:00:00Z'); return isNaN(t) ? d : t.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+function upcomingCardHtml(c) {
+  const open = c.registration_open;
+  return `
+    <div class="oc-card" onclick="courseAction('${esc(c.code)}')">
+      <div class="oc-top">
+        <div class="oc-icon" style="background:${tierBg('Specialist Track', false)}"><svg viewBox="0 0 24 24" fill="none">${ICONS[pickIcon(c.title)]}</svg></div>
+        <span class="oc-demand">${open ? 'REGISTRATION OPEN' : 'OPENS ' + esc(fmtDayPk(c.reg_opens)).toUpperCase()}</span>
+      </div>
+      <div>
+        <div class="oc-tier">${esc(c.mode)} &middot; ${esc(c.level)}</div>
+        <h4 class="oc-title">${esc(c.title)}</h4>
+      </div>
+      <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${esc(c.duration || '')}${c.duration && c.classes_start ? ' &middot; ' : ''}${c.classes_start ? 'Starts ' + esc(fmtDayPk(c.classes_start)) : ''}</div>
+      ${open ? `<div class="oc-meta">Registration closes ${esc(fmtDayPk(c.reg_closes))}</div>` : ''}
+      <div class="oc-foot">
+        <div class="oc-price">PKR ${Number(c.price_pkr).toLocaleString()}</div>
+        <button type="button" class="btn ${open ? 'btn-primary' : 'btn-ghost'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">View details</button>
+      </div>
+    </div>`;
+}
+function openUpcomingCourse(c) {
+  const list = (items) => `<ul style="margin:4px 0 12px;padding-left:18px">${items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
+  const fact = (k, v) => v ? `<div><div class="s" style="color:var(--muted)">${esc(k)}</div><b>${esc(v)}</b></div>` : '';
+  const schedule = [c.class_days, c.class_time].filter(Boolean).join(', ');
+  openModal(c.title, `
+    ${c.summary ? `<p class="s" style="color:var(--muted);margin-bottom:12px">${esc(c.summary)}</p>` : ''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
+      ${fact('Fee', 'PKR ' + Number(c.price_pkr).toLocaleString())}${fact('Duration', c.duration)}${fact('Total hours', c.hours ? c.hours + ' hours' : '')}
+      ${fact('Format', c.mode)}${fact('Level', c.level)}${fact('Instructor', c.instructor)}
+      ${fact('Classes start', fmtDayPk(c.classes_start))}${fact('Classes end', fmtDayPk(c.classes_end))}${fact('Schedule', schedule)}
+      ${fact('Registration opens', fmtDayPk(c.reg_opens))}${fact('Registration closes', fmtDayPk(c.reg_closes))}${fact('Seats', c.seats ? String(c.seats) : '')}
+    </div>
+    ${c.description ? `<h4>About this course</h4><p class="s" style="white-space:pre-line;margin-bottom:12px">${esc(c.description)}</p>` : ''}
+    ${c.outcomes.length ? `<h4>What you will be able to do</h4>${list(c.outcomes)}` : ''}
+    <h4>Prerequisites</h4>${c.prerequisites.length ? list(c.prerequisites) : '<p class="s" style="margin-bottom:12px">None - the course starts from the beginning.</p>'}
+    ${c.syllabus.length ? `<h4>Syllabus</h4><ol style="margin:4px 0 12px;padding-left:20px">${c.syllabus.map((m) => `<li style="margin-bottom:6px"><b>${esc(m.title)}</b>${m.topics.length ? `<ul style="padding-left:18px;color:var(--muted)">${m.topics.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}</li>`).join('')}</ol>` : ''}
+    ${c.class_dates.length ? `<h4>Class dates</h4><ul style="margin:4px 0 12px;padding-left:18px">${c.class_dates.map((d, i) => `<li><b>${esc(fmtDayPk(d.date))}</b> - ${esc(d.title || 'Class ' + (i + 1))}</li>`).join('')}</ul>` : ''}
+    ${c.registration_open
+      ? `<button class="btn btn-primary btn-block" onclick="openRegister('${esc(c.code)}')">Register now</button>`
+      : `<p class="s" style="color:var(--muted)">Registration opens on ${esc(fmtDayPk(c.reg_opens))}.</p>`}`);
+}
+window.openUpcomingCourse = openUpcomingCourse;
 function courseCardHtml(c) {
+  if (c.upcoming) return upcomingCardHtml(c);
   const isFree = c.price_pkr === 0;
   const comingSoon = c.available === false || c.coming_soon;
   const icon = pickIcon(c.title);
@@ -944,7 +992,7 @@ function drawCourses() {
     (!tier || c.tier === tier) &&
     (!mode || (mode === 'free' ? c.price_pkr === 0 : c.price_pkr > 0)) &&
     (!q || c.title.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || (c.summary || '').toLowerCase().includes(q)));
-  if (!list.length) { $('courseTable').innerHTML = '<div class="empty">No courses match those filters.</div>'; return; }
+  if (!list.length) { $('courseTable').innerHTML = `<div class="empty">${mode === 'paid' || tier === 'Upcoming Course' ? 'No live courses are open for registration right now. New courses are announced here - check back soon, or explore the free courses.' : 'No courses match those filters.'}</div>`; return; }
   // Free courses read as 5 language ladders (Beginner/Intermediate/Advanced
   // sub-courses per language) rather than a flat grid, whenever every
   // filtered result is free - i.e. the "Free courses" pill, or a search
@@ -958,6 +1006,7 @@ function drawCourses() {
 function courseAction(code) {
   const c = CATALOGUE.find((x) => x.code === code);
   if (!c) return;
+  if (c.upcoming) { openUpcomingCourse(c); return; }
   // Every course opens its full detail page (price, outline, key concepts,
   // final project, and its quests - first week open, the rest locked). Paid
   // courses carry a "Register to unlock" call to action inside that page.
@@ -975,8 +1024,10 @@ const AMBASSADOR_REF_CODE = (() => {
 })();
 function openRegister(code, title) {
   if (code === 'PATH') { toast('Bundle enrollment is not available yet. Choose an individual course.', true); return; }
+  const openCourses = CATALOGUE.filter((c) => c.upcoming && c.registration_open);
+  if (!openCourses.length) { toast('No course is open for registration right now. Check back soon.', true); return; }
   pushDialog('register', code);
-  const options = CATALOGUE.filter((c) => c.price_pkr > 0).map((c) =>
+  const options = openCourses.map((c) =>
     `<option value="${esc(c.code)}|${esc(c.title)}"${c.code === code ? ' selected' : ''}>${esc(c.code)} - ${esc(c.title)} (PKR ${c.price_pkr.toLocaleString()})</option>`).join('');
   openModal('Register for a course', `
     <p class="s" style="color:var(--muted);margin-bottom:12px">Share your details and our Admissions Office will email you the fee challan with payment details and next steps. Admissions will confirm the next available cohort and your payment deadline.</p>

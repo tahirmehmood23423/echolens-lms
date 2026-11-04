@@ -33,7 +33,43 @@ async function api(path, opts) {
   } catch {}
 
   loadTestimonials();
+  loadUpcomingCourses();
 })();
+
+/* ---------------------------- upcoming courses ----------------------------
+ * Admin-created live courses (admin portal -> Upcoming Courses). The server
+ * only returns courses whose registration has not closed, so a course drops
+ * off the home page by itself the day after registration closes. */
+const ART = ['#1B1145,#4B21B0', '#0E2A5C,#2563EB', '#3A0E4F,#9333EA', '#0B3B33,#0D9488'];
+const GEM = '<svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9l4-6z" fill="rgba(255,255,255,.9)"/><path d="M6 3l6 6 6-6M2 9h20M12 9l0 12" stroke="rgba(124,58,237,.5)" stroke-width=".8" fill="none"/></svg>';
+function slugify(s) { return String(s || '').toLowerCase().replace(/&/g, ' and ').replace(/\+/g, ' plus ').replace(/[/.]/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+function fmtDay(d) { if (!d) return ''; const t = new Date(d + 'T00:00:00Z'); return isNaN(t) ? d : t.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+async function loadUpcomingCourses() {
+  let list;
+  try { list = (await api('/api/public/upcoming-courses')).courses; } catch { return; }
+  if (!list || !list.length) return;
+  $('upcomingGrid').innerHTML = list.slice(0, 8).map((c, i) => {
+    const url = '/courses/' + slugify(c.title);
+    const meta = [c.duration, c.hours ? c.hours + ' Hours' : '', c.mode].filter(Boolean).map(esc).join(' <i></i> ');
+    return `
+    <article class="course">
+      <div class="course-art" style="background:linear-gradient(135deg,${ART[i % ART.length]})">
+        <span class="course-tier">${c.registration_open ? 'Registration open' : 'Opens ' + esc(fmtDay(c.reg_opens))}</span>${GEM}
+      </div>
+      <div class="course-body">
+        <h3><a href="${url}">${esc(c.title)}</a></h3>
+        <div class="course-meta">${meta}</div>
+        ${c.summary ? `<p>${esc(c.summary)}</p>` : ''}
+        <p style="font-size:12.5px">${c.classes_start ? 'Classes start ' + esc(fmtDay(c.classes_start)) + '. ' : ''}${c.registration_open ? 'Registration closes ' + esc(fmtDay(c.reg_closes)) + '.' : ''}</p>
+        <div class="course-price">PKR ${Number(c.price_pkr).toLocaleString()}</div>
+        ${c.registration_open
+          ? `<a class="btn-enroll" href="/open#register-${encodeURIComponent(c.code)}">Register Now</a>`
+          : `<a class="btn-enroll off" href="${url}">View syllabus</a>`}
+      </div>
+    </article>`;
+  }).join('');
+  $('courses').style.display = '';
+}
 
 /* ------------------------------ testimonials ------------------------------
  * Real, admin-approved feedback only (see the public feedback wall at

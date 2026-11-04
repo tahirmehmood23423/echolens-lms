@@ -749,7 +749,7 @@ app.get('/api/my/recommended', authRequired, (req, res) => {
   if (req.user.role !== 'student') return res.json({ courses: [] });
   const myCodes = new Set(coursesForUser(req.user).map((b) => Courses.byId(b.course_id)?.code).filter(Boolean));
   const rank = { flagship: 0, high_demand: 1, new: 2, free: 3 };
-  const out = officialCatalogue()
+  const out = store.publicCatalogue().filter((c) => c.upcoming)
     .filter((c) => !myCodes.has(c.code))
     .sort((a, b) => Math.min(...(a.badges || []).map((x) => rank[x] ?? 9), 9) - Math.min(...(b.badges || []).map((x) => rank[x] ?? 9), 9))
     .slice(0, 6);
@@ -2510,7 +2510,7 @@ app.get('/api/public/info', (req, res) => {
     // sign-in at /open (Courses tab) and GET /api/catalogue.
     stats: {
       students: Users.countByRole('student') + Users.countByRole('free'),
-      courses: officialCatalogue().length,
+      courses: store.publicCatalogue().length,
       tracks: Quests.tracks().length,
     },
     capabilities:{grading:ai.enabled(),talent:db.enabled(),email:mailer.configured},
@@ -4037,11 +4037,11 @@ app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
   }));
   res.json({
     catalogue: store.publicCatalogue().map((c) => ({ ...c, enrollment_count: enrollment_counts[c.track_key] || 0 })),
-    paths: store.learningPaths().map(p => ({ ...p, enrollment_available: false, availability_reason: 'Bundle enrollment is not available yet. Choose an individual course.' })),
+    paths: [], // the bundle was built from the retired paid catalogue
     free_families: store.freeFamilies(),
     links: KEY_LINKS,
     cohort: null,
-    counts:{total:officialCatalogue().length,free:officialCatalogue().filter(c=>c.price_pkr===0).length, open_web_enrollments:Object.values(enrollment_counts).reduce((a,b)=>a+b,0)},
+    counts:{total:store.publicCatalogue().length,free:store.publicCatalogue().filter(c=>c.price_pkr===0).length, open_web_enrollments:Object.values(enrollment_counts).reduce((a,b)=>a+b,0)},
   });
 });
 
@@ -4090,6 +4090,30 @@ function emailCodeValid(email, code) {
   EMAIL_CODES.delete(String(email).toLowerCase());
   return true;
 }
+
+/* ------------------- upcoming (admin-created) paid courses -------------------
+ * See upcoming-courses.js. Public: only courses whose registration has not
+ * closed. Admin: the full list, including drafts and closed courses.
+ */
+app.get('/api/public/upcoming-courses', (req, res) => res.json({ courses: store.UpcomingCourses.listed() }));
+app.get('/api/admin/upcoming-courses', authRequired, adminRequired, (req, res) => {
+  const regs = Registrations.all();
+  res.json({ courses: store.UpcomingCourses.all().map((c) => ({ ...c, registrations: regs.filter((r) => r.course_code === c.code).length })) });
+});
+app.post('/api/admin/upcoming-courses', authRequired, adminRequired, (req, res) => {
+  const out = store.UpcomingCourses.create(req.body || {}, req.user.id);
+  if (out.error) return res.status(400).json({ error: out.error });
+  res.json({ ok: true, course: out.course });
+});
+app.put('/api/admin/upcoming-courses/:id', authRequired, adminRequired, (req, res) => {
+  const out = store.UpcomingCourses.update(req.params.id, req.body || {});
+  if (out.error) return res.status(out.status || 400).json({ error: out.error });
+  res.json({ ok: true, course: out.course });
+});
+app.delete('/api/admin/upcoming-courses/:id', authRequired, adminRequired, (req, res) => {
+  if (!store.UpcomingCourses.remove(req.params.id)) return res.status(404).json({ error: 'Course not found.' });
+  res.json({ ok: true });
+});
 
 /* ------------------------- public announcements (item 7) ------------------------- */
 app.get('/api/public/announcements', (req, res) => res.json({ announcements: PublicAnnouncements.all() }));
@@ -4173,7 +4197,9 @@ app.delete('/api/jobs/comments/:id', authRequired, (req, res) => {
 app.post('/api/public/register-interest', limitLead, asyncRoute(async (req, res) => {
   const b = { ...req.body };
   if (b.company) return res.json({ ok: true }); // honeypot field: bots fill it, humans never see it
-  const resolved = store.resolveOffering(b.course_code);
+  // The website takes registrations only for an admin-created upcoming course
+  // whose registration window is open today.
+  const resolved = store.resolvePublicOffering(b.course_code);
   if (resolved.error) return res.status(400).json({ error: resolved.error });
   b.course_code = resolved.offer.code; b.course_title = resolved.offer.title;
   if (!b.name || String(b.name).trim().length < 2) return res.status(400).json({ error: 'Enter your full name.' });
@@ -5441,7 +5467,7 @@ let OPEN_HTML_CACHE = null;
 function buildOpenHtml() {
   const file = path.join(__dirname, 'public', 'open.html');
   let html = fs.readFileSync(file, 'utf8');
-  const items = officialCatalogue().map((c, i) => {
+  const items = officialCatalogue().filter((c) => !(Number(c.price_pkr) > 0)).map((c, i) => {
     const isFree = !c.price_pkr;
     const course = {
       '@type': 'Course',

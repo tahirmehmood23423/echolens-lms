@@ -326,10 +326,96 @@ function renderCourse(c, all) {
 ` + pageFoot();
 }
 
+/* --------------------------- upcoming course page --------------------------- */
+// An admin-created course (upcoming-courses.js): everything the admin entered -
+// syllabus, outcomes, prerequisites, duration and the class calendar.
+function fmtDay(d) {
+  if (!d) return '';
+  const t = new Date(d + 'T00:00:00Z');
+  return isNaN(t) ? d : t.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+function renderUpcoming(c, all) {
+  const slug = courseSlug(c);
+  const url = `${BASE}/courses/${slug}`;
+  const open = c.phase === 'open';
+  const title = `${c.title} | Upcoming course - EchoLens Digital`;
+  const metaDesc = `${c.summary || c.title} ${c.duration ? c.duration + ', ' : ''}${c.mode}. ${c.classes_start ? 'Classes start ' + fmtDay(c.classes_start) + '. ' : ''}Registration ${open ? 'closes ' + fmtDay(c.reg_closes) : 'opens ' + fmtDay(c.reg_opens)}.`.slice(0, 300);
+  const cta = open
+    ? `<a class="btn btn-grad" href="/open#register-${esc(c.code)}">Register now</a>`
+    : `<span class="btn btn-light" aria-disabled="true">Registration opens ${esc(fmtDay(c.reg_opens))}</span>`;
+  const list = (items) => `<ul class="cp-list">${items.map((i) => '<li>' + esc(i) + '</li>').join('')}</ul>`;
+  const syllabusHtml = c.syllabus.length ? `<h2>Syllabus</h2>
+        <ol class="cp-outline">${c.syllabus.map((m) => `<li><b>${esc(m.title)}</b>${m.topics.length ? `<ul>${m.topics.map((t) => '<li>' + esc(t) + '</li>').join('')}</ul>` : ''}</li>`).join('')}</ol>` : '';
+  const datesHtml = c.class_dates.length ? `<h2>Class dates</h2>
+        <table class="cp-dates"><thead><tr><th>Date</th><th>Session</th></tr></thead><tbody>${c.class_dates.map((d, i) => `<tr><td>${esc(fmtDay(d.date))}</td><td>${esc(d.title || 'Class ' + (i + 1))}</td></tr>`).join('')}</tbody></table>` : '';
+  const schedule = [c.class_days, c.class_time].filter(Boolean).join(', ');
+  const facts = [
+    ['Fee', priceLabel(c)],
+    ['Duration', c.duration || (c.weeks ? c.weeks + ' weeks' : '')],
+    ['Total hours', c.hours ? c.hours + ' hours' : ''],
+    ['Format', c.mode],
+    ['Level', c.level],
+    ['Classes start', fmtDay(c.classes_start)],
+    ['Classes end', fmtDay(c.classes_end)],
+    ['Schedule', schedule],
+    ['Instructor', c.instructor || ''],
+    ['Seats', c.seats ? String(c.seats) : ''],
+    ['Registration opens', fmtDay(c.reg_opens)],
+    ['Registration closes', fmtDay(c.reg_closes)],
+  ].filter(([, v]) => v);
+  const courseLd = {
+    '@context': 'https://schema.org', '@type': 'Course', name: c.title, description: c.summary || c.title, url, courseCode: c.code,
+    coursePrerequisites: c.prerequisites, teaches: c.outcomes.slice(0, 10),
+    provider: { '@type': 'EducationalOrganization', name: 'EchoLens Digital', url: BASE + '/' },
+    offers: { '@type': 'Offer', category: 'Paid', price: String(c.price_pkr), priceCurrency: 'PKR', availability: open ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder', validThrough: c.reg_closes || undefined, url },
+    hasCourseInstance: { '@type': 'CourseInstance', courseMode: c.mode === 'On-campus' ? 'Onsite' : c.mode === 'Hybrid' ? 'Blended' : 'Online', startDate: c.classes_start || undefined, endDate: c.classes_end || undefined, courseWorkload: c.hours ? 'PT' + c.hours + 'H' : undefined, instructor: c.instructor ? { '@type': 'Person', name: c.instructor } : undefined },
+  };
+  const others = all.filter((x) => x.upcoming && x.code !== c.code).slice(0, 4);
+  return pageHead({ title, description: metaDesc, canonical: url, keywords: [c.title, 'course Pakistan', 'live course', 'EchoLens'].join(', '), jsonld: [courseLd] }) + `
+<style>.cp-outline{padding-left:20px;margin:0 0 14px}.cp-outline>li{margin:0 0 10px}.cp-outline ul{margin:6px 0 0;padding-left:18px;color:#4B5563}.cp-dates{width:100%;border-collapse:collapse;margin:0 0 14px;font-size:14px}.cp-dates th,.cp-dates td{text-align:left;padding:8px 10px;border-bottom:1px solid #E5E7EB}.cp-dates th{color:#6B7280;font-weight:600}</style>
+<div class="cp-wrap">
+  <nav class="cp-crumb"><a href="/">Home</a> / <a href="/courses">Courses</a> / <span>${esc(c.title)}</span></nav>
+  <header class="cp-hero">
+    <div class="cp-badges"><span class="cp-badge hot">${open ? 'Registration open' : 'Opening soon'}</span><span class="cp-badge">${esc(c.mode)}</span><span class="cp-badge">${esc(c.level)}</span></div>
+    <h1 class="cp-h1">${esc(c.title)}</h1>
+    ${c.summary ? `<p class="cp-lead">${esc(c.summary)}</p>` : ''}
+    <div class="cp-meta">
+      <div><b>${esc(priceLabel(c))}</b>Course fee</div>
+      ${c.duration || c.weeks ? `<div><b>${esc(c.duration || c.weeks + ' weeks')}</b>${c.hours ? c.hours + ' hours' : 'Duration'}</div>` : ''}
+      ${c.classes_start ? `<div><b>${esc(fmtDay(c.classes_start))}</b>Classes start</div>` : ''}
+      <div><b>${esc(fmtDay(open ? c.reg_closes : c.reg_opens))}</b>${open ? 'Registration closes' : 'Registration opens'}</div>
+    </div>
+    <div class="cp-cta">${cta}</div>
+  </header>
+  <div class="cp-grid">
+    <main>
+      <section class="cp-card">
+        ${c.description ? `<h2>About this course</h2>${String(c.description).split(/\n{2,}/).map((para) => '<p>' + esc(para).replace(/\n/g, '<br>') + '</p>').join('')}` : ''}
+        ${c.outcomes.length ? `<h2>What you will be able to do</h2>${list(c.outcomes)}` : ''}
+        ${c.prerequisites.length ? `<h2>Prerequisites</h2>${list(c.prerequisites)}` : '<h2>Prerequisites</h2><p>None - the course starts from the beginning.</p>'}
+        ${syllabusHtml}
+        ${datesHtml}
+      </section>
+    </main>
+    <aside class="cp-side">
+      <div class="cp-card">
+        <div class="cp-price">${esc(priceLabel(c))}<small>Fee payable by challan after registration</small></div>
+        <ul class="cp-facts">${facts.map(([k, v]) => `<li><span>${esc(k)}</span><span>${esc(v)}</span></li>`).join('')}</ul>
+        <div style="display:flex;flex-direction:column;gap:8px">${cta}</div>
+        <p style="font-size:12.5px;color:#6B7280;margin-top:12px;line-height:1.55">Questions about ${esc(c.title)}? Message us on <a href="${WHATSAPP}" target="_blank" rel="noopener" style="color:#7C3AED;font-weight:600">WhatsApp</a> or email <a href="mailto:${EMAIL}" style="color:#7C3AED;font-weight:600">${EMAIL}</a>.</p>
+      </div>
+    </aside>
+  </div>
+  ${others.length ? `<h2 class="cp-sec-h">Other upcoming courses</h2>
+  <div class="cp-rel">${others.map((r) => `<a href="/courses/${courseSlug(r)}"><b>${esc(r.title)}</b><span>${esc(priceLabel(r))}${r.classes_start ? ' &middot; starts ' + esc(fmtDay(r.classes_start)) : ''}</span></a>`).join('')}</div>` : ''}
+</div>
+` + pageFoot();
+}
+
 /* -------------------------------- index page -------------------------------- */
 function renderIndex(all) {
   const url = BASE + '/courses';
-  const tiers = ['Bootcamp', 'Short Course', 'Specialist Track'];
+  const tiers = ['Upcoming Course', 'Bootcamp', 'Short Course', 'Specialist Track', 'Career Track'];
   const listLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -348,7 +434,9 @@ function renderIndex(all) {
     const items = all.filter((c) => c.tier === tier);
     if (!items.length) return '';
     return `<h2 class="cp-sec-h">${esc(tier)}s <span style="font-size:14px;color:#6B7280;font-weight:500">(${items.length})</span></h2>
-    <div class="cp-rel">${items.map((c) => `<a href="/courses/${courseSlug(c)}"><b>${esc(c.title)}</b><span>${esc(priceLabel(c))} &middot; ${c.weeks} weeks &middot; ${c.hours}h</span></a>`).join('')}</div>`;
+    <div class="cp-rel">${items.map((c) => `<a href="/courses/${courseSlug(c)}"><b>${esc(c.title)}</b><span>${c.upcoming
+      ? `${esc(priceLabel(c))}${c.classes_start ? ' &middot; starts ' + esc(fmtDay(c.classes_start)) : ''} &middot; ${c.phase === 'open' ? 'registration open' : 'opens ' + esc(fmtDay(c.reg_opens))}`
+      : `${esc(priceLabel(c))} &middot; ${c.weeks} weeks &middot; ${c.hours}h`}</span></a>`).join('')}</div>`;
   };
   return pageHead({
     title: 'All Courses - AI, Coding, Data Science & Design | EchoLens Digital',
@@ -371,15 +459,22 @@ function renderIndex(all) {
 }
 
 /* -------------------------------- registration -------------------------------- */
+// Only what the website currently offers: the free courses plus the
+// admin-created upcoming courses whose registration has not closed. A retired
+// paid course, or an upcoming one whose registration closed, is not found.
+function currentCourses() {
+  const free = store.officialCatalogue().filter((c) => !(Number(c.price_pkr) > 0));
+  return [...store.UpcomingCourses.listed(), ...free];
+}
 function allCourseUrls() {
-  return store.officialCatalogue().map((c) => '/courses/' + courseSlug(c));
+  return currentCourses().map((c) => '/courses/' + courseSlug(c));
 }
 function register(app) {
   app.get('/courses', (req, res) => {
-    res.type('html').send(renderIndex(store.officialCatalogue()));
+    res.type('html').send(renderIndex(currentCourses()));
   });
   app.get('/courses/:slug', (req, res) => {
-    const all = store.officialCatalogue();
+    const all = currentCourses();
     const c = all.find((x) => courseSlug(x) === req.params.slug);
     if (!c) {
       res.status(404).type('html').send(pageHead({
@@ -388,7 +483,7 @@ function register(app) {
       }) + `<div class="cp-wrap"><h1 class="cp-sec-h">Course not found</h1><p>We couldn't find that course. <a href="/courses" style="color:#7C3AED;font-weight:600">Browse all courses</a>.</p></div>` + pageFoot());
       return;
     }
-    res.type('html').send(renderCourse(c, all));
+    res.type('html').send(c.upcoming ? renderUpcoming(c, all) : renderCourse(c, all));
   });
 }
 

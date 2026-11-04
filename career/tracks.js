@@ -283,6 +283,12 @@ const TRACKS = [
   },
 ];
 
+// Assessment depth each roadmap needs per skill: the highest question difficulty
+// (1-3) the evidence must include before it counts for this roadmap. Tracks that
+// start at intermediate level need evidence from the hardest questions; a skill
+// verified only at a shallower depth elsewhere is re-assessed, never assumed.
+for (const t of TRACKS) for (const s of t.skills) if (s.depth == null) s.depth = t.suitability.includes('Beginner') ? 2 : 3;
+
 const bySlug = new Map(TRACKS.map((t) => [t.slug, t]));
 const track = (slug) => bySlug.get(String(slug || '')) || null;
 

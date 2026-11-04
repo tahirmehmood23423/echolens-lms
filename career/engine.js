@@ -76,7 +76,10 @@ function assembleForm({ pool, plan, seen = new Set(), seed = 1, reviewItems = 0 
   const items = [], used = new Set(), shortfall = {};
   const auto = pool.filter((q) => q.grading !== 'review');
   const fresh = (list) => [list.filter((c) => !seen.has(c.id)), list.filter((c) => seen.has(c.id))];
-  for (const [skill, want] of Object.entries(plan)) {
+  for (const [skill, spec] of Object.entries(plan)) {
+    // A plan entry is a count, or { n, depth } when the track needs evidence at a
+    // minimum difficulty (assessment depth) for this skill.
+    const want = typeof spec === 'object' ? spec.n : spec, depth = typeof spec === 'object' ? spec.depth || 0 : 0;
     const candidates = shuffle(auto.filter((q) => q.skills[0] === skill && !used.has(q.id)), rand);
     const picked = [];
     const take = (q) => { if (q && picked.length < want && !picked.includes(q)) picked.push(q); };
@@ -92,6 +95,11 @@ function assembleForm({ pool, plan, seen = new Set(), seed = 1, reviewItems = 0 
       const g = theoryFirst(group);
       for (const d of [1, 2, 3]) take(g.find((c) => c.difficulty === d && catOf(c) === 'theory' && !picked.includes(c)));
       for (const q of g) take(q);
+    }
+    if (depth && picked.length && !picked.some((q) => q.difficulty >= depth)) {
+      const deep = [...fresh(candidates.filter((c) => c.difficulty >= depth && !picked.includes(c)))].flat()[0];
+      const i = picked.map((q) => catOf(q)).lastIndexOf('theory');
+      if (deep) picked[i >= 0 ? i : picked.length - 1] = deep;
     }
     if (picked.length < want) shortfall[skill] = want - picked.length;
     picked.forEach((q) => { used.add(q.id); items.push(q); });
@@ -165,6 +173,9 @@ function summarize(responses, config = DEFAULT_CONFIG) {
       if (!r.answered) continue;
       if (r.pending) { e.pending++; continue; }
       e.answered++; e.possible += r.points; e.earned += r.earned;
+      e.max_difficulty = Math.max(e.max_difficulty || 0, r.d || 1);
+      (e.evidence_types = e.evidence_types || {})[r.grading === 'review' ? 'staff_reviewed' : 'auto_graded'] = true;
+      (e.questions = e.questions || []).push(r.id + '@v' + (r.v || 1));
       const bc = e.by_category[cat]; bc.answered++; bc.possible += r.points; bc.earned += r.earned;
     }
     if (r.answered && !r.pending) { const t = categories[cat]; t.answered++; t.possible += r.points; t.earned += r.earned; }
@@ -174,6 +185,8 @@ function summarize(responses, config = DEFAULT_CONFIG) {
     e.evidence = e.answered >= config.min_evidence_items ? 'sufficient' : 'insufficient';
     e.by_category = Object.fromEntries(Object.entries(e.by_category).map(([c, t]) => [c, finishTally(t)]));
     e.practical_score = e.by_category.practical.score;
+    e.max_difficulty = e.max_difficulty || 0;
+    e.evidence_types = Object.keys(e.evidence_types || {});
   }
   const done = responses.filter((r) => r.answered && !r.pending);
   const cats = Object.fromEntries(Object.entries(categories).map(([c, t]) => [c, finishTally(t)]));
@@ -190,7 +203,7 @@ function summarize(responses, config = DEFAULT_CONFIG) {
 function scoreAttempt(questions, answers, config = DEFAULT_CONFIG) {
   const responses = questions.map((q) => {
     const g = gradeResponse(q, answers[q.id]);
-    const r = { id: q.id, v: q.version, type: q.type, grading: q.grading || 'auto', category: catOf(q), answered: g.answered, earned: g.earned, points: q.points, correct: g.correct, practical: catOf(q) === 'practical', skills: q.skills };
+    const r = { id: q.id, v: q.version, d: q.difficulty || 1, type: q.type, grading: q.grading || 'auto', category: catOf(q), answered: g.answered, earned: g.earned, points: q.points, correct: g.correct, practical: catOf(q) === 'practical', skills: q.skills };
     if (g.pending) { r.pending = true; r.answer = String(answers[q.id]).slice(0, 6000); }
     return r;
   });
@@ -225,7 +238,8 @@ function skillProfile(attempts) {
       for (const c of CATEGORIES) { const t = e.by_category?.[c]; if (t && t.answered) cats[c] = { score: t.score, answered: t.answered, at: a.submitted_at }; }
       if (e.score == null) { if (prev) prev.by_category = cats; else if (Object.keys(cats).length) profile[skill] = { score: null, evidence: 'none', answered: 0, by_category: cats }; continue; }
       if (e.evidence === 'sufficient' || !prev || prev.evidence !== 'sufficient') {
-        profile[skill] = { score: e.score, evidence: e.evidence, answered: e.answered, attempt_id: a.id, at: a.submitted_at, assessment: a.assessment, by_category: cats };
+        profile[skill] = { score: e.score, evidence: e.evidence, answered: e.answered, attempt_id: a.id, at: a.submitted_at, assessment: a.assessment, by_category: cats,
+          max_difficulty: e.max_difficulty || 0, evidence_types: e.evidence_types || [], questions: e.questions || [], config_version: a.config_version || null, skill_version: a.skill_versions?.[skill] || 1 };
       } else prev.by_category = cats;
     }
   }

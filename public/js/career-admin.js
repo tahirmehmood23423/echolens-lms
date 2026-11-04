@@ -128,6 +128,9 @@ function caScoring() {
         <label class="field"><span>Questions per skill reassessment</span><input type="number" name="skill_reassess_items" value="${c.skill_reassess_items}"></label>
         <label class="field"><span>Hours before a full retake</span><input type="number" name="retake_cooldown_hours" value="${c.retake_cooldown_hours}"></label>
         <label class="field"><span>Staff-reviewed items per assessment (0-4)</span><input type="number" min="0" max="4" name="review_items_per_form" value="${c.review_items_per_form}"></label>
+        <label class="field"><span>Active roadmaps per student (1-12)</span><input type="number" min="1" max="12" name="max_active_roadmaps" value="${c.max_active_roadmaps}"></label>
+        <label class="field"><span>Days a common CS result stays valid (30-1095)</span><input type="number" min="30" max="1095" name="common_valid_days" value="${c.common_valid_days}"></label>
+        <label class="field"><span>Days a verified skill can be reused (30-1095)</span><input type="number" min="30" max="1095" name="skill_valid_days" value="${c.skill_valid_days}"></label>
         <label class="field"><span>Answered items a category needs to count</span><input type="number" min="1" max="10" name="min_category_items" value="${c.min_category_items}"></label>
       </div>
       <p class="s" style="color:var(--muted)">These bands are provisional placement guidance. Calibrate them against pilot results before relying on them.</p>
@@ -210,7 +213,8 @@ function caWire() {
       skill_thresholds: { strong: Number(f.strong.value), developing: Number(f.developing.value) },
       min_evidence_items: Number(f.min_evidence_items.value), min_confidence: Number(f.min_confidence.value),
       track_items_per_skill: Number(f.track_items_per_skill.value), skill_reassess_items: Number(f.skill_reassess_items.value), retake_cooldown_hours: Number(f.retake_cooldown_hours.value),
-      review_items_per_form: Number(f.review_items_per_form.value), min_category_items: Number(f.min_category_items.value),
+      review_items_per_form: Number(f.review_items_per_form.value),
+      max_active_roadmaps: Number(f.max_active_roadmaps.value), common_valid_days: Number(f.common_valid_days.value), skill_valid_days: Number(f.skill_valid_days.value), min_category_items: Number(f.min_category_items.value),
       category_weights: Object.fromEntries(CA_DATA.weights.map((w) => [w.key, Object.fromEntries(['theory', 'practical', 'scenario'].map((c) => [c, Number(f[`cw:${w.key}:${c}`].value)]))])),
     };
     try { await api('/api/admin/career/config', { method: 'PUT', body: JSON.stringify(body) }); toast('Scoring rules saved as a new version.'); renderAdminCareer('scoring'); } catch (err) { toast(err.message, true); }

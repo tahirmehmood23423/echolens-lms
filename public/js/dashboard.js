@@ -7666,20 +7666,21 @@ window.formUpcoming = formUpcoming; window.delUpcoming = delUpcoming;
  */
 async function careerOverviewCard(el) {
   let r; try { r = await api('/api/career/me'); } catch { return; }
-  const t = r.track, rm = r.roadmap, done = rm ? rm.stages.filter((s) => s.status === 'completed').length : 0;
+  const rms = r.roadmaps || { enrollments: [] }, p = rms.primary, prog = p?.progress;
+  const secondary = rms.enrollments.filter((e) => e.status === 'active' && !e.primary);
   const next = r.active ? ['#take', 'Resume ' + r.active.title]
-    : !r.common.last_attempt ? ['#assess/common', 'Take the common CS assessment']
-      : !t ? ['#tracks', 'Choose a career track']
-        : r.gaps[0] ? ['#report', 'Work on ' + (r.gaps[0].name || 'your next skill')] : ['#roadmap', 'Open my roadmap'];
+    : !p ? ['#me', 'Choose a career roadmap']
+      : prog?.next_activity ? [prog.next_activity.href.startsWith('#') ? prog.next_activity.href : '#me', prog.next_activity.label] : ['#roadmap', 'Open my roadmap'];
+  const href = (h) => (h.startsWith('/') ? h : '/career' + h);
   const card = document.createElement('div');
   card.className = 'card';
-  card.innerHTML = `<div class="card-head"><h3>Career development</h3><a class="btn btn-ghost btn-sm" href="/career#me">Open</a></div>
+  card.innerHTML = `<div class="card-head"><h3>My career roadmaps</h3><a class="btn btn-ghost btn-sm" href="/career#me">Manage</a></div>
     <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
-      <div style="min-width:160px"><div class="s" style="color:var(--muted)">Career track</div><strong>${esc(t ? t.title : 'Not chosen yet')}</strong></div>
-      <div style="min-width:140px"><div class="s" style="color:var(--muted)">Assessed level (provisional)</div><strong>${esc(r.readiness?.level || 'Not assessed')}</strong></div>
-      <div style="min-width:120px"><div class="s" style="color:var(--muted)">Roadmap</div><strong>${rm ? done + ' of 6 stages' : '-'}</strong></div>
+      <div style="min-width:160px"><div class="s" style="color:var(--muted)">Primary roadmap</div><strong>${esc(p ? p.title : 'Not chosen yet')}</strong>${secondary.length ? `<div class="s" style="color:var(--muted)">+ ${secondary.map((e) => esc(e.title)).join(', ')}</div>` : ''}</div>
+      <div style="min-width:140px"><div class="s" style="color:var(--muted)">Assessed level (provisional)</div><strong>${esc(prog?.level || 'Not assessed')}</strong></div>
+      <div style="min-width:120px"><div class="s" style="color:var(--muted)">Progress</div><strong>${prog ? prog.completion_pct + '%' + (prog.current_stage ? ' · stage ' + prog.current_stage : '') : '-'}</strong></div>
       <span style="flex:1"></span>
-      <a class="btn btn-teal btn-sm" href="/career${next[0]}">${esc(next[1])}</a>
+      <a class="btn btn-teal btn-sm" href="${esc(href(next[0]))}">${esc(next[1])}</a>
     </div>`;
   el.insertBefore(card, el.firstChild);
 }

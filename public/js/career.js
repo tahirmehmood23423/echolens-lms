@@ -3,12 +3,12 @@
  * EchoLens career paths (/career). One small hash-routed app:
  *   #tracks            explore the 12 tracks (public)
  *   #track/<slug>      track detail (public)
- *   #me                my career dashboard
+ *   #me                My Career Roadmaps (Primary, Secondary, paused, add)
  *   #onboarding        optional preferences
  *   #assess/<key>      assessment intro -> #take (one question per screen)
  *   #result/<id>       attempt result and answer review
  *   #report            skill report, gaps and recommendations
- *   #roadmap           personalised six-stage roadmap and my projects
+ *   #roadmap[/<slug>]  personalised six-stage roadmap and my projects
  *   #history           attempts and skill score history
  * Every score comes from the server; this file only displays it.
  */
@@ -16,7 +16,7 @@
   const $ = (id) => document.getElementById(id);
   const root = $('career');
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  let ME = null, TRACKS = null, OPTIONS = null, ATTEMPT = null, SAVE_TIMER = null, TICK = null;
+  let ME = null, PENDING_ADVICE = null, TRACKS = null, OPTIONS = null, ATTEMPT = null, SAVE_TIMER = null, TICK = null;
 
   async function api(path, opts = {}) {
     const res = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined });
@@ -32,7 +32,7 @@
   const CAT_DESC = { theory: 'concepts and code tracing', practical: 'hands-on coding, debugging and configuration', scenario: 'real-world problems and decisions' };
   const pctTxt = (v) => (v == null ? '-' : v + '%');
   const status = (s) => `<span class="cr-status" data-icon="${STATUS_ICON[s] || ''}" style="color:${STATUS_COLOR[s] || 'inherit'}">${esc(s)}</span>`;
-  const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['tracks', 'Career tracks'], ['me', 'My career'], ['report', 'My skill report'], ['roadmap', 'My roadmap'], ['history', 'Assessment history']]
+  const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['tracks', 'Career tracks'], ['me', 'My roadmaps'], ['report', 'My skill report'], ['roadmap', 'My roadmap'], ['history', 'Assessment history']]
     .map(([k, l]) => `<a href="#${k}"${cur === k ? ' aria-current="page"' : ''}>${l}</a>`).join('')}</nav>`;
   const learner = () => ME && ['free', 'student'].includes(ME.role);
   function needLogin(what) {
@@ -78,13 +78,13 @@
   async function viewTrack(slug) {
     const t = (await api('/api/career/tracks/' + encodeURIComponent(slug))).track;
     document.title = t.title + ' career track | EchoLens';
-    const preferred = ME && ME.career?.preferences?.preferred_track === t.slug;
+    const mine = (ME?.career?.roadmaps?.enrollments || []).find((e) => e.track === t.slug && e.status !== 'archived');
     root.innerHTML = `${tabs('tracks')}
       <p class="cr-small"><a href="#tracks">&larr; All career tracks</a></p>
       <section class="cr-hero"><h1>${esc(t.title)}</h1><p>${esc(t.overview)}</p>
         <div class="cr-tags">${t.suitability.map((s) => `<span class="cr-tag">${esc(s)}</span>`).join('')}<span class="cr-tag">${esc(t.duration)}</span></div>
         <div class="cr-actions">
-          ${learner() ? `<button class="cr-btn${preferred ? ' ghost' : ''}" id="crPick"${preferred ? ' disabled' : ''}>${preferred ? '✓ This is my track' : 'Make this my career track'}</button>` : ''}
+          ${learner() ? (mine ? `<a class="cr-btn ghost" href="#me">✓ ${mine.primary ? 'Your Primary roadmap' : mine.status === 'paused' ? 'In your roadmaps (paused)' : 'In your roadmaps'}</a>` : `<button class="cr-btn" id="crPick">Add to my roadmaps</button>`) : ''}
           ${t.assessment.available ? `<a class="cr-btn ghost" href="${learner() ? '#assess/' + esc(t.slug) : loginUrl()}">Take the ${esc(t.title)} assessment</a>` : `<span class="cr-tag">${esc(t.assessment.reason || 'Assessment coming soon')}</span>`}
         </div></section>
       <div class="cr-cols"><div>
@@ -101,7 +101,11 @@
         <div class="cr-panel"><h3>Practical assessment</h3><p class="cr-small">${esc(t.practical)}</p></div>
       </aside></div>`;
     const pick = $('crPick');
-    if (pick) pick.onclick = async () => { pick.disabled = true; try { await api('/api/career/me/preferences', { method: 'PUT', body: { ...(ME.career?.preferences || {}), preferred_track: t.slug } }); await loadMe(); location.hash = '#roadmap'; } catch (e) { pick.disabled = false; alert(e.message); } };
+    if (pick) pick.onclick = async () => {
+      pick.disabled = true;
+      try { const out = await api('/api/career/me/enrollments', { method: 'POST', body: { track: t.slug } }); await loadMe(); PENDING_ADVICE = out.recommendation; location.hash = '#me'; }
+      catch (e) { pick.disabled = false; pick.insertAdjacentHTML('afterend', `<span class="cr-small" role="alert" style="color:#8A1C1C">${esc(e.message)} <a href="#me">Manage my roadmaps</a></span>`); }
+    };
   }
 
   /* ------------------------------ onboarding ------------------------------ */
@@ -136,30 +140,84 @@
   }
 
   /* --------------------------- career dashboard --------------------------- */
-  async function viewMe() {
-    if (!ME) { root.innerHTML = needLogin('My career'); return; }
+  const ASSESS_TAG = { common_required: 'warn', skills_to_assess: 'warn', pending_review: '', up_to_date: 'teal' };
+  const STATE_TAG = { active: 'teal', paused: 'warn', archived: '' };
+  /** One roadmap card. `big` is the Primary card. */
+  function roadmapCard(e, rm, big) {
+    const p = e.progress || {}, a = p.assessment_status || {}, n = p.next_activity;
+    const act = (action, label, ghost = true) => `<button class="cr-btn${ghost ? ' ghost' : ''} cr-btn-sm" data-act="${action}" data-track="${esc(e.track)}">${label}</button>`;
+    return `<article class="cr-road${big ? ' primary' : ''}" aria-label="${esc(e.title)} roadmap">
+      <div class="cr-road-head"><h3>${esc(e.title)}</h3>
+        <div class="cr-tags">${e.primary ? '<span class="cr-tag teal">★ Primary</span>' : e.status === 'active' ? '<span class="cr-tag">Secondary</span>' : ''}<span class="cr-tag ${STATE_TAG[e.status]}">${esc(e.status[0].toUpperCase() + e.status.slice(1))}</span></div></div>
+      ${e.status === 'archived' ? `<p class="cr-small cr-muted">Archived ${fmtDate(e.archived_at)}. Your history and progress are kept.</p>` : `
+      <div class="cr-road-stats">
+        <div><span>Level (provisional)</span><b>${esc(p.level || 'Not assessed')}</b></div>
+        <div><span>Current stage</span><b>${p.current_stage ? `${p.current_stage}. ${esc(p.stage_name)}` : esc(p.stage_name || '-')}</b></div>
+        <div><span>Completed</span><b>${(p.completed_modules || []).length} module${(p.completed_modules || []).length === 1 ? '' : 's'}, ${(p.completed_projects || []).length} project${(p.completed_projects || []).length === 1 ? '' : 's'}</b></div>
+      </div>
+      <div class="cr-road-progress"><div class="cr-bar" role="progressbar" aria-label="${esc(e.title)} completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p.completion_pct || 0}"><i style="width:${p.completion_pct || 0}%"></i></div><b>${p.completion_pct || 0}%</b></div>
+      <p class="cr-small"><span class="cr-tag ${ASSESS_TAG[a.state] || ''}">${esc(a.label || 'Assessment status unknown')}</span></p>
+      ${n && e.status === 'active' ? `<p class="cr-small"><b>Next:</b> <a href="${esc(n.href)}">${esc(n.label)}</a></p>` : ''}`}
+      <div class="cr-actions">
+        ${e.status === 'active' ? `<a class="cr-btn${big ? '' : ' ghost'} cr-btn-sm" href="#roadmap/${esc(e.track)}">Open roadmap</a><a class="cr-btn ghost cr-btn-sm" href="#report/${esc(e.track)}">Skill report</a>` : ''}
+        ${e.status === 'active' && !e.primary ? act('primary', 'Make Primary', false) : ''}
+        ${e.status === 'active' ? act('pause', 'Pause') : ''}
+        ${e.status === 'paused' ? act('resume', 'Resume', false) : ''}
+        ${e.status !== 'archived' ? act('archive', 'Archive') : ''}
+        ${e.status === 'archived' ? `<button class="cr-btn ghost cr-btn-sm" data-add="${esc(e.track)}">Follow again</button>` : ''}
+      </div></article>`;
+  }
+  async function viewMe(advice) {
+    if (!ME) { root.innerHTML = needLogin('My Career Roadmaps'); return; }
     if (!learner()) { root.innerHTML = notLearner(); return; }
     const r = ME.career;
-    const t = r.track;
-    const nextStage = r.roadmap?.stages.find((s) => s.status === 'current');
-    const nextAction = r.active ? `<a class="cr-btn" href="#take">Resume: ${esc(r.active.title)}</a>`
-      : !r.common.last_attempt && r.assessments.common.available ? '<a class="cr-btn" href="#assess/common">Take the common CS assessment</a>'
-        : t && r.assessments.track?.available && !r.track_attempt ? `<a class="cr-btn" href="#assess/${esc(t.slug)}">Take the ${esc(t.title)} assessment</a>`
-          : r.gaps[0] ? `<a class="cr-btn" href="#report">Work on ${esc(r.gaps[0].name)}</a>` : '<a class="cr-btn" href="#roadmap">Open my roadmap</a>';
+    const [rm, tracks] = await Promise.all([api('/api/career/me/enrollments'), loadTracks()]);
+    const active = rm.enrollments.filter((e) => e.status === 'active'), paused = rm.enrollments.filter((e) => e.status === 'paused'), archived = rm.enrollments.filter((e) => e.status === 'archived');
+    const secondary = active.filter((e) => !e.primary);
+    const following = new Set(rm.enrollments.filter((e) => e.status !== 'archived').map((e) => e.track));
+    const canAdd = rm.active_count < rm.max_active, choices = tracks.filter((t) => !following.has(t.slug));
     root.innerHTML = `${tabs('me')}
-      <h1>My career</h1>
-      ${!r.preferences ? '<div class="cr-note">Tell us your interests to get better recommendations - it takes a minute and every question is optional. <a href="#onboarding">Set my career goals</a></div>' : ''}
-      <div class="cr-kpis">
-        <div class="cr-kpi"><span>Career track</span><b style="font-size:16px">${t ? esc(t.title) : 'Not chosen'}</b>${t ? '' : '<a href="#tracks" class="cr-small">Choose a track</a>'}</div>
-        <div class="cr-kpi"><span>Assessed level (provisional)</span><b style="font-size:16px">${esc(r.readiness?.level || 'Not assessed yet')}</b></div>
-        <div class="cr-kpi"><span>Common CS score</span><b>${r.common.score == null ? '-' : r.common.score + '%'}</b></div>
-        <div class="cr-kpi"><span>Roadmap stages completed</span><b>${r.roadmap ? r.roadmap.stages.filter((s) => s.status === 'completed').length + ' / 6' : '-'}</b></div>
-      </div>
-      <div class="cr-panel"><h3>Next recommended step</h3>
-        <p class="cr-small cr-muted">${nextStage ? `You are on stage ${nextStage.no}: ${esc(nextStage.name)}.` : t ? 'Choose an assessment to find your starting point.' : 'Pick a career track to get a personalised roadmap.'}</p>
-        <div class="cr-actions">${nextAction}<a class="cr-btn ghost" href="#onboarding">Update my goals</a></div></div>
-      ${r.gaps.length ? `<div class="cr-panel"><h3>Top priorities</h3><ul>${r.gaps.slice(0, 3).map((g) => `<li>${status(g.status)} <b>${esc(g.name)}</b> - ${esc(g.recommendation)}</li>`).join('')}</ul></div>` : ''}
+      <h1>My Career Roadmaps</h1>
+      <p class="cr-muted">Follow up to ${rm.max_active} career roadmaps at once. Your <b>Primary</b> roadmap drives your recommendations; skills you have already proved are shared across roadmaps, so you are only assessed on what is new.</p>
+      ${r.active ? `<div class="cr-note">You have an assessment in progress. <a class="cr-btn cr-btn-sm" href="#take">Resume: ${esc(r.active.title)}</a></div>` : ''}
+      ${!r.preferences ? '<div class="cr-note">Tell us your interests to get better recommendations - every question is optional. <a href="#onboarding">Set my career goals</a></div>' : ''}
+      <div class="cr-note${rm.common.valid ? '' : ' warn'}">${rm.common.valid ? `✓ Your common computer-science result is valid until ${fmtDate(rm.common.valid_until)}, so new roadmaps do not need it again.`
+        : `${rm.common.reason === 'expired' ? 'Your common computer-science result has expired.' : rm.common.reason === 'insufficient' ? 'Your common computer-science result did not have enough answers to verify your skills.' : 'You have not taken the common computer-science assessment yet.'} Every roadmap starts from it. <a href="#assess/common">Take it now</a>`}</div>
+      ${advice ? adviceBox(advice) : ''}
+      ${rm.primary ? `<h2>Primary roadmap</h2>${roadmapCard(rm.primary, rm, true)}`
+        : `<div class="cr-panel"><h3>${rm.enrollments.length ? 'No active roadmap' : 'You are not following a roadmap yet'}</h3><p class="cr-small">${paused.length ? 'Resume a paused roadmap below, or add a new one.' : 'Choose a career track below to get a personalised, assessment-based roadmap.'} You can still take any assessment and use every course.</p></div>`}
+      ${secondary.length ? `<h2>Secondary roadmaps</h2><div class="cr-road-grid">${secondary.map((e) => roadmapCard(e, rm, false)).join('')}</div>` : ''}
+      ${paused.length ? `<h2>Paused</h2><div class="cr-road-grid">${paused.map((e) => roadmapCard(e, rm, false)).join('')}</div>` : ''}
+      <section class="cr-panel" aria-labelledby="crAddH"><h3 id="crAddH">Add a roadmap</h3>
+        <p class="cr-small cr-muted">${rm.active_count} of ${rm.max_active} active roadmaps.${canAdd ? '' : ' Pause or archive one to add another.'}</p>
+        <form class="cr-add" id="crAdd"><label class="cr-sr" for="crAddTrack">Career track</label>
+          <select id="crAddTrack"${canAdd && choices.length ? '' : ' disabled'}><option value="">Choose a career track</option>${choices.map((t) => `<option value="${esc(t.slug)}">${esc(t.title)}</option>`).join('')}</select>
+          <label class="cr-check"><input type="checkbox" id="crAddPrimary"${rm.primary ? '' : ' checked disabled'}> Make it my Primary roadmap</label>
+          <button class="cr-btn" type="submit"${canAdd && choices.length ? '' : ' disabled'}>Add roadmap</button></form>
+        <p id="crRoadMsg" role="alert" class="cr-small"></p></section>
+      ${archived.length ? `<details class="cr-panel"><summary><b>Archived roadmaps (${archived.length})</b></summary><div class="cr-road-grid" style="margin-top:10px">${archived.map((e) => roadmapCard(e, rm, false)).join('')}</div></details>` : ''}
+      ${r.gaps.length && rm.primary ? `<div class="cr-panel"><h3>Top priorities for ${esc(rm.primary.title)}</h3><ul>${r.gaps.slice(0, 3).map((g) => `<li>${status(g.status)} <b>${esc(g.name)}</b> - ${esc(g.recommendation)}</li>`).join('')}</ul></div>` : ''}
       <p class="cr-muted cr-small">${esc(r.disclaimer)}</p>`;
+    const msg = $('crRoadMsg');
+    const run = async (fn) => { root.querySelectorAll('[data-act],[data-add],#crAdd button').forEach((b) => { b.disabled = true; }); try { const out = await fn(); await loadMe(); await viewMe(out?.recommendation); } catch (e) { await viewMe(); $('crRoadMsg').textContent = e.message; } };
+    root.querySelectorAll('[data-act]').forEach((b) => { b.onclick = () => {
+      if (b.dataset.act === 'archive' && !confirm('Archive this roadmap? Your progress and history are kept, and you can follow it again later.')) return;
+      run(() => api(`/api/career/me/enrollments/${encodeURIComponent(b.dataset.track)}/${b.dataset.act}`, { method: 'POST' }));
+    }; });
+    root.querySelectorAll('[data-add]').forEach((b) => { b.onclick = () => run(() => api('/api/career/me/enrollments', { method: 'POST', body: { track: b.dataset.add } })); });
+    $('crAdd').onsubmit = (e) => {
+      e.preventDefault(); const track = $('crAddTrack').value;
+      if (!track) { msg.textContent = 'Choose a career track first.'; return; }
+      run(() => api('/api/career/me/enrollments', { method: 'POST', body: { track, primary: $('crAddPrimary').checked } }));
+    };
+  }
+  /** After adding a roadmap: what is reused, what still needs assessing, and what to do next. */
+  function adviceBox(a) {
+    return `<section class="cr-panel cr-advice" aria-live="polite"><h3>Roadmap added</h3>
+      ${a.common_required ? '<p>Start with the common computer-science assessment - every roadmap builds on it.</p>' : '<p>Your recent common computer-science result counts for this roadmap too.</p>'}
+      ${a.reused.length ? `<p class="cr-small"><b>Reused from your earlier assessments (${a.reused.length}):</b> ${a.reused.map((x) => esc(x.name)).join(', ')}</p>` : ''}
+      ${a.needed.length ? `<p class="cr-small"><b>Still to assess (${a.needed.length}):</b> ${a.needed.map((x) => `${esc(x.name)} <span class="cr-muted">(${esc(x.reason_text)})</span>`).join(', ')}</p>` : ''}
+      <div class="cr-actions"><a class="cr-btn" href="${esc(a.next.href)}">${esc(a.next.label)}</a></div></section>`;
   }
 
   /* ------------------------------ assessments ------------------------------ */
@@ -168,23 +226,30 @@
     if (!learner()) { root.innerHTML = notLearner(); return; }
     const av = await api('/api/career/assessments/' + encodeURIComponent(key));
     if (ME.career.active) { location.hash = '#take'; return; }
+    const isTrack = key !== 'common' && !key.startsWith('skill:');
     root.innerHTML = `${tabs('')}
       <h1>${esc(av.title || 'Assessment')}</h1>
       ${av.available ? `<div class="cr-panel">
-        <p><b>${av.items} questions</b>, one at a time. A timer shows the time left; the limit is generous, and your answers save automatically, so you can come back if your connection drops.</p>
+        <p><b>${isTrack ? 'Up to ' : ''}${av.items} questions</b>, one at a time. A timer shows the time left; the limit is generous, and your answers save automatically, so you can come back if your connection drops.</p>
         <ul><li><b>Write your own answers.</b> Pasting into answer boxes is turned off, so the result shows what you can really do.</li>
           <li><b>Three kinds of question:</b> theory (concepts and code tracing), practical (debugging and fixing real code, queries or configuration) and scenario (real-world problems that need a decision).${av.weights ? ` They count ${av.weights.theory}% / ${av.weights.practical}% / ${av.weights.scenario}% towards your overall score.` : ''}</li>
           ${av.reviewed_items ? `<li><b>${av.reviewed_items} answer${av.reviewed_items === 1 ? '' : 's'} you write yourself</b> (an explanation or a practical submission). EchoLens staff review ${av.reviewed_items === 1 ? 'it' : 'them'} against a published rubric, usually within a few days; your scores update when that happens.</li>` : ''}
           <li>Skip anything you do not know - skipped questions are not counted as wrong; we simply ask about that skill again later.</li>
           <li>Your results guide your learning. They are not an official qualification.</li></ul>
+        ${isTrack ? `<fieldset class="cr-mode"><legend>What should this assessment cover?</legend>
+          <label class="cr-check"><input type="radio" name="crMode" value="gap" checked> <span><b>Only skills not yet verified</b> (recommended) - skills you already proved in another assessment, at the depth this roadmap needs, are reused.</span></label>
+          <label class="cr-check"><input type="radio" name="crMode" value="full"> <span><b>Full assessment</b> - every skill in this track, with fresh questions.</span></label></fieldset>` : ''}
         <div class="cr-actions"><button class="cr-btn" id="crStart">Start assessment</button><a class="cr-btn ghost" href="#me">Not now</a></div>
         <p id="crStartMsg" role="alert" class="cr-small"></p></div>`
         : `<div class="cr-note warn">${esc(av.reason || 'This assessment is not available yet.')}</div><a class="cr-btn ghost" href="#tracks">Explore tracks</a>`}`;
     const b = $('crStart');
     if (b) b.onclick = async () => {
       b.disabled = true;
-      try { ATTEMPT = (await api('/api/career/me/attempts', { method: 'POST', body: { assessment: key } })).attempt; ATTEMPT.cur = 0; location.hash = '#take'; }
-      catch (e) { $('crStartMsg').textContent = e.message; b.disabled = false; }
+      try { ATTEMPT = (await api('/api/career/me/attempts', { method: 'POST', body: { assessment: key, ...(isTrack ? { mode: root.querySelector('input[name=crMode]:checked').value } : {}) } })).attempt; ATTEMPT.cur = 0; location.hash = '#take'; }
+      catch (e) {
+        $('crStartMsg').textContent = e.message; b.disabled = false;
+        if (e.data?.reuse) { const full = root.querySelector('input[name=crMode][value=full]'); if (full) full.checked = true; }
+      }
     };
   }
 
@@ -374,11 +439,11 @@
       </div><aside>
         ${r.strongest.length ? `<div class="cr-panel"><h3>Strongest skills</h3><ul>${r.strongest.map((s) => `<li>${esc(s.name)} - ${s.score}%</li>`).join('')}</ul></div>` : ''}
         ${r.critical_gaps.length ? `<div class="cr-panel"><h3>Critical prerequisite gaps</h3><ul>${r.critical_gaps.map((g) => `<li>${esc(g.name)} - ${g.score}%</li>`).join('')}</ul></div>` : ''}
-        ${r.roadmap ? `<div class="cr-panel"><h3>Recommended starting stage</h3><p>${r.roadmap.starting_stage ? `Stage ${r.roadmap.starting_stage}: ${esc(r.roadmap.stages[r.roadmap.starting_stage - 1].name)}` : 'All stages complete'}</p><a class="cr-btn ghost" href="#roadmap">Open my roadmap</a></div>` : ''}
+        ${r.roadmap ? `<div class="cr-panel"><h3>Recommended starting stage</h3><p>${r.roadmap.starting_stage ? `Stage ${r.roadmap.starting_stage}: ${esc(r.roadmap.stages[r.roadmap.starting_stage - 1].name)}` : 'All stages complete'}</p><a class="cr-btn ghost" href="#roadmap/${esc(r.track.slug)}">Open my roadmap</a></div>` : ''}
         <div class="cr-panel"><h3>Reassessment</h3><p class="cr-small">${r.assessments.track?.available ? `Retake the full ${esc(r.track.title)} assessment once a day, or take a short reassessment for one skill whenever you finish its modules.` : 'Short skill reassessments are available from each recommendation.'}</p>
           ${r.track && r.assessments.track?.available ? `<a class="cr-btn ghost" href="#assess/${esc(r.track.slug)}">Take the ${esc(r.track.title)} assessment</a>` : ''}</div>
       </aside></div>`;
-    $('crTrackPick').onchange = async (e) => { ME.career = await api('/api/career/me?track=' + encodeURIComponent(e.target.value)); viewReport(); };
+    $('crTrackPick').onchange = (e) => { location.hash = '#report/' + e.target.value; };
   }
 
   /* -------------------------------- roadmap -------------------------------- */
@@ -387,9 +452,11 @@
     if (!learner()) { root.innerHTML = notLearner(); return; }
     const r = ME.career;
     if (!r.track) { root.innerHTML = `${tabs('roadmap')}<h1>My roadmap</h1><div class="cr-note">Choose a career track to get your personalised roadmap.</div><a class="cr-btn" href="#tracks">Explore tracks</a>`; return; }
-    const rm = r.roadmap;
+    const rm = r.roadmap, mine = (r.roadmaps?.enrollments || []).filter((e) => e.status !== 'archived');
     root.innerHTML = `${tabs('roadmap')}
+      ${mine.length > 1 ? `<nav class="cr-tags" aria-label="My roadmaps" style="margin-bottom:8px">${mine.map((e) => `<a class="cr-tag${e.track === r.track.slug ? ' teal' : ''}" href="#roadmap/${esc(e.track)}"${e.track === r.track.slug ? ' aria-current="page"' : ''}>${e.primary ? '★ ' : ''}${esc(e.title)}${e.status === 'paused' ? ' (paused)' : ''}</a>`).join('')}</nav>` : ''}
       <h1>${esc(r.track.title)} roadmap</h1>
+      ${r.enrollment ? `<p class="cr-small">${r.enrollment.primary ? '<span class="cr-tag teal">★ Primary roadmap</span>' : `<span class="cr-tag">${r.enrollment.status === 'paused' ? 'Paused' : 'Secondary'} roadmap</span>`} <span class="cr-tag">${r.enrollment.progress?.completion_pct ?? 0}% complete</span></p>` : learner() ? '<p class="cr-small"><a href="#me">Add this track to your roadmaps</a> to track progress on it.</p>' : ''}
       <p class="cr-muted">Built from your latest assessment results. Stages where you have already shown the skills are marked complete; critical prerequisites always need to be demonstrated first.</p>
       <div class="cr-steps" aria-label="Roadmap stages">${rm.stages.map((s) => `<span data-status="${s.status}">${s.no}. ${esc(s.name)}<br><small>${esc({ completed: '✓ Done', current: 'You are here', upcoming: 'Next', locked: 'Locked' }[s.status])}</small></span>`).join('')}</div>
       ${rm.stages.map((s) => `<section class="cr-stage" data-status="${s.status}" aria-label="Stage ${s.no}">
@@ -434,13 +501,16 @@
     document.title = 'Career Paths & Skill Assessment | EchoLens';
     try {
       if (view === 'track' && arg) await viewTrack(arg);
-      else if (view === 'me') await viewMe();
+      else if (view === 'me') { const a = PENDING_ADVICE; PENDING_ADVICE = null; await viewMe(a); }
       else if (view === 'onboarding') await viewOnboarding();
       else if (view === 'assess' && arg) await viewAssessIntro(arg);
       else if (view === 'take') await viewTake();
       else if (view === 'result' && arg) await viewResult(arg);
-      else if (view === 'report') await viewReport();
-      else if (view === 'roadmap') await viewRoadmap();
+      else if (view === 'report' || view === 'roadmap') {
+        // #roadmap/<track> and #report/<track> show one roadmap; without a track, the Primary.
+        if (ME && learner() && (arg || '') !== (ME.career?.track?.slug || '')) ME.career = await api('/api/career/me' + (arg ? '?track=' + encodeURIComponent(arg) : ''));
+        await (view === 'report' ? viewReport() : viewRoadmap());
+      }
       else if (view === 'history') await viewHistory();
       else await viewTracks();
     } catch (e) { fail(e); }

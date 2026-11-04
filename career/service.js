@@ -18,6 +18,7 @@ const crypto = require('crypto');
 const E = require('./engine');
 const { SKILLS, skill } = require('./skills');
 const { TRACKS, STAGE_NAMES, track: baseTrack } = require('./tracks');
+const R = require('./roadmaps');
 
 const { BANKS } = require('./banks');
 const REVIEWER_ROLES = ['admin', 'instructor'];
@@ -38,6 +39,9 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const c = { ...E.DEFAULT_CONFIG, ...o, skill_thresholds: { ...E.DEFAULT_CONFIG.skill_thresholds, ...(o.skill_thresholds || {}) } };
     c.enabled = { common: true, ...(o.enabled || {}) };
     c.category_weights = { ...E.DEFAULT_CONFIG.category_weights, ...(o.category_weights || {}) };
+    c.max_active_roadmaps = o.max_active_roadmaps ?? 3;
+    c.common_valid_days = o.common_valid_days ?? 365;
+    c.skill_valid_days = o.skill_valid_days ?? 365;
     return c;
   }
   /** Validate and apply an admin config change. Returns { config } or { error }. */
@@ -74,7 +78,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       }
       next.category_weights = cw;
     }
-    for (const [k, lo, hi] of [['min_evidence_items', 1, 10], ['min_category_items', 1, 10], ['track_items_per_skill', 2, 8], ['skill_reassess_items', 2, 10], ['review_items_per_form', 0, 4], ['retake_cooldown_hours', 0, 720]]) {
+    for (const [k, lo, hi] of [['min_evidence_items', 1, 10], ['min_category_items', 1, 10], ['track_items_per_skill', 2, 8], ['skill_reassess_items', 2, 10], ['review_items_per_form', 0, 4], ['retake_cooldown_hours', 0, 720], ['max_active_roadmaps', 1, 12], ['common_valid_days', 30, 1095], ['skill_valid_days', 30, 1095]]) {
       if (patch[k] !== undefined) { const v = Math.round(Number(patch[k])); if (!(v >= lo && v <= hi)) return { error: `${k} must be ${lo}-${hi}.` }; next[k] = v; }
     }
     if (patch.min_confidence !== undefined) { const v = Number(patch.min_confidence); if (!(v > 0 && v <= 1)) return { error: 'min_confidence must be between 0 and 1.' }; next.min_confidence = v; }
@@ -262,7 +266,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   /* ----------------------------- student records ----------------------------- */
   function career(user) {
     const c = user.profile?.career || {};
-    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {} };
+    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null };
   }
   function writeCareer(user, next) {
     const attempts = next.attempts.slice(-MAX_HISTORY);
@@ -291,8 +295,15 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       updated_at: iso(),
     };
     const c = career(user);
-    writeCareer(user, { ...c, preferences: { ...(c.preferences || {}), ...prefs, track_history: [...((c.preferences || {}).track_history || []), ...((c.preferences?.preferred_track || null) !== preferred && preferred ? [{ track: preferred, at: iso() }] : [])].slice(-20) } });
-    return { preferences: career(user).preferences };
+    writeCareer(user, { ...c, preferences: { ...(c.preferences || {}), ...prefs, preferred_track: c.preferences?.preferred_track || null } });
+    // The preferred track IS the Primary roadmap: enrol in it (or make it Primary) through the enrollment rules.
+    let roadmap_error = null;
+    if (preferred) {
+      const e = enrollmentFor(user, preferred);
+      const out = !e ? enrollTrack(user, preferred, { primary: true }) : e.status === 'active' ? makePrimary(user, preferred) : resumeTrack(user, preferred, { primary: true });
+      if (out.error) roadmap_error = out.error;
+    }
+    return { preferences: career(user).preferences, roadmap_error };
   }
 
   function seenIds(c, def) {
@@ -300,10 +311,19 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return new Set(recent.flatMap((a) => (a.result?.responses || []).map((r) => r.id)));
   }
 
-  function startAttempt(user, key) {
+  function startAttempt(user, key, { mode = 'gap' } = {}) {
     if (!isLearner(user)) return { error: 'Assessments are for learner accounts. Admins can preview forms from the admin panel.', status: 403 };
-    const def = assessmentDef(key); const av = availability(key);
-    if (!def || !av.available) return { error: av.reason || 'This assessment is not available.', status: 409 };
+    const base = assessmentDef(key); const av = availability(key);
+    if (!base || !av.available) return { error: av.reason || 'This assessment is not available.', status: 409 };
+    // Track tests reuse verified evidence: in 'gap' mode only skills that are not
+    // yet verified for THIS roadmap (at its required depth) are asked about.
+    let def = base, gapMode = false;
+    if (base.track) {
+      const plan = trackPlan(user, base.track, mode === 'full' ? 'full' : 'gap');
+      if (!Object.keys(plan).length) return { error: 'Every skill this roadmap assesses is already verified from your earlier results, so there is nothing new to test. Choose the full assessment if you want to be re-tested.', status: 409, reuse: true };
+      gapMode = mode !== 'full' && Object.keys(plan).length < Object.keys(base.plan).length;
+      def = { ...base, plan, title: gapMode ? `${base.title} (skills not yet verified)` : base.title };
+    }
     const c = career(user), cfg = config(), t = now();
     if (c.active) {
       const live = Date.parse(c.active.expires_at) + cfg.time_grace_sec * 1000 > t.getTime();
@@ -312,7 +332,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       finalize(user, c.active.id, {}, { expired: true });
     }
     const fresh = career(user);
-    if (!def.skill && cfg.retake_cooldown_hours) {
+    if (!def.skill && !gapMode && cfg.retake_cooldown_hours) {
       const last = fresh.attempts.filter((a) => a.assessment === key && a.status === 'submitted').pop();
       if (last && t.getTime() - Date.parse(last.submitted_at) < cfg.retake_cooldown_hours * 3600e3) {
         const at = new Date(Date.parse(last.submitted_at) + cfg.retake_cooldown_hours * 3600e3).toISOString();
@@ -328,14 +348,12 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const active = {
       id: 'ca_' + crypto.randomBytes(8).toString('hex'), assessment: key, title: def.title, track: def.track || null, skill: def.skill || null,
       started_at: t.toISOString(), expires_at: new Date(t.getTime() + limitSec * 1000).toISOString(), limit_sec: limitSec,
-      config_version: cfg.version, weights: def.weights, questions: snapshot, answers: {}, saved_at: null,
+      config_version: cfg.version, weights: def.weights, questions: snapshot, answers: {}, saved_at: null, mode: gapMode ? 'gap' : 'full',
     };
-    // Starting a track's test from "Test Your Skills" picks that career track, unless the student already chose one.
-    const prefs = fresh.preferences || {};
-    const preferences = def.track && !prefs.preferred_track
-      ? { ...prefs, preferred_track: def.track, track_history: [...(prefs.track_history || []), { track: def.track, at: iso() }].slice(-20), updated_at: iso() }
-      : fresh.preferences;
-    writeCareer(user, { ...fresh, preferences, active });
+    writeCareer(user, { ...fresh, active });
+    // Taking a track's test (for example from "Test Your Skills") enrols the student
+    // in that roadmap when they do not follow it yet and have room; the first one becomes Primary.
+    if (def.track && !enrollmentFor(user, def.track)) enrollTrack(user, def.track, {});
     return { attempt: deliver(active) };
   }
   /** Resume an interrupted assessment, or close one whose time has run out. */
@@ -393,8 +411,10 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const record = {
       id: a.id, assessment: a.assessment, title: a.title, track: a.track, skill: a.skill, status: 'submitted',
       started_at: a.started_at, submitted_at: iso(), late: late || expired, config_version: a.config_version, weights: a.weights || null, result,
+      mode: a.mode || 'full', skill_versions: Object.fromEntries(Object.keys(result.skills).map((id) => [id, skill(id)?.version || 1])),
     };
     writeCareer(user, { ...c, active: null, attempts: [...c.attempts, record] });
+    refreshEnrollments(user); // new evidence can change every roadmap's recommendations
     return record;
   }
   /** Submit - idempotent: re-sending the same attempt id returns the stored result. */
@@ -494,6 +514,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       ai_assisted: !!(f.r.ai_suggestion && body?.used_ai_suggestion), previous: prior ? { awarded: prior.awarded, at: prior.at, by: prior.by } : null };
     f.a.result = E.summarize(f.a.result.responses, config());
     writeCareer(f.u, { ...f.c });
+    refreshEnrollments(f.u);
     audit(reviewer.id, prior ? 'career_review_update' : 'career_review', 'career_attempt', attemptId, { user_id: uid, question: qid, awarded, max, ai_assisted: f.r.review.ai_assisted });
     // Tell the student once the last pending answer in the attempt is reviewed (not once per item).
     if (notify && f.u.email && !prior && !f.a.result.pending) {
@@ -529,21 +550,204 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return out;
   }
 
+  /* ----------------------------- shared skill profile ----------------------------- */
+  /**
+   * One record per skill for this student, independent of any roadmap, with
+   * proficiency, evidence type, assessment version, last assessed date,
+   * coverage and verification status (roadmaps.skillRecord).
+   */
+  function skillRecords(user, profile = E.skillProfile(career(user).attempts)) {
+    const cfg = config(), nowMs = now().getTime(), band = (v) => E.band(v, cfg);
+    return Object.entries(profile).filter(([, e]) => e.score != null || e.by_category)
+      .map(([id, e]) => ({ ...R.skillRecord(user.id, id, e, { validDays: cfg.skill_valid_days, nowMs, band, skillVersion: skill(id)?.version }), name: skill(id)?.name || id, group: skill(id)?.group || null }));
+  }
+  /**
+   * The shared profile as seen by ONE roadmap: a skill's evidence counts only
+   * when it is reusable at this roadmap's required depth and definition
+   * version. Otherwise it is marked insufficient ("Needs Further Assessment")
+   * for this roadmap, even if it served another roadmap well.
+   */
+  function trackProfile(user, t, profile = E.skillProfile(career(user).attempts)) {
+    const records = new Map(skillRecords(user, profile).map((r) => [r.skill_id, r]));
+    const out = { ...profile };
+    for (const sk of t.skills) {
+      const e = profile[sk.skill]; if (!e) continue;
+      const rr = R.reusable(records.get(sk.skill), { depth: sk.depth || 1, skillVersion: skill(sk.skill)?.version || 1 });
+      out[sk.skill] = rr.ok ? { ...e, reuse_reason: 'verified' } : { ...e, evidence: e.score == null ? e.evidence : 'insufficient', reuse_reason: rr.reason };
+    }
+    return out;
+  }
+  /** Which skills a track test should ask about: in 'gap' mode only those not reusable for this roadmap. */
+  function trackPlan(user, slug, mode) {
+    const t = track(slug), def = assessmentDef(slug); if (!t || !def) return {};
+    const tp = mode === 'gap' ? trackProfile(user, t) : null;
+    const plan = {};
+    for (const sk of t.skills) {
+      if (!def.plan[sk.skill]) continue;
+      if (tp && tp[sk.skill]?.reuse_reason === 'verified') continue;
+      plan[sk.skill] = { n: def.plan[sk.skill], depth: sk.depth || 0 };
+    }
+    return plan;
+  }
+  /** Is there a recent, valid common CS result? The common test is required only when there is not. */
+  function commonStatus(user) {
+    const cfg = config(), last = career(user).attempts.filter((a) => a.assessment === 'common' && a.status === 'submitted').pop();
+    if (!last) return { valid: false, reason: 'not_taken' };
+    const ageDays = (now().getTime() - Date.parse(last.submitted_at)) / 86400e3;
+    const enough = Object.values(last.result.skills).some((e) => e.evidence === 'sufficient');
+    if (!enough) return { valid: false, reason: 'insufficient', at: last.submitted_at };
+    if (ageDays > cfg.common_valid_days) return { valid: false, reason: 'expired', at: last.submitted_at };
+    return { valid: true, at: last.submitted_at, valid_until: new Date(Date.parse(last.submitted_at) + cfg.common_valid_days * 86400e3).toISOString() };
+  }
+
+  /* ------------------------------- roadmap enrollments ------------------------------- */
+  /** The student's enrollments. Students from before multi-roadmap support get their preferred track as Primary. */
+  function enrollments(user) {
+    const c = career(user);
+    if (c.enrollments) return c.enrollments;
+    const legacy = c.preferences?.preferred_track && track(c.preferences.preferred_track) ? c.preferences.preferred_track : null;
+    if (!legacy || !isLearner(user)) return [];
+    const out = R.enroll([], legacy, { max: config().max_active_roadmaps, at: iso(), primary: true, id: 'en_' + crypto.randomBytes(6).toString('hex') });
+    writeCareer(user, { ...c, enrollments: out.list });
+    return out.list;
+  }
+  const enrollmentFor = (user, slug) => enrollments(user).find((e) => e.track === slug && e.status !== 'archived') || null;
+  /**
+   * Run one enrollment change. Everything between reading the list and writing
+   * it back is synchronous, so concurrent requests are serialised by the event
+   * loop and see each other's results; the change is validated against the
+   * invariants (roadmaps.apply) and written all-or-nothing.
+   */
+  function changeEnrollments(user, op, slug, opts = {}) {
+    if (!isLearner(user)) return { error: 'Roadmaps are for learner accounts.', status: 403 };
+    if (!track(slug) || (op === 'enroll' && track(slug).status !== 'published')) return { error: 'Career track not found.', status: 404 };
+    const c = career(user), before = enrollments(user);
+    const out = R[op](before, slug, { max: config().max_active_roadmaps, at: iso(), id: 'en_' + crypto.randomBytes(6).toString('hex'), ...opts });
+    if (out.error) return { error: out.error, status: /at most/.test(out.error) ? 409 : /do not follow/.test(out.error) ? 404 : 409 };
+    const primary = R.primaryOf(out.list);
+    // preferences.preferred_track mirrors the Primary roadmap for older screens.
+    const prefs = { ...(career(user).preferences || {}), preferred_track: primary ? primary.track : null };
+    if (primary && primary.track !== c.preferences?.preferred_track) prefs.track_history = [...(c.preferences?.track_history || []), { track: primary.track, at: iso() }].slice(-20);
+    writeCareer(user, { ...career(user), preferences: prefs, enrollments: out.list });
+    refreshEnrollments(user);
+    return { roadmaps: listEnrollments(user) };
+  }
+  const enrollTrack = (user, slug, { primary = false } = {}) => changeEnrollments(user, 'enroll', slug, { primary });
+  /**
+   * What a newly added roadmap needs: is the common CS test still required,
+   * which of its skills reuse verified evidence, and which must be assessed.
+   */
+  function enrollmentAdvice(user, slug) {
+    const t = track(slug); if (!t) return null;
+    const tp = trackProfile(user, t), common = commonStatus(user);
+    const reused = [], needed = [];
+    for (const sk of t.skills) {
+      const why = tp[sk.skill]?.reuse_reason || 'not_assessed';
+      (why === 'verified' ? reused : needed).push({ skill: sk.skill, name: skill(sk.skill)?.name || sk.skill, reason: why, reason_text: R.REUSE_TEXT[why] });
+    }
+    return { common_required: !common.valid, common, reused, needed,
+      next: !common.valid ? { label: 'Take the common CS test', href: '#assess/common' }
+        : needed.length ? { label: `Assess the ${needed.length} skill${needed.length === 1 ? '' : 's'} not yet verified`, href: '#assess/' + slug } : { label: 'Open your roadmap', href: '#roadmap/' + slug } };
+  }
+  const makePrimary = (user, slug) => changeEnrollments(user, 'setPrimary', slug);
+  const pauseTrack = (user, slug) => changeEnrollments(user, 'pause', slug);
+  function resumeTrack(user, slug, { primary = false } = {}) {
+    const out = changeEnrollments(user, 'resume', slug);
+    return out.error || !primary ? out : makePrimary(user, slug);
+  }
+  const archiveTrack = (user, slug) => changeEnrollments(user, 'archive', slug);
+
+  /**
+   * Progress for one enrollment. Completed modules and projects are REAL
+   * learning activities (passed course tasks, submitted project links). Skills
+   * shown elsewhere can satisfy a stage's prerequisite check, but they never
+   * mark a module as completed - there are no exemption rules yet.
+   */
+  function progressFor(user, slug, profile, common) {
+    const t = track(slug), cfg = config();
+    const tp = trackProfile(user, t, profile);
+    const resolve = (id) => resources(id, user.id);
+    const rm = E.roadmap(t, tp, resolve, { stageNames: STAGE_NAMES, projects: career(user).projects[slug] || {} }, cfg);
+    const readiness = E.trackReadiness(t, tp, cfg);
+    const modules = new Map();
+    for (const st of rm.stages) for (const m of st.modules) modules.set(m.track_key + ':' + m.level, m);
+    const completedModules = [...modules.values()].filter((m) => m.completed).map((m) => ({ track_key: m.track_key, level: m.level, title: m.title, course: m.course }));
+    const projects = career(user).projects[slug] || {};
+    const completedProjects = Object.keys(projects).map(Number).sort();
+    const total = modules.size + 2; // modules plus the capstone and career-readiness projects
+    const done = completedModules.length + completedProjects.filter((n) => n >= 5).length;
+    const toAssess = Object.keys(trackPlan(user, slug, 'gap'));
+    const pending = career(user).attempts.filter((a) => a.track === slug && a.result?.pending).length;
+    const assessment_status = !common.valid ? { state: 'common_required', label: common.reason === 'expired' ? 'Common CS test result has expired - retake it' : 'Take the common CS test first' }
+      : pending ? { state: 'pending_review', label: `${pending} assessment${pending === 1 ? '' : 's'} awaiting staff review` }
+        : toAssess.length ? { state: 'skills_to_assess', label: `${toAssess.length} skill${toAssess.length === 1 ? '' : 's'} not yet verified for this roadmap`, skills: toAssess }
+          : { state: 'up_to_date', label: 'All assessable skills verified' };
+    const gaps = E.skillGaps(t, tp, resolve, cfg);
+    const firstGap = gaps.find((g) => g.score != null && g.evidence === 'sufficient');
+    const next = assessment_status.state === 'common_required' ? { kind: 'assess', label: 'Take the common CS test', href: '#assess/common' }
+      : assessment_status.state === 'skills_to_assess' ? { kind: 'assess', label: `Assess ${toAssess.length} remaining skill${toAssess.length === 1 ? '' : 's'}`, href: '#assess/' + slug }
+        : firstGap ? (firstGap.resources.find((m) => !m.completed)
+          ? { kind: 'learn', label: `${skill(firstGap.skill)?.name}: ${firstGap.resources.find((m) => !m.completed).title}`, href: firstGap.resources.find((m) => !m.completed).url }
+          : { kind: 'reassess', label: `Reassess ${skill(firstGap.skill)?.name}`, href: '#assess/skill:' + firstGap.skill })
+          : rm.starting_stage ? { kind: 'project', label: `Stage ${rm.starting_stage}: ${rm.stages[rm.starting_stage - 1].projects[0]}`, href: '#roadmap/' + slug }
+            : { kind: 'done', label: 'Roadmap complete - keep your portfolio fresh', href: '#roadmap/' + slug };
+    return {
+      current_stage: rm.starting_stage, stage_name: rm.starting_stage ? STAGE_NAMES[rm.starting_stage - 1] : 'Complete',
+      stages_completed: rm.stages.filter((st) => st.status === 'completed').length,
+      completed_modules: completedModules, completed_projects: completedProjects,
+      completion_pct: total ? Math.round((done / total) * 100) : 0,
+      level: readiness.level, score: readiness.score, assessment_status, next_activity: next, updated_at: iso(),
+    };
+  }
+  /** Recompute progress snapshots for active and paused roadmaps (archived ones keep their last snapshot). */
+  function refreshEnrollments(user) {
+    const list = enrollments(user); if (!list.length) return;
+    const profile = E.skillProfile(career(user).attempts), common = commonStatus(user);
+    const same = (a, b) => JSON.stringify({ ...(a || {}), updated_at: 0 }) === JSON.stringify({ ...(b || {}), updated_at: 0 });
+    let changed = false;
+    const next = list.map((e) => {
+      if (e.status === 'archived') return e;
+      const progress = progressFor(user, e.track, profile, common);
+      if (same(progress, e.progress)) return e;
+      changed = true; return { ...e, progress };
+    });
+    // Only write when something actually changed, so page views do not rewrite the store.
+    if (changed) writeCareer(user, { ...career(user), enrollments: next });
+  }
+  function publicEnrollment(user, e) {
+    if (!e) return null;
+    const t = track(e.track);
+    return { id: e.id, track: e.track, title: t?.title || e.track, status: e.status, primary: !!e.primary, enrolled_at: e.enrolled_at, updated_at: e.updated_at,
+      archived_at: e.archived_at || null, progress: e.progress, history: (e.history || []).slice(-10) };
+  }
+  function listEnrollments(user, { refresh = true } = {}) {
+    if (refresh) refreshEnrollments(user);
+    const list = enrollments(user).map((e) => publicEnrollment(user, e));
+    const order = { active: 0, paused: 1, archived: 2 };
+    list.sort((a, b) => (b.primary - a.primary) || (order[a.status] - order[b.status]) || String(a.enrolled_at).localeCompare(String(b.enrolled_at)));
+    return { enrollments: list, primary: list.find((e) => e.primary) || null, max_active: config().max_active_roadmaps,
+      active_count: list.filter((e) => e.status === 'active').length, common: commonStatus(user) };
+  }
+
   /* --------------------------------- reports --------------------------------- */
   function report(user, slug) {
     const c = career(user), cfg = config();
     const profile = E.skillProfile(c.attempts);
     // The track asked for, else the preferred one, else the track of the latest track assessment taken.
     const lastTrackAttempt = c.attempts.filter((a) => a.status === 'submitted' && a.track).pop();
-    const chosen = track(slug || c.preferences?.preferred_track || lastTrackAttempt?.track || '') || null;
+    const primary = R.primaryOf(enrollments(user));
+    const chosen = track(slug || primary?.track || c.preferences?.preferred_track || lastTrackAttempt?.track || '') || null;
     const common = E.commonScore(profile, cfg);
     const resolve = (id) => resources(id, user.id);
     let readiness = null, gaps = [], plan = null;
     if (chosen) {
-      readiness = E.trackReadiness(chosen, profile, cfg);
+      // Track-specific view of the shared profile: evidence counts only where it may be reused for this roadmap.
+      const tp = trackProfile(user, chosen, profile);
+      readiness = E.trackReadiness(chosen, tp, cfg);
+      readiness.reuse = Object.fromEntries(chosen.skills.map((sk) => [sk.skill, tp[sk.skill]?.reuse_reason || 'not_assessed']));
       readiness.skills = readiness.skills.map((s) => ({ ...s, name: skill(s.skill)?.name }));
-      gaps = E.skillGaps(chosen, profile, resolve, cfg).map((g) => ({ ...g, name: skill(g.skill)?.name, recommendation: E.recommendation(g, skill(g.skill)?.name || g.skill), reassess_available: availability('skill:' + g.skill).available }));
-      plan = E.roadmap(chosen, profile, resolve, { stageNames: STAGE_NAMES, projects: c.projects[chosen.slug] || {} }, cfg);
+      gaps = E.skillGaps(chosen, tp, resolve, cfg).map((g) => ({ ...g, name: skill(g.skill)?.name, recommendation: E.recommendation(g, skill(g.skill)?.name || g.skill), reassess_available: availability('skill:' + g.skill).available }));
+      plan = E.roadmap(chosen, tp, resolve, { stageNames: STAGE_NAMES, projects: c.projects[chosen.slug] || {} }, cfg);
       plan.stages.forEach((st) => st.skills.forEach((s) => { s.name = skill(s.skill)?.name; }));
       readiness.explanation = readiness.explanation.map((line) => line.replace(/\b([a-z]+\.[a-z_]+)\b/g, (m) => skill(m)?.name || m));
       readiness.category_feedback = categoryFeedback(readiness.evaluation, readiness.weakest_category, cfg);
@@ -563,6 +767,8 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       critical_gaps: gaps.filter((g) => g.status === E.STATUS.critical),
       active: c.active ? { id: c.active.id, assessment: c.active.assessment, title: c.active.title, expires_at: c.active.expires_at } : null,
       assessments: { common: availability('common'), track: chosen ? availability(chosen.slug) : null },
+      enrollment: chosen ? publicEnrollment(user, enrollmentFor(user, chosen.slug)) : null,
+      roadmaps: listEnrollments(user),
       history_count: submitted.length,
     };
   }
@@ -660,6 +866,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   return {
     BANKS, LANGS, PREF_FIELDS, REVIEWER_ROLES, config, updateConfig, categoryWeights, reviewQueue, suggestReview, submitReview, isReviewer, questions, published, questionById, setQuestionStatus, editQuestion, addQuestion,
     track, tracks, updateTrack, publicTrack, assessmentDef, coverage, availability, career, savePreferences, startAttempt, resumeAttempt, saveAnswers,
+    skillRecords, trackProfile, trackPlan, commonStatus, enrollments, listEnrollments, enrollTrack, enrollmentAdvice, makePrimary, pauseTrack, resumeTrack, archiveTrack, refreshEnrollments,
     submitAttempt, abandonAttempt, attemptReview, resources, contentGaps, report, history, setProject, analytics, preview, isLearner,
   };
 }

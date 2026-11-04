@@ -18,7 +18,7 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   const svc = createCareerService(store, { aiSuggest, notify, appUrl });
   const r = express.Router();
   const me = (req) => store.Users.byId(req.user.id);
-  const send = (res, out, ok = (o) => o) => (out && out.error ? res.status(out.status || 400).json({ error: out.error, ...(out.retry_at ? { retry_at: out.retry_at } : {}), ...(out.active ? { active: out.active } : {}) }) : res.json(ok(out)));
+  const send = (res, out, ok = (o) => o) => (out && out.error ? res.status(out.status || 400).json({ error: out.error, ...(out.retry_at ? { retry_at: out.retry_at } : {}), ...(out.active ? { active: out.active } : {}), ...(out.reuse ? { reuse: true } : {}) }) : res.json(ok(out)));
   const limitStart = rateLimit ? rateLimit('career-start', { max: 20, windowMs: 60 * 60 * 1000, message: 'Too many assessments started from this network. Please try again later.' }) : (q, s, n) => n();
   const limitSave = rateLimit ? rateLimit('career-save', { max: 600, windowMs: 60 * 60 * 1000, message: 'Too many saves. Please slow down.' }) : (q, s, n) => n();
 
@@ -39,7 +39,16 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   r.put('/career/me/preferences', authRequired, (req, res) => send(res, svc.savePreferences(me(req), req.body || {})));
   r.get('/career/me/history', authRequired, (req, res) => res.json(svc.history(me(req))));
   r.post('/career/me/projects', authRequired, (req, res) => send(res, svc.setProject(me(req), req.body?.track, req.body?.stage, req.body?.link)));
-  r.post('/career/me/attempts', authRequired, limitStart, (req, res) => send(res, svc.startAttempt(me(req), String(req.body?.assessment || ''))));
+  r.post('/career/me/attempts', authRequired, limitStart, (req, res) => send(res, svc.startAttempt(me(req), String(req.body?.assessment || ''), { mode: req.body?.mode === 'full' ? 'full' : 'gap' })));
+  // Multi-career roadmaps: enroll, switch Primary, pause, resume, archive.
+  r.get('/career/me/enrollments', authRequired, (req, res) => res.json(svc.listEnrollments(me(req))));
+  r.post('/career/me/enrollments', authRequired, (req, res) => send(res, svc.enrollTrack(me(req), String(req.body?.track || ''), { primary: !!req.body?.primary }), (o) => ({ ...o.roadmaps, recommendation: svc.enrollmentAdvice(me(req), String(req.body?.track || '')) })));
+  const act = { primary: svc.makePrimary, pause: svc.pauseTrack, resume: svc.resumeTrack, archive: svc.archiveTrack };
+  r.post('/career/me/enrollments/:track/:action', authRequired, (req, res) => {
+    const fn = act[req.params.action]; if (!fn) return res.status(404).json({ error: 'Unknown roadmap action.' });
+    send(res, fn(me(req), req.params.track), (o) => o.roadmaps);
+  });
+  r.get('/career/me/skills', authRequired, (req, res) => res.json({ skills: svc.skillRecords(me(req)), common: svc.commonStatus(me(req)) }));
   r.get('/career/me/attempts/active', authRequired, (req, res) => res.json(svc.resumeAttempt(me(req))));
   r.put('/career/me/attempts/:id/answers', authRequired, limitSave, (req, res) => send(res, svc.saveAnswers(me(req), req.params.id, req.body?.answers, req.body?.runs, req.body?.pastes)));
   r.post('/career/me/attempts/:id/submit', authRequired, (req, res) => send(res, svc.submitAttempt(me(req), req.params.id, req.body?.answers, req.body?.runs, req.body?.pastes), (o) => ({ attempt: o.attempt, existing: !!o.existing })));

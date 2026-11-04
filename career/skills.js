@@ -127,6 +127,10 @@ const SKILLS = [
   { id: 'se.design', name: 'Software design', group: 'Software Engineering', resources: [r('cpp-advanced', 3), r('python-advanced', 9)] },
 ];
 
+// Skill definitions are versioned. Bump a skill's version when its meaning or
+// required proficiency changes; evidence recorded under an older version is then
+// not reused (roadmaps.reusable).
+for (const s of SKILLS) if (s.version == null) s.version = 1;
 const byId = new Map(SKILLS.map((s) => [s.id, s]));
 const skill = (id) => byId.get(id) || null;
 

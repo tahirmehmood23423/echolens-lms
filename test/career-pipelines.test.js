@@ -66,7 +66,7 @@ for (const t of [{ slug: 'common', title: 'Common CS' }, ...TRACKS]) {
 
     // ---- retake: unseen practical and scenario items for every skill ----
     const seen = new Set(done.result.responses.map((r) => r.id));
-    const retake = svc.startAttempt(strong, t.slug).attempt;
+    const retake = svc.startAttempt(strong, t.slug, { mode: 'full' }).attempt;
     const skillsInForm = [...new Set(retake.questions.map((q) => svc.questionById(q.id).skills[0]))];
     for (const sk of skillsInForm) for (const c of ['practical', 'scenario']) {
       const pool = svc.questions(svc.assessmentDef(t.slug).banks.find((b) => svc.questions(b).some((q) => q.skills[0] === sk))).filter((q) => q.skills[0] === sk && q.category === c && q.grading !== 'review');

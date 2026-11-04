@@ -52,6 +52,17 @@ const REWRITES = Object.assign({}, ...['common', 'frontend', 'backend', 'aiml', 
   .map((b) => { try { return require('./rewrites/' + b); } catch (e) { if (e.code === 'MODULE_NOT_FOUND') return {}; throw e; } }));
 // Shortened correct options (same meaning, fewer words), applied after REWRITES.
 const TRIMS = Object.assign({}, ...['trim-a', 'trim-b', 'trim-c'].map((f) => { try { return require('./rewrites/' + f); } catch (e) { if (e.code === 'MODULE_NOT_FOUND') return {}; throw e; } }));
+const PROSE = require('./rewrites/prose');
+/** Plain punctuation (rewrites/prose.js); every pair must match, so a stale entry fails loudly. */
+function prose(q) {
+  for (const [from, to] of PROSE[q.id] || []) {
+    let hit = false;
+    if (q.prompt.includes(from)) { q.prompt = q.prompt.replace(from, to); hit = true; }
+    if ((q.explanation || '').includes(from)) { q.explanation = q.explanation.replace(from, to); hit = true; }
+    for (const o of q.options || []) if (o.text === from || o.text.includes(from)) { o.text = o.text.replace(from, to); hit = true; }
+    if (!hit) throw new Error(`${q.id}: prose rewrite does not match "${from.slice(0, 40)}"`);
+  }
+}
 function rebalance(q) {
   if (TRIMS[q.id]) {
     const right = q.options.filter((o) => q.answer.includes(o.id));
@@ -73,11 +84,12 @@ for (const bank of Object.values(BANKS)) for (const q of bank.questions) {
     q.type = 'single'; q.options = opts.map((text, i) => ({ id: LETTERS[i], text })); q.answer = ['a']; q.was_typed = true;
   }
   if (q.options?.length) rebalance(q);
+  prose(q);
   q.status = q.grading === 'review' ? 'retired' : 'published'; q.review = REVIEW;
   if (q.grading === 'review') q.retired_reason = 'Assessments are multiple-choice only; written and practical submissions are not used.';
 }
 
-const unknown = [...Object.keys(REWRITES), ...Object.keys(TRIMS)].filter((id) => !Object.values(BANKS).some((b) => b.questions.some((q) => q.id === id)));
+const unknown = [...Object.keys(REWRITES), ...Object.keys(TRIMS), ...Object.keys(PROSE)].filter((id) => !Object.values(BANKS).some((b) => b.questions.some((q) => q.id === id)));
 if (unknown.length) throw new Error('rewrites for unknown questions: ' + unknown.join(', '));
 
 module.exports = { BANKS, REVIEW, OUTPUT_MCQ };

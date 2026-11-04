@@ -430,7 +430,7 @@ function diagnosisText(gap, name) {
 }
 const ACTION = {
   theory: 'revisit the lesson videos and notes, and explain each concept in your own words before practising',
-  practical: 'write and debug the code yourself - solve every practice task rather than reading solutions',
+  practical: 'write and debug the code yourself, solving every practice task rather than reading solutions',
   scenario: 'work through the stage project and real-world examples, deciding and justifying each step',
 };
 
@@ -448,7 +448,7 @@ function recommendation(gap, skillName) {
   const learn = mods.length
     ? `Complete ${mods.map((m) => `"${m.title}" (${m.course})`).join(', ')}${tasks ? `, solve the ${tasks} practice task${tasks === 1 ? '' : 's'} in ${mods.length === 1 ? 'that module' : 'those modules'}` : ''}`
     : gap.resources.length ? 'Review the modules you have already completed for this skill'
-      : 'Practise with an external resource for now - EchoLens does not yet have a module for this skill';
+      : 'Practise with an external resource for now, as EchoLens does not yet have a module for this skill';
   return `${lead} ${learn}${focus.length ? '; ' + focus.join('; ') : ''}; then take the short ${gap.reassessment.items}-question ${skillName} reassessment.`;
 }
 

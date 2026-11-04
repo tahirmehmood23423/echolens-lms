@@ -687,7 +687,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const done = completedModules.length + completedProjects.filter((n) => n >= 5).length;
     const toAssess = Object.keys(trackPlan(user, slug, 'gap'));
     const pending = career(user).attempts.filter((a) => a.track === slug && a.result?.pending).length;
-    const assessment_status = !common.valid ? { state: 'common_required', label: common.reason === 'expired' ? 'Common CS test result has expired - retake it' : 'Take the common CS test first' }
+    const assessment_status = !common.valid ? { state: 'common_required', label: common.reason === 'expired' ? 'Your common CS test result has expired. Please retake it' : 'Take the common CS test first' }
       : pending ? { state: 'pending_review', label: `${pending} assessment${pending === 1 ? '' : 's'} awaiting staff review` }
         : toAssess.length ? { state: 'skills_to_assess', label: `${toAssess.length} skill${toAssess.length === 1 ? '' : 's'} not yet verified for this roadmap`, skills: toAssess }
           : { state: 'up_to_date', label: 'All assessable skills verified' };
@@ -699,7 +699,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
           ? { kind: 'learn', label: `${skill(firstGap.skill)?.name}: ${firstGap.resources.find((m) => !m.completed).title}`, href: firstGap.resources.find((m) => !m.completed).url }
           : { kind: 'reassess', label: `Reassess ${skill(firstGap.skill)?.name}`, href: '#assess/skill:' + firstGap.skill })
           : rm.starting_stage ? { kind: 'project', label: `Stage ${rm.starting_stage}: ${rm.stages[rm.starting_stage - 1].projects[0]}`, href: '#roadmap/' + slug }
-            : { kind: 'done', label: 'Roadmap complete - keep your portfolio fresh', href: '#roadmap/' + slug };
+            : { kind: 'done', label: 'Roadmap complete. Keep your portfolio fresh', href: '#roadmap/' + slug };
     return {
       current_stage: rm.starting_stage, stage_name: rm.starting_stage ? STAGE_NAMES[rm.starting_stage - 1] : 'Complete',
       stages_completed: rm.stages.filter((st) => st.status === 'completed').length,
@@ -996,9 +996,9 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   function categoryFeedback(evaluation, weakest, cfg) {
     const t = cfg.skill_thresholds;
     const TEXT = {
-      theory: { strong: 'You understand the underlying concepts well.', mid: 'Your conceptual understanding is developing - some ideas are not yet secure.', weak: 'Conceptual understanding is the main gap: revisit the lessons and make sure you can explain each idea in your own words.', none: 'Conceptual understanding has not been assessed yet.' },
-      practical: { strong: 'You can turn concepts into working code, queries or configurations.', mid: 'Your hands-on skills are developing - practise writing and debugging code yourself.', weak: 'Practical implementation is the main gap: you need much more hands-on coding and debugging practice.', none: 'Practical skills have not been shown yet - take an assessment with practical tasks.' },
-      scenario: { strong: 'You apply your knowledge well to real-world problems.', mid: 'Applying skills to real situations is developing - work through projects and case studies.', weak: 'Real-world application is the main gap: practise deciding and justifying what to do in realistic situations, for example through the stage projects.', none: 'Real-world problem-solving has not been assessed yet.' },
+      theory: { strong: 'You understand the underlying concepts well.', mid: 'Your conceptual understanding is developing; some ideas are not yet secure.', weak: 'Conceptual understanding is the main gap: revisit the lessons and make sure you can explain each idea in your own words.', none: 'Conceptual understanding has not been assessed yet.' },
+      practical: { strong: 'You can turn concepts into working code, queries or configurations.', mid: 'Your hands-on skills are developing. Practise writing and debugging code yourself.', weak: 'Practical implementation is the main gap: you need much more hands-on coding and debugging practice.', none: 'Practical skills have not been shown yet. Take an assessment with practical tasks.' },
+      scenario: { strong: 'You apply your knowledge well to real-world problems.', mid: 'Applying skills to real situations is developing. Work through projects and case studies.', weak: 'Real-world application is the main gap: practise deciding and justifying what to do in realistic situations, for example through the stage projects.', none: 'Real-world problem-solving has not been assessed yet.' },
     };
     const rows = E.CATEGORIES.map((c) => {
       const e = evaluation?.[c] || {};

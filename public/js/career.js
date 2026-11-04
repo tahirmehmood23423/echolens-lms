@@ -49,7 +49,7 @@
     const tracks = await loadTracks();
     root.innerHTML = `${tabs('tracks')}
       <section class="cr-hero"><h1>Find your technology career path</h1>
-        <p>Explore 12 career tracks, take a free skill assessment, and get a roadmap built from EchoLens courses - starting from what you already know. Results guide your learning; they are not an official qualification.</p>
+        <p>Explore 12 career tracks, take a free skill assessment, and get a roadmap built from EchoLens courses, starting from what you already know. Results guide your learning; they are not an official qualification.</p>
         <div class="cr-actions">${learner() ? '<a class="cr-btn" href="#assess/common">Take the common CS assessment</a><a class="cr-btn ghost" href="#onboarding">Set my career goals</a>' : ME ? '' : `<a class="cr-btn" href="${loginUrl()}">Sign in to get started</a>`}</div></section>
       <div class="cr-filters" role="search">
         <label class="sr-only" for="crQ">Search tracks</label><input id="crQ" type="search" placeholder="Search tracks, skills or tools">
@@ -181,7 +181,7 @@
       <h1>My Career Roadmaps</h1>
       <p class="cr-muted">Follow up to ${rm.max_active} career roadmaps at once. Your <b>Primary</b> roadmap drives your recommendations; skills you have already proved are shared across roadmaps, so you are only assessed on what is new.</p>
       ${r.active ? `<div class="cr-note">You have an assessment in progress. <a class="cr-btn cr-btn-sm" href="#take">Resume: ${esc(r.active.title)}</a></div>` : ''}
-      ${!r.preferences ? '<div class="cr-note">Tell us your interests to get better recommendations - every question is optional. <a href="#onboarding">Set my career goals</a></div>' : ''}
+      ${!r.preferences ? '<div class="cr-note">Tell us your interests to get better recommendations. Every question is optional. <a href="#onboarding">Set my career goals</a></div>' : ''}
       <div class="cr-note${rm.common.valid ? '' : ' warn'}">${rm.common.valid ? `✓ Your common computer-science result is valid until ${fmtDate(rm.common.valid_until)}, so new roadmaps do not need it again.`
         : `${rm.common.reason === 'expired' ? 'Your common computer-science result has expired.' : rm.common.reason === 'insufficient' ? 'Your common computer-science result did not have enough answers to verify your skills.' : 'You have not taken the common computer-science assessment yet.'} Every roadmap starts from it. <a href="#assess/common">Take it now</a>`}</div>
       ${advice ? adviceBox(advice) : ''}
@@ -215,7 +215,7 @@
   /** After adding a roadmap: what is reused, what still needs assessing, and what to do next. */
   function adviceBox(a) {
     return `<section class="cr-panel cr-advice" aria-live="polite"><h3>Roadmap added</h3>
-      ${a.common_required ? '<p>Start with the common computer-science assessment - every roadmap builds on it.</p>' : '<p>Your recent common computer-science result counts for this roadmap too.</p>'}
+      ${a.common_required ? '<p>Start with the common computer-science assessment, which every roadmap builds on.</p>' : '<p>Your recent common computer-science result counts for this roadmap too.</p>'}
       ${a.reused.length ? `<p class="cr-small"><b>Reused from your earlier assessments (${a.reused.length}):</b> ${a.reused.map((x) => esc(x.name)).join(', ')}</p>` : ''}
       ${a.needed.length ? `<p class="cr-small"><b>Still to assess (${a.needed.length}):</b> ${a.needed.map((x) => `${esc(x.name)} <span class="cr-muted">(${esc(x.reason_text)})</span>`).join(', ')}</p>` : ''}
       <div class="cr-actions"><a class="cr-btn" href="${esc(a.next.href)}">${esc(a.next.label)}</a></div></section>`;
@@ -235,10 +235,10 @@
         <ul><li><b>Every question is multiple choice</b>, from basic to advanced. Some ask you to read code, a query or a command and choose what it does or how to fix it.</li>
           <li><b>Three kinds of question:</b> theory (concepts and code tracing), practical (reading, debugging and fixing real code, queries or configuration) and scenario (real-world problems that need a decision).${av.weights ? ` They count ${av.weights.theory}% / ${av.weights.practical}% / ${av.weights.scenario}% towards your overall score.` : ''}</li>
           ${av.reviewed_items ? `<li><b>${av.reviewed_items} answer${av.reviewed_items === 1 ? '' : 's'} you write yourself</b> (an explanation or a practical submission). EchoLens staff review ${av.reviewed_items === 1 ? 'it' : 'them'} against a published rubric, usually within a few days; your scores update when that happens.</li>` : ''}
-          <li>Skip anything you do not know - skipped questions are not counted as wrong; we simply ask about that skill again later.</li>
+          <li>Skip anything you do not know. Skipped questions are not counted as wrong; we simply ask about that skill again later.</li>
           <li>Your results guide your learning. They are not an official qualification.</li></ul>
         ${isTrack ? `<fieldset class="cr-mode"><legend>What should this assessment cover?</legend>
-          <label class="cr-check"><input type="radio" name="crMode" value="gap" checked> <span><b>Only skills not yet verified</b> (recommended) - skills you already proved in another assessment, at the depth this roadmap needs, are reused.</span></label>
+          <label class="cr-check"><input type="radio" name="crMode" value="gap" checked> <span><b>Only skills not yet verified</b> (recommended). Skills you already proved in another assessment, at the depth this roadmap needs, are reused.</span></label>
           <label class="cr-check"><input type="radio" name="crMode" value="full"> <span><b>Full assessment</b> - every skill in this track, with fresh questions.</span></label></fieldset>` : ''}
         <div class="cr-actions"><button class="cr-btn" id="crStart">Start assessment</button><a class="cr-btn ghost" href="#me">Not now</a></div>
         <p id="crStartMsg" role="alert" class="cr-small"></p></div>`
@@ -296,7 +296,7 @@
           <button class="cr-btn ghost" id="crPrev"${a.cur === 0 ? ' disabled' : ''}>Previous</button>
           ${a.cur < n - 1 ? '<button class="cr-btn" id="crNext">Next</button>' : '<button class="cr-btn" id="crFinish">Finish and see results</button>'}
         </div>
-        ${q.type === 'output' || q.grading === 'review' ? '<p class="cr-small cr-muted">Type your answer yourself - pasting is turned off.</p><p id="crPasteMsg" class="cr-small" style="color:#7A4A00" role="status"></p>' : ''}
+        ${q.type === 'output' || q.grading === 'review' ? '<p class="cr-small cr-muted">Type your answer yourself. Pasting is turned off.</p><p id="crPasteMsg" class="cr-small" style="color:#7A4A00" role="status"></p>' : ''}
         <p id="crSaveMsg" class="cr-small cr-muted" role="status"></p>
       </section>
       <nav class="cr-dots" aria-label="Jump to question">${a.questions.map((x, i) => `<button type="button" data-i="${i}" data-done="${answered(x) ? 1 : 0}"${i === a.cur ? ' aria-current="true"' : ''} aria-label="Question ${i + 1}${answered(x) ? ', answered' : ''}">${i + 1}</button>`).join('')}</nav>
@@ -328,7 +328,7 @@
       const block = (e) => {
         e.preventDefault();
         a.pastes = a.pastes || {}; a.pastes[q.id] = (a.pastes[q.id] || 0) + 1;
-        const m = $('crPasteMsg'); if (m) m.textContent = 'Pasting is turned off in this assessment - please type your answer so your result reflects your own skills.';
+        const m = $('crPasteMsg'); if (m) m.textContent = 'Pasting is turned off in this assessment. Please type your answer so your result reflects your own skills.';
         queueSave();
       };
       box.addEventListener('paste', block);
@@ -349,7 +349,7 @@
     SAVE_TIMER = setTimeout(async () => {
       const msg = $('crSaveMsg');
       try { await api(`/api/career/me/attempts/${ATTEMPT.id}/answers`, { method: 'PUT', body: { answers: ATTEMPT.answers, runs: ATTEMPT.runs || {}, pastes: ATTEMPT.pastes || {} } }); if (msg) msg.textContent = 'Saved'; }
-      catch (e) { if (msg) msg.textContent = 'Not saved yet - we will try again. ' + e.message; }
+      catch (e) { if (msg) msg.textContent = 'Not saved yet. We will try again. ' + e.message; }
     }, 800);
   }
   async function submit(timeUp) {
@@ -376,7 +376,7 @@
         <div class="cr-kpi"><span>Answered</span><b>${a.answered} / ${a.total}</b></div>
         ${['theory', 'practical', 'scenario'].map((c) => `<div class="cr-kpi"><span>${CAT[c]} (weight ${a.categories[c].weight})</span><b>${pctTxt(a.categories[c].score)}</b><span>${a.categories[c].answered} scored</span></div>`).join('')}
       </div>
-      ${a.pending ? `<div class="cr-note"><b>${a.pending} answer${a.pending === 1 ? ' is' : 's are'} waiting for staff review.</b> They are not counted yet - your scores will update when the review is done.</div>` : ''}
+      ${a.pending ? `<div class="cr-note"><b>${a.pending} answer${a.pending === 1 ? ' is' : 's are'} waiting for staff review.</b> They are not counted yet; your scores will update when the review is done.</div>` : ''}
       <div class="cr-actions"><a class="cr-btn" href="#report">See my skill report and roadmap</a></div>
       <h2>Review your answers</h2>
       ${rv.map((r, i) => `<div class="cr-review" data-correct="${r.correct ? 1 : 0}">
@@ -430,13 +430,13 @@
       ${rd ? `<div class="cr-panel"><h3>How your level was worked out</h3><ul>${rd.explanation.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
       <div class="cr-cols"><div>
         ${rd ? `<h2>${esc(r.track.title)} skills</h2>${rd.skills.map(skillRow).join('')}
-          <p class="cr-small cr-muted">Striped bars mean too few questions were answered to be sure - take the short reassessment for that skill.</p>` : '<div class="cr-note">Choose a career track above to see your readiness for it.</div>'}
+          <p class="cr-small cr-muted">Striped bars mean too few questions were answered to be sure. Take the short reassessment for that skill.</p>` : '<div class="cr-note">Choose a career track above to see your readiness for it.</div>'}
         <h2>Common computer-science skills</h2>${r.common.categories.map((c) => skillRow({ ...c, critical: false })).join('')}
         ${r.gaps.length ? `<h2>What to work on next</h2>${r.gaps.map((g) => `<div class="cr-panel"><h3>${esc(g.name)} ${status(g.status)}</h3>
           ${(g.weak_in || []).length ? `<div class="cr-tags" style="margin-bottom:6px">${g.weak_in.map((c) => `<span class="cr-tag bad">Weak: ${esc(CAT[c])}</span>`).join('')}${(g.strong_in || []).map((c) => `<span class="cr-tag teal">Strong: ${esc(CAT[c])}</span>`).join('')}</div>` : ''}
           <p>${esc(g.recommendation)}</p>
           ${g.resources.length ? `<div>${g.resources.map((m) => `<div class="cr-mod"><a href="${esc(m.url)}">${esc(m.course)}: ${esc(m.title)}</a><span class="cr-small">${m.completed ? '✓ Completed' : m.tasks + ' practice task' + (m.tasks === 1 ? '' : 's')}</span></div>`).join('')}</div>` : ''}
-          <div class="cr-actions">${g.reassess_available ? `<a class="cr-btn ghost" href="#assess/${esc('skill:' + g.skill)}">${g.status === 'Not Yet Assessed' ? 'Assess this skill' : 'Take the reassessment'}</a>` : '<span class="cr-tag">A reassessment for this skill is coming soon</span>'}</div></div>`).join('')}` : rd ? '<div class="cr-note">No skill gaps for this track - see your roadmap for advanced projects.</div>' : ''}
+          <div class="cr-actions">${g.reassess_available ? `<a class="cr-btn ghost" href="#assess/${esc('skill:' + g.skill)}">${g.status === 'Not Yet Assessed' ? 'Assess this skill' : 'Take the reassessment'}</a>` : '<span class="cr-tag">A reassessment for this skill is coming soon</span>'}</div></div>`).join('')}` : rd ? '<div class="cr-note">No skill gaps for this track. See your roadmap for advanced projects.</div>' : ''}
       </div><aside>
         ${r.strongest.length ? `<div class="cr-panel"><h3>Strongest skills</h3><ul>${r.strongest.map((s) => `<li>${esc(s.name)} - ${s.score}%</li>`).join('')}</ul></div>` : ''}
         ${r.critical_gaps.length ? `<div class="cr-panel"><h3>Critical prerequisite gaps</h3><ul>${r.critical_gaps.map((g) => `<li>${esc(g.name)} - ${g.score}%</li>`).join('')}</ul></div>` : ''}
@@ -467,7 +467,7 @@
         <p class="cr-small"><b>Guided project:</b> ${s.projects.map(esc).join('; ')}</p>
         <p class="cr-small cr-muted"><b>Done when:</b> ${esc(s.criteria)}</p>
         ${s.no >= 5 ? `<form class="cr-form" data-stage="${s.no}"><label for="crProj${s.no}">Link to your project (GitHub or live URL)</label><input id="crProj${s.no}" type="url" placeholder="https://github.com/you/project" value="${esc(s.project?.link || '')}"${s.status === 'locked' ? ' disabled' : ''}>
-          <div class="cr-actions"><button class="cr-btn ghost" type="submit"${s.status === 'locked' ? ' disabled' : ''}>Save project link</button></div><p class="cr-small cr-muted" role="status">${s.project ? 'Self-reported - saved ' + fmtDate(s.project.at) : ''}</p></form>` : ''}
+          <div class="cr-actions"><button class="cr-btn ghost" type="submit"${s.status === 'locked' ? ' disabled' : ''}>Save project link</button></div><p class="cr-small cr-muted" role="status">${s.project ? 'Self-reported, saved ' + fmtDate(s.project.at) : ''}</p></form>` : ''}
         ${s.next_actions.length && s.status !== 'locked' && s.skills.length ? `<div class="cr-actions">${[...new Set(s.next_actions.map((a) => a.skill))].slice(0, 3).map((id) => `<a class="cr-btn ghost" href="#assess/${esc('skill:' + id)}">Assess ${esc(s.skills.find((k) => k.skill === id).name)}</a>`).join('')}</div>` : ''}
       </section>`).join('')}`;
     root.querySelectorAll('form[data-stage]').forEach((f) => f.addEventListener('submit', async (e) => {

@@ -203,3 +203,18 @@ test('admins edit the matching rules with validation and versioning; the feature
   assert.equal(reset.body.config.enabled, true);
   assert.equal((await call('POST', '/api/career/discovery/quiz')).status, 200);
 });
+
+test('student-facing text uses plain punctuation: no dash asides in questions, discovery screens or the home page', () => {
+  const fs2 = require('node:fs');
+  const { BANKS } = require('../career/banks');
+  const aside = /[A-Za-z)\]"'.%] - [A-Za-z("']|—|–/;
+  const maths = new Set(['m-ml-math_stats-p1', 'da-bz-p1', 'm-da-business-p1', 'm-se-arrays_strings-t3']); // real minus signs
+  const bad = [];
+  for (const b of Object.values(BANKS)) for (const q of b.questions) {
+    if (q.status !== 'published' || maths.has(q.id)) continue;
+    for (const t of [q.prompt, q.explanation, ...q.options.map((o) => o.text)]) if (aside.test(t || '')) bad.push(q.id);
+  }
+  assert.deepEqual(bad, []);
+  for (const f of ['public/landing.html', 'public/js/career-discovery.js']) assert.ok(!/&mdash;|&ndash;|—|–/.test(fs2.readFileSync(path.join(__dirname, '..', f), 'utf8')), `${f} has no dashes`);
+  for (const q of D.QUESTIONS) assert.ok(!aside.test(q.title + q.hint + q.options.map(([, t]) => t).join(' ')), q.id);
+});

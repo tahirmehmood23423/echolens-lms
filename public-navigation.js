@@ -7,6 +7,7 @@ const links = [
   ['Events','/open#events','events'],
   ['Announcements','/open#announcements','announcements'],
   ['Feedback','/open#feedback','feedback'],
+  ['Career Paths','/career'],
   ['Compiler','/compiler'],
   ['FAQ','/#faq'],
 ];

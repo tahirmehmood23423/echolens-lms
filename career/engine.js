@@ -311,7 +311,10 @@ function roadmap(track, profile, resolve, { stageNames, projects = {} } = {}, co
       const ok = crit.get(id) ? status === STATUS.strong : [STATUS.strong, STATUS.developing].includes(status);
       return { skill: id, critical: !!crit.get(id), status, satisfied: ok, score: profile[id]?.score ?? null };
     });
-    const modules = st.skills.flatMap((id) => resolve(id).map((r) => ({ ...r, skill: id })));
+    // A module can teach two skills in the same stage; list it once.
+    const seenMod = new Set();
+    const modules = st.skills.flatMap((id) => resolve(id).map((r) => ({ ...r, skill: id })))
+      .filter((m) => { const k = (m.track_key || m.title) + ':' + (m.level ?? ''); if (seenMod.has(k)) return false; seenMod.add(k); return true; });
     const project = projects[i + 1] || null;
     const complete = skills.length ? skills.every((s) => s.satisfied) : !!project;
     return { no: i + 1, name: (stageNames || [])[i] || `Stage ${i + 1}`, skills, modules, projects: st.projects, criteria: st.criteria, project, complete };

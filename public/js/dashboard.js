@@ -103,7 +103,7 @@ const TITLES = {
   leaderboard: 'Leaderboard', announcements: 'Announcements', settings: 'Settings',
   challenges: 'Challenges', copilot: 'AI Copilot', hackathons: 'ShipLens',
   events: 'Events', 'shiplens-detail': 'ShipLens team & finance', 'admin-analytics': 'Reports', 'admin-mailer': 'Email Leads',
-  'admin-catalogue': 'Courses', 'admin-upcoming': 'Upcoming Courses', 'admin-users': 'Users',
+  'admin-catalogue': 'Courses', 'admin-upcoming': 'Upcoming Courses', 'admin-career': 'Career Assessments', 'admin-users': 'Users',
   assignments: 'Assignments', quizzes: 'Quizzes', progress: 'Progress',
   certificates: 'Certificates', messages: 'Messages', resources: 'Resources',
   students: 'Students', grades: 'Grades', attendance: 'Attendance', analytics: 'Analytics',
@@ -149,7 +149,7 @@ function show(view) {
     leaderboard: renderLeaderboard, announcements: renderAnnouncements, settings: renderSettings,
     challenges: renderChallenges, copilot: renderCopilot, hackathons: renderHackathons,
     events: renderEvents, 'admin-analytics': renderAnalytics, 'admin-mailer': renderAdminMailer,
-    'admin-catalogue': renderCatalogue, 'admin-upcoming': renderAdminUpcoming, 'admin-users': renderUsers,
+    'admin-catalogue': renderCatalogue, 'admin-upcoming': renderAdminUpcoming, 'admin-career': () => renderAdminCareer(), 'admin-users': renderUsers,
     assignments: renderAssignments, quizzes: renderQuizzesGlobal, progress: renderProgress,
     certificates: renderCertificates, messages: renderMessages, resources: renderResources,
     students: renderTeacherStudents, grades: renderTeacherGrades, attendance: renderTeacherAttendance,
@@ -449,7 +449,7 @@ async function renderOverview() {
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
   const d = await api('/api/overview');
 
-  if (ME.role === 'student' && d.gamify) { renderStudentOverview(el, d); return; }
+  if (ME.role === 'student' && d.gamify) { await renderStudentOverview(el, d); careerOverviewCard(el); return; }
   if (ME.role === 'instructor' && d.teaching) { renderInstructorOverview(el, d); return; }
   if (ME.role === 'admin' && d.dashboard) { renderAdminOverview(el, d); return; }
 
@@ -7657,3 +7657,29 @@ async function delUpcoming(id) {
   catch (err) { toast(err.message, true); }
 }
 window.formUpcoming = formUpcoming; window.delUpcoming = delUpcoming;
+
+
+/* ----------------------- career development (students) -----------------------
+ * A compact summary of the student's career track, assessed level and next
+ * step, linking into /career where the full report and roadmap live. It never
+ * blocks the overview: if the career API fails, the card simply is not shown.
+ */
+async function careerOverviewCard(el) {
+  let r; try { r = await api('/api/career/me'); } catch { return; }
+  const t = r.track, rm = r.roadmap, done = rm ? rm.stages.filter((s) => s.status === 'completed').length : 0;
+  const next = r.active ? ['#take', 'Resume ' + r.active.title]
+    : !r.common.last_attempt ? ['#assess/common', 'Take the common CS assessment']
+      : !t ? ['#tracks', 'Choose a career track']
+        : r.gaps[0] ? ['#report', 'Work on ' + (r.gaps[0].name || 'your next skill')] : ['#roadmap', 'Open my roadmap'];
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<div class="card-head"><h3>Career development</h3><a class="btn btn-ghost btn-sm" href="/career#me">Open</a></div>
+    <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
+      <div style="min-width:160px"><div class="s" style="color:var(--muted)">Career track</div><strong>${esc(t ? t.title : 'Not chosen yet')}</strong></div>
+      <div style="min-width:140px"><div class="s" style="color:var(--muted)">Assessed level (provisional)</div><strong>${esc(r.readiness?.level || 'Not assessed')}</strong></div>
+      <div style="min-width:120px"><div class="s" style="color:var(--muted)">Roadmap</div><strong>${rm ? done + ' of 6 stages' : '-'}</strong></div>
+      <span style="flex:1"></span>
+      <a class="btn btn-teal btn-sm" href="/career${next[0]}">${esc(next[1])}</a>
+    </div>`;
+  el.insertBefore(card, el.firstChild);
+}

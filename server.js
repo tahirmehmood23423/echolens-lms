@@ -5512,6 +5512,9 @@ app.get('/open', (req, res) => {
 app.get('/shiplens', (req, res) => res.redirect(302, '/open#shiplens'));
 app.get('/compiler', (req, res) => res.sendFile(path.join(__dirname, 'public', 'compiler.html')));
 require('./coursepages').register(app); // SEO landing page per course: /courses and /courses/:slug
+// Career discovery, skill assessment and personalised roadmaps (career/).
+require('./career/routes').register(app, { store, authRequired, adminRequired, rateLimit });
+app.get(['/career', '/career/'], (req, res) => res.type('html').send(require('./career/page').render()));
 require('./talent').register(app, { authRequired, requireRecruiter, APP_URL, UPLOAD_DIR }); // Talent Marketplace: student profiles, projects, search (Phases 2-4)
 require('./talent-hiring').register(app, { authRequired, requireRecruiter, adminRequired, APP_URL, UPLOAD_DIR }); // Talent Marketplace: contact gating, shortlists, messaging, admin safety/analytics (Phases 5-6)
 require('./showcase').register(app, { authRequired, teacherOrAdmin, APP_URL }); // Showcase Feed (v20) - backend (step 4) + frontend pages (step 5)

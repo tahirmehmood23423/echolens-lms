@@ -34,7 +34,7 @@
   const CAT_DESC = { theory: 'concepts and code tracing', practical: 'hands-on coding, debugging and configuration', scenario: 'real-world problems and decisions' };
   const pctTxt = (v) => (v == null ? '-' : v + '%');
   const status = (s) => `<span class="cr-status" data-icon="${STATUS_ICON[s] || ''}" style="color:${STATUS_COLOR[s] || 'inherit'}">${esc(s)}</span>`;
-  const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['discover', 'Discover'], ['tracks', 'Career tracks'], ['me', 'My roadmaps'], ['report', 'My skill report'], ['roadmap', 'My roadmap'], ['history', 'Assessment history']]
+  const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['discover', 'Discover'], ['tracks', 'Explore careers'], ['me', 'My workspace'], ['report', 'Skill evidence'], ['roadmap', 'Learning plan'], ['history', 'Assessment history']]
     .map(([k, l]) => `<a href="#${k}"${cur === k ? ' aria-current="page"' : ''}>${l}</a>`).join('')}</nav>`;
   const learner = () => ME && ['free', 'student'].includes(ME.role);
   function needLogin(what) {
@@ -42,39 +42,53 @@
       <div class="cr-actions"><a class="cr-btn" href="${loginUrl()}">Sign in</a><a class="cr-btn ghost" href="/open#signup">Create a free account</a><a class="cr-btn ghost" href="#tracks">Explore tracks</a></div></div>`;
   }
   const notLearner = () => `${tabs('')}<div class="cr-note warn">Assessments and roadmaps are for learner accounts. Staff can preview assessments and manage question banks from the admin portal under <b>Career Assessments</b>.</div>`;
-  const fail = (e) => { root.innerHTML = `${tabs('')}<p class="cr-err" role="alert">${esc(e.message)}</p>`; };
+  const fail = (e) => { root.innerHTML = `${tabs('')}<section class="cx-error" role="alert"><h2>We could not load this step</h2><p>${esc(e.message)}</p><p class="cr-small">Your saved progress stays safe. Check your connection and try again.</p><button class="cr-btn ghost" id="crRetry">Try again</button></section>`; $('crRetry').onclick = route; };
 
   /* ------------------------------- tracks ------------------------------- */
   async function loadTracks() { if (!TRACKS) TRACKS = (await api('/api/career/tracks')).tracks; return TRACKS; }
   async function viewTracks() {
-    const tracks = await loadTracks();
-    root.innerHTML = `${tabs('tracks')}
-      <section class="cr-hero"><h1>Find your technology career path</h1>
-        <p>Explore 12 career tracks, take a free skill assessment, and get a roadmap built from EchoLens courses, starting from what you already know. Results guide your learning; they are not an official qualification.</p>
-        <div class="cr-actions">${learner() ? '<a class="cr-btn" href="#assess/common">Take the common CS assessment</a><a class="cr-btn ghost" href="#onboarding">Set my career goals</a>' : ME ? '' : `<a class="cr-btn" href="${loginUrl()}">Sign in to get started</a>`}</div></section>
-      <div class="cr-filters" role="search">
-        <label class="sr-only" for="crQ">Search tracks</label><input id="crQ" type="search" placeholder="Search tracks, skills or tools">
-        <label class="sr-only" for="crLevel">Suitable for</label><select id="crLevel"><option value="">Any level</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
-        <label class="sr-only" for="crAssess">Assessment</label><select id="crAssess"><option value="">All tracks</option><option value="1">Assessment available now</option></select>
-      </div>
-      <p class="cr-muted cr-small" id="crCount"></p>
-      <div class="cr-grid" id="crGrid"></div>`;
+    const tracks = await loadTracks(), recommended = new Set(window.CareerDiscovery?.recommended() || []);
+    let compare = []; try { compare = JSON.parse(sessionStorage.getItem('elCareerCompare') || '[]').filter(id => tracks.some(t => t.slug === id)).slice(0, 3); } catch {}
+    const icon = t => {
+      const paths = {
+        'frontend-web-developer': 'M3 4h18v16H3z M3 8h18 M8 12l-3 3 3 3 M16 12l3 3-3 3',
+        'backend-developer': 'M4 3h16v6H4z M4 15h16v6H4z M7 6h1 M7 18h1 M12 9v6',
+        'full-stack-web-developer': 'M3 3h18v7H3z M3 14h8v7H3z M15 14h6v7h-6z M12 10v4',
+        'mobile-app-developer': 'M7 2h10v20H7z M10 5h4 M11 19h2',
+        'ai-machine-learning-engineer': 'M8 5h8v14H8z M4 8h4 M4 16h4 M16 8h4 M16 16h4 M11 8v8 M13 11h3',
+        'generative-ai-llm-developer': 'M3 4h18v13H9l-5 4v-4H3z M8 9h8 M8 12h5',
+        'data-analyst-business-intelligence': 'M3 3v18h18 M7 17v-6 M12 17V7 M17 17V4',
+        'data-engineer': 'M3 4h7v6H3z M14 14h7v6h-7z M10 7h7v7 M3 17h7 M7 14l3 3-3 3',
+        'cybersecurity-analyst': 'M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6z M8 12l3 3 5-6',
+        'cloud-devops-engineer': 'M7 17a5 5 0 0 1 0-10 6 6 0 0 1 11 2 4 4 0 0 1 0 8 M9 21v-7 M15 21v-7',
+        'software-qa-test-automation': 'M4 4h16v17H4z M8 10l2 2 5-5 M8 16h8',
+        'software-engineering-dsa': 'M3 10h6v6H3z M15 3h6v6h-6z M15 15h6v6h-6z M9 13h3V6h3 M12 13v5h3'
+      };
+      return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[t.slug] || paths['backend-developer']}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    };
+    root.innerHTML = `${tabs('tracks')}<section class="cr-hero"><span class="cx-eyebrow">Your possibilities, made clear</span><h1>Find a career that fits your curiosity.</h1><p>Explore all 12 technology paths. See the roles, skills and first steps before you decide. Beginners are welcome, and your recommendations never limit your choice.</p><div class="cr-actions"><a class="cr-btn" href="#discover">Discover my direction</a>${learner() ? '<a class="cr-btn ghost" href="#me">My career dashboard</a>' : ''}</div></section>
+      <div class="cr-filters" role="search"><label class="sr-only" for="crQ">Search careers, skills or technologies</label><input id="crQ" type="search" placeholder="Search careers, skills or technologies"><label class="sr-only" for="crLevel">Experience level</label><select id="crLevel"><option value="">Every experience level</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select><label class="sr-only" for="crAssess">Assessment availability</label><select id="crAssess"><option value="">All careers</option><option value="1">Assessment available</option></select></div>
+      <div class="cx-compare-bar"><span id="cxCompareCount" role="status" aria-live="polite">Choose up to 3 careers to compare</span><button class="cr-btn ghost" id="cxCompare" disabled>Compare careers</button></div><p class="cr-small cr-muted" id="crCount" role="status" aria-live="polite"></p><div class="cr-grid" id="crGrid"></div>`;
     const draw = () => {
       const q = $('crQ').value.trim().toLowerCase(), lvl = $('crLevel').value, av = $('crAssess').value;
-      const list = tracks.filter((t) => (!lvl || t.suitability.includes(lvl)) && (!av || t.assessment.available)
-        && (!q || [t.title, t.summary, ...t.tools, ...t.skills.map((s) => s.name)].join(' ').toLowerCase().includes(q)));
-      $('crCount').textContent = `${list.length} of ${tracks.length} tracks`;
-      $('crGrid').innerHTML = list.map((t) => `
-        <article class="cr-card">
-          <h3><a href="#track/${esc(t.slug)}">${esc(t.title)}</a></h3>
-          <p>${esc(t.summary)}</p>
-          <div class="cr-tags">${t.suitability.map((s) => `<span class="cr-tag">${esc(s)}</span>`).join('')}<span class="cr-tag">${esc(t.duration)}</span></div>
-          <div class="cr-tags">${t.assessment.available ? '<span class="cr-tag teal">✓ Assessment available</span>' : '<span class="cr-tag">Assessment coming soon</span>'}</div>
-          <div class="cr-actions"><a class="cr-btn ghost" href="#track/${esc(t.slug)}">View track</a></div>
-        </article>`).join('') || '<p class="cr-muted">No tracks match those filters.</p>';
+      const list = tracks.filter(t => (!lvl || t.suitability.includes(lvl)) && (!av || t.assessment.available) && (!q || [t.title,t.summary,...t.tools,...t.skills.map(s => s.name)].join(' ').toLowerCase().includes(q)));
+      $('crCount').textContent = `${list.length} of ${tracks.length} careers`;
+      $('crGrid').innerHTML = list.map(t => `<article class="cr-card${recommended.has(t.slug) ? ' is-recommended' : ''}"><div class="cx-track-top"><span class="cx-track-icon">${icon(t)}</span>${recommended.has(t.slug) ? '<span class="cx-recommend">Suggested for you</span>' : ''}</div><h3><a href="#path/${esc(t.slug)}">${esc(t.title)}</a></h3><p>${esc(t.summary)}</p><div class="cr-tags">${t.suitability.slice(0,2).map(s => `<span class="cr-tag">${esc(s)} friendly</span>`).join('')}<span class="cr-tag">${t.job_roles.length} job roles</span></div><p class="cr-small" style="margin:12px 0 0"><b>Core tools:</b> ${t.tools.slice(0,4).map(esc).join(' · ')}</p><p class="cr-small" style="margin:8px 0 0"><b>Start here:</b> Programming foundations</p><div class="cx-track-foot"><a href="#path/${esc(t.slug)}">Explore career <span aria-hidden="true">→</span></a><label class="cx-compare-toggle"><input type="checkbox" data-compare="${esc(t.slug)}"${compare.includes(t.slug) ? ' checked' : ''} aria-label="Compare ${esc(t.title)}"> Compare</label></div></article>`).join('') || '<div class="cx-empty"><h2>No matching careers</h2><p>Try another skill or remove a filter. Every path is still open to you.</p><button class="cr-btn ghost" id="cxClear">Clear filters</button></div>';
+      const clear = $('cxClear'); if (clear) clear.onclick = () => { $('crQ').value = ''; $('crLevel').value = ''; $('crAssess').value = ''; draw(); $('crQ').focus(); };
+      $('cxCompare').disabled = compare.length < 2; $('cxCompareCount').textContent = compare.length ? `${compare.length} of 3 careers selected` : 'Choose up to 3 careers to compare';
+      root.querySelectorAll('[data-compare]').forEach(input => { input.onchange = () => {
+        if (input.checked && compare.length === 3) { input.checked = false; $('cxCompareCount').textContent = 'Remove one career before adding another. You can compare up to 3.'; return; }
+        compare = input.checked ? [...compare,input.dataset.compare] : compare.filter(id => id !== input.dataset.compare);
+        try { sessionStorage.setItem('elCareerCompare',JSON.stringify(compare)); } catch {}
+        $('cxCompare').disabled = compare.length < 2; $('cxCompareCount').textContent = `${compare.length} of 3 careers selected`;
+      }; });
     };
-    ['crQ', 'crLevel', 'crAssess'].forEach((id) => $(id).addEventListener('input', draw));
-    draw();
+    $('cxCompare').onclick = () => {
+      const chosen = tracks.filter(t => compare.includes(t.slug));
+      CareerUI.dialog('Compare your possibilities', `<div class="cx-compare-scroll" tabindex="0" aria-label="Career comparison"><table><thead><tr><th scope="col">What matters to you</th>${chosen.map(t => `<th scope="col">${esc(t.title)}</th>`).join('')}</tr></thead><tbody>${[['Experience',t=>t.suitability.join(', ')],['Core technologies',t=>t.tools.join(', ')],['Job roles',t=>t.job_roles.map(r=>r.title).join('; ')],['Suggested duration',t=>t.duration]].map(([label,value])=>`<tr><th scope="row">${label}</th>${chosen.map(t=>`<td>${esc(value(t))}</td>`).join('')}</tr>`).join('')}<tr><th scope="row">Explore</th>${chosen.map(t=>`<td><a href="#path/${esc(t.slug)}" data-compare-explore>View roles and subtracks</a></td>`).join('')}</tr></tbody></table></div><p>You can choose any career. These are learning pathways, not employment guarantees.</p>`, 'Done', 'Close');
+      document.querySelectorAll('[data-compare-explore]').forEach(a => { a.onclick = () => document.querySelector('.cx-dialog').close(); });
+    };
+    ['crQ','crLevel','crAssess'].forEach(id => $(id).addEventListener('input', draw)); draw();
   }
 
   async function viewTrack(slug) {
@@ -173,6 +187,7 @@
   async function viewMe(advice) {
     if (!ME) { root.innerHTML = needLogin('My Career Roadmaps'); return; }
     if (!learner()) { root.innerHTML = notLearner(); return; }
+    ME.career = await api('/api/career/me');
     const r = ME.career;
     const [rm, tracks] = await Promise.all([api('/api/career/me/enrollments'), loadTracks()]);
     const active = rm.enrollments.filter((e) => e.status === 'active'), paused = rm.enrollments.filter((e) => e.status === 'paused'), archived = rm.enrollments.filter((e) => e.status === 'archived');
@@ -180,7 +195,7 @@
     const following = new Set(rm.enrollments.filter((e) => e.status !== 'archived').map((e) => e.track));
     const canAdd = rm.active_count < rm.max_active, choices = tracks.filter((t) => !following.has(t.slug));
     root.innerHTML = `${tabs('me')}
-      <h1>My Career Roadmaps</h1>
+      <span class="cx-eyebrow">Your career workspace</span><h1>A clear next step. A future you build.</h1>${CareerUI.progress(r.curriculum)}
       <p class="cr-muted">Follow up to ${rm.max_active} career roadmaps at once. Your <b>Primary</b> roadmap drives your recommendations; skills you have already proved are shared across roadmaps, so you are only assessed on what is new.</p>
       ${r.active ? `<div class="cr-note">You have an assessment in progress. <a class="cr-btn cr-btn-sm" href="#take">Resume: ${esc(r.active.title)}</a></div>` : ''}
       ${!r.preferences ? '<div class="cr-note">Tell us your interests to get better recommendations. Every question is optional. <a href="#onboarding">Set my career goals</a></div>' : ''}
@@ -200,6 +215,7 @@
         <p id="crRoadMsg" role="alert" class="cr-small"></p></section>
       ${archived.length ? `<details class="cr-panel"><summary><b>Archived roadmaps (${archived.length})</b></summary><div class="cr-road-grid" style="margin-top:10px">${archived.map((e) => roadmapCard(e, rm, false)).join('')}</div></details>` : ''}
       ${r.gaps.length && rm.primary ? `<div class="cr-panel"><h3>Top priorities for ${esc(rm.primary.title)}</h3><ul>${r.gaps.slice(0, 3).map((g) => `<li>${status(g.status)} <b>${esc(g.name)}</b> - ${esc(g.recommendation)}</li>`).join('')}</ul></div>` : ''}
+      ${r.curriculum?.recent.length ? `<section class="cr-panel"><h2>Recent skill checkpoints</h2>${r.curriculum.recent.map(a=>`<p><a href="#sres/${esc(a.id)}">${esc(a.title)}</a> <span class="cr-tag">${a.overall}% · ${esc(a.outcome_label)}</span></p>`).join('')}</section>` : ''}
       <p class="cr-muted cr-small">${esc(r.disclaimer)}</p>`;
     const msg = $('crRoadMsg');
     const run = async (fn) => { root.querySelectorAll('[data-act],[data-add],#crAdd button').forEach((b) => { b.disabled = true; }); try { const out = await fn(); await loadMe(); await viewMe(out?.recommendation); } catch (e) { await viewMe(); $('crRoadMsg').textContent = e.message; } };
@@ -367,7 +383,8 @@
 
   async function viewResult(id) {
     if (!ME) { root.innerHTML = needLogin('Results'); return; }
-    const h = await api('/api/career/me/history');
+    const [h, canonical] = await Promise.all([api('/api/career/me/history'), api('/api/career/me/st/history')]);
+    const attempts = [...h.attempts.map(a => ({ ...a, href: '#result/' + a.id })), ...canonical.attempts.map(a => ({ ...a, raw_score: a.overall, href: '#sres/' + a.id }))].sort((a,b) => String(b.submitted_at).localeCompare(String(a.submitted_at)));
     const a = h.attempts.find((x) => x.id === id);
     if (!a) { root.innerHTML = `${tabs('history')}<p class="cr-err">That attempt was not found.</p>`; return; }
     const rv = (await api(`/api/career/me/attempts/${encodeURIComponent(id)}/review`)).review;
@@ -408,13 +425,13 @@
     const picker = `<label for="crTrackPick" class="cr-small" style="font-weight:600">Show readiness for</label>
       <select id="crTrackPick" style="min-height:40px;border:1px solid var(--line-strong);border-radius:10px;padding:6px 10px;margin-left:6px"><option value="">Choose a track</option>${tracks.map((t) => `<option value="${esc(t.slug)}"${r.track?.slug === t.slug ? ' selected' : ''}>${esc(t.title)}</option>`).join('')}</select>`;
     if (!r.history_count) {
-      root.innerHTML = `${tabs('report')}<h1>My skill report</h1><div class="cr-note">You have not taken an assessment yet. Start with the common computer-science assessment (about 20 minutes).</div>
+      root.innerHTML = `${tabs('report')}<h1>My skill report</h1>${CareerUI.progress(r.curriculum)}${CareerUI.evidence(r.curriculum)}<div class="cr-note">${r.curriculum?.recent.length ? 'Your comprehensive quiz evidence is shown above. The common CS assessment offers a separate foundational placement check.' : 'Take your first knowledge assessment to find a useful starting point. The common CS assessment takes about 20 minutes.'}</div>
         <div class="cr-actions">${r.assessments.common.available ? '<a class="cr-btn" href="#assess/common">Take the common CS assessment</a>' : `<span class="cr-tag">${esc(r.assessments.common.reason || '')}</span>`}<a class="cr-btn ghost" href="#tracks">Explore tracks</a></div>`;
       return;
     }
     const rd = r.readiness;
     root.innerHTML = `${tabs('report')}
-      <h1>My skill report</h1>
+      <h1>My skill report</h1>${CareerUI.progress(r.curriculum)}${CareerUI.evidence(r.curriculum)}
       <p>${picker}</p>
       <div class="cr-note warn"><b>Provisional.</b> ${esc(r.disclaimer)}</div>
       <div class="cr-kpis">
@@ -454,11 +471,11 @@
     if (!ME) { root.innerHTML = needLogin('My roadmap'); return; }
     if (!learner()) { root.innerHTML = notLearner(); return; }
     const r = ME.career;
-    if (!r.track) { root.innerHTML = `${tabs('roadmap')}<h1>My roadmap</h1><div class="cr-note">Choose a career track to get your personalised roadmap.</div><a class="cr-btn" href="#tracks">Explore tracks</a>`; return; }
+    if (!r.track) { root.innerHTML = `${tabs('roadmap')}<h1>My learning plan</h1>${CareerUI.progress(r.curriculum)}<div class="cr-note">Choose a career track to get your personalised roadmap.</div><a class="cr-btn" href="#tracks">Explore tracks</a>`; return; }
     const rm = r.roadmap, mine = (r.roadmaps?.enrollments || []).filter((e) => e.status !== 'archived');
     root.innerHTML = `${tabs('roadmap')}
       ${mine.length > 1 ? `<nav class="cr-tags" aria-label="My roadmaps" style="margin-bottom:8px">${mine.map((e) => `<a class="cr-tag${e.track === r.track.slug ? ' teal' : ''}" href="#roadmap/${esc(e.track)}"${e.track === r.track.slug ? ' aria-current="page"' : ''}>${e.primary ? '★ ' : ''}${esc(e.title)}${e.status === 'paused' ? ' (paused)' : ''}</a>`).join('')}</nav>` : ''}
-      <h1>${esc(r.track.title)} roadmap</h1>
+      <h1>${esc(r.track.title)} learning plan</h1>${CareerUI.progress(r.curriculum)}
       ${r.enrollment ? `<p class="cr-small">${r.enrollment.primary ? '<span class="cr-tag teal">★ Primary roadmap</span>' : `<span class="cr-tag">${r.enrollment.status === 'paused' ? 'Paused' : 'Secondary'} roadmap</span>`} <span class="cr-tag">${r.enrollment.progress?.completion_pct ?? 0}% complete</span></p>` : learner() ? '<p class="cr-small"><a href="#me">Add this track to your roadmaps</a> to track progress on it.</p>' : ''}
       <p class="cr-muted">Built from your latest assessment results. Stages where you have already shown the skills are marked complete; critical prerequisites always need to be demonstrated first.</p>
       <div class="cr-steps" aria-label="Roadmap stages">${rm.stages.map((s) => `<span data-status="${s.status}">${s.no}. ${esc(s.name)}<br><small>${esc({ completed: '✓ Done', current: 'You are here', upcoming: 'Next', locked: 'Locked' }[s.status])}</small></span>`).join('')}</div>
@@ -483,10 +500,11 @@
   async function viewHistory() {
     if (!ME) { root.innerHTML = needLogin('Assessment history'); return; }
     if (!learner()) { root.innerHTML = notLearner(); return; }
-    const h = await api('/api/career/me/history');
+    const [h, canonical] = await Promise.all([api('/api/career/me/history'), api('/api/career/me/st/history')]);
+    const attempts = [...h.attempts.map(a => ({ ...a, href: '#result/' + a.id })), ...canonical.attempts.map(a => ({ ...a, raw_score: a.overall, href: '#sres/' + a.id }))].sort((a,b) => String(b.submitted_at).localeCompare(String(a.submitted_at)));
     root.innerHTML = `${tabs('history')}<h1>Assessment history</h1>
-      ${h.attempts.length ? `<div style="overflow-x:auto"><table class="cr-table"><thead><tr><th>Date</th><th>Assessment</th><th>Score</th><th>Answered</th><th></th></tr></thead><tbody>
-        ${h.attempts.map((a) => `<tr><td>${fmtDate(a.submitted_at)}</td><td>${esc(a.title)}</td><td>${a.raw_score == null ? '-' : a.raw_score + '%'}</td><td>${a.answered}/${a.total}</td><td><a href="#result/${esc(a.id)}">Review</a></td></tr>`).join('')}</tbody></table></div>` : '<p class="cr-muted">No assessments yet.</p>'}
+      ${attempts.length ? `<div style="overflow-x:auto"><table class="cr-table"><thead><tr><th>Date</th><th>Assessment</th><th>Score</th><th>Answered</th><th></th></tr></thead><tbody>
+        ${attempts.map((a) => `<tr><td>${fmtDate(a.submitted_at)}</td><td>${esc(a.title)}</td><td>${a.raw_score == null ? '-' : a.raw_score + '%'}</td><td>${a.answered}/${a.total}</td><td><a href="${esc(a.href)}">Review</a></td></tr>`).join('')}</tbody></table></div>` : '<p class="cr-muted">No assessments yet.</p>'}
       ${h.skills.some((s) => s.history.length > 1) ? `<h2>Improvement over time</h2>${h.skills.filter((s) => s.history.length > 1).map((s) => {
         const first = s.history[0], last = s.history[s.history.length - 1], d = last.score - first.score;
         return `<div class="cr-skill"><span>${esc(s.name)}</span><span class="cr-small">${s.history.map((x) => x.score + '%').join(' → ')}</span><b>${d > 0 ? '▲ +' : d < 0 ? '▼ ' : '= '}${d}</b></div>`;
@@ -504,6 +522,9 @@
   }
   async function route() {
     clearInterval(TICK);
+    document.body.classList.toggle('career-exam', ['stake', 'take'].includes(location.hash.slice(1)));
+    root.setAttribute('aria-busy','true');
+    root.innerHTML = CareerUI.skeleton();
     // No hash: open Career Discovery once for people with no career activity yet; everyone else sees the tracks.
     if (!location.hash && window.CareerDiscovery && await CareerDiscovery.shouldAutoShow(discoveryCtx())) { history.replaceState(null, '', '#discover'); }
     const [view, arg, sub] = decodeURIComponent(location.hash.slice(1) || 'tracks').split('/');
@@ -519,12 +540,13 @@
       else if (view === 'result' && arg) await viewResult(arg);
       else if (view === 'report' || view === 'roadmap') {
         // #roadmap/<track> and #report/<track> show one roadmap; without a track, the Primary.
-        if (ME && learner() && (arg || '') !== (ME.career?.track?.slug || '')) ME.career = await api('/api/career/me' + (arg ? '?track=' + encodeURIComponent(arg) : ''));
+        if (ME && learner()) ME.career = await api('/api/career/me' + (arg ? '?track=' + encodeURIComponent(arg) : ''));
         await (view === 'report' ? viewReport() : viewRoadmap());
       }
       else if (view === 'history') await viewHistory();
       else await viewTracks();
     } catch (e) { fail(e); }
+    root.setAttribute('aria-busy','false');
     if (view !== 'take' && view !== 'stake') root.focus({ preventScroll: true });
   }
   window.addEventListener('hashchange', route);

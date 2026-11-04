@@ -14,7 +14,8 @@
     "validate:catalogue": "node scripts/validate-trending-tech.js",
     "validate:catalogue:release": "node scripts/validate-trending-tech.js --release",
     "test": "node --test test/*.test.js",
-    "audit:rubrics": "node scripts/audit-rubrics.js"
+    "audit:rubrics": "node scripts/audit-rubrics.js",
+    "test:career:browser": "node test/career-ui.browser.cjs"
   },
   "engines": {
     "node": ">=18"
@@ -41,5 +42,8 @@
     "prisma": "^7.9.0",
     "qrcode": "^1.5.4",
     "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
   }
 }

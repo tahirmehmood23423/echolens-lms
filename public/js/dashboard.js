@@ -7729,20 +7729,24 @@ window.formUpcoming = formUpcoming; window.formSchedule = formSchedule; window.d
  * blocks the overview: if the career API fails, the card simply is not shown.
  */
 async function careerOverviewCard(el) {
-  let r; try { r = await api('/api/career/me'); } catch { return; }
+  let r; try { r = await api('/api/career/me'); } catch (error) {
+    const notice = document.createElement('div'); notice.className = 'card'; notice.innerHTML = `<div class="card-body" role="alert"><strong>Your career workspace could not load</strong><p>${esc(error.message)}</p><button class="btn btn-ghost btn-sm">Try again</button></div>`; notice.querySelector('button').onclick = () => { notice.remove(); careerOverviewCard(el); }; el.insertBefore(notice, el.firstChild); return;
+  }
   const rms = r.roadmaps || { enrollments: [] }, p = rms.primary, prog = p?.progress;
   const secondary = rms.enrollments.filter((e) => e.status === 'active' && !e.primary);
-  const next = r.active ? ['#take', 'Resume ' + r.active.title]
+  const canonical = r.curriculum;
+  const next = canonical?.active ? [canonical.active.href, 'Continue assessment'] : canonical?.next ? [canonical.next.href, canonical.next.available ? 'Continue skill journey' : 'View learning plan'] : r.active ? ['#take', 'Resume ' + r.active.title]
     : !p ? ['#discover', 'Discover your career']
       : prog?.next_activity ? [prog.next_activity.href.startsWith('#') ? prog.next_activity.href : '#me', prog.next_activity.label] : ['#roadmap', 'Open my roadmap'];
   const href = (h) => (h.startsWith('/') ? h : '/career' + h);
   const card = document.createElement('div');
   card.className = 'card';
-  card.innerHTML = `<div class="card-head"><h3>My career roadmaps</h3><span style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-ghost btn-sm" href="/career#discover">Career Discovery</a><a class="btn btn-ghost btn-sm" href="/career#me">Manage</a></span></div>
+  card.innerHTML = `<div class="card-head"><h3>Your career workspace</h3><span style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-ghost btn-sm" href="/career#discover">Career Discovery</a><a class="btn btn-ghost btn-sm" href="/career#me">Manage</a></span></div>
     <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
       <div style="min-width:160px"><div class="s" style="color:var(--muted)">Primary roadmap</div><strong>${esc(p ? p.title : 'Not chosen yet')}</strong>${secondary.length ? `<div class="s" style="color:var(--muted)">+ ${secondary.map((e) => esc(e.title)).join(', ')}</div>` : ''}</div>
-      <div style="min-width:140px"><div class="s" style="color:var(--muted)">Assessed level (provisional)</div><strong>${esc(prog?.level || 'Not assessed')}</strong></div>
-      <div style="min-width:120px"><div class="s" style="color:var(--muted)">Progress</div><strong>${prog ? prog.completion_pct + '%' + (prog.current_stage ? ' · stage ' + prog.current_stage : '') : '-'}</strong></div>
+      <div style="min-width:140px"><div class="s" style="color:var(--muted)">Assessed proficiency</div><strong>${esc(prog?.level || 'Not assessed')}</strong></div>
+      <div style="min-width:120px"><div class="s" style="color:var(--muted)">Learning completion</div><strong>${prog ? prog.completion_pct + '%' + (prog.current_stage ? ' · stage ' + prog.current_stage : '') : '-'}</strong></div>
+      <div style="min-width:140px"><div class="s" style="color:var(--muted)">Target job role</div><strong>${esc(canonical?.target?.title || 'Not chosen yet')}</strong><div class="s">${canonical?.target ? `${canonical.passed} of ${canonical.required} knowledge checkpoints` : 'Choose a role from Career Paths'}</div></div>
       <span style="flex:1"></span>
       <a class="btn btn-teal btn-sm" href="${esc(href(next[0]))}">${esc(next[1])}</a>
     </div>`;

@@ -90,7 +90,7 @@
       <section class="dc-hero" aria-labelledby="dcH">
         <div class="dc-hero-copy">
           <span class="dc-badge">${ICON.spark}Career Discovery</span>
-          <h1 id="dcH">Discover What You Can Become.</h1>
+          <h1 id="dcH">Discover Your Career. Understand Your Skills. Build Your Future.</h1>
           <p class="dc-lead">Explore technology careers, discover your strengths, and build the skills you need, one step at a time.</p>
           <div class="dc-hero-actions">
             <button class="dc-btn dc-btn-primary" id="dcGo" type="button">${resume ? 'Continue where I left off' : 'Start Exploring'}${ICON.arrow}</button>
@@ -334,5 +334,5 @@
     if (arg === 'results') return S.outcome || S.result_token || (ctx.ME && i.state?.discovery?.completed_at) ? results(ctx.root) : (location.hash = '#discover/about/1');
     return welcome(ctx.root);
   }
-  window.CareerDiscovery = { render, shouldAutoShow, claimIfNeeded: (ctx) => { CTX = ctx; return claimIfNeeded(); }, highlight: hl };
+  window.CareerDiscovery = { render, shouldAutoShow, claimIfNeeded: (ctx) => { CTX = ctx; return claimIfNeeded(); }, highlight: hl, recommended: () => (S.outcome?.recommendations || []).map((r) => r.slug || r.track) };
 })();

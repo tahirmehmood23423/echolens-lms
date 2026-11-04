@@ -22,18 +22,20 @@ function render() {
 <link rel="stylesheet" href="/css/styles.css?v1451">
 <link rel="stylesheet" href="/css/public-navigation.css?v1">
 <link rel="stylesheet" href="/css/public-footer.css?v1">
-<link rel="stylesheet" href="/css/career.css?v6">
+<link rel="stylesheet" href="/css/career.css?v7">
 </head>
 <body class="career-page">
 ${publicNavigation.render()}
+<a class="cx-skip" href="#career">Skip to career content</a>
 <main id="career" class="cr-wrap" tabindex="-1" aria-live="polite"><p class="cr-muted">Loading&hellip;</p></main>
 ${publicFooter.render()}
 <script src="/js/workflow-ui.js?v2"></script>
 <script src="/js/public-navigation.js?v1"></script>
 <script src="/js/coderunner.js?v1422"></script>
-<script src="/js/career-discovery.js?v2"></script>
-<script src="/js/career-curriculum.js?v1"></script>
-<script src="/js/career.js?v7"></script>
+<script src="/js/career-ui.js?v1"></script>
+<script src="/js/career-discovery.js?v3"></script>
+<script src="/js/career-curriculum.js?v2"></script>
+<script src="/js/career.js?v8"></script>
 </body>
 </html>`;
 }

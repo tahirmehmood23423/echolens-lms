@@ -17,12 +17,17 @@ async function renderAdminCareer(tab) {
   if (tab) CA_TAB = tab;
   const el = $('view-admin-career');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  try {
   CA_DATA = await api('/api/admin/career/overview');
   const head = `<div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap">${CA_TABS.map(([k, l]) => `<button class="btn btn-sm ${CA_TAB === k ? 'btn-primary' : 'btn-ghost'}" onclick="renderAdminCareer('${k}')">${l}</button>`).join('')}
     <span style="flex:1"></span><a class="btn btn-ghost btn-sm" href="/career" target="_blank" rel="noopener">Open student view</a></div></div>`;
   const body = await ({ overview: caOverview, questions: caQuestions, scoring: caScoring, tracks: caTracks, preview: caPreview, insights: caInsights, discovery: caDiscovery, curriculum: caCurriculum }[CA_TAB])();
   el.innerHTML = head + body;
   caWire();
+  } catch (e) {
+    el.innerHTML = `<div class="card"><div class="card-body" role="alert"><h3>Career tools could not load</h3><p>${esc(e.message)}</p><button class="btn btn-primary" id="caRetry">Try again</button></div></div>`;
+    document.getElementById('caRetry').onclick = () => renderAdminCareer(CA_TAB);
+  }
 }
 
 function caOverview() {

@@ -58,10 +58,7 @@ function getPrismaClient() {
   // of the require graph entirely for JSON-file-only local dev.
   const { PrismaPg } = require('@prisma/adapter-pg');
   const { PrismaClient } = require('@prisma/client');
-  const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: true, ...(process.env.PGSSLROOTCERT ? { ca: require('fs').readFileSync(process.env.PGSSLROOTCERT, 'utf8') } : {}) },
-  });
+  const adapter = new PrismaPg(require('./postgres-config').postgresConfig(process.env.DATABASE_URL));
   client = new PrismaClient({ adapter, log: [{ emit: 'event', level: 'query' }] });
   client.$on('query', (e) => {
     queryCount++;

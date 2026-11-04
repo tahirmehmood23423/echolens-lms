@@ -15,6 +15,7 @@
 
 const { Pool } = require('pg');
 const { assertNotProdDbOutsideProd } = require('./db-guard');
+const { postgresConfig } = require('./postgres-config');
 
 // Fires at require() time, before anything below ever gets a chance to
 // open a real connection - store.js requires this module unconditionally
@@ -23,13 +24,6 @@ const { assertNotProdDbOutsideProd } = require('./db-guard');
 assertNotProdDbOutsideProd();
 
 const DATABASE_URL = process.env.DATABASE_URL || '';
-
-// Render's managed Postgres (and most hosted Postgres) requires SSL but
-// presents a certificate chain that Node's default trust store rejects
-// without this. PGSSLMODE=disable (e.g. for a local/dev database) skips it.
-const ssl = DATABASE_URL && process.env.PGSSLMODE !== 'disable'
-  ? { rejectUnauthorized: true, ...(process.env.PGSSLROOTCERT ? { ca: require('fs').readFileSync(process.env.PGSSLROOTCERT, 'utf8') } : {}) }
-  : false;
 
 let pool = null;
 
@@ -42,7 +36,7 @@ function getPool() {
     throw new Error('DATABASE_URL is not set - db.getPool() should not be called in JSON-file mode.');
   }
   if (!pool) {
-    pool = new Pool({ connectionString: DATABASE_URL, ssl });
+    pool = new Pool(postgresConfig(DATABASE_URL));
     pool.on('error', (err) => {
       // A background/idle client error must not crash the process - it
       // would take down the whole LMS for something Postgres will usually

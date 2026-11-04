@@ -4099,6 +4099,13 @@ app.get('/api/admin/upcoming-courses', authRequired, adminRequired, (req, res) =
   const regs = Registrations.all();
   res.json({ courses: store.UpcomingCourses.all().map((c) => ({ ...c, registrations: regs.filter((r) => r.course_code === c.code).length })) });
 });
+// Schedule a cohort of an existing catalogue course: only dates and schedule are needed.
+app.get('/api/admin/upcoming-courses/catalogue', authRequired, adminRequired, (req, res) => res.json({ courses: store.UpcomingCourses.catalogue() }));
+app.post('/api/admin/upcoming-courses/schedule', authRequired, adminRequired, (req, res) => {
+  const out = store.UpcomingCourses.schedule(req.body || {}, req.user.id);
+  if (out.error) return res.status(400).json({ error: out.error });
+  res.json({ ok: true, course: out.course });
+});
 app.post('/api/admin/upcoming-courses', authRequired, adminRequired, (req, res) => {
   const out = store.UpcomingCourses.create(req.body || {}, req.user.id);
   if (out.error) return res.status(400).json({ error: out.error });

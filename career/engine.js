@@ -34,13 +34,15 @@ const CATEGORY_NAME = { theory: 'Theory', practical: 'Practical', scenario: 'Sce
 const DEFAULT_CONFIG = {
   version: 1,
   common_weights: { 'cs.programming': 30, 'cs.logic': 25, 'cs.computing': 15, 'cs.dsa_basics': 15, 'cs.git_tools': 10, 'cs.debugging': 5 },
-  common_form: { 'cs.programming': 5, 'cs.logic': 4, 'cs.computing': 3, 'cs.dsa_basics': 3, 'cs.git_tools': 3, 'cs.debugging': 3 },
+  common_form: { 'cs.programming': 5, 'cs.logic': 4, 'cs.computing': 4, 'cs.dsa_basics': 4, 'cs.git_tools': 4, 'cs.debugging': 4 },
+  // Every common and track assessment delivers at least this many MCQs.
+  min_form_items: 25,
   // Default theory / practical / scenario weights; tracks may set their own
   // (tracks.js category_weights) and admins can override any of them.
   category_weights: { default: { theory: 40, practical: 35, scenario: 25 }, common: { theory: 50, practical: 30, scenario: 20 } },
   track_items_per_skill: 3,
-  skill_reassess_items: 4,
-  review_items_per_form: 2,
+  skill_reassess_items: 6,
+  review_items_per_form: 0,
   bands: [
     { min: 0, level: 'Foundation' }, { min: 25, level: 'Beginner' }, { min: 50, level: 'Intermediate' },
     { min: 70, level: 'Proficient' }, { min: 85, level: 'Advanced' },
@@ -67,14 +69,16 @@ const catOf = (q) => q.category || 'theory';
  * Pick `plan[skill]` AUTO-graded questions per skill: one practical and one
  * scenario first (when the pool has an unseen one), then theory, so each
  * skill gets evidence in every category. Unseen questions are preferred over ones the
- * student met recently, and difficulty is spread. Then up to
- * `reviewItems` staff-reviewed items (a written explanation, a practical
- * submission) are added for skills in the plan.
+ * student met recently, and difficulty is spread from basic to advanced in
+ * every category. Assessments are multiple-choice only.
  */
-function assembleForm({ pool, plan, seen = new Set(), seed = 1, reviewItems = 0 }) {
+function assembleForm({ pool, plan, seen = new Set(), seed = 1 }) {
   const rand = rng(seed);
   const items = [], used = new Set(), shortfall = {};
-  const auto = pool.filter((q) => q.grading !== 'review');
+  // Multiple-choice only: every delivered question has options and an answer key.
+  // Typed answers and staff-reviewed submissions are never put on a form.
+  const auto = pool.filter((q) => q.grading !== 'review' && Array.isArray(q.options) && q.options.length >= 2);
+  let skillNo = 0;
   const fresh = (list) => [list.filter((c) => !seen.has(c.id)), list.filter((c) => seen.has(c.id))];
   for (const [skill, spec] of Object.entries(plan)) {
     // A plan entry is a count, or { n, depth } when the track needs evidence at a
@@ -86,14 +90,26 @@ function assembleForm({ pool, plan, seen = new Set(), seed = 1, reviewItems = 0 
     // Category preference uses UNSEEN items only: on a retake, repeating the
     // same practical task would inflate the score. If every item of a category
     // was seen recently, the earlier evidence for it stays in the profile.
-    for (const cat of ['practical', 'scenario']) { const q = candidates.find((c) => catOf(c) === cat && !seen.has(c.id)); if (q && !picked.some((p) => catOf(p) === cat)) take(q); }
+    // Rotate the preferred difficulty across skills so each category on the
+    // form runs from basic to advanced (skill 1: practical easy / scenario
+    // medium, skill 2: practical medium / scenario hard, ...).
+    const rot = skillNo++;
+    for (const [k, cat] of ['practical', 'scenario'].entries()) {
+      const want = ((rot + k) % 3) + 1, unseen = candidates.filter((c) => catOf(c) === cat && !seen.has(c.id));
+      const q = unseen.find((c) => c.difficulty === want) || unseen[0];
+      if (q && !picked.some((p) => catOf(p) === cat)) take(q);
+    }
     // Fill the remaining slots with theory first, spreading difficulty, so that
     // spare practical and scenario items stay unseen for the next retake.
     // Extra practical/scenario items are used only when theory runs out.
     const theoryFirst = (list) => [...list.filter((c) => catOf(c) === 'theory'), ...list.filter((c) => catOf(c) !== 'theory')];
     for (const group of fresh(candidates)) {
       const g = theoryFirst(group);
-      for (const d of [1, 2, 3]) take(g.find((c) => c.difficulty === d && catOf(c) === 'theory' && !picked.includes(c)));
+      // Theory difficulty also rotates by skill, so short forms (3 per skill) still span basic to advanced.
+      const order = [0, 1, 2].map((k) => ((rot + 2 + k) % 3) + 1);
+      for (const d of order) take(g.find((c) => c.difficulty === d && catOf(c) === 'theory' && !picked.includes(c)));
+      // A second pass over practical and scenario by difficulty before any repeats of a level.
+      for (const d of [1, 2, 3]) for (const cat of ['practical', 'scenario']) if (!picked.some((p) => catOf(p) === cat && p.difficulty === d)) take(g.find((c) => c.difficulty === d && catOf(c) === cat && !picked.includes(c)));
       for (const q of g) take(q);
     }
     if (depth && picked.length && !picked.some((q) => q.difficulty >= depth)) {
@@ -103,17 +119,6 @@ function assembleForm({ pool, plan, seen = new Set(), seed = 1, reviewItems = 0 
     }
     if (picked.length < want) shortfall[skill] = want - picked.length;
     picked.forEach((q) => { used.add(q.id); items.push(q); });
-  }
-  if (reviewItems > 0) {
-    const manual = shuffle(pool.filter((q) => q.grading === 'review' && plan[q.skills[0]]), rand);
-    const chosen = [];
-    // Prefer one practical submission and one written explanation, on different skills.
-    for (const want of ['submission', 'written']) for (const group of fresh(manual.filter((q) => q.type === want))) {
-      const q = group.find((x) => !chosen.some((c) => c.skills[0] === x.skills[0])) || group[0];
-      if (q && chosen.length < reviewItems && !chosen.some((c) => c.type === want)) chosen.push(q);
-    }
-    for (const group of fresh(manual)) for (const q of group) if (chosen.length < reviewItems && !chosen.includes(q)) chosen.push(q);
-    chosen.forEach((q) => { used.add(q.id); items.push(q); });
   }
   return {
     items: shuffle(items, rand).map((q) => ({ id: q.id, version: q.version, order: q.options.length ? shuffle(q.options.map((o) => o.id), rand) : [] })),

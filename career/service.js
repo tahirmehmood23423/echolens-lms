@@ -78,7 +78,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       }
       next.category_weights = cw;
     }
-    for (const [k, lo, hi] of [['min_evidence_items', 1, 10], ['min_category_items', 1, 10], ['track_items_per_skill', 2, 8], ['skill_reassess_items', 2, 10], ['review_items_per_form', 0, 4], ['retake_cooldown_hours', 0, 720], ['max_active_roadmaps', 1, 12], ['common_valid_days', 30, 1095], ['skill_valid_days', 30, 1095]]) {
+    for (const [k, lo, hi] of [['min_evidence_items', 1, 10], ['min_category_items', 1, 10], ['track_items_per_skill', 2, 8], ['skill_reassess_items', 2, 10], ['min_form_items', 10, 60], ['retake_cooldown_hours', 0, 720], ['max_active_roadmaps', 1, 12], ['common_valid_days', 30, 1095], ['skill_valid_days', 30, 1095]]) {
       if (patch[k] !== undefined) { const v = Math.round(Number(patch[k])); if (!(v >= lo && v <= hi)) return { error: `${k} must be ${lo}-${hi}.` }; next[k] = v; }
     }
     if (patch.min_confidence !== undefined) { const v = Number(patch.min_confidence); if (!(v > 0 && v <= 1)) return { error: 'min_confidence must be between 0 and 1.' }; next.min_confidence = v; }
@@ -219,7 +219,10 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   function assessmentDef(key) {
     const cfg = config();
     if (key === 'common') {
-      return { key, title: BANKS.common.title, banks: ['common'], plan: { ...cfg.common_form }, enabled: cfg.enabled.common !== false, reviewItems: cfg.review_items_per_form, weights: categoryWeights('common') };
+      // Top the common form up to min_form_items, one question per skill in turn.
+      const plan = { ...cfg.common_form }, ids = Object.keys(plan);
+      for (let i = 0; ids.length && Object.values(plan).reduce((a, b) => a + b, 0) < cfg.min_form_items; i++) plan[ids[i % ids.length]]++;
+      return { key, title: BANKS.common.title, banks: ['common'], plan, enabled: cfg.enabled.common !== false, reviewItems: 0, weights: categoryWeights('common') };
     }
     if (String(key).startsWith('skill:')) {
       const id = key.slice(6); if (!skill(id)) return null;
@@ -227,13 +230,16 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       // Short and mostly auto-graded. One staff-reviewed item (where the skill
       // has one) lets a student prove practical or written ability that repeat
       // questions could not fairly show again.
-      return { key, title: `${skill(id).name} reassessment`, banks, plan: { [id]: cfg.skill_reassess_items }, enabled: true, skill: id, reviewItems: 1, weights: categoryWeights('default') };
+      return { key, title: `${skill(id).name} reassessment`, banks, plan: { [id]: cfg.skill_reassess_items }, enabled: true, skill: id, reviewItems: 0, weights: categoryWeights('default') };
     }
     const t = track(key); if (!t) return null;
     const banks = t.assessment.banks || [];
     const plan = {};
-    for (const s of t.skills) if (banks.some((b) => questions(b).some((q) => q.skills[0] === s.skill && q.grading !== 'review'))) plan[s.skill] = cfg.track_items_per_skill;
-    return { key, title: `${t.title} skill assessment`, banks, plan, enabled: !!banks.length && cfg.enabled[key] !== false && t.status === 'published', track: t.slug, reviewItems: cfg.review_items_per_form, weights: categoryWeights(key) };
+    const assessable = t.skills.filter((s) => banks.some((b) => questions(b).some((q) => q.skills[0] === s.skill && q.grading !== 'review')));
+    // Enough questions per skill that the whole test has at least min_form_items MCQs.
+    const per = Math.max(cfg.track_items_per_skill, Math.ceil(cfg.min_form_items / Math.max(1, assessable.length)));
+    for (const s of assessable) plan[s.skill] = per;
+    return { key, title: `${t.title} skill assessment`, banks, plan, enabled: !!banks.length && cfg.enabled[key] !== false && t.status === 'published', track: t.slug, reviewItems: 0, weights: categoryWeights(key) };
   }
   /** Coverage: does every planned skill have enough PUBLISHED questions? */
   function coverage(def) {
@@ -341,7 +347,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     }
     const pool = def.banks.flatMap(published);
     const seed = crypto.randomInt(1, 2 ** 31);
-    const form = E.assembleForm({ pool, plan: def.plan, seen: seenIds(fresh, def), seed, reviewItems: def.reviewItems || 0 });
+    const form = E.assembleForm({ pool, plan: def.plan, seen: seenIds(fresh, def), seed });
     const byId = new Map(pool.map((q) => [q.id, q]));
     const snapshot = form.items.map((i) => ({ ...byId.get(i.id), order: i.order }));
     const limitSec = Math.ceil(snapshot.reduce((a, q) => a + q.time_sec, 0) / 60) * 60;
@@ -581,12 +587,12 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   function trackPlan(user, slug, mode) {
     const t = track(slug), def = assessmentDef(slug); if (!t || !def) return {};
     const tp = mode === 'gap' ? trackProfile(user, t) : null;
+    const todo = t.skills.filter((sk) => def.plan[sk.skill] && !(tp && tp[sk.skill]?.reuse_reason === 'verified'));
+    // A gap test still aims for min_form_items MCQs, spread over the skills left
+    // to verify (at most 8 per skill, so only a test with very few skills left is shorter).
+    const per = Math.min(8, Math.max(...todo.map((sk) => def.plan[sk.skill]), Math.ceil(config().min_form_items / Math.max(1, todo.length))));
     const plan = {};
-    for (const sk of t.skills) {
-      if (!def.plan[sk.skill]) continue;
-      if (tp && tp[sk.skill]?.reuse_reason === 'verified') continue;
-      plan[sk.skill] = { n: def.plan[sk.skill], depth: sk.depth || 0 };
-    }
+    for (const sk of todo) plan[sk.skill] = { n: tp ? per : def.plan[sk.skill], depth: sk.depth || 0 };
     return plan;
   }
   /** Is there a recent, valid common CS result? The common test is required only when there is not. */
@@ -858,7 +864,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   function preview(key, { includeDrafts = true } = {}) {
     const def = assessmentDef(key); if (!def) return { error: 'Unknown assessment.', status: 404 };
     const pool = def.banks.flatMap((b) => questions(b).filter((q) => q.status === 'published' || (includeDrafts && ['draft', 'reviewed'].includes(q.status))));
-    const form = E.assembleForm({ pool, plan: def.plan, seed: crypto.randomInt(1, 2 ** 31), reviewItems: def.reviewItems || 0 });
+    const form = E.assembleForm({ pool, plan: def.plan, seed: crypto.randomInt(1, 2 ** 31) });
     const byId = new Map(pool.map((q) => [q.id, q]));
     return { title: def.title, weights: def.weights, shortfall: form.shortfall, coverage: coverage(def), questions: form.items.map((i) => ({ ...byId.get(i.id), options: E.publicQuestion(byId.get(i.id), i.order).options })) };
   }

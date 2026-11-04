@@ -48,7 +48,7 @@ for (const t of [{ slug: 'common', title: 'Common CS' }, ...TRACKS]) {
     if (t.slug !== 'common') take(strong, 'common', true); // shared CS skills such as programming come from here
     const { delivered, done } = take(strong, t.slug, true);
     for (const c of E.CATEGORIES) assert.ok(delivered.questions.some((q) => q.category === c), `${t.slug}: ${c} questions delivered`);
-    assert.ok(delivered.questions.some((q) => q.grading === 'review'), `${t.slug}: a staff-reviewed item`);
+    assert.ok(delivered.questions.length >= 25 && delivered.questions.every((q) => q.options.length && q.grading !== 'review'), `${t.slug}: 25+ MCQs only`);
     assert.equal(done.result.pending, 0, 'all reviews applied');
     assert.equal(done.result.raw_score, 100, `${t.slug}: all-correct scores 100`);
     for (const c of E.CATEGORIES) assert.equal(done.result.categories[c].score, 100, `${t.slug}: ${c} 100`);

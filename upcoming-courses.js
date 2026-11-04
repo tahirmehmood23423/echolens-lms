@@ -101,6 +101,8 @@ function normalize(b, prev = {}) {
     class_time: pick('class_time', (v) => str(v, 120) || null),
     class_dates: pick('class_dates', classDates),
     published: pick('published', (v) => v === true || v === 'true' || v === 'on'),
+    // The catalogue course this cohort was scheduled from, if any.
+    source_code: pick('source_code', (v) => str(v, 20).toUpperCase() || null),
   };
   return rec;
 }
@@ -147,4 +149,52 @@ function publicView(rec, today = todayPk()) {
   };
 }
 
-module.exports = { todayPk, normalize, validate, phase, isListed, acceptsRegistration, publicView, syllabus, classDates, lines, MODES, LEVELS };
+/* ------------------- scheduling from the existing catalogue -------------------
+ * Admins do not retype course details. Every paid course in the official
+ * catalogue already has a published outline (its quest track: description,
+ * learning outcomes, and one level or class per module). Scheduling a cohort
+ * copies that outline into a new upcoming course and only asks for dates.
+ */
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+/** Weekday indexes named in "Mon, Wed, Fri" / "Monday and Thursday" / an array. */
+function weekdays(v) {
+  const text = (Array.isArray(v) ? v.join(' ') : String(v || '')).toLowerCase();
+  return WEEKDAYS.map((d, i) => (new RegExp('\\b' + d.toLowerCase()).test(text) ? i : -1)).filter((i) => i >= 0);
+}
+/** Every class day between start and end (inclusive), as class_dates rows. */
+function scheduleDates(start, end, days) {
+  const want = weekdays(days);
+  if (!date(start) || !date(end) || !want.length || start > end) return [];
+  const out = [];
+  for (let t = Date.parse(start + 'T00:00:00Z'), stop = Date.parse(end + 'T00:00:00Z'); t <= stop && out.length < 120; t += 86400e3) {
+    if (want.includes(new Date(t).getUTCDay())) out.push({ date: new Date(t).toISOString().slice(0, 10), title: null });
+  }
+  return out;
+}
+/** "January 2027" from a YYYY-MM-DD date. */
+function monthLabel(d) {
+  if (!date(d)) return null;
+  return new Date(d + 'T00:00:00Z').toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+/**
+ * The course details a catalogue entry already has. `def` is its quest track
+ * definition (may be null). Nothing is invented: fields the catalogue does not
+ * have (such as prerequisites) are left empty for the admin to add if wanted.
+ */
+function templateFrom(course, def) {
+  const unit = course.tier === 'Bootcamp' ? 'Class' : 'Level';
+  const levels = (def && def.levels) || [];
+  return {
+    source_code: course.code,
+    title: course.title,
+    tagline: course.summary || null,
+    description: [def?.description, def?.outcome].filter(Boolean).join(' ') || course.summary || null,
+    weeks: course.weeks || null, hours: course.hours || null, duration: course.weeks ? `${course.weeks} weeks` : null,
+    price_pkr: Number(course.price_pkr) || 0,
+    outcomes: ((def && def.clos) || []).map((c) => String(c).replace(/^CLO\s*\d+:\s*/i, '').trim()).filter(Boolean),
+    syllabus: levels.map((l) => ({ title: `${unit} ${l.no}: ${l.title}`, topics: String(l.topic || '').split(/,\s*|;\s*/).map((x) => x.trim()).filter(Boolean) })),
+    prerequisites: [],
+  };
+}
+
+module.exports = { WEEKDAYS, weekdays, scheduleDates, monthLabel, templateFrom, todayPk, normalize, validate, phase, isListed, acceptsRegistration, publicView, syllabus, classDates, lines, MODES, LEVELS };

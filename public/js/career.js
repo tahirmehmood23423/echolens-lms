@@ -231,8 +231,8 @@
       <h1>${esc(av.title || 'Assessment')}</h1>
       ${av.available ? `<div class="cr-panel">
         <p><b>${isTrack ? 'Up to ' : ''}${av.items} questions</b>, one at a time. A timer shows the time left; the limit is generous, and your answers save automatically, so you can come back if your connection drops.</p>
-        <ul><li><b>Write your own answers.</b> Pasting into answer boxes is turned off, so the result shows what you can really do.</li>
-          <li><b>Three kinds of question:</b> theory (concepts and code tracing), practical (debugging and fixing real code, queries or configuration) and scenario (real-world problems that need a decision).${av.weights ? ` They count ${av.weights.theory}% / ${av.weights.practical}% / ${av.weights.scenario}% towards your overall score.` : ''}</li>
+        <ul><li><b>Every question is multiple choice</b>, from basic to advanced. Some ask you to read code, a query or a command and choose what it does or how to fix it.</li>
+          <li><b>Three kinds of question:</b> theory (concepts and code tracing), practical (reading, debugging and fixing real code, queries or configuration) and scenario (real-world problems that need a decision).${av.weights ? ` They count ${av.weights.theory}% / ${av.weights.practical}% / ${av.weights.scenario}% towards your overall score.` : ''}</li>
           ${av.reviewed_items ? `<li><b>${av.reviewed_items} answer${av.reviewed_items === 1 ? '' : 's'} you write yourself</b> (an explanation or a practical submission). EchoLens staff review ${av.reviewed_items === 1 ? 'it' : 'them'} against a published rubric, usually within a few days; your scores update when that happens.</li>` : ''}
           <li>Skip anything you do not know - skipped questions are not counted as wrong; we simply ask about that skill again later.</li>
           <li>Your results guide your learning. They are not an official qualification.</li></ul>

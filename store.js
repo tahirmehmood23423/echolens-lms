@@ -1448,6 +1448,45 @@ const UpcomingCourses = {
     Object.assign(prev, rec); UpcomingCourses.syncCourse(prev); save();
     return { course: { ...prev, phase: upcoming.phase(prev) } };
   },
+  /** Paid catalogue courses an admin can schedule, each with its ready-made outline. */
+  catalogue() {
+    const rows = UpcomingCourses.rows();
+    return OFFICIAL_CATALOGUE.filter((c) => Number(c.price_pkr) > 0).map((c) => {
+      const t = Quests.tracks({ includeUnpublished: true }).find((x) => x.course_code === c.code);
+      const tpl = upcoming.templateFrom(c, t ? Quests.trackDef(t.key) : null);
+      const cohorts = rows.filter((r) => r.source_code === c.code);
+      return { ...tpl, code: c.code, tier: c.tier, modules: tpl.syllabus.length,
+        cohorts: cohorts.length, listed_cohorts: cohorts.filter((r) => upcoming.isListed(r)).length };
+    });
+  },
+  /**
+   * Schedule a cohort of an existing catalogue course: the details come from
+   * the catalogue, the request only sets dates, schedule and (optionally) the
+   * fee, seats, format and instructor.
+   */
+  schedule(b, by) {
+    const src = UpcomingCourses.catalogue().find((c) => c.code === String(b.from_code || '').trim().toUpperCase());
+    if (!src) return { error: 'Choose a course from the catalogue.' };
+    const days = upcoming.weekdays(b.class_days).map((i) => upcoming.WEEKDAYS[i]).join(', ') || null;
+    const start = b.classes_start || null;
+    const label = upcoming.monthLabel(start || b.reg_closes);
+    const generated = upcoming.scheduleDates(start, b.classes_end, days);
+    const rec = {
+      title: label ? `${src.title} - ${label} cohort` : src.title,
+      tagline: src.tagline, description: src.description, duration: src.duration, weeks: src.weeks, hours: src.hours,
+      outcomes: src.outcomes, syllabus: src.syllabus, prerequisites: src.prerequisites, source_code: src.code,
+      price_pkr: Number(b.price_pkr) > 0 ? b.price_pkr : src.price_pkr,
+      seats: b.seats, mode: b.mode || 'Online (live)', level: b.level || 'All levels', instructor: b.instructor,
+      reg_opens: b.reg_opens, reg_closes: b.reg_closes, classes_start: start, classes_end: b.classes_end,
+      class_days: days, class_time: b.class_time, class_dates: generated,
+      published: b.published !== false && b.published !== 'false',
+    };
+    // Code: catalogue code + start month, e.g. ST-05-2701; a second cohort that month gets -B, -C ...
+    const ym = String(start || b.reg_closes || '').replace(/^\d{2}(\d{2})-(\d{2}).*$/, '$1$2');
+    let code = /^\d{4}$/.test(ym) ? `${src.code}-${ym}` : '';
+    for (let i = 0; code && (UpcomingCourses.byCode(code) || Courses.byCode(code)); i++) code = `${src.code}-${ym}-${String.fromCharCode(66 + i)}`;
+    return UpcomingCourses.create({ ...rec, code }, by);
+  },
   // The data.courses row stays: registrations, challans and batches may
   // still point at it.
   remove(id) {

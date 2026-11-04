@@ -50,3 +50,37 @@ test('an update keeps fields the request leaves out', () => {
   assert.deepEqual(next.outcomes, ['A', 'B']);
   assert.equal(next.price_pkr, 20000);
 });
+
+test('scheduling: class days and dates are generated from the schedule', () => {
+  assert.deepEqual(up.weekdays('Mon, Wed and Friday'), [1, 3, 5]);
+  assert.deepEqual(up.scheduleDates('2026-12-01', '2026-12-10', 'Tue, Thu').map((d) => d.date), ['2026-12-01', '2026-12-03', '2026-12-08', '2026-12-10']);
+  assert.deepEqual(up.scheduleDates('2026-12-10', '2026-12-01', 'Tue'), [], 'end before start gives nothing');
+  assert.equal(up.monthLabel('2027-01-05'), 'January 2027');
+});
+
+test('scheduling: a catalogue course becomes a cohort with its own outline, only dates are asked for', () => {
+  const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+  const dbPath = path.join(os.tmpdir(), 'echolens-upc-' + process.pid + '.json');
+  process.env.DATABASE_URL = ''; process.env.DB_PATH = dbPath;
+  const store = require('../store');
+  try {
+    const cat = store.UpcomingCourses.catalogue();
+    assert.equal(cat.length, store.officialCatalogue({ includeUnpublished: true }).filter((c) => c.price_pkr > 0).length);
+    for (const c of cat) assert.ok(c.syllabus.length > 0 && c.outcomes.length > 0 && c.description, `${c.code} has an outline`);
+    const out = store.UpcomingCourses.schedule({ from_code: 'ST-05', reg_closes: '2099-12-20', classes_start: '2100-01-05', classes_end: '2100-01-31', class_days: 'Tue, Thu', class_time: '7-9 PM' }, 1);
+    assert.ok(!out.error, out.error);
+    const c = out.course;
+    assert.equal(c.code, 'ST-05-0001'); assert.equal(c.source_code, 'ST-05');
+    assert.match(c.title, /Generative AI Engineering - January 2100 cohort/);
+    assert.equal(c.price_pkr, cat.find((x) => x.code === 'ST-05').price_pkr, 'catalogue fee by default');
+    assert.equal(c.class_dates.length, 8); assert.equal(c.class_days, 'Tue, Thu');
+    assert.ok(c.syllabus.length >= 5 && c.outcomes.length >= 3);
+    assert.equal(c.phase, 'open');
+    assert.equal(store.catalogueFee(c.code), c.price_pkr, 'Admissions charges the cohort fee');
+    // A second cohort the same month gets its own code; a fee override is respected.
+    const second = store.UpcomingCourses.schedule({ from_code: 'ST-05', reg_closes: '2099-12-20', classes_start: '2100-01-19', price_pkr: 18000 }, 1).course;
+    assert.equal(second.code, 'ST-05-0001-B'); assert.equal(second.price_pkr, 18000);
+    assert.match(store.UpcomingCourses.schedule({ from_code: 'NOPE', reg_closes: '2099-12-20' }, 1).error, /catalogue/);
+    assert.match(store.UpcomingCourses.schedule({ from_code: 'ST-05' }, 1).error, /registration closes/);
+  } finally { if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath); }
+});

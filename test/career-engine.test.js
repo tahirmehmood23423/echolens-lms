@@ -20,7 +20,10 @@ test('question banks are well formed: unique ids, valid keys, known skills, expl
       if (q.grading === 'review') assert.ok(q.rubric.length && q.points > 0, `${q.id} rubric`);
       else if (q.type === 'output') assert.ok(q.answer.length, q.id);
       else assert.ok(q.answer.every((a) => q.options.some((o) => o.id === a)), `${q.id} key`);
-      assert.equal(q.status, 'published', `${bank} ships reviewed and published`); assert.ok(q.review && q.review.at, `${q.id} review record`);
+      // MCQ-only: every published item has options; written/practical submissions ship retired.
+      assert.equal(q.status, q.grading === 'review' ? 'retired' : 'published', `${q.id} status`); assert.ok(q.review && q.review.at, `${q.id} review record`);
+      assert.notEqual(q.type, 'output', `${q.id} typed questions were converted to MCQ`);
+      if (q.status === 'published') assert.ok(q.options.length === 4 || q.type === 'multi' || q.options.length >= 3, `${q.id} has options`);
     }
   }
 });
@@ -69,7 +72,10 @@ test('grading: single, multiple-answer partial credit, typed output normalisatio
   assert.equal(E.gradeResponse(multi, ['a', 'b', 'c']).earned, multi.points);
   assert.equal(+E.gradeResponse(multi, ['a', 'b']).earned.toFixed(2), +(multi.points * 2 / 3).toFixed(2));
   assert.equal(E.gradeResponse(multi, ['a', 'd']).earned, 0, 'one right one wrong nets zero');
-  const typed = BANKS.aiml.find((q) => q.id === 'ml-py-01');
+  // Typed answers are no longer delivered, but grading still supports them for older attempts.
+  const typed = require('../career/q').out('legacy-typed', 'ml.python', 1, 'What does this print?', 'print([x ** 2 for x in range(4)])', ['[0, 1, 4, 9]', '[0,1,4,9]'], 'Squares of 0..3.');
+  const converted = BANKS.aiml.find((q) => q.id === 'ml-py-01');
+  assert.equal(converted.type, 'single'); assert.equal(converted.options.find((o) => o.id === converted.answer[0]).text, '[0, 1, 4, 9]');
   assert.equal(E.gradeResponse(typed, '  [0, 1,  4, 9] ').correct, true);
   assert.equal(E.gradeResponse(typed, '[0,1,4,9]').correct, true);
   assert.deepEqual(E.gradeResponse(typed, ''), { answered: false, earned: 0, correct: false });

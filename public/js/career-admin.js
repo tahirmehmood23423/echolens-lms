@@ -63,7 +63,7 @@ async function caQuestions() {
               : q.options.length ? `<ol type="a" class="s">${q.options.map((o) => `<li>${q.answer.includes(o.id) ? '<b>✓ ' : ''}${esc(o.text)}${q.answer.includes(o.id) ? '</b>' : ''}</li>`).join('')}</ol>` : `<div class="s">Accepted answers: <b>${q.answer.map(esc).join(' | ')}</b></div>`}
             <div class="s" style="color:var(--muted)">${esc(q.explanation)}</div></details></td>
         <td class="s">${esc(q.skills.join(', '))}</td><td class="s">${esc(q.type)} &middot; <b>${esc(q.category)}</b>${q.grading === 'review' ? ' &middot; staff-reviewed' : ''}</td><td>${q.difficulty}</td>
-        <td class="s"><b>${esc(q.status)}</b>${q.reviewed_at ? `<div style="color:var(--muted)">${esc(String(q.reviewed_at).slice(0, 10))}</div>` : ''}</td><td>${q.version}</td>
+        <td class="s"><b>${esc(q.status)}</b>${q.reviewed_at ? `<div style="color:var(--muted)" title="${esc(typeof q.reviewed_by === 'string' ? q.reviewed_by : 'Admin #' + q.reviewed_by)}">${esc(String(q.reviewed_at).slice(0, 10))}${typeof q.reviewed_by === 'string' ? ' &middot; content review' : ''}</div>` : ''}</td><td>${q.version}</td>
         <td><button class="btn btn-ghost btn-sm" onclick='caEditQuestion(${JSON.stringify(q.id)})'>Edit</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No questions match.</td></tr>'}
     </table></div></div>`;
 }
@@ -249,7 +249,7 @@ async function renderCareerReviews() {
     ${d.reviews.map((r, i) => `<div class="card"><div class="card-head"><h3>${esc(r.student)}${r.reg_no ? ' <span class="s mono">' + esc(r.reg_no) + '</span>' : ''}</h3><span class="s" style="color:var(--muted)">${esc(r.assessment)} &middot; ${esc(r.skill || '')} &middot; ${esc(r.category)} &middot; ${esc(r.type === 'submission' ? 'practical submission' : 'written answer')} &middot; ${esc(String(r.submitted_at).slice(0, 16).replace('T', ' '))}</span></div>
       <div class="card-body">
         <p><b>${esc(r.prompt)}</b></p>${r.code ? `<pre style="white-space:pre-wrap;font-size:12px;background:#F1F5F9;padding:8px;border-radius:6px">${esc(r.code)}</pre>` : ''}
-        <div class="s" style="color:var(--muted);margin-top:8px">Student's answer</div>
+        <div class="s" style="color:var(--muted);margin-top:8px">Student's answer${r.paste_attempts ? ` <b style="color:#7A4A00">&middot; ${r.paste_attempts} blocked paste attempt${r.paste_attempts === 1 ? '' : 's'}</b>` : ''}</div>
         <pre style="white-space:pre-wrap;background:#0F172A;color:#E2E8F0;padding:10px 12px;border-radius:8px;font-size:13px;max-height:340px;overflow:auto">${esc(r.answer)}</pre>
         ${r.run_output ? `<div class="s" style="color:#7A4A00;margin-top:6px"><b>Output from the student's own run</b> - produced on their device, so treat it as unverified:</div><pre style="white-space:pre-wrap;background:#FFFBEB;border:1px dashed #D97706;padding:8px 10px;border-radius:8px;font-size:12.5px">${esc(r.run_output)}</pre>` : ''}
         ${r.run_lang ? `<div style="margin:6px 0"><button type="button" class="btn btn-ghost btn-sm" onclick="crRunHere(${i})">Run the student's code here (${esc(r.run_lang)})</button><span class="s" style="color:var(--muted)"> runs in your browser's sandboxed compiler</span><div class="term crTerm" id="crTerm${i}" style="margin-top:6px;min-height:40px"></div></div>` : ''}

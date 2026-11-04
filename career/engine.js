@@ -84,9 +84,14 @@ function assembleForm({ pool, plan, seen = new Set(), seed = 1, reviewItems = 0 
     // same practical task would inflate the score. If every item of a category
     // was seen recently, the earlier evidence for it stays in the profile.
     for (const cat of ['practical', 'scenario']) { const q = candidates.find((c) => catOf(c) === cat && !seen.has(c.id)); if (q && !picked.some((p) => catOf(p) === cat)) take(q); }
+    // Fill the remaining slots with theory first, spreading difficulty, so that
+    // spare practical and scenario items stay unseen for the next retake.
+    // Extra practical/scenario items are used only when theory runs out.
+    const theoryFirst = (list) => [...list.filter((c) => catOf(c) === 'theory'), ...list.filter((c) => catOf(c) !== 'theory')];
     for (const group of fresh(candidates)) {
-      for (const d of [1, 2, 3]) take(group.find((c) => c.difficulty === d && !picked.includes(c)));
-      for (const q of group) take(q);
+      const g = theoryFirst(group);
+      for (const d of [1, 2, 3]) take(g.find((c) => c.difficulty === d && catOf(c) === 'theory' && !picked.includes(c)));
+      for (const q of g) take(q);
     }
     if (picked.length < want) shortfall[skill] = want - picked.length;
     picked.forEach((q) => { used.add(q.id); items.push(q); });

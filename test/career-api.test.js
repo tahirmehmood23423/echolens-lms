@@ -65,11 +65,19 @@ test('the 12 career tracks are public, data-driven and list real EchoLens course
   assert.equal((await call('GET', '/api/career/tracks/not-a-track')).status, 404);
 });
 
-test('draft questions are never served: assessments open only once questions are published', async () => {
-  const s = await call('POST', '/api/career/me/attempts', 1, { assessment: 'common' });
-  assert.equal(s.status, 409); assert.match(s.body.error, /reviewed/);
-  publishAll();
+test('reviewed questions ship published; retired or draft questions are never served', async () => {
+  const common = svc.questions('common');
+  assert.ok(common.every((q) => q.status === 'published' && q.reviewed_at), 'built-in items carry the content-review record');
   assert.equal((await call('POST', '/api/career/me/attempts', 1, { assessment: 'common' })).status, 200);
+  await call('POST', `/api/career/me/attempts/${store.Users.byId(1).profile.career.active.id}/abandon`, 1);
+  // Retiring the questions for one skill closes the assessment until it is covered again.
+  svc.setQuestionStatus(common.filter((q) => q.skills[0] === 'cs.logic').map((q) => q.id), 'retired', 3);
+  const s = await call('POST', '/api/career/me/attempts', 2, { assessment: 'common' });
+  assert.equal(s.status, 409); assert.match(s.body.error, /reviewed/);
+  // An admin edit is a new, unreviewed version: back to draft and not served until re-published.
+  const q = common.find((x) => x.skills[0] === 'cs.computing' && x.grading !== 'review');
+  svc.editQuestion(q.id, { explanation: 'Reworded explanation.' }, 3);
+  assert.equal(svc.questionById(q.id).status, 'draft');
 });
 
 test('onboarding is optional, keeps only known values, and can be changed later', async () => {
@@ -129,7 +137,7 @@ test('retakes respect the cooldown and draw an alternate form', async () => {
 test('admin: permissions, versioned edits, configurable weights and bands, audit-safe history', async () => {
   for (const u of [1, 2, 4]) assert.equal((await call('GET', '/api/admin/career/overview', u)).status, 403);
   const ov = await call('GET', '/api/admin/career/overview', 3);
-  assert.equal(ov.status, 200); assert.equal(ov.body.banks.find((b) => b.bank === 'common').draft, svc.questions('common').length);
+  assert.equal(ov.status, 200); assert.equal(ov.body.banks.find((b) => b.bank === 'common').published, svc.questions('common').length);
   publishAll(); skipCooldown();
   const done = await take(1, 'common', () => true);
   // A multiple-choice question: editing only its explanation must keep its options and key.
@@ -390,5 +398,5 @@ test('common CS retakes get unseen practical and scenario items for every skill'
   }
   const cov = svc.availability('common').coverage;
   assert.deepEqual(cov.thin, [], 'admin coverage shows no thin categories for the common assessment');
-  assert.ok(svc.availability('frontend-web-developer').coverage.thin.length > 0, 'and does flag thin ones elsewhere');
+  for (const t of svc.tracks()) assert.deepEqual(svc.availability(t.slug).coverage.thin, [], `${t.slug} has an alternate practical and scenario item for every skill`);
 });

@@ -101,7 +101,12 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const st = qstate();
     const base = (BANKS[bank]?.questions || []).map((q) => ({ ...q, ...(st.edits[q.id] || {}) }));
     const custom = st.custom.filter((q) => q.bank === bank);
-    return [...base, ...custom].map((q) => ({ ...q, bank, status: st.status[q.id]?.status || q.status, reviewed_by: st.status[q.id]?.by || null, reviewed_at: st.status[q.id]?.at || null }));
+    return [...base, ...custom].map((q) => {
+      const edited = !!st.edits[q.id];
+      // An admin edit is a new, unreviewed version: it stays draft until re-published, whatever the built-in status was.
+      const status = st.status[q.id]?.status || (edited ? 'draft' : q.status);
+      return { ...q, bank, status, reviewed_by: st.status[q.id]?.by || (!edited && q.review ? q.review.by : null), reviewed_at: st.status[q.id]?.at || (!edited && q.review ? q.review.at : null) };
+    });
   }
   const published = (bank) => questions(bank).filter((q) => q.status === 'published');
   function questionById(id) { const b = bankOf(id); return b ? questions(b).find((q) => q.id === id) || null : null; }
@@ -325,7 +330,12 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       started_at: t.toISOString(), expires_at: new Date(t.getTime() + limitSec * 1000).toISOString(), limit_sec: limitSec,
       config_version: cfg.version, weights: def.weights, questions: snapshot, answers: {}, saved_at: null,
     };
-    writeCareer(user, { ...fresh, active });
+    // Starting a track's test from "Test Your Skills" picks that career track, unless the student already chose one.
+    const prefs = fresh.preferences || {};
+    const preferences = def.track && !prefs.preferred_track
+      ? { ...prefs, preferred_track: def.track, track_history: [...(prefs.track_history || []), { track: def.track, at: iso() }].slice(-20), updated_at: iso() }
+      : fresh.preferences;
+    writeCareer(user, { ...fresh, preferences, active });
     return { attempt: deliver(active) };
   }
   /** Resume an interrupted assessment, or close one whose time has run out. */
@@ -355,14 +365,20 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return out;
   }
   /** Autosave, so an interrupted assessment resumes where it stopped. */
-  function saveAnswers(user, id, answers, runs) {
+  function cleanPastes(a, pastes) {
+    const out = {}, ids = new Set(a.questions.map((q) => q.id));
+    for (const [k, v] of Object.entries(pastes || {})) if (ids.has(k)) out[k] = Math.max(0, Math.min(999, Math.round(Number(v) || 0)));
+    return out;
+  }
+  function saveAnswers(user, id, answers, runs, pastes) {
     const c = career(user);
     if (!c.active || c.active.id !== id) return { error: 'Assessment not found or already submitted.', status: 404 };
     if (Date.parse(c.active.expires_at) + config().time_grace_sec * 1000 < now().getTime()) return { error: 'Time is up for this assessment. Submit to see your results.', status: 409 };
-    writeCareer(user, { ...c, active: { ...c.active, answers: { ...c.active.answers, ...cleanAnswers(c.active, answers) }, runs: { ...(c.active.runs || {}), ...cleanRuns(c.active, runs) }, saved_at: iso() } });
+    writeCareer(user, { ...c, active: { ...c.active, answers: { ...c.active.answers, ...cleanAnswers(c.active, answers) }, runs: { ...(c.active.runs || {}), ...cleanRuns(c.active, runs) }, pastes: mergeMax(c.active.pastes, cleanPastes(c.active, pastes)), saved_at: iso() } });
     return { ok: true };
   }
-  function finalize(user, id, answers, { expired = false, runs = {} } = {}) {
+  const mergeMax = (a = {}, b = {}) => { const o = { ...a }; for (const [k, v] of Object.entries(b)) o[k] = Math.max(o[k] || 0, v); return o; };
+  function finalize(user, id, answers, { expired = false, runs = {}, pastes = {} } = {}) {
     const c = career(user), a = c.active;
     const cfg = config();
     const late = Date.parse(a.expires_at) + cfg.time_grace_sec * 1000 < now().getTime();
@@ -371,6 +387,9 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const result = E.scoreAttempt(a.questions, final, cfg);
     const ran = late || expired ? (a.runs || {}) : { ...(a.runs || {}), ...cleanRuns(a, runs) };
     for (const r of result.responses) if (r.grading === 'review' && ran[r.id] && r.answered) r.run_output = ran[r.id];
+    // Blocked paste attempts: an integrity signal for reviewers, never a score change on its own.
+    const pasted = mergeMax(a.pastes, cleanPastes(a, pastes));
+    for (const r of result.responses) if (pasted[r.id]) r.paste_attempts = pasted[r.id];
     const record = {
       id: a.id, assessment: a.assessment, title: a.title, track: a.track, skill: a.skill, status: 'submitted',
       started_at: a.started_at, submitted_at: iso(), late: late || expired, config_version: a.config_version, weights: a.weights || null, result,
@@ -379,13 +398,13 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return record;
   }
   /** Submit - idempotent: re-sending the same attempt id returns the stored result. */
-  function submitAttempt(user, id, answers, runs) {
+  function submitAttempt(user, id, answers, runs, pastes) {
     if (!isLearner(user)) return { error: 'Assessments are for learner accounts.', status: 403 };
     const c = career(user);
     const done = c.attempts.find((x) => x.id === id);
     if (done) return { attempt: done, existing: true };
     if (!c.active || c.active.id !== id) return { error: 'Assessment not found.', status: 404 };
-    return { attempt: finalize(user, id, answers, { runs }) };
+    return { attempt: finalize(user, id, answers, { runs, pastes }) };
   }
   function abandonAttempt(user, id) {
     const c = career(user);
@@ -435,7 +454,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
         const q = questionVersion(r.id, r.v);
         out.push({ user_id: u.id, student: u.name || 'Learner #' + u.id, reg_no: u.reg_no || null, attempt_id: a.id, assessment: a.title, submitted_at: a.submitted_at,
           question_id: r.id, type: r.type, category: r.category, skill: skill(r.skills[0])?.name, prompt: q?.prompt, code: q?.code, rubric: q?.rubric || [], model_answer: q?.model_answer || null,
-          answer: r.answer || '', run_output: r.run_output || null, run_lang: q?.run_lang || null, points: r.points, ai_suggestion: r.ai_suggestion || null, review: r.review || null });
+          answer: r.answer || '', paste_attempts: r.paste_attempts || 0, run_output: r.run_output || null, run_lang: q?.run_lang || null, points: r.points, ai_suggestion: r.ai_suggestion || null, review: r.review || null });
       }
     }
     return out.sort((x, y) => String(x.submitted_at).localeCompare(String(y.submitted_at)));

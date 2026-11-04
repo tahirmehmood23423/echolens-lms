@@ -23,7 +23,7 @@ module.exports = [
   mc('da-sq-p1', 'da.sql', 2, 'This query should return total revenue per month for 2026, but it fails. What is the fix?',
     ['Add GROUP BY month', 'Replace SUM with COUNT', 'Remove the WHERE clause', 'Add ORDER BY amount'], 0,
     'When a query mixes a plain column (month) with an aggregate (SUM), the plain column must be in GROUP BY.',
-    { type: 'debug', code: "SELECT EXTRACT(MONTH FROM paid_at) AS month, SUM(amount)\nFROM payments\nWHERE paid_at >= '2026-01-01';" }),
+    { type: 'debug', code: "SELECT EXTRACT(MONTH FROM paid_at) AS month, SUM(amount)\nFROM payments\nWHERE paid_at >= '2026-01-01' AND paid_at < '2027-01-01';" }),
   mc('da-sq-s1', 'da.sql', 3, 'Revenue in your report is double the finance team\'s figure. The query joins payments to enrollments. What is the most likely cause?',
     ['The join multiplies rows (a payment matches several enrollments), so amounts are summed more than once', 'SQL adds numbers incorrectly', 'Finance used a calculator', 'The database is slow'], 0,
     'Joining to a table with several matching rows duplicates each payment. Aggregate before joining or join on the correct, unique key.', { type: 'scenario' }),

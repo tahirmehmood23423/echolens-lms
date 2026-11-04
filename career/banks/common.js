@@ -31,7 +31,7 @@ module.exports = [
     '`y = x` does not copy the list - both names refer to the same list object, so appending through y also changes x.'),
 
   // ---------------- Logical problem solving (cs.logic) ----------------
-  mc('cs-lg-01', 'cs.logic', 1, 'All cats are animals. Tom is a cat. Which statement must be true?',
+  mc('cs-lg-01', 'cs.logic', 1, 'All cats are animals. Tom is a cat. Based ONLY on these two statements, which must be true?',
     ['Tom is an animal', 'All animals are cats', 'Tom is not an animal', 'Some animals are not cats'], 0,
     'If every cat is an animal and Tom is a cat, Tom is an animal. The other statements do not follow from the two facts given.'),
   out('cs-lg-02', 'cs.logic', 1, 'What is the next number in the sequence 2, 6, 12, 20, 30, ... ?', null, ['42'],

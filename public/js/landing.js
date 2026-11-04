@@ -146,3 +146,23 @@ if (loopForm) {
 document.querySelectorAll('#navLinks a').forEach((a) => {
   a.addEventListener('click', () => $('navLinks').classList.remove('open'));
 });
+
+/* ------------------------------ Test Your Skills ------------------------------
+ * The central entry to the career skill tests: choose a track, start its test.
+ * /career handles sign-in (and returns the student to the test afterwards).
+ * The track list is refreshed from the server so it always matches the
+ * published tracks; the static options above are the no-JavaScript fallback. */
+(function skillTest() {
+  const form = $('skillTestForm'), sel = $('skillTrack');
+  if (!form || !sel) return;
+  api('/api/career/tracks').then((d) => {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Choose your career track...</option>' + d.tracks.map((t) => `<option value="${esc(t.slug)}"${t.assessment.available ? '' : ' disabled'}>${esc(t.title)}${t.assessment.available ? '' : ' (coming soon)'}</option>`).join('');
+    sel.value = cur;
+  }).catch(() => {});
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!sel.value) { sel.focus(); $('skillTestNote').textContent = 'Choose a career track first.'; return; }
+    location.href = '/career#assess/' + encodeURIComponent(sel.value);
+  });
+})();

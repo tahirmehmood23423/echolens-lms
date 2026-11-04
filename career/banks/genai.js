@@ -63,7 +63,7 @@ module.exports = [
     'Keyword search excels at exact terms and codes; vector search at meaning. Combining them covers both.', { type: 'scenario' }),
 
   // ---- Agents and tool calling ----
-  mc('ga-ag-01', 'gen.agents', 1, 'In tool (function) calling, who actually runs the tool?', ['Your application code, after the model asks for a call with arguments', 'The model itself on its servers', 'The user\'s browser automatically', 'Nobody - it is simulated'], 0,
+  mc('ga-ag-01', 'gen.agents', 1, 'In standard (client-side) tool or function calling, who actually runs the tool?', ['Your application code, after the model asks for a call with arguments', 'The model itself on its servers', 'The user\'s browser automatically', 'Nobody - it is simulated'], 0,
     'The model returns a structured request; your code validates it, runs the function and returns the result.'),
   mc('ga-ag-02', 'gen.agents', 2, 'What is the ReAct pattern?', ['The model alternates reasoning steps with actions (tool calls) and observations until it can answer', 'A React.js component', 'A single prompt with no tools', 'A training technique'], 0,
     'ReAct interleaves thinking, acting and observing so the model can use tools step by step.'),

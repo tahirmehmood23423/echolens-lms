@@ -172,7 +172,8 @@
       <h1>${esc(av.title || 'Assessment')}</h1>
       ${av.available ? `<div class="cr-panel">
         <p><b>${av.items} questions</b>, one at a time. A timer shows the time left; the limit is generous, and your answers save automatically, so you can come back if your connection drops.</p>
-        <ul><li><b>Three kinds of question:</b> theory (concepts and code tracing), practical (debugging and fixing real code, queries or configuration) and scenario (real-world problems that need a decision).${av.weights ? ` They count ${av.weights.theory}% / ${av.weights.practical}% / ${av.weights.scenario}% towards your overall score.` : ''}</li>
+        <ul><li><b>Write your own answers.</b> Pasting into answer boxes is turned off, so the result shows what you can really do.</li>
+          <li><b>Three kinds of question:</b> theory (concepts and code tracing), practical (debugging and fixing real code, queries or configuration) and scenario (real-world problems that need a decision).${av.weights ? ` They count ${av.weights.theory}% / ${av.weights.practical}% / ${av.weights.scenario}% towards your overall score.` : ''}</li>
           ${av.reviewed_items ? `<li><b>${av.reviewed_items} answer${av.reviewed_items === 1 ? '' : 's'} you write yourself</b> (an explanation or a practical submission). EchoLens staff review ${av.reviewed_items === 1 ? 'it' : 'them'} against a published rubric, usually within a few days; your scores update when that happens.</li>` : ''}
           <li>Skip anything you do not know - skipped questions are not counted as wrong; we simply ask about that skill again later.</li>
           <li>Your results guide your learning. They are not an official qualification.</li></ul>
@@ -229,6 +230,7 @@
           <button class="cr-btn ghost" id="crPrev"${a.cur === 0 ? ' disabled' : ''}>Previous</button>
           ${a.cur < n - 1 ? '<button class="cr-btn" id="crNext">Next</button>' : '<button class="cr-btn" id="crFinish">Finish and see results</button>'}
         </div>
+        ${q.type === 'output' || q.grading === 'review' ? '<p class="cr-small cr-muted">Type your answer yourself - pasting is turned off.</p><p id="crPasteMsg" class="cr-small" style="color:#7A4A00" role="status"></p>' : ''}
         <p id="crSaveMsg" class="cr-small cr-muted" role="status"></p>
       </section>
       <nav class="cr-dots" aria-label="Jump to question">${a.questions.map((x, i) => `<button type="button" data-i="${i}" data-done="${answered(x) ? 1 : 0}"${i === a.cur ? ' aria-current="true"' : ''} aria-label="Question ${i + 1}${answered(x) ? ', answered' : ''}">${i + 1}</button>`).join('')}</nav>
@@ -252,7 +254,23 @@
         runBtn.disabled = false; queueSave();
       };
     } else if (runBtn) runBtn.style.display = 'none';
-    if ($('crTyped')) { $('crTyped').addEventListener('input', record); $('crTyped').focus(); }
+    if ($('crTyped')) {
+      const box = $('crTyped');
+      box.addEventListener('input', record);
+      // Answers must be typed, so the result shows the student's own skill.
+      // Paste and drag-and-drop are blocked and counted; the count reaches the reviewer.
+      const block = (e) => {
+        e.preventDefault();
+        a.pastes = a.pastes || {}; a.pastes[q.id] = (a.pastes[q.id] || 0) + 1;
+        const m = $('crPasteMsg'); if (m) m.textContent = 'Pasting is turned off in this assessment - please type your answer so your result reflects your own skills.';
+        queueSave();
+      };
+      box.addEventListener('paste', block);
+      box.addEventListener('drop', block);
+      box.addEventListener('beforeinput', (e) => { if (e.inputType === 'insertFromPaste' || e.inputType === 'insertFromDrop') block(e); });
+      box.setAttribute('autocomplete', 'off');
+      box.focus();
+    }
     const go = (i) => { a.cur = i; drawQuestion(); window.scrollTo(0, 0); };
     $('crPrev').onclick = () => go(a.cur - 1);
     if ($('crNext')) $('crNext').onclick = () => go(a.cur + 1);
@@ -264,7 +282,7 @@
     clearTimeout(SAVE_TIMER);
     SAVE_TIMER = setTimeout(async () => {
       const msg = $('crSaveMsg');
-      try { await api(`/api/career/me/attempts/${ATTEMPT.id}/answers`, { method: 'PUT', body: { answers: ATTEMPT.answers, runs: ATTEMPT.runs || {} } }); if (msg) msg.textContent = 'Saved'; }
+      try { await api(`/api/career/me/attempts/${ATTEMPT.id}/answers`, { method: 'PUT', body: { answers: ATTEMPT.answers, runs: ATTEMPT.runs || {}, pastes: ATTEMPT.pastes || {} } }); if (msg) msg.textContent = 'Saved'; }
       catch (e) { if (msg) msg.textContent = 'Not saved yet - we will try again. ' + e.message; }
     }, 800);
   }
@@ -274,7 +292,7 @@
     clearInterval(TICK); clearTimeout(SAVE_TIMER);
     root.innerHTML = '<p class="cr-muted">Scoring your answers&hellip;</p>';
     try {
-      const out = await api(`/api/career/me/attempts/${ATTEMPT.id}/submit`, { method: 'POST', body: { answers: ATTEMPT.answers, runs: ATTEMPT.runs || {} } });
+      const out = await api(`/api/career/me/attempts/${ATTEMPT.id}/submit`, { method: 'POST', body: { answers: ATTEMPT.answers, runs: ATTEMPT.runs || {}, pastes: ATTEMPT.pastes || {} } });
       ATTEMPT = null; await loadMe(); location.hash = '#result/' + out.attempt.id;
     } catch (e) { fail(e); }
   }

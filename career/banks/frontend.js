@@ -81,7 +81,7 @@ module.exports = [
     'fetch is asynchronous: it returns a Promise for a Response object, which you then read with response.json() or similar.'),
   mc('fe-ap-02', 'fe.api', 2, 'The server answers a fetch() call with HTTP 404. What does fetch do?', ['Resolves normally; you must check response.ok or response.status', 'Rejects the Promise', 'Retries automatically', 'Throws a SyntaxError'], 0,
     'fetch only rejects on network failure. HTTP error statuses still resolve, so check response.ok (true for 200-299).'),
-  mc('fe-ap-03', 'fe.api', 2, 'In which order are the letters printed?', ['A, C, B', 'A, B, C', 'B, A, C', 'C, A, B'], 0,
+  mc('fe-ap-03', 'fe.api', 2, 'Assuming the request succeeds, in which order are the letters printed?', ['A, C, B', 'A, B, C', 'B, A, C', 'C, A, B'], 0,
     'The .then callback runs later, after the request completes, while console.log("C") runs immediately.',
     { code: 'console.log("A");\nfetch("/api").then(() => console.log("B"));\nconsole.log("C");' }),
   mc('fe-ap-04', 'fe.api', 2, 'How do you send a JavaScript object as JSON in a POST request?', ['fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })', 'fetch(url, { method: "POST", body: data })', 'fetch(url + JSON.stringify(data))', 'fetch.post(url, data)'], 0,

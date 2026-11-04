@@ -20,7 +20,7 @@ test('question banks are well formed: unique ids, valid keys, known skills, expl
       if (q.grading === 'review') assert.ok(q.rubric.length && q.points > 0, `${q.id} rubric`);
       else if (q.type === 'output') assert.ok(q.answer.length, q.id);
       else assert.ok(q.answer.every((a) => q.options.some((o) => o.id === a)), `${q.id} key`);
-      assert.equal(q.status, 'draft', `${bank} ships as draft`);
+      assert.equal(q.status, 'published', `${bank} ships reviewed and published`); assert.ok(q.review && q.review.at, `${q.id} review record`);
     }
   }
 });

@@ -41,8 +41,8 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   r.post('/career/me/projects', authRequired, (req, res) => send(res, svc.setProject(me(req), req.body?.track, req.body?.stage, req.body?.link)));
   r.post('/career/me/attempts', authRequired, limitStart, (req, res) => send(res, svc.startAttempt(me(req), String(req.body?.assessment || ''))));
   r.get('/career/me/attempts/active', authRequired, (req, res) => res.json(svc.resumeAttempt(me(req))));
-  r.put('/career/me/attempts/:id/answers', authRequired, limitSave, (req, res) => send(res, svc.saveAnswers(me(req), req.params.id, req.body?.answers, req.body?.runs)));
-  r.post('/career/me/attempts/:id/submit', authRequired, (req, res) => send(res, svc.submitAttempt(me(req), req.params.id, req.body?.answers, req.body?.runs), (o) => ({ attempt: o.attempt, existing: !!o.existing })));
+  r.put('/career/me/attempts/:id/answers', authRequired, limitSave, (req, res) => send(res, svc.saveAnswers(me(req), req.params.id, req.body?.answers, req.body?.runs, req.body?.pastes)));
+  r.post('/career/me/attempts/:id/submit', authRequired, (req, res) => send(res, svc.submitAttempt(me(req), req.params.id, req.body?.answers, req.body?.runs, req.body?.pastes), (o) => ({ attempt: o.attempt, existing: !!o.existing })));
   r.post('/career/me/attempts/:id/abandon', authRequired, (req, res) => send(res, svc.abandonAttempt(me(req), req.params.id)));
   r.get('/career/me/attempts/:id/review', authRequired, (req, res) => {
     const rows = svc.attemptReview(me(req), req.params.id);

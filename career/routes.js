@@ -87,6 +87,20 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   });
   r.get('/career/assessments/:key', authRequired, (req, res) => res.json(svc.availability(req.params.key)));
 
+  /* ------------------ curriculum: subtracks, job roles, comprehensive assessments ------------------ */
+  const cur = svc.curriculum;
+  const nf = (res, what) => res.status(404).json({ error: `${what} not found.` });
+  r.get('/career/curriculum/tracks/:slug', (req, res) => { const v = cur.trackView(who(req), req.params.slug); v ? res.json(v) : nf(res, 'Career track'); });
+  r.get('/career/curriculum/subtracks/:id', (req, res) => { const v = cur.subtrackView(who(req), req.params.id); v ? res.json(v) : nf(res, 'Subtrack'); });
+  r.get('/career/curriculum/roles/:id', (req, res) => { const v = cur.roleView(who(req), req.params.id); v ? res.json(v) : nf(res, 'Job role'); });
+  r.post('/career/me/st/subtracks/:id/start', authRequired, limitStart, (req, res) => send(res, cur.startSubtrack(me(req), req.params.id)));
+  r.post('/career/me/st/roles/:id/start', authRequired, limitStart, (req, res) => send(res, cur.startRole(me(req), req.params.id)));
+  r.get('/career/me/st/active', authRequired, (req, res) => res.json(cur.resume(me(req))));
+  r.put('/career/me/st/attempts/:id/answers', authRequired, limitSave, (req, res) => send(res, cur.saveAnswers(me(req), req.params.id, req.body?.answers)));
+  r.post('/career/me/st/attempts/:id/submit', authRequired, (req, res) => send(res, cur.submit(me(req), req.params.id, req.body?.answers)));
+  r.get('/career/me/st/attempts/:id/review', authRequired, (req, res) => { const rows = cur.attemptReview(me(req), req.params.id); rows ? res.json({ review: rows }) : nf(res, 'Attempt'); });
+  r.get('/career/me/st/history', authRequired, (req, res) => res.json({ attempts: cur.history(me(req), req.query.subtrack ? String(req.query.subtrack) : null) }));
+
   /* -------------------------------- admin -------------------------------- */
   const admin = [authRequired, adminRequired];
   r.get('/admin/career/discovery', admin, (req, res) => res.json({ config: svc.discoveryConfig(), analytics: svc.discoveryAnalytics(), questions: svc.discoveryInfo().questions, tracks: svc.tracks().map((t) => ({ slug: t.slug, title: t.title })) }));
@@ -114,6 +128,19 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   r.put('/admin/career/tracks/:slug', admin, (req, res) => send(res, svc.updateTrack(req.params.slug, req.body || {}, req.user.id)));
   r.get('/admin/career/tracks/:slug', admin, (req, res) => { const t = svc.track(req.params.slug); if (!t) return res.status(404).json({ error: 'Track not found.' }); res.json({ track: { ...svc.publicTrack(t), status: t.status } }); });
   r.get('/admin/career/analytics', admin, (req, res) => res.json(svc.analytics()));
+  // Curriculum and question-bank QA.
+  r.get('/admin/career/curriculum', admin, (req, res) => res.json({ ...cur.qaDashboard(), config: cur.config() }));
+  r.put('/admin/career/curriculum/config', admin, (req, res) => send(res, cur.updateConfig(req.body || {}, req.user.id)));
+  r.put('/admin/career/curriculum/structure', admin, (req, res) => send(res, cur.updateStructure(req.body || {}, req.user.id)));
+  r.get('/admin/career/curriculum/roles/:id', admin, (req, res) => { const v = cur.roleView(null, req.params.id); v ? res.json({ ...v, mandatory: cur.role(req.params.id).mandatory, optional_ids: cur.role(req.params.id).optional, jd_full: cur.role(req.params.id).jd }) : nf(res, 'Job role'); });
+  const known = (req, res, next) => (cur.subtrack(req.params.id) ? next() : nf(res, 'Subtrack'));
+  r.get('/admin/career/curriculum/subtracks/:id/questions', admin, known, (req, res) => res.json(cur.adminQuestions(req.params.id, { difficulty: req.query.difficulty || null, status: req.query.status || null })));
+  r.put('/admin/career/curriculum/subtracks/:id/questions/:qid', admin, known, (req, res) => send(res, cur.editQuestion(req.params.id, req.params.qid, req.body || {}, req.user.id)));
+  r.post('/admin/career/curriculum/subtracks/:id/questions/status', admin, known, (req, res) => send(res, cur.setQuestionStatus(req.params.id, req.body?.ids || [], String(req.body?.status || ''), req.user.id)));
+  r.post('/admin/career/curriculum/subtracks/:id/questions/import', admin, known, (req, res) => send(res, cur.importQuestions(req.params.id, req.body?.questions, req.user.id)));
+  r.get('/admin/career/curriculum/subtracks/:id/preview', admin, known, (req, res) => res.json(cur.previewForm(req.params.id)));
+  r.post('/admin/career/curriculum/subtracks/:id/publish', admin, known, (req, res) => { const out = cur.publishAssessment(req.params.id, req.user.id); out.error ? res.status(out.status).json({ error: out.error, reasons: out.reasons || [] }) : res.json(out); });
+  r.post('/admin/career/curriculum/subtracks/:id/unpublish', admin, known, (req, res) => send(res, cur.unpublishAssessment(req.params.id, req.user.id)));
 
   /* ------------------------- staff review (admin, instructor) ------------------------- */
   const reviewer = [authRequired, (req, res, next) => (svc.REVIEWER_ROLES.includes(req.user.role) ? next() : res.status(403).json({ error: 'Staff reviewers only.' }))];

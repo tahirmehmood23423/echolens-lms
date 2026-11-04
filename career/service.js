@@ -20,6 +20,7 @@ const { SKILLS, skill } = require('./skills');
 const { TRACKS, STAGE_NAMES, track: baseTrack } = require('./tracks');
 const R = require('./roadmaps');
 const D = require('./discovery');
+const { createCurriculumService } = require('./curriculum/service');
 
 const { BANKS } = require('./banks');
 const REVIEWER_ROLES = ['admin', 'instructor'];
@@ -28,7 +29,7 @@ const MAX_HISTORY = 60;
 const QUESTION_STATUSES = ['draft', 'reviewed', 'published', 'retired'];
 const TRACK_STATUSES = ['draft', 'published'];
 
-function createCareerService(store, { now = () => new Date(), aiSuggest = null, notify = null, appUrl = '', secret = null } = {}) {
+function createCareerService(store, { now = () => new Date(), aiSuggest = null, notify = null, appUrl = '', secret = null, curriculumOptions = {} } = {}) {
   // Signs Career Discovery quiz forms and results, so guests can take the quiz without an account.
   const SIGNING_KEY = secret || crypto.randomBytes(32).toString('hex');
   const data = () => store.allData();
@@ -275,7 +276,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   /* ----------------------------- student records ----------------------------- */
   function career(user) {
     const c = user.profile?.career || {};
-    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null, discovery: c.discovery || null };
+    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null, discovery: c.discovery || null, st: c.st || null };
   }
   function writeCareer(user, next) {
     const attempts = next.attempts.slice(-MAX_HISTORY);
@@ -1082,6 +1083,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     discoveryInfo, discoveryConfig, updateDiscoveryConfig, resetDiscoveryConfig, discoveryState, saveDiscovery, startDiscoveryQuiz, resumeDiscoveryQuiz, submitDiscoveryQuiz, discoveryRecommendations, claimDiscovery, discoveryAnalytics,
     skillRecords, trackProfile, trackPlan, commonStatus, enrollments, listEnrollments, enrollTrack, enrollmentAdvice, makePrimary, pauseTrack, resumeTrack, archiveTrack, refreshEnrollments,
     submitAttempt, abandonAttempt, attemptReview, resources, contentGaps, report, history, setProject, analytics, preview, isLearner,
+    curriculum: createCurriculumService({ settings, save, career, writeCareer, isLearner, iso, now, audit, users: () => data().users || [] }, curriculumOptions),
   };
 }
 

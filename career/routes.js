@@ -14,8 +14,8 @@ const express = require('express');
 const { createCareerService } = require('./service');
 const { SKILLS } = require('./skills');
 
-function register(app, { store, authRequired, adminRequired, rateLimit, aiSuggest = null }) {
-  const svc = createCareerService(store, { aiSuggest });
+function register(app, { store, authRequired, adminRequired, rateLimit, aiSuggest = null, notify = null, appUrl = '' }) {
+  const svc = createCareerService(store, { aiSuggest, notify, appUrl });
   const r = express.Router();
   const me = (req) => store.Users.byId(req.user.id);
   const send = (res, out, ok = (o) => o) => (out && out.error ? res.status(out.status || 400).json({ error: out.error, ...(out.retry_at ? { retry_at: out.retry_at } : {}), ...(out.active ? { active: out.active } : {}) }) : res.json(ok(out)));
@@ -41,8 +41,8 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   r.post('/career/me/projects', authRequired, (req, res) => send(res, svc.setProject(me(req), req.body?.track, req.body?.stage, req.body?.link)));
   r.post('/career/me/attempts', authRequired, limitStart, (req, res) => send(res, svc.startAttempt(me(req), String(req.body?.assessment || ''))));
   r.get('/career/me/attempts/active', authRequired, (req, res) => res.json(svc.resumeAttempt(me(req))));
-  r.put('/career/me/attempts/:id/answers', authRequired, limitSave, (req, res) => send(res, svc.saveAnswers(me(req), req.params.id, req.body?.answers)));
-  r.post('/career/me/attempts/:id/submit', authRequired, (req, res) => send(res, svc.submitAttempt(me(req), req.params.id, req.body?.answers), (o) => ({ attempt: o.attempt, existing: !!o.existing })));
+  r.put('/career/me/attempts/:id/answers', authRequired, limitSave, (req, res) => send(res, svc.saveAnswers(me(req), req.params.id, req.body?.answers, req.body?.runs)));
+  r.post('/career/me/attempts/:id/submit', authRequired, (req, res) => send(res, svc.submitAttempt(me(req), req.params.id, req.body?.answers, req.body?.runs), (o) => ({ attempt: o.attempt, existing: !!o.existing })));
   r.post('/career/me/attempts/:id/abandon', authRequired, (req, res) => send(res, svc.abandonAttempt(me(req), req.params.id)));
   r.get('/career/me/attempts/:id/review', authRequired, (req, res) => {
     const rows = svc.attemptReview(me(req), req.params.id);

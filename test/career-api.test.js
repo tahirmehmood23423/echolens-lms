@@ -16,13 +16,15 @@ const { register } = require('../career/routes');
 
 let server, base, svc;
 let AI_CALLS = 0;
+const MAIL = [];
+const fakeNotify = async (to, subject, text) => { MAIL.push({ to, subject, text }); };
 const fakeAi = async (uid, { rubric }) => { AI_CALLS++; return { criteria: rubric.map((r, i) => ({ index: i + 1, points: r.points, why: 'looks complete' })), feedback: 'AI thinks this is great.', model: 'stub' }; };
 const auth = (req, res, next) => { const id = Number(req.headers['x-user']); const u = store.Users.byId(id); if (!u) return res.status(401).json({ error: 'Sign in.' }); req.user = { id: u.id, role: u.role }; next(); };
 const admin = (req, res, next) => (req.user.role === 'admin' ? next() : res.status(403).json({ error: 'Admin access only.' }));
 
 before(async () => {
   const app = express(); app.use(express.json());
-  svc = register(app, { store, authRequired: auth, adminRequired: admin, aiSuggest: fakeAi });
+  svc = register(app, { store, authRequired: auth, adminRequired: admin, aiSuggest: fakeAi, notify: fakeNotify, appUrl: 'https://echolens.test' });
   await new Promise((r) => { server = app.listen(0, r); });
   base = `http://127.0.0.1:${server.address().port}`;
 });
@@ -351,4 +353,42 @@ test('admins can set theory / practical / scenario weights per track', async () 
   assert.equal(ok.status, 200);
   assert.deepEqual(svc.categoryWeights('backend-developer'), { theory: 20, practical: 60, scenario: 20 });
   assert.equal(svc.categoryWeights('frontend-web-developer').practical, 45, 'other tracks keep their defaults');
+});
+
+test('browser-run output of a submission reaches the reviewer as unverified evidence', async () => {
+  publishAll();
+  store.Users.byId(2).email = 'student2@example.com';
+  const s = await call('POST', '/api/career/me/attempts', 2, { assessment: 'software-engineering-dsa' });
+  const sub = s.body.attempt.questions.find((q) => q.run_lang === 'python');
+  assert.ok(sub, 'a runnable submission is delivered with its language');
+  const code = 'def first_unique(s):\n    return -1';
+  await call('PUT', `/api/career/me/attempts/${s.body.attempt.id}/answers`, 2, { answers: { [sub.id]: code }, runs: { [sub.id]: '-1\n', 'not-a-question': 'x' } });
+  const done = (await call('POST', `/api/career/me/attempts/${s.body.attempt.id}/submit`, 2, { answers: {} })).body.attempt;
+  const resp = done.result.responses.find((r) => r.id === sub.id);
+  assert.equal(resp.run_output, '-1\n'); assert.equal(resp.pending, true, 'running code does not grade it');
+  const item = (await call('GET', '/api/career/reviews', 3)).body.reviews.find((x) => x.attempt_id === done.id && x.question_id === sub.id);
+  assert.equal(item.run_output, '-1\n'); assert.equal(item.run_lang, 'python');
+  // The student is emailed once, after the LAST pending answer is reviewed.
+  MAIL.length = 0;
+  const pend = (await call('GET', '/api/career/reviews', 3)).body.reviews.filter((x) => x.attempt_id === done.id);
+  for (const [i, p] of pend.entries()) {
+    await call('POST', `/api/career/reviews/2/${done.id}/${p.question_id}`, 3, { criteria: p.rubric.map(() => ({ points: 0 })), comment: 'Please handle every case in the spec.' });
+    await new Promise((r) => setTimeout(r, 10));
+    assert.equal(MAIL.length, i === pend.length - 1 ? 1 : 0, `emails after review ${i + 1} of ${pend.length}`);
+  }
+  assert.equal(MAIL[0].to, 'student2@example.com'); assert.match(MAIL[0].text, /career#result\//);
+});
+
+test('common CS retakes get unseen practical and scenario items for every skill', async () => {
+  publishAll(); skipCooldown();
+  const first = await take(1, 'common', () => true);
+  const seen = new Set(first.result.responses.map((r) => r.id));
+  const second = (await call('POST', '/api/career/me/attempts', 1, { assessment: 'common' })).body.attempt;
+  for (const sk of ['cs.programming', 'cs.logic', 'cs.computing', 'cs.dsa_basics', 'cs.git_tools', 'cs.debugging']) for (const c of ['practical', 'scenario']) {
+    const fresh = second.questions.find((q) => svc.questionById(q.id).skills[0] === sk && q.category === c && !seen.has(q.id));
+    assert.ok(fresh, `${sk} ${c}: an unseen item on retake`);
+  }
+  const cov = svc.availability('common').coverage;
+  assert.deepEqual(cov.thin, [], 'admin coverage shows no thin categories for the common assessment');
+  assert.ok(svc.availability('frontend-web-developer').coverage.thin.length > 0, 'and does flag thin ones elsewhere');
 });

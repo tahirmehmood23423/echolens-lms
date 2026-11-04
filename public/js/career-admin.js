@@ -36,7 +36,8 @@ function caOverview() {
       <p class="s" style="color:var(--muted);margin-bottom:10px">An assessment opens to students only when it is enabled and every skill it measures has enough <b>published</b> questions. New questions ship as drafts: review each one, mark it reviewed, then publish.</p>
       <div style="overflow-x:auto"><table class="tbl"><tr><th>Assessment</th><th>Status</th><th>Coverage</th><th>Enabled</th></tr>
       ${d.assessments.map((a) => `<tr><td>${esc(a.title || a.key)}</td><td>${a.available ? '<span style="color:var(--ok);font-weight:700">✓ Open to students</span>' : esc(a.reason || 'Not available')}</td>
-        <td class="s">${a.coverage ? `<div><b>Theory ${a.coverage.categories.theory} &middot; Practical ${a.coverage.categories.practical} &middot; Scenario ${a.coverage.categories.scenario} &middot; Reviewed ${a.coverage.reviewed}</b></div>` + a.coverage.skills.map((s) => `${esc(s.name)}: ${s.published}/${s.want}${s.ok ? '' : ' ✕'}`).join(' &middot; ') : '-'}</td>
+        <td class="s">${a.coverage ? `<div><b>Theory ${a.coverage.categories.theory} &middot; Practical ${a.coverage.categories.practical} &middot; Scenario ${a.coverage.categories.scenario} &middot; Reviewed ${a.coverage.reviewed}</b></div>` + a.coverage.skills.map((s) => `${esc(s.name)}: ${s.published}/${s.want}${s.ok ? '' : ' ✕'}`).join(' &middot; ')
+          + (a.coverage.thin?.length ? `<details style="margin-top:4px"><summary style="color:#7A4A00">${a.coverage.thin.length} skill/category pair${a.coverage.thin.length === 1 ? '' : 's'} with no alternate form</summary>${a.coverage.thin.map((t) => `${esc(t.name)}: ${t.have} ${esc(t.category)}`).join(' &middot; ')}<div style="color:var(--muted)">Add a second published item in these so retakes get fresh questions.</div></details>` : '') : '-'}</td>
         <td><label style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" data-ca-enable="${esc(a.key)}"${a.enabled ? ' checked' : ''}> ${a.enabled ? 'On' : 'Off'}</label></td></tr>`).join('')}
       </table></div></div></div>`;
 }
@@ -87,6 +88,7 @@ async function caEditQuestion(id) {
       <label class="field"><span>Correct answer: option letters, comma-separated (a,c) - or, for output questions, each accepted answer on its own line</span><textarea name="answer" rows="2">${esc(keyText)}</textarea></label>
       <label class="field"><span>Explanation of the correct answer (for written/submission: the reference answer reviewers see)</span><textarea name="explanation" rows="3" required>${esc(q.explanation || '')}</textarea></label>
       <label class="field"><span>Rubric for written/submission types - one criterion per line as "criterion | points"</span><textarea name="rubric" rows="4" placeholder="Explains block scope | 2">${esc((q.rubric || []).map((r) => r.criterion + ' | ' + r.points).join('\n'))}</textarea></label>
+      <label class="field"><span>Submissions only: let students test their code in the browser compiler</span><select name="run_lang"><option value="">No run button</option>${['python', 'javascript'].map((l) => `<option${q.run_lang === l ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
       <p class="s" style="color:var(--muted)">Written and submission answers are always scored by a staff reviewer against this rubric. AI can only suggest scores to the reviewer.</p>
       <button class="btn btn-primary btn-block">${id ? 'Save new version' : 'Add as draft'}</button>
     </form>`, true);
@@ -94,7 +96,7 @@ async function caEditQuestion(id) {
     e.preventDefault(); const f = e.target, type = f.type.value;
     const body = { bank: CA_BANK, type, category: f.category.value, difficulty: Number(f.difficulty.value),
       rubric: f.rubric.value.split('\n').map((l) => l.split('|')).filter((p) => p[0].trim()).map((p) => ({ criterion: p[0].trim(), points: Number(p[1]) })),
-      model_answer: f.explanation.value, skills: [f.skill.value, ...(q.skills || []).slice(1)].filter((v, i, a) => a.indexOf(v) === i), practical: f.practical.checked,
+      model_answer: f.explanation.value, run_lang: f.run_lang.value, skills: [f.skill.value, ...(q.skills || []).slice(1)].filter((v, i, a) => a.indexOf(v) === i), practical: f.practical.checked,
       prompt: f.prompt.value, code: f.code.value, explanation: f.explanation.value,
       options: f.options.value.split('\n').map((x) => x.trim()).filter(Boolean),
       answer: type === 'output' ? f.answer.value.split('\n').map((x) => x.trim()).filter(Boolean) : f.answer.value.split(',').map((x) => x.trim().toLowerCase()).filter(Boolean) };
@@ -249,6 +251,8 @@ async function renderCareerReviews() {
         <p><b>${esc(r.prompt)}</b></p>${r.code ? `<pre style="white-space:pre-wrap;font-size:12px;background:#F1F5F9;padding:8px;border-radius:6px">${esc(r.code)}</pre>` : ''}
         <div class="s" style="color:var(--muted);margin-top:8px">Student's answer</div>
         <pre style="white-space:pre-wrap;background:#0F172A;color:#E2E8F0;padding:10px 12px;border-radius:8px;font-size:13px;max-height:340px;overflow:auto">${esc(r.answer)}</pre>
+        ${r.run_output ? `<div class="s" style="color:#7A4A00;margin-top:6px"><b>Output from the student's own run</b> - produced on their device, so treat it as unverified:</div><pre style="white-space:pre-wrap;background:#FFFBEB;border:1px dashed #D97706;padding:8px 10px;border-radius:8px;font-size:12.5px">${esc(r.run_output)}</pre>` : ''}
+        ${r.run_lang ? `<div style="margin:6px 0"><button type="button" class="btn btn-ghost btn-sm" onclick="crRunHere(${i})">Run the student's code here (${esc(r.run_lang)})</button><span class="s" style="color:var(--muted)"> runs in your browser's sandboxed compiler</span><div class="term crTerm" id="crTerm${i}" style="margin-top:6px;min-height:40px"></div></div>` : ''}
         <details><summary class="s">Reference answer (the student need not match it word for word)</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(r.model_answer || '')}</pre></details>
         <form class="crForm" data-i="${i}">
           <table class="tbl"><tr><th>Rubric criterion</th><th>Max</th><th>Score</th><th>Note (optional)</th></tr>
@@ -288,4 +292,12 @@ function crApply(i) {
   f.used_ai.value = '1';
   toast('Suggestion copied. Check every score and the feedback, then save.');
 }
+/** Reviewer re-runs the submission in their own browser compiler: evidence the reviewer saw for themselves. */
+async function crRunHere(i) {
+  const r = window.CR_ITEMS[i], el = $('crTerm' + i);
+  if (!window.EchoRun || !window.EchoTerm) { el.textContent = 'The compiler is not available on this page.'; return; }
+  const term = EchoTerm.mount(el);
+  try { await EchoRun.executeAny(r.run_lang, r.answer, { term, onStatus: () => {} }); } catch (e) { term.print('[' + e.message + ']\n'); }
+}
+window.crRunHere = crRunHere;
 window.renderCareerReviews = renderCareerReviews; window.crSuggest = crSuggest; window.crApply = crApply;

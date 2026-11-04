@@ -24,7 +24,10 @@
  *     platform cannot run safely on the server, so staff review it.
  *     rubric: [[criterion, points], ...]
  *
- * extra: { code, type: 'debug' | 'scenario', category, practical, time_sec }
+ * extra: { code, type: 'debug' | 'scenario', category, practical, time_sec, run }
+ * run: 'python' | 'javascript' lets the student test a submission in the
+ * existing browser compiler. The run happens on the student's device, so its
+ * output goes to the reviewer as unverified evidence, never as a grade.
  * Default category: 'scenario' type -> scenario; 'debug' type or
  * practical:true -> practical; everything else -> theory. Points follow difficulty
  * (1, 2, 3) for auto items and the rubric total for reviewed items. All
@@ -44,6 +47,8 @@ function base(id, skills, difficulty, prompt, explanation, extra = {}) {
   return {
     id, version: 1, status: 'draft', skills: [].concat(skills), difficulty, prompt, explanation,
     code: extra.code || null, points: difficulty, time_sec: extra.time_sec || TIME[difficulty], grading: 'auto',
+    // Language the student may run in the browser compiler before submitting (submissions only).
+    run_lang: extra.run || null,
   };
 }
 function finish(q, extra) {

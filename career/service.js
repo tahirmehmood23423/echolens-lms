@@ -26,7 +26,7 @@ const MAX_HISTORY = 60;
 const QUESTION_STATUSES = ['draft', 'reviewed', 'published', 'retired'];
 const TRACK_STATUSES = ['draft', 'published'];
 
-function createCareerService(store, { now = () => new Date(), aiSuggest = null } = {}) {
+function createCareerService(store, { now = () => new Date(), aiSuggest = null, notify = null, appUrl = '' } = {}) {
   const data = () => store.allData();
   const settings = () => { const d = data(); if (!d.settings) d.settings = {}; return d.settings; };
   const save = () => store.persist();
@@ -133,6 +133,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null }
       if (rubric.some((r) => !(r.points > 0 && r.points <= 10))) return { error: 'Each rubric criterion needs 1-10 points.' };
       q.rubric = rubric; q.points = rubric.reduce((a, r) => a + r.points, 0);
       q.model_answer = String(b.model_answer || b.explanation || '').slice(0, 4000);
+      q.run_lang = type === 'submission' && ['python', 'javascript'].includes(b.run_lang) ? b.run_lang : null;
       q.options = []; q.answer = [];
     } else if (type === 'output') {
       q.options = []; q.answer = [].concat(b.answer || []).map((a) => String(a).trim()).filter(Boolean).slice(0, 10);
@@ -235,7 +236,10 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null }
     });
     const inPlan = pool.filter((q) => def.plan[q.skills[0]]);
     const categories = Object.fromEntries(E.CATEGORIES.map((c) => [c, inPlan.filter((q) => q.category === c && q.grading !== 'review').length]));
-    return { skills, categories, reviewed: inPlan.filter((q) => q.grading === 'review').length,
+    // Skills whose practical or scenario pool has fewer than two items: a retake
+    // cannot draw a fresh one, so the earlier result simply stands. Admins add here first.
+    const thin = skills.flatMap((x) => ['practical', 'scenario'].filter((c) => x.by_category[c] < 2).map((c) => ({ skill: x.skill, name: x.name, category: c, have: x.by_category[c] })));
+    return { skills, categories, thin, reviewed: inPlan.filter((q) => q.grading === 'review').length,
       ok: skills.length > 0 && skills.every((s) => s.ok), practical: categories.practical > 0, scenario: categories.scenario > 0 };
   }
   function availability(key) {
@@ -344,21 +348,29 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null }
     }
     return out;
   }
+  /** Browser-compiler output for runnable submissions: kept as unverified evidence for the reviewer. */
+  function cleanRuns(a, runs) {
+    const out = {}, byId = new Map(a.questions.map((q) => [q.id, q]));
+    for (const [k, v] of Object.entries(runs || {})) { const q = byId.get(k); if (q && q.run_lang) out[k] = String(v ?? '').slice(0, 4000); }
+    return out;
+  }
   /** Autosave, so an interrupted assessment resumes where it stopped. */
-  function saveAnswers(user, id, answers) {
+  function saveAnswers(user, id, answers, runs) {
     const c = career(user);
     if (!c.active || c.active.id !== id) return { error: 'Assessment not found or already submitted.', status: 404 };
     if (Date.parse(c.active.expires_at) + config().time_grace_sec * 1000 < now().getTime()) return { error: 'Time is up for this assessment. Submit to see your results.', status: 409 };
-    writeCareer(user, { ...c, active: { ...c.active, answers: { ...c.active.answers, ...cleanAnswers(c.active, answers) }, saved_at: iso() } });
+    writeCareer(user, { ...c, active: { ...c.active, answers: { ...c.active.answers, ...cleanAnswers(c.active, answers) }, runs: { ...(c.active.runs || {}), ...cleanRuns(c.active, runs) }, saved_at: iso() } });
     return { ok: true };
   }
-  function finalize(user, id, answers, { expired = false } = {}) {
+  function finalize(user, id, answers, { expired = false, runs = {} } = {}) {
     const c = career(user), a = c.active;
     const cfg = config();
     const late = Date.parse(a.expires_at) + cfg.time_grace_sec * 1000 < now().getTime();
     // After the deadline only the answers autosaved in time count.
     const final = late || expired ? a.answers : { ...a.answers, ...cleanAnswers(a, answers) };
     const result = E.scoreAttempt(a.questions, final, cfg);
+    const ran = late || expired ? (a.runs || {}) : { ...(a.runs || {}), ...cleanRuns(a, runs) };
+    for (const r of result.responses) if (r.grading === 'review' && ran[r.id] && r.answered) r.run_output = ran[r.id];
     const record = {
       id: a.id, assessment: a.assessment, title: a.title, track: a.track, skill: a.skill, status: 'submitted',
       started_at: a.started_at, submitted_at: iso(), late: late || expired, config_version: a.config_version, weights: a.weights || null, result,
@@ -367,13 +379,13 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null }
     return record;
   }
   /** Submit - idempotent: re-sending the same attempt id returns the stored result. */
-  function submitAttempt(user, id, answers) {
+  function submitAttempt(user, id, answers, runs) {
     if (!isLearner(user)) return { error: 'Assessments are for learner accounts.', status: 403 };
     const c = career(user);
     const done = c.attempts.find((x) => x.id === id);
     if (done) return { attempt: done, existing: true };
     if (!c.active || c.active.id !== id) return { error: 'Assessment not found.', status: 404 };
-    return { attempt: finalize(user, id, answers) };
+    return { attempt: finalize(user, id, answers, { runs }) };
   }
   function abandonAttempt(user, id) {
     const c = career(user);
@@ -389,7 +401,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null }
       return { id: r.id, type: r.type, category: r.category, grading: r.grading, correct: r.correct, answered: r.answered, pending: !!r.pending, earned: r.earned, points: r.points, skill: skill(r.skills[0])?.name,
         prompt: q?.prompt, code: q?.code, options: q?.options || [], key: q?.answer || [],
         // Reviewed items: the student's own answer, the rubric, and - only once a human has reviewed it - the outcome and the reference answer.
-        answer: reviewed ? r.answer || '' : undefined, rubric: reviewed ? q?.rubric || [] : undefined,
+        answer: reviewed ? r.answer || '' : undefined, run_output: reviewed ? r.run_output || null : undefined, rubric: reviewed ? q?.rubric || [] : undefined,
         review: reviewed && r.review ? { criteria: r.review.criteria, comment: r.review.comment, reviewed_at: r.review.at, reviewer_role: r.review.role } : null,
         explanation: reviewed ? (r.review ? q?.model_answer || q?.explanation : null) : q?.explanation || null };
     });
@@ -423,7 +435,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null }
         const q = questionVersion(r.id, r.v);
         out.push({ user_id: u.id, student: u.name || 'Learner #' + u.id, reg_no: u.reg_no || null, attempt_id: a.id, assessment: a.title, submitted_at: a.submitted_at,
           question_id: r.id, type: r.type, category: r.category, skill: skill(r.skills[0])?.name, prompt: q?.prompt, code: q?.code, rubric: q?.rubric || [], model_answer: q?.model_answer || null,
-          answer: r.answer || '', points: r.points, ai_suggestion: r.ai_suggestion || null, review: r.review || null });
+          answer: r.answer || '', run_output: r.run_output || null, run_lang: q?.run_lang || null, points: r.points, ai_suggestion: r.ai_suggestion || null, review: r.review || null });
       }
     }
     return out.sort((x, y) => String(x.submitted_at).localeCompare(String(y.submitted_at)));
@@ -464,6 +476,13 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null }
     f.a.result = E.summarize(f.a.result.responses, config());
     writeCareer(f.u, { ...f.c });
     audit(reviewer.id, prior ? 'career_review_update' : 'career_review', 'career_attempt', attemptId, { user_id: uid, question: qid, awarded, max, ai_assisted: f.r.review.ai_assisted });
+    // Tell the student once the last pending answer in the attempt is reviewed (not once per item).
+    if (notify && f.u.email && !prior && !f.a.result.pending) {
+      const first = String(f.u.name || '').trim().split(/\s+/)[0] || 'there';
+      Promise.resolve().then(() => notify(f.u.email, `Your ${f.a.title} has been reviewed`,
+        `Hi ${first},\n\nEchoLens staff have finished reviewing your written and practical answers for "${f.a.title}". Your skill report and roadmap now include them.\n\nSee your results and the reviewer's feedback: ${appUrl}/career#result/${encodeURIComponent(f.a.id)}\n\nThese scores guide your learning; they are not an official qualification.\n\n- EchoLens`))
+        .catch(() => { /* a failed email never undoes a saved review */ });
+    }
     return { response: { id: f.r.id, earned: f.r.earned, review: f.r.review }, attempt: summary(f.a) };
   }
 

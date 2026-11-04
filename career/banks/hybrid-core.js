@@ -36,11 +36,46 @@ const common = [
     'A compiler (for example gcc for C) translates the whole program into a machine-code executable before it runs, so errors are found up front and the program runs fast. An interpreter (for example CPython) reads and executes the program as it runs, which makes trying code quick but execution usually slower. Many languages mix both.'),
   submission('cs-sb-01', 'cs.programming', 2, 'Write a Python function is_palindrome(s) that returns True when s reads the same forwards and backwards, ignoring case and spaces. Add two example calls with the output you expect.',
     [['Core logic is correct (compares the cleaned string with its reverse, or compares ends)', 3], ['Ignores case and spaces as asked', 2], ['Returns a boolean and handles an empty string', 1], ['Example calls with correct expected output', 1], ['Readable code: clear names, no needless complexity', 1]],
-    'def is_palindrome(s):\n    t = s.replace(" ", "").lower()\n    return t == t[::-1]\n\nprint(is_palindrome("Never odd or even"))  # True\nprint(is_palindrome("EchoLens"))  # False'),
+    'def is_palindrome(s):\n    t = s.replace(" ", "").lower()\n    return t == t[::-1]\n\nprint(is_palindrome("Never odd or even"))  # True\nprint(is_palindrome("EchoLens"))  # False', { run: 'python' }),
   written('cs-wr-02', 'cs.debugging', 2, 'scenario', 'A friend\'s program sometimes prints the wrong total. Describe, step by step, how you would find and fix the bug.',
     [['Reproduces the problem with a specific, small input', 2], ['Inspects intermediate values (print statements or a debugger)', 2], ['Narrows the problem down to the faulty part of the code', 1], ['Fixes it and re-tests, including edge cases', 1]],
     'Find an input that gives the wrong total and shrink it to the smallest failing case. Print or step through the running total to see where it first goes wrong, isolate that line or loop, fix it, then re-run the failing case plus edge cases such as an empty list or negative numbers.'),
 ];
+
+// Alternate practical and scenario items for the common assessment, so a
+// retake can draw a fresh one in every category.
+common.push(
+  mc('cs-pf-p2', 'cs.programming', 2, 'This should print the numbers 1, 2 and 3 on separate lines, but the loop never stops. Which line is missing inside the loop?',
+    ['i += 1', 'i = 1', 'break', 'print(i + 1)'], 0,
+    'The condition i <= 3 stays true forever because i never changes. Increasing i on every pass lets the loop end.',
+    { type: 'debug', code: 'i = 1\nwhile i <= 3:\n    print(i)\n    # missing line' }),
+  mc('cs-pf-s2', 'cs.programming', 3, 'A shop app needs the same "apply 10% discount" calculation on five different screens. What is the best way to write it?',
+    ['Write one function, for example apply_discount(price), and call it from every screen', 'Copy the same three lines into all five screens', 'Ask each screen\'s developer to write their own version', 'Do the calculation by hand and type the results in'], 0,
+    'One function keeps the rule in a single place, so a change (say, 15%) is made once and every screen stays consistent.', { type: 'scenario' }),
+  out('cs-lg-p2', 'cs.logic', 2, 'What does this program print?', 'n = 12\nsteps = 0\nwhile n != 1:\n    n = n // 2 if n % 2 == 0 else 3 * n + 1\n    steps += 1\nprint(steps)', ['9'],
+    'Trace it: 12, 6, 3, 10, 5, 16, 8, 4, 2, 1 - nine steps to reach 1.', { category: 'practical' }),
+  out('cs-cf-p2', 'cs.computing', 2, 'A video file is 1,500 MB. Your internet speed is 50 Mbps (megabits per second). Roughly how many seconds does the download take? (1 byte = 8 bits; number only.)', null, ['240', '240s', '240 seconds'],
+    '1,500 MB x 8 = 12,000 megabits. 12,000 / 50 = 240 seconds, or 4 minutes. Speeds are quoted in bits; file sizes in bytes.', { category: 'practical' }),
+  mc('cs-cf-s2', 'cs.computing', 3, 'Your university project folder exists only on your laptop, and the deadline is next week. What should you do now?',
+    ['Keep a second copy somewhere else, for example push it to a Git host or a cloud drive, and keep doing so as you work', 'Nothing - laptops rarely fail', 'Print the code', 'Rename the folder to "FINAL"'], 0,
+    'A single copy is one failure, theft or spilled cup of tea away from being lost. A remote copy that you update regularly removes that risk.', { type: 'scenario' }),
+  mc('cs-ds-p2', 'cs.dsa_basics', 2, 'Which line completes this code so that it prints the names in alphabetical order?',
+    ['names.sort()', 'names.reverse()', 'names = names[0]', 'sorted(names) on its own line'], 0,
+    'list.sort() sorts the list in place. sorted(names) returns a NEW list, so calling it without assigning the result changes nothing.',
+    { practical: true, code: 'names = ["Sara", "Ali", "Hina"]\n____\nfor n in names:\n    print(n)' }),
+  mc('cs-ds-s2', 'cs.dsa_basics', 3, 'A bank\'s customer helpline must serve callers in the order they called. Which data structure models the waiting callers?',
+    ['A queue (first in, first out)', 'A stack (last in, first out)', 'A dictionary keyed by name', 'A sorted list by surname'], 0,
+    'Callers are served in arrival order, which is exactly first-in, first-out.', { type: 'scenario' }),
+  mc('cs-gt-p2', 'cs.git_tools', 2, 'You committed a file called .env with passwords by mistake but have not pushed. Which is the right first step?',
+    ['Add .env to .gitignore and remove it from the commit (git rm --cached .env, then amend the commit)', 'Push it and delete it later', 'Rename the file to env.txt', 'Delete the whole repository'], 0,
+    'Untrack the file and fix the commit before it leaves your machine. If secrets were ever pushed, they must also be rotated, because history keeps them.', { practical: true }),
+  mc('cs-gt-s2', 'cs.git_tools', 3, 'Three students are building one project and keep overwriting each other\'s work by emailing zip files. What should they do?',
+    ['Use one shared Git repository, each work on a branch, and merge through pull requests', 'Email the zip files more often', 'Let only one student write code', 'Keep three separate versions'], 0,
+    'A shared repository with branches lets everyone work in parallel and merge changes safely with history.', { type: 'scenario' }),
+  mc('cs-db-s2', 'cs.debugging', 3, 'Your program works on your laptop but crashes on a friend\'s computer with "FileNotFoundError: data.csv". What is the most likely cause?',
+    ['The code uses a path that only exists on your machine, or the file was not copied; use a path relative to the script and include the file', 'Your friend\'s computer is too slow', 'Python cannot read CSV files on other computers', 'The file is too small'], 0,
+    'Hard-coded paths such as C:/Users/you/... break elsewhere. Build paths relative to the script and ship the data with the code.', { type: 'scenario' }),
+);
 
 const frontend = [
   mc('fe-ht-p1', 'fe.html', 2, 'Submitting this form sends an empty body to the server. What is the fix?',

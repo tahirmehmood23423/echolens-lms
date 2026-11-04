@@ -210,6 +210,9 @@
     const inputs = reviewed
       ? `<label for="crTyped" style="font-weight:600;display:block;margin-top:8px">${q.type === 'submission' ? 'Your code / solution' : 'Your answer'}</label>
          <textarea id="crTyped" rows="${q.type === 'submission' ? 12 : 7}" spellcheck="${q.type === 'submission' ? 'false' : 'true'}" style="width:100%;border:1px solid var(--line-strong);border-radius:10px;padding:10px 12px;font:inherit;${q.type === 'submission' ? 'font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px' : ''}">${esc(v || '')}</textarea>
+         ${q.run_lang ? `<div class="cr-actions" style="margin-top:8px"><button type="button" class="cr-btn ghost" id="crRun">Run my code (${esc(q.run_lang === 'python' ? 'Python' : 'JavaScript')})</button><span class="cr-small cr-muted" id="crRunStatus">Optional: test it here before submitting. The reviewer sees your last run's output.</span></div>
+           <div id="crTerm" class="term" style="margin-top:8px;min-height:60px"></div>
+           ${(a.runs || {})[q.id] ? `<p class="cr-small cr-muted">Last run output (saved):</p><pre style="white-space:pre-wrap;background:#0F172A;color:#E2E8F0;border-radius:8px;padding:8px 10px;font-size:12.5px">${esc(a.runs[q.id])}</pre>` : ''}` : ''}
          <div class="cr-note" style="margin-top:10px"><b>Reviewed by EchoLens staff</b> against this rubric (${q.points} points). Your result updates once it has been reviewed.<ul style="margin:6px 0 0;padding-left:18px">${(q.rubric || []).map((r) => `<li>${esc(r.criterion)} (${r.points})</li>`).join('')}</ul></div>`
       : q.type === 'output'
       ? `<label for="crTyped" style="font-weight:600;display:block;margin-top:8px">Your answer</label><input id="crTyped" type="text" autocomplete="off" spellcheck="false" style="width:100%;min-height:44px;border:1px solid var(--line-strong);border-radius:10px;padding:8px 12px;font:inherit" value="${esc(v || '')}">`
@@ -237,6 +240,18 @@
       queueSave();
     };
     root.querySelectorAll('input[name=crOpt]').forEach((x) => x.addEventListener('change', record));
+    const runBtn = $('crRun');
+    if (runBtn && window.EchoRun && window.EchoTerm) {
+      const term = EchoTerm.mount($('crTerm'));
+      runBtn.onclick = async () => {
+        record(); runBtn.disabled = true;
+        try { await EchoRun.executeAny(q.run_lang, $('crTyped').value, { term, onStatus: (t) => { $('crRunStatus').textContent = t; } }); }
+        catch (e) { term.print('[' + e.message + ']\n'); }
+        a.runs = a.runs || {}; a.runs[q.id] = term.text().slice(0, 4000);
+        $('crRunStatus').textContent = 'Output saved for the reviewer (it ran on your device, so it is shown to them as unverified).';
+        runBtn.disabled = false; queueSave();
+      };
+    } else if (runBtn) runBtn.style.display = 'none';
     if ($('crTyped')) { $('crTyped').addEventListener('input', record); $('crTyped').focus(); }
     const go = (i) => { a.cur = i; drawQuestion(); window.scrollTo(0, 0); };
     $('crPrev').onclick = () => go(a.cur - 1);
@@ -249,7 +264,7 @@
     clearTimeout(SAVE_TIMER);
     SAVE_TIMER = setTimeout(async () => {
       const msg = $('crSaveMsg');
-      try { await api(`/api/career/me/attempts/${ATTEMPT.id}/answers`, { method: 'PUT', body: { answers: ATTEMPT.answers } }); if (msg) msg.textContent = 'Saved'; }
+      try { await api(`/api/career/me/attempts/${ATTEMPT.id}/answers`, { method: 'PUT', body: { answers: ATTEMPT.answers, runs: ATTEMPT.runs || {} } }); if (msg) msg.textContent = 'Saved'; }
       catch (e) { if (msg) msg.textContent = 'Not saved yet - we will try again. ' + e.message; }
     }, 800);
   }
@@ -259,7 +274,7 @@
     clearInterval(TICK); clearTimeout(SAVE_TIMER);
     root.innerHTML = '<p class="cr-muted">Scoring your answers&hellip;</p>';
     try {
-      const out = await api(`/api/career/me/attempts/${ATTEMPT.id}/submit`, { method: 'POST', body: { answers: ATTEMPT.answers } });
+      const out = await api(`/api/career/me/attempts/${ATTEMPT.id}/submit`, { method: 'POST', body: { answers: ATTEMPT.answers, runs: ATTEMPT.runs || {} } });
       ATTEMPT = null; await loadMe(); location.hash = '#result/' + out.attempt.id;
     } catch (e) { fail(e); }
   }
@@ -286,6 +301,7 @@
         <p>${esc(r.prompt || '')}</p>${r.code ? `<pre style="background:#0F172A;color:#E2E8F0;border-radius:8px;padding:10px;overflow-x:auto"><code>${esc(r.code)}</code></pre>` : ''}
         ${r.grading === 'review' ? `
           ${r.answer ? `<p class="cr-small"><b>Your answer:</b></p><pre style="white-space:pre-wrap;background:#F8FAFC;border:1px solid var(--line-strong);border-radius:8px;padding:10px;font-size:13px">${esc(r.answer)}</pre>` : ''}
+          ${r.run_output ? `<p class="cr-small"><b>Your last run's output:</b></p><pre style="white-space:pre-wrap;background:#0F172A;color:#E2E8F0;border-radius:8px;padding:8px 10px;font-size:12.5px">${esc(r.run_output)}</pre>` : ''}
           ${r.review ? `<table class="cr-table"><thead><tr><th>Rubric criterion</th><th>Score</th></tr></thead><tbody>${r.review.criteria.map((c) => `<tr><td>${esc(c.criterion)}${c.note ? `<div class="cr-small cr-muted">${esc(c.note)}</div>` : ''}</td><td>${c.points} / ${c.max}</td></tr>`).join('')}</tbody></table>
             <p class="cr-small"><b>Reviewer feedback:</b> ${esc(r.review.comment)}</p>${r.explanation ? `<details><summary class="cr-small">Reference answer</summary><pre style="white-space:pre-wrap;font-size:13px">${esc(r.explanation)}</pre></details>` : ''}`
             : r.answered ? `<p class="cr-small cr-muted">Rubric: ${(r.rubric || []).map((c) => esc(c.criterion) + ' (' + c.points + ')').join('; ')}</p>` : ''}`

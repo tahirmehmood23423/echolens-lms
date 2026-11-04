@@ -30,7 +30,8 @@ ${publicNavigation.render()}
 ${publicFooter.render()}
 <script src="/js/workflow-ui.js?v2"></script>
 <script src="/js/public-navigation.js?v1"></script>
-<script src="/js/career.js?v4"></script>
+<script src="/js/coderunner.js?v1422"></script>
+<script src="/js/career.js?v5"></script>
 </body>
 </html>`;
 }

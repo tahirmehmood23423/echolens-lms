@@ -113,7 +113,7 @@ function publicQuestion(q, order) {
   const byId = new Map(q.options.map((o) => [o.id, o]));
   return {
     id: q.id, type: q.type, prompt: q.prompt, code: q.code, points: q.points, time_sec: q.time_sec,
-    category: catOf(q), practical: catOf(q) === 'practical', grading: q.grading || 'auto', multi: q.type === 'multi',
+    category: catOf(q), practical: catOf(q) === 'practical', grading: q.grading || 'auto', multi: q.type === 'multi', run_lang: q.grading === 'review' ? q.run_lang || null : null,
     rubric: q.grading === 'review' ? (q.rubric || []).map((r) => ({ criterion: r.criterion, points: r.points })) : undefined,
     options: (order && order.length ? order : q.options.map((o) => o.id)).map((id) => byId.get(id)).filter(Boolean).map((o) => ({ id: o.id, text: o.text })),
   };

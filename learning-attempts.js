@@ -90,7 +90,8 @@ function createAttempts({getData,nextId,save,tracks,now=()=>new Date().toISOStri
       const a=byId(id);if(!a)return null;if(a.status==='completed')return a;
       if(!Number.isFinite(Number(score))||Number(score)<0||Number(score)>100)throw new Error('Invalid grader score');
       const sub=getData().open_submissions.find(s=>s.id===a.submission_id);if(!sub)throw new Error('Missing submission');
-      const raw=Number(score),effective=grader==='ai'&&!tracks[a.track_key]?.friendly_grading?Math.round(raw*.9):Math.round(raw);
+      // No AI-grading deduction: the grader's score is the score.
+      const raw=Number(score),effective=Math.round(raw);
       Object.assign(a.payload,{score:effective,gems:Math.round(effective/100*sub.points),feedback:String(feedback||'').slice(0,4000),graded_at:now(),graded_by:grader,error:null,retry_at:null});
       // A later failed or lower-scoring attempt never destroys a successful result.
       if(sub.score==null||effective>sub.score)Object.assign(sub,{assessment_kind:a.payload.assessment_kind||sub.assessment_kind||'assignment',code:a.payload.code,language:a.payload.language,file_url:a.payload.file_url,file_name:a.payload.file_name,files:a.payload.files,evidence:a.payload.evidence,submitted_at:a.created_at,score:effective,gems:a.payload.gems,feedback:a.payload.feedback,graded_at:a.payload.graded_at});

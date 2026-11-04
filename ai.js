@@ -446,6 +446,19 @@ JSON schema: [{"q":"question text","options":["A","B","C","D"],"answer":0}] wher
 // banner compiled programs show, and the dataset notice SQL prints. Neither is
 // something the student's program printed, so neither may be compared against
 // the expected output.
+// Correct logic is a pass, whatever number the model wrote down: a learner who
+// solved the problem must never be blocked on a module by a stingy score.
+// It lands at least LOGIC_PASS_MARGIN above the pass mark (and at least 80),
+// so a correct solution clearly passes rather than scraping through.
+const LOGIC_PASS_MARGIN = 15;
+function applyLogicFloor(rawScore, logicCorrect, passMark) {
+  let score = Math.max(0, Math.min(100, Math.round(Number(rawScore) || 0)));
+  if (logicCorrect === true || logicCorrect === 'true') {
+    const pm = Number.isFinite(Number(passMark)) ? Number(passMark) : 60;
+    score = Math.max(score, Math.min(100, Math.max(80, pm + LOGIC_PASS_MARGIN)));
+  }
+  return score;
+}
 function cleanRunOutput(output) {
   if (!output) return '';
   return String(output).split(/\r?\n/)
@@ -453,7 +466,7 @@ function cleanRunOutput(output) {
     .join('\n').trim();
 }
 // Grades an open-event submission WITHOUT a teacher in the loop. Returns
-// { score, feedback }. The caller applies the 10% AI-grading reduction.
+// { score, feedback }. The score is used as-is - there is no AI-grading deduction.
 // The system user id 0 is exempt from the per-user rate limit budget being
 // tied to one person, but the same window still applies.
 async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passMark, code, language, text, criteria, solution, output, expectedOutput, sampleInput }) {
@@ -471,7 +484,13 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
     '',
     'Rules you must not break:',
     '1. Judge ONLY what is asked for. A submission that satisfies every requirement',
-    '   scores at least 90, even if you would have written it differently.',
+    '   scores at least 95, even if you would have written it differently.',
+    '1a. Judge the LOGIC first. If the approach is correct - it would solve the task',
+    '   for the intended inputs - set "logic_correct": true. Small slips (a typo in',
+    '   a printed label, formatting, a missing edge case the brief did not stress, a',
+    '   minor syntax slip in otherwise right logic) do not make the logic wrong.',
+    '   Correct logic always earns a PASSING score, never below the pass mark.',
+    '   Be generous: when in doubt between two scores, give the higher one.',
     '2. Never invent behaviour. Do not claim the program prints, computes or does',
     '   anything you cannot point to a line for. If you are unsure what it does,',
     '   trace it line by line before judging.',
@@ -494,8 +513,8 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
     '',
     'Reply with ONLY a JSON object, no markdown fences, in exactly this shape:',
     rubric.length
-      ? '{"rubric": [{"item": "<rubric item, abbreviated>", "met": true|false, "why": "<one short clause citing the code>"}], "score": <integer 0-100>, "feedback": "<2-3 sentences addressed to the student>"}'
-      : '{"score": <integer 0-100>, "feedback": "<2-3 sentences addressed to the student>"}',
+      ? '{"rubric": [{"item": "<rubric item, abbreviated>", "met": true|false, "why": "<one short clause citing the code>"}], "logic_correct": true|false, "score": <integer 0-100>, "feedback": "<2-3 sentences addressed to the student>"}'
+      : '{"logic_correct": true|false, "score": <integer 0-100>, "feedback": "<2-3 sentences addressed to the student>"}',
   ].join('\n');
 
   const parts = [
@@ -528,7 +547,7 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
   const m = cleaned.match(/\{[\s\S]*\}/);
   if (!m) throw new Error('The AI grader returned an unreadable response.');
   const parsed = JSON.parse(m[0]);
-  const score = Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 0)));
+  const score = applyLogicFloor(parsed.score, parsed.logic_correct, passMark);
   // The per-item verdicts are appended to the feedback so a learner (and the
   // staff member reviewing a dispute) can see exactly which requirement the
   // grader thought was missing, instead of a bare number.
@@ -540,4 +559,4 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
   return { score, feedback, rubric: checklist };
 }
 
-module.exports = { enabled, status, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, cleanRunOutput, codeHelp, promptLab, excelCopilot, activityReport };
+module.exports = { enabled, status, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, cleanRunOutput, applyLogicFloor, codeHelp, promptLab, excelCopilot, activityReport };

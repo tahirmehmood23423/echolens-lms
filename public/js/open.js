@@ -1931,17 +1931,16 @@ function svLangOptions() {
 const SV_NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 function svCertNote() { return CUR.track.free ? (CUR.track.capstone ? ' Pass every required assignment and the staff-reviewed capstone to receive your verified certificate.' : ' Pass every required assessment at its stated threshold and your verified certificate is issued automatically.') : ''; }
 // Beginner-track courses (the 5 free fundamentals tracks - see
-// tracks/free-micro.js's friendly_grading flag) never mention automated grading or the standard
-// 10% reduction - a first-timer's first working program shouldn't come
-// with a visible penalty attached, and how grading works internally isn't
-// something a beginner needs to know to trust their result.
+// tracks/free-micro.js's friendly_grading flag) never mention automated
+// grading - how grading works internally isn't something a beginner needs
+// to know to trust their result.
 function svGradingNote() {
   if (CUR_PROBLEM?.problem?.grading_mode === 'quiz') return 'Answers are checked the moment you submit. Retake it as often as you like - your best score counts.' + svCertNote();
   if (CUR_PROBLEM?.problem?.grading_mode === 'staff' && problemMode(CUR_PROBLEM.problem) === 'code') return 'Your code is saved immediately and reviewed by staff. Your best score is preserved.' + svCertNote();
   if (CUR_PROBLEM?.problem?.grading_mode === 'staff') return 'Your evidence is saved immediately and sent to staff for review. Your best score is preserved.' + svCertNote();
   return CUR.track.friendly_grading
     ? 'Your work is saved before grading. Gems reflect your best result.' + svCertNote()
-    : 'Automated grading applies the configured 10% adjustment. Gems reflect your best result.' + svCertNote();
+    : 'Your work is graded automatically. Correct logic earns at least a passing grade. Gems reflect your best result.' + svCertNote();
 }
 // Per-problem Prompt Lab workbooks and the Excel copilot session live in
 // memory for the visit - the submitted artifact is what gets graded.
@@ -2962,7 +2961,7 @@ function renderEventDetail() {
   // ---- middle column sections ----
   const fmtDT = (v) => v ? esc(String(v).replace('T', ' ')) : '—';
   const banner = ev.auto_grade
-    ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly, with a 10% reduction in score.</span></div>` : '';
+    ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly. Correct logic earns at least a passing grade.</span></div>` : '';
 
   // ---- overview stat tiles ----
   const closesAt = ev.series_kind === 'shiplens' ? ev.shiplens_schedule?.reg_closes : ev.ends_at;
@@ -3082,7 +3081,7 @@ function renderEventDetail() {
       : '<path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/>';
     return `<div class="sub-row">
       <span class="sub-ic ${cls}"><svg viewBox="0 0 24 24" fill="none">${icon}</svg></span>
-      <div class="grow"><div class="st">Submission #${subs.length - i}${i === 0 ? ' (Latest)' : ''}</div><div class="sub-when">Submitted ${esc(s.submitted_at)}</div>${s.graded_by === 'ai' ? '<div class="sub-when">10% reduction applied</div>' : ''}</div>
+      <div class="grow"><div class="st">Submission #${subs.length - i}${i === 0 ? ' (Latest)' : ''}</div><div class="sub-when">Submitted ${esc(s.submitted_at)}</div></div>
       <span class="sub-tag ${cls}">${label}</span>
       ${ev.series_kind === 'shiplens' ? `<div class="sl-sub-links">${s.github_link ? `<a href="${esc(s.github_link)}" target="_blank" rel="noopener">GitHub repository ↗</a>` : ''}${s.render_link ? `<a href="${esc(s.render_link)}" target="_blank" rel="noopener">Live deployment ↗</a>` : ''}${s.vercel_link ? `<a href="${esc(s.vercel_link)}" target="_blank" rel="noopener">Vercel deployment ↗</a>` : ''}${s.link ? `<a href="${esc(s.link)}" target="_blank" rel="noopener">Walkthrough video ↗</a>` : ''}${s.file_url ? `<a href="${esc(s.file_url)}" target="_blank" rel="noopener">${esc(s.file_name || 'Project attachment')} ↗</a>` : ''}${s.note ? `<span>${esc(s.note)}</span>` : ''}</div>` : ''}
       ${s.score != null ? `<span class="sub-score">${s.score}/100 pts</span>` : ''}
@@ -3237,7 +3236,6 @@ function renderFeedback(sub, ev) {
     </div>
     <div style="text-align:center">
       <div class="score-ring" style="--pct:${sub.score};--ring-color:${ring}"><span class="val">${sub.score}<span style="font-size:12px;color:var(--muted)">/100</span></span></div>
-      ${sub.graded_by === 'ai' ? '<div class="sub-note">10% reduction applied</div>' : ''}
     </div>
   </div>`;
 }

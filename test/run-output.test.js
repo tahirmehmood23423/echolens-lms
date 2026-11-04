@@ -25,3 +25,17 @@ test('empty or missing output stays empty', () => {
   assert.equal(cleanRunOutput(null), '');
   assert.equal(cleanRunOutput('   \n'), '');
 });
+
+const { applyLogicFloor } = require('../ai');
+
+test('correct logic is always a clear pass', () => {
+  assert.equal(applyLogicFloor(40, true, 60), 80);
+  assert.equal(applyLogicFloor(40, true, 70), 85);
+  assert.equal(applyLogicFloor(95, true, 60), 95); // never lowers a good score
+});
+
+test('incorrect logic keeps the grader score', () => {
+  assert.equal(applyLogicFloor(40, false, 60), 40);
+  assert.equal(applyLogicFloor(40, undefined, 60), 40);
+  assert.equal(applyLogicFloor(140, false, 60), 100);
+});

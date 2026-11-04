@@ -3309,7 +3309,7 @@ app.post('/api/admin/recruiters/:id/request-info', authRequired, adminRequired, 
  * The unified admin-generated system: quests, hackathons, competitions and
  * webinars - free or paid (payment screenshot verified by admin), inside the
  * portal, on the open site, or both, with an optional built-in compiler,
- * dataset URL, admin documents, AI auto-grading (-10%), pass marks, and
+ * dataset URL, admin documents, AI auto-grading, pass marks, and
  * automatic certificates.
  */
 function eventNotify(ev, audience) {
@@ -3661,8 +3661,8 @@ app.delete('/api/admin/event-entries/:id', authRequired, adminRequired, asyncRou
 }));
 // Submissions: editor code, an uploaded file (any document), and/or a link -
 // per problem for quests/competitions, single for hackathons. When the event
-// has AI auto-grading on, the submission is graded immediately with a 10%
-// reduction, and a certificate is issued automatically at the pass mark.
+// has AI auto-grading on, the submission is graded immediately (no
+// deduction), and a certificate is issued automatically at the pass mark.
 app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (req, res) => {
   const discardUpload = () => { if (req.file) { try { fs.unlinkSync(req.file.path); } catch {} } };
   if (!['free', 'student'].includes(req.user.role)) { discardUpload(); return res.status(403).json({ error: 'Events are for learners.' }); }
@@ -4818,7 +4818,7 @@ app.post('/api/staff/follow-ups/:idx/respond', authRequired, staffOnly, (req, re
 
 /* -------------- open quest submissions + certificates (items 3, 10) --------------
  * Submit code or a file (PDF, Word, PNG, JPEG) per problem. AI grades it on
- * the spot with the 10% reduction; gems accrue per problem; completing a
+ * the spot (no deduction); gems accrue per problem; completing a
  * fully free course above its pass mark issues the certificate automatically.
  */
 // Per-course workspaces decide what a submission looks like:

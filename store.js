@@ -3207,7 +3207,7 @@ function backupNow() {
  * / both), entry (free or paid with a payment-screenshot flow), an optional
  * built-in compiler (Python, JavaScript, TypeScript, C/C++, Java, Go, SQL or web) with an optional dataset URL,
  * admin-attached documents, problems (for quests & competitions), a pass
- * mark, AI auto-grading (with a 10% reduction), and automatic certificates.
+ * mark, AI auto-grading, and automatic certificates.
  */
 const EVENT_KINDS = ['quest', 'hackathon', 'competition', 'webinar'];
 const EVENT_SCOPES = ['portal', 'open', 'both'];
@@ -3559,12 +3559,12 @@ const Events = {
     save();
     return { submission: s, event: ev };
   },
-  // AI auto-grade: raw AI score gets a 10% reduction before it counts.
+  // AI auto-grade: the grader's score counts as-is (no deduction).
   applyAiGrade(sid, aiScore, feedback) {
     const s = data.event_submissions.find((x) => x.id === Number(sid)); if (!s) return null;
     const raw = Math.max(0, Math.min(100, Number(aiScore) || 0));
     s.ai_score = raw;
-    s.score = Math.round(raw * 0.9); // AI-graded work carries a 10% reduction
+    s.score = Math.round(raw);
     s.ai_feedback = String(feedback || '').slice(0, 2000) || null;
     s.graded_by = 'ai'; s.graded_at = now(); save();
     return s;
@@ -4251,7 +4251,7 @@ const Analytics = {
 
 /* ============================== v12.3: OPEN QUEST SUBMISSIONS ==============================
  * Real submissions for the open problem set: signed-in learners submit code
- * or files per problem, get AI-graded (10% reduction), earn gems, and - on
+ * or files per problem, get AI-graded, earn gems, and - on
  * completing a fully free track above its pass mark - receive an automatic
  * verified certificate.
  */

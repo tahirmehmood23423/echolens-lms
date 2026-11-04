@@ -6590,7 +6590,7 @@ function formEvent(seriesKind = null) {
       </div>
       <label class="field ev-webinar" style="display:none"><span>Meeting link (shown to registered participants)</span><input name="meeting_link" type="url" placeholder="https://meet.jit.si/echolens-webinar"></label>
       <div style="display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 4px">
-        <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_grade"> AI auto-grading (score carries a 10% reduction)</label>
+        <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_grade"> AI auto-grading</label>
         <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="auto_certificate" checked> Automatic certificate at the pass mark</label>
         <label class="s" style="display:flex;gap:7px;align-items:center;cursor:pointer"><input type="checkbox" name="partner"> In collaboration with WebEra</label>
       </div>

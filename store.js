@@ -3773,7 +3773,7 @@ const Events = {
       entry: d.entry, fee_pkr: d.fee_pkr, pay_instructions: d.pay_instructions,
       starts_at: d.starts_at, ends_at: d.ends_at, deadline: d.deadline, duration_minutes: d.duration_minutes,
       pass_mark: d.pass_mark, auto_grade: d.auto_grade, auto_certificate: d.auto_certificate,
-      compiler: d.compiler, status: d.status, entries_count: d.entries_count,
+      compiler: d.compiler, status: d.status,
       problems_count: (d.problems || []).length, prizes: d.prizes, meeting_link: null,
     };
   },

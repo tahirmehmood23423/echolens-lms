@@ -279,7 +279,7 @@ function backToCatalogue() {
 /* -------------------------------- boot -------------------------------- */
 (async () => {
   if (!location.pathname.startsWith('/demo/') && ['', '#home', '#compare'].includes(location.hash)) {
-    location.replace('/' + location.search + (location.hash === '#compare' ? '#learning-options' : '')); return;
+    location.replace('/' + location.search); return;
   }
   try { ME = await api('/api/auth/me'); } catch { ME = null; }
   EL.drafts.setAccount(ME?.id || null);
@@ -514,11 +514,10 @@ function backToCourse() {
 async function loadHomeStats() {
   renderHomePreview();
   renderJourney();
-  let courses = CATALOGUE.length || null, students = null;
+  let courses = CATALOGUE.length || null;
   try {
     const d = await api('/api/public/info');
     courses = d.stats.courses || courses;
-    students = d.stats.students;
   } catch {}
   const items = [
     ['#7C3AED', 'chart', courses==null?'?':String(courses), 'Courses'],
@@ -530,7 +529,7 @@ async function loadHomeStats() {
   const statsEl = $('homeStats'); if (!statsEl) return;
   statsEl.innerHTML = items.map(([bg, ic, n, l]) =>
     `<div class="si"><div class="si-ic" style="background:${bg}"><svg viewBox="0 0 24 24" fill="none">${ICONS[ic]}</svg></div><div><b>${n}</b><span>${esc(l)}</span></div></div>`
-  ).join('') + (students ? `<div class="si"><div class="si-ic" style="background:#0FBFA8"><svg viewBox="0 0 24 24" fill="none">${ICONS.bot}</svg></div><div><b>${students}+</b><span>Learners</span></div></div>` : '');
+  ).join(''); // learner counts are deliberately not shown
 }
 function renderHomePreview() {
   // Real progress for signed-in members only - guests get the marketing
@@ -804,11 +803,10 @@ async function loadCatalogue() {
     FREE_FAMILIES = d.free_families || [];
     const available = CATALOGUE.filter((course) => course.available !== false);
     const comingSoon = CATALOGUE.filter((course) => course.coming_soon);
-    const totalOpenEnrollments = Number(d.counts?.open_web_enrollments || 0);
-
+    
     const upcomingOpen = CATALOGUE.filter((c) => c.upcoming && c.registration_open);
     const upcomingAll = CATALOGUE.filter((c) => c.upcoming);
-    $('cohortLine').textContent = (upcomingAll.length ? upcomingAll.length + ' upcoming live course' + (upcomingAll.length === 1 ? '' : 's') + ' (' + upcomingOpen.length + ' open for registration) | ' : '') + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses | ' + totalOpenEnrollments.toLocaleString() + ' students enrolled in open-web courses.' + (comingSoon.filter(c=>!c.upcoming).length ? ' ' + comingSoon.filter(c=>!c.upcoming).length + ' new certified courses are open for syllabus preview and coming soon.' : '');
+    $('cohortLine').textContent = (upcomingAll.length ? upcomingAll.length + ' upcoming live course' + (upcomingAll.length === 1 ? '' : 's') + ' (' + upcomingOpen.length + ' open for registration) | ' : '') + available.filter(c=>c.price_pkr===0).length + ' free self-paced courses.' + (comingSoon.filter(c=>!c.upcoming).length ? ' ' + comingSoon.filter(c=>!c.upcoming).length + ' new certified courses are open for syllabus preview and coming soon.' : '');
     $('actionStrip').innerHTML = upcomingOpen.length ? `
       <button class="btn btn-primary" onclick="openRegister()">Register for an upcoming course</button>` : '';
     const p = (d.paths || [])[0];
@@ -908,7 +906,6 @@ function courseCardHtml(c) {
         <h4 class="oc-title">${esc(c.title)}</h4>
       </div>
       <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${c.weeks} Weeks &middot; ${c.hours} Hours</div>
-      ${isFree ? `<div class="oc-meta" aria-label="Students enrolled"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19v-1.5A3.5 3.5 0 0 1 7.5 14h3A3.5 3.5 0 0 1 14 17.5V19M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM16 13a2.5 2.5 0 1 0-1.5-4.5M16 15h.5A3.5 3.5 0 0 1 20 18.5V19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>${Number(c.enrollment_count || 0).toLocaleString()} students enrolled</div>` : ''}
       <div class="oc-foot">
         <div class="oc-price${isFree ? ' free' : ''}">${comingSoon ? 'Free certified course' : isFree ? 'Free course' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
         <button type="button" class="btn ${comingSoon ? 'btn-ghost' : isFree ? 'btn-teal' : 'btn-primary'} oc-btn" onclick="event.stopPropagation();courseAction('${esc(c.code)}')">${comingSoon ? (c.track_key && isReserved(c.track_key) ? 'Seat reserved' : 'View &amp; reserve') : isFree ? 'Start now' : 'View course'}</button>
@@ -2532,7 +2529,11 @@ async function loadEvents() {
   } catch (e) { $('evList').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
 
+// ShipLens lives only in its own section (the ShipLens nav link). Every
+// Events tab leaves it out.
 function evTabFilter(tab, ev) {
+  if (tab === 'hackathons') return ev.series_kind === 'shiplens';
+  if (ev.series_kind === 'shiplens') return false;
   if (tab === 'all') return true;
   if (tab === 'quests') return ev.kind === 'quest';
   if (tab === 'hackathons') return ev.series_kind === 'shiplens';
@@ -2542,10 +2543,10 @@ function evTabFilter(tab, ev) {
 }
 function renderEvTabs() {
   const defs = [
-    ['all', 'All Events'], ['quests', 'Open Quests'], ['hackathons', 'ShipLens'],
+    ['all', 'All Events'], ['quests', 'Open Quests'],
     ['live', 'Live Events'], ['webinars', 'Webinars'],
   ];
-  $('evTabs').innerHTML = defs.map(([k, label]) => {
+  $('evTabs').innerHTML = EV_TAB === 'hackathons' ? '' : defs.map(([k, label]) => {
     const n = EV_ALL.filter((e) => evTabFilter(k, e)).length;
     return `<button class="ev-tab ${EV_TAB === k ? 'active' : ''}" onclick="setEvTab('${k}')">${label}${n ? ` (${n})` : ''}</button>`;
   }).join('');
@@ -2588,11 +2589,11 @@ function renderShipLensHub() {
 }
 
 function renderEvStats() {
-  const quests = EV_ALL.filter((e) => e.kind === 'quest').length;
-  const hacks = EV_ALL.filter((e) => e.series_kind === 'shiplens').length;
-  const live = EV_ALL.filter((e) => e.status === 'live').length;
+  const events = EV_ALL.filter((e) => e.series_kind !== 'shiplens');
+  const quests = events.filter((e) => e.kind === 'quest').length;
+  const webinars = events.filter((e) => e.kind === 'webinar').length;
+  const live = events.filter((e) => e.status === 'live').length;
   const gems = (ME && ME.gamify && ME.gamify.gems) || 0;
-  const parts = EV_ALL.reduce((s, e) => s + (e.entries_count || 0), 0);
   const ic = {
     q: '<path d="M4 5h16M4 12h16M4 19h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     t: '<path d="M6 4h12v3a6 6 0 0 1-12 0V4zM9 15h6M12 15v4M8 21h8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -2603,10 +2604,9 @@ function renderEvStats() {
   const cell = (cls, icon, val, label) => `<div class="ev-stat ${cls}"><span class="ev-stat-ic"><svg viewBox="0 0 24 24" fill="none">${icon}</svg></span><div><b>${val}</b><span>${label}</span></div></div>`;
   $('evStats').innerHTML =
     cell('c1', ic.q, quests, 'Open Quests') +
-    cell('c2', ic.t, hacks, 'ShipLens series') +
+    cell('c2', ic.t, webinars, 'Webinars') +
     cell('c3', ic.l, live, 'Live Events') +
-    cell('c4', ic.g, gems.toLocaleString(), 'My Gems Earned') +
-    cell('c5', ic.p, parts.toLocaleString(), 'Participants');
+    cell('c4', ic.g, gems.toLocaleString(), 'My Gems Earned');
 }
 
 function evThumb(ev) {
@@ -2651,7 +2651,7 @@ function drawEventList() {
       : '<span class="ev-pill free">Free</span>';
     const avg = ev.my_progress && ev.my_progress.avg != null
       ? `<span class="ev-avg">Average so far: ${ev.my_progress.avg}%</span>`
-      : ev.entries_count ? `<span class="ev-avg">${ev.entries_count} joined</span>` : '';
+      : '';
     return `<div class="ev-row${ev.series_kind === 'shiplens' ? ' shiplens-event-row' : ''}" onclick="openOpenEvent(${ev.id})" style="cursor:pointer">
       ${evThumb(ev)}
       <div class="ev-body">
@@ -3017,11 +3017,9 @@ function renderEventDetail() {
   // ---- overview stat tiles ----
   const closesAt = ev.series_kind === 'shiplens' ? ev.shiplens_schedule?.reg_closes : ev.ends_at;
   const statsRow = ev.series_kind === 'shiplens' ? `<div class="ev-stats" style="margin-bottom:16px">
-    <div class="ev-stat c1"><span class="ev-stat-ic">◎</span><div><b>${(ev.entries_count || 0).toLocaleString()}</b><span>Registered teams</span></div></div>
     <div class="ev-stat c2"><span class="ev-stat-ic">◷</span><div><b>${shipLensDate(ev.shiplens_schedule?.submission_deadline)}</b><span>Project deadline</span></div></div>
     <div class="ev-stat c4"><span class="ev-stat-ic">✦</span><div><b>${esc(({registration:'Registration',pending:'Brief release',submission:'Build window',grading:'Judging',closed:'Completed'})[ev.shiplens_phase] || 'Upcoming')}</b><span>Current phase</span></div></div>
   </div>` : `<div class="ev-stats" style="margin-bottom:16px">
-    <div class="ev-stat c1"><span class="ev-stat-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><div><b>${(ev.entries_count || 0).toLocaleString()}</b><span>Total Participants</span></div></div>
     <div class="ev-stat c2"><span class="ev-stat-ic">${clock}</span><div><b>${esc(evTimeLeft(closesAt))}</b><span>Closes In</span></div></div>
     <div class="ev-stat c4"><span class="ev-stat-ic">${checkI}</span><div><b>${ev.auto_certificate ? ev.pass_mark + '%+' : '—'}</b><span>Certificate</span></div></div>
   </div>`;

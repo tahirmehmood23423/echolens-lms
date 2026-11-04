@@ -2508,8 +2508,8 @@ app.get('/api/public/info', (req, res) => {
   res.json({
     // v12: the full catalogue is no longer openly visible - it lives behind
     // sign-in at /open (Courses tab) and GET /api/catalogue.
+    // Learner counts are deliberately not published.
     stats: {
-      students: Users.countByRole('student') + Users.countByRole('free'),
       courses: store.publicCatalogue().length,
       tracks: Quests.tracks().length,
     },
@@ -3332,9 +3332,11 @@ app.get('/api/events', authRequired, (req, res) => {
   const visible = isAdmin ? Events.all()
     : req.user.role === 'free' ? Events.forScope('open')
     : [...new Map([...Events.forScope('portal'), ...Events.forScope('open')].map((e) => [e.id, e])).values()].sort((a, b) => b.id - a.id);
+  const hideCounts = req.user.role === 'free'; // learner numbers are not shown on the open website
   const list = visible
     .map((ev) => ({
       ...ev,
+      ...(hideCounts ? { entries_count: undefined, submissions_count: undefined } : {}),
       // Same redaction as the detail endpoint - the list payload must not
       // leak the exact ShipLens brief to devtools before the task opens.
       problems: !isAdmin && ev.series_kind === 'shiplens' ? Events.shipLensProblems(ev, ['submission', 'grading', 'closed'].includes(ev.shiplens_phase)) : ev.problems,
@@ -3367,7 +3369,7 @@ app.get('/api/events/:id', authRequired, (req, res) => {
     ? Events.shipLensProblems(ev, ['submission', 'grading', 'closed'].includes(d.shiplens_phase))
     : d.problems;
   res.json({
-    event: { ...d, problems: problemsOut, meeting_link: showLink ? d.meeting_link : null },
+    event: { ...d, problems: problemsOut, meeting_link: showLink ? d.meeting_link : null, ...(req.user.role === 'free' ? { entries_count: undefined, submissions_count: undefined } : {}) },
     my_entry: entry, can_participate: gate.ok, participate_msg: gate.ok ? null : gate.why,
     my_submissions: mySubs,
     my_progress: entry ? Events.progressFor(ev, req.user.id) : null,
@@ -4031,17 +4033,14 @@ const KEY_LINKS = {
   registration: process.env.REGISTRATION_FORM_URL || '/open#register',
 };
 app.get(['/api/catalogue', '/api/public/catalogue'], (req, res) => {
-  const enrollment_counts = {};
-  Users.all().forEach((u) => (u.profile?.free_course_enrollments || []).forEach((e) => {
-    if (e.track_key && OpenQuest.enrollment(u.id, e.track_key)) enrollment_counts[e.track_key] = (enrollment_counts[e.track_key] || 0) + 1;
-  }));
+  // Enrolment counts are deliberately not published on the open website.
   res.json({
-    catalogue: store.publicCatalogue().map((c) => ({ ...c, enrollment_count: enrollment_counts[c.track_key] || 0 })),
+    catalogue: store.publicCatalogue(),
     paths: [], // the bundle was built from the retired paid catalogue
     free_families: store.freeFamilies(),
     links: KEY_LINKS,
     cohort: null,
-    counts:{total:store.publicCatalogue().length,free:store.publicCatalogue().filter(c=>c.price_pkr===0).length, open_web_enrollments:Object.values(enrollment_counts).reduce((a,b)=>a+b,0)},
+    counts:{total:store.publicCatalogue().length,free:store.publicCatalogue().filter(c=>c.price_pkr===0).length},
   });
 });
 

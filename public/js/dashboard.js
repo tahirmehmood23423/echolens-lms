@@ -6489,6 +6489,9 @@ async function renderEvents() {
   const el = $('view-events');
   el.innerHTML = '<div class="empty">Loading&hellip;</div>';
   const d = await api('/api/events');
+  // ShipLens has its own section (ShipLens in the sidebar), so it is not
+  // listed among events.
+  d.events = d.events.filter((ev) => ev.series_kind !== 'shiplens');
   const adminBar = d.is_admin ? `<div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <span class="s" style="color:var(--muted)">Create quests, hackathons, competitions and webinars from here - free or paid, inside the portal, on the open website, or both. Everything (fees, pass marks, AI grading, certificates, compiler, emails) is configured per event.</span>
       <span style="flex:1"></span>

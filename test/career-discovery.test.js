@@ -77,7 +77,7 @@ test('Scenario 1 - complete beginner as a guest: skips, scores without penalty, 
   assert.ok(out.body.review.every((x) => x.explanation && x.correct_answer), 'explanations after submitting');
   const skipped = Object.values(out.body.result.areas).filter((a) => a.level === 'skipped');
   assert.ok(skipped.length >= 1 && skipped.every((a) => /fine/.test(a.message)));
-  for (const a of Object.values(out.body.result.areas)) for (const m of a.learn) assert.match(m.url, /^\/open#course\//, 'real free lessons only');
+  assert.ok(!/https?:\/\/|\/open#|"url"/.test(JSON.stringify(out.body.result)), 'no course or lesson links in Career Discovery');
   assert.ok(out.body.result_token, 'a signed result the guest can keep');
   assert.equal(store.allData().users.filter((u) => u.profile?.career).length, 0, 'nothing is stored for a guest');
 });
@@ -130,7 +130,7 @@ test('recommendations are transparent, additive and never close a career to a be
   const ai = D.recommend({ interests: ['ai'], experience: 'never', technologies: ['none'] }, low, tracks);
   assert.equal(ai.recommendations[0].slug, 'ai-machine-learning-engineer', 'no Python and a low quiz score still recommend AI/ML');
   assert.match(ai.recommendations[0].reasons[0], /artificial intelligence/);
-  assert.match(ai.recommendations[0].start, /very beginning.*no experience needed/);
+  assert.match(ai.recommendations[0].start, /very beginning.*no experience needed/i);
   const strong = D.recommend({ interests: ['ai'] }, { score: 95, areas: { 'disc.web': { score: 100, name: 'Internet and web basics' } } }, tracks);
   const lowAll = new Map(ai.all.map((x) => [x.slug, x.score])), strongAll = new Map(strong.all.map((x) => [x.slug, x.score]));
   for (const [slug, sc] of lowAll) assert.ok(strongAll.get(slug) >= sc, `${slug}: quiz results only add points`);

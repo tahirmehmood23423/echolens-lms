@@ -1,6 +1,6 @@
 'use strict';
 /**
- * Career Discovery - pure logic, no storage access.
+ * Career Discovery: pure logic, no storage access.
  *
  * 1. ONBOARDING QUESTIONS: five short, skippable multiple-choice questions.
  *    Answers are self-reported preferences. They are never treated as
@@ -23,7 +23,7 @@ const QUESTIONS = [
     ['software', 'Building software'], ['problems', 'Solving programming problems'], ['testing', 'Testing applications'],
     ['unsure', 'Not sure yet'],
   ] },
-  { id: 'experience', title: 'How much programming have you learned?', hint: 'There is no wrong answer - beginners are very welcome.', multi: false, options: [
+  { id: 'experience', title: 'How much programming have you learned?', hint: 'There is no wrong answer. Beginners are very welcome.', multi: false, options: [
     ['never', 'I have never programmed'], ['basics', 'I know basic concepts'], ['simple', 'I can write simple programs'],
     ['projects', 'I have built small projects'], ['experienced', 'I have experience developing applications'],
   ] },
@@ -174,9 +174,9 @@ function recommend(answers, quiz, tracks, config = DEFAULT_CONFIG) {
     if (!reasons.length) reasons.push('A friendly starting point if you are still exploring: its first stage assumes no experience.');
     const first = (t.first_skills || []).slice(0, 2);
     const startText = start === 'foundation'
-      ? `Start from the very beginning${first.length ? ` with ${joinWords(first)}` : ''} - no experience needed.`
+      ? `Start from the very beginning${first.length ? ` with ${joinWords(first)}` : ''}. No experience needed.`
       : start === 'beginner' ? `You can begin with ${first.length ? joinWords(first) : 'the first stage'}.`
-        : `You may be able to move quickly through ${first.length ? joinWords(first) : 'the first stage'} - a skill check will show you where to start.`;
+        : `You may be able to move quickly through ${first.length ? joinWords(first) : 'the first stage'}. A skill check will show you where to start.`;
     return { slug, title: t.title, score: pts.get(slug), matched: pts.get(slug) > 0, reasons, start: startText };
   });
   return { recommendations, all: ranked.map(([slug, score]) => ({ slug, score })), starting_point: start,

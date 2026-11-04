@@ -37,6 +37,8 @@ Status: implemented on branch `v8-test`. **Not deployed.** Production deployment
 | Gamification for career learning | ⚠ EchoLens gems/streaks exist (`GemEvents`) but are not wired to career activity → Release 5 |
 
 ### Reused, not duplicated
+Design: one palette across the pipeline (teal primary; indigo, amber and sky as soft supporting tints; slate neutrals), solid connectors and lines only, no dash punctuation in student-facing text.
+
 Release 1 reuses the existing quiz engine (`assembleForm`, `publicQuestion`, `gradeResponse`), question-bank management (review/publish/versioning in the admin panel), the track catalogue, the roadmap enrolment rules, rate limiting, auth and the `/career` page shell.
 
 ---
@@ -56,7 +58,7 @@ Exactly the five questions in the brief (interests, programming experience, tech
 ### Discovery quiz (`#discover/quiz`)
 - New bank `career/banks/discovery.js`: **32 MCQs**, 4 in each of 8 areas — how computers work, programming logic, variables and data types, conditions and loops, algorithms, working with data, internet and web, how software is built.
 - Each quiz: **12 questions, ~6 minutes**, every area covered, retakes prefer unseen questions. Concept, predict-the-output, find-the-error and scenario MCQs; every technical word is explained in the question; syntax-highlighted snippets; skip any question; no negative marking; skipped ≠ wrong.
-- After submitting: per-area feedback in positive language ("New to you — a great place to start"), links to real free EchoLens lessons for areas to work on, and a review of every question with the correct answer and explanation.
+- After submitting: per-area feedback in positive language ("New to you, and a great place to start") with a simple meter, and a review of every question with the correct answer and explanation. Career Discovery deliberately links to no courses or lessons: it only suggests a career so the student can choose and enrol in a track. Free courses stay separate.
 - **Screening only:** the result is stored under `career.discovery.quiz`, never as an assessment attempt, so it never becomes verified skill evidence and never affects roadmap readiness.
 
 ### Recommendations (`career/discovery.js`)

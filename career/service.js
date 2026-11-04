@@ -855,10 +855,10 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return { token, minutes: 6, questions: qs };
   }
   const areaLevel = (score) => (score == null ? 'skipped' : score >= 70 ? 'strong' : score >= 40 ? 'developing' : 'new');
-  const AREA_TEXT = { strong: 'You already know a good amount here.', developing: 'You know some of this - a little practice will help.', new: 'New to you - a great place to start learning.', skipped: 'You skipped these questions - that is fine.' };
+  const AREA_TEXT = { strong: 'You already know a good amount here.', developing: 'You know some of this. A little practice will help.', new: 'New to you, and a great place to start.', skipped: 'You skipped these questions, which is fine.' };
   function publicQuizResult(r) {
     return { id: r.id, at: r.at, score: r.score, answered: r.answered, total: r.total, starting_point: r.starting_point,
-      areas: Object.fromEntries(Object.entries(r.areas).map(([k, v]) => [k, { ...v, message: AREA_TEXT[v.level], learn: v.level === 'strong' ? [] : resources(k).slice(0, 2).map((m) => ({ title: m.title, course: m.course, url: m.url })) }])) };
+      areas: Object.fromEntries(Object.entries(r.areas).map(([k, v]) => [k, { ...v, message: AREA_TEXT[v.level] }])) };
   }
   /** Grade a discovery quiz. Works for guests; a signed-in learner's result is saved (once per form). */
   function submitDiscoveryQuiz(user, token, answers = {}, onboarding = null) {

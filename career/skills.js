@@ -15,6 +15,19 @@
 const r = (track, level) => ({ track, level });
 
 const SKILLS = [
+  // ---- Career Discovery quiz areas (beginner screening only) ----
+  // Used only by the short discovery quiz. Results never enter the verified
+  // skill profile; the linked modules are real free EchoLens lessons a
+  // beginner can start with.
+  { id: 'disc.computing', name: 'How computers work', group: 'Discovery', resources: [r('fc01-c-basics', 1), r('fc01-c-basics', 4)] },
+  { id: 'disc.logic', name: 'Programming logic', group: 'Discovery', resources: [r('fc01-c-basics', 9), r('fc01-c-basics', 10)] },
+  { id: 'disc.variables', name: 'Variables and data types', group: 'Discovery', resources: [r('cs104-python', 2)] },
+  { id: 'disc.control', name: 'Conditions and loops', group: 'Discovery', resources: [r('cs104-python', 5), r('cs104-python', 6)] },
+  { id: 'disc.algorithms', name: 'Algorithms and problem solving', group: 'Discovery', resources: [r('tt-dsa-interviews', 1)] },
+  { id: 'disc.data', name: 'Working with data', group: 'Discovery', resources: [r('cs104-python', 7), r('cs104-python', 9)] },
+  { id: 'disc.web', name: 'Internet and web basics', group: 'Discovery', resources: [r('cs106-html-css', 1)] },
+  { id: 'disc.software', name: 'How software is built', group: 'Discovery', resources: [r('web-advanced', 15), r('cs104-python', 15)] },
+
   // ---- Common CS assessment categories ----
   { id: 'cs.programming', name: 'Programming fundamentals', group: 'Common CS', resources: [r('cs104-python', 2), r('cs104-python', 5), r('cs104-python', 6), r('cs104-python', 10)] },
   { id: 'cs.logic', name: 'Logical problem solving', group: 'Common CS', resources: [r('fc01-c-basics', 9), r('fc01-c-basics', 10), r('tt-dsa-interviews', 1)] },

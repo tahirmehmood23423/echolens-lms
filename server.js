@@ -5523,7 +5523,9 @@ require('./coursepages').register(app); // SEO landing page per course: /courses
 require('./career/routes').register(app, { store, authRequired, adminRequired, rateLimit,
   // Rubric SUGGESTIONS for human reviewers only - never an automatic grade.
   aiSuggest: ai.enabled() ? (uid, args) => ai.rubricSuggest(uid, args) : null,
-  notify: (to, subject, text) => mailer.notify(to, subject, text), appUrl: APP_URL });
+  notify: (to, subject, text) => mailer.notify(to, subject, text), appUrl: APP_URL,
+  // Career Discovery is open to guests; signed-in learners get their progress saved.
+  optionalUser: (req) => currentUser(req), secret: JWT_SECRET });
 app.get(['/career', '/career/'], (req, res) => res.type('html').send(require('./career/page').render()));
 require('./talent').register(app, { authRequired, requireRecruiter, APP_URL, UPLOAD_DIR }); // Talent Marketplace: student profiles, projects, search (Phases 2-4)
 require('./talent-hiring').register(app, { authRequired, requireRecruiter, adminRequired, APP_URL, UPLOAD_DIR }); // Talent Marketplace: contact gating, shortlists, messaging, admin safety/analytics (Phases 5-6)

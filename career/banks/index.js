@@ -9,6 +9,8 @@ const alt = { ...require('./alt-web'), ...require('./alt-ai-mobile'), ...require
 const web = require('./mcq-web'), ai = require('./mcq-ai'), dat = require('./mcq-data'), so = require('./mcq-sec-ops'), qsm = require('./mcq-qa-se-mobile');
 
 const BANKS = {
+  // Career Discovery screening quiz: beginner-friendly, never enters the skill profile.
+  discovery: { title: 'Career Discovery quiz', questions: require('./discovery') },
   common: { title: 'Common Computer Science Assessment', questions: [...require('./common'), ...core.common, ...require('./mcq-common')] },
   frontend: { title: 'Frontend skills', questions: [...require('./frontend'), ...core.frontend, ...alt.frontend, ...web.frontend] },
   backend: { title: 'Backend skills', questions: [...require('./backend'), ...core.backend, ...alt.backend, ...web.backend] },

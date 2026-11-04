@@ -7733,12 +7733,12 @@ async function careerOverviewCard(el) {
   const rms = r.roadmaps || { enrollments: [] }, p = rms.primary, prog = p?.progress;
   const secondary = rms.enrollments.filter((e) => e.status === 'active' && !e.primary);
   const next = r.active ? ['#take', 'Resume ' + r.active.title]
-    : !p ? ['#me', 'Choose a career roadmap']
+    : !p ? ['#discover', 'Discover your career']
       : prog?.next_activity ? [prog.next_activity.href.startsWith('#') ? prog.next_activity.href : '#me', prog.next_activity.label] : ['#roadmap', 'Open my roadmap'];
   const href = (h) => (h.startsWith('/') ? h : '/career' + h);
   const card = document.createElement('div');
   card.className = 'card';
-  card.innerHTML = `<div class="card-head"><h3>My career roadmaps</h3><a class="btn btn-ghost btn-sm" href="/career#me">Manage</a></div>
+  card.innerHTML = `<div class="card-head"><h3>My career roadmaps</h3><span style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-ghost btn-sm" href="/career#discover">Career Discovery</a><a class="btn btn-ghost btn-sm" href="/career#me">Manage</a></span></div>
     <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
       <div style="min-width:160px"><div class="s" style="color:var(--muted)">Primary roadmap</div><strong>${esc(p ? p.title : 'Not chosen yet')}</strong>${secondary.length ? `<div class="s" style="color:var(--muted)">+ ${secondary.map((e) => esc(e.title)).join(', ')}</div>` : ''}</div>
       <div style="min-width:140px"><div class="s" style="color:var(--muted)">Assessed level (provisional)</div><strong>${esc(prog?.level || 'Not assessed')}</strong></div>

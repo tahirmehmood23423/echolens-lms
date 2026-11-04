@@ -1,6 +1,7 @@
 'use strict';
 /*
  * EchoLens career paths (/career). One small hash-routed app:
+ *   #discover[/...]    Career Discovery: welcome, questions, quiz, matches (career-discovery.js)
  *   #tracks            explore the 12 tracks (public)
  *   #track/<slug>      track detail (public)
  *   #me                My Career Roadmaps (Primary, Secondary, paused, add)
@@ -32,7 +33,7 @@
   const CAT_DESC = { theory: 'concepts and code tracing', practical: 'hands-on coding, debugging and configuration', scenario: 'real-world problems and decisions' };
   const pctTxt = (v) => (v == null ? '-' : v + '%');
   const status = (s) => `<span class="cr-status" data-icon="${STATUS_ICON[s] || ''}" style="color:${STATUS_COLOR[s] || 'inherit'}">${esc(s)}</span>`;
-  const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['tracks', 'Career tracks'], ['me', 'My roadmaps'], ['report', 'My skill report'], ['roadmap', 'My roadmap'], ['history', 'Assessment history']]
+  const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['discover', 'Discover'], ['tracks', 'Career tracks'], ['me', 'My roadmaps'], ['report', 'My skill report'], ['roadmap', 'My roadmap'], ['history', 'Assessment history']]
     .map(([k, l]) => `<a href="#${k}"${cur === k ? ' aria-current="page"' : ''}>${l}</a>`).join('')}</nav>`;
   const learner = () => ME && ['free', 'student'].includes(ME.role);
   function needLogin(what) {
@@ -185,7 +186,7 @@
         : `${rm.common.reason === 'expired' ? 'Your common computer-science result has expired.' : rm.common.reason === 'insufficient' ? 'Your common computer-science result did not have enough answers to verify your skills.' : 'You have not taken the common computer-science assessment yet.'} Every roadmap starts from it. <a href="#assess/common">Take it now</a>`}</div>
       ${advice ? adviceBox(advice) : ''}
       ${rm.primary ? `<h2>Primary roadmap</h2>${roadmapCard(rm.primary, rm, true)}`
-        : `<div class="cr-panel"><h3>${rm.enrollments.length ? 'No active roadmap' : 'You are not following a roadmap yet'}</h3><p class="cr-small">${paused.length ? 'Resume a paused roadmap below, or add a new one.' : 'Choose a career track below to get a personalised, assessment-based roadmap.'} You can still take any assessment and use every course.</p></div>`}
+        : `<div class="cr-panel"><h3>${rm.enrollments.length ? 'No active roadmap' : 'You are not following a roadmap yet'}</h3><p class="cr-small">${paused.length ? 'Resume a paused roadmap below, or add a new one.' : 'Choose a career track below to get a personalised, assessment-based roadmap.'} You can still take any assessment and use every course.</p><div class="cr-actions"><a class="cr-btn" href="#discover">Not sure? Try Career Discovery</a></div></div>`}
       ${secondary.length ? `<h2>Secondary roadmaps</h2><div class="cr-road-grid">${secondary.map((e) => roadmapCard(e, rm, false)).join('')}</div>` : ''}
       ${paused.length ? `<h2>Paused</h2><div class="cr-road-grid">${paused.map((e) => roadmapCard(e, rm, false)).join('')}</div>` : ''}
       <section class="cr-panel" aria-labelledby="crAddH"><h3 id="crAddH">Add a roadmap</h3>
@@ -491,16 +492,21 @@
   }
 
   /* --------------------------------- router --------------------------------- */
+  /** What the Career Discovery screens (career-discovery.js) need from this app. */
+  const discoveryCtx = () => ({ root, api, tabs, loginUrl, loadMe, get ME() { return ME; }, setAdvice: (a) => { PENDING_ADVICE = a; } });
   async function loadMe() {
     try { ME = await api('/api/auth/me'); } catch { ME = null; }
     if (ME) { try { ME.career = await api('/api/career/me'); } catch { ME.career = null; } }
   }
   async function route() {
     clearInterval(TICK);
-    const [view, arg] = decodeURIComponent(location.hash.slice(1) || 'tracks').split('/');
+    // No hash: open Career Discovery once for people with no career activity yet; everyone else sees the tracks.
+    if (!location.hash && window.CareerDiscovery && await CareerDiscovery.shouldAutoShow(discoveryCtx())) { history.replaceState(null, '', '#discover'); }
+    const [view, arg, sub] = decodeURIComponent(location.hash.slice(1) || 'tracks').split('/');
     document.title = 'Career Paths & Skill Assessment | EchoLens';
     try {
-      if (view === 'track' && arg) await viewTrack(arg);
+      if (view === 'discover' && window.CareerDiscovery) await CareerDiscovery.render(discoveryCtx(), arg, sub);
+      else if (view === 'track' && arg) await viewTrack(arg);
       else if (view === 'me') { const a = PENDING_ADVICE; PENDING_ADVICE = null; await viewMe(a); }
       else if (view === 'onboarding') await viewOnboarding();
       else if (view === 'assess' && arg) await viewAssessIntro(arg);

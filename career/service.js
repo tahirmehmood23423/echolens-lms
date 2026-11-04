@@ -19,6 +19,7 @@ const E = require('./engine');
 const { SKILLS, skill } = require('./skills');
 const { TRACKS, STAGE_NAMES, track: baseTrack } = require('./tracks');
 const R = require('./roadmaps');
+const D = require('./discovery');
 
 const { BANKS } = require('./banks');
 const REVIEWER_ROLES = ['admin', 'instructor'];
@@ -27,7 +28,9 @@ const MAX_HISTORY = 60;
 const QUESTION_STATUSES = ['draft', 'reviewed', 'published', 'retired'];
 const TRACK_STATUSES = ['draft', 'published'];
 
-function createCareerService(store, { now = () => new Date(), aiSuggest = null, notify = null, appUrl = '' } = {}) {
+function createCareerService(store, { now = () => new Date(), aiSuggest = null, notify = null, appUrl = '', secret = null } = {}) {
+  // Signs Career Discovery quiz forms and results, so guests can take the quiz without an account.
+  const SIGNING_KEY = secret || crypto.randomBytes(32).toString('hex');
   const data = () => store.allData();
   const settings = () => { const d = data(); if (!d.settings) d.settings = {}; return d.settings; };
   const save = () => store.persist();
@@ -225,7 +228,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       return { key, title: BANKS.common.title, banks: ['common'], plan, enabled: cfg.enabled.common !== false, reviewItems: 0, weights: categoryWeights('common') };
     }
     if (String(key).startsWith('skill:')) {
-      const id = key.slice(6); if (!skill(id)) return null;
+      const id = key.slice(6); if (!skill(id) || skill(id).group === 'Discovery') return null;
       const banks = Object.keys(BANKS).filter((b) => BANKS[b].questions.some((q) => q.skills[0] === id) || qstate().custom.some((q) => q.bank === b && q.skills[0] === id));
       // Short and mostly auto-graded. One staff-reviewed item (where the skill
       // has one) lets a student prove practical or written ability that repeat
@@ -272,7 +275,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   /* ----------------------------- student records ----------------------------- */
   function career(user) {
     const c = user.profile?.career || {};
-    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null };
+    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null, discovery: c.discovery || null };
   }
   function writeCareer(user, next) {
     const attempts = next.attempts.slice(-MAX_HISTORY);
@@ -735,6 +738,210 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
       active_count: list.filter((e) => e.status === 'active').length, common: commonStatus(user) };
   }
 
+  /* ------------------------------- career discovery ------------------------------- */
+  /**
+   * The first-run journey: welcome, five optional questions, a short
+   * beginner-friendly quiz, and transparent track suggestions. The quiz is a
+   * screening tool only: its result is stored under career.discovery, never
+   * as an assessment attempt, so it does not enter the verified skill profile
+   * or count as evidence for any roadmap.
+   *
+   * Guests can do all of it without an account. The server signs the quiz
+   * form and the graded result (HMAC); a guest who later signs in can attach
+   * that signed result to their account, and nothing unsigned is trusted.
+   */
+  const DISCOVERY_PLAN = { 'disc.computing': 2, 'disc.logic': 2, 'disc.variables': 1, 'disc.control': 2, 'disc.algorithms': 1, 'disc.data': 1, 'disc.web': 2, 'disc.software': 1 };
+  const DISCOVERY_FORM_TTL = 3 * 3600e3, DISCOVERY_RESULT_TTL = 60 * 86400e3;
+  function signToken(payload) {
+    const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    return body + '.' + crypto.createHmac('sha256', SIGNING_KEY).update('career-discovery:' + body).digest('base64url');
+  }
+  function readToken(token, kind, ttl) {
+    const [body, mac] = String(token || '').split('.');
+    if (!body || !mac) return null;
+    const want = crypto.createHmac('sha256', SIGNING_KEY).update('career-discovery:' + body).digest();
+    const got = Buffer.from(mac, 'base64url');
+    if (got.length !== want.length || !crypto.timingSafeEqual(got, want)) return null;
+    let p; try { p = JSON.parse(Buffer.from(body, 'base64url').toString()); } catch { return null; }
+    if (!p || p.k !== kind || typeof p.iat !== 'number' || now().getTime() - p.iat > ttl) return null;
+    return p;
+  }
+  function discoveryConfig() {
+    const o = settings().career_discovery_config;
+    return o ? { ...D.DEFAULT_CONFIG, ...o, weights: { ...D.DEFAULT_CONFIG.weights, ...(o.weights || {}) } } : { ...D.DEFAULT_CONFIG };
+  }
+  function updateDiscoveryConfig(patch, actorId) {
+    const cur = discoveryConfig(), { version, updated_at, updated_by, ...rest } = { ...cur, ...(patch || {}) };
+    const v = D.validateConfig(rest, TRACKS.map((t) => t.slug));
+    if (v.error) return { error: v.error, status: 400 };
+    const next = { ...v.config, version: (cur.version || 1) + 1, updated_at: iso(), updated_by: actorId || null };
+    settings().career_discovery_config = next; save();
+    audit(actorId, 'career_discovery_config_update', 'career_discovery_config', next.version, { keys: Object.keys(patch || {}) });
+    return { config: next };
+  }
+  function resetDiscoveryConfig(actorId) {
+    const cur = discoveryConfig();
+    settings().career_discovery_config = { ...D.DEFAULT_CONFIG, version: (cur.version || 1) + 1, updated_at: iso(), updated_by: actorId || null }; save();
+    audit(actorId, 'career_discovery_config_reset', 'career_discovery_config', settings().career_discovery_config.version, {});
+    return { config: settings().career_discovery_config };
+  }
+  const discoveryTracks = () => tracks().filter((t) => t.status === 'published')
+    .map((t) => ({ slug: t.slug, title: t.title, overview: t.overview, duration: t.duration, suitability: t.suitability, first_skills: (t.stages[0]?.skills || []).map((id) => skill(id)?.name).filter(Boolean) }));
+  /** Everything the public discovery pages need. */
+  function discoveryInfo() {
+    const cfg = discoveryConfig();
+    return { enabled: cfg.enabled !== false, questions: D.QUESTIONS.map((q) => ({ id: q.id, title: q.title, hint: q.hint, multi: q.multi, options: q.options.map(([id, text]) => ({ id, text })) })),
+      tracks: discoveryTracks(), quiz: { items: Object.values(DISCOVERY_PLAN).reduce((a, b) => a + b, 0), minutes: 6, available: quizCoverageOk() } };
+  }
+  function quizCoverageOk() {
+    const pool = published('discovery');
+    return Object.entries(DISCOVERY_PLAN).every(([sk, n]) => pool.filter((q) => q.skills[0] === sk && q.options.length).length >= n);
+  }
+  /** A learner's discovery record, and whether to show the welcome automatically (only to people with no career activity yet). */
+  function discoveryState(user) {
+    const c = career(user), d = c.discovery;
+    const busy = !!(c.preferences || c.attempts.length || (c.enrollments || []).length);
+    return { enabled: discoveryConfig().enabled !== false, show_welcome: discoveryConfig().enabled !== false && isLearner(user) && !d && !busy,
+      discovery: d ? publicDiscovery(d) : null };
+  }
+  function publicDiscovery(d) {
+    return { answers: d.answers || {}, step: d.step || 0, started_at: d.started_at || null, completed_at: d.completed_at || null, dismissed_at: d.dismissed_at || null,
+      quiz: d.quiz ? publicQuizResult(d.quiz) : null, chosen_track: d.chosen_track || null, chosen_recommended: d.chosen_recommended ?? null,
+      active_quiz: d.active && now().getTime() - Date.parse(d.active.at) < DISCOVERY_FORM_TTL ? { token: d.active.token } : null };
+  }
+  function writeDiscovery(user, patch) {
+    const c = career(user), d = { ...(c.discovery || {}), ...patch, updated_at: iso() };
+    if (!d.started_at) d.started_at = iso();
+    writeCareer(user, { ...c, discovery: d });
+    return d;
+  }
+  /** Save onboarding answers / progress. Everything is optional. */
+  function saveDiscovery(user, b = {}) {
+    if (!isLearner(user)) return { error: 'Career Discovery is for learner accounts.', status: 403 };
+    if (discoveryConfig().enabled === false) return { error: 'Career Discovery is not available right now.', status: 404 };
+    const cur = career(user).discovery || {}, patch = {};
+    if (b.answers !== undefined) patch.answers = D.cleanAnswers({ ...(cur.answers || {}), ...(b.answers || {}) });
+    if (b.replace_answers) patch.answers = D.cleanAnswers(b.answers || {});
+    if (b.step !== undefined) patch.step = Math.max(0, Math.min(10, Math.round(Number(b.step) || 0)));
+    if (b.dismissed) patch.dismissed_at = iso();
+    if (b.completed) patch.completed_at = iso();
+    if (b.chosen_track !== undefined) {
+      if (!track(b.chosen_track)) return { error: 'Career track not found.', status: 404 };
+      const recs = discoveryRecommendations(user).recommendations.map((r) => r.slug);
+      patch.chosen_track = b.chosen_track; patch.chosen_recommended = recs.includes(b.chosen_track); patch.chosen_at = iso();
+    }
+    writeDiscovery(user, patch);
+    return { discovery: publicDiscovery(career(user).discovery) };
+  }
+  /** Start the discovery quiz. Works for guests (user = null). */
+  function startDiscoveryQuiz(user) {
+    if (discoveryConfig().enabled === false) return { error: 'Career Discovery is not available right now.', status: 404 };
+    if (user && !isLearner(user)) return { error: 'Career Discovery is for learner accounts.', status: 403 };
+    const pool = published('discovery').filter((q) => q.options.length);
+    if (!quizCoverageOk()) return { error: 'The discovery quiz is not available yet.', status: 409 };
+    const seen = new Set(user ? (career(user).discovery?.quiz?.responses || []).map((r) => r.id) : []);
+    const form = E.assembleForm({ pool, plan: DISCOVERY_PLAN, seen, seed: crypto.randomInt(1, 2 ** 31) });
+    const byId = new Map(pool.map((q) => [q.id, q]));
+    const items = form.items.map((it) => [it.id, it.version, it.order]);
+    const token = signToken({ k: 'dq', items, iat: now().getTime(), n: crypto.randomBytes(9).toString('base64url'), u: user ? user.id : null });
+    if (user) writeDiscovery(user, { active: { token, at: iso() } });
+    return { token, minutes: 6, questions: form.items.map((it) => E.publicQuestion(byId.get(it.id), it.order)) };
+  }
+  /** Rebuild the public questions of a signed form (to resume a quiz). */
+  function resumeDiscoveryQuiz(token) {
+    const p = readToken(token, 'dq', DISCOVERY_FORM_TTL); if (!p) return { error: 'This quiz has expired. Please start a new one.', status: 410 };
+    const qs = p.items.map(([id, , order]) => { const q = questionById(id); return q ? E.publicQuestion(q, order) : null; });
+    if (qs.some((q) => !q)) return { error: 'This quiz has changed. Please start a new one.', status: 409 };
+    return { token, minutes: 6, questions: qs };
+  }
+  const areaLevel = (score) => (score == null ? 'skipped' : score >= 70 ? 'strong' : score >= 40 ? 'developing' : 'new');
+  const AREA_TEXT = { strong: 'You already know a good amount here.', developing: 'You know some of this - a little practice will help.', new: 'New to you - a great place to start learning.', skipped: 'You skipped these questions - that is fine.' };
+  function publicQuizResult(r) {
+    return { id: r.id, at: r.at, score: r.score, answered: r.answered, total: r.total, starting_point: r.starting_point,
+      areas: Object.fromEntries(Object.entries(r.areas).map(([k, v]) => [k, { ...v, message: AREA_TEXT[v.level], learn: v.level === 'strong' ? [] : resources(k).slice(0, 2).map((m) => ({ title: m.title, course: m.course, url: m.url })) }])) };
+  }
+  /** Grade a discovery quiz. Works for guests; a signed-in learner's result is saved (once per form). */
+  function submitDiscoveryQuiz(user, token, answers = {}, onboarding = null) {
+    const p = readToken(token, 'dq', DISCOVERY_FORM_TTL);
+    if (!p) return { error: 'This quiz has expired or is not valid. Please start a new one.', status: 410 };
+    if (p.u && (!user || user.id !== p.u)) return { error: 'This quiz belongs to another account.', status: 403 };
+    if (user && !isLearner(user)) return { error: 'Career Discovery is for learner accounts.', status: 403 };
+    const prev = user ? career(user).discovery?.quiz : null;
+    if (prev && prev.id === p.n) return { ...discoveryOutcome(user, null, prev), duplicate: true };
+    const responses = [], areas = {};
+    for (const [id, version] of p.items) {
+      const q = questionById(id);
+      if (!q || q.version !== version) return { error: 'A question changed while you were taking the quiz. Please start a new one.', status: 409 };
+      const g = E.gradeResponse(q, answers ? answers[id] : null), sk = q.skills[0];
+      const a = areas[sk] || (areas[sk] = { name: skill(sk)?.name || sk, total: 0, answered: 0, correct: 0, earned: 0, possible: 0 });
+      a.total++;
+      if (g.answered) { a.answered++; a.possible += q.points; a.earned += g.earned; if (g.correct) a.correct++; }
+      responses.push({ id, version, answer: g.answered ? answers[id] : null, answered: g.answered, correct: g.correct });
+    }
+    let earned = 0, possible = 0;
+    for (const a of Object.values(areas)) { earned += a.earned; possible += a.possible; a.score = a.possible ? Math.round((a.earned / a.possible) * 100) : null; a.level = areaLevel(a.score); delete a.earned; delete a.possible; }
+    const answered = responses.filter((r) => r.answered).length;
+    const score = possible ? Math.round((earned / possible) * 100) : null;
+    const result = { id: p.n, at: iso(), score, answered, total: responses.length, areas, responses, bank_version: 'discovery-v1' };
+    result.starting_point = D.startingPoint(result, D.cleanAnswers(onboarding || career(user || {}).discovery?.answers || {}));
+    if (user) {
+      const hist = [...(career(user).discovery?.quiz_history || []), ...(prev ? [{ id: prev.id, at: prev.at, score: prev.score }] : [])].slice(-10);
+      writeDiscovery(user, { quiz: result, quiz_history: hist, active: null, completed_at: career(user).discovery?.completed_at || iso() });
+    }
+    return discoveryOutcome(user, onboarding, result);
+  }
+  /** Graded result + per-question review + recommendations + a signed result a guest can claim later. */
+  function discoveryOutcome(user, onboarding, result) {
+    const review = result.responses.map((r) => {
+      const q = questionById(r.id); if (!q) return null;
+      const chosen = q.options.find((o) => o.id === String(r.answer));
+      return { id: r.id, prompt: q.prompt, code: q.code, area: skill(q.skills[0])?.name, answered: r.answered, correct: r.correct,
+        your_answer: chosen ? chosen.text : null, correct_answer: q.options.filter((o) => q.answer.includes(o.id)).map((o) => o.text).join(', '), explanation: q.explanation };
+    }).filter(Boolean);
+    const answersForRecs = onboarding ? D.cleanAnswers(onboarding) : D.cleanAnswers(user ? career(user).discovery?.answers || {} : {});
+    const recs = D.recommend(answersForRecs, result, discoveryTracks(), discoveryConfig());
+    const { responses, ...summary } = result;
+    return { result: publicQuizResult(result), review, ...recs,
+      result_token: signToken({ k: 'dr', iat: now().getTime(), result: { ...summary, responses: responses.map((r) => [r.id, r.version, r.answered ? 1 : 0, r.correct ? 1 : 0]) } }) };
+  }
+  /** Recommendations for a learner (stored answers and quiz) or a guest (answers + signed result). */
+  function discoveryRecommendations(user, { answers, result_token } = {}) {
+    let quiz = null;
+    if (user) quiz = career(user).discovery?.quiz || null;
+    else if (result_token) { const p = readToken(result_token, 'dr', DISCOVERY_RESULT_TTL); if (p) quiz = p.result; }
+    const a = user && answers === undefined ? career(user).discovery?.answers || {} : answers || {};
+    const recs = D.recommend(D.cleanAnswers(a), quiz, discoveryTracks(), discoveryConfig());
+    return { ...recs, quiz: quiz ? publicQuizResult({ ...quiz, responses: [] }) : null };
+  }
+  /** After signing in: keep the guest's answers and (verified) quiz result. Never overwrites a newer saved result. */
+  function claimDiscovery(user, { answers, result_token, step } = {}) {
+    if (!isLearner(user)) return { error: 'Career Discovery is for learner accounts.', status: 403 };
+    const cur = career(user).discovery || {}, patch = {};
+    if (answers && !Object.keys(cur.answers || {}).length) patch.answers = D.cleanAnswers(answers);
+    if (step !== undefined && !cur.step) patch.step = Math.max(0, Math.min(10, Math.round(Number(step) || 0)));
+    if (result_token) {
+      const p = readToken(result_token, 'dr', DISCOVERY_RESULT_TTL);
+      if (!p) return { error: 'That quiz result has expired or is not valid.', status: 400 };
+      if (!cur.quiz || Date.parse(cur.quiz.at) < Date.parse(p.result.at)) {
+        const r = p.result;
+        patch.quiz = { ...r, responses: (r.responses || []).map(([id, version, answered, correct]) => ({ id, version, answered: !!answered, correct: !!correct, answer: null })), claimed: true };
+        patch.completed_at = cur.completed_at || iso();
+      }
+    }
+    writeDiscovery(user, patch);
+    return { discovery: publicDiscovery(career(user).discovery) };
+  }
+  /** Admin view: how discovery is used, and how often students choose a track that was not suggested. */
+  function discoveryAnalytics() {
+    const learners = data().users.filter(isLearner), ds = learners.map((u) => career(u).discovery).filter(Boolean);
+    const chosen = ds.filter((d) => d.chosen_track);
+    const byTrack = {};
+    for (const d of chosen) byTrack[d.chosen_track] = (byTrack[d.chosen_track] || 0) + 1;
+    return { started: ds.length, answered_questions: ds.filter((d) => Object.keys(d.answers || {}).length).length, took_quiz: ds.filter((d) => d.quiz).length,
+      dismissed: ds.filter((d) => d.dismissed_at && !d.quiz).length, chose_track: chosen.length, chose_unrecommended: chosen.filter((d) => d.chosen_recommended === false).length,
+      chosen_tracks: Object.entries(byTrack).map(([slug, n]) => ({ slug, title: track(slug)?.title || slug, learners: n })).sort((a, b) => b.learners - a.learners) };
+  }
+
   /* --------------------------------- reports --------------------------------- */
   function report(user, slug) {
     const c = career(user), cfg = config();
@@ -872,6 +1079,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   return {
     BANKS, LANGS, PREF_FIELDS, REVIEWER_ROLES, config, updateConfig, categoryWeights, reviewQueue, suggestReview, submitReview, isReviewer, questions, published, questionById, setQuestionStatus, editQuestion, addQuestion,
     track, tracks, updateTrack, publicTrack, assessmentDef, coverage, availability, career, savePreferences, startAttempt, resumeAttempt, saveAnswers,
+    discoveryInfo, discoveryConfig, updateDiscoveryConfig, resetDiscoveryConfig, discoveryState, saveDiscovery, startDiscoveryQuiz, resumeDiscoveryQuiz, submitDiscoveryQuiz, discoveryRecommendations, claimDiscovery, discoveryAnalytics,
     skillRecords, trackProfile, trackPlan, commonStatus, enrollments, listEnrollments, enrollTrack, enrollmentAdvice, makePrimary, pauseTrack, resumeTrack, archiveTrack, refreshEnrollments,
     submitAttempt, abandonAttempt, attemptReview, resources, contentGaps, report, history, setProject, analytics, preview, isLearner,
   };

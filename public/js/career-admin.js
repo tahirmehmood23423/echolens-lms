@@ -11,7 +11,7 @@
  * content gaps).
  */
 let CA_TAB = 'overview', CA_BANK = 'common', CA_FILTER = '', CA_DATA = null;
-const CA_TABS = [['overview', 'Overview'], ['questions', 'Question banks'], ['scoring', 'Scoring rules'], ['tracks', 'Career tracks'], ['preview', 'Preview a form'], ['insights', 'Insights']];
+const CA_TABS = [['overview', 'Overview'], ['questions', 'Question banks'], ['scoring', 'Scoring rules'], ['tracks', 'Career tracks'], ['preview', 'Preview a form'], ['insights', 'Insights'], ['discovery', 'Career Discovery']];
 
 async function renderAdminCareer(tab) {
   if (tab) CA_TAB = tab;
@@ -20,7 +20,7 @@ async function renderAdminCareer(tab) {
   CA_DATA = await api('/api/admin/career/overview');
   const head = `<div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap">${CA_TABS.map(([k, l]) => `<button class="btn btn-sm ${CA_TAB === k ? 'btn-primary' : 'btn-ghost'}" onclick="renderAdminCareer('${k}')">${l}</button>`).join('')}
     <span style="flex:1"></span><a class="btn btn-ghost btn-sm" href="/career" target="_blank" rel="noopener">Open student view</a></div></div>`;
-  const body = await ({ overview: caOverview, questions: caQuestions, scoring: caScoring, tracks: caTracks, preview: caPreview, insights: caInsights }[CA_TAB])();
+  const body = await ({ overview: caOverview, questions: caQuestions, scoring: caScoring, tracks: caTracks, preview: caPreview, insights: caInsights, discovery: caDiscovery }[CA_TAB])();
   el.innerHTML = head + body;
   caWire();
 }
@@ -204,6 +204,7 @@ function caWire() {
     if (b.dataset.caBulk === 'published' && !confirm(`Publish ${ids.length} question(s)? Only publish questions you have read and checked.`)) return;
     try { const out = await api('/api/admin/career/questions/status', { method: 'POST', body: JSON.stringify({ ids, status: b.dataset.caBulk }) }); toast(`${out.updated} question(s) marked ${b.dataset.caBulk}.`); renderAdminCareer('questions'); } catch (e) { toast(e.message, true); }
   }));
+  caDiscoveryWire();
   const cfg = $('caCfg');
   if (cfg) cfg.addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target, c = CA_DATA.config;
@@ -230,6 +231,38 @@ function caWire() {
           ${q.options.length ? `<ul class="s">${q.options.map((o) => `<li>${q.answer.includes(o.id) ? '<b>✓ ' + esc(o.text) + '</b>' : esc(o.text)}</li>`).join('')}</ul>` : `<div class="s">Accepted: <b>${q.answer.map(esc).join(' | ')}</b></div>`}</li>`).join('')}</ol>`;
     } catch (e) { out.innerHTML = `<p class="form-msg err">${esc(e.message)}</p>`; }
   };
+}
+/**
+ * Career Discovery: on/off flag, usage, and the transparent matching rules
+ * (answer option -> career tracks, plus weights). Saved as a new version;
+ * the server validates every option id and track slug.
+ */
+async function caDiscovery() {
+  const d = await api('/api/admin/career/discovery'), c = d.config, a = d.analytics;
+  const { version, updated_at, updated_by, enabled, ...rules } = c;
+  return `<div class="card"><div class="card-head"><h3>Career Discovery</h3><span class="s" style="color:var(--muted)">Rules version ${version}${updated_at ? ' &middot; updated ' + esc(String(updated_at).slice(0, 16).replace('T', ' ')) : ''}</span></div><div class="card-body">
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="caDiscOn"${enabled ? ' checked' : ''} style="width:auto"> <span><b>Enabled</b> - the welcome, questions, quiz and suggestions at /career#discover</span></label>
+      <p class="s" style="color:var(--muted);margin-top:8px">${a.started} learner(s) started &middot; ${a.took_quiz} took the quiz &middot; ${a.chose_track} chose a track (${a.chose_unrecommended} chose one that was not suggested) &middot; ${a.dismissed} skipped</p>
+      ${a.chosen_tracks.length ? `<div>${a.chosen_tracks.map((t) => `<span class="chip">${esc(t.title)}: ${t.learners}</span>`).join(' ')}</div>` : ''}
+    </div></div>
+    <div class="card"><div class="card-head"><h3>Matching rules</h3><span class="s" style="color:var(--muted)">Each answer option lists the tracks it adds points to. Rules only add points - a low quiz score never removes a track.</span></div><div class="card-body">
+      <p class="s">Answer options: ${d.questions.map((q) => `<b>${esc(q.id)}</b>: ${q.options.map((o) => esc(o.id)).join(', ')}`).join(' &middot; ')}</p>
+      <p class="s">Track slugs: ${d.tracks.map((t) => esc(t.slug)).join(', ')}</p>
+      <label class="field"><span>Rules (JSON)</span><textarea id="caDiscRules" rows="22" spellcheck="false" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px">${esc(JSON.stringify(rules, null, 2))}</textarea></label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" id="caDiscSave">Save as new version</button><button class="btn btn-ghost btn-sm" id="caDiscReset">Reset to defaults</button></div>
+      <p class="form-msg" id="caDiscMsg"></p>
+    </div></div>`;
+}
+function caDiscoveryWire() {
+  const save = $('caDiscSave'); if (!save) return;
+  const msg = $('caDiscMsg');
+  $('caDiscOn').onchange = async (e) => { try { await api('/api/admin/career/discovery', { method: 'PUT', body: JSON.stringify({ enabled: e.target.checked }) }); toast(e.target.checked ? 'Career Discovery enabled.' : 'Career Discovery turned off.'); } catch (err) { toast(err.message, true); } };
+  save.onclick = async () => {
+    let rules; try { rules = JSON.parse($('caDiscRules').value); } catch (e) { msg.textContent = 'That is not valid JSON: ' + e.message; msg.className = 'form-msg err'; return; }
+    try { await api('/api/admin/career/discovery', { method: 'PUT', body: JSON.stringify(rules) }); toast('Matching rules saved as a new version.'); renderAdminCareer('discovery'); }
+    catch (err) { msg.textContent = err.message; msg.className = 'form-msg err'; }
+  };
+  $('caDiscReset').onclick = async () => { if (!confirm('Reset the matching rules to the built-in defaults?')) return; try { await api('/api/admin/career/discovery/reset', { method: 'POST' }); toast('Rules reset.'); renderAdminCareer('discovery'); } catch (err) { toast(err.message, true); } };
 }
 window.renderAdminCareer = renderAdminCareer; window.caEditQuestion = caEditQuestion; window.caEditTrack = caEditTrack;
 

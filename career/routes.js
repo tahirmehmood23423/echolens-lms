@@ -14,8 +14,10 @@ const express = require('express');
 const { createCareerService } = require('./service');
 const { SKILLS } = require('./skills');
 
-function register(app, { store, authRequired, adminRequired, rateLimit, aiSuggest = null, notify = null, appUrl = '' }) {
-  const svc = createCareerService(store, { aiSuggest, notify, appUrl });
+function register(app, { store, authRequired, adminRequired, rateLimit, aiSuggest = null, notify = null, appUrl = '', optionalUser = null, secret = null }) {
+  const svc = createCareerService(store, { aiSuggest, notify, appUrl, secret });
+  // Signed-in user if there is one; null for guests (Career Discovery is open to everyone).
+  const who = (req) => { try { const u = optionalUser ? optionalUser(req) : null; return u ? store.Users.byId(u.id) : null; } catch { return null; } };
   const r = express.Router();
   const me = (req) => store.Users.byId(req.user.id);
   const send = (res, out, ok = (o) => o) => (out && out.error ? res.status(out.status || 400).json({ error: out.error, ...(out.retry_at ? { retry_at: out.retry_at } : {}), ...(out.active ? { active: out.active } : {}), ...(out.reuse ? { reuse: true } : {}) }) : res.json(ok(out)));
@@ -30,6 +32,31 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
     res.json({ track: svc.publicTrack(t) });
   });
   r.get('/career/options', (req, res) => res.json({ preferences: svc.PREF_FIELDS, languages: svc.LANGS, tracks: svc.tracks().map((t) => ({ slug: t.slug, title: t.title })) }));
+
+  /* ---------------------------- career discovery ---------------------------- */
+  // Open to guests: welcome, questions, quiz and suggestions. Signing in is
+  // needed only to save progress (and a guest result can be claimed after).
+  const limitDisc = rateLimit ? rateLimit('career-discovery', { max: 40, windowMs: 60 * 60 * 1000, message: 'Too many quizzes started from this network. Please try again later.' }) : (q, s2, n) => n();
+  const limitDiscSubmit = rateLimit ? rateLimit('career-discovery-submit', { max: 80, windowMs: 60 * 60 * 1000, message: 'Too many submissions. Please slow down.' }) : (q, s2, n) => n();
+  const discOff = (res) => res.status(404).json({ error: 'Career Discovery is not available right now.' });
+  r.get('/career/discovery', (req, res) => {
+    const info = svc.discoveryInfo();
+    const u = who(req);
+    res.json({ ...info, signed_in: !!u, learner: !!u && svc.isLearner(u), state: u ? svc.discoveryState(u) : null });
+  });
+  r.post('/career/discovery/quiz', limitDisc, (req, res) => send(res, svc.startDiscoveryQuiz(who(req))));
+  r.post('/career/discovery/quiz/resume', (req, res) => send(res, svc.resumeDiscoveryQuiz(String(req.body?.token || ''))));
+  r.post('/career/discovery/quiz/submit', limitDiscSubmit, (req, res) => {
+    if (!svc.discoveryConfig().enabled) return discOff(res);
+    send(res, svc.submitDiscoveryQuiz(who(req), String(req.body?.token || ''), req.body?.answers || {}, req.body?.onboarding || null));
+  });
+  r.post('/career/discovery/recommendations', (req, res) => {
+    if (!svc.discoveryConfig().enabled) return discOff(res);
+    const u = who(req);
+    res.json(svc.discoveryRecommendations(u && svc.isLearner(u) ? u : null, { answers: req.body?.answers, result_token: req.body?.result_token }));
+  });
+  r.put('/career/me/discovery', authRequired, (req, res) => send(res, svc.saveDiscovery(me(req), req.body || {})));
+  r.post('/career/me/discovery/claim', authRequired, (req, res) => send(res, svc.claimDiscovery(me(req), req.body || {})));
 
   /* ------------------------------- learner ------------------------------- */
   r.get('/career/me', authRequired, (req, res) => {
@@ -62,6 +89,9 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
 
   /* -------------------------------- admin -------------------------------- */
   const admin = [authRequired, adminRequired];
+  r.get('/admin/career/discovery', admin, (req, res) => res.json({ config: svc.discoveryConfig(), analytics: svc.discoveryAnalytics(), questions: svc.discoveryInfo().questions, tracks: svc.tracks().map((t) => ({ slug: t.slug, title: t.title })) }));
+  r.put('/admin/career/discovery', admin, (req, res) => send(res, svc.updateDiscoveryConfig(req.body || {}, req.user.id)));
+  r.post('/admin/career/discovery/reset', admin, (req, res) => send(res, svc.resetDiscoveryConfig(req.user.id)));
   r.get('/admin/career/overview', admin, (req, res) => {
     const banks = Object.keys(svc.BANKS).map((b) => {
       const qs = svc.questions(b), by = (s) => qs.filter((q) => q.status === s).length;

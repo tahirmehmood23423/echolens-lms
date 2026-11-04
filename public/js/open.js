@@ -116,6 +116,14 @@ let CUR_VIDEO_LEVEL = null; // level.no when the dedicated Video subpoint (openS
 // exactly where you were - not back at the top of the course.
 let COURSE_SCROLL_Y = 0;
 let SV_TERM = null;
+// The exact code + language the terminal's current output came from. The
+// output is sent to the grader as the program's REAL output, so it may only
+// go with the submission when it was produced by the very code being
+// submitted - otherwise a learner who fixed a bug and submitted without
+// re-running had their correct code graded against the old run's errors.
+let SV_LAST_RUN = null;
+let EV_LAST_RUN = null;
+function lastRunMatches(run, code, lang) { return !!run && run.code === code && run.lang === lang; }
 let SV_FILES = [];
 let CUR_EVENT = null;
 // "Live Tech Courses" and "Free Certified Courses" are the same underlying
@@ -2056,7 +2064,7 @@ function drawWorkArea() {
     $('svWorkArea').innerHTML = codeLike
       ? codeIde({ dataset: false, submit: false, placeholder: '# Staff preview — run code freely. Submissions are for learner accounts.', status: 'Staff preview — submissions are for learner accounts.' }) + (mode === 'code-ai' ? svAiPanelHtml() : '')
       : `<div class="card"><div class="card-body"><p class="s" style="color:var(--muted)">Staff preview — this task takes ${mode === 'prompt' ? 'Prompt Lab workbook' : mode === 'evidence' ? 'links, notes and evidence files' : 'file'} submissions from learner accounts.</p></div></div>`;
-    if (codeLike) { SV_TERM = EchoTerm.mount($('svTerm')); EchoRun.wireEditor($('svCode')); svSyncGutter(); svLangChanged(); if (mode === 'code-ai') svWireAiPanel(); }
+    if (codeLike) { SV_TERM = EchoTerm.mount($('svTerm')); SV_LAST_RUN = null; EchoRun.wireEditor($('svCode')); svSyncGutter(); svLangChanged(); if (mode === 'code-ai') svWireAiPanel(); }
     return;
   }
 
@@ -2065,7 +2073,7 @@ function drawWorkArea() {
     // BC-05 style: the compiler with the AI copilot right beside it - the
     // same explain / fix / generate assistant as the free /compiler.
     $('svWorkArea').innerHTML = codeIde({ dataset: true, submit: true, sub, placeholder: '# Write your solution here. Run to test, submit for grading and gems.', status: 'Ready — runs in your browser, nothing to install.' }) + (mode === 'code-ai' ? svAiPanelHtml() : '');
-    SV_TERM = EchoTerm.mount($('svTerm'));
+    SV_TERM = EchoTerm.mount($('svTerm')); SV_LAST_RUN = null;
     EchoRun.wireEditor($('svCode'));
     svSyncGutter();
     EL.drafts.bind({editor:$('svCode'),language:$('svLang'),identity:['free',CUR.track.key,CUR_PROBLEM.level,CUR_PROBLEM.pid],initial:sub?.code || '',starter:lang=>EL.starter(lang,CUR_PROBLEM.problem)});
@@ -2338,8 +2346,11 @@ async function runSolve() {
   if (exec) exec.textContent = '';
   status.textContent = 'Running…';
   const started = performance.now();
+  SV_LAST_RUN = null;
   try {
-    const result = await EchoRun.executeAny($('svLang').value, code, { term: SV_TERM, files: SV_FILES, editor:$('svCode'), onStatus: (t) => { status.textContent = t; } });
+    const result = await EchoRun.executeAny(lang, code, { term: SV_TERM, files: SV_FILES, editor:$('svCode'), onStatus: (t) => { status.textContent = t; } });
+    // A stopped run or a compiler-service failure is not the program's output.
+    SV_LAST_RUN = result && !result.infra && !result.stopped ? { code, lang } : null;
     status.innerHTML = result?.ok
       ? `<span class="done"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>Done.</span>`
       : `<span style="color:var(--danger);font-weight:700">Fix the highlighted error${result?.errorLine ? ` on line ${result.errorLine}` : ''}.</span>`;
@@ -2389,7 +2400,7 @@ async function submitSolve(fileForm) {
     // Send what the program actually printed, if they ran it. The grader used
     // to reason about behaviour from source alone and got it wrong; with the
     // real output it can check against the brief's expected output instead.
-    const ran = SV_TERM && typeof SV_TERM.text === 'function' ? SV_TERM.text().trim() : '';
+    const ran = SV_TERM && typeof SV_TERM.text === 'function' && lastRunMatches(SV_LAST_RUN, code, $('svLang').value) ? SV_TERM.text().trim() : '';
     if (ran) fd.set('output', ran.slice(0, 4000));
   }
   EL.drafts.flushAll();
@@ -3232,7 +3243,7 @@ function renderFeedback(sub, ev) {
 }
 
 function wireEventWorkspace() {
-  EV_OUT_TERM = null; // the previous output terminal's DOM was just replaced
+  EV_OUT_TERM = null; EV_LAST_RUN = null; // the previous output terminal's DOM was just replaced
   const seed = $('evCodeSeed'), code = $('evCode');
   if (code) {
     if (seed) code.value = seed.value;
@@ -3307,7 +3318,12 @@ async function evRunCode() {
   const files = [];
   if (ev.dataset_url) { try { files.push(await EchoRun.fetchDataset(ev.dataset_url)); } catch (e) { EV_OUT_TERM.print('[Dataset: ' + e.message + ']\n'); } }
   for (const f of (ev.files || [])) if (/\.(csv|tsv|txt|json)$/i.test(f.name)) files.push({ name: f.name, url: f.url });
-  try { await EchoRun.executeAny(lang, code.value, { term: EV_OUT_TERM, files, editor:code, onStatus: () => {} }); }
+  EV_LAST_RUN = null;
+  const ranCode = code.value;
+  try {
+    const result = await EchoRun.executeAny(lang, ranCode, { term: EV_OUT_TERM, files, editor:code, onStatus: () => {} });
+    EV_LAST_RUN = result && !result.infra && !result.stopped ? { code: ranCode, lang } : null;
+  }
   catch (e) { EV_OUT_TERM.print('\n[' + e.message + ']\n'); }
   btn.innerHTML = evRunLabel();
 }
@@ -3330,7 +3346,7 @@ async function evSubmitCode() {
   fd.set('code', code); fd.set('language', lang);
   // Same as the free-course path: send what the program actually printed, so
   // the grader checks real output instead of guessing from the source.
-  const ran = EV_OUT_TERM && typeof EV_OUT_TERM.text === 'function' ? EV_OUT_TERM.text().trim() : '';
+  const ran = EV_OUT_TERM && typeof EV_OUT_TERM.text === 'function' && lastRunMatches(EV_LAST_RUN, code, lang) ? EV_OUT_TERM.text().trim() : '';
   if (ran) fd.set('output', ran.slice(0, 4000));
   try {
     const out = await api(`/api/events/${ev.id}/submit`, { method: 'POST', body: fd });

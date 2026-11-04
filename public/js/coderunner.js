@@ -1143,7 +1143,9 @@
     } catch (e) {
       term.print('[' + e.message + ']\n');
       status('Could not reach the compiler service.');
-      return { ok: false };
+      // infra: the program never ran - what the terminal shows is a service
+      // error, not program output, and must not be submitted as such.
+      return { ok: false, infra: true };
     }
   }
 

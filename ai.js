@@ -442,6 +442,16 @@ JSON schema: [{"q":"question text","options":["A","B","C","D"],"answer":0}] wher
 }
 
 /* --------------------------- v12: automatic grading --------------------------- */
+// The browser terminal mixes runner chrome into what it captures: the stdin
+// banner compiled programs show, and the dataset notice SQL prints. Neither is
+// something the student's program printed, so neither may be compared against
+// the expected output.
+function cleanRunOutput(output) {
+  if (!output) return '';
+  return String(output).split(/\r?\n/)
+    .filter((l) => !/^This program reads input\. Type ALL input lines below/.test(l) && !/^-- Datasets loaded as tables:/.test(l))
+    .join('\n').trim();
+}
 // Grades an open-event submission WITHOUT a teacher in the loop. Returns
 // { score, feedback }. The caller applies the 10% AI-grading reduction.
 // The system user id 0 is exempt from the per-user rate limit budget being
@@ -473,8 +483,14 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
     '   credit, never 0.',
     '5. Style, whitespace, comments, naming and extra output never cost marks unless',
     '   the task names them.',
-    '6. If the real output of the program is given below, trust it over your own',
-    '   reading of the code, and compare it against the expected output.',
+    '6. If the real output of the program is given below, use it as evidence and',
+    '   compare it against the expected output. Lines in [brackets] that come from',
+    '   the code runner (a stopped run, an unreachable compile service) are not',
+    '   program output - ignore them. If the output plainly could not come from',
+    '   the submitted code (it reports an error on a line that is fine, or prints',
+    '   text the code never prints), it is from an earlier run: judge the code.',
+    '7. Differences in trailing whitespace, blank lines, letter case of labels or',
+    '   the input prompt text echoed by the runner are not wrong output.',
     '',
     'Reply with ONLY a JSON object, no markdown fences, in exactly this shape:',
     rubric.length
@@ -498,9 +514,10 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
   }
   if (sampleInput) parts.push('', 'Sample input the program is run with:', String(sampleInput).slice(0, 500));
   if (expectedOutput) parts.push('', 'Expected output:', String(expectedOutput).slice(0, 1000));
-  if (output) {
-    parts.push('', `The student's program was actually run. Its real output was:`, String(output).slice(0, 4000),
-      '(This is what the program really printed. Trust it over your own reading of the code.)');
+  const ran = cleanRunOutput(output);
+  if (ran) {
+    parts.push('', `The student's program was actually run. Its output was:`, ran.slice(0, 4000),
+      '(Use this as evidence of what the program does, subject to rule 6.)');
   }
   parts.push('', `Pass mark: ${passMark}%`, '', `Student submission${language ? ` (${language})` : ''}:`,
     String(code || text || '').slice(0, 12000));
@@ -523,4 +540,4 @@ async function autoGrade(userId, { eventTitle, problemTitle, problemBrief, passM
   return { score, feedback, rubric: checklist };
 }
 
-module.exports = { enabled, status, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, codeHelp, promptLab, excelCopilot, activityReport };
+module.exports = { enabled, status, provider: () => PROVIDER, model: () => MODEL, chat, gradeDraft, quiz, quizJson, outline, skillReport, overallReport, classSummary, review, integrity, autoGrade, cleanRunOutput, codeHelp, promptLab, excelCopilot, activityReport };

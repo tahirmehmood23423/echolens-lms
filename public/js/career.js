@@ -11,6 +11,7 @@
  *   #report            skill report, gaps and recommendations
  *   #roadmap[/<slug>]  personalised six-stage roadmap and my projects
  *   #history           attempts and skill score history
+ *   #path, #role, #sub, #stake, #sres   job roles, subtracks and comprehensive assessments (career-curriculum.js)
  * Every score comes from the server; this file only displays it.
  */
 (() => {
@@ -85,6 +86,7 @@
       <section class="cr-hero"><h1>${esc(t.title)}</h1><p>${esc(t.overview)}</p>
         <div class="cr-tags">${t.suitability.map((s) => `<span class="cr-tag">${esc(s)}</span>`).join('')}<span class="cr-tag">${esc(t.duration)}</span></div>
         <div class="cr-actions">
+          <a class="cr-btn" href="#path/${esc(t.slug)}">Job roles and subtracks</a>
           ${learner() ? (mine ? `<a class="cr-btn ghost" href="#me">✓ ${mine.primary ? 'Your Primary roadmap' : mine.status === 'paused' ? 'In your roadmaps (paused)' : 'In your roadmaps'}</a>` : `<button class="cr-btn" id="crPick">Add to my roadmaps</button>`) : ''}
           ${t.assessment.available ? `<a class="cr-btn ghost" href="${learner() ? '#assess/' + esc(t.slug) : loginUrl()}">Take the ${esc(t.title)} assessment</a>` : `<span class="cr-tag">${esc(t.assessment.reason || 'Assessment coming soon')}</span>`}
         </div></section>
@@ -494,6 +496,8 @@
   /* --------------------------------- router --------------------------------- */
   /** What the Career Discovery screens (career-discovery.js) need from this app. */
   const discoveryCtx = () => ({ root, api, tabs, loginUrl, loadMe, get ME() { return ME; }, setAdvice: (a) => { PENDING_ADVICE = a; } });
+  /** What the curriculum screens (career-curriculum.js) need from this app. */
+  const curriculumCtx = () => ({ root, api, tabs, loginUrl, learner, get ME() { return ME; } });
   async function loadMe() {
     try { ME = await api('/api/auth/me'); } catch { ME = null; }
     if (ME) { try { ME.career = await api('/api/career/me'); } catch { ME.career = null; } }
@@ -506,6 +510,7 @@
     document.title = 'Career Paths & Skill Assessment | EchoLens';
     try {
       if (view === 'discover' && window.CareerDiscovery) await CareerDiscovery.render(discoveryCtx(), arg, sub);
+      else if (window.CareerCurriculum && CareerCurriculum.views.includes(view)) await CareerCurriculum.render(curriculumCtx(), view, arg);
       else if (view === 'track' && arg) await viewTrack(arg);
       else if (view === 'me') { const a = PENDING_ADVICE; PENDING_ADVICE = null; await viewMe(a); }
       else if (view === 'onboarding') await viewOnboarding();
@@ -520,7 +525,7 @@
       else if (view === 'history') await viewHistory();
       else await viewTracks();
     } catch (e) { fail(e); }
-    if (view !== 'take') root.focus({ preventScroll: true });
+    if (view !== 'take' && view !== 'stake') root.focus({ preventScroll: true });
   }
   window.addEventListener('hashchange', route);
   (async () => {

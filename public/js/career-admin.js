@@ -8,10 +8,10 @@
  * Questions (review, publish, edit = new version, add), Scoring (weights,
  * bands, thresholds), Tracks (status, text, skill weights/prerequisites),
  * Preview (sample form with keys), Insights (completion, gaps, item quality,
- * content gaps).
+ * content gaps), Career Discovery, Curriculum & QA (career-curriculum-admin.js).
  */
 let CA_TAB = 'overview', CA_BANK = 'common', CA_FILTER = '', CA_DATA = null;
-const CA_TABS = [['overview', 'Overview'], ['questions', 'Question banks'], ['scoring', 'Scoring rules'], ['tracks', 'Career tracks'], ['preview', 'Preview a form'], ['insights', 'Insights'], ['discovery', 'Career Discovery']];
+const CA_TABS = [['overview', 'Overview'], ['questions', 'Question banks'], ['scoring', 'Scoring rules'], ['tracks', 'Career tracks'], ['preview', 'Preview a form'], ['insights', 'Insights'], ['discovery', 'Career Discovery'], ['curriculum', 'Curriculum & QA']];
 
 async function renderAdminCareer(tab) {
   if (tab) CA_TAB = tab;
@@ -20,7 +20,7 @@ async function renderAdminCareer(tab) {
   CA_DATA = await api('/api/admin/career/overview');
   const head = `<div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap">${CA_TABS.map(([k, l]) => `<button class="btn btn-sm ${CA_TAB === k ? 'btn-primary' : 'btn-ghost'}" onclick="renderAdminCareer('${k}')">${l}</button>`).join('')}
     <span style="flex:1"></span><a class="btn btn-ghost btn-sm" href="/career" target="_blank" rel="noopener">Open student view</a></div></div>`;
-  const body = await ({ overview: caOverview, questions: caQuestions, scoring: caScoring, tracks: caTracks, preview: caPreview, insights: caInsights, discovery: caDiscovery }[CA_TAB])();
+  const body = await ({ overview: caOverview, questions: caQuestions, scoring: caScoring, tracks: caTracks, preview: caPreview, insights: caInsights, discovery: caDiscovery, curriculum: caCurriculum }[CA_TAB])();
   el.innerHTML = head + body;
   caWire();
 }
@@ -205,6 +205,7 @@ function caWire() {
     try { const out = await api('/api/admin/career/questions/status', { method: 'POST', body: JSON.stringify({ ids, status: b.dataset.caBulk }) }); toast(`${out.updated} question(s) marked ${b.dataset.caBulk}.`); renderAdminCareer('questions'); } catch (e) { toast(e.message, true); }
   }));
   caDiscoveryWire();
+  if (typeof cuAdminWire === 'function') cuAdminWire();
   const cfg = $('caCfg');
   if (cfg) cfg.addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target, c = CA_DATA.config;

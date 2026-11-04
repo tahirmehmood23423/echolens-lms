@@ -14,8 +14,8 @@ const express = require('express');
 const { createCareerService } = require('./service');
 const { SKILLS } = require('./skills');
 
-function register(app, { store, authRequired, adminRequired, rateLimit }) {
-  const svc = createCareerService(store);
+function register(app, { store, authRequired, adminRequired, rateLimit, aiSuggest = null }) {
+  const svc = createCareerService(store, { aiSuggest });
   const r = express.Router();
   const me = (req) => store.Users.byId(req.user.id);
   const send = (res, out, ok = (o) => o) => (out && out.error ? res.status(out.status || 400).json({ error: out.error, ...(out.retry_at ? { retry_at: out.retry_at } : {}), ...(out.active ? { active: out.active } : {}) }) : res.json(ok(out)));
@@ -59,7 +59,8 @@ function register(app, { store, authRequired, adminRequired, rateLimit }) {
       return { bank: b, title: svc.BANKS[b].title, total: qs.length, draft: by('draft'), reviewed: by('reviewed'), published: by('published'), retired: by('retired') };
     });
     const assessments = ['common', ...svc.tracks({ includeDraft: true }).map((t) => t.slug)].map((k) => ({ ...svc.availability(k), enabled: svc.config().enabled[k] !== false }));
-    res.json({ config: svc.config(), banks, assessments, tracks: svc.tracks({ includeDraft: true }).map((t) => ({ slug: t.slug, title: t.title, status: t.status, banks: t.assessment.banks })) });
+    const weights = [{ key: 'common', title: 'Common CS assessment' }, ...svc.tracks({ includeDraft: true }).map((t) => ({ key: t.slug, title: t.title }))].map((w) => ({ ...w, weights: svc.categoryWeights(w.key) }));
+    res.json({ weights, config: svc.config(), banks, assessments, tracks: svc.tracks({ includeDraft: true }).map((t) => ({ slug: t.slug, title: t.title, status: t.status, banks: t.assessment.banks })) });
   });
   r.put('/admin/career/config', admin, (req, res) => send(res, svc.updateConfig(req.body || {}, req.user.id)));
   r.get('/admin/career/questions', admin, (req, res) => {
@@ -74,6 +75,14 @@ function register(app, { store, authRequired, adminRequired, rateLimit }) {
   r.put('/admin/career/tracks/:slug', admin, (req, res) => send(res, svc.updateTrack(req.params.slug, req.body || {}, req.user.id)));
   r.get('/admin/career/tracks/:slug', admin, (req, res) => { const t = svc.track(req.params.slug); if (!t) return res.status(404).json({ error: 'Track not found.' }); res.json({ track: { ...svc.publicTrack(t), status: t.status } }); });
   r.get('/admin/career/analytics', admin, (req, res) => res.json(svc.analytics()));
+
+  /* ------------------------- staff review (admin, instructor) ------------------------- */
+  const reviewer = [authRequired, (req, res, next) => (svc.REVIEWER_ROLES.includes(req.user.role) ? next() : res.status(403).json({ error: 'Staff reviewers only.' }))];
+  r.get('/career/reviews', reviewer, (req, res) => res.json({ reviews: svc.reviewQueue({ status: req.query.status === 'done' ? 'done' : 'pending' }), ai_available: !!aiSuggest }));
+  r.post('/career/reviews/:uid/:attempt/:qid/suggest', reviewer, async (req, res, next) => {
+    try { send(res, await svc.suggestReview(me(req), Number(req.params.uid), req.params.attempt, req.params.qid)); } catch (e) { next(e); }
+  });
+  r.post('/career/reviews/:uid/:attempt/:qid', reviewer, (req, res) => send(res, svc.submitReview(me(req), Number(req.params.uid), req.params.attempt, req.params.qid, req.body || {})));
 
   app.use('/api', r);
   return svc;

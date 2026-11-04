@@ -10,9 +10,10 @@
  * student move past them. Stages 5 and 6 (capstone, career readiness) are
  * project and portfolio work rather than skill gates.
  *
- * `assessment.banks` names the question banks a track draws from. A track
- * with no bank yet shows "assessment coming soon" and still gets a roadmap
- * from the common CS assessment and any shared skills already measured.
+ * `assessment.banks` names the question banks a track draws from (a skill is
+ * assessed by whichever listed bank covers it). `category_weights` sets the
+ * default theory / practical / scenario mix for the track's overall score;
+ * admins can override it.
  * Admins can switch a track between draft and published (service.js); the
  * `status` here is only the default.
  */
@@ -38,6 +39,7 @@ const TRACKS = [
     duration: '6-9 months part-time', suitability: ['Beginner', 'Intermediate'],
     practical: 'Fix a small frontend component or JavaScript interaction.',
     assessment: { banks: ['frontend'] },
+    category_weights: { theory: 30, practical: 45, scenario: 25 },
     skills: [S('cs.programming', 1, true), S('fe.html', 2, true), S('fe.css', 2, true), S('fe.js', 3, true), S('fe.dom', 2), S('fe.typescript', 1), S('fe.react', 2), S('fe.api', 2), S('fe.debug_a11y', 1), S('cs.git_tools', 1)],
     stages: [
       stage(['cs.programming', 'fe.html', 'fe.css'], ['A personal profile page in semantic HTML and CSS'], 'Score Strong on HTML and CSS, and complete the matching EchoLens modules.'),
@@ -58,6 +60,7 @@ const TRACKS = [
     duration: '7-10 months part-time', suitability: ['Beginner', 'Intermediate'],
     practical: 'Debug a basic API endpoint or database query.',
     assessment: { banks: ['backend'] },
+    category_weights: { theory: 30, practical: 45, scenario: 25 },
     skills: [S('be.programming', 2, true), S('be.http', 2, true), S('be.sql', 2, true), S('be.auth', 2), S('be.architecture', 1), S('be.errors', 1), S('be.testing', 1), S('be.security', 2), S('cs.git_tools', 1)],
     stages: [
       stage(['cs.programming', 'be.programming', 'cs.git_tools'], ['A command-line tool that reads and writes files, kept in Git'], 'Score Strong on programming fundamentals.'),
@@ -78,6 +81,7 @@ const TRACKS = [
     duration: '9-12 months part-time', suitability: ['Beginner', 'Intermediate'],
     practical: 'Diagnose an issue involving frontend, API and database behaviour.',
     assessment: { banks: ['frontend', 'backend'] },
+    category_weights: { theory: 30, practical: 45, scenario: 25 },
     skills: [S('fe.html', 1, true), S('fe.css', 1, true), S('fe.js', 2, true), S('fe.react', 2), S('fe.api', 2), S('be.http', 2, true), S('be.sql', 2, true), S('be.auth', 1), S('cs.git_tools', 1), S('fs.deployment', 1)],
     stages: [
       stage(['cs.programming', 'fe.html', 'fe.css', 'fe.js'], ['A responsive landing page with interactive JavaScript'], 'Score Strong on HTML, CSS and JavaScript.'),
@@ -97,7 +101,8 @@ const TRACKS = [
     outcomes: ['Build multi-screen mobile apps', 'Manage state and local storage', 'Call APIs and handle offline cases', 'Test and publish an app'],
     duration: '7-10 months part-time', suitability: ['Beginner', 'Intermediate'],
     practical: 'Fix a simple mobile interface or state-management issue.',
-    assessment: { banks: [] },
+    assessment: { banks: ['mobile', 'frontend', 'se'] },
+    category_weights: { theory: 30, practical: 45, scenario: 25 },
     skills: [S('cs.programming', 2, true), S('se.oop', 1, true), S('mob.ui', 2), S('mob.framework', 2, true), S('mob.state', 2), S('fe.api', 1), S('mob.storage', 1), S('mob.testing', 1), S('mob.lifecycle', 1)],
     stages: [
       stage(['cs.programming', 'se.oop'], ['A console app using classes and collections'], 'Score Strong on programming fundamentals and OOP.'),
@@ -118,6 +123,7 @@ const TRACKS = [
     duration: '9-12 months part-time', suitability: ['Intermediate', 'Advanced'],
     practical: 'Interpret model metrics and correct a preprocessing or evaluation error.',
     assessment: { banks: ['aiml'] },
+    category_weights: { theory: 35, practical: 40, scenario: 25 },
     skills: [S('ml.python', 2, true), S('ml.math_stats', 2, true), S('ml.numpy_pandas', 2, true), S('ml.preprocessing', 2), S('ml.algorithms', 2), S('ml.evaluation', 2, true), S('ml.deep_learning', 1), S('ml.deployment', 1)],
     stages: [
       stage(['ml.python', 'ml.math_stats'], ['A statistics notebook summarising a public dataset'], 'Score Strong on Python and on mathematics and statistics.'),
@@ -137,7 +143,8 @@ const TRACKS = [
     outcomes: ['Design reliable prompts', 'Build a grounded RAG pipeline', 'Build tool-calling agents', 'Evaluate and secure LLM apps'],
     duration: '6-9 months part-time', suitability: ['Intermediate', 'Advanced'],
     practical: 'Design or debug a simple RAG workflow.',
-    assessment: { banks: [] },
+    assessment: { banks: ['genai', 'aiml', 'frontend'] },
+    category_weights: { theory: 30, practical: 40, scenario: 30 },
     skills: [S('ml.python', 2, true), S('fe.api', 1), S('gen.llm', 2, true), S('gen.prompting', 1), S('gen.embeddings', 2), S('gen.vectordb', 1), S('gen.rag', 2, true), S('gen.agents', 1), S('gen.eval_security', 2)],
     stages: [
       stage(['ml.python', 'fe.api'], ['A script that calls an LLM API and handles errors and retries'], 'Score Strong on Python.'),
@@ -157,7 +164,8 @@ const TRACKS = [
     outcomes: ['Clean and combine datasets', 'Answer questions with SQL', 'Summarise data with the right statistics', 'Build clear dashboards'],
     duration: '5-8 months part-time', suitability: ['Beginner', 'Intermediate'],
     practical: 'Analyse a dataset using SQL or interpret a business dashboard.',
-    assessment: { banks: [] },
+    assessment: { banks: ['analyst'] },
+    category_weights: { theory: 35, practical: 35, scenario: 30 },
     skills: [S('da.spreadsheets', 2, true), S('da.sql', 2, true), S('cs.programming', 1), S('da.cleaning', 2), S('da.stats', 2, true), S('da.visualization', 2), S('da.business', 1)],
     stages: [
       stage(['da.spreadsheets', 'cs.programming'], ['A cleaned sales sheet with pivot tables'], 'Use formulas, lookups and pivots confidently.'),
@@ -177,7 +185,8 @@ const TRACKS = [
     outcomes: ['Model data for analytics', 'Build reliable ETL/ELT pipelines', 'Orchestrate and monitor jobs', 'Guarantee data quality'],
     duration: '9-12 months part-time', suitability: ['Intermediate', 'Advanced'],
     practical: 'Debug a data transformation pipeline.',
-    assessment: { banks: [] },
+    assessment: { banks: ['dataeng', 'aiml'] },
+    category_weights: { theory: 30, practical: 45, scenario: 25 },
     skills: [S('ml.python', 2, true), S('de.advanced_sql', 2, true), S('de.modeling', 2), S('de.etl', 2, true), S('de.orchestration', 1), S('de.quality', 2), S('de.cloud_data', 1)],
     stages: [
       stage(['ml.python', 'da.sql'], ['Load a CSV into PostgreSQL with Python'], 'Score Strong on Python and SQL.'),
@@ -197,7 +206,8 @@ const TRACKS = [
     outcomes: ['Explain how networks and authentication work', 'Investigate logs and alerts', 'Assess and prioritise vulnerabilities', 'Run an incident-response playbook'],
     duration: '8-12 months part-time', suitability: ['Beginner', 'Intermediate'],
     practical: 'Analyse a simulated security incident using safe, authorised lab data.',
-    assessment: { banks: [] },
+    assessment: { banks: ['cyber'] },
+    category_weights: { theory: 30, practical: 35, scenario: 35 },
     skills: [S('sec.networking', 2, true), S('sec.linux', 2, true), S('sec.principles', 2, true), S('sec.auth', 1), S('sec.logs', 2), S('sec.vulns', 1), S('sec.incident', 2)],
     stages: [
       stage(['sec.networking', 'sec.linux'], ['Map a home lab network and harden a Linux VM'], 'Score Strong on networking and Linux.'),
@@ -217,7 +227,8 @@ const TRACKS = [
     outcomes: ['Containerise applications', 'Build CI/CD pipelines', 'Provision cloud infrastructure as code', 'Monitor and alert on services'],
     duration: '8-12 months part-time', suitability: ['Intermediate', 'Advanced'],
     practical: 'Identify and fix a deployment or CI/CD configuration issue.',
-    assessment: { banks: [] },
+    assessment: { banks: ['devops'] },
+    category_weights: { theory: 25, practical: 50, scenario: 25 },
     skills: [S('ops.linux', 2, true), S('ops.networking', 1, true), S('cs.git_tools', 1, true), S('ops.docker', 2), S('ops.cicd', 2), S('ops.cloud', 1), S('ops.iac', 1), S('ops.monitoring', 1), S('ops.kubernetes', 2)],
     stages: [
       stage(['ops.linux', 'ops.networking', 'cs.git_tools'], ['Set up and secure a Linux server'], 'Score Strong on Linux, networking and Git.'),
@@ -237,7 +248,8 @@ const TRACKS = [
     outcomes: ['Design test cases with good coverage', 'Write reproducible bug reports', 'Automate UI and API tests', 'Run tests in CI'],
     duration: '5-8 months part-time', suitability: ['Beginner', 'Intermediate'],
     practical: 'Create test cases for a sample application and identify missing coverage.',
-    assessment: { banks: [] },
+    assessment: { banks: ['qa'] },
+    category_weights: { theory: 30, practical: 40, scenario: 30 },
     skills: [S('qa.principles', 2, true), S('qa.test_design', 2, true), S('qa.bug_reports', 1), S('qa.api_testing', 2), S('cs.programming', 1), S('qa.automation', 2), S('qa.regression_ci', 1)],
     stages: [
       stage(['qa.principles', 'cs.programming'], ['Test plan for a login page'], 'Score Strong on testing principles.'),
@@ -257,7 +269,8 @@ const TRACKS = [
     outcomes: ['Choose the right data structure', 'Design and analyse algorithms', 'Write clean, tested, object-oriented code', 'Solve interview-style problems'],
     duration: '6-9 months part-time', suitability: ['Beginner', 'Intermediate', 'Advanced'],
     practical: 'Solve coding problems with test cases.',
-    assessment: { banks: [] },
+    assessment: { banks: ['se', 'common'] },
+    category_weights: { theory: 35, practical: 45, scenario: 20 },
     skills: [S('cs.programming', 2, true), S('se.oop', 1), S('se.arrays_strings', 2, true), S('se.linked_lists', 1), S('se.stacks_queues', 1), S('se.trees_graphs', 2), S('se.algorithms', 2), S('se.complexity', 2, true), S('cs.debugging', 1), S('se.design', 1)],
     stages: [
       stage(['cs.programming', 'se.oop', 'cs.debugging'], ['Twenty warm-up problems with tests'], 'Score Strong on programming fundamentals.'),

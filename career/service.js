@@ -19,18 +19,14 @@ const E = require('./engine');
 const { SKILLS, skill } = require('./skills');
 const { TRACKS, STAGE_NAMES, track: baseTrack } = require('./tracks');
 
-const BANKS = {
-  common: { title: 'Common Computer Science Assessment', questions: require('./banks/common') },
-  frontend: { title: 'Frontend skills', questions: require('./banks/frontend') },
-  backend: { title: 'Backend skills', questions: require('./banks/backend') },
-  aiml: { title: 'AI & Machine Learning skills', questions: require('./banks/aiml') },
-};
+const { BANKS } = require('./banks');
+const REVIEWER_ROLES = ['admin', 'instructor'];
 const LEARNER_ROLES = ['free', 'student'];
 const MAX_HISTORY = 60;
 const QUESTION_STATUSES = ['draft', 'reviewed', 'published', 'retired'];
 const TRACK_STATUSES = ['draft', 'published'];
 
-function createCareerService(store, { now = () => new Date() } = {}) {
+function createCareerService(store, { now = () => new Date(), aiSuggest = null } = {}) {
   const data = () => store.allData();
   const settings = () => { const d = data(); if (!d.settings) d.settings = {}; return d.settings; };
   const save = () => store.persist();
@@ -41,6 +37,7 @@ function createCareerService(store, { now = () => new Date() } = {}) {
     const o = settings().career_config || {};
     const c = { ...E.DEFAULT_CONFIG, ...o, skill_thresholds: { ...E.DEFAULT_CONFIG.skill_thresholds, ...(o.skill_thresholds || {}) } };
     c.enabled = { common: true, ...(o.enabled || {}) };
+    c.category_weights = { ...E.DEFAULT_CONFIG.category_weights, ...(o.category_weights || {}) };
     return c;
   }
   /** Validate and apply an admin config change. Returns { config } or { error }. */
@@ -66,7 +63,18 @@ function createCareerService(store, { now = () => new Date() } = {}) {
       if (!(d > 0 && s > d && s <= 100)) return { error: 'Thresholds must satisfy 0 < developing < strong <= 100.' };
       next.skill_thresholds = { strong: s, developing: d };
     }
-    for (const [k, lo, hi] of [['min_evidence_items', 1, 10], ['track_items_per_skill', 2, 8], ['skill_reassess_items', 2, 10], ['retake_cooldown_hours', 0, 720]]) {
+    if (patch.category_weights) {
+      const cw = { ...(cur.category_weights || {}) };
+      for (const [key, w] of Object.entries(patch.category_weights)) {
+        if (key !== 'default' && key !== 'common' && !baseTrack(key)) return { error: `Unknown assessment ${key}.` };
+        const vals = {};
+        for (const c of E.CATEGORIES) { const v = Number(w?.[c]); if (!Number.isFinite(v) || v < 0 || v > 100) return { error: `${c} weight for ${key} must be 0-100.` }; vals[c] = v; }
+        if (Object.values(vals).reduce((a, b) => a + b, 0) <= 0) return { error: `At least one category weight for ${key} must be above 0.` };
+        cw[key] = vals;
+      }
+      next.category_weights = cw;
+    }
+    for (const [k, lo, hi] of [['min_evidence_items', 1, 10], ['min_category_items', 1, 10], ['track_items_per_skill', 2, 8], ['skill_reassess_items', 2, 10], ['review_items_per_form', 0, 4], ['retake_cooldown_hours', 0, 720]]) {
       if (patch[k] !== undefined) { const v = Math.round(Number(patch[k])); if (!(v >= lo && v <= hi)) return { error: `${k} must be ${lo}-${hi}.` }; next[k] = v; }
     }
     if (patch.min_confidence !== undefined) { const v = Number(patch.min_confidence); if (!(v > 0 && v <= 1)) return { error: 'min_confidence must be between 0 and 1.' }; next.min_confidence = v; }
@@ -81,6 +89,9 @@ function createCareerService(store, { now = () => new Date() } = {}) {
   function audit(actorId, action, type, id, detail) {
     try { store.AuditLog?.record({ actor_id: actorId || null, action, target_type: type, target_id: typeof id === 'number' ? id : null, detail: { ...(detail || {}), ref: String(id) }, deferSave: true }); } catch { /* auditing must not block the change */ }
   }
+
+  /** Theory / practical / scenario weights in force for an assessment key. */
+  const categoryWeights = (key) => E.weightsFor(key, config(), baseTrack(key)?.category_weights);
 
   /* -------------------------------- questions -------------------------------- */
   const qstate = () => { const s = settings(); if (!s.career_questions) s.career_questions = { status: {}, edits: {}, custom: [], history: {} }; return s.career_questions; };
@@ -104,16 +115,26 @@ function createCareerService(store, { now = () => new Date() } = {}) {
   }
   /** Validate a question body from the admin form. */
   function cleanQuestion(b) {
-    const type = ['single', 'multi', 'output', 'debug', 'scenario'].includes(b.type) ? b.type : 'single';
+    const type = ['single', 'multi', 'output', 'debug', 'scenario', 'written', 'submission'].includes(b.type) ? b.type : 'single';
     const skills = [].concat(b.skills || []).map(String).filter((s) => skill(s));
     if (!skills.length) return { error: 'Map the question to at least one known skill.' };
     const prompt = String(b.prompt || '').trim().slice(0, 2000), explanation = String(b.explanation || '').trim().slice(0, 2000);
     if (prompt.length < 8) return { error: 'Write the question statement.' };
     if (!explanation) return { error: 'Every question needs an explanation of the correct answer.' };
     const difficulty = [1, 2, 3].includes(Number(b.difficulty)) ? Number(b.difficulty) : 1;
-    const q = { type, skills, difficulty, prompt, explanation, code: String(b.code || '').slice(0, 4000) || null, practical: !!b.practical,
-      points: difficulty, time_sec: Math.max(20, Math.min(600, Number(b.time_sec) || ({ 1: 45, 2: 75, 3: 105 })[difficulty])) };
-    if (type === 'output') {
+    const review = type === 'written' || type === 'submission';
+    const category = type === 'submission' ? 'practical' : E.CATEGORIES.includes(b.category) ? b.category
+      : type === 'scenario' ? 'scenario' : type === 'debug' || b.practical ? 'practical' : 'theory';
+    const q = { type, skills, difficulty, prompt, explanation, code: String(b.code || '').slice(0, 4000) || null, category, practical: category === 'practical',
+      grading: review ? 'review' : 'auto', points: difficulty, time_sec: Math.max(20, Math.min(900, Number(b.time_sec) || (review ? 300 : ({ 1: 45, 2: 75, 3: 105 })[difficulty]))) };
+    if (review) {
+      const rubric = [].concat(b.rubric || []).map((r) => ({ criterion: String(r?.criterion || '').trim().slice(0, 300), points: Number(r?.points) })).filter((r) => r.criterion);
+      if (!rubric.length) return { error: 'A reviewed question needs at least one rubric criterion.' };
+      if (rubric.some((r) => !(r.points > 0 && r.points <= 10))) return { error: 'Each rubric criterion needs 1-10 points.' };
+      q.rubric = rubric; q.points = rubric.reduce((a, r) => a + r.points, 0);
+      q.model_answer = String(b.model_answer || b.explanation || '').slice(0, 4000);
+      q.options = []; q.answer = [];
+    } else if (type === 'output') {
       q.options = []; q.answer = [].concat(b.answer || []).map((a) => String(a).trim()).filter(Boolean).slice(0, 10);
       if (!q.answer.length) return { error: 'List at least one accepted answer.' };
     } else {
@@ -188,27 +209,34 @@ function createCareerService(store, { now = () => new Date() } = {}) {
   function assessmentDef(key) {
     const cfg = config();
     if (key === 'common') {
-      return { key, title: BANKS.common.title, banks: ['common'], plan: { ...cfg.common_form }, enabled: cfg.enabled.common !== false };
+      return { key, title: BANKS.common.title, banks: ['common'], plan: { ...cfg.common_form }, enabled: cfg.enabled.common !== false, reviewItems: cfg.review_items_per_form, weights: categoryWeights('common') };
     }
     if (String(key).startsWith('skill:')) {
       const id = key.slice(6); if (!skill(id)) return null;
       const banks = Object.keys(BANKS).filter((b) => BANKS[b].questions.some((q) => q.skills[0] === id) || qstate().custom.some((q) => q.bank === b && q.skills[0] === id));
-      return { key, title: `${skill(id).name} reassessment`, banks, plan: { [id]: cfg.skill_reassess_items }, enabled: true, skill: id };
+      // Short and mostly auto-graded. One staff-reviewed item (where the skill
+      // has one) lets a student prove practical or written ability that repeat
+      // questions could not fairly show again.
+      return { key, title: `${skill(id).name} reassessment`, banks, plan: { [id]: cfg.skill_reassess_items }, enabled: true, skill: id, reviewItems: 1, weights: categoryWeights('default') };
     }
     const t = track(key); if (!t) return null;
     const banks = t.assessment.banks || [];
     const plan = {};
-    for (const s of t.skills) if (banks.some((b) => questions(b).some((q) => q.skills[0] === s.skill))) plan[s.skill] = cfg.track_items_per_skill;
-    return { key, title: `${t.title} skill assessment`, banks, plan, enabled: !!banks.length && cfg.enabled[key] !== false && t.status === 'published', track: t.slug };
+    for (const s of t.skills) if (banks.some((b) => questions(b).some((q) => q.skills[0] === s.skill && q.grading !== 'review'))) plan[s.skill] = cfg.track_items_per_skill;
+    return { key, title: `${t.title} skill assessment`, banks, plan, enabled: !!banks.length && cfg.enabled[key] !== false && t.status === 'published', track: t.slug, reviewItems: cfg.review_items_per_form, weights: categoryWeights(key) };
   }
   /** Coverage: does every planned skill have enough PUBLISHED questions? */
   function coverage(def) {
     const pool = def.banks.flatMap(published);
     const skills = Object.entries(def.plan).map(([id, want]) => {
-      const have = pool.filter((q) => q.skills[0] === id);
-      return { skill: id, name: skill(id)?.name || id, want, published: have.length, alternate_forms: have.length >= want * 2, ok: have.length >= want, difficulties: [...new Set(have.map((q) => q.difficulty))].sort() };
+      const have = pool.filter((q) => q.skills[0] === id && q.grading !== 'review');
+      const cats = Object.fromEntries(E.CATEGORIES.map((c) => [c, have.filter((q) => q.category === c).length]));
+      return { skill: id, name: skill(id)?.name || id, want, published: have.length, by_category: cats, alternate_forms: have.length >= want * 2, ok: have.length >= want, difficulties: [...new Set(have.map((q) => q.difficulty))].sort() };
     });
-    return { skills, ok: skills.length > 0 && skills.every((s) => s.ok), practical: pool.some((q) => q.practical && def.plan[q.skills[0]]) };
+    const inPlan = pool.filter((q) => def.plan[q.skills[0]]);
+    const categories = Object.fromEntries(E.CATEGORIES.map((c) => [c, inPlan.filter((q) => q.category === c && q.grading !== 'review').length]));
+    return { skills, categories, reviewed: inPlan.filter((q) => q.grading === 'review').length,
+      ok: skills.length > 0 && skills.every((s) => s.ok), practical: categories.practical > 0, scenario: categories.scenario > 0 };
   }
   function availability(key) {
     const def = assessmentDef(key); if (!def) return { key, available: false, reason: 'Unknown assessment.' };
@@ -216,8 +244,10 @@ function createCareerService(store, { now = () => new Date() } = {}) {
     if (!def.enabled) return { key, title: def.title, available: false, reason: 'This assessment is not enabled yet.' };
     const cov = coverage(def);
     if (!cov.ok) return { key, title: def.title, available: false, reason: 'Questions for this assessment are still being reviewed.', coverage: cov };
-    const items = Object.values(def.plan).reduce((a, b) => a + b, 0);
-    return { key, title: def.title, available: true, items, coverage: cov };
+    // A hybrid assessment needs practical and scenario evidence, not only theory (skill reassessments excepted).
+    if (!def.skill && (!cov.practical || !cov.scenario)) return { key, title: def.title, available: false, reason: 'Practical and scenario questions for this assessment are still being reviewed.', coverage: cov };
+    const items = Object.values(def.plan).reduce((a, b) => a + b, 0) + Math.min(def.reviewItems || 0, cov.reviewed);
+    return { key, title: def.title, available: true, items, reviewed_items: Math.min(def.reviewItems || 0, cov.reviewed), weights: def.weights, coverage: cov };
   }
 
   /* ----------------------------- student records ----------------------------- */
@@ -282,14 +312,14 @@ function createCareerService(store, { now = () => new Date() } = {}) {
     }
     const pool = def.banks.flatMap(published);
     const seed = crypto.randomInt(1, 2 ** 31);
-    const form = E.assembleForm({ pool, plan: def.plan, seen: seenIds(fresh, def), seed });
+    const form = E.assembleForm({ pool, plan: def.plan, seen: seenIds(fresh, def), seed, reviewItems: def.reviewItems || 0 });
     const byId = new Map(pool.map((q) => [q.id, q]));
     const snapshot = form.items.map((i) => ({ ...byId.get(i.id), order: i.order }));
     const limitSec = Math.ceil(snapshot.reduce((a, q) => a + q.time_sec, 0) / 60) * 60;
     const active = {
       id: 'ca_' + crypto.randomBytes(8).toString('hex'), assessment: key, title: def.title, track: def.track || null, skill: def.skill || null,
       started_at: t.toISOString(), expires_at: new Date(t.getTime() + limitSec * 1000).toISOString(), limit_sec: limitSec,
-      config_version: cfg.version, questions: snapshot, answers: {}, saved_at: null,
+      config_version: cfg.version, weights: def.weights, questions: snapshot, answers: {}, saved_at: null,
     };
     writeCareer(user, { ...fresh, active });
     return { attempt: deliver(active) };
@@ -303,13 +333,14 @@ function createCareerService(store, { now = () => new Date() } = {}) {
   /** The student-facing form: no keys, no explanations. */
   function deliver(a) {
     return { id: a.id, assessment: a.assessment, title: a.title, started_at: a.started_at, expires_at: a.expires_at, limit_sec: a.limit_sec, answers: a.answers || {},
+      weights: a.weights || null,
       questions: a.questions.map((q) => ({ ...E.publicQuestion(q, q.order), skill: skill(q.skills[0])?.name || q.skills[0] })) };
   }
   function cleanAnswers(a, answers) {
-    const out = {}, ids = new Set(a.questions.map((q) => q.id));
+    const out = {}, byId = new Map(a.questions.map((q) => [q.id, q]));
     for (const [k, v] of Object.entries(answers || {})) {
-      if (!ids.has(k)) continue;
-      out[k] = Array.isArray(v) ? v.slice(0, 8).map((x) => String(x).slice(0, 4)) : String(v ?? '').slice(0, 200);
+      const q = byId.get(k); if (!q) continue;
+      out[k] = Array.isArray(v) ? v.slice(0, 8).map((x) => String(x).slice(0, 4)) : String(v ?? '').slice(0, q.grading === 'review' ? 6000 : 200);
     }
     return out;
   }
@@ -330,7 +361,7 @@ function createCareerService(store, { now = () => new Date() } = {}) {
     const result = E.scoreAttempt(a.questions, final, cfg);
     const record = {
       id: a.id, assessment: a.assessment, title: a.title, track: a.track, skill: a.skill, status: 'submitted',
-      started_at: a.started_at, submitted_at: iso(), late: late || expired, config_version: a.config_version, result,
+      started_at: a.started_at, submitted_at: iso(), late: late || expired, config_version: a.config_version, weights: a.weights || null, result,
     };
     writeCareer(user, { ...c, active: null, attempts: [...c.attempts, record] });
     return record;
@@ -354,14 +385,86 @@ function createCareerService(store, { now = () => new Date() } = {}) {
   function attemptReview(user, id) {
     const a = career(user).attempts.find((x) => x.id === id); if (!a) return null;
     return a.result.responses.map((r) => {
-      const q = questionVersion(r.id, r.v);
-      return { id: r.id, correct: r.correct, answered: r.answered, earned: r.earned, points: r.points, skill: skill(r.skills[0])?.name,
-        prompt: q?.prompt, code: q?.code, options: q?.options || [], key: q?.answer || [], explanation: q?.explanation || null };
+      const q = questionVersion(r.id, r.v), reviewed = r.grading === 'review';
+      return { id: r.id, type: r.type, category: r.category, grading: r.grading, correct: r.correct, answered: r.answered, pending: !!r.pending, earned: r.earned, points: r.points, skill: skill(r.skills[0])?.name,
+        prompt: q?.prompt, code: q?.code, options: q?.options || [], key: q?.answer || [],
+        // Reviewed items: the student's own answer, the rubric, and - only once a human has reviewed it - the outcome and the reference answer.
+        answer: reviewed ? r.answer || '' : undefined, rubric: reviewed ? q?.rubric || [] : undefined,
+        review: reviewed && r.review ? { criteria: r.review.criteria, comment: r.review.comment, reviewed_at: r.review.at, reviewer_role: r.review.role } : null,
+        explanation: reviewed ? (r.review ? q?.model_answer || q?.explanation : null) : q?.explanation || null };
     });
   }
   function questionVersion(id, v) {
     const cur = questionById(id); if (cur && cur.version === v) return cur;
     return (qstate().history[id] || []).find((h) => h.version === v) || cur;
+  }
+
+  /* ------------------------------ staff review ------------------------------ */
+  /**
+   * Written explanations and practical submissions are scored by a person
+   * against the question's rubric. An optional AI suggestion can be requested
+   * and is shown to the reviewer as UNVERIFIED; it never changes a score. The
+   * attempt's totals are rebuilt (engine.summarize) once a review is saved.
+   */
+  const isReviewer = (u) => REVIEWER_ROLES.includes(u?.role);
+  function findResponse(uid, attemptId, qid) {
+    const u = store.Users.byId(uid); if (!u) return null;
+    const c = career(u), a = c.attempts.find((x) => x.id === attemptId); if (!a) return null;
+    const r = a.result.responses.find((x) => x.id === qid && x.grading === 'review'); if (!r) return null;
+    return { u, c, a, r };
+  }
+  function reviewQueue({ status = 'pending' } = {}) {
+    const out = [];
+    for (const u of data().users) {
+      if (!u.profile?.career) continue;
+      for (const a of career(u).attempts) for (const r of a.result.responses) {
+        if (r.grading !== 'review' || !r.answered) continue;
+        if (status === 'pending' ? !r.pending : r.pending) continue;
+        const q = questionVersion(r.id, r.v);
+        out.push({ user_id: u.id, student: u.name || 'Learner #' + u.id, reg_no: u.reg_no || null, attempt_id: a.id, assessment: a.title, submitted_at: a.submitted_at,
+          question_id: r.id, type: r.type, category: r.category, skill: skill(r.skills[0])?.name, prompt: q?.prompt, code: q?.code, rubric: q?.rubric || [], model_answer: q?.model_answer || null,
+          answer: r.answer || '', points: r.points, ai_suggestion: r.ai_suggestion || null, review: r.review || null });
+      }
+    }
+    return out.sort((x, y) => String(x.submitted_at).localeCompare(String(y.submitted_at)));
+  }
+  async function suggestReview(reviewer, uid, attemptId, qid) {
+    if (!isReviewer(reviewer)) return { error: 'Only staff reviewers can request suggestions.', status: 403 };
+    if (!aiSuggest) return { error: 'AI suggestions are not configured on this server. Review using the rubric.', status: 503 };
+    const f = findResponse(uid, attemptId, qid); if (!f) return { error: 'Response not found.', status: 404 };
+    const q = questionVersion(f.r.id, f.r.v);
+    let s;
+    try { s = await aiSuggest(reviewer.id, { prompt: q.prompt, rubric: q.rubric, model_answer: q.model_answer, answer: f.r.answer, kind: f.r.type }); }
+    catch (e) { return { error: 'AI suggestion failed: ' + e.message, status: 502 }; }
+    f.r.ai_suggestion = { ...s, verified: false, requested_by: reviewer.id, at: iso() };
+    writeCareer(f.u, { ...f.c });
+    return { suggestion: f.r.ai_suggestion };
+  }
+  /** Save a human review: points per rubric criterion (each within its maximum) and a comment for the student. */
+  function submitReview(reviewer, uid, attemptId, qid, body) {
+    if (!isReviewer(reviewer)) return { error: 'Only staff reviewers can score answers.', status: 403 };
+    const f = findResponse(uid, attemptId, qid); if (!f) return { error: 'Response not found.', status: 404 };
+    const q = questionVersion(f.r.id, f.r.v), rubric = q?.rubric || [];
+    const given = [].concat(body?.criteria || []);
+    if (given.length !== rubric.length) return { error: 'Score every rubric criterion.' };
+    const criteria = rubric.map((c, i) => {
+      const pts = Number(given[i]?.points);
+      return { criterion: c.criterion, max: c.points, points: pts, note: String(given[i]?.note || '').slice(0, 300) };
+    });
+    if (criteria.some((c) => !Number.isFinite(c.points) || c.points < 0 || c.points > c.max)) return { error: 'Each criterion score must be between 0 and its maximum.' };
+    const comment = String(body?.comment || '').trim().slice(0, 2000);
+    if (comment.length < 10) return { error: 'Write feedback for the student (at least a sentence).' };
+    const awarded = criteria.reduce((a, c) => a + c.points, 0), max = criteria.reduce((a, c) => a + c.max, 0);
+    const prior = f.r.review ? { ...f.r.review } : null;
+    f.r.earned = +(f.r.points * (max ? awarded / max : 0)).toFixed(3);
+    f.r.correct = max ? awarded / max >= 0.7 : false;
+    f.r.pending = false;
+    f.r.review = { criteria, comment, awarded, max, by: reviewer.id, role: reviewer.role, at: iso(),
+      ai_assisted: !!(f.r.ai_suggestion && body?.used_ai_suggestion), previous: prior ? { awarded: prior.awarded, at: prior.at, by: prior.by } : null };
+    f.a.result = E.summarize(f.a.result.responses, config());
+    writeCareer(f.u, { ...f.c });
+    audit(reviewer.id, prior ? 'career_review_update' : 'career_review', 'career_attempt', attemptId, { user_id: uid, question: qid, awarded, max, ai_assisted: f.r.review.ai_assisted });
+    return { response: { id: f.r.id, earned: f.r.earned, review: f.r.review }, attempt: summary(f.a) };
   }
 
   /* -------------------------------- resources -------------------------------- */
@@ -392,7 +495,9 @@ function createCareerService(store, { now = () => new Date() } = {}) {
   function report(user, slug) {
     const c = career(user), cfg = config();
     const profile = E.skillProfile(c.attempts);
-    const chosen = track(slug || c.preferences?.preferred_track || '') || null;
+    // The track asked for, else the preferred one, else the track of the latest track assessment taken.
+    const lastTrackAttempt = c.attempts.filter((a) => a.status === 'submitted' && a.track).pop();
+    const chosen = track(slug || c.preferences?.preferred_track || lastTrackAttempt?.track || '') || null;
     const common = E.commonScore(profile, cfg);
     const resolve = (id) => resources(id, user.id);
     let readiness = null, gaps = [], plan = null;
@@ -403,13 +508,16 @@ function createCareerService(store, { now = () => new Date() } = {}) {
       plan = E.roadmap(chosen, profile, resolve, { stageNames: STAGE_NAMES, projects: c.projects[chosen.slug] || {} }, cfg);
       plan.stages.forEach((st) => st.skills.forEach((s) => { s.name = skill(s.skill)?.name; }));
       readiness.explanation = readiness.explanation.map((line) => line.replace(/\b([a-z]+\.[a-z_]+)\b/g, (m) => skill(m)?.name || m));
+      readiness.category_feedback = categoryFeedback(readiness.evaluation, readiness.weakest_category, cfg);
     }
     const submitted = c.attempts.filter((a) => a.status === 'submitted');
     const last = (key) => submitted.filter((a) => a.assessment === key).pop() || null;
+    const pending = submitted.reduce((n, a) => n + (a.result.pending || 0), 0);
     return {
+      pending_reviews: pending,
       disclaimer: 'Scores guide your learning and placement on EchoLens. They are provisional estimates, not an employment qualification or a psychometrically validated certification.',
       preferences: c.preferences, track: chosen ? publicTrack(chosen) : null,
-      common: { ...common, categories: common.categories.map((x) => ({ ...x, name: skill(x.skill)?.name, status: E.skillStatus(profile[x.skill], false, cfg) })), last_attempt: last('common') ? summary(last('common')) : null },
+      common: { ...common, category_feedback: categoryFeedback(common.evaluation, null, cfg), categories: common.categories.map((x) => ({ ...x, name: skill(x.skill)?.name, status: E.skillStatus(profile[x.skill], false, cfg) })), last_attempt: last('common') ? summary(last('common')) : null },
       readiness, gaps, roadmap: plan,
       track_attempt: chosen && last(chosen.slug) ? summary(last(chosen.slug)) : null,
       strongest: chosen ? readiness.skills.filter((s) => s.status === E.STATUS.strong).sort((a, b) => b.score - a.score).slice(0, 3) : [],
@@ -420,7 +528,32 @@ function createCareerService(store, { now = () => new Date() } = {}) {
       history_count: submitted.length,
     };
   }
-  function summary(a) { return { id: a.id, assessment: a.assessment, title: a.title, submitted_at: a.submitted_at, raw_score: a.result.raw_score, practical_score: a.result.practical_score, answered: a.result.answered, total: a.result.total, late: a.late }; }
+  function summary(a) {
+    const cats = a.result.categories || {}, w = a.weights || categoryWeights(a.track || (a.assessment === 'common' ? 'common' : 'default'));
+    return { id: a.id, assessment: a.assessment, title: a.title, submitted_at: a.submitted_at, raw_score: a.result.raw_score, practical_score: a.result.practical_score,
+      answered: a.result.answered, total: a.result.total, late: a.late, pending: a.result.pending || 0,
+      categories: Object.fromEntries(E.CATEGORIES.map((c) => [c, { score: cats[c]?.score ?? null, answered: cats[c]?.answered || 0, weight: w[c] }])),
+      overall: E.weightedOverall(Object.fromEntries(E.CATEGORIES.map((c) => [c, { score: cats[c]?.score ?? null, sufficient: (cats[c]?.answered || 0) >= 1 }])), w) };
+  }
+  /** Plain-language feedback per evaluation category, so students know whether the weakness is theory, coding or real-world application. */
+  function categoryFeedback(evaluation, weakest, cfg) {
+    const t = cfg.skill_thresholds;
+    const TEXT = {
+      theory: { strong: 'You understand the underlying concepts well.', mid: 'Your conceptual understanding is developing - some ideas are not yet secure.', weak: 'Conceptual understanding is the main gap: revisit the lessons and make sure you can explain each idea in your own words.', none: 'Conceptual understanding has not been assessed yet.' },
+      practical: { strong: 'You can turn concepts into working code, queries or configurations.', mid: 'Your hands-on skills are developing - practise writing and debugging code yourself.', weak: 'Practical implementation is the main gap: you need much more hands-on coding and debugging practice.', none: 'Practical skills have not been shown yet - take an assessment with practical tasks.' },
+      scenario: { strong: 'You apply your knowledge well to real-world problems.', mid: 'Applying skills to real situations is developing - work through projects and case studies.', weak: 'Real-world application is the main gap: practise deciding and justifying what to do in realistic situations, for example through the stage projects.', none: 'Real-world problem-solving has not been assessed yet.' },
+    };
+    const rows = E.CATEGORIES.map((c) => {
+      const e = evaluation?.[c] || {};
+      const level = e.score == null || !e.sufficient ? 'none' : e.score >= t.strong ? 'strong' : e.score >= t.developing ? 'mid' : 'weak';
+      return { category: c, name: E.CATEGORY_NAME[c], label: E.CATEGORY_LABEL[c], score: e.sufficient ? e.score : null, weight: e.weight, items: e.items || 0, level, message: TEXT[c][level] };
+    });
+    const summaryText = weakest
+      ? `Your weakest area is ${weakest.label} (${weakest.score}%), compared with ${E.CATEGORY_LABEL[weakest.strongest]} (${weakest.strongest_score}%). ${TEXT[weakest.category].weak}`
+      : rows.every((r) => r.level === 'strong') ? 'You are strong in theory, practical work and real-world application alike.'
+        : rows.some((r) => r.level === 'none') ? 'Some evaluation areas have not been assessed yet, so the picture is incomplete.' : 'Your theory, practical and scenario results are at a similar level.';
+    return { rows, summary: summaryText };
+  }
   function history(user) {
     const c = career(user), sub = c.attempts.filter((a) => a.status === 'submitted');
     const skillsSeen = [...new Set(sub.flatMap((a) => Object.keys(a.result.skills)))];
@@ -468,6 +601,7 @@ function createCareerService(store, { now = () => new Date() } = {}) {
       // Per-question difficulty from real answers, to spot broken or ambiguous items.
       question_quality: questionStats(users),
       content_gaps: contentGaps(),
+      review_backlog: reviewQueue({ status: 'pending' }).length,
     };
   }
   function questionStats(users) {
@@ -480,13 +614,13 @@ function createCareerService(store, { now = () => new Date() } = {}) {
   function preview(key, { includeDrafts = true } = {}) {
     const def = assessmentDef(key); if (!def) return { error: 'Unknown assessment.', status: 404 };
     const pool = def.banks.flatMap((b) => questions(b).filter((q) => q.status === 'published' || (includeDrafts && ['draft', 'reviewed'].includes(q.status))));
-    const form = E.assembleForm({ pool, plan: def.plan, seed: crypto.randomInt(1, 2 ** 31) });
+    const form = E.assembleForm({ pool, plan: def.plan, seed: crypto.randomInt(1, 2 ** 31), reviewItems: def.reviewItems || 0 });
     const byId = new Map(pool.map((q) => [q.id, q]));
-    return { title: def.title, shortfall: form.shortfall, coverage: coverage(def), questions: form.items.map((i) => ({ ...byId.get(i.id), options: E.publicQuestion(byId.get(i.id), i.order).options })) };
+    return { title: def.title, weights: def.weights, shortfall: form.shortfall, coverage: coverage(def), questions: form.items.map((i) => ({ ...byId.get(i.id), options: E.publicQuestion(byId.get(i.id), i.order).options })) };
   }
 
   return {
-    BANKS, LANGS, PREF_FIELDS, config, updateConfig, questions, published, questionById, setQuestionStatus, editQuestion, addQuestion,
+    BANKS, LANGS, PREF_FIELDS, REVIEWER_ROLES, config, updateConfig, categoryWeights, reviewQueue, suggestReview, submitReview, isReviewer, questions, published, questionById, setQuestionStatus, editQuestion, addQuestion,
     track, tracks, updateTrack, publicTrack, assessmentDef, coverage, availability, career, savePreferences, startAttempt, resumeAttempt, saveAnswers,
     submitAttempt, abandonAttempt, attemptReview, resources, contentGaps, report, history, setProject, analytics, preview, isLearner,
   };

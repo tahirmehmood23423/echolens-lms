@@ -4,8 +4,10 @@ const assert = require('node:assert/strict');
 const E = require('../career/engine');
 const { skill } = require('../career/skills');
 const { TRACKS, track } = require('../career/tracks');
-const BANKS = { common: require('../career/banks/common'), frontend: require('../career/banks/frontend'), backend: require('../career/banks/backend'), aiml: require('../career/banks/aiml') };
+const REG = require('../career/banks').BANKS;
+const BANKS = Object.fromEntries(Object.entries(REG).map(([k, v]) => [k, v.questions]));
 const C = E.DEFAULT_CONFIG;
+// First forms (nothing seen yet) include one practical and one scenario item per skill where the bank has them.
 
 test('question banks are well formed: unique ids, valid keys, known skills, explanations', () => {
   const ids = new Set();
@@ -14,7 +16,9 @@ test('question banks are well formed: unique ids, valid keys, known skills, expl
       assert.ok(!ids.has(q.id), `duplicate ${q.id}`); ids.add(q.id);
       assert.ok(q.explanation && q.prompt, q.id);
       for (const s of q.skills) assert.ok(skill(s), `${q.id} unknown skill ${s}`);
-      if (q.type === 'output') assert.ok(q.answer.length, q.id);
+      assert.ok(['theory', 'practical', 'scenario'].includes(q.category), `${q.id} category`);
+      if (q.grading === 'review') assert.ok(q.rubric.length && q.points > 0, `${q.id} rubric`);
+      else if (q.type === 'output') assert.ok(q.answer.length, q.id);
       else assert.ok(q.answer.every((a) => q.options.some((o) => o.id === a)), `${q.id} key`);
       assert.equal(q.status, 'draft', `${bank} ships as draft`);
     }
@@ -31,19 +35,25 @@ test('every track and stage references known skills', () => {
 });
 
 test('form assembly follows the plan, spreads difficulty, prefers unseen questions and hides the key', () => {
-  const pool = BANKS.common;
+  const pool = BANKS.common.filter((q) => q.grading !== 'review');
   const form = E.assembleForm({ pool, plan: C.common_form, seed: 7 });
   assert.deepEqual(form.shortfall, {});
+  for (const sk of Object.keys(C.common_form)) for (const c of ['practical', 'scenario']) {
+    if (pool.some((q) => q.skills[0] === sk && q.category === c)) assert.ok(form.items.some((i) => { const q = pool.find((x) => x.id === i.id); return q.skills[0] === sk && q.category === c; }), `${sk} ${c}`);
+  }
   assert.equal(form.items.length, Object.values(C.common_form).reduce((a, b) => a + b, 0));
   const again = E.assembleForm({ pool, plan: C.common_form, seed: 7 });
   assert.deepEqual(again.items, form.items, 'same seed, same form');
   const seen = new Set(form.items.map((i) => i.id));
   const retake = E.assembleForm({ pool, plan: C.common_form, seen, seed: 8 });
   const overlap = retake.items.filter((i) => seen.has(i.id)).length;
-  const minOverlap = Object.entries(C.common_form).reduce((a, [s, n]) => a + Math.max(0, 2 * n - pool.filter((q) => q.skills[0] === s).length), 0);
-  // The pool forces `minOverlap` repeats; the one-practical-per-form rule may
-  // add one more when the bank has a single practical task (common has one).
-  assert.ok(overlap <= minOverlap + 1, `retake reused ${overlap}, pool forces ${minOverlap}`);
+  // A question is repeated only when its skill has fewer unseen items than the form needs.
+  for (const item of retake.items.filter((i) => seen.has(i.id))) {
+    const q = pool.find((x) => x.id === item.id), sk = q.skills[0], qs = pool.filter((x) => x.skills[0] === sk);
+    const unseen = qs.filter((x) => !seen.has(x.id)).length;
+    assert.ok(unseen < C.common_form[sk], `${q.id} was repeated although unseen questions remained`);
+  }
+  assert.ok(overlap < form.items.length);
   const q = pool.find((x) => x.id === form.items.find((i) => pool.find((p) => p.id === i.id).options.length).id);
   const pub = E.publicQuestion(q, form.items.find((i) => i.id === q.id).order);
   assert.equal(pub.answer, undefined); assert.equal(pub.explanation, undefined);
@@ -95,9 +105,13 @@ test('score bands and skill status thresholds', () => {
 
 test('readiness caps the level for critical gaps and unproven critical skills, and explains why', () => {
   const t = track('frontend-web-developer');
-  const all = (score) => Object.fromEntries(t.skills.map((s) => [s.skill, { score, evidence: 'sufficient' }]));
+  const cats = (score) => ({ theory: { score, answered: 2 }, practical: { score, answered: 2 }, scenario: { score, answered: 2 } });
+  const all = (score) => Object.fromEntries(t.skills.map((s) => [s.skill, { score, evidence: 'sufficient', by_category: cats(score) }]));
   assert.equal(E.trackReadiness(t, all(90)).level, 'Advanced');
-  const gap = { ...all(95), 'fe.js': { score: 30, evidence: 'sufficient' } };
+  const noPractical = Object.fromEntries(Object.entries(all(95)).map(([k, v]) => [k, { ...v, by_category: { theory: v.by_category.theory } }]));
+  const np = E.trackReadiness(t, noPractical);
+  assert.equal(np.level, 'Intermediate', 'theory alone never proves readiness'); assert.match(np.explanation.join(' '), /practical implementation has not been shown/);
+  const gap = { ...all(95), 'fe.js': { score: 30, evidence: 'sufficient', by_category: cats(30) } };
   const r = E.trackReadiness(t, gap);
   assert.equal(r.level, 'Beginner'); assert.match(r.explanation.join(' '), /critical prerequisite gap in fe\.js/);
   const unproven = { ...all(95) }; delete unproven['fe.css'];
@@ -139,4 +153,47 @@ test('skill profile keeps the latest sufficient evidence and never loses history
   assert.equal(E.skillProfile([a1, a2])['fe.js'].score, 40, 'thin evidence does not replace sufficient');
   assert.equal(E.skillProfile([a1, a2, a3])['fe.js'].score, 80);
   assert.deepEqual(E.skillHistory([a1, a2, a3], 'fe.js').map((h) => h.score), [40, 100, 80]);
+});
+
+test('category weights mix theory, practical and scenario into the overall score', () => {
+  const t = track('frontend-web-developer');
+  const p = Object.fromEntries(t.skills.map((s) => [s.skill, { score: 70, evidence: 'sufficient', by_category: { theory: { score: 100, answered: 2 }, practical: { score: 40, answered: 2 }, scenario: { score: 70, answered: 2 } } }]));
+  const r = E.trackReadiness(t, p);
+  const w = t.category_weights;
+  assert.equal(r.evaluation.practical.score, 40);
+  assert.equal(r.score, Math.round((w.theory * 100 + w.practical * 40 + w.scenario * 70) / (w.theory + w.practical + w.scenario)));
+  assert.equal(r.weakest_category.category, 'practical');
+  const custom = E.trackReadiness(t, p, { ...C, category_weights: { ...C.category_weights, [t.slug]: { theory: 100, practical: 0, scenario: 0 } } });
+  assert.equal(custom.score, 100);
+});
+
+test('reviewed items stay pending and out of every score until a human scores them', () => {
+  const w = BANKS.frontend.find((q) => q.id === 'fe-wr-01');
+  const mcq = BANKS.frontend.find((q) => q.id === 'fe-js-03');
+  const r = E.scoreAttempt([w, mcq], { [w.id]: 'let and const are block scoped...', [mcq.id]: mcq.answer[0] });
+  assert.equal(r.pending, 1); assert.equal(r.raw_score, 100);
+  assert.equal(r.skills['fe.js'].answered, 1, 'only the auto item counts');
+  const resp = r.responses.find((x) => x.id === w.id);
+  assert.equal(resp.earned, null); assert.ok(resp.answer.startsWith('let and const'));
+  resp.pending = false; resp.earned = 0;
+  const after = E.summarize(r.responses);
+  assert.equal(after.pending, 0); assert.equal(after.raw_score, Math.round((mcq.points / (mcq.points + w.points)) * 100));
+});
+
+test('gap diagnosis separates conceptual, practical and applied weaknesses', () => {
+  const t = track('backend-developer');
+  const p = { 'be.sql': { score: 72, evidence: 'sufficient', answered: 4, by_category: { theory: { score: 100, answered: 2 }, practical: { score: 0, answered: 1 }, scenario: { score: 100, answered: 1 } } } };
+  const g = E.skillGaps(t, p, () => [{ title: 'Joins', course: 'PG', tasks: 2, completed: false }]).find((x) => x.skill === 'be.sql');
+  assert.ok(g, 'Strong overall but weak practical still surfaces'); assert.deepEqual(g.weak_in, ['practical']); assert.equal(g.partial, true);
+  const text = E.recommendation(g, 'SQL');
+  assert.match(text, /practical implementation/); assert.match(text, /write and debug the code yourself/); assert.match(text, /theory 100%/);
+});
+
+test('every one of the 12 tracks has theory, practical and scenario items for its bank skills', () => {
+  for (const t of TRACKS) {
+    const pool = t.assessment.banks.flatMap((b) => BANKS[b]);
+    assert.ok(pool.length, `${t.slug} has banks`);
+    for (const c of ['theory', 'practical', 'scenario']) assert.ok(pool.some((q) => q.category === c && t.skills.some((s) => s.skill === q.skills[0])), `${t.slug} ${c}`);
+    assert.ok(pool.some((q) => q.grading === 'review' && t.skills.some((s) => s.skill === q.skills[0])), `${t.slug} reviewed item`);
+  }
 });

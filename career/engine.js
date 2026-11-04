@@ -3,32 +3,51 @@
  * Career assessment engine - pure, deterministic functions with no storage
  * access, so every rule can be unit-tested and every result explained.
  *
- *   assembleForm   pick a randomised form from published questions
- *   scoreAttempt   grade responses server-side and summarise per skill
- *   skillProfile   the CURRENT assessed proficiency, from attempt history
- *   commonScore    weighted common-CS score (configurable weights)
- *   trackReadiness readiness + level for a track, with caps and reasons
- *   skillGaps      prioritised gaps with concrete recommendations
- *   roadmap        six-stage personalised roadmap with a starting stage
+ * HYBRID ASSESSMENT. Every question is one of three evaluation categories:
+ *   theory     conceptual knowledge (MCQ, multiple-select, code tracing, explanations)
+ *   practical  hands-on implementation (debugging, fixing code/SQL/config, data tasks)
+ *   scenario   applied problem-solving on real-world situations
+ * Scores are kept per category, per skill, and per skill-and-category, and
+ * an assessment's overall score is a configurable weighted mix of the three.
  *
- * Scoring is rule-based: objective questions are graded by exact rules, and
- * no LLM is involved. Unanswered questions are excluded rather than counted
- * as zero, and a skill without enough answered questions is reported as
- * "insufficient evidence" instead of a low score.
+ * GRADING. 'auto' items are graded by exact rules. 'review' items (written
+ * explanations and practical submissions the server cannot run safely) wait
+ * for a staff reviewer with a rubric; until reviewed they are PENDING and are
+ * left out of every score rather than guessed. No LLM grade is ever used
+ * here - AI can only suggest rubric scores to a human reviewer (service.js).
+ *
+ *   assembleForm   randomised form: per skill one theory, practical, scenario
+ *   scoreAttempt   grade responses; summarise() rebuilds totals after review
+ *   skillProfile   CURRENT assessed proficiency, from attempt history
+ *   commonScore    weighted common-CS score
+ *   categoryScores weighted theory / practical / scenario scores for skills
+ *   trackReadiness overall score + level for a track, with caps and reasons
+ *   skillGaps      prioritised gaps, each diagnosed by category
+ *   recommendation concrete next steps that name the kind of weakness
+ *   roadmap        six-stage personalised roadmap with a starting stage
  */
+
+const CATEGORIES = ['theory', 'practical', 'scenario'];
+const CATEGORY_LABEL = { theory: 'theoretical understanding', practical: 'practical implementation', scenario: 'real-world application' };
+const CATEGORY_NAME = { theory: 'Theory', practical: 'Practical', scenario: 'Scenario' };
 
 const DEFAULT_CONFIG = {
   version: 1,
   common_weights: { 'cs.programming': 30, 'cs.logic': 25, 'cs.computing': 15, 'cs.dsa_basics': 15, 'cs.git_tools': 10, 'cs.debugging': 5 },
   common_form: { 'cs.programming': 5, 'cs.logic': 4, 'cs.computing': 3, 'cs.dsa_basics': 3, 'cs.git_tools': 3, 'cs.debugging': 3 },
+  // Default theory / practical / scenario weights; tracks may set their own
+  // (tracks.js category_weights) and admins can override any of them.
+  category_weights: { default: { theory: 40, practical: 35, scenario: 25 }, common: { theory: 50, practical: 30, scenario: 20 } },
   track_items_per_skill: 3,
   skill_reassess_items: 4,
+  review_items_per_form: 2,
   bands: [
     { min: 0, level: 'Foundation' }, { min: 25, level: 'Beginner' }, { min: 50, level: 'Intermediate' },
     { min: 70, level: 'Proficient' }, { min: 85, level: 'Advanced' },
   ],
   skill_thresholds: { strong: 70, developing: 50 },
   min_evidence_items: 3,
+  min_category_items: 2,
   min_confidence: 0.6,
   retake_cooldown_hours: 24,
   time_grace_sec: 120,
@@ -36,40 +55,52 @@ const DEFAULT_CONFIG = {
 };
 
 /* ------------------------------ seeded randomness ------------------------------ */
-// mulberry32: small, fast and reproducible, so a stored seed recreates a form.
 function rng(seed) {
   let a = seed >>> 0;
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 function shuffle(list, rand) { const a = list.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const catOf = (q) => q.category || 'theory';
 
 /* ---------------------------------- forms ---------------------------------- */
 /**
- * Pick `plan[skill]` questions per skill from `pool` (published questions).
- * Questions the student saw recently go last, so a retake gets an alternate
- * form wherever the bank allows. Within a skill the pick spreads difficulty,
- * and the form keeps at least one practical task when the pool has one.
- * Returns { items: [{id, version, order}], shortfall: {skill: missing} }.
+ * Pick `plan[skill]` AUTO-graded questions per skill: one practical and one
+ * scenario first (when the pool has an unseen one), then theory, so each
+ * skill gets evidence in every category. Unseen questions are preferred over ones the
+ * student met recently, and difficulty is spread. Then up to
+ * `reviewItems` staff-reviewed items (a written explanation, a practical
+ * submission) are added for skills in the plan.
  */
-function assembleForm({ pool, plan, seen = new Set(), seed = 1 }) {
+function assembleForm({ pool, plan, seen = new Set(), seed = 1, reviewItems = 0 }) {
   const rand = rng(seed);
   const items = [], used = new Set(), shortfall = {};
+  const auto = pool.filter((q) => q.grading !== 'review');
+  const fresh = (list) => [list.filter((c) => !seen.has(c.id)), list.filter((c) => seen.has(c.id))];
   for (const [skill, want] of Object.entries(plan)) {
-    const candidates = shuffle(pool.filter((q) => q.skills[0] === skill && !used.has(q.id)), rand);
+    const candidates = shuffle(auto.filter((q) => q.skills[0] === skill && !used.has(q.id)), rand);
     const picked = [];
-    // Unseen questions first, spreading difficulty within them; seen ones only
-    // when the pool has nothing new left for this skill.
-    for (const group of [candidates.filter((c) => !seen.has(c.id)), candidates.filter((c) => seen.has(c.id))]) {
-      for (const d of [1, 2, 3]) { const q = group.find((c) => c.difficulty === d && !picked.includes(c)); if (q && picked.length < want) picked.push(q); }
-      for (const q of group) { if (picked.length >= want) break; if (!picked.includes(q)) picked.push(q); }
+    const take = (q) => { if (q && picked.length < want && !picked.includes(q)) picked.push(q); };
+    // Category preference uses UNSEEN items only: on a retake, repeating the
+    // same practical task would inflate the score. If every item of a category
+    // was seen recently, the earlier evidence for it stays in the profile.
+    for (const cat of ['practical', 'scenario']) { const q = candidates.find((c) => catOf(c) === cat && !seen.has(c.id)); if (q && !picked.some((p) => catOf(p) === cat)) take(q); }
+    for (const group of fresh(candidates)) {
+      for (const d of [1, 2, 3]) take(group.find((c) => c.difficulty === d && !picked.includes(c)));
+      for (const q of group) take(q);
     }
     if (picked.length < want) shortfall[skill] = want - picked.length;
     picked.forEach((q) => { used.add(q.id); items.push(q); });
   }
-  if (!items.some((q) => q.practical)) {
-    const practical = shuffle(pool.filter((q) => q.practical && !used.has(q.id) && plan[q.skills[0]]), rand)
-      .sort((a, b) => Number(seen.has(a.id)) - Number(seen.has(b.id)))[0];
-    if (practical) { const i = items.findIndex((q) => q.skills[0] === practical.skills[0] && !q.practical); if (i >= 0) items[i] = practical; }
+  if (reviewItems > 0) {
+    const manual = shuffle(pool.filter((q) => q.grading === 'review' && plan[q.skills[0]]), rand);
+    const chosen = [];
+    // Prefer one practical submission and one written explanation, on different skills.
+    for (const want of ['submission', 'written']) for (const group of fresh(manual.filter((q) => q.type === want))) {
+      const q = group.find((x) => !chosen.some((c) => c.skills[0] === x.skills[0])) || group[0];
+      if (q && chosen.length < reviewItems && !chosen.some((c) => c.type === want)) chosen.push(q);
+    }
+    for (const group of fresh(manual)) for (const q of group) if (chosen.length < reviewItems && !chosen.includes(q)) chosen.push(q);
+    chosen.forEach((q) => { used.add(q.id); items.push(q); });
   }
   return {
     items: shuffle(items, rand).map((q) => ({ id: q.id, version: q.version, order: q.options.length ? shuffle(q.options.map((o) => o.id), rand) : [] })),
@@ -77,12 +108,13 @@ function assembleForm({ pool, plan, seen = new Set(), seed = 1 }) {
   };
 }
 
-/** What a student sees: no answer key, no explanation, options in form order. */
+/** What a student sees: no answer key, no explanation, no model answer. Rubric criteria are shown for reviewed items. */
 function publicQuestion(q, order) {
   const byId = new Map(q.options.map((o) => [o.id, o]));
   return {
-    id: q.id, type: q.type, prompt: q.prompt, code: q.code, points: q.points, time_sec: q.time_sec, practical: q.practical,
-    multi: q.type === 'multi',
+    id: q.id, type: q.type, prompt: q.prompt, code: q.code, points: q.points, time_sec: q.time_sec,
+    category: catOf(q), practical: catOf(q) === 'practical', grading: q.grading || 'auto', multi: q.type === 'multi',
+    rubric: q.grading === 'review' ? (q.rubric || []).map((r) => ({ criterion: r.criterion, points: r.points })) : undefined,
     options: (order && order.length ? order : q.options.map((o) => o.id)).map((id) => byId.get(id)).filter(Boolean).map((o) => ({ id: o.id, text: o.text })),
   };
 }
@@ -91,9 +123,10 @@ function publicQuestion(q, order) {
 const normalizeTyped = (s) => String(s == null ? '' : s).trim().toLowerCase().replace(/\s+/g, ' ').replace(/^["']|["']$/g, '');
 const isBlank = (a) => a == null || (Array.isArray(a) ? a.length === 0 : String(a).trim() === '');
 
-/** Grade one response. Multiple-answer: (right picks - wrong picks) / key size, never below 0. */
+/** Grade one response. Multiple-select: (right picks - wrong picks) / key size, never below 0. Reviewed items stay pending. */
 function gradeResponse(q, answer) {
   if (isBlank(answer)) return { answered: false, earned: 0, correct: false };
+  if (q.grading === 'review') return { answered: true, earned: null, correct: null, pending: true };
   if (q.type === 'output') {
     const ok = q.answer.map(normalizeTyped).includes(normalizeTyped(answer));
     return { answered: true, earned: ok ? q.points : 0, correct: ok };
@@ -109,65 +142,96 @@ function gradeResponse(q, answer) {
   return { answered: true, earned: ok ? q.points : 0, correct: ok };
 }
 
+const pct = (earned, possible) => (possible ? Math.round((earned / possible) * 100) : null);
+const blankTally = () => ({ answered: 0, possible: 0, earned: 0 });
+const finishTally = (t) => ({ ...t, score: pct(t.earned, t.possible) });
+
 /**
- * Grade an attempt. `questions` are the exact versions served. The result is
- * a self-contained record: later edits to the bank or config cannot change it.
+ * Totals from graded responses. A response counts only when it is answered
+ * and not pending review. Run again after a reviewer scores an item.
  */
-function scoreAttempt(questions, answers, config = DEFAULT_CONFIG) {
-  const responses = [], skills = {};
-  for (const q of questions) {
-    const g = gradeResponse(q, answers[q.id]);
-    responses.push({ id: q.id, v: q.version, answered: g.answered, earned: g.earned, points: q.points, correct: g.correct, practical: q.practical, skills: q.skills });
-    for (const s of q.skills) {
-      const e = skills[s] || (skills[s] = { presented: 0, answered: 0, possible: 0, earned: 0, practical_possible: 0, practical_earned: 0 });
+function summarize(responses, config = DEFAULT_CONFIG) {
+  const skills = {}, categories = Object.fromEntries(CATEGORIES.map((c) => [c, blankTally()]));
+  for (const r of responses) {
+    const cat = r.category || 'theory';
+    for (const s of r.skills) {
+      const e = skills[s] || (skills[s] = { presented: 0, answered: 0, pending: 0, possible: 0, earned: 0, by_category: Object.fromEntries(CATEGORIES.map((c) => [c, blankTally()])) });
       e.presented++;
-      if (!g.answered) continue;
-      e.answered++; e.possible += q.points; e.earned += g.earned;
-      if (q.practical) { e.practical_possible += q.points; e.practical_earned += g.earned; }
+      if (!r.answered) continue;
+      if (r.pending) { e.pending++; continue; }
+      e.answered++; e.possible += r.points; e.earned += r.earned;
+      const bc = e.by_category[cat]; bc.answered++; bc.possible += r.points; bc.earned += r.earned;
     }
+    if (r.answered && !r.pending) { const t = categories[cat]; t.answered++; t.possible += r.points; t.earned += r.earned; }
   }
   for (const e of Object.values(skills)) {
-    e.score = e.possible ? Math.round((e.earned / e.possible) * 100) : null;
-    e.practical_score = e.practical_possible ? Math.round((e.practical_earned / e.practical_possible) * 100) : null;
+    e.score = pct(e.earned, e.possible);
     e.evidence = e.answered >= config.min_evidence_items ? 'sufficient' : 'insufficient';
+    e.by_category = Object.fromEntries(Object.entries(e.by_category).map(([c, t]) => [c, finishTally(t)]));
+    e.practical_score = e.by_category.practical.score;
   }
-  const possible = responses.filter((r) => r.answered).reduce((a, r) => a + r.points, 0);
-  const earned = responses.reduce((a, r) => a + r.earned, 0);
-  const prac = responses.filter((r) => r.practical && r.answered);
+  const done = responses.filter((r) => r.answered && !r.pending);
+  const cats = Object.fromEntries(Object.entries(categories).map(([c, t]) => [c, finishTally(t)]));
   return {
-    responses, skills,
+    responses, skills, categories: cats,
     answered: responses.filter((r) => r.answered).length, total: responses.length,
-    raw_score: possible ? Math.round((earned / possible) * 100) : null,
-    practical_score: prac.length ? Math.round((prac.reduce((a, r) => a + r.earned, 0) / prac.reduce((a, r) => a + r.points, 0)) * 100) : null,
+    pending: responses.filter((r) => r.pending).length,
+    raw_score: pct(done.reduce((a, r) => a + r.earned, 0), done.reduce((a, r) => a + r.points, 0)),
+    practical_score: cats.practical.score,
   };
+}
+
+/** Grade an attempt. `questions` are the exact versions served; the result is self-contained. */
+function scoreAttempt(questions, answers, config = DEFAULT_CONFIG) {
+  const responses = questions.map((q) => {
+    const g = gradeResponse(q, answers[q.id]);
+    const r = { id: q.id, v: q.version, type: q.type, grading: q.grading || 'auto', category: catOf(q), answered: g.answered, earned: g.earned, points: q.points, correct: g.correct, practical: catOf(q) === 'practical', skills: q.skills };
+    if (g.pending) { r.pending = true; r.answer = String(answers[q.id]).slice(0, 6000); }
+    return r;
+  });
+  return summarize(responses, config);
+}
+
+/** Weighted overall from category scores: renormalised over the categories that have evidence. */
+function weightedOverall(categoryScores, weights) {
+  let w = 0, acc = 0;
+  for (const c of CATEGORIES) { const s = categoryScores[c]; if (s && s.score != null && s.sufficient !== false) { w += weights[c] || 0; acc += (weights[c] || 0) * s.score; } }
+  return w ? Math.round(acc / w) : null;
+}
+function weightsFor(key, config = DEFAULT_CONFIG, trackDefault) {
+  const cw = config.category_weights || {};
+  return { ...(cw.default || DEFAULT_CONFIG.category_weights.default), ...(trackDefault || {}), ...(cw[key] || {}) };
 }
 
 /* ------------------------------ current profile ------------------------------ */
 /**
  * Current assessed proficiency per skill: the most recent attempt that gave
- * SUFFICIENT evidence for the skill. If only thin evidence exists, the latest
- * thin record is kept and marked insufficient. History is never altered.
+ * SUFFICIENT evidence for the skill (else the latest thin record, marked).
+ * Each category keeps its own latest evidence, so a short reassessment of
+ * practical work updates the practical picture without erasing the rest.
  */
 function skillProfile(attempts) {
   const profile = {};
   const done = attempts.filter((a) => a.status === 'submitted' && a.result).sort((a, b) => String(a.submitted_at).localeCompare(String(b.submitted_at)));
   for (const a of done) {
     for (const [skill, e] of Object.entries(a.result.skills)) {
-      if (e.score == null) continue;
       const prev = profile[skill];
+      const cats = { ...(prev?.by_category || {}) };
+      for (const c of CATEGORIES) { const t = e.by_category?.[c]; if (t && t.answered) cats[c] = { score: t.score, answered: t.answered, at: a.submitted_at }; }
+      if (e.score == null) { if (prev) prev.by_category = cats; else if (Object.keys(cats).length) profile[skill] = { score: null, evidence: 'none', answered: 0, by_category: cats }; continue; }
       if (e.evidence === 'sufficient' || !prev || prev.evidence !== 'sufficient') {
-        profile[skill] = { score: e.score, practical_score: e.practical_score, evidence: e.evidence, answered: e.answered, attempt_id: a.id, at: a.submitted_at, assessment: a.assessment };
-      }
+        profile[skill] = { score: e.score, evidence: e.evidence, answered: e.answered, attempt_id: a.id, at: a.submitted_at, assessment: a.assessment, by_category: cats };
+      } else prev.by_category = cats;
     }
   }
+  for (const e of Object.values(profile)) e.practical_score = e.by_category?.practical?.score ?? null;
   return profile;
 }
 
-/** Skill history for before/after comparisons: every scored record, oldest first. */
 function skillHistory(attempts, skill) {
   return attempts.filter((a) => a.status === 'submitted' && a.result?.skills?.[skill]?.score != null)
     .sort((a, b) => String(a.submitted_at).localeCompare(String(b.submitted_at)))
-    .map((a) => ({ attempt_id: a.id, at: a.submitted_at, score: a.result.skills[skill].score, evidence: a.result.skills[skill].evidence }));
+    .map((a) => { const e = a.result.skills[skill]; return { attempt_id: a.id, at: a.submitted_at, score: e.score, evidence: e.evidence, by_category: Object.fromEntries(CATEGORIES.map((c) => [c, e.by_category?.[c]?.score ?? null])) }; });
 }
 
 /* ------------------------------ classification ------------------------------ */
@@ -189,82 +253,134 @@ function skillStatus(entry, critical, config = DEFAULT_CONFIG) {
 }
 const demonstrated = (entry, config) => skillStatus(entry, false, config) === STATUS.strong;
 
-/** Common CS score: configured weights over categories with sufficient evidence, renormalised. */
+/**
+ * Theory / practical / scenario scores over a set of weighted skills: for
+ * each category, the skill-weighted mean of the skills' category scores.
+ * A category needs at least `min_category_items` answered items in total to
+ * count towards the overall score.
+ */
+function categoryScores(skillEntries, profile, config = DEFAULT_CONFIG) {
+  const out = {};
+  for (const c of CATEGORIES) {
+    let w = 0, acc = 0, items = 0, skills = 0;
+    for (const { skill, weight } of skillEntries) {
+      const t = profile[skill]?.by_category?.[c];
+      if (t && t.score != null && t.answered) { w += weight; acc += weight * t.score; items += t.answered; skills++; }
+    }
+    out[c] = { score: w ? Math.round(acc / w) : null, items, skills, sufficient: items >= config.min_category_items };
+  }
+  return out;
+}
+
+/** Common CS score: configured category weights over CS skills with sufficient evidence, plus the theory/practical/scenario split. */
 function commonScore(profile, config = DEFAULT_CONFIG) {
   const w = config.common_weights, total = Object.values(w).reduce((a, b) => a + b, 0);
   let wsum = 0, acc = 0;
   const categories = Object.entries(w).map(([skill, weight]) => {
     const e = profile[skill], ok = e && e.evidence === 'sufficient' && e.score != null;
     if (ok) { wsum += weight; acc += weight * e.score; }
-    return { skill, weight, score: e ? e.score : null, evidence: e ? e.evidence : 'none' };
+    return { skill, weight, score: e ? e.score : null, evidence: e ? e.evidence : 'none', by_category: e?.by_category || {} };
   });
-  return { score: wsum ? Math.round(acc / wsum) : null, coverage: total ? +(wsum / total).toFixed(2) : 0, categories };
+  const split = categoryScores(Object.entries(w).map(([skill, weight]) => ({ skill, weight })), profile, config);
+  const weights = weightsFor('common', config);
+  return {
+    score: wsum ? Math.round(acc / wsum) : null, coverage: total ? +(wsum / total).toFixed(2) : 0, categories,
+    evaluation: Object.fromEntries(CATEGORIES.map((c) => [c, { ...split[c], weight: weights[c] }])),
+    overall: weightedOverall(split, weights),
+  };
 }
 
 /**
- * Track readiness: weighted mean over the track's skills that have sufficient
- * evidence. The level comes from the score band, then rules cap it:
- *   - coverage below min_confidence      -> "Insufficient Evidence"
- *   - any critical skill with a gap      -> at most "Beginner"
- *   - any critical skill not yet assessed -> at most "Intermediate"
- * Every rule that fires is written to `explanation`.
+ * Track readiness. Overall = theory/practical/scenario category scores mixed
+ * by the track's configured weights. The level comes from the score band,
+ * then rules cap it, each recorded in `explanation`:
+ *   - coverage below min_confidence          -> "Insufficient Evidence"
+ *   - a critical skill with a gap            -> at most band 2
+ *   - a critical skill not yet demonstrated  -> at most band 3
+ *   - no practical evidence at all           -> at most band 3 (knowledge alone never proves readiness)
  */
 function trackReadiness(track, profile, config = DEFAULT_CONFIG) {
   const total = track.skills.reduce((a, s) => a + s.weight, 0);
-  let wsum = 0, acc = 0, pw = 0, pacc = 0;
+  let wsum = 0, acc = 0;
   const skills = track.skills.map((s) => {
     const e = profile[s.skill], status = skillStatus(e, s.critical, config);
     if (e && e.evidence === 'sufficient' && e.score != null) { wsum += s.weight; acc += s.weight * e.score; }
-    if (e && e.practical_score != null) { pw += s.weight; pacc += s.weight * e.practical_score; }
-    return { ...s, score: e ? e.score : null, practical_score: e ? e.practical_score : null, evidence: e ? e.evidence : 'none', status };
+    return { ...s, score: e ? e.score : null, practical_score: e ? e.practical_score : null, evidence: e ? e.evidence : 'none', status,
+      by_category: Object.fromEntries(CATEGORIES.map((c) => [c, e?.by_category?.[c]?.score ?? null])) };
   });
-  const score = wsum ? Math.round(acc / wsum) : null;
+  const knowledge = wsum ? Math.round(acc / wsum) : null;
   const coverage = total ? +(wsum / total).toFixed(2) : 0;
+  const weights = weightsFor(track.slug, config, track.category_weights);
+  const cats = categoryScores(track.skills, profile, config);
+  const overall = weightedOverall(cats, weights) ?? knowledge;
   const explanation = [];
-  let level = band(score, config);
   const order = config.bands.map((b) => b.level);
+  let level = band(overall, config);
   const cap = (max, why) => { if (level && order.indexOf(level) > order.indexOf(max)) { level = max; explanation.push(why); } };
-  if (score != null) explanation.push(`Knowledge score ${score}% across the ${skills.filter((s) => s.evidence === 'sufficient').length} assessed skills places you in the ${band(score, config)} band.`);
+  if (overall != null) {
+    const parts = CATEGORIES.filter((c) => cats[c].score != null && cats[c].sufficient).map((c) => `${CATEGORY_NAME[c]} ${cats[c].score}% (weight ${weights[c]})`);
+    explanation.push(`Overall score ${overall}% from ${parts.join(', ') || 'the assessed skills'} places you in the ${band(overall, config)} band.`);
+    const thin = CATEGORIES.filter((c) => !cats[c].sufficient);
+    if (thin.length) explanation.push(`${thin.map((c) => CATEGORY_NAME[c]).join(' and ')} ${thin.length === 1 ? 'has' : 'have'} too little evidence yet, so ${thin.length === 1 ? 'it is' : 'they are'} left out of the overall score.`);
+  }
   const gaps = skills.filter((s) => s.critical && s.status === STATUS.critical);
   if (gaps.length) cap(order[1], `Capped at ${order[1]}: critical prerequisite gap in ${gaps.map((s) => s.skill).join(', ')}.`);
   const unproven = skills.filter((s) => s.critical && [STATUS.none, STATUS.thin].includes(s.status));
   if (unproven.length) cap(order[2], `Capped at ${order[2]}: critical skill(s) not yet demonstrated - ${unproven.map((s) => s.skill).join(', ')}.`);
-  if (score == null || coverage < config.min_confidence) {
+  if (!cats.practical.sufficient) cap(order[2], `Capped at ${order[2]}: practical implementation has not been shown yet. Knowledge questions alone cannot confirm readiness.`);
+  if (overall == null || coverage < config.min_confidence) {
     explanation.push(`Only ${Math.round(coverage * 100)}% of this track's skills (by weight) have enough evidence; at least ${Math.round(config.min_confidence * 100)}% is needed for a level.`);
     level = 'Insufficient Evidence';
   }
   return {
-    score, coverage, level, provisional: true, explanation, skills,
-    practical_score: pw ? Math.round(pacc / pw) : null,
+    score: overall, knowledge_score: knowledge, coverage, level, provisional: true, explanation, skills,
+    evaluation: Object.fromEntries(CATEGORIES.map((c) => [c, { ...cats[c], weight: weights[c] }])), weights,
+    practical_score: cats.practical.score, weakest_category: weakestCategory(cats),
     confidence: coverage >= 0.85 ? 'high' : coverage >= config.min_confidence ? 'moderate' : 'low',
   };
+}
+function weakestCategory(cats) {
+  const scored = CATEGORIES.filter((c) => cats[c].score != null && cats[c].sufficient).sort((a, b) => cats[a].score - cats[b].score);
+  if (scored.length < 2 || cats[scored[scored.length - 1]].score - cats[scored[0]].score < 10) return null;
+  return { category: scored[0], label: CATEGORY_LABEL[scored[0]], score: cats[scored[0]].score, strongest: scored[scored.length - 1], strongest_score: cats[scored[scored.length - 1]].score };
 }
 
 /* -------------------------------- skill gaps -------------------------------- */
 const SEVERITY = { [STATUS.critical]: 4, [STATUS.improve]: 3, [STATUS.thin]: 2, [STATUS.none]: 2, [STATUS.developing]: 1 };
 
+/** Which categories of a skill are weak (< developing) and which are strong. */
+function diagnose(entry, config = DEFAULT_CONFIG) {
+  const t = config.skill_thresholds, by = entry?.by_category || {};
+  const weak = CATEGORIES.filter((c) => by[c]?.score != null && by[c].score < t.developing);
+  const strong = CATEGORIES.filter((c) => by[c]?.score != null && by[c].score >= t.strong);
+  const untested = CATEGORIES.filter((c) => by[c]?.score == null);
+  return { weak_in: weak, strong_in: strong, untested_in: untested, scores: Object.fromEntries(CATEGORIES.map((c) => [c, by[c]?.score ?? null])) };
+}
+
 /**
- * Every track skill that is not Strong, with what to do about it, ordered by:
- * critical prerequisite first, then gap size, then how early its stage is
- * (later stages depend on it), then weak practical results, then whether
- * EchoLens has a module to recommend. `resolve(skillId)` returns the
- * validated resources for a skill: [{ title, course, tasks, completed, url }].
+ * Every track skill that is not Strong - and every Strong skill that is
+ * still weak in one category - with what to do about it, ordered by:
+ * critical prerequisite, severity, gap size, earlier stage, weak practical
+ * results, then whether EchoLens has a module for it.
  */
 function skillGaps(track, profile, resolve, config = DEFAULT_CONFIG) {
   const stageOf = (id) => { const i = track.stages.findIndex((st) => st.skills.includes(id)); return i < 0 ? 9 : i + 1; };
   const required = config.skill_thresholds.strong;
   const out = [];
   for (const s of track.skills) {
-    const e = profile[s.skill], status = skillStatus(e, s.critical, config);
-    if (status === STATUS.strong) continue;
+    const e = profile[s.skill];
+    let status = skillStatus(e, s.critical, config);
+    const d = diagnose(e, config);
+    if (status === STATUS.strong && !d.weak_in.length) continue;
+    const partial = status === STATUS.strong;
+    if (partial) status = STATUS.developing;
     const resources = resolve(s.skill);
-    const gap = e && e.score != null ? Math.max(0, required - e.score) : null;
     out.push({
-      skill: s.skill, status, critical: s.critical, stage: stageOf(s.skill),
+      skill: s.skill, status, critical: s.critical, stage: stageOf(s.skill), partial,
       score: e ? e.score : null, evidence: e ? e.evidence : 'none', answered: e ? e.answered : 0,
-      required, gap, severity: SEVERITY[status] || 0,
+      required, gap: e && e.score != null ? Math.max(0, required - e.score) : null, severity: (SEVERITY[status] || 0) - (partial ? 0.5 : 0),
       prerequisite_importance: s.critical ? 'critical' : 'standard',
-      practical_score: e ? e.practical_score : null,
+      practical_score: d.scores.practical, ...d,
       resources, content_gap: resources.length === 0,
       reassessment: { skill: s.skill, items: config.skill_reassess_items },
     });
@@ -278,29 +394,47 @@ function skillGaps(track, profile, resolve, config = DEFAULT_CONFIG) {
     || (a.content_gap - b.content_gap));
 }
 
+/** Plain-language diagnosis: is the weakness theory, coding ability, or real-world application? */
+function diagnosisText(gap, name) {
+  const s = gap.scores || {}, f = (c) => `${CATEGORY_NAME[c].toLowerCase()} ${s[c]}%`;
+  if (!gap.weak_in?.length) return null;
+  const weak = gap.weak_in, strong = gap.strong_in || [];
+  if (weak.length === 3) return `Your ${name} results are low in every category (${weak.map(f).join(', ')}), so start from the concepts.`;
+  const what = weak.map((c) => CATEGORY_LABEL[c]).join(' and ');
+  const but = strong.length ? `You do well on ${strong.map((c) => CATEGORY_LABEL[c]).join(' and ')} (${strong.map(f).join(', ')}), but ` : '';
+  return `${but}your weakness in ${name} is ${what} (${weak.map(f).join(', ')}).`;
+}
+const ACTION = {
+  theory: 'revisit the lesson videos and notes, and explain each concept in your own words before practising',
+  practical: 'write and debug the code yourself - solve every practice task rather than reading solutions',
+  scenario: 'work through the stage project and real-world examples, deciding and justifying each step',
+};
+
 /** One concrete, actionable recommendation for a gap. */
 function recommendation(gap, skillName) {
   const mods = gap.resources.filter((r) => !r.completed).slice(0, 3);
-  const evidence = gap.status === STATUS.none ? `${skillName} has not been assessed yet`
-    : gap.status === STATUS.thin ? `there is not yet enough evidence on ${skillName} (${gap.answered} question${gap.answered === 1 ? '' : 's'} answered)`
-      : `your ${skillName} score is ${gap.score}%, below the ${gap.required}% this stage needs`;
+  const tasks = mods.reduce((a, m) => a + (m.tasks || 0), 0);
+  if (gap.status === STATUS.none || gap.status === STATUS.thin) {
+    const why = gap.status === STATUS.none ? `${skillName} has not been assessed yet` : `there is not yet enough evidence on ${skillName} (${gap.answered} question${gap.answered === 1 ? '' : 's'} answered)`;
+    return `Take the ${skillName} assessment first, since ${why}.`;
+  }
+  const diag = diagnosisText(gap, skillName);
+  const lead = diag || `Your ${skillName} score is ${gap.score}%, below the ${gap.required}% this stage needs.`;
+  const focus = (gap.weak_in || []).map((c) => ACTION[c]);
   const learn = mods.length
-    ? `complete ${mods.map((m) => `"${m.title}" (${m.course})`).join(', ')}${mods.some((m) => m.tasks) ? `, solve ${mods.reduce((a, m) => a + (m.tasks || 0), 0)} practice task${mods.reduce((a, m) => a + (m.tasks || 0), 0) === 1 ? '' : 's'} in ${mods.length === 1 ? 'that module' : 'those modules'}` : ''}`
-    : gap.resources.length ? 'review the modules you have already completed for this skill'
-      : 'practise with an external resource for now - EchoLens does not yet have a module for this skill';
-  const reassess = `then take the short ${gap.reassessment.items}-question ${skillName} reassessment`;
-  const first = gap.status === STATUS.none || gap.status === STATUS.thin ? `Take the ${skillName} assessment first, since ${evidence}.` : `Because ${evidence}, ${learn}, ${reassess}.`;
-  return first.charAt(0).toUpperCase() + first.slice(1);
+    ? `Complete ${mods.map((m) => `"${m.title}" (${m.course})`).join(', ')}${tasks ? `, solve the ${tasks} practice task${tasks === 1 ? '' : 's'} in ${mods.length === 1 ? 'that module' : 'those modules'}` : ''}`
+    : gap.resources.length ? 'Review the modules you have already completed for this skill'
+      : 'Practise with an external resource for now - EchoLens does not yet have a module for this skill';
+  return `${lead} ${learn}${focus.length ? '; ' + focus.join('; ') : ''}; then take the short ${gap.reassessment.items}-question ${skillName} reassessment.`;
 }
 
 /* --------------------------------- roadmap --------------------------------- */
 /**
  * Six-stage roadmap. A stage is complete when every critical skill in it is
  * demonstrated (Strong, sufficient evidence) and every other skill is at
- * least Developing - so demonstrated skills are skipped, but critical ones
- * are never assumed. The first incomplete stage is the starting stage.
+ * least Developing. The first incomplete stage is the starting stage.
  * Capstone and career-readiness stages open once stage 4 is complete and are
- * completed by the student's submitted project links (self-reported).
+ * completed by the student's submitted (self-reported) project links.
  */
 function roadmap(track, profile, resolve, { stageNames, projects = {} } = {}, config = DEFAULT_CONFIG) {
   const crit = new Map(track.skills.map((s) => [s.skill, s.critical]));
@@ -311,7 +445,6 @@ function roadmap(track, profile, resolve, { stageNames, projects = {} } = {}, co
       const ok = crit.get(id) ? status === STATUS.strong : [STATUS.strong, STATUS.developing].includes(status);
       return { skill: id, critical: !!crit.get(id), status, satisfied: ok, score: profile[id]?.score ?? null };
     });
-    // A module can teach two skills in the same stage; list it once.
     const seenMod = new Set();
     const modules = st.skills.flatMap((id) => resolve(id).map((r) => ({ ...r, skill: id })))
       .filter((m) => { const k = (m.track_key || m.title) + ':' + (m.level ?? ''); if (seenMod.has(k)) return false; seenMod.add(k); return true; });
@@ -331,6 +464,7 @@ function roadmap(track, profile, resolve, { stageNames, projects = {} } = {}, co
 }
 
 module.exports = {
-  DEFAULT_CONFIG, STATUS, rng, shuffle, assembleForm, publicQuestion, normalizeTyped, gradeResponse, scoreAttempt,
-  skillProfile, skillHistory, band, skillStatus, demonstrated, commonScore, trackReadiness, skillGaps, recommendation, roadmap,
+  CATEGORIES, CATEGORY_LABEL, CATEGORY_NAME, DEFAULT_CONFIG, STATUS, rng, shuffle, assembleForm, publicQuestion, normalizeTyped, gradeResponse,
+  summarize, scoreAttempt, weightedOverall, weightsFor, skillProfile, skillHistory, band, skillStatus, demonstrated, categoryScores, commonScore,
+  trackReadiness, diagnose, diagnosisText, skillGaps, recommendation, roadmap,
 };

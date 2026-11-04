@@ -36,7 +36,7 @@ function caOverview() {
       <p class="s" style="color:var(--muted);margin-bottom:10px">An assessment opens to students only when it is enabled and every skill it measures has enough <b>published</b> questions. New questions ship as drafts: review each one, mark it reviewed, then publish.</p>
       <div style="overflow-x:auto"><table class="tbl"><tr><th>Assessment</th><th>Status</th><th>Coverage</th><th>Enabled</th></tr>
       ${d.assessments.map((a) => `<tr><td>${esc(a.title || a.key)}</td><td>${a.available ? '<span style="color:var(--ok);font-weight:700">✓ Open to students</span>' : esc(a.reason || 'Not available')}</td>
-        <td class="s">${a.coverage ? a.coverage.skills.map((s) => `${esc(s.name)}: ${s.published}/${s.want}${s.ok ? '' : ' ✕'}`).join(' &middot; ') : '-'}</td>
+        <td class="s">${a.coverage ? `<div><b>Theory ${a.coverage.categories.theory} &middot; Practical ${a.coverage.categories.practical} &middot; Scenario ${a.coverage.categories.scenario} &middot; Reviewed ${a.coverage.reviewed}</b></div>` + a.coverage.skills.map((s) => `${esc(s.name)}: ${s.published}/${s.want}${s.ok ? '' : ' ✕'}`).join(' &middot; ') : '-'}</td>
         <td><label style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" data-ca-enable="${esc(a.key)}"${a.enabled ? ' checked' : ''}> ${a.enabled ? 'On' : 'Off'}</label></td></tr>`).join('')}
       </table></div></div></div>`;
 }
@@ -58,9 +58,10 @@ async function caQuestions() {
       ${list.map((q) => `<tr><td><input type="checkbox" class="caPick" value="${esc(q.id)}" aria-label="Select ${esc(q.id)}"></td>
         <td style="max-width:420px"><div class="mono s">${esc(q.id)}</div>${esc(q.prompt)}${q.code ? `<pre style="white-space:pre-wrap;font-size:12px;background:#F1F5F9;padding:6px 8px;border-radius:6px;margin:4px 0">${esc(q.code)}</pre>` : ''}
           <details><summary class="s">Options, key and explanation</summary>
-            ${q.options.length ? `<ol type="a" class="s">${q.options.map((o) => `<li>${q.answer.includes(o.id) ? '<b>✓ ' : ''}${esc(o.text)}${q.answer.includes(o.id) ? '</b>' : ''}</li>`).join('')}</ol>` : `<div class="s">Accepted answers: <b>${q.answer.map(esc).join(' | ')}</b></div>`}
+            ${q.grading === 'review' ? `<div class="s"><b>Rubric:</b><ul>${q.rubric.map((r) => `<li>${esc(r.criterion)} (${r.points})</li>`).join('')}</ul><b>Reference answer:</b><pre style="white-space:pre-wrap;font-size:12px">${esc(q.model_answer || '')}</pre></div>`
+              : q.options.length ? `<ol type="a" class="s">${q.options.map((o) => `<li>${q.answer.includes(o.id) ? '<b>✓ ' : ''}${esc(o.text)}${q.answer.includes(o.id) ? '</b>' : ''}</li>`).join('')}</ol>` : `<div class="s">Accepted answers: <b>${q.answer.map(esc).join(' | ')}</b></div>`}
             <div class="s" style="color:var(--muted)">${esc(q.explanation)}</div></details></td>
-        <td class="s">${esc(q.skills.join(', '))}</td><td class="s">${esc(q.type)}${q.practical ? ' &middot; practical' : ''}</td><td>${q.difficulty}</td>
+        <td class="s">${esc(q.skills.join(', '))}</td><td class="s">${esc(q.type)} &middot; <b>${esc(q.category)}</b>${q.grading === 'review' ? ' &middot; staff-reviewed' : ''}</td><td>${q.difficulty}</td>
         <td class="s"><b>${esc(q.status)}</b>${q.reviewed_at ? `<div style="color:var(--muted)">${esc(String(q.reviewed_at).slice(0, 10))}</div>` : ''}</td><td>${q.version}</td>
         <td><button class="btn btn-ghost btn-sm" onclick='caEditQuestion(${JSON.stringify(q.id)})'>Edit</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No questions match.</td></tr>'}
     </table></div></div>`;
@@ -74,7 +75,8 @@ async function caEditQuestion(id) {
   openModal(id ? `Edit ${id} (saves as version ${q.version + 1}, back to draft)` : `Add a question to ${CA_BANK}`, `
     <form id="caQForm">
       <div class="form-grid">
-        <label class="field"><span>Type</span><select name="type">${['single', 'multi', 'output', 'debug', 'scenario'].map((t) => `<option${t === q.type ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+        <label class="field"><span>Type</span><select name="type">${['single', 'multi', 'output', 'debug', 'scenario', 'written', 'submission'].map((t) => `<option${t === q.type ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+        <label class="field"><span>Evaluation category</span><select name="category">${['theory', 'practical', 'scenario'].map((c) => `<option${c === (q.category || 'theory') ? ' selected' : ''}>${c}</option>`).join('')}</select></label>
         <label class="field"><span>Difficulty</span><select name="difficulty">${[1, 2, 3].map((n) => `<option${n === q.difficulty ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
         <label class="field"><span>Skill (primary first)</span><select name="skill">${skills.map((s) => `<option value="${esc(s.id)}"${s.id === q.skills[0] ? ' selected' : ''}>${esc(s.group)} - ${esc(s.name)}</option>`).join('')}</select></label>
         <label class="field" style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="practical" style="width:auto"${q.practical ? ' checked' : ''}> <span>Practical task</span></label>
@@ -83,12 +85,16 @@ async function caEditQuestion(id) {
       <label class="field"><span>Code (optional)</span><textarea name="code" rows="4" style="font-family:monospace">${esc(q.code || '')}</textarea></label>
       <label class="field"><span>Options - one per line (leave empty for typed "output" answers)</span><textarea name="options" rows="4">${esc(optText)}</textarea></label>
       <label class="field"><span>Correct answer: option letters, comma-separated (a,c) - or, for output questions, each accepted answer on its own line</span><textarea name="answer" rows="2">${esc(keyText)}</textarea></label>
-      <label class="field"><span>Explanation of the correct answer</span><textarea name="explanation" rows="3" required>${esc(q.explanation || '')}</textarea></label>
+      <label class="field"><span>Explanation of the correct answer (for written/submission: the reference answer reviewers see)</span><textarea name="explanation" rows="3" required>${esc(q.explanation || '')}</textarea></label>
+      <label class="field"><span>Rubric for written/submission types - one criterion per line as "criterion | points"</span><textarea name="rubric" rows="4" placeholder="Explains block scope | 2">${esc((q.rubric || []).map((r) => r.criterion + ' | ' + r.points).join('\n'))}</textarea></label>
+      <p class="s" style="color:var(--muted)">Written and submission answers are always scored by a staff reviewer against this rubric. AI can only suggest scores to the reviewer.</p>
       <button class="btn btn-primary btn-block">${id ? 'Save new version' : 'Add as draft'}</button>
     </form>`, true);
   $('caQForm').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target, type = f.type.value;
-    const body = { bank: CA_BANK, type, difficulty: Number(f.difficulty.value), skills: [f.skill.value, ...(q.skills || []).slice(1)].filter((v, i, a) => a.indexOf(v) === i), practical: f.practical.checked,
+    const body = { bank: CA_BANK, type, category: f.category.value, difficulty: Number(f.difficulty.value),
+      rubric: f.rubric.value.split('\n').map((l) => l.split('|')).filter((p) => p[0].trim()).map((p) => ({ criterion: p[0].trim(), points: Number(p[1]) })),
+      model_answer: f.explanation.value, skills: [f.skill.value, ...(q.skills || []).slice(1)].filter((v, i, a) => a.indexOf(v) === i), practical: f.practical.checked,
       prompt: f.prompt.value, code: f.code.value, explanation: f.explanation.value,
       options: f.options.value.split('\n').map((x) => x.trim()).filter(Boolean),
       answer: type === 'output' ? f.answer.value.split('\n').map((x) => x.trim()).filter(Boolean) : f.answer.value.split(',').map((x) => x.trim().toLowerCase()).filter(Boolean) };
@@ -104,6 +110,10 @@ function caScoring() {
     <form id="caCfg">
       <h4>Common CS category weights (currently total ${total})</h4>
       <div class="form-grid">${Object.entries(c.common_weights).map(([k, v]) => `<label class="field"><span>${esc(k)}</span><input type="number" min="0" max="100" name="w:${esc(k)}" value="${v}"></label>`).join('')}</div>
+      <h4>Theory / practical / scenario weights</h4>
+      <p class="s" style="color:var(--muted)">How much each evaluation category counts in an assessment's overall score. Tracks start from their own defaults; leave a row as it is to keep it.</p>
+      <div style="overflow-x:auto"><table class="tbl"><tr><th>Assessment</th><th>Theory</th><th>Practical</th><th>Scenario</th></tr>
+        ${CA_DATA.weights.map((w) => `<tr><td>${esc(w.title)}</td>${['theory', 'practical', 'scenario'].map((c) => `<td><input type="number" min="0" max="100" style="width:80px" name="cw:${esc(w.key)}:${c}" value="${w.weights[c]}"></td>`).join('')}</tr>`).join('')}</table></div>
       <h4>Level bands (minimum score for each level)</h4>
       <div class="form-grid">${c.bands.map((b, i) => `<label class="field"><span>Level ${i + 1} name</span><input name="bl:${i}" value="${esc(b.level)}"></label><label class="field"><span>From %</span><input type="number" min="0" max="100" name="bm:${i}" value="${b.min}"${i === 0 ? ' readonly' : ''}></label>`).join('')}</div>
       <h4>Skill status and evidence</h4>
@@ -115,6 +125,8 @@ function caScoring() {
         <label class="field"><span>Questions per skill (track assessments)</span><input type="number" name="track_items_per_skill" value="${c.track_items_per_skill}"></label>
         <label class="field"><span>Questions per skill reassessment</span><input type="number" name="skill_reassess_items" value="${c.skill_reassess_items}"></label>
         <label class="field"><span>Hours before a full retake</span><input type="number" name="retake_cooldown_hours" value="${c.retake_cooldown_hours}"></label>
+        <label class="field"><span>Staff-reviewed items per assessment (0-4)</span><input type="number" min="0" max="4" name="review_items_per_form" value="${c.review_items_per_form}"></label>
+        <label class="field"><span>Answered items a category needs to count</span><input type="number" min="1" max="10" name="min_category_items" value="${c.min_category_items}"></label>
       </div>
       <p class="s" style="color:var(--muted)">These bands are provisional placement guidance. Calibrate them against pilot results before relying on them.</p>
       <button class="btn btn-primary">Save scoring rules</button>
@@ -168,6 +180,7 @@ async function caInsights() {
     <div class="card"><div class="card-head"><h3>Aggregate skill gaps</h3><span class="s" style="color:var(--muted)">Share of assessed learners below the Developing threshold</span></div><div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl"><tr><th>Skill</th><th>Assessed</th><th>Needs improvement</th></tr>
       ${a.skill_gaps.slice(0, 25).map((g) => `<tr><td>${esc(g.name)}</td><td>${g.assessed}</td><td>${g.weak} (${Math.round(g.weak_share * 100)}%)</td></tr>`).join('') || '<tr><td colspan="3" class="empty">No data yet.</td></tr>'}</table></div></div>
     <div class="card"><div class="card-head"><h3>Questions to review</h3><span class="s" style="color:var(--muted)">10+ answers and almost nobody (or almost everybody) gets it right</span></div><div class="card-body">${flagged.map((q) => `<div class="s">${esc(q.id)} - ${Math.round(q.p_correct * 100)}% correct of ${q.answered}</div>`).join('') || '<span class="s" style="color:var(--muted)">Nothing flagged yet.</span>'}</div></div>
+    <div class="card"><div class="card-head"><h3>Review backlog</h3></div><div class="card-body"><b>${a.review_backlog}</b> written or practical answer${a.review_backlog === 1 ? '' : 's'} waiting for a staff reviewer. <a href="#" onclick="show('career-reviews');return false">Open Assessment Reviews</a></div></div>
     <div class="card"><div class="card-head"><h3>Content gaps (${a.content_gaps.length})</h3><span class="s" style="color:var(--muted)">Skills the roadmaps need but no EchoLens module teaches. Students see "no module yet" instead of a link.</span></div><div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl"><tr><th>Skill</th><th>Area</th><th>Used by</th><th>Reason</th></tr>
       ${a.content_gaps.map((g) => `<tr><td>${esc(g.name)}</td><td>${esc(g.group)}</td><td class="s">${esc(g.tracks.join(', '))}</td><td class="s">${esc(g.reason)}</td></tr>`).join('')}</table></div></div>`;
 }
@@ -195,6 +208,8 @@ function caWire() {
       skill_thresholds: { strong: Number(f.strong.value), developing: Number(f.developing.value) },
       min_evidence_items: Number(f.min_evidence_items.value), min_confidence: Number(f.min_confidence.value),
       track_items_per_skill: Number(f.track_items_per_skill.value), skill_reassess_items: Number(f.skill_reassess_items.value), retake_cooldown_hours: Number(f.retake_cooldown_hours.value),
+      review_items_per_form: Number(f.review_items_per_form.value), min_category_items: Number(f.min_category_items.value),
+      category_weights: Object.fromEntries(CA_DATA.weights.map((w) => [w.key, Object.fromEntries(['theory', 'practical', 'scenario'].map((c) => [c, Number(f[`cw:${w.key}:${c}`].value)]))])),
     };
     try { await api('/api/admin/career/config', { method: 'PUT', body: JSON.stringify(body) }); toast('Scoring rules saved as a new version.'); renderAdminCareer('scoring'); } catch (err) { toast(err.message, true); }
   });
@@ -211,3 +226,66 @@ function caWire() {
   };
 }
 window.renderAdminCareer = renderAdminCareer; window.caEditQuestion = caEditQuestion; window.caEditTrack = caEditTrack;
+
+
+/* ------------------------- Assessment Reviews (admin + instructor) -------------------------
+ * Written explanations and practical submissions scored by a person against
+ * the question rubric. "Get AI suggestion" asks the server for UNVERIFIED
+ * per-criterion suggestions; applying them only fills the form - the reviewer
+ * still checks every score and must press Save. Nothing counts until then.
+ */
+let CR_STATUS = 'pending';
+async function renderCareerReviews() {
+  const el = $('view-career-reviews');
+  el.innerHTML = '<div class="empty">Loading&hellip;</div>';
+  const d = await api('/api/career/reviews?status=' + CR_STATUS);
+  window.CR_ITEMS = d.reviews;
+  el.innerHTML = `<div class="card"><div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-sm ${CR_STATUS === 'pending' ? 'btn-primary' : 'btn-ghost'}" onclick="CR_STATUS='pending';renderCareerReviews()">Waiting for review</button>
+      <button class="btn btn-sm ${CR_STATUS === 'done' ? 'btn-primary' : 'btn-ghost'}" onclick="CR_STATUS='done';renderCareerReviews()">Reviewed</button>
+      <span class="s" style="color:var(--muted);flex:1">Score each criterion yourself and write feedback the student will read. ${d.ai_available ? 'AI suggestions are optional, unverified, and never count on their own.' : 'AI suggestions are not configured on this server.'}</span></div></div>
+    ${d.reviews.map((r, i) => `<div class="card"><div class="card-head"><h3>${esc(r.student)}${r.reg_no ? ' <span class="s mono">' + esc(r.reg_no) + '</span>' : ''}</h3><span class="s" style="color:var(--muted)">${esc(r.assessment)} &middot; ${esc(r.skill || '')} &middot; ${esc(r.category)} &middot; ${esc(r.type === 'submission' ? 'practical submission' : 'written answer')} &middot; ${esc(String(r.submitted_at).slice(0, 16).replace('T', ' '))}</span></div>
+      <div class="card-body">
+        <p><b>${esc(r.prompt)}</b></p>${r.code ? `<pre style="white-space:pre-wrap;font-size:12px;background:#F1F5F9;padding:8px;border-radius:6px">${esc(r.code)}</pre>` : ''}
+        <div class="s" style="color:var(--muted);margin-top:8px">Student's answer</div>
+        <pre style="white-space:pre-wrap;background:#0F172A;color:#E2E8F0;padding:10px 12px;border-radius:8px;font-size:13px;max-height:340px;overflow:auto">${esc(r.answer)}</pre>
+        <details><summary class="s">Reference answer (the student need not match it word for word)</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(r.model_answer || '')}</pre></details>
+        <form class="crForm" data-i="${i}">
+          <table class="tbl"><tr><th>Rubric criterion</th><th>Max</th><th>Score</th><th>Note (optional)</th></tr>
+            ${r.rubric.map((c, j) => `<tr><td class="s">${esc(c.criterion)}</td><td>${c.points}</td><td><input type="number" min="0" max="${c.points}" step="0.5" name="p${j}" required style="width:80px" value="${r.review ? r.review.criteria[j]?.points ?? '' : ''}"></td><td><input name="n${j}" maxlength="300" value="${esc(r.review?.criteria[j]?.note || '')}"></td></tr>`).join('')}</table>
+          <div class="crAi" style="margin:8px 0">${r.ai_suggestion ? crAiHtml(r.ai_suggestion, i) : ''}</div>
+          <label class="field"><span>Feedback for the student (explain what was strong and what to improve)</span><textarea name="comment" rows="3" required minlength="10">${esc(r.review?.comment || '')}</textarea></label>
+          <input type="hidden" name="used_ai" value="0">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${d.ai_available ? `<button type="button" class="btn btn-ghost btn-sm" onclick="crSuggest(${i})">Get AI suggestion (unverified)</button>` : ''}
+            <button class="btn btn-primary btn-sm">${r.review ? 'Update review' : 'Save review'}</button></div>
+          <p class="form-msg" role="status"></p>
+        </form></div></div>`).join('') || `<div class="card"><div class="card-body"><div class="empty">${CR_STATUS === 'pending' ? 'Nothing is waiting for review.' : 'No reviewed answers yet.'}</div></div></div>`}`;
+  el.querySelectorAll('.crForm').forEach((f) => f.addEventListener('submit', async (e) => {
+    e.preventDefault(); const r = window.CR_ITEMS[Number(f.dataset.i)], msg = f.querySelector('.form-msg');
+    const body = { criteria: r.rubric.map((_, j) => ({ points: Number(f['p' + j].value), note: f['n' + j].value })), comment: f.comment.value, used_ai_suggestion: f.used_ai.value === '1' };
+    try { await api(`/api/career/reviews/${r.user_id}/${encodeURIComponent(r.attempt_id)}/${encodeURIComponent(r.question_id)}`, { method: 'POST', body: JSON.stringify(body) }); toast('Review saved. The student\'s scores have been updated.'); renderCareerReviews(); }
+    catch (err) { msg.className = 'form-msg err'; msg.textContent = err.message; }
+  }));
+}
+function crAiHtml(sg, i) {
+  return `<div style="border:1px dashed #D97706;background:#FFFBEB;border-radius:8px;padding:8px 10px" class="s">
+    <b>AI suggestion - unverified, not a grade.</b> Check it against the answer before using any of it.
+    <ul>${sg.criteria.map((c) => `<li>Criterion ${c.index}: ${c.points} - ${esc(c.why)}</li>`).join('')}</ul>
+    <div><i>${esc(sg.feedback)}</i></div>
+    <button type="button" class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="crApply(${i})">Copy into the form for me to check</button></div>`;
+}
+async function crSuggest(i) {
+  const r = window.CR_ITEMS[i], f = document.querySelector(`.crForm[data-i="${i}"]`), box = f.querySelector('.crAi');
+  box.innerHTML = '<span class="s">Asking for a suggestion&hellip;</span>';
+  try { const out = await api(`/api/career/reviews/${r.user_id}/${encodeURIComponent(r.attempt_id)}/${encodeURIComponent(r.question_id)}/suggest`, { method: 'POST' }); r.ai_suggestion = out.suggestion; box.innerHTML = crAiHtml(out.suggestion, i); }
+  catch (e) { box.innerHTML = `<span class="form-msg err">${esc(e.message)}</span>`; }
+}
+function crApply(i) {
+  const r = window.CR_ITEMS[i], f = document.querySelector(`.crForm[data-i="${i}"]`);
+  r.ai_suggestion.criteria.forEach((c, j) => { if (f['p' + j]) f['p' + j].value = c.points; });
+  if (!f.comment.value.trim()) f.comment.value = r.ai_suggestion.feedback;
+  f.used_ai.value = '1';
+  toast('Suggestion copied. Check every score and the feedback, then save.');
+}
+window.renderCareerReviews = renderCareerReviews; window.crSuggest = crSuggest; window.crApply = crApply;

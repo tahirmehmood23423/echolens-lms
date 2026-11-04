@@ -28,6 +28,9 @@
   const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Karachi' }); };
   const STATUS_ICON = { 'Strong': '✓', 'Developing': '◐', 'Needs Improvement': '!', 'Critical Prerequisite Gap': '✕', 'Not Yet Assessed': '?', 'Needs Further Assessment': '?' };
   const STATUS_COLOR = { 'Strong': 'var(--teal-ink)', 'Developing': '#7A4A00', 'Needs Improvement': '#8A1C1C', 'Critical Prerequisite Gap': '#8A1C1C', 'Not Yet Assessed': 'var(--muted)', 'Needs Further Assessment': 'var(--muted)' };
+  const CAT = { theory: 'Theory', practical: 'Practical', scenario: 'Scenario' };
+  const CAT_DESC = { theory: 'concepts and code tracing', practical: 'hands-on coding, debugging and configuration', scenario: 'real-world problems and decisions' };
+  const pctTxt = (v) => (v == null ? '-' : v + '%');
   const status = (s) => `<span class="cr-status" data-icon="${STATUS_ICON[s] || ''}" style="color:${STATUS_COLOR[s] || 'inherit'}">${esc(s)}</span>`;
   const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['tracks', 'Career tracks'], ['me', 'My career'], ['report', 'My skill report'], ['roadmap', 'My roadmap'], ['history', 'Assessment history']]
     .map(([k, l]) => `<a href="#${k}"${cur === k ? ' aria-current="page"' : ''}>${l}</a>`).join('')}</nav>`;
@@ -169,7 +172,8 @@
       <h1>${esc(av.title || 'Assessment')}</h1>
       ${av.available ? `<div class="cr-panel">
         <p><b>${av.items} questions</b>, one at a time. A timer shows the time left; the limit is generous, and your answers save automatically, so you can come back if your connection drops.</p>
-        <ul><li>Questions include multiple choice, "what does this code print?" and short debugging tasks.</li>
+        <ul><li><b>Three kinds of question:</b> theory (concepts and code tracing), practical (debugging and fixing real code, queries or configuration) and scenario (real-world problems that need a decision).${av.weights ? ` They count ${av.weights.theory}% / ${av.weights.practical}% / ${av.weights.scenario}% towards your overall score.` : ''}</li>
+          ${av.reviewed_items ? `<li><b>${av.reviewed_items} answer${av.reviewed_items === 1 ? '' : 's'} you write yourself</b> (an explanation or a practical submission). EchoLens staff review ${av.reviewed_items === 1 ? 'it' : 'them'} against a published rubric, usually within a few days; your scores update when that happens.</li>` : ''}
           <li>Skip anything you do not know - skipped questions are not counted as wrong; we simply ask about that skill again later.</li>
           <li>Your results guide your learning. They are not an official qualification.</li></ul>
         <div class="cr-actions"><button class="cr-btn" id="crStart">Start assessment</button><a class="cr-btn ghost" href="#me">Not now</a></div>
@@ -202,14 +206,19 @@
   }
   function drawQuestion() {
     const a = ATTEMPT, q = a.questions[a.cur], n = a.questions.length, v = a.answers[q.id];
-    const inputs = q.type === 'output'
+    const reviewed = q.grading === 'review';
+    const inputs = reviewed
+      ? `<label for="crTyped" style="font-weight:600;display:block;margin-top:8px">${q.type === 'submission' ? 'Your code / solution' : 'Your answer'}</label>
+         <textarea id="crTyped" rows="${q.type === 'submission' ? 12 : 7}" spellcheck="${q.type === 'submission' ? 'false' : 'true'}" style="width:100%;border:1px solid var(--line-strong);border-radius:10px;padding:10px 12px;font:inherit;${q.type === 'submission' ? 'font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px' : ''}">${esc(v || '')}</textarea>
+         <div class="cr-note" style="margin-top:10px"><b>Reviewed by EchoLens staff</b> against this rubric (${q.points} points). Your result updates once it has been reviewed.<ul style="margin:6px 0 0;padding-left:18px">${(q.rubric || []).map((r) => `<li>${esc(r.criterion)} (${r.points})</li>`).join('')}</ul></div>`
+      : q.type === 'output'
       ? `<label for="crTyped" style="font-weight:600;display:block;margin-top:8px">Your answer</label><input id="crTyped" type="text" autocomplete="off" spellcheck="false" style="width:100%;min-height:44px;border:1px solid var(--line-strong);border-radius:10px;padding:8px 12px;font:inherit" value="${esc(v || '')}">`
       : `<fieldset style="border:0;padding:0;margin:0"><legend class="sr-only">Options</legend>${q.options.map((o) => `<label class="cr-opt"><input type="${q.multi ? 'checkbox' : 'radio'}" name="crOpt" value="${esc(o.id)}"${[].concat(v || []).includes(o.id) ? ' checked' : ''}><span>${esc(o.text)}</span></label>`).join('')}</fieldset>${q.multi ? '<p class="cr-small cr-muted">Select all that apply.</p>' : ''}`;
     root.innerHTML = `
       <div class="cr-qbar"><b>${esc(a.title)}</b><span id="crTimer" class="cr-small" aria-live="off"></span></div>
       <div class="cr-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${a.questions.filter(answered).length}" aria-label="Questions answered"><i style="width:${Math.round((a.questions.filter(answered).length / n) * 100)}%"></i></div>
       <section class="cr-q" aria-labelledby="crQh">
-        <p class="cr-small cr-muted">Question ${a.cur + 1} of ${n} &middot; ${esc(q.skill)}${q.practical ? ' &middot; practical task' : ''}</p>
+        <p class="cr-small cr-muted">Question ${a.cur + 1} of ${n} &middot; ${esc(q.skill)} &middot; <span class="cr-tag${q.category === 'practical' ? ' teal' : q.category === 'scenario' ? ' warn' : ''}">${esc(CAT[q.category] || 'Theory')}${reviewed ? ' &middot; staff-reviewed' : ''}</span></p>
         <h2 id="crQh" style="font-family:inherit;font-size:17px;margin:4px 0 6px">${esc(q.prompt)}</h2>
         ${q.code ? `<pre><code>${esc(q.code)}</code></pre>` : ''}
         ${inputs}
@@ -223,7 +232,7 @@
       <div class="cr-actions"><button class="cr-btn ghost" id="crAbandon">Stop and submit what I have answered</button></div>`;
     updateTimer();
     const record = () => {
-      if (q.type === 'output') a.answers[q.id] = $('crTyped').value;
+      if (q.type === 'output' || reviewed) a.answers[q.id] = $('crTyped').value;
       else { const picked = [...root.querySelectorAll('input[name=crOpt]:checked')].map((x) => x.value); a.answers[q.id] = q.multi ? picked : (picked[0] || ''); }
       queueSave();
     };
@@ -266,20 +275,29 @@
       <div class="cr-kpis">
         <div class="cr-kpi"><span>Score on answered questions</span><b>${a.raw_score == null ? '-' : a.raw_score + '%'}</b></div>
         <div class="cr-kpi"><span>Answered</span><b>${a.answered} / ${a.total}</b></div>
-        <div class="cr-kpi"><span>Practical tasks</span><b>${a.practical_score == null ? 'None answered' : a.practical_score + '%'}</b></div>
+        ${['theory', 'practical', 'scenario'].map((c) => `<div class="cr-kpi"><span>${CAT[c]} (weight ${a.categories[c].weight})</span><b>${pctTxt(a.categories[c].score)}</b><span>${a.categories[c].answered} scored</span></div>`).join('')}
       </div>
+      ${a.pending ? `<div class="cr-note"><b>${a.pending} answer${a.pending === 1 ? ' is' : 's are'} waiting for staff review.</b> They are not counted yet - your scores will update when the review is done.</div>` : ''}
       <div class="cr-actions"><a class="cr-btn" href="#report">See my skill report and roadmap</a></div>
       <h2>Review your answers</h2>
       ${rv.map((r, i) => `<div class="cr-review" data-correct="${r.correct ? 1 : 0}">
-        <p class="cr-small cr-muted">${i + 1}. ${esc(r.skill || '')} &middot; <b>${r.correct ? '✓ Correct' : r.answered ? '✕ Not correct' : 'Skipped'}</b></p>
+        <p class="cr-small cr-muted">${i + 1}. ${esc(r.skill || '')} &middot; ${esc(CAT[r.category] || '')} &middot; ${r.grading === 'review' ? 'staff-reviewed' : 'auto-graded'} &middot;
+          <b>${r.grading === 'review' ? (!r.answered ? 'Skipped' : r.pending ? '⏳ Awaiting staff review' : `Reviewed: ${r.review ? r.review.criteria.reduce((x, c) => x + c.points, 0) : 0} / ${r.points} points`) : r.correct ? '✓ Correct' : r.answered ? '✕ Not correct' : 'Skipped'}</b></p>
         <p>${esc(r.prompt || '')}</p>${r.code ? `<pre style="background:#0F172A;color:#E2E8F0;border-radius:8px;padding:10px;overflow-x:auto"><code>${esc(r.code)}</code></pre>` : ''}
-        <p class="cr-small"><b>Answer:</b> ${esc(r.options.length ? r.options.filter((o) => r.key.includes(o.id)).map((o) => o.text).join('; ') : r.key[0])}</p>
-        <p class="cr-small cr-muted">${esc(r.explanation || '')}</p></div>`).join('')}`;
+        ${r.grading === 'review' ? `
+          ${r.answer ? `<p class="cr-small"><b>Your answer:</b></p><pre style="white-space:pre-wrap;background:#F8FAFC;border:1px solid var(--line-strong);border-radius:8px;padding:10px;font-size:13px">${esc(r.answer)}</pre>` : ''}
+          ${r.review ? `<table class="cr-table"><thead><tr><th>Rubric criterion</th><th>Score</th></tr></thead><tbody>${r.review.criteria.map((c) => `<tr><td>${esc(c.criterion)}${c.note ? `<div class="cr-small cr-muted">${esc(c.note)}</div>` : ''}</td><td>${c.points} / ${c.max}</td></tr>`).join('')}</tbody></table>
+            <p class="cr-small"><b>Reviewer feedback:</b> ${esc(r.review.comment)}</p>${r.explanation ? `<details><summary class="cr-small">Reference answer</summary><pre style="white-space:pre-wrap;font-size:13px">${esc(r.explanation)}</pre></details>` : ''}`
+            : r.answered ? `<p class="cr-small cr-muted">Rubric: ${(r.rubric || []).map((c) => esc(c.criterion) + ' (' + c.points + ')').join('; ')}</p>` : ''}`
+        : `<p class="cr-small"><b>Answer:</b> ${esc(r.options.length ? r.options.filter((o) => r.key.includes(o.id)).map((o) => o.text).join('; ') : r.key[0])}</p>
+        <p class="cr-small cr-muted">${esc(r.explanation || '')}</p>`}</div>`).join('')}`;
   }
 
   /* ------------------------------ skill report ------------------------------ */
   const bar = (s) => `<div class="cr-bar${s.evidence !== 'sufficient' ? ' thin' : ''}" aria-hidden="true"><i style="width:${s.score == null ? 0 : s.score}%"></i></div>`;
-  const skillRow = (s) => `<div class="cr-skill"><span>${esc(s.name)}${s.critical ? ' <span class="cr-tag warn">prerequisite</span>' : ''}</span>${bar(s)}<span>${s.score == null ? '' : `<b>${s.score}%</b> `}${status(s.status)}</span></div>`;
+  const subScores = (by) => (by && Object.values(by).some((v) => v != null && (typeof v === 'number' || v.score != null))
+    ? `<div class="cr-small cr-muted">${['theory', 'practical', 'scenario'].map((c) => { const v = by[c]; const sc = typeof v === 'number' ? v : v?.score; return `${CAT[c]} ${pctTxt(sc ?? null)}`; }).join(' &middot; ')}</div>` : '');
+  const skillRow = (s) => `<div class="cr-skill"><span>${esc(s.name)}${s.critical ? ' <span class="cr-tag warn">prerequisite</span>' : ''}${subScores(s.by_category)}</span>${bar(s)}<span>${s.score == null ? '' : `<b>${s.score}%</b> `}${status(s.status)}</span></div>`;
   async function viewReport() {
     if (!ME) { root.innerHTML = needLogin('My skill report'); return; }
     if (!learner()) { root.innerHTML = notLearner(); return; }
@@ -287,7 +305,7 @@
     const tracks = await loadTracks();
     const picker = `<label for="crTrackPick" class="cr-small" style="font-weight:600">Show readiness for</label>
       <select id="crTrackPick" style="min-height:40px;border:1px solid var(--line-strong);border-radius:10px;padding:6px 10px;margin-left:6px"><option value="">Choose a track</option>${tracks.map((t) => `<option value="${esc(t.slug)}"${r.track?.slug === t.slug ? ' selected' : ''}>${esc(t.title)}</option>`).join('')}</select>`;
-    if (!r.common.last_attempt && !r.track_attempt && !r.readiness?.score) {
+    if (!r.history_count) {
       root.innerHTML = `${tabs('report')}<h1>My skill report</h1><div class="cr-note">You have not taken an assessment yet. Start with the common computer-science assessment (about 20 minutes).</div>
         <div class="cr-actions">${r.assessments.common.available ? '<a class="cr-btn" href="#assess/common">Take the common CS assessment</a>' : `<span class="cr-tag">${esc(r.assessments.common.reason || '')}</span>`}<a class="cr-btn ghost" href="#tracks">Explore tracks</a></div>`;
       return;
@@ -300,16 +318,22 @@
       <div class="cr-kpis">
         <div class="cr-kpi"><span>Career track</span><b style="font-size:16px">${r.track ? esc(r.track.title) : 'Not chosen'}</b></div>
         <div class="cr-kpi"><span>Provisional level</span><b style="font-size:16px">${esc(rd?.level || '-')}</b><span>${rd ? 'Confidence: ' + esc(rd.confidence) : ''}</span></div>
-        <div class="cr-kpi"><span>Track readiness (knowledge)</span><b>${rd?.score == null ? '-' : rd.score + '%'}</b><span>${rd ? Math.round(rd.coverage * 100) + '% of skills assessed' : ''}</span></div>
-        <div class="cr-kpi"><span>Practical tasks</span><b>${rd?.practical_score == null ? '-' : rd.practical_score + '%'}</b></div>
+        <div class="cr-kpi"><span>Overall (theory + practical + scenario)</span><b>${rd?.score == null ? '-' : rd.score + '%'}</b><span>${rd ? Math.round(rd.coverage * 100) + '% of skills assessed' : ''}</span></div>
+        ${['theory', 'practical', 'scenario'].map((c) => `<div class="cr-kpi"><span>${CAT[c]}${rd ? ' (weight ' + rd.evaluation[c].weight + ')' : ''}</span><b>${rd && rd.evaluation[c].sufficient ? pctTxt(rd.evaluation[c].score) : '-'}</b></div>`).join('')}
         <div class="cr-kpi"><span>Common CS score</span><b>${r.common.score == null ? '-' : r.common.score + '%'}</b><span>${r.common.last_attempt ? 'Taken ' + fmtDate(r.common.last_attempt.submitted_at) : 'Not taken'}</span></div>
       </div>
+      ${r.pending_reviews ? `<div class="cr-note"><b>${r.pending_reviews} written or practical answer${r.pending_reviews === 1 ? ' is' : 's are'} waiting for staff review.</b> They are not counted yet; this report updates when they are reviewed.</div>` : ''}
+      ${rd?.category_feedback ? `<section class="cr-panel" aria-labelledby="crCatH"><h3 id="crCatH">Theory, practical and real-world application</h3>
+        <p>${esc(rd.category_feedback.summary)}</p>
+        ${rd.category_feedback.rows.map((c) => `<div class="cr-skill"><span><b>${esc(c.name)}</b> <span class="cr-small cr-muted">(${esc(CAT_DESC[c.category])}, weight ${c.weight})</span></span>${bar({ score: c.score, evidence: c.score == null ? 'none' : 'sufficient' })}<span><b>${pctTxt(c.score)}</b></span></div>
+          <p class="cr-small cr-muted" style="margin:2px 0 8px">${esc(c.message)}</p>`).join('')}</section>` : ''}
       ${rd ? `<div class="cr-panel"><h3>How your level was worked out</h3><ul>${rd.explanation.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
       <div class="cr-cols"><div>
         ${rd ? `<h2>${esc(r.track.title)} skills</h2>${rd.skills.map(skillRow).join('')}
           <p class="cr-small cr-muted">Striped bars mean too few questions were answered to be sure - take the short reassessment for that skill.</p>` : '<div class="cr-note">Choose a career track above to see your readiness for it.</div>'}
         <h2>Common computer-science skills</h2>${r.common.categories.map((c) => skillRow({ ...c, critical: false })).join('')}
         ${r.gaps.length ? `<h2>What to work on next</h2>${r.gaps.map((g) => `<div class="cr-panel"><h3>${esc(g.name)} ${status(g.status)}</h3>
+          ${(g.weak_in || []).length ? `<div class="cr-tags" style="margin-bottom:6px">${g.weak_in.map((c) => `<span class="cr-tag bad">Weak: ${esc(CAT[c])}</span>`).join('')}${(g.strong_in || []).map((c) => `<span class="cr-tag teal">Strong: ${esc(CAT[c])}</span>`).join('')}</div>` : ''}
           <p>${esc(g.recommendation)}</p>
           ${g.resources.length ? `<div>${g.resources.map((m) => `<div class="cr-mod"><a href="${esc(m.url)}">${esc(m.course)}: ${esc(m.title)}</a><span class="cr-small">${m.completed ? '✓ Completed' : m.tasks + ' practice task' + (m.tasks === 1 ? '' : 's')}</span></div>`).join('')}</div>` : ''}
           <div class="cr-actions">${g.reassess_available ? `<a class="cr-btn ghost" href="#assess/${esc('skill:' + g.skill)}">${g.status === 'Not Yet Assessed' ? 'Assess this skill' : 'Take the reassessment'}</a>` : '<span class="cr-tag">A reassessment for this skill is coming soon</span>'}</div></div>`).join('')}` : rd ? '<div class="cr-note">No skill gaps for this track - see your roadmap for advanced projects.</div>' : ''}

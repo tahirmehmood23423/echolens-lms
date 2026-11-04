@@ -15,12 +15,14 @@ const express = require('express');
 const { register } = require('../career/routes');
 
 let server, base, svc;
+let AI_CALLS = 0;
+const fakeAi = async (uid, { rubric }) => { AI_CALLS++; return { criteria: rubric.map((r, i) => ({ index: i + 1, points: r.points, why: 'looks complete' })), feedback: 'AI thinks this is great.', model: 'stub' }; };
 const auth = (req, res, next) => { const id = Number(req.headers['x-user']); const u = store.Users.byId(id); if (!u) return res.status(401).json({ error: 'Sign in.' }); req.user = { id: u.id, role: u.role }; next(); };
 const admin = (req, res, next) => (req.user.role === 'admin' ? next() : res.status(403).json({ error: 'Admin access only.' }));
 
 before(async () => {
   const app = express(); app.use(express.json());
-  svc = register(app, { store, authRequired: auth, adminRequired: admin });
+  svc = register(app, { store, authRequired: auth, adminRequired: admin, aiSuggest: fakeAi });
   await new Promise((r) => { server = app.listen(0, r); });
   base = `http://127.0.0.1:${server.address().port}`;
 });
@@ -37,8 +39,8 @@ const call = async (method, url, user, body) => {
   return { status: res.status, body: await res.json() };
 };
 const publishAll = () => { for (const b of Object.keys(svc.BANKS)) svc.setQuestionStatus(svc.questions(b).map((q) => q.id), 'published', 3); };
-const key = (q) => (q.type === 'output' ? q.answer[0] : q.type === 'multi' ? q.answer : q.answer[0]);
-const wrong = (q) => (q.type === 'output' ? 'definitely wrong' : q.options.find((o) => !q.answer.includes(o.id)).id);
+const key = (q) => (q.grading === 'review' ? 'A thorough written answer covering every rubric point.' : q.type === 'output' ? q.answer[0] : q.type === 'multi' ? q.answer : q.answer[0]);
+const wrong = (q) => (q.grading === 'review' ? 'not sure' : q.type === 'output' ? 'definitely wrong' : q.options.find((o) => !q.answer.includes(o.id)).id);
 /** Answer each delivered question right or wrong according to rightFor(question). */
 function answers(attempt, rightFor) {
   return Object.fromEntries(attempt.questions.map((q) => { const full = svc.questionById(q.id); return [q.id, rightFor(full) ? key(full) : wrong(full)]; }));
@@ -125,16 +127,16 @@ test('retakes respect the cooldown and draw an alternate form', async () => {
 test('admin: permissions, versioned edits, configurable weights and bands, audit-safe history', async () => {
   for (const u of [1, 2, 4]) assert.equal((await call('GET', '/api/admin/career/overview', u)).status, 403);
   const ov = await call('GET', '/api/admin/career/overview', 3);
-  assert.equal(ov.status, 200); assert.equal(ov.body.banks.find((b) => b.bank === 'common').draft, 41);
+  assert.equal(ov.status, 200); assert.equal(ov.body.banks.find((b) => b.bank === 'common').draft, svc.questions('common').length);
   publishAll(); skipCooldown();
   const done = await take(1, 'common', () => true);
   // A multiple-choice question: editing only its explanation must keep its options and key.
-  const mcq = svc.questions('common').find((q) => q.type === 'single');
+  const mcq = svc.questions('common').find((q) => q.type === 'single' && q.grading !== 'review');
   const mcqEdit = await call('PUT', `/api/admin/career/questions/${mcq.id}`, 3, { explanation: 'Reworded.' });
   assert.equal(mcqEdit.status, 200, JSON.stringify(mcqEdit.body));
   assert.deepEqual(mcqEdit.body.question.options.map((o) => o.text), mcq.options.map((o) => o.text));
   assert.deepEqual(mcqEdit.body.question.answer, mcq.answer);
-  const id = done.result.responses.find((r) => r.id !== mcq.id).id;
+  const id = done.result.responses.find((r) => r.id !== mcq.id && r.grading !== 'review').id;
   const edit = await call('PUT', `/api/admin/career/questions/${id}`, 3, { explanation: 'Clarified explanation.' });
   assert.equal(edit.status, 200); assert.equal(edit.body.question.version, 2); assert.equal(edit.body.question.status, 'draft', 'an edit goes back to review');
   const review = await call('GET', `/api/career/me/attempts/${done.id}/review`, 1);
@@ -221,7 +223,19 @@ test('Scenario E - reassessment updates the report and roadmap without deleting 
   assert.equal(re.result.skills['be.sql'].evidence, 'sufficient');
   r = (await call('GET', '/api/career/me', 2)).body;
   assert.equal(r.readiness.skills.find((s) => s.skill === 'be.sql').status, 'Strong');
-  assert.ok(!r.gaps.some((g) => g.skill === 'be.sql'));
+  // Practical SQL is not re-proven by repeat questions: it stays flagged until a
+  // reviewer scores the practical submission included in the reassessment.
+  const left = r.gaps.find((g) => g.skill === 'be.sql');
+  assert.ok(!left || (left.partial && left.status !== 'Critical Prerequisite Gap'));
+  const sub = re.result.responses.find((x) => x.grading === 'review');
+  if (sub) {
+    const item = (await call('GET', '/api/career/reviews', 3)).body.reviews.find((x) => x.attempt_id === re.id);
+    await call('POST', `/api/career/reviews/2/${re.id}/${item.question_id}`, 3, { criteria: item.rubric.map((c) => ({ points: c.points })), comment: 'Correct join, grouping and ordering.' });
+    r = (await call('GET', '/api/career/me', 2)).body;
+    const g = r.gaps.find((x) => x.skill === 'be.sql');
+    assert.ok(!g || !g.weak_in.includes('practical'), 'reviewed practical work clears the practical weakness');
+    // Any category whose only items were already seen keeps its earlier result until new items exist.
+  }
   const h = (await call('GET', '/api/career/me/history', 2)).body;
   assert.equal(h.attempts.length, 2, 'both attempts kept');
   assert.deepEqual(h.skills.find((s) => s.skill === 'be.sql').history.map((x) => x.score), [0, 100], 'before and after');
@@ -245,4 +259,96 @@ test('content gaps are reported to admins, never shown as links', async () => {
   const stats = a.body.content_gaps.find((g) => g.skill === 'ml.math_stats');
   assert.ok(stats); assert.match(stats.reason, /No EchoLens module/);
   assert.deepEqual(svc.resources('ml.math_stats', 1), []);
+});
+
+test('all 12 career-track assessments open once their questions are published, each with all three categories', async () => {
+  publishAll();
+  const r = await call('GET', '/api/career/tracks');
+  for (const t of r.body.tracks) {
+    assert.equal(t.assessment.available, true, `${t.slug}: ${t.assessment.reason}`);
+    for (const c of ['theory', 'practical', 'scenario']) assert.ok(t.assessment.coverage.categories[c] > 0, `${t.slug} ${c}`);
+    assert.ok(t.assessment.reviewed_items >= 1, `${t.slug} includes a reviewed item`);
+  }
+});
+
+test('hybrid delivery: every assessment mixes categories and shows rubrics, never model answers', async () => {
+  publishAll();
+  const s = await call('POST', '/api/career/me/attempts', 1, { assessment: 'cybersecurity-analyst' });
+  assert.equal(s.status, 200, JSON.stringify(s.body));
+  const qs = s.body.attempt.questions;
+  for (const c of ['theory', 'practical', 'scenario']) assert.ok(qs.some((q) => q.category === c), c);
+  const rev = qs.filter((q) => q.grading === 'review');
+  assert.ok(rev.length >= 1 && rev.every((q) => q.rubric.length));
+  assert.ok(!/model_answer/.test(JSON.stringify(s.body)));
+});
+
+test('written answers: pending until a human reviews; AI suggestions are unverified and never change the score', async () => {
+  publishAll();
+  await call('PUT', '/api/career/me/preferences', 1, { preferred_track: 'frontend-web-developer' });
+  const done = await take(1, 'frontend-web-developer', () => true);
+  assert.ok(done.result.pending >= 1);
+  const before = done.result.raw_score;
+  let rep = (await call('GET', '/api/career/me', 1)).body;
+  assert.equal(rep.pending_reviews, done.result.pending);
+  // Learners cannot see or act on the review queue.
+  assert.equal((await call('GET', '/api/career/reviews', 1)).status, 403);
+  const q = await call('GET', '/api/career/reviews', 4);
+  assert.equal(q.status, 200);
+  const item = q.body.reviews.find((x) => x.attempt_id === done.id);
+  assert.ok(item.answer.includes('thorough'), 'reviewer sees the answer'); assert.ok(item.rubric.length);
+  const sug = await call('POST', `/api/career/reviews/1/${done.id}/${item.question_id}/suggest`, 4);
+  assert.equal(sug.status, 200); assert.equal(sug.body.suggestion.verified, false); assert.equal(AI_CALLS, 1);
+  let r1 = store.Users.byId(1).profile.career.attempts.find((a) => a.id === done.id).result.responses.find((x) => x.id === item.question_id);
+  assert.equal(r1.pending, true, 'an AI suggestion does not grade anything'); assert.equal(r1.earned, null);
+  // Validation: every criterion, within its maximum, with written feedback.
+  assert.equal((await call('POST', `/api/career/reviews/1/${done.id}/${item.question_id}`, 4, { criteria: [], comment: 'Good work overall here.' })).status, 400);
+  const over = item.rubric.map((c) => ({ points: c.points + 1 }));
+  assert.equal((await call('POST', `/api/career/reviews/1/${done.id}/${item.question_id}`, 4, { criteria: over, comment: 'Good work overall here.' })).status, 400);
+  const half = item.rubric.map(() => ({ points: 0 }));
+  const ok = await call('POST', `/api/career/reviews/1/${done.id}/${item.question_id}`, 4, { criteria: half, comment: 'This misses the key points about scope.', used_ai_suggestion: false });
+  assert.equal(ok.status, 200, JSON.stringify(ok.body));
+  r1 = store.Users.byId(1).profile.career.attempts.find((a) => a.id === done.id).result.responses.find((x) => x.id === item.question_id);
+  assert.equal(r1.pending, false); assert.equal(r1.earned, 0, 'the human score counts, not the AI one');
+  const after = store.Users.byId(1).profile.career.attempts.find((a) => a.id === done.id).result;
+  assert.ok(after.raw_score < before, 'totals were rebuilt with the reviewed item');
+  const review = (await call('GET', `/api/career/me/attempts/${done.id}/review`, 1)).body.review.find((x) => x.id === item.question_id);
+  assert.equal(review.review.comment, 'This misses the key points about scope.'); assert.ok(review.explanation, 'reference answer shown after review');
+  assert.equal(review.review.reviewer_role, 'instructor');
+});
+
+test('no AI configured: reviewers get a clear message and can still review by rubric', async () => {
+  const app = express(); app.use(express.json());
+  const plain = register(app, { store, authRequired: auth, adminRequired: admin });
+  const srv = await new Promise((r) => { const x = app.listen(0, () => r(x)); });
+  try {
+    for (const b of Object.keys(plain.BANKS)) plain.setQuestionStatus(plain.questions(b).map((q) => q.id), 'published', 3);
+    const s = plain.startAttempt(store.Users.byId(2), 'common');
+    const w = s.attempt.questions.find((q) => q.grading === 'review');
+    const done = plain.submitAttempt(store.Users.byId(2), s.attempt.id, { [w.id]: 'My explanation of the idea.' }).attempt;
+    const res = await fetch(`http://127.0.0.1:${srv.address().port}/api/career/reviews/2/${done.id}/${w.id}/suggest`, { method: 'POST', headers: { 'x-user': '3' } });
+    assert.equal(res.status, 503);
+  } finally { srv.close(); }
+});
+
+test('category feedback tells the student whether the weakness is theory, coding or application', async () => {
+  publishAll();
+  await call('PUT', '/api/career/me/preferences', 2, { preferred_track: 'backend-developer' });
+  await take(2, 'backend-developer', (q) => q.category !== 'practical');
+  const r = (await call('GET', '/api/career/me', 2)).body;
+  const fb = r.readiness.category_feedback;
+  assert.equal(fb.rows.find((x) => x.category === 'practical').level, 'weak');
+  assert.equal(fb.rows.find((x) => x.category === 'theory').level, 'strong');
+  assert.match(fb.summary, /practical implementation/);
+  assert.ok(r.gaps.some((g) => g.weak_in.includes('practical')));
+  assert.match(r.gaps.find((g) => g.weak_in.includes('practical')).recommendation, /practical implementation/);
+  assert.equal(r.readiness.weakest_category.category, 'practical');
+});
+
+test('admins can set theory / practical / scenario weights per track', async () => {
+  const bad = await call('PUT', '/api/admin/career/config', 3, { category_weights: { 'backend-developer': { theory: 50, practical: -1, scenario: 10 } } });
+  assert.equal(bad.status, 400);
+  const ok = await call('PUT', '/api/admin/career/config', 3, { category_weights: { 'backend-developer': { theory: 20, practical: 60, scenario: 20 } } });
+  assert.equal(ok.status, 200);
+  assert.deepEqual(svc.categoryWeights('backend-developer'), { theory: 20, practical: 60, scenario: 20 });
+  assert.equal(svc.categoryWeights('frontend-web-developer').practical, 45, 'other tracks keep their defaults');
 });

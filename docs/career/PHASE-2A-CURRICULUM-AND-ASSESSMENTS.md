@@ -1,8 +1,8 @@
 # EchoLens Phase 2A: Curriculum, Job Roles and Comprehensive Assessments
 
-Status: **in progress, staging only. Nothing has been deployed.** This report gives the exact inventory, separating what is complete from what is draft or planned. A generated or reviewed question bank is **not** a published assessment. Students only see an assessment after an admin publishes it in *Career Assessments > Curriculum & QA*.
+Status: **in progress. Pushed to the `v8-test` branch; nothing has been deployed to production.** This report gives the exact inventory, separating what is complete from what is draft or planned. A question bank is only live once it is approved and published. Five banks are approved; admins can publish or unpublish in *Career Assessments > Curriculum & QA*.
 
-## 1. Exact inventory (2026-11-04)
+## 1. Exact inventory (2026-11-04, after senior review)
 
 | Item | Complete | Draft or unverified | Remaining |
 |---|---|---|---|
@@ -10,23 +10,28 @@ Status: **in progress, staging only. Nothing has been deployed.** This report gi
 | Canonical subtracks (shared ids, 3 to 4 modules each) | 132 blueprints, status *reviewed* | | Lesson content for all 132 ("Learning content in preparation") |
 | Modules / competencies / key (critical) competencies | 413 / 680 / 312 | | |
 | Prerequisite graph | Validated: no cycles, no duplicates, no unknown ids | | |
-| Job roles mapped to mandatory and optional subtracks | 36 mapped | All 36 have role status *draft* | Human review of each role |
-| JD evidence | 0 human-verified | 33 *search summary, not verified*; 3 *JD verification required* (Android Developer, React Native Developer, Junior Security Engineer) | Admin reads current listings and marks *JD reviewed* |
-| Subtrack question banks at 90+ reviewed items | **3**: Python Fundamentals (90), SQL Fundamentals (90), REST API Design and Integration (90) | | **129 subtracks have no bank** (status *Assessment in preparation*) |
-| Published subtrack assessments | 0 in production | The 3 banks above are *ready to publish* | Admin publish decision, after this staging review |
-| Role final assessments (60 items) | Engine built and tested | All 36 show *blueprint*: they open only when every required subtrack is published | Banks for every required subtrack |
+| Job roles mapped to mandatory and optional subtracks | 36 mapped | All 36 have role status *draft* | |
+| JD evidence | 0 read in full by a person | All 36 are *search summary, not verified*, with search-result references (the last 3 added in this review) | Allow the listing sites in the session network, or have staff read them, then mark *JD reviewed* |
+| Subtrack question banks at 90+ items | **5 approved and published**: Programming and CS Foundations, Python Fundamentals, SQL Fundamentals, Git Collaboration, REST API Design (90 each) | | **127 subtracks have no bank** (*Assessment in preparation*) |
+| Role final assessments (60 items) | Engine tested end to end | All 36 are locked: each needs at least one subtrack that has no bank yet | Banks for the remaining required subtracks |
 
-Total questions written: **270**. All are single-answer MCQs with 4 options, a misconception note for each wrong option, and an explanation. 107 code-output items are verified by running them (61 in Python, 46 in SQLite), and every bank passes the validator with **0 errors and 0 warnings**.
+Total questions: **450**, all single-answer with 4 options, a misconception note for each wrong option and an explanation. **145 code outputs** are verified by execution (99 Python, 46 SQLite), and every bank passes the validator with **0 errors and 0 warnings**. All scenarios are original and none is attributed to a real company.
 
-| Bank | Easy | Medium | Hard | Advanced | Scenario share | Items per competency |
+| Bank | Easy | Medium | Hard | Advanced | Scenario share | Best length-guess score (chance 25%) |
 |---|---|---|---|---|---|---|
-| Python Fundamentals | 16 | 32 | 32 | 10 | 70% | 5 to 10 |
-| SQL Fundamentals | 17 | 31 | 31 | 11 | 99% | 10 |
-| REST API Design | 20 | 30 | 30 | 10 | 100% | 9 |
+| Programming and CS Foundations | 22 | 30 | 26 | 12 | 96% | 36% |
+| Python Fundamentals | 16 | 32 | 32 | 10 | 70% | 39% |
+| SQL Fundamentals | 17 | 31 | 31 | 11 | 99% | 39% |
+| Git Collaboration | 18 | 29 | 31 | 12 | 99% | 29% |
+| REST API Design | 20 | 30 | 30 | 10 | 100% | 37% |
 
-Every scenario is original and is not attributed to a real company.
+### Senior review findings and fixes
+- **Answer-length tell (fixed):** in the first three banks, the correct option was the longest one in up to 66% of items, so a guesser could exploit it. 125 distractors were rewritten. The validator now simulates longest, shortest and second-longest guessing and flags any bank above 40%.
+- **Version-dependent answer (caught by execution):** Python 3.12+ `sum()` of floats is compensated, so one keyed answer differed by interpreter version. The item now uses a plain `+=` loop.
+- **SQL portability:** derived tables now carry aliases, so the queries run in PostgreSQL as well as SQLite.
+- **Publication:** the five banks are approved and published by default (`career/curriculum/questions/index.js`, with the review evidence). The coverage gate still runs at runtime, and an admin unpublish always wins.
 
-**Next banks to write** (most widely required first): Programming and CS Foundations (needed by 30 roles), Git Collaboration (26), HTTP and Web Architecture (15), JavaScript Fundamentals (10), then HTML, JS DOM and async, Database Design, React Fundamentals, Networking and Linux.
+**Next banks** (most widely required): HTTP and Web Architecture (15 roles), JavaScript Fundamentals (10), then HTML, JS DOM and async, Database Design, React Fundamentals, Networking and Linux.
 
 ## 2. Assessment rules (configurable in *Assessment rules*, versioned)
 
@@ -49,15 +54,14 @@ Every scenario is original and is not attributed to a real company.
 
 ## 4. Verification
 
-- `test/career-curriculum.test.js`: 13 tests, all passing, including acceptance tests 1 to 8.
-- **Full suite:** 231 pass, and the same 13 failures as the baseline before this phase.
+- `test/career-curriculum.test.js`: 14 tests, all passing, including acceptance tests 1 to 8 and an end-to-end role final assessment.
+- **Full suite:** 232 pass, and the same 13 failures as the baseline before this phase.
 - **Browser check** on an isolated seeded database, at desktop and phone widths:
   - **Student journey:** track, roles, role, subtrack, quiz, result, subtrack again.
   - **Admin views:** QA dashboard, subtrack, role, rules.
   - **Results:** no script errors, no horizontal scroll, and no dash punctuation in student text.
 
-## 5. Decisions needed from EchoLens before production
-
-1. Review and approve publishing the 3 ready assessments.
-2. Assign a person to verify JD references for the 36 roles. Three have no usable references yet.
-3. Confirm the next bank batch and its order.
+## 5. Decisions taken in senior review
+1. **Publish:** the five banks that passed review are published. No bank is published without 90 reviewed items and full blueprint coverage.
+2. **JD verification:** a role is not marked *JD reviewed* until someone has read the listings themselves. Every role now has search references. The listing sites (bayt.com, qureos.com, careerjet.com.pk, iwork4sindh.com) are blocked from this session, so a person still needs to read them.
+3. **Bank order:** banks are written in order of how many roles need them. Programming and CS Foundations and Git Collaboration were done in this round.

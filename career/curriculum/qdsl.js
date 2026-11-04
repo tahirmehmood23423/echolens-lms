@@ -78,6 +78,26 @@ function validateBank(questions, subtrack) {
     const a = toks[i][1], b = toks[j][1], inter = [...a].filter((x) => b.has(x)).length, sim = inter / (a.size + b.size - inter || 1);
     if (sim >= 0.8) out.items[toks[j][0]].warnings.push(`very similar to ${toks[i][0]} (${Math.round(sim * 100)}%)`);
   }
+  // Length tells across the bank. Option order is shuffled per attempt, but a
+  // test-taker can still guess by length. Simulate three guessing strategies
+  // (pick the longest, the shortest, or the second longest option, treating
+  // lengths within 10% / 5% as indistinguishable) over the text questions.
+  // Pure chance is 25%; any strategy above 40% is flagged.
+  const text = questions.filter((q) => Array.isArray(q.options) && q.options.length === 4 && Math.max(...q.options.map((o) => String(o).length)) > 20);
+  if (text.length >= 20) {
+    const strategies = {
+      longest: (L) => { const m = Math.max(...L); return (l) => l >= m / 1.1; },
+      shortest: (L) => { const m = Math.min(...L); return (l) => l <= m * 1.1; },
+      'second longest': (L) => { const t = [...L].sort((x, y) => y - x)[1]; return (l) => Math.abs(l - t) <= t * 0.05; },
+    };
+    out.length_guess = {};
+    for (const [name, pick] of Object.entries(strategies)) {
+      let score = 0;
+      for (const q of text) { const L = q.options.map((o) => String(o).length), ok = pick(L), cand = L.map((_, i) => i).filter((i) => ok(L[i])); if (cand.includes(q.answer)) score += 1 / cand.length; }
+      out.length_guess[name] = Math.round((score / text.length) * 100);
+      if (out.length_guess[name] > 40) out.warnings.push(`bank: guessing the ${name} option scores ${out.length_guess[name]}% (chance is 25%); vary option lengths`);
+    }
+  }
   for (const [id, v] of Object.entries(out.items)) { v.errors.forEach((m) => out.errors.push(`${id}: ${m}`)); v.warnings.forEach((m) => out.warnings.push(`${id}: ${m}`)); }
   return out;
 }

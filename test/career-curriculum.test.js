@@ -66,6 +66,8 @@ test('banks: every built-in bank passes validation and every code output is veri
   for (const [id, b] of Object.entries(BANKS)) {
     const v = validateBank(b.questions, C.subtrack(id));
     assert.deepEqual(v.errors, [], id); assert.deepEqual(v.warnings, [], id);
+    // No length tell: guessing by option length never beats 40% (chance is 25%).
+    for (const [k, pct] of Object.entries(v.length_guess)) assert.ok(pct <= 40, `${id}: guessing ${k} scores ${pct}%`);
     assert.ok(b.questions.length >= 90, `${id} has ${b.questions.length}`);
     assert.ok(b.questions.filter((q) => q.scenario).length / b.questions.length >= 0.7, `${id} scenario share`);
     const comps = C.subtrack(id).modules.flatMap((m) => m.objectives.map((o) => o.id.slice(id.length + 1)));
@@ -75,7 +77,11 @@ test('banks: every built-in bank passes validation and every code output is veri
   assert.match(out, / 0 problems/);
 });
 
-test('unpublished assessments cannot be started, and forms never contain the answer key', async () => {
+test('approved banks are live by default; unpublished assessments cannot be started; forms never contain the answer key', async () => {
+  assert.equal((await call('GET', '/api/career/curriculum/subtracks/python-fundamentals', 1)).body.assessment.state, 'published');
+  assert.equal((await call('GET', '/api/career/curriculum/subtracks/git-collaboration', 1)).body.assessment.state, 'published');
+  assert.equal((await call('GET', '/api/career/curriculum/subtracks/linux-sysadmin', 1)).body.assessment.state, 'planned');
+  assert.equal((await call('POST', '/api/admin/career/curriculum/subtracks/python-fundamentals/unpublish', 3)).status, 200);
   let r = await start(1, 'python-fundamentals');
   assert.equal(r.status, 409);
   assert.equal((await call('GET', '/api/career/curriculum/subtracks/python-fundamentals', 1)).body.assessment.state, 'ready');
@@ -202,9 +208,9 @@ test('7. question-quality validation flags multiple correct answers and invalid 
 
 test('8. a subtrack with insufficient reviewed questions cannot be published as complete', async () => {
   // No bank at all.
-  let r = await publish('git-collaboration');
+  let r = await publish('linux-sysadmin');
   assert.equal(r.status, 409);
-  assert.equal((await call('GET', '/api/career/curriculum/subtracks/git-collaboration')).body.assessment.state, 'planned');
+  assert.equal((await call('GET', '/api/career/curriculum/subtracks/linux-sysadmin')).body.assessment.state, 'planned');
   // A real bank with most items sent back to draft.
   const ids = BANKS['python-fundamentals'].questions.slice(0, 70).map((q) => q.id);
   await call('POST', '/api/admin/career/curriculum/subtracks/python-fundamentals/questions/status', 3, { ids, status: 'draft' });
@@ -241,4 +247,26 @@ test('structure edits are validated: prerequisite cycles and mandatory/optional 
   r = await call('PUT', '/api/admin/career/curriculum/structure', 3, { role: { id: role.id, jd_status: 'jd_reviewed' } });
   assert.equal(r.status, 200);
   assert.equal((await call('GET', '/api/career/curriculum/roles/junior-data-engineer')).body.jd.status, 'jd_reviewed');
+});
+
+test('role final assessment: 60 items from every required subtrack, graded server side, readiness needs every subtrack too', async () => {
+  const subs = ['programming-foundations', 'python-fundamentals', 'sql-fundamentals', 'git-collaboration'];
+  await call('PUT', '/api/admin/career/curriculum/structure', 3, { role: { id: 'junior-data-analyst', mandatory: subs, optional: [] } });
+  await call('PUT', '/api/admin/career/curriculum/config', 3, { retake_hours: 0 });
+  const role = (await call('GET', '/api/career/curriculum/roles/junior-data-analyst', 1)).body;
+  assert.deepEqual(role.required.map((s) => s.id), subs);
+  assert.equal(role.final_assessment.state, 'published');
+  const a = (await call('POST', '/api/career/me/st/roles/junior-data-analyst/start', 1)).body.attempt;
+  assert.equal(a.questions.length, 60);
+  const owner = (id) => subs.find((s) => BANKS[s].questions.some((q) => q.id === id));
+  for (const s of subs) assert.ok(a.questions.filter((q) => owner(q.id) === s).length >= 2, s);
+  assert.ok(a.questions.filter((q) => q.scenario).length >= 42);
+  const answers = Object.fromEntries(a.questions.map((q) => [q.id, String(key(owner(q.id), q.id).answer)]));
+  const { body: { result } } = await submit(1, a, answers);
+  assert.equal(result.overall, 100); assert.equal(result.outcome, 'passed');
+  let rd = (await call('GET', '/api/career/curriculum/roles/junior-data-analyst', 1)).body.readiness;
+  assert.equal(rd.ready, false, 'subtrack assessments are still required');
+  for (const s of subs) { const x = (await start(1, s)).body.attempt; await submit(1, x, answersFor(s, x, () => true)); }
+  rd = (await call('GET', '/api/career/curriculum/roles/junior-data-analyst', 1)).body.readiness;
+  assert.equal(rd.ready, true); assert.equal(rd.passed, 4);
 });

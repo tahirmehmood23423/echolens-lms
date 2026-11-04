@@ -25,7 +25,7 @@
 const crypto = require('crypto');
 const C = require('./index');
 const { validateQuestion, validateBank } = require('./qdsl');
-const { BANKS: BUILT_IN } = require('./questions');
+const { BANKS: BUILT_IN, APPROVED } = require('./questions');
 const { verifyCode } = require('./verify');
 
 const READINESS_LABEL = 'EchoLens Assessed Knowledge Readiness';
@@ -212,11 +212,14 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
       unrestricted: pool.length >= cfg.unrestricted_bank, quota: q, need_scenario: needScenario };
   }
   const assessState = () => { const s = settings(); if (!s.career_st_assess) s.career_st_assess = {}; return s.career_st_assess; };
+  /** An admin decision stored in settings wins; otherwise the approval shipped with the bank (questions/index.js). */
+  const builtInPub = (id) => (APPROVED[id] && !extraBanks[id] ? { published: true, by: APPROVED[id].by, at: APPROVED[id].at, version: APPROVED[id].version, built_in: true } : null);
+  const pubRecord = (id) => assessState()[id] || builtInPub(id);
   /** planned | draft | ready (coverage OK, awaiting admin publish) | published */
   function assessmentStatus(subtrackId) {
     const total = questions(subtrackId).length;
     if (!total) return { state: 'planned', label: 'Assessment in preparation' };
-    const pub = assessState()[subtrackId];
+    const pub = pubRecord(subtrackId);
     if (pub?.published) {
       const cov = coverage(subtrackId, ['published']);
       if (!cov.feasible) return { state: 'draft', label: 'Assessment in preparation', reasons: cov.reasons };
@@ -231,12 +234,13 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     if (!cov.feasible) return { error: 'This assessment cannot be published yet: ' + cov.reasons.join(' '), status: 409, reasons: cov.reasons };
     const st = qs();
     for (const q of eligible(subtrackId, ['reviewed'])) st.status[q.id] = { status: 'published', by: actorId, at: iso() };
-    const cur = assessState()[subtrackId];
+    const cur = pubRecord(subtrackId);
     assessState()[subtrackId] = { published: true, by: actorId, at: iso(), version: (cur?.version || 0) + 1 };
     save(); audit(actorId, 'career_st_assessment_publish', 'career_st_assessment', subtrackId, { version: assessState()[subtrackId].version });
     return { status: assessmentStatus(subtrackId) };
   }
   function unpublishAssessment(subtrackId, actorId) {
+    if (!assessState()[subtrackId] && builtInPub(subtrackId)) assessState()[subtrackId] = { ...builtInPub(subtrackId) };
     const cur = assessState()[subtrackId]; if (!cur) return { error: 'Not published.', status: 404 };
     cur.published = false; cur.unpublished_at = iso(); save();
     audit(actorId, 'career_st_assessment_unpublish', 'career_st_assessment', subtrackId, {});

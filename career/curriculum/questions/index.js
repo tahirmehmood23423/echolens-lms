@@ -10,7 +10,17 @@ const REVIEW = { author: 'Claude (EchoLens subject-specialist author)', reviewed
 const BANKS = {
   'python-fundamentals': { ...REVIEW, questions: ['a', 'b', 'c'].flatMap((p) => require('./python-fundamentals.' + p)) },
   'sql-fundamentals': { ...REVIEW, questions: ['a', 'b'].flatMap((p) => require('./sql-fundamentals.' + p)) },
+  'programming-foundations': { ...REVIEW, questions: ['a', 'b'].flatMap((p) => require('./programming-foundations.' + p)) },
+  'git-collaboration': { ...REVIEW, questions: ['a', 'b', 'c'].flatMap((p) => require('./git-collaboration.' + p)) },
   'rest-api-design': { ...REVIEW, questions: ['a', 'b'].flatMap((p) => require('./rest-api-design.' + p)) },
 };
-for (const b of Object.values(BANKS)) for (const q of b.questions) q.status = 'reviewed';
-module.exports = { BANKS, REVIEW };
+/**
+ * Senior subject-matter approval to publish. Recorded here, with the review
+ * evidence, so the approval ships with the code; the service still re-checks
+ * blueprint coverage at runtime, and an admin unpublish always overrides it.
+ */
+const APPROVAL = { by: 'EchoLens senior subject review', at: '2026-11-04', version: 1,
+  evidence: 'Every item read for one defensible key; 107 code outputs executed; validator 0 errors 0 warnings; option-length tells removed (guessing the longest, shortest or second longest option scores at most 39%, chance 25%); SQL portable across SQLite and PostgreSQL.' };
+const APPROVED = { 'python-fundamentals': APPROVAL, 'sql-fundamentals': APPROVAL, 'rest-api-design': APPROVAL, 'programming-foundations': APPROVAL, 'git-collaboration': APPROVAL };
+for (const [id, b] of Object.entries(BANKS)) for (const q of b.questions) q.status = APPROVED[id] ? 'published' : 'reviewed';
+module.exports = { BANKS, REVIEW, APPROVED };

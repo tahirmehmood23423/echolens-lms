@@ -74,6 +74,27 @@ const SOC_JD = JD([
   ref('Junior SOC Analyst', 'https://www.iwork4sindh.com/job/junior-soc-analyst', null, 'Karachi'),
   ref('SOC vacancy', 'https://www.sbp.org.pk/careers/2023/Nov/SOC.htm', 'State Bank of Pakistan', 'Pakistan', '2023 posting'),
 ], ['monitoring SIEM, EDR and XDR alerts', 'escalating incidents to L2', 'documenting incidents', 'networking fundamentals (TCP/IP, DNS, HTTP)', 'Windows and Linux basics', 'shift work; Security+ or similar certifications are a plus']);
+const ANDROID_JD = JD([
+  ref('Senior Android Developer', 'https://www.bayt.com/en/pakistan/jobs/sr-android-developer-74941321/', 'Systems Limited', 'Pakistan', 'senior listing, used for skill themes only'),
+  ref('Android Developer', 'https://app.qureos.com/jobs/android-developer-1775264162119'),
+  ref('Android Developer', 'https://app.qureos.com/jobs/android-developer-1767251355309'),
+  ref('Android Developer roles', 'https://careers.netsoltech.com/?p=43879', 'NetSol Technologies', 'Lahore, Karachi', '3+ years'),
+  ref('Android jobs search', 'https://pk.indeed.com/q-android-jobs.html', null, 'Pakistan', 'search page'),
+], ['Kotlin (Java still common)', 'Android SDK and architecture best practices', 'REST API integration', 'Git', 'unit testing and secure data handling', 'entry roles ask for a CS degree and 1 to 2 years; many listings are senior']);
+const RN_JD = JD([
+  ref('React Native Developer', 'https://app.qureos.com/jobs/react-native-developer-1760608891938', null, 'Karachi'),
+  ref('React Native Developer', 'https://app.qureos.com/jobs/react-native-developer-1770494272997', null, 'Lahore'),
+  ref('React Native Developer (fresher)', 'https://www.iwork4sindh.com/job/react-native-developer-1767956163-6960dec3a9545', null, 'Karachi'),
+  ref('React Native Developer', 'https://wateen.com/?p=148754', 'Wateen Telecom'),
+  ref('React Native Developer', 'https://app.qureos.com/jobs/react-native-developer-1767262143940', null, 'Islamabad'),
+], ['JavaScript (ES6+); TypeScript usually expected, sometimes listed as a plus', 'state management with Redux, Context API, Zustand or MobX', 'REST API integration', 'App Store and Google Play releases', 'native modules in some roles', 'experience asked ranges from fresher to 4+ years']);
+const SECENG_JD = JD([
+  ref('Junior Cyber Security Engineer, Application Security', 'https://www.careerjet.com.pk/jobad/pkc90ad07bed81130e32cb7786e926b57b', null, 'Kharian'),
+  ref('Junior Security Engineer', 'https://pucit.edu.pk/junior-security-engineer/', null, 'Lahore'),
+  ref('Trainee Information Security Engineer', 'https://app.qureos.com/jobs/trainee-information-security-engineer-1756393540977', null, 'Lahore'),
+  ref('Junior Security Engineer', 'https://hireresolve.simplify.hr/vacancy/jsnsns'),
+  ref('Security Engineer', 'https://app.qureos.com/jobs/security-engineer-1770500028308', null, 'Pakistan', 'mid-level, used for skill themes only'),
+], ['networking and Linux fundamentals', 'information security fundamentals', 'security policies and compliance (ISO 27001, PCI-DSS, GDPR) in trainee roles', 'application security standards in AppSec roles', 'supporting investigations and remediation', 'degree or certifications such as CCNA or Security+ preferred']);
 const DEVOPS_JD = JD([
   ref('Junior DevOps Engineer', 'https://vyro.applytojob.com/apply/2Zm6OSLdlb/Junior-DevOps-Engineer', 'Vyro'),
   ref('Junior DevOps Engineer', 'https://app.qureos.com/jobs/junior-devops-engineer-1760020875892'),
@@ -141,11 +162,11 @@ module.exports = [
   R('android-developer', 'mobile-app-developer', 'Android Developer', 'Builds native Android apps with Kotlin and Jetpack Compose. Flutter evidence does not count here.',
     ['Build Compose UIs', 'Use ViewModel and lifecycle-aware architecture', 'Integrate APIs and Room', 'Publish to Google Play'],
     ['programming-foundations', 'mobile-ui-fundamentals', 'kotlin-android', 'mobile-apis-networking', 'mobile-storage', 'mobile-architecture', 'mobile-testing-debugging', 'git-collaboration'],
-    ['mobile-auth-security', 'mobile-performance-platform', 'app-distribution']),
+    ['mobile-auth-security', 'mobile-performance-platform', 'app-distribution'], ANDROID_JD),
   R('react-native-developer', 'mobile-app-developer', 'React Native Developer', 'Builds cross-platform apps with React Native. Flutter evidence does not count here.',
     ['Build React Native screens', 'Manage navigation and state', 'Integrate APIs and device features', 'Release to both stores'],
     ['js-fundamentals', 'js-dom-async', 'react-fundamentals', 'mobile-ui-fundamentals', 'react-native', 'mobile-apis-networking', 'mobile-storage', 'mobile-testing-debugging', 'git-collaboration'],
-    ['typescript-fundamentals', 'mobile-auth-security', 'app-distribution']),
+    ['typescript-fundamentals', 'mobile-auth-security', 'app-distribution'], RN_JD),
 
   // ---------------- AI & ML ----------------
   R('junior-ml-engineer', 'ai-machine-learning-engineer', 'Junior ML Engineer', 'Builds, evaluates and helps deploy classical machine learning models.',
@@ -215,7 +236,7 @@ module.exports = [
   R('junior-security-engineer', 'cybersecurity-analyst', 'Junior Security Engineer', 'Implements and automates security controls across networks, endpoints and cloud.',
     ['Harden systems', 'Implement security controls', 'Automate checks', 'Secure cloud resources'],
     ['networking-fundamentals', 'linux-sysadmin', 'security-foundations', 'identity-access-control', 'cryptography-secure-comms', 'vulnerabilities-defense', 'network-endpoint-cloud-security', 'scripting-automation'],
-    ['cloud-networking-iam', 'security-logging-monitoring']),
+    ['cloud-networking-iam', 'security-logging-monitoring', 'security-grc'], SECENG_JD),
 
   // ---------------- Cloud & DevOps ----------------
   R('junior-devops-engineer', 'cloud-devops-engineer', 'Junior DevOps Engineer', 'Automates builds, deployments and infrastructure, and supports production systems.',

@@ -1,4 +1,5 @@
 'use strict';
+const selectChoice = require('./helpers/choices.cjs');
 /**
  * Phase 2A: canonical curriculum, job roles and comprehensive subtrack
  * assessments, over HTTP against the real store. Covers acceptance tests
@@ -44,7 +45,7 @@ const start = (u, id) => call('POST', `/api/career/me/st/subtracks/${id}/start`,
 const submit = (u, a, answers) => call('POST', `/api/career/me/st/attempts/${a.id}/submit`, u, { answers });
 const key = (sub, id) => BANKS[sub].questions.find((q) => q.id === id);
 /** Answer each question correctly when pick(q) is true, otherwise choose a wrong option. */
-const answersFor = (sub, attempt, pick) => Object.fromEntries(attempt.questions.map((q) => { const k = key(sub, q.id); return [q.id, String(pick(k) ? k.answer : (k.answer + 1) % 4)]; }));
+const answersFor = (sub, attempt, pick) => Object.fromEntries(attempt.questions.map((q) => { const k = key(sub, q.id); return [q.id, selectChoice(q, k, pick(k) ? k.answer : (k.answer + 1) % 4)]; }));
 const tally = (list, f) => list.reduce((m, x) => (m[f(x)] = (m[f(x)] || 0) + 1, m), {});
 
 /* ------------------------------ catalogue gates ------------------------------ */
@@ -261,7 +262,7 @@ test('role final assessment: 60 items from every required subtrack, graded serve
   const owner = (id) => subs.find((s) => BANKS[s].questions.some((q) => q.id === id));
   for (const s of subs) assert.ok(a.questions.filter((q) => owner(q.id) === s).length >= 2, s);
   assert.ok(a.questions.filter((q) => q.scenario).length >= 42);
-  const answers = Object.fromEntries(a.questions.map((q) => [q.id, String(key(owner(q.id), q.id).answer)]));
+  const answers = Object.fromEntries(a.questions.map((q) => [q.id, selectChoice(q, key(owner(q.id), q.id), key(owner(q.id), q.id).answer)]));
   const { body: { result } } = await submit(1, a, answers);
   assert.equal(result.overall, 100); assert.equal(result.outcome, 'passed');
   let rd = (await call('GET', '/api/career/curriculum/roles/junior-data-analyst', 1)).body.readiness;

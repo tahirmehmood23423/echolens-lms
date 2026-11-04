@@ -19,6 +19,19 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   // Signed-in user if there is one; null for guests (Career Discovery is open to everyone).
   const who = (req) => { try { const u = optionalUser ? optionalUser(req) : null; return u ? store.Users.byId(u.id) : null; } catch { return null; } };
   const r = express.Router();
+  // A mutation is not acknowledged until the persistence queue has settled.
+  r.use((req, res, next) => {
+    if (!['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method) || !store.pendingPersist) return next();
+    const json = res.json;
+    res.json = function (body) {
+      res.json = json;
+      Promise.resolve().then(() => store.pendingPersist()).then(() => json.call(res, body)).catch(() => {
+        if (!res.headersSent) json.call(res.status(503), { error: 'Your changes could not be saved. Please retry; your previous saved work is safe.' });
+      });
+      return res;
+    };
+    next();
+  });
   const me = (req) => store.Users.byId(req.user.id);
   const send = (res, out, ok = (o) => o) => (out && out.error ? res.status(out.status || 400).json({ error: out.error, ...(out.retry_at ? { retry_at: out.retry_at } : {}), ...(out.active ? { active: out.active } : {}), ...(out.reuse ? { reuse: true } : {}) }) : res.json(ok(out)));
   const limitStart = rateLimit ? rateLimit('career-start', { max: 20, windowMs: 60 * 60 * 1000, message: 'Too many assessments started from this network. Please try again later.' }) : (q, s, n) => n();
@@ -89,6 +102,7 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
 
   /* ------------------ curriculum: subtracks, job roles, comprehensive assessments ------------------ */
   const cur = svc.curriculum;
+  r.put('/career/me/target', authRequired, (req, res) => send(res, cur.setTarget(me(req), req.body?.role || null)));
   const nf = (res, what) => res.status(404).json({ error: `${what} not found.` });
   r.get('/career/curriculum/tracks/:slug', (req, res) => { const v = cur.trackView(who(req), req.params.slug); v ? res.json(v) : nf(res, 'Career track'); });
   r.get('/career/curriculum/subtracks/:id', (req, res) => { const v = cur.subtrackView(who(req), req.params.id); v ? res.json(v) : nf(res, 'Subtrack'); });

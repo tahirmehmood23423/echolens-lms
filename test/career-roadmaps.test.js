@@ -1,4 +1,5 @@
 'use strict';
+const selectChoice = require('./helpers/choices.cjs');
 /**
  * Multi-career roadmaps over HTTP against the real store: enrollment limits,
  * exactly one Primary, pause/resume/archive with history, the shared skill
@@ -47,7 +48,7 @@ async function take(u, assessment, mode) {
   const s = await call('POST', '/api/career/me/attempts', u, { assessment, ...(mode ? { mode } : {}) });
   assert.equal(s.status, 200, JSON.stringify(s.body));
   const a = s.body.attempt;
-  const sub = await call('POST', `/api/career/me/attempts/${a.id}/submit`, u, { answers: Object.fromEntries(a.questions.map((q) => [q.id, right(svc.questionById(q.id))])) });
+  const sub = await call('POST', `/api/career/me/attempts/${a.id}/submit`, u, { answers: Object.fromEntries(a.questions.map((q) => [q.id, selectChoice(q, svc.questionById(q.id), right(svc.questionById(q.id)))])) });
   assert.equal(sub.status, 200, JSON.stringify(sub.body));
   for (const item of svc.reviewQueue().filter((x) => x.attempt_id === a.id)) {
     const out = svc.submitReview({ id: 4, role: 'instructor' }, u, a.id, item.question_id, { criteria: item.rubric.map((c) => ({ points: c.points })), comment: 'Covers every rubric point correctly.' });

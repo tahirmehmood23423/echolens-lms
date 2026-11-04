@@ -1,4 +1,5 @@
 'use strict';
+const selectChoice = require('./helpers/choices.cjs');
 /**
  * Every assessment pipeline, end to end, for all 12 career tracks plus the
  * common CS assessment: delivery, scoring, staff review, classification,
@@ -31,7 +32,7 @@ function take(u, key, right) {
   const s = svc.startAttempt(u, key); assert.ok(s.attempt, `${key}: ${s.error}`);
   const a = s.attempt, full = a.questions.map((q) => svc.questionById(q.id));
   assert.ok(!JSON.stringify(a).includes('"answer":['), `${key}: no answer keys delivered`);
-  const done = svc.submitAttempt(u, a.id, Object.fromEntries(full.map((q) => [q.id, answerFor(q, right)]))).attempt;
+  const done = svc.submitAttempt(u, a.id, Object.fromEntries(full.map((q) => [q.id, selectChoice(a.questions.find((d) => d.id === q.id), q, answerFor(q, right))]))).attempt;
   // Staff review every written/practical submission: full marks for the strong student, zero for the weak one.
   for (const item of svc.reviewQueue().filter((x) => x.attempt_id === done.id)) {
     const out = svc.submitReview(reviewer, u.id, done.id, item.question_id, { criteria: item.rubric.map((c) => ({ points: right ? c.points : 0 })), comment: right ? 'Complete and correct answer.' : 'This does not address the rubric.' });

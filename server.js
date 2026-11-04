@@ -56,6 +56,13 @@ const {
 } = store;
 
 const app = express();
+// General profile serialization must never expose private Career snapshots.
+const { studentResponse } = require('./career/privacy');
+app.use((req, res, next) => {
+  const json = res.json;
+  res.json = function (value) { return json.call(this, studentResponse(value)); };
+  next();
+});
 const PORT = process.env.PORT || 3000;
 const DEFAULT_JWT_SECRET = 'echolens-dev-secret-change-in-production';
 const JWT_SECRET = process.env.JWT_SECRET || DEFAULT_JWT_SECRET;

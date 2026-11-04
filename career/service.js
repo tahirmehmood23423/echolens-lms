@@ -25,13 +25,22 @@ const { createCurriculumService } = require('./curriculum/service');
 const { BANKS } = require('./banks');
 const REVIEWER_ROLES = ['admin', 'instructor'];
 const LEARNER_ROLES = ['free', 'student'];
-const MAX_HISTORY = 60;
+// Attempts are append-only; UI history is paginated instead of deleting evidence.
+const MAX_HISTORY = Infinity;
 const QUESTION_STATUSES = ['draft', 'reviewed', 'published', 'retired'];
 const TRACK_STATUSES = ['draft', 'published'];
 
 function createCareerService(store, { now = () => new Date(), aiSuggest = null, notify = null, appUrl = '', secret = null, curriculumOptions = {} } = {}) {
   // Signs Career Discovery quiz forms and results, so guests can take the quiz without an account.
   const SIGNING_KEY = secret || crypto.randomBytes(32).toString('hex');
+  const choiceId = (nonce, qid, id) => crypto.createHmac('sha256', SIGNING_KEY).update(`${nonce}:${qid}:${id}`).digest('hex').slice(0, 24);
+  const publicQuestion = (q, order, nonce) => { const out = E.publicQuestion(q, order); out.options = out.options.map((o) => ({ ...o, id: choiceId(nonce, q.id, o.id) })); return out; };
+  const decodeChoice = (q, nonce, value) => {
+    if (!q.options.length) return value;
+    const one = (v) => q.options.find((o) => choiceId(nonce, q.id, o.id) === String(v))?.id || '';
+    return Array.isArray(value) ? value.map(one).filter(Boolean) : one(value);
+  };
+
   const data = () => store.allData();
   const settings = () => { const d = data(); if (!d.settings) d.settings = {}; return d.settings; };
   const save = () => store.persist();
@@ -276,12 +285,13 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   /* ----------------------------- student records ----------------------------- */
   function career(user) {
     const c = user.profile?.career || {};
-    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null, discovery: c.discovery || null, st: c.st || null };
+    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null, discovery: c.discovery || null, st: c.st || null, target_role: c.target_role || null };
   }
   function writeCareer(user, next) {
-    const attempts = next.attempts.slice(-MAX_HISTORY);
+    const attempts = next.attempts;
+    const previous = user.profile;
     user.profile = { ...(user.profile || {}), career: { ...next, attempts } };
-    save();
+    try { save(); } catch (error) { user.profile = previous; throw error; }
   }
   const isLearner = (user) => LEARNER_ROLES.includes(user?.role);
 
@@ -358,7 +368,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const active = {
       id: 'ca_' + crypto.randomBytes(8).toString('hex'), assessment: key, title: def.title, track: def.track || null, skill: def.skill || null,
       started_at: t.toISOString(), expires_at: new Date(t.getTime() + limitSec * 1000).toISOString(), limit_sec: limitSec,
-      config_version: cfg.version, weights: def.weights, questions: snapshot, answers: {}, saved_at: null, mode: gapMode ? 'gap' : 'full',
+      config_version: cfg.version, rules: JSON.parse(JSON.stringify(cfg)), choice_nonce: crypto.randomBytes(16).toString('hex'), weights: def.weights, questions: snapshot, answers: {}, saved_at: null, mode: gapMode ? 'gap' : 'full',
     };
     writeCareer(user, { ...fresh, active });
     // Taking a track's test (for example from "Test Your Skills") enrols the student
@@ -374,13 +384,16 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   }
   /** The student-facing form: no keys, no explanations. */
   function deliver(a) {
-    return { id: a.id, assessment: a.assessment, title: a.title, started_at: a.started_at, expires_at: a.expires_at, limit_sec: a.limit_sec, answers: a.answers || {},
+    if (!a.choice_nonce) { a.choice_nonce = crypto.randomBytes(16).toString('hex'); save(); }
+    const encoded = Object.fromEntries(Object.entries(a.answers || {}).map(([id, answer]) => { const q = a.questions.find((q) => q.id === id); const enc = (v) => choiceId(a.choice_nonce, id, v); return [id, q?.options.length ? (Array.isArray(answer) ? answer.map(enc) : enc(answer)) : answer]; }));
+    return { id: a.id, assessment: a.assessment, title: a.title, started_at: a.started_at, expires_at: a.expires_at, limit_sec: a.limit_sec, answers: encoded,
       weights: a.weights || null,
-      questions: a.questions.map((q) => ({ ...E.publicQuestion(q, q.order), skill: skill(q.skills[0])?.name || q.skills[0] })) };
+      questions: a.questions.map((q) => ({ ...publicQuestion(q, q.order, a.choice_nonce), skill: skill(q.skills[0])?.name || q.skills[0] })) };
   }
   function cleanAnswers(a, answers) {
     const out = {}, byId = new Map(a.questions.map((q) => [q.id, q]));
-    for (const [k, v] of Object.entries(answers || {})) {
+    for (const [k, incoming] of Object.entries(answers || {})) {
+      const v = a.choice_nonce && byId.has(k) ? decodeChoice(byId.get(k), a.choice_nonce, incoming) : incoming;
       const q = byId.get(k); if (!q) continue;
       out[k] = Array.isArray(v) ? v.slice(0, 8).map((x) => String(x).slice(0, 4)) : String(v ?? '').slice(0, q.grading === 'review' ? 6000 : 200);
     }
@@ -401,6 +414,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   function saveAnswers(user, id, answers, runs, pastes) {
     const c = career(user);
     if (!c.active || c.active.id !== id) return { error: 'Assessment not found or already submitted.', status: 404 };
+    if (!c.active.choice_nonce) { deliver(c.active); return { error: 'This assessment was updated securely. Reload to resume; your saved answers are preserved.', status: 409 }; }
     if (Date.parse(c.active.expires_at) + config().time_grace_sec * 1000 < now().getTime()) return { error: 'Time is up for this assessment. Submit to see your results.', status: 409 };
     writeCareer(user, { ...c, active: { ...c.active, answers: { ...c.active.answers, ...cleanAnswers(c.active, answers) }, runs: { ...(c.active.runs || {}), ...cleanRuns(c.active, runs) }, pastes: mergeMax(c.active.pastes, cleanPastes(c.active, pastes)), saved_at: iso() } });
     return { ok: true };
@@ -408,7 +422,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   const mergeMax = (a = {}, b = {}) => { const o = { ...a }; for (const [k, v] of Object.entries(b)) o[k] = Math.max(o[k] || 0, v); return o; };
   function finalize(user, id, answers, { expired = false, runs = {}, pastes = {} } = {}) {
     const c = career(user), a = c.active;
-    const cfg = config();
+    const cfg = a.rules || config();
     const late = Date.parse(a.expires_at) + cfg.time_grace_sec * 1000 < now().getTime();
     // After the deadline only the answers autosaved in time count.
     const final = late || expired ? a.answers : { ...a.answers, ...cleanAnswers(a, answers) };
@@ -434,6 +448,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const done = c.attempts.find((x) => x.id === id);
     if (done) return { attempt: done, existing: true };
     if (!c.active || c.active.id !== id) return { error: 'Assessment not found.', status: 404 };
+    if (!c.active.choice_nonce) { deliver(c.active); return { error: 'This assessment was updated securely. Reload to resume; your saved answers are preserved.', status: 409 }; }
     return { attempt: finalize(user, id, answers, { runs, pastes }) };
   }
   function abandonAttempt(user, id) {
@@ -448,11 +463,11 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return a.result.responses.map((r) => {
       const q = questionVersion(r.id, r.v), reviewed = r.grading === 'review';
       return { id: r.id, type: r.type, category: r.category, grading: r.grading, correct: r.correct, answered: r.answered, pending: !!r.pending, earned: r.earned, points: r.points, skill: skill(r.skills[0])?.name,
-        prompt: q?.prompt, code: q?.code, options: q?.options || [], key: q?.answer || [],
+        prompt: q?.prompt, code: q?.code,
         // Reviewed items: the student's own answer, the rubric, and - only once a human has reviewed it - the outcome and the reference answer.
         answer: reviewed ? r.answer || '' : undefined, run_output: reviewed ? r.run_output || null : undefined, rubric: reviewed ? q?.rubric || [] : undefined,
         review: reviewed && r.review ? { criteria: r.review.criteria, comment: r.review.comment, reviewed_at: r.review.at, reviewer_role: r.review.role } : null,
-        explanation: reviewed ? (r.review ? q?.model_answer || q?.explanation : null) : q?.explanation || null };
+        explanation: null };
     });
   }
   function questionVersion(id, v) {
@@ -569,7 +584,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   function skillRecords(user, profile = E.skillProfile(career(user).attempts)) {
     const cfg = config(), nowMs = now().getTime(), band = (v) => E.band(v, cfg);
     return Object.entries(profile).filter(([, e]) => e.score != null || e.by_category)
-      .map(([id, e]) => ({ ...R.skillRecord(user.id, id, e, { validDays: cfg.skill_valid_days, nowMs, band, skillVersion: skill(id)?.version }), name: skill(id)?.name || id, group: skill(id)?.group || null }));
+      .map(([id, e]) => ({ ...R.skillRecord(user.id, id, e, { validDays: cfg.skill_valid_days, nowMs, band, skillVersion: skill(id)?.version }), name: skill(id)?.name || id, group: skill(id)?.group || null })).concat(curriculumService.sharedSkills(user));
   }
   /**
    * The shared profile as seen by ONE roadmap: a skill's evidence counts only
@@ -787,7 +802,8 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return { config: settings().career_discovery_config };
   }
   const discoveryTracks = () => tracks().filter((t) => t.status === 'published')
-    .map((t) => ({ slug: t.slug, title: t.title, overview: t.overview, duration: t.duration, suitability: t.suitability, first_skills: (t.stages[0]?.skills || []).map((id) => skill(id)?.name).filter(Boolean) }));
+    .map((t) => ({ slug: t.slug, title: t.title, overview: t.overview, job_roles: curriculumService.allRoles().filter(r => r.track === t.slug).map(r => ({ id: r.id, title: r.title })),
+      duration: t.duration, suitability: t.suitability, first_skills: (t.stages[0]?.skills || []).map((id) => skill(id)?.name).filter(Boolean) }));
   /** Everything the public discovery pages need. */
   function discoveryInfo() {
     const cfg = discoveryConfig();
@@ -844,14 +860,15 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const form = E.assembleForm({ pool, plan: DISCOVERY_PLAN, seen, seed: crypto.randomInt(1, 2 ** 31) });
     const byId = new Map(pool.map((q) => [q.id, q]));
     const items = form.items.map((it) => [it.id, it.version, it.order]);
-    const token = signToken({ k: 'dq', items, iat: now().getTime(), n: crypto.randomBytes(9).toString('base64url'), u: user ? user.id : null });
+    const nonce = crypto.randomBytes(9).toString('base64url');
+    const token = signToken({ k: 'dq', items, iat: now().getTime(), n: nonce, u: user ? user.id : null });
     if (user) writeDiscovery(user, { active: { token, at: iso() } });
-    return { token, minutes: 6, questions: form.items.map((it) => E.publicQuestion(byId.get(it.id), it.order)) };
+    return { token, minutes: 6, questions: form.items.map((it) => publicQuestion(byId.get(it.id), it.order, nonce)) };
   }
   /** Rebuild the public questions of a signed form (to resume a quiz). */
   function resumeDiscoveryQuiz(token) {
     const p = readToken(token, 'dq', DISCOVERY_FORM_TTL); if (!p) return { error: 'This quiz has expired. Please start a new one.', status: 410 };
-    const qs = p.items.map(([id, , order]) => { const q = questionById(id); return q ? E.publicQuestion(q, order) : null; });
+    const qs = p.items.map(([id, , order]) => { const q = questionById(id); return q ? publicQuestion(q, order, p.n) : null; });
     if (qs.some((q) => !q)) return { error: 'This quiz has changed. Please start a new one.', status: 409 };
     return { token, minutes: 6, questions: qs };
   }
@@ -873,11 +890,11 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     for (const [id, version] of p.items) {
       const q = questionById(id);
       if (!q || q.version !== version) return { error: 'A question changed while you were taking the quiz. Please start a new one.', status: 409 };
-      const g = E.gradeResponse(q, answers ? answers[id] : null), sk = q.skills[0];
+      const g = E.gradeResponse(q, decodeChoice(q, p.n, answers ? answers[id] : null)), sk = q.skills[0];
       const a = areas[sk] || (areas[sk] = { name: skill(sk)?.name || sk, total: 0, answered: 0, correct: 0, earned: 0, possible: 0 });
       a.total++;
       if (g.answered) { a.answered++; a.possible += q.points; a.earned += g.earned; if (g.correct) a.correct++; }
-      responses.push({ id, version, answer: g.answered ? answers[id] : null, answered: g.answered, correct: g.correct });
+      responses.push({ id, version, answer: g.answered ? decodeChoice(q, p.n, answers[id]) : null, answered: g.answered, correct: g.correct });
     }
     let earned = 0, possible = 0;
     for (const a of Object.values(areas)) { earned += a.earned; possible += a.possible; a.score = a.possible ? Math.round((a.earned / a.possible) * 100) : null; a.level = areaLevel(a.score); delete a.earned; delete a.possible; }
@@ -970,6 +987,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const last = (key) => submitted.filter((a) => a.assessment === key).pop() || null;
     const pending = submitted.reduce((n, a) => n + (a.result.pending || 0), 0);
     return {
+      curriculum: curriculumService.progress(user, chosen?.slug),
       pending_reviews: pending,
       disclaimer: 'Scores guide your learning and placement on EchoLens. They are provisional estimates, not an employment qualification or a psychometrically validated certification.',
       preferences: c.preferences, track: chosen ? publicTrack(chosen) : null,
@@ -1034,6 +1052,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
 
   function publicTrack(t) {
     return { slug: t.slug, title: t.title, summary: t.summary, overview: t.overview, prerequisites: t.prerequisites, tools: t.tools, outcomes: t.outcomes,
+      job_roles: curriculumService.allRoles().filter(r => r.track === t.slug).map(r => ({ id: r.id, title: r.title })),
       duration: t.duration, suitability: t.suitability, practical: t.practical, status: t.status,
       skills: t.skills.map((s) => ({ ...s, name: skill(s.skill)?.name, group: skill(s.skill)?.group })),
       stages: t.stages.map((st, i) => ({ no: i + 1, name: STAGE_NAMES[i], skills: st.skills.map((id) => ({ skill: id, name: skill(id)?.name })), projects: st.projects, criteria: st.criteria })),
@@ -1077,13 +1096,14 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return { title: def.title, weights: def.weights, shortfall: form.shortfall, coverage: coverage(def), questions: form.items.map((i) => ({ ...byId.get(i.id), options: E.publicQuestion(byId.get(i.id), i.order).options })) };
   }
 
+  const curriculumService = createCurriculumService({ settings, save, career, writeCareer, isLearner, iso, now, audit, users: () => data().users || [] }, curriculumOptions);
   return {
     BANKS, LANGS, PREF_FIELDS, REVIEWER_ROLES, config, updateConfig, categoryWeights, reviewQueue, suggestReview, submitReview, isReviewer, questions, published, questionById, setQuestionStatus, editQuestion, addQuestion,
     track, tracks, updateTrack, publicTrack, assessmentDef, coverage, availability, career, savePreferences, startAttempt, resumeAttempt, saveAnswers,
     discoveryInfo, discoveryConfig, updateDiscoveryConfig, resetDiscoveryConfig, discoveryState, saveDiscovery, startDiscoveryQuiz, resumeDiscoveryQuiz, submitDiscoveryQuiz, discoveryRecommendations, claimDiscovery, discoveryAnalytics,
     skillRecords, trackProfile, trackPlan, commonStatus, enrollments, listEnrollments, enrollTrack, enrollmentAdvice, makePrimary, pauseTrack, resumeTrack, archiveTrack, refreshEnrollments,
     submitAttempt, abandonAttempt, attemptReview, resources, contentGaps, report, history, setProject, analytics, preview, isLearner,
-    curriculum: createCurriculumService({ settings, save, career, writeCareer, isLearner, iso, now, audit, users: () => data().users || [] }, curriculumOptions),
+    curriculum: curriculumService,
   };
 }
 

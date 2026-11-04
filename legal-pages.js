@@ -149,6 +149,6 @@ ${footer.render()}
 function register(app) {
   for (const route of Object.keys(pages)) app.get(route, (req, res) => res.type('html').send(render(route)));
   // Keep existing privacy links working with the complete policy at a 200 URL.
-  app.get('/privacy', (req, res) => res.type('html').send(render('/privacy-policy')));
+  app.get(['/privacy', '/privacy.html'], (req, res) => res.type('html').send(render('/privacy-policy')));
 }
 module.exports = { pages, render, register, services };

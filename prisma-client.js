@@ -60,7 +60,7 @@ function getPrismaClient() {
   const { PrismaClient } = require('@prisma/client');
   const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: false },
+    ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: true, ...(process.env.PGSSLROOTCERT ? { ca: require('fs').readFileSync(process.env.PGSSLROOTCERT, 'utf8') } : {}) },
   });
   client = new PrismaClient({ adapter, log: [{ emit: 'event', level: 'query' }] });
   client.$on('query', (e) => {

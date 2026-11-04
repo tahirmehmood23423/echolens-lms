@@ -28,7 +28,7 @@ const DATABASE_URL = process.env.DATABASE_URL || '';
 // presents a certificate chain that Node's default trust store rejects
 // without this. PGSSLMODE=disable (e.g. for a local/dev database) skips it.
 const ssl = DATABASE_URL && process.env.PGSSLMODE !== 'disable'
-  ? { rejectUnauthorized: false }
+  ? { rejectUnauthorized: true, ...(process.env.PGSSLROOTCERT ? { ca: require('fs').readFileSync(process.env.PGSSLROOTCERT, 'utf8') } : {}) }
   : false;
 
 let pool = null;

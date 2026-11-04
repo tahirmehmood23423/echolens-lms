@@ -1,4 +1,5 @@
 'use strict';
+const selectChoice = require('./helpers/choices.cjs');
 /**
  * Career assessment API, end to end over HTTP against the real store:
  * onboarding, assessment delivery and submission security, scoring,
@@ -45,7 +46,7 @@ const key = (q) => (q.grading === 'review' ? 'A thorough written answer covering
 const wrong = (q) => (q.grading === 'review' ? 'not sure' : q.type === 'output' ? 'definitely wrong' : q.options.find((o) => !q.answer.includes(o.id)).id);
 /** Answer each delivered question right or wrong according to rightFor(question). */
 function answers(attempt, rightFor) {
-  return Object.fromEntries(attempt.questions.map((q) => { const full = svc.questionById(q.id); return [q.id, rightFor(full) ? key(full) : wrong(full)]; }));
+  return Object.fromEntries(attempt.questions.map((q) => { const full = svc.questionById(q.id); return [q.id, selectChoice(q, full, rightFor(full) ? key(full) : wrong(full))]; }));
 }
 async function take(user, assessment, rightFor) {
   const s = await call('POST', '/api/career/me/attempts', user, { assessment });
@@ -111,9 +112,9 @@ test('autosave and resume; answers after the time limit do not count', async () 
   publishAll();
   const s = await call('POST', '/api/career/me/attempts', 1, { assessment: 'common' });
   const a = s.body.attempt, first = a.questions[0], full = svc.questionById(first.id);
-  assert.equal((await call('PUT', `/api/career/me/attempts/${a.id}/answers`, 1, { answers: { [first.id]: key(full) } })).status, 200);
+  assert.equal((await call('PUT', `/api/career/me/attempts/${a.id}/answers`, 1, { answers: { [first.id]: selectChoice(first, full, key(full)) } })).status, 200);
   const resumed = await call('GET', '/api/career/me/attempts/active', 1);
-  assert.equal(resumed.body.resumed, true); assert.deepEqual(resumed.body.attempt.answers[first.id], key(full));
+  assert.equal(resumed.body.resumed, true); assert.deepEqual(resumed.body.attempt.answers[first.id], selectChoice(first, full, key(full)));
   assert.equal((await call('POST', '/api/career/me/attempts', 1, { assessment: 'frontend-web-developer' })).status, 409, 'one assessment at a time');
   // Time runs out: the deadline passes, then the learner submits everything correct.
   const u = store.Users.byId(1); u.profile.career.active.expires_at = new Date(Date.now() - 10 * 60e3).toISOString();

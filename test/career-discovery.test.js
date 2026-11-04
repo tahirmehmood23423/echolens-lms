@@ -1,4 +1,5 @@
 'use strict';
+const selectChoice = require('./helpers/choices.cjs');
 /**
  * Release 1 - Career Discovery: welcome state, onboarding answers, the
  * beginner discovery quiz (guest and signed-in), signed results, transparent
@@ -37,8 +38,8 @@ const call = async (method, url, user, body) => {
   const res = await fetch(base + url, { method, headers: { 'content-type': 'application/json', ...(user ? { 'x-user': String(user) } : {}) }, body: body ? JSON.stringify(body) : undefined });
   return { status: res.status, body: await res.json() };
 };
-const key = (q) => svc.questionById(q.id).answer[0];
-const wrong = (q) => q.options.find((o) => !svc.questionById(q.id).answer.includes(o.id)).id;
+const key = (q) => selectChoice(q, svc.questionById(q.id), svc.questionById(q.id).answer[0]);
+const wrong = (q) => q.options.find((o) => o.id !== key(q)).id;
 
 test('the discovery quiz is beginner-friendly: 12 MCQs across all 8 areas, published, with no answer keys sent', async () => {
   const info = (await call('GET', '/api/career/discovery')).body;

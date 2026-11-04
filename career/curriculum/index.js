@@ -57,11 +57,11 @@ function prereqOrder(ids) {
  * never dropped into a subtrack without its foundations.
  */
 function rolePath(r) {
-  const listed = new Set([...r.mandatory, ...r.optional]);
+  const listed = new Set(r.mandatory);
   const pre = new Set();
   for (const id of r.mandatory) for (const p of prereqClosure(id)) if (!listed.has(p)) pre.add(p);
   const required = prereqOrder([...pre, ...r.mandatory]);
-  return { required, prerequisites_added: [...pre], optional: prereqOrder(r.optional) };
+  return { required, prerequisites_added: [...pre], optional: prereqOrder(r.optional.filter((id) => !required.includes(id))) };
 }
 const words = (s) => new Set(String(s).toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter((w) => w.length > 3));
 const jaccard = (a, b) => { const i = [...a].filter((x) => b.has(x)).length; return i / (a.size + b.size - i || 1); };

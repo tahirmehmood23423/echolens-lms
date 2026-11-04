@@ -203,3 +203,19 @@ test('every one of the 12 tracks has theory, practical and scenario items for it
     assert.ok(pool.some((q) => q.grading === 'review' && t.skills.some((s) => s.skill === q.skills[0])), `${t.slug} reviewed item`);
   }
 });
+
+test('option lengths give no hint: the correct option is not systematically the longest', () => {
+  let n = 0, longest = 0; const bad = [];
+  for (const qs of Object.values(BANKS)) for (const q of qs) {
+    if (q.status !== 'published') continue;
+    assert.equal(new Set(q.options.map((o) => o.text.trim())).size, q.options.length, `${q.id}: duplicate option text`);
+    if (q.type === 'multi') continue;
+    n++;
+    const r = q.options.find((o) => q.answer.includes(o.id)).text.length;
+    const wmax = Math.max(...q.options.filter((o) => !q.answer.includes(o.id)).map((o) => o.text.length));
+    if (r > wmax) longest++;
+    if (r > 25 && r > wmax * 1.15) bad.push(`${q.id} (${r} vs ${wmax})`);
+  }
+  assert.deepEqual(bad, [], 'no correct option is clearly longer than every wrong one');
+  assert.ok(longest / n < 0.35, `correct option is the longest in ${Math.round(100 * longest / n)}% of questions (chance is 25%)`);
+});

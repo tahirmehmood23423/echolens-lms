@@ -40,6 +40,29 @@ const REVIEW = { by: 'Subject-specialist content review (Claude, acting as EchoL
  *    results that used them keep working) and are never put on a new form.
  */
 const OUTPUT_MCQ = require('./output-mcq');
+/**
+ * Length-balanced options. The correct option must not stand out as the
+ * longest, so distractors were rewritten to similar length (rewrites/*.js).
+ * Only wrong options are replaced, in order, so the answer key is unchanged;
+ * an entry may also trim the correct option ({ r, w }).
+ */
+const REWRITES = Object.assign({}, ...['common', 'frontend', 'backend', 'aiml', 'mobile', 'genai', 'analyst', 'dataeng', 'cyber', 'devops', 'qa', 'se']
+  .map((b) => { try { return require('./rewrites/' + b); } catch (e) { if (e.code === 'MODULE_NOT_FOUND') return {}; throw e; } }));
+// Shortened correct options (same meaning, fewer words), applied after REWRITES.
+const TRIMS = Object.assign({}, ...['trim-a', 'trim-b', 'trim-c'].map((f) => { try { return require('./rewrites/' + f); } catch (e) { if (e.code === 'MODULE_NOT_FOUND') return {}; throw e; } }));
+function rebalance(q) {
+  if (TRIMS[q.id]) {
+    const right = q.options.filter((o) => q.answer.includes(o.id));
+    if (right.length !== 1) throw new Error(`${q.id}: trims are for single-answer questions`);
+    right[0].text = TRIMS[q.id];
+  }
+  const rw = REWRITES[q.id]; if (!rw) return;
+  const w = Array.isArray(rw) ? rw : rw.w, wrong = q.options.filter((o) => !q.answer.includes(o.id));
+  if (w.length !== wrong.length) throw new Error(`${q.id}: rewrite has ${w.length} wrong options, question has ${wrong.length}`);
+  wrong.forEach((o, i) => { o.text = w[i]; });
+  if (rw.r) { const right = q.options.filter((o) => q.answer.includes(o.id)); if (right.length !== 1) throw new Error(`${q.id}: r only for single-answer`); right[0].text = rw.r; }
+  if (new Set(q.options.map((o) => o.text)).size !== q.options.length) throw new Error(`${q.id}: duplicate option text after rewrite`);
+}
 const LETTERS = 'abcd';
 for (const bank of Object.values(BANKS)) for (const q of bank.questions) {
   if (q.type === 'output') {
@@ -47,8 +70,12 @@ for (const bank of Object.values(BANKS)) for (const q of bank.questions) {
     if (!opts || opts.length !== 4 || new Set(opts).size !== 4) throw new Error(`${q.id}: needs four distinct MCQ options in output-mcq.js`);
     q.type = 'single'; q.options = opts.map((text, i) => ({ id: LETTERS[i], text })); q.answer = ['a']; q.was_typed = true;
   }
+  if (q.options?.length) rebalance(q);
   q.status = q.grading === 'review' ? 'retired' : 'published'; q.review = REVIEW;
   if (q.grading === 'review') q.retired_reason = 'Assessments are multiple-choice only; written and practical submissions are not used.';
 }
+
+const unknown = [...Object.keys(REWRITES), ...Object.keys(TRIMS)].filter((id) => !Object.values(BANKS).some((b) => b.questions.some((q) => q.id === id)));
+if (unknown.length) throw new Error('rewrites for unknown questions: ' + unknown.join(', '));
 
 module.exports = { BANKS, REVIEW, OUTPUT_MCQ };

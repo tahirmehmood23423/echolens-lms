@@ -10,6 +10,7 @@
 const store = require('./store');
 const publicNavigation = require('./public-navigation');
 const publicFooter = require('./public-footer');
+const freeLevels = require('./free-course-levels');
 
 const BASE = 'https://www.echolens.digital';
 // All enrolment goes through the in-site registration form (lands in the
@@ -168,7 +169,11 @@ function outlineSection(c) {
   const concepts = (d.key_concepts || []).map((k) => `<span style="display:inline-block;font-size:12.5px;font-weight:600;color:#4F46E5;border:1px solid #D9DCEE;border-radius:999px;padding:5px 12px;margin:4px 6px 0 0">${esc(k)}</span>`).join('');
   const clos = (d.clos || []).map((c, i) => `
     <li style="padding:6px 0;font-size:15px;line-height:1.55;color:#374151"><b style="color:#4F46E5">CLO ${i + 1}.</b> ${esc(c.replace(/^CLO\s*\d+:\s*/i, ''))}</li>`).join('');
-  const rows = d.levels.map((l) => `
+  // Beginner -> Intermediate -> Advanced stages over the existing order.
+  const staged = d.levels.length >= 3;
+  const stageAt = (i) => freeLevels.moduleStage(i, d.levels.length);
+  const rows = d.levels.map((l, i) => (staged && (i === 0 || stageAt(i - 1) !== stageAt(i))
+    ? `<li style="padding:16px 0 6px;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#7C3AED">${esc(stageAt(i).name)} stage</li>` : '') + `
     <li style="padding:8px 0;border-bottom:1px solid #F1F2F9;font-size:15px;line-height:1.55;color:#374151">
       <b style="color:#4F46E5">${unit} ${l.no}.</b> <b>${esc(l.title)}</b>${l.topic ? ` <span style="color:#6B7280">- ${esc(l.topic)}</span>` : ''}
     </li>`).join('');
@@ -195,7 +200,7 @@ function renderCourse(c, all) {
   const slug = courseSlug(c);
   const url = `${BASE}/courses/${slug}`;
   const free = isFree(c);
-  const level = levelFor(c.tier);
+  const level = c.level || levelFor(c.tier);
   // Prefer the course's own SEO search keywords (from its quest track) when
   // present, then top up with the generic catalogue keywords.
   const trackKw = trackForCourse(c)?.def?.keywords || [];
@@ -292,6 +297,7 @@ function renderCourse(c, all) {
         <h2>About this course</h2>
         <p>${esc(c.summary)}</p>
         <p>${esc(tierBlurb(c.tier))} ${free ? 'Learn online at your own pace.' : 'Admissions confirms the batch and start date when you enroll.'} Practice the concepts with the listed assessments.</p>
+        ${c.level_no ? `<h2>Level ${c.level_no}: ${esc(c.level)}</h2><p>${(c.recommended_first || []).length ? 'Best taken after ' + c.recommended_first.map((r) => `<a href="/courses/${courseSlug(r)}" style="color:#7C3AED;font-weight:600">${esc(r.title)}</a>`).join(' and ') + '.' : 'No experience needed - this course starts from the beginning.'}</p>` : ''}
         <h2>What's included</h2>
         <ul class="cp-list">${included.map((i) => '<li>' + esc(i) + '</li>').join('')}</ul>
         ${outlineSection(c)}
@@ -310,7 +316,7 @@ function renderCourse(c, all) {
           <li><span>Tier</span><span>${esc(c.tier)}</span></li>
           <li><span>Duration</span><span>${c.weeks} weeks</span></li>
           <li><span>Total hours</span><span>${c.hours} hours</span></li>
-          <li><span>Level</span><span>${esc(level)}</span></li>
+          <li><span>Level</span><span>${c.level_no ? 'Level ' + c.level_no + ' - ' + esc(c.level) : esc(level)}</span></li>
           ${free ? '' : '<li><span>Start date</span><span>Confirmed by Admissions</span></li>'}
           <li><span>Certificate</span><span>Verified</span></li>
         </ul>
@@ -430,8 +436,8 @@ function renderIndex(all) {
       { '@type': 'ListItem', position: 2, name: 'Courses', item: url },
     ],
   };
-  const section = (tier) => {
-    const items = all.filter((c) => c.tier === tier);
+  const section = (tier, unlevelledOnly) => {
+    const items = all.filter((c) => c.tier === tier && !(unlevelledOnly && c.level_no));
     if (!items.length) return '';
     return `<h2 class="cp-sec-h">${esc(tier)}s <span style="font-size:14px;color:#6B7280;font-weight:500">(${items.length})</span></h2>
     <div class="cp-rel">${items.map((c) => `<a href="/courses/${courseSlug(c)}"><b>${esc(c.title)}</b><span>${c.upcoming
@@ -453,7 +459,15 @@ function renderIndex(all) {
     <p class="cp-lead">${all.length} online courses across AI, data science, web development and design. Learn by solving real coding quests in your browser, earn gems, and collect verified certificates. ${all.filter(c=>!c.price_pkr).length} courses are free and self-paced.</p>
     <div class="cp-cta"><a class="btn btn-grad" href="/open#signup">Start free</a><a class="btn btn-light" href="/open">Free quests &amp; events</a></div>
   </header>
-  ${tiers.map(section).join('')}
+  ${section('Upcoming Course')}
+  ${freeLevels.LEVELS.map((lv) => {
+    const items = all.filter((c) => c.level_no === lv.no);
+    if (!items.length) return '';
+    return `<h2 class="cp-sec-h">Level ${lv.no}: ${esc(lv.name)} <span style="font-size:14px;color:#6B7280;font-weight:500">(${items.length} free)</span></h2>
+    <p style="color:#4B5568;margin:-6px 0 12px">${esc(lv.blurb)}</p>
+    <div class="cp-rel">${items.map((c) => `<a href="/courses/${courseSlug(c)}"><b>${esc(c.title)}</b><span>Free &middot; ${(c.recommended_first || []).length ? 'after ' + esc(c.recommended_first.map((r) => r.title.replace(/^CS-\d+:\s*/, '')).join(' + ')) : 'start here'}</span></a>`).join('')}</div>`;
+  }).join('')}
+  ${tiers.filter((t) => t !== 'Upcoming Course').map((t) => section(t, true)).join('')}
 </div>
 ` + pageFoot();
 }
@@ -463,7 +477,11 @@ function renderIndex(all) {
 // admin-created upcoming courses whose registration has not closed. A retired
 // paid course, or an upcoming one whose registration closed, is not found.
 function currentCourses() {
-  const free = store.officialCatalogue().filter((c) => !(Number(c.price_pkr) > 0));
+  const official = store.officialCatalogue();
+  const titleOf = (code) => official.find((x) => x.code === code)?.title || null;
+  const free = official.filter((c) => !(Number(c.price_pkr) > 0))
+    .map((c) => ({ ...c, ...freeLevels.courseLevel(c.code, titleOf) }))
+    .sort((a, b) => (a.level_no || 9) - (b.level_no || 9));
   return [...store.UpcomingCourses.listed(), ...free];
 }
 function allCourseUrls() {

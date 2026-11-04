@@ -1404,6 +1404,7 @@ const Courses = {
 
 /* ------------------------- upcoming (admin-created) courses ------------------------- */
 const upcoming = require('./upcoming-courses');
+const freeLevels = require('./free-course-levels');
 const UpcomingCourses = {
   rows() {
     if (!data.settings) data.settings = empty().settings;
@@ -2452,14 +2453,17 @@ const FREE_FAMILIES = [
 function publicCatalogue() {
   const trackByCode = {};
   for (const track of Quests.tracks({ includeUnpublished: true })) if (track.course_code) trackByCode[track.course_code] = track;
+  const titleOf = (code) => OFFICIAL_CATALOGUE.find((x) => x.code === code)?.title || null;
   const free = OFFICIAL_CATALOGUE
     .filter((course) => !(Number(course.price_pkr) > 0))
     .filter((course) => course.published !== false || trackByCode[course.code]?.staged_catalogue)
     .map((course) => {
       const track = trackByCode[course.code];
       const available = course.published !== false && (!track || track.published !== false);
-      return { ...course, track_key: track?.key || null, available, coming_soon: !available };
-    });
+      // Beginner -> Intermediate -> Advanced placement (free-course-levels.js).
+      return { ...course, ...freeLevels.courseLevel(course.code, titleOf), track_key: track?.key || null, available, coming_soon: !available };
+    })
+    .sort((a, b) => (a.level_no || 9) - (b.level_no || 9));
   return [...UpcomingCourses.listed(), ...free];
 }
 // The Web Developer Path bundle - the recommended beginner-to-job route.

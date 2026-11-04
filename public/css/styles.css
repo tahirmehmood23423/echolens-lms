@@ -2041,3 +2041,16 @@ input[type=file]::file-selector-button:hover{background:var(--canvas)}
   .cmp-toggle button { min-width: 0; flex: 1; padding: 10px 14px; }
   .cmp-toggle { display: flex; width: 100%; }
 }
+
+/* Free catalogue, beginner to advanced (open.js drawFreeFamilies) */
+.free-level-chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px}
+.free-level{margin-top:26px}
+.free-level-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.free-level-head h4{margin:0 0 2px;font-family:var(--font-display);font-size:19px;color:var(--navy)}
+.free-level-head p{margin:0;max-width:62ch}
+.free-level-no{flex:none;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#fff;background:linear-gradient(94deg,#0FBFA8,#7C6CF5);border-radius:999px;padding:6px 12px;margin-top:2px}
+.oc-first{font-size:12.5px}
+.curr-stage{display:flex;align-items:center;gap:10px;margin:18px 0 8px;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.curr-stage:first-child{margin-top:4px}
+.curr-stage:after{content:"";flex:1;height:1px;background:var(--line)}
+.curr-stage b{color:#fff;background:linear-gradient(94deg,#0FBFA8,#7C6CF5);border-radius:999px;padding:4px 10px;font-size:11px}

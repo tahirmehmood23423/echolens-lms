@@ -902,9 +902,10 @@ function courseCardHtml(c) {
         ${demand ? `<span class="oc-demand">${BADGE_LABEL[demand]}</span>` : ''}
       </div>
       <div>
-        <div class="oc-tier">${esc(c.tier)}</div>
+        <div class="oc-tier">${c.level_no ? 'Level ' + c.level_no + ' &middot; ' + esc(c.level) : esc(c.tier)}</div>
         <h4 class="oc-title">${esc(c.title)}</h4>
       </div>
+      ${c.level_no ? `<div class="oc-meta oc-first">${(c.recommended_first || []).length ? 'Take after: ' + c.recommended_first.map((r) => esc(r.title.replace(/^CS-\d+:\s*/, ''))).join(' + ') : 'No experience needed'}</div>` : ''}
       <div class="oc-meta"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${c.weeks} Weeks &middot; ${c.hours} Hours</div>
       <div class="oc-foot">
         <div class="oc-price${isFree ? ' free' : ''}">${comingSoon ? 'Free certified course' : isFree ? 'Free course' : 'PKR ' + c.price_pkr.toLocaleString()}</div>
@@ -918,62 +919,45 @@ function courseCardHtml(c) {
 // tracks/curriculum-advanced-combined.js for how that merge works).
 let FREE_SELECTED_FAMILY = null;
 let COURSE_LIMIT=12, COURSE_FILTER_KEY='';
-function freeLanguageIconIcon(key) {
-  return { c: 'code', cpp: 'code', python: 'chart', javascript: 'code', web: 'code', 'trending-tech': 'spark' }[key] || 'gem';
-}
-function freeLanguageButtonsHtml(byFamily) {
-  return `<div class="oc-lang-grid">${FREE_FAMILIES.filter((f) => byFamily[f.key]?.length).map((f) => `
-    <button type="button" class="oc-lang-btn" onclick="selectFreeFamily('${f.key}')">
-      <span class="oc-lang-icon"><svg viewBox="0 0 24 24" fill="none">${ICONS[freeLanguageIconIcon(f.key)]}</svg></span>
-      <span class="oc-lang-name">${esc(f.name)}</span>
-      <span class="oc-lang-count">${byFamily[f.key].length} courses</span>
-    </button>`).join('')}</div>`;
-}
 function selectFreeFamily(key) {
   const state = history.state?.v === 'courses' ? history.state : {v:'courses', mode:'free'};
   pushNav({...state, scrollY:0, filters:{...state.filters, free:'free', family:key}});
   FREE_SELECTED_FAMILY = key; drawCourses();
 }
 window.selectFreeFamily = selectFreeFamily;
-// The six trending-tech tracks used to sit one click inside the "Trending Tech"
-// language button, where nobody found them. They are now a titled section of
-// real cards on the front of the free-course view, alongside the language
-// ladders - the same card component the language courses use, so the two read
-// as one catalogue rather than two systems.
 const TECH_FAMILY = 'trending-tech';
-function techSectionHtml(courses) {
-  if (!courses.length) return '';
-  const open = courses.filter((c) => c.available !== false && !c.coming_soon).length;
-  return `
-    <section class="tech-front">
-      <div class="tech-front-head">
-        <div>
-          <h4>Top trending tech tracks</h4>
-          <p class="s" style="color:var(--muted)">${courses.length} certified specialist tracks, free. ${open ? open + ' open now.' : 'Reserve a seat and we will email you the day each one opens.'}</p>
-        </div>
-        <span class="kbadge quest">Free &middot; certified</span>
-      </div>
-      <div class="oc-grid">${courses.map(courseCardHtml).join('')}</div>
-    </section>`;
+// The free catalogue reads beginner to advanced (free-course-levels.js on the
+// server sets each course's level and what to take first). A row of language
+// chips narrows it to one language; every level section stays in order.
+const FREE_LEVELS = [
+  { no: 1, name: 'Beginner', blurb: 'Start here. No experience needed - learn a first language from the ground up.' },
+  { no: 2, name: 'Intermediate', blurb: 'Go deeper in a language you know: memory, objects, async and professional patterns.' },
+  { no: 3, name: 'Advanced', blurb: 'Professional tracks: full-stack, AI, cloud, backend and database engineering.' },
+];
+function freeFamilyChipsHtml(list) {
+  const present = FREE_FAMILIES.filter((f) => list.some((c) => c.family === f.key));
+  if (present.length < 2) return '';
+  const chip = (key, label) => `<button type="button" class="filt-pill${(FREE_SELECTED_FAMILY || null) === key ? ' active' : ''}" onclick="selectFreeFamily(${key ? `'${key}'` : 'null'})">${esc(label)}</button>`;
+  return `<div class="free-level-chips">${chip(null, 'All languages')}${present.map((f) => chip(f.key, f.key === TECH_FAMILY ? 'Professional tracks' : f.name)).join('')}</div>`;
 }
 function drawFreeFamilies(list) {
-  const byFamily = {};
-  for (const c of list) { if (!c.family) continue; (byFamily[c.family] = byFamily[c.family] || []).push(c); }
-  const ungrouped = list.filter((c) => !c.family);
-  if (!FREE_SELECTED_FAMILY || !byFamily[FREE_SELECTED_FAMILY]) {
-    const tech = (byFamily[TECH_FAMILY] || []).slice().sort((a, b) => (a.family_order || 0) - (b.family_order || 0));
-    const ladders = {};
-    for (const k of Object.keys(byFamily)) if (k !== TECH_FAMILY) ladders[k] = byFamily[k];
-    return freeLanguageButtonsHtml(ladders)
-      + techSectionHtml(tech)
-      + (ungrouped.length ? `<div class="oc-grid" style="margin-top:20px">${ungrouped.map(courseCardHtml).join('')}</div>` : '');
-  }
-  const family = FREE_FAMILIES.find((f) => f.key === FREE_SELECTED_FAMILY);
-  const ordered = byFamily[FREE_SELECTED_FAMILY].slice().sort((a, b) => (a.family_order || 0) - (b.family_order || 0));
-  return `
-    <button type="button" class="oc-lang-back" onclick="selectFreeFamily(null)">&larr; All languages</button>
-    <h4 style="margin:14px 0 10px;font-family:var(--font-display);color:var(--navy)">${esc(family ? family.name : '')}</h4>
-    <div class="oc-grid">${ordered.map(courseCardHtml).join('')}</div>`;
+  const shown = FREE_SELECTED_FAMILY ? list.filter((c) => c.family === FREE_SELECTED_FAMILY) : list;
+  const order = (a, b) => (FREE_FAMILIES.findIndex((f) => f.key === a.family) - FREE_FAMILIES.findIndex((f) => f.key === b.family)) || ((a.family_order || 0) - (b.family_order || 0));
+  const sections = FREE_LEVELS.map((lv) => {
+    const items = shown.filter((c) => c.level_no === lv.no).sort(order);
+    if (!items.length) return '';
+    return `
+    <section class="free-level">
+      <div class="free-level-head">
+        <span class="free-level-no">Level ${lv.no}</span>
+        <div><h4>${esc(lv.name)}</h4><p class="s" style="color:var(--muted)">${esc(lv.blurb)}</p></div>
+      </div>
+      <div class="oc-grid">${items.map(courseCardHtml).join('')}</div>
+    </section>`;
+  }).join('');
+  const unlevelled = shown.filter((c) => !c.level_no);
+  return freeFamilyChipsHtml(list) + sections
+    + (unlevelled.length ? `<div class="oc-grid" style="margin-top:20px">${unlevelled.map(courseCardHtml).join('')}</div>` : '');
 }
 function drawCourses() {
   if (!CATALOGUE.length) return;
@@ -1000,6 +984,8 @@ function drawCourses() {
     : `<div class="oc-grid">${list.slice(0,COURSE_LIMIT).map(courseCardHtml).join('')}</div><p class="hint">Showing ${Math.min(COURSE_LIMIT,list.length)} of ${list.length} courses</p>${list.length>COURSE_LIMIT?'<button class="btn btn-ghost" onclick="COURSE_LIMIT+=12;drawCourses()">Show more courses</button>':''}
        <p class="hint" style="margin-top:14px">Pay via bank transfer per your fee challan, then share the receipt to confirm your seat.</p>`;
 }
+function openCourseByCode(code) { const c = CATALOGUE.find((x) => x.code === code); if (c && c.track_key) openCourse(c.track_key); }
+window.openCourseByCode = openCourseByCode;
 function courseAction(code) {
   const c = CATALOGUE.find((x) => x.code === code);
   if (!c) return;
@@ -1518,7 +1504,12 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
   // would still call "available".
   const seat = CUR && CUR.enrollment;
   const pendingSeat = !!(seat && seat.active === false);
+  // Modules read Beginner -> Intermediate -> Advanced: the existing order in
+  // thirds (free-course-levels.js moduleStage), a header where each starts.
+  const stageOf = (i) => FREE_LEVELS[Math.min(2, Math.floor((i * 3) / Math.max(1, modules.length)))];
   const rows = modules.map((mod, mi) => {
+    const stage = stageOf(mi), stageHead = modules.length >= 3 && (mi === 0 || stageOf(mi - 1) !== stage)
+      ? (() => { const last = modules.map((_, j) => j).filter((j) => stageOf(j) === stage).pop() + 1; return `<div class="curr-stage"><b>${esc(stage.name)}</b>${last > mi + 1 ? `Modules ${mi + 1}-${last}` : `Module ${mi + 1}`}</div>`; })() : '';
     const style = MODULE_STYLES[mi % MODULE_STYLES.length];
     const allDone = mod.levels.every((l) => !l.locked && levelDone(l));
     const pace = paceStates[mi] || null;
@@ -1528,7 +1519,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
       : paceLocked ? esc(pace.reason || 'Locked.')
       : mod.levels.map((l) => esc(l.title)).join(' &middot; ');
     const pills = mod.levels.map((l) => `<span class="curr-pill">L${l.no}<b>${esc(l.title)}</b></span>`).join('');
-    return `<button type="button" class="curr-row${paceLocked ? ' curr-row-locked' : ''}"${disabled ? ' disabled aria-disabled="true"' : ` onclick="openModuleEntry(${mi})"`}>
+    return stageHead + `<button type="button" class="curr-row${paceLocked ? ' curr-row-locked' : ''}"${disabled ? ' disabled aria-disabled="true"' : ` onclick="openModuleEntry(${mi})"`}>
         <span class="curr-icon" style="background:${style.bg};color:${style.fg}"><svg viewBox="0 0 24 24" fill="none">${ICONS[paceLocked ? 'lock' : 'code'] || ICONS.code}</svg></span>
         <span class="curr-info">
           <span class="curr-title">Module ${mi + 1}${mod.title ? ': ' + esc(mod.title) : ''}${allDone ? '<span class="curr-done-dot"></span>' : ''}${pace && pace.status === 'open' ? ' <span class="kbadge quest">In progress</span>' : ''}</span>
@@ -1592,6 +1583,7 @@ function freeCurriculumHtml(t, heroCardHtml, heroStatsHtml, modules, prog, curLe
             <div>
               <h3>Course Curriculum</h3>
               <p class="s" style="color:var(--muted)">${preview ? 'Preview all modules, lectures and assessment titles before enrollment opens.' : 'Complete all modules and pass the assessments to earn your certificate.'}</p>
+              ${(() => { const cat = CATALOGUE.find((c) => c.code === t.course_code); return cat && cat.level_no ? `<p class="s" style="margin-top:4px"><span class="kbadge quest">Level ${cat.level_no} &middot; ${esc(cat.level)}</span> ${(cat.recommended_first || []).length ? 'Best taken after ' + cat.recommended_first.map((r) => `<a href="#" onclick="openCourseByCode('${esc(r.code)}');return false">${esc(r.title)}</a>`).join(' and ') + '.' : 'No experience needed - start here.'}</p>` : ''; })()}
             </div>
             <div class="curr-head-right">
               <div class="hero-stats curr-head-stats">${heroStatsHtml}</div>

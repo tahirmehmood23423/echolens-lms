@@ -523,7 +523,11 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
   function setTarget(user, id) {
     if (!isLearner(user)) return { error: 'Choose a learner account.', status: 403 };
     if (id && !role(id)) return { error: 'Job role not found.', status: 404 };
-    writeCareer(user, { ...career(user), target_role: id || null });
+    const current = career(user), target = role(id), previous = role(current.target_role), targets = { ...current.target_roles };
+    if (target) targets[target.track] = id;
+    else if (previous) delete targets[previous.track];
+    const roleHistory = current.target_role === (id || null) ? current.role_history || [] : [...(current.role_history || []), { id: id || null, title: target?.title || null, at: iso() }];
+    writeCareer(user, { ...current, target_role: id || null, target_roles: targets, role_history: roleHistory });
     return { target_role: id || null };
   }
   function sharedSkills(user) {
@@ -537,7 +541,8 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     })));
   }
   function progress(user, slug) {
-    const target = role(career(user).target_role), path = target ? rolePath(target).required : [...new Set((C.TRACKS[slug]?.order || []).flatMap((e) => e.subtracks))];
+    const current = career(user), candidate = role(current.target_roles?.[slug] || current.target_role);
+    const target = candidate && (!slug || candidate.track === slug) ? candidate : null, path = target ? rolePath(target).required : [...new Set((C.TRACKS[slug]?.order || []).flatMap((e) => e.subtracks))];
     const subs = path.map((id) => subtrackSummary(user, id)), passed = subs.filter((s) => s.student.status === 'passed');
     const next = subs.find((s) => s.student.status !== 'passed' && s.assessment.state === 'published') || subs.find((s) => s.student.status !== 'passed');
     return { target: target ? { id: target.id, title: target.title, track: target.track, readiness: roleReadiness(user, target) } : null,

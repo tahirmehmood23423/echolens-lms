@@ -1,6 +1,6 @@
 'use strict';
 const $ = (id) => document.getElementById(id);
-const destination = role => EL.safeReturn(new URLSearchParams(location.search).get('returnTo'), role === 'free' ? '/open#free' : '/dashboard');
+const destination = role => EL.safeReturn(new URLSearchParams(location.search).get('returnTo'), ['free', 'student'].includes(role) ? '/career' : '/dashboard');
 async function api(path, opts = {}) {
   const res = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts });
   const data = await res.json().catch(() => ({}));

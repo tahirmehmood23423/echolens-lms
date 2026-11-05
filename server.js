@@ -528,7 +528,7 @@ app.post('/api/auth/forgot-password', limitEmailSend, async (req, res) => {
   const u = Users.allByLogin(email).find(x => RECOVERABLE_ROLES.includes(x.role) && String(x.email).toLowerCase() === email);
   if (!u) console.warn('[recovery] PIN requested for an email with no learner account');
   if (u) {
-    const pin = recovery.issue(email, u.id, safeReturnPath(req.body.returnTo, APP_URL, u.role === 'free' ? '/open#free' : '/dashboard'));
+    const pin = recovery.issue(email, u.id, safeReturnPath(req.body.returnTo, APP_URL, ['free', 'student'].includes(u.role) ? '/career' : '/dashboard'));
     if (pin) {
       try {
         const result = await mailer.send({ to: u.email, subject: 'Your EchoLens password recovery PIN',
@@ -1836,7 +1836,7 @@ app.get('/api/auth/providers', (req, res) => res.json({ google: !!(G_ID && G_SEC
 
 app.get('/auth/google', (req, res) => {
   if (!G_ID || !G_SECRET) return res.redirect('/login?err=' + encodeURIComponent('Google sign-in is not configured yet.'));
-  const back = safeReturnPath(req.query.returnTo || req.query.back, APP_URL);
+  const back = req.query.returnTo || req.query.back ? safeReturnPath(req.query.returnTo || req.query.back, APP_URL, null) : null;
   const state = jwt.sign({ nonce: crypto.randomBytes(24).toString('hex'), back }, JWT_SECRET, { expiresIn: '10m' });
   res.cookie('el_oauth_state', state, { httpOnly: true, sameSite: 'lax', secure: isProd, maxAge: 600000 });
   const params = new URLSearchParams({
@@ -1867,7 +1867,7 @@ app.get('/auth/google/callback', async (req, res) => {
     if (u.email && u.profile?.marketing_opt_in==='yes') Leads.upsert({ name: u.name, email: u.email, whatsapp: (u.profile || {}).phone || null, source: 'google', user_id: u.id });
     setAuthCookie(res, sign(u));
     // Google sign-ins from the open site go back to the open site.
-    const back = safeReturnPath(oauthState.back, APP_URL, u.role === 'free' ? '/open#free' : '/dashboard');
+    const back = safeReturnPath(oauthState.back, APP_URL, ['free', 'student'].includes(u.role) ? '/career' : '/dashboard');
     res.clearCookie('el_back');
     res.redirect(back);
   } catch (e) {
@@ -5115,7 +5115,7 @@ app.post('/api/admin/open-courses/:key/students', authRequired, adminRequired, a
 }));
 
 app.post('/api/open/activity', authRequired, openLearnerRequired, asyncRoute(async (req, res) => {
-  const out = OpenQuest.recordOpen(req.user.id, String(req.body.track_key || ''));
+  const out = OpenQuest.recordOpen(req.user.id, String(req.body.track_key || ''), { level: req.body.level, pid: req.body.pid });
   if (out.error) return res.status(out.status).json({ error: out.error });
   await store.pendingPersist(); res.json(out);
 }));

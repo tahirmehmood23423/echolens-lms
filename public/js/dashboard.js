@@ -121,6 +121,7 @@ let DASH_RESTORING = false, COURSE_REQUEST = 0;
 function dashboardRoute(state) { if (DASH_RESTORING) return; const hash = '#' + new URLSearchParams(state).toString(); if (location.hash !== hash) history.pushState(state, '', '/dashboard' + hash); }
 async function restoreDashboard() {
   const state = Object.fromEntries(new URLSearchParams(location.hash.slice(1)));
+  if (!state.view && ['free','student'].includes(ME.role) && !location.pathname.startsWith('/demo/')) { location.replace('/career'); return; }
   DASH_RESTORING = true;
   try {
     if (state.view === 'task' && Number(state.batch) > 0) { await openCourse(Number(state.batch), 'Quest'); openTask(Number(state.qid),Number(state.pid)); }

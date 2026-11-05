@@ -76,6 +76,7 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
     const u = me(req); if (!u) return res.status(404).json({ error: 'Account not found.' });
     res.json({ learner: svc.isLearner(u), ...svc.report(u, req.query.track) });
   });
+  r.get('/career/me/workspace', authRequired, (req, res) => send(res, svc.workspace(me(req))));
   r.put('/career/me/preferences', authRequired, (req, res) => send(res, svc.savePreferences(me(req), req.body || {})));
   r.get('/career/me/history', authRequired, (req, res) => res.json(svc.history(me(req))));
   r.post('/career/me/projects', authRequired, (req, res) => send(res, svc.setProject(me(req), req.body?.track, req.body?.stage, req.body?.link)));
@@ -102,7 +103,7 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
 
   /* ------------------ curriculum: subtracks, job roles, comprehensive assessments ------------------ */
   const cur = svc.curriculum;
-  r.put('/career/me/target', authRequired, (req, res) => send(res, cur.setTarget(me(req), req.body?.role || null)));
+  r.put('/career/me/target', authRequired, (req, res) => send(res, svc.chooseTarget(me(req), req.body?.role || null)));
   const nf = (res, what) => res.status(404).json({ error: `${what} not found.` });
   r.get('/career/curriculum/tracks/:slug', (req, res) => { const v = cur.trackView(who(req), req.params.slug); v ? res.json(v) : nf(res, 'Career track'); });
   r.get('/career/curriculum/subtracks/:id', (req, res) => { const v = cur.subtrackView(who(req), req.params.id); v ? res.json(v) : nf(res, 'Subtrack'); });

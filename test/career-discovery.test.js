@@ -45,7 +45,7 @@ test('the discovery quiz is beginner-friendly: 12 MCQs across all 8 areas, publi
   const info = (await call('GET', '/api/career/discovery')).body;
   assert.equal(info.enabled, true);
   assert.equal(info.questions.length, 5);
-  assert.deepEqual(info.questions.map((q) => q.id), ['interests', 'experience', 'technologies', 'goal', 'enjoy']);
+  assert.deepEqual(info.questions.map((q) => q.id), ['experience', 'technologies', 'interests', 'goal', 'commitment']);
   assert.equal(info.tracks.length, 12);
   assert.equal(info.quiz.items, 12); assert.equal(info.quiz.available, true);
   const s = await call('POST', '/api/career/discovery/quiz');
@@ -217,5 +217,5 @@ test('student-facing text uses plain punctuation: no dash asides in questions, d
   }
   assert.deepEqual(bad, []);
   for (const f of ['public/landing.html', 'public/js/career-discovery.js']) assert.ok(!/&mdash;|&ndash;|—|–/.test(fs2.readFileSync(path.join(__dirname, '..', f), 'utf8')), `${f} has no dashes`);
-  for (const q of D.QUESTIONS) assert.ok(!aside.test(q.title + q.hint + q.options.map(([, t]) => t).join(' ')), q.id);
+  for (const q of D.QUESTIONS) assert.ok(!aside.test(q.title + q.hint + q.options.map(([, t]) => t.replace(/(?<=\d)–(?=\d)/g, ' to ')).join(' ')), q.id);
 });

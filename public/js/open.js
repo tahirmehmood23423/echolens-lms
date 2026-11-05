@@ -214,12 +214,12 @@ async function ensureCourseLoaded(key) {
   await openCourse(key, true);
 }
 const FREE_COURSE_OPEN_RECORDED = new Map();
-function recordFreeCourseOpen() {
+function recordFreeCourseOpen(level = null, pid = null) {
   if (!CUR?.track?.free || !CUR.enrollment?.active || location.pathname.startsWith('/demo/')) return;
-  const key = CUR.track.key, last = FREE_COURSE_OPEN_RECORDED.get(key) || 0;
-  if (Date.now() - last < 30 * 60 * 1000) return;
-  FREE_COURSE_OPEN_RECORDED.set(key, Date.now());
-  api('/api/open/activity', { method: 'POST', body: JSON.stringify({ track_key: key }) }).catch(() => FREE_COURSE_OPEN_RECORDED.delete(key));
+  const key = CUR.track.key, activityKey = key + ':' + level + ':' + pid, last = FREE_COURSE_OPEN_RECORDED.get(key);
+  if (last?.activityKey === activityKey && Date.now() - last.at < 30 * 60 * 1000) return;
+  FREE_COURSE_OPEN_RECORDED.set(key, { activityKey, at: Date.now() });
+  api('/api/open/activity', { method: 'POST', body: JSON.stringify({ track_key: key, level, pid }) }).catch(() => { if (FREE_COURSE_OPEN_RECORDED.get(key)?.activityKey === activityKey) FREE_COURSE_OPEN_RECORDED.delete(key); });
 }
 async function restoreNav(state, revision = NAV_REVISION) {
   if (!state?.v) return;
@@ -310,7 +310,7 @@ function drawUserBox() {
   $('userBox').innerHTML = ME
     ? `<span class="av-sm" style="width:30px;height:30px;margin-right:9px;cursor:pointer" onclick="openProfileTab()">${ME.avatar ? `<img src="${esc(ME.avatar)}" alt="">` : esc((ME.name || '?').charAt(0).toUpperCase())}</span>
        <span class="s" style="color:var(--muted);margin-right:10px">${esc(ME.name)}${ME.reg_no ? ' · <span class="mono">' + esc(ME.reg_no) + '</span>' : ''}</span>
-       <a class="btn btn-teal btn-sm" href="${ME.role === 'free' ? '/dashboard#view=courses' : '/dashboard'}" style="margin-right:8px">${ME.role === 'free' ? 'My courses' : 'LMS Portal'}</a>
+       <a class="btn btn-teal btn-sm" href="${['free','student'].includes(ME.role) ? '/career#me' : '/dashboard'}" style="margin-right:8px">${['free','student'].includes(ME.role) ? 'My learning' : 'LMS Portal'}</a>
        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>`
     : `<a class="btn btn-ghost btn-sm" data-open-login href="${esc(openLoginURL())}" style="margin-right:8px" title="For enrolled students and staff">LMS Portal</a>
        <button class="btn btn-ghost btn-sm" style="margin-right:8px" onclick="gate()" title="Free account - for the compiler, free courses, events and hackathons">Sign in free</button>
@@ -406,10 +406,10 @@ function showSignup() {
           ? 'Account created. Email delivery is paused right now, so here is your password once - save it: '
           : 'Account created. SMTP is not configured, so here is your password once: ';
         modalMsg(note + out.password, true);
-        setTimeout(() => location.reload(), 6000);
+        setTimeout(() => location.assign('/career'), 6000);
       } else {
         modalMsg('Account created - we emailed your password to ' + f.email.value.trim() + '.', true);
-        setTimeout(() => location.reload(), 1800);
+        setTimeout(() => location.assign('/career'), 1800);
       }
     } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
@@ -1789,11 +1789,11 @@ function svNavHtml() {
 // column isn't squeezed by a video competing for the same space; a small
 // link back to the video subpoint is offered instead when one exists.
 function openSolve(levelNo, pid, skipPush) {
-  recordFreeCourseOpen();
   EL.drafts.flushAll();
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   const p = lvl && (lvl.problems || []).find((x) => x.pid === pid);
   if (!p || lvl.locked) return;
+  recordFreeCourseOpen(levelNo, pid);
   COURSE_SCROLL_Y = window.scrollY;
   CUR_PROBLEM = { level: levelNo, pid, problem: p };
   CUR_VIDEO_LEVEL = null;
@@ -1856,9 +1856,9 @@ function openSolve(levelNo, pid, skipPush) {
 // solving the quest, so it doesn't need to be on screen while they watch.
 // "Continue to the quest" hands off to the normal openSolve() workspace.
 function openSolveVideo(levelNo, skipPush) {
-  recordFreeCourseOpen();
   const lvl = CUR.levels.find((l) => l.no === levelNo);
   if (!lvl || lvl.locked || !levelHasVideo(lvl)) return;
+  recordFreeCourseOpen(levelNo);
   COURSE_SCROLL_Y = window.scrollY;
   CUR_VIDEO_LEVEL = levelNo;
   openTab('solve');

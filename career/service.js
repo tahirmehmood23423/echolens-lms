@@ -285,7 +285,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   /* ----------------------------- student records ----------------------------- */
   function career(user) {
     const c = user.profile?.career || {};
-    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null, discovery: c.discovery || null, st: c.st || null, target_role: c.target_role || null };
+    return { preferences: c.preferences || null, attempts: c.attempts || [], active: c.active || null, projects: c.projects || {}, enrollments: c.enrollments || null, discovery: c.discovery || null, st: c.st || null, target_role: c.target_role || null, target_roles: c.target_roles || {}, role_history: c.role_history || [] };
   }
   function writeCareer(user, next) {
     const attempts = next.attempts;
@@ -559,11 +559,13 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return (skill(skillId)?.resources || []).map((r) => {
       const def = store.Quests.trackDef(r.track), entry = cat.get(r.track), lvl = def && def.levels.find((l) => l.no === r.level);
       if (!def || !lvl || !entry || entry.available === false) return null;
-      const problems = (lvl.problems || []).filter((p) => p.required !== false);
+      const problems = (lvl.problems || []).filter((p) => p.required !== false && p.optional !== true);
       const passMark = (p) => Number(p.pass_mark ?? def.pass_mark ?? 60);
       const completed = !!problems.length && problems.every((p) => subs.some((s) => s.track_key === r.track && s.level === r.level && s.pid === p.pid && s.score != null && s.score >= passMark(p)));
+      const video = !!(lvl.resource_url || lvl.video_url || lvl.videos?.length);
+      if (!video && !problems.length) return null;
       return { track_key: r.track, level: r.level, title: lvl.title, course: entry.title, course_code: entry.code, tasks: problems.length, completed,
-        url: `/open#course/${encodeURIComponent(r.track)}/lesson/${r.level}` };
+        url: `/open#course/${encodeURIComponent(r.track)}/lesson/${r.level}${video ? '' : '/practice/' + problems[0].pid}` };
     }).filter(Boolean);
   }
   function contentGaps() {
@@ -652,8 +654,11 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     const primary = R.primaryOf(out.list);
     // preferences.preferred_track mirrors the Primary roadmap for older screens.
     const prefs = { ...(career(user).preferences || {}), preferred_track: primary ? primary.track : null };
-    if (primary && primary.track !== c.preferences?.preferred_track) prefs.track_history = [...(c.preferences?.track_history || []), { track: primary.track, at: iso() }].slice(-20);
-    writeCareer(user, { ...career(user), preferences: prefs, enrollments: out.list });
+    if (primary && primary.track !== c.preferences?.preferred_track) prefs.track_history = [...(c.preferences?.track_history || []), { track: primary.track, at: iso() }];
+    const targets = { ...c.target_roles };
+    const previousRole = curriculumService.allRoles().find(r => r.id === c.target_role);
+    if (previousRole) targets[previousRole.track] = previousRole.id;
+    writeCareer(user, { ...career(user), preferences: prefs, enrollments: out.list, target_roles: targets, target_role: primary ? targets[primary.track] || null : null });
     refreshEnrollments(user);
     return { roadmaps: listEnrollments(user) };
   }
@@ -817,7 +822,9 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   /** A learner's discovery record, and whether to show the welcome automatically (only to people with no career activity yet). */
   function discoveryState(user) {
     const c = career(user), d = c.discovery;
-    const busy = !!(c.preferences || c.attempts.length || (c.enrollments || []).length);
+    const busy = !!(c.preferences || c.attempts.length || (c.enrollments || []).length || c.st?.attempts?.length ||
+      user.profile?.free_course_enrollments?.length || (data().enrollments || []).some(e => e.user_id === user.id) ||
+      (data().open_submissions || []).some(e => e.user_id === user.id));
     return { enabled: discoveryConfig().enabled !== false, show_welcome: discoveryConfig().enabled !== false && isLearner(user) && !d && !busy,
       discovery: d ? publicDiscovery(d) : null };
   }
@@ -834,6 +841,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   }
   /** Save onboarding answers / progress. Everything is optional. */
   function saveDiscovery(user, b = {}) {
+    if (b.expected_user_id != null && String(b.expected_user_id) !== String(user?.id)) return { error: 'Your signed-in account changed. Reload before saving.', status: 409 };
     if (!isLearner(user)) return { error: 'Career Discovery is for learner accounts.', status: 403 };
     if (discoveryConfig().enabled === false) return { error: 'Career Discovery is not available right now.', status: 404 };
     const cur = career(user).discovery || {}, patch = {};
@@ -932,7 +940,8 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return { ...recs, quiz: quiz ? publicQuizResult({ ...quiz, responses: [] }) : null };
   }
   /** After signing in: keep the guest's answers and (verified) quiz result. Never overwrites a newer saved result. */
-  function claimDiscovery(user, { answers, result_token, step } = {}) {
+  function claimDiscovery(user, { answers, result_token, step, expected_user_id } = {}) {
+    if (expected_user_id != null && String(expected_user_id) !== String(user?.id)) return { error: 'Your signed-in account changed. Reload before saving.', status: 409 };
     if (!isLearner(user)) return { error: 'Career Discovery is for learner accounts.', status: 403 };
     const cur = career(user).discovery || {}, patch = {};
     if (answers && !Object.keys(cur.answers || {}).length) patch.answers = D.cleanAnswers(answers);
@@ -1096,6 +1105,93 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return { title: def.title, weights: def.weights, shortfall: form.shortfall, coverage: coverage(def), questions: form.items.map((i) => ({ ...byId.get(i.id), options: E.publicQuestion(byId.get(i.id), i.order).options })) };
   }
 
+  // A lean projection of existing records. Never return raw submissions, answers or profile data.
+  function workspace(user) {
+    if (!isLearner(user)) return { error: 'Choose a learner account.', status: 403 };
+    const r = report(user), rm = r.roadmaps, c = career(user), events = [];
+    const add = (kind, title, at, href) => { if (at) events.push({ kind, title, at, href }); };
+    const courses = (store.OpenQuest?.enrollments(user.id) || []).map(e => {
+      const t = store.Quests.trackDef(e.track_key), p = store.OpenQuest.progress(user.id, e.track_key);
+      const published = t && t.published !== false;
+      const eligible = (t?.levels || []).filter(l => !p.modules || p.modules.find(m => m.levels?.includes(l.no))?.status !== 'locked');
+      const unfinished = l => p.requirements.some(q => q.level === l.no && !q.passed);
+      const saved = e.last_lesson, last = saved && eligible.find(l => l.no === saved.level && unfinished(l));
+      const next = last || eligible.find(unfinished);
+      const href = '/open#course/' + encodeURIComponent(e.track_key);
+      const task = next?.problems.find(q => p.requirements.some(r => r.level === next.no && r.pid === q.pid && !r.passed));
+      const resume = next && task ? href + '/lesson/' + next.no + '/practice/' + (last && saved.pid && next.problems.some(q => q.pid === saved.pid) && p.requirements.some(r => r.level === next.no && r.pid === saved.pid && !r.passed) ? saved.pid : task.pid) : href;
+      add('enrollment', 'Enrolled in ' + e.title, e.enrolled_at || e.created_at, href);
+      if (p.certificate) add('certificate', p.certificate.title, p.certificate.completion_date, p.certificate.url);
+      for (const [key, sub] of Object.entries(p.submissions || {})) if (p.requirements.some(r => r.level + ':' + r.pid === key && r.passed)) add('lesson', e.title + ' · completed lesson ' + key.split(':')[0], sub.submitted_at, href + '/lesson/' + key.split(':')[0] + '/practice/' + key.split(':')[1]);
+      return { track_key: e.track_key, title: e.title, completed: e.completed, passed: e.required_passed, total: e.required_total,
+        completion: e.required_total ? Math.round(100 * e.required_passed / e.required_total) : null,
+        last_opened_at: e.last_opened_at || null, next_lesson: next?.title || null, available: !!published, active: !!e.active, href, resume: published && e.active ? resume : null, certificate: p.certificate };
+    }).sort((a,b) => String(b.last_opened_at || '').localeCompare(String(a.last_opened_at || '')));
+    // Include closed/expired seats in history without restoring access or enrollment.
+    const currentKeys = new Set(courses.map(e => e.track_key));
+    for (const seat of user.profile?.free_course_enrollments || []) if (!currentKeys.has(seat.track_key)) {
+      const def = store.Quests.trackDef(seat.track_key), href = '/open#course/' + encodeURIComponent(seat.track_key);
+      add('enrollment', 'Enrolled in ' + (def?.title || seat.track_key), seat.enrolled_at, href);
+      if (seat.removed_at) add('enrollment', 'Enrollment ended: ' + (def?.title || seat.track_key), seat.removed_at, '/open#profile');
+      for (const prior of seat.history || []) add('enrollment', 'Earlier enrollment: ' + (def?.title || seat.track_key), prior.enrolled_at, href);
+    }
+    for (const a of history(user).attempts) add('assessment', a.title + ' · ' + a.raw_score + '%', a.submitted_at, '#result/' + a.id);
+    for (const a of c.st?.attempts || []) add('assessment', a.title + ' · ' + a.result.overall + '%', a.submitted_at, '#sres/' + a.id);
+    for (const e of c.preferences?.track_history || []) add('career', 'Primary career: ' + (track(e.track)?.title || e.track), e.at, '#path/' + e.track);
+    for (const e of enrollments(user).map(e => ({ ...e, title: track(e.track)?.title || e.track }))) {
+      add('career', 'Following ' + e.title, e.enrolled_at, '#path/' + e.track);
+      for (const event of e.history || []) add('career', e.title + ': ' + (event.event || event.action || event.op || 'roadmap updated'), event.at, '#path/' + e.track);
+    }
+    const portalCourses = (store.Enrollments?.batchesForStudent(user.id) || []).map(b => {
+      const course = store.Courses.byId(b.course_id), progress = store.Quests.progress(user.id, b.id);
+      const href = '/dashboard#view=course&batch=' + b.id;
+      const next = progress?.levels.find(l => l.unlocked && !l.passed);
+      const task = next?.quest.problems.find(p => !(data().quest_submissions || []).some(s => s.user_id === user.id && s.quest_id === next.quest.id && s.pid === p.pid && s.grade >= progress.track.pass_mark));
+      return { id: b.id, title: course?.title || b.name, cohort: b.name, in_progress: !!(next && task), next_lesson: next?.quest.title || null, completed: progress?.completed || false, passed: progress?.levels.filter(l => l.passed).length ?? null, total: progress?.levels.length ?? null, href,
+        resume: next && task ? '/dashboard#view=task&batch=' + b.id + '&qid=' + next.quest.id + '&pid=' + task.pid : href };
+    });
+    for (const e of data().enrollments || []) if (e.user_id === user.id) add('enrollment', 'Course enrollment: ' + (store.Batches?.byId(e.batch_id)?.name || 'Course'), e.created_at, '/dashboard#view=course&batch=' + e.batch_id);
+    for (const certificate of data().certificates || []) if (certificate.user_id === user.id) add('certificate', certificate.title, certificate.completion_date, '/cert?s=' + encodeURIComponent(certificate.serial));
+    for (const e of c.role_history) add('career', e.title ? 'Target role: ' + e.title : 'Target role cleared', e.at, e.id ? '#role/' + e.id : '#me');
+    const rewards = store.gamifyFor?.(user) || null;
+    for (const e of rewards?.recent_events || []) add('achievement', e.note || e.label || e.reason || e.title || 'Learning reward', e.at || e.created_at, '/open#profile');
+    const cur = r.curriculum, next = cur?.next, unfinished = courses.find(e => !e.completed && e.resume) || portalCourses.find(e => !e.completed && e.in_progress) || null;
+    let action;
+    if (!rm.primary) action = { label: 'Discover Your Career', href: '#discover', reason: 'Choose a direction, or keep exploring your courses below.' };
+    else if (!cur.target) action = { label: 'Choose Your Target Job Role', href: '#path/' + rm.primary.track, reason: 'Your role defines the required skill checkpoints.' };
+    else if (cur.active || r.active) action = { label: 'Continue Assessment', href: cur.active?.href || '#take', reason: 'Your saved assessment is ready to resume.' };
+    else if (!cur.assessed_competencies && !c.attempts.some(a => a.status === 'submitted' && a.result.answered > 0) && next?.available) action = { label: 'Assess Your Current Skills', href: next.href, reason: 'Start with a published knowledge checkpoint. Unassessed skills have no score.' };
+    else {
+      const gap = r.gaps.find(g => g.evidence === 'sufficient' && g.score != null && g.score < 70 && g.resources?.some(x => !x.completed));
+      const resource = gap?.resources.find(x => !x.completed);
+      const foundation = cur.subtracks.find(x => x.student.status !== 'passed' && cur.subtracks.some(y => x.prereq.includes(y.id) && y.student.status !== 'passed'));
+      const prereq = foundation && cur.subtracks.find(x => foundation.prereq.includes(x.id) && x.student.status !== 'passed' && x.assessment.state === 'published');
+      action = resource ? { label: 'Review ' + gap.name, href: resource.url, reason: 'A required skill needs review. This lesson is available now.' }
+        : prereq ? { label: 'Start With These Foundations', href: '#sub/' + prereq.id, reason: prereq.title + ' supports your later checkpoints.' }
+        : unfinished ? { label: 'Continue Your Lesson', href: unfinished.resume, reason: unfinished.title + (unfinished.next_lesson ? ' · ' + unfinished.next_lesson : '') }
+        : next ? { label: next.available ? 'Continue Your Skill Journey' : 'View Preparation Plan', href: next.href, reason: next.available ? next.title : next.title + ': learning content and assessment in preparation.' }
+        : { label: 'Review Your Target Role', href: '#role/' + cur.target.id, reason: 'Review your requirements and final checkpoint availability.' };
+    }
+    const pace = c.discovery?.answers?.commitment || null;
+    const nextSub = cur.subtracks.find(s => s.id === cur.next?.id), budget = { '3_5': [3,5], '5_10': [5,10] }[pace];
+    const studyPlan = nextSub?.hours && budget ? { title: nextSub.title, min_weeks: Math.max(1, Math.ceil(nextSub.hours / budget[1])), max_weeks: Math.max(1, Math.ceil(nextSub.hours / budget[0])) } : null;
+    const latest = events.filter(e => e.kind === 'assessment').sort((a,b) => String(b.at).localeCompare(String(a.at)))[0] || null;
+    return { report: r, roadmaps: rm, courses, portal_courses: portalCourses, latest_assessment: latest, rewards, next: action, continue_learning: unfinished || null,
+      history: [...new Map(events.map(e => [e.kind + '|' + e.href + '|' + e.at + '|' + e.title, e])).values()].sort((a,b) => String(b.at).localeCompare(String(a.at))).slice(0, 100),
+      pace, study_plan: studyPlan, discovery: publicDiscovery(c.discovery || {}) };
+  }
+  function chooseTarget(user, id) {
+    if (!id) return curriculumService.setTarget(user, null);
+    const role = curriculumService.allRoles().find(r => r.id === id);
+    if (!isLearner(user)) return { error: 'Choose a learner account.', status: 403 };
+    if (!role) return { error: 'Job role not found.', status: 404 };
+    const existing = enrollmentFor(user, role.track);
+    const out = existing?.status === 'active' ? existing.primary ? {} : makePrimary(user, role.track)
+      : existing?.status === 'paused' ? resumeTrack(user, role.track, { primary: true }) : enrollTrack(user, role.track, { primary: true });
+    if (out.error) return out;
+    return curriculumService.setTarget(user, id);
+  }
+
   const curriculumService = createCurriculumService({ settings, save, career, writeCareer, isLearner, iso, now, audit, users: () => data().users || [] }, curriculumOptions);
   return {
     BANKS, LANGS, PREF_FIELDS, REVIEWER_ROLES, config, updateConfig, categoryWeights, reviewQueue, suggestReview, submitReview, isReviewer, questions, published, questionById, setQuestionStatus, editQuestion, addQuestion,
@@ -1103,7 +1199,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     discoveryInfo, discoveryConfig, updateDiscoveryConfig, resetDiscoveryConfig, discoveryState, saveDiscovery, startDiscoveryQuiz, resumeDiscoveryQuiz, submitDiscoveryQuiz, discoveryRecommendations, claimDiscovery, discoveryAnalytics,
     skillRecords, trackProfile, trackPlan, commonStatus, enrollments, listEnrollments, enrollTrack, enrollmentAdvice, makePrimary, pauseTrack, resumeTrack, archiveTrack, refreshEnrollments,
     submitAttempt, abandonAttempt, attemptReview, resources, contentGaps, report, history, setProject, analytics, preview, isLearner,
-    curriculum: curriculumService,
+    curriculum: curriculumService, workspace, chooseTarget,
   };
 }
 

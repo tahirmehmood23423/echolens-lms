@@ -22,7 +22,7 @@ function render() {
 <link rel="stylesheet" href="/css/styles.css?v1451">
 <link rel="stylesheet" href="/css/public-navigation.css?v1">
 <link rel="stylesheet" href="/css/public-footer.css?v1">
-<link rel="stylesheet" href="/css/career.css?v7">
+<link rel="stylesheet" href="/css/career.css?v27">
 </head>
 <body class="career-page">
 ${publicNavigation.render()}
@@ -32,10 +32,10 @@ ${publicFooter.render()}
 <script src="/js/workflow-ui.js?v2"></script>
 <script src="/js/public-navigation.js?v1"></script>
 <script src="/js/coderunner.js?v1422"></script>
-<script src="/js/career-ui.js?v1"></script>
-<script src="/js/career-discovery.js?v3"></script>
+<script src="/js/career-ui.js?v2"></script>
+<script src="/js/career-discovery.js?v4"></script>
 <script src="/js/career-curriculum.js?v2"></script>
-<script src="/js/career.js?v8"></script>
+<script src="/js/career.js?v9"></script>
 </body>
 </html>`;
 }

@@ -37,6 +37,15 @@ data.quests.push({ id: 1, batch_id: batch.id, track_key: 'fc01-c-basics', no: 1,
 data.seq.quests = 1;
 data.quest_submissions.push({ id: 1, quest_id: 1, pid: 1, user_id: 5, grade: 90, gems: 90, submitted_at: '2026-09-15 12:00:00' });
 data.seq.quest_submissions = 1;
+if (process.env.ECHOLENS_TEST_ONBOARDING === '1') {
+  // The browser suite tests real signup; DNS is the only simulated boundary.
+  require('node:dns').promises.resolveMx = async () => [{ exchange: 'synthetic.invalid', priority: 10 }];
+  const track = store.Quests.tracks().find(t => t.free && t.published !== false && store.officialCatalogue().some(c => c.code === t.course_code && c.price_pkr === 0 && c.published !== false));
+  store.OpenQuest.enroll(2, track.key);
+  users[1].profile.free_course_enrollments[0].activates_at = '2020-01-01T00:00:00Z';
+  const def = store.Quests.trackDef(track.key), level = def.levels[0], task = level.problems.find(p => p.required !== false);
+  store.OpenQuest.recordOpen(2, track.key, { level: level.no, pid: task.pid });
+}
 store.persist();
 const mail = [];
 fs.writeFileSync(path.join(runtime, 'mail.json'), '[]');

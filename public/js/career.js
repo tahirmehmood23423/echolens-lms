@@ -34,7 +34,7 @@
   const CAT_DESC = { theory: 'concepts and code tracing', practical: 'hands-on coding, debugging and configuration', scenario: 'real-world problems and decisions' };
   const pctTxt = (v) => (v == null ? '-' : v + '%');
   const status = (s) => `<span class="cr-status" data-icon="${STATUS_ICON[s] || ''}" style="color:${STATUS_COLOR[s] || 'inherit'}">${esc(s)}</span>`;
-  const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['discover', 'Discover'], ['tracks', 'Explore careers'], ['me', 'My workspace'], ['report', 'Skill evidence'], ['roadmap', 'Learning plan'], ['history', 'Assessment history']]
+  const tabs = (cur) => `<nav class="cr-tabs" aria-label="Career sections">${[['discover', 'Discover'], ['tracks', 'Explore careers'], ['me', 'My dashboard'], ['report', 'Skill evidence'], ['roadmap', 'Learning plan'], ['history', 'Learning history']]
     .map(([k, l]) => `<a href="#${k}"${cur === k ? ' aria-current="page"' : ''}>${l}</a>`).join('')}</nav>`;
   const learner = () => ME && ['free', 'student'].includes(ME.role);
   function needLogin(what) {
@@ -160,23 +160,24 @@
   const ASSESS_TAG = { common_required: 'warn', skills_to_assess: 'warn', pending_review: '', up_to_date: 'teal' };
   const STATE_TAG = { active: 'teal', paused: 'warn', archived: '' };
   /** One roadmap card. `big` is the Primary card. */
-  function roadmapCard(e, rm, big) {
+  function roadmapCard(e, rm, big, curriculum = null) {
     const p = e.progress || {}, a = p.assessment_status || {}, n = p.next_activity;
     const act = (action, label, ghost = true) => `<button class="cr-btn${ghost ? ' ghost' : ''} cr-btn-sm" data-act="${action}" data-track="${esc(e.track)}">${label}</button>`;
     return `<article class="cr-road${big ? ' primary' : ''}" aria-label="${esc(e.title)} roadmap">
       <div class="cr-road-head"><h3>${esc(e.title)}</h3>
         <div class="cr-tags">${e.primary ? '<span class="cr-tag teal">★ Primary</span>' : e.status === 'active' ? '<span class="cr-tag">Secondary</span>' : ''}<span class="cr-tag ${STATE_TAG[e.status]}">${esc(e.status[0].toUpperCase() + e.status.slice(1))}</span></div></div>
       ${e.status === 'archived' ? `<p class="cr-small cr-muted">Archived ${fmtDate(e.archived_at)}. Your history and progress are kept.</p>` : `
-      <div class="cr-road-stats">
+      ${curriculum ? `<p><b>Target role:</b> ${curriculum.target ? esc(curriculum.target.title) : `<a href="#path/${esc(e.track)}">Choose your target role</a>`}</p><p>${curriculum.passed} / ${curriculum.required} required knowledge checkpoints passed · ${curriculum.assessed_competencies} competencies assessed</p>${curriculum.next ? `<p><b>Next subtrack:</b> <a href="${esc(curriculum.next.href)}">${esc(curriculum.next.title)}</a>${curriculum.next.available ? '' : ' · Assessment in preparation'}</p>` : ''}` : ''}
+      <details><summary>Coursework and earlier assessment progress</summary><div class="cr-road-stats">
         <div><span>Level (provisional)</span><b>${esc(p.level || 'Not assessed')}</b></div>
         <div><span>Current stage</span><b>${p.current_stage ? `${p.current_stage}. ${esc(p.stage_name)}` : esc(p.stage_name || '-')}</b></div>
         <div><span>Completed</span><b>${(p.completed_modules || []).length} module${(p.completed_modules || []).length === 1 ? '' : 's'}, ${(p.completed_projects || []).length} project${(p.completed_projects || []).length === 1 ? '' : 's'}</b></div>
       </div>
       <div class="cr-road-progress"><div class="cr-bar" role="progressbar" aria-label="${esc(e.title)} completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p.completion_pct || 0}"><i style="width:${p.completion_pct || 0}%"></i></div><b>${p.completion_pct || 0}%</b></div>
       <p class="cr-small"><span class="cr-tag ${ASSESS_TAG[a.state] || ''}">${esc(a.label || 'Assessment status unknown')}</span></p>
-      ${n && e.status === 'active' ? `<p class="cr-small"><b>Next:</b> <a href="${esc(n.href)}">${esc(n.label)}</a></p>` : ''}`}
+      ${!curriculum && n && e.status === 'active' ? `<p class="cr-small"><b>Next:</b> <a href="${esc(n.href)}">${esc(n.label)}</a></p>` : ''}</details>`}
       <div class="cr-actions">
-        ${e.status === 'active' ? `<a class="cr-btn${big ? '' : ' ghost'} cr-btn-sm" href="#roadmap/${esc(e.track)}">Open roadmap</a><a class="cr-btn ghost cr-btn-sm" href="#report/${esc(e.track)}">Skill report</a>` : ''}
+        ${e.status === 'active' ? `<a class="cr-btn${big ? '' : ' ghost'} cr-btn-sm" href="#path/${esc(e.track)}">Open roadmap</a><a class="cr-btn ghost cr-btn-sm" href="#report/${esc(e.track)}">Skill report</a>` : ''}
         ${e.status === 'active' && !e.primary ? act('primary', 'Make Primary', false) : ''}
         ${e.status === 'active' ? act('pause', 'Pause') : ''}
         ${e.status === 'paused' ? act('resume', 'Resume', false) : ''}
@@ -187,23 +188,20 @@
   async function viewMe(advice) {
     if (!ME) { root.innerHTML = needLogin('My Career Roadmaps'); return; }
     if (!learner()) { root.innerHTML = notLearner(); return; }
-    ME.career = await api('/api/career/me');
-    const r = ME.career;
-    const [rm, tracks] = await Promise.all([api('/api/career/me/enrollments'), loadTracks()]);
+    const [w, tracks] = await Promise.all([api('/api/career/me/workspace'), loadTracks()]);
+    const r = ME.career = w.report, rm = w.roadmaps;
     const active = rm.enrollments.filter((e) => e.status === 'active'), paused = rm.enrollments.filter((e) => e.status === 'paused'), archived = rm.enrollments.filter((e) => e.status === 'archived');
     const secondary = active.filter((e) => !e.primary);
     const following = new Set(rm.enrollments.filter((e) => e.status !== 'archived').map((e) => e.track));
     const canAdd = rm.active_count < rm.max_active, choices = tracks.filter((t) => !following.has(t.slug));
     root.innerHTML = `${tabs('me')}
-      <span class="cx-eyebrow">Your career workspace</span><h1>A clear next step. A future you build.</h1>${CareerUI.progress(r.curriculum)}
+      ${CareerUI.welcome(w, ME.name)}
       <p class="cr-muted">Follow up to ${rm.max_active} career roadmaps at once. Your <b>Primary</b> roadmap drives your recommendations; skills you have already proved are shared across roadmaps, so you are only assessed on what is new.</p>
       ${r.active ? `<div class="cr-note">You have an assessment in progress. <a class="cr-btn cr-btn-sm" href="#take">Resume: ${esc(r.active.title)}</a></div>` : ''}
-      ${!r.preferences ? '<div class="cr-note">Tell us your interests to get better recommendations. Every question is optional. <a href="#onboarding">Set my career goals</a></div>' : ''}
-      <div class="cr-note${rm.common.valid ? '' : ' warn'}">${rm.common.valid ? `✓ Your common computer-science result is valid until ${fmtDate(rm.common.valid_until)}, so new roadmaps do not need it again.`
-        : `${rm.common.reason === 'expired' ? 'Your common computer-science result has expired.' : rm.common.reason === 'insufficient' ? 'Your common computer-science result did not have enough answers to verify your skills.' : 'You have not taken the common computer-science assessment yet.'} Every roadmap starts from it. <a href="#assess/common">Take it now</a>`}</div>
       ${advice ? adviceBox(advice) : ''}
-      ${rm.primary ? `<h2>Primary roadmap</h2>${roadmapCard(rm.primary, rm, true)}`
+      ${rm.primary ? `<h2>Primary roadmap</h2>${roadmapCard(rm.primary, rm, true, r.curriculum)}`
         : `<div class="cr-panel"><h3>${rm.enrollments.length ? 'No active roadmap' : 'You are not following a roadmap yet'}</h3><p class="cr-small">${paused.length ? 'Resume a paused roadmap below, or add a new one.' : 'Choose a career track below to get a personalised, assessment-based roadmap.'} You can still take any assessment and use every course.</p><div class="cr-actions"><a class="cr-btn" href="#discover">Not sure? Try Career Discovery</a></div></div>`}
+      ${CareerUI.learning(w)}
       ${secondary.length ? `<h2>Secondary roadmaps</h2><div class="cr-road-grid">${secondary.map((e) => roadmapCard(e, rm, false)).join('')}</div>` : ''}
       ${paused.length ? `<h2>Paused</h2><div class="cr-road-grid">${paused.map((e) => roadmapCard(e, rm, false)).join('')}</div>` : ''}
       <section class="cr-panel" aria-labelledby="crAddH"><h3 id="crAddH">Add a roadmap</h3>
@@ -214,8 +212,7 @@
           <button class="cr-btn" type="submit"${canAdd && choices.length ? '' : ' disabled'}>Add roadmap</button></form>
         <p id="crRoadMsg" role="alert" class="cr-small"></p></section>
       ${archived.length ? `<details class="cr-panel"><summary><b>Archived roadmaps (${archived.length})</b></summary><div class="cr-road-grid" style="margin-top:10px">${archived.map((e) => roadmapCard(e, rm, false)).join('')}</div></details>` : ''}
-      ${r.gaps.length && rm.primary ? `<div class="cr-panel"><h3>Top priorities for ${esc(rm.primary.title)}</h3><ul>${r.gaps.slice(0, 3).map((g) => `<li>${status(g.status)} <b>${esc(g.name)}</b> - ${esc(g.recommendation)}</li>`).join('')}</ul></div>` : ''}
-      ${r.curriculum?.recent.length ? `<section class="cr-panel"><h2>Recent skill checkpoints</h2>${r.curriculum.recent.map(a=>`<p><a href="#sres/${esc(a.id)}">${esc(a.title)}</a> <span class="cr-tag">${a.overall}% · ${esc(a.outcome_label)}</span></p>`).join('')}</section>` : ''}
+      ${CareerUI.activity(w)}
       <p class="cr-muted cr-small">${esc(r.disclaimer)}</p>`;
     const msg = $('crRoadMsg');
     const run = async (fn) => { root.querySelectorAll('[data-act],[data-add],#crAdd button').forEach((b) => { b.disabled = true; }); try { const out = await fn(); await loadMe(); await viewMe(out?.recommendation); } catch (e) { await viewMe(); $('crRoadMsg').textContent = e.message; } };
@@ -383,7 +380,7 @@
 
   async function viewResult(id) {
     if (!ME) { root.innerHTML = needLogin('Results'); return; }
-    const [h, canonical] = await Promise.all([api('/api/career/me/history'), api('/api/career/me/st/history')]);
+    const [h, canonical, w] = await Promise.all([api('/api/career/me/history'), api('/api/career/me/st/history'), api('/api/career/me/workspace')]);
     const attempts = [...h.attempts.map(a => ({ ...a, href: '#result/' + a.id })), ...canonical.attempts.map(a => ({ ...a, raw_score: a.overall, href: '#sres/' + a.id }))].sort((a,b) => String(b.submitted_at).localeCompare(String(a.submitted_at)));
     const a = h.attempts.find((x) => x.id === id);
     if (!a) { root.innerHTML = `${tabs('history')}<p class="cr-err">That attempt was not found.</p>`; return; }
@@ -500,9 +497,9 @@
   async function viewHistory() {
     if (!ME) { root.innerHTML = needLogin('Assessment history'); return; }
     if (!learner()) { root.innerHTML = notLearner(); return; }
-    const [h, canonical] = await Promise.all([api('/api/career/me/history'), api('/api/career/me/st/history')]);
+    const [h, canonical, w] = await Promise.all([api('/api/career/me/history'), api('/api/career/me/st/history'), api('/api/career/me/workspace')]);
     const attempts = [...h.attempts.map(a => ({ ...a, href: '#result/' + a.id })), ...canonical.attempts.map(a => ({ ...a, raw_score: a.overall, href: '#sres/' + a.id }))].sort((a,b) => String(b.submitted_at).localeCompare(String(a.submitted_at)));
-    root.innerHTML = `${tabs('history')}<h1>Assessment history</h1>
+    root.innerHTML = `${tabs('history')}<h1>Learning history</h1>${CareerUI.activity(w, 100)}<h2>Assessment history</h2>
       ${attempts.length ? `<div style="overflow-x:auto"><table class="cr-table"><thead><tr><th>Date</th><th>Assessment</th><th>Score</th><th>Answered</th><th></th></tr></thead><tbody>
         ${attempts.map((a) => `<tr><td>${fmtDate(a.submitted_at)}</td><td>${esc(a.title)}</td><td>${a.raw_score == null ? '-' : a.raw_score + '%'}</td><td>${a.answered}/${a.total}</td><td><a href="${esc(a.href)}">Review</a></td></tr>`).join('')}</tbody></table></div>` : '<p class="cr-muted">No assessments yet.</p>'}
       ${h.skills.some((s) => s.history.length > 1) ? `<h2>Improvement over time</h2>${h.skills.filter((s) => s.history.length > 1).map((s) => {
@@ -525,8 +522,19 @@
     document.body.classList.toggle('career-exam', ['stake', 'take'].includes(location.hash.slice(1)));
     root.setAttribute('aria-busy','true');
     root.innerHTML = CareerUI.skeleton();
+    // A hash navigation can follow an account switch in another tab. Refresh
+    // identity before reading browser drafts or rendering private learner data.
+    try {
+      const current = await api('/api/auth/me');
+      const previous = ME;
+      ME = { ...current, career: previous?.id === current.id ? previous.career : null };
+      if (!ME.career && learner()) ME.career = await api('/api/career/me');
+    } catch (e) {
+      if (e.status === 401) ME = null;
+      else { fail(e); root.setAttribute('aria-busy', 'false'); return; }
+    }
     // No hash: open Career Discovery once for people with no career activity yet; everyone else sees the tracks.
-    if (!location.hash && window.CareerDiscovery && await CareerDiscovery.shouldAutoShow(discoveryCtx())) { history.replaceState(null, '', '#discover'); }
+    if (!location.hash) { const welcome = window.CareerDiscovery && await CareerDiscovery.shouldAutoShow(discoveryCtx()); history.replaceState(null, '', welcome ? '#discover' : learner() ? '#me' : '#tracks'); }
     const [view, arg, sub] = decodeURIComponent(location.hash.slice(1) || 'tracks').split('/');
     document.title = 'Career Paths & Skill Assessment | EchoLens';
     try {

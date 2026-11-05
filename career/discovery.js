@@ -16,41 +16,37 @@
  *    The whole rule table is configuration, editable by admins.
  */
 
-const QUESTIONS = [
-  { id: 'interests', title: 'What interests you?', hint: 'Choose as many as you like.', multi: true, options: [
-    ['websites', 'Building websites'], ['mobile', 'Creating mobile applications'], ['ai', 'Artificial intelligence'],
-    ['data', 'Working with data'], ['security', 'Cybersecurity'], ['cloud', 'Cloud and infrastructure'],
-    ['software', 'Building software'], ['problems', 'Solving programming problems'], ['testing', 'Testing applications'],
-    ['unsure', 'Not sure yet'],
-  ] },
-  { id: 'experience', title: 'How much programming have you learned?', hint: 'There is no wrong answer. Beginners are very welcome.', multi: false, options: [
-    ['never', 'I have never programmed'], ['basics', 'I know basic concepts'], ['simple', 'I can write simple programs'],
-    ['projects', 'I have built small projects'], ['experienced', 'I have experience developing applications'],
-  ] },
-  { id: 'technologies', title: 'Which technologies have you explored?', hint: 'Choose any you have tried, even briefly.', multi: true, options: [
-    ['python', 'Python'], ['c_cpp', 'C/C++'], ['java', 'Java'], ['javascript', 'JavaScript'], ['html_css', 'HTML/CSS'],
-    ['sql', 'SQL'], ['git', 'Git/GitHub'], ['none', 'None yet'],
-  ] },
-  { id: 'goal', title: 'What is your learning goal?', hint: 'Pick the one that fits best right now.', multi: false, options: [
-    ['explore', 'Explore computer science'], ['first_language', 'Learn my first programming language'],
-    ['practical', 'Develop practical technical skills'], ['internship', 'Prepare for internships'],
-    ['job', 'Prepare for entry-level jobs'], ['improve', 'Improve my existing technical skills'],
-    ['switch', 'Switch to a different technology career'],
-  ] },
-  { id: 'enjoy', title: 'What do you enjoy doing?', hint: 'Choose as many as you like.', multi: true, options: [
+const LEGACY_ENJOY = { id: 'enjoy', title: 'What do you enjoy doing?', hint: 'Choose as many as you like.', multi: true, options: [
     ['design', 'Designing visual interfaces'], ['logic', 'Solving logical problems'], ['analysis', 'Analyzing information'],
     ['systems', 'Understanding how systems work'], ['intelligent', 'Exploring intelligent technologies'],
     ['protect', 'Protecting systems and information'],
+  ] };
+const QUESTIONS = [
+  { id: 'experience', title: 'How familiar are you with programming?', hint: 'Beginners are welcome. This is a preference, not a skill assessment.', multi: false, options: [
+    ['never', "I'm completely new."], ['basics', 'I know a few basic concepts.'], ['simple', "I've written simple programs."], ['projects', "I've completed some projects."], ['experienced', "I've developed applications before."],
+  ] },
+  { id: 'technologies', title: 'Which technologies have you explored?', hint: 'Choose any you have tried, even briefly.', multi: true, options: [
+    ['python', 'Python'], ['c_cpp', 'C/C++'], ['java', 'Java'], ['javascript', 'JavaScript'], ['html_css', 'HTML/CSS'], ['sql', 'SQL'], ['git', 'Git/GitHub'], ['ai_ml', 'AI/ML tools'], ['other', 'Other'], ['none', 'None yet'],
+  ] },
+  { id: 'interests', title: 'What would you enjoy learning or building?', hint: 'Choose as many as you like.', multi: true, options: [
+    ['websites', 'Websites and applications'], ['mobile', 'Mobile apps'], ['ai', 'Artificial intelligence'], ['data', 'Data analysis'], ['security', 'Cybersecurity'], ['cloud', 'Cloud and infrastructure'], ['software', 'Software engineering'], ['testing', 'Testing and quality assurance'], ['unsure', "I'm still exploring."],
+  ] },
+  { id: 'goal', title: 'What brings you to EchoLens?', hint: 'You can change your goal later.', multi: false, options: [
+    ['explore', "I'm exploring computer science."], ['first_language', 'I want to learn programming from scratch.'], ['practical', 'I want to learn a new career skill.'], ['internship', "I'm preparing for internships."], ['job', "I'm preparing for a technical job."], ['improve', 'I want to improve my existing knowledge.'], ['switch', 'I want to change career fields.'],
+  ] },
+  { id: 'commitment', title: 'How much time can you dedicate to learning?', hint: 'Your suggested pace never limits which career you can choose.', multi: false, options: [
+    ['under_3', 'Less than 3 hours per week'], ['3_5', '3–5 hours per week'], ['5_10', '5–10 hours per week'], ['over_10', 'More than 10 hours per week'], ['unsure', 'Not sure yet'],
   ] },
 ];
-const QMAP = new Map(QUESTIONS.map((q) => [q.id, q]));
+const QMAP = new Map([...QUESTIONS, LEGACY_ENJOY].map((q) => [q.id, q]));
 const label = (qid, opt) => (QMAP.get(qid)?.options.find(([id]) => id === opt) || [])[1] || opt;
 
 /** Clean submitted answers: unknown options dropped, multi-select de-duplicated, everything optional. */
 function cleanAnswers(raw = {}) {
   const out = {};
-  for (const q of QUESTIONS) {
+  for (const q of [...QUESTIONS, LEGACY_ENJOY]) {
     const ids = q.options.map(([id]) => id), v = raw[q.id];
+    if (q.id === 'interests') ids.push('problems'); // retain earlier saved preferences
     if (q.multi) {
       let list = [...new Set([].concat(v || []).map(String))].filter((x) => ids.includes(x));
       // "Not sure yet" / "None yet" cannot be combined with real choices.
@@ -83,7 +79,7 @@ const DEFAULT_CONFIG = {
   },
   goal: { explore: [], first_language: [], practical: [], internship: [], job: [], improve: [], switch: [] },
   technologies: {
-    python: [ML, GA, DA, DE, BE], c_cpp: [SE], java: [SE, MO, BE], javascript: [FE, FS, BE], html_css: [FE, FS], sql: [DA, DE, BE], git: [OP], none: [],
+    python: [ML, GA, DA, DE, BE], c_cpp: [SE], java: [SE, MO, BE], javascript: [FE, FS, BE], html_css: [FE, FS], sql: [DA, DE, BE], git: [OP], ai_ml: [ML, GA], other: [], none: [],
   },
   // Quiz areas answered strongly (>= quiz_strong %) give a small nudge.
   quiz_strong: 70,
@@ -110,6 +106,7 @@ function validateConfig(c, trackSlugs) {
   const tables = { interests: 'interests', enjoy: 'enjoy', goal: 'goal', technologies: 'technologies' };
   for (const [key, qid] of Object.entries(tables)) {
     const allowed = new Set(QMAP.get(qid).options.map(([id]) => id)), table = out[key];
+    if (qid === 'interests') allowed.add('problems');
     if (!table || typeof table !== 'object' || Array.isArray(table)) return err(`"${key}" must map answer options to lists of track slugs.`);
     for (const [opt, list] of Object.entries(table)) {
       if (!allowed.has(opt)) return err(`"${key}" has an unknown answer option "${opt}".`);

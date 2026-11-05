@@ -4498,11 +4498,14 @@ const OpenQuest = {
     save();
     return { ok: true, enrollment: removed };
   },
-  recordOpen(uid, track_key, { deferSave = false } = {}) {
+  recordOpen(uid, track_key, { deferSave = false, level = null, pid = null } = {}) {
     const u = Users.byId(uid), seat = OpenQuest.enrollment(uid, track_key);
     if (!seat?.active) return { error: 'An active free-course enrollment is required.', status: 403 };
     const saved = u.profile?.free_course_enrollments || [];
     const row = saved.find(e => e.track_key === track_key) || { ...seat };
+    const t = TRACKS[track_key], lesson = level == null ? null : t?.levels.find(l => l.no === Number(level));
+    if (level != null && (!lesson || (pid != null && !lesson.problems.some(p => p.pid === Number(pid))))) return { error: 'Lesson not found.', status: 404 };
+    if (lesson) row.last_lesson = { level: lesson.no, pid: pid == null ? null : Number(pid) };
     row.last_opened_at = new Date().toISOString();
     u.profile = { ...(u.profile || {}), free_course_enrollments: [...saved.filter(e => e.track_key !== track_key), row] };
     if (!deferSave) save(); return { ok: true };

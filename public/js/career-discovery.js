@@ -13,10 +13,24 @@
  * recommendations all come from the server; this file only displays them.
  */
 (() => {
-  const KEY = 'elDiscovery.v1';
+  let KEY = 'elDiscovery.v1';
+  let account = null;
+  function scope(ctx) {
+    const next = ctx.ME ? String(ctx.ME.id) : 'guest';
+    if (account === next) return;
+    let guest = {};
+    try { guest = JSON.parse(localStorage.getItem('elDiscovery.v1:guest') || localStorage.getItem('elDiscovery.v1') || '{}'); } catch {}
+    KEY = 'elDiscovery.v1:' + next;
+    S = load();
+    if (!guest.claimed_by && Object.keys(guest).length) {
+      S = { ...guest, ...S };
+
+    }
+    account = next; INFO = null; HYDRATED = false;
+  }
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch { return {}; } };
   const store = (s) => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* private mode: keep going in memory */ } };
-  let S = load(), INFO = null, CTX = null;
+  let S = load(), INFO = null, CTX = null, HYDRATED = false, SYNC = Promise.resolve();
   const persist = () => store(S);
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -48,22 +62,35 @@
     }).join('')}</ol>`;
   }
   async function sync(extra = {}) {
-    persist();
+    S.pending = true; persist();
     if (!learner()) return;
-    try { await CTX.api('/api/career/me/discovery', { method: 'PUT', body: { answers: S.answers || {}, step: S.step || 0, ...extra } }); } catch { /* offline: the local copy is kept */ }
+    const payload = JSON.parse(JSON.stringify({ expected_user_id: CTX.ME.id, answers: S.answers || {}, step: S.step || 0, ...extra }));
+    const state = S;
+    const label = () => { const el = $('dcSync'); if (el) el.textContent = state.pending ? 'Saved on this device. Sync pending; keep this browser to resume offline.' : 'Saved to your account.'; };
+    label();
+    SYNC = SYNC.then(async () => {
+      try {
+        await CTX.api('/api/career/me/discovery', { method: 'PUT', body: payload });
+        state.pending = false; state.claimed_by = CTX.ME.id; persist();
+      } catch { state.pending = true; persist(); }
+      label();
+    });
+    return SYNC;
   }
   /** On sign-in, attach a guest's answers and signed quiz result to the account (once). */
   async function claimIfNeeded() {
     if (!learner() || S.claimed_by === CTX.ME.id) return;
     if (!S.result_token && !Object.keys(S.answers || {}).length) return;
-    try { await CTX.api('/api/career/me/discovery/claim', { method: 'POST', body: { answers: S.answers || {}, result_token: S.result_token || undefined, step: S.step || 0 } }); S.claimed_by = CTX.ME.id; persist(); } catch { /* try again next visit */ }
+    try { await CTX.api('/api/career/me/discovery/claim', { method: 'POST', body: { expected_user_id: CTX.ME.id, answers: S.answers || {}, result_token: S.result_token || undefined, step: S.step || 0 } }); S.claimed_by = CTX.ME.id; persist(); try { localStorage.removeItem('elDiscovery.v1'); localStorage.removeItem('elDiscovery.v1:guest'); } catch {} } catch { /* try again next visit */ }
   }
   /** For a signed-in learner with nothing saved locally, pick up their saved progress. */
   async function hydrate() {
-    const i = await info(), d = i.state?.discovery;
+    if (HYDRATED) return;
+    const i = await info(), d = i.state?.discovery; HYDRATED = true;
     if (!d) return;
-    if (!Object.keys(S.answers || {}).length && Object.keys(d.answers || {}).length) S.answers = d.answers;
+    if (!S.pending && Object.keys(d.answers || {}).length) S.answers = d.answers;
     if (!S.step && d.step) S.step = d.step;
+    if (d.dismissed_at) S.dismissed = true;
     if (!S.quiz && d.active_quiz) {
       try { const r = await CTX.api('/api/career/discovery/quiz/resume', { method: 'POST', body: { token: d.active_quiz.token } }); S.quiz = { token: r.token, questions: r.questions, answers: {}, cur: 0 }; } catch { /* expired */ }
     }
@@ -71,7 +98,7 @@
   }
   /** Open the welcome automatically only for people with no career activity who have not skipped it. */
   async function shouldAutoShow(ctx) {
-    CTX = ctx;
+    CTX = ctx; scope(ctx);
     try {
       const i = await info();
       if (!i.enabled || S.dismissed || S.outcome) return false;
@@ -90,26 +117,26 @@
       <section class="dc-hero" aria-labelledby="dcH">
         <div class="dc-hero-copy">
           <span class="dc-badge">${ICON.spark}Career Discovery</span>
-          <h1 id="dcH">Discover Your Career. Understand Your Skills. Build Your Future.</h1>
-          <p class="dc-lead">Explore technology careers, discover your strengths, and build the skills you need, one step at a time.</p>
+          <h1 id="dcH">Discover Your Potential. Build Your Future.</h1>
+          <p class="dc-lead">Find your technology career, discover the skills you already have, and follow a personalized learning path designed around your goals.</p>
           <div class="dc-hero-actions">
-            <button class="dc-btn dc-btn-primary" id="dcGo" type="button">${resume ? 'Continue where I left off' : 'Start Exploring'}${ICON.arrow}</button>
+            <button class="dc-btn dc-btn-primary" id="dcGo" type="button">${resume ? 'Continue where I left off' : 'Discover My Career'}${ICON.arrow}</button>
             ${S.outcome ? '<button class="dc-btn dc-btn-soft" id="dcSeen" type="button">See my matches</button>' : ''}
-            <button class="dc-btn dc-btn-ghost" id="dcSkip" type="button">Skip for now</button>
+            <button class="dc-btn dc-btn-ghost" id="dcSkip" type="button">Explore EchoLens First</button>
           </div>
           ${signInBtn()}
         </div>
         <div class="dc-hero-art" aria-hidden="true">${art()}</div>
       </section>
       <section class="dc-features" aria-label="What to expect">
-        <div class="dc-feature"><span class="dc-ico dc-ico-teal">${ICON.spark}</span><div><b>Made for beginners</b><p>No experience needed. Every career track starts from the basics.</p></div></div>
-        <div class="dc-feature"><span class="dc-ico dc-ico-indigo">${ICON.clock}</span><div><b>About 8 minutes</b><p>Five quick questions and a friendly 12 question quiz. Skip anything.</p></div></div>
-        <div class="dc-feature"><span class="dc-ico dc-ico-amber">${ICON.compass}</span><div><b>You decide</b><p>We suggest careers and explain why, and you can choose any of the 12.</p></div></div>
+        <div class="dc-feature"><span class="dc-ico dc-ico-teal">${ICON.spark}</span><div><b>Discover your strengths</b><p>No experience needed. Every career track starts from the basics.</p></div></div>
+        <div class="dc-feature"><span class="dc-ico dc-ico-indigo">${ICON.clock}</span><div><b>Learn at your own pace</b><p>Five quick questions and a friendly 12 question quiz. Skip anything.</p></div></div>
+        <div class="dc-feature"><span class="dc-ico dc-ico-amber">${ICON.compass}</span><div><b>Explore technology careers</b><p>We suggest careers and explain why, and you can choose any of the 12.</p></div></div>
       </section>
       ${stepper('')}`);
     $('dcGo').onclick = () => { location.hash = '#discover/about/' + (resume ? Math.min(S.step || 0, 4) + 1 : 1); };
     if ($('dcSeen')) $('dcSeen').onclick = () => { location.hash = '#discover/results'; };
-    $('dcSkip').onclick = async () => { S.dismissed = true; persist(); if (learner()) { try { await CTX.api('/api/career/me/discovery', { method: 'PUT', body: { dismissed: true } }); } catch { /* fine */ } } location.hash = '#tracks'; };
+    $('dcSkip').onclick = async () => { S.dismissed = true; persist(); if (learner()) { try { await CTX.api('/api/career/me/discovery', { method: 'PUT', body: { expected_user_id: CTX.ME.id, dismissed: true } }); } catch { /* fine */ } } location.hash = learner() ? '#me' : '#tracks'; };
     wireSignIn();
   }
   /** Illustration: one starting point connected to six career areas, each in its own palette tint. */
@@ -135,7 +162,7 @@
         <div class="dc-panel-top"><span class="dc-kicker">Question ${n} of ${qs.length}</span>
           <div class="dc-segments" aria-hidden="true">${qs.map((_, k) => `<i class="${k < n ? 'on' : ''}"></i>`).join('')}</div></div>
         <h1 id="dcQ" class="dc-title">${esc(q.title)}</h1>
-        <p class="dc-sub">${esc(q.hint)}</p>
+        <p class="dc-sub">${esc(q.hint)}</p><p class="cr-small cr-muted" id="dcSync" role="status">${learner() ? S.pending ? 'Saved on this device. Sync pending.' : 'Saved to your account as you go.' : 'Saved on this device. Sign in to save across devices.'}</p>
         <fieldset class="dc-options${q.options.length > 6 ? ' dc-options-3' : ''}"><legend class="sr-only">${esc(q.title)}</legend>
           ${q.options.map((o) => `<label class="dc-option"><input type="${q.multi ? 'checkbox' : 'radio'}" name="dcOpt" value="${esc(o.id)}"${cur.includes(o.id) ? ' checked' : ''}><span class="dc-mark${q.multi ? '' : ' dc-mark-round'}">${ICON.check}</span><span class="dc-option-t">${esc(o.text)}</span></label>`).join('')}
         </fieldset>
@@ -152,10 +179,13 @@
       // "Not sure yet" and "None yet" cannot be combined with other choices.
       if (q.multi && b.checked && ['unsure', 'none'].includes(b.value)) boxes.forEach((x) => { if (x !== b) x.checked = false; });
       else if (q.multi && b.checked) boxes.forEach((x) => { if (['unsure', 'none'].includes(x.value)) x.checked = false; });
+      const picked = boxes.filter(x => x.checked).map(x => x.value);
+      S.answers[q.id] = q.multi ? picked : picked[0] || ''; S.step = n - 1;
+      sync();
     }));
     const go = async (keep) => {
       const picked = boxes.filter((b) => b.checked).map((b) => b.value);
-      if (keep) { if (picked.length) S.answers[q.id] = q.multi ? picked : picked[0]; else delete S.answers[q.id]; }
+      if (keep) S.answers[q.id] = q.multi ? picked : picked[0] || ''; // explicit empty choice clears a saved preference
       S.step = Math.max(S.step || 0, n);
       await sync();
       location.hash = n === qs.length ? '#discover/quiz' : '#discover/about/' + (n + 1);
@@ -172,11 +202,11 @@
     root.innerHTML = frame(`${stepper('quiz')}
       <section class="dc-panel" aria-labelledby="dcQi">
         <span class="dc-kicker">Step 2 · Quick quiz</span>
-        <h1 id="dcQi" class="dc-title">A quick, friendly quiz</h1>
+        <h1 id="dcQi" class="dc-title">Let’s Discover What You Already Know</h1>
         <p class="dc-sub">${i.quiz.items} multiple choice questions about everyday computing ideas. It takes about ${i.quiz.minutes} minutes.</p>
         <div class="dc-tiles">
           <div class="dc-tile dc-tone-teal"><b>Beginner friendly</b><span>Every technical word is explained in the question.</span></div>
-          <div class="dc-tile dc-tone-indigo"><b>Skip freely</b><span>Skipped questions never count against you, and there is no negative marking.</span></div>
+          <div class="dc-tile dc-tone-indigo"><b>Skip freely</b><span>No negative marking. Your score covers the questions you answer. This is not a formal examination.</span></div>
           <div class="dc-tile dc-tone-amber"><b>No pressure</b><span>It only helps us suggest where to start. It never closes any career to you.</span></div>
         </div>
         <div class="dc-panel-foot">
@@ -223,7 +253,7 @@
       $('dcFin').disabled = true;
       try {
         const out = await CTX.api('/api/career/discovery/quiz/submit', { method: 'POST', body: { token: z.token, answers: z.answers, onboarding: S.answers || {} } });
-        S.outcome = out; S.result_token = out.result_token; S.quiz = null; if (learner()) S.claimed_by = CTX.ME.id; persist();
+        S.outcome = out; S.result_token = out.result_token; S.quiz = null; if (learner()) S.claimed_by = CTX.ME.id; persist(); try { localStorage.removeItem('elDiscovery.v1'); localStorage.removeItem('elDiscovery.v1:guest'); } catch {}
         location.hash = '#discover/results';
       } catch (e) {
         $('dcMsg').innerHTML = `${esc(e.message)} <button class="dc-btn dc-btn-soft dc-btn-sm" id="dcRestart" type="button">Start a new quiz</button>`;
@@ -314,7 +344,7 @@
       await CTX.api('/api/career/me/discovery', { method: 'PUT', body: { chosen_track: slug, completed: true } });
       S.pending_choice = null; persist();
       await CTX.loadMe(); CTX.setAdvice(out.recommendation);
-      location.hash = '#me';
+      location.hash = '#path/' + slug;
     } catch (e) {
       btn.disabled = false;
       msg.textContent = e.message;
@@ -324,7 +354,7 @@
 
   /* ---------------------------------- router ---------------------------------- */
   async function render(ctx, arg, sub) {
-    CTX = ctx;
+    CTX = ctx; scope(ctx);
     const i = await info();
     if (!i.enabled) { ctx.root.innerHTML = frame('<div class="dc-callout"><div><b>Career Discovery is not available right now.</b></div></div>'); return; }
     if (ctx.ME) { await claimIfNeeded(); await hydrate(); }
@@ -334,5 +364,5 @@
     if (arg === 'results') return S.outcome || S.result_token || (ctx.ME && i.state?.discovery?.completed_at) ? results(ctx.root) : (location.hash = '#discover/about/1');
     return welcome(ctx.root);
   }
-  window.CareerDiscovery = { render, shouldAutoShow, claimIfNeeded: (ctx) => { CTX = ctx; return claimIfNeeded(); }, highlight: hl, recommended: () => (S.outcome?.recommendations || []).map((r) => r.slug || r.track) };
+  window.CareerDiscovery = { render, shouldAutoShow, claimIfNeeded: (ctx) => { CTX = ctx; scope(ctx); return claimIfNeeded(); }, highlight: hl, recommended: () => (S.outcome?.recommendations || []).map((r) => r.slug || r.track) };
 })();

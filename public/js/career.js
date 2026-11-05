@@ -527,6 +527,7 @@
     try {
       const current = await api('/api/auth/me');
       const previous = ME;
+      if (previous?.id !== current.id) window.CareerCurriculum?.reset?.();
       ME = { ...current, career: previous?.id === current.id ? previous.career : null };
       if (!ME.career && learner()) ME.career = await api('/api/career/me');
     } catch (e) {
@@ -539,6 +540,7 @@
     document.title = 'Career Paths & Skill Assessment | EchoLens';
     try {
       if (view === 'discover' && window.CareerDiscovery) await CareerDiscovery.render(discoveryCtx(), arg, sub);
+      else if (window.CareerLearning && CareerLearning.views.includes(view)) await CareerLearning.render(curriculumCtx(), view, arg, sub);
       else if (window.CareerCurriculum && CareerCurriculum.views.includes(view)) await CareerCurriculum.render(curriculumCtx(), view, arg);
       else if (view === 'track' && arg) await viewTrack(arg);
       else if (view === 'me') { const a = PENDING_ADVICE; PENDING_ADVICE = null; await viewMe(a); }

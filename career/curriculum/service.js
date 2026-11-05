@@ -27,6 +27,7 @@ const C = require('./index');
 const { validateQuestion, validateBank } = require('./qdsl');
 const { BANKS: BUILT_IN, APPROVED } = require('./questions');
 const { verifyCode } = require('./verify');
+const { createLearning } = require('./learning');
 
 const READINESS_LABEL = 'EchoLens Assessed Knowledge Readiness';
 const DIFF_KEYS = ['easy', 'medium', 'hard', 'advanced'];
@@ -289,14 +290,14 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     return { ...r, status: expired ? 'expired' : r.status, label: STATUS_TEXT[expired ? 'expired' : r.status] };
   }
 
-  function canStart(user, key) {
+  function canStart(user, key, { formative = false } = {}) {
     const cfg = config();
     if (stOf(user).active && Date.parse(stOf(user).active.expires_at) <= now().getTime()) { publicAttempt(stOf(user).active); submit(user, stOf(user).active.id, {}); }
     const st = stOf(user);
     if (!isLearner(user)) return { error: 'Assessments are for learner accounts.', status: 403 };
     if (st.active && Date.parse(st.active.expires_at) > now().getTime()) return { error: 'Finish or submit your current assessment first.', status: 409, active: { id: st.active.id, key: st.active.key } };
     const last = [...st.attempts].reverse().find((a) => a.key === key);
-    if (last) {
+    if (last && !formative) {
       const limited = key.startsWith('subtrack:') && assessmentStatus(key.slice(9)).retakes === 'limited';
       const waitMs = limited ? cfg.limited_retake_days * 86400e3 : cfg.retake_hours * 3600e3;
       const at = Date.parse(last.submitted_at) + waitMs;
@@ -312,17 +313,20 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     const status = assessmentStatus(subtrackId);
     if (status.state !== 'published') return { error: 'This assessment is not available yet.', status: 409 };
     const block = canStart(user, 'subtrack:' + subtrackId); if (block) return block;
+    const remediate = learning.required(user, subtrackId);
+    if (remediate.length) return { error: 'Review the recommended lessons and pass their module checkpoints before this reassessment.', status: 409, remediation: remediate };
     const cfg = config(), pool = eligible(subtrackId, ['published']).map((q) => ({ ...q, compKey: q.comp }));
     const comps = competencies(s).map((c) => ({ key: c.rel, critical: c.critical }));
     const form = assemble(pool, { n: cfg.items, mix: cfg.mix, scenarioShare: cfg.scenario_share, seen: seenIds(user, new Set(pool.map((q) => q.id))), seed: crypto.randomInt(1, 2 ** 31), comps, criticalMin: cfg.critical_min_items });
-    return begin(user, { key: 'subtrack:' + subtrackId, title: `${s.title}: comprehensive assessment`, minutes: cfg.minutes, form, assessment_version: status.version });
+    return begin(user, { key: 'subtrack:' + subtrackId, title: `${s.title}: comprehensive assessment`, minutes: cfg.minutes, form, assessment_version: status.version, learning_context: learning.published(subtrackId) ? { version: learning.published(subtrackId).version } : null });
   }
-  function begin(user, { key, title, minutes, form, assessment_version }) {
+  function begin(user, { key, title, minutes, form, assessment_version, formative = null, learning_context = null }) {
     const rand = rng(crypto.randomInt(1, 2 ** 31));
     const items = form.map((q) => ({ id: q.id, subtrack: q.subtrack, version: q.version || 1, order: shuffle([0, 1, 2, 3], rand), choices: [0, 1, 2, 3].map(() => crypto.randomBytes(12).toString('hex')) }));
     const st = stOf(user);
     const attempt = { id: 'sta_' + crypto.randomBytes(8).toString('hex'), key, title, items, started_at: iso(), expires_at: new Date(now().getTime() + minutes * 60e3).toISOString(),
-      rules: JSON.parse(JSON.stringify(config())), config_version: config().version, assessment_version: assessment_version || null, answers: {} };
+      rules: JSON.parse(JSON.stringify({ ...config(), ...(formative ? { pass_overall: formative.pass_mark, critical_min: formative.pass_mark, critical_min_items: 1 } : {}) })), config_version: config().version, assessment_version: assessment_version || null, answers: {},
+      ...(formative ? { formative, question_snapshot: JSON.parse(JSON.stringify(form)) } : {}), ...(learning_context ? { learning_context } : {}) };
     writeSt(user, { ...st, active: attempt });
     return { attempt: publicAttempt(attempt) };
   }
@@ -330,7 +334,7 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     // Upgrade a persisted pre-fix attempt without losing its saved answers.
     for (const it of a.items) if (!it.choices) { it.choices = [0, 1, 2, 3].map(() => crypto.randomBytes(12).toString('hex')); if (a.answers?.[it.id] != null) a.answers[it.id] = it.choices[Number(a.answers[it.id])]; save(); }
     return { id: a.id, key: a.key, title: a.title, started_at: a.started_at, expires_at: a.expires_at, answers: a.answers || {},
-      questions: a.items.map((it) => { const q = questionAt(it.subtrack, it.id, it.version); return q ? publicQ(q, it.order, it.choices) : null; }).filter(Boolean) };
+      questions: a.items.map((it) => { const q = a.question_snapshot?.find(q => q.id === it.id) || questionAt(it.subtrack, it.id, it.version); return q ? publicQ(q, it.order, it.choices) : null; }).filter(Boolean) };
   }
   /** The exact question version a student saw (edits keep history). */
   function questionAt(subtrackId, id, version) {
@@ -361,12 +365,13 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     const given = late ? (a.answers || {}) : { ...(a.answers || {}), ...Object.fromEntries(Object.entries(answers || {}).map(([k, v]) => [k, String(v)])) };
     const cfg = a.rules || config(), responses = [];
     for (const it of a.items) {
-      const q = questionAt(it.subtrack, it.id, it.version); if (!q) continue;
+      const q = a.question_snapshot?.find(q => q.id === it.id) || questionAt(it.subtrack, it.id, it.version); if (!q) continue;
       const selected = given[it.id], pick = it.choices ? it.choices.indexOf(selected) : -1, answered = pick >= 0, correct = answered && pick === q.answer;
       responses.push({ id: q.id, subtrack: it.subtrack, version: it.version, comp: q.comp, difficulty: q.difficulty, scenario: !!q.scenario, answered, correct, pick: answered ? pick : null, weight: cfg.weights[q.difficulty] || 1 });
     }
     const result = score(a.key, responses, cfg);
-    const attempt = { id: a.id, key: a.key, title: a.title, items: a.items, started_at: a.started_at, submitted_at: iso(), timed_out: late, config_version: a.config_version, assessment_version: a.assessment_version, responses, result };
+    if (a.formative && result.overall >= cfg.pass_overall && result.unassessed.length) { result.outcome = 'further_evidence_required'; result.outcome_label = STATUS_TEXT.further_evidence_required; }
+    const attempt = { id: a.id, key: a.key, title: a.title, items: a.items, started_at: a.started_at, submitted_at: iso(), timed_out: late, config_version: a.config_version, assessment_version: a.assessment_version, responses, result, ...(a.formative ? { formative: a.formative, question_snapshot: a.question_snapshot } : {}), ...(a.learning_context ? { learning_context: a.learning_context } : {}) };
     const results = { ...st.results };
     if (a.key.startsWith('subtrack:')) {
       const sid = a.key.slice(9), prev = results[sid] || {};
@@ -422,7 +427,7 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
   /** What students see after submitting. Learning areas name real planned modules; lessons are marked as in preparation. */
   function publicResult(a) {
     const r = a.result, cfg = { critical_min: r.critical_min };
-    const weakComps = Object.entries(r.competencies).filter(([k, v]) => (v.score ?? 0) < cfg.critical_min || r.critical_gaps.includes(k)).map(([k]) => k);
+    const weakComps = [...new Set([...r.unassessed, ...Object.entries(r.competencies).filter(([k, v]) => (v.score ?? 0) < cfg.critical_min || r.critical_gaps.includes(k)).map(([k]) => k)])];
     const weakMods = [...new Set([...weakComps, ...r.critical_gaps, ...r.unassessed].map((k) => C.competency(k)?.module).filter(Boolean))];
     const describe = (k) => { const c = C.competency(k); const s = c && subtrack(c.subtrack); const m = s && s.modules.find((x) => x.id === c.module); return c ? { id: k, text: c.competency.text, critical: c.competency.critical, module: m?.title, subtrack: s?.title, ...(r.competencies[k] ? { score: r.competencies[k].score, answered: r.competencies[k].answered, items: r.competencies[k].items } : { score: null, answered: 0, items: 0 }) } : null; };
     return {
@@ -433,8 +438,11 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
       competencies: Object.keys(r.competencies).map(describe).filter(Boolean),
       strongest: r.strongest.map(describe).filter(Boolean), weakest: r.weakest.map(describe).filter(Boolean),
       critical_gaps: r.critical_gaps.map(describe).filter(Boolean), unassessed: r.unassessed.map(describe).filter(Boolean),
-      learning_areas: weakMods.map((mid) => { const s = C.SUBTRACKS.find((x) => x.modules.some((m) => m.id === mid)), m = s.modules.find((x) => x.id === mid); return { module: m.title, subtrack: s.title, objectives: m.objectives.map((o) => o.text), content: 'Learning content in preparation' }; }),
-      note: 'This shows the knowledge measured by this quiz. It is not proof of professional coding ability or job readiness.',
+      learning_areas: weakMods.map((mid) => { const s = C.SUBTRACKS.find((x) => x.modules.some((m) => m.id === mid)), m = s.modules.find((x) => x.id === mid); return { module: m.title, subtrack: s.title, objectives: m.objectives.map((o) => o.text), content: learning.recommendations(weakComps).some(l => l.module === mid) ? 'Published lessons available' : 'Learning content in preparation', lessons: learning.recommendations(weakComps).filter(l => l.module === mid) }; }),
+      formative: a.formative || null,
+      feedback: a.formative ? a.responses.map(res => { const q = a.question_snapshot.find(q => q.id === res.id); return { id:q.id, prompt:q.prompt, correct:res.correct, answered:res.answered, correct_answer:q.options[q.answer], explanation:q.explanation, objective:q.objective }; }) : undefined,
+      next_learning: a.formative ? learning.progress(null, a.formative.subtrack).available ? '#learn/' + a.formative.subtrack : '#sub/' + a.formative.subtrack : null,
+      note: a.formative ? 'Formative practice feedback. This result records learning progress only; it is not comprehensive mastery evidence.' : 'This shows the knowledge measured by this quiz. It is not proof of professional coding ability or job readiness.',
     };
   }
   /**
@@ -445,8 +453,8 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
    */
   function attemptReview(user, attemptId) {
     const a = stOf(user).attempts.find((x) => x.id === attemptId); if (!a) return null;
-    return a.responses.map((r) => { const q = questionAt(r.subtrack, r.id, r.version); if (!q) return null; const c = C.competency(`${r.subtrack}.${r.comp}`);
-      return { id: q.id, prompt: q.prompt, code: q.code, correct: r.correct, answered: r.answered, difficulty: q.difficulty, scenario: !!q.scenario, competency: c?.competency.text || r.comp, explanation: r.correct ? q.explanation : null }; }).filter(Boolean);
+    return a.responses.map((r) => { const q = a.question_snapshot?.find(q => q.id === r.id) || questionAt(r.subtrack, r.id, r.version); if (!q) return null; const c = C.competency(`${r.subtrack}.${r.comp}`);
+      return { id: q.id, prompt: q.prompt, code: q.code, correct: r.correct, answered: r.answered, difficulty: q.difficulty, scenario: !!q.scenario, competency: c?.competency.text || r.comp, explanation: a.formative || r.correct ? q.explanation : null }; }).filter(Boolean);
   }
   function history(user, subtrackId) { return stOf(user).attempts.filter((a) => !subtrackId || a.key === 'subtrack:' + subtrackId || a.key === subtrackId).map(publicResult).reverse(); }
 
@@ -500,7 +508,8 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     return {
       id, title: s.title, description: s.description, level: s.level, depth: s.depth, hours: s.hours, kind: s.kind, structure_status: s.structure_status,
       prereq: s.prereq.map((p) => ({ id: p, title: subtrack(p)?.title, student: user ? resultFor(user, p) : null })),
-      modules: s.modules.map((m) => ({ id: m.id, title: m.title, objectives: m.objectives.map((o) => ({ id: o.id, text: o.text, critical: o.critical })), content: 'Learning content in preparation' })),
+      modules: s.modules.map((m) => ({ id: m.id, title: m.title, objectives: m.objectives.map((o) => ({ id: o.id, text: o.text, critical: o.critical })), content: learning.published(id) ? 'Published lessons available' : 'Learning content in preparation' })),
+      learning: learning.summary(user, id),
       tracks: u.tracks, roles: u.roles.map((x) => ({ ...x, title: C.role(x.id)?.title })),
       assessment: { ...a, items: cfg.items, minutes: cfg.minutes, pass_mark: cfg.pass_overall, critical_min: cfg.critical_min, mix: cfg.mix, scenario_share: cfg.scenario_share },
       student: user ? { ...resultFor(user, id), attempts_list: history(user, id).slice(0, 10) } : null,
@@ -546,7 +555,7 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     const subs = path.map((id) => subtrackSummary(user, id)), passed = subs.filter((s) => s.student.status === 'passed');
     const next = subs.find((s) => s.student.status !== 'passed' && s.assessment.state === 'published') || subs.find((s) => s.student.status !== 'passed');
     return { target: target ? { id: target.id, title: target.title, track: target.track, readiness: roleReadiness(user, target) } : null,
-      subtracks: subs, passed: passed.length, required: subs.length, learning_completion: null,
+      subtracks: subs, passed: passed.length, required: subs.length, learning_completion: null, learning: learning.dashboard(user, path),
       active: resume(user).attempt ? { id: stOf(user).active.id, title: stOf(user).active.title, href: '#stake' } : null,
       next: next ? { id: next.id, title: next.title, href: '#sub/' + next.id, available: next.assessment.state === 'published' } : null,
       recent: stOf(user).attempts.slice(-5).reverse().map(publicResult), competencies: sharedSkills(user), assessed_competencies: sharedSkills(user).filter((s) => s.proficiency).length };
@@ -596,8 +605,10 @@ function createCurriculumService(core, { extraBanks = {} } = {}) {
     return { questions: form, by_difficulty: by((q) => q.difficulty), scenario: form.filter((q) => q.scenario).length, competencies: by((q) => q.comp) };
   }
 
+  const learning = createLearning({ settings, save, career, writeCareer, isLearner, iso, audit, subtrack, assessmentStatus, begin, canStart, stOf, writeSt, shuffle, rng, assemble, resultFor, questions, roleFinalStatus: roleAssessmentStatus, lookupCourse: core.lookupCourse, allRoles, rolePath });
+
   return {
-    READINESS_LABEL, config, updateConfig, subtrack, role, allRoles, rolePath, updateStructure,
+    learning, READINESS_LABEL, config, updateConfig, subtrack, role, allRoles, rolePath, updateStructure,
     questions, questionById, setQuestionStatus, editQuestion, importQuestions, coverage, assessmentStatus, publishAssessment, unpublishAssessment,
     startSubtrack, startRole, resume, saveAnswers, submit, attemptReview, history, resultFor,
     trackView, subtrackView, roleView, roleReadiness, sharedSkills, progress, setTarget, qaDashboard, adminQuestions, previewForm, itemStats, quota,

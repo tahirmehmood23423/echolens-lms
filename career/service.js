@@ -822,7 +822,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
   /** A learner's discovery record, and whether to show the welcome automatically (only to people with no career activity yet). */
   function discoveryState(user) {
     const c = career(user), d = c.discovery;
-    const busy = !!(c.preferences || c.attempts.length || (c.enrollments || []).length || c.st?.attempts?.length ||
+    const busy = !!(c.preferences || c.attempts.length || (c.enrollments || []).length || c.st?.attempts?.length || Object.keys(c.st?.learning || {}).length ||
       user.profile?.free_course_enrollments?.length || (data().enrollments || []).some(e => e.user_id === user.id) ||
       (data().open_submissions || []).some(e => e.user_id === user.id));
     return { enabled: discoveryConfig().enabled !== false, show_welcome: discoveryConfig().enabled !== false && isLearner(user) && !d && !busy,
@@ -1155,11 +1155,12 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     for (const e of c.role_history) add('career', e.title ? 'Target role: ' + e.title : 'Target role cleared', e.at, e.id ? '#role/' + e.id : '#me');
     const rewards = store.gamifyFor?.(user) || null;
     for (const e of rewards?.recent_events || []) add('achievement', e.note || e.label || e.reason || e.title || 'Learning reward', e.at || e.created_at, '/open#profile');
-    const cur = r.curriculum, next = cur?.next, unfinished = courses.find(e => !e.completed && e.resume) || portalCourses.find(e => !e.completed && e.in_progress) || null;
+    const cur = r.curriculum, next = cur?.next, unfinished = cur.learning?.resume ? { title: cur.learning.courses.find(p=>p.subtrack===cur.learning.resume.subtrack)?.title || 'Career learning', next_lesson: cur.learning.resume.title, resume: cur.learning.resume.href } : courses.find(e => !e.completed && e.resume) || portalCourses.find(e => !e.completed && e.in_progress) || null;
     let action;
     if (!rm.primary) action = { label: 'Discover Your Career', href: '#discover', reason: 'Choose a direction, or keep exploring your courses below.' };
     else if (!cur.target) action = { label: 'Choose Your Target Job Role', href: '#path/' + rm.primary.track, reason: 'Your role defines the required skill checkpoints.' };
     else if (cur.active || r.active) action = { label: 'Continue Assessment', href: cur.active?.href || '#take', reason: 'Your saved assessment is ready to resume.' };
+    else if (cur.learning?.resume && c.st?.attempts?.some(a => a.key.startsWith('subtrack:') && a.result.outcome !== 'passed')) action = { label: 'Study Your Recommended Topics', href: cur.learning.resume.href, reason: 'Published lessons and module checkpoints target the competencies needing more evidence.' };
     else if (!cur.assessed_competencies && !c.attempts.some(a => a.status === 'submitted' && a.result.answered > 0) && next?.available) action = { label: 'Assess Your Current Skills', href: next.href, reason: 'Start with a published knowledge checkpoint. Unassessed skills have no score.' };
     else {
       const gap = r.gaps.find(g => g.evidence === 'sufficient' && g.score != null && g.score < 70 && g.resources?.some(x => !x.completed));
@@ -1192,7 +1193,7 @@ function createCareerService(store, { now = () => new Date(), aiSuggest = null, 
     return curriculumService.setTarget(user, id);
   }
 
-  const curriculumService = createCurriculumService({ settings, save, career, writeCareer, isLearner, iso, now, audit, users: () => data().users || [] }, curriculumOptions);
+  const curriculumService = createCurriculumService({ settings, save, career, writeCareer, isLearner, iso, now, audit, users: () => data().users || [], lookupCourse: key => store.Quests.trackDef(key) }, curriculumOptions);
   return {
     BANKS, LANGS, PREF_FIELDS, REVIEWER_ROLES, config, updateConfig, categoryWeights, reviewQueue, suggestReview, submitReview, isReviewer, questions, published, questionById, setQuestionStatus, editQuestion, addQuestion,
     track, tracks, updateTrack, publicTrack, assessmentDef, coverage, availability, career, savePreferences, startAttempt, resumeAttempt, saveAnswers,

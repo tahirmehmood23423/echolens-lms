@@ -37,6 +37,17 @@ data.quests.push({ id: 1, batch_id: batch.id, track_key: 'fc01-c-basics', no: 1,
 data.seq.quests = 1;
 data.quest_submissions.push({ id: 1, quest_id: 1, pid: 1, user_id: 5, grade: 90, gems: 90, submitted_at: '2026-09-15 12:00:00' });
 data.seq.quest_submissions = 1;
+if (process.env.ECHOLENS_TEST_LEARNING === '1') {
+  // Synthetic approval solely to exercise published flows in this disposable DB.
+  // The repository draft and every production environment remain unapproved.
+  const cur = require('../../career/service').createCareerService(store).curriculum;
+  cur.updateConfig({ retake_hours: 0 }, 1);
+  const L = cur.learning;
+  for (const action of ['review','approve','publish']) {
+    const out = L.transition('python-fundamentals', action, { attest_human_review:true, notes:'Synthetic QA attestation for isolated end-to-end testing only; production content still requires actual human review.' }, 1);
+    if (out.error) throw Error(out.error);
+  }
+}
 if (process.env.ECHOLENS_TEST_ONBOARDING === '1') {
   // The browser suite tests real signup; DNS is the only simulated boundary.
   require('node:dns').promises.resolveMx = async () => [{ exchange: 'synthetic.invalid', priority: 10 }];

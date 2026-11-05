@@ -1,0 +1,290 @@
+{
+  "human_approved": false,
+  "published": false,
+  "courses": [
+    {
+      "id": "python-fundamentals",
+      "version": 1,
+      "course_hash": "b1e6a8f635c8802a4b1bd6cb81cbdd49e3e5c9f8efb710dd33e9dfcc618935c5",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "py-arithmetic",
+          "code_hash": "89f14d9fb9c05c7fa571c219c983ce2615b754db27f26c02ffb160be83f6b9c8",
+          "ran": true,
+          "ok": true,
+          "output": "3 2 4"
+        },
+        {
+          "id": "py-strings",
+          "code_hash": "a7c60c64dc8781a6e888d31c2dbe4b7cc8576951960bd7a22e91ccf644216360",
+          "ran": true,
+          "ok": true,
+          "output": "ENR: 0042\nenr-0042\nFalse"
+        },
+        {
+          "id": "py-conversions",
+          "code_hash": "283f09124a1c8808f9079e140ed1af8334d372e0699b72e469d3223c4c4f01b3",
+          "ran": true,
+          "ok": true,
+          "output": "12\nEnter a whole number\nEnter a positive count\nTrue"
+        },
+        {
+          "id": "py-collections",
+          "code_hash": "152c81805e6ebcbb11a7acedb4204db3ba98273f87a9963817a7726319a543ae",
+          "ran": true,
+          "ok": true,
+          "output": "[102, 103]\n30\nTrue"
+        },
+        {
+          "id": "py-mutation",
+          "code_hash": "da42e16b80c8fa0fb01cf6edd978bb6f7062916a112f127425a8e8bc15e5b109",
+          "ran": true,
+          "ok": true,
+          "output": "open\nreviewed\nFalse"
+        },
+        {
+          "id": "py-comprehensions",
+          "code_hash": "32c8465ce1db59822dce9a2af73039a0f7ea4fb540f31c27bb5116b6fd450363",
+          "ran": true,
+          "ok": true,
+          "output": "['a1']\n{'A1': 3}"
+        },
+        {
+          "id": "py-control-flow",
+          "code_hash": "214c99ab5a92ae1d772364b35dcc845b0e0bb81c442f54845eaaacc5aa608442",
+          "ran": true,
+          "ok": true,
+          "output": "5"
+        },
+        {
+          "id": "py-functions",
+          "code_hash": "f946ba4d0b72d22f328b2908255beb03e2a041c2d3e26893386a4b74a436d935",
+          "ran": true,
+          "ok": true,
+          "output": "45\n10"
+        },
+        {
+          "id": "py-scope",
+          "code_hash": "24a1bfed1ba5f9f4e4f089d4b9ff33ee99c407819ef232e7ef733bd68308b09b",
+          "ran": true,
+          "ok": true,
+          "output": "['A']\n['B']\n['C']"
+        },
+        {
+          "id": "py-exceptions",
+          "code_hash": "e572ae6b677e615ee335c7bd533eafce41b637d2dbf1acc0ea047fc1f25b35d7",
+          "ran": true,
+          "ok": true,
+          "output": "Parsed 3\nImport step finished\nInvalid count\nImport step finished"
+        },
+        {
+          "id": "py-files",
+          "code_hash": "0b002537d60475dbbb04a0df989344799e17d8373a248e283dabb531888d68b5",
+          "ran": true,
+          "ok": true,
+          "output": "Learner, One\n2\nstr"
+        },
+        {
+          "id": "py-modules",
+          "code_hash": "849922ec47fe0378353617b9937a618fbcf9f9a454108a74705354be2047cd55",
+          "ran": true,
+          "ok": true,
+          "output": "20\n[('login', 2), ('billing', 1)]"
+        },
+        {
+          "id": "py-arithmetic.q2",
+          "code_hash": "e7e3e1bc5b6b8eba07e4c22b901b42b2758a9c22d5ff97820ff84c5ef4434328",
+          "ran": true,
+          "ok": true,
+          "output": "-3"
+        },
+        {
+          "id": "py-arithmetic.q5",
+          "code_hash": "2c6632970e68606dc1a879ab963177816d4d823d2008fcab366cfe48359beba8",
+          "ran": true,
+          "ok": true,
+          "output": "2.0"
+        },
+        {
+          "id": "py-strings.q1",
+          "code_hash": "f5d740130875a0267a755f9fa9870bacebe3232c76d8136639b49f6b5d1a06de",
+          "ran": true,
+          "ok": true,
+          "output": "0042"
+        },
+        {
+          "id": "py-strings.q4",
+          "code_hash": "b01a939323aafef84148e2714db55bf1f684182ff4066689e00c23c595ca01a2",
+          "ran": true,
+          "ok": true,
+          "output": "RDE"
+        },
+        {
+          "id": "py-conversions.q1",
+          "code_hash": "8d4f8bb026a25f3e2df6d0722496ce3b0aa571d7aa30fde719714a17792086f2",
+          "ran": true,
+          "ok": true,
+          "output": "True"
+        },
+        {
+          "id": "py-conversions.q4",
+          "code_hash": "79a34bd3b07b729266215a426ead76df843b045d8ae8bd38a13f9235f9f99eb8",
+          "ran": true,
+          "ok": true,
+          "output": "-2"
+        },
+        {
+          "id": "py-mutation.q1",
+          "code_hash": "ebd7e06913090af2e899b051be1de3470b88559c56a786cf6b5900814a4792c7",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2]"
+        },
+        {
+          "id": "py-mutation.q2",
+          "code_hash": "1fd8093094ef440f2642966efe902692123de97a1a8b42ae31158f4cd50db636",
+          "ran": true,
+          "ok": true,
+          "output": "None"
+        },
+        {
+          "id": "py-mutation.q6",
+          "code_hash": "627315cba3273f663f9297d778a14299b4c2321cf4e382085ad61b84cca75252",
+          "ran": true,
+          "ok": true,
+          "output": "[1]"
+        },
+        {
+          "id": "py-comprehensions.q1",
+          "code_hash": "b50bd63bf43a61ea96a37d30ab9b41e86ef149660fabc1d69c6f5ff848715c04",
+          "ran": true,
+          "ok": true,
+          "output": "[4, 6]"
+        },
+        {
+          "id": "py-control-flow.q4",
+          "code_hash": "924fa0a57ad6e52118ea02071cf572e778cd613b96b2e0140bfcf5090f2eb251",
+          "ran": true,
+          "ok": true,
+          "output": "4"
+        },
+        {
+          "id": "py-control-flow.q5",
+          "code_hash": "a88bc60787fed17caf4bee9b4136ba423f231ab06b5b49cdf7f706de70ca1099",
+          "ran": true,
+          "ok": true,
+          "output": "2"
+        },
+        {
+          "id": "py-functions.q2",
+          "code_hash": "88f7d28a679885fd380680344b51acaad1fa3bf2434ee5d885d5d4f235e77d1d",
+          "ran": true,
+          "ok": true,
+          "output": "7"
+        },
+        {
+          "id": "py-scope.q1",
+          "code_hash": "0d01c70503978b67126f7c828d66a3b7bf4683da666ac92baebce19191b4c67b",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2]"
+        },
+        {
+          "id": "py-scope.q5",
+          "code_hash": "e0c26614d5c99bdc6b094e4b16f2773c0bcfe6c0b8f81c2259796025d54d8f27",
+          "ran": true,
+          "ok": true,
+          "output": "[2, 2, 2]"
+        },
+        {
+          "id": "py-exceptions.q4",
+          "code_hash": "3775411b6328658288cf9969ba82f6cb9d39484bc7a9966061922637baf1f433",
+          "ran": true,
+          "ok": true,
+          "output": "invalid\ndone"
+        },
+        {
+          "id": "py-files.q5",
+          "code_hash": "8bde8939d111ff716cf0eac28ee634421f5e2e254b3e168b9a95154167bb1fbf",
+          "ran": true,
+          "ok": true,
+          "output": "str"
+        },
+        {
+          "id": "py-modules.q4",
+          "code_hash": "e6d517ca0eca34e6dba33e0187f3b0f461bd1dd374ff62201250124438d3e9f8",
+          "ran": true,
+          "ok": true,
+          "output": "2"
+        }
+      ],
+      "objectives": 12,
+      "covered": 12,
+      "lessons": 12,
+      "questions": 72,
+      "human_approved": false
+    }
+  ],
+  "official_source": {
+    "repository": "https://github.com/python/cpython",
+    "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+    "references": [
+      {
+        "id": "introduction",
+        "path": "Doc/tutorial/introduction.rst",
+        "sha256": "44868375a1505a1d23d2915527fa8941632ccaaf8e6e090d7a3009df73b90d9e",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "controlflow",
+        "path": "Doc/tutorial/controlflow.rst",
+        "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "datastructures",
+        "path": "Doc/tutorial/datastructures.rst",
+        "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "errors",
+        "path": "Doc/tutorial/errors.rst",
+        "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "inputoutput",
+        "path": "Doc/tutorial/inputoutput.rst",
+        "sha256": "210f867a77f007c622ca3b268c0962fb49550adec8bedea5f7bb2926a6443795",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "modules",
+        "path": "Doc/tutorial/modules.rst",
+        "sha256": "acae97e5bf4e6393c903ac452c55c610cb1992c150a150785b9aadc87b9a420b",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "functions",
+        "path": "Doc/tutorial/controlflow.rst",
+        "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "types",
+        "path": "Doc/reference/datamodel.rst",
+        "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "csv",
+        "path": "Doc/library/csv.rst",
+        "sha256": "2ebad38f5e1dc4387fa90cbeb105ce1709a8c8ef40a8f9a074930aa9e8c46d21",
+        "checked_by": "official Git object and path inspection"
+      }
+    ]
+  }
+}

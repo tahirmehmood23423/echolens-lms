@@ -33,8 +33,9 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
     next();
   });
   const me = (req) => store.Users.byId(req.user.id);
-  const send = (res, out, ok = (o) => o) => (out && out.error ? res.status(out.status || 400).json({ error: out.error, ...(out.retry_at ? { retry_at: out.retry_at } : {}), ...(out.active ? { active: out.active } : {}), ...(out.reuse ? { reuse: true } : {}) }) : res.json(ok(out)));
+  const send = (res, out, ok = (o) => o) => (out && out.error ? res.status(out.status || 400).json({ error: out.error, ...(out.retry_at ? { retry_at: out.retry_at } : {}), ...(out.active ? { active: out.active } : {}), ...(out.reuse ? { reuse: true } : {}), ...(out.validation ? { validation: out.validation } : {}), ...(out.remediation ? { remediation: out.remediation } : {}) }) : res.json(ok(out)));
   const limitStart = rateLimit ? rateLimit('career-start', { max: 20, windowMs: 60 * 60 * 1000, message: 'Too many assessments started from this network. Please try again later.' }) : (q, s, n) => n();
+  const limitLearning = rateLimit ? rateLimit('career-learning-practice', { max: 300, windowMs: 60 * 60 * 1000, message: 'Too many practice quizzes started. Please pause and retry later.' }) : (q,s,n) => n();
   const limitSave = rateLimit ? rateLimit('career-save', { max: 600, windowMs: 60 * 60 * 1000, message: 'Too many saves. Please slow down.' }) : (q, s, n) => n();
 
   /* ------------------------------- public ------------------------------- */
@@ -110,6 +111,10 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   r.get('/career/curriculum/roles/:id', (req, res) => { const v = cur.roleView(who(req), req.params.id); v ? res.json(v) : nf(res, 'Job role'); });
   r.post('/career/me/st/subtracks/:id/start', authRequired, limitStart, (req, res) => send(res, cur.startSubtrack(me(req), req.params.id)));
   r.post('/career/me/st/roles/:id/start', authRequired, limitStart, (req, res) => send(res, cur.startRole(me(req), req.params.id)));
+  r.get('/career/learning/:id', (req, res) => { const v=cur.learning.summary(who(req),req.params.id); v ? res.json(v) : nf(res,'Subtrack'); });
+  r.get('/career/learning/:id/lessons/:lesson', (req,res) => { const v=cur.learning.lesson(who(req),req.params.id,req.params.lesson); v ? res.json(v) : nf(res,'Published lesson'); });
+  r.post('/career/me/learning/:id/lessons/:lesson', authRequired, (req,res) => send(res,cur.learning.visit(me(req),req.params.id,req.params.lesson,req.body?.read===true,req.body?.expected_user_id)));
+  r.post('/career/me/learning/:id/quizzes/:kind/:target', authRequired, limitLearning, (req,res) => send(res,cur.learning.start(me(req),req.params.id,req.params.kind,req.params.target)));
   r.get('/career/me/st/active', authRequired, (req, res) => res.json(cur.resume(me(req))));
   r.put('/career/me/st/attempts/:id/answers', authRequired, limitSave, (req, res) => send(res, cur.saveAnswers(me(req), req.params.id, req.body?.answers)));
   r.post('/career/me/st/attempts/:id/submit', authRequired, (req, res) => send(res, cur.submit(me(req), req.params.id, req.body?.answers)));
@@ -144,6 +149,13 @@ function register(app, { store, authRequired, adminRequired, rateLimit, aiSugges
   r.get('/admin/career/tracks/:slug', admin, (req, res) => { const t = svc.track(req.params.slug); if (!t) return res.status(404).json({ error: 'Track not found.' }); res.json({ track: { ...svc.publicTrack(t), status: t.status } }); });
   r.get('/admin/career/analytics', admin, (req, res) => res.json(svc.analytics()));
   // Curriculum and question-bank QA.
+  r.get('/admin/career/learning', admin, (req,res) => res.json(cur.learning.inventory(store)));
+  r.get('/admin/career/learning/:id', admin, (req,res) => res.json(cur.learning.adminView(req.params.id)));
+  r.put('/admin/career/learning/:id', admin, (req,res) => send(res,cur.learning.updateDraft(req.params.id,req.body,req.user.id)));
+  r.post('/admin/career/learning/:id/:action', admin, (req,res) => send(res,cur.learning.transition(req.params.id,req.params.action,req.body,req.user.id)));
+  r.get('/admin/career/learning/:id/versions/:version', admin, (req,res) => {const v=cur.learning.revision(req.params.id,req.params.version);v?res.json(v):nf(res,'Content version');});
+  r.get('/admin/career/learning/:id/preview', admin, (req,res) => {const v=cur.learning.summary(null,req.params.id,true);v?res.json(v):nf(res,'Subtrack');});
+  r.get('/admin/career/learning/:id/lessons/:lesson', admin, (req,res) => {const v=cur.learning.lesson(null,req.params.id,req.params.lesson,true);v?res.json(v):nf(res,'Draft lesson');});
   r.get('/admin/career/curriculum', admin, (req, res) => res.json({ ...cur.qaDashboard(), config: cur.config() }));
   r.put('/admin/career/curriculum/config', admin, (req, res) => send(res, cur.updateConfig(req.body || {}, req.user.id)));
   r.put('/admin/career/curriculum/structure', admin, (req, res) => send(res, cur.updateStructure(req.body || {}, req.user.id)));

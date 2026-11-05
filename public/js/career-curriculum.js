@@ -89,13 +89,13 @@
     const a = s.assessment, st = s.student, last = st?.attempts_list?.[0];
     const crit = s.modules.reduce((n, m) => n + m.objectives.filter((o) => o.critical).length, 0);
     let action = '';
-    if (a.state === 'published') action = ctx.learner() ? `<button class="cr-btn" id="cuStart">${st && st.attempts ? 'Retake the assessment' : 'Take assessment'}</button>`
+    if (a.state === 'published') action = ctx.learner() ? `<button class="cr-btn" id="cuStart">${st && st.attempts ? 'Retake the assessment' : 'I Already Know This: Take the Final Quiz'}</button>`
       : ctx.ME ? '<p class="cr-small cr-muted">Assessments are for learner accounts.</p>' : `<a class="cr-btn" href="${ctx.loginUrl()}">Sign in to take the assessment</a>`;
     ctx.root.innerHTML = `${ctx.tabs('tracks')}
       <nav class="cu-crumbs" aria-label="Breadcrumb"><a href="#tracks">Career tracks</a>${s.tracks[0] ? `<span aria-hidden="true">›</span><a href="#path/${esc(s.tracks[0])}">Roles and subtracks</a>` : ''}<span aria-hidden="true">›</span><span>${esc(s.title)}</span></nav>
       <section class="cu-head"><h1>${esc(s.title)}</h1><p>${esc(s.description)}</p>
         <div class="cr-tags"><span class="cr-tag teal">${esc(LEVEL[s.level])}</span><span class="cr-tag">${esc(DEPTH[s.depth])}</span><span class="cr-tag">About ${esc(s.hours)} hours</span><span class="cr-tag">${s.modules.length} modules</span></div></section>
-      <div class="cx-choices"><section class="cx-choice"><span class="cx-eyebrow">Show what you know</span><h2>I already know this</h2><p>Demonstrate your knowledge with a comprehensive assessment. Results count toward every role that needs this subtrack.</p>${action || `<p class="cx-unavailable">${esc(a.label)}. Your learning plan is available below.</p>`}<p id="cuMsg" role="alert" class="cu-err"></p></section><section class="cx-choice"><span class="cx-eyebrow">Build your foundation</span><h2>Start learning from the beginning</h2><p>Explore the planned modules and the skills you will develop, at your own pace.</p><a class="cr-btn ghost" href="#cuModules" id="cuOutline">Explore the learning outline</a><p class="cx-unavailable">Learning content in preparation. Lessons are not available yet.</p></section></div>
+      <div class="cx-choices"><section class="cx-choice"><span class="cx-eyebrow">Show what you know</span><h2>I already know this</h2><p>Demonstrate your knowledge with a comprehensive assessment. Results count toward every role that needs this subtrack.</p>${action || `<p class="cx-unavailable">${esc(a.label)}. Your learning plan is available below.</p>`}<p id="cuMsg" role="alert" class="cu-err"></p></section><section class="cx-choice"><span class="cx-eyebrow">Build your foundation</span><h2>Start learning from the beginning</h2><p>Explore the modules and the skills you will develop, at your own pace.</p>${s.learning?.available ? `<a class="cr-btn" href="#learn/${esc(id)}">Start Learning</a><p class="cr-small">${s.learning.progress.completed} / ${s.learning.progress.total} lessons completed through learning. Comprehensive mastery is recorded separately.</p>` : ''}<a class="cr-btn ghost" href="#cuModules" id="cuOutline">Explore the learning outline</a>${s.learning?.available ? '<p>Written lessons, practice quizzes and module checkpoints are available.</p>' : '<p class="cx-unavailable">Learning content in preparation. Lessons are not available yet.</p>'}</section></div>
       <div class="cr-cols"><div>
         ${s.prereq.length ? `<h2>Before you start</h2><div class="cu-list">${s.prereq.map((p) => `<a class="cu-sub" href="#sub/${esc(p.id)}"><span class="cu-sub-main"><b>${esc(p.title)}</b></span><span class="cu-sub-side">${p.student ? studentPill(p.student) : ''}</span></a>`).join('')}</div>` : ''}
         <h2 id="cuModules" tabindex="-1">Modules and competencies</h2>
@@ -201,12 +201,13 @@
   window.addEventListener('online', () => { if (ATT && ACTIVE_CTX && SAVE_ERROR) saveProgress(ACTIVE_CTX); });
   window.addEventListener('beforeunload', e => { if (ATT && (SAVE_ERROR || SAVING || SAVE_STATE !== 'All changes saved')) { e.preventDefault(); e.returnValue = ''; } });
   async function submit(ctx) {
-    clearTimeout(SAVE); clearInterval(TICK); const a = ATT; if (!a) return;
+    clearTimeout(SAVE); clearInterval(TICK); const a = ATT; if (!a) return; const owner = ctx.ME.id;
     const btn = document.getElementById('cuSubmit'); if (btn) btn.disabled = true;
     try {
       if (SAVING) await SAVING.catch(() => {});
       const out = await ctx.api(`/api/career/me/st/attempts/${a.id}/submit`, { method: 'POST', body: { answers: a.answers } });
       try { sessionStorage.removeItem(draftKey(ctx, a)); localStorage.removeItem(`elCareerFlags:${ctx.ME.id}:${a.id}`); } catch {}
+      if (ctx.ME?.id !== owner) return;
       ATT = null; RESULT = out.result; document.body.classList.remove('career-exam'); location.hash = '#sres/' + out.result.id;
     } catch (e) { if (btn) btn.disabled = false; const m = document.getElementById('cuTakeMsg'); if (m) m.textContent = `${e.message} Your answers are still in this browser. Try submitting again.`; }
   }
@@ -218,6 +219,7 @@
     let r = RESULT && RESULT.id === id ? RESULT : null;
     if (!r) r = (await ctx.api('/api/career/me/st/history')).attempts.find((x) => x.id === id);
     if (!r) { ctx.root.innerHTML = `${ctx.tabs('')}<p class="cr-err" role="alert">That result was not found.</p>`; return; }
+    if (r.formative) return CareerLearning.result(ctx, r);
     const review = (await ctx.api(`/api/career/me/st/attempts/${encodeURIComponent(id)}/review`)).review;
     const sub = r.key.startsWith('subtrack:') ? r.key.slice(9) : null;
     const head = { passed: 'You met every assessed requirement', further_evidence_required: 'Strong overall, but a key skill needs more evidence', learning_recommended: 'Some areas need more learning first' }[r.outcome];
@@ -236,7 +238,7 @@
       </div>
       <h2>By competency</h2>
       <div class="cr-panel">${byComp.map((c) => `<div class="cu-row cu-comp"><span>${c.critical ? '<span class="cu-key">Key</span> ' : ''}${esc(c.text)}<small>${esc(c.module)}</small></span>${bar(c.score)}<b>${c.score == null ? 'Not assessed' : c.score + '%'}</b></div>`).join('')}</div>
-      ${r.learning_areas.length ? `<h2>Recommended learning</h2><div class="cu-learn">${r.learning_areas.map((a) => `<div class="cr-panel"><h3>${esc(a.module)}</h3><p class="cr-small cr-muted">${esc(a.subtrack)}</p><ul class="cr-small">${a.objectives.map((o) => `<li>${esc(o)}</li>`).join('')}</ul>${pill(a.content, 'idle')}</div>`).join('')}</div>` : ''}
+      ${r.learning_areas.length ? `<h2>Recommended learning</h2><div class="cu-learn">${r.learning_areas.map((a) => `<div class="cr-panel"><h3>${esc(a.module)}</h3><p class="cr-small cr-muted">${esc(a.subtrack)}</p><ul class="cr-small">${a.objectives.map((o) => `<li>${esc(o)}</li>`).join('')}</ul>${pill(a.content, 'idle')}${(a.lessons||[]).map(l=>`<p><a href="${esc(l.href)}">Study: ${esc(l.title)}</a></p>`).join('')}</div>`).join('')}</div>` : ''}
       <h2>Question review</h2><p class="cr-small cr-muted">Correct answers are not shown, because the same question bank is used for retakes. Explanations appear for questions you answered correctly.</p>
       ${review.map((q, i) => `<div class="cr-review" data-correct="${q.correct ? 1 : 0}"><p class="cr-small"><b>${i + 1}. ${q.correct ? 'Correct' : q.answered ? 'Incorrect' : 'Not answered'}</b> · ${esc(DIFF[q.difficulty])} · ${esc(q.competency)}</p><p>${esc(q.prompt)}</p>${q.explanation ? `<p class="cr-small cr-muted">${esc(q.explanation)}</p>` : ''}</div>`).join('')}
       <div class="cr-actions">${sub ? `<a class="cr-btn" href="#sub/${esc(sub)}">Back to ${esc(r.title.split(':')[0])}</a>` : ''}<a class="cr-btn ghost" href="#tracks">Career tracks</a></div>`;
@@ -251,5 +253,5 @@
     if (view === 'stake') return viewTake(ctx);
     if (view === 'sres') return viewResult(ctx, arg);
   }
-  window.CareerCurriculum = { render, views: ['path', 'role', 'sub', 'stake', 'sres'] };
+  window.CareerCurriculum = { reset: () => { ATT=null; RESULT=null; ACTIVE_CTX=null; clearTimeout(SAVE); clearInterval(TICK); SAVE_ERROR=false; SAVE_STATE='All changes saved'; }, render, views: ['path', 'role', 'sub', 'stake', 'sres'] };
 })();

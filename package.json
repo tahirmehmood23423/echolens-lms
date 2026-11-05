@@ -15,7 +15,11 @@
     "validate:catalogue:release": "node scripts/validate-trending-tech.js --release",
     "test": "node --test test/*.test.js",
     "audit:rubrics": "node scripts/audit-rubrics.js",
-    "test:career:browser": "node test/career-ui.browser.cjs"
+    "test:career:browser": "node test/career-ui.browser.cjs",
+    "validate:career:learning": "node scripts/validate-career-learning.js",
+    "inventory:career:learning": "node scripts/career-learning-inventory.js",
+    "test:career:learning:browser": "node test/career-learning.browser.cjs",
+    "review:career:learning": "node scripts/build-career-learning-review.js"
   },
   "engines": {
     "node": ">=18"

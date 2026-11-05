@@ -10,6 +10,7 @@
  * one job role (mandatory/optional subtracks, JD references and status),
  * assessment rules.
  */
+let CU_LEARNING = 'python-fundamentals';
 let CU_VIEW = 'dash', CU_SUB = null, CU_ROLE = null, CU_DIFF = '', CU_STATUS = '', CU_DATA = null, CU_SEARCH = '';
 const CU_STATE_TXT = { planned: 'No questions yet', draft: 'Draft bank, coverage incomplete', ready: 'Ready to publish', published: 'Published' };
 const CU_JD_TXT = { search_summary_unverified: 'Search summary, not verified', jd_verification_required: 'JD verification required', jd_reviewed: 'JD reviewed' };
@@ -18,8 +19,9 @@ const cuGo = (view, arg) => { CU_VIEW = view; if (view === 'sub') CU_SUB = arg; 
 
 async function caCurriculum() {
   const nav = `<div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-    ${[['dash', 'QA dashboard'], ['rules', 'Assessment rules']].map(([k, l]) => `<button class="btn btn-sm ${CU_VIEW === k ? 'btn-primary' : 'btn-ghost'}" onclick="cuGo('${k}')">${l}</button>`).join('')}
+    ${[['dash', 'QA dashboard'], ['rules', 'Assessment rules'], ['learning', 'Lessons & publishing']].map(([k, l]) => `<button class="btn btn-sm ${CU_VIEW === k ? 'btn-primary' : 'btn-ghost'}" onclick="cuGo('${k}')">${l}</button>`).join('')}
     ${CU_VIEW === 'sub' ? `<span class="s">› Subtrack <b>${esc(CU_SUB)}</b></span>` : ''}${CU_VIEW === 'role' ? `<span class="s">› Job role <b>${esc(CU_ROLE)}</b></span>` : ''}</div></div>`;
+  if (CU_VIEW === 'learning') return nav + await cuLearning();
   if (CU_VIEW === 'sub') return nav + await cuSubtrack(CU_SUB);
   if (CU_VIEW === 'role') return nav + await cuRole(CU_ROLE);
   CU_DATA = await api('/api/admin/career/curriculum');
@@ -183,6 +185,10 @@ async function cuStructure(id) {
 
 function cuAdminWire() {
   const el = $('view-admin-career'); if (!el) return;
+  const ls=$('cuLearningSelect');if(ls)ls.onchange=()=>{CU_LEARNING=ls.value;renderAdminCareer('curriculum');};
+  const save=$('cuLearningSave');if(save)save.onclick=async()=>{save.disabled=true;try{await api('/api/admin/career/learning/'+encodeURIComponent(CU_LEARNING),{method:'PUT',body:JSON.stringify(JSON.parse($('cuLearningJSON').value))});await renderAdminCareer('curriculum');}catch(e){$('cuLearningMsg').textContent=e.message;save.disabled=false;}};
+  el.querySelectorAll('[data-learning-action]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await api('/api/admin/career/learning/'+encodeURIComponent(CU_LEARNING)+'/'+b.dataset.learningAction,{method:'POST',body:JSON.stringify({attest_human_review:$('cuLearningAttest').checked,notes:$('cuLearningNotes').value})});await renderAdminCareer('curriculum');}catch(e){$('cuLearningMsg').textContent=e.message;b.disabled=false;}});
+
   const s = $('cuSearch'); if (s) s.oninput = () => { CU_SEARCH = s.value; const pos = s.selectionStart; renderAdminCareer('curriculum').then(() => { const n = $('cuSearch'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } }); };
   const df = $('cuDiff'); if (df) df.onchange = () => { CU_DIFF = df.value; renderAdminCareer('curriculum'); };
   const sf = $('cuStatus'); if (sf) sf.onchange = () => { CU_STATUS = sf.value; renderAdminCareer('curriculum'); };
@@ -206,4 +212,19 @@ function cuAdminWire() {
     const body = { ...Object.fromEntries(keys.map((k) => [k, Number(f[k].value)])), mix: Object.fromEntries(['easy', 'medium', 'hard', 'advanced'].map((k) => [k, Number(f['mix:' + k].value)])) };
     try { await api('/api/admin/career/curriculum/config', { method: 'PUT', body: JSON.stringify(body) }); toast('Rules saved as a new version.'); renderAdminCareer('curriculum'); } catch (err) { toast(err.message, true); }
   });
+}
+
+// Curriculum authoring lives in the existing Career admin area.
+async function cuLearning() {
+  const [inventory,doc]=await Promise.all([api('/api/admin/career/learning'),api('/api/admin/career/learning/'+encodeURIComponent(CU_LEARNING))]);
+  const c=doc.draft, first=c?.lessons?.[0], errors=doc.validation?.errors||[], warnings=doc.validation?.warnings||[];
+  return `<section class="card"><div class="card-head"><h3>Learning content completion tracker</h3></div><div class="card-body"><p>${inventory.totals.lessons} authored lessons · ${inventory.totals.formative_mcqs} formative MCQs · ${inventory.totals.automated_complete} subtracks passing structural checks · ${inventory.totals.human_approved} approved releases · ${inventory.totals.complete_roles} complete job-role pathways</p><p class="s">Repository/runtime free catalogue: ${inventory.reconciliation.public_free.length} listings. Trending Tech validator subset: ${inventory.reconciliation.trending_subset.length} courses. These are different inventories. Short notes and coding quests are candidate supplements, not proof of complete written coverage.</p>
+  <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Career</th><th>Subtracks</th><th>Outlines</th><th>Authored lessons</th><th>Verified lesson examples</th><th>Lesson quizzes</th><th>Checkpoints</th><th>Comprehensive assessments</th><th>Structurally complete</th><th>Human-approved</th><th>Remaining subtracks</th></tr></thead><tbody>${inventory.tracks.map(t=>`<tr><td>${esc(t.id)}</td><td>${t.subtracks}</td><td>${t.outlines}</td><td>${t.lessons}</td><td>${t.verified_lesson_examples}</td><td>${t.lesson_quizzes}</td><td>${t.checkpoint_modules}</td><td>${t.comprehensive_subtracks}</td><td>${t.complete_lesson_subtracks}</td><td>${t.approved_subtracks}</td><td>${t.remaining.length}</td></tr>`).join('')}</tbody></table></div>
+  <label class="field"><span>Canonical subtrack to edit</span><select id="cuLearningSelect">${inventory.subtracks.map(s=>`<option value="${esc(s.id)}"${s.id===CU_LEARNING?' selected':''}>${esc(s.title)} (${s.lessons} lessons; ${s.published?'published':'not released'})</option>`).join('')}</select></label></div></section>
+  <section class="card"><div class="card-head"><h3>Versioned lesson editor</h3></div><div class="card-body"><p>State: <b>${esc(c?.state||'not authored')}</b> · Draft version ${c?.version||'none'} · Published version ${doc.published_version||'none'}. Editing creates a new draft and invalidates its review; an older release stays available.</p><p class="s">The structured JSON supports module and lesson order, objectives, paragraphs, tables, diagrams, worked examples, references, optional practice links and MCQs. Lesson IDs and competency IDs must resolve. Correct-answer fields remain inside authorized admin APIs.</p>
+  <label class="field"><span>Course content JSON</span><textarea id="cuLearningJSON" rows="22" spellcheck="false" style="font-family:monospace;max-width:100%;width:100%;box-sizing:border-box">${esc(JSON.stringify(c||{id:CU_LEARNING,version:1,pass_mark:70,checkpoint_items:9,quiz_minutes:12,checkpoint_minutes:20,modules:[],lessons:[],questions:[],references:[]},null,2))}</textarea></label>
+  <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn btn-primary" id="cuLearningSave">Save new draft version</button>${first?`<a class="btn btn-ghost" href="/career#learn-preview/${esc(CU_LEARNING)}" target="_blank" rel="noopener">Preview written lessons</a>`:''}<button class="btn btn-ghost" data-learning-action="review">Send for human review</button><button class="btn btn-ghost" data-learning-action="unpublish">Unpublish release</button></div>
+  <h4>Validation</h4><p>${errors.length} errors · ${warnings.length} warnings. Passing automated checks does not constitute human approval.</p>${errors.length?`<ul>${errors.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`:''}${warnings.length?`<details><summary>Quality warnings</summary><ul>${warnings.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></details>`:''}
+  <h4>Human review and publication</h4><label class="field"><span>Review notes, source checks and corrections</span><textarea id="cuLearningNotes" rows="4">${esc(doc.review?.notes||'')}</textarea></label><label class="check"><input type="checkbox" id="cuLearningAttest"> I personally reviewed the lesson explanations, code outputs, quiz keys, competency mappings and source references for this exact version.</label>
+  <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn btn-ghost" data-learning-action="approve">Record human approval</button><button class="btn btn-primary" data-learning-action="publish">Publish approved version</button></div><p class="s">Approval checks exact code hashes against the repository verification artifact; changed examples require the server sandbox. Publishing requires this version’s approval and its published comprehensive assessment. Drafts are never automatically student-visible.</p><p id="cuLearningMsg" role="status"></p></div></section>`;
 }

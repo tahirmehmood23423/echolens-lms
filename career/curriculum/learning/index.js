@@ -6,7 +6,7 @@ const { BANKS: COMPREHENSIVE_BANKS } = require('../questions');
 const { validateQuestion } = require('../qdsl');
 const { verifyCode } = require('../verify');
 const VERIFIED = require('./verification.json');
-const BUILTIN = { 'python-fundamentals': require('./python') };
+const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations') };
 const clone = x => x == null ? x : JSON.parse(JSON.stringify(x));
 const hash = x => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const text = x => typeof x === 'string' && x.trim().length > 0;

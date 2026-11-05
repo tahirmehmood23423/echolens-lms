@@ -117,7 +117,7 @@ test('missing or unpublished content never yields a broken recommended lesson',(
 });
 test('completion inventory distinguishes 16 free listings, six validated-course subset and zero approved pilot releases',()=>{
  const report=L.inventory(store);assert.equal(report.reconciliation.public_free.length,16);assert.equal(report.reconciliation.trending_subset.length,6);assert.equal(report.totals.subtracks,132);assert.equal(report.totals.objectives,680);
- assert.equal(report.totals.lessons,12);assert.equal(report.totals.formative_mcqs,72);assert.equal(report.totals.automated_complete,1);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
+ assert.equal(report.totals.lessons,24);assert.equal(report.totals.formative_mcqs,144);assert.equal(report.totals.automated_complete,2);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
 });
 test('learning resume appears in the unified dashboard without an enrollment or false onboarding interruption',()=>{
  release();L.visit(user(1),SID,'py-strings');const w=svc.workspace(user(1));assert.equal(w.continue_learning.resume,'#lesson/'+SID+'/py-strings');assert.equal(w.report.curriculum.learning.completed,0);assert.equal(svc.discoveryState(user(1)).show_welcome,false);
@@ -152,4 +152,14 @@ test('minor content releases retain unchanged lesson and checkpoint credit and k
  const revision=L.draft(SID);revision.lessons[0].sections[0].paragraphs[0]+=' This clarification is part of the new reading material.';L.updateDraft(SID,revision,3);release();
  p=L.progress(user(1),SID);assert.equal(p.completed,2);assert.equal(p.lessons[0].read,false);assert.equal(p.lessons[0].quiz_passed,true);assert.ok(user(1).profile.career.st.learning[SID].versions[1].read['py-arithmetic']);
  L.visit(user(1),SID,'py-arithmetic',true);assert.equal(L.progress(user(1),SID).completed,3);assert.equal(cur.history(user(1)).length,4);
+});
+test('Programming Foundations is a complete second draft with verified objective coverage and no automatic release',()=>{
+ const c=BUILTIN['programming-foundations'],v=validate(c);assert.deepEqual(v.errors,[]);assert.deepEqual(v.warnings,[]);assert.equal(v.covered,12);assert.equal(c.lessons.length,12);assert.equal(c.questions.length,72);assert.equal(L.summary(user(1),c.id).available,false);
+});
+test('a beginner can learn all Programming Foundations modules, then demonstrate knowledge in its existing final bank',()=>{
+ const id='programming-foundations';for(const action of ['review','approve','publish'])assert.ok(!L.transition(id,action,{attest_human_review:true,notes:'Synthetic QA review for the second foundation draft; not a production human approval.'},3).error);
+ const c=L.published(id),answersFor=a=>Object.fromEntries(a.questions.map(q=>{const b=c.questions.find(x=>x.id===q.id)||BANKS[id].questions.find(x=>x.id===q.id);return [q.id,select(q,b,b.answer)];}));
+ for(const m of c.modules){for(const lid of m.lessons){L.visit(user(1),id,lid,true);const a=L.start(user(1),id,'lesson',lid).attempt;assert.equal(cur.submit(user(1),a.id,answersFor(a)).result.outcome,'passed');}const a=L.start(user(1),id,'module',m.id).attempt;assert.equal(a.questions.length,9);assert.equal(cur.submit(user(1),a.id,answersFor(a)).result.outcome,'passed');}
+ const before=L.progress(user(1),id);assert.equal(before.completed,12);assert.equal(before.mastered_by_assessment,false);
+ const a=cur.startSubtrack(user(1),id).attempt;assert.equal(a.questions.length,30);assert.equal(cur.submit(user(1),a.id,answersFor(a)).result.outcome,'passed');assert.equal(L.progress(user(1),id).mastered_by_assessment,true);assert.equal(L.progress(user(1),id).completed,12);
 });

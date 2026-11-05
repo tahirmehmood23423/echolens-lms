@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('no
 const {BUILTIN,validate,hash}=require('../career/curriculum/learning');
 const arg=name=>{const i=process.argv.indexOf(name);return i<0?null:process.argv[i+1];};
 const execute=!process.argv.includes('--structure-only'), sourceRoot=arg('--source-root');
-const report={human_approved:false,published:false,courses:[],official_source:null};
+const report={human_approved:false,published:false,courses:[],official_source:null,official_sources:[]};
 for(const course of Object.values(BUILTIN)) {
   const result=validate(course,{execute});
   report.courses.push({id:course.id,version:course.version,course_hash:hash(course),...result});
@@ -17,7 +17,8 @@ for(const course of Object.values(BUILTIN)) {
       const content=fs.readFileSync(target);
       return {id:r.id,path:r.source.path,sha256:require('node:crypto').createHash('sha256').update(content).digest('hex'),checked_by:'official Git object and path inspection'};
     });
-    report.official_source={repository:'https://github.com/python/cpython',commit,references};
+    const source={repository:'https://github.com/python/cpython',commit,references};
+    report.official_sources.push({course:course.id,...source});report.official_source=source;
   }
 }
 const output=arg('--output');if(output)fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');

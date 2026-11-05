@@ -7,6 +7,8 @@ process.env.DATABASE_URL='';process.env.DIRECT_URL='';process.env.DB_PATH=path.j
 const store=require('../store'), {createCareerService}=require('../career/service');
 (async()=>{try{
   const svc=createCareerService(store),report=svc.curriculum.learning.inventory(store);
+  report.legacy_career_banks=Object.keys(svc.BANKS).map(id=>{const qs=svc.questions(id);return {id,title:svc.BANKS[id].title,questions:qs.length,published:qs.filter(q=>q.status==='published').length,published_types:[...new Set(qs.filter(q=>q.status==='published').map(q=>q.type))]};});
+  report.stored_quiz_records=(store.allData().quizzes||[]).length;
   report.scope='Repository catalogue and canonical curriculum in an isolated store; deployment and production overrides not inspected.';
   report.baseline_commit=require('node:child_process').execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
   report.working_tree_modified=!!require('node:child_process').execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim();

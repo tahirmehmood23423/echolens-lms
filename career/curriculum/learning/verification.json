@@ -225,6 +225,209 @@
       "lessons": 12,
       "questions": 72,
       "human_approved": false
+    },
+    {
+      "id": "programming-foundations",
+      "version": 1,
+      "course_hash": "507b88a66b204817033c86faa74ea70171d9021cf6b924c98cd7af89f4b700dd",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "pf-source-execution",
+          "code_hash": "b3900f3597ccaa7724cf0fb022befb4bde84ba650634a27fbdbe9ae02ba620a9",
+          "ran": true,
+          "ok": true,
+          "output": "Shipping job started\n5"
+        },
+        {
+          "id": "pf-machine-resources",
+          "code_hash": "24b8753bb295ded5ee0b76f25d8d1bd29fd55861d97151967ada0dd6a97fdd3a",
+          "ran": true,
+          "ok": true,
+          "output": "7 10"
+        },
+        {
+          "id": "pf-representation",
+          "code_hash": "2dbb5187a56916ec28d8bcc9e4a1d2c43d8d408575c868494512b93905c012ab",
+          "ran": true,
+          "ok": true,
+          "output": "11\n0\n1 2"
+        },
+        {
+          "id": "pf-expressions",
+          "code_hash": "14cef1ed77dce7db2156a7fca125a8758ccb4a15d667f5a52cbaa4e01f57cc46",
+          "ran": true,
+          "ok": true,
+          "output": "95\nTrue"
+        },
+        {
+          "id": "pf-types-contracts",
+          "code_hash": "5ab6dd119dd8f2c532059585d3adf7349970c07f6f27576e99481ce473c2eb4c",
+          "ran": true,
+          "ok": true,
+          "output": "0042\nTrue\nTrue"
+        },
+        {
+          "id": "pf-state-tracing",
+          "code_hash": "7aa1ed458637ff49bf804faf0ed160467330b669830adcef4e4a7d338c55cd95",
+          "ran": true,
+          "ok": true,
+          "output": "8 11\n11"
+        },
+        {
+          "id": "pf-conditions",
+          "code_hash": "c9525c5ec47b4cb2ebe60ba5da0b0e4cd49c7dfd5709541d87d94f635b913fc4",
+          "ran": true,
+          "ok": true,
+          "output": "Rejected\n6"
+        },
+        {
+          "id": "pf-boundary-errors",
+          "code_hash": "dd79a93f503b10f2d54d0c59fd7d7dabcd74922aac289fe0850468d30f1a6861",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2, 3, 4]\n3\n2\n1"
+        },
+        {
+          "id": "pf-loop-choice",
+          "code_hash": "50e5c31f3b7cc1601bc3470a1d50db19b4997b32636cfa8b1d1801518f124530",
+          "ran": true,
+          "ok": true,
+          "output": "2"
+        },
+        {
+          "id": "pf-function-traces",
+          "code_hash": "efb692800f6e5563dd5aa169c0dc2830386c5d9f1cd26d48973171d77b6cf7d7",
+          "ran": true,
+          "ok": true,
+          "output": "45\n40"
+        },
+        {
+          "id": "pf-decomposition",
+          "code_hash": "00fa2358a24fbc9617ee1c1c7118127d35a82022d7f54a1f3fc7f8ce9644b6be",
+          "ran": true,
+          "ok": true,
+          "output": "65"
+        },
+        {
+          "id": "pf-algorithms",
+          "code_hash": "83e3da2b441c8bb704779a1a1807f74e2f842ad357b5db59939c34f39048a3c8",
+          "ran": true,
+          "ok": true,
+          "output": "15"
+        },
+        {
+          "id": "pf-source-execution.q5",
+          "code_hash": "1b2b8666159a6d9636d41bbaa6e5e68a8e85cca2100d0f49ce1b4ca1deea2448",
+          "ran": true,
+          "ok": true,
+          "output": "Ready\n6"
+        },
+        {
+          "id": "pf-machine-resources.q5",
+          "code_hash": "4bdad08594cda8ba8c23e6c7465d6dc7d09f49ca180ba2d2dfda98c7a13b8527",
+          "ran": true,
+          "ok": true,
+          "output": "6 9"
+        },
+        {
+          "id": "pf-representation.q5",
+          "code_hash": "ff5e249188ce1ca5b222d18706bdc7d55216485f086c4a11e8dc98e3e72b3d2c",
+          "ran": true,
+          "ok": true,
+          "output": "13\n0"
+        },
+        {
+          "id": "pf-expressions.q1",
+          "code_hash": "eeec7537fed54f15b215769b9b7327270bd47fa2fcac3bb5b3b37530c3bdce97",
+          "ran": true,
+          "ok": true,
+          "output": "14"
+        },
+        {
+          "id": "pf-expressions.q3",
+          "code_hash": "17bcae60cbea9bd2e8fed7f4e191a12abd3b1b370e2fe3e82e86b1c2e04b9a05",
+          "ran": true,
+          "ok": true,
+          "output": "42"
+        },
+        {
+          "id": "pf-types-contracts.q5",
+          "code_hash": "7215af2cee2d5d507d9bdaea8d8b5f3fa52dabfd968e537b6d51a314726d0793",
+          "ran": true,
+          "ok": true,
+          "output": "True True"
+        },
+        {
+          "id": "pf-state-tracing.q1",
+          "code_hash": "2551f3387b831e2e7f3a278c709aa4f529ee1a48c314a2622d99e87ab8dec99d",
+          "ran": true,
+          "ok": true,
+          "output": "9 5"
+        },
+        {
+          "id": "pf-state-tracing.q5",
+          "code_hash": "13743f09113de0be85a3ba9c4300a23a4c9b9e087761206742f4c2f99288e817",
+          "ran": true,
+          "ok": true,
+          "output": "11"
+        },
+        {
+          "id": "pf-conditions.q2",
+          "code_hash": "f9680f143e13dcefe2ced19f0958a1b64a2eb790f4e3c4b7fd639afc161acf1f",
+          "ran": true,
+          "ok": true,
+          "output": "4"
+        },
+        {
+          "id": "pf-conditions.q5",
+          "code_hash": "3d53aaa186b4dd792dee4d9acdc7b7c050c7d460982b4e7118286773ac01ad8e",
+          "ran": true,
+          "ok": true,
+          "output": "0"
+        },
+        {
+          "id": "pf-boundary-errors.q5",
+          "code_hash": "562be493b32dd072f887e45ef76c5d9a502d0129c6bc1a22654615889897f969",
+          "ran": true,
+          "ok": true,
+          "output": "2\n1"
+        },
+        {
+          "id": "pf-loop-choice.q5",
+          "code_hash": "a0bd5718de376f3cd8fa0f184d795ddb8572f03e1001c9c6ae7ead867893edc7",
+          "ran": true,
+          "ok": true,
+          "output": "1"
+        },
+        {
+          "id": "pf-function-traces.q1",
+          "code_hash": "1d6541bd1ebf22063377f8320b8b229d2c883570aed1ad1d1513accc5647e153",
+          "ran": true,
+          "ok": true,
+          "output": "14"
+        },
+        {
+          "id": "pf-decomposition.q5",
+          "code_hash": "436a99f2c60650fbb4f858f5237405b6b1564c3cc09e9be2d3a5bd32eadaf037",
+          "ran": true,
+          "ok": true,
+          "output": "36"
+        },
+        {
+          "id": "pf-algorithms.q5",
+          "code_hash": "a745f56d2a2f1c71ae7dba728967161a03d46b7a16fbd57a4986bbaa21da3fd3",
+          "ran": true,
+          "ok": true,
+          "output": "9"
+        }
+      ],
+      "objectives": 12,
+      "covered": 12,
+      "lessons": 12,
+      "questions": 72,
+      "human_approved": false
     }
   ],
   "official_source": {
@@ -232,39 +435,45 @@
     "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
     "references": [
       {
+        "id": "interpreter",
+        "path": "Doc/tutorial/interpreter.rst",
+        "sha256": "98188481efa72845a44997210be514fc61c5ef9e244655ce1dca23620fad9a7e",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
         "id": "introduction",
         "path": "Doc/tutorial/introduction.rst",
         "sha256": "44868375a1505a1d23d2915527fa8941632ccaaf8e6e090d7a3009df73b90d9e",
         "checked_by": "official Git object and path inspection"
       },
       {
-        "id": "controlflow",
+        "id": "execution",
+        "path": "Doc/reference/executionmodel.rst",
+        "sha256": "6fa125c5f6ab34be6b7b34b4b3419d6d92baefce840bd0485dccaac08463ca71",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "memory",
+        "path": "Doc/c-api/memory.rst",
+        "sha256": "6f7a42ffd90e2a7d328feb1b3fd98d57e829ae978bcf4e588914352bc67554b0",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "numbers",
+        "path": "Doc/tutorial/floatingpoint.rst",
+        "sha256": "8e648340d27e4ad469e40a53f8b47389d8490a7b10ea828f0bc76186c3863a55",
+        "checked_by": "official Git object and path inspection"
+      },
+      {
+        "id": "control",
         "path": "Doc/tutorial/controlflow.rst",
         "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
         "checked_by": "official Git object and path inspection"
       },
       {
-        "id": "datastructures",
+        "id": "collections",
         "path": "Doc/tutorial/datastructures.rst",
         "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
-        "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "errors",
-        "path": "Doc/tutorial/errors.rst",
-        "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
-        "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "inputoutput",
-        "path": "Doc/tutorial/inputoutput.rst",
-        "sha256": "210f867a77f007c622ca3b268c0962fb49550adec8bedea5f7bb2926a6443795",
-        "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "modules",
-        "path": "Doc/tutorial/modules.rst",
-        "sha256": "acae97e5bf4e6393c903ac452c55c610cb1992c150a150785b9aadc87b9a420b",
         "checked_by": "official Git object and path inspection"
       },
       {
@@ -272,19 +481,125 @@
         "path": "Doc/tutorial/controlflow.rst",
         "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
         "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "types",
-        "path": "Doc/reference/datamodel.rst",
-        "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
-        "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "csv",
-        "path": "Doc/library/csv.rst",
-        "sha256": "2ebad38f5e1dc4387fa90cbeb105ce1709a8c8ef40a8f9a074930aa9e8c46d21",
-        "checked_by": "official Git object and path inspection"
       }
     ]
-  }
+  },
+  "official_sources": [
+    {
+      "course": "python-fundamentals",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "introduction",
+          "path": "Doc/tutorial/introduction.rst",
+          "sha256": "44868375a1505a1d23d2915527fa8941632ccaaf8e6e090d7a3009df73b90d9e",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "controlflow",
+          "path": "Doc/tutorial/controlflow.rst",
+          "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "datastructures",
+          "path": "Doc/tutorial/datastructures.rst",
+          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "errors",
+          "path": "Doc/tutorial/errors.rst",
+          "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "inputoutput",
+          "path": "Doc/tutorial/inputoutput.rst",
+          "sha256": "210f867a77f007c622ca3b268c0962fb49550adec8bedea5f7bb2926a6443795",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "modules",
+          "path": "Doc/tutorial/modules.rst",
+          "sha256": "acae97e5bf4e6393c903ac452c55c610cb1992c150a150785b9aadc87b9a420b",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "functions",
+          "path": "Doc/tutorial/controlflow.rst",
+          "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "types",
+          "path": "Doc/reference/datamodel.rst",
+          "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "csv",
+          "path": "Doc/library/csv.rst",
+          "sha256": "2ebad38f5e1dc4387fa90cbeb105ce1709a8c8ef40a8f9a074930aa9e8c46d21",
+          "checked_by": "official Git object and path inspection"
+        }
+      ]
+    },
+    {
+      "course": "programming-foundations",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "interpreter",
+          "path": "Doc/tutorial/interpreter.rst",
+          "sha256": "98188481efa72845a44997210be514fc61c5ef9e244655ce1dca23620fad9a7e",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "introduction",
+          "path": "Doc/tutorial/introduction.rst",
+          "sha256": "44868375a1505a1d23d2915527fa8941632ccaaf8e6e090d7a3009df73b90d9e",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "execution",
+          "path": "Doc/reference/executionmodel.rst",
+          "sha256": "6fa125c5f6ab34be6b7b34b4b3419d6d92baefce840bd0485dccaac08463ca71",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "memory",
+          "path": "Doc/c-api/memory.rst",
+          "sha256": "6f7a42ffd90e2a7d328feb1b3fd98d57e829ae978bcf4e588914352bc67554b0",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "numbers",
+          "path": "Doc/tutorial/floatingpoint.rst",
+          "sha256": "8e648340d27e4ad469e40a53f8b47389d8490a7b10ea828f0bc76186c3863a55",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "control",
+          "path": "Doc/tutorial/controlflow.rst",
+          "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "collections",
+          "path": "Doc/tutorial/datastructures.rst",
+          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "functions",
+          "path": "Doc/tutorial/controlflow.rst",
+          "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
+          "checked_by": "official Git object and path inspection"
+        }
+      ]
+    }
+  ]
 }

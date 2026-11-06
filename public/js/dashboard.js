@@ -7580,9 +7580,9 @@ async function renderAdminUpcoming() {
   const d = await api('/api/admin/upcoming-courses');
   UPCOMING_ADMIN = d.courses;
   el.innerHTML = `
-    <div class="card"><div class="card-head"><h3>Upcoming courses</h3><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="formSchedule()">Schedule a course</button><button class="btn btn-ghost btn-sm" onclick="formUpcoming()">Custom course</button></span></div>
+    <div class="card"><div class="card-head"><h3>Upcoming courses</h3><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="formSchedule()">Add upcoming course</button><button class="btn btn-ghost btn-sm" onclick="formUpcoming(null, true)">Create custom content</button></span></div>
       <div class="card-body">
-        <p class="s" style="color:var(--muted);margin-bottom:12px"><b>Schedule a course</b> picks one of the existing catalogue courses - its description, learning outcomes and module-by-module syllabus are filled in for you - and you only set the registration window and class schedule. A published course appears on the home page, Live Tech Courses and /courses, and is removed automatically the day after its registration closes. Registrations arrive in the Admissions Office like any other course.</p>
+        <p class="s" style="color:var(--muted);margin-bottom:12px"><b>Add upcoming course</b> lets you select an existing catalogue course and set registration opening and closing dates. Its description, learning outcomes, syllabus, duration and fee are included automatically. Class schedules and cohort settings are optional. A published course appears on the home page, Live Tech Courses and /courses, and is removed automatically the day after its registration closes. Registrations arrive in the Admissions Office like any other course.</p>
       </div>
       <div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl">
         <tr><th>Code</th><th>Course</th><th>Fee (PKR)</th><th>Registration</th><th>Classes</th><th>Status</th><th>Registrations</th><th></th></tr>
@@ -7596,12 +7596,13 @@ async function renderAdminUpcoming() {
             ${c.phase !== 'draft' && c.phase !== 'closed' ? `<a class="btn btn-ghost btn-sm" href="/courses/${esc(upSlug(c.title))}" target="_blank" rel="noopener">View page</a>` : ''}
             ${c.source_code ? `<button class="btn btn-ghost btn-sm" onclick="formSchedule('${esc(c.source_code)}')">New cohort</button>` : ''}
             <button class="btn btn-ghost btn-sm" onclick="formUpcoming(${c.id})">Edit</button>
-            <button class="btn btn-danger btn-sm" onclick="delUpcoming(${c.id})">Delete</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No upcoming courses yet. Create one to show it on the website.</td></tr>'}
+            <button class="btn btn-danger btn-sm" onclick="delUpcoming(${c.id})">Delete</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No upcoming courses yet. Select Add upcoming course to use existing course content.</td></tr>'}
       </table></div></div>`;
 }
 function upSlug(s) { return String(s || '').toLowerCase().replace(/&/g, ' and ').replace(/\+/g, ' plus ').replace(/[/.]/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
 function upSyllabusText(list) { return (list || []).map((m) => [m.title, ...(m.topics || []).map((t) => '- ' + t)].join('\n')).join('\n'); }
-function formUpcoming(id) {
+function formUpcoming(id, custom = false) {
+  if (!id && !custom) return formSchedule();
   const c = UPCOMING_ADMIN.find((x) => x.id === id) || { published: true, mode: 'Online (live)', level: 'All levels' };
   const v = (k) => esc(c[k] == null ? '' : c[k]);
   const opt = (list, cur) => list.map((x) => `<option${x === cur ? ' selected' : ''}>${esc(x)}</option>`).join('');
@@ -7662,7 +7663,7 @@ async function formSchedule(code) {
   if (!UP_CATALOGUE) { try { UP_CATALOGUE = (await api('/api/admin/upcoming-courses/catalogue')).courses; } catch (e) { toast(e.message, true); return; } }
   const tiers = [...new Set(UP_CATALOGUE.map((c) => c.tier))];
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  openModal('Schedule a course', `
+  openModal('Add upcoming course', `
     <form id="schForm">
       <label class="field"><span>Course from the catalogue</span><select name="from_code" required><option value="">Choose a course</option>
         ${tiers.map((t) => `<optgroup label="${esc(t)}">${UP_CATALOGUE.filter((c) => c.tier === t).map((c) => `<option value="${esc(c.code)}"${c.code === code ? ' selected' : ''}>${esc(c.code)} - ${esc(c.title)}${c.listed_cohorts ? ' (on the website now)' : ''}</option>`).join('')}</optgroup>`).join('')}
@@ -7673,9 +7674,9 @@ async function formSchedule(code) {
         <label class="field"><span>Registration opens (empty = open now)</span><input name="reg_opens" type="date"></label>
         <label class="field"><span>Registration closes (course leaves the website after this day)</span><input name="reg_closes" type="date" required></label>
       </div>
-      <h4 style="margin:10px 0 6px">Class schedule</h4>
+      <details><summary style="cursor:pointer;margin:10px 0">Optional class schedule and cohort settings</summary>
       <div class="form-grid">
-        <label class="field"><span>Classes start</span><input name="classes_start" type="date" required></label>
+        <label class="field"><span>Classes start</span><input name="classes_start" type="date"></label>
         <label class="field"><span>Classes end</span><input name="classes_end" type="date"></label>
         <label class="field"><span>Class time</span><input name="class_time" placeholder="e.g. 7:00 - 9:00 PM PKT"></label>
         <label class="field"><span>Format</span><select name="mode"><option>Online (live)</option><option>On-campus</option><option>Hybrid</option></select></label>
@@ -7687,15 +7688,22 @@ async function formSchedule(code) {
         <label class="field"><span>Seats (optional)</span><input name="seats" type="number" min="0"></label>
         <label class="field"><span>Instructor (optional)</span><input name="instructor"></label>
       </div>
-      <p id="schDates" class="s" style="color:var(--muted)"></p>
+      <p id="schDates" class="s" style="color:var(--muted)"></p></details>
       <label class="field" style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="published" checked style="width:auto"> <span>Publish - show on the website while registration is open</span></label>
-      <button class="btn btn-primary btn-block">Schedule course</button>
+      <p class="s">The existing course description, syllabus, outcomes, duration and catalogue fee are included automatically. No content upload is needed.</p><button class="btn btn-primary btn-block">Add upcoming course</button>
     </form>`, true);
   const f = $('schForm');
   const preview = () => {
     const c = UP_CATALOGUE.find((x) => x.code === f.from_code.value);
     $('schPreview').innerHTML = c ? `${esc(c.tier)} &middot; ${c.weeks || '?'} weeks, ${c.hours || '?'} hours &middot; catalogue fee PKR ${Number(c.price_pkr).toLocaleString()} &middot; ${c.modules} modules and ${c.outcomes.length} learning outcomes filled in from the catalogue${c.cohorts ? ` &middot; scheduled ${c.cohorts} time${c.cohorts === 1 ? '' : 's'} before` : ''}` : '';
-    if (c && !f.price_pkr.value) f.price_pkr.placeholder = String(c.price_pkr);
+    if (c) {
+      $('schPreview').innerHTML += `<details style="margin-top:10px"><summary style="cursor:pointer">Preview included course content</summary>
+        <p>${esc(c.description || c.tagline || '')}</p>
+        <h4>Learning outcomes</h4><ul>${(c.outcomes || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+        <h4>What we will cover</h4>${(c.syllabus || []).map((m) => `<h5>${esc(m.title)}</h5><ul>${(m.topics || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`).join('')}
+        ${(c.prerequisites || []).length ? `<h4>Prerequisites</h4><ul>${c.prerequisites.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</details>`;
+    }
+    if (!f.price_pkr.value) f.price_pkr.placeholder = c ? String(c.price_pkr) : 'Catalogue fee';
     const picked = [...f.querySelectorAll('input[name=day]:checked')].map((x) => x.value);
     let n = 0;
     if (f.classes_start.value && f.classes_end.value && picked.length) {

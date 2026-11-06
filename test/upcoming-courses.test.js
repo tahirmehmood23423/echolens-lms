@@ -77,6 +77,18 @@ test('scheduling: a catalogue course becomes a cohort with its own outline, only
     assert.ok(c.syllabus.length >= 5 && c.outcomes.length >= 3);
     assert.equal(c.phase, 'open');
     assert.equal(store.catalogueFee(c.code), c.price_pkr, 'Admissions charges the cohort fee');
+    // Minimal admin flow: course plus registration dates; content is resolved server-side.
+    const datesOnly = store.UpcomingCourses.schedule({ from_code: 'ST-05', reg_opens: '2099-10-01', reg_closes: '2099-10-31', title: 'Ignore injected title', outcomes: ['Ignore injected content'] }, 1);
+    assert.ok(!datesOnly.error, datesOnly.error);
+    assert.deepEqual(datesOnly.course.outcomes, c.outcomes);
+    assert.deepEqual(datesOnly.course.syllabus, c.syllabus);
+    assert.equal(datesOnly.course.description, c.description);
+    assert.equal(datesOnly.course.price_pkr, c.price_pkr);
+    assert.equal(datesOnly.course.classes_start, null);
+    assert.deepEqual(datesOnly.course.class_dates, []);
+    assert.equal(datesOnly.course.reg_opens, '2099-10-01');
+    assert.equal(datesOnly.course.reg_closes, '2099-10-31');
+    assert.equal(store.UpcomingCourses.byCode(c.code).title, c.title, 'new cohort leaves existing records intact');
     // A second cohort the same month gets its own code; a fee override is respected.
     const second = store.UpcomingCourses.schedule({ from_code: 'ST-05', reg_closes: '2099-12-20', classes_start: '2100-01-19', price_pkr: 18000 }, 1).course;
     assert.equal(second.code, 'ST-05-0001-B'); assert.equal(second.price_pkr, 18000);

@@ -43,7 +43,7 @@ if (process.env.ECHOLENS_TEST_LEARNING === '1') {
   const cur = require('../../career/service').createCareerService(store).curriculum;
   cur.updateConfig({ retake_hours: 0 }, 1);
   const L = cur.learning;
-  for (const sid of ['programming-foundations','python-fundamentals']) for (const action of ['review','approve','publish']) {
+  for (const sid of ['programming-foundations','python-fundamentals','sql-fundamentals']) for (const action of ['review','approve','publish']) {
     const out = L.transition(sid, action, { attest_human_review:true, notes:'Synthetic QA attestation for isolated end-to-end testing only; production content still requires actual human review.' }, 1);
     if (out.error) throw Error(out.error);
   }

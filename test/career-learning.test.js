@@ -117,7 +117,7 @@ test('missing or unpublished content never yields a broken recommended lesson',(
 });
 test('completion inventory distinguishes 16 free listings, six validated-course subset and zero approved pilot releases',()=>{
  const report=L.inventory(store);assert.equal(report.reconciliation.public_free.length,16);assert.equal(report.reconciliation.trending_subset.length,6);assert.equal(report.totals.subtracks,132);assert.equal(report.totals.objectives,680);
- assert.equal(report.totals.lessons,24);assert.equal(report.totals.formative_mcqs,144);assert.equal(report.totals.automated_complete,2);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
+ assert.equal(report.totals.lessons,36);assert.equal(report.totals.formative_mcqs,224);assert.equal(report.totals.automated_complete,3);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
 });
 test('learning resume appears in the unified dashboard without an enrollment or false onboarding interruption',()=>{
  release();L.visit(user(1),SID,'py-strings');const w=svc.workspace(user(1));assert.equal(w.continue_learning.resume,'#lesson/'+SID+'/py-strings');assert.equal(w.report.curriculum.learning.completed,0);assert.equal(svc.discoveryState(user(1)).show_welcome,false);
@@ -128,7 +128,7 @@ test('late practice answers are ignored and late autosaves are refused, using on
 });
 test('lesson drafts can be created for another canonical subtrack and incomplete content stays unpublished',()=>{
  const out=L.updateDraft('sql-fundamentals',{id:'sql-fundamentals',modules:[],lessons:[],questions:[],references:[],pass_mark:70,checkpoint_items:9,quiz_minutes:12,checkpoint_minutes:20},3);
- assert.equal(out.draft.version,1);assert.ok(out.validation.errors.length);assert.equal(L.transition('sql-fundamentals','review',{},3).status,409);assert.equal(L.summary(user(1),'sql-fundamentals').available,false);
+ assert.equal(out.draft.version,2);assert.ok(out.validation.errors.length);assert.equal(L.transition('sql-fundamentals','review',{},3).status,409);assert.equal(L.summary(user(1),'sql-fundamentals').available,false);
 });
 test('publishing rejects nonexistent legacy practice links and preserves archived course versions',()=>{
  release();const d=L.draft(SID);d.lessons[0].reuse=[{track:'cs104-python',level:999,relationship:'supplementary_practice'}];L.updateDraft(SID,d,3);
@@ -162,4 +162,19 @@ test('a beginner can learn all Programming Foundations modules, then demonstrate
  for(const m of c.modules){for(const lid of m.lessons){L.visit(user(1),id,lid,true);const a=L.start(user(1),id,'lesson',lid).attempt;assert.equal(cur.submit(user(1),a.id,answersFor(a)).result.outcome,'passed');}const a=L.start(user(1),id,'module',m.id).attempt;assert.equal(a.questions.length,9);assert.equal(cur.submit(user(1),a.id,answersFor(a)).result.outcome,'passed');}
  const before=L.progress(user(1),id);assert.equal(before.completed,12);assert.equal(before.mastered_by_assessment,false);
  const a=cur.startSubtrack(user(1),id).attempt;assert.equal(a.questions.length,30);assert.equal(cur.submit(user(1),a.id,answersFor(a)).result.outcome,'passed');assert.equal(L.progress(user(1),id).mastered_by_assessment,true);assert.equal(L.progress(user(1),id).completed,12);
+});
+
+test('SQL Fundamentals covers every canonical objective with complete draft lessons and independent formative pools',()=>{
+ const c=BUILTIN['sql-fundamentals'],v=validate(c);assert.deepEqual(v.errors,[]);assert.deepEqual(v.warnings,[]);assert.equal(v.covered,9);assert.equal(c.lessons.length,12);assert.equal(c.questions.length,80);assert.equal(c.human_review,null);assert.equal(L.summary(user(1),c.id).available,false);
+ assert.ok(c.lessons.every(l=>l.worked.lang==='sql'));assert.equal(BANKS[c.id].questions.length,90);
+});
+test('SQL beginner, direct knowledge, targeted remediation and fresh attempts reuse the existing assessment engine',()=>{
+ const sid='sql-fundamentals';for(const action of ['review','approve','publish']){const r=L.transition(sid,action,{attest_human_review:true,notes:'Synthetic SQL QA attestation in a disposable test store only, never actual human content approval.'},3);assert.ok(!r.error,JSON.stringify(r));}
+ const c=L.published(sid),keys=(a,right=()=>true)=>Object.fromEntries(a.questions.map(q=>{const b=c.questions.find(x=>x.id===q.id)||BANKS[sid].questions.find(x=>x.id===q.id);return [q.id,select(q,b,right(b)?b.answer:(b.answer+1)%4)];}));
+ const first=cur.startSubtrack(user(1),sid).attempt;assert.ok(first);const fail=cur.submit(user(1),first.id,keys(first,()=>false)).result;assert.equal(fail.outcome,'learning_recommended');assert.ok(fail.learning_areas.flatMap(m=>m.lessons).some(l=>l.id==='sql-null'));
+ assert.equal(cur.startSubtrack(user(1),sid).status,409);
+ for(const m of c.modules){for(const lid of m.lessons){L.visit(user(1),sid,lid,true);const a=L.start(user(1),sid,'lesson',lid).attempt;assert.ok(a);assert.ok(!JSON.stringify(a).includes('"answer":'));assert.equal(cur.submit(user(1),a.id,keys(a)).result.outcome,'passed');}const a=L.start(user(1),sid,'module',m.id).attempt;assert.equal(a.questions.length,9);assert.equal(cur.submit(user(1),a.id,keys(a)).result.outcome,'passed');}
+ assert.equal(L.progress(user(1),sid).completed,12);assert.equal(L.progress(user(1),sid).mastered_by_assessment,false);
+ const fresh=cur.startSubtrack(user(1),sid).attempt;assert.notEqual(fresh.id,first.id);assert.equal(cur.submit(user(1),fresh.id,keys(fresh)).result.outcome,'passed');assert.equal(L.progress(user(1),sid).mastered_by_assessment,true);assert.equal(cur.history(user(1)).length,18);
+ const direct=cur.startSubtrack(user(2),sid).attempt;assert.equal(cur.submit(user(2),direct.id,keys(direct)).result.outcome,'passed');assert.equal(L.progress(user(2),sid).completed,0);
 });

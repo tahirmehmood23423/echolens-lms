@@ -8,16 +8,18 @@ const report={human_approved:false,published:false,courses:[],official_source:nu
 for(const course of Object.values(BUILTIN)) {
   const result=validate(course,{execute});
   report.courses.push({id:course.id,version:course.version,course_hash:hash(course),...result});
-  if(sourceRoot) {
-    const commit=execFileSync('git',['-C',sourceRoot,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+  const repo=course.references[0]?.source?.repo;
+  const courseSourceRoot=repo==='postgres/postgres'?arg('--source-root-postgres'):sourceRoot;
+  if(courseSourceRoot) {
+    const commit=execFileSync('git',['-C',courseSourceRoot,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
     const references=course.references.map(r=>{
       if(commit!==r.source.commit)throw Error('Reference checkout does not match the recorded official source commit.');
-      const target=path.resolve(sourceRoot,r.source.path);
-      if(!target.startsWith(path.resolve(sourceRoot)+path.sep))throw Error('Invalid source path.');
+      const target=path.resolve(courseSourceRoot,r.source.path);
+      if(!target.startsWith(path.resolve(courseSourceRoot)+path.sep))throw Error('Invalid source path.');
       const content=fs.readFileSync(target);
       return {id:r.id,path:r.source.path,sha256:require('node:crypto').createHash('sha256').update(content).digest('hex'),checked_by:'official Git object and path inspection'};
     });
-    const source={repository:'https://github.com/python/cpython',commit,references};
+    const source={repository:'https://github.com/'+repo,commit,references};
     report.official_sources.push({course:course.id,...source});report.official_source=source;
   }
 }

@@ -1,0 +1,133 @@
+id,title,lessons,formative_questions,objectives,verified_examples,comprehensive_questions,automated_complete,human_approved,published,missing
+programming-foundations,Programming and Computer Science Foundations,12,72,12,12,90,True,False,False,Human content review and release
+python-fundamentals,Python Fundamentals,12,72,12,12,90,True,False,False,Human content review and release
+python-intermediate-oop,Intermediate Python and Object-Oriented Programming,0,0,12,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+practical-data-structures,Data Structures and Backend Problem Solving,0,0,7,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+http-web-architecture,"HTTP, Networking and Web Architecture",0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+rest-api-design,REST API Design and Integration,0,0,10,0,90,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+fastapi-backend,FastAPI and Python Backend Development,0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+node-express,"Node.js, Express and Server APIs",0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+sql-fundamentals,SQL Fundamentals,12,80,9,12,90,True,False,False,Human content review and release
+database-design,Database Design and PostgreSQL,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+db-integration-performance,"Database Integration, Transactions and Performance",0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+api-security-auth,"Authentication, Authorization and API Security",0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+backend-testing-reliability,"Backend Testing, Debugging and Reliability",0,0,7,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+backend-deployment-ops,"Docker, Deployment and Backend Operations",0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+web-foundations,Web and Internet Foundations,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+html-semantic,HTML and Semantic Web,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+css-fundamentals,CSS Fundamentals,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+responsive-css,Responsive Design and Modern CSS Layout,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+js-fundamentals,JavaScript Fundamentals,0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+js-dom-async,JavaScript DOM and Asynchronous Programming,0,0,7,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+typescript-fundamentals,TypeScript Fundamentals,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+react-fundamentals,React Fundamentals,0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+react-advanced,Advanced React and State Management,0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+nextjs-architecture,Next.js and Modern Frontend Architecture,0,0,7,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+frontend-api-security,"API Integration, Authentication and Frontend Security",0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+frontend-quality,"Frontend Accessibility, Testing, Performance and Deployment",0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+fullstack-integration-state,Frontend-Backend Integration and State Management,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+fullstack-architecture,Full-Stack Application Architecture,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+web-deployment-cicd,"Deployment, CI/CD and Monitoring for Web Apps",0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+mobile-ui-fundamentals,Mobile Application and UI Fundamentals,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+dart-programming,Dart Programming,0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+flutter-fundamentals,Flutter Fundamentals,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+flutter-layout-nav-state,"Flutter Layout, Navigation and State",0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+kotlin-android,Kotlin and Android Development,0,0,8,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+react-native,React Native Development,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+mobile-apis-networking,Mobile APIs and Networking,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+mobile-storage,Local Storage and Databases,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+mobile-auth-security,Mobile Authentication and Security,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+mobile-architecture,Mobile Architecture and Maintainability,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+mobile-testing-debugging,Mobile Testing and Debugging,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+mobile-performance-platform,"Performance, Accessibility and Platform Integration",0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+app-distribution,App Distribution and Release Management,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+math-for-ai,Linear Algebra and Mathematics for AI,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+probability-statistics,Probability and Statistics,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+numpy-arrays,NumPy and Numerical Computing,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+pandas-fundamentals,Pandas and Data Manipulation,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-cleaning,Data Cleaning and Validation,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+ml-preprocessing,Data Preprocessing and Leakage Prevention,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+ml-fundamentals,Machine Learning Fundamentals,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+supervised-learning,Supervised Learning and Model Selection,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+unsupervised-learning,Unsupervised Learning and Representation,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+feature-eng-evaluation,Feature Engineering and Evaluation,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+deep-learning,Deep Learning and Neural Networks,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+computer-vision,Computer Vision Fundamentals,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+nlp-fundamentals,Natural Language Processing Fundamentals,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+mlops-deployment,Model Deployment and MLOps,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+responsible-ai-monitoring,"Responsible AI, Monitoring and Reliability",0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+ai-api-integration,APIs and AI Application Integration,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+llm-fundamentals,Language Model Fundamentals,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+prompting-structured-output,"Tokens, Context, Prompting and Structured Outputs",0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+embeddings-semantic-search,Embeddings and Semantic Search,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+vector-databases,Vector Databases and Retrieval,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+rag-fundamentals,RAG Fundamentals,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+rag-advanced,"Advanced RAG, Ranking and Evaluation",0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+agents-tool-calling,Tool Calling and AI Agent Fundamentals,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+agent-workflows,Agent Workflows and Orchestration,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+llm-security-eval,"LLM Security, Reliability and Evaluation",0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+llm-deployment-cost,"LLM Deployment, Monitoring and Cost Optimization",0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-business-fundamentals,Data and Business Analysis Fundamentals,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+spreadsheet-analysis,Excel and Spreadsheet Analysis,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+advanced-sql,Analytical and Advanced SQL with Query Performance,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+descriptive-stats-metrics,Descriptive Statistics and Business Metrics,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+eda,Exploratory Data Analysis,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-visualization,Data Visualization Principles,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+powerbi-modeling,Power BI and Data Modeling,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+dashboards-reporting,Interactive Dashboards and Reporting,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-storytelling,Business Decision-Making and Data Storytelling,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-modeling-warehousing,Data Modeling and Warehousing,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+etl-elt-architecture,ETL/ELT Architecture,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-transformation-pipelines,Data Transformation and Pipeline Design,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+workflow-orchestration,Workflow Orchestration,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-quality-testing,"Data Quality, Testing and Validation",0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+batch-streaming,Batch and Streaming Data Processing,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+cloud-data-platforms,Cloud Storage and Data Platforms,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-reliability-recovery,"Monitoring, Reliability and Recovery",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+data-governance-security,"Data Governance, Security and Optimization",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+computing-os-foundations,Computing and Operating System Foundations,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+networking-fundamentals,Networking and Internet Protocols,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+linux-sysadmin,Linux and System Administration,0,0,6,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+security-foundations,Cybersecurity Foundations and Threat Models,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+identity-access-control,"Authentication, Authorization and Access Control",0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+cryptography-secure-comms,Cryptography and Secure Communication,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+vulnerabilities-defense,Vulnerabilities and Defensive Security,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+security-logging-monitoring,Security Logging and Monitoring,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+soc-siem,Security Operations and SIEM,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+incident-response,Incident Detection and Response,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+network-endpoint-cloud-security,"Network, Endpoint and Cloud Security",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+security-grc,"Security Governance, Risk and Compliance",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+git-collaboration,"Git, Development Workflows and Code Review",0,0,6,0,90,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+scripting-automation,Bash/Python Scripting and Automation,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+cloud-aws-foundations,Cloud Computing and AWS Foundations,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+cloud-networking-iam,"Cloud Networking, IAM and Security",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+docker-containers,Docker and Containerization,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+ci-cd,Continuous Integration and Delivery,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+infrastructure-as-code,Infrastructure as Code,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+kubernetes,Kubernetes and Container Orchestration,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+observability,"Monitoring, Logging and Observability",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+reliability-incident-cost,"Reliability, Incident Management and Cost Optimization",0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+sdlc-foundations,Software Development and SDLC Foundations,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+qa-principles,QA Principles and Testing Methodologies,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+test-design,Test Planning and Test Case Design,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+defect-management,Defect Management and Bug Reporting,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+functional-regression-exploratory,"Functional, Regression and Exploratory Testing",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+web-api-testing,Web and API Testing,0,0,5,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+test-data-management,SQL and Test Data Management,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+playwright-automation,Playwright/Selenium Fundamentals,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+automation-frameworks,Automation Frameworks and Test Architecture,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+ci-test-reporting,CI/CD Integration and Test Reporting,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+performance-quality-engineering,"Performance, Reliability and Quality Engineering",0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+oop-principles,Object-Oriented Programming,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+java-fundamentals,Java Fundamentals,0,0,7,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+complexity-analysis,Algorithm Analysis and Complexity,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+arrays-strings-hashing,"Arrays, Strings and Hashing",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+linear-structures,"Linked Lists, Stacks and Queues",0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+recursion-backtracking,Recursion and Backtracking,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+searching-sorting,Searching and Sorting,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+trees-bst,Trees and Binary Search Trees,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+graphs,Graphs and Traversal Algorithms,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+greedy-dp,Greedy Algorithms and Dynamic Programming,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+debugging-testing,Debugging and Software Testing,0,0,4,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+software-design,Software Design Principles and Maintainability,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+engineering-problem-solving,Technical Problem Solving and Engineering Decisions,0,0,3,0,0,False,False,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review

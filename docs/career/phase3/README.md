@@ -1,5 +1,7 @@
 # Phase 3: content engine and first two authoring batches
 
+This is the original two-draft batch report. See the [subsequent SQL batch report](sql-batch/README.md) for the latest cumulative inventory and validation.
+
 ## Delivery status
 
 Two canonical short courses are fully authored and technically tested as **drafts**:

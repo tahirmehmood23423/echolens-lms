@@ -1282,34 +1282,277 @@
       "lessons": 9,
       "questions": 72,
       "human_approved": false
+    },
+    {
+      "id": "sdlc-foundations",
+      "version": 1,
+      "course_hash": "1cd22e0f763fa094341d7f6c8713517b97fc68339db3edc5eacb1c10a5c0ddce",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "sdlc-foundations-models",
+          "code_hash": "0dd75c92260b136bc6049f090a89639cd308a73b47bc4ff8faa2bbb35d211db6",
+          "ran": true,
+          "ok": true,
+          "output": "['application', 'receipt']"
+        },
+        {
+          "id": "sdlc-foundations-flow",
+          "code_hash": "befb52b359fdf6329d87d94ea4549c0d65cd723f540eea373372e3fde16faa93",
+          "ran": true,
+          "ok": true,
+          "output": "3\nFalse"
+        },
+        {
+          "id": "sdlc-foundations-roles",
+          "code_hash": "d6b660c7872768d5fb29964837f0208b1ffd87b2ef7d6c741a6f04f4359c202c",
+          "ran": true,
+          "ok": true,
+          "output": "['release']"
+        },
+        {
+          "id": "sdlc-foundations-stories",
+          "code_hash": "7693fafa08263f353ed40c5d883966a48e2881ad9b67e63aacabb1f5c638986e",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "sdlc-foundations-examples",
+          "code_hash": "1142f736134f52c440b310d8c9f7cbe574bd014fb0ef2c694001e8c43aca36b5",
+          "ran": true,
+          "ok": true,
+          "output": "[False, False, True]\n[False, True, True]"
+        },
+        {
+          "id": "sdlc-foundations-changes",
+          "code_hash": "74c9ace3b41c51a75714277bf02eb0b1b87241bf8bc161e2a2b6450bacd986d8",
+          "ran": true,
+          "ok": true,
+          "output": "['max_rows']"
+        },
+        {
+          "id": "sdlc-foundations-builds",
+          "code_hash": "0d7dd5157f2a648ae06e82524d7691751c1970923247d1d3539dbcb54c9d2821",
+          "ran": true,
+          "ok": true,
+          "output": "False"
+        },
+        {
+          "id": "sdlc-foundations-gates",
+          "code_hash": "b4e3f38c9a7a6dc552de705aec3643e2177db969deea1d68f730cef6fa3890e4",
+          "ran": true,
+          "ok": true,
+          "output": "False\n['migration']"
+        },
+        {
+          "id": "sdlc-foundations-observe",
+          "code_hash": "ce3ecd599fe3d30e3f331c92d56dd081e9876aee0465001efa5a8cfd3f11e904",
+          "ran": true,
+          "ok": true,
+          "output": "0.06\nTrue"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 56,
+      "human_approved": false
+    },
+    {
+      "id": "networking-fundamentals",
+      "version": 1,
+      "course_hash": "f3bf245df4a586c589c2ea0bae06794e89feabe61e8822e96526ba4fe50f1c8f",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "networking-fundamentals-l1",
+          "code_hash": "913527dfb53f47e87b8b3ea73697795004d3b3c17b1a406feb56a16c0e5e692f",
+          "ran": true,
+          "ok": true,
+          "output": "tcp_connect\n['link', 'ip_route']"
+        },
+        {
+          "id": "networking-fundamentals-l2",
+          "code_hash": "e45c56fa349c51581e9f6e563a272d6d9b921e3c4eff67011b62ab07042e5021",
+          "ran": true,
+          "ok": true,
+          "output": "256\nTrue\nFalse"
+        },
+        {
+          "id": "networking-fundamentals-l3",
+          "code_hash": "f1b9cd35a43072d96f9327a7cf682f4f2a21b3713215c855106e0d7537773a9c",
+          "ran": true,
+          "ok": true,
+          "output": "['order=1', 'order=2']\nTrue"
+        },
+        {
+          "id": "networking-fundamentals-l4",
+          "code_hash": "135dd13a7fa074631cb12798c36d04f47f3b2048bae6c574fa694cffd3805cd9",
+          "ran": true,
+          "ok": true,
+          "output": "['192.0.2.10']\nFalse"
+        },
+        {
+          "id": "networking-fundamentals-l5",
+          "code_hash": "e8fd954c3c9520e809997ac9bf84f9b577abac57578130b77083b8913d8ecb07",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "networking-fundamentals-l6",
+          "code_hash": "af930fe60ee1acf4e23b6ce303ad93ef5ded6ce8813eab7a332583d372af259e",
+          "ran": true,
+          "ok": true,
+          "output": "3\nFalse\nTrue"
+        },
+        {
+          "id": "networking-fundamentals-l7",
+          "code_hash": "34e5acf5720c55943898afa8b90aa70f22e6fa00691743d7d98f673646e02289",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "networking-fundamentals-l8",
+          "code_hash": "11a9fbc968f785bed13b83e816ebda7d1cd5ed0accd9b3bff2a563fb807c1928",
+          "ran": true,
+          "ok": true,
+          "output": "['a', 'c', 'a', 'c', 'a']"
+        },
+        {
+          "id": "networking-fundamentals-l9",
+          "code_hash": "2fb51410836d561b82d2082736c4ffee21f7a53b63a34dca548e1a7113c50270",
+          "ran": true,
+          "ok": true,
+          "output": "tls\nhostname_mismatch"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "html-semantic",
+      "version": 1,
+      "course_hash": "4b87809aa62b6fead3145a42993a1244aad5297acbd742dd4483fc6b567fd454",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "html-heading-outline",
+          "code_hash": "edd342d4aafe076d3110ce3b53da5a33d4ffa71be85a028ae5f5e41704e36895",
+          "ran": true,
+          "ok": true,
+          "output": "h1 > h2 > h3"
+        },
+        {
+          "id": "html-semantic-controls",
+          "code_hash": "898a5fbc88cf5b40b2905c602193b2ade5146e30ff87e20d98756328eccbb05d",
+          "ran": true,
+          "ok": true,
+          "output": "view invoice: a with href\nsend request: button\nrelated items: ul or ol"
+        },
+        {
+          "id": "html-content-regions",
+          "code_hash": "3e705919d806a08b5b7a7493bcd3175fc1f9e700630c9f950a9e507564854599",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue"
+        },
+        {
+          "id": "html-labels-constraints",
+          "code_hash": "b3680141fdab6eb7301a43873bbf6e52f428007b617872233fbac9e976b7bc26",
+          "ran": true,
+          "ok": true,
+          "output": "True\n1"
+        },
+        {
+          "id": "html-form-submission",
+          "code_hash": "5b1461a960dd67c89d798f1d8b0d91d71b845cbc17c9381fd37b1542d34dc54b",
+          "ran": true,
+          "ok": true,
+          "output": "course=web+basics&slot=morning&slot=evening\n['morning', 'evening']"
+        },
+        {
+          "id": "html-form-errors",
+          "code_hash": "6d21b48483bc93a77a75efa1748d9c58df5428d928e3a3cd7f808b0e533340be",
+          "ran": true,
+          "ok": true,
+          "output": "{'email': 'Enter a contact email.'}\nTrue"
+        },
+        {
+          "id": "html-image-alternatives",
+          "code_hash": "60c3c37a3a5c0461dd4507c5c2056475e5c479f62669f71a43cda281cb6f1aa7",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nView shipment status"
+        },
+        {
+          "id": "html-document-metadata",
+          "code_hash": "0405445edc332d0fd07c698eda51cf7208b4964b47a8818419f36872dbaeb8fd",
+          "ran": true,
+          "ok": true,
+          "output": "Open Day | Example University\nPlan your campus visit."
+        },
+        {
+          "id": "html-media-links-review",
+          "code_hash": "38950228f3879623e7575a5c92953b5e57f43fb412a7f0ee9f83fb7cb7c08809",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nreview context and controls separately"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/openai/openai-cookbook",
-    "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+    "repository": "https://github.com/mdn/content",
+    "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
     "references": [
       {
-        "id": "stream",
-        "path": "examples/How_to_stream_completions.ipynb",
-        "sha256": "c2aa466319c891f39f427ddf3ed74d6c2933c70bc27782ab16ad7f1b293b8afd",
+        "id": "html-syntax",
+        "path": "files/en-us/learn_web_development/core/structuring_content/basic_html_syntax/index.md",
+        "sha256": "bd5e80fbf1bf33618696da5ff009bd1507d8599e8a424d72b04e8ba62b610236",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "retry",
-        "path": "examples/How_to_handle_rate_limits.ipynb",
-        "sha256": "de228ec125143956ef0cab538f1f615b0af8405203c7ae4032ac3f6611028fcf",
+        "id": "html-metadata",
+        "path": "files/en-us/learn_web_development/core/structuring_content/webpage_metadata/index.md",
+        "sha256": "d5e4b5a45c47c36fe5a3995572743acf9ffcbad072e9a831aee25055307c5720",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "tokens",
-        "path": "examples/How_to_count_tokens_with_tiktoken.ipynb",
-        "sha256": "b83aa4aebf80a432b0a93a54fe3056e09d768774f8914ea7bf8329129b6800d5",
+        "id": "html-debugging",
+        "path": "files/en-us/learn_web_development/core/structuring_content/debugging_html/index.md",
+        "sha256": "a3ac151810a7d43ee42dab3345e7b006872def073ba561002dcd0d53ea07d165",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "structure",
-        "path": "examples/Structured_Outputs_Intro.ipynb",
-        "sha256": "05731b657039904eec7d55c5a69532a6227fe8b9747a54a19934d993e6d50dde",
+        "id": "html-forms",
+        "path": "files/en-us/learn_web_development/core/structuring_content/html_forms/index.md",
+        "sha256": "b6a10716a5906129e0a78b7552205ba629a89eac2d5f0751a9332a7524cb1cad",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "html-images",
+        "path": "files/en-us/learn_web_development/core/structuring_content/html_images/index.md",
+        "sha256": "71f9a1752978e0929314d8b1c70596fdf8e8167a77d03b7ec8a5b8ecb2b3c1a4",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "html-regions",
+        "path": "files/en-us/learn_web_development/core/structuring_content/structuring_documents/index.md",
+        "sha256": "0f0d4d820066c3bb135d16a47e2459e155343d2385dea3cca3aaf51ca19b140e",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -1870,6 +2113,100 @@
           "id": "structure",
           "path": "examples/Structured_Outputs_Intro.ipynb",
           "sha256": "05731b657039904eec7d55c5a69532a6227fe8b9747a54a19934d993e6d50dde",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "sdlc-foundations",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "unittest",
+          "path": "Doc/library/unittest.rst",
+          "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "itertools",
+          "path": "Doc/library/itertools.rst",
+          "sha256": "1c100cdb246d6281ba452bc230a9b05f4bc4838be3080e3e3b7a17cec8d728b1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "networking-fundamentals",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-ipaddress",
+          "path": "Doc/library/ipaddress.rst",
+          "sha256": "15356f23e693b9f3333b49e91445d592c311b10cb0797ec403404415de205733",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-socket",
+          "path": "Doc/library/socket.rst",
+          "sha256": "fa1ad5f48c9a9d9317a9502aacb068b73dbbdefb5894e61a59ae19838cf07bfe",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "networking-fundamentals",
+      "repository": "https://github.com/httpwg/http-core",
+      "commit": "bde37f634681bd5462568b73aa722af9c9a3ef5e",
+      "references": [
+        {
+          "id": "http-semantics",
+          "path": "rfc9110.xml",
+          "sha256": "22797e1c392d3a08cca9dca4d8affd7f3461fe574b333658c97b397627efb4d1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "html-semantic",
+      "repository": "https://github.com/mdn/content",
+      "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
+      "references": [
+        {
+          "id": "html-syntax",
+          "path": "files/en-us/learn_web_development/core/structuring_content/basic_html_syntax/index.md",
+          "sha256": "bd5e80fbf1bf33618696da5ff009bd1507d8599e8a424d72b04e8ba62b610236",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "html-metadata",
+          "path": "files/en-us/learn_web_development/core/structuring_content/webpage_metadata/index.md",
+          "sha256": "d5e4b5a45c47c36fe5a3995572743acf9ffcbad072e9a831aee25055307c5720",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "html-debugging",
+          "path": "files/en-us/learn_web_development/core/structuring_content/debugging_html/index.md",
+          "sha256": "a3ac151810a7d43ee42dab3345e7b006872def073ba561002dcd0d53ea07d165",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "html-forms",
+          "path": "files/en-us/learn_web_development/core/structuring_content/html_forms/index.md",
+          "sha256": "b6a10716a5906129e0a78b7552205ba629a89eac2d5f0751a9332a7524cb1cad",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "html-images",
+          "path": "files/en-us/learn_web_development/core/structuring_content/html_images/index.md",
+          "sha256": "71f9a1752978e0929314d8b1c70596fdf8e8167a77d03b7ec8a5b8ecb2b3c1a4",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "html-regions",
+          "path": "files/en-us/learn_web_development/core/structuring_content/structuring_documents/index.md",
+          "sha256": "0f0d4d820066c3bb135d16a47e2459e155343d2385dea3cca3aaf51ca19b140e",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

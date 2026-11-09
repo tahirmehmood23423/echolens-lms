@@ -117,7 +117,7 @@ test('missing or unpublished content never yields a broken recommended lesson',(
 });
 test('completion inventory distinguishes 16 free listings, six validated-course subset and zero approved pilot releases',()=>{
  const report=L.inventory(store);assert.equal(report.reconciliation.public_free.length,16);assert.equal(report.reconciliation.trending_subset.length,6);assert.equal(report.totals.subtracks,132);assert.equal(report.totals.objectives,680);
- assert.equal(report.totals.lessons,36);assert.equal(report.totals.formative_mcqs,224);assert.equal(report.totals.automated_complete,3);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
+ assert.equal(report.totals.lessons,45);assert.equal(report.totals.formative_mcqs,280);assert.equal(report.totals.automated_complete,4);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
 });
 test('learning resume appears in the unified dashboard without an enrollment or false onboarding interruption',()=>{
  release();L.visit(user(1),SID,'py-strings');const w=svc.workspace(user(1));assert.equal(w.continue_learning.resume,'#lesson/'+SID+'/py-strings');assert.equal(w.report.curriculum.learning.completed,0);assert.equal(svc.discoveryState(user(1)).show_welcome,false);
@@ -177,4 +177,21 @@ test('SQL beginner, direct knowledge, targeted remediation and fresh attempts re
  assert.equal(L.progress(user(1),sid).completed,12);assert.equal(L.progress(user(1),sid).mastered_by_assessment,false);
  const fresh=cur.startSubtrack(user(1),sid).attempt;assert.notEqual(fresh.id,first.id);assert.equal(cur.submit(user(1),fresh.id,keys(fresh)).result.outcome,'passed');assert.equal(L.progress(user(1),sid).mastered_by_assessment,true);assert.equal(cur.history(user(1)).length,18);
  const direct=cur.startSubtrack(user(2),sid).attempt;assert.equal(cur.submit(user(2),direct.id,keys(direct)).result.outcome,'passed');assert.equal(L.progress(user(2),sid).completed,0);
+});
+
+test('HTTP foundations and its comprehensive bank remain unpublished drafts, with every objective covered',()=>{
+ const id='http-web-architecture',c=BUILTIN[id],v=validate(c),bank=BANKS[id].questions;assert.deepEqual(v.errors,[]);assert.deepEqual(v.warnings,[]);assert.equal(v.covered,8);assert.equal(c.lessons.length,9);assert.equal(c.questions.length,56);assert.equal(bank.length,90);assert.ok(bank.every(q=>q.status==='draft'));assert.equal(BANKS[id].reviewed_by,null);
+ assert.equal(cur.assessmentStatus(id).state,'draft');assert.equal(cur.startSubtrack(user(1),id).status,409);assert.equal(L.transition(id,'publish',{},3).status,409);assert.equal(L.summary(user(1),id).available,false);
+ const matrix=L.inventory(store).job_roles.find(r=>r.id==='junior-backend-developer');assert.equal(matrix.required.length,9);assert.equal(matrix.completion_matrix.length,9);const row=matrix.completion_matrix.find(r=>r.id===id);assert.equal(row.lessons,9);assert.equal(row.comprehensive_state,'draft');assert.equal(row.human_review,'pending');assert.ok(row.remaining.includes('Comprehensive assessment review and publication'));assert.equal(matrix.complete,false);
+});
+test('HTTP beginner and direct pathways, required remediation, fresh forms and historical evidence use the same engine',()=>{
+ const id='http-web-architecture',bank=BANKS[id].questions;
+ cur.setQuestionStatus(id,bank.map(q=>q.id),'reviewed',3);assert.equal(cur.coverage(id).feasible,true);assert.ok(!cur.publishAssessment(id,3).error);
+ for(const action of ['review','approve','publish']){const out=L.transition(id,action,{attest_human_review:true,notes:'Synthetic HTTP fixture review for isolated integration testing only, never production human content approval.'},3);assert.ok(!out.error,JSON.stringify(out));}
+ const c=L.published(id),keys=(a,correct=()=>true)=>Object.fromEntries(a.questions.map(q=>{const b=c.questions.find(x=>x.id===q.id)||bank.find(x=>x.id===q.id);return [q.id,select(q,b,correct(b)?b.answer:(b.answer+1)%4)];}));
+ const fail=cur.startSubtrack(user(1),id).attempt;const low=cur.submit(user(1),fail.id,keys(fail,q=>!['m2.c1','m2.c3'].includes(q.comp))).result;assert.ok(low.learning_areas.flatMap(m=>m.lessons).some(l=>l.id==='http-safety-retries'));assert.equal(cur.startSubtrack(user(1),id).status,409);
+ for(const m of c.modules){for(const lid of m.lessons){L.visit(user(1),id,lid,true);const a=L.start(user(1),id,'lesson',lid).attempt;assert.ok(a);assert.equal(cur.submit(user(1),a.id,keys(a)).result.outcome,'passed');}const a=L.start(user(1),id,'module',m.id).attempt;assert.equal(a.questions.length,8);assert.equal(cur.submit(user(1),a.id,keys(a)).result.outcome,'passed');}
+ const learned=L.progress(user(1),id);assert.equal(learned.completed,9);assert.equal(learned.mastered_by_assessment,false);
+ const fresh=cur.startSubtrack(user(1),id).attempt;assert.equal(fresh.questions.length,30);assert.ok(fresh.questions.some(q=>!fail.questions.some(p=>p.id===q.id)));assert.ok(!JSON.stringify(fresh).includes('"answer":'));assert.equal(cur.submit(user(1),fresh.id,keys(fresh)).result.outcome,'passed');assert.equal(cur.history(user(1)).length,14);
+ const direct=cur.startSubtrack(user(2),id).attempt;assert.equal(cur.submit(user(2),direct.id,keys(direct)).result.outcome,'passed');assert.equal(L.progress(user(2),id).completed,0);
 });

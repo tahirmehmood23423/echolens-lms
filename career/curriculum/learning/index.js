@@ -6,7 +6,7 @@ const { BANKS: COMPREHENSIVE_BANKS } = require('../questions');
 const { validateQuestion } = require('../qdsl');
 const { verifyCode } = require('../verify');
 const VERIFIED = require('./verification.json');
-const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql') };
+const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http') };
 const clone = x => x == null ? x : JSON.parse(JSON.stringify(x));
 const hash = x => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const text = x => typeof x === 'string' && x.trim().length > 0;
@@ -218,7 +218,7 @@ function createLearning(core) {
     const subs=C.SUBTRACKS.map(base=>{
       const s=subtrack(base.id), d=draft(s.id), p=published(s.id), v=d?validate(d):null;
       const checked=VERIFIED.courses.find(c=>c.id===s.id);
-      const bank=core.questions(s.id);
+      const bank=core.questions(s.id), assessment=assessmentStatus(s.id);
       const exampleCount=(d?.lessons||[]).filter(l=>l?.worked&&checked?.examples.some(e=>e.id===l.id&&e.ok&&e.code_hash===hash({code:l.worked.code,expect:l.worked.expect,lang:l.worked.lang||'python'}))).length;
       const mapping=bank.map(q=>({question:q.id,objective:s.id+'.'+q.comp,
         lessons:(d?.lessons||[]).filter(l=>l?.objectives?.some(o=>o?.id===s.id+'.'+q.comp)).map(l=>({id:l.id,href:p?lessonHref(s.id,l.id):null}))}));
@@ -230,10 +230,10 @@ function createLearning(core) {
         validated_formative_mcqs:v&&!v.errors.length?d.questions.length:0,
         comprehensive_questions:bank.length,comprehensive_mapping:mapping,legacy_bank_review:bank.length?{author:COMPREHENSIVE_BANKS[s.id]?.author,reviewed_by:COMPREHENSIVE_BANKS[s.id]?.reviewed_by,human_attestation:'No separate human attestation is supplied by this legacy metadata; do not treat it as approval of new lessons.'}:null,
         validation_errors:v?.errors||[],automated_complete:!!v&&!v.errors.length,
-        human_approved:!!p?.human_review?.human_attestation,published:!!p,comprehensive:assessmentStatus(s.id),
+        human_approved:!!p?.human_review?.human_attestation,published:!!p,comprehensive:assessment,
         reused_resources:d?.lessons.flatMap(l=>l?.reuse||[])||[],
         candidate_courses:s.refs.map(key=>({key,exists:trackDefs.some(t=>t.key===key),coverage:'Candidate only; detailed objective mapping still requires review.'})),
-        missing:d?(!p?['Human content review and release']:[]):['Written lessons','Lesson MCQs','Module checkpoints','Human content review']};
+        missing:[...(d?(!p?['Human content review and release']:[]):['Written lessons','Lesson MCQs','Module checkpoints','Human content review']),...(assessment.state!=='published'?['Comprehensive assessment review and publication']:[])]};
     });
     const tracks=Object.keys(C.TRACKS).map(id=>{
       const ids=C.trackSubtracks(id), rows=subs.filter(s=>[...ids.core,...ids.variants].includes(s.id));
@@ -246,7 +246,13 @@ function createLearning(core) {
     const roles=core.allRoles().map(r=>{
       const path=core.rolePath(r), final=core.roleFinalStatus(r);
       const missing=path.required.filter(id=>!published(id)||assessmentStatus(id).state!=='published');
-      return {id:r.id,title:r.title,track:r.track,required:path.required,missing,final:final.state,complete:!missing.length&&final.state==='published'};
+      const completion_matrix=path.required.map((id,index)=>{
+        const row=subs.find(s=>s.id===id),content=draft(id),review=records()[id]?.review;
+        return {order:index+1,id,title:row.title,prerequisites:row.prerequisites,lessons:row.lessons,lesson_quizzes:row.quizzes,module_checkpoints:row.checkpoint_modules,
+          comprehensive_questions:row.comprehensive_questions,comprehensive_state:row.comprehensive.state,automated_complete:row.automated_complete,
+          human_review:review?.human_attestation?'approved exact draft':content?'pending':'not authored',published:row.published,remaining:row.missing};
+      });
+      return {id:r.id,title:r.title,track:r.track,required:path.required,optional:path.optional,completion_matrix,missing,final:final.state,complete:!missing.length&&final.state==='published'};
     });
     // Shared prerequisites first; then prioritize subtracks blocking the most roles.
     const explicit=['programming-foundations','python-fundamentals','python-intermediate-oop','js-fundamentals','web-foundations','html-semantic','sql-fundamentals','git-collaboration','practical-data-structures','http-web-architecture','networking-fundamentals','linux-sysadmin','math-for-ai','probability-statistics'];
@@ -256,7 +262,7 @@ function createLearning(core) {
       return rank(a.id)-rank(b.id)||usage(b.id)-usage(a.id)||a.id.localeCompare(b.id);
     });
     const queue=[],seen=new Set();
-    const visit=id=>{if(seen.has(id))return;seen.add(id);for(const p of subtrack(id).prereq)visit(p);const s=subs.find(s=>s.id===id);if(!s.published)queue.push({id,title:s.title,roles_blocked:usage(id),lessons_authored:s.lessons,comprehensive:s.comprehensive.state,next:s.lessons?'Human content review':'Author complete lessons, formative bank and checkpoints'});};
+    const visit=id=>{if(seen.has(id))return;seen.add(id);for(const p of subtrack(id).prereq)visit(p);const s=subs.find(s=>s.id===id);if(!s.published)queue.push({id,title:s.title,roles_blocked:usage(id),lessons_authored:s.lessons,comprehensive:s.comprehensive.state,next:s.lessons?(s.comprehensive.state==='published'?'Human content review':'Human content and comprehensive assessment review'):'Author complete lessons, formative bank and checkpoints'});};
     sorted.forEach(s=>visit(s.id));
     const sum=key=>subs.reduce((n,s)=>n+s[key],0);
     return {scope:'Current runtime catalogue; CLI snapshots are not evidence of deployed production data.',

@@ -526,40 +526,105 @@
       "lessons": 12,
       "questions": 80,
       "human_approved": false
+    },
+    {
+      "id": "http-web-architecture",
+      "version": 1,
+      "course_hash": "8d5078c14f72f2220517fa300ea42700844eecd0f69a1c222957f97104353b5b",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "http-url-boundaries",
+          "code_hash": "340141d30d46fca8f0bb78def85cccbee05aad17ddee9a8ca24c2ef34db2981e",
+          "ran": true,
+          "ok": true,
+          "output": "https portal.example.test 8443\n/learners?page=2\nresults"
+        },
+        {
+          "id": "http-dns-connections",
+          "code_hash": "4129d49862dd51d08f08102e58f414cba36ec56931deb3f51f8f14f3d569a5a0",
+          "ran": true,
+          "ok": true,
+          "output": "192.0.2.10\nHTTPS gateway\nno listener"
+        },
+        {
+          "id": "http-tls-trust",
+          "code_hash": "6b098571d6094f70f6381418b6ffa9b3f6efe71ed9027c6fe861adcfa31910e7",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue"
+        },
+        {
+          "id": "http-methods-status",
+          "code_hash": "5e052c00efac164908fd7d45037e06805bb992280e9690525db4bac5c9ab33f1",
+          "ran": true,
+          "ok": true,
+          "output": "201 Created\n202 Accepted\n204 No Content\n403 Forbidden\n504 Gateway Timeout"
+        },
+        {
+          "id": "http-headers-cache",
+          "code_hash": "d252ddc3db43b335832fab1e6d2677326ac5eb69cc1a1c7a29399d3ddb5828cb",
+          "ran": true,
+          "ok": true,
+          "output": "200\napplication/json\nprivate, no-store\n{}"
+        },
+        {
+          "id": "http-safety-retries",
+          "code_hash": "14add9793df7e48cca8a7de2b28afc0cc20949df5bf60c5292fa5bbaf4a4eea7",
+          "ran": true,
+          "ok": true,
+          "output": "3\n6"
+        },
+        {
+          "id": "http-proxies-state",
+          "code_hash": "7e8ad7ff256c4f187791dfa3c4f12505a2af3f957b2807e34e6ba74db6fc184e",
+          "ran": true,
+          "ok": true,
+          "output": "missing\nA learner-7\nB learner-7"
+        },
+        {
+          "id": "http-sessions-tokens",
+          "code_hash": "6ae6f956e31d3bd9ce0db37595d9ea7def32af33afa77b5d38a309d6b79c1012",
+          "ran": true,
+          "ok": true,
+          "output": "7\ndeny"
+        },
+        {
+          "id": "http-production-trace",
+          "code_hash": "744ff6ac7133f53d4b83b423a1e387b7ff57988cb390547fd0977cc3793a6ce3",
+          "ran": true,
+          "ok": true,
+          "output": "0 gateway_received\n10 app_started\n100 gateway_504\n130 database_committed\ncommit_after_timeout True"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 9,
+      "questions": 56,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/postgres/postgres",
-    "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
+    "repository": "https://github.com/httpwg/http-core",
+    "commit": "bde37f634681bd5462568b73aa722af9c9a3ef5e",
     "references": [
       {
-        "id": "queries",
-        "path": "doc/src/sgml/queries.sgml",
-        "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+        "id": "semantics",
+        "path": "rfc9110.xml",
+        "sha256": "22797e1c392d3a08cca9dca4d8affd7f3461fe574b333658c97b397627efb4d1",
         "checked_by": "official Git object and path inspection"
       },
       {
-        "id": "ddl",
-        "path": "doc/src/sgml/ddl.sgml",
-        "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+        "id": "cache",
+        "path": "rfc9111.xml",
+        "sha256": "800d7f7c39dbe9b580c5d1bac28bd6328e396d66608a25c8bc9c1f78b6da5a25",
         "checked_by": "official Git object and path inspection"
       },
       {
-        "id": "dml",
-        "path": "doc/src/sgml/dml.sgml",
-        "sha256": "f68c23678292aa2b52e666cb5491018458da3df3437f1fbcd0765e4017220b03",
-        "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "comparison",
-        "path": "doc/src/sgml/func.sgml",
-        "sha256": "b894fa8ef7e7fc448b98d682c12498da71dc56a3c22cd5c799c57254f9e16a6a",
-        "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "tutorial",
-        "path": "doc/src/sgml/query.sgml",
-        "sha256": "f2271a6a63e7d7d63a01e8866d2195287284d1531fe2824e4485eb7c9ce72813",
+        "id": "messaging",
+        "path": "rfc9112.xml",
+        "sha256": "92dcc8785c82d98d27a4af726fe9b29f002d524c316c1a316d32249fbf218247",
         "checked_by": "official Git object and path inspection"
       }
     ]
@@ -714,6 +779,31 @@
           "id": "tutorial",
           "path": "doc/src/sgml/query.sgml",
           "sha256": "f2271a6a63e7d7d63a01e8866d2195287284d1531fe2824e4485eb7c9ce72813",
+          "checked_by": "official Git object and path inspection"
+        }
+      ]
+    },
+    {
+      "course": "http-web-architecture",
+      "repository": "https://github.com/httpwg/http-core",
+      "commit": "bde37f634681bd5462568b73aa722af9c9a3ef5e",
+      "references": [
+        {
+          "id": "semantics",
+          "path": "rfc9110.xml",
+          "sha256": "22797e1c392d3a08cca9dca4d8affd7f3461fe574b333658c97b397627efb4d1",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "cache",
+          "path": "rfc9111.xml",
+          "sha256": "800d7f7c39dbe9b580c5d1bac28bd6328e396d66608a25c8bc9c1f78b6da5a25",
+          "checked_by": "official Git object and path inspection"
+        },
+        {
+          "id": "messaging",
+          "path": "rfc9112.xml",
+          "sha256": "92dcc8785c82d98d27a4af726fe9b29f002d524c316c1a316d32249fbf218247",
           "checked_by": "official Git object and path inspection"
         }
       ]

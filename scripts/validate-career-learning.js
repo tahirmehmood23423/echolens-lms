@@ -9,7 +9,7 @@ for(const course of Object.values(BUILTIN)) {
   const result=validate(course,{execute});
   report.courses.push({id:course.id,version:course.version,course_hash:hash(course),...result});
   const repo=course.references[0]?.source?.repo;
-  const courseSourceRoot=repo==='postgres/postgres'?arg('--source-root-postgres'):sourceRoot;
+  const courseSourceRoot=repo==='postgres/postgres'?arg('--source-root-postgres'):repo==='httpwg/http-core'?arg('--source-root-http'):sourceRoot;
   if(courseSourceRoot) {
     const commit=execFileSync('git',['-C',courseSourceRoot,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
     const references=course.references.map(r=>{

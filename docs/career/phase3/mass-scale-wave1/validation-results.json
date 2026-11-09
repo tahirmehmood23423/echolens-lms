@@ -1,0 +1,81 @@
+{
+  "scope": "Isolated repository tests and synthetic local browser fixtures; production runtime was not inspected.",
+  "implementation_commit": "7bee8dc",
+  "starting_authored": 7,
+  "newly_authored": 17,
+  "total_authored": 24,
+  "remaining": 108,
+  "new_modules": 53,
+  "new_lessons": 159,
+  "new_formative_mcqs": 1184,
+  "new_comprehensive_mcqs": 1440,
+  "reused_comprehensive_mcqs": 90,
+  "new_verified_worked_examples": 159,
+  "canonical_objectives_newly_taught": 99,
+  "targeted": {
+    "tests": 192,
+    "pass": 192,
+    "fail": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "passed": true,
+    "checks": 355,
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "errors": [],
+    "production_published": false
+  },
+  "full_suite": {
+    "tests": 349,
+    "pass": 337,
+    "fail": 11,
+    "skipped": 1
+  },
+  "existing_failure_names_match_prior_batch": true,
+  "existing_failures": [
+    "\u2716 actual health and alert functions expose full error details without connecting to a database",
+    "\u2716 admin login and role-specific browsing",
+    "\u2716 all demo roles browse synthetic data; writes cannot alter the store or SQL",
+    "\u2716 coord login and role-specific browsing",
+    "\u2716 reminder settings and delivery history round-trip through the production Prisma JSON mapping",
+    "\u2716 required ad choices and unresolved age/retention facts remain explicit",
+    "\u2716 test/certificate-final-project.test.js",
+    "\u2716 test/flush-step2.test.js",
+    "\u2716 test/free-course-reminders.test.js",
+    "\u2716 test/talent.test.js",
+    "\u2716 test/trending-tech.test.js"
+  ],
+  "new_failures": [],
+  "fresh_code_checks": 273,
+  "distinct_worked_examples": 240,
+  "official_source_course_groups": 29,
+  "source_repositories": [
+    "https://github.com/OAI/OpenAPI-Specification",
+    "https://github.com/OWASP/CheatSheetSeries",
+    "https://github.com/coreutils/coreutils",
+    "https://github.com/git/git",
+    "https://github.com/httpwg/http-core",
+    "https://github.com/huggingface/course",
+    "https://github.com/mdn/content",
+    "https://github.com/openai/openai-cookbook",
+    "https://github.com/postgres/postgres",
+    "https://github.com/python/cpython",
+    "https://github.com/systemd/systemd"
+  ],
+  "human_review_pending": 24,
+  "human_reviewed": 0,
+  "new_lessons_published": 0,
+  "authored_role_pathways": [
+    "junior-backend-developer"
+  ],
+  "published_complete_role_pathways": [],
+  "new_commits_pushed": false,
+  "deployed": false,
+  "parallel_authoring_limit": "Worker execution usage limit reached; two interrupted packages quarantined and excluded."
+}

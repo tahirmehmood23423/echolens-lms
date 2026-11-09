@@ -1,0 +1,206 @@
+[
+  {
+    "id": "backend-testing-reliability",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "git-collaboration",
+    "reused": true,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 29,
+      "hard": 31,
+      "advanced": 12
+    },
+    "scenarios": 89
+  },
+  {
+    "id": "web-foundations",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "computing-os-foundations",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "ai-api-integration",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "sdlc-foundations",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "networking-fundamentals",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "html-semantic",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "qa-principles",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "llm-fundamentals",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "math-for-ai",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "probability-statistics",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "data-business-fundamentals",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "test-design",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "css-fundamentals",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "linux-sysadmin",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  },
+  {
+    "id": "python-intermediate-oop",
+    "reused": false,
+    "items": 90,
+    "difficulties": {
+      "easy": 18,
+      "medium": 32,
+      "hard": 31,
+      "advanced": 9
+    },
+    "scenarios": 63
+  }
+]

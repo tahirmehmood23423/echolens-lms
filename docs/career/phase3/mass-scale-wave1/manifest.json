@@ -1,0 +1,40 @@
+{
+  "wave": "shared-foundations-1",
+  "starting_commit": "051a99c",
+  "starting_authored": 7,
+  "courses": [
+    "backend-testing-reliability",
+    "git-collaboration",
+    "web-foundations",
+    "computing-os-foundations",
+    "ai-api-integration",
+    "sdlc-foundations",
+    "networking-fundamentals",
+    "html-semantic",
+    "qa-principles",
+    "llm-fundamentals",
+    "math-for-ai",
+    "probability-statistics",
+    "data-business-fundamentals",
+    "test-design",
+    "css-fundamentals",
+    "linux-sysadmin",
+    "python-intermediate-oop"
+  ],
+  "quarantined": [
+    {
+      "id": "prompting-structured-output",
+      "original": "career/curriculum/learning/wave1/prompting-structured-output.js",
+      "reason": "Lesson/practice candidate exists; comprehensive bank and full integration incomplete.",
+      "preserved": "career/curriculum/learning/quarantine/wave1/prompting-structured-output.js.partial",
+      "sha256": "bc2fd834cb33b87cfadaa3ae0bd2525af44a3b79e693f23874b0ea9af0f94420"
+    },
+    {
+      "id": "descriptive-stats-metrics",
+      "original": "career/curriculum/learning/wave1/descriptive-stats-metrics.js",
+      "reason": "Authoring interrupted; source is syntactically incomplete and comprehensive bank missing.",
+      "preserved": "career/curriculum/learning/quarantine/wave1/descriptive-stats-metrics.js.partial",
+      "sha256": "6bac3a1b3c88a93828cb8d0a957dbea7eae8be2cdf5a802cc899be218157dd8c"
+    }
+  ]
+}

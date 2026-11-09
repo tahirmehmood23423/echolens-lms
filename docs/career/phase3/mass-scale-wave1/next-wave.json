@@ -1,0 +1,1400 @@
+{
+  "selected": [
+    {
+      "id": "prompting-structured-output",
+      "prerequisites": [
+        "llm-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "generative-ai-llm-developer"
+        ],
+        "roles": [
+          {
+            "id": "llm-application-developer",
+            "mandatory": true
+          },
+          {
+            "id": "rag-developer",
+            "mandatory": true
+          },
+          {
+            "id": "ai-agent-developer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "prompting-structured-output.m1.c1",
+          "text": "Write system and user prompts with clear tasks, constraints and examples",
+          "critical": true
+        },
+        {
+          "id": "prompting-structured-output.m1.c2",
+          "text": "Manage context length and conversation history",
+          "critical": false
+        },
+        {
+          "id": "prompting-structured-output.m2.c1",
+          "text": "Get valid JSON with schemas or structured-output modes and validate it",
+          "critical": true
+        },
+        {
+          "id": "prompting-structured-output.m3.c1",
+          "text": "Compare prompt versions on a fixed evaluation set",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "descriptive-stats-metrics",
+      "prerequisites": [
+        "data-business-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "data-analyst-business-intelligence"
+        ],
+        "roles": [
+          {
+            "id": "junior-data-analyst",
+            "mandatory": true
+          },
+          {
+            "id": "sql-analyst",
+            "mandatory": true
+          },
+          {
+            "id": "powerbi-analyst",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "descriptive-stats-metrics.m1.c1",
+          "text": "Choose mean, median or mode and measures of spread",
+          "critical": true
+        },
+        {
+          "id": "descriptive-stats-metrics.m1.c2",
+          "text": "Identify skew and outliers",
+          "critical": false
+        },
+        {
+          "id": "descriptive-stats-metrics.m2.c1",
+          "text": "Compute growth, conversion, retention, churn and margin correctly",
+          "critical": true
+        },
+        {
+          "id": "descriptive-stats-metrics.m2.c2",
+          "text": "Apply agreed metric definitions (for example refunds and revenue)",
+          "critical": false
+        },
+        {
+          "id": "descriptive-stats-metrics.m3.c1",
+          "text": "Avoid confusing correlation with causation",
+          "critical": true
+        },
+        {
+          "id": "descriptive-stats-metrics.m3.c2",
+          "text": "Report uncertainty and sample size",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "js-fundamentals",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "usage": {
+        "tracks": [
+          "frontend-web-developer",
+          "backend-developer",
+          "full-stack-web-developer",
+          "mobile-app-developer",
+          "software-qa-test-automation"
+        ],
+        "roles": [
+          {
+            "id": "junior-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-developer",
+            "mandatory": true
+          },
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nodejs-developer",
+            "mandatory": true
+          },
+          {
+            "id": "mern-stack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nextjs-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "python-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-native-developer",
+            "mandatory": true
+          },
+          {
+            "id": "api-tester",
+            "mandatory": true
+          },
+          {
+            "id": "automation-qa-engineer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "js-fundamentals.m1.c1",
+          "text": "Predict results involving type coercion, equality and truthiness",
+          "critical": true
+        },
+        {
+          "id": "js-fundamentals.m1.c2",
+          "text": "Use let and const with correct scoping",
+          "critical": false
+        },
+        {
+          "id": "js-fundamentals.m2.c1",
+          "text": "Trace functions, closures and arrow functions",
+          "critical": true
+        },
+        {
+          "id": "js-fundamentals.m2.c2",
+          "text": "Explain how this behaves in different call styles",
+          "critical": false
+        },
+        {
+          "id": "js-fundamentals.m3.c1",
+          "text": "Transform data with map, filter, reduce and destructuring",
+          "critical": true
+        },
+        {
+          "id": "js-fundamentals.m3.c2",
+          "text": "Predict reference versus copy behaviour for objects and arrays",
+          "critical": false
+        },
+        {
+          "id": "js-fundamentals.m4.c1",
+          "text": "Use modules, template literals, spread and optional chaining",
+          "critical": false
+        },
+        {
+          "id": "js-fundamentals.m4.c2",
+          "text": "Handle errors with try/catch and custom errors",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "cloud-aws-foundations",
+      "prerequisites": [
+        "networking-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "data-engineer",
+          "cybersecurity-analyst",
+          "cloud-devops-engineer"
+        ],
+        "roles": [
+          {
+            "id": "cloud-data-engineer",
+            "mandatory": true
+          },
+          {
+            "id": "junior-devops-engineer",
+            "mandatory": true
+          },
+          {
+            "id": "cloud-engineer",
+            "mandatory": true
+          },
+          {
+            "id": "cicd-engineer",
+            "mandatory": false
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "cloud-aws-foundations.m1.c1",
+          "text": "Compare IaaS, PaaS and SaaS and the shared responsibility model",
+          "critical": true
+        },
+        {
+          "id": "cloud-aws-foundations.m1.c2",
+          "text": "Explain regions and availability zones",
+          "critical": false
+        },
+        {
+          "id": "cloud-aws-foundations.m2.c1",
+          "text": "Choose compute (EC2, Lambda, containers) and storage (S3, EBS, RDS) for a workload",
+          "critical": true
+        },
+        {
+          "id": "cloud-aws-foundations.m3.c1",
+          "text": "Estimate and control cloud costs with budgets and tags",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "practical-data-structures",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "backend-developer"
+        ],
+        "roles": [
+          {
+            "id": "junior-backend-developer",
+            "mandatory": false
+          },
+          {
+            "id": "python-fastapi-developer",
+            "mandatory": false
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "practical-data-structures.m1.c1",
+          "text": "Choose list, dict, set, queue or heap for a backend requirement",
+          "critical": true
+        },
+        {
+          "id": "practical-data-structures.m1.c2",
+          "text": "Explain average lookup cost for lists versus hash maps",
+          "critical": false
+        },
+        {
+          "id": "practical-data-structures.m2.c1",
+          "text": "Estimate time complexity of loops and nested loops in request handlers",
+          "critical": true
+        },
+        {
+          "id": "practical-data-structures.m2.c2",
+          "text": "Identify accidental quadratic work such as membership checks in loops",
+          "critical": false
+        },
+        {
+          "id": "practical-data-structures.m3.c1",
+          "text": "Use dictionaries for grouping, counting and indexing records",
+          "critical": false
+        },
+        {
+          "id": "practical-data-structures.m3.c2",
+          "text": "Use queues and priority queues for jobs and scheduling",
+          "critical": false
+        },
+        {
+          "id": "practical-data-structures.m3.c3",
+          "text": "Paginate and batch work over large collections",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "js-dom-async",
+      "prerequisites": [
+        "js-fundamentals",
+        "html-semantic"
+      ],
+      "usage": {
+        "tracks": [
+          "frontend-web-developer",
+          "backend-developer",
+          "full-stack-web-developer"
+        ],
+        "roles": [
+          {
+            "id": "junior-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-developer",
+            "mandatory": true
+          },
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nodejs-developer",
+            "mandatory": true
+          },
+          {
+            "id": "mern-stack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nextjs-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "python-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-native-developer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "js-dom-async.m1.c1",
+          "text": "Select, create and update elements safely (textContent vs innerHTML)",
+          "critical": true
+        },
+        {
+          "id": "js-dom-async.m1.c2",
+          "text": "Use event listeners and event delegation",
+          "critical": false
+        },
+        {
+          "id": "js-dom-async.m2.c1",
+          "text": "Predict execution order of synchronous code, timers, promises and microtasks",
+          "critical": true
+        },
+        {
+          "id": "js-dom-async.m3.c1",
+          "text": "Handle async results and errors with async/await",
+          "critical": true
+        },
+        {
+          "id": "js-dom-async.m3.c2",
+          "text": "Run requests in parallel or sequence appropriately",
+          "critical": false
+        },
+        {
+          "id": "js-dom-async.m4.c1",
+          "text": "Call APIs with fetch and check response status",
+          "critical": false
+        },
+        {
+          "id": "js-dom-async.m4.c2",
+          "text": "Use localStorage and sessionStorage appropriately",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "typescript-fundamentals",
+      "prerequisites": [
+        "js-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "frontend-web-developer",
+          "backend-developer",
+          "full-stack-web-developer"
+        ],
+        "roles": [
+          {
+            "id": "junior-frontend-developer",
+            "mandatory": false
+          },
+          {
+            "id": "react-developer",
+            "mandatory": false
+          },
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nodejs-developer",
+            "mandatory": false
+          },
+          {
+            "id": "mern-stack-developer",
+            "mandatory": false
+          },
+          {
+            "id": "nextjs-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "python-fullstack-developer",
+            "mandatory": false
+          },
+          {
+            "id": "react-native-developer",
+            "mandatory": false
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "typescript-fundamentals.m1.c1",
+          "text": "Type values, functions and objects with interfaces and type aliases",
+          "critical": true
+        },
+        {
+          "id": "typescript-fundamentals.m1.c2",
+          "text": "Use optional and readonly properties correctly",
+          "critical": false
+        },
+        {
+          "id": "typescript-fundamentals.m2.c1",
+          "text": "Narrow union types safely, including discriminated unions",
+          "critical": true
+        },
+        {
+          "id": "typescript-fundamentals.m2.c2",
+          "text": "Handle null and undefined under strict mode",
+          "critical": false
+        },
+        {
+          "id": "typescript-fundamentals.m3.c1",
+          "text": "Write and use generic functions and types",
+          "critical": false
+        },
+        {
+          "id": "typescript-fundamentals.m3.c2",
+          "text": "Configure tsconfig strictness and interpret compiler errors",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "react-fundamentals",
+      "prerequisites": [
+        "js-dom-async"
+      ],
+      "usage": {
+        "tracks": [
+          "frontend-web-developer",
+          "full-stack-web-developer",
+          "mobile-app-developer"
+        ],
+        "roles": [
+          {
+            "id": "junior-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-developer",
+            "mandatory": true
+          },
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "mern-stack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nextjs-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "python-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-native-developer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "react-fundamentals.m1.c1",
+          "text": "Compose UIs from components that receive props",
+          "critical": true
+        },
+        {
+          "id": "react-fundamentals.m1.c2",
+          "text": "Render lists with stable keys and conditional content",
+          "critical": false
+        },
+        {
+          "id": "react-fundamentals.m2.c1",
+          "text": "Update state correctly, including functional updates",
+          "critical": true
+        },
+        {
+          "id": "react-fundamentals.m2.c2",
+          "text": "Lift state up and pass callbacks",
+          "critical": false
+        },
+        {
+          "id": "react-fundamentals.m3.c1",
+          "text": "Use useEffect with correct dependencies and cleanup",
+          "critical": true
+        },
+        {
+          "id": "react-fundamentals.m3.c2",
+          "text": "Fetch data in components and handle loading and error states",
+          "critical": false
+        },
+        {
+          "id": "react-fundamentals.m4.c1",
+          "text": "Build controlled forms with validation",
+          "critical": false
+        },
+        {
+          "id": "react-fundamentals.m4.c2",
+          "text": "Explain controlled versus uncontrolled inputs",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "advanced-sql",
+      "prerequisites": [
+        "sql-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "data-analyst-business-intelligence",
+          "data-engineer"
+        ],
+        "roles": [
+          {
+            "id": "sql-analyst",
+            "mandatory": true
+          },
+          {
+            "id": "powerbi-analyst",
+            "mandatory": false
+          },
+          {
+            "id": "junior-data-engineer",
+            "mandatory": true
+          },
+          {
+            "id": "etl-developer",
+            "mandatory": true
+          },
+          {
+            "id": "cloud-data-engineer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "advanced-sql.m1.c1",
+          "text": "Structure complex queries with CTEs",
+          "critical": true
+        },
+        {
+          "id": "advanced-sql.m1.c2",
+          "text": "Use correlated subqueries and EXISTS correctly",
+          "critical": false
+        },
+        {
+          "id": "advanced-sql.m2.c1",
+          "text": "Rank, running totals and period comparisons with window functions",
+          "critical": true
+        },
+        {
+          "id": "advanced-sql.m2.c2",
+          "text": "Pick the latest row per group",
+          "critical": false
+        },
+        {
+          "id": "advanced-sql.m3.c1",
+          "text": "Read query plans and add suitable indexes",
+          "critical": true
+        },
+        {
+          "id": "advanced-sql.m3.c2",
+          "text": "Write sargable filters and avoid unnecessary scans",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "fastapi-backend",
+      "prerequisites": [
+        "python-intermediate-oop",
+        "rest-api-design"
+      ],
+      "usage": {
+        "tracks": [
+          "backend-developer",
+          "full-stack-web-developer",
+          "generative-ai-llm-developer"
+        ],
+        "roles": [
+          {
+            "id": "python-fastapi-developer",
+            "mandatory": true
+          },
+          {
+            "id": "python-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "llm-application-developer",
+            "mandatory": false
+          },
+          {
+            "id": "rag-developer",
+            "mandatory": false
+          },
+          {
+            "id": "ai-agent-developer",
+            "mandatory": false
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "fastapi-backend.m1.c1",
+          "text": "Define routes, path and query parameters and request bodies",
+          "critical": true
+        },
+        {
+          "id": "fastapi-backend.m1.c2",
+          "text": "Use Pydantic models for validation and serialization",
+          "critical": false
+        },
+        {
+          "id": "fastapi-backend.m2.c1",
+          "text": "Structure an app with routers, dependencies and settings",
+          "critical": true
+        },
+        {
+          "id": "fastapi-backend.m2.c2",
+          "text": "Separate handlers, services and data access",
+          "critical": false
+        },
+        {
+          "id": "fastapi-backend.m3.c1",
+          "text": "Explain when async helps and when it blocks the event loop",
+          "critical": true
+        },
+        {
+          "id": "fastapi-backend.m3.c2",
+          "text": "Use background tasks and queues for slow work",
+          "critical": false
+        },
+        {
+          "id": "fastapi-backend.m4.c1",
+          "text": "Handle errors with exception handlers and consistent responses",
+          "critical": false
+        },
+        {
+          "id": "fastapi-backend.m4.c2",
+          "text": "Configure CORS, logging and health checks",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "docker-containers",
+      "prerequisites": [
+        "linux-sysadmin"
+      ],
+      "usage": {
+        "tracks": [
+          "data-engineer",
+          "cloud-devops-engineer"
+        ],
+        "roles": [
+          {
+            "id": "cloud-data-engineer",
+            "mandatory": false
+          },
+          {
+            "id": "junior-devops-engineer",
+            "mandatory": true
+          },
+          {
+            "id": "cloud-engineer",
+            "mandatory": true
+          },
+          {
+            "id": "cicd-engineer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "docker-containers.m1.c1",
+          "text": "Write efficient Dockerfiles with layer caching and multi-stage builds",
+          "critical": true
+        },
+        {
+          "id": "docker-containers.m2.c1",
+          "text": "Use ports, volumes, networks and environment configuration",
+          "critical": true
+        },
+        {
+          "id": "docker-containers.m2.c2",
+          "text": "Run multi-container apps with Compose",
+          "critical": false
+        },
+        {
+          "id": "docker-containers.m3.c1",
+          "text": "Use minimal images, non-root users and image scanning",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "frontend-api-security",
+      "prerequisites": [
+        "js-dom-async"
+      ],
+      "usage": {
+        "tracks": [
+          "frontend-web-developer",
+          "full-stack-web-developer"
+        ],
+        "roles": [
+          {
+            "id": "junior-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-developer",
+            "mandatory": true
+          },
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nextjs-fullstack-developer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "frontend-api-security.m1.c1",
+          "text": "Handle loading, error, empty and retry states",
+          "critical": true
+        },
+        {
+          "id": "frontend-api-security.m1.c2",
+          "text": "Prevent duplicate submissions and race conditions in the UI",
+          "critical": false
+        },
+        {
+          "id": "frontend-api-security.m2.c1",
+          "text": "Store and send credentials safely (cookies vs tokens)",
+          "critical": true
+        },
+        {
+          "id": "frontend-api-security.m2.c2",
+          "text": "Protect routes and handle expired sessions",
+          "critical": false
+        },
+        {
+          "id": "frontend-api-security.m3.c1",
+          "text": "Prevent XSS and explain CORS and CSRF",
+          "critical": true
+        },
+        {
+          "id": "frontend-api-security.m3.c2",
+          "text": "Apply Content-Security-Policy and safe third-party scripts",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "frontend-quality",
+      "prerequisites": [
+        "react-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "frontend-web-developer",
+          "full-stack-web-developer"
+        ],
+        "roles": [
+          {
+            "id": "junior-frontend-developer",
+            "mandatory": false
+          },
+          {
+            "id": "react-developer",
+            "mandatory": true
+          },
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nextjs-fullstack-developer",
+            "mandatory": false
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "frontend-quality.m1.c1",
+          "text": "Meet WCAG basics: keyboard access, focus, labels and contrast",
+          "critical": true
+        },
+        {
+          "id": "frontend-quality.m1.c2",
+          "text": "Use ARIA only where native HTML is not enough",
+          "critical": false
+        },
+        {
+          "id": "frontend-quality.m2.c1",
+          "text": "Write component tests that check behaviour, not implementation",
+          "critical": true
+        },
+        {
+          "id": "frontend-quality.m2.c2",
+          "text": "Add end-to-end tests for critical flows",
+          "critical": false
+        },
+        {
+          "id": "frontend-quality.m3.c1",
+          "text": "Diagnose slow pages with Core Web Vitals and DevTools",
+          "critical": true
+        },
+        {
+          "id": "frontend-quality.m3.c2",
+          "text": "Optimise images, bundles and caching",
+          "critical": false
+        },
+        {
+          "id": "frontend-quality.m4.c1",
+          "text": "Deploy with build pipelines, environments and rollbacks",
+          "critical": false
+        },
+        {
+          "id": "frontend-quality.m4.c2",
+          "text": "Monitor frontend errors in production",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "node-express",
+      "prerequisites": [
+        "js-dom-async",
+        "rest-api-design"
+      ],
+      "usage": {
+        "tracks": [
+          "backend-developer",
+          "full-stack-web-developer"
+        ],
+        "roles": [
+          {
+            "id": "nodejs-developer",
+            "mandatory": true
+          },
+          {
+            "id": "mern-stack-developer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "node-express.m1.c1",
+          "text": "Explain the event loop and why CPU-heavy work blocks a Node server",
+          "critical": true
+        },
+        {
+          "id": "node-express.m1.c2",
+          "text": "Use modules, npm packages and environment configuration",
+          "critical": false
+        },
+        {
+          "id": "node-express.m2.c1",
+          "text": "Build routes and middleware chains, and order them correctly",
+          "critical": true
+        },
+        {
+          "id": "node-express.m2.c2",
+          "text": "Parse and validate request bodies and parameters",
+          "critical": false
+        },
+        {
+          "id": "node-express.m3.c1",
+          "text": "Handle promise rejections and errors in async handlers",
+          "critical": true
+        },
+        {
+          "id": "node-express.m3.c2",
+          "text": "Use centralized error middleware",
+          "critical": false
+        },
+        {
+          "id": "node-express.m4.c1",
+          "text": "Connect to SQL or MongoDB databases with pooling",
+          "critical": false
+        },
+        {
+          "id": "node-express.m4.c2",
+          "text": "Prevent injection with parameterised queries or ODM validation",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "fullstack-integration-state",
+      "prerequisites": [
+        "react-fundamentals",
+        "node-express"
+      ],
+      "usage": {
+        "tracks": [
+          "full-stack-web-developer"
+        ],
+        "roles": [
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": false
+          },
+          {
+            "id": "mern-stack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "nextjs-fullstack-developer",
+            "mandatory": true
+          },
+          {
+            "id": "python-fullstack-developer",
+            "mandatory": false
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "fullstack-integration-state.m1.c1",
+          "text": "Keep request and response shapes consistent with shared types and validation",
+          "critical": true
+        },
+        {
+          "id": "fullstack-integration-state.m1.c2",
+          "text": "Version contracts without breaking clients",
+          "critical": false
+        },
+        {
+          "id": "fullstack-integration-state.m2.c1",
+          "text": "Keep client and server state consistent after mutations",
+          "critical": true
+        },
+        {
+          "id": "fullstack-integration-state.m2.c2",
+          "text": "Handle pagination, filtering and real-time updates",
+          "critical": false
+        },
+        {
+          "id": "fullstack-integration-state.m3.c1",
+          "text": "Design user-visible behaviour for partial failures",
+          "critical": false
+        },
+        {
+          "id": "fullstack-integration-state.m3.c2",
+          "text": "Trace a bug across frontend, API and database",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "react-advanced",
+      "prerequisites": [
+        "react-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "frontend-web-developer",
+          "full-stack-web-developer"
+        ],
+        "roles": [
+          {
+            "id": "react-developer",
+            "mandatory": true
+          },
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "mern-stack-developer",
+            "mandatory": false
+          },
+          {
+            "id": "nextjs-fullstack-developer",
+            "mandatory": false
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "react-advanced.m1.c1",
+          "text": "Choose local state, context, reducers or a store for a requirement",
+          "critical": true
+        },
+        {
+          "id": "react-advanced.m1.c2",
+          "text": "Avoid prop drilling and unnecessary global state",
+          "critical": false
+        },
+        {
+          "id": "react-advanced.m2.c1",
+          "text": "Cache and synchronise server data (for example with React Query patterns)",
+          "critical": true
+        },
+        {
+          "id": "react-advanced.m2.c2",
+          "text": "Handle optimistic updates and rollback",
+          "critical": false
+        },
+        {
+          "id": "react-advanced.m3.c1",
+          "text": "Diagnose unnecessary re-renders and fix them with memoisation",
+          "critical": true
+        },
+        {
+          "id": "react-advanced.m3.c2",
+          "text": "Split code and lazy-load routes",
+          "critical": false
+        },
+        {
+          "id": "react-advanced.m4.c1",
+          "text": "Write custom hooks",
+          "critical": false
+        },
+        {
+          "id": "react-advanced.m4.c2",
+          "text": "Design reusable component APIs",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "responsive-css",
+      "prerequisites": [
+        "css-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "frontend-web-developer",
+          "full-stack-web-developer"
+        ],
+        "roles": [
+          {
+            "id": "junior-frontend-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-developer",
+            "mandatory": true
+          },
+          {
+            "id": "typescript-frontend-developer",
+            "mandatory": false
+          },
+          {
+            "id": "mern-stack-developer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "responsive-css.m1.c1",
+          "text": "Build one-dimensional layouts and alignments with Flexbox",
+          "critical": true
+        },
+        {
+          "id": "responsive-css.m2.c1",
+          "text": "Build two-dimensional page layouts with CSS Grid",
+          "critical": true
+        },
+        {
+          "id": "responsive-css.m2.c2",
+          "text": "Choose between Flexbox and Grid for a layout",
+          "critical": false
+        },
+        {
+          "id": "responsive-css.m3.c1",
+          "text": "Use the viewport meta tag, fluid units and media queries for mobile-first design",
+          "critical": true
+        },
+        {
+          "id": "responsive-css.m3.c2",
+          "text": "Make images and media responsive and fast",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "scripting-automation",
+      "prerequisites": [
+        "linux-sysadmin",
+        "python-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "cybersecurity-analyst",
+          "cloud-devops-engineer"
+        ],
+        "roles": [
+          {
+            "id": "junior-security-engineer",
+            "mandatory": true
+          },
+          {
+            "id": "junior-devops-engineer",
+            "mandatory": true
+          },
+          {
+            "id": "cloud-engineer",
+            "mandatory": false
+          },
+          {
+            "id": "cicd-engineer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "scripting-automation.m1.c1",
+          "text": "Write safe Bash scripts with variables, loops, exit codes and set -euo pipefail",
+          "critical": true
+        },
+        {
+          "id": "scripting-automation.m2.c1",
+          "text": "Automate tasks with Python, subprocess and APIs",
+          "critical": true
+        },
+        {
+          "id": "scripting-automation.m3.c1",
+          "text": "Make scripts idempotent, logged and testable",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "mobile-ui-fundamentals",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "usage": {
+        "tracks": [
+          "mobile-app-developer"
+        ],
+        "roles": [
+          {
+            "id": "flutter-developer",
+            "mandatory": true
+          },
+          {
+            "id": "android-developer",
+            "mandatory": true
+          },
+          {
+            "id": "react-native-developer",
+            "mandatory": true
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "mobile-ui-fundamentals.m1.c1",
+          "text": "Compare native, cross-platform and web apps for a product",
+          "critical": true
+        },
+        {
+          "id": "mobile-ui-fundamentals.m1.c2",
+          "text": "Explain the app lifecycle at a high level",
+          "critical": false
+        },
+        {
+          "id": "mobile-ui-fundamentals.m2.c1",
+          "text": "Apply touch-target, layout and navigation conventions",
+          "critical": true
+        },
+        {
+          "id": "mobile-ui-fundamentals.m2.c2",
+          "text": "Design for different screen sizes and orientations",
+          "critical": false
+        },
+        {
+          "id": "mobile-ui-fundamentals.m3.c1",
+          "text": "Design for poor networks, battery and storage limits",
+          "critical": false
+        },
+        {
+          "id": "mobile-ui-fundamentals.m3.c2",
+          "text": "Respect platform guidelines (Material, Human Interface)",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "app-distribution",
+      "prerequisites": [
+        "mobile-ui-fundamentals"
+      ],
+      "usage": {
+        "tracks": [
+          "mobile-app-developer"
+        ],
+        "roles": [
+          {
+            "id": "flutter-developer",
+            "mandatory": false
+          },
+          {
+            "id": "android-developer",
+            "mandatory": false
+          },
+          {
+            "id": "react-native-developer",
+            "mandatory": false
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "app-distribution.m1.c1",
+          "text": "Prepare signed builds and store listings for Google Play and the App Store",
+          "critical": true
+        },
+        {
+          "id": "app-distribution.m1.c2",
+          "text": "Meet store review and privacy requirements",
+          "critical": false
+        },
+        {
+          "id": "app-distribution.m2.c1",
+          "text": "Use staged rollouts, versioning and release notes",
+          "critical": true
+        },
+        {
+          "id": "app-distribution.m2.c2",
+          "text": "Roll out fixes and handle forced updates",
+          "critical": false
+        },
+        {
+          "id": "app-distribution.m3.c1",
+          "text": "Monitor crashes, ratings and analytics after release",
+          "critical": false
+        }
+      ]
+    }
+  ],
+  "remaining": [
+    "db-integration-performance",
+    "backend-deployment-ops",
+    "nextjs-architecture",
+    "fullstack-architecture",
+    "web-deployment-cicd",
+    "dart-programming",
+    "flutter-fundamentals",
+    "flutter-layout-nav-state",
+    "kotlin-android",
+    "react-native",
+    "mobile-apis-networking",
+    "mobile-storage",
+    "mobile-auth-security",
+    "mobile-architecture",
+    "mobile-testing-debugging",
+    "mobile-performance-platform",
+    "numpy-arrays",
+    "pandas-fundamentals",
+    "data-cleaning",
+    "ml-preprocessing",
+    "ml-fundamentals",
+    "supervised-learning",
+    "unsupervised-learning",
+    "feature-eng-evaluation",
+    "deep-learning",
+    "computer-vision",
+    "nlp-fundamentals",
+    "mlops-deployment",
+    "responsible-ai-monitoring",
+    "embeddings-semantic-search",
+    "vector-databases",
+    "rag-fundamentals",
+    "rag-advanced",
+    "agents-tool-calling",
+    "agent-workflows",
+    "llm-security-eval",
+    "llm-deployment-cost",
+    "spreadsheet-analysis",
+    "eda",
+    "data-visualization",
+    "powerbi-modeling",
+    "dashboards-reporting",
+    "data-storytelling",
+    "data-modeling-warehousing",
+    "etl-elt-architecture",
+    "data-transformation-pipelines",
+    "workflow-orchestration",
+    "data-quality-testing",
+    "batch-streaming",
+    "cloud-data-platforms",
+    "data-reliability-recovery",
+    "data-governance-security",
+    "security-foundations",
+    "identity-access-control",
+    "cryptography-secure-comms",
+    "vulnerabilities-defense",
+    "security-logging-monitoring",
+    "soc-siem",
+    "incident-response",
+    "network-endpoint-cloud-security",
+    "security-grc",
+    "cloud-networking-iam",
+    "ci-cd",
+    "infrastructure-as-code",
+    "kubernetes",
+    "observability",
+    "reliability-incident-cost",
+    "defect-management",
+    "functional-regression-exploratory",
+    "web-api-testing",
+    "test-data-management",
+    "playwright-automation",
+    "automation-frameworks",
+    "ci-test-reporting",
+    "performance-quality-engineering",
+    "oop-principles",
+    "java-fundamentals",
+    "complexity-analysis",
+    "arrays-strings-hashing",
+    "linear-structures",
+    "recursion-backtracking",
+    "searching-sorting",
+    "trees-bst",
+    "graphs",
+    "greedy-dp",
+    "debugging-testing",
+    "software-design",
+    "engineering-problem-solving"
+  ]
+}

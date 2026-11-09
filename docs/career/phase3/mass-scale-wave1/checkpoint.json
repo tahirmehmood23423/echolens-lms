@@ -1,0 +1,1640 @@
+{
+  "schema_version": 1,
+  "scope": "Repository-only content checks; no application store, human approval or publication",
+  "courses": [
+    {
+      "id": "backend-testing-reliability",
+      "fingerprint": "12c8e4cc6925c51a59700355eb5ff9940eb5360c0b02ffe16eff1d99b0b8f26c",
+      "course_hash": "89eab60ab7199d6726287b88745c9f34b21fb88443d17eba9e3a2d62d4169be1",
+      "bank_hash": "c75002554251a5c1f4fa7225f09787394b2d59cdd37c921391052ffc3618e1ef",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 7,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "btr-unit",
+          "code_hash": "6aafc431436bf4a4573d463370fb88afb8f07b5edd90514dfecacf1b9179a2bc",
+          "ran": true,
+          "ok": true,
+          "output": "3 True"
+        },
+        {
+          "id": "btr-boundaries",
+          "code_hash": "419c409113e123e189f88f2e3549d2d5ce02c6404c551bdacf82826c33452f6f",
+          "ran": true,
+          "ok": true,
+          "output": "200 ['id', 'state'] 1"
+        },
+        {
+          "id": "btr-fixtures",
+          "code_hash": "b8a32f4dfce29d70b0a2a3b73be1cb58c69b9343833166de53fa3a40a5857dd8",
+          "ran": true,
+          "ok": true,
+          "output": "duplicate rejected\nFalse"
+        },
+        {
+          "id": "btr-traces",
+          "code_hash": "6fa5a736e44cb489ca3379518d61afe468b90925ca0a08d63523a631b5d50c37",
+          "ran": true,
+          "ok": true,
+          "output": "ValueError parse_quantity"
+        },
+        {
+          "id": "btr-reproduce",
+          "code_hash": "f310bc934bdfcf4ea11101a91fc74326beda4e48b31467c229116dab48f20065",
+          "ran": true,
+          "ok": true,
+          "output": "True False\n[True, False, False]"
+        },
+        {
+          "id": "btr-isolate",
+          "code_hash": "96a2c02d608929c320b04390d1533b1177b9e4f0b96584e281dbdf0167cdcc6d",
+          "ran": true,
+          "ok": true,
+          "output": "quantity format ValueError\n12"
+        },
+        {
+          "id": "btr-timeouts",
+          "code_hash": "a12c920651900388d71e5d037e2177d5e9640aa0372b8589112d4ddcd5b8d759",
+          "ran": true,
+          "ok": true,
+          "output": "[2, 5, 9]\nTrue"
+        },
+        {
+          "id": "btr-events",
+          "code_hash": "932cbabbfd549ace1366f21bce0dde2bf9ca4fb5535e438e3b233188c75bf1f6",
+          "ran": true,
+          "ok": true,
+          "output": "{\"category\": \"dependency_timeout\", \"duration_ms\": 80, \"request_id\": \"req-demo\"}\nlive True ready False"
+        },
+        {
+          "id": "btr-degrade",
+          "code_hash": "4615c6af5ba938d3bb0fc9d3eee6157147cfb63025b00ca949d387012def8335",
+          "ran": true,
+          "ok": true,
+          "output": "unavailable: optional feature\nfailed: no reservation created\nnormal"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "git-collaboration",
+      "fingerprint": "bf2d65c19f9da9de5a56ffa7117779af1a2d6e64a6dcc8dd70fb6be84f526bba",
+      "course_hash": "552e08eb7e7f8e4dae3f7bc4d29bd59e1dedb0367417b2a6cb514b6cdd939727",
+      "bank_hash": "c99433b9b943fe409f6a3e6b9a88414f1cf232b44721b0e54650f1e504dd58af",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 81,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [
+        "Historical bank retains its original key positions; verify server-shuffled delivery instead of rewriting published item keys."
+      ],
+      "examples": [
+        {
+          "id": "git-snapshots",
+          "code_hash": "c9a84fe0c93f1ddcee76b1eeede0808d1e18ba1e313cbd4940f6336009aff099",
+          "ran": true,
+          "ok": true,
+          "output": "first\nsecond"
+        },
+        {
+          "id": "git-branches",
+          "code_hash": "e2dde9406786067ba4a8763fb843ab0c4d004283f6dc28df6b43e1b3d699ad7e",
+          "ran": true,
+          "ok": true,
+          "output": "['base.txt', 'feature.txt', 'guide.txt']"
+        },
+        {
+          "id": "git-history",
+          "code_hash": "48549236386ad7b3ae2f728f82b5c8269460f81905f4e836dfe5cf8a828575dc",
+          "ran": true,
+          "ok": true,
+          "output": "original\n3"
+        },
+        {
+          "id": "git-review",
+          "code_hash": "4b031faf7a051a0b2f20c3457069b7d5296c5eda313cf1874940d73d3089b979",
+          "ran": true,
+          "ok": true,
+          "output": "deadline.txt"
+        },
+        {
+          "id": "git-branch-policy",
+          "code_hash": "edc716753b68bab7c2a81f3eed334efbf1f5c8f3e1e68340f584de4a020ce870",
+          "ran": true,
+          "ok": true,
+          "output": "targeted fix\nrelease"
+        },
+        {
+          "id": "git-protection",
+          "code_hash": "00cd4924790c4f8aa533f3766a1db431bbd7b57abc677056172d294056a7df05",
+          "ran": true,
+          "ok": true,
+          "output": "True\n2"
+        },
+        {
+          "id": "git-ignore",
+          "code_hash": "3502f37376fec513091b597260b71f059ba1a49e153507d582b996265c1e566e",
+          "ran": true,
+          "ok": true,
+          "output": ".env\nTrue"
+        },
+        {
+          "id": "git-secret-response",
+          "code_hash": "543d456558ae663c465718e17fbf4cf1bc3ddd87757f58047dea232dce7b6f14",
+          "ran": true,
+          "ok": true,
+          "output": "True\nremoved"
+        },
+        {
+          "id": "git-messages",
+          "code_hash": "b039a27def277f3158a9aefeaa72f120fb67055745405fd18e4e5a666a103ad4",
+          "ran": true,
+          "ok": true,
+          "output": "Reject expiry equality\nEquality is outside the accepted session interval."
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "web-foundations",
+      "fingerprint": "5a67c24d1adb75e5997dee1d8dcf23c4608dd9da9ac67a37a083e93f57bd5c58",
+      "course_hash": "51064b378745841af923b57d11a434448f82ddbe547ad0534cb9ae76c9acd746",
+      "bank_hash": "46393a4766e46532ba57b9a9e3f3851e11a61286ea3fac1ca32c64b4def36174",
+      "prerequisites": [],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "web-request-render",
+          "code_hash": "6ba23591f93ba8e3c9b12fd3d2fe62b1630e880d97f44d8b876a023d45e138fa",
+          "ran": true,
+          "ok": true,
+          "output": "True\n2"
+        },
+        {
+          "id": "web-url-dns",
+          "code_hash": "f06c46cd7088a508d8a90d2b8b14a651972d89a5a46780bc88ba574080ccd5a3",
+          "ran": true,
+          "ok": true,
+          "output": "portal.example.test\n/orders open\nsummary"
+        },
+        {
+          "id": "web-response-diagnosis",
+          "code_hash": "e9d9b461f3de05ad301a62b4140201cbbce9e2a507da0787e154ef0e255a7963",
+          "ran": true,
+          "ok": true,
+          "output": "no HTTP response\nrequest failure\nserver failure\ninspect successful response contract"
+        },
+        {
+          "id": "web-inspect-elements",
+          "code_hash": "7ffff440d67d93fb74bb3d9325c081180f36838d48f7910e310ee74b8fb6292b",
+          "ran": true,
+          "ok": true,
+          "output": "button\nTrue\ninline-block"
+        },
+        {
+          "id": "web-network-console",
+          "code_hash": "84c46a6025113d1512f2d59d2164be23c38cdd759446cb08905a7c33bb127a7f",
+          "ran": true,
+          "ok": true,
+          "output": "['/tickets/summary']\ncorrelate with console; do not infer cause"
+        },
+        {
+          "id": "web-languages",
+          "code_hash": "186bc0c0b9d96019efcf975925cad23133ca0b5d19172638f2f191c996822b36",
+          "ran": true,
+          "ok": true,
+          "output": "product heading: HTML\ncard spacing: CSS\ncart feedback: JavaScript"
+        },
+        {
+          "id": "web-https-cookies",
+          "code_hash": "bd3d4785cf9c2e7b960cca113adbd014301fffc7ef85e67904df4e7d2caded57",
+          "ran": true,
+          "ok": true,
+          "output": "True\nLax\nauthorization still required"
+        },
+        {
+          "id": "web-build-version-deploy",
+          "code_hash": "597d911ac0b89a3cb52988de133f22419fb85c9d35be31c3f8dfb56a74e39c21",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "web-safe-professional-use",
+          "code_hash": "8bb507d67d2242c383b78996058328c0ccddb5f183889051e10a9addea216db0",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "computing-os-foundations",
+      "fingerprint": "32c60865cc71543df43b717bb31d31edd2447b3ee1ac2549f6bc4583909abafd",
+      "course_hash": "ce6641f908da1ce6af9aad9fbff069bea78bc5110b63fe8658c8f71860a1e024",
+      "bank_hash": "6c3a96c067196f065a952e329989d8e548cc152239d9c2a4dba77e24a15616bc",
+      "prerequisites": [],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "computing-os-foundations-l1",
+          "code_hash": "64d0f3ff52b4858de68143c1608842a5032cbac6d210c28602ea785b18fbad53",
+          "ran": true,
+          "ok": true,
+          "output": "3\n9"
+        },
+        {
+          "id": "computing-os-foundations-l2",
+          "code_hash": "1f773e89a108efbbedf6eabd8c97e54dec848a4f4e3c295f980b7ee7583ae966",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nFalse"
+        },
+        {
+          "id": "computing-os-foundations-l3",
+          "code_hash": "3219018cca3f3ff25bfafdbe2bcd18fe5824214b6ef3be388b28df1a1412137f",
+          "ran": true,
+          "ok": true,
+          "output": "/srv/invoices\n.pdf\nTrue"
+        },
+        {
+          "id": "computing-os-foundations-l4",
+          "code_hash": "60d0da708687cf976a14875506a0bf0bba33e869e8537baa412cd97dfa120138",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "computing-os-foundations-l5",
+          "code_hash": "cb6b1199747a3bb5172a2f5622a7b6e499db86add9ca0956180fd5e8d7183d96",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "computing-os-foundations-l6",
+          "code_hash": "ae054214faf943d90527f231cd4b86d059e3a80ec7d95b6b596b7b3311ebafa6",
+          "ran": true,
+          "ok": true,
+          "output": "['support-demo']"
+        },
+        {
+          "id": "computing-os-foundations-l7",
+          "code_hash": "e3a56fd93d8b2c191f86db7e04cd648a77bb83bf8529539360bf2f7d07d86236",
+          "ran": true,
+          "ok": true,
+          "output": "C:\n/var/log/demo"
+        },
+        {
+          "id": "computing-os-foundations-l8",
+          "code_hash": "a6bc69a3ab274ff06163d5ec4b37cfa9a88bad14299a7d380340b6558d281378",
+          "ran": true,
+          "ok": true,
+          "output": "[{'id': 'r1', 'level': 'ERROR'}]"
+        },
+        {
+          "id": "computing-os-foundations-l9",
+          "code_hash": "0d14afd18d161f7012c6dc504bc86e914cd5819141dd34ff5f857db365d3adf6",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['jobs']"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "ai-api-integration",
+      "fingerprint": "59fa9c0230e0a1ca63a7722257d086f7164aac898b4e77849a359e74b034d044",
+      "course_hash": "8102fca24c5495cc273b7628b67d0a23e536338b8962a14b49863a57a79353f5",
+      "bank_hash": "3d5610fec53af8df4b069a2036d8d3bc7238e88fb9a75701dd93e20feb87fe79",
+      "prerequisites": [
+        "python-fundamentals",
+        "http-web-architecture"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ai-api-integration-request-contract",
+          "code_hash": "4b7912635e6d842be3aaa5a7acbfdedf300c4774f609e36fda0717e1423d074e",
+          "ran": true,
+          "ok": true,
+          "output": "2\nuser\n120"
+        },
+        {
+          "id": "ai-api-integration-stream-state",
+          "code_hash": "aacd164fcd6cb7f1a55c021b0c1e7db8bae9331f839dbd075c0164cd9f864e63",
+          "ran": true,
+          "ok": true,
+          "output": "Enrollment opens Monday.\ncomplete\ncomplete"
+        },
+        {
+          "id": "ai-api-integration-bounded-retries",
+          "code_hash": "0cfe22b9eb6d6edf24cd7c6e1b83e21379fce659230163f3a9d75d90f8dbc621",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2, 4]\n7\nTrue"
+        },
+        {
+          "id": "ai-api-integration-server-boundary",
+          "code_hash": "e805f1a5298573b1d4ebfe951eb8f091f2e581b05cfd21c65cc0397579285052",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "ai-api-integration-conversation-flow",
+          "code_hash": "12bfa33345070d3ac536cdc1944bd744e07fcc3df775a3b5b1ffbfa06644bfae",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue\nFalse\n3"
+        },
+        {
+          "id": "ai-api-integration-safe-output",
+          "code_hash": "2483b014892a46b3ab5b83da6b4fe8802140e44b6c66f19f338c4bc586c4ff14",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "ai-api-integration-token-budget",
+          "code_hash": "166fa7a9093d881be5f36abb861441cc07b1f760f406e1235e291d17c597984b",
+          "ran": true,
+          "ok": true,
+          "output": "760\nTrue\n40"
+        },
+        {
+          "id": "ai-api-integration-cost-ledger",
+          "code_hash": "e17227047fca2d5fca21f3d343dad1149f15486854ffbac29c3d0ff59c0e0eca",
+          "ran": true,
+          "ok": true,
+          "output": "0.0048\n48.00"
+        },
+        {
+          "id": "ai-api-integration-economic-controls",
+          "code_hash": "4221704503cf1d4fdbfe568a9695f1e7ccd7b8c8f24c8bef04221da64d36537a",
+          "ran": true,
+          "ok": true,
+          "output": "[True, True, False]\n0.001"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "sdlc-foundations",
+      "fingerprint": "bc8afbd1ed018af64a4173c6809c213284cfe90006a95122211e8382a13235a0",
+      "course_hash": "1cd22e0f763fa094341d7f6c8713517b97fc68339db3edc5eacb1c10a5c0ddce",
+      "bank_hash": "557c7ff44bb73b36478d364363a95826fec2986a1d8a0b256df0e71f1d08c879",
+      "prerequisites": [],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 56,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "sdlc-foundations-models",
+          "code_hash": "0dd75c92260b136bc6049f090a89639cd308a73b47bc4ff8faa2bbb35d211db6",
+          "ran": true,
+          "ok": true,
+          "output": "['application', 'receipt']"
+        },
+        {
+          "id": "sdlc-foundations-flow",
+          "code_hash": "befb52b359fdf6329d87d94ea4549c0d65cd723f540eea373372e3fde16faa93",
+          "ran": true,
+          "ok": true,
+          "output": "3\nFalse"
+        },
+        {
+          "id": "sdlc-foundations-roles",
+          "code_hash": "d6b660c7872768d5fb29964837f0208b1ffd87b2ef7d6c741a6f04f4359c202c",
+          "ran": true,
+          "ok": true,
+          "output": "['release']"
+        },
+        {
+          "id": "sdlc-foundations-stories",
+          "code_hash": "7693fafa08263f353ed40c5d883966a48e2881ad9b67e63aacabb1f5c638986e",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "sdlc-foundations-examples",
+          "code_hash": "1142f736134f52c440b310d8c9f7cbe574bd014fb0ef2c694001e8c43aca36b5",
+          "ran": true,
+          "ok": true,
+          "output": "[False, False, True]\n[False, True, True]"
+        },
+        {
+          "id": "sdlc-foundations-changes",
+          "code_hash": "74c9ace3b41c51a75714277bf02eb0b1b87241bf8bc161e2a2b6450bacd986d8",
+          "ran": true,
+          "ok": true,
+          "output": "['max_rows']"
+        },
+        {
+          "id": "sdlc-foundations-builds",
+          "code_hash": "0d7dd5157f2a648ae06e82524d7691751c1970923247d1d3539dbcb54c9d2821",
+          "ran": true,
+          "ok": true,
+          "output": "False"
+        },
+        {
+          "id": "sdlc-foundations-gates",
+          "code_hash": "b4e3f38c9a7a6dc552de705aec3643e2177db969deea1d68f730cef6fa3890e4",
+          "ran": true,
+          "ok": true,
+          "output": "False\n['migration']"
+        },
+        {
+          "id": "sdlc-foundations-observe",
+          "code_hash": "ce3ecd599fe3d30e3f331c92d56dd081e9876aee0465001efa5a8cfd3f11e904",
+          "ran": true,
+          "ok": true,
+          "output": "0.06\nTrue"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "networking-fundamentals",
+      "fingerprint": "b88a98b0a5231f7b02d727ac1ab5074559f80114d206135f8b3257831a1d2524",
+      "course_hash": "f3bf245df4a586c589c2ea0bae06794e89feabe61e8822e96526ba4fe50f1c8f",
+      "bank_hash": "ba8af3864d07d95a3699090bc58303ec5b2fdd561500b1460df388b5fe8653df",
+      "prerequisites": [
+        "computing-os-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "networking-fundamentals-l1",
+          "code_hash": "913527dfb53f47e87b8b3ea73697795004d3b3c17b1a406feb56a16c0e5e692f",
+          "ran": true,
+          "ok": true,
+          "output": "tcp_connect\n['link', 'ip_route']"
+        },
+        {
+          "id": "networking-fundamentals-l2",
+          "code_hash": "e45c56fa349c51581e9f6e563a272d6d9b921e3c4eff67011b62ab07042e5021",
+          "ran": true,
+          "ok": true,
+          "output": "256\nTrue\nFalse"
+        },
+        {
+          "id": "networking-fundamentals-l3",
+          "code_hash": "f1b9cd35a43072d96f9327a7cf682f4f2a21b3713215c855106e0d7537773a9c",
+          "ran": true,
+          "ok": true,
+          "output": "['order=1', 'order=2']\nTrue"
+        },
+        {
+          "id": "networking-fundamentals-l4",
+          "code_hash": "135dd13a7fa074631cb12798c36d04f47f3b2048bae6c574fa694cffd3805cd9",
+          "ran": true,
+          "ok": true,
+          "output": "['192.0.2.10']\nFalse"
+        },
+        {
+          "id": "networking-fundamentals-l5",
+          "code_hash": "e8fd954c3c9520e809997ac9bf84f9b577abac57578130b77083b8913d8ecb07",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "networking-fundamentals-l6",
+          "code_hash": "af930fe60ee1acf4e23b6ce303ad93ef5ded6ce8813eab7a332583d372af259e",
+          "ran": true,
+          "ok": true,
+          "output": "3\nFalse\nTrue"
+        },
+        {
+          "id": "networking-fundamentals-l7",
+          "code_hash": "34e5acf5720c55943898afa8b90aa70f22e6fa00691743d7d98f673646e02289",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "networking-fundamentals-l8",
+          "code_hash": "11a9fbc968f785bed13b83e816ebda7d1cd5ed0accd9b3bff2a563fb807c1928",
+          "ran": true,
+          "ok": true,
+          "output": "['a', 'c', 'a', 'c', 'a']"
+        },
+        {
+          "id": "networking-fundamentals-l9",
+          "code_hash": "2fb51410836d561b82d2082736c4ffee21f7a53b63a34dca548e1a7113c50270",
+          "ran": true,
+          "ok": true,
+          "output": "tls\nhostname_mismatch"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "html-semantic",
+      "fingerprint": "e3f43c2bac0cd848b10018debe9d7a7b84afb51264bdab905edc6e3ccb0ccf59",
+      "course_hash": "4b87809aa62b6fead3145a42993a1244aad5297acbd742dd4483fc6b567fd454",
+      "bank_hash": "214a10eae48a019bb9b530bd5f2c56c97dfc4ea7cc13edd633d4db07962231d3",
+      "prerequisites": [
+        "web-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "html-heading-outline",
+          "code_hash": "edd342d4aafe076d3110ce3b53da5a33d4ffa71be85a028ae5f5e41704e36895",
+          "ran": true,
+          "ok": true,
+          "output": "h1 > h2 > h3"
+        },
+        {
+          "id": "html-semantic-controls",
+          "code_hash": "898a5fbc88cf5b40b2905c602193b2ade5146e30ff87e20d98756328eccbb05d",
+          "ran": true,
+          "ok": true,
+          "output": "view invoice: a with href\nsend request: button\nrelated items: ul or ol"
+        },
+        {
+          "id": "html-content-regions",
+          "code_hash": "3e705919d806a08b5b7a7493bcd3175fc1f9e700630c9f950a9e507564854599",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue"
+        },
+        {
+          "id": "html-labels-constraints",
+          "code_hash": "b3680141fdab6eb7301a43873bbf6e52f428007b617872233fbac9e976b7bc26",
+          "ran": true,
+          "ok": true,
+          "output": "True\n1"
+        },
+        {
+          "id": "html-form-submission",
+          "code_hash": "5b1461a960dd67c89d798f1d8b0d91d71b845cbc17c9381fd37b1542d34dc54b",
+          "ran": true,
+          "ok": true,
+          "output": "course=web+basics&slot=morning&slot=evening\n['morning', 'evening']"
+        },
+        {
+          "id": "html-form-errors",
+          "code_hash": "6d21b48483bc93a77a75efa1748d9c58df5428d928e3a3cd7f808b0e533340be",
+          "ran": true,
+          "ok": true,
+          "output": "{'email': 'Enter a contact email.'}\nTrue"
+        },
+        {
+          "id": "html-image-alternatives",
+          "code_hash": "60c3c37a3a5c0461dd4507c5c2056475e5c479f62669f71a43cda281cb6f1aa7",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nView shipment status"
+        },
+        {
+          "id": "html-document-metadata",
+          "code_hash": "0405445edc332d0fd07c698eda51cf7208b4964b47a8818419f36872dbaeb8fd",
+          "ran": true,
+          "ok": true,
+          "output": "Open Day | Example University\nPlan your campus visit."
+        },
+        {
+          "id": "html-media-links-review",
+          "code_hash": "38950228f3879623e7575a5c92953b5e57f43fb412a7f0ee9f83fb7cb7c08809",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nreview context and controls separately"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "qa-principles",
+      "fingerprint": "9f42e80337b8bc4242c00a69e5f0ab59d50ec46cc05be9748786846e7f9753c0",
+      "course_hash": "17eee2a169dfae3822978005c116d5ca92b9316757b8a30ad9005fab97155bc7",
+      "bank_hash": "e6863e58c21c58f5ed64b94f158e5e7b200b7571b9a9aa9c2b1634cefce2b8e1",
+      "prerequisites": [
+        "sdlc-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 58,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "qa-principles-principles",
+          "code_hash": "b0f0a6e19e4dc13827263b0c88f1f8eefb1fad32c6fe058041e55ab68183a7ff",
+          "ran": true,
+          "ok": true,
+          "output": "120\nTrue"
+        },
+        {
+          "id": "qa-principles-review-learning",
+          "code_hash": "9224690e9b3f1ab13e8e7adfe6f2169b2ed292a72f791e1cd4826e22b53d54ea",
+          "ran": true,
+          "ok": true,
+          "output": "['cross_tenant_denied']"
+        },
+        {
+          "id": "qa-principles-verification-validation",
+          "code_hash": "db20dc58d2113748dac80ded2c90779dcaf784a6babc452aad2dc421ab133b1b",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "qa-principles-levels",
+          "code_hash": "4f6cb3bd49f4ec5c96b89b7dd6cb99c54c4a42a5d2b53aad6499ae8771c02a2d",
+          "ran": true,
+          "ok": true,
+          "output": "80"
+        },
+        {
+          "id": "qa-principles-system-acceptance",
+          "code_hash": "882e12a3acf30d2dcb43dd16b5eb52a81a43136d6b1b211ffd29dfaf395d06bd",
+          "ran": true,
+          "ok": true,
+          "output": "False\n['confirmation_visible']"
+        },
+        {
+          "id": "qa-principles-types",
+          "code_hash": "d00595287ce08a2d8a094012778d36fa5fae377a85f552f7a3f958a7ac983793",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "qa-principles-risk",
+          "code_hash": "5f39e0ae8c937c4c8e1a8a319fc9ffce5b2c74c38c4ba766eeed0bf7b169eb32",
+          "ran": true,
+          "ok": true,
+          "output": "['lost_registration', 'slow_search', 'alignment']"
+        },
+        {
+          "id": "qa-principles-risk-evidence",
+          "code_hash": "c9d6f8a86b4c5ce4ba56f6c03427e1e8e04b334a8c396844058ea3dbac223274",
+          "ran": true,
+          "ok": true,
+          "output": "['lost_status']"
+        },
+        {
+          "id": "qa-principles-reporting",
+          "code_hash": "56897d2cffd53d10ee43008e58b678340f094ecbb53c3ee3a8457e08bd3bd585",
+          "ran": true,
+          "ok": true,
+          "output": "{'blocked': 1, 'failed': 1, 'not_run': 1, 'passed': 2}"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "llm-fundamentals",
+      "fingerprint": "f07bbcec3217842527a3ab6124ad3659677df9cf695d659f665fcf3ca6d82f2b",
+      "course_hash": "9faedfcbdd88f607873758215458f7358a3c169b7bd22083cb9dbd032cdd9a7e",
+      "bank_hash": "d2d7a0e155d84c29d69b77b68b2a8407046066997b06bd870794317a2dbdfb1c",
+      "prerequisites": [
+        "ai-api-integration"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "llm-fundamentals-prediction",
+          "code_hash": "82243ae873444c540c1916243593561affb53266e2efd37a0c3cfd5f36823b35",
+          "ran": true,
+          "ok": true,
+          "output": "0.6\nMonday\n10"
+        },
+        {
+          "id": "llm-fundamentals-context-boundary",
+          "code_hash": "521ebbb4544eacfdf863970e774b69822c6c7d539dcd66836c2bf9517dd94aea",
+          "ran": true,
+          "ok": true,
+          "output": "['middle', 'recent']\n10"
+        },
+        {
+          "id": "llm-fundamentals-training-stages",
+          "code_hash": "ef120889a2af9eb3c0bb773b4c50a0392ca40a7e5ab3f56d95baceafb7cb96b8",
+          "ran": true,
+          "ok": true,
+          "output": "['demo-3']\nFalse\nTrue"
+        },
+        {
+          "id": "llm-fundamentals-unsupported-claims",
+          "code_hash": "85a4b0c504ad0852bc24f2909a85767bd73e0383b81085fce74d451bb7956794",
+          "ran": true,
+          "ok": true,
+          "output": "['deadline']\n['fee', 'scholarship']"
+        },
+        {
+          "id": "llm-fundamentals-grounding",
+          "code_hash": "dac0f728c6f00caafb87bb2dd5c731a8c9810a4b12d8d0d8be9e18c071cb66c6",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "llm-fundamentals-model-selection",
+          "code_hash": "e4b6a688b958f197707be91d72a08416097d57c062f8c0f7fd628ebb13eaf5f5",
+          "ran": true,
+          "ok": true,
+          "output": "['medium']\nmedium"
+        },
+        {
+          "id": "llm-fundamentals-temperature",
+          "code_hash": "8be4109e81e1f5fc284bed7c14496f63de6754ed6683c50742e4197c957f62d7",
+          "ran": true,
+          "ok": true,
+          "output": "0.867\n0.506\nTrue"
+        },
+        {
+          "id": "llm-fundamentals-candidate-filters",
+          "code_hash": "e4f00a5b496502b038bbcca6caa57509e9a9936e7561af9cfdf06833e586f327",
+          "ran": true,
+          "ok": true,
+          "output": "['A', 'B']\n0.8\n['A', 'B']"
+        },
+        {
+          "id": "llm-fundamentals-sampling-evidence",
+          "code_hash": "6c4d6432bfcf891ac61dbc83f3d7cfb05fbe20dc41de93895f919fbfe86b35a1",
+          "ran": true,
+          "ok": true,
+          "output": "True\n3\n0.6"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "math-for-ai",
+      "fingerprint": "2b6ccdd9821190dec49a7b48f64e1ed761f8b47694f7e42fc2c76739214c6c47",
+      "course_hash": "825e0156a0296bdb7e103ed30c10cd841ae4542095e125b042e1cb462fd643fc",
+      "bank_hash": "9bc9cc41d6c6aba0749356fcfc14afc20bc701db11c488aaf548f4e72e5069e0",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ma-dot",
+          "code_hash": "649fb9fb0f17739bd77ddc23b2fc312d1951bae05168272d1dac870c4ffb097d",
+          "ran": true,
+          "ok": true,
+          "output": "5\n11"
+        },
+        {
+          "id": "ma-norm",
+          "code_hash": "bedf8f8113f765ae000f7fe307bfeb6720bce1df7c3e714f1dae9a34e9290430",
+          "ran": true,
+          "ok": true,
+          "output": "(2, 2)\n[10, 2]\n5.0\n7"
+        },
+        {
+          "id": "ma-matrix",
+          "code_hash": "58f12c71ed39575658ad796ac914b7e76edd906cfdce86a97a4ccefc0e01ddca",
+          "ran": true,
+          "ok": true,
+          "output": "[4, 2]\n[6, 2]"
+        },
+        {
+          "id": "ma-transform",
+          "code_hash": "575f9cb165cc2da7d9fe0f2c6305d1f703f91b817b8b29c4ecd95fedb7b596bb",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 0]\nTrue\n[3, 0]"
+        },
+        {
+          "id": "ma-eigen",
+          "code_hash": "0c0944b7df7deb98e1c19a17b42e167ec3a30a5497ecf70fe0339d07589f1212",
+          "ran": true,
+          "ok": true,
+          "output": "[6, 0]\n[0, -2]\n[3, -1]"
+        },
+        {
+          "id": "ma-pca",
+          "code_hash": "08570c75233a3dff7592cba5f1f73b98636f45ba50466d2f1c9f164e15a54eb3",
+          "ran": true,
+          "ok": true,
+          "output": "[2.0, 2.0]\n[-1.414214, 1.414214]\n[[1.0, 1.0], [3.0, 3.0]]"
+        },
+        {
+          "id": "ma-derivative",
+          "code_hash": "76154e356360465994e1da302ebb3bde9571b3d18a99f1887eb1e4a39fe39e30",
+          "ran": true,
+          "ok": true,
+          "output": "-6.0\n-6.0\n0"
+        },
+        {
+          "id": "ma-gradient",
+          "code_hash": "e9749f93b51d91eec03b9143cb8dccae8966b7d7d99a1d86dd027697e51580d8",
+          "ran": true,
+          "ok": true,
+          "output": "[2.8125, 0.0, -3.2208]"
+        },
+        {
+          "id": "ma-partials",
+          "code_hash": "9e1c7ad66dec45c2698fabf002fb65f0b1ff77aa0d54632d932da10d326a449f",
+          "ran": true,
+          "ok": true,
+          "output": "[-4.0, 8.0]\n[0.4, -0.8]\n8.0 2.72"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "probability-statistics",
+      "fingerprint": "d6bc3eafafdde9141c9a60b6313813d492d259c3d091aceb8cb5d35879af9017",
+      "course_hash": "5760de638b48a3592808870007af37ed3fff50c4137653590dab6f188f9088c8",
+      "bank_hash": "ff8aaf4d7de983e6e45c8db54b1126933403a732294cccb636920282a18970f1",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ps-conditional",
+          "code_hash": "9ead404a851383912771de25ef07f310942c414edaa8a16118089539f9bc729b",
+          "ran": true,
+          "ok": true,
+          "output": "3/4\n3/5"
+        },
+        {
+          "id": "ps-baserates",
+          "code_hash": "c33230ca56751cf5866ec8bff5aa871600f76edaa399efedf755301e3b3840fa",
+          "ran": true,
+          "ok": true,
+          "output": "90 495\n2/13\n0.1538"
+        },
+        {
+          "id": "ps-dependence",
+          "code_hash": "aae739d87741a86c9148e71f0f091d89860f625ac121cce1ee61f03e33b471b9",
+          "ran": true,
+          "ok": true,
+          "output": "A [0.9, 0.2] 0.83\nB [0.9, 0.267] 0.33"
+        },
+        {
+          "id": "ps-distributions",
+          "code_hash": "dca1796c6aefde2f48d9177317dbb43ca41481938ab95e78d00716a61d6b98b9",
+          "ran": true,
+          "ok": true,
+          "output": "0.096\n0.6827"
+        },
+        {
+          "id": "ps-sampling",
+          "code_hash": "ced2f8b22f27510e3cf57ab8c5c991f6af2378fc1f0b6c16dd97e4ccb1ec85b9",
+          "ran": true,
+          "ok": true,
+          "output": "14.0\n26.0"
+        },
+        {
+          "id": "ps-clt",
+          "code_hash": "bd8cf1879d58ebc2e2c7b3e4a743b1a938efd24002daf97ad34266805569cdb4",
+          "ran": true,
+          "ok": true,
+          "output": "[(0.0, 1), (0.5, 2), (1.0, 1)]\n0.25 0.125"
+        },
+        {
+          "id": "ps-inference",
+          "code_hash": "e485731d295286d95eda7ed996e94f73e6dac3da8dcec5f88361effa38d00860",
+          "ran": true,
+          "ok": true,
+          "output": "98.04 101.96\n0.0455"
+        },
+        {
+          "id": "ps-abdesign",
+          "code_hash": "f8f0605be57a8d924ba9db9e037e77638a922ff67af3d7f748e2c3edbc8e25dd",
+          "ran": true,
+          "ok": true,
+          "output": "True\n5 3"
+        },
+        {
+          "id": "ps-abread",
+          "code_hash": "4b0727d30a60f12ef9bd11cc1955813dff94aea9c54f79d8cee7069b166294a5",
+          "ran": true,
+          "ok": true,
+          "output": "2.0 20.0\n-0.0074 0.0474"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "data-business-fundamentals",
+      "fingerprint": "76e533f53817b40d95f0bb14ee300e7c0cd9a27e637af5b33a54246245220564",
+      "course_hash": "ced51e6e86c2c504a9aca10828f43ce77c63c702788bce92017a5abac958dfa0",
+      "bank_hash": "ed973dfb2b8732c1e721616e9f9337c0be0810e726b372ac5915b514a1d3c6c9",
+      "prerequisites": [],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dbf-question",
+          "code_hash": "479560d6b5712bca253cfa44d34df7a322bfb1508eff18080f0c83b1e4acc4af",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue"
+        },
+        {
+          "id": "dbf-stakeholders",
+          "code_hash": "e927e4c3d5c963b2f639d661573ea683d4fbe9911b3a68c4601b72290ce1fb58",
+          "ran": true,
+          "ok": true,
+          "output": "['publish_report']\n2"
+        },
+        {
+          "id": "dbf-evidence",
+          "code_hash": "266c9901401c75c47bbef73f8c34f92347e6a9fbb921e64fec310901b2fab5eb",
+          "ran": true,
+          "ok": true,
+          "output": "0.6666666666666666\n0.6"
+        },
+        {
+          "id": "dbf-grain",
+          "code_hash": "7bfe60618b33fde67ef4c88ba1cd449d7c1dd1b8efd7d9649b5457c5d53a66e5",
+          "ran": true,
+          "ok": true,
+          "output": "3 2\n2500\n1500"
+        },
+        {
+          "id": "dbf-sources",
+          "code_hash": "90571044eaddcf4fd8d57aac73b1ea3e0caead4ef517220c5bf664cde95c51bf",
+          "ran": true,
+          "ok": true,
+          "output": "3 2\n['e2']"
+        },
+        {
+          "id": "dbf-quality",
+          "code_hash": "877fe36e95839d53f11dd01c7f8a95b3a7971c2ab49989ef6e10a5fbb218d5f8",
+          "ran": true,
+          "ok": true,
+          "output": "['duplicate_id', 'status', 'amount']"
+        },
+        {
+          "id": "dbf-metric",
+          "code_hash": "48ca2271e2bcacc72c7e04ee8fc4cf645f0aacec8b066ea88fdb48710d0e5afe",
+          "ran": true,
+          "ok": true,
+          "output": "0.12\nNone"
+        },
+        {
+          "id": "dbf-indicators",
+          "code_hash": "3957d7880d35c4950fc506dabc83da1f52e5fac4bc3e108f1922a0767d9fbacd",
+          "ran": true,
+          "ok": true,
+          "output": "True 2 3\nFalse 1 2"
+        },
+        {
+          "id": "dbf-scorecard",
+          "code_hash": "2f13b998d3c7602c1e0341f1d939d604e09772d148d25040f697f6a397862caf",
+          "ran": true,
+          "ok": true,
+          "output": "True False\nreview_required"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "test-design",
+      "fingerprint": "adb0cc53918e649b8d57ce74d46a82a514e7300ae0f143ef25338dccc7d873a0",
+      "course_hash": "ae2cb2d3e4ae5041f4402b518146f24000ef5b68433ebd05b2db30201a8a9551",
+      "bank_hash": "4a3d363e61f98152d3c0d07fa6e5486f737e678fdb7d5d4081d59a39da700cca",
+      "prerequisites": [
+        "qa-principles"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 56,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "test-design-partitions",
+          "code_hash": "1b50ed7516b9c57b1a7aaff7aee8ea59c23b41bdbf356d839096215981b439ae",
+          "ran": true,
+          "ok": true,
+          "output": "['missing', 'type', 'type', 'below', 'valid', 'above']"
+        },
+        {
+          "id": "test-design-boundaries",
+          "code_hash": "7f4e821230ae756b314382a401eb8b684af2e185b3032c7a4c29554ff858dce6",
+          "ran": true,
+          "ok": true,
+          "output": "[(0, False), (1, True), (2, True), (49, True), (50, True), (51, False)]"
+        },
+        {
+          "id": "test-design-decision-state",
+          "code_hash": "29abca539caf3ac66f823556be8853a7a6e5d070023f99245030f0ef0898e749",
+          "ran": true,
+          "ok": true,
+          "output": "[(False, False, False), (False, True, False), (True, False, False), (True, True, True)]\ninvalid"
+        },
+        {
+          "id": "test-design-case-contract",
+          "code_hash": "efdee567290d3b421849747f9f6f58626cdda9043540d63fcaf4c6ef2e66ecae",
+          "ran": true,
+          "ok": true,
+          "output": "True\nready"
+        },
+        {
+          "id": "test-design-oracles",
+          "code_hash": "6dd3e50e29ad266e5ff255d4acb67a42c6d8195bc2f5125a22348f8feda6418b",
+          "ran": true,
+          "ok": true,
+          "output": "[{'score': 80}]"
+        },
+        {
+          "id": "test-design-fixtures",
+          "code_hash": "ec21f9b2003735e849214ce3fa8fbad63dd9b47bf23ad3169091a4b9b0fc8803",
+          "ran": true,
+          "ok": true,
+          "output": "1\n0"
+        },
+        {
+          "id": "test-design-plan-scope",
+          "code_hash": "14a183ad1421225f270c963148f5684803ea6545df5738dd67d855154cc44e57",
+          "ran": true,
+          "ok": true,
+          "output": "['import_contract']"
+        },
+        {
+          "id": "test-design-criteria",
+          "code_hash": "0f39eebc122f94e3b76110c69c3f629c90dd217d0f3f5df8aae9af311c0a887f",
+          "ran": true,
+          "ok": true,
+          "output": "['provider_contract']\nFalse"
+        },
+        {
+          "id": "test-design-execution-plan",
+          "code_hash": "a7296b915a344b2c7c0c5980d84c73d83f145e0db361ffce5b4e1c203b2ca8df",
+          "ran": true,
+          "ok": true,
+          "output": "['provider_stub']"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "css-fundamentals",
+      "fingerprint": "3f40d82d77ee34654bac5d5c23a98c873b83d2b61b4396f36f13de13bf8dd19f",
+      "course_hash": "d274256d84389e508a4d7d893c72cd83f8f80d73d9a7b4160f4cbeb5663c402e",
+      "bank_hash": "8ec357e16ebc408eeb2cf86f92f3c135d098ef31da83467f3e55bf1b5aa0304a",
+      "prerequisites": [
+        "html-semantic"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "css-normal-cascade",
+          "code_hash": "a1bda7cf4bc7a41a6393ac9c9fe653595a3836a2400057263938169f33ce0800",
+          "ran": true,
+          "ok": true,
+          "output": "navy\nTrue"
+        },
+        {
+          "id": "css-maintainable-selectors",
+          "code_hash": "c4bfb09137d948051d248c594eb1e1ce67e0ca8314f861185d1d68523f5c6490",
+          "ran": true,
+          "ok": true,
+          "output": "['article', 'article']\n2"
+        },
+        {
+          "id": "css-winning-rule-review",
+          "code_hash": "94ae3abdf8c626b6d5b1bdc3635289e9c3b6cafdeefdb74de5b475ef29eb9cbb",
+          "ran": true,
+          "ok": true,
+          "output": "summary: teal\nwarning: maroon"
+        },
+        {
+          "id": "css-box-sizing",
+          "code_hash": "25acefe50bc148cb62bf29d27024b42f02a6f23f41b0dcadb44af9908bb9d1ba",
+          "ran": true,
+          "ok": true,
+          "output": "336\n264\nmargins are outside these widths"
+        },
+        {
+          "id": "css-display-position",
+          "code_hash": "f76b082e3289123977d05d783e9af68cf096fb4aeb88e0fe57e16dd0bbd68d71",
+          "ran": true,
+          "ok": true,
+          "output": "flow slot: 40\nrendered top: 48\nbadge top: 34"
+        },
+        {
+          "id": "css-overflow-spacing",
+          "code_hash": "d5f04ef0cc747fe20e945cb534cc54ee4e75ce094013b42f172c2ef8e2b3f694",
+          "ran": true,
+          "ok": true,
+          "output": "260\nTrue\ninspect constraints; do not hide essential content"
+        },
+        {
+          "id": "css-type-units",
+          "code_hash": "eb2ed8e699c116e3f8df82d3bbc94991fc5fda40a64b08187a0ca25e8465a329",
+          "ran": true,
+          "ok": true,
+          "output": "root 16 heading 24.0 line 24.0\nroot 20 heading 30.0 line 30.0"
+        },
+        {
+          "id": "css-design-tokens",
+          "code_hash": "d2869bb2b1f7362ff212c583fc440873d1bf71adf0f1a1b3d1c1f6b2a6b8b725",
+          "ran": true,
+          "ok": true,
+          "output": "navy\ngrey\nteal"
+        },
+        {
+          "id": "css-contrast-review",
+          "code_hash": "9f4f86b6929f271f4d5e6335ffbc7438547b52916e0b4a2a274194209792322f",
+          "ran": true,
+          "ok": true,
+          "output": "21.0:1\nTrue"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "linux-sysadmin",
+      "fingerprint": "17b23b6585634263b11cbb3e3b10e44d7f779f5d4569a633676b1c0ef4d2cf16",
+      "course_hash": "a0918d0de0dfdc515cd88205f0634c50b127d8f36df73d871a29a5e910b9d65b",
+      "bank_hash": "67e995cb743a8a1a58edd6576693a45634a820c435e0b6cbdd5dabbb4a477039",
+      "prerequisites": [
+        "computing-os-foundations"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 96,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "linux-sysadmin-l1",
+          "code_hash": "ead91463cf8fb7f1753a4202f814aafd804107be63743361d0e7355db2a81c46",
+          "ran": true,
+          "ok": true,
+          "output": "True"
+        },
+        {
+          "id": "linux-sysadmin-l2",
+          "code_hash": "01f6cd1d068ee32683dfc4f838d01df28a2b932b43893ed03e2929c5308e5c6a",
+          "ran": true,
+          "ok": true,
+          "output": "limit=10\nlimit=20"
+        },
+        {
+          "id": "linux-sysadmin-l3",
+          "code_hash": "77c4b50882d8d6182efc56e01f8cf17bb746b277fee3e8d87ab4339029621bcf",
+          "ran": true,
+          "ok": true,
+          "output": "ERROR fixture_failure\n0"
+        },
+        {
+          "id": "linux-sysadmin-l4",
+          "code_hash": "c53aa784f0ec0cdd592b5e6a3ef8ff2d79e4d26091fd8f3b25d42261e3125b40",
+          "ran": true,
+          "ok": true,
+          "output": "0o640\nFalse"
+        },
+        {
+          "id": "linux-sysadmin-l5",
+          "code_hash": "f52abf95a58388befabd409a546a762c0936e072954b2799b33a62b777127e44",
+          "ran": true,
+          "ok": true,
+          "output": "(1001, 2001)\n(3001, 2001)\n1002"
+        },
+        {
+          "id": "linux-sysadmin-l6",
+          "code_hash": "f58ed3db00f4d3e0044c7c2e19687d363d648f76d6b896b06c8c7b71ab690628",
+          "ran": true,
+          "ok": true,
+          "output": "[True, False]"
+        },
+        {
+          "id": "linux-sysadmin-l7",
+          "code_hash": "9d3008bd06a4fe2b53e49aab0c7d8f7bd1c74ca1990aed76fbba2351e480bf89",
+          "ran": true,
+          "ok": true,
+          "output": "['worker.service']"
+        },
+        {
+          "id": "linux-sysadmin-l8",
+          "code_hash": "315f5a2246eed44ffcdbc14e8b2d0b6b333a80bdae1dad1047161ca04a6f1b72",
+          "ran": true,
+          "ok": true,
+          "output": "['e1']"
+        },
+        {
+          "id": "linux-sysadmin-l9",
+          "code_hash": "3ac48ff6a4c8a9691836c8aa5329047d46d83350ab3d7309b8e290363da7063f",
+          "ran": true,
+          "ok": true,
+          "output": "0.4\nTrue"
+        },
+        {
+          "id": "linux-sysadmin-l10",
+          "code_hash": "515630dae55554966cea5f76f1f7e6c9282038beec00837957d8153c3e235237",
+          "ran": true,
+          "ok": true,
+          "output": "['worker']"
+        },
+        {
+          "id": "linux-sysadmin-l11",
+          "code_hash": "b292a6121fc20bc8e514d89bae9f7098362ff7a55fde8fe19da060aa61229efc",
+          "ran": true,
+          "ok": true,
+          "output": "('15', '2')\nTrue"
+        },
+        {
+          "id": "linux-sysadmin-l12",
+          "code_hash": "57caba975f736a83a208e23f4ce1b373d8490e288d49515255c1c121dc364821",
+          "ran": true,
+          "ok": true,
+          "output": "created\nalready_done"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "python-intermediate-oop",
+      "fingerprint": "9838da9418c603ae94897c345925d50a7c7f9cfb2f1be1e8c7ea4939740c3652",
+      "course_hash": "108663eff824b9e82b1ee11677d593fd683ce1674ccde158f67a198721420512",
+      "bank_hash": "f9fa98e2729cdb3f97d8d36160eaeca8a30cb43a60ef45e43057091319c8ecbe",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 12,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "pio-entities",
+          "code_hash": "0cf41ef567dc51e10623542091340efe4397eef4abccd130ad7b79f1a2b269b1",
+          "ran": true,
+          "ok": true,
+          "output": "True False\nrepeat rejected"
+        },
+        {
+          "id": "pio-attributes",
+          "code_hash": "23ec456ac15cfd1c584a9726496488cc1aa7f8d4aaffbcab1c20657a74350127",
+          "ran": true,
+          "ok": true,
+          "output": "urgent normal normal\n['billing'] []"
+        },
+        {
+          "id": "pio-dataclasses",
+          "code_hash": "75b3bace80ed2c469cc00d964e72451f01139962c748dfc00264c4ed61bf0b90",
+          "ran": true,
+          "ok": true,
+          "output": "True False\nA-B: 2500"
+        },
+        {
+          "id": "pio-composition",
+          "code_hash": "b1db7a8411511963211913f4421eeb78b709e0ca57911e667f9acc5f9b76fb58",
+          "ran": true,
+          "ok": true,
+          "output": "queued for synthetic-account: amount=1200"
+        },
+        {
+          "id": "pio-super",
+          "code_hash": "60ccf61a257328d8a0346eed8661325c29e9a845602d01de3f65d544e7b0c83d",
+          "ran": true,
+          "ok": true,
+          "output": "['audit', 'validate', 'base']\n['Processor', 'Audit', 'Validate', 'Base']"
+        },
+        {
+          "id": "pio-polymorphism",
+          "code_hash": "d06c0f5d88dea2a5ee43f60ebc02860c735dd1843d166184e6b02cba2eb29925",
+          "ran": true,
+          "ok": true,
+          "output": "[500, 0]\n[0, 0]"
+        },
+        {
+          "id": "pio-generators",
+          "code_hash": "c30c064b895311e4222e9636eb76c9e523a959ea60cd385915e0fd627cf75d1f",
+          "ran": true,
+          "ok": true,
+          "output": "[]\n[10, 20]\n[1, 2]"
+        },
+        {
+          "id": "pio-iterators",
+          "code_hash": "758237c42d3625fb34399e26b691ac857cffbd01ecfce68ef7e95e794d2c0a30",
+          "ran": true,
+          "ok": true,
+          "output": "pen book pen\nfinished\nTrue"
+        },
+        {
+          "id": "pio-crosscut",
+          "code_hash": "1eedaa566dc59608a88c9e52072d900b54adbf74ce55c703a667d86d57eec451",
+          "ran": true,
+          "ok": true,
+          "output": "['open', 'close', 'failed']\ncalculate"
+        },
+        {
+          "id": "pio-exceptions",
+          "code_hash": "2bf3fba2b91a57cb86557a51c3b6d472af1fa3b762434321104494bccfe15f43",
+          "ran": true,
+          "ok": true,
+          "output": "QuantityFormatError\nValueError\n7"
+        },
+        {
+          "id": "pio-types",
+          "code_hash": "9226ee1df50babc7d396d58bc02eb3d65abaeeb5249e8e46546b757b25547046",
+          "ran": true,
+          "ok": true,
+          "output": "3\nrejected\nrejected\nrejected"
+        },
+        {
+          "id": "pio-environments",
+          "code_hash": "b38f0d570c9eee5dc78b418e7e114606735d928e0175a3a903aef715d3140193",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nFalse"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    }
+  ],
+  "duplication": {
+    "errors": [],
+    "warnings": []
+  },
+  "completed": [
+    "backend-testing-reliability",
+    "git-collaboration",
+    "web-foundations",
+    "computing-os-foundations",
+    "ai-api-integration",
+    "sdlc-foundations",
+    "networking-fundamentals",
+    "html-semantic",
+    "qa-principles",
+    "llm-fundamentals",
+    "math-for-ai",
+    "probability-statistics",
+    "data-business-fundamentals",
+    "test-design",
+    "css-fundamentals",
+    "linux-sysadmin",
+    "python-intermediate-oop"
+  ],
+  "pending": [
+    "practical-data-structures",
+    "fastapi-backend",
+    "node-express",
+    "db-integration-performance",
+    "backend-deployment-ops",
+    "responsive-css",
+    "js-fundamentals",
+    "js-dom-async",
+    "typescript-fundamentals",
+    "react-fundamentals",
+    "react-advanced",
+    "nextjs-architecture",
+    "frontend-api-security",
+    "frontend-quality",
+    "fullstack-integration-state",
+    "fullstack-architecture",
+    "web-deployment-cicd",
+    "mobile-ui-fundamentals",
+    "dart-programming",
+    "flutter-fundamentals",
+    "flutter-layout-nav-state",
+    "kotlin-android",
+    "react-native",
+    "mobile-apis-networking",
+    "mobile-storage",
+    "mobile-auth-security",
+    "mobile-architecture",
+    "mobile-testing-debugging",
+    "mobile-performance-platform",
+    "app-distribution",
+    "numpy-arrays",
+    "pandas-fundamentals",
+    "data-cleaning",
+    "ml-preprocessing",
+    "ml-fundamentals",
+    "supervised-learning",
+    "unsupervised-learning",
+    "feature-eng-evaluation",
+    "deep-learning",
+    "computer-vision",
+    "nlp-fundamentals",
+    "mlops-deployment",
+    "responsible-ai-monitoring",
+    "prompting-structured-output",
+    "embeddings-semantic-search",
+    "vector-databases",
+    "rag-fundamentals",
+    "rag-advanced",
+    "agents-tool-calling",
+    "agent-workflows",
+    "llm-security-eval",
+    "llm-deployment-cost",
+    "spreadsheet-analysis",
+    "advanced-sql",
+    "descriptive-stats-metrics",
+    "eda",
+    "data-visualization",
+    "powerbi-modeling",
+    "dashboards-reporting",
+    "data-storytelling",
+    "data-modeling-warehousing",
+    "etl-elt-architecture",
+    "data-transformation-pipelines",
+    "workflow-orchestration",
+    "data-quality-testing",
+    "batch-streaming",
+    "cloud-data-platforms",
+    "data-reliability-recovery",
+    "data-governance-security",
+    "security-foundations",
+    "identity-access-control",
+    "cryptography-secure-comms",
+    "vulnerabilities-defense",
+    "security-logging-monitoring",
+    "soc-siem",
+    "incident-response",
+    "network-endpoint-cloud-security",
+    "security-grc",
+    "scripting-automation",
+    "cloud-aws-foundations",
+    "cloud-networking-iam",
+    "docker-containers",
+    "ci-cd",
+    "infrastructure-as-code",
+    "kubernetes",
+    "observability",
+    "reliability-incident-cost",
+    "defect-management",
+    "functional-regression-exploratory",
+    "web-api-testing",
+    "test-data-management",
+    "playwright-automation",
+    "automation-frameworks",
+    "ci-test-reporting",
+    "performance-quality-engineering",
+    "oop-principles",
+    "java-fundamentals",
+    "complexity-analysis",
+    "arrays-strings-hashing",
+    "linear-structures",
+    "recursion-backtracking",
+    "searching-sorting",
+    "trees-bst",
+    "graphs",
+    "greedy-dp",
+    "debugging-testing",
+    "software-design",
+    "engineering-problem-solving"
+  ],
+  "human_approved": false,
+  "published": false
+}

@@ -81,7 +81,8 @@ test('banks: every built-in bank passes validation and every code output is veri
 test('approved banks are live by default; unpublished assessments cannot be started; forms never contain the answer key', async () => {
   assert.equal((await call('GET', '/api/career/curriculum/subtracks/python-fundamentals', 1)).body.assessment.state, 'published');
   assert.equal((await call('GET', '/api/career/curriculum/subtracks/git-collaboration', 1)).body.assessment.state, 'published');
-  assert.equal((await call('GET', '/api/career/curriculum/subtracks/linux-sysadmin', 1)).body.assessment.state, 'planned');
+  assert.equal((await call('GET', '/api/career/curriculum/subtracks/linux-sysadmin', 1)).body.assessment.state, 'draft');
+  assert.equal((await start(1,'linux-sysadmin')).status,409,'new unreviewed bank cannot start');
   assert.equal((await call('POST', '/api/admin/career/curriculum/subtracks/python-fundamentals/unpublish', 3)).status, 200);
   let r = await start(1, 'python-fundamentals');
   assert.equal(r.status, 409);
@@ -208,10 +209,10 @@ test('7. question-quality validation flags multiple correct answers and invalid 
 });
 
 test('8. a subtrack with insufficient reviewed questions cannot be published as complete', async () => {
-  // No bank at all.
-  let r = await publish('linux-sysadmin');
+  // This canonical subtrack still has no bank; Linux now has an unreviewed draft.
+  let r = await publish('kubernetes');
   assert.equal(r.status, 409);
-  assert.equal((await call('GET', '/api/career/curriculum/subtracks/linux-sysadmin')).body.assessment.state, 'planned');
+  assert.equal((await call('GET', '/api/career/curriculum/subtracks/kubernetes')).body.assessment.state, 'planned');
   // A real bank with most items sent back to draft.
   const ids = BANKS['python-fundamentals'].questions.slice(0, 70).map((q) => q.id);
   await call('POST', '/api/admin/career/curriculum/subtracks/python-fundamentals/questions/status', 3, { ids, status: 'draft' });

@@ -38,7 +38,7 @@ beforeEach(() => {
 });
 
 const call = async (method, url, user, body) => {
-  const res = await fetch(base + url, { method, headers: { 'content-type': 'application/json', ...(user ? { 'x-user': String(user) } : {}) }, body: body ? JSON.stringify(body) : undefined });
+  const res = await fetch(base + url, { method, headers: { 'content-type': 'application/json', connection:'close', ...(user ? { 'x-user': String(user) } : {}) }, body: body ? JSON.stringify(body) : undefined });
   return { status: res.status, body: await res.json() };
 };
 const publishAll = () => { for (const b of Object.keys(svc.BANKS)) svc.setQuestionStatus(svc.questions(b).map((q) => q.id), 'published', 3); };

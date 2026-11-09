@@ -17,6 +17,8 @@ const BANKS = {
   'git-collaboration': { ...REVIEW, questions: ['a', 'b', 'c'].flatMap((p) => require('./git-collaboration.' + p)) },
   'rest-api-design': { ...REVIEW, questions: ['a', 'b'].flatMap((p) => require('./rest-api-design.' + p)) },
 };
+// Only curated, validated drafts are registered. Historical banks are reused.
+for(const id of require('../learning/wave1/manifest.json').courses)if(!BANKS[id])BANKS[id]={author:'EchoLens AI-assisted draft',reviewed_by:null,reviewed_at:null,method:'Unreviewed authored wave; automated checks do not supply human approval.',questions:require('./wave1/'+id)};
 /**
  * Senior subject-matter approval to publish. Recorded here, with the review
  * evidence, so the approval ships with the code; the service still re-checks

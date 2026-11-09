@@ -5,14 +5,15 @@ const {BUILTIN,validate,hash}=require('../career/curriculum/learning');
 const arg=name=>{const i=process.argv.indexOf(name);return i<0?null:process.argv[i+1];};
 const execute=!process.argv.includes('--structure-only'), sourceRoot=arg('--source-root');
 const report={human_approved:false,published:false,courses:[],official_source:null,official_sources:[]};
+const roots=arg('--source-roots')?JSON.parse(fs.readFileSync(arg('--source-roots'),'utf8')):{};
+for(const [repo,root] of Object.entries({'python/cpython':sourceRoot,'postgres/postgres':arg('--source-root-postgres'),'httpwg/http-core':arg('--source-root-http'),'OAI/OpenAPI-Specification':arg('--source-root-openapi'),'OWASP/CheatSheetSeries':arg('--source-root-owasp')}))if(root)roots[repo]=root;
 for(const course of Object.values(BUILTIN)) {
   const result=validate(course,{execute});
   report.courses.push({id:course.id,version:course.version,course_hash:hash(course),...result});
-  const roots={'python/cpython':sourceRoot,'postgres/postgres':arg('--source-root-postgres'),'httpwg/http-core':arg('--source-root-http'),'OAI/OpenAPI-Specification':arg('--source-root-openapi'),'OWASP/CheatSheetSeries':arg('--source-root-owasp')};
   const groups=new Map();
   for(const ref of course.references){const repo=ref.source?.repo;if(!groups.has(repo))groups.set(repo,[]);groups.get(repo).push(ref);}
   for(const [repo,refs] of groups){
-    const courseSourceRoot=roots[repo];if(!courseSourceRoot)continue;
+    const courseSourceRoot=roots[repo];if(!courseSourceRoot){if(process.argv.includes('--require-sources'))throw Error('Missing pinned source checkout for '+course.id+': '+repo);continue;}
     const commit=execFileSync('git',['-C',courseSourceRoot,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
     const references=refs.map(r=>{
       if(commit!==r.source.commit)throw Error('Reference checkout does not match the recorded official source commit.');

@@ -43,12 +43,9 @@ if (process.env.ECHOLENS_TEST_LEARNING === '1') {
   const cur = require('../../career/service').createCareerService(store).curriculum;
   cur.updateConfig({ retake_hours: 0 }, 1);
   const L = cur.learning;
-  const http='http-web-architecture';
-  cur.setQuestionStatus(http,cur.questions(http).map(q=>q.id),'reviewed',1);
-  const publication=cur.publishAssessment(http,1);if(publication.error)throw Error(publication.error);
-  const database='database-design';cur.setQuestionStatus(database,cur.questions(database).map(q=>q.id),'reviewed',1);const dbPublication=cur.publishAssessment(database,1);if(dbPublication.error)throw Error(dbPublication.error);
-  const security='api-security-auth';cur.setQuestionStatus(security,cur.questions(security).map(q=>q.id),'reviewed',1);const securityPublication=cur.publishAssessment(security,1);if(securityPublication.error)throw Error(securityPublication.error);
-  for (const sid of ['programming-foundations','python-fundamentals','sql-fundamentals','http-web-architecture','rest-api-design','database-design','api-security-auth']) for (const action of ['review','approve','publish']) {
+  const courses=Object.keys(require('../../career/curriculum/learning').BUILTIN);
+  for(const id of courses)if(cur.assessmentStatus(id).state!=='published'){cur.setQuestionStatus(id,cur.questions(id).map(q=>q.id),'reviewed',1);const result=cur.publishAssessment(id,1);if(result.error)throw Error(id+': '+result.error);}
+  for (const sid of courses) for (const action of ['review','approve','publish']) {
     const out = L.transition(sid, action, { attest_human_review:true, notes:'Synthetic QA attestation for isolated end-to-end testing only; production content still requires actual human review.' }, 1);
     if (out.error) throw Error(out.error);
   }

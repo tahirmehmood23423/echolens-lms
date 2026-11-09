@@ -117,7 +117,7 @@ test('missing or unpublished content never yields a broken recommended lesson',(
 });
 test('completion inventory distinguishes 16 free listings, six validated-course subset and zero approved pilot releases',()=>{
  const report=L.inventory(store);assert.equal(report.reconciliation.public_free.length,16);assert.equal(report.reconciliation.trending_subset.length,6);assert.equal(report.totals.subtracks,132);assert.equal(report.totals.objectives,680);
- assert.equal(report.totals.lessons,81);assert.equal(report.totals.formative_mcqs,508);assert.equal(report.totals.automated_complete,7);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
+ const wave=require('../career/curriculum/learning/wave1/manifest.json').courses.map(id=>BUILTIN[id]);assert.equal(report.totals.lessons,81+wave.reduce((n,c)=>n+c.lessons.length,0));assert.equal(report.totals.formative_mcqs,508+wave.reduce((n,c)=>n+c.questions.length,0));assert.equal(report.totals.automated_complete,7+wave.length);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
 });
 test('learning resume appears in the unified dashboard without an enrollment or false onboarding interruption',()=>{
  release();L.visit(user(1),SID,'py-strings');const w=svc.workspace(user(1));assert.equal(w.continue_learning.resume,'#lesson/'+SID+'/py-strings');assert.equal(w.report.curriculum.learning.completed,0);assert.equal(svc.discoveryState(user(1)).show_welcome,false);

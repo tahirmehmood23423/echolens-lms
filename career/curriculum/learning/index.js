@@ -8,6 +8,7 @@ const { verifyCode } = require('../verify');
 const VERIFIED = require('./verification.json');
 const DATABASE_VERIFIED=require('./database-verification.json'),DATABASE_CASES=require('./database-cases');
 const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http'), 'rest-api-design': require('./rest'), 'database-design': require('./database'), 'api-security-auth': require('./security') };
+for(const id of require('./wave1/manifest.json').courses){if(BUILTIN[id]||!C.subtrack(id))throw Error('Invalid or duplicate curated learning entry: '+id);const course=require('./wave1/'+id);if(course.id!==id)throw Error('Learning entry differs from canonical ID: '+id);BUILTIN[id]=course;}
 const clone = x => x == null ? x : JSON.parse(JSON.stringify(x));
 const hash = x => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const text = x => typeof x === 'string' && x.trim().length > 0;
@@ -231,6 +232,8 @@ function createLearning(core) {
       const checked=VERIFIED.courses.find(c=>c.id===s.id);
       const bank=core.questions(s.id), assessment=assessmentStatus(s.id);
       const exampleCount=(d?.lessons||[]).filter(l=>l?.worked&&checked?.examples.some(e=>e.id===l.id&&e.ok&&e.code_hash===hash({code:l.worked.code,expect:l.worked.expect,lang:l.worked.lang||'python'}))).length;
+      const humanReviewed=!!(records()[s.id]?.review?.human_attestation&&records()[s.id].review.hash===hash(d));
+      const technicallyValidated=!!d&&!v.errors.length&&exampleCount===d.lessons.length&&bank.length>=90;
       const mapping=bank.map(q=>({question:q.id,objective:s.id+'.'+q.comp,
         lessons:(d?.lessons||[]).filter(l=>l?.objectives?.some(o=>o?.id===s.id+'.'+q.comp)).map(l=>({id:l.id,href:p?lessonHref(s.id,l.id):null}))}));
       return {id:s.id,title:s.title,outline_state:s.structure_status,prerequisites:s.prereq,
@@ -241,6 +244,9 @@ function createLearning(core) {
         validated_formative_mcqs:v&&!v.errors.length?d.questions.length:0,
         comprehensive_questions:bank.length,comprehensive_mapping:mapping,legacy_bank_review:bank.length?{author:COMPREHENSIVE_BANKS[s.id]?.author,reviewed_by:COMPREHENSIVE_BANKS[s.id]?.reviewed_by,human_attestation:'No separate human attestation is supplied by this legacy metadata; do not treat it as approval of new lessons.'}:null,
         validation_errors:v?.errors||[],automated_complete:!!v&&!v.errors.length,
+        content_status:p?'published':humanReviewed?'human_reviewed':technicallyValidated?'automated_validation_passed':d?'authored_draft':s.structure_status==='reviewed'?'outline_only':'no_learning_content',
+        authored_draft:!!d,technically_validated:technicallyValidated,human_review_pending:!!d&&!humanReviewed,human_reviewed:humanReviewed,
+        missing_examples:Math.max(0,(d?.lessons.length||0)-exampleCount),missing_objectives:d?v.errors.filter(e=>e.startsWith('Missing instructional coverage:')):s.modules.flatMap(m=>m.objectives.map(o=>o.id)),
         human_approved:!!p?.human_review?.human_attestation,published:!!p,comprehensive:assessment,
         reused_resources:d?.lessons.flatMap(l=>l?.reuse||[])||[],
         candidate_courses:s.refs.map(key=>({key,exists:trackDefs.some(t=>t.key===key),coverage:'Candidate only; detailed objective mapping still requires review.'})),
@@ -251,7 +257,7 @@ function createLearning(core) {
       return {id,subtracks:rows.length,outlines:rows.filter(s=>s.outline_state==='reviewed').length,
         lessons:rows.reduce((n,s)=>n+s.lessons,0),verified_lesson_examples:rows.reduce((n,s)=>n+s.verified_lesson_examples,0),
         lesson_quizzes:rows.reduce((n,s)=>n+s.quizzes,0),checkpoint_modules:rows.reduce((n,s)=>n+s.checkpoint_modules,0),
-        complete_lesson_subtracks:rows.filter(s=>s.automated_complete).length,approved_subtracks:rows.filter(s=>s.human_approved).length,
+        complete_lesson_subtracks:rows.filter(s=>s.automated_complete).length,authored_subtracks:rows.filter(s=>s.authored_draft).length,technically_validated_subtracks:rows.filter(s=>s.technically_validated).length,human_review_pending:rows.filter(s=>s.human_review_pending).length,published_subtracks:rows.filter(s=>s.published).length,missing_authored:rows.filter(s=>!s.authored_draft).map(s=>s.id),approved_subtracks:rows.filter(s=>s.human_approved).length,
         comprehensive_subtracks:rows.filter(s=>s.comprehensive.state==='published').length,remaining:rows.filter(s=>!s.published).map(s=>s.id)};
     });
     const roles=core.allRoles().map(r=>{
@@ -263,7 +269,7 @@ function createLearning(core) {
           comprehensive_questions:row.comprehensive_questions,comprehensive_state:row.comprehensive.state,automated_complete:row.automated_complete,
           human_review:review?.human_attestation?'approved exact draft':content?'pending':'not authored',published:row.published,remaining:row.missing};
       });
-      return {id:r.id,title:r.title,track:r.track,required:path.required,optional:path.optional,completion_matrix,missing,final:final.state,complete:!missing.length&&final.state==='published'};
+      return {id:r.id,title:r.title,track:r.track,required:path.required,optional:path.optional,completion_matrix,missing,authored_requirements:completion_matrix.filter(row=>row.lessons>0&&!row.validation_errors.length&&row.comprehensive_questions>=90).length,authored_complete:completion_matrix.every(row=>row.lessons>0&&!row.validation_errors.length&&row.comprehensive_questions>=90),final:final.state,complete:!missing.length&&final.state==='published'};
     });
     // Shared prerequisites first; then prioritize subtracks blocking the most roles.
     const explicit=['programming-foundations','python-fundamentals','python-intermediate-oop','js-fundamentals','web-foundations','html-semantic','sql-fundamentals','git-collaboration','practical-data-structures','http-web-architecture','networking-fundamentals','linux-sysadmin','math-for-ai','probability-statistics'];
@@ -283,7 +289,7 @@ function createLearning(core) {
         validated_formative_mcqs:sum('validated_formative_mcqs'),verified_lesson_examples:sum('verified_lesson_examples'),
         comprehensive_questions:sum('comprehensive_questions'),comprehensive_questions_with_draft_lessons:subs.reduce((n,s)=>n+s.comprehensive_mapping.filter(q=>q.lessons.length).length,0),
         existing_practice_lessons_referenced:new Set(subs.flatMap(s=>s.reused_resources.map(r=>r.track+':'+r.level))).size,
-        automated_complete:subs.filter(s=>s.automated_complete).length,human_approved:subs.filter(s=>s.human_approved).length,published:subs.filter(s=>s.published).length,complete_roles:roles.filter(r=>r.complete).length},
+        automated_complete:subs.filter(s=>s.automated_complete).length,authored_subtracks:subs.filter(s=>s.authored_draft).length,technically_validated:subs.filter(s=>s.technically_validated).length,human_review_pending:subs.filter(s=>s.human_review_pending).length,human_reviewed:subs.filter(s=>s.human_reviewed).length,authored_role_pathways:roles.filter(r=>r.authored_complete).length,human_approved:subs.filter(s=>s.human_approved).length,published:subs.filter(s=>s.published).length,complete_roles:roles.filter(r=>r.complete).length},
       complete_roles:roles.filter(r=>r.complete).map(r=>r.id)};
   }
   return {revision:(id,version)=>(records()[id]?.revisions||[]).find(c=>c.version===Number(version))||null,draft,published,adminView,updateDraft,transition,summary,lesson,progress,visit,start,recommendations,required,dashboard,inventory,validate};

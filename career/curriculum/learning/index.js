@@ -236,7 +236,7 @@ function createLearning(core) {
       const technicallyValidated=!!d&&!v.errors.length&&exampleCount===d.lessons.length&&bank.length>=90;
       const mapping=bank.map(q=>({question:q.id,objective:s.id+'.'+q.comp,
         lessons:(d?.lessons||[]).filter(l=>l?.objectives?.some(o=>o?.id===s.id+'.'+q.comp)).map(l=>({id:l.id,href:p?lessonHref(s.id,l.id):null}))}));
-      return {id:s.id,title:s.title,outline_state:s.structure_status,prerequisites:s.prereq,
+      return {id:s.id,title:s.title,outline_state:s.structure_status,prerequisites:s.prereq,canonical_usage:C.usage(s.id),
         curriculum:s.modules,modules:s.modules.length,objectives:s.modules.flatMap(m=>m.objectives).length,
         database_verification:d?databaseEvidence(d):null,lessons:d?.lessons.length||0,quizzes:d?.lessons.filter(l=>l?.quiz?.length>=3).length||0,
         checkpoint_modules:d?.modules.filter(m=>m&&d.questions.filter(q=>C.competency(q?.objective)?.module===m.id).length>=d.checkpoint_items).length||0,

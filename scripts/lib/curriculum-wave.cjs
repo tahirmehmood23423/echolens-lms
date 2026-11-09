@@ -37,6 +37,8 @@ function checkCourse(course,bank,{validate,execute=false,previous=null}={}){
  const bankResult=validateBank(bank,C.subtrack(course.id));errors.push(...bankResult.errors);warnings.push(...bankResult.warnings);
  if(bank.length<90)errors.push('Comprehensive bank requires at least 90 distinct items.');
  for(const difficulty of ['easy','medium','hard','advanced'])if(!bank.some(q=>q.difficulty===difficulty))errors.push('Missing comprehensive difficulty: '+difficulty);
+ for(const [difficulty,min] of Object.entries({easy:12,medium:22,hard:20,advanced:6}))if(bank.filter(q=>q.difficulty===difficulty).length<min)errors.push('Insufficient comprehensive '+difficulty+' alternatives for two fresh 30-item forms.');
+ for(const objective of C.subtrack(course.id).modules.flatMap(m=>m.objectives))if(bank.filter(q=>course.id+'.'+q.comp===objective.id).length<4)errors.push('Insufficient comprehensive alternatives for objective '+objective.id);
  if(bank.filter(q=>q.scenario).length/Math.max(1,bank.length)<.7)errors.push('Comprehensive bank needs at least 70% scenario items.');
  const positions=[0,1,2,3].map(i=>bank.filter(q=>q.answer===i).length);
  if(positions.some(n=>n/bank.length>.4||n/bank.length<.1))errors.push('Comprehensive answer-position distribution is too predictable.');

@@ -17,7 +17,7 @@ if(mode==='plan'){
   const bank=BANKS[id]?.questions||require(path.resolve(__dirname,'../career/curriculum/questions/wave1',id+'.js'));
   courses.push(course);rows.push(checkCourse(course,bank,{validate,execute:process.argv.includes('--execute'),previous:previous?.courses?.find(c=>c.id===id)}));
  }
- const duplicate=proseDuplicates(courses),done=new Set(Object.keys(BUILTIN));
+ const duplicate=proseDuplicates(courses),done=new Set(Object.keys(BUILTIN).filter(id=>!rows.some(row=>row.id===id&&!row.execution_passed)));
  const report={schema_version:1,scope:'Repository-only content checks; no application store, human approval or publication',courses:rows,duplication:duplicate,completed:rows.filter(c=>c.execution_passed).map(c=>c.id),pending:C.SUBTRACKS.filter(s=>!done.has(s.id)&&!rows.some(r=>r.id===s.id&&r.execution_passed)).map(s=>s.id),human_approved:false,published:false};
  if(output)writeCheckpoint(output,report);
  console.log(JSON.stringify({courses:rows.length,completed:report.completed,errors:rows.flatMap(c=>c.errors).concat(duplicate.errors),warnings:rows.flatMap(c=>c.warnings).concat(duplicate.warnings),pending:report.pending.length},null,2));

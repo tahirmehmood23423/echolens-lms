@@ -2,5 +2,9 @@
   "wave": "shared-foundations-1",
   "starting_commit": "051a99c",
   "starting_authored": 7,
-  "courses": []
+  "courses": [
+    "web-foundations",
+    "computing-os-foundations",
+    "ai-api-integration"
+  ]
 }

@@ -897,88 +897,265 @@
       "lessons": 12,
       "questions": 76,
       "human_approved": false
+    },
+    {
+      "id": "web-foundations",
+      "version": 1,
+      "course_hash": "51064b378745841af923b57d11a434448f82ddbe547ad0534cb9ae76c9acd746",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "web-request-render",
+          "code_hash": "6ba23591f93ba8e3c9b12fd3d2fe62b1630e880d97f44d8b876a023d45e138fa",
+          "ran": true,
+          "ok": true,
+          "output": "True\n2"
+        },
+        {
+          "id": "web-url-dns",
+          "code_hash": "f06c46cd7088a508d8a90d2b8b14a651972d89a5a46780bc88ba574080ccd5a3",
+          "ran": true,
+          "ok": true,
+          "output": "portal.example.test\n/orders open\nsummary"
+        },
+        {
+          "id": "web-response-diagnosis",
+          "code_hash": "e9d9b461f3de05ad301a62b4140201cbbce9e2a507da0787e154ef0e255a7963",
+          "ran": true,
+          "ok": true,
+          "output": "no HTTP response\nrequest failure\nserver failure\ninspect successful response contract"
+        },
+        {
+          "id": "web-inspect-elements",
+          "code_hash": "7ffff440d67d93fb74bb3d9325c081180f36838d48f7910e310ee74b8fb6292b",
+          "ran": true,
+          "ok": true,
+          "output": "button\nTrue\ninline-block"
+        },
+        {
+          "id": "web-network-console",
+          "code_hash": "84c46a6025113d1512f2d59d2164be23c38cdd759446cb08905a7c33bb127a7f",
+          "ran": true,
+          "ok": true,
+          "output": "['/tickets/summary']\ncorrelate with console; do not infer cause"
+        },
+        {
+          "id": "web-languages",
+          "code_hash": "186bc0c0b9d96019efcf975925cad23133ca0b5d19172638f2f191c996822b36",
+          "ran": true,
+          "ok": true,
+          "output": "product heading: HTML\ncard spacing: CSS\ncart feedback: JavaScript"
+        },
+        {
+          "id": "web-https-cookies",
+          "code_hash": "bd3d4785cf9c2e7b960cca113adbd014301fffc7ef85e67904df4e7d2caded57",
+          "ran": true,
+          "ok": true,
+          "output": "True\nLax\nauthorization still required"
+        },
+        {
+          "id": "web-build-version-deploy",
+          "code_hash": "597d911ac0b89a3cb52988de133f22419fb85c9d35be31c3f8dfb56a74e39c21",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "web-safe-professional-use",
+          "code_hash": "8bb507d67d2242c383b78996058328c0ccddb5f183889051e10a9addea216db0",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "computing-os-foundations",
+      "version": 1,
+      "course_hash": "ce6641f908da1ce6af9aad9fbff069bea78bc5110b63fe8658c8f71860a1e024",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "computing-os-foundations-l1",
+          "code_hash": "64d0f3ff52b4858de68143c1608842a5032cbac6d210c28602ea785b18fbad53",
+          "ran": true,
+          "ok": true,
+          "output": "3\n9"
+        },
+        {
+          "id": "computing-os-foundations-l2",
+          "code_hash": "1f773e89a108efbbedf6eabd8c97e54dec848a4f4e3c295f980b7ee7583ae966",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nFalse"
+        },
+        {
+          "id": "computing-os-foundations-l3",
+          "code_hash": "3219018cca3f3ff25bfafdbe2bcd18fe5824214b6ef3be388b28df1a1412137f",
+          "ran": true,
+          "ok": true,
+          "output": "/srv/invoices\n.pdf\nTrue"
+        },
+        {
+          "id": "computing-os-foundations-l4",
+          "code_hash": "60d0da708687cf976a14875506a0bf0bba33e869e8537baa412cd97dfa120138",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "computing-os-foundations-l5",
+          "code_hash": "cb6b1199747a3bb5172a2f5622a7b6e499db86add9ca0956180fd5e8d7183d96",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "computing-os-foundations-l6",
+          "code_hash": "ae054214faf943d90527f231cd4b86d059e3a80ec7d95b6b596b7b3311ebafa6",
+          "ran": true,
+          "ok": true,
+          "output": "['support-demo']"
+        },
+        {
+          "id": "computing-os-foundations-l7",
+          "code_hash": "e3a56fd93d8b2c191f86db7e04cd648a77bb83bf8529539360bf2f7d07d86236",
+          "ran": true,
+          "ok": true,
+          "output": "C:\n/var/log/demo"
+        },
+        {
+          "id": "computing-os-foundations-l8",
+          "code_hash": "a6bc69a3ab274ff06163d5ec4b37cfa9a88bad14299a7d380340b6558d281378",
+          "ran": true,
+          "ok": true,
+          "output": "[{'id': 'r1', 'level': 'ERROR'}]"
+        },
+        {
+          "id": "computing-os-foundations-l9",
+          "code_hash": "0d14afd18d161f7012c6dc504bc86e914cd5819141dd34ff5f857db365d3adf6",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['jobs']"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "ai-api-integration",
+      "version": 1,
+      "course_hash": "8102fca24c5495cc273b7628b67d0a23e536338b8962a14b49863a57a79353f5",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ai-api-integration-request-contract",
+          "code_hash": "4b7912635e6d842be3aaa5a7acbfdedf300c4774f609e36fda0717e1423d074e",
+          "ran": true,
+          "ok": true,
+          "output": "2\nuser\n120"
+        },
+        {
+          "id": "ai-api-integration-stream-state",
+          "code_hash": "aacd164fcd6cb7f1a55c021b0c1e7db8bae9331f839dbd075c0164cd9f864e63",
+          "ran": true,
+          "ok": true,
+          "output": "Enrollment opens Monday.\ncomplete\ncomplete"
+        },
+        {
+          "id": "ai-api-integration-bounded-retries",
+          "code_hash": "0cfe22b9eb6d6edf24cd7c6e1b83e21379fce659230163f3a9d75d90f8dbc621",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2, 4]\n7\nTrue"
+        },
+        {
+          "id": "ai-api-integration-server-boundary",
+          "code_hash": "e805f1a5298573b1d4ebfe951eb8f091f2e581b05cfd21c65cc0397579285052",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "ai-api-integration-conversation-flow",
+          "code_hash": "12bfa33345070d3ac536cdc1944bd744e07fcc3df775a3b5b1ffbfa06644bfae",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue\nFalse\n3"
+        },
+        {
+          "id": "ai-api-integration-safe-output",
+          "code_hash": "2483b014892a46b3ab5b83da6b4fe8802140e44b6c66f19f338c4bc586c4ff14",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "ai-api-integration-token-budget",
+          "code_hash": "166fa7a9093d881be5f36abb861441cc07b1f760f406e1235e291d17c597984b",
+          "ran": true,
+          "ok": true,
+          "output": "760\nTrue\n40"
+        },
+        {
+          "id": "ai-api-integration-cost-ledger",
+          "code_hash": "e17227047fca2d5fca21f3d343dad1149f15486854ffbac29c3d0ff59c0e0eca",
+          "ran": true,
+          "ok": true,
+          "output": "0.0048\n48.00"
+        },
+        {
+          "id": "ai-api-integration-economic-controls",
+          "code_hash": "4221704503cf1d4fdbfe568a9695f1e7ccd7b8c8f24c8bef04221da64d36537a",
+          "ran": true,
+          "ok": true,
+          "output": "[True, True, False]\n0.001"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/OWASP/CheatSheetSeries",
-    "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
+    "repository": "https://github.com/openai/openai-cookbook",
+    "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
     "references": [
       {
-        "id": "passwords",
-        "path": "cheatsheets/Password_Storage_Cheat_Sheet.md",
-        "sha256": "5004d1ead2dfa8270df8be7789c9decb39746261639ddf271e24ba1ac68b32a1",
+        "id": "stream",
+        "path": "examples/How_to_stream_completions.ipynb",
+        "sha256": "c2aa466319c891f39f427ddf3ed74d6c2933c70bc27782ab16ad7f1b293b8afd",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "authentication",
-        "path": "cheatsheets/Authentication_Cheat_Sheet.md",
-        "sha256": "92f7483b28548679917a329c7b9be1824f33e934d9eed670aaf3e9a1e7b37e83",
+        "id": "retry",
+        "path": "examples/How_to_handle_rate_limits.ipynb",
+        "sha256": "de228ec125143956ef0cab538f1f615b0af8405203c7ae4032ac3f6611028fcf",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "sessions",
-        "path": "cheatsheets/Session_Management_Cheat_Sheet.md",
-        "sha256": "c6dfdd81905de29eb149fa3826fa803da38e37f186b309dbdc85000c732aa514",
+        "id": "tokens",
+        "path": "examples/How_to_count_tokens_with_tiktoken.ipynb",
+        "sha256": "b83aa4aebf80a432b0a93a54fe3056e09d768774f8914ea7bf8329129b6800d5",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "recovery",
-        "path": "cheatsheets/Forgot_Password_Cheat_Sheet.md",
-        "sha256": "c3cc207d452c280cfc1a660eecdbc3cc4def29903da1aef10b3095607a4472dc",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "mfa",
-        "path": "cheatsheets/Multifactor_Authentication_Cheat_Sheet.md",
-        "sha256": "aa0c03c9d10c1facfaef0ace5f61536aab46e2a8ea409cf8527086d0d11132f2",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "authorization",
-        "path": "cheatsheets/Authorization_Cheat_Sheet.md",
-        "sha256": "fb8b6e5c60ed783025beefb5049142fd9da02d01f5c95de18a19d26479737975",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "input",
-        "path": "cheatsheets/Input_Validation_Cheat_Sheet.md",
-        "sha256": "163390e3dcf5cc965aeac5e633692682403c08067a7f2ae54bdb49372e886810",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "sql",
-        "path": "cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md",
-        "sha256": "6c377eef95804d03ed29c27b8002a1d714ced833dfc651e1ee69ccf4abdadd6b",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "xss",
-        "path": "cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.md",
-        "sha256": "e4bbeced6010bb9029061910e97f01f4391cb8b89d1a0f31a390ca5a00a5e9a8",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "csrf",
-        "path": "cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md",
-        "sha256": "fb6fb6a43e11dd0ae2709ddcad06ee3682ebc55fef4b8f7bc89e4852d0ba0ff4",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "rest",
-        "path": "cheatsheets/REST_Security_Cheat_Sheet.md",
-        "sha256": "3e2959541004f37a28d47ea1f742f30f46d06a331317eb4d9371617f2ad7a704",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "secrets",
-        "path": "cheatsheets/Secrets_Management_Cheat_Sheet.md",
-        "sha256": "c7b67badc6e5990da90d1942f48b73e6e354f157de9b4eee56381cf4a906ae61",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "logging",
-        "path": "cheatsheets/Logging_Cheat_Sheet.md",
-        "sha256": "55ed0b4e9b2a68dba0f5a26c817a20760632d91b315aa42bb33ecfe36cc7195d",
+        "id": "structure",
+        "path": "examples/Structured_Outputs_Intro.ipynb",
+        "sha256": "05731b657039904eec7d55c5a69532a6227fe8b9747a54a19934d993e6d50dde",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -1318,6 +1495,93 @@
           "id": "logging",
           "path": "cheatsheets/Logging_Cheat_Sheet.md",
           "sha256": "55ed0b4e9b2a68dba0f5a26c817a20760632d91b315aa42bb33ecfe36cc7195d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "web-foundations",
+      "repository": "https://github.com/mdn/content",
+      "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
+      "references": [
+        {
+          "id": "mdn-web",
+          "path": "files/en-us/learn_web_development/getting_started/web_standards/how_the_web_works/index.md",
+          "sha256": "68e853957ffde47e638b8ab0b50292601f833da0717c3be9fd2c070f7b7e964b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mdn-render",
+          "path": "files/en-us/learn_web_development/getting_started/web_standards/how_browsers_load_websites/index.md",
+          "sha256": "ad2737ca233943423a1e6632fe34adca8b6cd316949e292ef716bf985167fbc8",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mdn-tools",
+          "path": "files/en-us/learn_web_development/howto/tools_and_setup/what_are_browser_developer_tools/index.md",
+          "sha256": "416ebc3d4c514cf9f9c7e1b51e56416e7a914a07049eb2007e75bb76905df662",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "computing-os-foundations",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-os",
+          "path": "Doc/library/os.rst",
+          "sha256": "1d54f83bb3f583e37bae07d820d16206cf02f4fb2ef281338635b4b7fd01ebe4",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-pathlib",
+          "path": "Doc/library/pathlib.rst",
+          "sha256": "ef79ce3541ae12a3919ca60e3a8bbd879958876c30e155aa2234112e8b6cca28",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-subprocess",
+          "path": "Doc/library/subprocess.rst",
+          "sha256": "eaf797f6e7c2f43d8aa6cd288e44e9a9966754d33368e35194816ace8dab6415",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-logging",
+          "path": "Doc/library/logging.rst",
+          "sha256": "b84325a6a1594d8398fd45d45b6dee35a6c5fd2bee864a719d700cbc22a50415",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "ai-api-integration",
+      "repository": "https://github.com/openai/openai-cookbook",
+      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "references": [
+        {
+          "id": "stream",
+          "path": "examples/How_to_stream_completions.ipynb",
+          "sha256": "c2aa466319c891f39f427ddf3ed74d6c2933c70bc27782ab16ad7f1b293b8afd",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "retry",
+          "path": "examples/How_to_handle_rate_limits.ipynb",
+          "sha256": "de228ec125143956ef0cab538f1f615b0af8405203c7ae4032ac3f6611028fcf",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "tokens",
+          "path": "examples/How_to_count_tokens_with_tiktoken.ipynb",
+          "sha256": "b83aa4aebf80a432b0a93a54fe3056e09d768774f8914ea7bf8329129b6800d5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "structure",
+          "path": "examples/Structured_Outputs_Intro.ipynb",
+          "sha256": "05731b657039904eec7d55c5a69532a6227fe8b9747a54a19934d993e6d50dde",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

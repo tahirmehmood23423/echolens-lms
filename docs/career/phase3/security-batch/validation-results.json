@@ -1,0 +1,57 @@
+{
+  "human_approved": false,
+  "published": false,
+  "implementation_commit": "9a7d7e0",
+  "targeted": {
+    "tests": 170,
+    "passed": 170,
+    "failed": 0
+  },
+  "browser": {
+    "passed": true,
+    "checks": 114,
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "errors": [],
+    "production_published": false
+  },
+  "full_suite": {
+    "tests": 327,
+    "passed": 315,
+    "failed": 11,
+    "skipped": 1,
+    "failure_names_match_database_batch": true,
+    "failures": [
+      "\u2716 reminder settings and delivery history round-trip through the production Prisma JSON mapping",
+      "\u2716 test/certificate-final-project.test.js",
+      "  \u2716 admin login and role-specific browsing",
+      "  \u2716 coord login and role-specific browsing",
+      "\u2716 all demo roles browse synthetic data; writes cannot alter the store or SQL",
+      "\u2716 actual health and alert functions expose full error details without connecting to a database",
+      "\u2716 test/flush-step2.test.js",
+      "\u2716 test/free-course-reminders.test.js",
+      "\u2716 required ad choices and unresolved age/retention facts remain explicit",
+      "\u2716 test/talent.test.js",
+      "\u2716 test/trending-tech.test.js",
+      "\u2716 failing tests:",
+      "\u2716 reminder settings and delivery history round-trip through the production Prisma JSON mapping",
+      "\u2716 test/certificate-final-project.test.js",
+      "\u2716 admin login and role-specific browsing",
+      "\u2716 coord login and role-specific browsing",
+      "\u2716 actual health and alert functions expose full error details without connecting to a database",
+      "\u2716 test/flush-step2.test.js",
+      "\u2716 test/free-course-reminders.test.js",
+      "\u2716 required ad choices and unresolved age/retention facts remain explicit",
+      "\u2716 test/talent.test.js",
+      "\u2716 test/trending-tech.test.js"
+    ]
+  },
+  "isolated_code_checks": 114,
+  "security_worked_examples": 12,
+  "sources": "Pinned official Git objects checked against local files, not public HTML availability"
+}

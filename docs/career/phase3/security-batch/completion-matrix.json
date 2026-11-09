@@ -1,0 +1,274 @@
+{
+  "id": "junior-backend-developer",
+  "title": "Junior Backend Developer",
+  "track": "backend-developer",
+  "required": [
+    "programming-foundations",
+    "python-fundamentals",
+    "http-web-architecture",
+    "rest-api-design",
+    "sql-fundamentals",
+    "database-design",
+    "api-security-auth",
+    "backend-testing-reliability",
+    "git-collaboration"
+  ],
+  "optional": [
+    "python-intermediate-oop",
+    "practical-data-structures",
+    "backend-deployment-ops"
+  ],
+  "completion_matrix": [
+    {
+      "order": 1,
+      "id": "programming-foundations",
+      "title": "Programming and Computer Science Foundations",
+      "prerequisites": [],
+      "modules": 4,
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "practice_mcqs": 72,
+      "verified_lesson_examples": 12,
+      "database_verification": null,
+      "validation_errors": [],
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ],
+      "integration_evidence": "Guided/direct paths covered by current Node/browser suites"
+    },
+    {
+      "order": 2,
+      "id": "python-fundamentals",
+      "title": "Python Fundamentals",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "modules": 4,
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "practice_mcqs": 72,
+      "verified_lesson_examples": 12,
+      "database_verification": null,
+      "validation_errors": [],
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ],
+      "integration_evidence": "Guided/direct paths covered by current Node/browser suites"
+    },
+    {
+      "order": 3,
+      "id": "http-web-architecture",
+      "title": "HTTP, Networking and Web Architecture",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "modules": 3,
+      "lessons": 9,
+      "lesson_quizzes": 9,
+      "module_checkpoints": 3,
+      "practice_mcqs": 56,
+      "verified_lesson_examples": 9,
+      "database_verification": null,
+      "validation_errors": [],
+      "comprehensive_questions": 90,
+      "comprehensive_state": "draft",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release",
+        "Comprehensive assessment review and publication"
+      ],
+      "integration_evidence": "Guided/direct paths covered by current Node/browser suites"
+    },
+    {
+      "order": 4,
+      "id": "rest-api-design",
+      "title": "REST API Design and Integration",
+      "prerequisites": [
+        "http-web-architecture"
+      ],
+      "modules": 4,
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "practice_mcqs": 76,
+      "verified_lesson_examples": 12,
+      "database_verification": null,
+      "validation_errors": [],
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ],
+      "integration_evidence": "Guided/direct paths covered by current Node/browser suites"
+    },
+    {
+      "order": 5,
+      "id": "sql-fundamentals",
+      "title": "SQL Fundamentals",
+      "prerequisites": [],
+      "modules": 4,
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "practice_mcqs": 80,
+      "verified_lesson_examples": 12,
+      "database_verification": null,
+      "validation_errors": [],
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ],
+      "integration_evidence": "Guided/direct paths covered by current Node/browser suites"
+    },
+    {
+      "order": 6,
+      "id": "database-design",
+      "title": "Database Design and PostgreSQL",
+      "prerequisites": [
+        "sql-fundamentals"
+      ],
+      "modules": 3,
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 3,
+      "practice_mcqs": 76,
+      "verified_lesson_examples": 12,
+      "database_verification": {
+        "engine": "PostgreSQL via PGlite 0.4.3 (single-process WASM)",
+        "version": "PostgreSQL 17.5 on wasm32-unknown-linux-gnu, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+        "verified": 12,
+        "total": 12,
+        "native_multi_connection_test": false,
+        "storage_crash_test": false
+      },
+      "validation_errors": [],
+      "comprehensive_questions": 90,
+      "comprehensive_state": "draft",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release",
+        "Comprehensive assessment review and publication"
+      ],
+      "integration_evidence": "Guided/direct paths covered by current Node/browser suites"
+    },
+    {
+      "order": 7,
+      "id": "api-security-auth",
+      "title": "Authentication, Authorization and API Security",
+      "prerequisites": [
+        "rest-api-design"
+      ],
+      "modules": 3,
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 3,
+      "practice_mcqs": 76,
+      "verified_lesson_examples": 12,
+      "database_verification": null,
+      "validation_errors": [],
+      "comprehensive_questions": 90,
+      "comprehensive_state": "draft",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release",
+        "Comprehensive assessment review and publication"
+      ],
+      "integration_evidence": "Guided/direct paths covered by current Node/browser suites"
+    },
+    {
+      "order": 8,
+      "id": "backend-testing-reliability",
+      "title": "Backend Testing, Debugging and Reliability",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "modules": 3,
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "practice_mcqs": 0,
+      "verified_lesson_examples": 0,
+      "database_verification": null,
+      "validation_errors": [],
+      "comprehensive_questions": 0,
+      "comprehensive_state": "planned",
+      "automated_complete": false,
+      "human_review": "not authored",
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review",
+        "Comprehensive assessment review and publication"
+      ],
+      "integration_evidence": "No authored lesson flow"
+    },
+    {
+      "order": 9,
+      "id": "git-collaboration",
+      "title": "Git, Development Workflows and Code Review",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "modules": 3,
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "practice_mcqs": 0,
+      "verified_lesson_examples": 0,
+      "database_verification": null,
+      "validation_errors": [],
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": false,
+      "human_review": "not authored",
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ],
+      "integration_evidence": "No authored lesson flow"
+    }
+  ],
+  "missing": [
+    "programming-foundations",
+    "python-fundamentals",
+    "http-web-architecture",
+    "rest-api-design",
+    "sql-fundamentals",
+    "database-design",
+    "api-security-auth",
+    "backend-testing-reliability",
+    "git-collaboration"
+  ],
+  "final": "blueprint",
+  "complete": false
+}

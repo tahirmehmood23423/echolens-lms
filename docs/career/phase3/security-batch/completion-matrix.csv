@@ -1,0 +1,10 @@
+order,id,prerequisites,modules,lessons,lesson_quizzes,checkpoints,practice_mcqs,comprehensive_items,comprehensive_state,verified_worked_examples,validation_errors,integration_evidence,human_review,published,remaining
+1,programming-foundations,,4,12,12,4,72,90,published,12,0,Guided/direct paths covered by current Node/browser suites,pending,False,Human content review and release
+2,python-fundamentals,programming-foundations,4,12,12,4,72,90,published,12,0,Guided/direct paths covered by current Node/browser suites,pending,False,Human content review and release
+3,http-web-architecture,programming-foundations,3,9,9,3,56,90,draft,9,0,Guided/direct paths covered by current Node/browser suites,pending,False,Human content review and release; Comprehensive assessment review and publication
+4,rest-api-design,http-web-architecture,4,12,12,4,76,90,published,12,0,Guided/direct paths covered by current Node/browser suites,pending,False,Human content review and release
+5,sql-fundamentals,,4,12,12,4,80,90,published,12,0,Guided/direct paths covered by current Node/browser suites,pending,False,Human content review and release
+6,database-design,sql-fundamentals,3,12,12,3,76,90,draft,12,0,Guided/direct paths covered by current Node/browser suites,pending,False,Human content review and release; Comprehensive assessment review and publication
+7,api-security-auth,rest-api-design,3,12,12,3,76,90,draft,12,0,Guided/direct paths covered by current Node/browser suites,pending,False,Human content review and release; Comprehensive assessment review and publication
+8,backend-testing-reliability,python-fundamentals,3,0,0,0,0,0,planned,0,0,No authored lesson flow,not authored,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review; Comprehensive assessment review and publication
+9,git-collaboration,programming-foundations,3,0,0,0,0,90,published,0,0,No authored lesson flow,not authored,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review

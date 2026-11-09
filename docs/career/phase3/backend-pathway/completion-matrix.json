@@ -1,0 +1,222 @@
+{
+  "id": "junior-backend-developer",
+  "title": "Junior Backend Developer",
+  "track": "backend-developer",
+  "required": [
+    "programming-foundations",
+    "python-fundamentals",
+    "http-web-architecture",
+    "rest-api-design",
+    "sql-fundamentals",
+    "database-design",
+    "api-security-auth",
+    "backend-testing-reliability",
+    "git-collaboration"
+  ],
+  "optional": [
+    "python-intermediate-oop",
+    "practical-data-structures",
+    "backend-deployment-ops"
+  ],
+  "completion_matrix": [
+    {
+      "order": 1,
+      "id": "programming-foundations",
+      "title": "Programming and Computer Science Foundations",
+      "prerequisites": [],
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ]
+    },
+    {
+      "order": 2,
+      "id": "python-fundamentals",
+      "title": "Python Fundamentals",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ]
+    },
+    {
+      "order": 3,
+      "id": "http-web-architecture",
+      "title": "HTTP, Networking and Web Architecture",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 9,
+      "lesson_quizzes": 9,
+      "module_checkpoints": 3,
+      "comprehensive_questions": 90,
+      "comprehensive_state": "draft",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release",
+        "Comprehensive assessment review and publication"
+      ]
+    },
+    {
+      "order": 4,
+      "id": "rest-api-design",
+      "title": "REST API Design and Integration",
+      "prerequisites": [
+        "http-web-architecture"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": false,
+      "human_review": "not authored",
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ]
+    },
+    {
+      "order": 5,
+      "id": "sql-fundamentals",
+      "title": "SQL Fundamentals",
+      "prerequisites": [],
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": true,
+      "human_review": "pending",
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ]
+    },
+    {
+      "order": 6,
+      "id": "database-design",
+      "title": "Database Design and PostgreSQL",
+      "prerequisites": [
+        "sql-fundamentals"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 0,
+      "comprehensive_state": "planned",
+      "automated_complete": false,
+      "human_review": "not authored",
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review",
+        "Comprehensive assessment review and publication"
+      ]
+    },
+    {
+      "order": 7,
+      "id": "api-security-auth",
+      "title": "Authentication, Authorization and API Security",
+      "prerequisites": [
+        "rest-api-design"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 0,
+      "comprehensive_state": "planned",
+      "automated_complete": false,
+      "human_review": "not authored",
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review",
+        "Comprehensive assessment review and publication"
+      ]
+    },
+    {
+      "order": 8,
+      "id": "backend-testing-reliability",
+      "title": "Backend Testing, Debugging and Reliability",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 0,
+      "comprehensive_state": "planned",
+      "automated_complete": false,
+      "human_review": "not authored",
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review",
+        "Comprehensive assessment review and publication"
+      ]
+    },
+    {
+      "order": 9,
+      "id": "git-collaboration",
+      "title": "Git, Development Workflows and Code Review",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 90,
+      "comprehensive_state": "published",
+      "automated_complete": false,
+      "human_review": "not authored",
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ]
+    }
+  ],
+  "missing": [
+    "programming-foundations",
+    "python-fundamentals",
+    "http-web-architecture",
+    "rest-api-design",
+    "sql-fundamentals",
+    "database-design",
+    "api-security-auth",
+    "backend-testing-reliability",
+    "git-collaboration"
+  ],
+  "final": "blueprint",
+  "complete": false
+}

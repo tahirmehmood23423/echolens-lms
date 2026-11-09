@@ -1,0 +1,171 @@
+{
+  "role": "junior-backend-developer",
+  "title": "Junior Backend Developer",
+  "source_commit": "b4b1423",
+  "required": [
+    {
+      "order": 1,
+      "id": "programming-foundations",
+      "prerequisites": [],
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "comprehensive_questions": 90,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ]
+    },
+    {
+      "order": 2,
+      "id": "python-fundamentals",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "comprehensive_questions": 90,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ]
+    },
+    {
+      "order": 3,
+      "id": "http-web-architecture",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 0,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ]
+    },
+    {
+      "order": 4,
+      "id": "rest-api-design",
+      "prerequisites": [
+        "http-web-architecture"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 90,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ]
+    },
+    {
+      "order": 5,
+      "id": "sql-fundamentals",
+      "prerequisites": [],
+      "lessons": 12,
+      "lesson_quizzes": 12,
+      "module_checkpoints": 4,
+      "comprehensive_questions": 90,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Human content review and release"
+      ]
+    },
+    {
+      "order": 6,
+      "id": "database-design",
+      "prerequisites": [
+        "sql-fundamentals"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 0,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ]
+    },
+    {
+      "order": 7,
+      "id": "api-security-auth",
+      "prerequisites": [
+        "rest-api-design"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 0,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ]
+    },
+    {
+      "order": 8,
+      "id": "backend-testing-reliability",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 0,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ]
+    },
+    {
+      "order": 9,
+      "id": "git-collaboration",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 0,
+      "lesson_quizzes": 0,
+      "module_checkpoints": 0,
+      "comprehensive_questions": 90,
+      "human_approved": false,
+      "published": false,
+      "remaining": [
+        "Written lessons",
+        "Lesson MCQs",
+        "Module checkpoints",
+        "Human content review"
+      ]
+    }
+  ],
+  "optional": [
+    "python-intermediate-oop",
+    "practical-data-structures",
+    "backend-deployment-ops"
+  ],
+  "interpretation": "The junior role is used without renaming it or adding the separate Python/FastAPI role requirements. Job-description references remain search summaries, not independently verified employer specifications."
+}

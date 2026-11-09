@@ -1,0 +1,10 @@
+order,subtrack,prerequisites,lessons,lesson_quizzes,module_checkpoints,comprehensive_items,comprehensive_state,human_review,published,remaining
+1,programming-foundations,,12,12,4,90,published,pending,False,Human content review and release
+2,python-fundamentals,programming-foundations,12,12,4,90,published,pending,False,Human content review and release
+3,http-web-architecture,programming-foundations,9,9,3,90,draft,pending,False,Human content review and release; Comprehensive assessment review and publication
+4,rest-api-design,http-web-architecture,0,0,0,90,published,not authored,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review
+5,sql-fundamentals,,12,12,4,90,published,pending,False,Human content review and release
+6,database-design,sql-fundamentals,0,0,0,0,planned,not authored,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review; Comprehensive assessment review and publication
+7,api-security-auth,rest-api-design,0,0,0,0,planned,not authored,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review; Comprehensive assessment review and publication
+8,backend-testing-reliability,python-fundamentals,0,0,0,0,planned,not authored,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review; Comprehensive assessment review and publication
+9,git-collaboration,programming-foundations,0,0,0,90,published,not authored,False,Written lessons; Lesson MCQs; Module checkpoints; Human content review

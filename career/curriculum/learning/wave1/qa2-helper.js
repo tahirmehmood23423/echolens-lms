@@ -1,0 +1,28 @@
+'use strict';
+// Internal authoring adapter; all prose and every question are authored inputs.
+const C=require('../../index'),{Q}=require('../../qdsl');
+const PIN='42155a0feaca9ba6991942c323cbe9fb7278be3c';
+function item(sid,id,comp,diff,row,scenario){
+ const a=row.split('|');if(a.length!==7)throw Error(id+': expected seven authored columns');
+ const [prompt,correct,w1,w2,w3,explanation,notes]=a,why=notes.split(';');
+ if(why.length!==3||why.some(s=>s.length<10))throw Error(id+': three explicit misconception notes required');
+ const values=[correct,w1,w2,w3],rotation=Number(id.match(/\d+$/)[0])%4;
+ const pairs=values.map((text,i)=>({text,why:i?why[i-1]:null}));
+ const shuffled=[...pairs.slice(rotation),...pairs.slice(0,rotation)];
+ return {...Q(id,comp,diff,scenario?'scenario':'concept',scenario?'original synthetic QA engineering case':null,prompt,null,shuffled.map(x=>x.text),shuffled.findIndex(x=>x.text===correct),explanation,shuffled.filter(x=>x.why).map(x=>x.why)),status:'draft',subtrack:sid,objective:sid+'.'+comp};
+}
+function build(sid,units){
+ const sub=C.subtrack(sid),questions=[],bank=[],lessons=[];
+ units.forEach((u,i)=>{
+  const objective=sid+'.'+u.comp,meta=C.competency(objective),id=sid+'-'+u.slug;
+  const practice=u.practice.trim().split('\n'),formal=u.formal.trim().split('\n');
+  if(practice.length<6||formal.length!==10)throw Error(id+': incomplete authored pools');
+  const qs=practice.map((r,j)=>item(sid,id+'.q'+(j+1),u.comp,j<3?'E':j<5?'M':'H',r,j>=2));questions.push(...qs);
+  const mix=i<4?['E','E','M','M','M','H','H','H','H','A']:['E','E','M','M','M','M','H','H','H','A'];
+  formal.forEach((r,j)=>bank.push(item(sid,sid+'.final'+String(i*10+j+1).padStart(3,'0'),u.comp,mix[j],r,j>=3)));
+  lessons.push({id,module:meta.module,title:u.title,version:1,minutes:45,objectives:[{id:objective,text:meta.competency.text}],prerequisites:i?[lessons[i-1].id]:[],prerequisite_note:u.prerequisite_note,introduction:u.intro,sections:u.sections.map(([heading,...paragraphs])=>({heading,paragraphs})),worked:u.worked,mistakes:u.mistakes,takeaways:u.takeaways,references:sid==='test-data-management'?['unittest','sqlite3']:['unittest','itertools'],reuse:[],quiz:qs.slice(0,3).map(q=>q.id)});
+ });
+ const paths=sid==='test-data-management'?['unittest','sqlite3']:['unittest','itertools'];
+ return {course:{id:sid,version:1,state:'draft',language:'en',author:'EchoLens AI-assisted instructional draft',human_review:null,pass_mark:70,checkpoint_items:9,quiz_minutes:12,checkpoint_minutes:20,modules:sub.modules.map(m=>({id:m.id,title:m.title,lessons:lessons.filter(l=>l.module===m.id).map(l=>l.id)})),lessons,questions,references:paths.map(name=>({id:name,title:'Python 3.13 '+name+' documentation (fixture mechanics)',url:'https://github.com/python/cpython/blob/'+PIN+'/Doc/library/'+name+'.rst',source:{repo:'python/cpython',commit:PIN,path:'Doc/library/'+name+'.rst',verification:'Pinned official Python fixture-mechanics reference. Process, privacy and coverage judgments remain subject to expert review.'}}))},bank};
+}
+module.exports={build};

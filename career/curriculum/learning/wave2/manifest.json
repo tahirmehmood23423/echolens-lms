@@ -2,6 +2,15 @@
   "wave": "shared-foundations-2",
   "starting_commit": "1b5b6f7",
   "starting_authored": 24,
-  "courses": [],
-  "recovered_from_quarantine": []
+  "courses": [
+    "prompting-structured-output",
+    "descriptive-stats-metrics",
+    "cloud-aws-foundations",
+    "defect-management",
+    "js-fundamentals"
+  ],
+  "recovered_from_quarantine": [
+    "prompting-structured-output",
+    "descriptive-stats-metrics"
+  ]
 }

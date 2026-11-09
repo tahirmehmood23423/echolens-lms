@@ -14,210 +14,240 @@
           "code_hash": "89f14d9fb9c05c7fa571c219c983ce2615b754db27f26c02ffb160be83f6b9c8",
           "ran": true,
           "ok": true,
-          "output": "3 2 4"
+          "output": "3 2 4",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-strings",
           "code_hash": "a7c60c64dc8781a6e888d31c2dbe4b7cc8576951960bd7a22e91ccf644216360",
           "ran": true,
           "ok": true,
-          "output": "ENR: 0042\nenr-0042\nFalse"
+          "output": "ENR: 0042\nenr-0042\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-conversions",
           "code_hash": "283f09124a1c8808f9079e140ed1af8334d372e0699b72e469d3223c4c4f01b3",
           "ran": true,
           "ok": true,
-          "output": "12\nEnter a whole number\nEnter a positive count\nTrue"
+          "output": "12\nEnter a whole number\nEnter a positive count\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-collections",
           "code_hash": "152c81805e6ebcbb11a7acedb4204db3ba98273f87a9963817a7726319a543ae",
           "ran": true,
           "ok": true,
-          "output": "[102, 103]\n30\nTrue"
+          "output": "[102, 103]\n30\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-mutation",
           "code_hash": "da42e16b80c8fa0fb01cf6edd978bb6f7062916a112f127425a8e8bc15e5b109",
           "ran": true,
           "ok": true,
-          "output": "open\nreviewed\nFalse"
+          "output": "open\nreviewed\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-comprehensions",
           "code_hash": "32c8465ce1db59822dce9a2af73039a0f7ea4fb540f31c27bb5116b6fd450363",
           "ran": true,
           "ok": true,
-          "output": "['a1']\n{'A1': 3}"
+          "output": "['a1']\n{'A1': 3}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-control-flow",
           "code_hash": "214c99ab5a92ae1d772364b35dcc845b0e0bb81c442f54845eaaacc5aa608442",
           "ran": true,
           "ok": true,
-          "output": "5"
+          "output": "5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-functions",
           "code_hash": "f946ba4d0b72d22f328b2908255beb03e2a041c2d3e26893386a4b74a436d935",
           "ran": true,
           "ok": true,
-          "output": "45\n10"
+          "output": "45\n10",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-scope",
           "code_hash": "24a1bfed1ba5f9f4e4f089d4b9ff33ee99c407819ef232e7ef733bd68308b09b",
           "ran": true,
           "ok": true,
-          "output": "['A']\n['B']\n['C']"
+          "output": "['A']\n['B']\n['C']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-exceptions",
           "code_hash": "e572ae6b677e615ee335c7bd533eafce41b637d2dbf1acc0ea047fc1f25b35d7",
           "ran": true,
           "ok": true,
-          "output": "Parsed 3\nImport step finished\nInvalid count\nImport step finished"
+          "output": "Parsed 3\nImport step finished\nInvalid count\nImport step finished",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-files",
           "code_hash": "0b002537d60475dbbb04a0df989344799e17d8373a248e283dabb531888d68b5",
           "ran": true,
           "ok": true,
-          "output": "Learner, One\n2\nstr"
+          "output": "Learner, One\n2\nstr",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-modules",
           "code_hash": "849922ec47fe0378353617b9937a618fbcf9f9a454108a74705354be2047cd55",
           "ran": true,
           "ok": true,
-          "output": "20\n[('login', 2), ('billing', 1)]"
+          "output": "20\n[('login', 2), ('billing', 1)]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-arithmetic.q2",
           "code_hash": "e7e3e1bc5b6b8eba07e4c22b901b42b2758a9c22d5ff97820ff84c5ef4434328",
           "ran": true,
           "ok": true,
-          "output": "-3"
+          "output": "-3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-arithmetic.q5",
           "code_hash": "2c6632970e68606dc1a879ab963177816d4d823d2008fcab366cfe48359beba8",
           "ran": true,
           "ok": true,
-          "output": "2.0"
+          "output": "2.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-strings.q1",
           "code_hash": "f5d740130875a0267a755f9fa9870bacebe3232c76d8136639b49f6b5d1a06de",
           "ran": true,
           "ok": true,
-          "output": "0042"
+          "output": "0042",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-strings.q4",
           "code_hash": "b01a939323aafef84148e2714db55bf1f684182ff4066689e00c23c595ca01a2",
           "ran": true,
           "ok": true,
-          "output": "RDE"
+          "output": "RDE",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-conversions.q1",
           "code_hash": "8d4f8bb026a25f3e2df6d0722496ce3b0aa571d7aa30fde719714a17792086f2",
           "ran": true,
           "ok": true,
-          "output": "True"
+          "output": "True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-conversions.q4",
           "code_hash": "79a34bd3b07b729266215a426ead76df843b045d8ae8bd38a13f9235f9f99eb8",
           "ran": true,
           "ok": true,
-          "output": "-2"
+          "output": "-2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-mutation.q1",
           "code_hash": "ebd7e06913090af2e899b051be1de3470b88559c56a786cf6b5900814a4792c7",
           "ran": true,
           "ok": true,
-          "output": "[1, 2]"
+          "output": "[1, 2]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-mutation.q2",
           "code_hash": "1fd8093094ef440f2642966efe902692123de97a1a8b42ae31158f4cd50db636",
           "ran": true,
           "ok": true,
-          "output": "None"
+          "output": "None",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-mutation.q6",
           "code_hash": "627315cba3273f663f9297d778a14299b4c2321cf4e382085ad61b84cca75252",
           "ran": true,
           "ok": true,
-          "output": "[1]"
+          "output": "[1]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-comprehensions.q1",
           "code_hash": "b50bd63bf43a61ea96a37d30ab9b41e86ef149660fabc1d69c6f5ff848715c04",
           "ran": true,
           "ok": true,
-          "output": "[4, 6]"
+          "output": "[4, 6]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-control-flow.q4",
           "code_hash": "924fa0a57ad6e52118ea02071cf572e778cd613b96b2e0140bfcf5090f2eb251",
           "ran": true,
           "ok": true,
-          "output": "4"
+          "output": "4",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-control-flow.q5",
           "code_hash": "a88bc60787fed17caf4bee9b4136ba423f231ab06b5b49cdf7f706de70ca1099",
           "ran": true,
           "ok": true,
-          "output": "2"
+          "output": "2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-functions.q2",
           "code_hash": "88f7d28a679885fd380680344b51acaad1fa3bf2434ee5d885d5d4f235e77d1d",
           "ran": true,
           "ok": true,
-          "output": "7"
+          "output": "7",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-scope.q1",
           "code_hash": "0d01c70503978b67126f7c828d66a3b7bf4683da666ac92baebce19191b4c67b",
           "ran": true,
           "ok": true,
-          "output": "[1, 2]"
+          "output": "[1, 2]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-scope.q5",
           "code_hash": "e0c26614d5c99bdc6b094e4b16f2773c0bcfe6c0b8f81c2259796025d54d8f27",
           "ran": true,
           "ok": true,
-          "output": "[2, 2, 2]"
+          "output": "[2, 2, 2]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-exceptions.q4",
           "code_hash": "3775411b6328658288cf9969ba82f6cb9d39484bc7a9966061922637baf1f433",
           "ran": true,
           "ok": true,
-          "output": "invalid\ndone"
+          "output": "invalid\ndone",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-files.q5",
           "code_hash": "8bde8939d111ff716cf0eac28ee634421f5e2e254b3e168b9a95154167bb1fbf",
           "ran": true,
           "ok": true,
-          "output": "str"
+          "output": "str",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "py-modules.q4",
           "code_hash": "e6d517ca0eca34e6dba33e0187f3b0f461bd1dd374ff62201250124438d3e9f8",
           "ran": true,
           "ok": true,
-          "output": "2"
+          "output": "2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 12,
@@ -238,189 +268,216 @@
           "code_hash": "b3900f3597ccaa7724cf0fb022befb4bde84ba650634a27fbdbe9ae02ba620a9",
           "ran": true,
           "ok": true,
-          "output": "Shipping job started\n5"
+          "output": "Shipping job started\n5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-machine-resources",
           "code_hash": "24b8753bb295ded5ee0b76f25d8d1bd29fd55861d97151967ada0dd6a97fdd3a",
           "ran": true,
           "ok": true,
-          "output": "7 10"
+          "output": "7 10",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-representation",
           "code_hash": "2dbb5187a56916ec28d8bcc9e4a1d2c43d8d408575c868494512b93905c012ab",
           "ran": true,
           "ok": true,
-          "output": "11\n0\n1 2"
+          "output": "11\n0\n1 2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-expressions",
           "code_hash": "14cef1ed77dce7db2156a7fca125a8758ccb4a15d667f5a52cbaa4e01f57cc46",
           "ran": true,
           "ok": true,
-          "output": "95\nTrue"
+          "output": "95\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-types-contracts",
           "code_hash": "5ab6dd119dd8f2c532059585d3adf7349970c07f6f27576e99481ce473c2eb4c",
           "ran": true,
           "ok": true,
-          "output": "0042\nTrue\nTrue"
+          "output": "0042\nTrue\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-state-tracing",
           "code_hash": "7aa1ed458637ff49bf804faf0ed160467330b669830adcef4e4a7d338c55cd95",
           "ran": true,
           "ok": true,
-          "output": "8 11\n11"
+          "output": "8 11\n11",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-conditions",
           "code_hash": "c9525c5ec47b4cb2ebe60ba5da0b0e4cd49c7dfd5709541d87d94f635b913fc4",
           "ran": true,
           "ok": true,
-          "output": "Rejected\n6"
+          "output": "Rejected\n6",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-boundary-errors",
           "code_hash": "dd79a93f503b10f2d54d0c59fd7d7dabcd74922aac289fe0850468d30f1a6861",
           "ran": true,
           "ok": true,
-          "output": "[1, 2, 3, 4]\n3\n2\n1"
+          "output": "[1, 2, 3, 4]\n3\n2\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-loop-choice",
           "code_hash": "50e5c31f3b7cc1601bc3470a1d50db19b4997b32636cfa8b1d1801518f124530",
           "ran": true,
           "ok": true,
-          "output": "2"
+          "output": "2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-function-traces",
           "code_hash": "efb692800f6e5563dd5aa169c0dc2830386c5d9f1cd26d48973171d77b6cf7d7",
           "ran": true,
           "ok": true,
-          "output": "45\n40"
+          "output": "45\n40",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-decomposition",
           "code_hash": "00fa2358a24fbc9617ee1c1c7118127d35a82022d7f54a1f3fc7f8ce9644b6be",
           "ran": true,
           "ok": true,
-          "output": "65"
+          "output": "65",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-algorithms",
           "code_hash": "83e3da2b441c8bb704779a1a1807f74e2f842ad357b5db59939c34f39048a3c8",
           "ran": true,
           "ok": true,
-          "output": "15"
+          "output": "15",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-source-execution.q5",
           "code_hash": "1b2b8666159a6d9636d41bbaa6e5e68a8e85cca2100d0f49ce1b4ca1deea2448",
           "ran": true,
           "ok": true,
-          "output": "Ready\n6"
+          "output": "Ready\n6",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-machine-resources.q5",
           "code_hash": "4bdad08594cda8ba8c23e6c7465d6dc7d09f49ca180ba2d2dfda98c7a13b8527",
           "ran": true,
           "ok": true,
-          "output": "6 9"
+          "output": "6 9",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-representation.q5",
           "code_hash": "ff5e249188ce1ca5b222d18706bdc7d55216485f086c4a11e8dc98e3e72b3d2c",
           "ran": true,
           "ok": true,
-          "output": "13\n0"
+          "output": "13\n0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-expressions.q1",
           "code_hash": "eeec7537fed54f15b215769b9b7327270bd47fa2fcac3bb5b3b37530c3bdce97",
           "ran": true,
           "ok": true,
-          "output": "14"
+          "output": "14",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-expressions.q3",
           "code_hash": "17bcae60cbea9bd2e8fed7f4e191a12abd3b1b370e2fe3e82e86b1c2e04b9a05",
           "ran": true,
           "ok": true,
-          "output": "42"
+          "output": "42",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-types-contracts.q5",
           "code_hash": "7215af2cee2d5d507d9bdaea8d8b5f3fa52dabfd968e537b6d51a314726d0793",
           "ran": true,
           "ok": true,
-          "output": "True True"
+          "output": "True True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-state-tracing.q1",
           "code_hash": "2551f3387b831e2e7f3a278c709aa4f529ee1a48c314a2622d99e87ab8dec99d",
           "ran": true,
           "ok": true,
-          "output": "9 5"
+          "output": "9 5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-state-tracing.q5",
           "code_hash": "13743f09113de0be85a3ba9c4300a23a4c9b9e087761206742f4c2f99288e817",
           "ran": true,
           "ok": true,
-          "output": "11"
+          "output": "11",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-conditions.q2",
           "code_hash": "f9680f143e13dcefe2ced19f0958a1b64a2eb790f4e3c4b7fd639afc161acf1f",
           "ran": true,
           "ok": true,
-          "output": "4"
+          "output": "4",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-conditions.q5",
           "code_hash": "3d53aaa186b4dd792dee4d9acdc7b7c050c7d460982b4e7118286773ac01ad8e",
           "ran": true,
           "ok": true,
-          "output": "0"
+          "output": "0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-boundary-errors.q5",
           "code_hash": "562be493b32dd072f887e45ef76c5d9a502d0129c6bc1a22654615889897f969",
           "ran": true,
           "ok": true,
-          "output": "2\n1"
+          "output": "2\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-loop-choice.q5",
           "code_hash": "a0bd5718de376f3cd8fa0f184d795ddb8572f03e1001c9c6ae7ead867893edc7",
           "ran": true,
           "ok": true,
-          "output": "1"
+          "output": "1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-function-traces.q1",
           "code_hash": "1d6541bd1ebf22063377f8320b8b229d2c883570aed1ad1d1513accc5647e153",
           "ran": true,
           "ok": true,
-          "output": "14"
+          "output": "14",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-decomposition.q5",
           "code_hash": "436a99f2c60650fbb4f858f5237405b6b1564c3cc09e9be2d3a5bd32eadaf037",
           "ran": true,
           "ok": true,
-          "output": "36"
+          "output": "36",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pf-algorithms.q5",
           "code_hash": "a745f56d2a2f1c71ae7dba728967161a03d46b7a16fbd57a4986bbaa21da3fd3",
           "ran": true,
           "ok": true,
-          "output": "9"
+          "output": "9",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 12,
@@ -441,84 +498,96 @@
           "code_hash": "35ad2bab457e629cb0442064b5794c7c83a445ecfcd6a40d8e5eee28b7f846b6",
           "ran": true,
           "ok": true,
-          "output": "Amina, 88; Chen, 88"
+          "output": "Amina, 88; Chen, 88",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-relations",
           "code_hash": "c514708090fad1e27172998d9a0dec84467c34716d4bf0b2c411832c50508534",
           "ran": true,
           "ok": true,
-          "output": "10, Amina, SQL; 11, Amina, Git"
+          "output": "10, Amina, SQL; 11, Amina, Git",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-null",
           "code_hash": "0ed95856dd77eacdfccee14da793e3e6ea88e59400b63b5012e23bd188a05c25",
           "ran": true,
           "ok": true,
-          "output": "3, 2, 80, 40.0"
+          "output": "3, 2, 80, 40.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-inner-joins",
           "code_hash": "5702c64c18706b845d59fe7ccf5bf63fe7b6c524e36567f6c878ce3c5ba079fe",
           "ran": true,
           "ok": true,
-          "output": "10, Amina; 11, NULL; 12, Bilal"
+          "output": "10, Amina; 11, NULL; 12, Bilal",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-outer-filters",
           "code_hash": "677668d87d393d00fbacf4956fca682196c2a32210bbf198501e9feb69e66901",
           "ran": true,
           "ok": true,
-          "output": "Amina, 10; Bilal, NULL; Chen, NULL"
+          "output": "Amina, 10; Bilal, NULL; Chen, NULL",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-fanout",
           "code_hash": "e53f7f11624f29ba21cdca9dc325d4a40a74c31c62619e7edd889b609d4a71bf",
           "ran": true,
           "ok": true,
-          "output": "6, 2, 3"
+          "output": "6, 2, 3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-grouping",
           "code_hash": "107efae3526f737223b55960eefba80b5f9420f817016aa0a4f61b6d9582989e",
           "ran": true,
           "ok": true,
-          "output": "SQL, 2"
+          "output": "SQL, 2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-distinct-counts",
           "code_hash": "3dbdd1997cefe95f36ae8e7ec3b904eb4b05d89fa400a41ff810299d3c3b2e42",
           "ran": true,
           "ok": true,
-          "output": "1, 3, 2; 2, 0, 0"
+          "output": "1, 3, 2; 2, 0, 0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-safe-totals",
           "code_hash": "cfba8badd95606de8542e824a6c583786a868f33c884da2c0b2a2e192b391633",
           "ran": true,
           "ok": true,
-          "output": "1, 200; 2, 0"
+          "output": "1, 200; 2, 0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-safe-insert",
           "code_hash": "bc0401c947eea358c13d0ddf17375068abdbf85a9649484efe9acc7471c24114",
           "ran": true,
           "ok": true,
-          "output": "10, active; 11, pending"
+          "output": "10, active; 11, pending",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-safe-delete",
           "code_hash": "93781801ada55c21da7c986e96fdf2478913f2ec20006885a3236e1ff920ae3a",
           "ran": true,
           "ok": true,
-          "output": "1, expired; 2, active"
+          "output": "1, expired; 2, active",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sql-subqueries-case",
           "code_hash": "a3fd17b2ee777fd4c6472290ee72c115cddda9809883bc2bfd0e0d0ba853d809",
           "ran": true,
           "ok": true,
-          "output": "Bilal, unassessed; Chen, review"
+          "output": "Bilal, unassessed; Chen, review",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 9,
@@ -539,63 +608,72 @@
           "code_hash": "340141d30d46fca8f0bb78def85cccbee05aad17ddee9a8ca24c2ef34db2981e",
           "ran": true,
           "ok": true,
-          "output": "https portal.example.test 8443\n/learners?page=2\nresults"
+          "output": "https portal.example.test 8443\n/learners?page=2\nresults",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "http-dns-connections",
           "code_hash": "4129d49862dd51d08f08102e58f414cba36ec56931deb3f51f8f14f3d569a5a0",
           "ran": true,
           "ok": true,
-          "output": "192.0.2.10\nHTTPS gateway\nno listener"
+          "output": "192.0.2.10\nHTTPS gateway\nno listener",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "http-tls-trust",
           "code_hash": "6b098571d6094f70f6381418b6ffa9b3f6efe71ed9027c6fe861adcfa31910e7",
           "ran": true,
           "ok": true,
-          "output": "True\nTrue"
+          "output": "True\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "http-methods-status",
           "code_hash": "5e052c00efac164908fd7d45037e06805bb992280e9690525db4bac5c9ab33f1",
           "ran": true,
           "ok": true,
-          "output": "201 Created\n202 Accepted\n204 No Content\n403 Forbidden\n504 Gateway Timeout"
+          "output": "201 Created\n202 Accepted\n204 No Content\n403 Forbidden\n504 Gateway Timeout",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "http-headers-cache",
           "code_hash": "d252ddc3db43b335832fab1e6d2677326ac5eb69cc1a1c7a29399d3ddb5828cb",
           "ran": true,
           "ok": true,
-          "output": "200\napplication/json\nprivate, no-store\n{}"
+          "output": "200\napplication/json\nprivate, no-store\n{}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "http-safety-retries",
           "code_hash": "14add9793df7e48cca8a7de2b28afc0cc20949df5bf60c5292fa5bbaf4a4eea7",
           "ran": true,
           "ok": true,
-          "output": "3\n6"
+          "output": "3\n6",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "http-proxies-state",
           "code_hash": "7e8ad7ff256c4f187791dfa3c4f12505a2af3f957b2807e34e6ba74db6fc184e",
           "ran": true,
           "ok": true,
-          "output": "missing\nA learner-7\nB learner-7"
+          "output": "missing\nA learner-7\nB learner-7",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "http-sessions-tokens",
           "code_hash": "6ae6f956e31d3bd9ce0db37595d9ea7def32af33afa77b5d38a309d6b79c1012",
           "ran": true,
           "ok": true,
-          "output": "7\ndeny"
+          "output": "7\ndeny",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "http-production-trace",
           "code_hash": "744ff6ac7133f53d4b83b423a1e387b7ff57988cb390547fd0977cc3793a6ce3",
           "ran": true,
           "ok": true,
-          "output": "0 gateway_received\n10 app_started\n100 gateway_504\n130 database_committed\ncommit_after_timeout True"
+          "output": "0 gateway_received\n10 app_started\n100 gateway_504\n130 database_committed\ncommit_after_timeout True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 8,
@@ -616,84 +694,96 @@
           "code_hash": "4871b5ca19e87279c93c8b48446b4c9d090f4edf5d5017122ab96d70186e816e",
           "ran": true,
           "ok": true,
-          "output": "201\n{\"id\": \"cancel-1\", \"order_id\": \"ord-7\", \"status\": \"requested\"}\nplaced"
+          "output": "201\n{\"id\": \"cancel-1\", \"order_id\": \"ord-7\", \"status\": \"requested\"}\nplaced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-pagination",
           "code_hash": "3e0cbd0b59663d74cad74caec0510fe12313c8765ca810b21fed410ca544242b",
           "ran": true,
           "ok": true,
-          "output": "[12, 13]\n2"
+          "output": "[12, 13]\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-errors",
           "code_hash": "4337bfcd2cc936297ba651b308fbabd75962643148f27c5c6fe4626bcff7f0e3",
           "ran": true,
           "ok": true,
-          "output": "{\"code\": \"out_of_stock\", \"request_id\": \"req-demo-4\", \"status\": 409, \"title\": \"Conflict\", \"type\": \"about:blank\"}"
+          "output": "{\"code\": \"out_of_stock\", \"request_id\": \"req-demo-4\", \"status\": 409, \"title\": \"Conflict\", \"type\": \"about:blank\"}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-validation",
           "code_hash": "19fe5e0b53c1430ee0071d15bd3d4598749460a0f80f7c6f4986ee78bbffc5d6",
           "ran": true,
           "ok": true,
-          "output": "[]\n['unknown_field', 'quantity']"
+          "output": "[]\n['unknown_field', 'quantity']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-data-contracts",
           "code_hash": "97edcd63758f0860c266124c629c258c1159ac2f7b167e943765c384ee524219",
           "ran": true,
           "ok": true,
-          "output": "1230\ninvalid_amount\ninvalid_amount"
+          "output": "1230\ninvalid_amount\ninvalid_amount",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-openapi-versioning",
           "code_hash": "78bacc1412192a98126ffbcdde1fb08985a54e295a5df1baa55f9939e17c06f6",
           "ran": true,
           "ok": true,
-          "output": "3.1.1\n['200', '404']"
+          "output": "3.1.1\n['200', '404']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-idempotency",
           "code_hash": "d7319730a69d4aa4543ef75acd18a5046e0bc1d9192b21247500ca5ab3f80a75",
           "ran": true,
           "ok": true,
-          "output": "payment-1\npayment-1\npayload_conflict\n1"
+          "output": "payment-1\npayment-1\npayload_conflict\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-deadlines-limits",
           "code_hash": "bbf81febebc9c34901a41e2ee72017de63c646f96564db155ea6b3eaa8a459a5",
           "ran": true,
           "ok": true,
-          "output": "retry_after 1\nretry_after 2\nstop 3\nbudget 5"
+          "output": "retry_after 1\nretry_after 2\nstop 3\nbudget 5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-cache-concurrency",
           "code_hash": "e0f416a5171bfea6ef85c672ecf033756d46ac705fbf9a3ec68bb9ffb1fa8b80",
           "ran": true,
           "ok": true,
-          "output": "412\nCurrent\n200\n3"
+          "output": "412\nCurrent\n200\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-webhooks",
           "code_hash": "95c479ee08ec2a231375d59b8f4dc27f9e5b887c8c4c9e3026afdc1b667f9907",
           "ran": true,
           "ok": true,
-          "output": "applied duplicate older\ndelivered"
+          "output": "applied duplicate older\ndelivered",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-partial-failures",
           "code_hash": "349f1a4fbaffa156777ec00653508660a19124f0281a99f9116120a941c57719",
           "ran": true,
           "ok": true,
-          "output": "compensation_pending\nrequest_refund\nconfirmed"
+          "output": "compensation_pending\nrequest_refund\nconfirmed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "rest-secrets-contract",
           "code_hash": "30f345f185daa3a6b93c90fae3da35341c8d9e715e5a9d8266e541fb0ed06248",
           "ran": true,
           "ok": true,
-          "output": "{\"method\": \"POST\", \"path\": \"/orders\", \"request_id\": \"req-demo-12\", \"status\": 201}"
+          "output": "{\"method\": \"POST\", \"path\": \"/orders\", \"request_id\": \"req-demo-12\", \"status\": 201}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 10,
@@ -714,84 +804,96 @@
           "code_hash": "90f6cddcea1b655dcf8850e4f1d634e59faa0a9efa7176e96d67a15d3284b9ac",
           "ran": true,
           "ok": true,
-          "output": "1, 2; 2, 0"
+          "output": "1, 2; 2, 0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-relationships",
           "code_hash": "b6d59c11fc27e081a535e9cbb7afc7e11e985afb728cb458a5794e3add0ba205",
           "ran": true,
           "ok": true,
-          "output": "1, 7, 2"
+          "output": "1, 7, 2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-keys",
           "code_hash": "6b6d111932de36981f69033f9e2f7680d395302894efbd11f823cde3fb8e1740",
           "ran": true,
           "ok": true,
-          "output": "1, CUS-7, new@example.test"
+          "output": "1, CUS-7, new@example.test",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-commerce",
           "code_hash": "426d94753a8a5d4ee093ff5813ffac696f5d6d6927cd2afc028d9a1c777d5bcf",
           "ran": true,
           "ok": true,
-          "output": "10, 2400"
+          "output": "10, 2400",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-types",
           "code_hash": "fa1358edeb2903d33d58515d8fea3ec52ad38f0a22aaffa18060e09483d6f38e",
           "ran": true,
           "ok": true,
-          "output": "1, 1230"
+          "output": "1, 1230",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-constraints",
           "code_hash": "a3c130bb013cbc144b7eb279a9443e7d04f2fae9f2fc38482c9366b3f1f204b4",
           "ran": true,
           "ok": true,
-          "output": "7, 2"
+          "output": "7, 2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-referential",
           "code_hash": "b7ed059238fff50e9dac7caccac5c32a86edb72a3a932583948e0268e21ac025",
           "ran": true,
           "ok": true,
-          "output": "1, 0"
+          "output": "1, 0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-transactions",
           "code_hash": "7691bc71c819ccec0b84606d1aa1d264722825f742e28ca06144c3282ee3452b",
           "ran": true,
           "ok": true,
-          "output": "7, 1"
+          "output": "7, 1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-dependencies",
           "code_hash": "1ef39a63e507b923e62146984f95bcd0c2dda000ef8e6b389dac657b2740bd8e",
           "ran": true,
           "ok": true,
-          "output": "1, Relational Database Design; 2, Relational Database Design"
+          "output": "1, Relational Database Design; 2, Relational Database Design",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-normalize",
           "code_hash": "c7646d4855c8cac4ca4d2f7a4b6cd7b2ddd894aa454d8d590717209a679dc4dc",
           "ran": true,
           "ok": true,
-          "output": "Reliable Data, Amina; Reliable Data, Bilal"
+          "output": "Reliable Data, Amina; Reliable Data, Bilal",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-denormalize-indexes",
           "code_hash": "5ec063877ae070f3ffb3c367bacbe055c254597e237b3a8dc85e3d69a0d84281",
           "ran": true,
           "ok": true,
-          "output": "1; 4"
+          "output": "1; 4",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "db-evolution-review",
           "code_hash": "91d415969844c56c2921b8bcbfb12f4faaf2d6dc0d3608bfccabadf5f8df0d96",
           "ran": true,
           "ok": true,
-          "output": "1, Amina, Amina"
+          "output": "1, Amina, Amina",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -812,84 +914,96 @@
           "code_hash": "fdf6ddb693133ef1378d7ce1604d927993c74e5fad1ccaf9bebd28aa93d571e7",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nTrue"
+          "output": "True\nFalse\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-sessions",
           "code_hash": "4e7bbe020973e764b51d2a22b0fc4019c7a7b7155a89808fbb2407c6a6a01594",
           "ran": true,
           "ok": true,
-          "output": "7\nNone\nNone"
+          "output": "7\nNone\nNone",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-token-policy",
           "code_hash": "206aa05f7c9dfb709a64b71535cfa3ac4a818812f4dcbd1a5ac0660722b2e10f",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse\nFalse"
+          "output": "True\nFalse\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-recovery-mfa",
           "code_hash": "b37528aecb1b8e13a0ea34fcb8983237110defb60f1f48cf92b9f09e1a76ae2f",
           "ran": true,
           "ok": true,
-          "output": "False\nFalse\nTrue\nFalse"
+          "output": "False\nFalse\nTrue\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-object-access",
           "code_hash": "93f69a04d2000a797c17f93d964d8c08ca6540007b5f7c3c9bedf78f6bb86b30",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse\nFalse"
+          "output": "True\nFalse\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-roles",
           "code_hash": "3c8e18da4e3a7502b56f9454b6e44eb8d76084064215266733f4227ae009f6a3",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse\nFalse"
+          "output": "True\nFalse\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-tenant-responses",
           "code_hash": "eb78ca53fc94f4ceb4e30efd3c8629aeeba6649bb9904c8e1585cb718302e444",
           "ran": true,
           "ok": true,
-          "output": "[{'id': 'inv-1', 'status': 'paid'}]\nTrue"
+          "output": "[{'id': 'inv-1', 'status': 'paid'}]\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-commerce-review",
           "code_hash": "0c4bc76fc4938295b327672e327b46b8efeba0baf8b1e90988f6f79938098355",
           "ran": true,
           "ok": true,
-          "output": "denied\nrequest_accepted\ninvalid_request"
+          "output": "denied\nrequest_accepted\ninvalid_request",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-input-output",
           "code_hash": "3fd57969b1a737bca70ffeda4335647c01729ed8ce6156f47d7572da972bd80f",
           "ran": true,
           "ok": true,
-          "output": "1\n&lt;em&gt;Welcome&lt;/em&gt;"
+          "output": "1\n&lt;em&gt;Welcome&lt;/em&gt;",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-browser-boundaries",
           "code_hash": "3774bfcaae98a04466af11a0f0b7f6d0cfb1435652c44f85f782fc85df63daf3",
           "ran": true,
           "ok": true,
-          "output": "(True, True)\n(False, False)\n(True, False)"
+          "output": "(True, True)\n(False, False)\n(True, False)",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-abuse-limits",
           "code_hash": "c03508f2aa97611cb72b15d5ebd4e2194985426391c96ee8c8d65023419b6b90",
           "ran": true,
           "ok": true,
-          "output": "True True False\nTrue\nTrue"
+          "output": "True True False\nTrue\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sec-config-logs",
           "code_hash": "780d0295a8156e30b86ec472c21193ce263d1632351d88441832041742ec9e2b",
           "ran": true,
           "ok": true,
-          "output": "{\"category\": \"authentication_failed\", \"request_id\": \"req-demo\"}\nconfiguration_policy_passed"
+          "output": "{\"category\": \"authentication_failed\", \"request_id\": \"req-demo\"}\nconfiguration_policy_passed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 8,
@@ -910,63 +1024,72 @@
           "code_hash": "6aafc431436bf4a4573d463370fb88afb8f07b5edd90514dfecacf1b9179a2bc",
           "ran": true,
           "ok": true,
-          "output": "3 True"
+          "output": "3 True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "btr-boundaries",
           "code_hash": "419c409113e123e189f88f2e3549d2d5ce02c6404c551bdacf82826c33452f6f",
           "ran": true,
           "ok": true,
-          "output": "200 ['id', 'state'] 1"
+          "output": "200 ['id', 'state'] 1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "btr-fixtures",
           "code_hash": "b8a32f4dfce29d70b0a2a3b73be1cb58c69b9343833166de53fa3a40a5857dd8",
           "ran": true,
           "ok": true,
-          "output": "duplicate rejected\nFalse"
+          "output": "duplicate rejected\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "btr-traces",
           "code_hash": "6fa5a736e44cb489ca3379518d61afe468b90925ca0a08d63523a631b5d50c37",
           "ran": true,
           "ok": true,
-          "output": "ValueError parse_quantity"
+          "output": "ValueError parse_quantity",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "btr-reproduce",
           "code_hash": "f310bc934bdfcf4ea11101a91fc74326beda4e48b31467c229116dab48f20065",
           "ran": true,
           "ok": true,
-          "output": "True False\n[True, False, False]"
+          "output": "True False\n[True, False, False]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "btr-isolate",
           "code_hash": "96a2c02d608929c320b04390d1533b1177b9e4f0b96584e281dbdf0167cdcc6d",
           "ran": true,
           "ok": true,
-          "output": "quantity format ValueError\n12"
+          "output": "quantity format ValueError\n12",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "btr-timeouts",
           "code_hash": "a12c920651900388d71e5d037e2177d5e9640aa0372b8589112d4ddcd5b8d759",
           "ran": true,
           "ok": true,
-          "output": "[2, 5, 9]\nTrue"
+          "output": "[2, 5, 9]\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "btr-events",
           "code_hash": "932cbabbfd549ace1366f21bce0dde2bf9ca4fb5535e438e3b233188c75bf1f6",
           "ran": true,
           "ok": true,
-          "output": "{\"category\": \"dependency_timeout\", \"duration_ms\": 80, \"request_id\": \"req-demo\"}\nlive True ready False"
+          "output": "{\"category\": \"dependency_timeout\", \"duration_ms\": 80, \"request_id\": \"req-demo\"}\nlive True ready False",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "btr-degrade",
           "code_hash": "4615c6af5ba938d3bb0fc9d3eee6157147cfb63025b00ca949d387012def8335",
           "ran": true,
           "ok": true,
-          "output": "unavailable: optional feature\nfailed: no reservation created\nnormal"
+          "output": "unavailable: optional feature\nfailed: no reservation created\nnormal",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 7,
@@ -987,63 +1110,72 @@
           "code_hash": "c9a84fe0c93f1ddcee76b1eeede0808d1e18ba1e313cbd4940f6336009aff099",
           "ran": true,
           "ok": true,
-          "output": "first\nsecond"
+          "output": "first\nsecond",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "git-branches",
           "code_hash": "e2dde9406786067ba4a8763fb843ab0c4d004283f6dc28df6b43e1b3d699ad7e",
           "ran": true,
           "ok": true,
-          "output": "['base.txt', 'feature.txt', 'guide.txt']"
+          "output": "['base.txt', 'feature.txt', 'guide.txt']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "git-history",
           "code_hash": "48549236386ad7b3ae2f728f82b5c8269460f81905f4e836dfe5cf8a828575dc",
           "ran": true,
           "ok": true,
-          "output": "original\n3"
+          "output": "original\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "git-review",
           "code_hash": "4b031faf7a051a0b2f20c3457069b7d5296c5eda313cf1874940d73d3089b979",
           "ran": true,
           "ok": true,
-          "output": "deadline.txt"
+          "output": "deadline.txt",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "git-branch-policy",
           "code_hash": "edc716753b68bab7c2a81f3eed334efbf1f5c8f3e1e68340f584de4a020ce870",
           "ran": true,
           "ok": true,
-          "output": "targeted fix\nrelease"
+          "output": "targeted fix\nrelease",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "git-protection",
           "code_hash": "00cd4924790c4f8aa533f3766a1db431bbd7b57abc677056172d294056a7df05",
           "ran": true,
           "ok": true,
-          "output": "True\n2"
+          "output": "True\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "git-ignore",
           "code_hash": "3502f37376fec513091b597260b71f059ba1a49e153507d582b996265c1e566e",
           "ran": true,
           "ok": true,
-          "output": ".env\nTrue"
+          "output": ".env\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "git-secret-response",
           "code_hash": "543d456558ae663c465718e17fbf4cf1bc3ddd87757f58047dea232dce7b6f14",
           "ran": true,
           "ok": true,
-          "output": "True\nremoved"
+          "output": "True\nremoved",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "git-messages",
           "code_hash": "b039a27def277f3158a9aefeaa72f120fb67055745405fd18e4e5a666a103ad4",
           "ran": true,
           "ok": true,
-          "output": "Reject expiry equality\nEquality is outside the accepted session interval."
+          "output": "Reject expiry equality\nEquality is outside the accepted session interval.",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -1064,63 +1196,72 @@
           "code_hash": "6ba23591f93ba8e3c9b12fd3d2fe62b1630e880d97f44d8b876a023d45e138fa",
           "ran": true,
           "ok": true,
-          "output": "True\n2"
+          "output": "True\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "web-url-dns",
           "code_hash": "f06c46cd7088a508d8a90d2b8b14a651972d89a5a46780bc88ba574080ccd5a3",
           "ran": true,
           "ok": true,
-          "output": "portal.example.test\n/orders open\nsummary"
+          "output": "portal.example.test\n/orders open\nsummary",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "web-response-diagnosis",
           "code_hash": "e9d9b461f3de05ad301a62b4140201cbbce9e2a507da0787e154ef0e255a7963",
           "ran": true,
           "ok": true,
-          "output": "no HTTP response\nrequest failure\nserver failure\ninspect successful response contract"
+          "output": "no HTTP response\nrequest failure\nserver failure\ninspect successful response contract",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "web-inspect-elements",
           "code_hash": "7ffff440d67d93fb74bb3d9325c081180f36838d48f7910e310ee74b8fb6292b",
           "ran": true,
           "ok": true,
-          "output": "button\nTrue\ninline-block"
+          "output": "button\nTrue\ninline-block",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "web-network-console",
           "code_hash": "84c46a6025113d1512f2d59d2164be23c38cdd759446cb08905a7c33bb127a7f",
           "ran": true,
           "ok": true,
-          "output": "['/tickets/summary']\ncorrelate with console; do not infer cause"
+          "output": "['/tickets/summary']\ncorrelate with console; do not infer cause",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "web-languages",
           "code_hash": "186bc0c0b9d96019efcf975925cad23133ca0b5d19172638f2f191c996822b36",
           "ran": true,
           "ok": true,
-          "output": "product heading: HTML\ncard spacing: CSS\ncart feedback: JavaScript"
+          "output": "product heading: HTML\ncard spacing: CSS\ncart feedback: JavaScript",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "web-https-cookies",
           "code_hash": "bd3d4785cf9c2e7b960cca113adbd014301fffc7ef85e67904df4e7d2caded57",
           "ran": true,
           "ok": true,
-          "output": "True\nLax\nauthorization still required"
+          "output": "True\nLax\nauthorization still required",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "web-build-version-deploy",
           "code_hash": "597d911ac0b89a3cb52988de133f22419fb85c9d35be31c3f8dfb56a74e39c21",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse"
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "web-safe-professional-use",
           "code_hash": "8bb507d67d2242c383b78996058328c0ccddb5f183889051e10a9addea216db0",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse"
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -1141,63 +1282,72 @@
           "code_hash": "64d0f3ff52b4858de68143c1608842a5032cbac6d210c28602ea785b18fbad53",
           "ran": true,
           "ok": true,
-          "output": "3\n9"
+          "output": "3\n9",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "computing-os-foundations-l2",
           "code_hash": "1f773e89a108efbbedf6eabd8c97e54dec848a4f4e3c295f980b7ee7583ae966",
           "ran": true,
           "ok": true,
-          "output": "True\nTrue\nFalse"
+          "output": "True\nTrue\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "computing-os-foundations-l3",
           "code_hash": "3219018cca3f3ff25bfafdbe2bcd18fe5824214b6ef3be388b28df1a1412137f",
           "ran": true,
           "ok": true,
-          "output": "/srv/invoices\n.pdf\nTrue"
+          "output": "/srv/invoices\n.pdf\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "computing-os-foundations-l4",
           "code_hash": "60d0da708687cf976a14875506a0bf0bba33e869e8537baa412cd97dfa120138",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse"
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "computing-os-foundations-l5",
           "code_hash": "cb6b1199747a3bb5172a2f5622a7b6e499db86add9ca0956180fd5e8d7183d96",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse"
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "computing-os-foundations-l6",
           "code_hash": "ae054214faf943d90527f231cd4b86d059e3a80ec7d95b6b596b7b3311ebafa6",
           "ran": true,
           "ok": true,
-          "output": "['support-demo']"
+          "output": "['support-demo']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "computing-os-foundations-l7",
           "code_hash": "e3a56fd93d8b2c191f86db7e04cd648a77bb83bf8529539360bf2f7d07d86236",
           "ran": true,
           "ok": true,
-          "output": "C:\n/var/log/demo"
+          "output": "C:\n/var/log/demo",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "computing-os-foundations-l8",
           "code_hash": "a6bc69a3ab274ff06163d5ec4b37cfa9a88bad14299a7d380340b6558d281378",
           "ran": true,
           "ok": true,
-          "output": "[{'id': 'r1', 'level': 'ERROR'}]"
+          "output": "[{'id': 'r1', 'level': 'ERROR'}]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "computing-os-foundations-l9",
           "code_hash": "0d14afd18d161f7012c6dc504bc86e914cd5819141dd34ff5f857db365d3adf6",
           "ran": true,
           "ok": true,
-          "output": "True\n['jobs']"
+          "output": "True\n['jobs']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 4,
@@ -1218,63 +1368,72 @@
           "code_hash": "4b7912635e6d842be3aaa5a7acbfdedf300c4774f609e36fda0717e1423d074e",
           "ran": true,
           "ok": true,
-          "output": "2\nuser\n120"
+          "output": "2\nuser\n120",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ai-api-integration-stream-state",
           "code_hash": "aacd164fcd6cb7f1a55c021b0c1e7db8bae9331f839dbd075c0164cd9f864e63",
           "ran": true,
           "ok": true,
-          "output": "Enrollment opens Monday.\ncomplete\ncomplete"
+          "output": "Enrollment opens Monday.\ncomplete\ncomplete",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ai-api-integration-bounded-retries",
           "code_hash": "0cfe22b9eb6d6edf24cd7c6e1b83e21379fce659230163f3a9d75d90f8dbc621",
           "ran": true,
           "ok": true,
-          "output": "[1, 2, 4]\n7\nTrue"
+          "output": "[1, 2, 4]\n7\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ai-api-integration-server-boundary",
           "code_hash": "e805f1a5298573b1d4ebfe951eb8f091f2e581b05cfd21c65cc0397579285052",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse"
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ai-api-integration-conversation-flow",
           "code_hash": "12bfa33345070d3ac536cdc1944bd744e07fcc3df775a3b5b1ffbfa06644bfae",
           "ran": true,
           "ok": true,
-          "output": "False\nTrue\nFalse\n3"
+          "output": "False\nTrue\nFalse\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ai-api-integration-safe-output",
           "code_hash": "2483b014892a46b3ab5b83da6b4fe8802140e44b6c66f19f338c4bc586c4ff14",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse"
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ai-api-integration-token-budget",
           "code_hash": "166fa7a9093d881be5f36abb861441cc07b1f760f406e1235e291d17c597984b",
           "ran": true,
           "ok": true,
-          "output": "760\nTrue\n40"
+          "output": "760\nTrue\n40",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ai-api-integration-cost-ledger",
           "code_hash": "e17227047fca2d5fca21f3d343dad1149f15486854ffbac29c3d0ff59c0e0eca",
           "ran": true,
           "ok": true,
-          "output": "0.0048\n48.00"
+          "output": "0.0048\n48.00",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ai-api-integration-economic-controls",
           "code_hash": "4221704503cf1d4fdbfe568a9695f1e7ccd7b8c8f24c8bef04221da64d36537a",
           "ran": true,
           "ok": true,
-          "output": "[True, True, False]\n0.001"
+          "output": "[True, True, False]\n0.001",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 5,
@@ -1295,63 +1454,72 @@
           "code_hash": "0dd75c92260b136bc6049f090a89639cd308a73b47bc4ff8faa2bbb35d211db6",
           "ran": true,
           "ok": true,
-          "output": "['application', 'receipt']"
+          "output": "['application', 'receipt']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sdlc-foundations-flow",
           "code_hash": "befb52b359fdf6329d87d94ea4549c0d65cd723f540eea373372e3fde16faa93",
           "ran": true,
           "ok": true,
-          "output": "3\nFalse"
+          "output": "3\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sdlc-foundations-roles",
           "code_hash": "d6b660c7872768d5fb29964837f0208b1ffd87b2ef7d6c741a6f04f4359c202c",
           "ran": true,
           "ok": true,
-          "output": "['release']"
+          "output": "['release']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sdlc-foundations-stories",
           "code_hash": "7693fafa08263f353ed40c5d883966a48e2881ad9b67e63aacabb1f5c638986e",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse"
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sdlc-foundations-examples",
           "code_hash": "1142f736134f52c440b310d8c9f7cbe574bd014fb0ef2c694001e8c43aca36b5",
           "ran": true,
           "ok": true,
-          "output": "[False, False, True]\n[False, True, True]"
+          "output": "[False, False, True]\n[False, True, True]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sdlc-foundations-changes",
           "code_hash": "74c9ace3b41c51a75714277bf02eb0b1b87241bf8bc161e2a2b6450bacd986d8",
           "ran": true,
           "ok": true,
-          "output": "['max_rows']"
+          "output": "['max_rows']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sdlc-foundations-builds",
           "code_hash": "0d7dd5157f2a648ae06e82524d7691751c1970923247d1d3539dbcb54c9d2821",
           "ran": true,
           "ok": true,
-          "output": "False"
+          "output": "False",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sdlc-foundations-gates",
           "code_hash": "b4e3f38c9a7a6dc552de705aec3643e2177db969deea1d68f730cef6fa3890e4",
           "ran": true,
           "ok": true,
-          "output": "False\n['migration']"
+          "output": "False\n['migration']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "sdlc-foundations-observe",
           "code_hash": "ce3ecd599fe3d30e3f331c92d56dd081e9876aee0465001efa5a8cfd3f11e904",
           "ran": true,
           "ok": true,
-          "output": "0.06\nTrue"
+          "output": "0.06\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 4,
@@ -1372,63 +1540,72 @@
           "code_hash": "913527dfb53f47e87b8b3ea73697795004d3b3c17b1a406feb56a16c0e5e692f",
           "ran": true,
           "ok": true,
-          "output": "tcp_connect\n['link', 'ip_route']"
+          "output": "tcp_connect\n['link', 'ip_route']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "networking-fundamentals-l2",
           "code_hash": "e45c56fa349c51581e9f6e563a272d6d9b921e3c4eff67011b62ab07042e5021",
           "ran": true,
           "ok": true,
-          "output": "256\nTrue\nFalse"
+          "output": "256\nTrue\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "networking-fundamentals-l3",
           "code_hash": "f1b9cd35a43072d96f9327a7cf682f4f2a21b3713215c855106e0d7537773a9c",
           "ran": true,
           "ok": true,
-          "output": "['order=1', 'order=2']\nTrue"
+          "output": "['order=1', 'order=2']\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "networking-fundamentals-l4",
           "code_hash": "135dd13a7fa074631cb12798c36d04f47f3b2048bae6c574fa694cffd3805cd9",
           "ran": true,
           "ok": true,
-          "output": "['192.0.2.10']\nFalse"
+          "output": "['192.0.2.10']\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "networking-fundamentals-l5",
           "code_hash": "e8fd954c3c9520e809997ac9bf84f9b577abac57578130b77083b8913d8ecb07",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse"
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "networking-fundamentals-l6",
           "code_hash": "af930fe60ee1acf4e23b6ce303ad93ef5ded6ce8813eab7a332583d372af259e",
           "ran": true,
           "ok": true,
-          "output": "3\nFalse\nTrue"
+          "output": "3\nFalse\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "networking-fundamentals-l7",
           "code_hash": "34e5acf5720c55943898afa8b90aa70f22e6fa00691743d7d98f673646e02289",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse"
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "networking-fundamentals-l8",
           "code_hash": "11a9fbc968f785bed13b83e816ebda7d1cd5ed0accd9b3bff2a563fb807c1928",
           "ran": true,
           "ok": true,
-          "output": "['a', 'c', 'a', 'c', 'a']"
+          "output": "['a', 'c', 'a', 'c', 'a']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "networking-fundamentals-l9",
           "code_hash": "2fb51410836d561b82d2082736c4ffee21f7a53b63a34dca548e1a7113c50270",
           "ran": true,
           "ok": true,
-          "output": "tls\nhostname_mismatch"
+          "output": "tls\nhostname_mismatch",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -1449,63 +1626,72 @@
           "code_hash": "edd342d4aafe076d3110ce3b53da5a33d4ffa71be85a028ae5f5e41704e36895",
           "ran": true,
           "ok": true,
-          "output": "h1 > h2 > h3"
+          "output": "h1 > h2 > h3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "html-semantic-controls",
           "code_hash": "898a5fbc88cf5b40b2905c602193b2ade5146e30ff87e20d98756328eccbb05d",
           "ran": true,
           "ok": true,
-          "output": "view invoice: a with href\nsend request: button\nrelated items: ul or ol"
+          "output": "view invoice: a with href\nsend request: button\nrelated items: ul or ol",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "html-content-regions",
           "code_hash": "3e705919d806a08b5b7a7493bcd3175fc1f9e700630c9f950a9e507564854599",
           "ran": true,
           "ok": true,
-          "output": "True\nTrue"
+          "output": "True\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "html-labels-constraints",
           "code_hash": "b3680141fdab6eb7301a43873bbf6e52f428007b617872233fbac9e976b7bc26",
           "ran": true,
           "ok": true,
-          "output": "True\n1"
+          "output": "True\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "html-form-submission",
           "code_hash": "5b1461a960dd67c89d798f1d8b0d91d71b845cbc17c9381fd37b1542d34dc54b",
           "ran": true,
           "ok": true,
-          "output": "course=web+basics&slot=morning&slot=evening\n['morning', 'evening']"
+          "output": "course=web+basics&slot=morning&slot=evening\n['morning', 'evening']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "html-form-errors",
           "code_hash": "6d21b48483bc93a77a75efa1748d9c58df5428d928e3a3cd7f808b0e533340be",
           "ran": true,
           "ok": true,
-          "output": "{'email': 'Enter a contact email.'}\nTrue"
+          "output": "{'email': 'Enter a contact email.'}\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "html-image-alternatives",
           "code_hash": "60c3c37a3a5c0461dd4507c5c2056475e5c479f62669f71a43cda281cb6f1aa7",
           "ran": true,
           "ok": true,
-          "output": "True\nTrue\nView shipment status"
+          "output": "True\nTrue\nView shipment status",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "html-document-metadata",
           "code_hash": "0405445edc332d0fd07c698eda51cf7208b4964b47a8818419f36872dbaeb8fd",
           "ran": true,
           "ok": true,
-          "output": "Open Day | Example University\nPlan your campus visit."
+          "output": "Open Day | Example University\nPlan your campus visit.",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "html-media-links-review",
           "code_hash": "38950228f3879623e7575a5c92953b5e57f43fb412a7f0ee9f83fb7cb7c08809",
           "ran": true,
           "ok": true,
-          "output": "True\nTrue\nreview context and controls separately"
+          "output": "True\nTrue\nreview context and controls separately",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -1526,63 +1712,72 @@
           "code_hash": "b0f0a6e19e4dc13827263b0c88f1f8eefb1fad32c6fe058041e55ab68183a7ff",
           "ran": true,
           "ok": true,
-          "output": "120\nTrue"
+          "output": "120\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "qa-principles-review-learning",
           "code_hash": "9224690e9b3f1ab13e8e7adfe6f2169b2ed292a72f791e1cd4826e22b53d54ea",
           "ran": true,
           "ok": true,
-          "output": "['cross_tenant_denied']"
+          "output": "['cross_tenant_denied']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "qa-principles-verification-validation",
           "code_hash": "db20dc58d2113748dac80ded2c90779dcaf784a6babc452aad2dc421ab133b1b",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse"
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "qa-principles-levels",
           "code_hash": "4f6cb3bd49f4ec5c96b89b7dd6cb99c54c4a42a5d2b53aad6499ae8771c02a2d",
           "ran": true,
           "ok": true,
-          "output": "80"
+          "output": "80",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "qa-principles-system-acceptance",
           "code_hash": "882e12a3acf30d2dcb43dd16b5eb52a81a43136d6b1b211ffd29dfaf395d06bd",
           "ran": true,
           "ok": true,
-          "output": "False\n['confirmation_visible']"
+          "output": "False\n['confirmation_visible']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "qa-principles-types",
           "code_hash": "d00595287ce08a2d8a094012778d36fa5fae377a85f552f7a3f958a7ac983793",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse"
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "qa-principles-risk",
           "code_hash": "5f39e0ae8c937c4c8e1a8a319fc9ffce5b2c74c38c4ba766eeed0bf7b169eb32",
           "ran": true,
           "ok": true,
-          "output": "['lost_registration', 'slow_search', 'alignment']"
+          "output": "['lost_registration', 'slow_search', 'alignment']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "qa-principles-risk-evidence",
           "code_hash": "c9d6f8a86b4c5ce4ba56f6c03427e1e8e04b334a8c396844058ea3dbac223274",
           "ran": true,
           "ok": true,
-          "output": "['lost_status']"
+          "output": "['lost_status']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "qa-principles-reporting",
           "code_hash": "56897d2cffd53d10ee43008e58b678340f094ecbb53c3ee3a8457e08bd3bd585",
           "ran": true,
           "ok": true,
-          "output": "{'blocked': 1, 'failed': 1, 'not_run': 1, 'passed': 2}"
+          "output": "{'blocked': 1, 'failed': 1, 'not_run': 1, 'passed': 2}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 5,
@@ -1603,63 +1798,72 @@
           "code_hash": "82243ae873444c540c1916243593561affb53266e2efd37a0c3cfd5f36823b35",
           "ran": true,
           "ok": true,
-          "output": "0.6\nMonday\n10"
+          "output": "0.6\nMonday\n10",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "llm-fundamentals-context-boundary",
           "code_hash": "521ebbb4544eacfdf863970e774b69822c6c7d539dcd66836c2bf9517dd94aea",
           "ran": true,
           "ok": true,
-          "output": "['middle', 'recent']\n10"
+          "output": "['middle', 'recent']\n10",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "llm-fundamentals-training-stages",
           "code_hash": "ef120889a2af9eb3c0bb773b4c50a0392ca40a7e5ab3f56d95baceafb7cb96b8",
           "ran": true,
           "ok": true,
-          "output": "['demo-3']\nFalse\nTrue"
+          "output": "['demo-3']\nFalse\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "llm-fundamentals-unsupported-claims",
           "code_hash": "85a4b0c504ad0852bc24f2909a85767bd73e0383b81085fce74d451bb7956794",
           "ran": true,
           "ok": true,
-          "output": "['deadline']\n['fee', 'scholarship']"
+          "output": "['deadline']\n['fee', 'scholarship']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "llm-fundamentals-grounding",
           "code_hash": "dac0f728c6f00caafb87bb2dd5c731a8c9810a4b12d8d0d8be9e18c071cb66c6",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse"
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "llm-fundamentals-model-selection",
           "code_hash": "e4b6a688b958f197707be91d72a08416097d57c062f8c0f7fd628ebb13eaf5f5",
           "ran": true,
           "ok": true,
-          "output": "['medium']\nmedium"
+          "output": "['medium']\nmedium",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "llm-fundamentals-temperature",
           "code_hash": "8be4109e81e1f5fc284bed7c14496f63de6754ed6683c50742e4197c957f62d7",
           "ran": true,
           "ok": true,
-          "output": "0.867\n0.506\nTrue"
+          "output": "0.867\n0.506\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "llm-fundamentals-candidate-filters",
           "code_hash": "e4f00a5b496502b038bbcca6caa57509e9a9936e7561af9cfdf06833e586f327",
           "ran": true,
           "ok": true,
-          "output": "['A', 'B']\n0.8\n['A', 'B']"
+          "output": "['A', 'B']\n0.8\n['A', 'B']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "llm-fundamentals-sampling-evidence",
           "code_hash": "6c4d6432bfcf891ac61dbc83f3d7cfb05fbe20dc41de93895f919fbfe86b35a1",
           "ran": true,
           "ok": true,
-          "output": "True\n3\n0.6"
+          "output": "True\n3\n0.6",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 5,
@@ -1680,63 +1884,72 @@
           "code_hash": "649fb9fb0f17739bd77ddc23b2fc312d1951bae05168272d1dac870c4ffb097d",
           "ran": true,
           "ok": true,
-          "output": "5\n11"
+          "output": "5\n11",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ma-norm",
           "code_hash": "bedf8f8113f765ae000f7fe307bfeb6720bce1df7c3e714f1dae9a34e9290430",
           "ran": true,
           "ok": true,
-          "output": "(2, 2)\n[10, 2]\n5.0\n7"
+          "output": "(2, 2)\n[10, 2]\n5.0\n7",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ma-matrix",
           "code_hash": "58f12c71ed39575658ad796ac914b7e76edd906cfdce86a97a4ccefc0e01ddca",
           "ran": true,
           "ok": true,
-          "output": "[4, 2]\n[6, 2]"
+          "output": "[4, 2]\n[6, 2]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ma-transform",
           "code_hash": "575f9cb165cc2da7d9fe0f2c6305d1f703f91b817b8b29c4ecd95fedb7b596bb",
           "ran": true,
           "ok": true,
-          "output": "[0, 0]\nTrue\n[3, 0]"
+          "output": "[0, 0]\nTrue\n[3, 0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ma-eigen",
           "code_hash": "0c0944b7df7deb98e1c19a17b42e167ec3a30a5497ecf70fe0339d07589f1212",
           "ran": true,
           "ok": true,
-          "output": "[6, 0]\n[0, -2]\n[3, -1]"
+          "output": "[6, 0]\n[0, -2]\n[3, -1]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ma-pca",
           "code_hash": "08570c75233a3dff7592cba5f1f73b98636f45ba50466d2f1c9f164e15a54eb3",
           "ran": true,
           "ok": true,
-          "output": "[2.0, 2.0]\n[-1.414214, 1.414214]\n[[1.0, 1.0], [3.0, 3.0]]"
+          "output": "[2.0, 2.0]\n[-1.414214, 1.414214]\n[[1.0, 1.0], [3.0, 3.0]]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ma-derivative",
           "code_hash": "76154e356360465994e1da302ebb3bde9571b3d18a99f1887eb1e4a39fe39e30",
           "ran": true,
           "ok": true,
-          "output": "-6.0\n-6.0\n0"
+          "output": "-6.0\n-6.0\n0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ma-gradient",
           "code_hash": "e9749f93b51d91eec03b9143cb8dccae8966b7d7d99a1d86dd027697e51580d8",
           "ran": true,
           "ok": true,
-          "output": "[2.8125, 0.0, -3.2208]"
+          "output": "[2.8125, 0.0, -3.2208]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ma-partials",
           "code_hash": "9e1c7ad66dec45c2698fabf002fb65f0b1ff77aa0d54632d932da10d326a449f",
           "ran": true,
           "ok": true,
-          "output": "[-4.0, 8.0]\n[0.4, -0.8]\n8.0 2.72"
+          "output": "[-4.0, 8.0]\n[0.4, -0.8]\n8.0 2.72",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 5,
@@ -1757,63 +1970,72 @@
           "code_hash": "9ead404a851383912771de25ef07f310942c414edaa8a16118089539f9bc729b",
           "ran": true,
           "ok": true,
-          "output": "3/4\n3/5"
+          "output": "3/4\n3/5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ps-baserates",
           "code_hash": "c33230ca56751cf5866ec8bff5aa871600f76edaa399efedf755301e3b3840fa",
           "ran": true,
           "ok": true,
-          "output": "90 495\n2/13\n0.1538"
+          "output": "90 495\n2/13\n0.1538",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ps-dependence",
           "code_hash": "aae739d87741a86c9148e71f0f091d89860f625ac121cce1ee61f03e33b471b9",
           "ran": true,
           "ok": true,
-          "output": "A [0.9, 0.2] 0.83\nB [0.9, 0.267] 0.33"
+          "output": "A [0.9, 0.2] 0.83\nB [0.9, 0.267] 0.33",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ps-distributions",
           "code_hash": "dca1796c6aefde2f48d9177317dbb43ca41481938ab95e78d00716a61d6b98b9",
           "ran": true,
           "ok": true,
-          "output": "0.096\n0.6827"
+          "output": "0.096\n0.6827",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ps-sampling",
           "code_hash": "ced2f8b22f27510e3cf57ab8c5c991f6af2378fc1f0b6c16dd97e4ccb1ec85b9",
           "ran": true,
           "ok": true,
-          "output": "14.0\n26.0"
+          "output": "14.0\n26.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ps-clt",
           "code_hash": "bd8cf1879d58ebc2e2c7b3e4a743b1a938efd24002daf97ad34266805569cdb4",
           "ran": true,
           "ok": true,
-          "output": "[(0.0, 1), (0.5, 2), (1.0, 1)]\n0.25 0.125"
+          "output": "[(0.0, 1), (0.5, 2), (1.0, 1)]\n0.25 0.125",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ps-inference",
           "code_hash": "e485731d295286d95eda7ed996e94f73e6dac3da8dcec5f88361effa38d00860",
           "ran": true,
           "ok": true,
-          "output": "98.04 101.96\n0.0455"
+          "output": "98.04 101.96\n0.0455",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ps-abdesign",
           "code_hash": "f8f0605be57a8d924ba9db9e037e77638a922ff67af3d7f748e2c3edbc8e25dd",
           "ran": true,
           "ok": true,
-          "output": "True\n5 3"
+          "output": "True\n5 3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "ps-abread",
           "code_hash": "4b0727d30a60f12ef9bd11cc1955813dff94aea9c54f79d8cee7069b166294a5",
           "ran": true,
           "ok": true,
-          "output": "2.0 20.0\n-0.0074 0.0474"
+          "output": "2.0 20.0\n-0.0074 0.0474",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -1834,63 +2056,72 @@
           "code_hash": "479560d6b5712bca253cfa44d34df7a322bfb1508eff18080f0c83b1e4acc4af",
           "ran": true,
           "ok": true,
-          "output": "True\nTrue"
+          "output": "True\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "dbf-stakeholders",
           "code_hash": "e927e4c3d5c963b2f639d661573ea683d4fbe9911b3a68c4601b72290ce1fb58",
           "ran": true,
           "ok": true,
-          "output": "['publish_report']\n2"
+          "output": "['publish_report']\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "dbf-evidence",
           "code_hash": "266c9901401c75c47bbef73f8c34f92347e6a9fbb921e64fec310901b2fab5eb",
           "ran": true,
           "ok": true,
-          "output": "0.6666666666666666\n0.6"
+          "output": "0.6666666666666666\n0.6",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "dbf-grain",
           "code_hash": "7bfe60618b33fde67ef4c88ba1cd449d7c1dd1b8efd7d9649b5457c5d53a66e5",
           "ran": true,
           "ok": true,
-          "output": "3 2\n2500\n1500"
+          "output": "3 2\n2500\n1500",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "dbf-sources",
           "code_hash": "90571044eaddcf4fd8d57aac73b1ea3e0caead4ef517220c5bf664cde95c51bf",
           "ran": true,
           "ok": true,
-          "output": "3 2\n['e2']"
+          "output": "3 2\n['e2']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "dbf-quality",
           "code_hash": "877fe36e95839d53f11dd01c7f8a95b3a7971c2ab49989ef6e10a5fbb218d5f8",
           "ran": true,
           "ok": true,
-          "output": "['duplicate_id', 'status', 'amount']"
+          "output": "['duplicate_id', 'status', 'amount']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "dbf-metric",
           "code_hash": "48ca2271e2bcacc72c7e04ee8fc4cf645f0aacec8b066ea88fdb48710d0e5afe",
           "ran": true,
           "ok": true,
-          "output": "0.12\nNone"
+          "output": "0.12\nNone",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "dbf-indicators",
           "code_hash": "3957d7880d35c4950fc506dabc83da1f52e5fac4bc3e108f1922a0767d9fbacd",
           "ran": true,
           "ok": true,
-          "output": "True 2 3\nFalse 1 2"
+          "output": "True 2 3\nFalse 1 2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "dbf-scorecard",
           "code_hash": "2f13b998d3c7602c1e0341f1d939d604e09772d148d25040f697f6a397862caf",
           "ran": true,
           "ok": true,
-          "output": "True False\nreview_required"
+          "output": "True False\nreview_required",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -1911,63 +2142,72 @@
           "code_hash": "1b50ed7516b9c57b1a7aaff7aee8ea59c23b41bdbf356d839096215981b439ae",
           "ran": true,
           "ok": true,
-          "output": "['missing', 'type', 'type', 'below', 'valid', 'above']"
+          "output": "['missing', 'type', 'type', 'below', 'valid', 'above']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "test-design-boundaries",
           "code_hash": "7f4e821230ae756b314382a401eb8b684af2e185b3032c7a4c29554ff858dce6",
           "ran": true,
           "ok": true,
-          "output": "[(0, False), (1, True), (2, True), (49, True), (50, True), (51, False)]"
+          "output": "[(0, False), (1, True), (2, True), (49, True), (50, True), (51, False)]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "test-design-decision-state",
           "code_hash": "29abca539caf3ac66f823556be8853a7a6e5d070023f99245030f0ef0898e749",
           "ran": true,
           "ok": true,
-          "output": "[(False, False, False), (False, True, False), (True, False, False), (True, True, True)]\ninvalid"
+          "output": "[(False, False, False), (False, True, False), (True, False, False), (True, True, True)]\ninvalid",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "test-design-case-contract",
           "code_hash": "efdee567290d3b421849747f9f6f58626cdda9043540d63fcaf4c6ef2e66ecae",
           "ran": true,
           "ok": true,
-          "output": "True\nready"
+          "output": "True\nready",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "test-design-oracles",
           "code_hash": "6dd3e50e29ad266e5ff255d4acb67a42c6d8195bc2f5125a22348f8feda6418b",
           "ran": true,
           "ok": true,
-          "output": "[{'score': 80}]"
+          "output": "[{'score': 80}]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "test-design-fixtures",
           "code_hash": "ec21f9b2003735e849214ce3fa8fbad63dd9b47bf23ad3169091a4b9b0fc8803",
           "ran": true,
           "ok": true,
-          "output": "1\n0"
+          "output": "1\n0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "test-design-plan-scope",
           "code_hash": "14a183ad1421225f270c963148f5684803ea6545df5738dd67d855154cc44e57",
           "ran": true,
           "ok": true,
-          "output": "['import_contract']"
+          "output": "['import_contract']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "test-design-criteria",
           "code_hash": "0f39eebc122f94e3b76110c69c3f629c90dd217d0f3f5df8aae9af311c0a887f",
           "ran": true,
           "ok": true,
-          "output": "['provider_contract']\nFalse"
+          "output": "['provider_contract']\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "test-design-execution-plan",
           "code_hash": "a7296b915a344b2c7c0c5980d84c73d83f145e0db361ffce5b4e1c203b2ca8df",
           "ran": true,
           "ok": true,
-          "output": "['provider_stub']"
+          "output": "['provider_stub']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 4,
@@ -1988,63 +2228,72 @@
           "code_hash": "a1bda7cf4bc7a41a6393ac9c9fe653595a3836a2400057263938169f33ce0800",
           "ran": true,
           "ok": true,
-          "output": "navy\nTrue"
+          "output": "navy\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "css-maintainable-selectors",
           "code_hash": "c4bfb09137d948051d248c594eb1e1ce67e0ca8314f861185d1d68523f5c6490",
           "ran": true,
           "ok": true,
-          "output": "['article', 'article']\n2"
+          "output": "['article', 'article']\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "css-winning-rule-review",
           "code_hash": "94ae3abdf8c626b6d5b1bdc3635289e9c3b6cafdeefdb74de5b475ef29eb9cbb",
           "ran": true,
           "ok": true,
-          "output": "summary: teal\nwarning: maroon"
+          "output": "summary: teal\nwarning: maroon",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "css-box-sizing",
           "code_hash": "25acefe50bc148cb62bf29d27024b42f02a6f23f41b0dcadb44af9908bb9d1ba",
           "ran": true,
           "ok": true,
-          "output": "336\n264\nmargins are outside these widths"
+          "output": "336\n264\nmargins are outside these widths",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "css-display-position",
           "code_hash": "f76b082e3289123977d05d783e9af68cf096fb4aeb88e0fe57e16dd0bbd68d71",
           "ran": true,
           "ok": true,
-          "output": "flow slot: 40\nrendered top: 48\nbadge top: 34"
+          "output": "flow slot: 40\nrendered top: 48\nbadge top: 34",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "css-overflow-spacing",
           "code_hash": "d5f04ef0cc747fe20e945cb534cc54ee4e75ce094013b42f172c2ef8e2b3f694",
           "ran": true,
           "ok": true,
-          "output": "260\nTrue\ninspect constraints; do not hide essential content"
+          "output": "260\nTrue\ninspect constraints; do not hide essential content",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "css-type-units",
           "code_hash": "eb2ed8e699c116e3f8df82d3bbc94991fc5fda40a64b08187a0ca25e8465a329",
           "ran": true,
           "ok": true,
-          "output": "root 16 heading 24.0 line 24.0\nroot 20 heading 30.0 line 30.0"
+          "output": "root 16 heading 24.0 line 24.0\nroot 20 heading 30.0 line 30.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "css-design-tokens",
           "code_hash": "d2869bb2b1f7362ff212c583fc440873d1bf71adf0f1a1b3d1c1f6b2a6b8b725",
           "ran": true,
           "ok": true,
-          "output": "navy\ngrey\nteal"
+          "output": "navy\ngrey\nteal",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "css-contrast-review",
           "code_hash": "9f4f86b6929f271f4d5e6335ffbc7438547b52916e0b4a2a274194209792322f",
           "ran": true,
           "ok": true,
-          "output": "21.0:1\nTrue"
+          "output": "21.0:1\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -2065,84 +2314,96 @@
           "code_hash": "ead91463cf8fb7f1753a4202f814aafd804107be63743361d0e7355db2a81c46",
           "ran": true,
           "ok": true,
-          "output": "True"
+          "output": "True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l2",
           "code_hash": "01f6cd1d068ee32683dfc4f838d01df28a2b932b43893ed03e2929c5308e5c6a",
           "ran": true,
           "ok": true,
-          "output": "limit=10\nlimit=20"
+          "output": "limit=10\nlimit=20",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l3",
           "code_hash": "77c4b50882d8d6182efc56e01f8cf17bb746b277fee3e8d87ab4339029621bcf",
           "ran": true,
           "ok": true,
-          "output": "ERROR fixture_failure\n0"
+          "output": "ERROR fixture_failure\n0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l4",
           "code_hash": "c53aa784f0ec0cdd592b5e6a3ef8ff2d79e4d26091fd8f3b25d42261e3125b40",
           "ran": true,
           "ok": true,
-          "output": "0o640\nFalse"
+          "output": "0o640\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l5",
           "code_hash": "f52abf95a58388befabd409a546a762c0936e072954b2799b33a62b777127e44",
           "ran": true,
           "ok": true,
-          "output": "(1001, 2001)\n(3001, 2001)\n1002"
+          "output": "(1001, 2001)\n(3001, 2001)\n1002",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l6",
           "code_hash": "f58ed3db00f4d3e0044c7c2e19687d363d648f76d6b896b06c8c7b71ab690628",
           "ran": true,
           "ok": true,
-          "output": "[True, False]"
+          "output": "[True, False]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l7",
           "code_hash": "9d3008bd06a4fe2b53e49aab0c7d8f7bd1c74ca1990aed76fbba2351e480bf89",
           "ran": true,
           "ok": true,
-          "output": "['worker.service']"
+          "output": "['worker.service']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l8",
           "code_hash": "315f5a2246eed44ffcdbc14e8b2d0b6b333a80bdae1dad1047161ca04a6f1b72",
           "ran": true,
           "ok": true,
-          "output": "['e1']"
+          "output": "['e1']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l9",
           "code_hash": "3ac48ff6a4c8a9691836c8aa5329047d46d83350ab3d7309b8e290363da7063f",
           "ran": true,
           "ok": true,
-          "output": "0.4\nTrue"
+          "output": "0.4\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l10",
           "code_hash": "515630dae55554966cea5f76f1f7e6c9282038beec00837957d8153c3e235237",
           "ran": true,
           "ok": true,
-          "output": "['worker']"
+          "output": "['worker']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l11",
           "code_hash": "b292a6121fc20bc8e514d89bae9f7098362ff7a55fde8fe19da060aa61229efc",
           "ran": true,
           "ok": true,
-          "output": "('15', '2')\nTrue"
+          "output": "('15', '2')\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "linux-sysadmin-l12",
           "code_hash": "57caba975f736a83a208e23f4ce1b373d8490e288d49515255c1c121dc364821",
           "ran": true,
           "ok": true,
-          "output": "created\nalready_done"
+          "output": "created\nalready_done",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 6,
@@ -2163,84 +2424,96 @@
           "code_hash": "0cf41ef567dc51e10623542091340efe4397eef4abccd130ad7b79f1a2b269b1",
           "ran": true,
           "ok": true,
-          "output": "True False\nrepeat rejected"
+          "output": "True False\nrepeat rejected",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-attributes",
           "code_hash": "23ec456ac15cfd1c584a9726496488cc1aa7f8d4aaffbcab1c20657a74350127",
           "ran": true,
           "ok": true,
-          "output": "urgent normal normal\n['billing'] []"
+          "output": "urgent normal normal\n['billing'] []",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-dataclasses",
           "code_hash": "75b3bace80ed2c469cc00d964e72451f01139962c748dfc00264c4ed61bf0b90",
           "ran": true,
           "ok": true,
-          "output": "True False\nA-B: 2500"
+          "output": "True False\nA-B: 2500",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-composition",
           "code_hash": "b1db7a8411511963211913f4421eeb78b709e0ca57911e667f9acc5f9b76fb58",
           "ran": true,
           "ok": true,
-          "output": "queued for synthetic-account: amount=1200"
+          "output": "queued for synthetic-account: amount=1200",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-super",
           "code_hash": "60ccf61a257328d8a0346eed8661325c29e9a845602d01de3f65d544e7b0c83d",
           "ran": true,
           "ok": true,
-          "output": "['audit', 'validate', 'base']\n['Processor', 'Audit', 'Validate', 'Base']"
+          "output": "['audit', 'validate', 'base']\n['Processor', 'Audit', 'Validate', 'Base']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-polymorphism",
           "code_hash": "d06c0f5d88dea2a5ee43f60ebc02860c735dd1843d166184e6b02cba2eb29925",
           "ran": true,
           "ok": true,
-          "output": "[500, 0]\n[0, 0]"
+          "output": "[500, 0]\n[0, 0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-generators",
           "code_hash": "c30c064b895311e4222e9636eb76c9e523a959ea60cd385915e0fd627cf75d1f",
           "ran": true,
           "ok": true,
-          "output": "[]\n[10, 20]\n[1, 2]"
+          "output": "[]\n[10, 20]\n[1, 2]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-iterators",
           "code_hash": "758237c42d3625fb34399e26b691ac857cffbd01ecfce68ef7e95e794d2c0a30",
           "ran": true,
           "ok": true,
-          "output": "pen book pen\nfinished\nTrue"
+          "output": "pen book pen\nfinished\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-crosscut",
           "code_hash": "1eedaa566dc59608a88c9e52072d900b54adbf74ce55c703a667d86d57eec451",
           "ran": true,
           "ok": true,
-          "output": "['open', 'close', 'failed']\ncalculate"
+          "output": "['open', 'close', 'failed']\ncalculate",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-exceptions",
           "code_hash": "2bf3fba2b91a57cb86557a51c3b6d472af1fa3b762434321104494bccfe15f43",
           "ran": true,
           "ok": true,
-          "output": "QuantityFormatError\nValueError\n7"
+          "output": "QuantityFormatError\nValueError\n7",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-types",
           "code_hash": "9226ee1df50babc7d396d58bc02eb3d65abaeeb5249e8e46546b757b25547046",
           "ran": true,
           "ok": true,
-          "output": "3\nrejected\nrejected\nrejected"
+          "output": "3\nrejected\nrejected\nrejected",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "pio-environments",
           "code_hash": "b38f0d570c9eee5dc78b418e7e114606735d928e0175a3a903aef715d3140193",
           "ran": true,
           "ok": true,
-          "output": "True\nTrue\nFalse"
+          "output": "True\nTrue\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 12,
@@ -2248,70 +2521,512 @@
       "lessons": 12,
       "questions": 72,
       "human_approved": false
+    },
+    {
+      "id": "prompting-structured-output",
+      "version": 1,
+      "course_hash": "4b637c779371b24c245ac7db20405b941a14f526b505b6a0681decf2852e585a",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "prompting-structured-output-task-contract",
+          "code_hash": "6a1c1c815589823b7078649e5a3060a13e5e9ae1b92f70c6f6171409f6218524",
+          "ran": true,
+          "ok": true,
+          "output": "['system', 'user']\nTrue\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "prompting-structured-output-examples",
+          "code_hash": "3dc2d35d5a562264ca396f2f46a35320c0d2800ce620d6bfe6c9dfdcac54ca1a",
+          "ran": true,
+          "ok": true,
+          "output": "1\nWhere is my parcel?",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "prompting-structured-output-context-management",
+          "code_hash": "392b7a0725fc695957f918ad36879d97f1c8ccf228c981e1c177a13d6f1bfbd2",
+          "ran": true,
+          "ok": true,
+          "output": "['relevant_decision']\n90",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "prompting-structured-output-json-shape",
+          "code_hash": "1e26edac08d563c60500adf43460fde901c8fffb642db2c77c90b2824c2bfba8",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "prompting-structured-output-semantic-checks",
+          "code_hash": "2fa278dd4ba399ac06a387a0a9eace620df3813ec0482cd2ff0a9207ed330c09",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "prompting-structured-output-response-outcomes",
+          "code_hash": "eef2270f348dfebf708b03c82ea824d05ec0475b7756056c064ddcae5823dcb7",
+          "ran": true,
+          "ok": true,
+          "output": "validate_payload\nshow_refusal\nnot_a_result",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "prompting-structured-output-evaluation-set",
+          "code_hash": "5bcf7b8a2907d2dfcd99ba8d3d13f14e06b16aa9769a5df9326c32c17cc87b80",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['access_boundary', 'missing_evidence', 'normal', 'schema_edge']\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "prompting-structured-output-scoring",
+          "code_hash": "3394737713393e3eead07eda0aa3e71fa239ae65abcf91df87334df4fb4dc02f",
+          "ran": true,
+          "ok": true,
+          "output": "['missing']\n['critical']\n2 2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "prompting-structured-output-regression-gates",
+          "code_hash": "38e3b4df8f351e48a190f28af51ec9271175563c20926d40a97a6882a99791a2",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True]\nhuman approval remains separate",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "descriptive-stats-metrics",
+      "version": 1,
+      "course_hash": "88aebc8f98b7fc8515017e5e47c80a3bf33322d208853d4a2ab80512d884f344",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dsm-center",
+          "code_hash": "d63c636e9312acea5ed98a41bef3be4f6e0b47953b075deea52456220a91fb9d",
+          "ran": true,
+          "ok": true,
+          "output": "10\n3\n[2, 3]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dsm-skew",
+          "code_hash": "f40b45a19654d6e798c6a3c2ec2be897e505bebb59c19ed8cc04245275d24227",
+          "ran": true,
+          "ok": true,
+          "output": "6.5 18.5\n[80]\n6",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dsm-spread",
+          "code_hash": "eeff0334d45fc196c12d10141c96b3602cf88cb6886406fbf383f53b383504b5",
+          "ran": true,
+          "ok": true,
+          "output": "5 5\n0.0 3.162278\n[2.5, 5.0, 7.5]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dsm-growth",
+          "code_hash": "28924e39e5ceb3185521e3e89b2c9e4749c090a9b847646f8db27fe39589ab60",
+          "ran": true,
+          "ok": true,
+          "output": "1/10 9/100\n-1/100\n4/5\n99/100",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dsm-margin",
+          "code_hash": "a0429c6a984084b67f9d7f610786cc5f255006069118709ee17e689fcdfc5d2f",
+          "ran": true,
+          "ok": true,
+          "output": "90.00 36.00\n0.4\n0.6667",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dsm-retention",
+          "code_hash": "134cd2bed03abf34aa181809791a1baa121deae2b7411077e1391f27a752ff55",
+          "ran": true,
+          "ok": true,
+          "output": "0.6666666666666666\n0.6666666666666666\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dsm-confounding",
+          "code_hash": "73507c56dbefbd33609240139506f61fbdba13442e1cc896323ee164d4c75d8d",
+          "ran": true,
+          "ok": true,
+          "output": "True 110.0 1.0\nFalse 50.0 0.5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dsm-uncertainty",
+          "code_hash": "0bd12edfdce331d71042cde5799f03e1e5a76fb79fbd0978906a3aa83df8a48f",
+          "ran": true,
+          "ok": true,
+          "output": "1 1 1.0 0.0\n900 1000 0.9 0.0095\nboundary estimates need a suitable interval method",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dsm-review",
+          "code_hash": "f2012efaa8618370e183d84479317bf651844adb510e792f25ad15054e765bbc",
+          "ran": true,
+          "ok": true,
+          "output": "10.0 [100, 50]\n2 True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 63,
+      "human_approved": false
+    },
+    {
+      "id": "cloud-aws-foundations",
+      "version": 1,
+      "course_hash": "85dbd27df05943e89c5d7b4542772516d60bdceba9f72674bfc5d101a6635f87",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "cloud-aws-foundations-l1",
+          "code_hash": "067885d89bb6b20c2d0ff38d1b042c952d58a262ae0a87f895aeda233709bb2d",
+          "ran": true,
+          "ok": true,
+          "output": "['guest_os', 'application_permissions']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "cloud-aws-foundations-l2",
+          "code_hash": "1c1854a7576f65d8a790ade310a7d1144a51deca8bafa6c39335ee4ee623d868",
+          "ran": true,
+          "ok": true,
+          "output": "['invoice-demo']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "cloud-aws-foundations-l3",
+          "code_hash": "2c962cb3be8a94c7a4a8e008d691df6c0231367da5ab2a02d1279aa9a383f878",
+          "ran": true,
+          "ok": true,
+          "output": "2\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "cloud-aws-foundations-l4",
+          "code_hash": "28f5010d293971d5da04571e7858787d58edcf564e1b03eba11e74cf03cbb226",
+          "ran": true,
+          "ok": true,
+          "output": "[('daemon', 'vm-candidate'), ('event-job', 'managed-candidate')]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "cloud-aws-foundations-l5",
+          "code_hash": "dc641ac0543f84dcbc85a860a3a7877821d8b1a6dd7d6321ba9ea30b25a69353",
+          "ran": true,
+          "ok": true,
+          "output": "['object-candidate', 'block-candidate']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "cloud-aws-foundations-l6",
+          "code_hash": "89fbdbe507c335903df894d94ec33b462f800ee4c22efb9f26327cf5a06e7c4b",
+          "ran": true,
+          "ok": true,
+          "output": "rejected\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "cloud-aws-foundations-l7",
+          "code_hash": "274a4ba8795808857d2a2a8f1a075e26bef95e2e26709a26543218fc538234f3",
+          "ran": true,
+          "ok": true,
+          "output": "10.00\n20.00",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "cloud-aws-foundations-l8",
+          "code_hash": "27385056e2314e512563e35fb95a8c4252a8fffc4c50a1c506804020d3eb03a2",
+          "ran": true,
+          "ok": true,
+          "output": "['review_required']\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "cloud-aws-foundations-l9",
+          "code_hash": "b883507ff2c26167028f9c266ce2fd8e929d83e8fd082cc1ad71a2fa6ff80da8",
+          "ran": true,
+          "ok": true,
+          "output": "{'portal': 10, 'unallocated': 3}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "defect-management",
+      "version": 1,
+      "course_hash": "0bd839e379dc7ab509953e98d3564b35e3f96027363dc48a2118f69477a5e8c3",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "defect-management-report-contract",
+          "code_hash": "b82c5ce66189bd8f7bf404aeec4379866f8b88e5e3aba889594f39c5c3b76fad",
+          "ran": true,
+          "ok": true,
+          "output": "{'expected': 80, 'actual': 100, 'matches': False}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "defect-management-reproduce",
+          "code_hash": "17518153fce7a0d184343ef616d5ac0d6fc62b5c478ac74f75afc594744d3c0d",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['reserve', 'cancel', 'retry']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "defect-management-evidence",
+          "code_hash": "5b35449234b6558914f6e29125d564ec7b8a463f2f1ebab7cafc93ab0b0d0687",
+          "ran": true,
+          "ok": true,
+          "output": "{'request_id': 'req-synthetic', 'status': 403}\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "defect-management-severity-priority",
+          "code_hash": "65bc4868cff1ec01943d71173325d1e1793a0d88ada2965fb326fd41ac492bb5",
+          "ran": true,
+          "ok": true,
+          "output": "[('loss', 5), ('caption', 1)]\n['caption']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "defect-management-triage",
+          "code_hash": "28f457c6bad0995133201e611dcf67f5c77c909ec54b627e997c8bb062cb4647",
+          "ran": true,
+          "ok": true,
+          "output": "False\n['a', 'b']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "defect-management-impact",
+          "code_hash": "6c8b057753267d9d679d80db08429f78cd1c7c593dc701a4b8fd2106e439bc8b",
+          "ran": true,
+          "ok": true,
+          "output": "['scheduled_export']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "defect-management-lifecycle",
+          "code_hash": "9ecd3cafb30b47345b8af6268dcc956d354af0b393cac84d3b6df00a15d07218",
+          "ran": true,
+          "ok": true,
+          "output": "verified\ninvalid",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "defect-management-fix-verification",
+          "code_hash": "0cc6dddf47360f670c3814c16b7b20fc5649218181f60e6dd9f74a0f915c838b",
+          "ran": true,
+          "ok": true,
+          "output": "[True, True, True]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "defect-management-closure",
+          "code_hash": "ffa44a296a477e7fc88804dce020a252ea4c2d0534fb9b501041c36b4de93ca0",
+          "ran": true,
+          "ok": true,
+          "output": "verified_fix\n['native_concurrency_unverified']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "js-fundamentals",
+      "version": 1,
+      "course_hash": "b58fcd741ed74be09efb7e54dce95bc3d9fdf8d1fc963ca4a664cdc5f7b8f4b6",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "js-values-coercion",
+          "code_hash": "a6bf62d9e2b49a1e6da5a23cf05b5cdbde4935dcb5d08d5d2af6332aa04ee459",
+          "ran": true,
+          "ok": true,
+          "output": "23\n5\nfalse\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-bindings-scope",
+          "code_hash": "8bc8f5c63e991a6a3a5ae4320fed202cf699da45e93f40fbe5efa2f5867f65f1",
+          "ran": true,
+          "ok": true,
+          "output": "3\n1\njavascript",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-truthy-defaults",
+          "code_hash": "366384ed82496b000c2b27a41dd3298b9ab779c9dbf26b74f28f4ee803ec4c6d",
+          "ran": true,
+          "ok": true,
+          "output": "10\n0\ntrue\nNot supplied",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-functions-closures",
+          "code_hash": "741adc4690165e03229e02cef6f1ef77cee6a2a0aafe77bcf3e173d4cdcba400",
+          "ran": true,
+          "ok": true,
+          "output": "1 2 1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-this-calls",
+          "code_hash": "a17b2ed3b815deaa8e5488faad5860b87df3ad9024ad3d8808b4a913b21cd394",
+          "ran": true,
+          "ok": true,
+          "output": "Hello Demo\nMember Demo",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-arrows-return",
+          "code_hash": "940bbb13f64bbf5d81d5d8bc93d12002075de9496412f1a173f1e566994000cd",
+          "ran": true,
+          "ok": true,
+          "output": "[{\"id\":1,\"doubled\":4},{\"id\":2,\"doubled\":8}]\n12",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-array-transformations",
+          "code_hash": "4b219d980ba36287290d06f9e039449b08fd687cef5a9f33a239a29ce22d1106",
+          "ran": true,
+          "ok": true,
+          "output": "[{\"id\":1,\"title\":\"Login\"}]\n2",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-reference-shallow-copy",
+          "code_hash": "862a4069e61e843860eb3272d80bfc407ba18db16d3057ab4c637be44e452015",
+          "ran": true,
+          "ok": true,
+          "output": "B\nB C\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-reduce-aggregation",
+          "code_hash": "680cb1522e741da04493302e89a3f6e4756477efbde0077755154418dd01156b",
+          "ran": true,
+          "ok": true,
+          "output": "[[\"North\",5],[\"South\",1]]\n0",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-modern-access",
+          "code_hash": "0bfa9fb7a52e1d59ba949dc36e140c5f78ff8b7601829c411f0dc543c326d724",
+          "ran": true,
+          "ok": true,
+          "output": "Demo: team\nNo email supplied\nbasic",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-errors-contracts",
+          "code_hash": "a7241f9e0b34f1e49e0cd6a4631a14b8b9f293ee35c43a5e7c59c51b311fc8dd",
+          "ran": true,
+          "ok": true,
+          "output": "QuantityError: Enter a positive integer.\ncleanup checked",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-module-boundaries",
+          "code_hash": "248cdd37f6e5e373eba1a8e3556e7021f531e781b76fedc7a17119cc62170849",
+          "ran": true,
+          "ok": true,
+          "output": "0.1\n110.00",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 12,
+      "questions": 96,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/python/cpython",
-    "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+    "repository": "https://github.com/mdn/content",
+    "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
     "references": [
       {
-        "id": "classes",
-        "path": "Doc/tutorial/classes.rst",
-        "sha256": "11b17c6582aba43dbf3972b8e1646c4dd2eaa42cd77f164edfb21ca2cd40bbc9",
+        "id": "js-grammar",
+        "path": "files/en-us/web/javascript/guide/grammar_and_types/index.md",
+        "sha256": "0fa7023008fb32cdc670d5138be2b21b64d90e0fc458a47fc6cf05b33433588a",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "datamodel",
-        "path": "Doc/reference/datamodel.rst",
-        "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
+        "id": "js-functions",
+        "path": "files/en-us/web/javascript/guide/functions/index.md",
+        "sha256": "11e59a5c148dd61a3e629c5792b7999a7ccce4a21ccb296dd91509b685a52ba9",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "dataclasses",
-        "path": "Doc/library/dataclasses.rst",
-        "sha256": "8e3d7a07b6e83b70948a5fe0e0def39626d08324f26512f23d5da22387626a05",
+        "id": "js-objects",
+        "path": "files/en-us/web/javascript/guide/working_with_objects/index.md",
+        "sha256": "0cc58e985a4ae1174ea081527540fc24d6ccce7ff28f2f3570682b5581513751",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "typing",
-        "path": "Doc/library/typing.rst",
-        "sha256": "845db21277221073dabf955264ed407b50a01cab3d99f5de0621c7ea52ca594f",
+        "id": "js-collections",
+        "path": "files/en-us/web/javascript/guide/indexed_collections/index.md",
+        "sha256": "0f8eceb4b2fab68bb582a94ee96acbc1f25c2f9a1613fd8f1cf7d64cb78c4a41",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "contextlib",
-        "path": "Doc/library/contextlib.rst",
-        "sha256": "e7067c69060f62f41099deb9e7e9c8776210926d06d7f33a644cb557118f6612",
+        "id": "js-modules",
+        "path": "files/en-us/web/javascript/guide/modules/index.md",
+        "sha256": "b0009c393e02c3a0343abefc2ab574fb580392e0f0bddf1373ff3070fc508711",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "functools",
-        "path": "Doc/library/functools.rst",
-        "sha256": "17e13f58611ad90c6aac266eaddcf61f33f468831c42c1811deacb6518607972",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "errors",
-        "path": "Doc/tutorial/errors.rst",
-        "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "traceback",
-        "path": "Doc/library/traceback.rst",
-        "sha256": "3dcf7e034edf016e30f1ae6ddcd10924ed58f137e074edaf24eb66c6f736a90a",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "venv",
-        "path": "Doc/library/venv.rst",
-        "sha256": "7e2148e133fbc824ec831cd2301832324510967e0f32fb052976f6c1ccd05975",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "modules",
-        "path": "Doc/tutorial/modules.rst",
-        "sha256": "acae97e5bf4e6393c903ac452c55c610cb1992c150a150785b9aadc87b9a420b",
+        "id": "js-errors",
+        "path": "files/en-us/web/javascript/guide/control_flow_and_error_handling/index.md",
+        "sha256": "d600e0768242290add5045e599ff534a200a2891cb2f282253e6eab7a6388ffa",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -3260,6 +3975,182 @@
           "id": "modules",
           "path": "Doc/tutorial/modules.rst",
           "sha256": "acae97e5bf4e6393c903ac452c55c610cb1992c150a150785b9aadc87b9a420b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "prompting-structured-output",
+      "repository": "https://github.com/openai/openai-cookbook",
+      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "references": [
+        {
+          "id": "stream",
+          "path": "examples/How_to_stream_completions.ipynb",
+          "sha256": "c2aa466319c891f39f427ddf3ed74d6c2933c70bc27782ab16ad7f1b293b8afd",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "retry",
+          "path": "examples/How_to_handle_rate_limits.ipynb",
+          "sha256": "de228ec125143956ef0cab538f1f615b0af8405203c7ae4032ac3f6611028fcf",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "tokens",
+          "path": "examples/How_to_count_tokens_with_tiktoken.ipynb",
+          "sha256": "b83aa4aebf80a432b0a93a54fe3056e09d768774f8914ea7bf8329129b6800d5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "structure",
+          "path": "examples/Structured_Outputs_Intro.ipynb",
+          "sha256": "05731b657039904eec7d55c5a69532a6227fe8b9747a54a19934d993e6d50dde",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "evals",
+          "path": "examples/evaluation/Getting_Started_with_OpenAI_Evals.ipynb",
+          "sha256": "c1669e066456031c32e59c3a916616875af226959d6c6b792ed71115d3851472",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "descriptive-stats-metrics",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "statistics",
+          "path": "Doc/library/statistics.rst",
+          "sha256": "a09dac9e7bd1582f9405146c56412b4c5e9fc6424c8118a56c5eb37f6a0e0a7a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "decimal",
+          "path": "Doc/library/decimal.rst",
+          "sha256": "d8d635d0b2a2a8ebeb33796abd717a4c4a7da4b44f493aaa9dd9321c20ddc99e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "fractions",
+          "path": "Doc/library/fractions.rst",
+          "sha256": "fea1f716882ff7448987664ba74108ee18eefa9339a1872d91a9d8b2df0588ca",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "cloud-aws-foundations",
+      "repository": "Official AWS HTTPS documentation",
+      "kind": "official-http-snapshot",
+      "references": [
+        {
+          "id": "aws-shared-responsibility",
+          "path": "shared-responsibility.html",
+          "url": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "sha256": "d40bce9b61cf522712d759809ee22d38d0610a4e785e9f4da2a87bc52e38a43b",
+          "fetched_at": "2026-11-09T17:12:01.371159+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-global-infrastructure",
+          "path": "global-infrastructure.html",
+          "url": "https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html",
+          "sha256": "c9f3d179d619bfef8722b75b45fb1d5f3dec8f444f53506ca1e66216b946be31",
+          "fetched_at": "2026-11-09T17:12:01.371314+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-cloud-overview",
+          "path": "cloud-overview.html",
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/what-is-cloud-computing.html",
+          "sha256": "acfe204351970dbea9ef87c6ecd434caf63a3fee147324ad0e2fe200ae2474b1",
+          "fetched_at": "2026-11-09T17:12:01.371426+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-cost-management",
+          "path": "cost-management.html",
+          "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html",
+          "sha256": "8ef78fef6163b8168f8409b47e7ded0f55649f6907cb487522b8138cc226a2c2",
+          "fetched_at": "2026-11-09T17:12:01.371523+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        }
+      ]
+    },
+    {
+      "course": "cloud-aws-foundations",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-decimal",
+          "path": "Doc/library/decimal.rst",
+          "sha256": "d8d635d0b2a2a8ebeb33796abd717a4c4a7da4b44f493aaa9dd9321c20ddc99e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "defect-management",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "unittest",
+          "path": "Doc/library/unittest.rst",
+          "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "itertools",
+          "path": "Doc/library/itertools.rst",
+          "sha256": "1c100cdb246d6281ba452bc230a9b05f4bc4838be3080e3e3b7a17cec8d728b1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "js-fundamentals",
+      "repository": "https://github.com/mdn/content",
+      "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
+      "references": [
+        {
+          "id": "js-grammar",
+          "path": "files/en-us/web/javascript/guide/grammar_and_types/index.md",
+          "sha256": "0fa7023008fb32cdc670d5138be2b21b64d90e0fc458a47fc6cf05b33433588a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "js-functions",
+          "path": "files/en-us/web/javascript/guide/functions/index.md",
+          "sha256": "11e59a5c148dd61a3e629c5792b7999a7ccce4a21ccb296dd91509b685a52ba9",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "js-objects",
+          "path": "files/en-us/web/javascript/guide/working_with_objects/index.md",
+          "sha256": "0cc58e985a4ae1174ea081527540fc24d6ccce7ff28f2f3570682b5581513751",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "js-collections",
+          "path": "files/en-us/web/javascript/guide/indexed_collections/index.md",
+          "sha256": "0f8eceb4b2fab68bb582a94ee96acbc1f25c2f9a1613fd8f1cf7d64cb78c4a41",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "js-modules",
+          "path": "files/en-us/web/javascript/guide/modules/index.md",
+          "sha256": "b0009c393e02c3a0343abefc2ab574fb580392e0f0bddf1373ff3070fc508711",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "js-errors",
+          "path": "files/en-us/web/javascript/guide/control_flow_and_error_handling/index.md",
+          "sha256": "d600e0768242290add5045e599ff534a200a2891cb2f282253e6eab7a6388ffa",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

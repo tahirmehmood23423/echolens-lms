@@ -7,7 +7,7 @@ const { validateQuestion } = require('../qdsl');
 const { verifyCode } = require('../verify');
 const VERIFIED = require('./verification.json');
 const DATABASE_VERIFIED=require('./database-verification.json'),DATABASE_CASES=require('./database-cases');
-const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http'), 'rest-api-design': require('./rest'), 'database-design': require('./database') };
+const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http'), 'rest-api-design': require('./rest'), 'database-design': require('./database'), 'api-security-auth': require('./security') };
 const clone = x => x == null ? x : JSON.parse(JSON.stringify(x));
 const hash = x => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const text = x => typeof x === 'string' && x.trim().length > 0;

@@ -8,7 +8,7 @@ const report={human_approved:false,published:false,courses:[],official_source:nu
 for(const course of Object.values(BUILTIN)) {
   const result=validate(course,{execute});
   report.courses.push({id:course.id,version:course.version,course_hash:hash(course),...result});
-  const roots={'python/cpython':sourceRoot,'postgres/postgres':arg('--source-root-postgres'),'httpwg/http-core':arg('--source-root-http'),'OAI/OpenAPI-Specification':arg('--source-root-openapi')};
+  const roots={'python/cpython':sourceRoot,'postgres/postgres':arg('--source-root-postgres'),'httpwg/http-core':arg('--source-root-http'),'OAI/OpenAPI-Specification':arg('--source-root-openapi'),'OWASP/CheatSheetSeries':arg('--source-root-owasp')};
   const groups=new Map();
   for(const ref of course.references){const repo=ref.source?.repo;if(!groups.has(repo))groups.set(repo,[]);groups.get(repo).push(ref);}
   for(const [repo,refs] of groups){

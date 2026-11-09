@@ -799,46 +799,186 @@
       "lessons": 12,
       "questions": 76,
       "human_approved": false
+    },
+    {
+      "id": "api-security-auth",
+      "version": 1,
+      "course_hash": "aed95ea2f8f7fcbe54b1b204cec7579ffe55a31a831248981eae8e385bcdc370",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "sec-passwords",
+          "code_hash": "fdf6ddb693133ef1378d7ce1604d927993c74e5fad1ccaf9bebd28aa93d571e7",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nTrue"
+        },
+        {
+          "id": "sec-sessions",
+          "code_hash": "4e7bbe020973e764b51d2a22b0fc4019c7a7b7155a89808fbb2407c6a6a01594",
+          "ran": true,
+          "ok": true,
+          "output": "7\nNone\nNone"
+        },
+        {
+          "id": "sec-token-policy",
+          "code_hash": "206aa05f7c9dfb709a64b71535cfa3ac4a818812f4dcbd1a5ac0660722b2e10f",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse\nFalse"
+        },
+        {
+          "id": "sec-recovery-mfa",
+          "code_hash": "b37528aecb1b8e13a0ea34fcb8983237110defb60f1f48cf92b9f09e1a76ae2f",
+          "ran": true,
+          "ok": true,
+          "output": "False\nFalse\nTrue\nFalse"
+        },
+        {
+          "id": "sec-object-access",
+          "code_hash": "93f69a04d2000a797c17f93d964d8c08ca6540007b5f7c3c9bedf78f6bb86b30",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse\nFalse"
+        },
+        {
+          "id": "sec-roles",
+          "code_hash": "3c8e18da4e3a7502b56f9454b6e44eb8d76084064215266733f4227ae009f6a3",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse\nFalse"
+        },
+        {
+          "id": "sec-tenant-responses",
+          "code_hash": "eb78ca53fc94f4ceb4e30efd3c8629aeeba6649bb9904c8e1585cb718302e444",
+          "ran": true,
+          "ok": true,
+          "output": "[{'id': 'inv-1', 'status': 'paid'}]\nTrue"
+        },
+        {
+          "id": "sec-commerce-review",
+          "code_hash": "0c4bc76fc4938295b327672e327b46b8efeba0baf8b1e90988f6f79938098355",
+          "ran": true,
+          "ok": true,
+          "output": "denied\nrequest_accepted\ninvalid_request"
+        },
+        {
+          "id": "sec-input-output",
+          "code_hash": "3fd57969b1a737bca70ffeda4335647c01729ed8ce6156f47d7572da972bd80f",
+          "ran": true,
+          "ok": true,
+          "output": "1\n&lt;em&gt;Welcome&lt;/em&gt;"
+        },
+        {
+          "id": "sec-browser-boundaries",
+          "code_hash": "3774bfcaae98a04466af11a0f0b7f6d0cfb1435652c44f85f782fc85df63daf3",
+          "ran": true,
+          "ok": true,
+          "output": "(True, True)\n(False, False)\n(True, False)"
+        },
+        {
+          "id": "sec-abuse-limits",
+          "code_hash": "c03508f2aa97611cb72b15d5ebd4e2194985426391c96ee8c8d65023419b6b90",
+          "ran": true,
+          "ok": true,
+          "output": "True True False\nTrue\nTrue"
+        },
+        {
+          "id": "sec-config-logs",
+          "code_hash": "780d0295a8156e30b86ec472c21193ce263d1632351d88441832041742ec9e2b",
+          "ran": true,
+          "ok": true,
+          "output": "{\"category\": \"authentication_failed\", \"request_id\": \"req-demo\"}\nconfiguration_policy_passed"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 12,
+      "questions": 76,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/postgres/postgres",
-    "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
+    "repository": "https://github.com/OWASP/CheatSheetSeries",
+    "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
     "references": [
       {
-        "id": "ddl",
-        "path": "doc/src/sgml/ddl.sgml",
-        "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+        "id": "passwords",
+        "path": "cheatsheets/Password_Storage_Cheat_Sheet.md",
+        "sha256": "5004d1ead2dfa8270df8be7789c9decb39746261639ddf271e24ba1ac68b32a1",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "datatype",
-        "path": "doc/src/sgml/datatype.sgml",
-        "sha256": "5bb18e295745da6d8dc8d3b85a6b97d4bb8c3ad313f23489b6938f7cf2ae31d2",
+        "id": "authentication",
+        "path": "cheatsheets/Authentication_Cheat_Sheet.md",
+        "sha256": "92f7483b28548679917a329c7b9be1824f33e934d9eed670aaf3e9a1e7b37e83",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "queries",
-        "path": "doc/src/sgml/queries.sgml",
-        "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+        "id": "sessions",
+        "path": "cheatsheets/Session_Management_Cheat_Sheet.md",
+        "sha256": "c6dfdd81905de29eb149fa3826fa803da38e37f186b309dbdc85000c732aa514",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "indexes",
-        "path": "doc/src/sgml/indices.sgml",
-        "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+        "id": "recovery",
+        "path": "cheatsheets/Forgot_Password_Cheat_Sheet.md",
+        "sha256": "c3cc207d452c280cfc1a660eecdbc3cc4def29903da1aef10b3095607a4472dc",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "transactions",
-        "path": "doc/src/sgml/advanced.sgml",
-        "sha256": "5010d701eaa5e07d144f1271b521d51f39d769e73a23a8d55411aee179f28668",
+        "id": "mfa",
+        "path": "cheatsheets/Multifactor_Authentication_Cheat_Sheet.md",
+        "sha256": "aa0c03c9d10c1facfaef0ace5f61536aab46e2a8ea409cf8527086d0d11132f2",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "mvcc",
-        "path": "doc/src/sgml/mvcc.sgml",
-        "sha256": "b0dafb2a3fd2d9204deb075ed2cb2d74b6496523bb5d4867a2f4a3d9758a6314",
+        "id": "authorization",
+        "path": "cheatsheets/Authorization_Cheat_Sheet.md",
+        "sha256": "fb8b6e5c60ed783025beefb5049142fd9da02d01f5c95de18a19d26479737975",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "input",
+        "path": "cheatsheets/Input_Validation_Cheat_Sheet.md",
+        "sha256": "163390e3dcf5cc965aeac5e633692682403c08067a7f2ae54bdb49372e886810",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "sql",
+        "path": "cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md",
+        "sha256": "6c377eef95804d03ed29c27b8002a1d714ced833dfc651e1ee69ccf4abdadd6b",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "xss",
+        "path": "cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.md",
+        "sha256": "e4bbeced6010bb9029061910e97f01f4391cb8b89d1a0f31a390ca5a00a5e9a8",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "csrf",
+        "path": "cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md",
+        "sha256": "fb6fb6a43e11dd0ae2709ddcad06ee3682ebc55fef4b8f7bc89e4852d0ba0ff4",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "rest",
+        "path": "cheatsheets/REST_Security_Cheat_Sheet.md",
+        "sha256": "3e2959541004f37a28d47ea1f742f30f46d06a331317eb4d9371617f2ad7a704",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "secrets",
+        "path": "cheatsheets/Secrets_Management_Cheat_Sheet.md",
+        "sha256": "c7b67badc6e5990da90d1942f48b73e6e354f157de9b4eee56381cf4a906ae61",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "logging",
+        "path": "cheatsheets/Logging_Cheat_Sheet.md",
+        "sha256": "55ed0b4e9b2a68dba0f5a26c817a20760632d91b315aa42bb33ecfe36cc7195d",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -1093,6 +1233,91 @@
           "id": "mvcc",
           "path": "doc/src/sgml/mvcc.sgml",
           "sha256": "b0dafb2a3fd2d9204deb075ed2cb2d74b6496523bb5d4867a2f4a3d9758a6314",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "api-security-auth",
+      "repository": "https://github.com/OWASP/CheatSheetSeries",
+      "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
+      "references": [
+        {
+          "id": "passwords",
+          "path": "cheatsheets/Password_Storage_Cheat_Sheet.md",
+          "sha256": "5004d1ead2dfa8270df8be7789c9decb39746261639ddf271e24ba1ac68b32a1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "authentication",
+          "path": "cheatsheets/Authentication_Cheat_Sheet.md",
+          "sha256": "92f7483b28548679917a329c7b9be1824f33e934d9eed670aaf3e9a1e7b37e83",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sessions",
+          "path": "cheatsheets/Session_Management_Cheat_Sheet.md",
+          "sha256": "c6dfdd81905de29eb149fa3826fa803da38e37f186b309dbdc85000c732aa514",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "recovery",
+          "path": "cheatsheets/Forgot_Password_Cheat_Sheet.md",
+          "sha256": "c3cc207d452c280cfc1a660eecdbc3cc4def29903da1aef10b3095607a4472dc",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mfa",
+          "path": "cheatsheets/Multifactor_Authentication_Cheat_Sheet.md",
+          "sha256": "aa0c03c9d10c1facfaef0ace5f61536aab46e2a8ea409cf8527086d0d11132f2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "authorization",
+          "path": "cheatsheets/Authorization_Cheat_Sheet.md",
+          "sha256": "fb8b6e5c60ed783025beefb5049142fd9da02d01f5c95de18a19d26479737975",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "input",
+          "path": "cheatsheets/Input_Validation_Cheat_Sheet.md",
+          "sha256": "163390e3dcf5cc965aeac5e633692682403c08067a7f2ae54bdb49372e886810",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sql",
+          "path": "cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md",
+          "sha256": "6c377eef95804d03ed29c27b8002a1d714ced833dfc651e1ee69ccf4abdadd6b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "xss",
+          "path": "cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.md",
+          "sha256": "e4bbeced6010bb9029061910e97f01f4391cb8b89d1a0f31a390ca5a00a5e9a8",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "csrf",
+          "path": "cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md",
+          "sha256": "fb6fb6a43e11dd0ae2709ddcad06ee3682ebc55fef4b8f7bc89e4852d0ba0ff4",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "rest",
+          "path": "cheatsheets/REST_Security_Cheat_Sheet.md",
+          "sha256": "3e2959541004f37a28d47ea1f742f30f46d06a331317eb4d9371617f2ad7a704",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "secrets",
+          "path": "cheatsheets/Secrets_Management_Cheat_Sheet.md",
+          "sha256": "c7b67badc6e5990da90d1942f48b73e6e354f157de9b4eee56381cf4a906ae61",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "logging",
+          "path": "cheatsheets/Logging_Cheat_Sheet.md",
+          "sha256": "55ed0b4e9b2a68dba0f5a26c817a20760632d91b315aa42bb33ecfe36cc7195d",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

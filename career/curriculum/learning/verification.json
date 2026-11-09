@@ -603,29 +603,115 @@
       "lessons": 9,
       "questions": 56,
       "human_approved": false
+    },
+    {
+      "id": "rest-api-design",
+      "version": 1,
+      "course_hash": "267257cbb36c9f6d5165764dec02ba9e73d3b460d1954d595ec058afa24a3c58",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "rest-resources",
+          "code_hash": "4871b5ca19e87279c93c8b48446b4c9d090f4edf5d5017122ab96d70186e816e",
+          "ran": true,
+          "ok": true,
+          "output": "201\n{\"id\": \"cancel-1\", \"order_id\": \"ord-7\", \"status\": \"requested\"}\nplaced"
+        },
+        {
+          "id": "rest-pagination",
+          "code_hash": "3e0cbd0b59663d74cad74caec0510fe12313c8765ca810b21fed410ca544242b",
+          "ran": true,
+          "ok": true,
+          "output": "[12, 13]\n2"
+        },
+        {
+          "id": "rest-errors",
+          "code_hash": "4337bfcd2cc936297ba651b308fbabd75962643148f27c5c6fe4626bcff7f0e3",
+          "ran": true,
+          "ok": true,
+          "output": "{\"code\": \"out_of_stock\", \"request_id\": \"req-demo-4\", \"status\": 409, \"title\": \"Conflict\", \"type\": \"about:blank\"}"
+        },
+        {
+          "id": "rest-validation",
+          "code_hash": "19fe5e0b53c1430ee0071d15bd3d4598749460a0f80f7c6f4986ee78bbffc5d6",
+          "ran": true,
+          "ok": true,
+          "output": "[]\n['unknown_field', 'quantity']"
+        },
+        {
+          "id": "rest-data-contracts",
+          "code_hash": "97edcd63758f0860c266124c629c258c1159ac2f7b167e943765c384ee524219",
+          "ran": true,
+          "ok": true,
+          "output": "1230\ninvalid_amount\ninvalid_amount"
+        },
+        {
+          "id": "rest-openapi-versioning",
+          "code_hash": "78bacc1412192a98126ffbcdde1fb08985a54e295a5df1baa55f9939e17c06f6",
+          "ran": true,
+          "ok": true,
+          "output": "3.1.1\n['200', '404']"
+        },
+        {
+          "id": "rest-idempotency",
+          "code_hash": "d7319730a69d4aa4543ef75acd18a5046e0bc1d9192b21247500ca5ab3f80a75",
+          "ran": true,
+          "ok": true,
+          "output": "payment-1\npayment-1\npayload_conflict\n1"
+        },
+        {
+          "id": "rest-deadlines-limits",
+          "code_hash": "bbf81febebc9c34901a41e2ee72017de63c646f96564db155ea6b3eaa8a459a5",
+          "ran": true,
+          "ok": true,
+          "output": "retry_after 1\nretry_after 2\nstop 3\nbudget 5"
+        },
+        {
+          "id": "rest-cache-concurrency",
+          "code_hash": "e0f416a5171bfea6ef85c672ecf033756d46ac705fbf9a3ec68bb9ffb1fa8b80",
+          "ran": true,
+          "ok": true,
+          "output": "412\nCurrent\n200\n3"
+        },
+        {
+          "id": "rest-webhooks",
+          "code_hash": "95c479ee08ec2a231375d59b8f4dc27f9e5b887c8c4c9e3026afdc1b667f9907",
+          "ran": true,
+          "ok": true,
+          "output": "applied duplicate older\ndelivered"
+        },
+        {
+          "id": "rest-partial-failures",
+          "code_hash": "349f1a4fbaffa156777ec00653508660a19124f0281a99f9116120a941c57719",
+          "ran": true,
+          "ok": true,
+          "output": "compensation_pending\nrequest_refund\nconfirmed"
+        },
+        {
+          "id": "rest-secrets-contract",
+          "code_hash": "30f345f185daa3a6b93c90fae3da35341c8d9e715e5a9d8266e541fb0ed06248",
+          "ran": true,
+          "ok": true,
+          "output": "{\"method\": \"POST\", \"path\": \"/orders\", \"request_id\": \"req-demo-12\", \"status\": 201}"
+        }
+      ],
+      "objectives": 10,
+      "covered": 10,
+      "lessons": 12,
+      "questions": 76,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/httpwg/http-core",
-    "commit": "bde37f634681bd5462568b73aa722af9c9a3ef5e",
+    "repository": "https://github.com/OAI/OpenAPI-Specification",
+    "commit": "69d8b7953c3259e243cf746388a0951b89649763",
     "references": [
       {
-        "id": "semantics",
-        "path": "rfc9110.xml",
-        "sha256": "22797e1c392d3a08cca9dca4d8affd7f3461fe574b333658c97b397627efb4d1",
-        "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "cache",
-        "path": "rfc9111.xml",
-        "sha256": "800d7f7c39dbe9b580c5d1bac28bd6328e396d66608a25c8bc9c1f78b6da5a25",
-        "checked_by": "official Git object and path inspection"
-      },
-      {
-        "id": "messaging",
-        "path": "rfc9112.xml",
-        "sha256": "92dcc8785c82d98d27a4af726fe9b29f002d524c316c1a316d32249fbf218247",
-        "checked_by": "official Git object and path inspection"
+        "id": "openapi",
+        "path": "versions/3.1.1.md",
+        "sha256": "a612d2b72d422925616b2cabfa7acc0419ffaaf4b0eb42bfb11dc9b804f92749",
+        "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
   },
@@ -639,55 +725,55 @@
           "id": "introduction",
           "path": "Doc/tutorial/introduction.rst",
           "sha256": "44868375a1505a1d23d2915527fa8941632ccaaf8e6e090d7a3009df73b90d9e",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "controlflow",
           "path": "Doc/tutorial/controlflow.rst",
           "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "datastructures",
           "path": "Doc/tutorial/datastructures.rst",
           "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "errors",
           "path": "Doc/tutorial/errors.rst",
           "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "inputoutput",
           "path": "Doc/tutorial/inputoutput.rst",
           "sha256": "210f867a77f007c622ca3b268c0962fb49550adec8bedea5f7bb2926a6443795",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "modules",
           "path": "Doc/tutorial/modules.rst",
           "sha256": "acae97e5bf4e6393c903ac452c55c610cb1992c150a150785b9aadc87b9a420b",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "functions",
           "path": "Doc/tutorial/controlflow.rst",
           "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "types",
           "path": "Doc/reference/datamodel.rst",
           "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "csv",
           "path": "Doc/library/csv.rst",
           "sha256": "2ebad38f5e1dc4387fa90cbeb105ce1709a8c8ef40a8f9a074930aa9e8c46d21",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
     },
@@ -700,49 +786,49 @@
           "id": "interpreter",
           "path": "Doc/tutorial/interpreter.rst",
           "sha256": "98188481efa72845a44997210be514fc61c5ef9e244655ce1dca23620fad9a7e",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "introduction",
           "path": "Doc/tutorial/introduction.rst",
           "sha256": "44868375a1505a1d23d2915527fa8941632ccaaf8e6e090d7a3009df73b90d9e",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "execution",
           "path": "Doc/reference/executionmodel.rst",
           "sha256": "6fa125c5f6ab34be6b7b34b4b3419d6d92baefce840bd0485dccaac08463ca71",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "memory",
           "path": "Doc/c-api/memory.rst",
           "sha256": "6f7a42ffd90e2a7d328feb1b3fd98d57e829ae978bcf4e588914352bc67554b0",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "numbers",
           "path": "Doc/tutorial/floatingpoint.rst",
           "sha256": "8e648340d27e4ad469e40a53f8b47389d8490a7b10ea828f0bc76186c3863a55",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "control",
           "path": "Doc/tutorial/controlflow.rst",
           "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "collections",
           "path": "Doc/tutorial/datastructures.rst",
           "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "functions",
           "path": "Doc/tutorial/controlflow.rst",
           "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
     },
@@ -755,31 +841,31 @@
           "id": "queries",
           "path": "doc/src/sgml/queries.sgml",
           "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "ddl",
           "path": "doc/src/sgml/ddl.sgml",
           "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "dml",
           "path": "doc/src/sgml/dml.sgml",
           "sha256": "f68c23678292aa2b52e666cb5491018458da3df3437f1fbcd0765e4017220b03",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "comparison",
           "path": "doc/src/sgml/func.sgml",
           "sha256": "b894fa8ef7e7fc448b98d682c12498da71dc56a3c22cd5c799c57254f9e16a6a",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "tutorial",
           "path": "doc/src/sgml/query.sgml",
           "sha256": "f2271a6a63e7d7d63a01e8866d2195287284d1531fe2824e4485eb7c9ce72813",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
     },
@@ -792,19 +878,51 @@
           "id": "semantics",
           "path": "rfc9110.xml",
           "sha256": "22797e1c392d3a08cca9dca4d8affd7f3461fe574b333658c97b397627efb4d1",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "cache",
           "path": "rfc9111.xml",
           "sha256": "800d7f7c39dbe9b580c5d1bac28bd6328e396d66608a25c8bc9c1f78b6da5a25",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
         },
         {
           "id": "messaging",
           "path": "rfc9112.xml",
           "sha256": "92dcc8785c82d98d27a4af726fe9b29f002d524c316c1a316d32249fbf218247",
-          "checked_by": "official Git object and path inspection"
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "rest-api-design",
+      "repository": "https://github.com/httpwg/http-core",
+      "commit": "bde37f634681bd5462568b73aa722af9c9a3ef5e",
+      "references": [
+        {
+          "id": "http-semantics",
+          "path": "rfc9110.xml",
+          "sha256": "22797e1c392d3a08cca9dca4d8affd7f3461fe574b333658c97b397627efb4d1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "http-cache",
+          "path": "rfc9111.xml",
+          "sha256": "800d7f7c39dbe9b580c5d1bac28bd6328e396d66608a25c8bc9c1f78b6da5a25",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "rest-api-design",
+      "repository": "https://github.com/OAI/OpenAPI-Specification",
+      "commit": "69d8b7953c3259e243cf746388a0951b89649763",
+      "references": [
+        {
+          "id": "openapi",
+          "path": "versions/3.1.1.md",
+          "sha256": "a612d2b72d422925616b2cabfa7acc0419ffaaf4b0eb42bfb11dc9b804f92749",
+          "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
     }

@@ -6,7 +6,7 @@ const { BANKS: COMPREHENSIVE_BANKS } = require('../questions');
 const { validateQuestion } = require('../qdsl');
 const { verifyCode } = require('../verify');
 const VERIFIED = require('./verification.json');
-const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http') };
+const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http'), 'rest-api-design': require('./rest') };
 const clone = x => x == null ? x : JSON.parse(JSON.stringify(x));
 const hash = x => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const text = x => typeof x === 'string' && x.trim().length > 0;
@@ -48,6 +48,10 @@ function validate(course, { execute = false, reuseVerified = false } = {}) {
       if(!section||typeof section!=='object'){fail(l.id+': theory sections must be objects.');continue;}
       if(!text(section.heading)||!Array.isArray(section.paragraphs)||!section.paragraphs.length||section.paragraphs.some(p=>!text(p)))fail(l.id+': incomplete theory section.');
       if(section.table&&(!Array.isArray(section.table.headers)||!Array.isArray(section.table.rows)||section.table.rows.some(row=>!Array.isArray(row)||row.length!==section.table.headers.length)))fail(l.id+': malformed table.');
+      if(section.snippet){
+        if(!['json','http'].includes(section.snippet.lang)||!text(section.snippet.code)||section.snippet.code.length>30000)fail(l.id+': invalid JSON/HTTP snippet.');
+        else if(section.snippet.lang==='json'){try{JSON.parse(section.snippet.code);}catch{fail(l.id+': invalid JSON example.');}}
+      }
     }
     const w=l.worked;
     if(!w||!text(w.problem)||!Array.isArray(w.steps)||w.steps.length<3||w.steps.some(s=>!text(s))||!text(w.code)||w.expect==null||!text(w.explanation))fail(l.id+': complete worked problem, steps, code, expected output and explanation required.');
@@ -153,7 +157,7 @@ function createLearning(core) {
     const c=preview?draft(sid):published(sid);if(!c||preview&&validate(c).errors.length)return null;
     const l=c.lessons.find(l=>l.id===id);if(!l)return null;
     const list=ordered(c), index=list.findIndex(l=>l.id===id), mod=c.modules.find(m=>m.id===l.module), base=preview?'#lesson-preview/':'#lesson/';
-    return { id:l.id,title:l.title,version:l.version,objectives:clone(l.objectives),prerequisites:clone(l.prerequisites),prerequisite_note:l.prerequisite_note,video:l.video?{title:l.video.title,url:l.video.url}:null,introduction:l.introduction,sections:l.sections.map(s=>({heading:s.heading,paragraphs:s.paragraphs,...(s.table?{table:s.table}:{}),...(s.diagram?{diagram:s.diagram}:{})})),worked:clone(l.worked),mistakes:l.mistakes,takeaways:l.takeaways,reuse:clone(l?.reuse||[]),minutes:l.minutes,course:{id:sid,title:subtrack(sid).title,prerequisites:subtrack(sid).prereq.map(id=>({id,title:subtrack(id).title})),version:c.version,state:preview?c.state:'published'},
+    return { id:l.id,title:l.title,version:l.version,objectives:clone(l.objectives),prerequisites:clone(l.prerequisites),prerequisite_note:l.prerequisite_note,video:l.video?{title:l.video.title,url:l.video.url}:null,introduction:l.introduction,sections:l.sections.map(s=>({heading:s.heading,paragraphs:s.paragraphs,...(s.table?{table:s.table}:{}),...(s.diagram?{diagram:s.diagram}:{}),...(s.snippet?{snippet:{lang:s.snippet.lang,code:s.snippet.code}}:{})})),worked:clone(l.worked),mistakes:l.mistakes,takeaways:l.takeaways,reuse:clone(l?.reuse||[]),minutes:l.minutes,course:{id:sid,title:subtrack(sid).title,prerequisites:subtrack(sid).prereq.map(id=>({id,title:subtrack(id).title})),version:c.version,state:preview?c.state:'published'},
       references:l.references.map(id=>c.references.find(r=>r.id===id)),quiz_items:l.quiz.length,pass_mark:c.pass_mark,
       previous:index?base+sid+'/'+list[index-1].id:null,next:index+1<list.length?base+sid+'/'+list[index+1].id:null,
       module:{id:mod.id,title:mod.title,lessons:mod.lessons.map(id=>({id,title:c.lessons.find(l=>l.id===id).title,href:base+sid+'/'+id}))},
@@ -248,7 +252,7 @@ function createLearning(core) {
       const missing=path.required.filter(id=>!published(id)||assessmentStatus(id).state!=='published');
       const completion_matrix=path.required.map((id,index)=>{
         const row=subs.find(s=>s.id===id),content=draft(id),review=records()[id]?.review;
-        return {order:index+1,id,title:row.title,prerequisites:row.prerequisites,lessons:row.lessons,lesson_quizzes:row.quizzes,module_checkpoints:row.checkpoint_modules,
+        return {order:index+1,id,title:row.title,prerequisites:row.prerequisites,modules:row.modules,lessons:row.lessons,lesson_quizzes:row.quizzes,module_checkpoints:row.checkpoint_modules,practice_mcqs:row.questions,verified_lesson_examples:row.verified_lesson_examples,validation_errors:row.validation_errors,
           comprehensive_questions:row.comprehensive_questions,comprehensive_state:row.comprehensive.state,automated_complete:row.automated_complete,
           human_review:review?.human_attestation?'approved exact draft':content?'pending':'not authored',published:row.published,remaining:row.missing};
       });

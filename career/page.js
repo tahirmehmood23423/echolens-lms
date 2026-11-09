@@ -34,7 +34,7 @@ ${publicFooter.render()}
 <script src="/js/coderunner.js?v1422"></script>
 <script src="/js/career-ui.js?v3"></script>
 <script src="/js/career-discovery.js?v4"></script>
-<script src="/js/career-learning.js?v1"></script>
+<script src="/js/career-learning.js?v2"></script>
 <script src="/js/career-curriculum.js?v3"></script>
 <script src="/js/career.js?v10"></script>
 </body>

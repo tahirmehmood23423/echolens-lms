@@ -6,10 +6,16 @@ const { BANKS: COMPREHENSIVE_BANKS } = require('../questions');
 const { validateQuestion } = require('../qdsl');
 const { verifyCode } = require('../verify');
 const VERIFIED = require('./verification.json');
-const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http'), 'rest-api-design': require('./rest') };
+const DATABASE_VERIFIED=require('./database-verification.json'),DATABASE_CASES=require('./database-cases');
+const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http'), 'rest-api-design': require('./rest'), 'database-design': require('./database') };
 const clone = x => x == null ? x : JSON.parse(JSON.stringify(x));
 const hash = x => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const text = x => typeof x === 'string' && x.trim().length > 0;
+function databaseEvidence(course){
+ if(course?.id!=='database-design')return null;
+ const checked=(course.lessons||[]).filter(l=>{const fixture=DATABASE_CASES.find(c=>c.id===l.id),e=DATABASE_VERIFIED.cases.find(c=>c.id===l.id);return fixture&&e?.passed&&e.case_hash===hash(fixture)&&e.code_hash===hash({code:l.worked?.code,expect:l.worked?.expect,lang:l.worked?.lang||'python'});});
+ return {engine:DATABASE_VERIFIED.engine,version:DATABASE_VERIFIED.version,verified:checked.length,total:course.lessons?.length||0,native_multi_connection_test:false,storage_crash_test:false};
+}
 const idOK = x => typeof x === 'string' && /^[a-z0-9][a-z0-9.-]{0,120}$/.test(x);
 const https = x => { try { const u=new URL(x); return u.protocol==='https:' && !u.username && !u.password; } catch { return false; } };
 function validate(course, { execute = false, reuseVerified = false } = {}) {
@@ -49,7 +55,7 @@ function validate(course, { execute = false, reuseVerified = false } = {}) {
       if(!text(section.heading)||!Array.isArray(section.paragraphs)||!section.paragraphs.length||section.paragraphs.some(p=>!text(p)))fail(l.id+': incomplete theory section.');
       if(section.table&&(!Array.isArray(section.table.headers)||!Array.isArray(section.table.rows)||section.table.rows.some(row=>!Array.isArray(row)||row.length!==section.table.headers.length)))fail(l.id+': malformed table.');
       if(section.snippet){
-        if(!['json','http'].includes(section.snippet.lang)||!text(section.snippet.code)||section.snippet.code.length>30000)fail(l.id+': invalid JSON/HTTP snippet.');
+        if(!['json','http','sql'].includes(section.snippet.lang)||!text(section.snippet.code)||section.snippet.code.length>30000)fail(l.id+': invalid JSON/HTTP/SQL snippet.');
         else if(section.snippet.lang==='json'){try{JSON.parse(section.snippet.code);}catch{fail(l.id+': invalid JSON example.');}}
       }
     }
@@ -89,6 +95,7 @@ function validate(course, { execute = false, reuseVerified = false } = {}) {
   if(new Set(assigned).size!==assigned.length||course.lessons.some(l=>!assigned.includes(l.id)))fail('Every lesson must occur in exactly one module.');
   const order=course.modules.flatMap(m=>Array.isArray(m.lessons)?m.lessons:[]);
   for(const l of course.lessons)for(const p of Array.isArray(l.prerequisites)?l.prerequisites:[])if(order.indexOf(p)>=order.indexOf(l.id))fail(l.id+': prerequisite is cyclic or out of learning order.');
+  if(execute&&course.id==='database-design'&&databaseEvidence(course).verified!==course.lessons.length)fail('Database examples require matching PostgreSQL/WASM verification; update the reviewed fixtures and run verify:career:database before approval.');
   return {errors,warnings,examples,objectives:objectives.size,covered:covered.size,lessons:course.lessons.length,questions:course.questions.length,human_approved:false};
 }
 function createLearning(core) {
@@ -228,7 +235,7 @@ function createLearning(core) {
         lessons:(d?.lessons||[]).filter(l=>l?.objectives?.some(o=>o?.id===s.id+'.'+q.comp)).map(l=>({id:l.id,href:p?lessonHref(s.id,l.id):null}))}));
       return {id:s.id,title:s.title,outline_state:s.structure_status,prerequisites:s.prereq,
         curriculum:s.modules,modules:s.modules.length,objectives:s.modules.flatMap(m=>m.objectives).length,
-        lessons:d?.lessons.length||0,quizzes:d?.lessons.filter(l=>l?.quiz?.length>=3).length||0,
+        database_verification:d?databaseEvidence(d):null,lessons:d?.lessons.length||0,quizzes:d?.lessons.filter(l=>l?.quiz?.length>=3).length||0,
         checkpoint_modules:d?.modules.filter(m=>m&&d.questions.filter(q=>C.competency(q?.objective)?.module===m.id).length>=d.checkpoint_items).length||0,
         questions:d?.questions.length||0,verified_lesson_examples:exampleCount,
         validated_formative_mcqs:v&&!v.errors.length?d.questions.length:0,
@@ -252,7 +259,7 @@ function createLearning(core) {
       const missing=path.required.filter(id=>!published(id)||assessmentStatus(id).state!=='published');
       const completion_matrix=path.required.map((id,index)=>{
         const row=subs.find(s=>s.id===id),content=draft(id),review=records()[id]?.review;
-        return {order:index+1,id,title:row.title,prerequisites:row.prerequisites,modules:row.modules,lessons:row.lessons,lesson_quizzes:row.quizzes,module_checkpoints:row.checkpoint_modules,practice_mcqs:row.questions,verified_lesson_examples:row.verified_lesson_examples,validation_errors:row.validation_errors,
+        return {order:index+1,id,title:row.title,prerequisites:row.prerequisites,modules:row.modules,lessons:row.lessons,lesson_quizzes:row.quizzes,module_checkpoints:row.checkpoint_modules,practice_mcqs:row.questions,verified_lesson_examples:row.verified_lesson_examples,database_verification:row.database_verification,validation_errors:row.validation_errors,
           comprehensive_questions:row.comprehensive_questions,comprehensive_state:row.comprehensive.state,automated_complete:row.automated_complete,
           human_review:review?.human_attestation?'approved exact draft':content?'pending':'not authored',published:row.published,remaining:row.missing};
       });
@@ -281,4 +288,4 @@ function createLearning(core) {
   }
   return {revision:(id,version)=>(records()[id]?.revisions||[]).find(c=>c.version===Number(version))||null,draft,published,adminView,updateDraft,transition,summary,lesson,progress,visit,start,recommendations,required,dashboard,inventory,validate};
 }
-module.exports={createLearning,validate,BUILTIN,hash};
+module.exports={createLearning,validate,BUILTIN,hash,databaseEvidence};

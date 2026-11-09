@@ -19,7 +19,8 @@
     "validate:career:learning": "node scripts/validate-career-learning.js",
     "inventory:career:learning": "node scripts/career-learning-inventory.js",
     "test:career:learning:browser": "node test/career-learning.browser.cjs",
-    "review:career:learning": "node scripts/build-career-learning-review.js"
+    "review:career:learning": "node scripts/build-career-learning-review.js",
+    "verify:career:database": "node scripts/verify-database-design.cjs"
   },
   "engines": {
     "node": ">=18"

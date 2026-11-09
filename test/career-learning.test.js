@@ -117,7 +117,7 @@ test('missing or unpublished content never yields a broken recommended lesson',(
 });
 test('completion inventory distinguishes 16 free listings, six validated-course subset and zero approved pilot releases',()=>{
  const report=L.inventory(store);assert.equal(report.reconciliation.public_free.length,16);assert.equal(report.reconciliation.trending_subset.length,6);assert.equal(report.totals.subtracks,132);assert.equal(report.totals.objectives,680);
- assert.equal(report.totals.lessons,57);assert.equal(report.totals.formative_mcqs,356);assert.equal(report.totals.automated_complete,5);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
+ assert.equal(report.totals.lessons,69);assert.equal(report.totals.formative_mcqs,432);assert.equal(report.totals.automated_complete,6);assert.equal(report.totals.human_approved,0);assert.equal(report.totals.complete_roles,0);
 });
 test('learning resume appears in the unified dashboard without an enrollment or false onboarding interruption',()=>{
  release();L.visit(user(1),SID,'py-strings');const w=svc.workspace(user(1));assert.equal(w.continue_learning.resume,'#lesson/'+SID+'/py-strings');assert.equal(w.report.curriculum.learning.completed,0);assert.equal(svc.discoveryState(user(1)).show_welcome,false);
@@ -204,7 +204,7 @@ test('REST draft covers the existing canonical contract without duplicating or r
 test('JSON lesson snippets are validated and public projections contain only allowed example fields',async()=>{
  const id='rest-api-design',c=structuredClone(BUILTIN[id]);
  const wire=c.lessons[0].sections[0].snippet.code,[head,body]=wire.split('\r\n\r\n');assert.ok(head.startsWith('POST /orders HTTP/1.1\r\n'));assert.equal(Number(head.match(/Content-Length: (\d+)/)[1]),Buffer.byteLength(body,'utf8'));assert.equal(JSON.parse(body).quantity,2);
- const section=c.lessons[0].sections.find(s=>s.snippet?.lang==='json');section.snippet.code='{invalid';assert.ok(validate(c).errors.some(e=>e.includes('invalid JSON example')));section.snippet={lang:'html',code:'<script>alert(1)</script>'};assert.ok(validate(c).errors.some(e=>e.includes('invalid JSON/HTTP snippet')));
+ const section=c.lessons[0].sections.find(s=>s.snippet?.lang==='json');section.snippet.code='{invalid';assert.ok(validate(c).errors.some(e=>e.includes('invalid JSON example')));section.snippet={lang:'html',code:'<script>alert(1)</script>'};assert.ok(validate(c).errors.some(e=>e.includes('invalid JSON/HTTP/SQL snippet')));
  const draft=structuredClone(BUILTIN[id]);draft.lessons[0].sections[0].snippet.instructor_only='private fixture field';assert.ok(!L.updateDraft(id,draft,3).error);
  for(const action of ['review','approve','publish'])assert.ok(!L.transition(id,action,{attest_human_review:true,notes:'Synthetic REST snippet verification in a disposable fixture, not human content approval.'},3).error);
  const r=await call('career/learning/'+id+'/lessons/rest-resources',null);assert.equal(r.status,200);assert.deepEqual(Object.keys(r.data.sections[0].snippet).sort(),['code','lang']);assert.equal(r.data.questions,undefined);assert.ok(!JSON.stringify(r.data).includes('private fixture field'));
@@ -218,5 +218,22 @@ test('REST beginner, direct mastery, targeted recommendations and fresh final fo
  const fresh=cur.startSubtrack(user(1),id).attempt;assert.equal(fresh.questions.length,30);assert.ok(fresh.questions.some(q=>!first.questions.some(old=>old.id===q.id)));assert.ok(!JSON.stringify(fresh).includes('"answer":'));
  const mix=Object.fromEntries(['easy','medium','hard','advanced'].map(d=>[d,fresh.questions.filter(q=>q.difficulty===d).length]));assert.deepEqual(mix,cur.quota(30,cur.config().mix));assert.ok(fresh.questions.filter(q=>bank.find(b=>b.id===q.id).scenario).length>=21);
  assert.equal(cur.submit(user(1),fresh.id,keys(fresh)).result.outcome,'passed');assert.equal(cur.history(user(1)).length,18);
+ const direct=cur.startSubtrack(user(2),id).attempt;assert.equal(cur.submit(user(2),direct.id,keys(direct)).result.outcome,'passed');assert.equal(L.progress(user(2),id).completed,0);
+});
+
+test('Database Design keeps three canonical modules, covers all objectives and requires distinct human assessment/content review',()=>{
+ const id='database-design',c=BUILTIN[id],v=validate(c),q=BANKS[id].questions;assert.deepEqual(v.errors,[]);assert.deepEqual(v.warnings,[]);assert.equal(c.modules.length,3);assert.equal(c.lessons.length,12);assert.equal(c.questions.length,76);assert.equal(v.covered,6);assert.equal(q.length,90);assert.ok(q.every(x=>x.status==='draft'));assert.equal(cur.assessmentStatus(id).state,'draft');assert.equal(L.summary(user(1),id).available,false);assert.equal(L.transition(id,'publish',{},3).status,409);
+ const {databaseEvidence}=require('../career/curriculum/learning');assert.equal(databaseEvidence(c).verified,12);const altered=structuredClone(c);altered.lessons[0].worked.expect='changed';assert.equal(databaseEvidence(altered).verified,11);
+ const role=L.inventory(store).job_roles.find(r=>r.id==='junior-backend-developer'),row=role.completion_matrix.find(r=>r.id===id);assert.equal(row.modules,3);assert.equal(row.database_verification.verified,12);assert.equal(row.database_verification.native_multi_connection_test,false);assert.equal(role.complete,false);
+ assert.deepEqual(Object.fromEntries(['easy','medium','hard','advanced'].map(d=>[d,q.filter(x=>x.difficulty===d).length])),{easy:18,medium:32,hard:31,advanced:9});assert.equal(q.filter(x=>x.scenario).length,63);
+});
+test('Database Design guided, direct, remediation and fresh assessment paths preserve prior knowledge evidence',()=>{
+ const id='database-design',bank=BANKS[id].questions;cur.setQuestionStatus(id,bank.map(q=>q.id),'reviewed',3);assert.ok(!cur.publishAssessment(id,3).error);
+ for(const action of ['review','approve','publish']){const out=L.transition(id,action,{attest_human_review:true,notes:'Synthetic Database Design test attestation only in a disposable store, never actual human content approval.'},3);assert.ok(!out.error,JSON.stringify(out));}
+ const c=L.published(id),keys=(a,right=()=>true)=>Object.fromEntries(a.questions.map(q=>{const b=c.questions.find(x=>x.id===q.id)||bank.find(x=>x.id===q.id);return [q.id,select(q,b,right(b)?b.answer:(b.answer+1)%4)];}));
+ const first=cur.startSubtrack(user(1),id).attempt;const low=cur.submit(user(1),first.id,keys(first,q=>!['m2.c1','m3.c1'].includes(q.comp))).result;assert.ok(low.learning_areas.flatMap(m=>m.lessons).some(l=>l.id==='db-constraints'));assert.equal(cur.startSubtrack(user(1),id).status,409);
+ for(const m of c.modules){for(const lid of m.lessons){L.visit(user(1),id,lid,true);const a=L.start(user(1),id,'lesson',lid).attempt;assert.ok(a);assert.equal(a.questions.length,3);assert.equal(cur.submit(user(1),a.id,keys(a)).result.outcome,'passed');}const a=L.start(user(1),id,'module',m.id).attempt;assert.equal(a.questions.length,9);assert.equal(cur.submit(user(1),a.id,keys(a)).result.outcome,'passed');}
+ const learned=L.progress(user(1),id);assert.equal(learned.completed,12);assert.equal(learned.learned,true);assert.equal(learned.mastered_by_assessment,false);
+ const fresh=cur.startSubtrack(user(1),id).attempt;assert.ok(fresh.questions.some(q=>!first.questions.some(p=>p.id===q.id)));assert.equal(fresh.questions.length,30);assert.ok(!JSON.stringify(fresh).includes('"answer":'));assert.equal(cur.submit(user(1),fresh.id,keys(fresh)).result.outcome,'passed');assert.equal(cur.history(user(1)).length,17);
  const direct=cur.startSubtrack(user(2),id).attempt;assert.equal(cur.submit(user(2),direct.id,keys(direct)).result.outcome,'passed');assert.equal(L.progress(user(2),id).completed,0);
 });

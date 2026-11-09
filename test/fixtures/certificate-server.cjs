@@ -46,7 +46,8 @@ if (process.env.ECHOLENS_TEST_LEARNING === '1') {
   const http='http-web-architecture';
   cur.setQuestionStatus(http,cur.questions(http).map(q=>q.id),'reviewed',1);
   const publication=cur.publishAssessment(http,1);if(publication.error)throw Error(publication.error);
-  for (const sid of ['programming-foundations','python-fundamentals','sql-fundamentals','http-web-architecture','rest-api-design']) for (const action of ['review','approve','publish']) {
+  const database='database-design';cur.setQuestionStatus(database,cur.questions(database).map(q=>q.id),'reviewed',1);const dbPublication=cur.publishAssessment(database,1);if(dbPublication.error)throw Error(dbPublication.error);
+  for (const sid of ['programming-foundations','python-fundamentals','sql-fundamentals','http-web-architecture','rest-api-design','database-design']) for (const action of ['review','approve','publish']) {
     const out = L.transition(sid, action, { attest_human_review:true, notes:'Synthetic QA attestation for isolated end-to-end testing only; production content still requires actual human review.' }, 1);
     if (out.error) throw Error(out.error);
   }

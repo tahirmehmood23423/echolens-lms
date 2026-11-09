@@ -701,16 +701,144 @@
       "lessons": 12,
       "questions": 76,
       "human_approved": false
+    },
+    {
+      "id": "database-design",
+      "version": 1,
+      "course_hash": "456e6b2cb693e04df294b96193ff6b0c0dcc8ab5195ce394d608df6b54fff12d",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "db-requirements",
+          "code_hash": "90f6cddcea1b655dcf8850e4f1d634e59faa0a9efa7176e96d67a15d3284b9ac",
+          "ran": true,
+          "ok": true,
+          "output": "1, 2; 2, 0"
+        },
+        {
+          "id": "db-relationships",
+          "code_hash": "b6d59c11fc27e081a535e9cbb7afc7e11e985afb728cb458a5794e3add0ba205",
+          "ran": true,
+          "ok": true,
+          "output": "1, 7, 2"
+        },
+        {
+          "id": "db-keys",
+          "code_hash": "6b6d111932de36981f69033f9e2f7680d395302894efbd11f823cde3fb8e1740",
+          "ran": true,
+          "ok": true,
+          "output": "1, CUS-7, new@example.test"
+        },
+        {
+          "id": "db-commerce",
+          "code_hash": "426d94753a8a5d4ee093ff5813ffac696f5d6d6927cd2afc028d9a1c777d5bcf",
+          "ran": true,
+          "ok": true,
+          "output": "10, 2400"
+        },
+        {
+          "id": "db-types",
+          "code_hash": "fa1358edeb2903d33d58515d8fea3ec52ad38f0a22aaffa18060e09483d6f38e",
+          "ran": true,
+          "ok": true,
+          "output": "1, 1230"
+        },
+        {
+          "id": "db-constraints",
+          "code_hash": "a3c130bb013cbc144b7eb279a9443e7d04f2fae9f2fc38482c9366b3f1f204b4",
+          "ran": true,
+          "ok": true,
+          "output": "7, 2"
+        },
+        {
+          "id": "db-referential",
+          "code_hash": "b7ed059238fff50e9dac7caccac5c32a86edb72a3a932583948e0268e21ac025",
+          "ran": true,
+          "ok": true,
+          "output": "1, 0"
+        },
+        {
+          "id": "db-transactions",
+          "code_hash": "7691bc71c819ccec0b84606d1aa1d264722825f742e28ca06144c3282ee3452b",
+          "ran": true,
+          "ok": true,
+          "output": "7, 1"
+        },
+        {
+          "id": "db-dependencies",
+          "code_hash": "1ef39a63e507b923e62146984f95bcd0c2dda000ef8e6b389dac657b2740bd8e",
+          "ran": true,
+          "ok": true,
+          "output": "1, Relational Database Design; 2, Relational Database Design"
+        },
+        {
+          "id": "db-normalize",
+          "code_hash": "c7646d4855c8cac4ca4d2f7a4b6cd7b2ddd894aa454d8d590717209a679dc4dc",
+          "ran": true,
+          "ok": true,
+          "output": "Reliable Data, Amina; Reliable Data, Bilal"
+        },
+        {
+          "id": "db-denormalize-indexes",
+          "code_hash": "5ec063877ae070f3ffb3c367bacbe055c254597e237b3a8dc85e3d69a0d84281",
+          "ran": true,
+          "ok": true,
+          "output": "1; 4"
+        },
+        {
+          "id": "db-evolution-review",
+          "code_hash": "91d415969844c56c2921b8bcbfb12f4faaf2d6dc0d3608bfccabadf5f8df0d96",
+          "ran": true,
+          "ok": true,
+          "output": "1, Amina, Amina"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 12,
+      "questions": 76,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/OAI/OpenAPI-Specification",
-    "commit": "69d8b7953c3259e243cf746388a0951b89649763",
+    "repository": "https://github.com/postgres/postgres",
+    "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
     "references": [
       {
-        "id": "openapi",
-        "path": "versions/3.1.1.md",
-        "sha256": "a612d2b72d422925616b2cabfa7acc0419ffaaf4b0eb42bfb11dc9b804f92749",
+        "id": "ddl",
+        "path": "doc/src/sgml/ddl.sgml",
+        "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "datatype",
+        "path": "doc/src/sgml/datatype.sgml",
+        "sha256": "5bb18e295745da6d8dc8d3b85a6b97d4bb8c3ad313f23489b6938f7cf2ae31d2",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "queries",
+        "path": "doc/src/sgml/queries.sgml",
+        "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "indexes",
+        "path": "doc/src/sgml/indices.sgml",
+        "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "transactions",
+        "path": "doc/src/sgml/advanced.sgml",
+        "sha256": "5010d701eaa5e07d144f1271b521d51f39d769e73a23a8d55411aee179f28668",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "mvcc",
+        "path": "doc/src/sgml/mvcc.sgml",
+        "sha256": "b0dafb2a3fd2d9204deb075ed2cb2d74b6496523bb5d4867a2f4a3d9758a6314",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -922,6 +1050,49 @@
           "id": "openapi",
           "path": "versions/3.1.1.md",
           "sha256": "a612d2b72d422925616b2cabfa7acc0419ffaaf4b0eb42bfb11dc9b804f92749",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "database-design",
+      "repository": "https://github.com/postgres/postgres",
+      "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
+      "references": [
+        {
+          "id": "ddl",
+          "path": "doc/src/sgml/ddl.sgml",
+          "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "datatype",
+          "path": "doc/src/sgml/datatype.sgml",
+          "sha256": "5bb18e295745da6d8dc8d3b85a6b97d4bb8c3ad313f23489b6938f7cf2ae31d2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "queries",
+          "path": "doc/src/sgml/queries.sgml",
+          "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "indexes",
+          "path": "doc/src/sgml/indices.sgml",
+          "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "transactions",
+          "path": "doc/src/sgml/advanced.sgml",
+          "sha256": "5010d701eaa5e07d144f1271b521d51f39d769e73a23a8d55411aee179f28668",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mvcc",
+          "path": "doc/src/sgml/mvcc.sgml",
+          "sha256": "b0dafb2a3fd2d9204deb075ed2cb2d74b6496523bb5d4867a2f4a3d9758a6314",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

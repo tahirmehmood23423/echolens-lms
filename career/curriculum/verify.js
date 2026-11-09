@@ -16,6 +16,7 @@ const SQL_RUNNER = [
   'code = sys.argv[2].strip().rstrip(";")',
   'i = code.rfind(";")',
   'con = sqlite3.connect(":memory:")',
+  'con.execute("PRAGMA foreign_keys = ON")',
   'con.executescript(code[:i + 1])',
   'rows = con.execute(code[i + 1:]).fetchall()',
   'fmt = lambda v: "NULL" if v is None else str(v)',

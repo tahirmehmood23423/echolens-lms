@@ -8,12 +8,16 @@ const report={human_approved:false,published:false,courses:[],official_source:nu
 const roots=arg('--source-roots')?JSON.parse(fs.readFileSync(arg('--source-roots'),'utf8')):{};
 for(const [repo,root] of Object.entries({'python/cpython':sourceRoot,'postgres/postgres':arg('--source-root-postgres'),'httpwg/http-core':arg('--source-root-http'),'OAI/OpenAPI-Specification':arg('--source-root-openapi'),'OWASP/CheatSheetSeries':arg('--source-root-owasp')}))if(root)roots[repo]=root;
 for(const course of Object.values(BUILTIN)) {
-  const result=validate(course,{execute});
+  const result=validate(course,{execute,reuseVerified:process.argv.includes('--reuse-verified')});
   report.courses.push({id:course.id,version:course.version,course_hash:hash(course),...result});
   const groups=new Map();
   for(const ref of course.references){const repo=ref.source?.repo;if(!groups.has(repo))groups.set(repo,[]);groups.get(repo).push(ref);}
   for(const [repo,refs] of groups){
     const courseSourceRoot=roots[repo];if(!courseSourceRoot){if(process.argv.includes('--require-sources'))throw Error('Missing pinned source checkout for '+course.id+': '+repo);continue;}
+    if(refs.every(r=>r.source?.kind==='official-http-snapshot')){
+      const references=refs.map(r=>require('./lib/curriculum-sources.cjs').verifyHttpSnapshot(courseSourceRoot,r,repo));
+      const source={repository:'Official AWS HTTPS documentation',kind:'official-http-snapshot',references};report.official_sources.push({course:course.id,...source});report.official_source=source;continue;
+    }
     const commit=execFileSync('git',['-C',courseSourceRoot,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
     const references=refs.map(r=>{
       if(commit!==r.source.commit)throw Error('Reference checkout does not match the recorded official source commit.');

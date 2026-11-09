@@ -24,6 +24,7 @@ test('batch validation rejects insufficient banks, reused keys and repeated teac
  course.questions[0].id=bank[0].id;assert.ok(checkCourse(course,bank,{validate}).errors.some(e=>e.includes('Repeated assessment id')));
  course.lessons[1].introduction=course.lessons[0].introduction;assert.ok(proseDuplicates([course]).errors.length);
  assert.equal(questionDuplicates([],[ [{id:'a',prompt:'A worker retries 10 jobs after a timeout. What changes?'},{id:'b',prompt:'A worker retries 20 jobs after a timeout. What changes?'}] ]).errors.length,1);
+ assert.equal(questionDuplicates([],[ [{id:'a',prompt:'What does this code print?',code:'print(2 + 3)'},{id:'b',prompt:'What does this code print?',code:'print(2 * 3)'}] ]).errors.length,0);
 });
 test('private batch artifacts cannot escape through a symlink into public assets',()=>{
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'wave-output-'));try{

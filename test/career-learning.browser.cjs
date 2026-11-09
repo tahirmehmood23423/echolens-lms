@@ -106,7 +106,7 @@ const check=(v,msg)=>{assert.ok(v,msg);checks++;};
  const sd=(await api(prior,'career/me/st/subtracks/'+security.id+'/start',{})).attempt;await api(prior,`career/me/st/attempts/${sd.id}/submit`,{answers:answers(sd)});const sdp=(await api(prior,'career/learning/'+security.id)).progress;check(sdp.mastered_by_assessment&&sdp.completed===0,'security direct pass preserves unread status');await securityContext.close();
  }
  // Every curated wave course uses the existing browser and assessment interface.
- for(const sid of require('../career/curriculum/learning/wave1/manifest.json').courses){
+ for(const sid of (process.env.CAREER_LEARNING_WAVE==='2'?require('../career/curriculum/learning/wave2/manifest.json').courses:require('../career/curriculum/learning/registry').ids)){
   const course=BUILTIN[sid],context=await session(5),page=await context.newPage();page.setDefaultTimeout(12000);page.on('pageerror',e=>errors.push(e.message));
   await go(page,'sub/'+sid);check(await page.getByRole('link',{name:'Start Learning',exact:true}).isVisible(),sid+' course overview exposes guided route');await page.getByRole('link',{name:'Start Learning',exact:true}).click();await page.getByRole('link',{name:course.lessons[0].title,exact:true}).click();await page.locator('#clPractice').waitFor();
   check(await page.getByRole('heading',{name:'Worked example',exact:true}).isVisible(),sid+' worked example renders');

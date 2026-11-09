@@ -8,7 +8,7 @@ const { verifyCode } = require('../verify');
 const VERIFIED = require('./verification.json');
 const DATABASE_VERIFIED=require('./database-verification.json'),DATABASE_CASES=require('./database-cases');
 const BUILTIN = { 'python-fundamentals': require('./python'), 'programming-foundations': require('./foundations'), 'sql-fundamentals': require('./sql'), 'http-web-architecture': require('./http'), 'rest-api-design': require('./rest'), 'database-design': require('./database'), 'api-security-auth': require('./security') };
-for(const id of require('./wave1/manifest.json').courses){if(BUILTIN[id]||!C.subtrack(id))throw Error('Invalid or duplicate curated learning entry: '+id);const course=require('./wave1/'+id);if(course.id!==id)throw Error('Learning entry differs from canonical ID: '+id);BUILTIN[id]=course;}
+for(const id of require('./registry').ids){if(BUILTIN[id]||!C.subtrack(id))throw Error('Invalid or duplicate curated learning entry: '+id);const course=require('./wave1/'+id);if(course.id!==id)throw Error('Learning entry differs from canonical ID: '+id);BUILTIN[id]=course;}
 const clone = x => x == null ? x : JSON.parse(JSON.stringify(x));
 const hash = x => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const text = x => typeof x === 'string' && x.trim().length > 0;

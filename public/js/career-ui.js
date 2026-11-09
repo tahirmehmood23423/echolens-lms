@@ -3,6 +3,7 @@
   const escape = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const skeleton = () => '<section class="cx-loading" role="status" aria-label="Loading career details"><span class="cx-skeleton cx-wide"></span><span class="cx-skeleton"></span><div class="cx-loading-grid"><span class="cx-skeleton cx-block"></span><span class="cx-skeleton cx-block"></span><span class="cx-skeleton cx-block"></span></div><span class="sr-only">Loading. Please wait.</span></section>';
   function code(text, lang = '') {
+    if(['python-pandas','python-fastapi'].includes(lang))lang='Python';
     const pattern = /(#[^\n]*|\/\/[^\n]*|--[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:def|return|if|else|elif|for|while|in|import|from|as|class|try|except|raise|with|True|False|None|const|let|function|SELECT|FROM|WHERE|JOIN|ON|GROUP|BY|ORDER|NULL|AND|OR|INSERT|CREATE|TABLE|COUNT|AS|LIMIT|UPDATE|SET|DELETE)\b|\b\d+(?:\.\d+)?\b)/g;
     let at = 0, out = '';
     for (const m of String(text).matchAll(pattern)) {

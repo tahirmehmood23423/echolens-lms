@@ -33,7 +33,7 @@ function questionDuplicates(courses,banks){
  const seen=new Map(),errors=[],warnings=[];
  for(const q of [...courses.flatMap(c=>c.questions),...banks.flat()]){
   // Literal-only variants do not constitute new engineering questions.
-  const signature=norm(q.prompt).replace(/\b\d+(?:\.\d+)?\b/g,'#'),prior=seen.get(signature);
+  const signature=norm(q.prompt).replace(/\b\d+(?:\.\d+)?\b/g,'#')+'|'+String(q.code||'').replace(/\r\n/g,'\n').trim(),prior=seen.get(signature);
   if(prior)errors.push('Repeated question or numeric-only variant: '+prior+' / '+q.id);else seen.set(signature,q.id);
  }
  return {errors,warnings};

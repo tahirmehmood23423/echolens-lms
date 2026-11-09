@@ -5,7 +5,7 @@ const runtime=fs.mkdtempSync(path.join(os.tmpdir(),'career-wave-'));
 require('dotenv').config=()=>({parsed:{}});process.env.DATABASE_URL='';process.env.DB_PATH=path.join(runtime,'store.json');
 const store=require('../store'),C=require('../career/curriculum'),{createCareerService}=require('../career/service');
 const {BUILTIN,validate}=require('../career/curriculum/learning'),{BANKS,APPROVED}=require('../career/curriculum/questions');
-const wave=require('../career/curriculum/learning/wave1/manifest.json').courses,select=require('./helpers/choices.cjs');
+const wave=require('../career/curriculum/learning/registry').ids,select=require('./helpers/choices.cjs');
 let service,cur,L;const user=id=>store.Users.byId(id);
 before(()=>{service=createCareerService(store);cur=service.curriculum;L=cur.learning;});
 beforeEach(()=>{const d=store.allData();d.users=[{id:1,role:'student',profile:{}},{id:2,role:'free',profile:{}},{id:3,role:'admin',profile:{}}];d.settings.career_learning={};d.settings.career_st_config={retake_hours:0};d.settings.career_curriculum={roles:{},subtracks:{}};d.settings.career_st_assess={};d.settings.career_stq=undefined;});

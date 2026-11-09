@@ -29,7 +29,16 @@ function proseDuplicates(courses){
  for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++)if(items[i].tokens.size>=25&&items[j].tokens.size>=25&&similarity(items[i].tokens,items[j].tokens)>.9)warnings.push('Near-duplicate teaching: '+items[i].id+' / '+items[j].id);
  return {errors,warnings};
 }
-function checkCourse(course,bank,{validate,execute=false,previous=null}={}){
+function questionDuplicates(courses,banks){
+ const seen=new Map(),errors=[],warnings=[];
+ for(const q of [...courses.flatMap(c=>c.questions),...banks.flat()]){
+  // Literal-only variants do not constitute new engineering questions.
+  const signature=norm(q.prompt).replace(/\b\d+(?:\.\d+)?\b/g,'#'),prior=seen.get(signature);
+  if(prior)errors.push('Repeated question or numeric-only variant: '+prior+' / '+q.id);else seen.set(signature,q.id);
+ }
+ return {errors,warnings};
+}
+function checkCourse(course,bank,{validate,execute=false,previous=null,historicalBank=false}={}){
  const errors=[],warnings=[],fingerprint=digest({course,bank});
  // A checkpoint can avoid repeated code execution only for exactly matching content.
  const reuse=!!(previous?.fingerprint===fingerprint&&previous?.execution_passed&&previous?.errors?.length===0);
@@ -41,7 +50,10 @@ function checkCourse(course,bank,{validate,execute=false,previous=null}={}){
  for(const objective of C.subtrack(course.id).modules.flatMap(m=>m.objectives))if(bank.filter(q=>course.id+'.'+q.comp===objective.id).length<4)errors.push('Insufficient comprehensive alternatives for objective '+objective.id);
  if(bank.filter(q=>q.scenario).length/Math.max(1,bank.length)<.7)errors.push('Comprehensive bank needs at least 70% scenario items.');
  const positions=[0,1,2,3].map(i=>bank.filter(q=>q.answer===i).length);
- if(positions.some(n=>n/bank.length>.4||n/bank.length<.1))errors.push('Comprehensive answer-position distribution is too predictable.');
+ if(positions.some(n=>n/bank.length>.4||n/bank.length<.1)){
+  if(historicalBank)warnings.push('Historical bank retains its original key positions; verify server-shuffled delivery instead of rewriting published item keys.');
+  else errors.push('New comprehensive answer-position distribution is too predictable.');
+ }
  const ids=new Set(),prompts=new Set();for(const q of [...course.questions,...bank]){if(ids.has(q.id))errors.push('Repeated assessment id: '+q.id);ids.add(q.id);const prompt=norm(q.prompt);if(prompts.has(prompt))errors.push('Repeated formative/formal prompt: '+q.id);prompts.add(prompt);}
  const lessons=new Set(course.lessons.map(l=>l.id)),prerequisites=C.subtrack(course.id)?.prereq||[];
  const examples=reuse?previous.examples:[...result.examples];
@@ -55,4 +67,4 @@ function safeOutput(file,publicRoot=path.resolve(__dirname,'../../public')){
  return target;
 }
 function writeCheckpoint(file,value){const target=safeOutput(file);fs.mkdirSync(path.dirname(target),{recursive:true});const temp=target+'.tmp';fs.writeFileSync(temp,JSON.stringify(value,null,2)+'\n');fs.renameSync(temp,target);}
-module.exports={plan,checkCourse,proseDuplicates,writeCheckpoint,safeOutput,digest};
+module.exports={plan,checkCourse,proseDuplicates,questionDuplicates,writeCheckpoint,safeOutput,digest};

@@ -899,6 +899,160 @@
       "human_approved": false
     },
     {
+      "id": "backend-testing-reliability",
+      "version": 1,
+      "course_hash": "89eab60ab7199d6726287b88745c9f34b21fb88443d17eba9e3a2d62d4169be1",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "btr-unit",
+          "code_hash": "6aafc431436bf4a4573d463370fb88afb8f07b5edd90514dfecacf1b9179a2bc",
+          "ran": true,
+          "ok": true,
+          "output": "3 True"
+        },
+        {
+          "id": "btr-boundaries",
+          "code_hash": "419c409113e123e189f88f2e3549d2d5ce02c6404c551bdacf82826c33452f6f",
+          "ran": true,
+          "ok": true,
+          "output": "200 ['id', 'state'] 1"
+        },
+        {
+          "id": "btr-fixtures",
+          "code_hash": "b8a32f4dfce29d70b0a2a3b73be1cb58c69b9343833166de53fa3a40a5857dd8",
+          "ran": true,
+          "ok": true,
+          "output": "duplicate rejected\nFalse"
+        },
+        {
+          "id": "btr-traces",
+          "code_hash": "6fa5a736e44cb489ca3379518d61afe468b90925ca0a08d63523a631b5d50c37",
+          "ran": true,
+          "ok": true,
+          "output": "ValueError parse_quantity"
+        },
+        {
+          "id": "btr-reproduce",
+          "code_hash": "f310bc934bdfcf4ea11101a91fc74326beda4e48b31467c229116dab48f20065",
+          "ran": true,
+          "ok": true,
+          "output": "True False\n[True, False, False]"
+        },
+        {
+          "id": "btr-isolate",
+          "code_hash": "96a2c02d608929c320b04390d1533b1177b9e4f0b96584e281dbdf0167cdcc6d",
+          "ran": true,
+          "ok": true,
+          "output": "quantity format ValueError\n12"
+        },
+        {
+          "id": "btr-timeouts",
+          "code_hash": "a12c920651900388d71e5d037e2177d5e9640aa0372b8589112d4ddcd5b8d759",
+          "ran": true,
+          "ok": true,
+          "output": "[2, 5, 9]\nTrue"
+        },
+        {
+          "id": "btr-events",
+          "code_hash": "932cbabbfd549ace1366f21bce0dde2bf9ca4fb5535e438e3b233188c75bf1f6",
+          "ran": true,
+          "ok": true,
+          "output": "{\"category\": \"dependency_timeout\", \"duration_ms\": 80, \"request_id\": \"req-demo\"}\nlive True ready False"
+        },
+        {
+          "id": "btr-degrade",
+          "code_hash": "4615c6af5ba938d3bb0fc9d3eee6157147cfb63025b00ca949d387012def8335",
+          "ran": true,
+          "ok": true,
+          "output": "unavailable: optional feature\nfailed: no reservation created\nnormal"
+        }
+      ],
+      "objectives": 7,
+      "covered": 7,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "git-collaboration",
+      "version": 1,
+      "course_hash": "552e08eb7e7f8e4dae3f7bc4d29bd59e1dedb0367417b2a6cb514b6cdd939727",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "git-snapshots",
+          "code_hash": "c9a84fe0c93f1ddcee76b1eeede0808d1e18ba1e313cbd4940f6336009aff099",
+          "ran": true,
+          "ok": true,
+          "output": "first\nsecond"
+        },
+        {
+          "id": "git-branches",
+          "code_hash": "e2dde9406786067ba4a8763fb843ab0c4d004283f6dc28df6b43e1b3d699ad7e",
+          "ran": true,
+          "ok": true,
+          "output": "['base.txt', 'feature.txt', 'guide.txt']"
+        },
+        {
+          "id": "git-history",
+          "code_hash": "48549236386ad7b3ae2f728f82b5c8269460f81905f4e836dfe5cf8a828575dc",
+          "ran": true,
+          "ok": true,
+          "output": "original\n3"
+        },
+        {
+          "id": "git-review",
+          "code_hash": "4b031faf7a051a0b2f20c3457069b7d5296c5eda313cf1874940d73d3089b979",
+          "ran": true,
+          "ok": true,
+          "output": "deadline.txt"
+        },
+        {
+          "id": "git-branch-policy",
+          "code_hash": "edc716753b68bab7c2a81f3eed334efbf1f5c8f3e1e68340f584de4a020ce870",
+          "ran": true,
+          "ok": true,
+          "output": "targeted fix\nrelease"
+        },
+        {
+          "id": "git-protection",
+          "code_hash": "00cd4924790c4f8aa533f3766a1db431bbd7b57abc677056172d294056a7df05",
+          "ran": true,
+          "ok": true,
+          "output": "True\n2"
+        },
+        {
+          "id": "git-ignore",
+          "code_hash": "3502f37376fec513091b597260b71f059ba1a49e153507d582b996265c1e566e",
+          "ran": true,
+          "ok": true,
+          "output": ".env\nTrue"
+        },
+        {
+          "id": "git-secret-response",
+          "code_hash": "543d456558ae663c465718e17fbf4cf1bc3ddd87757f58047dea232dce7b6f14",
+          "ran": true,
+          "ok": true,
+          "output": "True\nremoved"
+        },
+        {
+          "id": "git-messages",
+          "code_hash": "b039a27def277f3158a9aefeaa72f120fb67055745405fd18e4e5a666a103ad4",
+          "ran": true,
+          "ok": true,
+          "output": "Reject expiry equality\nEquality is outside the accepted session interval."
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 81,
+      "human_approved": false
+    },
+    {
       "id": "web-foundations",
       "version": 1,
       "course_hash": "51064b378745841af923b57d11a434448f82ddbe547ad0534cb9ae76c9acd746",
@@ -1495,6 +1649,140 @@
           "id": "logging",
           "path": "cheatsheets/Logging_Cheat_Sheet.md",
           "sha256": "55ed0b4e9b2a68dba0f5a26c817a20760632d91b315aa42bb33ecfe36cc7195d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "backend-testing-reliability",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "unittest",
+          "path": "Doc/library/unittest.rst",
+          "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mock",
+          "path": "Doc/library/unittest.mock.rst",
+          "sha256": "9b912c0c2b1578910613dd8de1b151b0d90101629f08d9ef2e1ddffcea2d31d3",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "traceback",
+          "path": "Doc/library/traceback.rst",
+          "sha256": "3dcf7e034edf016e30f1ae6ddcd10924ed58f137e074edaf24eb66c6f736a90a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "logging",
+          "path": "Doc/library/logging.rst",
+          "sha256": "b84325a6a1594d8398fd45d45b6dee35a6c5fd2bee864a719d700cbc22a50415",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "time",
+          "path": "Doc/library/time.rst",
+          "sha256": "2a4a1bd7ec8206edc5172e84d8d49f66eedb31a48b1bdc55768ee58b8e90cac4",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "errors",
+          "path": "Doc/tutorial/errors.rst",
+          "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "git-collaboration",
+      "repository": "https://github.com/git/git",
+      "commit": "9a2fb147f2c61d0cab52c883e7e26f5b7948e3ed",
+      "references": [
+        {
+          "id": "commit",
+          "path": "Documentation/git-commit.adoc",
+          "sha256": "a338fd260e1b0715564f7a1d7ee3694d99fc8fe863e6fcfe571355ddee10fe1d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "diff",
+          "path": "Documentation/git-diff.adoc",
+          "sha256": "929703cf047c7cfe06f81e397fe77480f7a146e2673dd19208e7b45e65cc8371",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "branch",
+          "path": "Documentation/git-branch.adoc",
+          "sha256": "311fc33c55adc286dcbb5a5120c1c74ea2fc78aec471bd4051154a4aba9006c3",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "merge",
+          "path": "Documentation/git-merge.adoc",
+          "sha256": "8ef01610c3356215cd36ed18acf1fa460a7afbd8ac02b23b75d373b9765cece9",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "switch",
+          "path": "Documentation/git-switch.adoc",
+          "sha256": "af2df19ed0b0c84e3f82210433e6912b0989dc9be271728de4c4ccc5e10701b8",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "log",
+          "path": "Documentation/git-log.adoc",
+          "sha256": "17f65ae61e398c02f4f3f6a79bcc8a7b1dcc3946edc1afa5404a0e01363a852a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "show",
+          "path": "Documentation/git-show.adoc",
+          "sha256": "dea0fc6fbdb0e2e8f81ab38467401e9429413a2f59507a7f7cc6076c80e60061",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "restore",
+          "path": "Documentation/git-restore.adoc",
+          "sha256": "52ce5fdd6921705f570f4042163124764b5c7573596b33abcd569eefc2e196b6",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "revert",
+          "path": "Documentation/git-revert.adoc",
+          "sha256": "63cd3400c56f2c55e61ac2d6048e72c0b700071caabe8d9b337a37d8b180b5fd",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "reset",
+          "path": "Documentation/git-reset.adoc",
+          "sha256": "490ce2009618795279689608b28370f77aac9d509de16573b7ffd8e4364c52f1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "workflows",
+          "path": "Documentation/gitworkflows.adoc",
+          "sha256": "c7543eeddf45f44b96a33064094e0c2555e0ca2ebe4743724142a82b9af3ea13",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "cherry",
+          "path": "Documentation/git-cherry-pick.adoc",
+          "sha256": "252073a4dbc3c6ffdeaba7771fb0d4f63ac418f810a43d9f0b8f4c4372481dd0",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "ignore",
+          "path": "Documentation/gitignore.adoc",
+          "sha256": "11228627cb92a82297766739eee801c82deb39b75fb2b1f42d5d0cdca7f9cd53",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "lsfiles",
+          "path": "Documentation/git-ls-files.adoc",
+          "sha256": "68121e25c1f77931530d6c35605f37d42c9a4175c363d009abf27e6df4c6ab73",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

@@ -2,7 +2,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const C=require('../career/curriculum'),{BUILTIN,validate}=require('../career/curriculum/learning'),{BANKS}=require('../career/curriculum/questions');
-const {plan,checkCourse,proseDuplicates,safeOutput,writeCheckpoint}=require('../scripts/lib/curriculum-wave.cjs');
+const {plan,checkCourse,proseDuplicates,questionDuplicates,safeOutput,writeCheckpoint}=require('../scripts/lib/curriculum-wave.cjs');
 test('batch queue resolves canonical prerequisites once and preserves priority',()=>{
  const done=Object.keys(BUILTIN).filter(id=>!['backend-testing-reliability','git-collaboration'].includes(id)),r=plan(done,{limit:20});
  assert.equal(r.selected[0].id,'backend-testing-reliability');assert.equal(r.selected[1].id,'git-collaboration');
@@ -23,6 +23,7 @@ test('batch validation rejects insufficient banks, reused keys and repeated teac
  const short=checkCourse(course,bank.slice(0,20),{validate});assert.ok(short.errors.some(e=>e.includes('90 distinct')));
  course.questions[0].id=bank[0].id;assert.ok(checkCourse(course,bank,{validate}).errors.some(e=>e.includes('Repeated assessment id')));
  course.lessons[1].introduction=course.lessons[0].introduction;assert.ok(proseDuplicates([course]).errors.length);
+ assert.equal(questionDuplicates([],[ [{id:'a',prompt:'A worker retries 10 jobs after a timeout. What changes?'},{id:'b',prompt:'A worker retries 20 jobs after a timeout. What changes?'}] ]).errors.length,1);
 });
 test('private batch artifacts cannot escape through a symlink into public assets',()=>{
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'wave-output-'));try{

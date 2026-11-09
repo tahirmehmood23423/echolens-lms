@@ -69,6 +69,12 @@ require('../../mailer').notify = async (to, subject) => {
 };
 require('../../ai').enabled = () => false;
 const express = require('express');
+if(process.env.ECHOLENS_TEST_LEARNING==='1'){
+  // Model independent synthetic client networks for a multi-course browser batch.
+  // Production rate limits remain enabled and are still tested per client.
+  const ip=Object.getOwnPropertyDescriptor(express.request,'ip').get;
+  Object.defineProperty(express.request,'ip',{configurable:true,get(){const client=this.headers['x-echolens-test-client'];return typeof client==='string'&&/^synthetic-\d+$/.test(client)?client:ip.call(this);}});
+}
 const listen = express.application.listen;
 express.application.listen = function (...args) {
   const server = listen.apply(this, args);

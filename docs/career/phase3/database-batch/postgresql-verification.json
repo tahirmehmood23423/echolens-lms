@@ -1,0 +1,333 @@
+{
+  "engine": "PostgreSQL via PGlite 0.4.3 (single-process WASM)",
+  "native_multi_connection_test": false,
+  "storage_crash_test": false,
+  "human_approved": false,
+  "published": false,
+  "cases": [
+    {
+      "id": "db-requirements",
+      "case_hash": "2351b5e6b771fa00e137ea82d2718fdc13cf1592e8452f5cc9f861d5c51f96a7",
+      "code_hash": "90f6cddcea1b655dcf8850e4f1d634e59faa0a9efa7176e96d67a15d3284b9ac",
+      "probes": [
+        {
+          "label": "Mandatory owner",
+          "passed": true,
+          "sqlstate": "23502"
+        },
+        {
+          "label": "Referenced student exists",
+          "passed": true,
+          "sqlstate": "23503"
+        }
+      ],
+      "output": "1, 2; 2, 0",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-relationships",
+      "case_hash": "8229784c6a3ed2727fe78518410b59fd0c328f185527142f23258bac9c6eff0f",
+      "code_hash": "b6d59c11fc27e081a535e9cbb7afc7e11e985afb728cb458a5794e3add0ba205",
+      "probes": [
+        {
+          "label": "Reject cross-tenant course reference",
+          "passed": true,
+          "sqlstate": "23503"
+        },
+        {
+          "label": "Reject duplicate enrollment pair",
+          "passed": true,
+          "sqlstate": "23505"
+        }
+      ],
+      "output": "1, 7, 2",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-keys",
+      "case_hash": "bb61bcbd128c727fbea05c224c3b3e7546641d7225c500dedb081ba995333bcb",
+      "code_hash": "6b6d111932de36981f69033f9e2f7680d395302894efbd11f823cde3fb8e1740",
+      "probes": [
+        {
+          "label": "Candidate business key remains unique",
+          "passed": true,
+          "sqlstate": "23505"
+        },
+        {
+          "label": "Primary identity remains unique",
+          "passed": true,
+          "sqlstate": "23505"
+        }
+      ],
+      "output": "1, CUS-7, new@example.test",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-commerce",
+      "case_hash": "78b95c5409ddcb676a3ced8cb1b52d11581770534463b3d7b410d2aee6558eec",
+      "code_hash": "426d94753a8a5d4ee093ff5813ffac696f5d6d6927cd2afc028d9a1c777d5bcf",
+      "probes": [
+        {
+          "label": "Positive line quantity",
+          "passed": true,
+          "sqlstate": "23514"
+        },
+        {
+          "label": "Unique external payment reference",
+          "passed": true,
+          "sqlstate": "23505"
+        },
+        {
+          "label": "Index is not automatically added to every foreign-key child",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "count": 2
+            }
+          ]
+        }
+      ],
+      "output": "10, 2400",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-types",
+      "case_hash": "e2e81cc99de8615c4cb38821ddb9d38eb3b0435ed50b08b7438d26bec57dc3f4",
+      "code_hash": "fa1358edeb2903d33d58515d8fea3ec52ad38f0a22aaffa18060e09483d6f38e",
+      "probes": [
+        {
+          "label": "PostgreSQL numeric scale rounds input",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "amount": "12.35"
+            }
+          ]
+        },
+        {
+          "label": "Nonfinite NaN money rejected",
+          "passed": true,
+          "sqlstate": "23514"
+        },
+        {
+          "label": "Numeric precision overflow",
+          "passed": true,
+          "sqlstate": "22003"
+        },
+        {
+          "label": "timestamptz denotes an instant, not original zone label",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "same_instant": true
+            }
+          ]
+        },
+        {
+          "label": "JSONB extraction uses PostgreSQL semantics",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "channel": "email"
+            }
+          ]
+        },
+        {
+          "label": "PostgreSQL text column type is explicit",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "type": "text"
+            }
+          ]
+        }
+      ],
+      "output": "1, 1230",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-constraints",
+      "case_hash": "2612fc8198ba312d253f125e99ed6de216e4b142439025e9f7ea085f4c8a2960",
+      "code_hash": "a3c130bb013cbc144b7eb279a9443e7d04f2fae9f2fc38482c9366b3f1f204b4",
+      "probes": [
+        {
+          "label": "CHECK accepts unknown unless NOT NULL separately required",
+          "passed": true,
+          "sqlstate": null
+        },
+        {
+          "label": "Reject a false CHECK predicate",
+          "passed": true,
+          "sqlstate": "23514"
+        },
+        {
+          "label": "Partial unique index implements one active loan per copy",
+          "passed": true,
+          "sqlstate": "23505"
+        }
+      ],
+      "output": "7, 2",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-referential",
+      "case_hash": "0ffb952cc1abc4bd6ebb928ae10fb1ecfe29296fff61f89678bdce0c6093b2db",
+      "code_hash": "b7ed059238fff50e9dac7caccac5c32a86edb72a3a932583948e0268e21ac025",
+      "probes": [
+        {
+          "label": "Restrict preserves a referenced order",
+          "passed": true,
+          "sqlstate": "23503"
+        },
+        {
+          "label": "Foreign key rejects a missing order",
+          "passed": true,
+          "sqlstate": "23503"
+        }
+      ],
+      "output": "1, 0",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-transactions",
+      "case_hash": "5dc7acf776b261a09382fc19d017dd1dfd310c506967b1254911ba4e6d6e6ad9",
+      "code_hash": "7691bc71c819ccec0b84606d1aa1d264722825f742e28ca06144c3282ee3452b",
+      "probes": [
+        {
+          "label": "Conditional atomic decrement permits only available units",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "available": 0
+            }
+          ]
+        },
+        {
+          "label": "Two sequential purchase attempts cannot consume two from one",
+          "passed": true,
+          "sqlstate": null,
+          "rows": []
+        },
+        {
+          "label": "Negative stock rejected independently of application",
+          "passed": true,
+          "sqlstate": "23514"
+        }
+      ],
+      "output": "7, 1",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-dependencies",
+      "case_hash": "773d2c99ad0f5ad645ea07427ae61037023be8bc98afa50e0e7c49a0567f7377",
+      "code_hash": "1ef39a63e507b923e62146984f95bcd0c2dda000ef8e6b389dac657b2740bd8e",
+      "probes": [
+        {
+          "label": "One enrollment per student/course candidate key",
+          "passed": true,
+          "sqlstate": "23505"
+        }
+      ],
+      "output": "1, Relational Database Design; 2, Relational Database Design",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-normalize",
+      "case_hash": "a2a2458081de7977682cd132e4c5b5225f5d26c16efa3d72fa9f67b4b536b629",
+      "code_hash": "c7646d4855c8cac4ca4d2f7a4b6cd7b2ddd894aa454d8d590717209a679dc4dc",
+      "probes": [
+        {
+          "label": "Separate authors can exist without a current book",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "count": 3
+            }
+          ]
+        }
+      ],
+      "output": "Reliable Data, Amina; Reliable Data, Bilal",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-denormalize-indexes",
+      "case_hash": "24cddb707ffd15b8897179f493d6299609fd91dd81f800828c44e85e161890d6",
+      "code_hash": "5ec063877ae070f3ffb3c367bacbe055c254597e237b3a8dc85e3d69a0d84281",
+      "probes": [
+        {
+          "label": "PostgreSQL catalog records the intended composite index",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "count": 1
+            }
+          ]
+        },
+        {
+          "label": "A normal secondary index does not imply uniqueness",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "count": 3
+            }
+          ]
+        }
+      ],
+      "output": "1; 4",
+      "worked_passed": true,
+      "passed": true
+    },
+    {
+      "id": "db-evolution-review",
+      "case_hash": "01f3f01e052f3209090e69e9be703b12a30d1c5143b475f09c1c7256e545a703",
+      "code_hash": "91d415969844c56c2921b8bcbfb12f4faaf2d6dc0d3608bfccabadf5f8df0d96",
+      "probes": [
+        {
+          "label": "Old writer can omit the newly optional field during overlap",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "display_name": null
+            }
+          ]
+        },
+        {
+          "label": "New writer can supply both fields during overlap",
+          "passed": true,
+          "sqlstate": null,
+          "rows": [
+            {
+              "name": "Chen",
+              "display_name": "Chen C."
+            }
+          ]
+        }
+      ],
+      "output": "1, Amina, Amina",
+      "worked_passed": true,
+      "passed": true
+    }
+  ],
+  "version": "PostgreSQL 17.5 on wasm32-unknown-linux-gnu, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "passed": true
+}

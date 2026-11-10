@@ -48,7 +48,7 @@ module.exports=build("rag-advanced", [
         "Term evidence can be important for identifiers that a semantic match may blur."
       ],
       [
-        "What does reciprocal rank fusion combine?",
+        "A hybrid retriever returns BM25 scores and cosine similarities on incompatible numeric scales. Which evidence does reciprocal rank fusion combine without treating those raw values as comparable?",
         "Which input quantity does RRF use rather than raw score magnitudes?",
         "Reciprocal ranks",
         "Raw score sums",

@@ -21,7 +21,14 @@
     "responsive-css",
     "frontend-api-security",
     "frontend-quality",
-    "web-deployment-cicd"
+    "web-deployment-cicd",
+    "fullstack-architecture",
+    "feature-eng-evaluation",
+    "agents-tool-calling",
+    "infrastructure-as-code",
+    "reliability-incident-cost",
+    "data-modeling-warehousing",
+    "etl-elt-architecture"
   ],
   "recovered_from_quarantine": [
     "react-fundamentals",

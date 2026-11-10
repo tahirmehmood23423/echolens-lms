@@ -950,7 +950,7 @@ const specs=[
         "A supplier code appears with two effective-date versions. What should matching specify?",
         "The intended date version",
         "Only the first row",
-        "Only the font color",
+        "The version active on today’s refresh date",
         "Only the largest term",
         "Historical rows may both be valid, so the order date and version interval must determine the appropriate contract."
       ],

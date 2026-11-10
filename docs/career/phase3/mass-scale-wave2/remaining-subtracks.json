@@ -1,0 +1,1179 @@
+[
+  {
+    "id": "node-express",
+    "title": "Node.js, Express and Server APIs",
+    "prerequisites": [
+      "js-dom-async",
+      "rest-api-design"
+    ],
+    "careers": [
+      "backend-developer",
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": [
+      "nodejs-developer",
+      "mern-stack-developer",
+      "nextjs-fullstack-developer"
+    ]
+  },
+  {
+    "id": "responsive-css",
+    "title": "Responsive Design and Modern CSS Layout",
+    "prerequisites": [
+      "css-fundamentals"
+    ],
+    "careers": [
+      "frontend-web-developer",
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": [
+      "junior-frontend-developer",
+      "react-developer",
+      "mern-stack-developer"
+    ]
+  },
+  {
+    "id": "react-fundamentals",
+    "title": "React Fundamentals",
+    "prerequisites": [
+      "js-dom-async"
+    ],
+    "careers": [
+      "frontend-web-developer",
+      "full-stack-web-developer",
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "junior-frontend-developer",
+      "react-developer",
+      "typescript-frontend-developer",
+      "mern-stack-developer",
+      "nextjs-fullstack-developer",
+      "python-fullstack-developer",
+      "react-native-developer"
+    ]
+  },
+  {
+    "id": "react-advanced",
+    "title": "Advanced React and State Management",
+    "prerequisites": [
+      "react-fundamentals"
+    ],
+    "careers": [
+      "frontend-web-developer",
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": [
+      "react-developer",
+      "typescript-frontend-developer"
+    ]
+  },
+  {
+    "id": "nextjs-architecture",
+    "title": "Next.js and Modern Frontend Architecture",
+    "prerequisites": [
+      "react-fundamentals",
+      "typescript-fundamentals"
+    ],
+    "careers": [
+      "frontend-web-developer",
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": [
+      "typescript-frontend-developer",
+      "nextjs-fullstack-developer"
+    ]
+  },
+  {
+    "id": "frontend-api-security",
+    "title": "API Integration, Authentication and Frontend Security",
+    "prerequisites": [
+      "js-dom-async"
+    ],
+    "careers": [
+      "frontend-web-developer",
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": [
+      "junior-frontend-developer",
+      "react-developer",
+      "typescript-frontend-developer",
+      "nextjs-fullstack-developer"
+    ]
+  },
+  {
+    "id": "frontend-quality",
+    "title": "Frontend Accessibility, Testing, Performance and Deployment",
+    "prerequisites": [
+      "react-fundamentals"
+    ],
+    "careers": [
+      "frontend-web-developer",
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": [
+      "react-developer",
+      "typescript-frontend-developer"
+    ]
+  },
+  {
+    "id": "fullstack-integration-state",
+    "title": "Frontend-Backend Integration and State Management",
+    "prerequisites": [
+      "react-fundamentals",
+      "node-express"
+    ],
+    "careers": [
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": [
+      "mern-stack-developer",
+      "nextjs-fullstack-developer"
+    ]
+  },
+  {
+    "id": "fullstack-architecture",
+    "title": "Full-Stack Application Architecture",
+    "prerequisites": [
+      "fullstack-integration-state",
+      "database-design"
+    ],
+    "careers": [
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "web-deployment-cicd",
+    "title": "Deployment, CI/CD and Monitoring for Web Apps",
+    "prerequisites": [
+      "backend-deployment-ops"
+    ],
+    "careers": [
+      "full-stack-web-developer"
+    ],
+    "blocking_roles": [
+      "nextjs-fullstack-developer"
+    ]
+  },
+  {
+    "id": "mobile-ui-fundamentals",
+    "title": "Mobile Application and UI Fundamentals",
+    "prerequisites": [
+      "programming-foundations"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "flutter-developer",
+      "android-developer",
+      "react-native-developer"
+    ]
+  },
+  {
+    "id": "dart-programming",
+    "title": "Dart Programming",
+    "prerequisites": [
+      "programming-foundations"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "flutter-developer"
+    ]
+  },
+  {
+    "id": "flutter-fundamentals",
+    "title": "Flutter Fundamentals",
+    "prerequisites": [
+      "dart-programming",
+      "mobile-ui-fundamentals"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "flutter-developer"
+    ]
+  },
+  {
+    "id": "flutter-layout-nav-state",
+    "title": "Flutter Layout, Navigation and State",
+    "prerequisites": [
+      "flutter-fundamentals"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "flutter-developer"
+    ]
+  },
+  {
+    "id": "kotlin-android",
+    "title": "Kotlin and Android Development",
+    "prerequisites": [
+      "programming-foundations",
+      "mobile-ui-fundamentals"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "android-developer"
+    ]
+  },
+  {
+    "id": "react-native",
+    "title": "React Native Development",
+    "prerequisites": [
+      "react-fundamentals",
+      "mobile-ui-fundamentals"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "react-native-developer"
+    ]
+  },
+  {
+    "id": "mobile-apis-networking",
+    "title": "Mobile APIs and Networking",
+    "prerequisites": [
+      "mobile-ui-fundamentals",
+      "http-web-architecture"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "flutter-developer",
+      "android-developer",
+      "react-native-developer"
+    ]
+  },
+  {
+    "id": "mobile-storage",
+    "title": "Local Storage and Databases",
+    "prerequisites": [
+      "mobile-ui-fundamentals"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "flutter-developer",
+      "android-developer",
+      "react-native-developer"
+    ]
+  },
+  {
+    "id": "mobile-auth-security",
+    "title": "Mobile Authentication and Security",
+    "prerequisites": [
+      "mobile-apis-networking"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "mobile-architecture",
+    "title": "Mobile Architecture and Maintainability",
+    "prerequisites": [
+      "mobile-apis-networking"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "android-developer"
+    ]
+  },
+  {
+    "id": "mobile-testing-debugging",
+    "title": "Mobile Testing and Debugging",
+    "prerequisites": [
+      "mobile-ui-fundamentals"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": [
+      "flutter-developer",
+      "android-developer",
+      "react-native-developer"
+    ]
+  },
+  {
+    "id": "mobile-performance-platform",
+    "title": "Performance, Accessibility and Platform Integration",
+    "prerequisites": [
+      "mobile-testing-debugging"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "app-distribution",
+    "title": "App Distribution and Release Management",
+    "prerequisites": [
+      "mobile-ui-fundamentals"
+    ],
+    "careers": [
+      "mobile-app-developer"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "numpy-arrays",
+    "title": "NumPy and Numerical Computing",
+    "prerequisites": [
+      "python-fundamentals"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "junior-ml-engineer",
+      "ai-engineer",
+      "computer-vision-engineer"
+    ]
+  },
+  {
+    "id": "ml-preprocessing",
+    "title": "Data Preprocessing and Leakage Prevention",
+    "prerequisites": [
+      "data-cleaning"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "junior-ml-engineer",
+      "ai-engineer",
+      "computer-vision-engineer"
+    ]
+  },
+  {
+    "id": "ml-fundamentals",
+    "title": "Machine Learning Fundamentals",
+    "prerequisites": [
+      "numpy-arrays",
+      "probability-statistics"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "junior-ml-engineer",
+      "ai-engineer",
+      "computer-vision-engineer"
+    ]
+  },
+  {
+    "id": "supervised-learning",
+    "title": "Supervised Learning and Model Selection",
+    "prerequisites": [
+      "ml-fundamentals",
+      "ml-preprocessing"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "junior-ml-engineer",
+      "ai-engineer",
+      "computer-vision-engineer"
+    ]
+  },
+  {
+    "id": "unsupervised-learning",
+    "title": "Unsupervised Learning and Representation",
+    "prerequisites": [
+      "ml-fundamentals"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "feature-eng-evaluation",
+    "title": "Feature Engineering and Evaluation",
+    "prerequisites": [
+      "supervised-learning"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "junior-ml-engineer",
+      "computer-vision-engineer"
+    ]
+  },
+  {
+    "id": "deep-learning",
+    "title": "Deep Learning and Neural Networks",
+    "prerequisites": [
+      "ml-fundamentals",
+      "math-for-ai"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "ai-engineer",
+      "computer-vision-engineer"
+    ]
+  },
+  {
+    "id": "computer-vision",
+    "title": "Computer Vision Fundamentals",
+    "prerequisites": [
+      "deep-learning"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "computer-vision-engineer"
+    ]
+  },
+  {
+    "id": "nlp-fundamentals",
+    "title": "Natural Language Processing Fundamentals",
+    "prerequisites": [
+      "ml-fundamentals"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "mlops-deployment",
+    "title": "Model Deployment and MLOps",
+    "prerequisites": [
+      "supervised-learning"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "ai-engineer",
+      "computer-vision-engineer"
+    ]
+  },
+  {
+    "id": "responsible-ai-monitoring",
+    "title": "Responsible AI, Monitoring and Reliability",
+    "prerequisites": [
+      "mlops-deployment"
+    ],
+    "careers": [
+      "ai-machine-learning-engineer"
+    ],
+    "blocking_roles": [
+      "ai-engineer"
+    ]
+  },
+  {
+    "id": "rag-advanced",
+    "title": "Advanced RAG, Ranking and Evaluation",
+    "prerequisites": [
+      "rag-fundamentals"
+    ],
+    "careers": [
+      "generative-ai-llm-developer"
+    ],
+    "blocking_roles": [
+      "rag-developer"
+    ]
+  },
+  {
+    "id": "agents-tool-calling",
+    "title": "Tool Calling and AI Agent Fundamentals",
+    "prerequisites": [
+      "prompting-structured-output"
+    ],
+    "careers": [
+      "generative-ai-llm-developer"
+    ],
+    "blocking_roles": [
+      "ai-agent-developer"
+    ]
+  },
+  {
+    "id": "agent-workflows",
+    "title": "Agent Workflows and Orchestration",
+    "prerequisites": [
+      "agents-tool-calling"
+    ],
+    "careers": [
+      "generative-ai-llm-developer"
+    ],
+    "blocking_roles": [
+      "ai-agent-developer"
+    ]
+  },
+  {
+    "id": "llm-security-eval",
+    "title": "LLM Security, Reliability and Evaluation",
+    "prerequisites": [
+      "rag-fundamentals"
+    ],
+    "careers": [
+      "generative-ai-llm-developer"
+    ],
+    "blocking_roles": [
+      "llm-application-developer",
+      "rag-developer",
+      "ai-agent-developer"
+    ]
+  },
+  {
+    "id": "llm-deployment-cost",
+    "title": "LLM Deployment, Monitoring and Cost Optimization",
+    "prerequisites": [
+      "ai-api-integration"
+    ],
+    "careers": [
+      "generative-ai-llm-developer"
+    ],
+    "blocking_roles": [
+      "llm-application-developer"
+    ]
+  },
+  {
+    "id": "spreadsheet-analysis",
+    "title": "Excel and Spreadsheet Analysis",
+    "prerequisites": [
+      "data-business-fundamentals"
+    ],
+    "careers": [
+      "data-analyst-business-intelligence"
+    ],
+    "blocking_roles": [
+      "junior-data-analyst",
+      "powerbi-analyst"
+    ]
+  },
+  {
+    "id": "data-visualization",
+    "title": "Data Visualization Principles",
+    "prerequisites": [
+      "data-business-fundamentals"
+    ],
+    "careers": [
+      "data-analyst-business-intelligence"
+    ],
+    "blocking_roles": [
+      "junior-data-analyst",
+      "sql-analyst",
+      "powerbi-analyst"
+    ]
+  },
+  {
+    "id": "powerbi-modeling",
+    "title": "Power BI and Data Modeling",
+    "prerequisites": [
+      "spreadsheet-analysis",
+      "sql-fundamentals"
+    ],
+    "careers": [
+      "data-analyst-business-intelligence"
+    ],
+    "blocking_roles": [
+      "powerbi-analyst"
+    ]
+  },
+  {
+    "id": "dashboards-reporting",
+    "title": "Interactive Dashboards and Reporting",
+    "prerequisites": [
+      "data-visualization"
+    ],
+    "careers": [
+      "data-analyst-business-intelligence"
+    ],
+    "blocking_roles": [
+      "powerbi-analyst"
+    ]
+  },
+  {
+    "id": "data-storytelling",
+    "title": "Business Decision-Making and Data Storytelling",
+    "prerequisites": [
+      "descriptive-stats-metrics"
+    ],
+    "careers": [
+      "data-analyst-business-intelligence"
+    ],
+    "blocking_roles": [
+      "junior-data-analyst",
+      "sql-analyst",
+      "powerbi-analyst"
+    ]
+  },
+  {
+    "id": "data-modeling-warehousing",
+    "title": "Data Modeling and Warehousing",
+    "prerequisites": [
+      "database-design"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "junior-data-engineer",
+      "etl-developer",
+      "cloud-data-engineer"
+    ]
+  },
+  {
+    "id": "etl-elt-architecture",
+    "title": "ETL/ELT Architecture",
+    "prerequisites": [
+      "sql-fundamentals",
+      "python-fundamentals"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "junior-data-engineer",
+      "etl-developer",
+      "cloud-data-engineer"
+    ]
+  },
+  {
+    "id": "data-transformation-pipelines",
+    "title": "Data Transformation and Pipeline Design",
+    "prerequisites": [
+      "etl-elt-architecture",
+      "advanced-sql"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "junior-data-engineer",
+      "etl-developer",
+      "cloud-data-engineer"
+    ]
+  },
+  {
+    "id": "workflow-orchestration",
+    "title": "Workflow Orchestration",
+    "prerequisites": [
+      "etl-elt-architecture"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "junior-data-engineer",
+      "etl-developer",
+      "cloud-data-engineer"
+    ]
+  },
+  {
+    "id": "data-quality-testing",
+    "title": "Data Quality, Testing and Validation",
+    "prerequisites": [
+      "etl-elt-architecture"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "junior-data-engineer",
+      "etl-developer"
+    ]
+  },
+  {
+    "id": "batch-streaming",
+    "title": "Batch and Streaming Data Processing",
+    "prerequisites": [
+      "data-transformation-pipelines"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "cloud-data-engineer"
+    ]
+  },
+  {
+    "id": "cloud-data-platforms",
+    "title": "Cloud Storage and Data Platforms",
+    "prerequisites": [
+      "etl-elt-architecture"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "cloud-data-engineer"
+    ]
+  },
+  {
+    "id": "data-reliability-recovery",
+    "title": "Monitoring, Reliability and Recovery",
+    "prerequisites": [
+      "workflow-orchestration"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "etl-developer"
+    ]
+  },
+  {
+    "id": "data-governance-security",
+    "title": "Data Governance, Security and Optimization",
+    "prerequisites": [
+      "cloud-data-platforms"
+    ],
+    "careers": [
+      "data-engineer"
+    ],
+    "blocking_roles": [
+      "cloud-data-engineer"
+    ]
+  },
+  {
+    "id": "security-foundations",
+    "title": "Cybersecurity Foundations and Threat Models",
+    "prerequisites": [
+      "computing-os-foundations"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "soc-analyst",
+      "security-analyst",
+      "junior-security-engineer"
+    ]
+  },
+  {
+    "id": "identity-access-control",
+    "title": "Authentication, Authorization and Access Control",
+    "prerequisites": [
+      "security-foundations"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "soc-analyst",
+      "security-analyst",
+      "junior-security-engineer"
+    ]
+  },
+  {
+    "id": "cryptography-secure-comms",
+    "title": "Cryptography and Secure Communication",
+    "prerequisites": [
+      "security-foundations"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "security-analyst",
+      "junior-security-engineer"
+    ]
+  },
+  {
+    "id": "vulnerabilities-defense",
+    "title": "Vulnerabilities and Defensive Security",
+    "prerequisites": [
+      "networking-fundamentals",
+      "security-foundations"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "security-analyst",
+      "junior-security-engineer"
+    ]
+  },
+  {
+    "id": "security-logging-monitoring",
+    "title": "Security Logging and Monitoring",
+    "prerequisites": [
+      "linux-sysadmin",
+      "networking-fundamentals"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "soc-analyst",
+      "security-analyst"
+    ]
+  },
+  {
+    "id": "soc-siem",
+    "title": "Security Operations and SIEM",
+    "prerequisites": [
+      "security-logging-monitoring"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "soc-analyst",
+      "security-analyst"
+    ]
+  },
+  {
+    "id": "incident-response",
+    "title": "Incident Detection and Response",
+    "prerequisites": [
+      "soc-siem"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "soc-analyst",
+      "security-analyst"
+    ]
+  },
+  {
+    "id": "network-endpoint-cloud-security",
+    "title": "Network, Endpoint and Cloud Security",
+    "prerequisites": [
+      "vulnerabilities-defense"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "junior-security-engineer"
+    ]
+  },
+  {
+    "id": "security-grc",
+    "title": "Security Governance, Risk and Compliance",
+    "prerequisites": [
+      "security-foundations"
+    ],
+    "careers": [
+      "cybersecurity-analyst"
+    ],
+    "blocking_roles": [
+      "security-analyst"
+    ]
+  },
+  {
+    "id": "scripting-automation",
+    "title": "Bash/Python Scripting and Automation",
+    "prerequisites": [
+      "linux-sysadmin",
+      "python-fundamentals"
+    ],
+    "careers": [
+      "cybersecurity-analyst",
+      "cloud-devops-engineer"
+    ],
+    "blocking_roles": [
+      "junior-security-engineer",
+      "junior-devops-engineer",
+      "cicd-engineer"
+    ]
+  },
+  {
+    "id": "infrastructure-as-code",
+    "title": "Infrastructure as Code",
+    "prerequisites": [
+      "cloud-aws-foundations"
+    ],
+    "careers": [
+      "cloud-devops-engineer"
+    ],
+    "blocking_roles": [
+      "cloud-engineer",
+      "cicd-engineer"
+    ]
+  },
+  {
+    "id": "kubernetes",
+    "title": "Kubernetes and Container Orchestration",
+    "prerequisites": [
+      "docker-containers"
+    ],
+    "careers": [
+      "cloud-devops-engineer"
+    ],
+    "blocking_roles": [
+      "cicd-engineer"
+    ]
+  },
+  {
+    "id": "observability",
+    "title": "Monitoring, Logging and Observability",
+    "prerequisites": [
+      "linux-sysadmin"
+    ],
+    "careers": [
+      "cloud-devops-engineer"
+    ],
+    "blocking_roles": [
+      "junior-devops-engineer",
+      "cloud-engineer",
+      "cicd-engineer"
+    ]
+  },
+  {
+    "id": "reliability-incident-cost",
+    "title": "Reliability, Incident Management and Cost Optimization",
+    "prerequisites": [
+      "observability"
+    ],
+    "careers": [
+      "cloud-devops-engineer"
+    ],
+    "blocking_roles": [
+      "cloud-engineer"
+    ]
+  },
+  {
+    "id": "playwright-automation",
+    "title": "Playwright/Selenium Fundamentals",
+    "prerequisites": [
+      "js-fundamentals",
+      "web-api-testing"
+    ],
+    "careers": [
+      "software-qa-test-automation"
+    ],
+    "blocking_roles": [
+      "automation-qa-engineer"
+    ]
+  },
+  {
+    "id": "automation-frameworks",
+    "title": "Automation Frameworks and Test Architecture",
+    "prerequisites": [
+      "playwright-automation"
+    ],
+    "careers": [
+      "software-qa-test-automation"
+    ],
+    "blocking_roles": [
+      "automation-qa-engineer"
+    ]
+  },
+  {
+    "id": "ci-test-reporting",
+    "title": "CI/CD Integration and Test Reporting",
+    "prerequisites": [
+      "automation-frameworks",
+      "git-collaboration"
+    ],
+    "careers": [
+      "software-qa-test-automation"
+    ],
+    "blocking_roles": [
+      "automation-qa-engineer"
+    ]
+  },
+  {
+    "id": "performance-quality-engineering",
+    "title": "Performance, Reliability and Quality Engineering",
+    "prerequisites": [
+      "web-api-testing"
+    ],
+    "careers": [
+      "software-qa-test-automation"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "oop-principles",
+    "title": "Object-Oriented Programming",
+    "prerequisites": [
+      "programming-foundations"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": [
+      "junior-software-engineer",
+      "python-software-developer",
+      "java-software-developer"
+    ]
+  },
+  {
+    "id": "java-fundamentals",
+    "title": "Java Fundamentals",
+    "prerequisites": [
+      "programming-foundations"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": [
+      "java-software-developer"
+    ]
+  },
+  {
+    "id": "complexity-analysis",
+    "title": "Algorithm Analysis and Complexity",
+    "prerequisites": [
+      "programming-foundations"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": [
+      "junior-software-engineer",
+      "python-software-developer",
+      "java-software-developer"
+    ]
+  },
+  {
+    "id": "arrays-strings-hashing",
+    "title": "Arrays, Strings and Hashing",
+    "prerequisites": [
+      "complexity-analysis"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": [
+      "junior-software-engineer",
+      "python-software-developer",
+      "java-software-developer"
+    ]
+  },
+  {
+    "id": "linear-structures",
+    "title": "Linked Lists, Stacks and Queues",
+    "prerequisites": [
+      "complexity-analysis"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": [
+      "junior-software-engineer",
+      "python-software-developer",
+      "java-software-developer"
+    ]
+  },
+  {
+    "id": "recursion-backtracking",
+    "title": "Recursion and Backtracking",
+    "prerequisites": [
+      "complexity-analysis"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "searching-sorting",
+    "title": "Searching and Sorting",
+    "prerequisites": [
+      "complexity-analysis"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": [
+      "junior-software-engineer",
+      "python-software-developer",
+      "java-software-developer"
+    ]
+  },
+  {
+    "id": "trees-bst",
+    "title": "Trees and Binary Search Trees",
+    "prerequisites": [
+      "recursion-backtracking"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "graphs",
+    "title": "Graphs and Traversal Algorithms",
+    "prerequisites": [
+      "linear-structures",
+      "recursion-backtracking"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "greedy-dp",
+    "title": "Greedy Algorithms and Dynamic Programming",
+    "prerequisites": [
+      "recursion-backtracking"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": []
+  },
+  {
+    "id": "debugging-testing",
+    "title": "Debugging and Software Testing",
+    "prerequisites": [
+      "programming-foundations"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": [
+      "junior-software-engineer",
+      "python-software-developer",
+      "java-software-developer"
+    ]
+  },
+  {
+    "id": "software-design",
+    "title": "Software Design Principles and Maintainability",
+    "prerequisites": [
+      "oop-principles"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": [
+      "junior-software-engineer",
+      "python-software-developer",
+      "java-software-developer"
+    ]
+  },
+  {
+    "id": "engineering-problem-solving",
+    "title": "Technical Problem Solving and Engineering Decisions",
+    "prerequisites": [
+      "complexity-analysis"
+    ],
+    "careers": [
+      "software-engineering-dsa"
+    ],
+    "blocking_roles": []
+  }
+]

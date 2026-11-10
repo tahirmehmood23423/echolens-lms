@@ -1,3 +1,5 @@
+The latest [resumed mass-scale wave](mass-scale-wave2/README.md) records 48 authored drafts and the exact continuation state.
+
 # Phase 3: content engine and first two authoring batches
 
 This is the original two-draft batch report. The [mass-scale foundation wave](mass-scale-wave1/README.md) contains the latest 24-draft inventory, 12-career matrix and exact continuation checkpoint. The [API Security batch](security-batch/README.md) contains the latest seven-draft inventory, validation and nine-subtrack completion matrix. The [Database Design batch](database-batch/README.md) contains the latest six-draft inventory and junior-role matrix. See the [REST API Design batch](rest-batch/README.md) for the latest five-draft counts and junior-role matrix. The [junior backend / HTTP batch report](backend-pathway/README.md) contains the current role matrix and latest cumulative counts. See the [subsequent SQL batch report](sql-batch/README.md) for the latest cumulative inventory and validation.

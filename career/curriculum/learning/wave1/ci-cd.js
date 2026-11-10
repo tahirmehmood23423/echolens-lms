@@ -958,12 +958,12 @@ const data=[
     ],
     "practice": [
       [
-        "What is a canary rollout?",
-        "Observed limited traffic exposure",
-        "Immediate replacement of all users",
-        "An automatic database restore",
-        "A mandatory duplicate full environment",
-        "Canaries reduce initial exposure while collecting evidence."
+        "A canary breaches its error threshold. What should the pipeline do before increasing traffic?",
+        "Block the next promotion",
+        "Expand to all users",
+        "Discard canary telemetry",
+        "Skip the recovery decision",
+        "A failing canary should stop further exposure while owners investigate and apply reviewed recovery rules."
       ],
       [
         "What is a rolling deployment?",

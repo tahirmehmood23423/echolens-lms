@@ -1,0 +1,98 @@
+[
+  {
+    "id": "python-fundamentals",
+    "unchanged": true
+  },
+  {
+    "id": "programming-foundations",
+    "unchanged": true
+  },
+  {
+    "id": "sql-fundamentals",
+    "unchanged": true
+  },
+  {
+    "id": "http-web-architecture",
+    "unchanged": true
+  },
+  {
+    "id": "rest-api-design",
+    "unchanged": true
+  },
+  {
+    "id": "database-design",
+    "unchanged": true
+  },
+  {
+    "id": "api-security-auth",
+    "unchanged": true
+  },
+  {
+    "id": "backend-testing-reliability",
+    "unchanged": true
+  },
+  {
+    "id": "git-collaboration",
+    "unchanged": true
+  },
+  {
+    "id": "web-foundations",
+    "unchanged": true
+  },
+  {
+    "id": "computing-os-foundations",
+    "unchanged": true
+  },
+  {
+    "id": "ai-api-integration",
+    "unchanged": true
+  },
+  {
+    "id": "sdlc-foundations",
+    "unchanged": true
+  },
+  {
+    "id": "networking-fundamentals",
+    "unchanged": true
+  },
+  {
+    "id": "html-semantic",
+    "unchanged": true
+  },
+  {
+    "id": "qa-principles",
+    "unchanged": true
+  },
+  {
+    "id": "llm-fundamentals",
+    "unchanged": true
+  },
+  {
+    "id": "math-for-ai",
+    "unchanged": true
+  },
+  {
+    "id": "probability-statistics",
+    "unchanged": true
+  },
+  {
+    "id": "data-business-fundamentals",
+    "unchanged": true
+  },
+  {
+    "id": "test-design",
+    "unchanged": true
+  },
+  {
+    "id": "css-fundamentals",
+    "unchanged": true
+  },
+  {
+    "id": "linux-sysadmin",
+    "unchanged": true
+  },
+  {
+    "id": "python-intermediate-oop",
+    "unchanged": true
+  }
+]

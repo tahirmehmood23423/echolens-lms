@@ -1,0 +1,2367 @@
+[
+  {
+    "id": "junior-frontend-developer",
+    "title": "Junior Frontend Developer",
+    "career": "frontend-web-developer",
+    "required_ids": [
+      "programming-foundations",
+      "web-foundations",
+      "html-semantic",
+      "css-fundamentals",
+      "responsive-css",
+      "js-fundamentals",
+      "js-dom-async",
+      "react-fundamentals",
+      "frontend-api-security",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 10,
+      "authored": 5,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "css-fundamentals",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "responsive-css",
+        "js-fundamentals",
+        "js-dom-async",
+        "react-fundamentals",
+        "frontend-api-security"
+      ],
+      "pending_human_reviews": 5,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 10,
+      "authored": 7,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "css-fundamentals",
+        "js-fundamentals",
+        "js-dom-async",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "responsive-css",
+        "react-fundamentals",
+        "frontend-api-security"
+      ],
+      "pending_human_reviews": 7,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "react-developer",
+    "title": "React Developer",
+    "career": "frontend-web-developer",
+    "required_ids": [
+      "web-foundations",
+      "programming-foundations",
+      "html-semantic",
+      "css-fundamentals",
+      "responsive-css",
+      "js-fundamentals",
+      "js-dom-async",
+      "react-fundamentals",
+      "react-advanced",
+      "frontend-api-security",
+      "frontend-quality",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 12,
+      "authored": 5,
+      "authored_ids": [
+        "web-foundations",
+        "programming-foundations",
+        "html-semantic",
+        "css-fundamentals",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "responsive-css",
+        "js-fundamentals",
+        "js-dom-async",
+        "react-fundamentals",
+        "react-advanced",
+        "frontend-api-security",
+        "frontend-quality"
+      ],
+      "pending_human_reviews": 5,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 12,
+      "authored": 7,
+      "authored_ids": [
+        "web-foundations",
+        "programming-foundations",
+        "html-semantic",
+        "css-fundamentals",
+        "js-fundamentals",
+        "js-dom-async",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "responsive-css",
+        "react-fundamentals",
+        "react-advanced",
+        "frontend-api-security",
+        "frontend-quality"
+      ],
+      "pending_human_reviews": 7,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "typescript-frontend-developer",
+    "title": "TypeScript Frontend Developer",
+    "career": "frontend-web-developer",
+    "required_ids": [
+      "programming-foundations",
+      "web-foundations",
+      "html-semantic",
+      "js-fundamentals",
+      "js-dom-async",
+      "typescript-fundamentals",
+      "react-fundamentals",
+      "react-advanced",
+      "nextjs-architecture",
+      "frontend-api-security",
+      "frontend-quality",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 12,
+      "authored": 4,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "js-fundamentals",
+        "js-dom-async",
+        "typescript-fundamentals",
+        "react-fundamentals",
+        "react-advanced",
+        "nextjs-architecture",
+        "frontend-api-security",
+        "frontend-quality"
+      ],
+      "pending_human_reviews": 4,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 12,
+      "authored": 7,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "js-fundamentals",
+        "js-dom-async",
+        "typescript-fundamentals",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "react-fundamentals",
+        "react-advanced",
+        "nextjs-architecture",
+        "frontend-api-security",
+        "frontend-quality"
+      ],
+      "pending_human_reviews": 7,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "junior-backend-developer",
+    "title": "Junior Backend Developer",
+    "career": "backend-developer",
+    "required_ids": [
+      "programming-foundations",
+      "python-fundamentals",
+      "http-web-architecture",
+      "rest-api-design",
+      "sql-fundamentals",
+      "database-design",
+      "api-security-auth",
+      "backend-testing-reliability",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 9,
+      "authored": 9,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "http-web-architecture",
+        "rest-api-design",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "backend-testing-reliability",
+        "git-collaboration"
+      ],
+      "missing_ids": [],
+      "pending_human_reviews": 9,
+      "released_subtracks": 0,
+      "authored_complete": true,
+      "released": false
+    },
+    "current": {
+      "required": 9,
+      "authored": 9,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "http-web-architecture",
+        "rest-api-design",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "backend-testing-reliability",
+        "git-collaboration"
+      ],
+      "missing_ids": [],
+      "pending_human_reviews": 9,
+      "released_subtracks": 0,
+      "authored_complete": true,
+      "released": false
+    }
+  },
+  {
+    "id": "python-fastapi-developer",
+    "title": "Python/FastAPI Developer",
+    "career": "backend-developer",
+    "required_ids": [
+      "programming-foundations",
+      "python-fundamentals",
+      "python-intermediate-oop",
+      "http-web-architecture",
+      "rest-api-design",
+      "fastapi-backend",
+      "sql-fundamentals",
+      "database-design",
+      "db-integration-performance",
+      "api-security-auth",
+      "backend-testing-reliability",
+      "backend-deployment-ops",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 13,
+      "authored": 10,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "python-intermediate-oop",
+        "http-web-architecture",
+        "rest-api-design",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "backend-testing-reliability",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "fastapi-backend",
+        "db-integration-performance",
+        "backend-deployment-ops"
+      ],
+      "pending_human_reviews": 10,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 13,
+      "authored": 13,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "python-intermediate-oop",
+        "http-web-architecture",
+        "rest-api-design",
+        "fastapi-backend",
+        "sql-fundamentals",
+        "database-design",
+        "db-integration-performance",
+        "api-security-auth",
+        "backend-testing-reliability",
+        "backend-deployment-ops",
+        "git-collaboration"
+      ],
+      "missing_ids": [],
+      "pending_human_reviews": 13,
+      "released_subtracks": 0,
+      "authored_complete": true,
+      "released": false
+    }
+  },
+  {
+    "id": "nodejs-developer",
+    "title": "Node.js Developer",
+    "career": "backend-developer",
+    "required_ids": [
+      "programming-foundations",
+      "web-foundations",
+      "html-semantic",
+      "python-fundamentals",
+      "js-fundamentals",
+      "js-dom-async",
+      "http-web-architecture",
+      "rest-api-design",
+      "node-express",
+      "sql-fundamentals",
+      "database-design",
+      "api-security-auth",
+      "backend-testing-reliability",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 14,
+      "authored": 11,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "python-fundamentals",
+        "http-web-architecture",
+        "rest-api-design",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "backend-testing-reliability",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "js-fundamentals",
+        "js-dom-async",
+        "node-express"
+      ],
+      "pending_human_reviews": 11,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 14,
+      "authored": 13,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "python-fundamentals",
+        "js-fundamentals",
+        "js-dom-async",
+        "http-web-architecture",
+        "rest-api-design",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "backend-testing-reliability",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "node-express"
+      ],
+      "pending_human_reviews": 13,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "mern-stack-developer",
+    "title": "MERN Stack Developer",
+    "career": "full-stack-web-developer",
+    "required_ids": [
+      "web-foundations",
+      "programming-foundations",
+      "html-semantic",
+      "css-fundamentals",
+      "responsive-css",
+      "js-fundamentals",
+      "js-dom-async",
+      "react-fundamentals",
+      "http-web-architecture",
+      "rest-api-design",
+      "node-express",
+      "api-security-auth",
+      "fullstack-integration-state",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 14,
+      "authored": 8,
+      "authored_ids": [
+        "web-foundations",
+        "programming-foundations",
+        "html-semantic",
+        "css-fundamentals",
+        "http-web-architecture",
+        "rest-api-design",
+        "api-security-auth",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "responsive-css",
+        "js-fundamentals",
+        "js-dom-async",
+        "react-fundamentals",
+        "node-express",
+        "fullstack-integration-state"
+      ],
+      "pending_human_reviews": 8,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 14,
+      "authored": 10,
+      "authored_ids": [
+        "web-foundations",
+        "programming-foundations",
+        "html-semantic",
+        "css-fundamentals",
+        "js-fundamentals",
+        "js-dom-async",
+        "http-web-architecture",
+        "rest-api-design",
+        "api-security-auth",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "responsive-css",
+        "react-fundamentals",
+        "node-express",
+        "fullstack-integration-state"
+      ],
+      "pending_human_reviews": 10,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "nextjs-fullstack-developer",
+    "title": "Next.js Full-Stack Developer",
+    "career": "full-stack-web-developer",
+    "required_ids": [
+      "programming-foundations",
+      "web-foundations",
+      "html-semantic",
+      "http-web-architecture",
+      "js-fundamentals",
+      "js-dom-async",
+      "rest-api-design",
+      "node-express",
+      "backend-deployment-ops",
+      "typescript-fundamentals",
+      "react-fundamentals",
+      "nextjs-architecture",
+      "sql-fundamentals",
+      "database-design",
+      "api-security-auth",
+      "frontend-api-security",
+      "fullstack-integration-state",
+      "web-deployment-cicd",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 19,
+      "authored": 9,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "http-web-architecture",
+        "rest-api-design",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "js-fundamentals",
+        "js-dom-async",
+        "node-express",
+        "backend-deployment-ops",
+        "typescript-fundamentals",
+        "react-fundamentals",
+        "nextjs-architecture",
+        "frontend-api-security",
+        "fullstack-integration-state",
+        "web-deployment-cicd"
+      ],
+      "pending_human_reviews": 9,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 19,
+      "authored": 13,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "http-web-architecture",
+        "js-fundamentals",
+        "js-dom-async",
+        "rest-api-design",
+        "backend-deployment-ops",
+        "typescript-fundamentals",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "node-express",
+        "react-fundamentals",
+        "nextjs-architecture",
+        "frontend-api-security",
+        "fullstack-integration-state",
+        "web-deployment-cicd"
+      ],
+      "pending_human_reviews": 13,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "python-fullstack-developer",
+    "title": "Python Full-Stack Developer",
+    "career": "full-stack-web-developer",
+    "required_ids": [
+      "web-foundations",
+      "programming-foundations",
+      "http-web-architecture",
+      "html-semantic",
+      "css-fundamentals",
+      "js-fundamentals",
+      "js-dom-async",
+      "react-fundamentals",
+      "python-fundamentals",
+      "python-intermediate-oop",
+      "rest-api-design",
+      "fastapi-backend",
+      "sql-fundamentals",
+      "database-design",
+      "api-security-auth",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 16,
+      "authored": 12,
+      "authored_ids": [
+        "web-foundations",
+        "programming-foundations",
+        "http-web-architecture",
+        "html-semantic",
+        "css-fundamentals",
+        "python-fundamentals",
+        "python-intermediate-oop",
+        "rest-api-design",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "js-fundamentals",
+        "js-dom-async",
+        "react-fundamentals",
+        "fastapi-backend"
+      ],
+      "pending_human_reviews": 12,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 16,
+      "authored": 15,
+      "authored_ids": [
+        "web-foundations",
+        "programming-foundations",
+        "http-web-architecture",
+        "html-semantic",
+        "css-fundamentals",
+        "js-fundamentals",
+        "js-dom-async",
+        "python-fundamentals",
+        "python-intermediate-oop",
+        "rest-api-design",
+        "fastapi-backend",
+        "sql-fundamentals",
+        "database-design",
+        "api-security-auth",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "react-fundamentals"
+      ],
+      "pending_human_reviews": 15,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "flutter-developer",
+    "title": "Flutter Developer",
+    "career": "mobile-app-developer",
+    "required_ids": [
+      "programming-foundations",
+      "http-web-architecture",
+      "mobile-ui-fundamentals",
+      "dart-programming",
+      "flutter-fundamentals",
+      "flutter-layout-nav-state",
+      "mobile-apis-networking",
+      "mobile-storage",
+      "mobile-testing-debugging",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 10,
+      "authored": 3,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "mobile-ui-fundamentals",
+        "dart-programming",
+        "flutter-fundamentals",
+        "flutter-layout-nav-state",
+        "mobile-apis-networking",
+        "mobile-storage",
+        "mobile-testing-debugging"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 10,
+      "authored": 3,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "mobile-ui-fundamentals",
+        "dart-programming",
+        "flutter-fundamentals",
+        "flutter-layout-nav-state",
+        "mobile-apis-networking",
+        "mobile-storage",
+        "mobile-testing-debugging"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "android-developer",
+    "title": "Android Developer",
+    "career": "mobile-app-developer",
+    "required_ids": [
+      "programming-foundations",
+      "http-web-architecture",
+      "mobile-ui-fundamentals",
+      "kotlin-android",
+      "mobile-apis-networking",
+      "mobile-storage",
+      "mobile-architecture",
+      "mobile-testing-debugging",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 9,
+      "authored": 3,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "mobile-ui-fundamentals",
+        "kotlin-android",
+        "mobile-apis-networking",
+        "mobile-storage",
+        "mobile-architecture",
+        "mobile-testing-debugging"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 9,
+      "authored": 3,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "mobile-ui-fundamentals",
+        "kotlin-android",
+        "mobile-apis-networking",
+        "mobile-storage",
+        "mobile-architecture",
+        "mobile-testing-debugging"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "react-native-developer",
+    "title": "React Native Developer",
+    "career": "mobile-app-developer",
+    "required_ids": [
+      "programming-foundations",
+      "web-foundations",
+      "html-semantic",
+      "http-web-architecture",
+      "js-fundamentals",
+      "js-dom-async",
+      "react-fundamentals",
+      "mobile-ui-fundamentals",
+      "react-native",
+      "mobile-apis-networking",
+      "mobile-storage",
+      "mobile-testing-debugging",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 13,
+      "authored": 5,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "http-web-architecture",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "js-fundamentals",
+        "js-dom-async",
+        "react-fundamentals",
+        "mobile-ui-fundamentals",
+        "react-native",
+        "mobile-apis-networking",
+        "mobile-storage",
+        "mobile-testing-debugging"
+      ],
+      "pending_human_reviews": 5,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 13,
+      "authored": 7,
+      "authored_ids": [
+        "programming-foundations",
+        "web-foundations",
+        "html-semantic",
+        "http-web-architecture",
+        "js-fundamentals",
+        "js-dom-async",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "react-fundamentals",
+        "mobile-ui-fundamentals",
+        "react-native",
+        "mobile-apis-networking",
+        "mobile-storage",
+        "mobile-testing-debugging"
+      ],
+      "pending_human_reviews": 7,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "junior-ml-engineer",
+    "title": "Junior ML Engineer",
+    "career": "ai-machine-learning-engineer",
+    "required_ids": [
+      "programming-foundations",
+      "python-fundamentals",
+      "probability-statistics",
+      "numpy-arrays",
+      "pandas-fundamentals",
+      "data-cleaning",
+      "ml-preprocessing",
+      "ml-fundamentals",
+      "supervised-learning",
+      "feature-eng-evaluation",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 11,
+      "authored": 4,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "probability-statistics",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "numpy-arrays",
+        "pandas-fundamentals",
+        "data-cleaning",
+        "ml-preprocessing",
+        "ml-fundamentals",
+        "supervised-learning",
+        "feature-eng-evaluation"
+      ],
+      "pending_human_reviews": 4,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 11,
+      "authored": 6,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "probability-statistics",
+        "pandas-fundamentals",
+        "data-cleaning",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "numpy-arrays",
+        "ml-preprocessing",
+        "ml-fundamentals",
+        "supervised-learning",
+        "feature-eng-evaluation"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "ai-engineer",
+    "title": "AI Engineer",
+    "career": "ai-machine-learning-engineer",
+    "required_ids": [
+      "programming-foundations",
+      "python-fundamentals",
+      "pandas-fundamentals",
+      "data-cleaning",
+      "probability-statistics",
+      "math-for-ai",
+      "python-intermediate-oop",
+      "numpy-arrays",
+      "ml-preprocessing",
+      "ml-fundamentals",
+      "supervised-learning",
+      "deep-learning",
+      "mlops-deployment",
+      "responsible-ai-monitoring",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 15,
+      "authored": 6,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "probability-statistics",
+        "math-for-ai",
+        "python-intermediate-oop",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "pandas-fundamentals",
+        "data-cleaning",
+        "numpy-arrays",
+        "ml-preprocessing",
+        "ml-fundamentals",
+        "supervised-learning",
+        "deep-learning",
+        "mlops-deployment",
+        "responsible-ai-monitoring"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 15,
+      "authored": 8,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "pandas-fundamentals",
+        "data-cleaning",
+        "probability-statistics",
+        "math-for-ai",
+        "python-intermediate-oop",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "numpy-arrays",
+        "ml-preprocessing",
+        "ml-fundamentals",
+        "supervised-learning",
+        "deep-learning",
+        "mlops-deployment",
+        "responsible-ai-monitoring"
+      ],
+      "pending_human_reviews": 8,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "computer-vision-engineer",
+    "title": "Computer Vision Engineer",
+    "career": "ai-machine-learning-engineer",
+    "required_ids": [
+      "programming-foundations",
+      "probability-statistics",
+      "python-fundamentals",
+      "numpy-arrays",
+      "ml-fundamentals",
+      "pandas-fundamentals",
+      "data-cleaning",
+      "ml-preprocessing",
+      "supervised-learning",
+      "math-for-ai",
+      "deep-learning",
+      "computer-vision",
+      "feature-eng-evaluation",
+      "mlops-deployment",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 15,
+      "authored": 5,
+      "authored_ids": [
+        "programming-foundations",
+        "probability-statistics",
+        "python-fundamentals",
+        "math-for-ai",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "numpy-arrays",
+        "ml-fundamentals",
+        "pandas-fundamentals",
+        "data-cleaning",
+        "ml-preprocessing",
+        "supervised-learning",
+        "deep-learning",
+        "computer-vision",
+        "feature-eng-evaluation",
+        "mlops-deployment"
+      ],
+      "pending_human_reviews": 5,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 15,
+      "authored": 7,
+      "authored_ids": [
+        "programming-foundations",
+        "probability-statistics",
+        "python-fundamentals",
+        "pandas-fundamentals",
+        "data-cleaning",
+        "math-for-ai",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "numpy-arrays",
+        "ml-fundamentals",
+        "ml-preprocessing",
+        "supervised-learning",
+        "deep-learning",
+        "computer-vision",
+        "feature-eng-evaluation",
+        "mlops-deployment"
+      ],
+      "pending_human_reviews": 7,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "llm-application-developer",
+    "title": "LLM Application Developer",
+    "career": "generative-ai-llm-developer",
+    "required_ids": [
+      "programming-foundations",
+      "http-web-architecture",
+      "python-fundamentals",
+      "ai-api-integration",
+      "llm-fundamentals",
+      "embeddings-semantic-search",
+      "vector-databases",
+      "prompting-structured-output",
+      "rag-fundamentals",
+      "rest-api-design",
+      "llm-security-eval",
+      "llm-deployment-cost",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 13,
+      "authored": 7,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "python-fundamentals",
+        "ai-api-integration",
+        "llm-fundamentals",
+        "rest-api-design",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "embeddings-semantic-search",
+        "vector-databases",
+        "prompting-structured-output",
+        "rag-fundamentals",
+        "llm-security-eval",
+        "llm-deployment-cost"
+      ],
+      "pending_human_reviews": 7,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 13,
+      "authored": 11,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "python-fundamentals",
+        "ai-api-integration",
+        "llm-fundamentals",
+        "embeddings-semantic-search",
+        "vector-databases",
+        "prompting-structured-output",
+        "rag-fundamentals",
+        "rest-api-design",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "llm-security-eval",
+        "llm-deployment-cost"
+      ],
+      "pending_human_reviews": 11,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "rag-developer",
+    "title": "RAG Developer",
+    "career": "generative-ai-llm-developer",
+    "required_ids": [
+      "programming-foundations",
+      "http-web-architecture",
+      "python-fundamentals",
+      "ai-api-integration",
+      "llm-fundamentals",
+      "prompting-structured-output",
+      "embeddings-semantic-search",
+      "vector-databases",
+      "rag-fundamentals",
+      "rag-advanced",
+      "llm-security-eval",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 12,
+      "authored": 6,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "python-fundamentals",
+        "ai-api-integration",
+        "llm-fundamentals",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "prompting-structured-output",
+        "embeddings-semantic-search",
+        "vector-databases",
+        "rag-fundamentals",
+        "rag-advanced",
+        "llm-security-eval"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 12,
+      "authored": 10,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "python-fundamentals",
+        "ai-api-integration",
+        "llm-fundamentals",
+        "prompting-structured-output",
+        "embeddings-semantic-search",
+        "vector-databases",
+        "rag-fundamentals",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "rag-advanced",
+        "llm-security-eval"
+      ],
+      "pending_human_reviews": 10,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "ai-agent-developer",
+    "title": "AI Agent Developer",
+    "career": "generative-ai-llm-developer",
+    "required_ids": [
+      "programming-foundations",
+      "http-web-architecture",
+      "python-fundamentals",
+      "ai-api-integration",
+      "llm-fundamentals",
+      "embeddings-semantic-search",
+      "vector-databases",
+      "prompting-structured-output",
+      "rag-fundamentals",
+      "rest-api-design",
+      "agents-tool-calling",
+      "agent-workflows",
+      "llm-security-eval",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 14,
+      "authored": 7,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "python-fundamentals",
+        "ai-api-integration",
+        "llm-fundamentals",
+        "rest-api-design",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "embeddings-semantic-search",
+        "vector-databases",
+        "prompting-structured-output",
+        "rag-fundamentals",
+        "agents-tool-calling",
+        "agent-workflows",
+        "llm-security-eval"
+      ],
+      "pending_human_reviews": 7,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 14,
+      "authored": 11,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "python-fundamentals",
+        "ai-api-integration",
+        "llm-fundamentals",
+        "embeddings-semantic-search",
+        "vector-databases",
+        "prompting-structured-output",
+        "rag-fundamentals",
+        "rest-api-design",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "agents-tool-calling",
+        "agent-workflows",
+        "llm-security-eval"
+      ],
+      "pending_human_reviews": 11,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "junior-data-analyst",
+    "title": "Junior Data Analyst",
+    "career": "data-analyst-business-intelligence",
+    "required_ids": [
+      "data-business-fundamentals",
+      "spreadsheet-analysis",
+      "sql-fundamentals",
+      "descriptive-stats-metrics",
+      "data-visualization",
+      "data-storytelling"
+    ],
+    "baseline": {
+      "required": 6,
+      "authored": 2,
+      "authored_ids": [
+        "data-business-fundamentals",
+        "sql-fundamentals"
+      ],
+      "missing_ids": [
+        "spreadsheet-analysis",
+        "descriptive-stats-metrics",
+        "data-visualization",
+        "data-storytelling"
+      ],
+      "pending_human_reviews": 2,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 6,
+      "authored": 3,
+      "authored_ids": [
+        "data-business-fundamentals",
+        "sql-fundamentals",
+        "descriptive-stats-metrics"
+      ],
+      "missing_ids": [
+        "spreadsheet-analysis",
+        "data-visualization",
+        "data-storytelling"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "sql-analyst",
+    "title": "SQL Analyst",
+    "career": "data-analyst-business-intelligence",
+    "required_ids": [
+      "data-business-fundamentals",
+      "sql-fundamentals",
+      "advanced-sql",
+      "descriptive-stats-metrics",
+      "data-visualization",
+      "data-storytelling"
+    ],
+    "baseline": {
+      "required": 6,
+      "authored": 2,
+      "authored_ids": [
+        "data-business-fundamentals",
+        "sql-fundamentals"
+      ],
+      "missing_ids": [
+        "advanced-sql",
+        "descriptive-stats-metrics",
+        "data-visualization",
+        "data-storytelling"
+      ],
+      "pending_human_reviews": 2,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 6,
+      "authored": 4,
+      "authored_ids": [
+        "data-business-fundamentals",
+        "sql-fundamentals",
+        "advanced-sql",
+        "descriptive-stats-metrics"
+      ],
+      "missing_ids": [
+        "data-visualization",
+        "data-storytelling"
+      ],
+      "pending_human_reviews": 4,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "powerbi-analyst",
+    "title": "Power BI Analyst",
+    "career": "data-analyst-business-intelligence",
+    "required_ids": [
+      "data-business-fundamentals",
+      "spreadsheet-analysis",
+      "sql-fundamentals",
+      "descriptive-stats-metrics",
+      "data-visualization",
+      "powerbi-modeling",
+      "dashboards-reporting",
+      "data-storytelling"
+    ],
+    "baseline": {
+      "required": 8,
+      "authored": 2,
+      "authored_ids": [
+        "data-business-fundamentals",
+        "sql-fundamentals"
+      ],
+      "missing_ids": [
+        "spreadsheet-analysis",
+        "descriptive-stats-metrics",
+        "data-visualization",
+        "powerbi-modeling",
+        "dashboards-reporting",
+        "data-storytelling"
+      ],
+      "pending_human_reviews": 2,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 8,
+      "authored": 3,
+      "authored_ids": [
+        "data-business-fundamentals",
+        "sql-fundamentals",
+        "descriptive-stats-metrics"
+      ],
+      "missing_ids": [
+        "spreadsheet-analysis",
+        "data-visualization",
+        "powerbi-modeling",
+        "dashboards-reporting",
+        "data-storytelling"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "junior-data-engineer",
+    "title": "Junior Data Engineer",
+    "career": "data-engineer",
+    "required_ids": [
+      "programming-foundations",
+      "python-fundamentals",
+      "python-intermediate-oop",
+      "sql-fundamentals",
+      "database-design",
+      "advanced-sql",
+      "data-modeling-warehousing",
+      "etl-elt-architecture",
+      "data-transformation-pipelines",
+      "workflow-orchestration",
+      "data-quality-testing",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 12,
+      "authored": 6,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "python-intermediate-oop",
+        "sql-fundamentals",
+        "database-design",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "advanced-sql",
+        "data-modeling-warehousing",
+        "etl-elt-architecture",
+        "data-transformation-pipelines",
+        "workflow-orchestration",
+        "data-quality-testing"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 12,
+      "authored": 7,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "python-intermediate-oop",
+        "sql-fundamentals",
+        "database-design",
+        "advanced-sql",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "data-modeling-warehousing",
+        "etl-elt-architecture",
+        "data-transformation-pipelines",
+        "workflow-orchestration",
+        "data-quality-testing"
+      ],
+      "pending_human_reviews": 7,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "etl-developer",
+    "title": "ETL Developer",
+    "career": "data-engineer",
+    "required_ids": [
+      "programming-foundations",
+      "sql-fundamentals",
+      "database-design",
+      "python-fundamentals",
+      "advanced-sql",
+      "data-modeling-warehousing",
+      "etl-elt-architecture",
+      "data-transformation-pipelines",
+      "workflow-orchestration",
+      "data-quality-testing",
+      "data-reliability-recovery"
+    ],
+    "baseline": {
+      "required": 11,
+      "authored": 4,
+      "authored_ids": [
+        "programming-foundations",
+        "sql-fundamentals",
+        "database-design",
+        "python-fundamentals"
+      ],
+      "missing_ids": [
+        "advanced-sql",
+        "data-modeling-warehousing",
+        "etl-elt-architecture",
+        "data-transformation-pipelines",
+        "workflow-orchestration",
+        "data-quality-testing",
+        "data-reliability-recovery"
+      ],
+      "pending_human_reviews": 4,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 11,
+      "authored": 5,
+      "authored_ids": [
+        "programming-foundations",
+        "sql-fundamentals",
+        "database-design",
+        "python-fundamentals",
+        "advanced-sql"
+      ],
+      "missing_ids": [
+        "data-modeling-warehousing",
+        "etl-elt-architecture",
+        "data-transformation-pipelines",
+        "workflow-orchestration",
+        "data-quality-testing",
+        "data-reliability-recovery"
+      ],
+      "pending_human_reviews": 5,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "cloud-data-engineer",
+    "title": "Cloud Data Engineer",
+    "career": "data-engineer",
+    "required_ids": [
+      "programming-foundations",
+      "sql-fundamentals",
+      "database-design",
+      "python-fundamentals",
+      "etl-elt-architecture",
+      "advanced-sql",
+      "data-transformation-pipelines",
+      "computing-os-foundations",
+      "networking-fundamentals",
+      "python-intermediate-oop",
+      "data-modeling-warehousing",
+      "workflow-orchestration",
+      "batch-streaming",
+      "cloud-data-platforms",
+      "data-governance-security",
+      "cloud-aws-foundations",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 17,
+      "authored": 8,
+      "authored_ids": [
+        "programming-foundations",
+        "sql-fundamentals",
+        "database-design",
+        "python-fundamentals",
+        "computing-os-foundations",
+        "networking-fundamentals",
+        "python-intermediate-oop",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "etl-elt-architecture",
+        "advanced-sql",
+        "data-transformation-pipelines",
+        "data-modeling-warehousing",
+        "workflow-orchestration",
+        "batch-streaming",
+        "cloud-data-platforms",
+        "data-governance-security",
+        "cloud-aws-foundations"
+      ],
+      "pending_human_reviews": 8,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 17,
+      "authored": 10,
+      "authored_ids": [
+        "programming-foundations",
+        "sql-fundamentals",
+        "database-design",
+        "python-fundamentals",
+        "advanced-sql",
+        "computing-os-foundations",
+        "networking-fundamentals",
+        "python-intermediate-oop",
+        "cloud-aws-foundations",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "etl-elt-architecture",
+        "data-transformation-pipelines",
+        "data-modeling-warehousing",
+        "workflow-orchestration",
+        "batch-streaming",
+        "cloud-data-platforms",
+        "data-governance-security"
+      ],
+      "pending_human_reviews": 10,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "soc-analyst",
+    "title": "SOC Analyst",
+    "career": "cybersecurity-analyst",
+    "required_ids": [
+      "computing-os-foundations",
+      "networking-fundamentals",
+      "linux-sysadmin",
+      "security-foundations",
+      "identity-access-control",
+      "security-logging-monitoring",
+      "soc-siem",
+      "incident-response"
+    ],
+    "baseline": {
+      "required": 8,
+      "authored": 3,
+      "authored_ids": [
+        "computing-os-foundations",
+        "networking-fundamentals",
+        "linux-sysadmin"
+      ],
+      "missing_ids": [
+        "security-foundations",
+        "identity-access-control",
+        "security-logging-monitoring",
+        "soc-siem",
+        "incident-response"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 8,
+      "authored": 3,
+      "authored_ids": [
+        "computing-os-foundations",
+        "networking-fundamentals",
+        "linux-sysadmin"
+      ],
+      "missing_ids": [
+        "security-foundations",
+        "identity-access-control",
+        "security-logging-monitoring",
+        "soc-siem",
+        "incident-response"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "security-analyst",
+    "title": "Security Analyst",
+    "career": "cybersecurity-analyst",
+    "required_ids": [
+      "computing-os-foundations",
+      "linux-sysadmin",
+      "networking-fundamentals",
+      "security-logging-monitoring",
+      "soc-siem",
+      "security-foundations",
+      "identity-access-control",
+      "cryptography-secure-comms",
+      "vulnerabilities-defense",
+      "incident-response",
+      "security-grc"
+    ],
+    "baseline": {
+      "required": 11,
+      "authored": 3,
+      "authored_ids": [
+        "computing-os-foundations",
+        "linux-sysadmin",
+        "networking-fundamentals"
+      ],
+      "missing_ids": [
+        "security-logging-monitoring",
+        "soc-siem",
+        "security-foundations",
+        "identity-access-control",
+        "cryptography-secure-comms",
+        "vulnerabilities-defense",
+        "incident-response",
+        "security-grc"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 11,
+      "authored": 3,
+      "authored_ids": [
+        "computing-os-foundations",
+        "linux-sysadmin",
+        "networking-fundamentals"
+      ],
+      "missing_ids": [
+        "security-logging-monitoring",
+        "soc-siem",
+        "security-foundations",
+        "identity-access-control",
+        "cryptography-secure-comms",
+        "vulnerabilities-defense",
+        "incident-response",
+        "security-grc"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "junior-security-engineer",
+    "title": "Junior Security Engineer",
+    "career": "cybersecurity-analyst",
+    "required_ids": [
+      "computing-os-foundations",
+      "programming-foundations",
+      "python-fundamentals",
+      "networking-fundamentals",
+      "linux-sysadmin",
+      "security-foundations",
+      "identity-access-control",
+      "cryptography-secure-comms",
+      "vulnerabilities-defense",
+      "network-endpoint-cloud-security",
+      "scripting-automation"
+    ],
+    "baseline": {
+      "required": 11,
+      "authored": 5,
+      "authored_ids": [
+        "computing-os-foundations",
+        "programming-foundations",
+        "python-fundamentals",
+        "networking-fundamentals",
+        "linux-sysadmin"
+      ],
+      "missing_ids": [
+        "security-foundations",
+        "identity-access-control",
+        "cryptography-secure-comms",
+        "vulnerabilities-defense",
+        "network-endpoint-cloud-security",
+        "scripting-automation"
+      ],
+      "pending_human_reviews": 5,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 11,
+      "authored": 5,
+      "authored_ids": [
+        "computing-os-foundations",
+        "programming-foundations",
+        "python-fundamentals",
+        "networking-fundamentals",
+        "linux-sysadmin"
+      ],
+      "missing_ids": [
+        "security-foundations",
+        "identity-access-control",
+        "cryptography-secure-comms",
+        "vulnerabilities-defense",
+        "network-endpoint-cloud-security",
+        "scripting-automation"
+      ],
+      "pending_human_reviews": 5,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "junior-devops-engineer",
+    "title": "Junior DevOps Engineer",
+    "career": "cloud-devops-engineer",
+    "required_ids": [
+      "computing-os-foundations",
+      "programming-foundations",
+      "python-fundamentals",
+      "linux-sysadmin",
+      "networking-fundamentals",
+      "git-collaboration",
+      "scripting-automation",
+      "cloud-aws-foundations",
+      "docker-containers",
+      "ci-cd",
+      "observability"
+    ],
+    "baseline": {
+      "required": 11,
+      "authored": 6,
+      "authored_ids": [
+        "computing-os-foundations",
+        "programming-foundations",
+        "python-fundamentals",
+        "linux-sysadmin",
+        "networking-fundamentals",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "scripting-automation",
+        "cloud-aws-foundations",
+        "docker-containers",
+        "ci-cd",
+        "observability"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 11,
+      "authored": 9,
+      "authored_ids": [
+        "computing-os-foundations",
+        "programming-foundations",
+        "python-fundamentals",
+        "linux-sysadmin",
+        "networking-fundamentals",
+        "git-collaboration",
+        "cloud-aws-foundations",
+        "docker-containers",
+        "ci-cd"
+      ],
+      "missing_ids": [
+        "scripting-automation",
+        "observability"
+      ],
+      "pending_human_reviews": 9,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "cloud-engineer",
+    "title": "Cloud Engineer",
+    "career": "cloud-devops-engineer",
+    "required_ids": [
+      "computing-os-foundations",
+      "linux-sysadmin",
+      "networking-fundamentals",
+      "cloud-aws-foundations",
+      "cloud-networking-iam",
+      "infrastructure-as-code",
+      "docker-containers",
+      "observability",
+      "reliability-incident-cost"
+    ],
+    "baseline": {
+      "required": 9,
+      "authored": 3,
+      "authored_ids": [
+        "computing-os-foundations",
+        "linux-sysadmin",
+        "networking-fundamentals"
+      ],
+      "missing_ids": [
+        "cloud-aws-foundations",
+        "cloud-networking-iam",
+        "infrastructure-as-code",
+        "docker-containers",
+        "observability",
+        "reliability-incident-cost"
+      ],
+      "pending_human_reviews": 3,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 9,
+      "authored": 6,
+      "authored_ids": [
+        "computing-os-foundations",
+        "linux-sysadmin",
+        "networking-fundamentals",
+        "cloud-aws-foundations",
+        "cloud-networking-iam",
+        "docker-containers"
+      ],
+      "missing_ids": [
+        "infrastructure-as-code",
+        "observability",
+        "reliability-incident-cost"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "cicd-engineer",
+    "title": "CI/CD Engineer",
+    "career": "cloud-devops-engineer",
+    "required_ids": [
+      "programming-foundations",
+      "computing-os-foundations",
+      "python-fundamentals",
+      "networking-fundamentals",
+      "cloud-aws-foundations",
+      "git-collaboration",
+      "linux-sysadmin",
+      "scripting-automation",
+      "docker-containers",
+      "ci-cd",
+      "infrastructure-as-code",
+      "kubernetes",
+      "observability"
+    ],
+    "baseline": {
+      "required": 13,
+      "authored": 6,
+      "authored_ids": [
+        "programming-foundations",
+        "computing-os-foundations",
+        "python-fundamentals",
+        "networking-fundamentals",
+        "git-collaboration",
+        "linux-sysadmin"
+      ],
+      "missing_ids": [
+        "cloud-aws-foundations",
+        "scripting-automation",
+        "docker-containers",
+        "ci-cd",
+        "infrastructure-as-code",
+        "kubernetes",
+        "observability"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 13,
+      "authored": 9,
+      "authored_ids": [
+        "programming-foundations",
+        "computing-os-foundations",
+        "python-fundamentals",
+        "networking-fundamentals",
+        "cloud-aws-foundations",
+        "git-collaboration",
+        "linux-sysadmin",
+        "docker-containers",
+        "ci-cd"
+      ],
+      "missing_ids": [
+        "scripting-automation",
+        "infrastructure-as-code",
+        "kubernetes",
+        "observability"
+      ],
+      "pending_human_reviews": 9,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "manual-qa-engineer",
+    "title": "Manual QA Engineer",
+    "career": "software-qa-test-automation",
+    "required_ids": [
+      "programming-foundations",
+      "http-web-architecture",
+      "sdlc-foundations",
+      "qa-principles",
+      "test-design",
+      "defect-management",
+      "functional-regression-exploratory",
+      "web-api-testing",
+      "sql-fundamentals",
+      "test-data-management"
+    ],
+    "baseline": {
+      "required": 10,
+      "authored": 6,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "sdlc-foundations",
+        "qa-principles",
+        "test-design",
+        "sql-fundamentals"
+      ],
+      "missing_ids": [
+        "defect-management",
+        "functional-regression-exploratory",
+        "web-api-testing",
+        "test-data-management"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 10,
+      "authored": 10,
+      "authored_ids": [
+        "programming-foundations",
+        "http-web-architecture",
+        "sdlc-foundations",
+        "qa-principles",
+        "test-design",
+        "defect-management",
+        "functional-regression-exploratory",
+        "web-api-testing",
+        "sql-fundamentals",
+        "test-data-management"
+      ],
+      "missing_ids": [],
+      "pending_human_reviews": 10,
+      "released_subtracks": 0,
+      "authored_complete": true,
+      "released": false
+    }
+  },
+  {
+    "id": "api-tester",
+    "title": "API Tester",
+    "career": "software-qa-test-automation",
+    "required_ids": [
+      "programming-foundations",
+      "sdlc-foundations",
+      "qa-principles",
+      "test-design",
+      "functional-regression-exploratory",
+      "defect-management",
+      "http-web-architecture",
+      "web-api-testing",
+      "sql-fundamentals",
+      "test-data-management",
+      "js-fundamentals"
+    ],
+    "baseline": {
+      "required": 11,
+      "authored": 6,
+      "authored_ids": [
+        "programming-foundations",
+        "sdlc-foundations",
+        "qa-principles",
+        "test-design",
+        "http-web-architecture",
+        "sql-fundamentals"
+      ],
+      "missing_ids": [
+        "functional-regression-exploratory",
+        "defect-management",
+        "web-api-testing",
+        "test-data-management",
+        "js-fundamentals"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 11,
+      "authored": 11,
+      "authored_ids": [
+        "programming-foundations",
+        "sdlc-foundations",
+        "qa-principles",
+        "test-design",
+        "functional-regression-exploratory",
+        "defect-management",
+        "http-web-architecture",
+        "web-api-testing",
+        "sql-fundamentals",
+        "test-data-management",
+        "js-fundamentals"
+      ],
+      "missing_ids": [],
+      "pending_human_reviews": 11,
+      "released_subtracks": 0,
+      "authored_complete": true,
+      "released": false
+    }
+  },
+  {
+    "id": "automation-qa-engineer",
+    "title": "Automation QA Engineer",
+    "career": "software-qa-test-automation",
+    "required_ids": [
+      "sdlc-foundations",
+      "qa-principles",
+      "test-design",
+      "functional-regression-exploratory",
+      "programming-foundations",
+      "http-web-architecture",
+      "defect-management",
+      "web-api-testing",
+      "js-fundamentals",
+      "playwright-automation",
+      "automation-frameworks",
+      "git-collaboration",
+      "ci-test-reporting"
+    ],
+    "baseline": {
+      "required": 13,
+      "authored": 6,
+      "authored_ids": [
+        "sdlc-foundations",
+        "qa-principles",
+        "test-design",
+        "programming-foundations",
+        "http-web-architecture",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "functional-regression-exploratory",
+        "defect-management",
+        "web-api-testing",
+        "js-fundamentals",
+        "playwright-automation",
+        "automation-frameworks",
+        "ci-test-reporting"
+      ],
+      "pending_human_reviews": 6,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 13,
+      "authored": 10,
+      "authored_ids": [
+        "sdlc-foundations",
+        "qa-principles",
+        "test-design",
+        "functional-regression-exploratory",
+        "programming-foundations",
+        "http-web-architecture",
+        "defect-management",
+        "web-api-testing",
+        "js-fundamentals",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "playwright-automation",
+        "automation-frameworks",
+        "ci-test-reporting"
+      ],
+      "pending_human_reviews": 10,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "junior-software-engineer",
+    "title": "Junior Software Engineer",
+    "career": "software-engineering-dsa",
+    "required_ids": [
+      "programming-foundations",
+      "oop-principles",
+      "complexity-analysis",
+      "arrays-strings-hashing",
+      "linear-structures",
+      "searching-sorting",
+      "debugging-testing",
+      "software-design",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 9,
+      "authored": 2,
+      "authored_ids": [
+        "programming-foundations",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "oop-principles",
+        "complexity-analysis",
+        "arrays-strings-hashing",
+        "linear-structures",
+        "searching-sorting",
+        "debugging-testing",
+        "software-design"
+      ],
+      "pending_human_reviews": 2,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 9,
+      "authored": 2,
+      "authored_ids": [
+        "programming-foundations",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "oop-principles",
+        "complexity-analysis",
+        "arrays-strings-hashing",
+        "linear-structures",
+        "searching-sorting",
+        "debugging-testing",
+        "software-design"
+      ],
+      "pending_human_reviews": 2,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "python-software-developer",
+    "title": "Python Software Developer",
+    "career": "software-engineering-dsa",
+    "required_ids": [
+      "programming-foundations",
+      "oop-principles",
+      "python-fundamentals",
+      "python-intermediate-oop",
+      "complexity-analysis",
+      "arrays-strings-hashing",
+      "linear-structures",
+      "searching-sorting",
+      "debugging-testing",
+      "software-design",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 11,
+      "authored": 4,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "python-intermediate-oop",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "oop-principles",
+        "complexity-analysis",
+        "arrays-strings-hashing",
+        "linear-structures",
+        "searching-sorting",
+        "debugging-testing",
+        "software-design"
+      ],
+      "pending_human_reviews": 4,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 11,
+      "authored": 4,
+      "authored_ids": [
+        "programming-foundations",
+        "python-fundamentals",
+        "python-intermediate-oop",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "oop-principles",
+        "complexity-analysis",
+        "arrays-strings-hashing",
+        "linear-structures",
+        "searching-sorting",
+        "debugging-testing",
+        "software-design"
+      ],
+      "pending_human_reviews": 4,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  },
+  {
+    "id": "java-software-developer",
+    "title": "Java Software Developer",
+    "career": "software-engineering-dsa",
+    "required_ids": [
+      "programming-foundations",
+      "java-fundamentals",
+      "oop-principles",
+      "complexity-analysis",
+      "arrays-strings-hashing",
+      "linear-structures",
+      "searching-sorting",
+      "debugging-testing",
+      "software-design",
+      "git-collaboration"
+    ],
+    "baseline": {
+      "required": 10,
+      "authored": 2,
+      "authored_ids": [
+        "programming-foundations",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "java-fundamentals",
+        "oop-principles",
+        "complexity-analysis",
+        "arrays-strings-hashing",
+        "linear-structures",
+        "searching-sorting",
+        "debugging-testing",
+        "software-design"
+      ],
+      "pending_human_reviews": 2,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    },
+    "current": {
+      "required": 10,
+      "authored": 2,
+      "authored_ids": [
+        "programming-foundations",
+        "git-collaboration"
+      ],
+      "missing_ids": [
+        "java-fundamentals",
+        "oop-principles",
+        "complexity-analysis",
+        "arrays-strings-hashing",
+        "linear-structures",
+        "searching-sorting",
+        "debugging-testing",
+        "software-design"
+      ],
+      "pending_human_reviews": 2,
+      "released_subtracks": 0,
+      "authored_complete": false,
+      "released": false
+    }
+  }
+]

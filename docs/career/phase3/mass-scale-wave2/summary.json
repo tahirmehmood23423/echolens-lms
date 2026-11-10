@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "scope": "Read-only repository snapshots; authored coverage is separate from human review and release. No production-state or additional test claims.",
+  "wave": "shared-foundations-2",
+  "input_digests": {
+    "baseline": "366e48a57700c710effd212ce86ff81aa28bb337d5d2fcdaa6b9fcb8ba9fdee7",
+    "inventory": "42464487599c15bebbdb15df96efb71b82813604b0c71cf09c240a9e2a30b747",
+    "checkpoint": "70aafe68cf90f51375ea0a584b9ff80596f7290a8494b53bcb666bc04c16fd19",
+    "manifest": "6a62276d78165aa3771818826d0ff311436a180b6cb45aa17a796b190a297904"
+  },
+  "canonical_subtracks": 132,
+  "starting": {
+    "authored_subtracks": 24,
+    "modules": 78,
+    "lessons": 240,
+    "formative": 1692,
+    "formal": 2160,
+    "verified_worked_examples": 240,
+    "pending_human_reviews": 24
+  },
+  "added": {
+    "authored_subtracks": 24,
+    "modules": 75,
+    "lessons": 226,
+    "formative": 1630,
+    "formal": 2160,
+    "verified_worked_examples": 226,
+    "pending_human_reviews": 24,
+    "objectives": 127
+  },
+  "total": {
+    "authored_subtracks": 48,
+    "modules": 153,
+    "lessons": 466,
+    "formative": 3322,
+    "formal": 4320,
+    "verified_worked_examples": 466,
+    "pending_human_reviews": 48,
+    "states": {
+      "missing": 84,
+      "outline_only": 84,
+      "authored": 48,
+      "automatically_validated": 48,
+      "human_review_pending": 48,
+      "human_reviewed": 0,
+      "published": 0
+    }
+  },
+  "remaining_subtracks": 84,
+  "authored_complete_roles": {
+    "baseline": [
+      "junior-backend-developer"
+    ],
+    "current": [
+      "junior-backend-developer",
+      "python-fastapi-developer",
+      "manual-qa-engineer",
+      "api-tester"
+    ]
+  },
+  "released_roles": {
+    "baseline": [],
+    "current": []
+  }
+}

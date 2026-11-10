@@ -1,0 +1,191 @@
+{
+  "wave": "shared-foundations-2",
+  "starting_commit": "1b5b6f7",
+  "starting_authored": 24,
+  "courses": [
+    "practical-data-structures",
+    "fastapi-backend",
+    "db-integration-performance",
+    "backend-deployment-ops",
+    "js-fundamentals",
+    "js-dom-async",
+    "typescript-fundamentals",
+    "pandas-fundamentals",
+    "data-cleaning",
+    "prompting-structured-output",
+    "embeddings-semantic-search",
+    "vector-databases",
+    "rag-fundamentals",
+    "advanced-sql",
+    "descriptive-stats-metrics",
+    "eda",
+    "cloud-aws-foundations",
+    "cloud-networking-iam",
+    "docker-containers",
+    "ci-cd",
+    "defect-management",
+    "functional-regression-exploratory",
+    "web-api-testing",
+    "test-data-management"
+  ],
+  "recovered_from_quarantine": [
+    "prompting-structured-output",
+    "descriptive-stats-metrics"
+  ],
+  "quarantined": [
+    {
+      "id": "react-fundamentals",
+      "original": "career/curriculum/learning/wave1/react-fundamentals.js",
+      "preserved": "career/curriculum/learning/quarantine/wave2/learning-react-fundamentals.js.partial",
+      "sha256": "b21ed13d81908c8f12f55ab48aa42349491b06911b355a3a713a1004eedd63ce",
+      "errors": [],
+      "warnings": [
+        "react-lists-keys.q7: the correct option is noticeably longer than the others",
+        "react-state-snapshots.q5: the correct option is noticeably longer than the others",
+        "react-state-collections.q7: the correct option is noticeably longer than the others",
+        "react-lift-state.q4: the correct option is noticeably longer than the others",
+        "react-lift-state.q6: the correct option is noticeably longer than the others",
+        "react-effect-sync.q8: the correct option is noticeably longer than the others",
+        "react-effect-dependencies.q7: the correct option is noticeably longer than the others",
+        "react-fetch-states.q4: the correct option is noticeably longer than the others",
+        "react-controlled-inputs.q7: the correct option is noticeably longer than the others",
+        "react-form-validation.q2: the correct option is noticeably longer than the others",
+        "react-form-validation.q6: the correct option is noticeably longer than the others",
+        "react-form-validation.q8: the correct option is noticeably longer than the others",
+        "react-uncontrolled-boundaries.q7: the correct option is noticeably longer than the others",
+        "react-fundamentals.f037: the correct option is noticeably longer than the others",
+        "react-fundamentals.f049: the correct option is noticeably longer than the others",
+        "react-fundamentals.f056: the correct option is noticeably longer than the others",
+        "react-fundamentals.f076: the correct option is noticeably longer than the others",
+        "react-fundamentals.f086: the correct option is noticeably longer than the others",
+        "react-fundamentals.f087: the correct option is noticeably longer than the others"
+      ]
+    },
+    {
+      "id": "react-fundamentals",
+      "original": "career/curriculum/questions/wave1/react-fundamentals.js",
+      "preserved": "career/curriculum/learning/quarantine/wave2/questions-react-fundamentals.js.partial",
+      "sha256": "dbd4227b5ee8affa4c1f3f0fb152e27fd0ff82a4beadd4219856745dc2284b81",
+      "errors": [],
+      "warnings": [
+        "react-lists-keys.q7: the correct option is noticeably longer than the others",
+        "react-state-snapshots.q5: the correct option is noticeably longer than the others",
+        "react-state-collections.q7: the correct option is noticeably longer than the others",
+        "react-lift-state.q4: the correct option is noticeably longer than the others",
+        "react-lift-state.q6: the correct option is noticeably longer than the others",
+        "react-effect-sync.q8: the correct option is noticeably longer than the others",
+        "react-effect-dependencies.q7: the correct option is noticeably longer than the others",
+        "react-fetch-states.q4: the correct option is noticeably longer than the others",
+        "react-controlled-inputs.q7: the correct option is noticeably longer than the others",
+        "react-form-validation.q2: the correct option is noticeably longer than the others",
+        "react-form-validation.q6: the correct option is noticeably longer than the others",
+        "react-form-validation.q8: the correct option is noticeably longer than the others",
+        "react-uncontrolled-boundaries.q7: the correct option is noticeably longer than the others",
+        "react-fundamentals.f037: the correct option is noticeably longer than the others",
+        "react-fundamentals.f049: the correct option is noticeably longer than the others",
+        "react-fundamentals.f056: the correct option is noticeably longer than the others",
+        "react-fundamentals.f076: the correct option is noticeably longer than the others",
+        "react-fundamentals.f086: the correct option is noticeably longer than the others",
+        "react-fundamentals.f087: the correct option is noticeably longer than the others"
+      ]
+    },
+    {
+      "id": "numpy-arrays",
+      "original": "career/curriculum/learning/wave1/numpy-arrays.js",
+      "preserved": "career/curriculum/learning/quarantine/wave2/learning-numpy-arrays.js.partial",
+      "sha256": "267685784cc3b3d45822fbabe6eb5dca7d06e89988f0af8ccf0a20779d723135",
+      "errors": [],
+      "warnings": [
+        "numpy-arrays.p048: the correct option is noticeably longer than the others",
+        "numpy-arrays.p066: the correct option is noticeably longer than the others",
+        "numpy-arrays.f034: the correct option is noticeably longer than the others",
+        "numpy-arrays.f039: the correct option is noticeably longer than the others",
+        "numpy-arrays.f040: the correct option is noticeably longer than the others",
+        "numpy-arrays.f052: the correct option is noticeably longer than the others",
+        "numpy-arrays.f064: the correct option is noticeably longer than the others"
+      ]
+    },
+    {
+      "id": "numpy-arrays",
+      "original": "career/curriculum/questions/wave1/numpy-arrays.js",
+      "preserved": "career/curriculum/learning/quarantine/wave2/questions-numpy-arrays.js.partial",
+      "sha256": "e546c1138c41f85e9b114672b62b3162d1fd14da319097998cef47b7485875bb",
+      "errors": [],
+      "warnings": [
+        "numpy-arrays.p048: the correct option is noticeably longer than the others",
+        "numpy-arrays.p066: the correct option is noticeably longer than the others",
+        "numpy-arrays.f034: the correct option is noticeably longer than the others",
+        "numpy-arrays.f039: the correct option is noticeably longer than the others",
+        "numpy-arrays.f040: the correct option is noticeably longer than the others",
+        "numpy-arrays.f052: the correct option is noticeably longer than the others",
+        "numpy-arrays.f064: the correct option is noticeably longer than the others"
+      ]
+    },
+    {
+      "id": "data-visualization",
+      "original": "career/curriculum/learning/wave1/data-visualization.js",
+      "preserved": "career/curriculum/learning/quarantine/wave2/learning-data-visualization.js.partial",
+      "sha256": "0ecf4b6f8a0bd1ea7bcd47b21d14257931f7eca53b44c2e16310fd2dbe798fce",
+      "errors": [
+        "viz-trends: the code actually prints \"[np.int64(1), np.int64(2), np.int64(3), np.int64(4)]\\n[False, True, False, False]\\nTrue\", not the declared \"[1, 2, 3, 4]\\n[False, True, False, False]\\nTrue\"",
+        "viz-aggregation: the code actually prints \"[np.float64(0.5), np.float64(0.8)]\\n['A (n=2)', 'B (n=100)']\\nTrue\", not the declared \"[0.5, 0.8]\\n['A (n=2)', 'B (n=100)']\\nTrue\""
+      ],
+      "warnings": [
+        "viz-trends.q7: the correct option is noticeably longer than the others",
+        "viz-distributions.q5: the correct option is noticeably longer than the others",
+        "viz-distributions.q6: the correct option is noticeably longer than the others",
+        "viz-axes.q6: the correct option is noticeably longer than the others",
+        "viz-color.q9: the correct option is noticeably longer than the others",
+        "viz-message.q5: the correct option is noticeably longer than the others",
+        "viz-clutter.q2: the correct option is noticeably longer than the others",
+        "viz-clutter.q7: the correct option is noticeably longer than the others",
+        "data-visualization.w1.9: the correct option is noticeably longer than the others",
+        "data-visualization.w1.14: the correct option is noticeably longer than the others",
+        "data-visualization.w1.17: the correct option is noticeably longer than the others",
+        "data-visualization.w1.19: the correct option is noticeably longer than the others",
+        "data-visualization.w1.30: the correct option is noticeably longer than the others",
+        "data-visualization.w1.37: the correct option is noticeably longer than the others",
+        "data-visualization.w1.49: the correct option is noticeably longer than the others",
+        "data-visualization.w1.55: the correct option is noticeably longer than the others",
+        "data-visualization.w1.58: the correct option is noticeably longer than the others",
+        "data-visualization.w1.64: the correct option is noticeably longer than the others",
+        "data-visualization.w1.66: the correct option is noticeably longer than the others",
+        "data-visualization.w1.79: the correct option is noticeably longer than the others",
+        "data-visualization.w1.82: the correct option is noticeably longer than the others"
+      ]
+    },
+    {
+      "id": "data-visualization",
+      "original": "career/curriculum/questions/wave1/data-visualization.js",
+      "preserved": "career/curriculum/learning/quarantine/wave2/questions-data-visualization.js.partial",
+      "sha256": "105663730068b885bd90bf3fc21c93aae0026c402e7ce89d883f18d25364adf0",
+      "errors": [
+        "viz-trends: the code actually prints \"[np.int64(1), np.int64(2), np.int64(3), np.int64(4)]\\n[False, True, False, False]\\nTrue\", not the declared \"[1, 2, 3, 4]\\n[False, True, False, False]\\nTrue\"",
+        "viz-aggregation: the code actually prints \"[np.float64(0.5), np.float64(0.8)]\\n['A (n=2)', 'B (n=100)']\\nTrue\", not the declared \"[0.5, 0.8]\\n['A (n=2)', 'B (n=100)']\\nTrue\""
+      ],
+      "warnings": [
+        "viz-trends.q7: the correct option is noticeably longer than the others",
+        "viz-distributions.q5: the correct option is noticeably longer than the others",
+        "viz-distributions.q6: the correct option is noticeably longer than the others",
+        "viz-axes.q6: the correct option is noticeably longer than the others",
+        "viz-color.q9: the correct option is noticeably longer than the others",
+        "viz-message.q5: the correct option is noticeably longer than the others",
+        "viz-clutter.q2: the correct option is noticeably longer than the others",
+        "viz-clutter.q7: the correct option is noticeably longer than the others",
+        "data-visualization.w1.9: the correct option is noticeably longer than the others",
+        "data-visualization.w1.14: the correct option is noticeably longer than the others",
+        "data-visualization.w1.17: the correct option is noticeably longer than the others",
+        "data-visualization.w1.19: the correct option is noticeably longer than the others",
+        "data-visualization.w1.30: the correct option is noticeably longer than the others",
+        "data-visualization.w1.37: the correct option is noticeably longer than the others",
+        "data-visualization.w1.49: the correct option is noticeably longer than the others",
+        "data-visualization.w1.55: the correct option is noticeably longer than the others",
+        "data-visualization.w1.58: the correct option is noticeably longer than the others",
+        "data-visualization.w1.64: the correct option is noticeably longer than the others",
+        "data-visualization.w1.66: the correct option is noticeably longer than the others",
+        "data-visualization.w1.79: the correct option is noticeably longer than the others",
+        "data-visualization.w1.82: the correct option is noticeably longer than the others"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "targeted": {
+    "tests": 224,
+    "pass": 224,
+    "fail": 0,
+    "skipped": 0
+  },
+  "full": {
+    "tests": 381,
+    "pass": 369,
+    "fail": 11,
+    "skipped": 1
+  },
+  "browser": {
+    "passed": true,
+    "checks": 454,
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "errors": [],
+    "production_published": false
+  },
+  "final_wording_regression": {
+    "tests": 42,
+    "pass": 42,
+    "fail": 0,
+    "skipped": 0
+  },
+  "existing_failures_match": true,
+  "existing_failures": [
+    "\u2716 actual health and alert functions expose full error details without connecting to a database",
+    "\u2716 admin login and role-specific browsing",
+    "\u2716 all demo roles browse synthetic data; writes cannot alter the store or SQL",
+    "\u2716 coord login and role-specific browsing",
+    "\u2716 reminder settings and delivery history round-trip through the production Prisma JSON mapping",
+    "\u2716 required ad choices and unresolved age/retention facts remain explicit",
+    "\u2716 test/certificate-final-project.test.js",
+    "\u2716 test/flush-step2.test.js",
+    "\u2716 test/free-course-reminders.test.js",
+    "\u2716 test/talent.test.js",
+    "\u2716 test/trending-tech.test.js"
+  ],
+  "new_failures": [],
+  "human_approved": false,
+  "published": false,
+  "pushed": false,
+  "deployed": false
+}

@@ -1,0 +1,275 @@
+{
+  "course": "db-integration-performance",
+  "engine": "PGlite 0.4.3 PostgreSQL WASM, isolated in-memory",
+  "version": "PostgreSQL 17.5 on wasm32-unknown-linux-gnu, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "script_sha256": "1fc2e53956b4c4251d11a42853903a281389c52120ca558c3c14da86a62c36f6",
+  "case_count": 7,
+  "probe_count": 15,
+  "checks": 15,
+  "observations": [
+    "duplicate key inside transaction rejected",
+    "failed transaction requires rollback before query",
+    "rollback restored both local balances",
+    "first sequential guarded allocation changes one row",
+    "second sequential guarded allocation changes zero rows",
+    "sequential allocation preserves nonnegative seat invariant",
+    "configured isolation READ COMMITTED",
+    "configured isolation REPEATABLE READ",
+    "configured isolation SERIALIZABLE",
+    "first scoped keyset page with tied timestamps",
+    "second scoped keyset page uses stable tuple continuation",
+    "JSON execution-aware read plan exists",
+    "execution-aware plan reports actual rows without timing threshold claim",
+    "additive DDL/backfill preserves old and new read paths",
+    "null-only repeated backfill preserves populated newer value in sequential fixture"
+  ],
+  "executed": [
+    {
+      "method": "query",
+      "sql": "SELECT version() AS version",
+      "args": [
+        null
+      ],
+      "sha256": "f69332a7346cfc0817ece259efb20e947f306f5113356aef1adc28efa95b4144"
+    },
+    {
+      "method": "query",
+      "sql": "\n      SELECT b.oid, b.typarray\n      FROM pg_catalog.pg_type a\n      LEFT JOIN pg_catalog.pg_type b ON b.oid = a.typelem\n      WHERE a.typcategory = 'A'\n      GROUP BY b.oid, b.typarray\n      ORDER BY b.oid\n    ",
+      "args": [],
+      "sha256": "192e1f304339ce49b58edfba52a1d987f81852eaf0a1089dd55c84c217284f1b"
+    },
+    {
+      "method": "exec",
+      "sql": "CREATE TABLE accounts(id integer PRIMARY KEY,balance integer NOT NULL CHECK(balance>=0));INSERT INTO accounts VALUES(1,100),(2,100)",
+      "args": [],
+      "sha256": "6bac3bb1085ec641a8e27a1d7431603511040f15f5401ebadd220066c0030b78"
+    },
+    {
+      "method": "exec",
+      "sql": "BEGIN;UPDATE accounts SET balance=balance-20 WHERE id=1",
+      "args": [],
+      "sha256": "56038baf852ec1a88c19dd2f89e02f4ccda1be4392d28fd23c743cc8694a9149"
+    },
+    {
+      "method": "query",
+      "sql": "INSERT INTO accounts VALUES(2,20)",
+      "args": [],
+      "sha256": "c5dbfdcd5523e7e8f6b2f0de32f35073b1582c6ebbf88d6423924d9712d019fa"
+    },
+    {
+      "method": "query",
+      "sql": "SELECT 1",
+      "args": [],
+      "sha256": "eba504a46e7368e736ab9a63cbf0166263fb29f77408fa7392e51761c146c9aa"
+    },
+    {
+      "method": "exec",
+      "sql": "ROLLBACK",
+      "args": [],
+      "sha256": "2905750e999be6d3a6d2d7f1c2a24aa5821be3432668ee00193e3cb72f13fcf9"
+    },
+    {
+      "method": "query",
+      "sql": "SELECT balance FROM accounts ORDER BY id",
+      "args": [
+        null
+      ],
+      "sha256": "1e50213dac99f701eda0f90cfcb6d96d16765ccf0282151186c10134faf3cf39"
+    },
+    {
+      "method": "exec",
+      "sql": "CREATE TABLE seats(id integer PRIMARY KEY,available integer CHECK(available>=0));INSERT INTO seats VALUES(1,1)",
+      "args": [],
+      "sha256": "c64cf6a65522d7663d74c1d3458bd4b2d0f1de0eb489d19b5576d95d36e228e4"
+    },
+    {
+      "method": "query",
+      "sql": "UPDATE seats SET available=available-1 WHERE id=1 AND available>0",
+      "args": [],
+      "sha256": "4a8a993a3d3f5dfa5360882f4e08dcdb8859d6dfe26750928394fa85da7a7877"
+    },
+    {
+      "method": "query",
+      "sql": "UPDATE seats SET available=available-1 WHERE id=1 AND available>0",
+      "args": [],
+      "sha256": "4a8a993a3d3f5dfa5360882f4e08dcdb8859d6dfe26750928394fa85da7a7877"
+    },
+    {
+      "method": "query",
+      "sql": "SELECT available FROM seats",
+      "args": [
+        null
+      ],
+      "sha256": "8c7ffe038644e62d31d9f8f65e3bfe25fec0ac7c49457d86fd76f998dadc04fa"
+    },
+    {
+      "method": "exec",
+      "sql": "BEGIN ISOLATION LEVEL READ COMMITTED",
+      "args": [],
+      "sha256": "2575986414cdd3368a31aa0b1c93d073b7e1e5b5a77f4bbaa76db7c5ca175e4b"
+    },
+    {
+      "method": "query",
+      "sql": "SHOW transaction_isolation",
+      "args": [
+        null
+      ],
+      "sha256": "0ffbc6acc4d30724533e9e609e711013b67a4d4668bbd6c572df379cdbda38cd"
+    },
+    {
+      "method": "exec",
+      "sql": "ROLLBACK",
+      "args": [],
+      "sha256": "2905750e999be6d3a6d2d7f1c2a24aa5821be3432668ee00193e3cb72f13fcf9"
+    },
+    {
+      "method": "exec",
+      "sql": "BEGIN ISOLATION LEVEL REPEATABLE READ",
+      "args": [],
+      "sha256": "788270d74d2609fb844a2dfe1242c7c0ae435e2c599da1edef119aabedfb1572"
+    },
+    {
+      "method": "query",
+      "sql": "SHOW transaction_isolation",
+      "args": [
+        null
+      ],
+      "sha256": "0ffbc6acc4d30724533e9e609e711013b67a4d4668bbd6c572df379cdbda38cd"
+    },
+    {
+      "method": "exec",
+      "sql": "ROLLBACK",
+      "args": [],
+      "sha256": "2905750e999be6d3a6d2d7f1c2a24aa5821be3432668ee00193e3cb72f13fcf9"
+    },
+    {
+      "method": "exec",
+      "sql": "BEGIN ISOLATION LEVEL SERIALIZABLE",
+      "args": [],
+      "sha256": "72892097343386f8b8335b094064aa45f83971ca441e2ee0536c91e077ff24fb"
+    },
+    {
+      "method": "query",
+      "sql": "SHOW transaction_isolation",
+      "args": [
+        null
+      ],
+      "sha256": "0ffbc6acc4d30724533e9e609e711013b67a4d4668bbd6c572df379cdbda38cd"
+    },
+    {
+      "method": "exec",
+      "sql": "ROLLBACK",
+      "args": [],
+      "sha256": "2905750e999be6d3a6d2d7f1c2a24aa5821be3432668ee00193e3cb72f13fcf9"
+    },
+    {
+      "method": "exec",
+      "sql": "CREATE TABLE events(tenant integer,created integer,id integer PRIMARY KEY,payload text);INSERT INTO events VALUES(7,90,5,'a'),(7,100,3,'b'),(7,100,9,'c'),(7,110,2,'d'),(8,100,20,'private-other-tenant');CREATE INDEX events_tenant_created_id ON events(tenant,created,id)",
+      "args": [],
+      "sha256": "8c32c0a5c831080182fd0e4001d7a684cdb19104dab837c1bb4d19ab5cde290d"
+    },
+    {
+      "method": "query",
+      "sql": "SELECT created,id FROM events WHERE tenant=$1 ORDER BY created,id LIMIT 2",
+      "args": [
+        [
+          7
+        ]
+      ],
+      "sha256": "f7e67f7798bafa012f8c3aa7e53db43554347525b8a9f2e566cbfa29f5718de5"
+    },
+    {
+      "method": "query",
+      "sql": "SELECT created,id FROM events WHERE tenant=$1 AND (created,id)>($2,$3) ORDER BY created,id LIMIT 2",
+      "args": [
+        [
+          7,
+          100,
+          3
+        ]
+      ],
+      "sha256": "e302b9a8efa265d35e14225b85cf066f402d106a37d7d52b66c096a4b65c8fe8"
+    },
+    {
+      "method": "query",
+      "sql": "EXPLAIN (ANALYZE,FORMAT JSON) SELECT id FROM events WHERE tenant=7 ORDER BY created,id LIMIT 2",
+      "args": [
+        null
+      ],
+      "sha256": "a2058b8facb4990cab9e71e1c7f81af773cfec87b1aa0dd79352834b83c71f3a"
+    },
+    {
+      "method": "exec",
+      "sql": "CREATE TABLE students(id integer PRIMARY KEY,name text NOT NULL);INSERT INTO students VALUES(1,'Synthetic Student');ALTER TABLE students ADD COLUMN display_name text;UPDATE students SET display_name=name WHERE display_name IS NULL",
+      "args": [],
+      "sha256": "8bfbf159bca9e9f63e2110b5b05a0eb93fcc9ab6a330313391d5d9cabc58a93d"
+    },
+    {
+      "method": "query",
+      "sql": "SELECT name,COALESCE(display_name,name) AS current_name FROM students",
+      "args": [
+        null
+      ],
+      "sha256": "73021f0236f355ce0ce11cfb89421ff8bd7ad253b454b30dcff75556b686950b"
+    },
+    {
+      "method": "exec",
+      "sql": "UPDATE students SET display_name='Newer Value' WHERE id=1;UPDATE students SET display_name=name WHERE display_name IS NULL",
+      "args": [],
+      "sha256": "70de34420607af71ba0b16eb7b32a060dc0fa5414f7f238cef89e717b89c3149"
+    },
+    {
+      "method": "query",
+      "sql": "SELECT display_name FROM students",
+      "args": [
+        null
+      ],
+      "sha256": "5a49aed6cf221dda17666a898e93272af3b67e6e75ffdbc5d9c9347a4ba7bfc4"
+    }
+  ],
+  "course_worked_code_hashes": [
+    {
+      "id": "dbi-atomic",
+      "sha256": "ae2a812e010ddbb4677e57dfaeedd5c49f1929ba6c9c6af6d9ac10129e811d02"
+    },
+    {
+      "id": "dbi-races",
+      "sha256": "1776487286805134b9f1a17ebfb6ca0e6cde0395e4a779ee62eb1d0aa302247f"
+    },
+    {
+      "id": "dbi-isolation",
+      "sha256": "d2239fefeac4f2f85119260c6c54ffb4428f76fde085c768cb1b5814a9ea51b6"
+    },
+    {
+      "id": "dbi-index-patterns",
+      "sha256": "9f801971b8877e667375c0e11cfbdb69650fb66df0e01faf62d3ec239146a875"
+    },
+    {
+      "id": "dbi-index-order",
+      "sha256": "1849d6c1d32aae68c16b3a4c043815c5a828f5bc203ec86565d4972b73ae86e2"
+    },
+    {
+      "id": "dbi-explain",
+      "sha256": "fb45f354bbb1284559ff6e0f7f21fd8b9d577aa360ed2934b6d58a2791e9bf7e"
+    },
+    {
+      "id": "dbi-nplusone",
+      "sha256": "4a50789b115223cc67e11da8901adf16059f7ae2eab58c27a3283dcd2c248732"
+    },
+    {
+      "id": "dbi-pools-pages",
+      "sha256": "7932fb96667d7f065936b18535ea3f3eee825b6d8ad1d88a36a85bec1447e9d8"
+    },
+    {
+      "id": "dbi-migrations",
+      "sha256": "ef9210bf204d871b4888097830f4eddf31408c387c0ae8e293837628816233fc"
+    }
+  ],
+  "errors": [],
+  "native_multi_connection_test": false,
+  "native_multi_connection": false,
+  "concurrency_race": false,
+  "production_performance": false,
+  "cloud_access": false,
+  "deployment": false
+}

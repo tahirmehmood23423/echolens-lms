@@ -1,0 +1,2372 @@
+{
+  "schema_version": 1,
+  "scope": "Repository-only content checks; no application store, human approval or publication",
+  "courses": [
+    {
+      "id": "practical-data-structures",
+      "fingerprint": "326cc031c0940299ccc7f020e6ccb422ad2217d8b475501dff6210b26fcaf40d",
+      "course_hash": "82756a12d4cd7bab6b94361d7b9a36ca2a51796a399fcf61ef9e52057e00a4de",
+      "bank_hash": "93796114be5cdd4c1c6bfcd806c667bd4bb47a20f2493970e14995b57aefc12c",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 58,
+      "comprehensive": 90,
+      "objectives": 7,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "pds-selection",
+          "code_hash": "c886734461b2927dd0ef4d3edae0745b08f1a91c71c41f8954f924a1492905ec",
+          "ran": true,
+          "ok": true,
+          "output": "3 2 2\nclosed\n['s1', 's2', 's1']"
+        },
+        {
+          "id": "pds-queue-choice",
+          "code_hash": "fd06326e98e0d277fe5d2a5c804d8541bd623f29890c6ad05bfa48645a5ac72d",
+          "ran": true,
+          "ok": true,
+          "output": "first\n(2, 'early')\n[2, 3]"
+        },
+        {
+          "id": "pds-lookup",
+          "code_hash": "7d4b368d9c0bb33502dfd1ee6cd97ea54ca4af350d13503ffb1f8795461a7c7f",
+          "ran": true,
+          "ok": true,
+          "output": "False 4\nFalse True"
+        },
+        {
+          "id": "pds-loops",
+          "code_hash": "df3f02284a4fe1f043bf8fc14bc45234c7b6a1a40def5259a70cac903497f022",
+          "ran": true,
+          "ok": true,
+          "output": "8 12 6\nTrue"
+        },
+        {
+          "id": "pds-cost-model",
+          "code_hash": "c07b9ea3c7d49ea71bb26dac37540f360f962beebd553df406e9a35eea125853",
+          "ran": true,
+          "ok": true,
+          "output": "15\n15\n5"
+        },
+        {
+          "id": "pds-quadratic",
+          "code_hash": "bb3d72c2a06b662f0b819e84b84416da7f5a0cd07116435a898acf3dd6280a6e",
+          "ran": true,
+          "ok": true,
+          "output": "True\n[3, 1, 3, 2]\n[]"
+        },
+        {
+          "id": "pds-grouping",
+          "code_hash": "3c5857c69cbef7d114c66e098cbe49d4a0a3e774ab06933707ca936f3f312469",
+          "ran": true,
+          "ok": true,
+          "output": "[('A', 2), ('B', 1)]\n{'A': [1, 3], 'B': [2]}\nB"
+        },
+        {
+          "id": "pds-jobs",
+          "code_hash": "8ba9e21197bebb39cf918146eb2edd32c8ec4a011528c7f103a569fcfdb407ae",
+          "ran": true,
+          "ok": true,
+          "output": "['B', 'C', 'A']\n['A', 'B', 'C']"
+        },
+        {
+          "id": "pds-batching",
+          "code_hash": "504bc389922aa67e0b53126a3f8687c4b083a2380b9475a2debb037c679f6c70",
+          "ran": true,
+          "ok": true,
+          "output": "[[0, 1, 2], [3, 4, 5], [6]]\n[]\nsize must be positive"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "fastapi-backend",
+      "fingerprint": "fa2ab57c3123dc0053d0c647d8a96b20d295cf9e61b2a30092bd013f195ef4fb",
+      "course_hash": "c7903c7e9378574871c3e2ebf9d6d4d21255a99c140e5a266d435e25be6f975d",
+      "bank_hash": "ecc4119b01df643feb7630654485e248ea4a233c4c2f46f928bd177e4d42e3b2",
+      "prerequisites": [
+        "python-intermediate-oop",
+        "rest-api-design"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 84,
+      "comprehensive": 90,
+      "objectives": 8,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "fa-routes",
+          "code_hash": "b67f0b23e8ad0ecbd81ae28d0b0af365912ee20519ed56b81945127f2512a1fa",
+          "ran": true,
+          "ok": true,
+          "output": "current\n42\n422",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-query-body",
+          "code_hash": "75650deaece280979cf5df90f54c6cb461970f20a35bbbfd4025670d9b9dd302",
+          "ran": true,
+          "ok": true,
+          "output": "5\n422\n422",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-models",
+          "code_hash": "55290cd8f9524409088c31864f9caab20b94182575c1038747210e2a75d62a77",
+          "ran": true,
+          "ok": true,
+          "output": "['display_name', 'id']\nFalse",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-routers",
+          "code_hash": "f1a88d0a5938c3fc10794dd94343d75f8eb313f985b0c429c098e33b608243c9",
+          "ran": true,
+          "ok": true,
+          "output": "fixture\n404",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-dependencies",
+          "code_hash": "586fa2b16b000bdfac70300b71fe204d50aa0bfae49ba2d290418a60ebca4f67",
+          "ran": true,
+          "ok": true,
+          "output": "401\n7\n401",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-service-boundary",
+          "code_hash": "18091e07b69cda3bd07496cfc793bea0a3ce4d1d1e809a06490a2c59ea4633da",
+          "ran": true,
+          "ok": true,
+          "output": "accepted\ncapacity rejected\n1"
+        },
+        {
+          "id": "fa-async-io",
+          "code_hash": "db7c112b4d99d5813c14e7112d0d863402c5bb9107ff28194e4e8cbf35905f81",
+          "ran": true,
+          "ok": true,
+          "output": "[]\n7\n['started', 'finished']"
+        },
+        {
+          "id": "fa-blocking",
+          "code_hash": "410b5a305270096adcea882437adf86ba6d6ba6ae117f3610aee9f3bba66c07d",
+          "ran": true,
+          "ok": true,
+          "output": "8\nfailure propagated"
+        },
+        {
+          "id": "fa-background",
+          "code_hash": "88765a8732ea47afb703419171c9b059d262961d10028165eb8f79a0eaa8760d",
+          "ran": true,
+          "ok": true,
+          "output": "202 accepted\n['local callback']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-errors",
+          "code_hash": "cf3e70eddea1b85b164b606d9e61bab22ac6aa79a8fa87bf9294ccc16604fed5",
+          "ran": true,
+          "ok": true,
+          "output": "409 capacity_conflict\nFalse",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-browser-policy",
+          "code_hash": "8b6ef3ed7d57af710fc590a0738779c28cf24178eff42f19bd70e90a4fb0965b",
+          "ran": true,
+          "ok": true,
+          "output": "https://portal.example.invalid\nabsent",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-operations",
+          "code_hash": "3bc2f9597b60d096517f0fcdd469057a46aabe041f9c664d8c06da1bd81baa17",
+          "ran": true,
+          "ok": true,
+          "output": "200 {'live': True, 'ready': False}\n['live', 'ready']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "db-integration-performance",
+      "fingerprint": "d40fcd6c23660ac705319b1cfde63fdc0d8c7e9d6cc278c07aa48d95dd2d73d1",
+      "course_hash": "ac7b5c3d6a4ac0818b06e8a3e66a7f7bcdd23b9a92e62cc567bc7b66739e0d68",
+      "bank_hash": "c3f38074818b9703d31bb3dc0e39d7a80b0fc1d4198596d25f450c699396b64f",
+      "prerequisites": [
+        "database-design"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 56,
+      "comprehensive": 90,
+      "objectives": 8,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dbi-atomic",
+          "code_hash": "9927c30a1f1211d29232043daf0124f17aa15083ff2efb0e901a9631301c1838",
+          "ran": true,
+          "ok": true,
+          "output": "[(100,), (100,)]"
+        },
+        {
+          "id": "dbi-races",
+          "code_hash": "2542b4d2766b3fe0554a2f79b51565ad33672fc7bc910e6fb9fbba967c2b1fd4",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 0]\n0"
+        },
+        {
+          "id": "dbi-isolation",
+          "code_hash": "4001aba5bc45b307737824e5933b56370ca1ec857a0665caaba4c99c846c1771",
+          "ran": true,
+          "ok": true,
+          "output": "100 120\n100 100"
+        },
+        {
+          "id": "dbi-index-patterns",
+          "code_hash": "26db3bf52c92b483de39bdd0c90b7f9be3817af9e9b50a4233a94b2975319800",
+          "ran": true,
+          "ok": true,
+          "output": "['customer', 'created']"
+        },
+        {
+          "id": "dbi-index-order",
+          "code_hash": "322d0506bf5818d64fd1e36f9ddfec2b320942f5583440abf59083a97390a4e2",
+          "ran": true,
+          "ok": true,
+          "output": "[5, 3, 9]"
+        },
+        {
+          "id": "dbi-explain",
+          "code_hash": "4c60a47e47b1f29d2d58e84a9d73e63bfa8abe74695e016b93120b6d4ccba211",
+          "ran": true,
+          "ok": true,
+          "output": "True"
+        },
+        {
+          "id": "dbi-nplusone",
+          "code_hash": "1443f53ae3b4b4c405e96d64767258ca29f746216ba0aacf09ac1d6575f21280",
+          "ran": true,
+          "ok": true,
+          "output": "True\n4 2"
+        },
+        {
+          "id": "dbi-pools-pages",
+          "code_hash": "3641ea87c4d5ae30147be86dad2ed0ca71a14406f5d2a6500e119c873a561b53",
+          "ran": true,
+          "ok": true,
+          "output": "[(90, 5), (100, 3)]\n[(100, 9), (110, 2)]\nTrue"
+        },
+        {
+          "id": "dbi-migrations",
+          "code_hash": "e70786a2f985c85d8e50efa4d3c9dfe92093b36f7226395d7f54c6579a22830a",
+          "ran": true,
+          "ok": true,
+          "output": "Synthetic Student\nSynthetic Student"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "backend-deployment-ops",
+      "fingerprint": "4a3b99a8fbf5a1f568ffd4e2761c3511735da6c63b0e2b03a9f380549df140f2",
+      "course_hash": "32aa1381d43c8c88a8ab0c86c9b6707c9ffad8b5cbb89ed44e5365408c04b4bb",
+      "bank_hash": "163e4ce13ef02917d7eac9752d11305a7de0cbd8e13524f19bc9cba6e680707f",
+      "prerequisites": [
+        "http-web-architecture"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 60,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ops-recipe",
+          "code_hash": "f00a93f1dede7c0183085842f26b59dfa41448934a904934a06e37f15dbcd7bd",
+          "ran": true,
+          "ok": true,
+          "output": "[\"python\", \"-m\", \"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]\nTrue"
+        },
+        {
+          "id": "ops-context",
+          "code_hash": "7e26670756f43c265544840c750eee438336acdcdf29f56f1c1b1a75ea4213f1",
+          "ran": true,
+          "ok": true,
+          "output": "['app/main.py', 'requirements.txt']\nTrue"
+        },
+        {
+          "id": "ops-runtime",
+          "code_hash": "0520893136ec179082ce462ae389bf5edd2b41e1e04c415b4a9ef1aa3d44051c",
+          "ran": true,
+          "ok": true,
+          "output": "8000\nsynthetic-content\n{}"
+        },
+        {
+          "id": "ops-config",
+          "code_hash": "9f1499c57c0dc4f9eadd95189fa11a7bedb41f00e1313a3b3c270f6f33780b99",
+          "ran": true,
+          "ok": true,
+          "output": "5\ninvalid TIMEOUT_S"
+        },
+        {
+          "id": "ops-redaction",
+          "code_hash": "8e910f7fff7a107be6d82fc13688c9d6c4eac12f868f4fddeccbcf319638b20c",
+          "ran": true,
+          "ok": true,
+          "output": "{\"ENV\": \"staging\", \"TIMEOUT_S\": 5}\nTrue"
+        },
+        {
+          "id": "ops-promotion",
+          "code_hash": "f17b09daa302bc04ad0eed36536f8dd2d07f1c79fbe06c344ae8f18b98c9e43c",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "ops-logs",
+          "code_hash": "1d41d7c123c095beaea2a890afdd9c9d0ae15358b6f2308c9eae9c1aff9c6459",
+          "ran": true,
+          "ok": true,
+          "output": "['start', 'dependency_timeout']\nTrue"
+        },
+        {
+          "id": "ops-metrics",
+          "code_hash": "8dd7561da0e9ef31a77624f80d08a64e91f3f5ed534d02338112430c1901d0b2",
+          "ran": true,
+          "ok": true,
+          "output": "2.00%\n900"
+        },
+        {
+          "id": "ops-rollback",
+          "code_hash": "bde69e9f7af45dcce9850389f05a5f77eee4302d72c7401f1b27a9685d0ef17a",
+          "ran": true,
+          "ok": true,
+          "output": "old False\ncompatible True"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "js-fundamentals",
+      "fingerprint": "9bbc5dc48ceb0892c742f60bff7428dffe9d201fd0c900a02185b6ccece773e3",
+      "course_hash": "b58fcd741ed74be09efb7e54dce95bc3d9fdf8d1fc963ca4a664cdc5f7b8f4b6",
+      "bank_hash": "5adf1d43abe76172116c6c2528e22d61ace52e89c10d0747af81dca12ceee5ac",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 96,
+      "comprehensive": 90,
+      "objectives": 8,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "js-values-coercion",
+          "code_hash": "a6bf62d9e2b49a1e6da5a23cf05b5cdbde4935dcb5d08d5d2af6332aa04ee459",
+          "ran": true,
+          "ok": true,
+          "output": "23\n5\nfalse\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-bindings-scope",
+          "code_hash": "8bc8f5c63e991a6a3a5ae4320fed202cf699da45e93f40fbe5efa2f5867f65f1",
+          "ran": true,
+          "ok": true,
+          "output": "3\n1\njavascript",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-truthy-defaults",
+          "code_hash": "366384ed82496b000c2b27a41dd3298b9ab779c9dbf26b74f28f4ee803ec4c6d",
+          "ran": true,
+          "ok": true,
+          "output": "10\n0\ntrue\nNot supplied",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-functions-closures",
+          "code_hash": "741adc4690165e03229e02cef6f1ef77cee6a2a0aafe77bcf3e173d4cdcba400",
+          "ran": true,
+          "ok": true,
+          "output": "1 2 1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-this-calls",
+          "code_hash": "a17b2ed3b815deaa8e5488faad5860b87df3ad9024ad3d8808b4a913b21cd394",
+          "ran": true,
+          "ok": true,
+          "output": "Hello Demo\nMember Demo",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-arrows-return",
+          "code_hash": "940bbb13f64bbf5d81d5d8bc93d12002075de9496412f1a173f1e566994000cd",
+          "ran": true,
+          "ok": true,
+          "output": "[{\"id\":1,\"doubled\":4},{\"id\":2,\"doubled\":8}]\n12",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-array-transformations",
+          "code_hash": "4b219d980ba36287290d06f9e039449b08fd687cef5a9f33a239a29ce22d1106",
+          "ran": true,
+          "ok": true,
+          "output": "[{\"id\":1,\"title\":\"Login\"}]\n2",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-reference-shallow-copy",
+          "code_hash": "862a4069e61e843860eb3272d80bfc407ba18db16d3057ab4c637be44e452015",
+          "ran": true,
+          "ok": true,
+          "output": "B\nB C\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-reduce-aggregation",
+          "code_hash": "680cb1522e741da04493302e89a3f6e4756477efbde0077755154418dd01156b",
+          "ran": true,
+          "ok": true,
+          "output": "[[\"North\",5],[\"South\",1]]\n0",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-modern-access",
+          "code_hash": "0bfa9fb7a52e1d59ba949dc36e140c5f78ff8b7601829c411f0dc543c326d724",
+          "ran": true,
+          "ok": true,
+          "output": "Demo: team\nNo email supplied\nbasic",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-errors-contracts",
+          "code_hash": "a7241f9e0b34f1e49e0cd6a4631a14b8b9f293ee35c43a5e7c59c51b311fc8dd",
+          "ran": true,
+          "ok": true,
+          "output": "QuantityError: Enter a positive integer.\ncleanup checked",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "js-module-boundaries",
+          "code_hash": "248cdd37f6e5e373eba1a8e3556e7021f531e781b76fedc7a17119cc62170849",
+          "ran": true,
+          "ok": true,
+          "output": "0.1\n110.00",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "js-dom-async",
+      "fingerprint": "02e52d564c6f43a53e61d00c6f4ddc62874c645fba58fb14f7bebc4fc74e3163",
+      "course_hash": "a5ef49d796749092a88359181c39ff2bfe7a68b2d80310695e425eb2ebefe1f8",
+      "bank_hash": "52bfee99a930be47b367da1dd44b3007b077d9ba827adb5cf0b92258e90d6a9c",
+      "prerequisites": [
+        "js-fundamentals",
+        "html-semantic"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 96,
+      "comprehensive": 90,
+      "objectives": 7,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dom-safe-content",
+          "code_hash": "d93a6952e11cd0b6dd1071716cca18da05930324738dd5c29e2e8540a2c67254",
+          "ran": true,
+          "ok": true,
+          "output": "{\"nodeType\":\"text\",\"value\":\"<em>Delivery update</em>\"}\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "dom-event-listeners",
+          "code_hash": "6a8fc0f54eeb075e80b75d8fffc91dbf389d019f4cbab3d3f6e35b42a57a0f73",
+          "ran": true,
+          "ok": true,
+          "output": "2",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "dom-event-delegation",
+          "code_hash": "2bfa99eb54a5c88123f15744bed887099830d670afc9c80bb484e98d9c65f3f9",
+          "ran": true,
+          "ok": true,
+          "output": "close 7\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "async-sync-timer-order",
+          "code_hash": "cf06c0110568c6fdff771b91d728bb03d25149d9cc53bfb5d51caf2890dd86cb",
+          "ran": true,
+          "ok": true,
+          "output": "start\nend\ntimer",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "async-microtask-order",
+          "code_hash": "f19c1b65316a9125dc13d92b0b566865270c97c6ecf7deb2f027b86cc889361b",
+          "ran": true,
+          "ok": true,
+          "output": "A\nB\npromise\nmicrotask\ntimer",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "async-yield-budget",
+          "code_hash": "bab1a165e394d655be08f95e7e3592cd2b34af78208c0fb3fc78d3e05f417cd3",
+          "ran": true,
+          "ok": true,
+          "output": "stale ignored\nnew report\nmeasure real task duration separately",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "async-await-flow",
+          "code_hash": "c06c7d0ebf63d31c7b3895a662b964b88ba854c21d0c528f0b9a815bb31a5676",
+          "ran": true,
+          "ok": true,
+          "output": "inside\ncaller continues\nREADY",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "async-rejection-cleanup",
+          "code_hash": "59e8e18281af027aec43f152fffef8d50715ef6228b0c95a097f78e1174a5a70",
+          "ran": true,
+          "ok": true,
+          "output": "synthetic save failed\npending: false",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "async-parallel-contracts",
+          "code_hash": "e31a6897c13583d668eb7ef2a72be25422513e25debc0a52d0caf7dd143d01b5",
+          "ran": true,
+          "ok": true,
+          "output": "[\"profile\",\"count\"]\nfulfilled,rejected",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fetch-status-contract",
+          "code_hash": "567fc6977def03825203c241066cd4b4646a3799c0649173683717bb4a6d5bbe",
+          "ran": true,
+          "ok": true,
+          "output": "false 404\n2",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "storage-scope-lifecycle",
+          "code_hash": "86e3fda4a688da4684bdda8f8b003c01a9c293e60cfc867956c752d7449b298e",
+          "ran": true,
+          "ok": true,
+          "output": "1 teal\nstring",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "storage-safe-recovery",
+          "code_hash": "e50ea89d8e861f5e72b114b671f9a0af6125e096b9150b95905fd63bc8ea75c5",
+          "ran": true,
+          "ok": true,
+          "output": "intro\nnull\nnull",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "typescript-fundamentals",
+      "fingerprint": "895b902e01d5f6c2d79d2127a0ef91ce950d6f75fa897d239547c5d189fabb19",
+      "course_hash": "d65b89445ea6a8071f7750e7c4c701f1a3122e90890bdebc2c88e03b47e1a47e",
+      "bank_hash": "d4acab9b06b15c9bec32b3597f6cbe6d76e1884d70b786a17bc0cfc145b8693a",
+      "prerequisites": [
+        "js-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ts-function-contracts",
+          "code_hash": "5c0d50e29093474a405f76c36a68a72b35c1ad74c555672eef13552fc4763b88",
+          "ran": true,
+          "ok": true,
+          "output": "USD 12.50",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        },
+        {
+          "id": "ts-object-shapes",
+          "code_hash": "e0a1a818c5723d7e7c1e949df4be42eb921d47d33ed5e6a7d73d4ead1ea18b5c",
+          "ran": true,
+          "ok": true,
+          "output": "L1: Interfaces\ntrue",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        },
+        {
+          "id": "ts-optional-readonly",
+          "code_hash": "d28c5b4a0df0f33e6b92d75ca44c1845016b5f80d39675bfe430e121cd8c3186",
+          "ran": true,
+          "ok": true,
+          "output": "No subtitle\ncore,typed",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        },
+        {
+          "id": "ts-union-narrowing",
+          "code_hash": "cc0e754a5e9167cb6a719a56542a7ac7315e5568e198c1aea3d5cc15d1a9356a",
+          "ran": true,
+          "ok": true,
+          "output": "DRAFT\n7",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        },
+        {
+          "id": "ts-discriminated-results",
+          "code_hash": "4b7655f394c3cf1a7a41cb3ebc2d828a4a09b73c696170ccbe25bff229214b4b",
+          "ran": true,
+          "ok": true,
+          "output": "Count 3\nTry again",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        },
+        {
+          "id": "ts-null-strictness",
+          "code_hash": "4338bc18627592666dd62e443a4c1261ef26b4c0134c451e159e8f4c6d8e86d7",
+          "ran": true,
+          "ok": true,
+          "output": "Lesson not found\nStart",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        },
+        {
+          "id": "ts-generic-relations",
+          "code_hash": "e44e86177176f53f1fbb53061ae90a7f2922a2ce21291e2f2213f580e9c038e7",
+          "ran": true,
+          "ok": true,
+          "output": "alpha\n4\nempty",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        },
+        {
+          "id": "ts-generic-constraints",
+          "code_hash": "c451df959e6ccec733c779ce414f0b217016780065ab97adfba9f21e93a22706",
+          "ran": true,
+          "ok": true,
+          "output": "3\nstable",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        },
+        {
+          "id": "ts-tooling-diagnostics",
+          "code_hash": "f5e2c2d390d9f63da74552297cabc66bc050f33bde6ef6e3faeb35a660fbb5b2",
+          "ran": true,
+          "ok": true,
+          "output": "8",
+          "runtime": "TypeScript 5.9.3",
+          "profile": "Isolated strict TypeScript compiler then emitted JavaScript; 192 MiB heap, 3 GiB virtual address space, 6 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "pandas-fundamentals",
+      "fingerprint": "5a56fa873eebf7e87d90b978185ea2073b98bc6639037c5afa66310c2c166c8d",
+      "course_hash": "6f3a68bf1fa73250f754cd85e0da21ff61ab15e36bba3d3555919cc32b11c3f8",
+      "bank_hash": "e976e0bcb79c0597f710e0f543194446238f02d88da619021e2106badc85fb36",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "pd-load",
+          "code_hash": "1e53914f590c4d63e88f4db561775c0945e3a581503e7303afb9cecee3f1fc72",
+          "ran": true,
+          "ok": true,
+          "output": "['001', '002']\n['001']\n2.2.3",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-types",
+          "code_hash": "aa4300de0396c0c32935d7f7433aee1297892d511b3d125f3d7333ff3bd9fecb",
+          "ran": true,
+          "ok": true,
+          "output": "Int64 1\n1\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-alignment",
+          "code_hash": "9299f1ec0b4d7c9ab99843fbead928caac2c525a214cf3474623ae6f2607df68",
+          "ran": true,
+          "ok": true,
+          "output": "23.0\n{'a': True, 'b': False, 'c': True}\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-group",
+          "code_hash": "557608b26245196b891b8df00b5770065fe70ed92e420e9113f92fe768d313a8",
+          "ran": true,
+          "ok": true,
+          "output": "[2.0, 1.0, 2.0]\n3",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-vector",
+          "code_hash": "07df665b320e115ed96902ca164206e015029dfb3841021d4bf040f93ac713c3",
+          "ran": true,
+          "ok": true,
+          "output": "[200, 0, 150]\n[True, False, True]\n[False, True, False]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-pivot",
+          "code_hash": "cfcab336f527a2f7e3e477a04a2753cbe68c6657ae1d9f88517499ae107a3dda",
+          "ran": true,
+          "ok": true,
+          "output": "duplicate cells\n5",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-merge",
+          "code_hash": "9c0f2d6c21bb1f092016af045cb14b806da3fc48ebff4cc2e216d333aaa7d5fe",
+          "ran": true,
+          "ok": true,
+          "output": "invalid lookup\n['both', 'left_only']\n30",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-concat",
+          "code_hash": "79851ad084f8805304601c494d5d50a345b204bcc1e04a36b7216de54b032b25",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2, 2, 3]\n2\n1",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-reshape",
+          "code_hash": "9663706704fff26598ef975bb917790cef00c2eceb42bcbf63eadbc729f66c76",
+          "ran": true,
+          "ok": true,
+          "output": "4 2\nFalse\n[1, 3]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "data-cleaning",
+      "fingerprint": "0b03dfabcc45070dea85bb7df3caf005a9d8375238ee861ce5f2444aadd723d8",
+      "course_hash": "b9f4a317949dd8b23c8ecbee23fa757a091e1d3146108eabde53508933e2bfd7",
+      "bank_hash": "4185de44a07f153adc33fab7dfcecbfa5c2d92c98b57d1c323ba88fb1061ad33",
+      "prerequisites": [
+        "pandas-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dc-missing",
+          "code_hash": "92142aa8be1c95fa1e2378fe8bc14d3d2ee5e82125a6880349d879d5c857dcce",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True, False]\n[10.0, 20.0, 30.0]\n1 0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-invalid",
+          "code_hash": "4ebea026acb995736489704c8bd041dce6739e90fad30ed7e3bac75f9d33f7fb",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True, False]\n[False, False, True]\n[1.0, -2.0, 100.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-strategy",
+          "code_hash": "422c959d9b8b56fb38614c89459dac1a0d4be5a3cd6ac0bffddb0f253bf3131a",
+          "ran": true,
+          "ok": true,
+          "output": "1\n20.0\n13.333333333333334 46.666666666666664",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-standardize",
+          "code_hash": "39598e0f9a2255a6e2148d16014a8d96807ed6304314a7c5616b0d73ce2a69c8",
+          "ran": true,
+          "ok": true,
+          "output": "['north', 'north', 'UNMAPPED']\n[False, True]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-dedup",
+          "code_hash": "c0e31e916e5007054eb7238d42a60cbc2240b06582a6acc25db3a142b6d44b0e",
+          "ran": true,
+          "ok": true,
+          "output": "1\n{'a': 12, 'b': 5}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-consistency",
+          "code_hash": "849ed01b9201c9d59bba5c101d39f2756eb221de3ba39335de06036aa0aefbc4",
+          "ran": true,
+          "ok": true,
+          "output": "['A1', ' a1 ']\n['A1', 'A1', 'B2']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-rules",
+          "code_hash": "09aa0b300809c6c2f0da94bf1c9a66ffffecf8281e409461d114d1ee15314b78",
+          "ran": true,
+          "ok": true,
+          "output": "[('bad', ['status', 'amount'])]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-lineage",
+          "code_hash": "31fe2ac6d131f25a7166da831b6f2a30c29bd296eea57f0c30978105aaf68275",
+          "ran": true,
+          "ok": true,
+          "output": "{'source': 'synthetic-v1', 'rule': 'trim-region-v1', 'changed': 1, 'rows': 2}\n north",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-idempotence",
+          "code_hash": "a5dcecd4deb574068efd738f97ead347b7aca9a266b9ef9568d16c53dde712fb",
+          "ran": true,
+          "ok": true,
+          "output": "True\n[1.0] [0.001]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "prompting-structured-output",
+      "fingerprint": "a90d1f4afcf40f43d5f10171fe4442d789141b9ab54c101e9966f2e7c420434e",
+      "course_hash": "4b637c779371b24c245ac7db20405b941a14f526b505b6a0681decf2852e585a",
+      "bank_hash": "89caa155712163baa4b9fa0e6ec94248a560de3023b51665a3d8c21da3869e2b",
+      "prerequisites": [
+        "llm-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "prompting-structured-output-task-contract",
+          "code_hash": "6a1c1c815589823b7078649e5a3060a13e5e9ae1b92f70c6f6171409f6218524",
+          "ran": true,
+          "ok": true,
+          "output": "['system', 'user']\nTrue\nTrue"
+        },
+        {
+          "id": "prompting-structured-output-examples",
+          "code_hash": "3dc2d35d5a562264ca396f2f46a35320c0d2800ce620d6bfe6c9dfdcac54ca1a",
+          "ran": true,
+          "ok": true,
+          "output": "1\nWhere is my parcel?"
+        },
+        {
+          "id": "prompting-structured-output-context-management",
+          "code_hash": "392b7a0725fc695957f918ad36879d97f1c8ccf228c981e1c177a13d6f1bfbd2",
+          "ran": true,
+          "ok": true,
+          "output": "['relevant_decision']\n90"
+        },
+        {
+          "id": "prompting-structured-output-json-shape",
+          "code_hash": "1e26edac08d563c60500adf43460fde901c8fffb642db2c77c90b2824c2bfba8",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "prompting-structured-output-semantic-checks",
+          "code_hash": "2fa278dd4ba399ac06a387a0a9eace620df3813ec0482cd2ff0a9207ed330c09",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "prompting-structured-output-response-outcomes",
+          "code_hash": "eef2270f348dfebf708b03c82ea824d05ec0475b7756056c064ddcae5823dcb7",
+          "ran": true,
+          "ok": true,
+          "output": "validate_payload\nshow_refusal\nnot_a_result"
+        },
+        {
+          "id": "prompting-structured-output-evaluation-set",
+          "code_hash": "5bcf7b8a2907d2dfcd99ba8d3d13f14e06b16aa9769a5df9326c32c17cc87b80",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['access_boundary', 'missing_evidence', 'normal', 'schema_edge']\nTrue"
+        },
+        {
+          "id": "prompting-structured-output-scoring",
+          "code_hash": "3394737713393e3eead07eda0aa3e71fa239ae65abcf91df87334df4fb4dc02f",
+          "ran": true,
+          "ok": true,
+          "output": "['missing']\n['critical']\n2 2"
+        },
+        {
+          "id": "prompting-structured-output-regression-gates",
+          "code_hash": "38e3b4df8f351e48a190f28af51ec9271175563c20926d40a97a6882a99791a2",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True]\nhuman approval remains separate"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "embeddings-semantic-search",
+      "fingerprint": "f69e1c5a0b7c737f60fc6f5a2aa81e16676d8b3a1c2b646d5a4ae8c92607e517",
+      "course_hash": "9a151396ed45bc3330b63c4baa26a487986846c0a5e0bf4ff4ad3389dcba4203",
+      "bank_hash": "8ec14930cfef06159ea7f6092c5ce8c8fc4021aaac3cdf854f827c99853aaba4",
+      "prerequisites": [
+        "llm-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "embeddings-semantic-search-vector-meaning",
+          "code_hash": "ff36dcf2570db5d90af3bbd304639e9f41191987a5dcc61216872f84eee6892b",
+          "ran": true,
+          "ok": true,
+          "output": "1.0\n0.0"
+        },
+        {
+          "id": "embeddings-semantic-search-metric-contract",
+          "code_hash": "a637363c1b50caa7d50b0d56a2679caaf9d694599d3f06c1178946411787c128",
+          "ran": true,
+          "ok": true,
+          "output": "long\n1.0 1.0\n0.707"
+        },
+        {
+          "id": "embeddings-semantic-search-model-selection",
+          "code_hash": "5404310ff5263c358e6154edb38d6f42a4d864e6bc1671824f923e21a468eb4f",
+          "ran": true,
+          "ok": true,
+          "output": "['B']\n1"
+        },
+        {
+          "id": "embeddings-semantic-search-chunk-boundaries",
+          "code_hash": "f1b4d4e6b3e2a0178fe611ff607ce840ae49ed4ba59e30794d7c2a5f963d91a5",
+          "ran": true,
+          "ok": true,
+          "output": "[['p1', 'p2'], ['p3']]\n['p1', 'p2', 'p3']"
+        },
+        {
+          "id": "embeddings-semantic-search-overlap",
+          "code_hash": "f89b6bb1e2a12c02418ec7efb6080e5a8bce21ceb778b02e21de593e6ae64072",
+          "ran": true,
+          "ok": true,
+          "output": "[[0, 1, 2, 3], [3, 4, 5, 6], [6, 7, 8, 9], [9]]\nTrue\n13"
+        },
+        {
+          "id": "embeddings-semantic-search-hybrid",
+          "code_hash": "7eedf924f21b2bfdb80f58af5af52ff3bdbda39aa92617a11f0a5f3254fa294e",
+          "ran": true,
+          "ok": true,
+          "output": "['delivery-policy', 'code-guide', 'refund-policy']\n3"
+        },
+        {
+          "id": "embeddings-semantic-search-precision",
+          "code_hash": "6738a1252edcb8bdacf61c61ca72042629ad99510d55466326d2eaa99c281fdd",
+          "ran": true,
+          "ok": true,
+          "output": "2\n0.50\n['p1', 'p2', 'p3', 'p4']"
+        },
+        {
+          "id": "embeddings-semantic-search-recall",
+          "code_hash": "4e86c0e1ee63130f52bd91456fc22d7f338dd5d3f3cbf630ff44dc2dc2cf8b02",
+          "ran": true,
+          "ok": true,
+          "output": "precision=0.667\nrecall=0.500\n['e', 'f']"
+        },
+        {
+          "id": "embeddings-semantic-search-evaluation-cases",
+          "code_hash": "11cca2e5821de85a3de1330202775273f038c589574053f393074f2c81be4f88",
+          "ran": true,
+          "ok": true,
+          "output": "macro=0.625\npooled=0.400\nTrue"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "vector-databases",
+      "fingerprint": "5853c69fc2d5fef059216cb1b03f5bbd454c79394d12bbf4e45fad4e5e35a073",
+      "course_hash": "28814c4fd72a0ca3e97b260e0533a9e070a190e8059775f86046b9c934e2df92",
+      "bank_hash": "aae123b207712f058f31568a97809b4d1ce67676e0d2cddf9fe10a0409d3b1c7",
+      "prerequisites": [
+        "embeddings-semantic-search"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 75,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "vector-databases-store-choice",
+          "code_hash": "2517306491a3845fcaccd7fc80bb1ec766cd90e4cbe81c16a878e9b0add31f04",
+          "ran": true,
+          "ok": true,
+          "output": "['database']\n3072000"
+        },
+        {
+          "id": "vector-databases-exact-ann",
+          "code_hash": "6c299a5b47995f76eb1db71d17ddae7f361c5e1fb4e1e2cc2e6fe310a73c2936",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['b', 'c']\n0.5"
+        },
+        {
+          "id": "vector-databases-index-tradeoffs",
+          "code_hash": "ae429884efb53247f779b84811e464d55f5d5a10725170d442f8e6e8ede744c5",
+          "ran": true,
+          "ok": true,
+          "output": "['a', 'b']\n['a', 'b', 'c', 'd']\nTrue"
+        },
+        {
+          "id": "vector-databases-tenant-filter",
+          "code_hash": "90cc098ee2222a819d8d7001d82576f09acfcfc10a631068e93bbf9ec8e476a4",
+          "ran": true,
+          "ok": true,
+          "output": "[{'id': 'a', 'distance': 0.2}]\nTrue"
+        },
+        {
+          "id": "vector-databases-metadata-contract",
+          "code_hash": "9256bb1c991fd834498afef40349bd44742cefb3e1994ddb871007a4fcb7253f",
+          "ran": true,
+          "ok": true,
+          "output": "['x']\n['x', 'z']"
+        },
+        {
+          "id": "vector-databases-serving-scope",
+          "code_hash": "54d3a4ba65cd9302f503e96d2bb3aa48557ccf796cf2d9421388aa338227070c",
+          "ran": true,
+          "ok": true,
+          "output": "['tenant3-policy']\nNone\nNone"
+        },
+        {
+          "id": "vector-databases-versioned-update",
+          "code_hash": "d6b471a35aa356fcee9a4e3b36122a715a976161c9a34f414b5e74278327c956",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nFalse\n1 2"
+        },
+        {
+          "id": "vector-databases-delete-lifecycle",
+          "code_hash": "caf7b785cd9bbba7e4ab6bb01aae603dabc7be99cad3d2db44f4af05cf83df0b",
+          "ran": true,
+          "ok": true,
+          "output": "[{'source': 'b', 'chunk': 1}]\nFalse\nTrue"
+        },
+        {
+          "id": "vector-databases-reembedding",
+          "code_hash": "064db38283f64e7e62e67cab6172f15c3dd744db2f90a33e99b4eaa57f7d3847",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue\nembed-v2"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "rag-fundamentals",
+      "fingerprint": "6dfe3b856d1ac8f53d9dc9a05fcae7430f689494873e668664c4b82f1f6c446b",
+      "course_hash": "74d9f6b10e8f21bbc9a80e9739796c2be710f0d1689e87a8ec92a58d21b2686c",
+      "bank_hash": "ba7a30932c30b6b6f9a7f84384eb636f04d57ff8f8a7a20a6da52cde3501c8c1",
+      "prerequisites": [
+        "vector-databases",
+        "prompting-structured-output"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 75,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "rag-fundamentals-ingestion-contract",
+          "code_hash": "c644eabfe06112ec591f753dfce78d46b866476bc31622442bf9a39486b1f721",
+          "ran": true,
+          "ok": true,
+          "output": "[('handbook', 3, 0), ('handbook', 3, 2)]\n2"
+        },
+        {
+          "id": "rag-fundamentals-retrieval-handoff",
+          "code_hash": "e5c2710d70f7e61fafdb86f230636fa9bd63b016aa0cda128287d4003648689c",
+          "ran": true,
+          "ok": true,
+          "output": "['a', 'c']\nTrue"
+        },
+        {
+          "id": "rag-fundamentals-context-citations",
+          "code_hash": "340caa82c4f9faf2d806f55c3ad37b620874a632cf030bb9019d812d37d736ee",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "rag-fundamentals-stage-diagnosis",
+          "code_hash": "ee7c543ca2c0d739a1c6623dfbf3686b9f595cc789651b12d1814fefe68688b3",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\nFalse\npacking loss"
+        },
+        {
+          "id": "rag-fundamentals-generation-support",
+          "code_hash": "180cda41ed6e247594421197615f60251ae93310bb204773615f86c593df9404",
+          "ran": true,
+          "ok": true,
+          "output": "['c2']\n0.6666666666666666"
+        },
+        {
+          "id": "rag-fundamentals-no-evidence",
+          "code_hash": "2e48f8369d598f342ae0b0617d62f30461f58fcef3b0cf23bfc3382d3dd4833d",
+          "ran": true,
+          "ok": true,
+          "output": "answer from evidence\ninsufficient evidence\nevidence unavailable"
+        },
+        {
+          "id": "rag-fundamentals-version-manifest",
+          "code_hash": "cdf18608bcce65710aa0ed25e3692a61a4e4aabffd313759ba6f3c2813b3b380",
+          "ran": true,
+          "ok": true,
+          "output": "['returns']\nFalse\nTrue"
+        },
+        {
+          "id": "rag-fundamentals-fresh-context",
+          "code_hash": "f63e5cae4bce6b2979778506034615eb137a3542ed69d5387e5d39210e5514e7",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "rag-fundamentals-freshness-acceptance",
+          "code_hash": "f4d720332331df733150ddbc16d6484955365c494cd8df3f5b5c91189250a64c",
+          "ran": true,
+          "ok": true,
+          "output": "['changed_policy']\n[]"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "advanced-sql",
+      "fingerprint": "51173119a1710c86fcaa10d7f66effb072ca3b7cb9200db1a6c3c56aeb39fc94",
+      "course_hash": "24e3983f86b1e4564cbe33c5d700c22f46cdfb3b56ced84b9ea9b5e74720f1da",
+      "bank_hash": "648573497a3042251873ba59282f98d60e08688989995c920bdd2a39043eb801",
+      "prerequisites": [
+        "sql-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "as-ctes",
+          "code_hash": "432458a4faea2b35e617a311d2a659071077de65fabb4ce7a7328e213b4a6f41",
+          "ran": true,
+          "ok": true,
+          "output": "[('a', 70)]"
+        },
+        {
+          "id": "as-exists",
+          "code_hash": "1b69e9723c0ffef5f9c63c99453bdc30f3a748d2b2f24a2849888ab6f4c823bb",
+          "ran": true,
+          "ok": true,
+          "output": "[(1,)]"
+        },
+        {
+          "id": "as-antijoin",
+          "code_hash": "5c4aa558f962d6a2e84e3c54fb936f12c5b76503b4fe3f2c2ccbf2f721a5ffce",
+          "ran": true,
+          "ok": true,
+          "output": "[(2,)]\n[]"
+        },
+        {
+          "id": "as-ranking",
+          "code_hash": "e14288fe17e69e8cc71160b6e30883cb2fff6828f01a4302290e8e61d8563137",
+          "ran": true,
+          "ok": true,
+          "output": "[(1, 1, 1, 1), (2, 2, 1, 1), (3, 3, 3, 2)]"
+        },
+        {
+          "id": "as-running",
+          "code_hash": "f9ab07726c655d3ed6c774959d380b39d78daca72c7c1ba58a52055a709ffbce",
+          "ran": true,
+          "ok": true,
+          "output": "[(1, 10, None), (2, 30, 10), (4, 35, 20)]"
+        },
+        {
+          "id": "as-latest",
+          "code_hash": "f01e7a1fdae07f0a906c24e7d39dfa606ebb84f22fe9e0f2f14cebe0f2069a55",
+          "ran": true,
+          "ok": true,
+          "output": "[('a', 'active'), ('b', 'new')]"
+        },
+        {
+          "id": "as-plans",
+          "code_hash": "789882a14ad8fc021b66d7efa4b11c286f7cec2559d8defb341f7b3ee6620843",
+          "ran": true,
+          "ok": true,
+          "output": "True"
+        },
+        {
+          "id": "as-indexes",
+          "code_hash": "6b38d5efa67674b49247a7c7e2b50c11b01a3c249808bdd717cabff954767f2e",
+          "ran": true,
+          "ok": true,
+          "output": "[(2,), (1,)]\nTrue"
+        },
+        {
+          "id": "as-sargable",
+          "code_hash": "22cb696a6c504b9afd0b21999207c4887daad70da301fce06347dcd6021cfe2a",
+          "ran": true,
+          "ok": true,
+          "output": "[(2,), (3,)]"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "descriptive-stats-metrics",
+      "fingerprint": "4912d1596eb368d57c5d40048371bb96588e63ba649f5fac119ce0f8778e7669",
+      "course_hash": "88aebc8f98b7fc8515017e5e47c80a3bf33322d208853d4a2ab80512d884f344",
+      "bank_hash": "4c86ecbde8de94692c1048f14cdd03f3ee8eab6890924bb302938dfedf04632c",
+      "prerequisites": [
+        "data-business-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dsm-center",
+          "code_hash": "d63c636e9312acea5ed98a41bef3be4f6e0b47953b075deea52456220a91fb9d",
+          "ran": true,
+          "ok": true,
+          "output": "10\n3\n[2, 3]"
+        },
+        {
+          "id": "dsm-skew",
+          "code_hash": "f40b45a19654d6e798c6a3c2ec2be897e505bebb59c19ed8cc04245275d24227",
+          "ran": true,
+          "ok": true,
+          "output": "6.5 18.5\n[80]\n6"
+        },
+        {
+          "id": "dsm-spread",
+          "code_hash": "eeff0334d45fc196c12d10141c96b3602cf88cb6886406fbf383f53b383504b5",
+          "ran": true,
+          "ok": true,
+          "output": "5 5\n0.0 3.162278\n[2.5, 5.0, 7.5]"
+        },
+        {
+          "id": "dsm-growth",
+          "code_hash": "28924e39e5ceb3185521e3e89b2c9e4749c090a9b847646f8db27fe39589ab60",
+          "ran": true,
+          "ok": true,
+          "output": "1/10 9/100\n-1/100\n4/5\n99/100"
+        },
+        {
+          "id": "dsm-margin",
+          "code_hash": "a0429c6a984084b67f9d7f610786cc5f255006069118709ee17e689fcdfc5d2f",
+          "ran": true,
+          "ok": true,
+          "output": "90.00 36.00\n0.4\n0.6667"
+        },
+        {
+          "id": "dsm-retention",
+          "code_hash": "134cd2bed03abf34aa181809791a1baa121deae2b7411077e1391f27a752ff55",
+          "ran": true,
+          "ok": true,
+          "output": "0.6666666666666666\n0.6666666666666666\nFalse"
+        },
+        {
+          "id": "dsm-confounding",
+          "code_hash": "73507c56dbefbd33609240139506f61fbdba13442e1cc896323ee164d4c75d8d",
+          "ran": true,
+          "ok": true,
+          "output": "True 110.0 1.0\nFalse 50.0 0.5"
+        },
+        {
+          "id": "dsm-uncertainty",
+          "code_hash": "0bd12edfdce331d71042cde5799f03e1e5a76fb79fbd0978906a3aa83df8a48f",
+          "ran": true,
+          "ok": true,
+          "output": "1 1 1.0 0.0\n900 1000 0.9 0.0095\nboundary estimates need a suitable interval method"
+        },
+        {
+          "id": "dsm-review",
+          "code_hash": "f2012efaa8618370e183d84479317bf651844adb510e792f25ad15054e765bbc",
+          "ran": true,
+          "ok": true,
+          "output": "10.0 [100, 50]\n2 True"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "eda",
+      "fingerprint": "c4010c60af083d9be2463c1f2d3806a74abc5bd90e6721c43a28e410564c43b2",
+      "course_hash": "2b7f637ead35a05e6d40cbc13f531807e1d6c8178c1e5de6f9da5359696ab0e1",
+      "bank_hash": "a5d3bb2910e2cc08f5d00a3d57640fb5588e9a5114d36216de06dd91f4cddf55",
+      "prerequisites": [
+        "pandas-fundamentals",
+        "descriptive-stats-metrics"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 66,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "eda-profile",
+          "code_hash": "e74864099183e84b367a98a263d75d0b32cb551c56ab19fbd1c74b818ed8a523",
+          "ran": true,
+          "ok": true,
+          "output": "(4, 2)\n4 5.0 100.0\n1 4",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "eda-expect",
+          "code_hash": "c0335761c005c8ed1d974912b4456f40d48ad58d60c53831637dd95fe65131c4",
+          "ran": true,
+          "ok": true,
+          "output": "{'repeated_order_rows': 2, 'unknown_status_rows': 1}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "eda-relate",
+          "code_hash": "6ebd0600f870bf5266a77a168cc9c878260b8a420ddc6b2b523ca866b8ebd4d5",
+          "ran": true,
+          "ok": true,
+          "output": "3\n1.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "eda-segments",
+          "code_hash": "cb791c0126466d9f3b74953ebaa08c17e299190512a620c899772067c5d95db8",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2] [2, 3]\n[0.5, 0.667]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "eda-simpson",
+          "code_hash": "ee46df4e3f58ec94c2cd142840521c12f425c50ee3b8bd34d05fdc4fe9835ff8",
+          "ran": true,
+          "ok": true,
+          "output": "[0.9, 0.2, 0.8, 0.1]\n[0.264, 0.736]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "eda-time",
+          "code_hash": "c99bb5d6f1d34318921af458896099db9b3c797e41f7fe3e4ece5a5a619150b6",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True, False]\n[True, True, True]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "eda-findings",
+          "code_hash": "889dcf4d9c22f6fa6b60e62db9d4f5ed34f38df1196b3788c99e6d05db4165af",
+          "ran": true,
+          "ok": true,
+          "output": "2.0\n20.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "eda-questions",
+          "code_hash": "90138aad74d5b4c648ea74af85d064cf9f1bcbbc133fa23267a597cde821f8c8",
+          "ran": true,
+          "ok": true,
+          "output": "{'far': 2.0, 'near': 2.0}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "eda-handoff",
+          "code_hash": "f25c3f7c8d89b282c530c60aeb186d8d4ecd4f45b581a8fd2498406af65b6267",
+          "ran": true,
+          "ok": true,
+          "output": "{'finding': 'F1', 'input_rows': 3, 'observed_rows': 2, 'mean_observed': 15.0, 'status': 'exploratory'}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "cloud-aws-foundations",
+      "fingerprint": "7913ab74cccc95008f929f81d63c414f0e2c72e74f39cd5ecb8cf3a1f7c790c3",
+      "course_hash": "85dbd27df05943e89c5d7b4542772516d60bdceba9f72674bfc5d101a6635f87",
+      "bank_hash": "d079291fdf499cfbd479169bc3f263b02f47a8eb4803e6862ea5e2aac86c51e6",
+      "prerequisites": [
+        "networking-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "cloud-aws-foundations-l1",
+          "code_hash": "067885d89bb6b20c2d0ff38d1b042c952d58a262ae0a87f895aeda233709bb2d",
+          "ran": true,
+          "ok": true,
+          "output": "['guest_os', 'application_permissions']"
+        },
+        {
+          "id": "cloud-aws-foundations-l2",
+          "code_hash": "1c1854a7576f65d8a790ade310a7d1144a51deca8bafa6c39335ee4ee623d868",
+          "ran": true,
+          "ok": true,
+          "output": "['invoice-demo']"
+        },
+        {
+          "id": "cloud-aws-foundations-l3",
+          "code_hash": "2c962cb3be8a94c7a4a8e008d691df6c0231367da5ab2a02d1279aa9a383f878",
+          "ran": true,
+          "ok": true,
+          "output": "2\nTrue"
+        },
+        {
+          "id": "cloud-aws-foundations-l4",
+          "code_hash": "28f5010d293971d5da04571e7858787d58edcf564e1b03eba11e74cf03cbb226",
+          "ran": true,
+          "ok": true,
+          "output": "[('daemon', 'vm-candidate'), ('event-job', 'managed-candidate')]"
+        },
+        {
+          "id": "cloud-aws-foundations-l5",
+          "code_hash": "dc641ac0543f84dcbc85a860a3a7877821d8b1a6dd7d6321ba9ea30b25a69353",
+          "ran": true,
+          "ok": true,
+          "output": "['object-candidate', 'block-candidate']"
+        },
+        {
+          "id": "cloud-aws-foundations-l6",
+          "code_hash": "89fbdbe507c335903df894d94ec33b462f800ee4c22efb9f26327cf5a06e7c4b",
+          "ran": true,
+          "ok": true,
+          "output": "rejected\n2"
+        },
+        {
+          "id": "cloud-aws-foundations-l7",
+          "code_hash": "274a4ba8795808857d2a2a8f1a075e26bef95e2e26709a26543218fc538234f3",
+          "ran": true,
+          "ok": true,
+          "output": "10.00\n20.00"
+        },
+        {
+          "id": "cloud-aws-foundations-l8",
+          "code_hash": "27385056e2314e512563e35fb95a8c4252a8fffc4c50a1c506804020d3eb03a2",
+          "ran": true,
+          "ok": true,
+          "output": "['review_required']\nFalse"
+        },
+        {
+          "id": "cloud-aws-foundations-l9",
+          "code_hash": "b883507ff2c26167028f9c266ce2fd8e929d83e8fd082cc1ad71a2fa6ff80da8",
+          "ran": true,
+          "ok": true,
+          "output": "{'portal': 10, 'unallocated': 3}"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "cloud-networking-iam",
+      "fingerprint": "d66b697e388e70fbc528add5dba04afd71ac478bfa1c395f37e97d5099ea8d88",
+      "course_hash": "8ce27419f8f0a1ea2cf22c33e83f60ad368e333bd9ed49b2a7eed278194717e4",
+      "bank_hash": "5de0907e323c80962904cbf8c470b273b0cd18d591b3da8e9a45e677a1878691",
+      "prerequisites": [
+        "cloud-aws-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "cloud-networking-iam-l1",
+          "code_hash": "a9e1dfe403aa9ae81885ddb5c5ebf7f27abc3a3ef9442534ebbbdcb5c9f0f98d",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l2",
+          "code_hash": "890cdfd3c1eb8f9d5679e5c59f5524455e2e61a3ecb4935ee80fa240d2080bca",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l3",
+          "code_hash": "e596f77020e10ffbc210b75c9e041fb976d9bd3eacd4b1b5c7b778d5ec98ce47",
+          "ran": true,
+          "ok": true,
+          "output": "['storage']"
+        },
+        {
+          "id": "cloud-networking-iam-l4",
+          "code_hash": "087f1f8bc4832848408249741f76d274af0ae13ae4353e15737cf6b85631bd97",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l5",
+          "code_hash": "978560412a66bcb1e11e3c3c5fd8bdd229c9d3937b771ba189fde4e524d7bf8c",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l6",
+          "code_hash": "9133314ea415cadb925e79a2c6517daf75567135ade82b7bbec39047697af065",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l7",
+          "code_hash": "69a9981723225f54fe3ddf7824b502ff03676a87760db4005d1a8850f23a5d71",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue"
+        },
+        {
+          "id": "cloud-networking-iam-l8",
+          "code_hash": "827101470031cc292152b4e05e31708d2849d0bd310756ea04bae904f7eadeef",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nTrue"
+        },
+        {
+          "id": "cloud-networking-iam-l9",
+          "code_hash": "0cc5b81a2d47756a2025a9e6ea5b2f45dacf960a99a9fbab63a666cc9a5c058a",
+          "ran": true,
+          "ok": true,
+          "output": "[{'actor': 'role-demo', 'action': 'policy-change', 'outcome': 'accepted'}]\nTrue"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "docker-containers",
+      "fingerprint": "62c29a7f2feee48df3d86b47716297d2b0b2c8c9bfebb5e55b0c62298173888f",
+      "course_hash": "1693b091900e7af491c4f3e80545b1e1c71ced4a0e6d2c5e8904b654244b9167",
+      "bank_hash": "95e00b2510552667432293df51fa5e3e0b3f4be563e9d74e5e1343a0314df14f",
+      "prerequisites": [
+        "linux-sysadmin"
+      ],
+      "lessons": 10,
+      "modules": 3,
+      "formative": 60,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "docker-containers-l1",
+          "code_hash": "76797bec16301aff68a7fbb5b809fc5a136b1878a0bb42fc742980c395952778",
+          "ran": true,
+          "ok": true,
+          "output": "True\n[]"
+        },
+        {
+          "id": "docker-containers-l2",
+          "code_hash": "af3a8d2f880fafc59dcfd0a98a39eb0b7415a015fa7cf695a79bd683d6de05b3",
+          "ran": true,
+          "ok": true,
+          "output": "reuse\nreuse\nrebuild"
+        },
+        {
+          "id": "docker-containers-l3",
+          "code_hash": "9ec6f2e9b4c2144ebb863e6d23665a85a09329eca03bddb471648518a99e7235",
+          "ran": true,
+          "ok": true,
+          "output": "python,runtime-library,wheel\nFalse"
+        },
+        {
+          "id": "docker-containers-l4",
+          "code_hash": "7f3d2c6e20808f4e9225a4e44714c1b208edeb13f13c76286b07ef76fc464628",
+          "ran": true,
+          "ok": true,
+          "output": "8080 -> 8000\nTrue"
+        },
+        {
+          "id": "docker-containers-l5",
+          "code_hash": "3b297f9ea9ccb87b7a6241c5a3d1b30a6af271c8dbf012499bc14f008596f8a0",
+          "ran": true,
+          "ok": true,
+          "output": "['invoice-1']\n[]"
+        },
+        {
+          "id": "docker-containers-l6",
+          "code_hash": "25617b87d6d43d0f547cb886de3ff5f4c4d4e42e5d87c781d3caa9c3a56326f4",
+          "ran": true,
+          "ok": true,
+          "output": "True\n2"
+        },
+        {
+          "id": "docker-containers-l7",
+          "code_hash": "184b6155d35d9a5ec7a5efafde99b532d98cd28cf5c2445d794b5d3b0fdb7027",
+          "ran": true,
+          "ok": true,
+          "output": "ready on attempt 3"
+        },
+        {
+          "id": "docker-containers-l8",
+          "code_hash": "ceb2489c3d6641fea82041ca8c8a2de07fac6ec7a272ab443a992f8f50dc3b90",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue"
+        },
+        {
+          "id": "docker-containers-l9",
+          "code_hash": "354e49ad6ee43519391a7c37779264c67340216e23ddebba0dd7a33bfd57f2cf",
+          "ran": true,
+          "ok": true,
+          "output": "block"
+        },
+        {
+          "id": "docker-containers-l10",
+          "code_hash": "490450a9dc02815feeadbe678dc228873e001b09d814f68ef8dff489be36159f",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['lockfile', 'source']"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "ci-cd",
+      "fingerprint": "c43913fbe07e95893cfd395e3875cbb241dacdd83cf471695a35994827006f84",
+      "course_hash": "68fe5e0a761b4aaf1a378db1c636eed67fd0cc84c23625965590f7021bb484ba",
+      "bank_hash": "ca7e30fff09b8bcdacdda877c99b7cfe95023edbe70819c72fd7a8c0bc8338a2",
+      "prerequisites": [
+        "git-collaboration"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 61,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ci-cd-l1",
+          "code_hash": "cb5efa61d0bb0fc282fe8a501ffcc181e0558d852465dff1e74bd28bb7d88129",
+          "ran": true,
+          "ok": true,
+          "output": "False\ntest"
+        },
+        {
+          "id": "ci-cd-l2",
+          "code_hash": "8d018faf1ae2023f158a7f7c35d53b7aacded1fedc2b52decc96750899b18deb",
+          "ran": true,
+          "ok": true,
+          "output": "separate trust contexts"
+        },
+        {
+          "id": "ci-cd-l3",
+          "code_hash": "16973f50606c9c5539d3352f7b20c32f7834b78bb6fdc1ee06ad6cb8debd7d9f",
+          "ran": true,
+          "ok": true,
+          "output": "2\nlinux-python3.13-lock-v2"
+        },
+        {
+          "id": "ci-cd-l4",
+          "code_hash": "b21aae89b7b660ab96735c762a2827c29d4db5f0bff4f28b95b0f26540119f40",
+          "ran": true,
+          "ok": true,
+          "output": "hold\nrelease-42"
+        },
+        {
+          "id": "ci-cd-l5",
+          "code_hash": "54ce5ed282273370fd99e8a1d2fa1a9f46e90dcbf2ea6b8407a7b7d2116964f4",
+          "ran": true,
+          "ok": true,
+          "output": "blue -> green\nretain blue"
+        },
+        {
+          "id": "ci-cd-l6",
+          "code_hash": "d3a41fc04e0499dee8484625af9aad100de0d86f062d96ae64890a75cd3ba638",
+          "ran": true,
+          "ok": true,
+          "output": "0.004 0.040\nhold"
+        },
+        {
+          "id": "ci-cd-l7",
+          "code_hash": "19901342584449b12cf969c3e426a14c3f80c14a56523dff438734eb52e9576e",
+          "ran": true,
+          "ok": true,
+          "output": "unstable\nfirst result: failure"
+        },
+        {
+          "id": "ci-cd-l8",
+          "code_hash": "f710d0e8c8ff250f9fa9188d88adb8ffb1d4a3321d55dbbc3f37c167e7c5790d",
+          "ran": true,
+          "ok": true,
+          "output": "assess forward recovery"
+        },
+        {
+          "id": "ci-cd-l9",
+          "code_hash": "6ad405fcc15c00e08bc5d4c094bad690fbccc2abde736c05715bb9381eaebfbf",
+          "ran": true,
+          "ok": true,
+          "output": "old stale\nnew eligible"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "defect-management",
+      "fingerprint": "8f7e4371699f692ff9ca53423280abe3641e584573652bae296771a9b472aef1",
+      "course_hash": "0bd839e379dc7ab509953e98d3564b35e3f96027363dc48a2118f69477a5e8c3",
+      "bank_hash": "f5b6728ec16f0e33a82022c604584d039ba4040148a0bb6cdc773880ea4d9894",
+      "prerequisites": [
+        "qa-principles"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "defect-management-report-contract",
+          "code_hash": "b82c5ce66189bd8f7bf404aeec4379866f8b88e5e3aba889594f39c5c3b76fad",
+          "ran": true,
+          "ok": true,
+          "output": "{'expected': 80, 'actual': 100, 'matches': False}"
+        },
+        {
+          "id": "defect-management-reproduce",
+          "code_hash": "17518153fce7a0d184343ef616d5ac0d6fc62b5c478ac74f75afc594744d3c0d",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['reserve', 'cancel', 'retry']"
+        },
+        {
+          "id": "defect-management-evidence",
+          "code_hash": "5b35449234b6558914f6e29125d564ec7b8a463f2f1ebab7cafc93ab0b0d0687",
+          "ran": true,
+          "ok": true,
+          "output": "{'request_id': 'req-synthetic', 'status': 403}\nTrue"
+        },
+        {
+          "id": "defect-management-severity-priority",
+          "code_hash": "65bc4868cff1ec01943d71173325d1e1793a0d88ada2965fb326fd41ac492bb5",
+          "ran": true,
+          "ok": true,
+          "output": "[('loss', 5), ('caption', 1)]\n['caption']"
+        },
+        {
+          "id": "defect-management-triage",
+          "code_hash": "28f457c6bad0995133201e611dcf67f5c77c909ec54b627e997c8bb062cb4647",
+          "ran": true,
+          "ok": true,
+          "output": "False\n['a', 'b']"
+        },
+        {
+          "id": "defect-management-impact",
+          "code_hash": "6c8b057753267d9d679d80db08429f78cd1c7c593dc701a4b8fd2106e439bc8b",
+          "ran": true,
+          "ok": true,
+          "output": "['scheduled_export']"
+        },
+        {
+          "id": "defect-management-lifecycle",
+          "code_hash": "9ecd3cafb30b47345b8af6268dcc956d354af0b393cac84d3b6df00a15d07218",
+          "ran": true,
+          "ok": true,
+          "output": "verified\ninvalid"
+        },
+        {
+          "id": "defect-management-fix-verification",
+          "code_hash": "0cc6dddf47360f670c3814c16b7b20fc5649218181f60e6dd9f74a0f915c838b",
+          "ran": true,
+          "ok": true,
+          "output": "[True, True, True]"
+        },
+        {
+          "id": "defect-management-closure",
+          "code_hash": "ffa44a296a477e7fc88804dce020a252ea4c2d0534fb9b501041c36b4de93ca0",
+          "ran": true,
+          "ok": true,
+          "output": "verified_fix\n['native_concurrency_unverified']"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "functional-regression-exploratory",
+      "fingerprint": "97bb6d7f77a9205fe2d39c806a60b9eacba1ba1094f611f33566f2cd441b05e8",
+      "course_hash": "4071085e47f28f14b1add77b41ab01f2e40351caeee5b4d5cbbdfc108e597506",
+      "bank_hash": "bcb4c162281c9fa957a0d0db8c1fd2e7d5696774fc8b6d56d7d008facc94e420",
+      "prerequisites": [
+        "test-design"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "functional-regression-exploratory-functional-oracle",
+          "code_hash": "ad1e82a7d79d6976b396bf52f357f4b1c3dfaef2ff3d0fe2f6d46f6a4ffb6407",
+          "ran": true,
+          "ok": true,
+          "output": "True\ncancelled"
+        },
+        {
+          "id": "functional-regression-exploratory-negative",
+          "code_hash": "9edacd238885dfadaaef2000ae6eeb243b074e554b5cac8e036849c251f197fb",
+          "ran": true,
+          "ok": true,
+          "output": "False\nSynthetic"
+        },
+        {
+          "id": "functional-regression-exploratory-state-effects",
+          "code_hash": "7e2405e1a97af42f98d2dd892b3ce0f407fc5cdc75c91ed27f8fb07deacbced0",
+          "ran": true,
+          "ok": true,
+          "output": "accepted\naccepted\n1"
+        },
+        {
+          "id": "functional-regression-exploratory-impact-selection",
+          "code_hash": "c99d06c4b9720f6ecce477eec1aaec0c4ac33562acc499a1cfa5e03e16dd5929",
+          "ran": true,
+          "ok": true,
+          "output": "['export', 'invoice']"
+        },
+        {
+          "id": "functional-regression-exploratory-suite-maintenance",
+          "code_hash": "e5577d230dac8377d4dee5c2e9648ea3cc88fe619c9f51b934e89b711833cd24",
+          "ran": true,
+          "ok": true,
+          "output": "['old_caption']"
+        },
+        {
+          "id": "functional-regression-exploratory-flakiness",
+          "code_hash": "6652efc9a1d2c17b8550c07dc26cfc6dd1436b63e1f1c0669b5692f58ada8142",
+          "ran": true,
+          "ok": true,
+          "output": "2\nTrue\nFalse"
+        },
+        {
+          "id": "functional-regression-exploratory-charters",
+          "code_hash": "3498e47ab593e0a854c1a18afa7db89432dc2df0f187f75ef6792ff3a11c70e5",
+          "ran": true,
+          "ok": true,
+          "output": "['account_change']\n30"
+        },
+        {
+          "id": "functional-regression-exploratory-session-notes",
+          "code_hash": "af227da29ebe46d63ba063f834aeec2869d6988eeab41dfbb9af9d49aea90640",
+          "ran": true,
+          "ok": true,
+          "output": "['observation', 'hypothesis', 'question']\n1"
+        },
+        {
+          "id": "functional-regression-exploratory-debrief",
+          "code_hash": "a80416895352cc9b816df92edabf40220b3761881610a00959d421d8038627b9",
+          "ran": true,
+          "ok": true,
+          "output": "{'confirmed_issue': 1, 'question': 2, 'not_explored': 1}"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "web-api-testing",
+      "fingerprint": "1c007c6ac8e437f86d4758f46746cce65c49dd78a8ba5c98ca90d145c608959b",
+      "course_hash": "aef674945455add51890eafb7377e4f86ac9c26023f62ca1af0e3a3284f418dd",
+      "bank_hash": "494e3d2beccfbcd44008a3f3fa84125ee0ca779a2ea2ec03953818ffbe5ac18b",
+      "prerequisites": [
+        "functional-regression-exploratory",
+        "http-web-architecture"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 60,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "web-api-testing-form-boundaries",
+          "code_hash": "bf30674a7912f276cd867de42c92254039758e322ae6af91bade831aba501792",
+          "ran": true,
+          "ok": true,
+          "output": "422\n{'accepted': True}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "web-api-testing-session-responsive",
+          "code_hash": "21673054bd44e18a526eda2604acc46b584df621b3c517d8b0a9da7f687b455b",
+          "ran": true,
+          "ok": true,
+          "output": "True",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "web-api-testing-devtools-evidence",
+          "code_hash": "79b6b3e6e3bef2f2ebbf4e9292992e3ae2aae99f1e729bf532ee911ec91f0192",
+          "ran": true,
+          "ok": true,
+          "output": "500"
+        },
+        {
+          "id": "web-api-testing-status-body-headers",
+          "code_hash": "677741ea4ac054d9704f7207685e93ee3beef25604c5173bc5e5ff5fff8cfd2b",
+          "ran": true,
+          "ok": true,
+          "output": "200\n7\napplication/json",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "web-api-testing-errors-retries",
+          "code_hash": "93315e8bdd91b1ffe760c9723fd8d7b8ef1694f650521bfd1812b7766adca03c",
+          "ran": true,
+          "ok": true,
+          "output": "accepted accepted\n1"
+        },
+        {
+          "id": "web-api-testing-auth-boundaries",
+          "code_hash": "0298af0c1fce5fff697316459ac783aefd32093263cfbf19ca1662fa2ba38eb5",
+          "ran": true,
+          "ok": true,
+          "output": "403\n{'id': 7}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "web-api-testing-schema-contract",
+          "code_hash": "6ab4aebc56887708303908797130a9ecd9d8e04da14922e902cdf38f0757d5d8",
+          "ran": true,
+          "ok": true,
+          "output": "2\ninvalid type",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "web-api-testing-isolated-api-data",
+          "code_hash": "8a7457f9b7a4a68241330cbc554d26d0fc6e55ec4106c97cab8413020a88e10c",
+          "ran": true,
+          "ok": true,
+          "output": "1\n2\n1",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "web-api-testing-contract-evidence",
+          "code_hash": "9f16a56962128dab91a8111a7ce7118c7bfd644bd19e784bee1eacb71336d03b",
+          "ran": true,
+          "ok": true,
+          "output": "contract mismatch\nsynthetic-7",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "test-data-management",
+      "fingerprint": "b161c21bcb246c0a943803330858fecb3576de3903ea55cddfb003f6cca31419",
+      "course_hash": "a77442fc48c6694800691eca90d07d3228d0b8e0d1444f73e69486cfc5c9a972",
+      "bank_hash": "a1a018f2228dd5b94bd01815e2ceb5939c4b8b2881e098a78f6119be9a526057",
+      "prerequisites": [
+        "sql-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "test-data-management-fixture-scope",
+          "code_hash": "d8a88e974d15e9626b8fdbbfb81c2d1196bef096a6da7f38cd98eab08d66caf0",
+          "ran": true,
+          "ok": true,
+          "output": "[1]"
+        },
+        {
+          "id": "test-data-management-deterministic-seeds",
+          "code_hash": "77882c346ed5f41b824ab3d873519dbed524787072058a091071e2da7ee4f6d8",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "test-data-management-cleanup-lifecycle",
+          "code_hash": "8a666be83f69a8197f0650ae6e538a203edabe2d53db5c115736768b0e24f5bb",
+          "ran": true,
+          "ok": true,
+          "output": "0"
+        },
+        {
+          "id": "test-data-management-relational-oracles",
+          "code_hash": "e909e21d8d25aaa09e793b7b6d8e583b5d9625c4a31614f657916e30abd83175",
+          "ran": true,
+          "ok": true,
+          "output": "1"
+        },
+        {
+          "id": "test-data-management-transactions-visibility",
+          "code_hash": "c1a7a1aa324691cf8953e8e15592cc7c5b32f4a23877edd25d7cacf89dd04dae",
+          "ran": true,
+          "ok": true,
+          "output": "1\n0"
+        },
+        {
+          "id": "test-data-management-aggregate-null",
+          "code_hash": "bb282293a158965082ecd40684c92903ac755cfa7b45d7b5bb54ca74c46cf493",
+          "ran": true,
+          "ok": true,
+          "output": "(3, 2, 10)"
+        },
+        {
+          "id": "test-data-management-privacy-minimization",
+          "code_hash": "bdf9aa1fce5605fc8439dbc849bb879a04aa19ccb0babb09ef6c10b07caebff0",
+          "ran": true,
+          "ok": true,
+          "output": "['fixture_id', 'region']"
+        },
+        {
+          "id": "test-data-management-consistent-masking",
+          "code_hash": "6d2064aed2f807b4859edaf6302bb4d2cf15a1372949e4d32bb3c50d1889a0e3",
+          "ran": true,
+          "ok": true,
+          "output": "True"
+        },
+        {
+          "id": "test-data-management-retention-evidence",
+          "code_hash": "c81b9394ed2199187dac5443c0a3a4f30b820767ea180c9b40afe03a2d08ef8f",
+          "ran": true,
+          "ok": true,
+          "output": "['r1-log']"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    }
+  ],
+  "duplication": {
+    "errors": [],
+    "warnings": []
+  },
+  "completed": [
+    "practical-data-structures",
+    "fastapi-backend",
+    "db-integration-performance",
+    "backend-deployment-ops",
+    "js-fundamentals",
+    "js-dom-async",
+    "typescript-fundamentals",
+    "pandas-fundamentals",
+    "data-cleaning",
+    "prompting-structured-output",
+    "embeddings-semantic-search",
+    "vector-databases",
+    "rag-fundamentals",
+    "advanced-sql",
+    "descriptive-stats-metrics",
+    "eda",
+    "cloud-aws-foundations",
+    "cloud-networking-iam",
+    "docker-containers",
+    "ci-cd",
+    "defect-management",
+    "functional-regression-exploratory",
+    "web-api-testing",
+    "test-data-management"
+  ],
+  "pending": [
+    "node-express",
+    "responsive-css",
+    "react-fundamentals",
+    "react-advanced",
+    "nextjs-architecture",
+    "frontend-api-security",
+    "frontend-quality",
+    "fullstack-integration-state",
+    "fullstack-architecture",
+    "web-deployment-cicd",
+    "mobile-ui-fundamentals",
+    "dart-programming",
+    "flutter-fundamentals",
+    "flutter-layout-nav-state",
+    "kotlin-android",
+    "react-native",
+    "mobile-apis-networking",
+    "mobile-storage",
+    "mobile-auth-security",
+    "mobile-architecture",
+    "mobile-testing-debugging",
+    "mobile-performance-platform",
+    "app-distribution",
+    "numpy-arrays",
+    "ml-preprocessing",
+    "ml-fundamentals",
+    "supervised-learning",
+    "unsupervised-learning",
+    "feature-eng-evaluation",
+    "deep-learning",
+    "computer-vision",
+    "nlp-fundamentals",
+    "mlops-deployment",
+    "responsible-ai-monitoring",
+    "rag-advanced",
+    "agents-tool-calling",
+    "agent-workflows",
+    "llm-security-eval",
+    "llm-deployment-cost",
+    "spreadsheet-analysis",
+    "data-visualization",
+    "powerbi-modeling",
+    "dashboards-reporting",
+    "data-storytelling",
+    "data-modeling-warehousing",
+    "etl-elt-architecture",
+    "data-transformation-pipelines",
+    "workflow-orchestration",
+    "data-quality-testing",
+    "batch-streaming",
+    "cloud-data-platforms",
+    "data-reliability-recovery",
+    "data-governance-security",
+    "security-foundations",
+    "identity-access-control",
+    "cryptography-secure-comms",
+    "vulnerabilities-defense",
+    "security-logging-monitoring",
+    "soc-siem",
+    "incident-response",
+    "network-endpoint-cloud-security",
+    "security-grc",
+    "scripting-automation",
+    "infrastructure-as-code",
+    "kubernetes",
+    "observability",
+    "reliability-incident-cost",
+    "playwright-automation",
+    "automation-frameworks",
+    "ci-test-reporting",
+    "performance-quality-engineering",
+    "oop-principles",
+    "java-fundamentals",
+    "complexity-analysis",
+    "arrays-strings-hashing",
+    "linear-structures",
+    "recursion-backtracking",
+    "searching-sorting",
+    "trees-bst",
+    "graphs",
+    "greedy-dp",
+    "debugging-testing",
+    "software-design",
+    "engineering-problem-solving"
+  ],
+  "human_approved": false,
+  "published": false
+}

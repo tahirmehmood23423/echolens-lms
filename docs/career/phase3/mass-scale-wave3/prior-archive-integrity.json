@@ -1,0 +1,20 @@
+[
+  {
+    "file": "/workspace/echolens-audit/wave2-private-review.zip",
+    "bytes": 3361829,
+    "sha256": "1ad3d241bf65aa9aab2a44c06f6d0707f11cdb5ef5b1182f760b97434fe45903",
+    "integrity": "passed"
+  },
+  {
+    "file": "/workspace/echolens-audit/wave2-browser-evidence.zip",
+    "bytes": 36398065,
+    "sha256": "d7a024dded38ad6f53b1c287015b25b81559a7ddd4a61bd404a617109bb98a5f",
+    "integrity": "passed"
+  },
+  {
+    "file": "/workspace/echolens-audit/junior-backend-review.zip",
+    "bytes": 468738,
+    "sha256": "9dce815766b2316174fabd55260def99de74fcd6c7a8683faa5fcefa2a0db3cf",
+    "integrity": "passed"
+  }
+]

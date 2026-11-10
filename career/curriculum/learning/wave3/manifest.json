@@ -1,0 +1,13 @@
+{
+  "wave": "shared-foundations-3",
+  "starting_commit": "4880f3a",
+  "starting_authored": 48,
+  "courses": [
+    "react-fundamentals",
+    "numpy-arrays"
+  ],
+  "recovered_from_quarantine": [
+    "react-fundamentals",
+    "numpy-arrays"
+  ]
+}

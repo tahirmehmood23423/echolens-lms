@@ -4665,22 +4665,248 @@
       "lessons": 9,
       "questions": 54,
       "human_approved": false
+    },
+    {
+      "id": "react-fundamentals",
+      "version": 1,
+      "course_hash": "25c9ebd8cf726c9f0474129afcf1d326804ae0ec4879865334f8b000aaea05e9",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "react-component-props",
+          "code_hash": "a388165d4528233d8b54676e9e54377d064496991ad32fbd6c5968a49fda7f85",
+          "ran": true,
+          "ok": true,
+          "output": "<article><h2>Learn &lt;React&gt;</h2></article>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-jsx-expressions",
+          "code_hash": "b5af25172f906b3be451c7960196de1eb1b844518e6ba13ba19fd6fcbd95d6f9",
+          "ran": true,
+          "ok": true,
+          "output": "<section class=\"lesson\"><h2>Functions</h2><p>2 completed</p></section>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-lists-keys",
+          "code_hash": "e95ed4f2bb3c72ced49893e259b7c8ef8e0e46c7795167fbc9b445b4fd12a7c7",
+          "ran": true,
+          "ok": true,
+          "output": "<ul><li>Read</li><li>Practice</li></ul>\n<p>Goals ready</p>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-state-snapshots",
+          "code_hash": "ff5a9d138fe5f4766fd017e8900f71d4b687b7852b7d7f461fb0955232f4a0b4",
+          "ran": true,
+          "ok": true,
+          "output": "1\n3",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-state-collections",
+          "code_hash": "32efa0a50dd8df14f2fa2a806ce1250c8d16edd2061245a71c40c0e1935b54d0",
+          "ran": true,
+          "ok": true,
+          "output": "false true\nfalse true false",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-lift-state",
+          "code_hash": "8d25eb51cc09d2f3163bccc4cc789207455221d521b2c04594f359c717054734",
+          "ran": true,
+          "ok": true,
+          "output": "core core",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-effect-sync",
+          "code_hash": "5fd7a333708dbfcabe183dd8336e513da247a79acb4aee7dfcde11aad8512ded",
+          "ran": true,
+          "ok": true,
+          "output": "<p>Room lobby</p>\nfalse",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-effect-dependencies",
+          "code_hash": "9d2202eed6434d4532ed3f977357075cc941800531687b4587c4915dc2b3deb8",
+          "ran": true,
+          "ok": true,
+          "output": "B\n0",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-fetch-states",
+          "code_hash": "d433a02b790a42bd394cface76c04a2c842254b7c4800b08bfdddb189d6b82c1",
+          "ran": true,
+          "ok": true,
+          "output": "success new courses",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-controlled-inputs",
+          "code_hash": "3ab36da5d1370f4e63708f860a91f09f183764736e7b7459587f27644dd264ad",
+          "ran": true,
+          "ok": true,
+          "output": "<label for=\"comment\">Comment<input id=\"comment\" value=\"\"/></label>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-form-validation",
+          "code_hash": "9db40080b71f2be586fe5ca3abf75a96e12f378b517e323446ab93406c57ef57",
+          "ran": true,
+          "ok": true,
+          "output": "{\"ok\":false,\"error\":\"Enter a name\"}\n{\"ok\":true,\"value\":\"Ada\"}",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-uncontrolled-boundaries",
+          "code_hash": "e2bf8aa3db60ae6a6d1cd70e01b08c16cde9ff09bff426273b3e34ca6ec41298",
+          "ran": true,
+          "ok": true,
+          "output": "<input name=\"draft\" value=\"seed\"/>\n<input name=\"draft\" value=\"seed\"/>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 12,
+      "questions": 96,
+      "human_approved": false
+    },
+    {
+      "id": "numpy-arrays",
+      "version": 1,
+      "course_hash": "5d1273a3c77ab9276da3139db785eca938fb4a3ac2464a90a19aedbf8d66c474",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "numpy-arrays-array-contract",
+          "code_hash": "fad4f03443a87d617366f2d2d5f201b90761d21ff658605ea88aaae5b722cdcb",
+          "ran": true,
+          "ok": true,
+          "output": "(3, 2) 2 6\nint16 12\n[[0, 0, 0], [0, 0, 0]]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-indexing-memory",
+          "code_hash": "a731414e999c931994d867aaf0eac2b671d0c7e47b4b0e627ea7bca7727d856d",
+          "ran": true,
+          "ok": true,
+          "output": "[[0, 99, 2], [3, 4, 5]]\n[-1, 5]\n[[0, 1, 2], [3, 4, 5]]\nTrue False",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-reshape-shapes",
+          "code_hash": "d7011d1a26f096e2e977af1f944f8b4e7a881464343d9e776d586f8814044090",
+          "ran": true,
+          "ok": true,
+          "output": "(3, 4) (4, 3) (3, 1)\n[4, 5, 6, 7]\nTrue\n(3,)",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-vector-operations",
+          "code_hash": "362f7b904a8b728ee679659e4f6554b1857b10f7c04b622c32be1f10fe333b6d",
+          "ran": true,
+          "ok": true,
+          "output": "[32.0, 50.0, 68.0]\nTrue\n[False, True, False]\n[0, 1, 0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-broadcast-contract",
+          "code_hash": "2ef684404f71cc52c852b2cb7fa6c70039d881b0898d186a771d7511ca2a4da3",
+          "ran": true,
+          "ok": true,
+          "output": "[[9, 18, 27], [39, 48, 57]]\n[[5, 15, 25], [30, 40, 50]]\n(2, 3)",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-axis-reductions",
+          "code_hash": "1cb80f45b6c980e2666db53f2774d0268db5c352de6c56325b3b6fa1e9125415",
+          "ran": true,
+          "ok": true,
+          "output": "(1, 2) [[3.0, 20.0]]\n[11.0, 23.0, 35.0]\n[0.0, 0.0]\n69.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-dtype-range",
+          "code_hash": "afe9ca387130137c641bc4953c96d5980256d0888141153c8c3bbc557588f6b2",
+          "ran": true,
+          "ok": true,
+          "output": "[-116] [140]\n[-116]\n-128 127",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-missing-values",
+          "code_hash": "c6e331ab67945290c79e9624f6de104afe5a8f1bc7a0ffdbb682e8b036e93555",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True, False, False]\n[True, False, True, False]\nTrue\n4.0 2\ninf",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-float-comparisons",
+          "code_hash": "8d15e9814ccac28dc8a836b7186f8a057a4cef3aa055717b18e1779d1d3a04af",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue\nTrue\nFalse",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/python/cpython",
-    "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+    "repository": "https://github.com/numpy/numpy",
+    "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
     "references": [
       {
-        "id": "unittest",
-        "path": "Doc/library/unittest.rst",
-        "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+        "id": "numpy-quickstart",
+        "path": "doc/source/user/quickstart.rst",
+        "sha256": "1a1369e31bffdf7f4af84c12a5048b36dabbc16c1808f641d3e164a22cd82329",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "sqlite3",
-        "path": "Doc/library/sqlite3.rst",
-        "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
+        "id": "numpy-indexing",
+        "path": "doc/source/user/basics.indexing.rst",
+        "sha256": "90c8b7c9b60bc2f6911726700025c2299dbd2e3d6066c5601b4c67395aea2658",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "numpy-copies",
+        "path": "doc/source/user/basics.copies.rst",
+        "sha256": "5e326d8368f56aa3ec78fcbbb5cfcf7eff0f0ca76cd9301b6d1cd3ad995eae2a",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "numpy-broadcasting",
+        "path": "doc/source/user/basics.broadcasting.rst",
+        "sha256": "d1379801e96ec350b320d2929687d35b045e24bea962a29efb2259d080427048",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "numpy-types",
+        "path": "doc/source/user/basics.types.rst",
+        "sha256": "0e288c072dc1b8733326dc3094c11c344d0698cf6e9ff21ff2dd7fb57ccd8d89",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -6759,6 +6985,86 @@
           "id": "sqlite3",
           "path": "Doc/library/sqlite3.rst",
           "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "react-fundamentals",
+      "repository": "https://github.com/reactjs/react.dev",
+      "commit": "7594a2b008489121bdf25f97320d11ac0422510e",
+      "references": [
+        {
+          "id": "react-components",
+          "path": "src/content/learn/describing-the-ui.md",
+          "sha256": "e60fe2bac558d200a5f03b7209a9fbada007436cc250a9205cf43faac670ad9f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-state",
+          "path": "src/content/learn/queueing-a-series-of-state-updates.md",
+          "sha256": "31227dbb30c6240e7cfa22b0619be7238a567205fc83d03307f281b30efa9c4d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-effects",
+          "path": "src/content/learn/synchronizing-with-effects.md",
+          "sha256": "64a36b73ed2aeac4822f32fb609255562c6e66890f0bb149394eacd4a9c606e7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-effect-api",
+          "path": "src/content/reference/react/useEffect.md",
+          "sha256": "9a6269a1450a4639828a6c0cc0868e8f8ddfe2dde6ae83e1426f084b4410b315",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-input",
+          "path": "src/content/reference/react-dom/components/input.md",
+          "sha256": "452755484b8856746a91b574a5975e54404ea193f91b72257a2caf163da75544",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-lists",
+          "path": "src/content/learn/rendering-lists.md",
+          "sha256": "efd1740b90e1a9ad427f4e38c9ca747691174d5d48e9e4b5988a10fa3b3f9480",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "numpy-arrays",
+      "repository": "https://github.com/numpy/numpy",
+      "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
+      "references": [
+        {
+          "id": "numpy-quickstart",
+          "path": "doc/source/user/quickstart.rst",
+          "sha256": "1a1369e31bffdf7f4af84c12a5048b36dabbc16c1808f641d3e164a22cd82329",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "numpy-indexing",
+          "path": "doc/source/user/basics.indexing.rst",
+          "sha256": "90c8b7c9b60bc2f6911726700025c2299dbd2e3d6066c5601b4c67395aea2658",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "numpy-copies",
+          "path": "doc/source/user/basics.copies.rst",
+          "sha256": "5e326d8368f56aa3ec78fcbbb5cfcf7eff0f0ca76cd9301b6d1cd3ad995eae2a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "numpy-broadcasting",
+          "path": "doc/source/user/basics.broadcasting.rst",
+          "sha256": "d1379801e96ec350b320d2929687d35b045e24bea962a29efb2259d080427048",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "numpy-types",
+          "path": "doc/source/user/basics.types.rst",
+          "sha256": "0e288c072dc1b8733326dc3094c11c344d0698cf6e9ff21ff2dd7fb57ccd8d89",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

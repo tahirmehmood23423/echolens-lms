@@ -1,0 +1,1039 @@
+'use strict';
+const {bank}=require('../../learning/wave1/ai-helper');
+module.exports=bank('numpy-arrays',[
+  {
+    "comp": "m1.c1",
+    "rows": [
+      [
+        "Which combination fully describes numeric array structure and element representation?",
+        "Shape and dtype",
+        "Array name",
+        "Print precision",
+        "File extension",
+        "Shape gives axis lengths and dtype gives the stored representation; labels and formatting do not replace them.",
+        "Array name is not consistent with the required calculation. Shape gives axis lengths and dtype gives the stored representation; labels and formatting do not replace them.",
+        "Print precision is not consistent with the required calculation. Shape gives axis lengths and dtype gives the stored representation; labels and formatting do not replace them.",
+        "File extension is not consistent with the required calculation. Shape gives axis lengths and dtype gives the stored representation; labels and formatting do not replace them."
+      ],
+      [
+        "How many axes does shape (2, 3, 4) have?",
+        "Three",
+        "Two",
+        "Four",
+        "Twenty-four",
+        "ndim counts shape entries, whereas the product gives twenty-four elements.",
+        "Two is not consistent with the required calculation. ndim counts shape entries, whereas the product gives twenty-four elements.",
+        "Four is not consistent with the required calculation. ndim counts shape entries, whereas the product gives twenty-four elements.",
+        "Twenty-four is not consistent with the required calculation. ndim counts shape entries, whereas the product gives twenty-four elements."
+      ],
+      [
+        "What does a scalar NumPy array have as its shape?",
+        "()",
+        "(1,)",
+        "(0,)",
+        "(1, 1)",
+        "A zero-dimensional array has an empty shape tuple, distinct from a one-item vector or matrix.",
+        "(1,) is not consistent with the required calculation. A zero-dimensional array has an empty shape tuple, distinct from a one-item vector or matrix.",
+        "(0,) is not consistent with the required calculation. A zero-dimensional array has an empty shape tuple, distinct from a one-item vector or matrix.",
+        "(1, 1) is not consistent with the required calculation. A zero-dimensional array has an empty shape tuple, distinct from a one-item vector or matrix."
+      ],
+      [
+        "A lab records four patients with three measurements each. With patients on axis zero, which shape matches?",
+        "(4, 3)",
+        "(3, 4)",
+        "(12,)",
+        "(4, 1)",
+        "The first axis has four patient positions and the second has three measurement positions.",
+        "(3, 4) is not consistent with the required calculation. The first axis has four patient positions and the second has three measurement positions.",
+        "(12,) is not consistent with the required calculation. The first axis has four patient positions and the second has three measurement positions.",
+        "(4, 1) is not consistent with the required calculation. The first axis has four patient positions and the second has three measurement positions."
+      ],
+      [
+        "A team expects exact integer storage but one input is 2.5. What should it inspect after array creation?",
+        "The inferred dtype and values",
+        "Only the number of variable names",
+        "Only the import statement order",
+        "Only terminal column width",
+        "Mixed integer and fractional numeric inputs can lead to floating-point representation, so the boundary contract needs inspection.",
+        "Only the number of variable names is not consistent with the required calculation. Mixed integer and fractional numeric inputs can lead to floating-point representation, so the boundary contract needs inspection.",
+        "Only the import statement order is not consistent with the required calculation. Mixed integer and fractional numeric inputs can lead to floating-point representation, so the boundary contract needs inspection.",
+        "Only terminal column width is not consistent with the required calculation. Mixed integer and fractional numeric inputs can lead to floating-point representation, so the boundary contract needs inspection."
+      ],
+      [
+        "A feed has rows of unequal lengths. What should a rectangular numeric pipeline do?",
+        "Validate and normalize the records",
+        "Assume every row is automatically padded",
+        "Assume missing items always become zeros",
+        "Treat the printed brackets as a shape guarantee",
+        "Regular numeric matrices require an explicit rectangular representation and missingness policy rather than assumed padding.",
+        "Assume every row is automatically padded is not consistent with the required calculation. Regular numeric matrices require an explicit rectangular representation and missingness policy rather than assumed padding.",
+        "Assume missing items always become zeros is not consistent with the required calculation. Regular numeric matrices require an explicit rectangular representation and missingness policy rather than assumed padding.",
+        "Treat the printed brackets as a shape guarantee is not consistent with the required calculation. Regular numeric matrices require an explicit rectangular representation and missingness policy rather than assumed padding."
+      ],
+      [
+        "A payload budget covers 1000 float64 elements. What raw data size does that imply?",
+        "8000 bytes",
+        "1000 bytes",
+        "64000 bytes",
+        "1064 bytes",
+        "Each float64 element occupies eight bytes, so the numeric buffer is eight thousand bytes before other overhead.",
+        "1000 bytes is not consistent with the required calculation. Each float64 element occupies eight bytes, so the numeric buffer is eight thousand bytes before other overhead.",
+        "64000 bytes is not consistent with the required calculation. Each float64 element occupies eight bytes, so the numeric buffer is eight thousand bytes before other overhead.",
+        "1064 bytes is not consistent with the required calculation. Each float64 element occupies eight bytes, so the numeric buffer is eight thousand bytes before other overhead."
+      ],
+      [
+        "An image batch uses shape (8, 32, 32, 3). What must documentation specify beyond that tuple?",
+        "The axis and channel meaning",
+        "Only that ndim equals four",
+        "Only that size is an integer",
+        "Only that brackets print correctly",
+        "Shape alone does not tell a reader whether an axis is batch, height, width or channel, nor how channels are ordered.",
+        "Only that ndim equals four is not consistent with the required calculation. Shape alone does not tell a reader whether an axis is batch, height, width or channel, nor how channels are ordered.",
+        "Only that size is an integer is not consistent with the required calculation. Shape alone does not tell a reader whether an axis is batch, height, width or channel, nor how channels are ordered.",
+        "Only that brackets print correctly is not consistent with the required calculation. Shape alone does not tell a reader whether an axis is batch, height, width or channel, nor how channels are ordered."
+      ],
+      [
+        "Two datasets have shape (10, 2), but rows list customers in different orders. What is required before elementwise combination?",
+        "Entity alignment validation",
+        "Only matching the dtype names",
+        "Only counting both axes",
+        "Only confirming both are ndarrays",
+        "Equal shapes do not guarantee that corresponding positions represent the same real-world entities.",
+        "Only matching the dtype names is not consistent with the required calculation. Equal shapes do not guarantee that corresponding positions represent the same real-world entities.",
+        "Only counting both axes is not consistent with the required calculation. Equal shapes do not guarantee that corresponding positions represent the same real-world entities.",
+        "Only confirming both are ndarrays is not consistent with the required calculation. Equal shapes do not guarantee that corresponding positions represent the same real-world entities."
+      ],
+      [
+        "A memory report uses ndarray.nbytes as the total service footprint. What correction is needed?",
+        "It reports element storage only",
+        "It includes all Python and OS overhead",
+        "It reports peak network traffic",
+        "It measures future index allocations",
+        "nbytes describes the array's element payload, not complete allocator, object, process or system memory.",
+        "It includes all Python and OS overhead is not consistent with the required calculation. nbytes describes the array's element payload, not complete allocator, object, process or system memory.",
+        "It reports peak network traffic is not consistent with the required calculation. nbytes describes the array's element payload, not complete allocator, object, process or system memory.",
+        "It measures future index allocations is not consistent with the required calculation. nbytes describes the array's element payload, not complete allocator, object, process or system memory."
+      ]
+    ]
+  },
+  {
+    "comp": "m1.c1",
+    "rows": [
+      [
+        "For a two-dimensional matrix, what does a[1, 2] normally select?",
+        "One scalar element",
+        "The entire second row",
+        "The entire third column",
+        "A two-axis copy of the matrix",
+        "Two integer indices select a single position, using zero-based indexing.",
+        "The entire second row is not consistent with the required calculation. Two integer indices select a single position, using zero-based indexing.",
+        "The entire third column is not consistent with the required calculation. Two integer indices select a single position, using zero-based indexing.",
+        "A two-axis copy of the matrix is not consistent with the required calculation. Two integer indices select a single position, using zero-based indexing."
+      ],
+      [
+        "What interval does a[2:5] select on the first axis?",
+        "Indices two through four",
+        "Indices two through five",
+        "Only index five",
+        "The final two indices",
+        "Python-style slices are half-open: the start is included and the stop is excluded.",
+        "Indices two through five is not consistent with the required calculation. Python-style slices are half-open: the start is included and the stop is excluded.",
+        "Only index five is not consistent with the required calculation. Python-style slices are half-open: the start is included and the stop is excluded.",
+        "The final two indices is not consistent with the required calculation. Python-style slices are half-open: the start is included and the stop is excluded."
+      ],
+      [
+        "Which operation explicitly duplicates an array's data buffer?",
+        "a.copy()",
+        "b = a",
+        "a.view()",
+        "a[:] for a basic slice",
+        "An explicit copy creates independent data storage; assignment and basic views share the original data relationship.",
+        "b = a is not consistent with the required calculation. An explicit copy creates independent data storage; assignment and basic views share the original data relationship.",
+        "a.view() is not consistent with the required calculation. An explicit copy creates independent data storage; assignment and basic views share the original data relationship.",
+        "a[:] for a basic slice is not consistent with the required calculation. An explicit copy creates independent data storage; assignment and basic views share the original data relationship."
+      ],
+      [
+        "A researcher changes b after b = a[1:4] and sees a change in a. Why?",
+        "The slice shares data",
+        "Implicit copy",
+        "List conversion",
+        "Source reload",
+        "A writable basic slice is a view, so changes can affect the shared source buffer.",
+        "Implicit copy is not consistent with the required calculation. A writable basic slice is a view, so changes can affect the shared source buffer.",
+        "List conversion is not consistent with the required calculation. A writable basic slice is a view, so changes can affect the shared source buffer.",
+        "Source reload is not consistent with the required calculation. A writable basic slice is a view, so changes can affect the shared source buffer."
+      ],
+      [
+        "An analyst retrieves b = a[[0, 2]] and later mutates b. What is expected for a?",
+        "That mutation does not update a",
+        "It always updates those rows of a",
+        "It deletes the first row of a",
+        "It changes every row of a",
+        "Integer-array advanced indexing returns a copy when retrieving values, so later edits to the result are independent.",
+        "It always updates those rows of a is not consistent with the required calculation. Integer-array advanced indexing returns a copy when retrieving values, so later edits to the result are independent.",
+        "It deletes the first row of a is not consistent with the required calculation. Integer-array advanced indexing returns a copy when retrieving values, so later edits to the result are independent.",
+        "It changes every row of a is not consistent with the required calculation. Integer-array advanced indexing returns a copy when retrieving values, so later edits to the result are independent."
+      ],
+      [
+        "A team assigns a[[0, 2]] = -1 directly. What happens?",
+        "The selected target rows are updated",
+        "Only a detached temporary is edited",
+        "The row indices become negative",
+        "The dtype always becomes object",
+        "Direct advanced-index assignment writes to the target; it is distinct from editing a previously retrieved copy.",
+        "Only a detached temporary is edited is not consistent with the required calculation. Direct advanced-index assignment writes to the target; it is distinct from editing a previously retrieved copy.",
+        "The row indices become negative is not consistent with the required calculation. Direct advanced-index assignment writes to the target; it is distinct from editing a previously retrieved copy.",
+        "The dtype always becomes object is not consistent with the required calculation. Direct advanced-index assignment writes to the target; it is distinct from editing a previously retrieved copy."
+      ],
+      [
+        "A matrix a has shape (7, 4). Which expression preserves a two-dimensional single-column result?",
+        "a[:, 2:3]",
+        "a[:, 2]",
+        "a[2, 2]",
+        "a[2]",
+        "A column slice retains the second axis, while an integer column index removes it.",
+        "a[:, 2] is not consistent with the required calculation. A column slice retains the second axis, while an integer column index removes it.",
+        "a[2, 2] is not consistent with the required calculation. A column slice retains the second axis, while an integer column index removes it.",
+        "a[2] is not consistent with the required calculation. A column slice retains the second axis, while an integer column index removes it."
+      ],
+      [
+        "A quality filter stores selected = a[a > 0] for a two-dimensional numeric array. What structure is returned?",
+        "A one-dimensional selected copy",
+        "The original rectangular shape always",
+        "A shared writable basic slice",
+        "A scalar count of positive values",
+        "A full-shape boolean mask retrieves the matching elements as an advanced-indexing copy in one dimension.",
+        "The original rectangular shape always is not consistent with the required calculation. A full-shape boolean mask retrieves the matching elements as an advanced-indexing copy in one dimension.",
+        "A shared writable basic slice is not consistent with the required calculation. A full-shape boolean mask retrieves the matching elements as an advanced-indexing copy in one dimension.",
+        "A scalar count of positive values is not consistent with the required calculation. A full-shape boolean mask retrieves the matching elements as an advanced-indexing copy in one dimension."
+      ],
+      [
+        "A pipeline needs to know whether two array results may mutate the same buffer. Which check addresses that directly?",
+        "np.shares_memory",
+        "np.array_equal",
+        "a.shape == b.shape",
+        "a.dtype == b.dtype",
+        "Equal values or metadata do not imply shared storage; shares_memory tests the relevant memory relationship.",
+        "np.array_equal is not consistent with the required calculation. Equal values or metadata do not imply shared storage; shares_memory tests the relevant memory relationship.",
+        "a.shape == b.shape is not consistent with the required calculation. Equal values or metadata do not imply shared storage; shares_memory tests the relevant memory relationship.",
+        "a.dtype == b.dtype is not consistent with the required calculation. Equal values or metadata do not imply shared storage; shares_memory tests the relevant memory relationship."
+      ],
+      [
+        "A function receives an array and must edit only its private working data. Which ownership policy is clearest?",
+        "Copy before mutable processing",
+        "Rely on a second variable binding",
+        "Assume every input is independent",
+        "Infer ownership from variable names",
+        "An explicit copy establishes an independent buffer when mutation isolation is part of the function's contract.",
+        "Rely on a second variable binding is not consistent with the required calculation. An explicit copy establishes an independent buffer when mutation isolation is part of the function's contract.",
+        "Assume every input is independent is not consistent with the required calculation. An explicit copy establishes an independent buffer when mutation isolation is part of the function's contract.",
+        "Infer ownership from variable names is not consistent with the required calculation. An explicit copy establishes an independent buffer when mutation isolation is part of the function's contract."
+      ]
+    ]
+  },
+  {
+    "comp": "m1.c1",
+    "rows": [
+      [
+        "What condition determines whether a target reshape has enough positions?",
+        "Equal total element count",
+        "Equal number of shape entries",
+        "Equal axis labels in comments",
+        "Equal variable name lengths",
+        "A reshape must preserve the product of the axis lengths.",
+        "Equal number of shape entries is not consistent with the required calculation. A reshape must preserve the product of the axis lengths.",
+        "Equal axis labels in comments is not consistent with the required calculation. A reshape must preserve the product of the axis lengths.",
+        "Equal variable name lengths is not consistent with the required calculation. A reshape must preserve the product of the axis lengths."
+      ],
+      [
+        "What does transpose do to a two-dimensional array's axes?",
+        "Swaps the two axes",
+        "An extra axis",
+        "Float conversion",
+        "Value sorting",
+        "Transposition permutes axes rather than sorting values or changing their representation.",
+        "An extra axis is not consistent with the required calculation. Transposition permutes axes rather than sorting values or changing their representation.",
+        "Float conversion is not consistent with the required calculation. Transposition permutes axes rather than sorting values or changing their representation.",
+        "Value sorting is not consistent with the required calculation. Transposition permutes axes rather than sorting values or changing their representation."
+      ],
+      [
+        "What does a singleton axis mean?",
+        "An axis of length one",
+        "One-byte array",
+        "All-zero axis",
+        "Storage copy",
+        "A singleton describes one position on an axis and is useful in explicit broadcasting alignment.",
+        "One-byte array is not consistent with the required calculation. A singleton describes one position on an axis and is useful in explicit broadcasting alignment.",
+        "All-zero axis is not consistent with the required calculation. A singleton describes one position on an axis and is useful in explicit broadcasting alignment.",
+        "Storage copy is not consistent with the required calculation. A singleton describes one position on an axis and is useful in explicit broadcasting alignment."
+      ],
+      [
+        "A flat array contains eighteen values. What shape does reshape(3, -1) produce?",
+        "(3, 6)",
+        "(3, 18)",
+        "(6, 3)",
+        "(18, 1)",
+        "The inferred dimension is eighteen divided by three, preserving all eighteen elements.",
+        "(3, 18) is not consistent with the required calculation. The inferred dimension is eighteen divided by three, preserving all eighteen elements.",
+        "(6, 3) is not consistent with the required calculation. The inferred dimension is eighteen divided by three, preserving all eighteen elements.",
+        "(18, 1) is not consistent with the required calculation. The inferred dimension is eighteen divided by three, preserving all eighteen elements."
+      ],
+      [
+        "A developer tries to reshape ten values into (3, 4). What should occur?",
+        "A shape incompatibility error",
+        "Automatic zero padding",
+        "Automatic removal of two values",
+        "A silent change to object dtype",
+        "Twelve output positions cannot be filled by ten values under reshape's element-preserving contract.",
+        "Automatic zero padding is not consistent with the required calculation. Twelve output positions cannot be filled by ten values under reshape's element-preserving contract.",
+        "Automatic removal of two values is not consistent with the required calculation. Twelve output positions cannot be filled by ten values under reshape's element-preserving contract.",
+        "A silent change to object dtype is not consistent with the required calculation. Twelve output positions cannot be filled by ten values under reshape's element-preserving contract."
+      ],
+      [
+        "A feature vector has shape (5,). What does its transpose shape become?",
+        "(5,)",
+        "(1, 5)",
+        "(5, 1)",
+        "(5, 5)",
+        "A one-dimensional transpose has only one axis to permute, so it does not create a row or column matrix.",
+        "(1, 5) is not consistent with the required calculation. A one-dimensional transpose has only one axis to permute, so it does not create a row or column matrix.",
+        "(5, 1) is not consistent with the required calculation. A one-dimensional transpose has only one axis to permute, so it does not create a row or column matrix.",
+        "(5, 5) is not consistent with the required calculation. A one-dimensional transpose has only one axis to permute, so it does not create a row or column matrix."
+      ],
+      [
+        "A batch tensor is (2, 3, 4), and transpose(1, 0, 2) is applied. Which shape follows?",
+        "(3, 2, 4)",
+        "(4, 3, 2)",
+        "(2, 4, 3)",
+        "(24,)",
+        "The specified axis permutation places original axis one first, axis zero second and axis two last.",
+        "(4, 3, 2) is not consistent with the required calculation. The specified axis permutation places original axis one first, axis zero second and axis two last.",
+        "(2, 4, 3) is not consistent with the required calculation. The specified axis permutation places original axis one first, axis zero second and axis two last.",
+        "(24,) is not consistent with the required calculation. The specified axis permutation places original axis one first, axis zero second and axis two last."
+      ],
+      [
+        "A data loader reshapes values with the right count but the wrong record ordering. What is the likely result?",
+        "Structurally valid but misassigned values",
+        "An automatic semantic-ordering error",
+        "A guarantee of corrected ordering",
+        "A new source permission policy",
+        "Reshape can preserve every value while assigning it to the wrong conceptual record or feature.",
+        "An automatic semantic-ordering error is not consistent with the required calculation. Reshape can preserve every value while assigning it to the wrong conceptual record or feature.",
+        "A guarantee of corrected ordering is not consistent with the required calculation. Reshape can preserve every value while assigning it to the wrong conceptual record or feature.",
+        "A new source permission policy is not consistent with the required calculation. Reshape can preserve every value while assigning it to the wrong conceptual record or feature."
+      ],
+      [
+        "A strided array is reshaped and code assumes zero allocation. What must be verified?",
+        "Whether the result shares memory",
+        "Only that shape exists",
+        "Only that size is unchanged",
+        "Only that the code imports NumPy",
+        "Reshape can copy when layout prevents a suitable view, so allocation behavior is input- and order-dependent.",
+        "Only that shape exists is not consistent with the required calculation. Reshape can copy when layout prevents a suitable view, so allocation behavior is input- and order-dependent.",
+        "Only that size is unchanged is not consistent with the required calculation. Reshape can copy when layout prevents a suitable view, so allocation behavior is input- and order-dependent.",
+        "Only that the code imports NumPy is not consistent with the required calculation. Reshape can copy when layout prevents a suitable view, so allocation behavior is input- and order-dependent."
+      ],
+      [
+        "A service needs an independent flattened snapshot regardless of input layout. Which policy meets that need?",
+        "Request an explicit copy",
+        "Assume every reshape copies",
+        "Assume every ravel result copies",
+        "Use assignment to a new name only",
+        "Ownership requirements need explicit copying rather than assumptions about layout-dependent views.",
+        "Assume every reshape copies is not consistent with the required calculation. Ownership requirements need explicit copying rather than assumptions about layout-dependent views.",
+        "Assume every ravel result copies is not consistent with the required calculation. Ownership requirements need explicit copying rather than assumptions about layout-dependent views.",
+        "Use assignment to a new name only is not consistent with the required calculation. Ownership requirements need explicit copying rather than assumptions about layout-dependent views."
+      ]
+    ]
+  },
+  {
+    "comp": "m2.c1",
+    "rows": [
+      [
+        "For compatible same-shaped arrays, what does a + b compute?",
+        "Elementwise sums",
+        "Concatenation",
+        "Matrix product",
+        "Sorted union",
+        "Numeric ndarray addition combines corresponding elements under array arithmetic rules.",
+        "Concatenation is not consistent with the required calculation. Numeric ndarray addition combines corresponding elements under array arithmetic rules.",
+        "Matrix product is not consistent with the required calculation. Numeric ndarray addition combines corresponding elements under array arithmetic rules.",
+        "Sorted union is not consistent with the required calculation. Numeric ndarray addition combines corresponding elements under array arithmetic rules."
+      ],
+      [
+        "Which operation is distinct from elementwise multiplication?",
+        "Matrix multiplication",
+        "Scalar broadcasting",
+        "Elementwise subtraction",
+        "Elementwise comparison",
+        "Matrix multiplication combines contracted dimensions rather than simply multiplying corresponding entries.",
+        "Scalar broadcasting is not consistent with the required calculation. Matrix multiplication combines contracted dimensions rather than simply multiplying corresponding entries.",
+        "Elementwise subtraction is not consistent with the required calculation. Matrix multiplication combines contracted dimensions rather than simply multiplying corresponding entries.",
+        "Elementwise comparison is not consistent with the required calculation. Matrix multiplication combines contracted dimensions rather than simply multiplying corresponding entries."
+      ],
+      [
+        "What does np.vectorize guarantee about arbitrary callbacks?",
+        "Convenient calling semantics",
+        "A compiled numeric kernel",
+        "Automatic parallel GPU execution",
+        "Universal speedup over Python loops",
+        "np.vectorize is a convenience utility and does not itself compile an arbitrary Python function for speed.",
+        "A compiled numeric kernel is not consistent with the required calculation. np.vectorize is a convenience utility and does not itself compile an arbitrary Python function for speed.",
+        "Automatic parallel GPU execution is not consistent with the required calculation. np.vectorize is a convenience utility and does not itself compile an arbitrary Python function for speed.",
+        "Universal speedup over Python loops is not consistent with the required calculation. np.vectorize is a convenience utility and does not itself compile an arbitrary Python function for speed."
+      ],
+      [
+        "A tax calculation applies the same scale and offset to every sale. What is a suitable first correctness check?",
+        "Check reviewed fixtures",
+        "Assume shorter code is correct",
+        "Measure only import time",
+        "Check only the variable names",
+        "Vectorized syntax must preserve the formula, types and shapes before any performance claim is made.",
+        "Assume shorter code is correct is not consistent with the required calculation. Vectorized syntax must preserve the formula, types and shapes before any performance claim is made.",
+        "Measure only import time is not consistent with the required calculation. Vectorized syntax must preserve the formula, types and shapes before any performance claim is made.",
+        "Check only the variable names is not consistent with the required calculation. Vectorized syntax must preserve the formula, types and shapes before any performance claim is made."
+      ],
+      [
+        "A matrix model uses * when its intended formula requires @. What may be wrong?",
+        "Operation semantics",
+        "Array layout",
+        "Axis count",
+        "Dtype name",
+        "Elementwise multiplication and matrix multiplication represent different formulas even when code executes.",
+        "Array layout is not consistent with the required calculation. Elementwise multiplication and matrix multiplication represent different formulas even when code executes.",
+        "Axis count is not consistent with the required calculation. Elementwise multiplication and matrix multiplication represent different formulas even when code executes.",
+        "Dtype name is not consistent with the required calculation. Elementwise multiplication and matrix multiplication represent different formulas even when code executes."
+      ],
+      [
+        "A mask needs x >= 0 and x < 5 for every element. Which construction fits?",
+        "Parenthesized comparisons joined by &",
+        "The Python and keyword on whole arrays",
+        "Matrix multiplication of comparisons",
+        "String concatenation of conditions",
+        "Elementwise conjunction uses & with comparison grouping; Python and is not an array-wise operation.",
+        "The Python and keyword on whole arrays is not consistent with the required calculation. Elementwise conjunction uses & with comparison grouping; Python and is not an array-wise operation.",
+        "Matrix multiplication of comparisons is not consistent with the required calculation. Elementwise conjunction uses & with comparison grouping; Python and is not an array-wise operation.",
+        "String concatenation of conditions is not consistent with the required calculation. Elementwise conjunction uses & with comparison grouping; Python and is not an array-wise operation."
+      ],
+      [
+        "A script calls np.where(mask, 1 / x, 0) and expects division never to run where x is zero. What is overlooked?",
+        "Argument evaluation before selection",
+        "A requirement that mask be a string",
+        "A guarantee of lazy branch execution",
+        "A mandatory transpose before division",
+        "Expressions supplied to where are evaluated normally before element selection, so unsafe arithmetic needs another strategy.",
+        "A requirement that mask be a string is not consistent with the required calculation. Expressions supplied to where are evaluated normally before element selection, so unsafe arithmetic needs another strategy.",
+        "A guarantee of lazy branch execution is not consistent with the required calculation. Expressions supplied to where are evaluated normally before element selection, so unsafe arithmetic needs another strategy.",
+        "A mandatory transpose before division is not consistent with the required calculation. Expressions supplied to where are evaluated normally before element selection, so unsafe arithmetic needs another strategy."
+      ],
+      [
+        "A pipeline chains several full-array arithmetic steps and exceeds memory limits. What should profiling inspect?",
+        "Intermediate array allocations",
+        "Only identifier capitalization",
+        "Only the number of comments",
+        "Only the script filename length",
+        "Vectorized expressions can create large temporaries; reduced Python overhead does not imply minimal memory use.",
+        "Only identifier capitalization is not consistent with the required calculation. Vectorized expressions can create large temporaries; reduced Python overhead does not imply minimal memory use.",
+        "Only the number of comments is not consistent with the required calculation. Vectorized expressions can create large temporaries; reduced Python overhead does not imply minimal memory use.",
+        "Only the script filename length is not consistent with the required calculation. Vectorized expressions can create large temporaries; reduced Python overhead does not imply minimal memory use."
+      ],
+      [
+        "A microbenchmark on ten values shows a loop faster than an array call. Which conclusion is justified?",
+        "This workload favors loops",
+        "All vectorized code is always slower",
+        "NumPy never uses compiled operations",
+        "The array result must be incorrect",
+        "Setup and dispatch overhead can dominate small inputs; performance conclusions must stay within the measured workload.",
+        "All vectorized code is always slower is not consistent with the required calculation. Setup and dispatch overhead can dominate small inputs; performance conclusions must stay within the measured workload.",
+        "NumPy never uses compiled operations is not consistent with the required calculation. Setup and dispatch overhead can dominate small inputs; performance conclusions must stay within the measured workload.",
+        "The array result must be incorrect is not consistent with the required calculation. Setup and dispatch overhead can dominate small inputs; performance conclusions must stay within the measured workload."
+      ],
+      [
+        "A team replaces a loop with numeric array operations and wants a defensible speed claim. What evidence is strongest?",
+        "Correctness and benchmarks",
+        "Only fewer source-code lines",
+        "Only use of np.vectorize",
+        "Only a vendor's unrelated benchmark",
+        "A useful optimization claim requires preserved behavior and measurements on the intended data, hardware and resource constraints.",
+        "Only fewer source-code lines is not consistent with the required calculation. A useful optimization claim requires preserved behavior and measurements on the intended data, hardware and resource constraints.",
+        "Only use of np.vectorize is not consistent with the required calculation. A useful optimization claim requires preserved behavior and measurements on the intended data, hardware and resource constraints.",
+        "Only a vendor's unrelated benchmark is not consistent with the required calculation. A useful optimization claim requires preserved behavior and measurements on the intended data, hardware and resource constraints."
+      ]
+    ]
+  },
+  {
+    "comp": "m2.c1",
+    "rows": [
+      [
+        "Which dimensions can broadcast when aligned?",
+        "Equal lengths or a singleton",
+        "Only equal lengths always",
+        "Any two positive lengths",
+        "Only prime lengths",
+        "Broadcasting permits equality or expansion of a length-one dimension.",
+        "Only equal lengths always is not consistent with the required calculation. Broadcasting permits equality or expansion of a length-one dimension.",
+        "Any two positive lengths is not consistent with the required calculation. Broadcasting permits equality or expansion of a length-one dimension.",
+        "Only prime lengths is not consistent with the required calculation. Broadcasting permits equality or expansion of a length-one dimension."
+      ],
+      [
+        "Where does NumPy start comparing dimensions for broadcasting?",
+        "The rightmost dimensions",
+        "The leftmost dimensions only",
+        "The largest dtype width",
+        "The first variable name",
+        "Trailing-axis alignment determines shape compatibility, with missing leading dimensions treated as one.",
+        "The leftmost dimensions only is not consistent with the required calculation. Trailing-axis alignment determines shape compatibility, with missing leading dimensions treated as one.",
+        "The largest dtype width is not consistent with the required calculation. Trailing-axis alignment determines shape compatibility, with missing leading dimensions treated as one.",
+        "The first variable name is not consistent with the required calculation. Trailing-axis alignment determines shape compatibility, with missing leading dimensions treated as one."
+      ],
+      [
+        "What output shape comes from (2, 1) plus (1, 4)?",
+        "(2, 4)",
+        "(1, 4)",
+        "(2, 1)",
+        "(8,)",
+        "Each singleton expands against the corresponding nonsingleton axis, yielding a two-by-four result.",
+        "(1, 4) is not consistent with the required calculation. Each singleton expands against the corresponding nonsingleton axis, yielding a two-by-four result.",
+        "(2, 1) is not consistent with the required calculation. Each singleton expands against the corresponding nonsingleton axis, yielding a two-by-four result.",
+        "(8,) is not consistent with the required calculation. Each singleton expands against the corresponding nonsingleton axis, yielding a two-by-four result."
+      ],
+      [
+        "A feature matrix has shape (20, 6). Which offset shape naturally applies one value per feature?",
+        "(6,)",
+        "(20,)",
+        "(6, 1)",
+        "(20, 20)",
+        "The six-element trailing vector aligns with the feature axis and repeats conceptually over samples.",
+        "(20,) is not consistent with the required calculation. The six-element trailing vector aligns with the feature axis and repeats conceptually over samples.",
+        "(6, 1) is not consistent with the required calculation. The six-element trailing vector aligns with the feature axis and repeats conceptually over samples.",
+        "(20, 20) is not consistent with the required calculation. The six-element trailing vector aligns with the feature axis and repeats conceptually over samples."
+      ],
+      [
+        "A matrix is (20, 6) and each row needs one offset. Which offset shape expresses that?",
+        "(20, 1)",
+        "(1, 20)",
+        "(6,)",
+        "(6, 20)",
+        "A singleton feature axis allows each row's offset to apply across its six columns.",
+        "(1, 20) is not consistent with the required calculation. A singleton feature axis allows each row's offset to apply across its six columns.",
+        "(6,) is not consistent with the required calculation. A singleton feature axis allows each row's offset to apply across its six columns.",
+        "(6, 20) is not consistent with the required calculation. A singleton feature axis allows each row's offset to apply across its six columns."
+      ],
+      [
+        "A (3, 4) array is added to a (3,) vector. What follows?",
+        "Incompatible trailing lengths",
+        "A guaranteed (3, 4) result",
+        "A guaranteed (3, 3) result",
+        "Automatic row-label alignment",
+        "The trailing lengths four and three are unequal and neither is one, so they do not broadcast.",
+        "A guaranteed (3, 4) result is not consistent with the required calculation. The trailing lengths four and three are unequal and neither is one, so they do not broadcast.",
+        "A guaranteed (3, 3) result is not consistent with the required calculation. The trailing lengths four and three are unequal and neither is one, so they do not broadcast.",
+        "Automatic row-label alignment is not consistent with the required calculation. The trailing lengths four and three are unequal and neither is one, so they do not broadcast."
+      ],
+      [
+        "A color image is (100, 80, 3) and channel gains are (3,). What output shape follows?",
+        "(100, 80, 3)",
+        "(3, 100, 80)",
+        "(100, 3)",
+        "(80, 3)",
+        "The gain vector aligns with the final channel axis while leading image axes are retained.",
+        "(3, 100, 80) is not consistent with the required calculation. The gain vector aligns with the final channel axis while leading image axes are retained.",
+        "(100, 3) is not consistent with the required calculation. The gain vector aligns with the final channel axis while leading image axes are retained.",
+        "(80, 3) is not consistent with the required calculation. The gain vector aligns with the final channel axis while leading image axes are retained."
+      ],
+      [
+        "A column of 50000 values combines with a row of 50000 values. Why might memory fail?",
+        "The output has 2.5 billion elements",
+        "The input buffers must already be that large",
+        "Broadcasting guarantees no output allocation",
+        "Every singleton axis is an error",
+        "Broadcasting can create a huge output grid even when inputs do not need repeated physical copies.",
+        "The input buffers must already be that large is not consistent with the required calculation. Broadcasting can create a huge output grid even when inputs do not need repeated physical copies.",
+        "Broadcasting guarantees no output allocation is not consistent with the required calculation. Broadcasting can create a huge output grid even when inputs do not need repeated physical copies.",
+        "Every singleton axis is an error is not consistent with the required calculation. Broadcasting can create a huge output grid even when inputs do not need repeated physical copies."
+      ],
+      [
+        "A (4, 1) target is updated in place with a result shaped (4, 3). What constraint matters?",
+        "The existing destination shape",
+        "Only the input variable names",
+        "Only whether all values are positive",
+        "Only the length of dtype text",
+        "In-place operations cannot simply expand existing storage to any out-of-place result shape.",
+        "Only the input variable names is not consistent with the required calculation. In-place operations cannot simply expand existing storage to any out-of-place result shape.",
+        "Only whether all values are positive is not consistent with the required calculation. In-place operations cannot simply expand existing storage to any out-of-place result shape.",
+        "Only the length of dtype text is not consistent with the required calculation. In-place operations cannot simply expand existing storage to any out-of-place result shape."
+      ],
+      [
+        "Two arrays broadcast successfully but represent unmatched customer orders. What must validation still establish?",
+        "Corresponding entity semantics",
+        "Only mechanical broadcast feasibility",
+        "Only that both arrays have size",
+        "Only that the expression returns",
+        "Shape compatibility is a structural rule and does not establish that aligned positions have the intended business meaning.",
+        "Only mechanical broadcast feasibility is not consistent with the required calculation. Shape compatibility is a structural rule and does not establish that aligned positions have the intended business meaning.",
+        "Only that both arrays have size is not consistent with the required calculation. Shape compatibility is a structural rule and does not establish that aligned positions have the intended business meaning.",
+        "Only that the expression returns is not consistent with the required calculation. Shape compatibility is a structural rule and does not establish that aligned positions have the intended business meaning."
+      ]
+    ]
+  },
+  {
+    "comp": "m2.c2",
+    "rows": [
+      [
+        "For a sample-by-feature matrix, which reduction leaves one value per feature?",
+        "Reduce axis zero",
+        "Reduce axis one",
+        "Flatten then take the first item",
+        "Transpose without reduction",
+        "Axis zero combines samples, retaining the feature positions.",
+        "Reduce axis one is not consistent with the required calculation. Axis zero combines samples, retaining the feature positions.",
+        "Flatten then take the first item is not consistent with the required calculation. Axis zero combines samples, retaining the feature positions.",
+        "Transpose without reduction is not consistent with the required calculation. Axis zero combines samples, retaining the feature positions."
+      ],
+      [
+        "What does keepdims change in a reduction result?",
+        "Retains singleton axes",
+        "Keeps all input elements",
+        "Forces integer arithmetic",
+        "Sorts the reduced axis",
+        "Reduced axes remain length one, helping later broadcasting while the values are still aggregated.",
+        "Keeps all input elements is not consistent with the required calculation. Reduced axes remain length one, helping later broadcasting while the values are still aggregated.",
+        "Forces integer arithmetic is not consistent with the required calculation. Reduced axes remain length one, helping later broadcasting while the values are still aggregated.",
+        "Sorts the reduced axis is not consistent with the required calculation. Reduced axes remain length one, helping later broadcasting while the values are still aggregated."
+      ],
+      [
+        "What does a reduction with axis=None generally do?",
+        "Combines the entire array",
+        "Combines only the last row",
+        "Copies the first column",
+        "Keeps every axis unchanged",
+        "The default all-axis reduction combines all elements rather than one named axis.",
+        "Combines only the last row is not consistent with the required calculation. The default all-axis reduction combines all elements rather than one named axis.",
+        "Copies the first column is not consistent with the required calculation. The default all-axis reduction combines all elements rather than one named axis.",
+        "Keeps every axis unchanged is not consistent with the required calculation. The default all-axis reduction combines all elements rather than one named axis."
+      ],
+      [
+        "A sales matrix has stores on rows and days on columns. How should total sales per day be computed?",
+        "Sum along axis zero",
+        "Sum along axis one",
+        "Transpose without summing",
+        "Read only the diagonal",
+        "Combining stores reduces the row axis and leaves one total per day.",
+        "Sum along axis one is not consistent with the required calculation. Combining stores reduces the row axis and leaves one total per day.",
+        "Transpose without summing is not consistent with the required calculation. Combining stores reduces the row axis and leaves one total per day.",
+        "Read only the diagonal is not consistent with the required calculation. Combining stores reduces the row axis and leaves one total per day."
+      ],
+      [
+        "An array has shape (8, 5). What shape does mean(axis=1, keepdims=True) return?",
+        "(8, 1)",
+        "(1, 5)",
+        "(8,)",
+        "(5, 1)",
+        "The second axis is reduced to length one while the eight rows remain.",
+        "(1, 5) is not consistent with the required calculation. The second axis is reduced to length one while the eight rows remain.",
+        "(8,) is not consistent with the required calculation. The second axis is reduced to length one while the eight rows remain.",
+        "(5, 1) is not consistent with the required calculation. The second axis is reduced to length one while the eight rows remain."
+      ],
+      [
+        "A tensor is (2, 3, 4). Reducing sum over axes (0, 2) without keepdims leaves what shape?",
+        "(3,)",
+        "(2, 4)",
+        "(1, 3, 1)",
+        "(24,)",
+        "Removing the first and third axes leaves the original three-position middle axis.",
+        "(2, 4) is not consistent with the required calculation. Removing the first and third axes leaves the original three-position middle axis.",
+        "(1, 3, 1) is not consistent with the required calculation. Removing the first and third axes leaves the original three-position middle axis.",
+        "(24,) is not consistent with the required calculation. Removing the first and third axes leaves the original three-position middle axis."
+      ],
+      [
+        "A model-preparation step subtracts each feature mean from all samples. Which retained mean shape is useful for a (12, 7) matrix?",
+        "(1, 7)",
+        "(12, 1)",
+        "(7, 1)",
+        "(12, 7, 1)",
+        "A one-row feature summary aligns explicitly with the seven feature positions across all samples.",
+        "(12, 1) is not consistent with the required calculation. A one-row feature summary aligns explicitly with the seven feature positions across all samples.",
+        "(7, 1) is not consistent with the required calculation. A one-row feature summary aligns explicitly with the seven feature positions across all samples.",
+        "(12, 7, 1) is not consistent with the required calculation. A one-row feature summary aligns explicitly with the seven feature positions across all samples."
+      ],
+      [
+        "A report averages means from groups with different observation counts. What can go wrong?",
+        "An unintended weighting policy",
+        "Every group is automatically weighted by size",
+        "The array must become three-dimensional",
+        "All values become NaN by definition",
+        "An unweighted average of group means gives each group equal weight rather than each observation equal weight.",
+        "Every group is automatically weighted by size is not consistent with the required calculation. An unweighted average of group means gives each group equal weight rather than each observation equal weight.",
+        "The array must become three-dimensional is not consistent with the required calculation. An unweighted average of group means gives each group equal weight rather than each observation equal weight.",
+        "All values become NaN by definition is not consistent with the required calculation. An unweighted average of group means gives each group equal weight rather than each observation equal weight."
+      ],
+      [
+        "A boolean validity mask is reduced to count included values. Which interpretation must be clear?",
+        "What makes an observation valid",
+        "Only the mask variable's spelling",
+        "Only the dtype object's title",
+        "Only the source file extension",
+        "Counting true values is meaningful only when the mask represents the intended inclusion policy.",
+        "Only the mask variable's spelling is not consistent with the required calculation. Counting true values is meaningful only when the mask represents the intended inclusion policy.",
+        "Only the dtype object's title is not consistent with the required calculation. Counting true values is meaningful only when the mask represents the intended inclusion policy.",
+        "Only the source file extension is not consistent with the required calculation. Counting true values is meaningful only when the mask represents the intended inclusion policy."
+      ],
+      [
+        "A centered matrix passes a near-zero column-mean check. What remains outside that evidence?",
+        "Correctness of the downstream model",
+        "The observed centering invariant",
+        "The computed local feature means",
+        "The provided matrix shape",
+        "A transformation invariant on synthetic data does not establish model training quality or all data assumptions.",
+        "The observed centering invariant is not consistent with the required calculation. A transformation invariant on synthetic data does not establish model training quality or all data assumptions.",
+        "The computed local feature means is not consistent with the required calculation. A transformation invariant on synthetic data does not establish model training quality or all data assumptions.",
+        "The provided matrix shape is not consistent with the required calculation. A transformation invariant on synthetic data does not establish model training quality or all data assumptions."
+      ]
+    ]
+  },
+  {
+    "comp": "m3.c1",
+    "rows": [
+      [
+        "What is a key difference between NumPy int8 arrays and Python integers?",
+        "Fixed-width versus arbitrary precision",
+        "Only different printed brackets",
+        "NumPy int8 has unlimited range",
+        "Python integers always use eight bits",
+        "A fixed-width numeric dtype has bounded range, unlike Python's arbitrary-precision integer arithmetic.",
+        "Only different printed brackets is not consistent with the required calculation. A fixed-width numeric dtype has bounded range, unlike Python's arbitrary-precision integer arithmetic.",
+        "NumPy int8 has unlimited range is not consistent with the required calculation. A fixed-width numeric dtype has bounded range, unlike Python's arbitrary-precision integer arithmetic.",
+        "Python integers always use eight bits is not consistent with the required calculation. A fixed-width numeric dtype has bounded range, unlike Python's arbitrary-precision integer arithmetic."
+      ],
+      [
+        "Which tool reports floating-point dtype properties?",
+        "np.finfo",
+        "np.iinfo for float64",
+        "np.reshape",
+        "np.isnan only",
+        "finfo provides floating-point properties such as precision and representable limits; iinfo is for integer types.",
+        "np.iinfo for float64 is not consistent with the required calculation. finfo provides floating-point properties such as precision and representable limits; iinfo is for integer types.",
+        "np.reshape is not consistent with the required calculation. finfo provides floating-point properties such as precision and representable limits; iinfo is for integer types.",
+        "np.isnan only is not consistent with the required calculation. finfo provides floating-point properties such as precision and representable limits; iinfo is for integer types."
+      ],
+      [
+        "What can a cast from fractional floats to integers lose?",
+        "Fractional information",
+        "Every axis length always",
+        "All memory ownership metadata",
+        "File extension characters",
+        "Integer representation cannot retain fractional components, so rounding and truncation policy must be explicit.",
+        "Every axis length always is not consistent with the required calculation. Integer representation cannot retain fractional components, so rounding and truncation policy must be explicit.",
+        "All memory ownership metadata is not consistent with the required calculation. Integer representation cannot retain fractional components, so rounding and truncation policy must be explicit.",
+        "File extension characters is not consistent with the required calculation. Integer representation cannot retain fractional components, so rounding and truncation policy must be explicit."
+      ],
+      [
+        "A counter stores int8 values and may reach 200. What should the design consider?",
+        "A wider integer dtype",
+        "Add an axis",
+        "Cast after overflow",
+        "Print more digits",
+        "A representation must accommodate intended values and intermediate arithmetic before information is lost.",
+        "Add an axis is not consistent with the required calculation. A representation must accommodate intended values and intermediate arithmetic before information is lost.",
+        "Cast after overflow is not consistent with the required calculation. A representation must accommodate intended values and intermediate arithmetic before information is lost.",
+        "Print more digits is not consistent with the required calculation. A representation must accommodate intended values and intermediate arithmetic before information is lost."
+      ],
+      [
+        "Two int8 arrays containing 100 are added elementwise. Why can their result differ from 200?",
+        "The narrow result overflows",
+        "Addition is secretly a matrix product",
+        "Every dtype promotes to unlimited integers",
+        "Shape metadata changes the mathematical sum",
+        "Array arithmetic in a narrow fixed-width dtype can wrap when the true result is outside its representable range.",
+        "Addition is secretly a matrix product is not consistent with the required calculation. Array arithmetic in a narrow fixed-width dtype can wrap when the true result is outside its representable range.",
+        "Every dtype promotes to unlimited integers is not consistent with the required calculation. Array arithmetic in a narrow fixed-width dtype can wrap when the true result is outside its representable range.",
+        "Shape metadata changes the mathematical sum is not consistent with the required calculation. Array arithmetic in a narrow fixed-width dtype can wrap when the true result is outside its representable range."
+      ],
+      [
+        "A wrapped result is converted to int64 afterward. What happens to the lost intended value?",
+        "It is not reconstructed",
+        "It is always recovered exactly",
+        "It becomes the correct source automatically",
+        "It can be inferred from shape alone",
+        "Widening preserves the already computed stored result and cannot recover information lost during overflow.",
+        "It is always recovered exactly is not consistent with the required calculation. Widening preserves the already computed stored result and cannot recover information lost during overflow.",
+        "It becomes the correct source automatically is not consistent with the required calculation. Widening preserves the already computed stored result and cannot recover information lost during overflow.",
+        "It can be inferred from shape alone is not consistent with the required calculation. Widening preserves the already computed stored result and cannot recover information lost during overflow."
+      ],
+      [
+        "A precision-critical pipeline changes float64 storage to float32 to save memory. What is required?",
+        "An error-budget validation",
+        "Only a matching number of axes",
+        "Only an unchanged variable name",
+        "Only a successful import statement",
+        "Reduced storage precision must still satisfy the numerical requirements across representative and boundary cases.",
+        "Only a matching number of axes is not consistent with the required calculation. Reduced storage precision must still satisfy the numerical requirements across representative and boundary cases.",
+        "Only an unchanged variable name is not consistent with the required calculation. Reduced storage precision must still satisfy the numerical requirements across representative and boundary cases.",
+        "Only a successful import statement is not consistent with the required calculation. Reduced storage precision must still satisfy the numerical requirements across representative and boundary cases."
+      ],
+      [
+        "A numeric pipeline unexpectedly has object dtype after ingestion. What should it inspect?",
+        "The input and numeric contract",
+        "Only the array's printed color",
+        "Only terminal size",
+        "Only the last loop counter",
+        "Object arrays can carry arbitrary Python objects and differ from ordinary homogeneous numeric storage and performance behavior.",
+        "Only the array's printed color is not consistent with the required calculation. Object arrays can carry arbitrary Python objects and differ from ordinary homogeneous numeric storage and performance behavior.",
+        "Only terminal size is not consistent with the required calculation. Object arrays can carry arbitrary Python objects and differ from ordinary homogeneous numeric storage and performance behavior.",
+        "Only the last loop counter is not consistent with the required calculation. Object arrays can carry arbitrary Python objects and differ from ordinary homogeneous numeric storage and performance behavior."
+      ],
+      [
+        "A team assumes every mixed-type expression widens safely. What is a stronger approach?",
+        "Explicit dtype contracts and boundary tests",
+        "Trust variable names to select precision",
+        "Ignore NumPy version and operand types",
+        "Cast only the final printed string",
+        "Promotion depends on operand types and operations, so important range and precision behavior needs deliberate verification.",
+        "Trust variable names to select precision is not consistent with the required calculation. Promotion depends on operand types and operations, so important range and precision behavior needs deliberate verification.",
+        "Ignore NumPy version and operand types is not consistent with the required calculation. Promotion depends on operand types and operations, so important range and precision behavior needs deliberate verification.",
+        "Cast only the final printed string is not consistent with the required calculation. Promotion depends on operand types and operations, so important range and precision behavior needs deliberate verification."
+      ],
+      [
+        "A dtype optimization passes ordinary examples but fails at extreme intermediate products. What was missing?",
+        "Intermediate-bound analysis",
+        "Only the array constructor call",
+        "Only a second source-code comment",
+        "Only the final result's shape check",
+        "A safe final range does not guarantee intermediate calculations fit; the computation path needs range analysis.",
+        "Only the array constructor call is not consistent with the required calculation. A safe final range does not guarantee intermediate calculations fit; the computation path needs range analysis.",
+        "Only a second source-code comment is not consistent with the required calculation. A safe final range does not guarantee intermediate calculations fit; the computation path needs range analysis.",
+        "Only the final result's shape check is not consistent with the required calculation. A safe final range does not guarantee intermediate calculations fit; the computation path needs range analysis."
+      ]
+    ]
+  },
+  {
+    "comp": "m3.c1",
+    "rows": [
+      [
+        "Why does a == np.nan fail as a general NaN detector?",
+        "NaN is unequal to itself",
+        "NaN is always zero",
+        "Equality sorts the array",
+        "NaN only exists in strings",
+        "NaN comparison semantics require a dedicated predicate such as isnan.",
+        "NaN is always zero is not consistent with the required calculation. NaN comparison semantics require a dedicated predicate such as isnan.",
+        "Equality sorts the array is not consistent with the required calculation. NaN comparison semantics require a dedicated predicate such as isnan.",
+        "NaN only exists in strings is not consistent with the required calculation. NaN comparison semantics require a dedicated predicate such as isnan."
+      ],
+      [
+        "Which values make isfinite return false?",
+        "NaN and infinities",
+        "Only negative numbers",
+        "Only zeros",
+        "All fractional values",
+        "Finiteness excludes NaN and positive or negative infinity, not ordinary finite signs or fractions.",
+        "Only negative numbers is not consistent with the required calculation. Finiteness excludes NaN and positive or negative infinity, not ordinary finite signs or fractions.",
+        "Only zeros is not consistent with the required calculation. Finiteness excludes NaN and positive or negative infinity, not ordinary finite signs or fractions.",
+        "All fractional values is not consistent with the required calculation. Finiteness excludes NaN and positive or negative infinity, not ordinary finite signs or fractions."
+      ],
+      [
+        "Does nanmean automatically reject infinity?",
+        "No, it skips NaN only",
+        "Yes, it skips every invalid value",
+        "Yes, it skips all large values",
+        "Only for one-dimensional arrays",
+        "The NaN-aware reduction does not define a universal domain-validity or nonfinite-value policy.",
+        "Yes, it skips every invalid value is not consistent with the required calculation. The NaN-aware reduction does not define a universal domain-validity or nonfinite-value policy.",
+        "Yes, it skips all large values is not consistent with the required calculation. The NaN-aware reduction does not define a universal domain-validity or nonfinite-value policy.",
+        "Only for one-dimensional arrays is not consistent with the required calculation. The NaN-aware reduction does not define a universal domain-validity or nonfinite-value policy."
+      ],
+      [
+        "A temperature feed uses zero as a valid reading and NaN for absence. What is wrong with filling absence with zero before averaging?",
+        "It changes the inclusion meaning",
+        "It preserves all original missingness",
+        "It makes every mean statistically unbiased",
+        "It only changes printed spacing",
+        "A substituted zero becomes a measured numeric contribution and can distort the intended statistic.",
+        "It preserves all original missingness is not consistent with the required calculation. A substituted zero becomes a measured numeric contribution and can distort the intended statistic.",
+        "It makes every mean statistically unbiased is not consistent with the required calculation. A substituted zero becomes a measured numeric contribution and can distort the intended statistic.",
+        "It only changes printed spacing is not consistent with the required calculation. A substituted zero becomes a measured numeric contribution and can distort the intended statistic."
+      ],
+      [
+        "An array has values 2, NaN and 8. Under a skip-NaN mean policy, what mean is obtained?",
+        "5.0",
+        "3.3333333333333335",
+        "0.0",
+        "10.0",
+        "The two valid observations total ten and are divided by the valid count two.",
+        "3.3333333333333335 is not consistent with the required calculation. The two valid observations total ten and are divided by the valid count two.",
+        "0.0 is not consistent with the required calculation. The two valid observations total ten and are divided by the valid count two.",
+        "10.0 is not consistent with the required calculation. The two valid observations total ten and are divided by the valid count two."
+      ],
+      [
+        "A group is entirely missing. What should reporting define?",
+        "A no-valid-observation outcome",
+        "A guarantee the mean equals zero",
+        "A guarantee every value is finite",
+        "A mandatory permission escalation",
+        "There is no included observation to average, so missing-group behavior must be explicit rather than fabricated.",
+        "A guarantee the mean equals zero is not consistent with the required calculation. There is no included observation to average, so missing-group behavior must be explicit rather than fabricated.",
+        "A guarantee every value is finite is not consistent with the required calculation. There is no included observation to average, so missing-group behavior must be explicit rather than fabricated.",
+        "A mandatory permission escalation is not consistent with the required calculation. There is no included observation to average, so missing-group behavior must be explicit rather than fabricated."
+      ],
+      [
+        "A finite-value mean is published without a count. What interpretation can be hidden?",
+        "How much data was excluded",
+        "Whether the variable has a name",
+        "Whether Python supports lists",
+        "Whether arrays have shape",
+        "A mean over a small surviving subset can appear equivalent to a complete-data mean unless valid counts are visible.",
+        "Whether the variable has a name is not consistent with the required calculation. A mean over a small surviving subset can appear equivalent to a complete-data mean unless valid counts are visible.",
+        "Whether Python supports lists is not consistent with the required calculation. A mean over a small surviving subset can appear equivalent to a complete-data mean unless valid counts are visible.",
+        "Whether arrays have shape is not consistent with the required calculation. A mean over a small surviving subset can appear equivalent to a complete-data mean unless valid counts are visible."
+      ],
+      [
+        "An int32 array must represent missing observations. What is necessary?",
+        "A suitable dtype or separate mask",
+        "Assuming int32 stores NaN natively",
+        "Converting absence to a real zero silently",
+        "Reshaping the array to add range",
+        "Ordinary integer storage has no native floating NaN value, so missingness needs an explicit representation.",
+        "Assuming int32 stores NaN natively is not consistent with the required calculation. Ordinary integer storage has no native floating NaN value, so missingness needs an explicit representation.",
+        "Converting absence to a real zero silently is not consistent with the required calculation. Ordinary integer storage has no native floating NaN value, so missingness needs an explicit representation.",
+        "Reshaping the array to add range is not consistent with the required calculation. Ordinary integer storage has no native floating NaN value, so missingness needs an explicit representation."
+      ],
+      [
+        "A finite pressure reading is negative despite a nonnegative physical domain. What does this show?",
+        "Numerical finiteness is insufficient",
+        "isfinite proves the sensor is correct",
+        "The value is necessarily infinity",
+        "Every finite value is valid by definition",
+        "Domain validity includes constraints beyond NaN and infinity checks.",
+        "isfinite proves the sensor is correct is not consistent with the required calculation. Domain validity includes constraints beyond NaN and infinity checks.",
+        "The value is necessarily infinity is not consistent with the required calculation. Domain validity includes constraints beyond NaN and infinity checks.",
+        "Every finite value is valid by definition is not consistent with the required calculation. Domain validity includes constraints beyond NaN and infinity checks."
+      ],
+      [
+        "A team applies nanmean to every dataset and calls it a missing-data solution. What is overstated?",
+        "The statistical validity of exclusion",
+        "The existence of the reduction function",
+        "The ability to inspect valid counts",
+        "The availability of a NaN marker",
+        "Skipping NaN is an arithmetic rule, not a justified missingness model or universal analysis policy.",
+        "The existence of the reduction function is not consistent with the required calculation. Skipping NaN is an arithmetic rule, not a justified missingness model or universal analysis policy.",
+        "The ability to inspect valid counts is not consistent with the required calculation. Skipping NaN is an arithmetic rule, not a justified missingness model or universal analysis policy.",
+        "The availability of a NaN marker is not consistent with the required calculation. Skipping NaN is an arithmetic rule, not a justified missingness model or universal analysis policy."
+      ]
+    ]
+  },
+  {
+    "comp": "m3.c1",
+    "rows": [
+      [
+        "Why may exact equality fail for simple decimal arithmetic in float arrays?",
+        "Finite binary representation",
+        "Automatic alphabetical sorting",
+        "The array has an axis",
+        "A dtype always stores text",
+        "Many decimal fractions are approximated in binary floating point, so arithmetic can introduce rounding differences.",
+        "Automatic alphabetical sorting is not consistent with the required calculation. Many decimal fractions are approximated in binary floating point, so arithmetic can introduce rounding differences.",
+        "The array has an axis is not consistent with the required calculation. Many decimal fractions are approximated in binary floating point, so arithmetic can introduce rounding differences.",
+        "A dtype always stores text is not consistent with the required calculation. Many decimal fractions are approximated in binary floating point, so arithmetic can introduce rounding differences."
+      ],
+      [
+        "What is the role of absolute tolerance near zero?",
+        "An allowed error floor",
+        "A new missing-value marker",
+        "An extra array dimension",
+        "A way to infer units",
+        "A scale-independent absolute allowance can dominate near zero, so it needs a domain-appropriate value.",
+        "A new missing-value marker is not consistent with the required calculation. A scale-independent absolute allowance can dominate near zero, so it needs a domain-appropriate value.",
+        "An extra array dimension is not consistent with the required calculation. A scale-independent absolute allowance can dominate near zero, so it needs a domain-appropriate value.",
+        "A way to infer units is not consistent with the required calculation. A scale-independent absolute allowance can dominate near zero, so it needs a domain-appropriate value."
+      ],
+      [
+        "What does relative tolerance provide?",
+        "An allowance scaled to reference magnitude",
+        "An always exact comparison",
+        "A guaranteed number of decimal strings",
+        "A complete rounding policy for money",
+        "Relative tolerance accounts for scale using the magnitude of the reference value under the comparison contract.",
+        "An always exact comparison is not consistent with the required calculation. Relative tolerance accounts for scale using the magnitude of the reference value under the comparison contract.",
+        "A guaranteed number of decimal strings is not consistent with the required calculation. Relative tolerance accounts for scale using the magnitude of the reference value under the comparison contract.",
+        "A complete rounding policy for money is not consistent with the required calculation. Relative tolerance accounts for scale using the magnitude of the reference value under the comparison contract."
+      ],
+      [
+        "A sensor specification permits error at most 1e-10 near zero, but a test accepts 1e-6. What is the issue?",
+        "The tolerance exceeds requirements",
+        "The test is necessarily more accurate",
+        "Every accepted value becomes exact",
+        "The dtype automatically changes",
+        "An overly broad tolerance can hide errors the actual specification rejects.",
+        "The test is necessarily more accurate is not consistent with the required calculation. An overly broad tolerance can hide errors the actual specification rejects.",
+        "Every accepted value becomes exact is not consistent with the required calculation. An overly broad tolerance can hide errors the actual specification rejects.",
+        "The dtype automatically changes is not consistent with the required calculation. An overly broad tolerance can hide errors the actual specification rejects."
+      ],
+      [
+        "A check compares 1000.0 to reference 1001.0 with rtol=0 and atol=0.5. What should it report?",
+        "Not close",
+        "Close exactly",
+        "Unknown because both are positive",
+        "Close only because shapes match",
+        "The absolute difference is one, exceeding the allowed half-unit error when relative tolerance is zero.",
+        "Close exactly is not consistent with the required calculation. The absolute difference is one, exceeding the allowed half-unit error when relative tolerance is zero.",
+        "Unknown because both are positive is not consistent with the required calculation. The absolute difference is one, exceeding the allowed half-unit error when relative tolerance is zero.",
+        "Close only because shapes match is not consistent with the required calculation. The absolute difference is one, exceeding the allowed half-unit error when relative tolerance is zero."
+      ],
+      [
+        "A NumPy comparison uses abs(a-b) <= atol + rtol*abs(b). Which operand sets the relative scale?",
+        "b as the reference",
+        "a as the candidate only",
+        "The element count",
+        "The number of dtype bits",
+        "The usual NumPy closeness formula scales the relative component by the reference operand b.",
+        "a as the candidate only is not consistent with the required calculation. The usual NumPy closeness formula scales the relative component by the reference operand b.",
+        "The element count is not consistent with the required calculation. The usual NumPy closeness formula scales the relative component by the reference operand b.",
+        "The number of dtype bits is not consistent with the required calculation. The usual NumPy closeness formula scales the relative component by the reference operand b."
+      ],
+      [
+        "A reconciliation task compares transaction identifiers. What equality policy is appropriate?",
+        "Exact identifier matching",
+        "A broad floating tolerance",
+        "Treat near values as the same id",
+        "Compare only printed prefixes",
+        "Identifiers represent discrete identities and should not be merged under numerical approximate equality.",
+        "A broad floating tolerance is not consistent with the required calculation. Identifiers represent discrete identities and should not be merged under numerical approximate equality.",
+        "Treat near values as the same id is not consistent with the required calculation. Identifiers represent discrete identities and should not be merged under numerical approximate equality.",
+        "Compare only printed prefixes is not consistent with the required calculation. Identifiers represent discrete identities and should not be merged under numerical approximate equality."
+      ],
+      [
+        "A report prints two floats as 1.00. What can be concluded?",
+        "Their formatted values coincide",
+        "Their stored values are identical",
+        "Their computation paths are identical",
+        "Their units are necessarily identical",
+        "Display rounding can conceal differences and does not establish exact underlying equality or shared meaning.",
+        "Their stored values are identical is not consistent with the required calculation. Display rounding can conceal differences and does not establish exact underlying equality or shared meaning.",
+        "Their computation paths are identical is not consistent with the required calculation. Display rounding can conceal differences and does not establish exact underlying equality or shared meaning.",
+        "Their units are necessarily identical is not consistent with the required calculation. Display rounding can conceal differences and does not establish exact underlying equality or shared meaning."
+      ],
+      [
+        "A numeric team changes reduction order and sees tiny differences. What should it investigate?",
+        "Rounding and accumulation sensitivity",
+        "Only identifier capitalization",
+        "Only whether the data is rectangular",
+        "Only array variable ownership",
+        "Floating-point addition is not generally associative, so different accumulation paths can produce different rounded results.",
+        "Only identifier capitalization is not consistent with the required calculation. Floating-point addition is not generally associative, so different accumulation paths can produce different rounded results.",
+        "Only whether the data is rectangular is not consistent with the required calculation. Floating-point addition is not generally associative, so different accumulation paths can produce different rounded results.",
+        "Only array variable ownership is not consistent with the required calculation. Floating-point addition is not generally associative, so different accumulation paths can produce different rounded results."
+      ],
+      [
+        "A finance workflow requires exact minor-unit totals and explicit rounding. Which design fits better than arbitrary allclose thresholds?",
+        "A specified exact or decimal representation",
+        "Increasing tolerance until all checks pass",
+        "Treating display formatting as arithmetic",
+        "Assuming float64 makes all decimals exact",
+        "Exact monetary requirements call for a representation and rounding contract suited to the task rather than unexplained tolerance-based acceptance.",
+        "Increasing tolerance until all checks pass is not consistent with the required calculation. Exact monetary requirements call for a representation and rounding contract suited to the task rather than unexplained tolerance-based acceptance.",
+        "Treating display formatting as arithmetic is not consistent with the required calculation. Exact monetary requirements call for a representation and rounding contract suited to the task rather than unexplained tolerance-based acceptance.",
+        "Assuming float64 makes all decimals exact is not consistent with the required calculation. Exact monetary requirements call for a representation and rounding contract suited to the task rather than unexplained tolerance-based acceptance."
+      ]
+    ]
+  }
+]);

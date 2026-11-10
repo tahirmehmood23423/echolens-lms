@@ -8,6 +8,7 @@ function signals(course,bank){
  for(const q of [...course.questions,...bank]){
   if(!web&&q.options.some(o=>/font colou?r|terminal theme|username length|button colou?r|screen resolution/i.test(o)))flags.push({kind:'distractor_relevance_review',question:q.id,note:'A cosmetic distractor may be implausible for this domain.'});
   if(q.why.some(w=>/misses the stated distinction|fails this requirement/i.test(w)))flags.push({kind:'misconception_review',question:q.id,note:'Check that each wrong-option explanation identifies its specific misconception.'});
+  if(['hard','advanced'].includes(q.difficulty)&&!q.code&&q.prompt.split(/\s+/).length<16)flags.push({kind:'difficulty_review',question:q.id,note:'Short hard/advanced recognition item requires difficulty and constraint-depth review; this heuristic is not a calibration.'});
   if(q.scenario&&q.prompt.split(/\s+/).length<12&&!q.code)flags.push({kind:'scenario_depth_review',question:q.id,note:'Short scenario-tagged stem may test a definition rather than a concrete engineering constraint.'});
  }
  return flags;

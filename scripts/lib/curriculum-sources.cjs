@@ -11,4 +11,11 @@ function verifyHttpSnapshot(root,reference,repo){
  if(!record||record.url!==meta.url||record.http_status!==200||record.sha256!==sha256||sha256!==meta.sha256||!meta.fetched_at||record.fetched_at!==meta.fetched_at)throw Error('Official HTTP snapshot evidence mismatch: '+reference.id);
  return {id:reference.id,path:meta.path,url:meta.url,sha256,fetched_at:meta.fetched_at,checked_by:'Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision'};
 }
-module.exports={verifyHttpSnapshot};
+function unavailableReference(reference,course,allow){
+ const s=reference.source||{};
+ if(!allow)throw Error('Unavailable reference requires explicit reporting opt-in for '+course);
+ const url=new URL(reference.url);
+ if(url.protocol!=='https:'||url.username||url.password||![403,404,429,500,502,503,504].includes(s.retrieval_status)||!s.checked_at||!s.verification)throw Error('Missing unavailable-reference evidence.');
+ return {course,id:reference.id,url:reference.url,status:s.retrieval_status,checked_at:s.checked_at,reason:s.verification,verified:false,human_source_review_required:true};
+}
+module.exports={verifyHttpSnapshot,unavailableReference};

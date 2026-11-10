@@ -4667,6 +4667,128 @@
       "human_approved": false
     },
     {
+      "id": "node-express",
+      "version": 1,
+      "course_hash": "0cfbfdebc3240e874261acca759f097e9fdecc2380e48ea989ea05f1740d0e65",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "node-express.l01",
+          "code_hash": "9283597d80488a56f5d7edf661c332bed22c5e2546a664ba5c736c2b64bbecba",
+          "ran": true,
+          "ok": true,
+          "output": "start,sync,promise",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l02",
+          "code_hash": "6fc41fddd381abe7abc1060bf54c3a5d5b378ded88d2352676265d269a6f943b",
+          "ran": true,
+          "ok": true,
+          "output": "3000\ninvalid port",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l03",
+          "code_hash": "1ae52c55ceb5deab2aac17384f41abcf314f9befc47c2446006800befe12598a",
+          "ran": true,
+          "ok": true,
+          "output": "2,4,6,8,10",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l04",
+          "code_hash": "89316f36739505a81dc36e9980c914a7add5bc57e38e75d51c8f41b20b807d42",
+          "ran": true,
+          "ok": true,
+          "output": "identity,access,true",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l05",
+          "code_hash": "85b87fd0b7fb309a7b1d0adf4da213e2299f858dcc0f2fc89e09ac116b8748d3",
+          "ran": true,
+          "ok": true,
+          "output": "{\"quantity\":2}\ninvalid",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l06",
+          "code_hash": "189e14250774e8d5be8d0527433da5196ca63c05c381808b79e6d6cd5f9f613a",
+          "ran": true,
+          "ok": true,
+          "output": "A B",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l07",
+          "code_hash": "bf8123830a21641bf5124a55c36c9e17312a0f955ec838c2157c31d9aad5ba7b",
+          "ran": true,
+          "ok": true,
+          "output": "1 lookup failed",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l08",
+          "code_hash": "6f01d02da45543eadf1e11670887558dcc7851692afff48fb28956ae5e3a5686",
+          "ran": true,
+          "ok": true,
+          "output": "{\"status\":400,\"error\":\"Invalid request\"}\n{\"status\":500,\"error\":\"Internal error\"}",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l09",
+          "code_hash": "d23dd86efdc69b726889b374dc7e6d6bef4b63046fa2c68c2e4ccde2817e2f20",
+          "ran": true,
+          "ok": true,
+          "output": "1 1 1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l10",
+          "code_hash": "d96a0ed42c974da7f7223d040066c519f285dc4b31ecb6f00723e81e7f06333f",
+          "ran": true,
+          "ok": true,
+          "output": "query failed\n1 1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l11",
+          "code_hash": "c1dc185cf485b38852b68f6af5ec417944a966b4772cc8eb12e48a40401510d0",
+          "ran": true,
+          "ok": true,
+          "output": "SELECT id FROM users WHERE email = $1 ORDER BY created_at\n1 true",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l12",
+          "code_hash": "5a18cea092b424f692d2dc36af9881991276ee6cdd62539d9c80ccee0d4ecc05",
+          "ran": true,
+          "ok": true,
+          "output": "{\"status\":200,\"body\":{\"id\":\"o1\",\"total\":42}}\n404",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 12,
+      "questions": 64,
+      "human_approved": false
+    },
+    {
       "id": "react-fundamentals",
       "version": 1,
       "course_hash": "25c9ebd8cf726c9f0474129afcf1d326804ae0ec4879865334f8b000aaea05e9",
@@ -4679,8 +4801,7 @@
           "ran": true,
           "ok": true,
           "output": "<article><h2>Learn &lt;React&gt;</h2></article>",
-          "runtime": "React 19.2.0",
-          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-jsx-expressions",
@@ -4688,8 +4809,7 @@
           "ran": true,
           "ok": true,
           "output": "<section class=\"lesson\"><h2>Functions</h2><p>2 completed</p></section>",
-          "runtime": "React 19.2.0",
-          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-lists-keys",
@@ -4697,8 +4817,7 @@
           "ran": true,
           "ok": true,
           "output": "<ul><li>Read</li><li>Practice</li></ul>\n<p>Goals ready</p>",
-          "runtime": "React 19.2.0",
-          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-state-snapshots",
@@ -4706,8 +4825,7 @@
           "ran": true,
           "ok": true,
           "output": "1\n3",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-state-collections",
@@ -4715,8 +4833,7 @@
           "ran": true,
           "ok": true,
           "output": "false true\nfalse true false",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-lift-state",
@@ -4724,8 +4841,7 @@
           "ran": true,
           "ok": true,
           "output": "core core",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-effect-sync",
@@ -4733,8 +4849,7 @@
           "ran": true,
           "ok": true,
           "output": "<p>Room lobby</p>\nfalse",
-          "runtime": "React 19.2.0",
-          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-effect-dependencies",
@@ -4742,8 +4857,7 @@
           "ran": true,
           "ok": true,
           "output": "B\n0",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-fetch-states",
@@ -4751,8 +4865,7 @@
           "ran": true,
           "ok": true,
           "output": "success new courses",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-controlled-inputs",
@@ -4760,8 +4873,7 @@
           "ran": true,
           "ok": true,
           "output": "<label for=\"comment\">Comment<input id=\"comment\" value=\"\"/></label>",
-          "runtime": "React 19.2.0",
-          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-form-validation",
@@ -4769,8 +4881,7 @@
           "ran": true,
           "ok": true,
           "output": "{\"ok\":false,\"error\":\"Enter a name\"}\n{\"ok\":true,\"value\":\"Ada\"}",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "react-uncontrolled-boundaries",
@@ -4778,14 +4889,108 @@
           "ran": true,
           "ok": true,
           "output": "<input name=\"draft\" value=\"seed\"/>\n<input name=\"draft\" value=\"seed\"/>",
-          "runtime": "React 19.2.0",
-          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 8,
       "covered": 8,
       "lessons": 12,
       "questions": 96,
+      "human_approved": false
+    },
+    {
+      "id": "fullstack-integration-state",
+      "version": 1,
+      "course_hash": "ce4c83b7fe0f1178b3af0e58227bbae1fd4b945564c4bf022e30382675fce34d",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "fullstack-integration-state.l01",
+          "code_hash": "f36c5c3fbb146b44ec020070cccb74c5093af78ababf5e8e95ebaf25069c1089",
+          "ran": true,
+          "ok": true,
+          "output": "{\"id\":\"i1\",\"total\":42}\ncontract error",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l02",
+          "code_hash": "8b2b7c8daefc834a23fb8f0a3e52556d1020f8908a5b2f4653036df027626f70",
+          "ran": true,
+          "ok": true,
+          "output": "1200 1200\nambiguous",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l03",
+          "code_hash": "7e28b460fc619297bff064197d838c7535d4e297b2ae8285be9df015590f465c",
+          "ran": true,
+          "ok": true,
+          "output": "success:no-content,success:decode,conflict,failure",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l04",
+          "code_hash": "72d81a56acc4ee4ef24221fca31060e4d66f0493e271f4f1616908d8e9fd96ff",
+          "ran": true,
+          "ok": true,
+          "output": "server second",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l05",
+          "code_hash": "ee15660c7c68a678ca37ab6406532ad420089255c62c675a27355bb627f88a5a",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfalse\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l06",
+          "code_hash": "e4be49cadfc13e0bb7686efaec57428b4a2672b93f593a309e2b0fe0c07df330",
+          "ran": true,
+          "ok": true,
+          "output": "remote unsaved true",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l07",
+          "code_hash": "a9fa9f8ccdd793d62a410fb7e1264a766620bb638913db4805967a997599e7c1",
+          "ran": true,
+          "ok": true,
+          "output": "fulfilled Ada\nrejected",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l08",
+          "code_hash": "8daf0fe233489fcee38a3f44f79d4c62c7f920d696165532e80962cdd26b5be9",
+          "ran": true,
+          "ok": true,
+          "output": "browser:send,api:200,cache:stale",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l09",
+          "code_hash": "145bf2667833b7a1d41f66eec76d895ebaffbbb9842ef412c3aec26fd51a37fa",
+          "ran": true,
+          "ok": true,
+          "output": "new filter",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 48,
       "human_approved": false
     },
     {
@@ -4801,7 +5006,7 @@
           "ran": true,
           "ok": true,
           "output": "(3, 2) 2 6\nint16 12\n[[0, 0, 0], [0, 0, 0]]",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "numpy-arrays-indexing-memory",
@@ -4809,7 +5014,7 @@
           "ran": true,
           "ok": true,
           "output": "[[0, 99, 2], [3, 4, 5]]\n[-1, 5]\n[[0, 1, 2], [3, 4, 5]]\nTrue False",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "numpy-arrays-reshape-shapes",
@@ -4817,7 +5022,7 @@
           "ran": true,
           "ok": true,
           "output": "(3, 4) (4, 3) (3, 1)\n[4, 5, 6, 7]\nTrue\n(3,)",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "numpy-arrays-vector-operations",
@@ -4825,7 +5030,7 @@
           "ran": true,
           "ok": true,
           "output": "[32.0, 50.0, 68.0]\nTrue\n[False, True, False]\n[0, 1, 0]",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "numpy-arrays-broadcast-contract",
@@ -4833,7 +5038,7 @@
           "ran": true,
           "ok": true,
           "output": "[[9, 18, 27], [39, 48, 57]]\n[[5, 15, 25], [30, 40, 50]]\n(2, 3)",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "numpy-arrays-axis-reductions",
@@ -4841,7 +5046,7 @@
           "ran": true,
           "ok": true,
           "output": "(1, 2) [[3.0, 20.0]]\n[11.0, 23.0, 35.0]\n[0.0, 0.0]\n69.0",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "numpy-arrays-dtype-range",
@@ -4849,7 +5054,7 @@
           "ran": true,
           "ok": true,
           "output": "[-116] [140]\n[-116]\n-128 127",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "numpy-arrays-missing-values",
@@ -4857,7 +5062,7 @@
           "ran": true,
           "ok": true,
           "output": "[False, True, False, False]\n[True, False, True, False]\nTrue\n4.0 2\ninf",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "numpy-arrays-float-comparisons",
@@ -4865,7 +5070,7 @@
           "ran": true,
           "ok": true,
           "output": "False\nTrue\nTrue\nFalse",
-          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 4,
@@ -4873,40 +5078,440 @@
       "lessons": 9,
       "questions": 72,
       "human_approved": false
+    },
+    {
+      "id": "ml-preprocessing",
+      "version": 1,
+      "course_hash": "868a4fa9f3dfe31ebce2c964993e311c0a8b1fbb1f2387486990a698fabc70b2",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ml-preprocessing-numeric-scale",
+          "code_hash": "86154cc6820dcd4398e2f38e0d79fea2ba907e2a01d09a05af601d5e38850654",
+          "ran": true,
+          "ok": true,
+          "output": "[1.0]\n[[3.0]]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-categorical-contract",
+          "code_hash": "ff7e7d115c662bf0319424abe51f914a57661e5d496d88e7186b0528db424602",
+          "ran": true,
+          "ok": true,
+          "output": "[[0.0, 0.0]]\n[[0.0, 1.0]]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-mixed-columns",
+          "code_hash": "c508e750c43548526422befbeb221ab86e672ac582a931be84c2ec0bc0e98db2",
+          "ran": true,
+          "ok": true,
+          "output": "(2, 3)\n['n__km', 'c__zone_east', 'c__zone_west']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-holdout-purpose",
+          "code_hash": "36300f07978f1684b52c2d29d225c897c3f5a6d14f16a0a3e5f9c92c5cd952ce",
+          "ran": true,
+          "ok": true,
+          "output": "6 4\n3 2",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-temporal-splits",
+          "code_hash": "1100f4247c23547ed3f46a8c8cd3129f3c1c54d59c97d4ddce09fe9707a03ee6",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 1, 2] [4, 5]\n[0, 1, 2, 3, 4] [6, 7]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-group-independence",
+          "code_hash": "32b8e9e978c71e43264a0971ea81c2e79bcea836aaf9c79986bc3c30774b8871",
+          "ran": true,
+          "ok": true,
+          "output": "False\n1",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-target-leakage",
+          "code_hash": "27f82d758dc7495769a195838035cd6c53a48a6b4bcf439c10c7ac5834332546",
+          "ran": true,
+          "ok": true,
+          "output": "['age_days', 'prior_claims']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-pipeline-fit",
+          "code_hash": "884cc54fdacf7811af1bd89742ac3a91b2f3659eabbbdb3ef01d00a0f60b0490",
+          "ran": true,
+          "ok": true,
+          "output": "[2.0]\n[4.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-rehearse-deployment",
+          "code_hash": "bdcb86444aa034c1747587eaffeb57d259c2a5f71b7566a4c4be8fd59abdcc0d",
+          "ran": true,
+          "ok": true,
+          "output": "3.0 5.0\n[1.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 58,
+      "human_approved": false
+    },
+    {
+      "id": "ml-fundamentals",
+      "version": 1,
+      "course_hash": "212c9861b04cbcde2a519c1dcb690a60b9e64de9d801577e1e4a70e659f078db",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ml-fundamentals-task-and-target",
+          "code_hash": "65bd71ef332ca792885333b3444754fc691941558c7596e9b8c5ffe5e5578cfb",
+          "ran": true,
+          "ok": true,
+          "output": "binary\ncontinuous",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-baseline-skill",
+          "code_hash": "19dc2497c4f1415b7a71d42f043ff3be45c9ced06497fa4f40c4ba8be9216373",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 0]\n[4.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-measurement-contract",
+          "code_hash": "09ea65dda565bfe0f5561be5abbedaa9d51a708154f7e148d3ac11c9d66a9545",
+          "ran": true,
+          "ok": true,
+          "output": "1 1 12",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-learning-curves",
+          "code_hash": "929a2beba103bf2221aacce7caffae262a68a929e35c9136b5cabf4115e70306",
+          "ran": true,
+          "ok": true,
+          "output": "[4, 8]\n(2, 3) (2, 3)",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-bias-variance",
+          "code_hash": "8136650b7d599421855d0138bd20cad8118181d41fd96c4ecb22025e7e6928b4",
+          "ran": true,
+          "ok": true,
+          "output": "2.8\n0.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-capacity-validation",
+          "code_hash": "27c9e3c3bbea0e89558dfdc3372c68fe5694c9e8c21c761b38c49a322844320e",
+          "ran": true,
+          "ok": true,
+          "output": "0.75\n1.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-estimator-interface",
+          "code_hash": "91c4585e6a091704650c5a52df553327f52a1f4847295af6f2f1c4532437c5f5",
+          "ran": true,
+          "ok": true,
+          "output": "1\n[7.0, 9.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-pipeline-workflow",
+          "code_hash": "08e845f705547134acdaf388134b78ff2190cb813887685e04dfd84b92961225",
+          "ran": true,
+          "ok": true,
+          "output": "[7.0]\n2",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-reproducible-experiment",
+          "code_hash": "92aeb41ed29bd65a8b4597369430cbc3fd3670481f4be4a433f89350db6c5fcc",
+          "ran": true,
+          "ok": true,
+          "output": "True\n5",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "data-visualization",
+      "version": 1,
+      "course_hash": "0b192a0c9df1409d46026356637735ab94f0c85e87bdd50222936bbede2e509c",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "viz-comparison",
+          "code_hash": "1eb698d0f6d02f49f05f9694562ca0ff075640f6e9d4ad41060a29cdab526130",
+          "ran": true,
+          "ok": true,
+          "output": "[5, 10, 20]\nEligible tickets 0\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "viz-trends",
+          "code_hash": "c00a2e0c8231e0f3a8a6253978728b36bc2c0ffbc5c9c2c49afefeb0215a2d22",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2, 3, 4]\n[False, True, False, False]\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "viz-distributions",
+          "code_hash": "f222c49b522f01bbb4349594e2a966d53d9363c6810c60284b59bcba3681e757",
+          "ran": true,
+          "ok": true,
+          "output": "[3, 1, 1]\n[0, 3, 6, 9]\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "viz-axes",
+          "code_hash": "41c0a8df131b781a242a46c4978c196c78c4253e230fa3123c078af4764e1409",
+          "ran": true,
+          "ok": true,
+          "output": "[98, 100]\n(0, 110)\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "viz-aggregation",
+          "code_hash": "20c733ec2320677f23694f6547926b1a204ec1ae08616e9cf0debc80132070ab",
+          "ran": true,
+          "ok": true,
+          "output": "[0.5, 0.8]\n['A (n=2)', 'B (n=100)']\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "viz-color",
+          "code_hash": "de8b16455242b6a06f962787515b93685ed6897124db83b83f39498878a98efa",
+          "ran": true,
+          "ok": true,
+          "output": "- -- o s\n['Observed', 'Reference']\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "viz-message",
+          "code_hash": "e620a2cffa0a68714c2964adf9bafda4a1f2a93f63bfdaf5e3dc85fa754971e5",
+          "ran": true,
+          "ok": true,
+          "output": "Observed score rose across three checks\n1 Target, not observed\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "viz-clutter",
+          "code_hash": "7a2b40646528b4cd3c3df0f1a191544423a78678c9fba9dcb1a02235fadbacba",
+          "ran": true,
+          "ok": true,
+          "output": "False True\nCheck Score\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "viz-handoff",
+          "code_hash": "b2b121a42eb4e81213a47fb6b2162a71abf7f3a709864856f2b89ccf9c89d3b9",
+          "ran": true,
+          "ok": true,
+          "output": "[('North', 12), ('South', 18)]\n6\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 66,
+      "human_approved": false
+    },
+    {
+      "id": "scripting-automation",
+      "version": 1,
+      "course_hash": "ce0acbf5bea6a9bb4731f679d3433c4b33235013234f30ef66dd25280c541cb1",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "scripting-automation-l1",
+          "code_hash": "fb5bbb86634577f9b6c9c29bb7667d37054ecd611e4d1e3ccccf44f7c7c94bdf",
+          "ran": true,
+          "ok": true,
+          "output": "<pay roll.csv>\n<*.csv>"
+        },
+        {
+          "id": "scripting-automation-l2",
+          "code_hash": "fd3e69c1da8250936391187c59143b1a89553a170288a6f59142ee0cd57663f7",
+          "ran": true,
+          "ok": true,
+          "output": "ok:alpha\nfailed:beta:1"
+        },
+        {
+          "id": "scripting-automation-l3",
+          "code_hash": "9536771aab7153ce3a8b90069c0f03c2a67033e5488d7e6b1ba969c911896ffe",
+          "ran": true,
+          "ok": true,
+          "output": "pipeline:1\nmode:dry"
+        },
+        {
+          "id": "scripting-automation-l4",
+          "code_hash": "d266813f59095e310e1a7aa0a9b4598521b56ae7ae8bbb6feb10fe074923a4e4",
+          "ran": true,
+          "ok": true,
+          "output": "2\npartial\nbad-input"
+        },
+        {
+          "id": "scripting-automation-l5",
+          "code_hash": "7ecaf6216accd14e57a25d5493758cb7471284317bcf83ff421bb55fe88986fb",
+          "ran": true,
+          "ok": true,
+          "output": "True\nrows=3"
+        },
+        {
+          "id": "scripting-automation-l6",
+          "code_hash": "b83be6585dcf1fac22643618e1f98c5ff99d98bbd90feb925018f4708afd8e6c",
+          "ran": true,
+          "ok": true,
+          "output": "retry-with-budget\nstop\nstop"
+        },
+        {
+          "id": "scripting-automation-l7",
+          "code_hash": "f51f7af9a410fde01e918fdda97f4a66237a9f66287f57f305a9210d10ba8c7e",
+          "ran": true,
+          "ok": true,
+          "output": "changed\nunchanged"
+        },
+        {
+          "id": "scripting-automation-l8",
+          "code_hash": "c6dcf8c45b2c6c6f8d6f7786e443c9b1a47c7cdbabc4158454804a8799ca846f",
+          "ran": true,
+          "ok": true,
+          "output": "{\"operation\": \"sync-17\", \"outcome\": \"failed\", \"stage\": \"validate\"}\nFalse"
+        },
+        {
+          "id": "scripting-automation-l9",
+          "code_hash": "700dc4b85d9aa8d021fafd523f90435257463c16b9eba5f2e80ca9655165bbcc",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "observability",
+      "version": 1,
+      "course_hash": "38a92900c2f04463c87d4317785273de040487e5b7eb47ceb1678b51308d24ae",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "observability-l1",
+          "code_hash": "6ae100961603494ca542e53b5b1e00ed57e1084b8f6fe126ac3619837bc860ff",
+          "ran": true,
+          "ok": true,
+          "output": "metric\nlog\ntrace"
+        },
+        {
+          "id": "observability-l2",
+          "code_hash": "0c8fb49f396f8c316ce289388be0214bfcf172d4f422d50895832507064a73bb",
+          "ran": true,
+          "ok": true,
+          "output": "96\n960000"
+        },
+        {
+          "id": "observability-l3",
+          "code_hash": "f9b19657e4a7cbf5179b9df64c2196413501ad64cc6d795180cf99dc02a6277a",
+          "ran": true,
+          "ok": true,
+          "output": "['a', 'b']\n4"
+        },
+        {
+          "id": "observability-l4",
+          "code_hash": "331d4e62b95725d88848412c5618a4cb42e35f52118f2e3da5c39ab10e80a82c",
+          "ran": true,
+          "ok": true,
+          "output": "100\n30"
+        },
+        {
+          "id": "observability-l5",
+          "code_hash": "084f8a98dbb7aa645c9e95842f865b9a077a226860b28b18406e6232fb19aace",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "observability-l6",
+          "code_hash": "6cdb258f65ca8a2b29940f9d1be2ca3d43fa2f750ec70a084143fd5026bf0e1d",
+          "ran": true,
+          "ok": true,
+          "output": "checkout:latency,errors\nsearch:latency"
+        },
+        {
+          "id": "observability-l7",
+          "code_hash": "a61808a05acc86d4a47d654bcb210dd53b1f58566eccd24f1a1d61f8fad92db1",
+          "ran": true,
+          "ok": true,
+          "output": "64\n10\n100"
+        },
+        {
+          "id": "observability-l8",
+          "code_hash": "42483cb77229005edbfe6f2eb0fe75e7586c74fa892683172e9b34738cc7b583",
+          "ran": true,
+          "ok": true,
+          "output": "0.1:1\n0.3:3\n1.0:4\ncount:4"
+        },
+        {
+          "id": "observability-l9",
+          "code_hash": "adac5e3db8fe8bf34d1bb76189bcc34a4dc7b3eb11b5690b23198d032b2a57af",
+          "ran": true,
+          "ok": true,
+          "output": "db\n80"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/numpy/numpy",
-    "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
+    "repository": "https://github.com/prometheus/docs",
+    "commit": "cc0672badce86173b9afaa95a59904576bcd6d6a",
     "references": [
       {
-        "id": "numpy-quickstart",
-        "path": "doc/source/user/quickstart.rst",
-        "sha256": "1a1369e31bffdf7f4af84c12a5048b36dabbc16c1808f641d3e164a22cd82329",
+        "id": "prom-histograms",
+        "path": "docs/practices/histograms.md",
+        "sha256": "ebe64305d7d6156ca6b7021604c84eb5eab1868f35510089670ffe6fe387dcd2",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "numpy-indexing",
-        "path": "doc/source/user/basics.indexing.rst",
-        "sha256": "90c8b7c9b60bc2f6911726700025c2299dbd2e3d6066c5601b4c67395aea2658",
+        "id": "prom-alerting",
+        "path": "docs/practices/alerting.md",
+        "sha256": "2df77104b4764de91fb3792ee81db29e54dd50db301b669eca4d0591da409786",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "numpy-copies",
-        "path": "doc/source/user/basics.copies.rst",
-        "sha256": "5e326d8368f56aa3ec78fcbbb5cfcf7eff0f0ca76cd9301b6d1cd3ad995eae2a",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "numpy-broadcasting",
-        "path": "doc/source/user/basics.broadcasting.rst",
-        "sha256": "d1379801e96ec350b320d2929687d35b045e24bea962a29efb2259d080427048",
-        "checked_by": "Pinned official Git object and matching local source file"
-      },
-      {
-        "id": "numpy-types",
-        "path": "doc/source/user/basics.types.rst",
-        "sha256": "0e288c072dc1b8733326dc3094c11c344d0698cf6e9ff21ff2dd7fb57ccd8d89",
+        "id": "prom-instrumentation",
+        "path": "docs/practices/instrumentation.md",
+        "sha256": "8f7f26690b5b1d590729183acbbae519786a958986bd76c2ba236ca9d4a35dfb",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -6990,6 +7595,56 @@
       ]
     },
     {
+      "course": "node-express",
+      "repository": "https://github.com/nodejs/node",
+      "commit": "b009466555c360513b8012ce549f716501090ee5",
+      "references": [
+        {
+          "id": "node-loop",
+          "path": "doc/api/timers.md",
+          "sha256": "e39eae1df8b8c6a21c6e5f111c877bd0156c55139fa926376ebe34d6b1701bdf",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-modules",
+          "path": "doc/api/modules.md",
+          "sha256": "46d4d2e498378ea6569deb289d5ebb68b415ede5f9d6db5340a64340a767e807",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-streams",
+          "path": "doc/api/stream.md",
+          "sha256": "938b8188174345db45674b373783fc89fcc35be27afdf1278bcf22835088bb95",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "node-express",
+      "repository": "https://github.com/expressjs/express",
+      "commit": "1faf228935aa0a13111f92c28ee795be64ce3f0f",
+      "references": [
+        {
+          "id": "express-app",
+          "path": "lib/application.js",
+          "sha256": "5901b32f609ba349351bf7406dbdc0c4c57b77ce6f7215ea67ccca5ac2a28e88",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "express-router",
+          "path": "lib/router/index.js",
+          "sha256": "19c5ca9b025396612dbe464d07fbe7104ff9170c4d6a1c7e5507df4dbbf4d5cb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "express-layer",
+          "path": "lib/router/layer.js",
+          "sha256": "c90709dcba8d9a6cfd1f2b4ef6d7a22d833e317f0c876d884342cee5a96f8a02",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
       "course": "react-fundamentals",
       "repository": "https://github.com/reactjs/react.dev",
       "commit": "7594a2b008489121bdf25f97320d11ac0422510e",
@@ -7033,6 +7688,50 @@
       ]
     },
     {
+      "course": "fullstack-integration-state",
+      "repository": "https://github.com/reactjs/react.dev",
+      "commit": "7594a2b008489121bdf25f97320d11ac0422510e",
+      "references": [
+        {
+          "id": "react-effects",
+          "path": "src/content/learn/synchronizing-with-effects.md",
+          "sha256": "64a36b73ed2aeac4822f32fb609255562c6e66890f0bb149394eacd4a9c606e7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-state",
+          "path": "src/content/learn/choosing-the-state-structure.md",
+          "sha256": "5ff72fcf9858ff2552aec6aac1354b459ba037578672212d792d754e783720a7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "fullstack-integration-state",
+      "repository": "https://github.com/nodejs/node",
+      "commit": "b009466555c360513b8012ce549f716501090ee5",
+      "references": [
+        {
+          "id": "node-fetch",
+          "path": "doc/api/globals.md",
+          "sha256": "33c8f063e5b078c4241e7c020fa95f06f10cb7fe40b940b443ac28d54180b084",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-url",
+          "path": "doc/api/url.md",
+          "sha256": "98ef69de20000002b6ca956b84ac60c4313ac1b61ba5c1cdcc0aab4226a05134",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-errors",
+          "path": "doc/api/errors.md",
+          "sha256": "716131e014f70ca12f3c4cc69fcd1a005cce79733c44ad69fa7b9546bafe7e23",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
       "course": "numpy-arrays",
       "repository": "https://github.com/numpy/numpy",
       "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
@@ -7068,6 +7767,186 @@
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
+    },
+    {
+      "course": "ml-preprocessing",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "sklearn-0",
+          "path": "doc/modules/preprocessing.rst",
+          "sha256": "de780cd96a24a0b947ac3db305ccf4abe27a5f8610878c5b1e89d904e3850b6a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-1",
+          "path": "doc/modules/compose.rst",
+          "sha256": "d116a5d4852ca1c437805ebcc1021169d04c8dd9d15781198641c9f5da607045",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-2",
+          "path": "doc/modules/cross_validation.rst",
+          "sha256": "a785c904bfdf6a37b57839d17ec470533a0f94b90bfcb37ab41d671f3dd16583",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-3",
+          "path": "doc/modules/impute.rst",
+          "sha256": "c3e0eee330c9b2338bde545e2e8a91f3f435cc78deefaa2dad03921cdaf13918",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "ml-fundamentals",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "sklearn-0",
+          "path": "doc/modules/learning_curve.rst",
+          "sha256": "4de94b0e724f845184cc3702faf2733e1087f5cfe1c31688387cf5f6c25b4a2b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-1",
+          "path": "doc/modules/model_evaluation.rst",
+          "sha256": "d61349c80806b05dea0c6fb852abe028c7baae194154936613ee08b0096a6e0e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-2",
+          "path": "doc/modules/compose.rst",
+          "sha256": "d116a5d4852ca1c437805ebcc1021169d04c8dd9d15781198641c9f5da607045",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-3",
+          "path": "doc/modules/linear_model.rst",
+          "sha256": "e348a36c4ab2f4e108c3c9f3c5a33e129012a2fe2b884dea1507e5ecdd070f27",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "data-visualization",
+      "repository": "https://github.com/matplotlib/matplotlib",
+      "commit": "1392cbe3c79cdb93f9282747841d648770f60249",
+      "references": [
+        {
+          "id": "quickstart",
+          "path": "galleries/users_explain/quick_start.py",
+          "sha256": "d8c335626c92c2e07be78133e584ab450b12ceca09619f9e8f9e7a53915bc0fa",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "lifecycle",
+          "path": "galleries/tutorials/lifecycle.py",
+          "sha256": "b81cc5e073d5e5cbd5824dccbbddb456cab50bc5e060ad3e49dcc3e83786b027",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "colormaps",
+          "path": "galleries/users_explain/colors/colormaps.py",
+          "sha256": "5fccec884f0e53bc5e5ed3ea1d39e24f8134a013e2bc5d7b326c1f405128131b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "histograms",
+          "path": "galleries/examples/statistics/histogram_histtypes.py",
+          "sha256": "a80d9f82b01b510ddab5bf18ec84b7e826b1e048117c289162af3a88c72f1d54",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "scripting-automation",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-subprocess",
+          "path": "Doc/library/subprocess.rst",
+          "sha256": "eaf797f6e7c2f43d8aa6cd288e44e9a9966754d33368e35194816ace8dab6415",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-pathlib",
+          "path": "Doc/library/pathlib.rst",
+          "sha256": "ef79ce3541ae12a3919ca60e3a8bbd879958876c30e155aa2234112e8b6cca28",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-os",
+          "path": "Doc/library/os.rst",
+          "sha256": "1d54f83bb3f583e37bae07d820d16206cf02f4fb2ef281338635b4b7fd01ebe4",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-logging",
+          "path": "Doc/library/logging.rst",
+          "sha256": "b84325a6a1594d8398fd45d45b6dee35a6c5fd2bee864a719d700cbc22a50415",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-hashlib",
+          "path": "Doc/library/hashlib.rst",
+          "sha256": "bf23b9b1e5dc9ff5b0b86a7c88637d73e2c8496681dca125aa3df1da631ee106",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "observability",
+      "repository": "https://github.com/open-telemetry/opentelemetry.io",
+      "commit": "52bc572fc569401f35171b4138844754e5dac670",
+      "references": [
+        {
+          "id": "otel-traces",
+          "path": "content/en/docs/concepts/signals/traces.md",
+          "sha256": "e114163e1eecc33e146a502784c484ca482648a1f278c24ab4809262d2cc0061",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "observability",
+      "repository": "https://github.com/prometheus/docs",
+      "commit": "cc0672badce86173b9afaa95a59904576bcd6d6a",
+      "references": [
+        {
+          "id": "prom-histograms",
+          "path": "docs/practices/histograms.md",
+          "sha256": "ebe64305d7d6156ca6b7021604c84eb5eab1868f35510089670ffe6fe387dcd2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "prom-alerting",
+          "path": "docs/practices/alerting.md",
+          "sha256": "2df77104b4764de91fb3792ee81db29e54dd50db301b669eca4d0591da409786",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "prom-instrumentation",
+          "path": "docs/practices/instrumentation.md",
+          "sha256": "8f7f26690b5b1d590729183acbbae519786a958986bd76c2ba236ca9d4a35dfb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    }
+  ],
+  "unavailable_sources": [
+    {
+      "course": "scripting-automation",
+      "id": "bash-manual",
+      "url": "https://www.gnu.org/software/bash/manual/bash.html",
+      "status": 503,
+      "checked_at": "2026-11-10",
+      "reason": "Official manual URL. Retrieval of full and chapter HTTPS pages returned 503 on 2026-11-10; no captured official response or immutable revision is claimed. Real installed Bash examples execute locally; expert Bash source review remains blocked.",
+      "verified": false,
+      "human_source_review_required": true
     }
   ]
 }

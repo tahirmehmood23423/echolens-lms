@@ -3,11 +3,19 @@
   "starting_commit": "4880f3a",
   "starting_authored": 48,
   "courses": [
+    "node-express",
     "react-fundamentals",
-    "numpy-arrays"
+    "fullstack-integration-state",
+    "numpy-arrays",
+    "ml-preprocessing",
+    "ml-fundamentals",
+    "data-visualization",
+    "scripting-automation",
+    "observability"
   ],
   "recovered_from_quarantine": [
     "react-fundamentals",
-    "numpy-arrays"
+    "numpy-arrays",
+    "data-visualization"
   ]
 }

@@ -1,0 +1,70 @@
+[
+  {
+    "role": "api-tester",
+    "totals": {
+      "required": 11,
+      "authored": 11,
+      "modules": 36,
+      "lessons": 108,
+      "formative": 696,
+      "comprehensive": 990,
+      "verified_worked_examples": 108
+    },
+    "file": "/workspace/echolens-audit/wave3-role-review/api-tester.zip",
+    "sha256": "09f65d4469215e1159cd91de06742dbf633ab6a489621ca179eccab4d4926031",
+    "integrity": "passed",
+    "human_approved": false,
+    "published": false
+  },
+  {
+    "role": "junior-backend-developer",
+    "totals": {
+      "required": 9,
+      "authored": 9,
+      "modules": 31,
+      "lessons": 99,
+      "formative": 661,
+      "comprehensive": 810,
+      "verified_worked_examples": 99
+    },
+    "file": "/workspace/echolens-audit/wave3-role-review/junior-backend-developer.zip",
+    "sha256": "602dc35d832c6006e7757a5f717040fd7ba862f6e51f08da2480a48f86655250",
+    "integrity": "passed",
+    "human_approved": false,
+    "published": false
+  },
+  {
+    "role": "manual-qa-engineer",
+    "totals": {
+      "required": 10,
+      "authored": 10,
+      "modules": 32,
+      "lessons": 96,
+      "formative": 600,
+      "comprehensive": 900,
+      "verified_worked_examples": 96
+    },
+    "file": "/workspace/echolens-audit/wave3-role-review/manual-qa-engineer.zip",
+    "sha256": "ab99fed9fe47ca2217fcfd70728f8cadebd96609ff2fea4243f947f393ce8e14",
+    "integrity": "passed",
+    "human_approved": false,
+    "published": false
+  },
+  {
+    "role": "python-fastapi-developer",
+    "totals": {
+      "required": 13,
+      "authored": 13,
+      "modules": 45,
+      "lessons": 141,
+      "formative": 933,
+      "comprehensive": 1170,
+      "verified_worked_examples": 141
+    },
+    "file": "/workspace/echolens-audit/wave3-role-review/python-fastapi-developer.zip",
+    "sha256": "054544fa4f673a81f254d95d5f6bda9fff9a6f6f787cda100648f742642cf7a6",
+    "integrity": "passed",
+    "human_approved": false,
+    "published": false
+  }
+]

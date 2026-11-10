@@ -104,15 +104,15 @@ module.exports=bank('numpy-arrays',[
         "Only confirming both are ndarrays is not consistent with the required calculation. Equal shapes do not guarantee that corresponding positions represent the same real-world entities."
       ],
       [
-        "A memory report uses ndarray.nbytes as the total service footprint. What correction is needed?",
-        "It reports element storage only",
-        "It includes all Python and OS overhead",
-        "It reports peak network traffic",
-        "It measures future index allocations",
-        "nbytes describes the array's element payload, not complete allocator, object, process or system memory.",
-        "It includes all Python and OS overhead is not consistent with the required calculation. nbytes describes the array's element payload, not complete allocator, object, process or system memory.",
-        "It reports peak network traffic is not consistent with the required calculation. nbytes describes the array's element payload, not complete allocator, object, process or system memory.",
-        "It measures future index allocations is not consistent with the required calculation. nbytes describes the array's element payload, not complete allocator, object, process or system memory."
+        "A worker retains base=np.arange(1000,dtype=np.int64), view=base[::2] and owned=view.copy(). Ignoring object overhead, how much distinct ndarray element storage remains allocated while all three live?",
+        "12000 bytes",
+        "16000 bytes",
+        "8000 bytes",
+        "4000 bytes",
+        "base owns 8000 bytes and view retains a reference to that same allocation rather than owning another payload. owned allocates 4000 independent bytes. Distinct live element storage is therefore 12000 bytes; summing every array nbytes would double-count the view.",
+        "Summing base.nbytes, view.nbytes and owned.nbytes counts the view\u2019s 4000-byte logical payload twice even though its elements share base storage.",
+        "Counting base alone omits the independent 4000-byte copy owned by owned.",
+        "Counting only owned omits the 8000-byte base allocation that base and view still retain."
       ]
     ]
   },

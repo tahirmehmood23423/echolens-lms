@@ -71,15 +71,15 @@ module.exports=bank('react-fundamentals',[
         "Names do not transform content."
       ],
       [
-        "A JSX build succeeds without importing React solely for syntax. What explains a valid setup?",
-        "The configured modern JSX transform",
-        "A browser executing JSX directly",
-        "TypeScript creating all components",
-        "CSS compiling the JSX",
-        "The modern JSX transform can avoid that import requirement while still requiring proper tooling.",
-        "Browsers do not generally execute untransformed JSX.",
-        "Types do not invent component behavior.",
-        "CSS does not compile JSX."
+        "A component uses the automatic JSX transform and calls useState without importing or binding it. Compilation accepts the JSX, but rendering throws ReferenceError. Which repair addresses the boundary correctly?",
+        "Import useState explicitly",
+        "Add a key to the component",
+        "Enable a CSS module loader",
+        "Replace the JSX fragment tag",
+        "The automatic JSX transform provides JSX-runtime helpers, not bindings for Hook identifiers. Import useState from React so the runtime call resolves; successful JSX transformation does not establish every JavaScript name.",
+        "A key controls tree identity and cannot bind an unresolved Hook identifier.",
+        "A CSS loader changes stylesheet handling, not JavaScript lexical name resolution.",
+        "Changing a fragment does not define useState, which still fails when evaluated."
       ],
       [
         "A child needs to display nested caller content inside a panel. Which API may fit?",

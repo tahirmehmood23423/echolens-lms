@@ -1,0 +1,1636 @@
+'use strict';
+const {course}=require('./data-wave2-helper');
+const specs=[
+  {
+    "id": "viz-comparison",
+    "comps": [
+      "m1.c1"
+    ],
+    "title": "Compare categories with aligned positions and bars",
+    "intro": "A branch manager needs to compare support workload across teams. The chart should make differences easy to judge without requiring readers to decode area, perspective or decorative effects.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "For a small number of categories, bars provide aligned lengths that support magnitude comparison. A dot plot can use aligned positions when comparing values around a meaningful range. Choose horizontal bars when category labels are long, and use a justified category order such as magnitude or a meaningful business sequence.",
+        "Counts and rates answer different questions. A workload count describes total demand; a resolution rate describes successes per eligible case. Label the measure and units rather than letting a chart type imply a denominator. Avoid adding irrelevant categories or unrelated series merely because the plotting library accepts them."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture uses horizontal bars for three synthetic teams, labels the workload unit and sorts the values explicitly. Inspecting artist widths verifies that the plotted magnitudes match the specified counts. A zero baseline is deliberately set because bar length is the chosen magnitude encoding.",
+        "A bar chart is not always preferable to a table: exact lookup, many narrow categories or detailed accounting may require a compact table instead. If a message concerns change from a prior value, a paired dot or slope chart may show that difference more directly than two crowded sets of bars."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Compare categories with aligned positions and bars on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nf,a=plt.subplots(figsize=(3,2))\na.barh([\"C\",\"A\",\"B\"],[5,10,20])\na.set_xlabel(\"Eligible tickets\")\na.set_xlim(left=0)\nprint([int(p.get_width()) for p in a.patches])\nprint(a.get_xlabel(),int(a.get_xlim()[0]))\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "[5, 10, 20]\nEligible tickets 0\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "For a small number of categories, bars provide aligned lengths that support magnitude comparison.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "Which encoding makes category magnitudes easy to compare?",
+        "Aligned lengths",
+        "Unlabeled perspective depth",
+        "Decorative icon area alone",
+        "Random hue intensity",
+        "Bars with a shared baseline let readers compare aligned magnitudes directly."
+      ],
+      [
+        "Which orientation often suits long category labels?",
+        "Horizontal bars",
+        "A tilted pie always",
+        "A 3D column always",
+        "An unlabeled map",
+        "Horizontal bars can leave more room for readable category text without rotating labels."
+      ],
+      [
+        "What must distinguish a workload count from a success rate?",
+        "Measure and denominator",
+        "Only bar color",
+        "Only legend position",
+        "Only output format",
+        "Counts measure volume while rates divide outcomes by eligible cases, so units and denominators must be explicit."
+      ],
+      [
+        "A manager needs exact counts for forty small categories. What alternative deserves consideration?",
+        "A searchable table",
+        "A 3D pie",
+        "An unlabeled bubble cloud",
+        "A random radial chart",
+        "Precise lookup across many categories can be better supported by a table than a crowded visual."
+      ],
+      [
+        "A team sorts months by sales height. What can be lost?",
+        "Calendar sequence",
+        "Only chart contrast",
+        "Only output resolution",
+        "Only row identifiers",
+        "Natural temporal order matters when the intended question is progression through time."
+      ],
+      [
+        "A bar chart combines dollars and tickets on one shared numeric scale. What is unclear?",
+        "Comparable units",
+        "Only label spelling",
+        "Only bar spacing",
+        "Only plot width",
+        "Different measurement units cannot be read as directly comparable lengths without an explicit justified transformation."
+      ],
+      [
+        "A branch has more successful cases but much higher volume. Which chart answers success propensity?",
+        "Rates with support",
+        "Raw successes alone",
+        "Only total arrivals",
+        "Only category codes",
+        "Success propensity needs successful cases divided by eligible volume, with denominator support visible."
+      ]
+    ],
+    "formal": [
+      [
+        "What does a category bar\u2019s length usually encode?",
+        "Magnitude",
+        "A causal coefficient necessarily",
+        "A timestamp necessarily",
+        "A database key",
+        "The reader interprets the bar length as the size of the labeled measure."
+      ],
+      [
+        "What makes category order analytically useful?",
+        "It supports the reader\u2019s task",
+        "It always follows input order",
+        "It hides the smallest values",
+        "It must be random",
+        "Ordering by magnitude or a meaningful domain sequence can make comparisons easier."
+      ],
+      [
+        "When is a table a useful visual alternative?",
+        "Exact-value lookup",
+        "Showing perspective depth",
+        "Hiding denominators",
+        "Replacing every trend",
+        "Tables support precise retrieval of many values where a chart may add little."
+      ],
+      [
+        "A dashboard uses pictograms with both width and height scaled by value. What can readers misjudge?",
+        "Area amplification",
+        "Only label grammar",
+        "Only page navigation",
+        "Only file compression",
+        "Scaling both dimensions makes area grow quadratically relative to the chosen linear dimension."
+      ],
+      [
+        "A service comparison uses different units without labeling them. What should be fixed?",
+        "Measure labels",
+        "Only brighter bars",
+        "Only more categories",
+        "Only a narrower plot",
+        "Readers need units to know whether plotted magnitudes represent comparable quantities."
+      ],
+      [
+        "A chart sorts satisfaction tiers alphabetically. What alternative may be clearer?",
+        "Their ordinal sequence",
+        "Random order",
+        "Longest labels first",
+        "Only creation time",
+        "Ordered categories such as low, medium and high carry a natural sequence that alphabetical order can obscure."
+      ],
+      [
+        "A comparison includes eighty categories with unreadable labels. What should guide redesign?",
+        "The comparison task",
+        "Only a smaller font",
+        "Only more colors",
+        "Only a wider legend",
+        "The designer should choose useful grouping, filtering, a table or another view based on what readers need to compare."
+      ],
+      [
+        "A report wants to compare each branch\u2019s current and prior values. What may communicate paired change?",
+        "A paired dot plot",
+        "Only one aggregate bar",
+        "A map without coordinates",
+        "An unrelated histogram",
+        "Paired aligned positions can show direction and magnitude of change for each category."
+      ],
+      [
+        "A chart ranks teams by resolved counts but claims quality. What is missing?",
+        "An appropriate rate and case context",
+        "Only a trophy icon",
+        "Only a wider bar",
+        "Only the report date",
+        "Volume counts do not isolate success propensity or performance across differing case mixes."
+      ],
+      [
+        "A library renders the chosen chart without errors. What remains to assess?",
+        "Fitness for the decision",
+        "Whether code ran",
+        "Whether an image exists",
+        "Whether artist objects were created",
+        "Rendering success verifies an output artifact but does not establish that its encoding answers the reader\u2019s question."
+      ]
+    ]
+  },
+  {
+    "id": "viz-trends",
+    "comps": [
+      "m1.c1"
+    ],
+    "title": "Show time trends without inventing continuity",
+    "intro": "A revenue report needs to show changes over dates. Connecting points implies an ordered relationship; missing periods, uneven intervals and changing observation windows can alter what the line appears to say.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "Use a line chart when the horizontal coordinate has meaningful order, often time, and connecting observations aids interpretation. Sort by the actual time values rather than source row position. Show meaningful date intervals and distinguish an irregular event series from regular period aggregates.",
+        "An absent value is not the same as zero. A gap in collection should usually remain visible rather than become a fabricated drop to zero or an unjustified interpolated bridge. State whether values are daily totals, moving averages or cumulative measures, because each changes the meaning of the trend."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture plots four ordered positions with one unavailable observation using NaN. Matplotlib retains the missing value in the line data and breaks the rendered line there. The assertion checks missing support rather than treating the empty period as evidence of inactivity.",
+        "Compare equivalent windows and identify partial periods. A seasonal cycle, expanded reporting population or changed definition can explain a visible slope without an intervention effect. A small multiple with shared scales can make regional trends easier to compare than an overcrowded multi-line chart."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Show time trends without inventing continuity on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nimport math\nf,a=plt.subplots(figsize=(3,2))\nline,=a.plot([1,2,3,4],[10,float(\"nan\"),15,20],marker=\"o\")\na.set_xlabel(\"Observation day\")\na.set_ylabel(\"Reported revenue\")\nprint(list(line.get_xdata()))\nprint([math.isnan(float(v)) for v in line.get_ydata()])\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "[1, 2, 3, 4]\n[False, True, False, False]\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "Use a line chart when the horizontal coordinate has meaningful order, often time, and connecting observations aids interpretation.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "What does a line connect?",
+        "Ordered observations",
+        "Unrelated categories necessarily",
+        "Only identical values",
+        "Only data without gaps",
+        "A line implies a meaningful ordering and relationship between successive observations."
+      ],
+      [
+        "Should an unknown observation automatically be drawn as zero?",
+        "No",
+        "Always",
+        "Only if a line is used",
+        "Only if the axis is labeled",
+        "Unknown collection and genuine zero activity are different facts and should not be conflated."
+      ],
+      [
+        "What should be explicit for a smoothed line?",
+        "The smoothing definition",
+        "Only its color",
+        "Only its filename",
+        "Only the font size",
+        "Readers need to know which observations and window produced the smoother."
+      ],
+      [
+        "A date column is plotted in unsorted file order. What may appear?",
+        "Artificial zigzags",
+        "Guaranteed correct chronology",
+        "Automatic seasonality",
+        "A valid causal estimate",
+        "Connecting unsorted times can make the line double back and imply changes that do not follow chronological order."
+      ],
+      [
+        "A monthly chart includes the current partial month. What needs marking?",
+        "Incomplete coverage",
+        "Only a new legend",
+        "Only more decimals",
+        "Only a different marker",
+        "A shorter observed window can look like a decline despite comparable full-period activity."
+      ],
+      [
+        "A company doubles reporting stores and revenue rises. What should accompany the trend?",
+        "Coverage context",
+        "Only a celebratory arrow",
+        "Only a thicker line",
+        "Only a hidden y-axis",
+        "The changing reporting population can explain growth in totals without comparable-unit improvement."
+      ],
+      [
+        "Twenty lines overlap beyond readability. What is a useful candidate?",
+        "Shared-scale small multiples",
+        "More saturated hues only",
+        "An unlabeled 3D view",
+        "A larger legend alone",
+        "Separate coordinated panels can reduce overlap while preserving comparable axes."
+      ]
+    ],
+    "formal": [
+      [
+        "What does a missing-value gap communicate?",
+        "Unobserved support",
+        "A proven zero",
+        "A guaranteed linear path",
+        "A mandatory declining value",
+        "A gap can honestly distinguish unavailable observations from measured values."
+      ],
+      [
+        "Why should time positions reflect actual intervals?",
+        "Spacing carries duration",
+        "Dates are always categories",
+        "Only labels matter",
+        "It guarantees causality",
+        "Equal spacing for unequal durations can distort perceived rates of change."
+      ],
+      [
+        "How does a cumulative line differ from a period-total line?",
+        "It includes earlier contributions",
+        "It always returns smaller values",
+        "It removes measurement units",
+        "It cannot be plotted",
+        "Cumulative measures carry prior amounts forward, so their slope and level have different interpretations."
+      ],
+      [
+        "A line bridges a week-long sensor outage without explanation. What is implied without evidence?",
+        "Continuity through the gap",
+        "Only a changed title",
+        "Only a larger sample",
+        "Only a new file type",
+        "The connecting segment can suggest observed or justified behavior during a period with no measurements."
+      ],
+      [
+        "Two panels use different vertical ranges but their slopes are compared visually. What should be checked?",
+        "Scale comparability",
+        "Only panel borders",
+        "Only title length",
+        "Only legend ordering",
+        "Different scales can make identical changes appear to have very different visual steepness."
+      ],
+      [
+        "A smoothed series hides a brief severe outage. What should remain available?",
+        "Raw observations",
+        "Only the smoothest line",
+        "Only the annual mean",
+        "Only the chosen palette",
+        "Smoothing can suppress operationally important short-lived events, so the original evidence should remain inspectable."
+      ],
+      [
+        "A chart plots revenue after a promotion and claims effect. What limits this?",
+        "Other time-varying influences",
+        "Only marker shape",
+        "Only date parsing success",
+        "Only a shared font",
+        "A trend around an intervention can also reflect seasonality, exposure or concurrent changes."
+      ],
+      [
+        "An irregular event stream is labeled daily average without aggregation. What is wrong?",
+        "The stated temporal grain",
+        "Only the tick rotation",
+        "Only the line width",
+        "Only output dimensions",
+        "Raw events do not automatically represent one comparable aggregate per day."
+      ],
+      [
+        "A centered rolling line is displayed as a real-time signal. What needs disclosure?",
+        "Its use of later observations",
+        "Only its marker color",
+        "Only export resolution",
+        "Only category order",
+        "Centered windows incorporate future observations relative to their center and are not available as live values then."
+      ],
+      [
+        "A trend compares fiscal and calendar months as if identical. What needs alignment?",
+        "Period definitions",
+        "Only label fonts",
+        "Only image size",
+        "Only the maximum value",
+        "Different period boundaries describe different observation windows and can change the apparent comparison."
+      ]
+    ]
+  },
+  {
+    "id": "viz-distributions",
+    "comps": [
+      "m1.c1"
+    ],
+    "title": "Choose distribution and relationship views from the question",
+    "intro": "Two teams have the same average delivery time but very different tails. A distribution view reveals what a mean hides; a relationship view asks how two paired measures vary together.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "A histogram groups a quantitative variable into intervals and shows counts or density. Bin boundaries and widths affect the visible shape. A box plot summarizes selected quantiles and potential outlier rules but does not reveal every mode or observation. For small samples, showing individual points can prevent a polished summary from implying abundant evidence.",
+        "A scatterplot uses paired quantitative coordinates to show shape, direction, clusters and outliers. Each point must represent a meaningful paired observation. Overplotting can hide density; transparency, smaller markers or suitable density summaries may help. A visible association is not by itself a causal effect."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture constructs a histogram with declared edges and verifies counts and boundaries. This shows that binning is part of the analytical specification, not merely decoration. The example does not estimate a population density or identify the cause of the observed values.",
+        "Choose a chart from the question: distribution for spread and tails, relationship for paired co-variation, categories for group comparisons and a line for ordered progression. A complex chart is not inherently more informative; label the unit, support and transformation so readers know what the encoded observations mean."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Choose distribution and relationship views from the question on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nf,a=plt.subplots(figsize=(3,2))\nn,edges,_=a.hist([1,2,2,4,7],bins=[0,3,6,9])\na.set_xlabel(\"Minutes\")\na.set_ylabel(\"Observed count\")\nprint(n.astype(int).tolist())\nprint(edges.astype(int).tolist())\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "[3, 1, 1]\n[0, 3, 6, 9]\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "A histogram groups a quantitative variable into intervals and shows counts or density.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "What question does a histogram primarily support?",
+        "Distribution shape",
+        "Category identity alone",
+        "Causal intervention effect",
+        "A database schema",
+        "A histogram shows how observed quantitative values occupy specified intervals."
+      ],
+      [
+        "What does a scatterplot require?",
+        "Paired coordinates",
+        "Only category names",
+        "Only one aggregate",
+        "An arbitrary row shuffle",
+        "Each point must pair the intended measurements from the same unit or occasion."
+      ],
+      [
+        "Can histogram bin choices affect apparent shape?",
+        "Yes",
+        "Never",
+        "Only after a causal study",
+        "Only for text labels",
+        "Different edges and widths can emphasize or conceal features in the observed distribution."
+      ],
+      [
+        "Two groups have equal means but different extreme delays. What helps?",
+        "Distribution views",
+        "Only one mean bar each",
+        "Only a pie chart",
+        "Only totals without units",
+        "Spread and tail behavior require information beyond the center."
+      ],
+      [
+        "A scatterplot is nearly solid from overlapping points. What can help?",
+        "Transparency or density encoding",
+        "Only a larger title",
+        "Only alphabetical sorting",
+        "Only a border",
+        "Overplotting hides multiplicity; suitable transparency or density summaries can expose concentration."
+      ],
+      [
+        "A box plot has one marked outlier. What does that prove?",
+        "A rule-based unusual value",
+        "A factual data error",
+        "A fraudulent event",
+        "A proven causal effect",
+        "Outlier markers follow a statistical rule and need domain context before being labeled invalid."
+      ],
+      [
+        "A small sample is summarized by a smooth-looking distribution. What should be considered?",
+        "Individual observations",
+        "Only a smoother curve",
+        "Only a larger legend",
+        "Only more decimals",
+        "Showing the points can reveal limited support that a smooth graphic might obscure."
+      ]
+    ],
+    "formal": [
+      [
+        "What determines histogram interval membership?",
+        "Bin edges",
+        "Only chart color",
+        "Only label rotation",
+        "Only the title",
+        "Values are counted according to defined bin boundaries, whose convention should be understood."
+      ],
+      [
+        "What can a scatterplot reveal beyond a coefficient?",
+        "Shape and outliers",
+        "A guaranteed intervention effect",
+        "Every hidden confounder",
+        "Exact population independence",
+        "A plotted relationship can expose nonlinear patterns, clusters and influential cases that one summary hides."
+      ],
+      [
+        "What does a box plot omit by itself?",
+        "Full distribution detail",
+        "Every quantile",
+        "The concept of median",
+        "The existence of spread",
+        "A box summary does not display every mode, gap or observation."
+      ],
+      [
+        "An analyst changes bin width until a preferred peak appears. What should be transparent?",
+        "Binning sensitivity",
+        "Only palette choice",
+        "Only image dimensions",
+        "Only a filename",
+        "Conclusions that depend on chosen bins require sensitivity checks and clear reporting."
+      ],
+      [
+        "A relationship plot pairs usage with another customer\u2019s spending after independent sorting. What fails?",
+        "Pair identity",
+        "Only marker size",
+        "Only axis fonts",
+        "Only the colorbar",
+        "Coordinates no longer describe the intended same customer observation, making the plotted relationship misleading."
+      ],
+      [
+        "A histogram compares groups with very different sample sizes using counts. What may dominate?",
+        "Group volume",
+        "Only the distribution shape",
+        "Only the mean difference",
+        "Only the axis label",
+        "Higher counts can reflect a larger sample rather than a different relative distribution."
+      ],
+      [
+        "A chart needs to show two modes and exact small-sample observations. What can improve a box summary?",
+        "A point distribution view",
+        "Only a thicker box border",
+        "Only a different median color",
+        "Only hiding fliers",
+        "Individual points or an appropriate distribution view can reveal modes hidden by a quantile summary."
+      ],
+      [
+        "A scatterplot has a curved pattern and low linear correlation. What is plausible?",
+        "Nonlinear association",
+        "Guaranteed independence",
+        "No relationship possible",
+        "An invalid chart by definition",
+        "A linear coefficient can be small despite a structured nonlinear relationship."
+      ],
+      [
+        "A histogram density axis is labeled count. What should be corrected?",
+        "The measure label",
+        "Only tick color",
+        "Only chart width",
+        "Only sample ordering",
+        "Density and count have different units and interpretations, so the vertical label must match the calculation."
+      ],
+      [
+        "A large scatterplot includes repeated observations per customer. What should interpretation consider?",
+        "Dependence and observation grain",
+        "Only total pixel count",
+        "Only point color",
+        "Only axis precision",
+        "Repeated units affect the meaning of support and may not represent independent customers."
+      ]
+    ]
+  },
+  {
+    "id": "viz-axes",
+    "comps": [
+      "m2.c1"
+    ],
+    "title": "Choose axes and scales that match the encoded comparison",
+    "intro": "A slide shows a small rate change as a dramatic jump by starting a bar axis near the lower value. Honest chart design makes scale choices visible and matches the encoding readers use.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "Because a bar\u2019s length encodes magnitude, its baseline should ordinarily be zero. A truncated bar baseline makes length ratios diverge from value ratios. A line or dot plot can sometimes use a narrowed range to reveal variation, but the axis and context must make the scale explicit and the wording must not exaggerate magnitude.",
+        "Linear axes represent equal additive differences with equal distances. Logarithmic axes represent equal ratios with equal distances and require appropriate handling of nonpositive values. A log scale can clarify orders of magnitude, but readers need clear labels and an explanation of the comparison it supports."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture constructs a bar chart for values 98 and 100 and explicitly sets the lower limit to zero. The assertions inspect bar heights and the baseline; the render confirms an actual image artifact. These checks cannot establish that a reader notices a small difference or that the message is worthwhile.",
+        "Dual axes can visually align unrelated series through arbitrary scaling. Prefer separate aligned panels or a clearly justified normalized comparison when needed. Use consistent scales across panels intended for direct magnitude comparison, and identify any break, transformation or exceptional range deliberately."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Choose axes and scales that match the encoded comparison on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nf,a=plt.subplots(figsize=(3,2))\na.bar([\"Before\",\"After\"],[98,100])\na.set_ylim(0,110)\na.set_ylabel(\"Observed rate (%)\")\nprint([int(p.get_height()) for p in a.patches])\nprint(tuple(int(v) for v in a.get_ylim()))\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "[98, 100]\n(0, 110)\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "Because a bar\u2019s length encodes magnitude, its baseline should ordinarily be zero.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "Why is a zero baseline usually important for bars?",
+        "Length encodes magnitude",
+        "Zero improves every line chart",
+        "It proves causal validity",
+        "It removes all uncertainty",
+        "A truncated baseline makes displayed bar-length ratios differ from the underlying value ratios."
+      ],
+      [
+        "What does equal spacing on a logarithmic axis represent?",
+        "Equal ratios",
+        "Equal additive differences always",
+        "Equal category counts",
+        "Equal missing values",
+        "Logarithmic distance corresponds to multiplicative ratios rather than fixed additive increments."
+      ],
+      [
+        "Can an ordinary log axis directly display zero?",
+        "No",
+        "Always",
+        "Only with bars",
+        "Only with dates",
+        "The logarithm of zero is undefined, so zero needs a different treatment or representation."
+      ],
+      [
+        "A bar axis begins at 97 for rates 98 and 100. What is exaggerated?",
+        "The length contrast",
+        "Only the label count",
+        "Only the file size",
+        "Only font weight",
+        "Lengths of one and three units visually exaggerate values whose actual ratio is close to one."
+      ],
+      [
+        "A line chart uses a narrow nonzero range to inspect small variation. What must remain explicit?",
+        "The axis scale",
+        "Only a bright color",
+        "Only a longer title",
+        "Only export format",
+        "A narrowed line range can support variation analysis if the scale and interpretation remain clear."
+      ],
+      [
+        "Two unrelated series align closely on independently tuned dual axes. What is uncertain?",
+        "Whether the visual alignment is meaningful",
+        "Whether two axes can render",
+        "Whether labels exist",
+        "Whether lines contain points",
+        "Arbitrary independent ranges can create apparent similarity without a stable substantive relationship."
+      ],
+      [
+        "Shared comparisons use different panel maxima. What needs review?",
+        "Cross-panel scale meaning",
+        "Only panel titles",
+        "Only legend fonts",
+        "Only color names",
+        "Different ranges change the visual mapping from magnitude to distance and can undermine direct comparison."
+      ]
+    ],
+    "formal": [
+      [
+        "What is preserved by a linear numeric axis?",
+        "Equal additive steps",
+        "Equal ratios always",
+        "Equal area always",
+        "Equal uncertainty",
+        "A fixed difference in values maps to a fixed distance along a linear axis."
+      ],
+      [
+        "What should a transformed scale disclose?",
+        "The transformation",
+        "Only the image dimensions",
+        "Only the analyst name",
+        "Only the export date",
+        "Readers need to know whether distances represent raw differences, ratios or another transformed quantity."
+      ],
+      [
+        "What is a risk of independently adjustable dual axes?",
+        "Arbitrary visual alignment",
+        "Guaranteed arithmetic errors",
+        "Mandatory missing data",
+        "Automatic causality",
+        "Different axis limits can make unrelated curves appear aligned or opposed."
+      ],
+      [
+        "A chart compares tenfold increases across a huge range. What scale may help?",
+        "A labeled log scale",
+        "An unlabeled truncated bar scale",
+        "A perspective axis",
+        "A random nonlinear axis",
+        "A log scale makes multiplicative changes more comparable across orders of magnitude when values are positive."
+      ],
+      [
+        "A negative profit is silently removed to fit a log chart. What fails?",
+        "Evidence completeness",
+        "Only axis formatting",
+        "Only label spacing",
+        "Only the PNG header",
+        "A scale choice must not erase substantively important nonpositive observations without disclosure or an appropriate alternative."
+      ],
+      [
+        "A zero-based line chart makes tiny medically important changes invisible. What should guide design?",
+        "The question and explicit scale",
+        "A universal zero rule for every encoding",
+        "Only decorative emphasis",
+        "Only a larger legend",
+        "Line positions can use an explicit focused range when needed, while the claim remains proportionate and clear."
+      ],
+      [
+        "A percentage axis runs beyond 100 without context for a bounded rate. What needs checking?",
+        "Metric bounds and labeling",
+        "Only font color",
+        "Only chart size",
+        "Only category order",
+        "Rates bounded between zero and one hundred need a scale and labels consistent with their defined meaning."
+      ],
+      [
+        "A broken axis appears without a visible break mark. What may readers assume?",
+        "A continuous scale",
+        "A guaranteed log transform",
+        "A second denominator",
+        "A new source snapshot",
+        "An undisclosed break violates the normal expectation of a continuous mapping along the axis."
+      ],
+      [
+        "A chart labels log ticks as raw equal steps. What is misleading?",
+        "Distance interpretation",
+        "Only the marker shape",
+        "Only output format",
+        "Only the title length",
+        "Readers may infer additive differences when the displayed distances actually encode ratios."
+      ],
+      [
+        "An index-normalized chart starts both series at 100. What should the title explain?",
+        "Relative change from a baseline",
+        "Equal original magnitudes",
+        "Shared physical units necessarily",
+        "Guaranteed causal linkage",
+        "Indexing compares changes relative to each series\u2019 baseline and does not preserve their original absolute levels."
+      ]
+    ]
+  },
+  {
+    "id": "viz-aggregation",
+    "comps": [
+      "m2.c1"
+    ],
+    "title": "Expose denominators, aggregation and uncertainty in charts",
+    "intro": "A regional chart ranks success percentages without showing how many cases support them. Honest visualization includes the analytical choices that determine each mark, not only the polished final values.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "State the observation grain, inclusion rule and denominator. A stacked bar may show counts, shares within each group or composition across all observations; these are distinct measures. A 100% stacked bar normalizes each total and hides differences in group volume unless support is reported separately.",
+        "Aggregated values can conceal subgroup differences and composition shifts. A mean alone can hide tails; an overall rate can reverse within meaningful strata. Choose an appropriate disaggregation when it changes the question, and explain any standardization rather than presenting adjusted values as raw observations."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture calculates success rates from explicit numerators and denominators and places both rates in a bar chart. Labels include eligible counts. The code checks the exact plotted proportions and labels; it supplies no sampling model or uncertainty interval.",
+        "Error bars require a defined meaning: standard deviation, standard error, confidence interval, prediction interval and range are not interchangeable. Name the measure, calculation and assumptions. Do not invent precision from a tiny convenience sample or use decorative error bars without an underlying estimate."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Expose denominators, aggregation and uncertainty in charts on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nwins=[1,80]\ntotals=[2,100]\nrates=[w/n for w,n in zip(wins,totals)]\nf,a=plt.subplots(figsize=(3,2))\na.bar([\"A (n=2)\",\"B (n=100)\"],rates)\na.set_ylim(0,1)\na.set_ylabel(\"Observed success proportion\")\nprint([round(p.get_height(),2) for p in a.patches])\nprint([t.get_text() for t in a.get_xticklabels()])\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "[0.5, 0.8]\n['A (n=2)', 'B (n=100)']\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "State the observation grain, inclusion rule and denominator.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "What should accompany a plotted success rate?",
+        "Eligible support",
+        "Only the bar hue",
+        "Only the chart width",
+        "Only the team logo",
+        "The denominator defines the rate and helps readers interpret how much evidence supports it."
+      ],
+      [
+        "What does a 100% stacked bar normalize?",
+        "Each group total",
+        "Only the largest category",
+        "The database key",
+        "The chart\u2019s pixel area",
+        "Each bar represents its own composition as shares summing to one hundred percent."
+      ],
+      [
+        "Are confidence intervals and standard deviations interchangeable?",
+        "No",
+        "Always",
+        "Only for bars",
+        "Only when rounded",
+        "They describe different quantities and depend on different calculations and assumptions."
+      ],
+      [
+        "Two share bars are the same height but one group has two cases and the other two thousand. What is hidden?",
+        "Volume differences",
+        "Only category spelling",
+        "Only color contrast",
+        "Only image format",
+        "Normalization removes absolute totals, so support must be provided separately when it matters."
+      ],
+      [
+        "An overall rate favors A but every risk stratum favors B. What should a chart reveal?",
+        "Composition and strata",
+        "Only the aggregate winner",
+        "Only a trophy icon",
+        "Only the largest category",
+        "Aggregated rates can be driven by different subgroup mixtures; stratified support helps explain the reversal."
+      ],
+      [
+        "An error bar has no definition in a report. What should be added?",
+        "Its statistical meaning",
+        "Only a brighter cap",
+        "Only more decimals",
+        "Only a larger legend",
+        "Readers cannot interpret uncertainty correctly without knowing what interval or spread the bars represent."
+      ],
+      [
+        "A mean chart hides a severe right tail. What complement may help?",
+        "A distribution view",
+        "Only a wider mean bar",
+        "Only new colors",
+        "Only a rounded mean",
+        "Distribution information exposes variability and tail outcomes that a single average can conceal."
+      ]
+    ],
+    "formal": [
+      [
+        "What does an observed share require?",
+        "A defined total",
+        "Only a color scale",
+        "Only a plot title",
+        "Only sorted names",
+        "A share\u2019s denominator determines which whole the numerator is part of."
+      ],
+      [
+        "What is necessary for an error bar interpretation?",
+        "A named measure and method",
+        "Only symmetric line lengths",
+        "Only a known palette",
+        "Only a legend border",
+        "The displayed interval must be linked to its underlying statistical quantity and assumptions."
+      ],
+      [
+        "What does normalization to percentages remove from the bar height?",
+        "Absolute group volume",
+        "Every subgroup relationship",
+        "The meaning of categories",
+        "All uncertainty",
+        "Relative composition bars can look identical for populations of very different sizes."
+      ],
+      [
+        "A chart compares open-ticket counts with resolved-ticket percentages. What is needed?",
+        "A coherent comparison definition",
+        "Only a shared blue color",
+        "Only matching fonts",
+        "Only the same number of bars",
+        "Different quantities and units cannot support a simple magnitude ranking without a justified representation."
+      ],
+      [
+        "A branch\u2019s rate improves after difficult cases are excluded. What must the chart disclose?",
+        "Changed eligibility",
+        "Only a new baseline color",
+        "Only the current rank",
+        "Only a shorter title",
+        "A changed denominator can alter the metric without improved outcomes in the original population."
+      ],
+      [
+        "A pie chart\u2019s slices total 140% because categories overlap. What is wrong?",
+        "The part-to-whole assumption",
+        "Only perspective depth",
+        "Only the legend font",
+        "Only the number of labels",
+        "A pie implies mutually compatible parts of one whole; overlapping memberships violate that representation."
+      ],
+      [
+        "A chart shows an adjusted mean without explaining weights. What is missing?",
+        "The target population",
+        "Only annotation placement",
+        "Only palette names",
+        "Only the rendering backend",
+        "Weighting changes which population the summary represents, so readers need its target and method."
+      ],
+      [
+        "A tiny selected sample has narrow decorative error bars. What is unsupported?",
+        "The uncertainty claim",
+        "The ability to draw caps",
+        "The sample\u2019s existence",
+        "The chosen background",
+        "Error bars require a defensible calculation and sampling interpretation rather than visual decoration."
+      ],
+      [
+        "A cumulative chart is labeled daily cases. What should be corrected?",
+        "Temporal aggregation meaning",
+        "Only the x-axis font",
+        "Only the line color",
+        "Only its export size",
+        "Cumulative values include previous periods and should not be described as per-day flow counts."
+      ],
+      [
+        "A stakeholder interprets overlapping intervals as proof of no difference. What needs clarification?",
+        "The comparison method",
+        "Only interval color",
+        "Only bar order",
+        "Only the figure title",
+        "Overlap alone is not a universal hypothesis test; interpretation depends on the interval types and comparison design."
+      ]
+    ]
+  },
+  {
+    "id": "viz-color",
+    "comps": [
+      "m2.c2"
+    ],
+    "title": "Use color with redundant cues and appropriate palettes",
+    "intro": "A status chart uses red and green with no labels. Readers with different color perception, grayscale printouts or poor displays may lose the distinction, so color should support rather than carry all essential meaning.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "Use qualitative colors for nominal categories, a sequential palette for ordered magnitude, and a diverging palette when a meaningful midpoint separates opposite directions. A diverging color map needs a justified center, not merely a preference for two bright hues. Perceptual lightness can help communicate ordered values more consistently.",
+        "Use labels, marker shapes, line styles or patterns as redundant cues for essential distinctions. Avoid relying on red-versus-green alone. Check the actual output at its intended size and in relevant viewing conditions; a palette name does not certify accessibility, contrast or success for every reader."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture constructs two lines with both different line styles and marker shapes, labels each series and renders an image. Assertions inspect the redundant style choices and legend text. They verify construction, not whether a person can perceive every mark or whether a screen reader receives an equivalent explanation.",
+        "Reserve emphasis colors for the intended message and keep supporting context restrained. Too many equally saturated categories compete for attention. Direct labels can reduce dependence on a distant legend, while a textual summary and data table can provide another route to the evidence."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Use color with redundant cues and appropriate palettes on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nf,a=plt.subplots(figsize=(3,2))\nl1,=a.plot([1,2],[2,3],color=\"#0072B2\",linestyle=\"-\",marker=\"o\",label=\"Observed\")\nl2,=a.plot([1,2],[3,2],color=\"#D55E00\",linestyle=\"--\",marker=\"s\",label=\"Reference\")\na.legend()\nprint(l1.get_linestyle(),l2.get_linestyle(),l1.get_marker(),l2.get_marker())\nprint([t.get_text() for t in a.get_legend().get_texts()])\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "- -- o s\n['Observed', 'Reference']\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "Use qualitative colors for nominal categories, a sequential palette for ordered magnitude, and a diverging palette when a meaningful midpoint separates opposite directions.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "Which palette suits ordered magnitude?",
+        "Sequential",
+        "Random nominal colors",
+        "Only red and green",
+        "A categorical rainbow always",
+        "Sequential color progression can encode increasing magnitude through an ordered visual change."
+      ],
+      [
+        "What does a diverging palette require?",
+        "A meaningful center",
+        "Exactly two categories",
+        "Only positive values",
+        "An unlabeled legend",
+        "A diverging scale separates directions relative to a substantively meaningful midpoint."
+      ],
+      [
+        "What strengthens an essential color distinction?",
+        "Redundant cues",
+        "Only more saturation",
+        "Only a larger file",
+        "Only transparency",
+        "Labels, shapes and line styles can carry meaning when color differences are hard to perceive."
+      ],
+      [
+        "A status chart uses red and green alone. What should be added?",
+        "Labels or patterns",
+        "Only a gradient",
+        "Only thinner bars",
+        "Only a glossy background",
+        "Redundant noncolor cues help readers distinguish status without depending solely on hue perception."
+      ],
+      [
+        "A map uses a diverging palette centered on the dataset mean by accident. What needs review?",
+        "The center\u2019s meaning",
+        "Only legend position",
+        "Only file compression",
+        "Only border width",
+        "The palette\u2019s midpoint should reflect the analytical comparison, not an unexplained default."
+      ],
+      [
+        "A chart has twenty equally vivid category colors. What may improve focus?",
+        "Selective emphasis",
+        "Only more vivid colors",
+        "Only a 3D frame",
+        "Only a larger legend border",
+        "A restrained context palette with deliberate emphasis can reduce competition for attention."
+      ],
+      [
+        "An approved palette is used with tiny low-contrast text. What remains necessary?",
+        "Output-level review",
+        "Only the palette name",
+        "Only backend selection",
+        "Only more categories",
+        "Accessibility depends on the actual text, background, size and viewing conditions, not the color-map name alone."
+      ],
+      [
+        "A chart must work in grayscale print. Which cue can complement color?",
+        "Marker shape",
+        "Only hue saturation",
+        "Only a gradient",
+        "Only a colored border",
+        "A distinct marker shape carries category identity independently of hue."
+      ],
+      [
+        "A signed heat map has no meaningful neutral point. What should be questioned?",
+        "Diverging-scale suitability",
+        "Only image width",
+        "Only file compression",
+        "Only annotation count",
+        "A diverging palette needs an interpretable center separating directions; without one its visual semantics may be inappropriate."
+      ],
+      [
+        "A line is identified only in a distant legend. Which addition can reduce lookup?",
+        "A direct label",
+        "Only a longer filename",
+        "Only a brighter background",
+        "Only a thicker frame",
+        "A clear nearby series label can reduce repeated matching between a legend and distant marks."
+      ]
+    ],
+    "formal": [
+      [
+        "Which palette type represents unordered categories?",
+        "Qualitative",
+        "Sequential by arbitrary id",
+        "Diverging around any number",
+        "Logarithmic by default",
+        "Qualitative palettes distinguish nominal membership without implying a numeric ordering."
+      ],
+      [
+        "What should color not be the sole carrier of?",
+        "Essential distinctions",
+        "All decorative context",
+        "Any background",
+        "Every optional gridline",
+        "Meaning required to understand the chart needs another cue when color is unavailable or difficult to perceive."
+      ],
+      [
+        "What does a sequential color map imply?",
+        "Ordered magnitude",
+        "Causal direction",
+        "Unrelated category identity only",
+        "Guaranteed equal contrast",
+        "A sequence is appropriate when values have a meaningful low-to-high order."
+      ],
+      [
+        "A printout loses hue differences between two lines. What can preserve identification?",
+        "Distinct markers and styles",
+        "Only the same solid stroke",
+        "Only a colored title",
+        "Only a gradient background",
+        "Noncolor encodings remain useful when colors become similar in grayscale."
+      ],
+      [
+        "A heat map uses rainbow hues for smooth ordered values. What should be assessed?",
+        "Perceived order and artificial boundaries",
+        "Only image width",
+        "Only label count",
+        "Only file naming",
+        "Uneven perceptual transitions can create apparent boundaries or emphasize arbitrary ranges."
+      ],
+      [
+        "A diverging heat map shows signed deviations but centers away from zero without explanation. What is unclear?",
+        "The neutral reference",
+        "Only chart aspect ratio",
+        "Only table sorting",
+        "Only the export date",
+        "Readers need to know what the neutral midpoint represents for positive and negative deviations."
+      ],
+      [
+        "A chart highlights every series. What happens to attention guidance?",
+        "Emphasis loses selectivity",
+        "The main message becomes guaranteed",
+        "All comparisons become causal",
+        "The legend becomes unnecessary",
+        "When everything is visually emphasized, no element has a clear priority over its context."
+      ],
+      [
+        "A designer claims color accessibility from a successful PNG render. What is missing?",
+        "Perceptual and reader assessment",
+        "Proof that an image exists",
+        "The renderer\u2019s success",
+        "The artist count",
+        "Rendering verifies an artifact, not how people with varied perception and access needs can understand it."
+      ],
+      [
+        "A legend requires constant back-and-forth matching for ten lines. What may help?",
+        "Direct series labels",
+        "Only smaller legend text",
+        "Only more line crossings",
+        "Only a darker border",
+        "Direct labels can reduce lookup effort, especially when placed clearly near their corresponding series."
+      ],
+      [
+        "A crucial category has only a color swatch and no textual label. What should change?",
+        "Add an explicit name",
+        "Only brighten the swatch",
+        "Only enlarge the image",
+        "Only reorder the file",
+        "Readers need a textual identity and redundant access path to understand what the encoded category means."
+      ]
+    ]
+  },
+  {
+    "id": "viz-message",
+    "comps": [
+      "m3.c1"
+    ],
+    "title": "Write titles and annotations that guide without overstating",
+    "intro": "A chart can be technically correct yet leave readers searching for the point. Titles, labels and annotations should explain the intended observation while preserving the boundaries of the evidence.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "Use a title that states a scoped, defensible message or a clear analytical question. Add a subtitle or caption for the population, period and definition. Avoid causal verbs such as caused or fixed when the evidence is only descriptive, and distinguish a target line from an observed result.",
+        "Place annotations near the relevant marks and use concise text. A note should identify what happened or why a point deserves attention without hiding neighboring data. Direct labels can reduce legend lookup, but dense text may require selective labeling or a separate table."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture labels an observed series, draws a clearly named target line and annotates one point. The assertions verify the actual title, annotation count and target label. The render does not validate the narrative: a reviewer must still assess whether the wording follows from the data and whether labels overlap.",
+        "Let the reader distinguish observation, interpretation and recommendation. A meaningful highlight can focus the question, while a caption records uncertainty and caveats. Supporting details should remain available without forcing every data point to carry a long paragraph in the plot area."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Write titles and annotations that guide without overstating on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nf,a=plt.subplots(figsize=(3,2))\na.plot([1,2,3],[6,7,8],marker=\"o\",label=\"Observed\")\na.axhline(9,linestyle=\"--\",label=\"Target, not observed\")\na.set_title(\"Observed score rose across three checks\")\na.annotate(\"Latest: 8\",xy=(3,8),xytext=(2.1,6))\nprint(a.get_title())\nprint(len(a.texts),a.lines[1].get_label())\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "Observed score rose across three checks\n1 Target, not observed\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "Use a title that states a scoped, defensible message or a clear analytical question.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "What should a chart title support?",
+        "A defensible scoped message",
+        "A guaranteed causal conclusion",
+        "Only an internal filename",
+        "Only the analyst\u2019s preference",
+        "The title should help readers understand the observed comparison without exceeding the evidence."
+      ],
+      [
+        "What must distinguish a target line?",
+        "It is a reference",
+        "It is always measured",
+        "It is a confidence interval",
+        "It is a causal effect",
+        "A target is an intended benchmark and must not be confused with an observed series."
+      ],
+      [
+        "What is an annotation\u2019s main role?",
+        "Guide attention",
+        "Replace all data",
+        "Guarantee correct interpretation",
+        "Remove the need for units",
+        "A concise relevant annotation directs readers to an important mark or contextual fact."
+      ],
+      [
+        "A title says a campaign caused growth based only on a line. What should be revised?",
+        "The causal wording",
+        "Only the plot border",
+        "Only marker size",
+        "Only axis color",
+        "A descriptive time pattern does not isolate a campaign effect from other influences."
+      ],
+      [
+        "A benchmark appears as an unlabeled solid line. What could readers confuse?",
+        "Reference with observation",
+        "Only marker counts",
+        "Only the file format",
+        "Only caption length",
+        "A benchmark needs clear identity so readers do not interpret it as a measured outcome."
+      ],
+      [
+        "Annotations cover several extreme values. What should be improved?",
+        "Placement and density",
+        "Only brighter text",
+        "Only more annotations",
+        "Only a larger legend border",
+        "Guidance should not obscure the evidence it is meant to explain."
+      ],
+      [
+        "A title generalizes from one branch to every customer. What needs narrowing?",
+        "Population scope",
+        "Only the typeface",
+        "Only tick precision",
+        "Only image width",
+        "The title should match the population represented by the observed data."
+      ]
+    ],
+    "formal": [
+      [
+        "What belongs in a chart\u2019s scope note?",
+        "Population and period",
+        "Only decorative style",
+        "Only editor name",
+        "Only image dimensions",
+        "A scope note identifies which observations and window the chart describes."
+      ],
+      [
+        "How should an annotation relate to a mark?",
+        "Clearly and specifically",
+        "Through an unrelated color only",
+        "By hiding its coordinate",
+        "By replacing its unit",
+        "Readers should be able to identify which observation the note describes and why it matters."
+      ],
+      [
+        "What should separate a recommendation from a finding?",
+        "Its action status",
+        "Only text color",
+        "Only font size",
+        "Only chart position",
+        "A proposed action is distinct from an observed fact and may need further evidence or approval."
+      ],
+      [
+        "A chart labels forecast values simply as revenue. What is missing?",
+        "Observed-versus-predicted identity",
+        "Only a larger axis label",
+        "Only the source language",
+        "Only a line border",
+        "Forecasts and measurements have different evidential status and should be visibly distinguished."
+      ],
+      [
+        "An annotation highlights a drop but omits a metric-definition change. What is needed?",
+        "Relevant context",
+        "Only a downward arrow",
+        "Only a warning color",
+        "Only a smaller title",
+        "The observed discontinuity may reflect changed measurement rather than changed business behavior."
+      ],
+      [
+        "A title calls a result dramatic without giving a baseline. What can strengthen it?",
+        "Concrete magnitude and context",
+        "Only bolder text",
+        "Only more adjectives",
+        "Only a brighter palette",
+        "A specific scoped comparison is more assessable than an unsupported evaluative adjective."
+      ],
+      [
+        "A direct label is too far from its line and matches another series. What should change?",
+        "Label association",
+        "Only file compression",
+        "Only source order",
+        "Only legend casing",
+        "The visual connection between text and the intended series must be unambiguous."
+      ],
+      [
+        "A chart identifies the maximum but the decision concerns reliability. What should guide emphasis?",
+        "The decision question",
+        "Only the largest point",
+        "Only analyst preference",
+        "Only the easiest label",
+        "Highlights should serve the reader\u2019s task rather than merely the most visually convenient extremum."
+      ],
+      [
+        "A caption contains a crucial limitation in unreadable tiny text. What fails?",
+        "Usable disclosure",
+        "Only chart syntax",
+        "Only the PNG signature",
+        "Only artist creation",
+        "A limitation is not practically communicated if intended readers cannot read it at the delivery size."
+      ],
+      [
+        "A target is exceeded once and the title claims permanent success. What exceeds the evidence?",
+        "The temporal generalization",
+        "The plotted point",
+        "The presence of a target",
+        "The comparison arithmetic",
+        "One observed crossing does not establish sustained future performance."
+      ]
+    ]
+  },
+  {
+    "id": "viz-clutter",
+    "comps": [
+      "m3.c1"
+    ],
+    "title": "Reduce clutter while preserving useful reference information",
+    "intro": "A report has thick gridlines, shaded backgrounds, heavy borders and many competing labels. Removing visual noise can reveal the data, but a minimalist chart still needs units, reference points and enough context to be interpretable.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "Prioritize marks that encode evidence. Lighten unnecessary gridlines, remove decorative backgrounds and avoid redundant frames when they do not support reading. Keep meaningful reference lines and readable ticks; less ink is not the goal if the reader loses the ability to estimate values or understand the comparison.",
+        "Use a consistent visual hierarchy: restrained context, clear data marks and limited emphasis for the message. White space can separate groups and panels. Too many legends or repeated labels increase lookup effort, while removing every label makes the chart depend on unexplained conventions."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture hides only the top and right spines and retains left and bottom axes, labels and a light y-grid. Assertions verify those visibility choices. This is a deliberate construction pattern, not a universal rule that every chart must remove exactly those spines.",
+        "Evaluate the chart at its actual viewing size. A dashboard card, projection screen and printed report create different legibility needs. Small multiples can simplify comparison when axes and definitions are coordinated; inconsistent ranges can make clean-looking panels misleading."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Reduce clutter while preserving useful reference information on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nf,a=plt.subplots(figsize=(3,2))\na.plot([1,2,3],[2,5,4],marker=\"o\")\na.set_xlabel(\"Check\")\na.set_ylabel(\"Score\")\na.spines[\"top\"].set_visible(False)\na.spines[\"right\"].set_visible(False)\na.grid(axis=\"y\",alpha=0.2)\nprint(a.spines[\"top\"].get_visible(),a.spines[\"left\"].get_visible())\nprint(a.get_xlabel(),a.get_ylabel())\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "False True\nCheck Score\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "Prioritize marks that encode evidence.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "What should simplification preserve?",
+        "Interpretive essentials",
+        "Every decorative border",
+        "Only a blank background",
+        "Only a headline",
+        "Units, useful reference points and required context remain essential even in a visually simple chart."
+      ],
+      [
+        "What is visual hierarchy?",
+        "A deliberate attention order",
+        "A database foreign key",
+        "A mandatory 3D layout",
+        "A random color sequence",
+        "Hierarchy distinguishes primary evidence, emphasis and supporting context so readers can navigate the view."
+      ],
+      [
+        "Is removing all gridlines always best?",
+        "No",
+        "Always",
+        "Only for line charts",
+        "Only for grayscale",
+        "Gridlines can aid value estimation; their usefulness depends on the task and rendering context."
+      ],
+      [
+        "Thick gridlines dominate a light data line. What can help?",
+        "Reduce grid prominence",
+        "Remove the data line",
+        "Add a glossy background",
+        "Use thicker gridlines",
+        "Supporting reference marks should not compete with or obscure the evidence marks."
+      ],
+      [
+        "A simplified chart loses its y-axis units. What must return?",
+        "The measure definition",
+        "Only a decorative frame",
+        "Only a logo",
+        "Only a shadow",
+        "Removing clutter should not remove the information needed to interpret values."
+      ],
+      [
+        "A dashboard card looks clear at full-screen size but unreadable when embedded. What is needed?",
+        "Delivery-size review",
+        "Only a larger source image",
+        "Only more decimals",
+        "Only a new filename",
+        "Legibility depends on the actual size and conditions in which readers encounter the chart."
+      ],
+      [
+        "Six coordinated panels repeat identical long labels. What might improve them?",
+        "Shared labeling where clear",
+        "Unrelated scales",
+        "Only more legends",
+        "Only smaller fonts",
+        "Shared labels can reduce repetition when panel scope and relationships remain unambiguous."
+      ]
+    ],
+    "formal": [
+      [
+        "What is chart clutter in this context?",
+        "Competing nonessential detail",
+        "Any axis label",
+        "Every visible data mark",
+        "Every meaningful annotation",
+        "Clutter is detail that consumes attention without supporting the intended reading task."
+      ],
+      [
+        "What should determine whether a gridline remains?",
+        "Reading usefulness",
+        "A universal no-grid rule",
+        "Only a style trend",
+        "Only the default template",
+        "A reference line is useful when it helps estimate or compare values without dominating the evidence."
+      ],
+      [
+        "What is a benefit of well-used white space?",
+        "Separating visual groups",
+        "Proving data completeness",
+        "Guaranteeing accurate forecasts",
+        "Removing all uncertainty",
+        "Space can organize panels and reduce confusion without adding new encoded data."
+      ],
+      [
+        "A chart uses shadows behind every bar. What should justify them?",
+        "A useful information role",
+        "Their availability in software",
+        "Only a modern appearance",
+        "Only a larger file size",
+        "Decorative effects should be removed when they add emphasis or depth without useful evidence."
+      ],
+      [
+        "A designer removes every tick to make the chart clean. What can readers lose?",
+        "Value reference",
+        "Only a visual border",
+        "Only a title font",
+        "Only color identity",
+        "Without reference ticks or direct values, readers may be unable to estimate the encoded magnitudes."
+      ],
+      [
+        "Small multiples use a shared legend but different metric definitions. What is wrong?",
+        "Semantic inconsistency",
+        "Only panel spacing",
+        "Only chart resolution",
+        "Only the legend border",
+        "A coordinated layout implies comparability that differing definitions can violate."
+      ],
+      [
+        "A critical annotation has the same prominence as decorative text. What should change?",
+        "Attention hierarchy",
+        "Only table sorting",
+        "Only file metadata",
+        "Only source code comments",
+        "Visual emphasis should distinguish information central to the reader\u2019s decision from supporting decoration."
+      ],
+      [
+        "A chart becomes simpler after hiding all low-performing groups. What fails?",
+        "Evidence coverage",
+        "Only visual balance",
+        "Only the color count",
+        "Only axis syntax",
+        "Selective removal of relevant groups is misleading omission rather than legitimate clutter reduction."
+      ],
+      [
+        "A minimalist dashboard requires a paragraph to decode every mark. What should be reconsidered?",
+        "Encoding and labeling clarity",
+        "Only removing more text",
+        "Only adding empty space",
+        "Only a larger logo",
+        "Simplicity should reduce reader effort; unexplained encodings can make a sparse chart harder to understand."
+      ],
+      [
+        "A template removes spines from every chart automatically. What is missing?",
+        "Task-specific judgment",
+        "Only a default palette",
+        "Only output compression",
+        "Only the author name",
+        "Style rules should be evaluated against the reference information each chart actually needs."
+      ]
+    ]
+  },
+  {
+    "id": "viz-handoff",
+    "comps": [
+      "m3.c1"
+    ],
+    "title": "Deliver a chart with traceable data and alternative access",
+    "intro": "A chart handed to stakeholders needs more than a working image file. The deliverable should identify its source, calculation, scope and limitations, and offer another way to understand the evidence when the visual alone is insufficient.",
+    "sections": [
+      [
+        "Choose the visual reasoning",
+        "Keep the source snapshot, transformation code, chart settings and dependency versions traceable. A title cannot replace metric definitions, inclusion rules or data lineage. Preserve a table of the plotted values so a reviewer can check that marks and labels agree with the underlying calculation.",
+        "Provide a concise textual summary of the main comparison and its limits, plus an accessible table when appropriate. Alternative text should communicate the purpose and relevant evidence rather than simply naming chart colors. A static PNG by itself does not provide a full semantic data structure for assistive technologies."
+      ],
+      [
+        "Inspect the constructed chart",
+        "The fixture plots synthetic values and extracts a parallel list of labeled values from the same declared data. The chart includes explicit units and the code renders a real in-memory PNG. This demonstrates a common source for the chart and table, not a complete accessible web delivery or a human-tested description.",
+        "Review the final export for clipping, contrast, label size, units and source attribution in its intended destination. Separate computational validation, design review and authorization to publish. A draft can have verified calculations while still requiring educational or business review before public use."
+      ]
+    ],
+    "lang": "python-pandas",
+    "problem": "Deliver a chart with traceable data and alternative access on a synthetic plot.",
+    "steps": [
+      "State the reader\u2019s comparison and the units.",
+      "Construct the relevant Matplotlib artists and inspect their properties.",
+      "Render a small PNG in memory and inspect its file signature."
+    ],
+    "code": "import os\nos.environ[\"MPLCONFIGDIR\"]=\"/tmp/mpl\"\nimport matplotlib\nmatplotlib.use(\"Agg\")\nimport matplotlib.pyplot as plt\nfrom io import BytesIO\nlabels=[\"North\",\"South\"]\nvalues=[12,18]\nf,a=plt.subplots(figsize=(3,2))\na.bar(labels,values)\na.set_ylabel(\"Synthetic tickets\")\na.set_title(\"South has six more observed tickets\")\ntable=list(zip(labels,values))\nprint(table)\nprint(values[1]-values[0])\nb=BytesIO()\nf.savefig(b,format=\"png\",dpi=60)\nprint(b.getvalue()[:8]==b\"\\x89PNG\\r\\n\\x1a\\n\")\nplt.close(f)",
+    "expect": "[('North', 12), ('South', 18)]\n6\nTrue",
+    "limit": "Matplotlib 3.10.8 uses the noninteractive Agg backend. Assertions inspect chart data, settings and a real in-memory PNG signature under the existing 2 CPU-second/1 GiB sandbox. They do not establish visual legibility, assistive-technology compatibility, correct business interpretation or human design approval.",
+    "mistakes": [
+      "A successfully rendered image can still mislead if its scope or encoding is inappropriate.",
+      "Synthetic chart values are not measured business evidence."
+    ],
+    "takeaways": [
+      "Keep the source snapshot, transformation code, chart settings and dependency versions traceable.",
+      "Check both encoded data and the reader\u2019s likely interpretation."
+    ],
+    "practice": [
+      [
+        "What should accompany a chart for exact-value inspection?",
+        "A data table",
+        "Only a logo",
+        "Only a glossy border",
+        "Only the file size",
+        "A table gives another route to the plotted values and supports precise checking."
+      ],
+      [
+        "Does a PNG signature prove accessible communication?",
+        "No",
+        "Always",
+        "Only for small images",
+        "Only with bright colors",
+        "A valid image file does not establish usable alternative text, contrast or assistive-technology support."
+      ],
+      [
+        "What makes a chart traceable?",
+        "Source and calculation identity",
+        "Only the editor\u2019s initials",
+        "Only a memorable title",
+        "Only a timestamped filename",
+        "Traceable inputs and transformations let reviewers reconstruct how the visual evidence was produced."
+      ],
+      [
+        "A text alternative says only blue bars and orange bars. What is missing?",
+        "The meaningful comparison",
+        "Only a bigger font",
+        "Only output metadata",
+        "Only a palette name",
+        "An alternative should communicate purpose and relevant evidence, not merely decorative appearances."
+      ],
+      [
+        "A table and chart are copied from different snapshots. What must be reconciled?",
+        "Input consistency",
+        "Only chart border width",
+        "Only legend location",
+        "Only title casing",
+        "Parallel representations should describe the same scoped data or explicitly explain their differences."
+      ],
+      [
+        "A saved chart clips its unit label. What should be checked?",
+        "The exported artifact",
+        "Only the interactive preview",
+        "Only the source code length",
+        "Only a new filename",
+        "Layout can change across formats and sizes, so the actual delivered file requires inspection."
+      ],
+      [
+        "A draft has verified calculations but no substantive review. What status is accurate?",
+        "Validated draft",
+        "Human-approved publication",
+        "Guaranteed correct decision",
+        "Automatically accessible product",
+        "Technical verification does not replace design, educational or business review and publication authorization."
+      ]
+    ],
+    "formal": [
+      [
+        "What is a useful textual chart summary?",
+        "The main comparison and limits",
+        "Only a list of hues",
+        "Only the plotting package name",
+        "Only the number of pixels",
+        "A summary should carry the chart\u2019s purpose and important evidence in words with its relevant boundaries."
+      ],
+      [
+        "What should a plotted-value table share with the chart?",
+        "Its scoped input and calculation",
+        "Only a font family",
+        "Only an image width",
+        "Only the same author name",
+        "Shared data and metric definitions keep alternative representations consistent."
+      ],
+      [
+        "What does a clean rerun establish?",
+        "Computational reproducibility",
+        "Universal design approval",
+        "Causal identification",
+        "Guaranteed reader comprehension",
+        "A rerun shows that the stated process can recreate outputs, while meaning and usability need separate assessment."
+      ],
+      [
+        "A stakeholder shares a chart without its caption defining a denominator. What can be lost?",
+        "Metric meaning",
+        "Only background decoration",
+        "Only image compression",
+        "Only panel numbering",
+        "A rate can be misunderstood when the population or denominator definition is detached from the visual."
+      ],
+      [
+        "A chart exposes sensitive record labels unnecessarily. What should be reviewed?",
+        "Authorized disclosure",
+        "Only palette ordering",
+        "Only tick rotation",
+        "Only file extension",
+        "A visual handoff must limit sensitive detail to what is needed and authorized for its audience."
+      ],
+      [
+        "A revised dataset changes values but the chart title stays unchanged. What must be rechecked?",
+        "Narrative consistency",
+        "Only the PNG header",
+        "Only the font family",
+        "Only the chart border",
+        "A title can become false when its underlying values change even if the plotting code still executes."
+      ],
+      [
+        "A report embeds a raster image at a much smaller size. What needs validation?",
+        "Legibility at destination size",
+        "Only source image dimensions",
+        "Only the data type",
+        "Only the plotting library version",
+        "The actual delivered size determines whether labels and differences remain readable."
+      ],
+      [
+        "A chart uses a library default palette. What is not established?",
+        "Audience accessibility",
+        "The existence of color values",
+        "The ability to create artists",
+        "The default\u2019s software identity",
+        "A default palette alone does not verify contrast, redundant cues or comprehension for the intended readers."
+      ],
+      [
+        "A reviewer cannot reproduce a plot after a package update. What record helps?",
+        "Dependency and code versions",
+        "Only the last slide title",
+        "Only file creation order",
+        "Only a printed screenshot",
+        "Version records help identify changes in plotting behavior or calculation dependencies."
+      ],
+      [
+        "A team wants to publish a verified chart immediately despite unresolved source scope. What should remain explicit?",
+        "The unresolved review status",
+        "Only the most favorable value",
+        "Only a larger logo",
+        "Only the image resolution",
+        "A technically rendered draft should not be represented as approved evidence while substantive scope issues remain unresolved."
+      ]
+    ]
+  }
+];
+const c=course('data-visualization',specs,[]);
+const COMMIT='1392cbe3c79cdb93f9282747841d648770f60249';
+const refs={quickstart:'galleries/users_explain/quick_start.py',lifecycle:'galleries/tutorials/lifecycle.py',colormaps:'galleries/users_explain/colors/colormaps.py',histograms:'galleries/examples/statistics/histogram_histtypes.py'};
+c.references=Object.entries(refs).map(([id,path])=>({id,title:'Matplotlib 3.10.8 official documentation: '+id,url:'https://github.com/matplotlib/matplotlib/blob/'+COMMIT+'/'+path,source:{repo:'matplotlib/matplotlib',commit:COMMIT,path,verification:'Official release v3.10.8 matches the installed runtime. Original chart reasoning is distinguished from API evidence; pinned source and Agg rendering do not establish human design or accessibility approval.'}}));
+for(const l of c.lessons){l.references=Object.keys(refs);l.prerequisite_note=l.prerequisites.length?'Use the preceding chart vocabulary and canonical data-business-fundamentals prerequisite. Python rendering is an optional illustration; no programming experience is required to answer the chart-design questions.':'Canonical prerequisite: data-business-fundamentals. Review observations, metrics and business questions. A chart maps data to visual marks; axes describe coordinates and units. Matplotlib code is an optional illustration using synthetic values, not a required coding assignment.';}
+module.exports=c;

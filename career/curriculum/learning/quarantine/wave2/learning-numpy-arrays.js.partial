@@ -1,0 +1,1295 @@
+'use strict';
+const {course}=require('./ai-helper');
+module.exports=course('numpy-arrays',[
+  {
+    "slug": "array-contract",
+    "comp": "m1.c1",
+    "title": "Create arrays and read shape size and dtype",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A weather team stores three days of measurements from two sensors. Before calculating anything, it needs a shared convention: rows are days, columns are sensors, and each value is a numeric reading. Shape describes this structure; dtype describes how individual values are represented.",
+    "sections": [
+      {
+        "heading": "An ndarray has axes and a shared element type",
+        "paragraphs": [
+          "NumPy ndarray supports homogeneous element storage with shape metadata. For a two-dimensional readings array, shape (3, 2) means axis 0 has three positions and axis 1 has two. ndim counts axes, size counts elements and dtype describes the stored values. A one-dimensional shape (6,) is not interchangeable with a two-dimensional shape (3, 2), even when both contain six elements.",
+          "Create arrays from regular nested sequences or use constructors such as zeros, ones and arange. Specify an appropriate dtype when storage range or downstream behavior matters. A Python list can mix arbitrary objects; an ordinary numeric ndarray instead uses one numeric dtype. Inferred types can change when the input includes floats or strings, so inspect the result at data boundaries."
+        ]
+      },
+      {
+        "heading": "Distinguish representation from meaning",
+        "paragraphs": [
+          "A rectangular numeric shape does not encode physical units, sensor names or business meaning. Maintain an external axis convention and validate dimensions before combining datasets. Two arrays of equal shape can still describe different entities or units.",
+          "The example creates actual NumPy arrays and inspects metadata and payload bytes. nbytes covers the array element buffer; it is not a full process-memory measurement and does not include every object or allocator overhead."
+        ]
+      }
+    ],
+    "problem": "Inspect a synthetic day-by-sensor array and its numeric payload.",
+    "code": "import numpy as np\na = np.array([[12, 14], [11, 15], [13, 16]], dtype=np.int16)\nprint(a.shape, a.ndim, a.size)\nprint(str(a.dtype), a.nbytes)\nprint(np.zeros((2, 3), dtype=np.int8).tolist())",
+    "expect": "(3, 2) 2 6\nint16 12\n[[0, 0, 0], [0, 0, 0]]",
+    "steps": [
+      "Create a rectangular array with an explicit 16-bit integer dtype.",
+      "Read axes, total element count and payload size.",
+      "Construct a separate zero-filled array with a declared shape."
+    ],
+    "limit": "This verifies actual NumPy construction and metadata on synthetic values. It does not benchmark throughput, validate physical units or measure total process memory.",
+    "mistakes": [
+      "Treating shape as if it also names units and entities.",
+      "Assuming inferred dtype is always the intended storage contract."
+    ],
+    "takeaways": [
+      "State axis meaning alongside shape.",
+      "Inspect dtype and range before arithmetic."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "What does shape (3, 2) describe?",
+        "Axis lengths three and two",
+        "Three bytes and two bits",
+        "Three types and two values",
+        "A one-dimensional six-item vector",
+        "Shape lists the length of each axis, not dtype width or total bytes.",
+        "Three bytes and two bits does not follow the array contract. Shape lists the length of each axis, not dtype width or total bytes.",
+        "Three types and two values does not follow the array contract. Shape lists the length of each axis, not dtype width or total bytes.",
+        "A one-dimensional six-item vector does not follow the array contract. Shape lists the length of each axis, not dtype width or total bytes."
+      ],
+      [
+        "What is the size of an array shaped (4, 5)?",
+        "20 elements",
+        "9 elements",
+        "4 elements",
+        "5 elements",
+        "Element count is the product of axis lengths, four times five.",
+        "9 elements does not follow the array contract. Element count is the product of axis lengths, four times five.",
+        "4 elements does not follow the array contract. Element count is the product of axis lengths, four times five.",
+        "5 elements does not follow the array contract. Element count is the product of axis lengths, four times five."
+      ],
+      [
+        "Which attribute identifies the stored element type?",
+        "dtype",
+        "ndim",
+        "shape",
+        "size",
+        "dtype defines element representation while the other attributes describe structure or count.",
+        "ndim does not follow the array contract. dtype defines element representation while the other attributes describe structure or count.",
+        "shape does not follow the array contract. dtype defines element representation while the other attributes describe structure or count.",
+        "size does not follow the array contract. dtype defines element representation while the other attributes describe structure or count."
+      ],
+      [
+        "A sensor matrix has days on rows. Which axis indexes days?",
+        "Axis zero",
+        "Axis one",
+        "The dtype axis",
+        "The itemsize axis",
+        "For a two-dimensional matrix, the first shape position is axis zero.",
+        "Axis one does not follow the array contract. For a two-dimensional matrix, the first shape position is axis zero.",
+        "The dtype axis does not follow the array contract. For a two-dimensional matrix, the first shape position is axis zero.",
+        "The itemsize axis does not follow the array contract. For a two-dimensional matrix, the first shape position is axis zero."
+      ],
+      [
+        "A team stores six int16 values. What is their raw numeric payload?",
+        "12 bytes",
+        "6 bytes",
+        "16 bytes",
+        "96 bytes",
+        "Each int16 element occupies two bytes, so six elements occupy twelve payload bytes.",
+        "6 bytes does not follow the array contract. Each int16 element occupies two bytes, so six elements occupy twelve payload bytes.",
+        "16 bytes does not follow the array contract. Each int16 element occupies two bytes, so six elements occupy twelve payload bytes.",
+        "96 bytes does not follow the array contract. Each int16 element occupies two bytes, so six elements occupy twelve payload bytes."
+      ],
+      [
+        "A list combines readings and a text marker. What should an array conversion inspect?",
+        "The resulting dtype",
+        "Only the list's name",
+        "Only the loop counter",
+        "Only terminal width",
+        "Mixed input can produce an unintended nonnumeric representation rather than the desired numeric array.",
+        "Only the list's name does not follow the array contract. Mixed input can produce an unintended nonnumeric representation rather than the desired numeric array.",
+        "Only the loop counter does not follow the array contract. Mixed input can produce an unintended nonnumeric representation rather than the desired numeric array.",
+        "Only terminal width does not follow the array contract. Mixed input can produce an unintended nonnumeric representation rather than the desired numeric array."
+      ],
+      [
+        "Two matrices have equal shape but different units. Can shape checks prove safe addition?",
+        "No, units remain a separate contract",
+        "Yes, all equal shapes share units",
+        "Yes, dtype records every unit",
+        "Only if both arrays are square",
+        "NumPy shapes describe dimensions, not the physical or business meaning of corresponding elements.",
+        "Yes, all equal shapes share units does not follow the array contract. NumPy shapes describe dimensions, not the physical or business meaning of corresponding elements.",
+        "Yes, dtype records every unit does not follow the array contract. NumPy shapes describe dimensions, not the physical or business meaning of corresponding elements.",
+        "Only if both arrays are square does not follow the array contract. NumPy shapes describe dimensions, not the physical or business meaning of corresponding elements."
+      ],
+      [
+        "A worked example prints nbytes. What does it measure?",
+        "Element-buffer payload",
+        "The full Python process",
+        "Every referenced object",
+        "All operating-system memory",
+        "nbytes reports element storage rather than complete runtime or process overhead.",
+        "The full Python process does not follow the array contract. nbytes reports element storage rather than complete runtime or process overhead.",
+        "Every referenced object does not follow the array contract. nbytes reports element storage rather than complete runtime or process overhead.",
+        "All operating-system memory does not follow the array contract. nbytes reports element storage rather than complete runtime or process overhead."
+      ]
+    ]
+  },
+  {
+    "slug": "indexing-memory",
+    "comp": "m1.c1",
+    "title": "Index arrays and distinguish views from independent selections",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A quality analyst extracts a portion of a measurement array, adjusts an outlier and unexpectedly changes the original dataset. Correct indexing includes understanding both selected values and whether the selection shares the underlying buffer.",
+    "sections": [
+      {
+        "heading": "Read indexing syntax from the axis contract",
+        "paragraphs": [
+          "Use a[row, column] for a scalar in a two-dimensional array, a[:, column] for a column and a[start:stop] for a half-open row slice. Negative indices count from the end. Integer indices remove an axis; a slice such as column:column+1 retains that axis. A boolean mask selects positions where its condition is true.",
+          "Basic array slices are views that share data, so mutating a writable slice can affect the original. Advanced indexing with integer arrays or boolean selection returns a copy when retrieving values. Assignment directly through an index, such as a[mask] = value, updates the indexed target; do not confuse that assignment with mutating a previously retrieved selection."
+        ]
+      },
+      {
+        "heading": "Make ownership explicit at mutation boundaries",
+        "paragraphs": [
+          "Use copy when an independent working buffer is required, and use shares_memory for a targeted check when teaching or debugging shared storage. Assignment such as b = a creates another reference to the same array rather than a new data buffer. Avoid relying on incidental ownership assumptions after complicated indexing.",
+          "The fixture contrasts a basic slice, an integer-array selection and an explicit copy. It changes each result to show actual NumPy behavior. This is a local ownership demonstration, not a general guarantee about an arbitrary third-party array implementation."
+        ]
+      }
+    ],
+    "problem": "Observe shared slice mutation and independent advanced indexing.",
+    "code": "import numpy as np\na = np.arange(6).reshape(2, 3)\nview = a[:, 1:]\nselected = a[[0, 1], [1, 2]]\nindependent = a.copy()\nview[0, 0] = 99\nselected[0] = -1\nprint(a.tolist())\nprint(selected.tolist())\nprint(independent.tolist())\nprint(np.shares_memory(a, view), np.shares_memory(a, selected))",
+    "expect": "[[0, 99, 2], [3, 4, 5]]\n[-1, 5]\n[[0, 1, 2], [3, 4, 5]]\nTrue False",
+    "steps": [
+      "Retrieve a shared basic slice and an advanced-indexing copy.",
+      "Modify the selections and compare the original.",
+      "Check memory sharing and the independent snapshot."
+    ],
+    "limit": "Actual NumPy indexing and buffer sharing are exercised for these arrays. The example does not establish memory ownership for every reshape, external array library or nonstandard storage backend.",
+    "mistakes": [
+      "Assuming every selection is an independent copy.",
+      "Assuming advanced-index assignment is equivalent to modifying a retrieved copy."
+    ],
+    "takeaways": [
+      "Predict the selected shape and its storage relationship.",
+      "Copy deliberately when mutation must be isolated."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "Which selection preserves a one-column axis?",
+        "a[:, 1:2]",
+        "a[:, 1]",
+        "a[0, 1]",
+        "a[1, 1]",
+        "A slice retains the selected axis, giving shape (rows, 1), while an integer index removes it.",
+        "a[:, 1] does not follow the array contract. A slice retains the selected axis, giving shape (rows, 1), while an integer index removes it.",
+        "a[0, 1] does not follow the array contract. A slice retains the selected axis, giving shape (rows, 1), while an integer index removes it.",
+        "a[1, 1] does not follow the array contract. A slice retains the selected axis, giving shape (rows, 1), while an integer index removes it."
+      ],
+      [
+        "What does b = a do for a NumPy array?",
+        "Adds another reference",
+        "Copies all elements",
+        "Changes the dtype",
+        "Creates independent storage",
+        "Python assignment binds another reference to the same array object.",
+        "Copies all elements does not follow the array contract. Python assignment binds another reference to the same array object.",
+        "Changes the dtype does not follow the array contract. Python assignment binds another reference to the same array object.",
+        "Creates independent storage does not follow the array contract. Python assignment binds another reference to the same array object."
+      ],
+      [
+        "What does a basic array slice usually expose?",
+        "A shared-data view",
+        "An unrelated data file",
+        "A model parameter",
+        "A permanent deep copy",
+        "Basic array slicing produces a view of the underlying data buffer.",
+        "An unrelated data file does not follow the array contract. Basic array slicing produces a view of the underlying data buffer.",
+        "A model parameter does not follow the array contract. Basic array slicing produces a view of the underlying data buffer.",
+        "A permanent deep copy does not follow the array contract. Basic array slicing produces a view of the underlying data buffer."
+      ],
+      [
+        "An analyst needs independent data before editing. Which operation is explicit?",
+        "a.copy()",
+        "b = a",
+        "a[:] alone",
+        "a.view() alone",
+        "An explicit copy duplicates the data buffer for independent mutation.",
+        "b = a does not follow the array contract. An explicit copy duplicates the data buffer for independent mutation.",
+        "a[:] alone does not follow the array contract. An explicit copy duplicates the data buffer for independent mutation.",
+        "a.view() alone does not follow the array contract. An explicit copy duplicates the data buffer for independent mutation."
+      ],
+      [
+        "A boolean selection is stored as b = a[mask], then b is edited. What generally happens to a?",
+        "It is unchanged by editing b",
+        "It always changes with b",
+        "It becomes a Python list",
+        "It loses all masked elements",
+        "Retrieving with boolean advanced indexing creates a copy, so editing that result does not mutate the original.",
+        "It always changes with b does not follow the array contract. Retrieving with boolean advanced indexing creates a copy, so editing that result does not mutate the original.",
+        "It becomes a Python list does not follow the array contract. Retrieving with boolean advanced indexing creates a copy, so editing that result does not mutate the original.",
+        "It loses all masked elements does not follow the array contract. Retrieving with boolean advanced indexing creates a copy, so editing that result does not mutate the original."
+      ],
+      [
+        "A team writes a[mask] = 0. What is the target?",
+        "Selected elements of a",
+        "Only an independent temporary",
+        "The mask's dtype",
+        "Every Python variable",
+        "Direct indexed assignment modifies the target array at selected positions.",
+        "Only an independent temporary does not follow the array contract. Direct indexed assignment modifies the target array at selected positions.",
+        "The mask's dtype does not follow the array contract. Direct indexed assignment modifies the target array at selected positions.",
+        "Every Python variable does not follow the array contract. Direct indexed assignment modifies the target array at selected positions."
+      ],
+      [
+        "A matrix has shape (5, 4). What shape is a[:, 2]?",
+        "(5,)",
+        "(5, 1)",
+        "(4,)",
+        "(1, 4)",
+        "The integer column index removes the second axis and leaves a five-element vector.",
+        "(5, 1) does not follow the array contract. The integer column index removes the second axis and leaves a five-element vector.",
+        "(4,) does not follow the array contract. The integer column index removes the second axis and leaves a five-element vector.",
+        "(1, 4) does not follow the array contract. The integer column index removes the second axis and leaves a five-element vector."
+      ],
+      [
+        "A view changes the source after an outlier correction. What should the analyst inspect?",
+        "Shared-memory ownership",
+        "Only terminal spacing",
+        "Only file extension",
+        "Only a variable's spelling",
+        "A writable view can update its shared source buffer, so ownership must match the intended mutation policy.",
+        "Only terminal spacing does not follow the array contract. A writable view can update its shared source buffer, so ownership must match the intended mutation policy.",
+        "Only file extension does not follow the array contract. A writable view can update its shared source buffer, so ownership must match the intended mutation policy.",
+        "Only a variable's spelling does not follow the array contract. A writable view can update its shared source buffer, so ownership must match the intended mutation policy."
+      ]
+    ]
+  },
+  {
+    "slug": "reshape-shapes",
+    "comp": "m1.c1",
+    "title": "Reshape with element counts and explicit layout assumptions",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A retailer reshapes a flat stream of twelve readings into stores by time slots. The code can produce many valid shapes, but only one agrees with the documented ordering. A successful reshape establishes structural feasibility rather than business correctness.",
+    "sections": [
+      {
+        "heading": "Conserve elements and declare ordering",
+        "paragraphs": [
+          "Reshape changes the axis structure while retaining the same number of elements. One dimension may be inferred with -1 when the remaining dimensions determine it unambiguously. Six values can become shape (2, 3) or (3, 2), but not (4, 2). Default C-order reshaping follows the specified logical ordering; it does not infer which axis represents a store.",
+          "Transpose permutes axes and therefore changes which index identifies a dimension. Transposing a two-dimensional matrix swaps rows and columns, while a one-dimensional array has no second axis to swap. To create a column vector from shape (n,), use an explicit singleton axis or reshape to (n, 1)."
+        ]
+      },
+      {
+        "heading": "Do not infer copying from the method name",
+        "paragraphs": [
+          "Reshape returns a view when possible and otherwise may copy. Layout, strides and requested order matter, so do not promise shared memory for every reshape. ravel and flatten also have different copying behavior; use an explicit copy if independence is required and test shares_memory when the relation matters.",
+          "The fixture reshapes a contiguous array, infers one dimension and demonstrates the difference between a vector and a column. Its memory relationship is verified for this particular input rather than generalized to every strided array."
+        ]
+      }
+    ],
+    "problem": "Predict reshape and transpose shapes without changing element count.",
+    "code": "import numpy as np\na = np.arange(12)\nb = a.reshape(3, -1)\ncolumn = np.arange(3).reshape(-1, 1)\nprint(b.shape, b.T.shape, column.shape)\nprint(b[1].tolist())\nprint(np.shares_memory(a, b))\nprint(np.arange(3).T.shape)",
+    "expect": "(3, 4) (4, 3) (3, 1)\n[4, 5, 6, 7]\nTrue\n(3,)",
+    "steps": [
+      "Infer the missing dimension from twelve elements.",
+      "Compare the matrix transpose and explicit column shape.",
+      "Check sharing for the contiguous fixture and the one-dimensional transpose."
+    ],
+    "limit": "The memory check covers this contiguous reshape only. Shape feasibility does not verify a dataset axis convention or prove that every noncontiguous reshape avoids copying.",
+    "mistakes": [
+      "Using reshape to guess the meaning of a flat input stream.",
+      "Expecting transpose to turn a one-dimensional vector into a column."
+    ],
+    "takeaways": [
+      "Conserve total elements during reshape.",
+      "Specify singleton axes and verify layout-dependent ownership."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "What must reshape conserve?",
+        "Total element count",
+        "The number of axes",
+        "Every original stride",
+        "The original axis names",
+        "Reshape changes dimensions without creating or dropping array elements.",
+        "The number of axes does not follow the array contract. Reshape changes dimensions without creating or dropping array elements.",
+        "Every original stride does not follow the array contract. Reshape changes dimensions without creating or dropping array elements.",
+        "The original axis names does not follow the array contract. Reshape changes dimensions without creating or dropping array elements."
+      ],
+      [
+        "How many reshape dimensions may be inferred with -1?",
+        "One",
+        "Two",
+        "Every dimension",
+        "Zero always",
+        "A single unknown dimension can be determined from the total element count and the other dimensions.",
+        "Two does not follow the array contract. A single unknown dimension can be determined from the total element count and the other dimensions.",
+        "Every dimension does not follow the array contract. A single unknown dimension can be determined from the total element count and the other dimensions.",
+        "Zero always does not follow the array contract. A single unknown dimension can be determined from the total element count and the other dimensions."
+      ],
+      [
+        "What shape is the transpose of a one-dimensional (7,) array?",
+        "(7,)",
+        "(7, 1)",
+        "(1, 7)",
+        "(1, 1, 7)",
+        "Transposition permutes existing axes and does not add an axis to a vector.",
+        "(7, 1) does not follow the array contract. Transposition permutes existing axes and does not add an axis to a vector.",
+        "(1, 7) does not follow the array contract. Transposition permutes existing axes and does not add an axis to a vector.",
+        "(1, 1, 7) does not follow the array contract. Transposition permutes existing axes and does not add an axis to a vector."
+      ],
+      [
+        "A stream has twelve values. Which target shape is feasible?",
+        "(3, 4)",
+        "(3, 5)",
+        "(5, 3)",
+        "(2, 7)",
+        "Three times four preserves twelve elements; the other products do not.",
+        "(3, 5) does not follow the array contract. Three times four preserves twelve elements; the other products do not.",
+        "(5, 3) does not follow the array contract. Three times four preserves twelve elements; the other products do not.",
+        "(2, 7) does not follow the array contract. Three times four preserves twelve elements; the other products do not."
+      ],
+      [
+        "An array has shape (2, 5). What shape does its transpose have?",
+        "(5, 2)",
+        "(2, 5)",
+        "(10,)",
+        "(1, 10)",
+        "A two-dimensional transpose swaps the two axis lengths.",
+        "(2, 5) does not follow the array contract. A two-dimensional transpose swaps the two axis lengths.",
+        "(10,) does not follow the array contract. A two-dimensional transpose swaps the two axis lengths.",
+        "(1, 10) does not follow the array contract. A two-dimensional transpose swaps the two axis lengths."
+      ],
+      [
+        "An engineer needs a column from a vector v. Which is explicit?",
+        "v.reshape(-1, 1)",
+        "v.T alone",
+        "v + 0",
+        "v.copy() alone",
+        "Adding a singleton second axis gives a column shape; transpose and copying do not add axes.",
+        "v.T alone does not follow the array contract. Adding a singleton second axis gives a column shape; transpose and copying do not add axes.",
+        "v + 0 does not follow the array contract. Adding a singleton second axis gives a column shape; transpose and copying do not add axes.",
+        "v.copy() alone does not follow the array contract. Adding a singleton second axis gives a column shape; transpose and copying do not add axes."
+      ],
+      [
+        "A reshape succeeds but store/time meanings are reversed. What was unchecked?",
+        "The input ordering contract",
+        "Only element count",
+        "Only dimension arithmetic",
+        "Only array allocation",
+        "Many shapes can preserve the same number of values while assigning the wrong meaning to positions.",
+        "Only element count does not follow the array contract. Many shapes can preserve the same number of values while assigning the wrong meaning to positions.",
+        "Only dimension arithmetic does not follow the array contract. Many shapes can preserve the same number of values while assigning the wrong meaning to positions.",
+        "Only array allocation does not follow the array contract. Many shapes can preserve the same number of values while assigning the wrong meaning to positions."
+      ],
+      [
+        "A strided input is reshaped. What should code avoid assuming?",
+        "That a view is guaranteed",
+        "That element count is preserved",
+        "That shape is available",
+        "That dimensions are integers",
+        "Reshape may need a copy depending on layout and requested order, so sharing must not be assumed.",
+        "That element count is preserved does not follow the array contract. Reshape may need a copy depending on layout and requested order, so sharing must not be assumed.",
+        "That shape is available does not follow the array contract. Reshape may need a copy depending on layout and requested order, so sharing must not be assumed.",
+        "That dimensions are integers does not follow the array contract. Reshape may need a copy depending on layout and requested order, so sharing must not be assumed."
+      ]
+    ]
+  },
+  {
+    "slug": "vector-operations",
+    "comp": "m2.c1",
+    "title": "Express elementwise transformations without Python item loops",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A utility company converts a million synthetic meter readings from one unit to another. The formula is the same for every element. NumPy can express this as array arithmetic, but replacing syntax alone does not guarantee correct types, units or resource use.",
+    "sections": [
+      {
+        "heading": "Use array operations with the same mathematical contract",
+        "paragraphs": [
+          "Universal functions and array operators apply numeric work across arrays. With compatible shapes, addition and multiplication are elementwise. Multiplying two matrices with * does not perform matrix multiplication; @ expresses the matrix-product contract. Start from the intended formula, check shapes and compare a small reviewed input before measuring throughput.",
+          "Boolean expressions also operate elementwise. Parenthesize comparisons and combine masks with & or |; Python and/or do not perform elementwise array logic. Use a mask or np.where for conditional results, while remembering that expressions passed as arguments are normally evaluated before where selects results."
+        ]
+      },
+      {
+        "heading": "Measure the implementation rather than the notation",
+        "paragraphs": [
+          "Array operations often move loops into compiled code and reduce Python dispatch overhead. np.vectorize is primarily a convenience wrapper and does not make an arbitrary Python callback a compiled numeric kernel. Chained expressions can allocate large temporary arrays; profile representative data when memory or speed matters.",
+          "The fixture compares a small loop result with actual array arithmetic and applies a boolean condition. It verifies the transformation and mask on these values, not a performance claim for every workload or hardware configuration."
+        ]
+      }
+    ],
+    "problem": "Convert synthetic readings and build an elementwise alert mask.",
+    "code": "import numpy as np\nraw = np.array([0.0, 10.0, 20.0])\nconverted = raw * 1.8 + 32.0\nloop = [float(x) * 1.8 + 32.0 for x in raw]\nalerts = (raw >= 5) & (raw < 20)\nprint(converted.tolist())\nprint(np.allclose(converted, loop))\nprint(alerts.tolist())\nprint(np.where(alerts, 1, 0).tolist())",
+    "expect": "[32.0, 50.0, 68.0]\nTrue\n[False, True, False]\n[0, 1, 0]",
+    "steps": [
+      "Express the same conversion with a loop and an array formula.",
+      "Compare results under a deliberate numeric tolerance.",
+      "Build and apply a parenthesized elementwise condition."
+    ],
+    "limit": "The actual NumPy operations are exercised on three values. No timing benchmark or universal speedup claim follows; large workloads need dtype, memory and representative performance checks.",
+    "mistakes": [
+      "Confusing elementwise multiplication with matrix products.",
+      "Treating np.vectorize as a guaranteed speed optimization."
+    ],
+    "takeaways": [
+      "Translate the mathematical operation before optimizing.",
+      "Use elementwise boolean operators with explicit parentheses."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "What does multiplication with * do for same-shaped numeric arrays?",
+        "Elementwise products",
+        "A matrix product always",
+        "String concatenation",
+        "Only shape comparison",
+        "The * operator multiplies corresponding elements; matrix multiplication uses a different contract.",
+        "A matrix product always does not follow the array contract. The * operator multiplies corresponding elements; matrix multiplication uses a different contract.",
+        "String concatenation does not follow the array contract. The * operator multiplies corresponding elements; matrix multiplication uses a different contract.",
+        "Only shape comparison does not follow the array contract. The * operator multiplies corresponding elements; matrix multiplication uses a different contract."
+      ],
+      [
+        "Which operator expresses matrix multiplication for ndarrays?",
+        "@",
+        "*",
+        "&",
+        "==",
+        "The @ operator performs matrix multiplication under the compatible dimension rules.",
+        "* does not follow the array contract. The @ operator performs matrix multiplication under the compatible dimension rules.",
+        "& does not follow the array contract. The @ operator performs matrix multiplication under the compatible dimension rules.",
+        "== does not follow the array contract. The @ operator performs matrix multiplication under the compatible dimension rules."
+      ],
+      [
+        "What is np.vectorize primarily intended for?",
+        "Convenient function wrapping",
+        "Guaranteed compiled speed",
+        "Automatic GPU execution",
+        "Removing all Python callbacks",
+        "np.vectorize provides convenient array-like calling semantics rather than guaranteed native-kernel acceleration.",
+        "Guaranteed compiled speed does not follow the array contract. np.vectorize provides convenient array-like calling semantics rather than guaranteed native-kernel acceleration.",
+        "Automatic GPU execution does not follow the array contract. np.vectorize provides convenient array-like calling semantics rather than guaranteed native-kernel acceleration.",
+        "Removing all Python callbacks does not follow the array contract. np.vectorize provides convenient array-like calling semantics rather than guaranteed native-kernel acceleration."
+      ],
+      [
+        "A mask needs values above zero and below ten. Which combines array comparisons?",
+        "The & operator with parentheses",
+        "Python and without parentheses",
+        "String addition of conditions",
+        "The @ operator on booleans",
+        "Parenthesized comparisons combined with & express elementwise conjunction.",
+        "Python and without parentheses does not follow the array contract. Parenthesized comparisons combined with & express elementwise conjunction.",
+        "String addition of conditions does not follow the array contract. Parenthesized comparisons combined with & express elementwise conjunction.",
+        "The @ operator on booleans does not follow the array contract. Parenthesized comparisons combined with & express elementwise conjunction."
+      ],
+      [
+        "A conversion loop becomes raw * scale + offset. What should be checked first?",
+        "Formula shapes and dtype",
+        "Only the variable length",
+        "Only console formatting",
+        "Only the source filename",
+        "Vectorization must preserve the intended operation, compatible shape and numeric representation.",
+        "Only the variable length does not follow the array contract. Vectorization must preserve the intended operation, compatible shape and numeric representation.",
+        "Only console formatting does not follow the array contract. Vectorization must preserve the intended operation, compatible shape and numeric representation.",
+        "Only the source filename does not follow the array contract. Vectorization must preserve the intended operation, compatible shape and numeric representation."
+      ],
+      [
+        "A chained expression uses too much memory. What might contribute?",
+        "Large temporary arrays",
+        "Only short variable names",
+        "Only type annotations",
+        "Only the number of imports",
+        "Array expressions can allocate full intermediate results even while reducing Python loop overhead.",
+        "Only short variable names does not follow the array contract. Array expressions can allocate full intermediate results even while reducing Python loop overhead.",
+        "Only type annotations does not follow the array contract. Array expressions can allocate full intermediate results even while reducing Python loop overhead.",
+        "Only the number of imports does not follow the array contract. Array expressions can allocate full intermediate results even while reducing Python loop overhead."
+      ],
+      [
+        "A small fixture matches the loop. What is established?",
+        "That case's numeric agreement",
+        "Universal hardware speedup",
+        "All possible input correctness",
+        "Automatic unit conversion",
+        "A reviewed sample checks behavior locally but does not replace broader correctness or performance evaluation.",
+        "Universal hardware speedup does not follow the array contract. A reviewed sample checks behavior locally but does not replace broader correctness or performance evaluation.",
+        "All possible input correctness does not follow the array contract. A reviewed sample checks behavior locally but does not replace broader correctness or performance evaluation.",
+        "Automatic unit conversion does not follow the array contract. A reviewed sample checks behavior locally but does not replace broader correctness or performance evaluation."
+      ],
+      [
+        "A team expects np.where to prevent evaluation of an invalid branch expression. What is important?",
+        "Arguments are evaluated first",
+        "Only chosen Python expressions run",
+        "where is a lazy Python if",
+        "Every branch changes dtype to object",
+        "np.where selects from evaluated arguments and is not general lazy control flow.",
+        "Only chosen Python expressions run does not follow the array contract. np.where selects from evaluated arguments and is not general lazy control flow.",
+        "where is a lazy Python if does not follow the array contract. np.where selects from evaluated arguments and is not general lazy control flow.",
+        "Every branch changes dtype to object does not follow the array contract. np.where selects from evaluated arguments and is not general lazy control flow."
+      ]
+    ]
+  },
+  {
+    "slug": "broadcast-contract",
+    "comp": "m2.c1",
+    "title": "Predict broadcasting before combining feature arrays",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A model-preparation script subtracts a feature baseline from every customer row. The intended operation is simple, but a misplaced singleton dimension can create a much larger grid or subtract along the wrong axis without a syntax error.",
+    "sections": [
+      {
+        "heading": "Compare shapes from the right",
+        "paragraphs": [
+          "Broadcasting aligns trailing axes. Corresponding lengths must be equal or one of them must be one; missing leading axes behave as length one. A (4, 3) matrix and a (3,) feature vector produce (4, 3). A (4,) vector does not represent per-row offsets for that matrix automatically because its trailing length conflicts with three.",
+          "To apply one value per row, reshape the row vector to (4, 1), aligning the singleton with the feature axis. A (4, 1) column combined with a (3,) row produces a (4, 3) grid. State the intended result shape before executing; successful broadcasting does not prove that the selected entities correspond."
+        ]
+      },
+      {
+        "heading": "Account for result size and mutation rules",
+        "paragraphs": [
+          "Broadcasting avoids physically repeating an input solely to make its dimensions match, but the output or intermediates can still be large. A pairwise calculation over n and m items may create n times m results. In-place operations also need the existing destination shape and casting rules to accommodate the result; an out-of-place expression can succeed where an in-place one cannot.",
+          "The fixture subtracts per-feature and per-row offsets from an actual NumPy matrix. It prints both outputs so the axis meaning is visible. It does not estimate large-scale peak memory or benchmark automatic expansion."
+        ]
+      }
+    ],
+    "problem": "Apply feature and row offsets with explicit compatible shapes.",
+    "code": "import numpy as np\na = np.array([[10, 20, 30], [40, 50, 60]])\nfeatures = np.array([1, 2, 3])\nrows = np.array([5, 10])[:, None]\nprint((a - features).tolist())\nprint((a - rows).tolist())\nprint((rows + features).shape)",
+    "expect": "[[9, 18, 27], [39, 48, 57]]\n[[5, 15, 25], [30, 40, 50]]\n(2, 3)",
+    "steps": [
+      "Align a feature vector with the trailing matrix axis.",
+      "Insert a singleton axis for row offsets.",
+      "Predict the grid shape produced by column and row addition."
+    ],
+    "limit": "This exercises actual broadcasting for small numeric arrays. It does not prove semantic alignment of real entities, measure peak memory or validate an in-place casting strategy.",
+    "mistakes": [
+      "Aligning dimensions from the left instead of the right.",
+      "Assuming broadcasting means the output consumes no memory."
+    ],
+    "takeaways": [
+      "Use singleton axes to state intended alignment.",
+      "Predict output dimensions and allocation size."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "In which direction are broadcasting dimensions aligned?",
+        "From the trailing axes",
+        "From the leading axes only",
+        "By variable name",
+        "By dtype width",
+        "NumPy compares corresponding dimensions from right to left.",
+        "From the leading axes only does not follow the array contract. NumPy compares corresponding dimensions from right to left.",
+        "By variable name does not follow the array contract. NumPy compares corresponding dimensions from right to left.",
+        "By dtype width does not follow the array contract. NumPy compares corresponding dimensions from right to left."
+      ],
+      [
+        "When are two aligned dimensions compatible?",
+        "Equal or one is one",
+        "Only if both are equal",
+        "Only if both are even",
+        "If their sum is ten",
+        "A singleton dimension can expand conceptually while unequal nonsingleton dimensions conflict.",
+        "Only if both are equal does not follow the array contract. A singleton dimension can expand conceptually while unequal nonsingleton dimensions conflict.",
+        "Only if both are even does not follow the array contract. A singleton dimension can expand conceptually while unequal nonsingleton dimensions conflict.",
+        "If their sum is ten does not follow the array contract. A singleton dimension can expand conceptually while unequal nonsingleton dimensions conflict."
+      ],
+      [
+        "What shape results from (4, 1) plus (3,)?",
+        "(4, 3)",
+        "(4, 1)",
+        "(3, 4)",
+        "(7,)",
+        "The trailing dimensions expand to three and the leading singleton aligns to four.",
+        "(4, 1) does not follow the array contract. The trailing dimensions expand to three and the leading singleton aligns to four.",
+        "(3, 4) does not follow the array contract. The trailing dimensions expand to three and the leading singleton aligns to four.",
+        "(7,) does not follow the array contract. The trailing dimensions expand to three and the leading singleton aligns to four."
+      ],
+      [
+        "A matrix is (5, 2) and row offsets are (5,). What shape should row offsets use?",
+        "(5, 1)",
+        "(1, 5)",
+        "(2, 5)",
+        "(2,)",
+        "A singleton trailing dimension aligns one offset with every column of its own row.",
+        "(1, 5) does not follow the array contract. A singleton trailing dimension aligns one offset with every column of its own row.",
+        "(2, 5) does not follow the array contract. A singleton trailing dimension aligns one offset with every column of its own row.",
+        "(2,) does not follow the array contract. A singleton trailing dimension aligns one offset with every column of its own row."
+      ],
+      [
+        "A matrix is (5, 2). What shape fits a per-feature offset vector?",
+        "(2,)",
+        "(5,)",
+        "(5, 1)",
+        "(10,)",
+        "A two-item vector aligns with the two trailing feature positions.",
+        "(5,) does not follow the array contract. A two-item vector aligns with the two trailing feature positions.",
+        "(5, 1) does not follow the array contract. A two-item vector aligns with the two trailing feature positions.",
+        "(10,) does not follow the array contract. A two-item vector aligns with the two trailing feature positions."
+      ],
+      [
+        "A (10000, 1) column adds a (10000,) vector. What result size is implied?",
+        "100 million elements",
+        "Ten thousand elements",
+        "Twenty thousand elements",
+        "One scalar element",
+        "Broadcasting produces a two-dimensional 10000 by 10000 grid even though the inputs are small.",
+        "Ten thousand elements does not follow the array contract. Broadcasting produces a two-dimensional 10000 by 10000 grid even though the inputs are small.",
+        "Twenty thousand elements does not follow the array contract. Broadcasting produces a two-dimensional 10000 by 10000 grid even though the inputs are small.",
+        "One scalar element does not follow the array contract. Broadcasting produces a two-dimensional 10000 by 10000 grid even though the inputs are small."
+      ],
+      [
+        "An expression broadcasts successfully but applies the wrong customer's baseline. What was not proven?",
+        "Semantic entity alignment",
+        "Mechanical shape compatibility",
+        "Existence of the result",
+        "Validity of the syntax",
+        "Compatible shapes alone do not establish that the positions refer to the intended entities.",
+        "Mechanical shape compatibility does not follow the array contract. Compatible shapes alone do not establish that the positions refer to the intended entities.",
+        "Existence of the result does not follow the array contract. Compatible shapes alone do not establish that the positions refer to the intended entities.",
+        "Validity of the syntax does not follow the array contract. Compatible shapes alone do not establish that the positions refer to the intended entities."
+      ],
+      [
+        "An out-of-place sum expands to a new shape. Can an in-place target always do the same?",
+        "No, its storage shape constrains it",
+        "Yes, destinations always resize",
+        "Yes, dtype is irrelevant",
+        "Only if variable names match",
+        "In-place operations must fit the destination shape and casting contract rather than creating an arbitrary expanded output.",
+        "Yes, destinations always resize does not follow the array contract. In-place operations must fit the destination shape and casting contract rather than creating an arbitrary expanded output.",
+        "Yes, dtype is irrelevant does not follow the array contract. In-place operations must fit the destination shape and casting contract rather than creating an arbitrary expanded output.",
+        "Only if variable names match does not follow the array contract. In-place operations must fit the destination shape and casting contract rather than creating an arbitrary expanded output."
+      ]
+    ]
+  },
+  {
+    "slug": "axis-reductions",
+    "comp": "m2.c2",
+    "title": "Reduce the intended axes and retain dimensions when needed",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A training dataset has samples on rows and features on columns. A mean can summarize each feature, each sample or the entire dataset. Choosing the wrong axis can return a plausible number with the wrong interpretation.",
+    "sections": [
+      {
+        "heading": "An axis names what the reduction removes",
+        "paragraphs": [
+          "For shape (samples, features), mean(axis=0) reduces over samples and leaves one value per feature. mean(axis=1) reduces over features and leaves one value per sample. With no axis specified, a reduction such as sum or mean normally combines all elements into a scalar. Predict the output shape before assigning a business name to it.",
+          "keepdims=True retains reduced axes with length one. This makes it easier to broadcast a feature mean back across rows or a row mean across columns without accidentally aligning the wrong dimension. Multiple axes can be reduced with a tuple when a higher-dimensional axis contract requires it."
+        ]
+      },
+      {
+        "heading": "Keep reduction semantics visible",
+        "paragraphs": [
+          "Choose sum, mean, minimum, maximum or a count according to the question rather than using whichever returns the desired shape. Boolean masks can be counted by summing or count_nonzero under a clear validity definition. Reduction dtype and missing-value policy also matter and are treated in numerical-care lessons.",
+          "The fixture calculates feature means, row sums and centered features from an actual two-dimensional array. Matching centered means near zero checks one useful invariant for the example; it is not evidence that a machine-learning model was trained correctly."
+        ]
+      }
+    ],
+    "problem": "Compute feature summaries and center columns with retained axes.",
+    "code": "import numpy as np\na = np.array([[1.0, 10.0], [3.0, 20.0], [5.0, 30.0]])\nmeans = a.mean(axis=0, keepdims=True)\ncentered = a - means\nprint(means.shape, means.tolist())\nprint(a.sum(axis=1).tolist())\nprint(centered.mean(axis=0).tolist())\nprint(float(a.sum()))",
+    "expect": "(1, 2) [[3.0, 20.0]]\n[11.0, 23.0, 35.0]\n[0.0, 0.0]\n69.0",
+    "steps": [
+      "Reduce the sample axis while retaining it as a singleton.",
+      "Calculate a separate per-row sum.",
+      "Broadcast the feature mean back and check centered-column means."
+    ],
+    "limit": "The example verifies axis behavior on supplied complete data. It does not address fitting preprocessing only on training data, missingness, weighted averages or the correctness of a downstream model.",
+    "mistakes": [
+      "Interpreting axis zero as the output axis instead of the reduced axis.",
+      "Dropping a dimension and relying on accidental broadcasting."
+    ],
+    "takeaways": [
+      "Name the removed axis and predict the remaining shape.",
+      "Use keepdims to make later broadcasting explicit."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "For shape (samples, features), mean(axis=0) returns what?",
+        "One mean per feature",
+        "One mean per sample",
+        "Every original sample",
+        "Only the first row",
+        "Reducing axis zero combines samples and retains the feature dimension.",
+        "One mean per sample does not follow the array contract. Reducing axis zero combines samples and retains the feature dimension.",
+        "Every original sample does not follow the array contract. Reducing axis zero combines samples and retains the feature dimension.",
+        "Only the first row does not follow the array contract. Reducing axis zero combines samples and retains the feature dimension."
+      ],
+      [
+        "What does keepdims=True retain?",
+        "Reduced axes of length one",
+        "Every input value unchanged",
+        "Only the highest mean",
+        "The original dtype always",
+        "Keeping singleton reduced axes preserves a shape suitable for explicit broadcasting.",
+        "Every input value unchanged does not follow the array contract. Keeping singleton reduced axes preserves a shape suitable for explicit broadcasting.",
+        "Only the highest mean does not follow the array contract. Keeping singleton reduced axes preserves a shape suitable for explicit broadcasting.",
+        "The original dtype always does not follow the array contract. Keeping singleton reduced axes preserves a shape suitable for explicit broadcasting."
+      ],
+      [
+        "What does sum() without an axis normally combine?",
+        "All elements",
+        "Only the first axis entry",
+        "Only the last column",
+        "Only positive values",
+        "The default reduction covers the entire array unless an axis or selection changes the contract.",
+        "Only the first axis entry does not follow the array contract. The default reduction covers the entire array unless an axis or selection changes the contract.",
+        "Only the last column does not follow the array contract. The default reduction covers the entire array unless an axis or selection changes the contract.",
+        "Only positive values does not follow the array contract. The default reduction covers the entire array unless an axis or selection changes the contract."
+      ],
+      [
+        "A (6, 4) array is summed along axis 1. What shape remains?",
+        "(6,)",
+        "(4,)",
+        "(6, 1, 4)",
+        "(24,)",
+        "Reducing the four-position second axis leaves six per-row results.",
+        "(4,) does not follow the array contract. Reducing the four-position second axis leaves six per-row results.",
+        "(6, 1, 4) does not follow the array contract. Reducing the four-position second axis leaves six per-row results.",
+        "(24,) does not follow the array contract. Reducing the four-position second axis leaves six per-row results."
+      ],
+      [
+        "A feature mean from (6, 4) uses keepdims=True along axis 0. What shape results?",
+        "(1, 4)",
+        "(6, 1)",
+        "(4, 1)",
+        "(6, 4)",
+        "The reduced sample axis stays as length one while the four features remain.",
+        "(6, 1) does not follow the array contract. The reduced sample axis stays as length one while the four features remain.",
+        "(4, 1) does not follow the array contract. The reduced sample axis stays as length one while the four features remain.",
+        "(6, 4) does not follow the array contract. The reduced sample axis stays as length one while the four features remain."
+      ],
+      [
+        "A report needs total sales per store for rows=stores and columns=days. Which axis is reduced?",
+        "Axis one",
+        "Axis zero",
+        "No axis ever",
+        "The dtype axis",
+        "Combining days within each row reduces the day axis, which is axis one.",
+        "Axis zero does not follow the array contract. Combining days within each row reduces the day axis, which is axis one.",
+        "No axis ever does not follow the array contract. Combining days within each row reduces the day axis, which is axis one.",
+        "The dtype axis does not follow the array contract. Combining days within each row reduces the day axis, which is axis one."
+      ],
+      [
+        "A centered feature matrix has near-zero feature means. What does this support?",
+        "The local centering invariant",
+        "A universally correct model",
+        "No missing data anywhere",
+        "A full performance benchmark",
+        "The check supports the transformation on the given data, not all model or dataset properties.",
+        "A universally correct model does not follow the array contract. The check supports the transformation on the given data, not all model or dataset properties.",
+        "No missing data anywhere does not follow the array contract. The check supports the transformation on the given data, not all model or dataset properties.",
+        "A full performance benchmark does not follow the array contract. The check supports the transformation on the given data, not all model or dataset properties."
+      ],
+      [
+        "A team averages row means when rows have different valid counts. What should it examine?",
+        "The intended weighting policy",
+        "Only the array's name",
+        "Only terminal formatting",
+        "Only the feature title",
+        "An unweighted mean of group means can differ from a mean over all valid observations.",
+        "Only the array's name does not follow the array contract. An unweighted mean of group means can differ from a mean over all valid observations.",
+        "Only terminal formatting does not follow the array contract. An unweighted mean of group means can differ from a mean over all valid observations.",
+        "Only the feature title does not follow the array contract. An unweighted mean of group means can differ from a mean over all valid observations."
+      ]
+    ]
+  },
+  {
+    "slug": "dtype-range",
+    "comp": "m3.c1",
+    "title": "Choose dtypes for range casting and intermediate arithmetic",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A telemetry feed stores small integer values efficiently, but multiplying two readings in the same narrow dtype silently wraps the result. Correct numerical computing includes the intermediate representation, not just the printed final type.",
+    "sections": [
+      {
+        "heading": "Fixed-width storage has finite range",
+        "paragraphs": [
+          "NumPy integer dtypes such as int8, int16 and int64 have fixed-width ranges. Use iinfo to inspect integer limits and finfo for floating-point properties. Python integers and NumPy fixed-width arrays do not have identical overflow behavior. A valid input value can still produce an out-of-range intermediate result.",
+          "Choose a sufficiently wide dtype before arithmetic that needs it. Casting an already overflowed result to a wider dtype cannot reconstruct the lost value. Converting fractional floating-point values to integers also loses fractional information; make rounding and range requirements explicit rather than treating a cast as a validation step."
+        ]
+      },
+      {
+        "heading": "Separate storage efficiency from correctness",
+        "paragraphs": [
+          "A small dtype can reduce memory and I/O, but range and precision must meet the task. Mixed-type promotion rules and Python scalar interactions depend on operation and version; prefer explicit contracts and small boundary tests over assumptions that every operation widens safely. Object dtype may support arbitrary Python objects but changes the numerical performance and semantics.",
+          "The fixture demonstrates actual int8 array overflow during addition and avoids it by widening the operands first. No scalar-overflow warning is used as the acceptance mechanism. This example deliberately exposes a failure mode rather than recommending wrapped arithmetic for ordinary counts."
+        ]
+      }
+    ],
+    "problem": "Compare narrow arithmetic with widening before the calculation.",
+    "code": "import numpy as np\na = np.array([120], dtype=np.int8)\nb = np.array([20], dtype=np.int8)\nnarrow = a + b\nwide = a.astype(np.int16) + b.astype(np.int16)\nprint(narrow.tolist(), wide.tolist())\nprint(narrow.astype(np.int16).tolist())\nprint(np.iinfo(np.int8).min, np.iinfo(np.int8).max)",
+    "expect": "[-116] [140]\n[-116]\n-128 127",
+    "steps": [
+      "Perform the addition in the declared narrow integer dtype.",
+      "Widen the input arrays before repeating the arithmetic.",
+      "Compare with widening after overflow and inspect the dtype range."
+    ],
+    "limit": "Actual array overflow and casting are exercised under NumPy 2.3.5. The chosen range does not prescribe a universal dtype; real values, reductions and intermediate bounds need task-specific analysis.",
+    "mistakes": [
+      "Widening only after an overflowing intermediate.",
+      "Assuming fixed-width NumPy integers behave like arbitrary-precision Python integers."
+    ],
+    "takeaways": [
+      "Check ranges before arithmetic.",
+      "Treat casting and rounding as explicit data transformations."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "What does int8 specify?",
+        "A fixed-width integer dtype",
+        "An arbitrary-precision integer",
+        "An eight-axis array",
+        "A floating-point tolerance",
+        "int8 is an eight-bit signed integer representation with a finite range.",
+        "An arbitrary-precision integer does not follow the array contract. int8 is an eight-bit signed integer representation with a finite range.",
+        "An eight-axis array does not follow the array contract. int8 is an eight-bit signed integer representation with a finite range.",
+        "A floating-point tolerance does not follow the array contract. int8 is an eight-bit signed integer representation with a finite range."
+      ],
+      [
+        "Which function exposes integer dtype limits?",
+        "np.iinfo",
+        "np.reshape",
+        "np.isnan",
+        "np.transpose",
+        "iinfo reports the minimum and maximum values of an integer dtype.",
+        "np.reshape does not follow the array contract. iinfo reports the minimum and maximum values of an integer dtype.",
+        "np.isnan does not follow the array contract. iinfo reports the minimum and maximum values of an integer dtype.",
+        "np.transpose does not follow the array contract. iinfo reports the minimum and maximum values of an integer dtype."
+      ],
+      [
+        "Does casting an overflowed result recover the original exact value?",
+        "No, information was lost",
+        "Yes, every wider cast repairs it",
+        "Only if the array is one-dimensional",
+        "Only if the source had no NaN",
+        "A later widening preserves the already computed wrapped value rather than reconstructing the intended result.",
+        "Yes, every wider cast repairs it does not follow the array contract. A later widening preserves the already computed wrapped value rather than reconstructing the intended result.",
+        "Only if the array is one-dimensional does not follow the array contract. A later widening preserves the already computed wrapped value rather than reconstructing the intended result.",
+        "Only if the source had no NaN does not follow the array contract. A later widening preserves the already computed wrapped value rather than reconstructing the intended result."
+      ],
+      [
+        "A count may exceed 127 during addition. What can avoid int8 overflow?",
+        "Widen before arithmetic",
+        "Widen only after arithmetic",
+        "Rename the variable",
+        "Reshape to more columns",
+        "The intermediate must be representable in the dtype used when the arithmetic occurs.",
+        "Widen only after arithmetic does not follow the array contract. The intermediate must be representable in the dtype used when the arithmetic occurs.",
+        "Rename the variable does not follow the array contract. The intermediate must be representable in the dtype used when the arithmetic occurs.",
+        "Reshape to more columns does not follow the array contract. The intermediate must be representable in the dtype used when the arithmetic occurs."
+      ],
+      [
+        "A float 3.9 is cast to an integer. What must the team acknowledge?",
+        "Fractional information is lost",
+        "The result retains every fraction",
+        "The array becomes a string",
+        "The shape doubles",
+        "Integer conversion does not retain a fractional component and is not the same as a chosen rounding policy.",
+        "The result retains every fraction does not follow the array contract. Integer conversion does not retain a fractional component and is not the same as a chosen rounding policy.",
+        "The array becomes a string does not follow the array contract. Integer conversion does not retain a fractional component and is not the same as a chosen rounding policy.",
+        "The shape doubles does not follow the array contract. Integer conversion does not retain a fractional component and is not the same as a chosen rounding policy."
+      ],
+      [
+        "A memory optimization uses a smaller dtype. What must remain satisfied?",
+        "Range and precision requirements",
+        "Only shorter variable names",
+        "Only prettier printed arrays",
+        "Only the import count",
+        "Storage savings are valid only if numeric range and precision still meet the task.",
+        "Only shorter variable names does not follow the array contract. Storage savings are valid only if numeric range and precision still meet the task.",
+        "Only prettier printed arrays does not follow the array contract. Storage savings are valid only if numeric range and precision still meet the task.",
+        "Only the import count does not follow the array contract. Storage savings are valid only if numeric range and precision still meet the task."
+      ],
+      [
+        "Python integers handle a large value that a NumPy fixed-width array cannot. Why?",
+        "The representations differ",
+        "Python always stores int8",
+        "NumPy never supports integers",
+        "Array shape grants extra range",
+        "Python arbitrary-precision integers and fixed-width numeric arrays have different numeric bounds.",
+        "Python always stores int8 does not follow the array contract. Python arbitrary-precision integers and fixed-width numeric arrays have different numeric bounds.",
+        "NumPy never supports integers does not follow the array contract. Python arbitrary-precision integers and fixed-width numeric arrays have different numeric bounds.",
+        "Array shape grants extra range does not follow the array contract. Python arbitrary-precision integers and fixed-width numeric arrays have different numeric bounds."
+      ],
+      [
+        "A fixture shows wrapped array arithmetic. What is its educational purpose?",
+        "Expose a numerical hazard",
+        "Recommend wrapping all counts",
+        "Prove every dtype is unsafe",
+        "Measure production telemetry load",
+        "The demonstration identifies a bounded failure mode and a preventive dtype decision.",
+        "Recommend wrapping all counts does not follow the array contract. The demonstration identifies a bounded failure mode and a preventive dtype decision.",
+        "Prove every dtype is unsafe does not follow the array contract. The demonstration identifies a bounded failure mode and a preventive dtype decision.",
+        "Measure production telemetry load does not follow the array contract. The demonstration identifies a bounded failure mode and a preventive dtype decision."
+      ]
+    ]
+  },
+  {
+    "slug": "missing-values",
+    "comp": "m3.c1",
+    "title": "Handle NaN and nonfinite values with an explicit validity policy",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A monitoring array has one missing reading. Replacing it with zero makes totals easy to compute but changes the meaning of an average. Missingness and nonfinite values need a declared policy rather than a convenient arithmetic shortcut.",
+    "sections": [
+      {
+        "heading": "Detect the value class deliberately",
+        "paragraphs": [
+          "NaN is a floating-point marker used in many numerical missing-data workflows. It is not equal to itself, so use isnan rather than equality with np.nan. isfinite rejects both NaN and positive or negative infinity. An ordinary integer dtype cannot represent NaN directly; use a suitable representation rather than silently inventing a numeric sentinel without documentation.",
+          "Ordinary mean propagates NaN. nanmean ignores NaN values but does not mean ignore every invalid observation: infinities and domain-specific invalid codes need separate handling. All-NaN groups require an explicit outcome and can produce warnings and NaN results; detect them when that case matters rather than claiming every group has a valid average."
+        ]
+      },
+      {
+        "heading": "Preserve counts and business meaning",
+        "paragraphs": [
+          "Report valid counts alongside statistics where missingness affects interpretation. Zero is often a real measurement and must not silently substitute for absence. A finite value can still be out of physical range, while infinity can signal an overflow or a meaningful special result depending on the task. Define the validity mask in domain terms.",
+          "The fixture compares NaN propagation, NaN-aware averaging and an explicit finite-value mean with its count. It uses supplied data and does not establish a statistical missingness model, imputation policy or sensor quality standard."
+        ]
+      }
+    ],
+    "problem": "Compute a finite-value mean and distinguish NaN from infinity.",
+    "code": "import numpy as np\na = np.array([2.0, np.nan, 6.0, np.inf])\nfinite = np.isfinite(a)\nprint(np.isnan(a).tolist())\nprint(finite.tolist())\nprint(bool(np.isnan(np.mean(a))))\nprint(float(a[finite].mean()), int(finite.sum()))\nprint(float(np.nanmean(a)))",
+    "expect": "[False, True, False, False]\n[True, False, True, False]\nTrue\n4.0 2\ninf",
+    "steps": [
+      "Detect NaN separately from all nonfinite values.",
+      "Observe propagation through an ordinary mean.",
+      "Compute a mean under the declared finite mask and retain its count."
+    ],
+    "limit": "This tests actual NaN and infinity handling on one synthetic array. Ignoring nonfinite values is a declared example policy, not a universally valid imputation or statistical analysis method.",
+    "mistakes": [
+      "Using equality with NaN as a missingness test.",
+      "Assuming nanmean excludes infinity or solves every data-quality problem."
+    ],
+    "takeaways": [
+      "Define validity before reducing values.",
+      "Keep missingness distinct from a legitimate zero."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "How should code identify NaN elements?",
+        "np.isnan(a)",
+        "a == np.nan",
+        "a is np.nan",
+        "a == 0",
+        "NaN does not compare equal to itself; the dedicated elementwise predicate detects it.",
+        "a == np.nan does not follow the array contract. NaN does not compare equal to itself; the dedicated elementwise predicate detects it.",
+        "a is np.nan does not follow the array contract. NaN does not compare equal to itself; the dedicated elementwise predicate detects it.",
+        "a == 0 does not follow the array contract. NaN does not compare equal to itself; the dedicated elementwise predicate detects it."
+      ],
+      [
+        "Which predicate excludes both NaN and infinity?",
+        "np.isfinite",
+        "np.isnan alone",
+        "a > 0 alone",
+        "a != 0 alone",
+        "isfinite is true only for finite values, whereas isnan excludes only NaN.",
+        "np.isnan alone does not follow the array contract. isfinite is true only for finite values, whereas isnan excludes only NaN.",
+        "a > 0 alone does not follow the array contract. isfinite is true only for finite values, whereas isnan excludes only NaN.",
+        "a != 0 alone does not follow the array contract. isfinite is true only for finite values, whereas isnan excludes only NaN."
+      ],
+      [
+        "What does nanmean skip?",
+        "NaN values",
+        "Every nonfinite value",
+        "Every zero value",
+        "Every negative value",
+        "nanmean ignores NaN but infinity and domain-specific invalid values require separate policy.",
+        "Every nonfinite value does not follow the array contract. nanmean ignores NaN but infinity and domain-specific invalid values require separate policy.",
+        "Every zero value does not follow the array contract. nanmean ignores NaN but infinity and domain-specific invalid values require separate policy.",
+        "Every negative value does not follow the array contract. nanmean ignores NaN but infinity and domain-specific invalid values require separate policy."
+      ],
+      [
+        "A missing reading is replaced with zero before averaging. What changed?",
+        "The statistic's meaning",
+        "Only text formatting",
+        "Only axis numbering",
+        "Only the import path",
+        "Zero becomes an included measured value rather than absence, potentially changing the average.",
+        "Only text formatting does not follow the array contract. Zero becomes an included measured value rather than absence, potentially changing the average.",
+        "Only axis numbering does not follow the array contract. Zero becomes an included measured value rather than absence, potentially changing the average.",
+        "Only the import path does not follow the array contract. Zero becomes an included measured value rather than absence, potentially changing the average."
+      ],
+      [
+        "A group contains only NaN values. What is needed?",
+        "An explicit no-valid-data policy",
+        "A claim the mean is always zero",
+        "A claim every value is finite",
+        "A forced integer cast",
+        "An all-missing group has no valid mean under a skip-NaN policy and must be handled explicitly.",
+        "A claim the mean is always zero does not follow the array contract. An all-missing group has no valid mean under a skip-NaN policy and must be handled explicitly.",
+        "A claim every value is finite does not follow the array contract. An all-missing group has no valid mean under a skip-NaN policy and must be handled explicitly.",
+        "A forced integer cast does not follow the array contract. An all-missing group has no valid mean under a skip-NaN policy and must be handled explicitly."
+      ],
+      [
+        "A report uses finite values only. What count should accompany its mean?",
+        "The included valid count",
+        "Only the raw file byte count",
+        "Only the array's ndim",
+        "Only the dtype name length",
+        "The number of included observations helps interpret a statistic computed after exclusions.",
+        "Only the raw file byte count does not follow the array contract. The number of included observations helps interpret a statistic computed after exclusions.",
+        "Only the array's ndim does not follow the array contract. The number of included observations helps interpret a statistic computed after exclusions.",
+        "Only the dtype name length does not follow the array contract. The number of included observations helps interpret a statistic computed after exclusions."
+      ],
+      [
+        "An integer array needs missing values. What should be chosen?",
+        "A suitable missingness representation",
+        "Assume int8 stores NaN directly",
+        "Use a text label as arithmetic zero",
+        "Change only the array shape",
+        "The storage representation and mask must support the intended missingness policy.",
+        "Assume int8 stores NaN directly does not follow the array contract. The storage representation and mask must support the intended missingness policy.",
+        "Use a text label as arithmetic zero does not follow the array contract. The storage representation and mask must support the intended missingness policy.",
+        "Change only the array shape does not follow the array contract. The storage representation and mask must support the intended missingness policy."
+      ],
+      [
+        "A finite reading is physically impossible. What follows?",
+        "Domain validation is still needed",
+        "isfinite proves sensor validity",
+        "The value must be NaN",
+        "The dtype must be object",
+        "Finiteness is a numerical property, not a complete domain-validity test.",
+        "isfinite proves sensor validity does not follow the array contract. Finiteness is a numerical property, not a complete domain-validity test.",
+        "The value must be NaN does not follow the array contract. Finiteness is a numerical property, not a complete domain-validity test.",
+        "The dtype must be object does not follow the array contract. Finiteness is a numerical property, not a complete domain-validity test."
+      ]
+    ]
+  },
+  {
+    "slug": "float-comparisons",
+    "comp": "m3.c1",
+    "title": "Use floating-point tolerances that match the task",
+    "before": "Complete Python Fundamentals. Review sequences, numeric expressions and zero-based indexing. NumPy arrays have explicit shape and dtype contracts that Python lists do not provide.",
+    "intro": "A reconciliation check fails because a computed total differs from its expected value by a tiny rounding amount. Replacing every equality with a broad tolerance may hide real errors. Numerical tolerance is part of the acceptance specification.",
+    "sections": [
+      {
+        "heading": "Binary floating point approximates many decimal fractions",
+        "paragraphs": [
+          "Floating-point formats represent a finite set of values. Operations can introduce rounding and the order of a reduction can affect results. Expressions such as 0.1 + 0.2 need not equal 0.3 bit for bit. Greater precision can reduce some errors but cannot make every decimal fraction exactly representable or remove the need for algorithmic care.",
+          "Use isclose or allclose when approximate comparison is appropriate, with chosen absolute and relative tolerances. In NumPy the common comparison uses absolute difference against atol plus rtol times the absolute reference value, so the reference scale matters. A default tolerance may be unsuitable near zero, for strict engineering limits or for exact accounting."
+        ]
+      },
+      {
+        "heading": "Choose tolerances from requirements",
+        "paragraphs": [
+          "Absolute tolerance describes an allowed error floor in the value units; relative tolerance scales with the reference magnitude. NaN equality is a separate policy and should not be enabled merely to make tests pass. Compare exact integer or identifier data exactly when exactness is the real requirement. Financial systems may require integer minor units or decimal arithmetic under a specified rounding policy.",
+          "The fixture contrasts exact and approximate comparisons using explicit tolerances, then shows why a generous absolute tolerance can accept a small but meaningful near-zero error. It verifies actual NumPy behavior without prescribing universal tolerances for every domain."
+        ]
+      }
+    ],
+    "problem": "Compare floating-point results under explicit absolute and relative tolerances.",
+    "code": "import numpy as np\na = np.array([0.1 + 0.2])\nb = np.array([0.3])\nprint(bool((a == b)[0]))\nprint(bool(np.allclose(a, b, rtol=0.0, atol=1e-12)))\nprint(bool(np.isclose(1e-9, 0.0, rtol=0.0, atol=1e-8)))\nprint(bool(np.isclose(1e-9, 0.0, rtol=0.0, atol=1e-12)))",
+    "expect": "False\nTrue\nTrue\nFalse",
+    "steps": [
+      "Observe a binary floating-point exact comparison.",
+      "Apply a deliberately small absolute tolerance to the known rounding case.",
+      "Compare two tolerances near zero and interpret the acceptance difference."
+    ],
+    "limit": "The example demonstrates comparison mechanics on supplied scalars and arrays. It does not choose tolerances for finance, engineering safety or every numerical algorithm; those require explicit domain error budgets.",
+    "mistakes": [
+      "Assuming more decimal display digits mean exact arithmetic.",
+      "Using a broad default tolerance to hide an unexplained discrepancy."
+    ],
+    "takeaways": [
+      "Set absolute and relative tolerances deliberately.",
+      "Use exact arithmetic contracts where the task requires exact values."
+    ],
+    "refs": [
+      "numpy-quickstart",
+      "numpy-indexing",
+      "numpy-copies",
+      "numpy-broadcasting",
+      "numpy-types"
+    ],
+    "questions": [
+      [
+        "Why can 0.1 + 0.2 differ from 0.3 exactly?",
+        "Binary representation rounds",
+        "NumPy changes decimal syntax",
+        "The array has too many axes",
+        "Python always uses integers",
+        "Many decimal fractions are not exactly representable in binary floating point.",
+        "NumPy changes decimal syntax does not follow the array contract. Many decimal fractions are not exactly representable in binary floating point.",
+        "The array has too many axes does not follow the array contract. Many decimal fractions are not exactly representable in binary floating point.",
+        "Python always uses integers does not follow the array contract. Many decimal fractions are not exactly representable in binary floating point."
+      ],
+      [
+        "What does absolute tolerance express?",
+        "An error allowance in value units",
+        "An extra array axis",
+        "A guaranteed percentage only",
+        "A source of missing values",
+        "Absolute tolerance provides a scale-independent floor in the units of the compared values.",
+        "An extra array axis does not follow the array contract. Absolute tolerance provides a scale-independent floor in the units of the compared values.",
+        "A guaranteed percentage only does not follow the array contract. Absolute tolerance provides a scale-independent floor in the units of the compared values.",
+        "A source of missing values does not follow the array contract. Absolute tolerance provides a scale-independent floor in the units of the compared values."
+      ],
+      [
+        "What does relative tolerance scale with in NumPy's reference comparison?",
+        "The reference magnitude",
+        "Only array element count",
+        "Only the dtype name length",
+        "Only the number of axes",
+        "The standard formula includes rtol times the absolute reference value.",
+        "Only array element count does not follow the array contract. The standard formula includes rtol times the absolute reference value.",
+        "Only the dtype name length does not follow the array contract. The standard formula includes rtol times the absolute reference value.",
+        "Only the number of axes does not follow the array contract. The standard formula includes rtol times the absolute reference value."
+      ],
+      [
+        "A near-zero error matters at 1e-10, but atol is 1e-6. What is the risk?",
+        "Meaningful errors pass",
+        "Every value becomes exact",
+        "The result becomes integer",
+        "NaN is automatically removed",
+        "An overly broad absolute tolerance can accept differences larger than the domain permits.",
+        "Every value becomes exact does not follow the array contract. An overly broad absolute tolerance can accept differences larger than the domain permits.",
+        "The result becomes integer does not follow the array contract. An overly broad absolute tolerance can accept differences larger than the domain permits.",
+        "NaN is automatically removed does not follow the array contract. An overly broad absolute tolerance can accept differences larger than the domain permits."
+      ],
+      [
+        "A team compares transaction ids with allclose. What should it reconsider?",
+        "Exactness of identifiers",
+        "Only output formatting",
+        "Only the array's title",
+        "Only the Python version string",
+        "Identifiers have an exact equality contract rather than a numerical error budget.",
+        "Only output formatting does not follow the array contract. Identifiers have an exact equality contract rather than a numerical error budget.",
+        "Only the array's title does not follow the array contract. Identifiers have an exact equality contract rather than a numerical error budget.",
+        "Only the Python version string does not follow the array contract. Identifiers have an exact equality contract rather than a numerical error budget."
+      ],
+      [
+        "A display rounds two different results to 0.30. What does that prove?",
+        "Only their displayed rounding",
+        "Exact stored-value equality",
+        "Identical accumulation history",
+        "Guaranteed financial correctness",
+        "Formatting can hide representational differences and does not establish exact equality.",
+        "Exact stored-value equality does not follow the array contract. Formatting can hide representational differences and does not establish exact equality.",
+        "Identical accumulation history does not follow the array contract. Formatting can hide representational differences and does not establish exact equality.",
+        "Guaranteed financial correctness does not follow the array contract. Formatting can hide representational differences and does not establish exact equality."
+      ],
+      [
+        "A float64 calculation is more precise than float32. Does that ensure exact decimal arithmetic?",
+        "No, representation is still finite",
+        "Yes, all decimals become exact",
+        "Only if shape is square",
+        "Only with a transpose",
+        "More precision expands available values but does not represent every decimal fraction exactly.",
+        "Yes, all decimals become exact does not follow the array contract. More precision expands available values but does not represent every decimal fraction exactly.",
+        "Only if shape is square does not follow the array contract. More precision expands available values but does not represent every decimal fraction exactly.",
+        "Only with a transpose does not follow the array contract. More precision expands available values but does not represent every decimal fraction exactly."
+      ],
+      [
+        "An approximate comparison passes after tolerance is enlarged without investigation. What remains needed?",
+        "A justified domain error budget",
+        "Only a longer variable name",
+        "Only another printed digit",
+        "Only a renamed test function",
+        "Tolerance should follow requirements and understood error sources rather than merely make a failing check pass.",
+        "Only a longer variable name does not follow the array contract. Tolerance should follow requirements and understood error sources rather than merely make a failing check pass.",
+        "Only another printed digit does not follow the array contract. Tolerance should follow requirements and understood error sources rather than merely make a failing check pass.",
+        "Only a renamed test function does not follow the array contract. Tolerance should follow requirements and understood error sources rather than merely make a failing check pass."
+      ]
+    ]
+  }
+],[
+  {
+    "id": "numpy-quickstart",
+    "title": "NumPy 2.3.5: Quickstart",
+    "url": "https://github.com/numpy/numpy/blob/c3d60fc8393f3ca3306b8ce8b6453d43737e3d90/doc/source/user/quickstart.rst",
+    "source": {
+      "repo": "numpy/numpy",
+      "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
+      "path": "doc/source/user/quickstart.rst",
+      "verification": "Official v2.3.5 source read, pinned to the dereferenced release commit matching installed NumPy 2.3.5. Worked examples import actual NumPy in the isolated python-pandas profile; small synthetic fixtures verify operation behavior, not universal performance or domain data quality."
+    }
+  },
+  {
+    "id": "numpy-indexing",
+    "title": "NumPy 2.3.5: Indexing",
+    "url": "https://github.com/numpy/numpy/blob/c3d60fc8393f3ca3306b8ce8b6453d43737e3d90/doc/source/user/basics.indexing.rst",
+    "source": {
+      "repo": "numpy/numpy",
+      "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
+      "path": "doc/source/user/basics.indexing.rst",
+      "verification": "Official v2.3.5 source read, pinned to the dereferenced release commit matching installed NumPy 2.3.5. Worked examples import actual NumPy in the isolated python-pandas profile; small synthetic fixtures verify operation behavior, not universal performance or domain data quality."
+    }
+  },
+  {
+    "id": "numpy-copies",
+    "title": "NumPy 2.3.5: Copies and views",
+    "url": "https://github.com/numpy/numpy/blob/c3d60fc8393f3ca3306b8ce8b6453d43737e3d90/doc/source/user/basics.copies.rst",
+    "source": {
+      "repo": "numpy/numpy",
+      "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
+      "path": "doc/source/user/basics.copies.rst",
+      "verification": "Official v2.3.5 source read, pinned to the dereferenced release commit matching installed NumPy 2.3.5. Worked examples import actual NumPy in the isolated python-pandas profile; small synthetic fixtures verify operation behavior, not universal performance or domain data quality."
+    }
+  },
+  {
+    "id": "numpy-broadcasting",
+    "title": "NumPy 2.3.5: Broadcasting",
+    "url": "https://github.com/numpy/numpy/blob/c3d60fc8393f3ca3306b8ce8b6453d43737e3d90/doc/source/user/basics.broadcasting.rst",
+    "source": {
+      "repo": "numpy/numpy",
+      "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
+      "path": "doc/source/user/basics.broadcasting.rst",
+      "verification": "Official v2.3.5 source read, pinned to the dereferenced release commit matching installed NumPy 2.3.5. Worked examples import actual NumPy in the isolated python-pandas profile; small synthetic fixtures verify operation behavior, not universal performance or domain data quality."
+    }
+  },
+  {
+    "id": "numpy-types",
+    "title": "NumPy 2.3.5: Data types and numerical precision",
+    "url": "https://github.com/numpy/numpy/blob/c3d60fc8393f3ca3306b8ce8b6453d43737e3d90/doc/source/user/basics.types.rst",
+    "source": {
+      "repo": "numpy/numpy",
+      "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
+      "path": "doc/source/user/basics.types.rst",
+      "verification": "Official v2.3.5 source read, pinned to the dereferenced release commit matching installed NumPy 2.3.5. Worked examples import actual NumPy in the isolated python-pandas profile; small synthetic fixtures verify operation behavior, not universal performance or domain data quality."
+    }
+  }
+]);
+for(const lesson of module.exports.lessons) lesson.worked.lang='python-pandas';
+module.exports.references=module.exports.references.filter(ref=>ref.id.startsWith('numpy-'));

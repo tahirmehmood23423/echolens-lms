@@ -1,0 +1,1039 @@
+'use strict';
+const {bank}=require('../../learning/wave1/web-helper');
+module.exports=bank('react-fundamentals',[
+  {
+    "comp": "m1.c1",
+    "rows": [
+      [
+        "What does a component function primarily describe?",
+        "UI for its current inputs",
+        "A universal database transaction",
+        "An authenticated server role",
+        "A guaranteed browser screenshot",
+        "Components compute renderable content from props and state under the render contract.",
+        "No transaction is implied.",
+        "Client components do not establish server authority.",
+        "Rendered output still depends on the actual environment."
+      ],
+      [
+        "Which JSX expression delays save until a click handler runs?",
+        "onClick={() => save(id)}",
+        "onClick={save(id)}",
+        "onClick={save()}",
+        "onClick={alert(\"saved\")}",
+        "The wrapper function defers its body until invoked as a handler.",
+        "The call executes during evaluation.",
+        "The call executes during evaluation.",
+        "Alert runs during evaluation."
+      ],
+      [
+        "How should a parent-provided object prop be treated?",
+        "As read-only input",
+        "As an owned mutable scratchpad",
+        "As trusted permission evidence",
+        "As a runtime validator",
+        "The child should request changes through the owner rather than mutate the prop.",
+        "The parent owns that input state.",
+        "Props can be client controlled.",
+        "An object is not a validator."
+      ],
+      [
+        "A billing card submits a charge while rendering its JSX label. What is the defect?",
+        "An irreversible render effect",
+        "Only a short component name",
+        "Only a missing CSS class",
+        "Only a string interpolation",
+        "Rendering can repeat or be discarded and should not initiate that charge.",
+        "Naming does not fix the side effect.",
+        "Styling is unrelated.",
+        "Interpolation can be pure; the charge is the issue."
+      ],
+      [
+        "A course card receives a title containing markup-shaped text. Which default behavior should it rely on for ordinary text children?",
+        "React text escaping",
+        "Automatic raw HTML parsing",
+        "Automatic script execution",
+        "Server permission inheritance",
+        "React renders ordinary string children as escaped text.",
+        "Raw HTML needs a separate explicit API boundary.",
+        "Text children are not executed as code.",
+        "Rendering does not inherit backend authority."
+      ],
+      [
+        "A UI passes a plain object as a visible child and React reports an error. What should the developer select?",
+        "The intended renderable content",
+        "Only a broader type assertion",
+        "Only a larger object literal",
+        "Only a different object name",
+        "Choose the intended field or React element rather than rendering an arbitrary object directly.",
+        "Assertions do not change runtime renderability.",
+        "Size does not make it renderable.",
+        "Names do not transform content."
+      ],
+      [
+        "A JSX build succeeds without importing React solely for syntax. What explains a valid setup?",
+        "The configured modern JSX transform",
+        "A browser executing JSX directly",
+        "TypeScript creating all components",
+        "CSS compiling the JSX",
+        "The modern JSX transform can avoid that import requirement while still requiring proper tooling.",
+        "Browsers do not generally execute untransformed JSX.",
+        "Types do not invent component behavior.",
+        "CSS does not compile JSX."
+      ],
+      [
+        "A child needs to display nested caller content inside a panel. Which API may fit?",
+        "The children prop",
+        "Mutating parent DOM globally",
+        "A new server cookie",
+        "A random list key",
+        "Children can express nested content in a composed component API.",
+        "Global mutation bypasses the declarative owner.",
+        "Cookies are unrelated.",
+        "Keys encode identity rather than nested content."
+      ],
+      [
+        "A frontend sends a protected request because its Card prop says canEdit. What must the server do?",
+        "Authorize the authenticated actor",
+        "Only trust the supplied boolean",
+        "Only inspect component spelling",
+        "Only check JSX formatting",
+        "Client UI permission hints cannot replace server access control.",
+        "The client can be modified.",
+        "Names are not authority.",
+        "Formatting is unrelated."
+      ],
+      [
+        "An SSR test verifies escaped card text and the team claims all browser interaction passed. What is the missing boundary?",
+        "Mounted client behavior",
+        "The produced static string",
+        "The escaped title characters",
+        "Actual server-rendering calls",
+        "Server markup does not exercise client events, state, focus or hydration.",
+        "The string can be verified.",
+        "The escape result is observable.",
+        "The renderer actually ran."
+      ]
+    ]
+  },
+  {
+    "comp": "m1.c2",
+    "rows": [
+      [
+        "What scope requires list keys to be unique?",
+        "The relevant sibling list",
+        "Every element on the internet",
+        "Every file in the repository",
+        "Every database across all apps",
+        "Keys identify items among siblings during React reconciliation.",
+        "Global internet uniqueness is not required.",
+        "Source files are not the key scope.",
+        "Database-wide uniqueness is a different constraint."
+      ],
+      [
+        "Why avoid random keys generated during render?",
+        "They change item identity",
+        "They validate every list item",
+        "They guarantee no rerenders",
+        "They automatically sort data",
+        "Changing keys can make React remount items instead of preserving their state.",
+        "Keys do not validate domain values.",
+        "Unstable keys can increase work.",
+        "Keys are not a sorting algorithm."
+      ],
+      [
+        "Is key automatically available as a normal child prop?",
+        "No",
+        "Yes, always",
+        "Only for numeric keys",
+        "Only in production",
+        "Pass an explicit id prop if the child needs the identifier; key is special metadata.",
+        "It is not an ordinary prop.",
+        "Numeric values do not alter this contract.",
+        "The rule is not production-only."
+      ],
+      [
+        "A sortable task editor uses indices and local drafts follow the wrong record. Which change addresses identity?",
+        "Use stable task identifiers",
+        "Only sort the input again",
+        "Only assign random keys",
+        "Only move the stylesheet",
+        "Stable data ids associate local state with the same record across reordering.",
+        "More sorting preserves positional ambiguity.",
+        "Random keys discard stability.",
+        "Styles do not identify records."
+      ],
+      [
+        "A badge condition uses results.length && element and displays zero. What is a precise fix?",
+        "Check results.length > 0",
+        "Only use a different key",
+        "Only rename results",
+        "Only disable list warnings",
+        "An explicit boolean condition avoids returning numeric zero as a child.",
+        "Keys do not change expression evaluation.",
+        "Names are irrelevant.",
+        "Warnings do not remove the value."
+      ],
+      [
+        "A server list renders correctly but later client insertion loses a row’s typed draft. What test is needed?",
+        "Client identity preservation",
+        "Only another SSR snapshot",
+        "Only a longer list title",
+        "Only server JSON parsing",
+        "The failure involves live client reconciliation and local state across an insertion.",
+        "Static markup does not perform the transition.",
+        "Titles do not test identity.",
+        "Parsing does not mount rows."
+      ],
+      [
+        "Two sibling rows share an id from a faulty import. What should engineers correct?",
+        "The key uniqueness problem",
+        "Only the text color",
+        "Only the useEffect delay",
+        "Only the component filename",
+        "Duplicate sibling keys undermine unambiguous item identity and may reflect a data issue.",
+        "Color does not distinguish identity for React.",
+        "Effect timing is unrelated.",
+        "Filenames do not fix duplicate data."
+      ],
+      [
+        "A genuinely static decorative list never changes or holds local state. How should an index-key decision be assessed?",
+        "Against those actual constraints",
+        "As always forbidden by syntax",
+        "As permission to use indices everywhere",
+        "As a server authorization design",
+        "Index keys are a context-sensitive choice; the stated static constraints differ from editable reorderable data.",
+        "Index keys are valid syntax.",
+        "The exception does not generalize to dynamic lists.",
+        "Keys do not authorize."
+      ],
+      [
+        "A list item needs its domain id to submit an action. The parent supplied only key. What should the parent add?",
+        "An explicit id prop",
+        "Only a data type alias",
+        "Only a random key suffix",
+        "Only a Fragment wrapper",
+        "The child does not receive key as an ordinary prop, so pass the needed id separately.",
+        "A type alias does not supply runtime data.",
+        "Randomness does not pass the id.",
+        "A wrapper does not create the prop."
+      ],
+      [
+        "A result screen treats pending, failed and successful-empty as one no-data view. What product meaning was lost?",
+        "Distinct request outcomes",
+        "Only the key’s data type",
+        "Only the browser logo",
+        "Only the title’s font size",
+        "A user must not be told a search is empty when it has not completed successfully.",
+        "Key types are a separate issue.",
+        "Branding does not define outcomes.",
+        "Typography does not establish result truth."
+      ]
+    ]
+  },
+  {
+    "comp": "m2.c1",
+    "rows": [
+      [
+        "What does a state setter do to an existing handler’s captured local value?",
+        "It does not rewrite that snapshot",
+        "It changes it synchronously inline",
+        "It turns it into a live ref",
+        "It fetches the server value",
+        "The handler retains the state value from its render while updates are requested.",
+        "Setters do not rewrite captured locals.",
+        "State is not automatically a ref.",
+        "No server request is implied."
+      ],
+      [
+        "Which state update can build on a pending previous value?",
+        "A functional updater",
+        "Mutating the closed-over variable",
+        "Changing an incoming prop",
+        "Calling JSON.stringify",
+        "A pure updater receives the pending prior value used for the calculation.",
+        "Local mutation does not express the queued update.",
+        "Props should not be mutated.",
+        "Serialization does not update state."
+      ],
+      [
+        "Should updater functions perform network mutations?",
+        "No",
+        "Yes, to guarantee exactly once",
+        "Only in development",
+        "Only when the new value is numeric",
+        "Updaters should be pure and may be invoked again during checks.",
+        "They do not guarantee exactly-once side effects.",
+        "Development is where stress checks can reveal impurities.",
+        "Value type does not justify side effects."
+      ],
+      [
+        "A click queues three setScore(score + 1) calls from score five. Why does that not mean eight?",
+        "Each call uses one rendered score",
+        "Every setter increments automatically",
+        "React forbids multiple updates",
+        "JavaScript ignores the second call",
+        "Each replacement expression evaluates from the same captured value, six.",
+        "Setters take requested values or updater functions.",
+        "Multiple updates are supported.",
+        "The calls occur; their requested values matter."
+      ],
+      [
+        "A click must add three reliably based on pending state. What expression fits?",
+        "setScore(n => n + 3)",
+        "score += 3 with no setter",
+        "props.score += 3",
+        "setScore(score) three times",
+        "The updater expresses a calculation from the pending previous value.",
+        "Direct local mutation does not request the intended state update.",
+        "Props mutation violates ownership.",
+        "Repeating the old value does not increment."
+      ],
+      [
+        "A component calls useState inside a branch that changes between renders. What rule is violated?",
+        "Stable hook call ordering",
+        "Only HTML nesting",
+        "Only the CSS cascade",
+        "Only fetch response parsing",
+        "Hooks must follow the top-level ordering rules in components or custom hooks.",
+        "Markup may be unrelated.",
+        "Styles do not determine hook order.",
+        "Parsing is a different concern."
+      ],
+      [
+        "A counter changes its key every render and keeps resetting. What does the key affect?",
+        "Component identity and state",
+        "Only the displayed text",
+        "Only server session expiry",
+        "Only a function’s numeric result",
+        "New identity can cause React to replace the component and reset its state.",
+        "Keys are not merely labels.",
+        "No session change follows.",
+        "Keys do not compute arithmetic."
+      ],
+      [
+        "A state setter is awaited as if it returned a render-completion promise. What assumption is wrong?",
+        "Setters are not that promise API",
+        "Await guarantees the browser painted",
+        "Setters always return fetched data",
+        "Every update starts a transaction",
+        "UseState setters do not provide a promise that resolves after commit.",
+        "Awaiting undefined does not prove painting.",
+        "No data fetch is implied.",
+        "State updates are not database transactions."
+      ],
+      [
+        "A pure model reduces three increment functions to three. What does it establish?",
+        "The modeled value composition",
+        "Actual React batching timings",
+        "A browser click dispatch",
+        "A committed render count",
+        "The JavaScript algebra is executed, but the actual renderer’s queue is not.",
+        "No renderer scheduling runs.",
+        "No DOM event runs.",
+        "No client commit occurs."
+      ],
+      [
+        "A team sends analytics inside an updater and development reports doubles. What should it change?",
+        "Move effects out of the updater",
+        "Only disable all development checks",
+        "Only change the analytics label",
+        "Only wrap the request in any",
+        "The updater calculation should remain pure under repeated checking.",
+        "Suppression hides the impurity.",
+        "Names do not remove effects.",
+        "Types do not change execution."
+      ]
+    ]
+  },
+  {
+    "comp": "m2.c1",
+    "rows": [
+      [
+        "What does spreading an object provide by default?",
+        "A shallow property copy",
+        "A deep independent graph",
+        "A cloned browser document",
+        "A server-side transaction",
+        "Spread copies properties while nested reference values remain shared.",
+        "It does not recursively clone.",
+        "DOM cloning is unrelated.",
+        "No transaction follows."
+      ],
+      [
+        "Which method returns a new selected array rather than removing in place?",
+        "filter",
+        "splice",
+        "pop",
+        "reverse",
+        "Filter selects elements into a new array without mutating the original array.",
+        "Splice mutates.",
+        "Pop mutates.",
+        "Reverse mutates."
+      ],
+      [
+        "What can stay identical when only one list record changes immutably?",
+        "Unchanged record references",
+        "Every changed record reference",
+        "The outer array necessarily",
+        "Every nested record always",
+        "A precise update can reuse unchanged members while replacing the changed path.",
+        "The changed record generally needs a new value.",
+        "A new array is ordinarily constructed for this update.",
+        "Changed nested paths may need copying."
+      ],
+      [
+        "A goal editor copies an array then changes copied[0].done directly. What is still shared?",
+        "The nested record object",
+        "Only the numeric length",
+        "A freshly deep-cloned record",
+        "Only the map function",
+        "An array copy is shallow, so its element objects can still alias the prior state.",
+        "Length is not the mutable record.",
+        "No deep clone occurred.",
+        "Function identity is not the issue."
+      ],
+      [
+        "A roster calls sort on its state array before rendering. What should it avoid?",
+        "Mutating the prior snapshot",
+        "Only alphabetical text",
+        "Only a copied temporary array",
+        "Only stable item ids",
+        "Sort mutates its receiver, so use a deliberate nonmutating approach or an actual copy.",
+        "Alphabetic order may be intended.",
+        "A copy can be appropriate.",
+        "Stable ids are useful."
+      ],
+      [
+        "A reducer replaces one record using its id and preserves all others. What should it also preserve?",
+        "Unchanged field values",
+        "Random keys for every row",
+        "Deleted unrelated records",
+        "A false server success flag",
+        "A precise update should not corrupt unrelated data while changing the intended record.",
+        "Random identity is harmful.",
+        "Deletion is outside the intended change.",
+        "State edits do not prove server success."
+      ],
+      [
+        "A deep-clone-on-every-edit strategy makes typing slower. What is a better investigation?",
+        "Measure and copy changed paths",
+        "Only clone twice as often",
+        "Only randomize all keys",
+        "Only suppress every render",
+        "Broad cloning can add work and discard useful reference identity; measure and update deliberately.",
+        "More cloning can worsen cost.",
+        "Random keys add instability.",
+        "Suppressing rendering breaks interaction."
+      ],
+      [
+        "A component modifies an object retained by a previous render. What conceptual guarantee was broken?",
+        "Snapshot consistency",
+        "Only CSS inheritance",
+        "Only HTTP content negotiation",
+        "Only source-map paths",
+        "Prior render values should not be mutated behind readers that still reference them.",
+        "Styling is unrelated.",
+        "HTTP representation choice is separate.",
+        "Debugging paths do not control object identity."
+      ],
+      [
+        "A nonmutating array transformation passes tests. What claim still needs a renderer test?",
+        "The actual component update",
+        "The returned array values",
+        "The reference comparisons",
+        "The pure function’s output",
+        "Transformation tests do not invoke React state setters or reconciliation.",
+        "Those are observed directly.",
+        "Those can execute in the fixture.",
+        "That is exactly what the function test covers."
+      ],
+      [
+        "A shallow copy changes one nested branch but another branch shares the same object intentionally. What should design review trace?",
+        "Aliasing and intended ownership",
+        "Only property name lengths",
+        "Only array index formatting",
+        "Only the source extension",
+        "Shared references can make apparently local edits affect other views; reason about the data graph.",
+        "Names do not reveal all aliases.",
+        "Formatting is unrelated.",
+        "Extensions do not constrain references."
+      ]
+    ]
+  },
+  {
+    "comp": "m2.c2",
+    "rows": [
+      [
+        "What does lifting state aim to provide for shared data?",
+        "One appropriate source of truth",
+        "A global store for every value",
+        "An automatic server cache",
+        "A permission token",
+        "A common owner can keep dependent views consistent through values and callbacks.",
+        "Not all state must become global.",
+        "Caching is separate.",
+        "UI state is not authority."
+      ],
+      [
+        "How should a controlled child request a parent-owned value change?",
+        "Through a callback prop",
+        "By mutating the parent object",
+        "By editing a server cookie",
+        "By changing a list key randomly",
+        "The parent owns applying the requested transition according to its rules.",
+        "Mutation bypasses ownership.",
+        "Cookies do not express the intended UI callback.",
+        "Random keys reset identity rather than update the value."
+      ],
+      [
+        "Must every temporary local value be lifted to the application root?",
+        "No",
+        "Yes, all values always",
+        "Only text values",
+        "Only numeric values",
+        "Ownership should match the actual sharing and lifecycle needs.",
+        "Globalizing everything is unnecessary.",
+        "The rule is not based on primitive type.",
+        "The rule is not based on numeric values."
+      ],
+      [
+        "A filter and results panel each maintain separate copies of one category and drift. What should own it?",
+        "Their suitable common ancestor",
+        "Only the results DOM node",
+        "Only two more local copies",
+        "Only a random module variable",
+        "A common owner can pass one current value to both and apply their requests consistently.",
+        "DOM ownership is not the React data model.",
+        "More copies add synchronization risk.",
+        "An arbitrary global obscures lifecycle and isolation."
+      ],
+      [
+        "An editor initializes local draft from props and intentionally allows divergence. What must it define?",
+        "Draft commit and reset policy",
+        "Only the draft variable spelling",
+        "Only a larger form border",
+        "Only the import order",
+        "Separate draft state is legitimate when its synchronization, reset and save behavior are explicit.",
+        "Names alone do not define behavior.",
+        "Borders do not manage lifecycle.",
+        "Imports do not define commit rules."
+      ],
+      [
+        "A child callback can update a displayed user role. What must remain independent on the server?",
+        "Access-control enforcement",
+        "Only the displayed badge",
+        "Only the prop’s casing",
+        "Only the callback’s name",
+        "UI ownership and callback flow cannot grant backend permission.",
+        "Badges are presentation.",
+        "Case is not authority.",
+        "Names do not authorize."
+      ],
+      [
+        "A parent passes value but no update callback to an editable child. What needs clarification?",
+        "The edit request path",
+        "Only a longer value string",
+        "Only a new CSS variable",
+        "Only JSON indentation",
+        "The child needs a defined way to request changes if the input is meant to be editable.",
+        "Length does not define ownership.",
+        "CSS is unrelated.",
+        "Formatting does not enable updates."
+      ],
+      [
+        "A common owner stores both selectedId and a separately mirrored selectedRecord that becomes stale. What may simplify it?",
+        "Derive the record from the id",
+        "Add a third mirrored value",
+        "Only rename both fields",
+        "Only disable effects",
+        "Avoid redundant state when one value can be computed from authoritative current data.",
+        "More copies add drift.",
+        "Names do not synchronize fields.",
+        "Disabling effects alone does not fix modeling."
+      ],
+      [
+        "A form changes accounts while retaining a private draft. What must the owner consider?",
+        "Account-bound draft lifecycle",
+        "Only label capitalization",
+        "Only file extension",
+        "Only input width",
+        "Shared ownership still requires privacy and reset behavior across identity transitions.",
+        "Labels do not isolate users.",
+        "Extensions are unrelated.",
+        "Width does not protect drafts."
+      ],
+      [
+        "A synchronous owner model updates two view objects from one value. What is its evidentiary limit?",
+        "It does not mount React",
+        "It proves every callback event",
+        "It proves browser accessibility",
+        "It proves server authorization",
+        "The model traces data ownership without actual component interaction or renderer scheduling.",
+        "No browser callback is dispatched.",
+        "No accessible tree is exercised.",
+        "No server checks run."
+      ]
+    ]
+  },
+  {
+    "comp": "m3.c1",
+    "rows": [
+      [
+        "What does an effect dependency list describe?",
+        "Reactive inputs used by setup",
+        "Only desired rerun frequency",
+        "Every possible global value",
+        "Only the component filename",
+        "Dependencies must match reactive reads that define synchronization, rather than a preferred arbitrary schedule.",
+        "Omitting inputs to control frequency can create stale effects.",
+        "Not every global is reactive.",
+        "File names are unrelated."
+      ],
+      [
+        "When dependencies change, what is the normal cleanup/setup relationship?",
+        "Prior cleanup before new setup",
+        "Every setup before all cleanup",
+        "Cleanup is never needed",
+        "Cleanup only runs on server",
+        "React cleans up the prior synchronization before establishing the replacement.",
+        "That can leak or overlap resources.",
+        "External resources may need cleanup.",
+        "Effects do not run during SSR."
+      ],
+      [
+        "Which comparison is used for individual effect dependencies?",
+        "Object.is",
+        "JSON deep comparison",
+        "Only string length",
+        "Only object key count",
+        "React compares dependency entries using Object.is.",
+        "It does not recursively serialize by default.",
+        "Length does not establish equality.",
+        "Object sizes do not determine identity."
+      ],
+      [
+        "A chat connects in an effect but never disconnects when roomId changes. What is needed?",
+        "Cleanup of the old connection",
+        "Only a second room heading",
+        "Only an empty dependency array",
+        "Only a new CSS theme",
+        "Each setup should release its resource before replacement or unmount.",
+        "Headings do not disconnect.",
+        "Empty dependencies can keep the old room stale.",
+        "Themes are unrelated."
+      ],
+      [
+        "A component creates a fresh options object each render and uses it as a dependency. Why can setup repeat?",
+        "The object identity changes",
+        "React compares fields deeply",
+        "All dependencies are ignored",
+        "The browser retries HTML",
+        "Object.is sees distinct objects even when their fields look similar.",
+        "Deep comparison is not the default.",
+        "Dependencies are used.",
+        "No HTML retry is implied."
+      ],
+      [
+        "An effect reads accountId but suppresses the dependency warning. What can fail?",
+        "Account synchronization freshness",
+        "Only a static screenshot",
+        "Only the type alias spelling",
+        "Only the HTML tag order",
+        "The external synchronization may continue using an obsolete account if actual reactive inputs are hidden.",
+        "A screenshot omits lifecycle change.",
+        "Names do not fix dependencies.",
+        "Tags do not define identity freshness."
+      ],
+      [
+        "A setup returns a promise because the effect callback is async. What contract was missed?",
+        "Cleanup is a function or absent",
+        "Every promise is a cleanup function",
+        "Effects must always be async",
+        "JSX requires promise cleanup",
+        "An async function returns a promise, not the cleanup function React expects.",
+        "A promise is not the cleanup callback.",
+        "Effects can start async work inside a normal setup.",
+        "JSX does not define this contract."
+      ],
+      [
+        "Development Strict Mode runs an extra setup/cleanup stress cycle and exposes a leak. What should the team repair?",
+        "Symmetric resource ownership",
+        "Only remove every dependency",
+        "Only hide the warning",
+        "Only change the room label",
+        "Effects should be robust under cleanup and replacement, including the development stress check.",
+        "Omitted inputs can add stale behavior.",
+        "Hiding evidence does not release resources.",
+        "Names do not fix leaks."
+      ],
+      [
+        "A fullName is derived solely from current first and last props. Where can it normally be computed?",
+        "During render calculation",
+        "Only in an effect with more state",
+        "Only in a server cookie",
+        "Only in a subscription callback",
+        "Pure derived data need not become extra synchronized state.",
+        "An extra effect can add redundant state and renders.",
+        "Cookies are unrelated.",
+        "No external subscription is needed."
+      ],
+      [
+        "An SSR test shows an effect did not run. What is not proven?",
+        "Client cleanup and commit timing",
+        "The server output string",
+        "The initial component markup",
+        "The absence of SSR effect execution",
+        "Server omission does not execute the browser lifecycle or its timing.",
+        "The output is observed.",
+        "The markup is rendered.",
+        "That is the tested omission."
+      ]
+    ]
+  },
+  {
+    "comp": "m3.c2",
+    "rows": [
+      [
+        "What does response.ok indicate?",
+        "A 200–299 HTTP status",
+        "Valid business data always",
+        "Valid JSON syntax always",
+        "An authorized account always",
+        "Ok describes the HTTP success status range, not the complete application contract.",
+        "Business invariants need checking.",
+        "JSON parsing can still fail.",
+        "Permission must be enforced separately."
+      ],
+      [
+        "Which outcome needs distinction from successful empty data?",
+        "A request failure",
+        "A valid empty array",
+        "A confirmed zero count",
+        "A successful no-match response",
+        "Failure is not evidence that a search completed with zero matches.",
+        "That can be empty success.",
+        "That can be empty success.",
+        "That can be empty success."
+      ],
+      [
+        "What is a generation token useful for in manual fetching?",
+        "Rejecting stale result application",
+        "Reversing every server write",
+        "Installing all cache behavior",
+        "Validating all response fields",
+        "A current-generation comparison can decide whether a result still belongs to the view.",
+        "It does not roll back remote effects.",
+        "Caching requires more design.",
+        "Identity alone does not validate schema."
+      ],
+      [
+        "A search for old text completes after the current query and wins the UI. What should the loader track?",
+        "Current request ownership",
+        "Only the response body length",
+        "Only the alphabetic query order",
+        "Only the result card color",
+        "The response must be associated with the query and account that are still current.",
+        "Length does not establish freshness.",
+        "Alphabetic order is unrelated.",
+        "Colors do not coordinate completion."
+      ],
+      [
+        "A loader uses an empty array for every network error. What false claim can result?",
+        "That the search found nothing",
+        "That a failure occurred",
+        "That retry might be possible",
+        "That the request is unresolved",
+        "A failure converted to success-empty misstates the actual outcome.",
+        "Failure would be truthful if known.",
+        "Retry may be a valid policy.",
+        "Unresolved can be truthful before completion."
+      ],
+      [
+        "A component aborts a POST after the server may have accepted it. What must it avoid assuming?",
+        "The remote effect was reversed",
+        "Local waiting can stop",
+        "Remote state may be uncertain",
+        "Reconciliation may be needed",
+        "Local abort is not a universal transaction rollback.",
+        "Local waiting can indeed end.",
+        "Uncertainty is possible.",
+        "Recovery may be required."
+      ],
+      [
+        "A fetch returns 200 but its body is malformed JSON. What should the interface handle?",
+        "Representation parsing failure",
+        "Only successful data rendering",
+        "Only a CSS warning",
+        "Only a longer timeout",
+        "HTTP status success does not guarantee valid JSON or schema.",
+        "The body cannot be assumed valid.",
+        "Styles do not parse responses.",
+        "Timeouts do not correct malformed data."
+      ],
+      [
+        "A profile request from a previous account returns after account switching. What boundary matters?",
+        "Current identity before application",
+        "Only the old response timestamp",
+        "Only a larger cache key label",
+        "Only a rendered avatar color",
+        "A late private result must not cross into another person’s active view.",
+        "Time alone does not establish authorization.",
+        "Labels do not implement isolation by themselves.",
+        "Appearance does not protect privacy."
+      ],
+      [
+        "A manual effect-fetch example lacks caching and server data integration. What should teaching make explicit?",
+        "Its limited architecture scope",
+        "A universal production guarantee",
+        "Automatic deduplication support",
+        "Automatic SSR data readiness",
+        "A small pattern does not implement every production data concern; framework APIs may be more suitable.",
+        "The scope is bounded.",
+        "No cache follows automatically.",
+        "Client effects do not populate SSR by themselves."
+      ],
+      [
+        "A pure generation model passes out-of-order completion tests. What needs separate verification?",
+        "Actual rendered request lifecycle",
+        "The model’s equality comparison",
+        "The modeled current value",
+        "The supplied generation counters",
+        "The model does not mount React, perform fetch or show loading/error UI in a browser.",
+        "The comparison runs.",
+        "The value is observed.",
+        "The counters are explicit inputs."
+      ]
+    ]
+  },
+  {
+    "comp": "m4.c1",
+    "rows": [
+      [
+        "Which pair is central to an editable controlled text input?",
+        "value and onChange",
+        "defaultValue and key only",
+        "checked and href",
+        "className and title only",
+        "Value supplies current text and the handler updates its state from user changes.",
+        "DefaultValue is initialization, not ongoing control.",
+        "These do not express text control.",
+        "Presentation props do not update text ownership."
+      ],
+      [
+        "Which event value should a checkbox handler commonly read?",
+        "event.target.checked",
+        "event.target.href",
+        "event.target.rows",
+        "event.target.placeholder",
+        "Checked supplies the checkbox boolean rather than its submitted string value.",
+        "Href is for links.",
+        "Rows is sizing for textarea.",
+        "Placeholder is a hint."
+      ],
+      [
+        "What is a suitable empty initial controlled text state?",
+        "\"\"",
+        "undefined then later text",
+        "null then later text",
+        "An arbitrary object",
+        "A string preserves the controlled text contract from the beginning.",
+        "This can switch from uncontrolled to controlled.",
+        "Null is not the intended controlled string.",
+        "Objects are not the text value contract."
+      ],
+      [
+        "A controlled input snaps back after typing. The handler only logs the event. What is missing?",
+        "Updating the backing state",
+        "Only a larger maxlength",
+        "Only a shorter label",
+        "Only an extra data attribute",
+        "The supplied value remains unchanged unless the change path updates its source.",
+        "Length limits do not update state.",
+        "Labels do not update values.",
+        "Attributes do not supply the state update."
+      ],
+      [
+        "A registration button is disabled for invalid text. What must the server still do?",
+        "Enforce rules and permission",
+        "Only inspect the disabled prop",
+        "Only trust a valid-looking UI",
+        "Only record the click count",
+        "Direct or modified requests bypass client controls, so trusted enforcement remains necessary.",
+        "The prop is not server authority.",
+        "Visual validity is not the request contract.",
+        "Counts do not establish valid inputs."
+      ],
+      [
+        "A form displays a global error with no relationship to the invalid field. What improves recovery?",
+        "Accessible field-specific feedback",
+        "Only a redder border",
+        "Only smaller response JSON",
+        "Only a randomized input key",
+        "Users need to identify the field and understand the corrective action through usable associations.",
+        "Color alone is insufficient.",
+        "Payload size does not label errors.",
+        "Random keys can disrupt editing."
+      ],
+      [
+        "A save request fails but the UI clears the form and says success. What should be corrected?",
+        "Truthful status and safe recovery",
+        "Only the success icon shape",
+        "Only the route’s capitalization",
+        "Only the input placeholder",
+        "Failure should not be presented as persisted success, and useful safe input should be retained as appropriate.",
+        "Icons do not change evidence.",
+        "Names are unrelated.",
+        "Hints do not fix persistence truth."
+      ],
+      [
+        "A password field is trimmed because display names are trimmed. What should decide normalization?",
+        "The specific field contract",
+        "Only the developer’s habit",
+        "Only the label length",
+        "Only the form’s width",
+        "Normalization can change meaning and must follow the field’s requirements.",
+        "Habits are not a contract.",
+        "Length is unrelated.",
+        "Layout is unrelated."
+      ],
+      [
+        "A purchase form blocks clicks locally while pending. What may still be needed for repeats?",
+        "Server idempotency",
+        "Only a loading animation",
+        "Only a second local flag",
+        "Only a larger button",
+        "Repeat-sensitive remote effects need backend safety because client guards can be bypassed or race.",
+        "Animation does not protect transactions.",
+        "More local state is not authoritative.",
+        "Size does not coordinate operations."
+      ],
+      [
+        "An SSR controlled form includes initial value and label attributes. What still needs browser evidence?",
+        "Typing, validation and focus",
+        "The emitted initial text",
+        "The printed input id",
+        "The server’s label markup",
+        "Static rendering does not dispatch changes, run native constraints or move focus.",
+        "The text is observed.",
+        "The id is present.",
+        "The real renderer produced markup."
+      ]
+    ]
+  },
+  {
+    "comp": "m4.c2",
+    "rows": [
+      [
+        "What does defaultValue do for an uncontrolled text input?",
+        "Sets its initial value",
+        "Controls every later keystroke",
+        "Grants file-system access",
+        "Submits the form automatically",
+        "The DOM owns the current uncontrolled value after initialization.",
+        "Ongoing controlled ownership uses value.",
+        "Defaults do not grant file access.",
+        "Initialization does not submit."
+      ],
+      [
+        "Does ref.current mutation alone behave like a state setter?",
+        "No",
+        "Yes, it always rerenders",
+        "Only when the ref holds text",
+        "Only when the ref holds a node",
+        "Refs can hold mutable values without requesting rerender on each change.",
+        "Refs and state differ.",
+        "The held type does not change that basic rule.",
+        "DOM refs do not become state setters."
+      ],
+      [
+        "What restricts arbitrary script-selected local upload files?",
+        "Browser file-input security",
+        "Only JSX capitalization",
+        "Only a random key",
+        "Only the defaultValue string",
+        "Scripts cannot select arbitrary local file paths as if the user had chosen them.",
+        "Names do not grant file access.",
+        "Keys do not bypass security.",
+        "Default text cannot select a file."
+      ],
+      [
+        "A simple form intentionally reads current DOM values at submission. Which pattern may fit?",
+        "Uncontrolled input ownership",
+        "An unrelated duplicate state copy",
+        "A fixed value with no handler",
+        "A server cookie for every edit",
+        "Uncontrolled inputs can fit deliberate submit-time DOM-owned values.",
+        "Competing copies obscure ownership.",
+        "A fixed controlled value prevents normal edits.",
+        "Cookies are not required for every edit."
+      ],
+      [
+        "A live preview and input must stay synchronized on every change. What may be useful?",
+        "One controlled state source",
+        "Only a defaultValue update",
+        "Only a random input key",
+        "Only a hidden textarea",
+        "Controlled state can feed both the current input value and preview consistently.",
+        "DefaultValue is not ongoing control.",
+        "Random keys reset identity.",
+        "Hidden controls do not define shared truth."
+      ],
+      [
+        "An input changes from no value prop to a supplied string after loading. What should design avoid?",
+        "Unintentional ownership switching",
+        "Only matching initial HTML",
+        "Only a visible label",
+        "Only a named change handler",
+        "Choose a consistent controlled or uncontrolled model for that input lifetime.",
+        "Initial markup alone is not the issue.",
+        "Labels are useful.",
+        "Named handlers are valid."
+      ],
+      [
+        "A developer mutates a ref holding a validation result and expects error text to rerender. What is missing?",
+        "A render-triggering state path",
+        "Only a different ref name",
+        "Only another object field",
+        "Only a new defaultValue",
+        "Ref mutation does not request a render to update visible content.",
+        "Names do not change scheduling.",
+        "More fields do not trigger rendering.",
+        "Defaults do not update arbitrary error UI."
+      ],
+      [
+        "A native reset button is expected to reset a controlled React value. What should be implemented or verified?",
+        "The controlled state reset",
+        "Only a CSS reset stylesheet",
+        "Only a new input name",
+        "Only server cookie expiry",
+        "A controlled current value follows React state and needs an intentional reset path.",
+        "CSS resets concern styles.",
+        "Names do not update state.",
+        "Cookies do not reset the local field."
+      ],
+      [
+        "Two SSR strings match for value and defaultValue inputs. What can still differ?",
+        "Mounted ownership semantics",
+        "The observed initial markup",
+        "The printed name attribute",
+        "The rendered initial text",
+        "Initial server markup can match while client controlled and DOM-owned behavior differs.",
+        "Those strings were observed.",
+        "The attribute can match.",
+        "The text can match."
+      ],
+      [
+        "A team chooses uncontrolled inputs to avoid all validation work. What is the flawed assumption?",
+        "Ownership removes enforcement needs",
+        "DOM-owned values can be read",
+        "Submit-time values may be useful",
+        "Controlled forms are optional",
+        "Both ownership models still require appropriate usability, runtime validation and trusted server authorization.",
+        "Reading DOM values can be legitimate.",
+        "That is a valid design option.",
+        "A choice exists, but not an exemption from rules."
+      ]
+    ]
+  }
+]);

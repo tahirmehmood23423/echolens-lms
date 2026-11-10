@@ -1,0 +1,2631 @@
+{
+  "schema_version": 1,
+  "scope": "Repository-only content checks; no application store, human approval or publication",
+  "courses": [
+    {
+      "id": "node-express",
+      "fingerprint": "c44347a80f9ef43469092c8e5ec2f0ed02be7d72a5239eb3385dd77c4c256bb5",
+      "course_hash": "8c028db374e298d39b8e15727d4079bf4effe384e38af9f365f530068dd3bd32",
+      "bank_hash": "816148985b1f23fbddd5321b9563c0cf28da2a04ffd4138db6c81a3fa2f23f72",
+      "prerequisites": [
+        "js-dom-async",
+        "rest-api-design"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 64,
+      "comprehensive": 90,
+      "objectives": 8,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "node-express.l01",
+          "code_hash": "9283597d80488a56f5d7edf661c332bed22c5e2546a664ba5c736c2b64bbecba",
+          "ran": true,
+          "ok": true,
+          "output": "start,sync,promise",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l02",
+          "code_hash": "6fc41fddd381abe7abc1060bf54c3a5d5b378ded88d2352676265d269a6f943b",
+          "ran": true,
+          "ok": true,
+          "output": "3000\ninvalid port",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l03",
+          "code_hash": "1ae52c55ceb5deab2aac17384f41abcf314f9befc47c2446006800befe12598a",
+          "ran": true,
+          "ok": true,
+          "output": "2,4,6,8,10",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l04",
+          "code_hash": "89316f36739505a81dc36e9980c914a7add5bc57e38e75d51c8f41b20b807d42",
+          "ran": true,
+          "ok": true,
+          "output": "identity,access,true",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l05",
+          "code_hash": "85b87fd0b7fb309a7b1d0adf4da213e2299f858dcc0f2fc89e09ac116b8748d3",
+          "ran": true,
+          "ok": true,
+          "output": "{\"quantity\":2}\ninvalid",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l06",
+          "code_hash": "189e14250774e8d5be8d0527433da5196ca63c05c381808b79e6d6cd5f9f613a",
+          "ran": true,
+          "ok": true,
+          "output": "A B",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l07",
+          "code_hash": "bf8123830a21641bf5124a55c36c9e17312a0f955ec838c2157c31d9aad5ba7b",
+          "ran": true,
+          "ok": true,
+          "output": "1 lookup failed",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l08",
+          "code_hash": "6f01d02da45543eadf1e11670887558dcc7851692afff48fb28956ae5e3a5686",
+          "ran": true,
+          "ok": true,
+          "output": "{\"status\":400,\"error\":\"Invalid request\"}\n{\"status\":500,\"error\":\"Internal error\"}",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l09",
+          "code_hash": "d23dd86efdc69b726889b374dc7e6d6bef4b63046fa2c68c2e4ccde2817e2f20",
+          "ran": true,
+          "ok": true,
+          "output": "1 1 1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l10",
+          "code_hash": "d96a0ed42c974da7f7223d040066c519f285dc4b31ecb6f00723e81e7f06333f",
+          "ran": true,
+          "ok": true,
+          "output": "query failed\n1 1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l11",
+          "code_hash": "c1dc185cf485b38852b68f6af5ec417944a966b4772cc8eb12e48a40401510d0",
+          "ran": true,
+          "ok": true,
+          "output": "SELECT id FROM users WHERE email = $1 ORDER BY created_at\n1 true",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "node-express.l12",
+          "code_hash": "5a18cea092b424f692d2dc36af9881991276ee6cdd62539d9c80ccee0d4ecc05",
+          "ran": true,
+          "ok": true,
+          "output": "{\"status\":200,\"body\":{\"id\":\"o1\",\"total\":42}}\n404",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "react-fundamentals",
+      "fingerprint": "fd06e954acc8a9e1d43b376d839941190be5f7f44c74709cd0907aa9ff69b1e7",
+      "course_hash": "25c9ebd8cf726c9f0474129afcf1d326804ae0ec4879865334f8b000aaea05e9",
+      "bank_hash": "e6e436205e7e129b071c2987c82356345b2f93ec2e990fe095a766a90c1aaabe",
+      "prerequisites": [
+        "js-dom-async"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 96,
+      "comprehensive": 90,
+      "objectives": 8,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "react-component-props",
+          "code_hash": "a388165d4528233d8b54676e9e54377d064496991ad32fbd6c5968a49fda7f85",
+          "ran": true,
+          "ok": true,
+          "output": "<article><h2>Learn &lt;React&gt;</h2></article>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-jsx-expressions",
+          "code_hash": "b5af25172f906b3be451c7960196de1eb1b844518e6ba13ba19fd6fcbd95d6f9",
+          "ran": true,
+          "ok": true,
+          "output": "<section class=\"lesson\"><h2>Functions</h2><p>2 completed</p></section>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-lists-keys",
+          "code_hash": "e95ed4f2bb3c72ced49893e259b7c8ef8e0e46c7795167fbc9b445b4fd12a7c7",
+          "ran": true,
+          "ok": true,
+          "output": "<ul><li>Read</li><li>Practice</li></ul>\n<p>Goals ready</p>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-state-snapshots",
+          "code_hash": "ff5a9d138fe5f4766fd017e8900f71d4b687b7852b7d7f461fb0955232f4a0b4",
+          "ran": true,
+          "ok": true,
+          "output": "1\n3",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-state-collections",
+          "code_hash": "32efa0a50dd8df14f2fa2a806ce1250c8d16edd2061245a71c40c0e1935b54d0",
+          "ran": true,
+          "ok": true,
+          "output": "false true\nfalse true false",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-lift-state",
+          "code_hash": "8d25eb51cc09d2f3163bccc4cc789207455221d521b2c04594f359c717054734",
+          "ran": true,
+          "ok": true,
+          "output": "core core",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-effect-sync",
+          "code_hash": "5fd7a333708dbfcabe183dd8336e513da247a79acb4aee7dfcde11aad8512ded",
+          "ran": true,
+          "ok": true,
+          "output": "<p>Room lobby</p>\nfalse",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-effect-dependencies",
+          "code_hash": "9d2202eed6434d4532ed3f977357075cc941800531687b4587c4915dc2b3deb8",
+          "ran": true,
+          "ok": true,
+          "output": "B\n0",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-fetch-states",
+          "code_hash": "d433a02b790a42bd394cface76c04a2c842254b7c4800b08bfdddb189d6b82c1",
+          "ran": true,
+          "ok": true,
+          "output": "success new courses",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-controlled-inputs",
+          "code_hash": "3ab36da5d1370f4e63708f860a91f09f183764736e7b7459587f27644dd264ad",
+          "ran": true,
+          "ok": true,
+          "output": "<label for=\"comment\">Comment<input id=\"comment\" value=\"\"/></label>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        },
+        {
+          "id": "react-form-validation",
+          "code_hash": "9db40080b71f2be586fe5ca3abf75a96e12f378b517e323446ab93406c57ef57",
+          "ran": true,
+          "ok": true,
+          "output": "{\"ok\":false,\"error\":\"Enter a name\"}\n{\"ok\":true,\"value\":\"Ada\"}",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "react-uncontrolled-boundaries",
+          "code_hash": "e2bf8aa3db60ae6a6d1cd70e01b08c16cde9ff09bff426273b3e34ca6ec41298",
+          "ran": true,
+          "ok": true,
+          "output": "<input name=\"draft\" value=\"seed\"/>\n<input name=\"draft\" value=\"seed\"/>",
+          "runtime": "React 19.2.0",
+          "profile": "Isolated React server rendering; 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network; not evidence about browser effects"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "fullstack-integration-state",
+      "fingerprint": "db35d7050e6b73b183ccd5f81a120107672acaf58b08c968a4084296c23bf5d0",
+      "course_hash": "ce4c83b7fe0f1178b3af0e58227bbae1fd4b945564c4bf022e30382675fce34d",
+      "bank_hash": "e87334372758dc02d96f00ac3a360bfb74061ad3159e1502a879ce105086ad63",
+      "prerequisites": [
+        "react-fundamentals",
+        "node-express"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 48,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "fullstack-integration-state.l01",
+          "code_hash": "f36c5c3fbb146b44ec020070cccb74c5093af78ababf5e8e95ebaf25069c1089",
+          "ran": true,
+          "ok": true,
+          "output": "{\"id\":\"i1\",\"total\":42}\ncontract error",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l02",
+          "code_hash": "8b2b7c8daefc834a23fb8f0a3e52556d1020f8908a5b2f4653036df027626f70",
+          "ran": true,
+          "ok": true,
+          "output": "1200 1200\nambiguous",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l03",
+          "code_hash": "7e28b460fc619297bff064197d838c7535d4e297b2ae8285be9df015590f465c",
+          "ran": true,
+          "ok": true,
+          "output": "success:no-content,success:decode,conflict,failure",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l04",
+          "code_hash": "72d81a56acc4ee4ef24221fca31060e4d66f0493e271f4f1616908d8e9fd96ff",
+          "ran": true,
+          "ok": true,
+          "output": "server second",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l05",
+          "code_hash": "ee15660c7c68a678ca37ab6406532ad420089255c62c675a27355bb627f88a5a",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfalse\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l06",
+          "code_hash": "e4be49cadfc13e0bb7686efaec57428b4a2672b93f593a309e2b0fe0c07df330",
+          "ran": true,
+          "ok": true,
+          "output": "remote unsaved true",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l07",
+          "code_hash": "a9fa9f8ccdd793d62a410fb7e1264a766620bb638913db4805967a997599e7c1",
+          "ran": true,
+          "ok": true,
+          "output": "fulfilled Ada\nrejected",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l08",
+          "code_hash": "8daf0fe233489fcee38a3f44f79d4c62c7f920d696165532e80962cdd26b5be9",
+          "ran": true,
+          "ok": true,
+          "output": "browser:send,api:200,cache:stale",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-integration-state.l09",
+          "code_hash": "145bf2667833b7a1d41f66eec76d895ebaffbbb9842ef412c3aec26fd51a37fa",
+          "ran": true,
+          "ok": true,
+          "output": "new filter",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "numpy-arrays",
+      "fingerprint": "4b6357092693f5641b5dedbb9f08e95e0b13acd2f6960d05103b98b050e39c33",
+      "course_hash": "5d1273a3c77ab9276da3139db785eca938fb4a3ac2464a90a19aedbf8d66c474",
+      "bank_hash": "873d399c0dde6640776ef6b0b7218e4e564e5be4884b1898f9df48a789e7416c",
+      "prerequisites": [
+        "python-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "numpy-arrays-array-contract",
+          "code_hash": "fad4f03443a87d617366f2d2d5f201b90761d21ff658605ea88aaae5b722cdcb",
+          "ran": true,
+          "ok": true,
+          "output": "(3, 2) 2 6\nint16 12\n[[0, 0, 0], [0, 0, 0]]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-indexing-memory",
+          "code_hash": "a731414e999c931994d867aaf0eac2b671d0c7e47b4b0e627ea7bca7727d856d",
+          "ran": true,
+          "ok": true,
+          "output": "[[0, 99, 2], [3, 4, 5]]\n[-1, 5]\n[[0, 1, 2], [3, 4, 5]]\nTrue False",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-reshape-shapes",
+          "code_hash": "d7011d1a26f096e2e977af1f944f8b4e7a881464343d9e776d586f8814044090",
+          "ran": true,
+          "ok": true,
+          "output": "(3, 4) (4, 3) (3, 1)\n[4, 5, 6, 7]\nTrue\n(3,)",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-vector-operations",
+          "code_hash": "362f7b904a8b728ee679659e4f6554b1857b10f7c04b622c32be1f10fe333b6d",
+          "ran": true,
+          "ok": true,
+          "output": "[32.0, 50.0, 68.0]\nTrue\n[False, True, False]\n[0, 1, 0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-broadcast-contract",
+          "code_hash": "2ef684404f71cc52c852b2cb7fa6c70039d881b0898d186a771d7511ca2a4da3",
+          "ran": true,
+          "ok": true,
+          "output": "[[9, 18, 27], [39, 48, 57]]\n[[5, 15, 25], [30, 40, 50]]\n(2, 3)",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-axis-reductions",
+          "code_hash": "1cb80f45b6c980e2666db53f2774d0268db5c352de6c56325b3b6fa1e9125415",
+          "ran": true,
+          "ok": true,
+          "output": "(1, 2) [[3.0, 20.0]]\n[11.0, 23.0, 35.0]\n[0.0, 0.0]\n69.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-dtype-range",
+          "code_hash": "afe9ca387130137c641bc4953c96d5980256d0888141153c8c3bbc557588f6b2",
+          "ran": true,
+          "ok": true,
+          "output": "[-116] [140]\n[-116]\n-128 127",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-missing-values",
+          "code_hash": "c6e331ab67945290c79e9624f6de104afe5a8f1bc7a0ffdbb682e8b036e93555",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True, False, False]\n[True, False, True, False]\nTrue\n4.0 2\ninf",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "numpy-arrays-float-comparisons",
+          "code_hash": "8d15e9814ccac28dc8a836b7186f8a057a4cef3aa055717b18e1779d1d3a04af",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue\nTrue\nFalse",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "ml-preprocessing",
+      "fingerprint": "f67a4511c2d253d63c0e0a46b485a427969c58a14fb2452122c2b4e28ab883af",
+      "course_hash": "868a4fa9f3dfe31ebce2c964993e311c0a8b1fbb1f2387486990a698fabc70b2",
+      "bank_hash": "65b4d884915ca4d9b95b08b12d7581980dfd6243b8c7cfd19ba8388102da6beb",
+      "prerequisites": [
+        "data-cleaning"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 58,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ml-preprocessing-numeric-scale",
+          "code_hash": "86154cc6820dcd4398e2f38e0d79fea2ba907e2a01d09a05af601d5e38850654",
+          "ran": true,
+          "ok": true,
+          "output": "[1.0]\n[[3.0]]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-categorical-contract",
+          "code_hash": "ff7e7d115c662bf0319424abe51f914a57661e5d496d88e7186b0528db424602",
+          "ran": true,
+          "ok": true,
+          "output": "[[0.0, 0.0]]\n[[0.0, 1.0]]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-mixed-columns",
+          "code_hash": "c508e750c43548526422befbeb221ab86e672ac582a931be84c2ec0bc0e98db2",
+          "ran": true,
+          "ok": true,
+          "output": "(2, 3)\n['n__km', 'c__zone_east', 'c__zone_west']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-holdout-purpose",
+          "code_hash": "36300f07978f1684b52c2d29d225c897c3f5a6d14f16a0a3e5f9c92c5cd952ce",
+          "ran": true,
+          "ok": true,
+          "output": "6 4\n3 2",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-temporal-splits",
+          "code_hash": "1100f4247c23547ed3f46a8c8cd3129f3c1c54d59c97d4ddce09fe9707a03ee6",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 1, 2] [4, 5]\n[0, 1, 2, 3, 4] [6, 7]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-group-independence",
+          "code_hash": "32b8e9e978c71e43264a0971ea81c2e79bcea836aaf9c79986bc3c30774b8871",
+          "ran": true,
+          "ok": true,
+          "output": "False\n1",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-target-leakage",
+          "code_hash": "27f82d758dc7495769a195838035cd6c53a48a6b4bcf439c10c7ac5834332546",
+          "ran": true,
+          "ok": true,
+          "output": "['age_days', 'prior_claims']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-pipeline-fit",
+          "code_hash": "884cc54fdacf7811af1bd89742ac3a91b2f3659eabbbdb3ef01d00a0f60b0490",
+          "ran": true,
+          "ok": true,
+          "output": "[2.0]\n[4.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-preprocessing-rehearse-deployment",
+          "code_hash": "bdcb86444aa034c1747587eaffeb57d259c2a5f71b7566a4c4be8fd59abdcc0d",
+          "ran": true,
+          "ok": true,
+          "output": "3.0 5.0\n[1.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "ml-fundamentals",
+      "fingerprint": "409380918e928c2478704fb2e9e496d35d993c58885d48668ae12658c9895856",
+      "course_hash": "212c9861b04cbcde2a519c1dcb690a60b9e64de9d801577e1e4a70e659f078db",
+      "bank_hash": "9316d49eeb855dc6068f1fa6db4711e08bb09c4b846f5841c3c24ddb325412e2",
+      "prerequisites": [
+        "numpy-arrays",
+        "probability-statistics"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ml-fundamentals-task-and-target",
+          "code_hash": "65bd71ef332ca792885333b3444754fc691941558c7596e9b8c5ffe5e5578cfb",
+          "ran": true,
+          "ok": true,
+          "output": "binary\ncontinuous",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-baseline-skill",
+          "code_hash": "19dc2497c4f1415b7a71d42f043ff3be45c9ced06497fa4f40c4ba8be9216373",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 0]\n[4.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-measurement-contract",
+          "code_hash": "09ea65dda565bfe0f5561be5abbedaa9d51a708154f7e148d3ac11c9d66a9545",
+          "ran": true,
+          "ok": true,
+          "output": "1 1 12",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-learning-curves",
+          "code_hash": "929a2beba103bf2221aacce7caffae262a68a929e35c9136b5cabf4115e70306",
+          "ran": true,
+          "ok": true,
+          "output": "[4, 8]\n(2, 3) (2, 3)",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-bias-variance",
+          "code_hash": "8136650b7d599421855d0138bd20cad8118181d41fd96c4ecb22025e7e6928b4",
+          "ran": true,
+          "ok": true,
+          "output": "2.8\n0.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-capacity-validation",
+          "code_hash": "27c9e3c3bbea0e89558dfdc3372c68fe5694c9e8c21c761b38c49a322844320e",
+          "ran": true,
+          "ok": true,
+          "output": "0.75\n1.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-estimator-interface",
+          "code_hash": "91c4585e6a091704650c5a52df553327f52a1f4847295af6f2f1c4532437c5f5",
+          "ran": true,
+          "ok": true,
+          "output": "1\n[7.0, 9.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-pipeline-workflow",
+          "code_hash": "08e845f705547134acdaf388134b78ff2190cb813887685e04dfd84b92961225",
+          "ran": true,
+          "ok": true,
+          "output": "[7.0]\n2",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "ml-fundamentals-reproducible-experiment",
+          "code_hash": "92aeb41ed29bd65a8b4597369430cbc3fd3670481f4be4a433f89350db6c5fcc",
+          "ran": true,
+          "ok": true,
+          "output": "True\n5",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "data-visualization",
+      "fingerprint": "35e2e36264f76a3c80de439ba1885b6d12cee1ade5b73905c0c66cc430eaa411",
+      "course_hash": "0b192a0c9df1409d46026356637735ab94f0c85e87bdd50222936bbede2e509c",
+      "bank_hash": "f9d74fad2335023c63512de33b0391ee60ed9e5159f0435d49936279609f602a",
+      "prerequisites": [
+        "data-business-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 66,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "viz-comparison",
+          "code_hash": "1eb698d0f6d02f49f05f9694562ca0ff075640f6e9d4ad41060a29cdab526130",
+          "ran": true,
+          "ok": true,
+          "output": "[5, 10, 20]\nEligible tickets 0\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "viz-trends",
+          "code_hash": "c00a2e0c8231e0f3a8a6253978728b36bc2c0ffbc5c9c2c49afefeb0215a2d22",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2, 3, 4]\n[False, True, False, False]\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "viz-distributions",
+          "code_hash": "f222c49b522f01bbb4349594e2a966d53d9363c6810c60284b59bcba3681e757",
+          "ran": true,
+          "ok": true,
+          "output": "[3, 1, 1]\n[0, 3, 6, 9]\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "viz-axes",
+          "code_hash": "41c0a8df131b781a242a46c4978c196c78c4253e230fa3123c078af4764e1409",
+          "ran": true,
+          "ok": true,
+          "output": "[98, 100]\n(0, 110)\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "viz-aggregation",
+          "code_hash": "20c733ec2320677f23694f6547926b1a204ec1ae08616e9cf0debc80132070ab",
+          "ran": true,
+          "ok": true,
+          "output": "[0.5, 0.8]\n['A (n=2)', 'B (n=100)']\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "viz-color",
+          "code_hash": "de8b16455242b6a06f962787515b93685ed6897124db83b83f39498878a98efa",
+          "ran": true,
+          "ok": true,
+          "output": "- -- o s\n['Observed', 'Reference']\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "viz-message",
+          "code_hash": "e620a2cffa0a68714c2964adf9bafda4a1f2a93f63bfdaf5e3dc85fa754971e5",
+          "ran": true,
+          "ok": true,
+          "output": "Observed score rose across three checks\n1 Target, not observed\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "viz-clutter",
+          "code_hash": "7a2b40646528b4cd3c3df0f1a191544423a78678c9fba9dcb1a02235fadbacba",
+          "ran": true,
+          "ok": true,
+          "output": "False True\nCheck Score\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "viz-handoff",
+          "code_hash": "b2b121a42eb4e81213a47fb6b2162a71abf7f3a709864856f2b89ccf9c89d3b9",
+          "ran": true,
+          "ok": true,
+          "output": "[('North', 12), ('South', 18)]\n6\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "scripting-automation",
+      "fingerprint": "e62f259b43180421ae29e031ee69ba12eead5555109af17a913f01472ed49330",
+      "course_hash": "139597bde309f56fec1d831d97ab411cd25adcf2e41a921cf226299df1524286",
+      "bank_hash": "af0b4e202d6d9dec3657c4feb405e247b58554c231a3945c6e7ba65355182ddf",
+      "prerequisites": [
+        "linux-sysadmin",
+        "python-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "scripting-automation-l1",
+          "code_hash": "fb5bbb86634577f9b6c9c29bb7667d37054ecd611e4d1e3ccccf44f7c7c94bdf",
+          "ran": true,
+          "ok": true,
+          "output": "<pay roll.csv>\n<*.csv>"
+        },
+        {
+          "id": "scripting-automation-l2",
+          "code_hash": "fd3e69c1da8250936391187c59143b1a89553a170288a6f59142ee0cd57663f7",
+          "ran": true,
+          "ok": true,
+          "output": "ok:alpha\nfailed:beta:1"
+        },
+        {
+          "id": "scripting-automation-l3",
+          "code_hash": "9536771aab7153ce3a8b90069c0f03c2a67033e5488d7e6b1ba969c911896ffe",
+          "ran": true,
+          "ok": true,
+          "output": "pipeline:1\nmode:dry"
+        },
+        {
+          "id": "scripting-automation-l4",
+          "code_hash": "d266813f59095e310e1a7aa0a9b4598521b56ae7ae8bbb6feb10fe074923a4e4",
+          "ran": true,
+          "ok": true,
+          "output": "2\npartial\nbad-input"
+        },
+        {
+          "id": "scripting-automation-l5",
+          "code_hash": "7ecaf6216accd14e57a25d5493758cb7471284317bcf83ff421bb55fe88986fb",
+          "ran": true,
+          "ok": true,
+          "output": "True\nrows=3"
+        },
+        {
+          "id": "scripting-automation-l6",
+          "code_hash": "b83be6585dcf1fac22643618e1f98c5ff99d98bbd90feb925018f4708afd8e6c",
+          "ran": true,
+          "ok": true,
+          "output": "retry-with-budget\nstop\nstop"
+        },
+        {
+          "id": "scripting-automation-l7",
+          "code_hash": "f51f7af9a410fde01e918fdda97f4a66237a9f66287f57f305a9210d10ba8c7e",
+          "ran": true,
+          "ok": true,
+          "output": "changed\nunchanged"
+        },
+        {
+          "id": "scripting-automation-l8",
+          "code_hash": "c6dcf8c45b2c6c6f8d6f7786e443c9b1a47c7cdbabc4158454804a8799ca846f",
+          "ran": true,
+          "ok": true,
+          "output": "{\"operation\": \"sync-17\", \"outcome\": \"failed\", \"stage\": \"validate\"}\nFalse"
+        },
+        {
+          "id": "scripting-automation-l9",
+          "code_hash": "700dc4b85d9aa8d021fafd523f90435257463c16b9eba5f2e80ca9655165bbcc",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "observability",
+      "fingerprint": "8fac88c44e5e27a1b2c97990c107372bb903cba2075d0a2af4e201ffdd912a38",
+      "course_hash": "38a92900c2f04463c87d4317785273de040487e5b7eb47ceb1678b51308d24ae",
+      "bank_hash": "20f237084180fbe918bd7cf4989bb367ce0701e2a239fa53b02c341b1731f420",
+      "prerequisites": [
+        "linux-sysadmin"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "observability-l1",
+          "code_hash": "6ae100961603494ca542e53b5b1e00ed57e1084b8f6fe126ac3619837bc860ff",
+          "ran": true,
+          "ok": true,
+          "output": "metric\nlog\ntrace"
+        },
+        {
+          "id": "observability-l2",
+          "code_hash": "0c8fb49f396f8c316ce289388be0214bfcf172d4f422d50895832507064a73bb",
+          "ran": true,
+          "ok": true,
+          "output": "96\n960000"
+        },
+        {
+          "id": "observability-l3",
+          "code_hash": "f9b19657e4a7cbf5179b9df64c2196413501ad64cc6d795180cf99dc02a6277a",
+          "ran": true,
+          "ok": true,
+          "output": "['a', 'b']\n4"
+        },
+        {
+          "id": "observability-l4",
+          "code_hash": "331d4e62b95725d88848412c5618a4cb42e35f52118f2e3da5c39ab10e80a82c",
+          "ran": true,
+          "ok": true,
+          "output": "100\n30"
+        },
+        {
+          "id": "observability-l5",
+          "code_hash": "084f8a98dbb7aa645c9e95842f865b9a077a226860b28b18406e6232fb19aace",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "observability-l6",
+          "code_hash": "6cdb258f65ca8a2b29940f9d1be2ca3d43fa2f750ec70a084143fd5026bf0e1d",
+          "ran": true,
+          "ok": true,
+          "output": "checkout:latency,errors\nsearch:latency"
+        },
+        {
+          "id": "observability-l7",
+          "code_hash": "a61808a05acc86d4a47d654bcb210dd53b1f58566eccd24f1a1d61f8fad92db1",
+          "ran": true,
+          "ok": true,
+          "output": "64\n10\n100"
+        },
+        {
+          "id": "observability-l8",
+          "code_hash": "42483cb77229005edbfe6f2eb0fe75e7586c74fa892683172e9b34738cc7b583",
+          "ran": true,
+          "ok": true,
+          "output": "0.1:1\n0.3:3\n1.0:4\ncount:4"
+        },
+        {
+          "id": "observability-l9",
+          "code_hash": "adac5e3db8fe8bf34d1bb76189bcc34a4dc7b3eb11b5690b23198d032b2a57af",
+          "ran": true,
+          "ok": true,
+          "output": "db\n80"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "supervised-learning",
+      "fingerprint": "c097dba650be28cfee7d51e94dea299e0c44c5b918549e8f9c5018dfcedace73",
+      "course_hash": "35508ba46978affada63b02e4cd752bb514b10d1c01417dccab79207fcdc0d42",
+      "bank_hash": "e7f2905d6840a578f3335102d73e76b0a29a8fbc7826fe70404bfc8f1b3abab7",
+      "prerequisites": [
+        "ml-fundamentals",
+        "ml-preprocessing"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "supervised-learning-linear-effects",
+          "code_hash": "9638afb09b395f86b3154feab155c0c2b1bb742a4a5843b50467f5ab6cf4c1a0",
+          "ran": true,
+          "ok": true,
+          "output": "[3.0]\n5.0\n[14.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "supervised-learning-logistic-probability",
+          "code_hash": "e86097a62b9945729468b7b22496e736f88450dd6441ab4cab84a1b076c3d8c8",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 1]\n[[0.5, 0.5]]\n1.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "supervised-learning-regularized-fit",
+          "code_hash": "f1f4b905465e3dc70227e12d5bc030dc0861235e3e36603ca3c05ed0405e626d",
+          "ran": true,
+          "ok": true,
+          "output": "[2.0]\n[1.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "supervised-learning-tree-splits",
+          "code_hash": "67626fabad8ae88a4047f47f216e3e34c196c55a4e14884cc59df20aeebf83ec",
+          "ran": true,
+          "ok": true,
+          "output": "1 2\n[0, 1, 1, 1]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "supervised-learning-forest-averaging",
+          "code_hash": "07ac47ed139f7aeb5764df23004e85ddf4f5916a765eb388739fb9c3532084bc",
+          "ran": true,
+          "ok": true,
+          "output": "5\n[0, 1]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "supervised-learning-boosting-sequence",
+          "code_hash": "6af10534cd4a6cb3a0c8463c5316579ca92da90382e1f6fa29f7ff1a5e46d718",
+          "ran": true,
+          "ok": true,
+          "output": "1.0\n4e-06",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "supervised-learning-cross-validation",
+          "code_hash": "4b73e11d1eaeb09bb2dec9cad7fdb459d06701f37ea213fdd79ce535d02e03a2",
+          "ran": true,
+          "ok": true,
+          "output": "[-3.0, -0.5, -3.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "supervised-learning-hyperparameter-search",
+          "code_hash": "718122cc4099cddd87bbcaa640477d501f6ef1520bbc2c8c4f74d8d1fc11a462",
+          "ran": true,
+          "ok": true,
+          "output": "2\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "supervised-learning-operating-constraints",
+          "code_hash": "17a24f54daf28413b87e8ec91e105e2e138e1e63cbe5a3ca8dc134c176b7e635",
+          "ran": true,
+          "ok": true,
+          "output": "linear\n2",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "rag-advanced",
+      "fingerprint": "439b93a666232a92cf41d4f3a5d487f2d134b40742a6e84645319c14a1523bd7",
+      "course_hash": "c5a9e6980819b9c13de17ad5e4bbffad699b451ea58c6ba89fc5eb3157fd934a",
+      "bank_hash": "4a28fc1841a44d53726e41e05ceed28783f54feeccbce021df85f1ac7e94c151",
+      "prerequisites": [
+        "rag-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "rag-advanced-hybrid-fusion",
+          "code_hash": "b576e6db4417cbb7dac332a3ac1b093ef07b297b52fe39c0196701b03bc3e390",
+          "ran": true,
+          "ok": true,
+          "output": "['B', 'A', 'C']\n0.0325"
+        },
+        {
+          "id": "rag-advanced-rerank-rewrite",
+          "code_hash": "da704b7670c949db6517e8cece7153ceb891edc219454d4349ce569fffd71323",
+          "ran": true,
+          "ok": true,
+          "output": "['exception', 'overview', 'general']\nFalse"
+        },
+        {
+          "id": "rag-advanced-long-documents-tables",
+          "code_hash": "ba5f9815b9b002d8f81d22193f3c34d5b2376f966fa8e5fbbd9a873217dc9b35",
+          "ran": true,
+          "ok": true,
+          "output": "Department: support; weekly threshold: 40 hours\n2"
+        },
+        {
+          "id": "rag-advanced-retrieval-metrics",
+          "code_hash": "96857b42ab65b2c73b802de98e1d4ef467b16878034cea71711ec72f662cd1c5",
+          "ran": true,
+          "ok": true,
+          "output": "0.67\n1.00\n0.50"
+        },
+        {
+          "id": "rag-advanced-faithfulness-answer-quality",
+          "code_hash": "994e534f1d852267fb7ff364d2f54a8fef550fff9c93fb251fa602f911827ffa",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "rag-advanced-judge-validation",
+          "code_hash": "a9479e74974734566a07cc983f69bcade8ea0295b3c11fd25c1a29c791236b59",
+          "ran": true,
+          "ok": true,
+          "output": "0.75\n1 0"
+        },
+        {
+          "id": "rag-advanced-latency-cost-budgets",
+          "code_hash": "f3b8cf665d45ec6735cc2f9f0f2806636de6fed34a87bb050be31a58803071e5",
+          "ran": true,
+          "ok": true,
+          "output": "600\n['a', 'b']\n750"
+        },
+        {
+          "id": "rag-advanced-drift-and-freshness",
+          "code_hash": "6fe625f5b8e574f94036fd0f63d8273145e285872b70e46e0ec7d651c9cc7274",
+          "ran": true,
+          "ok": true,
+          "output": "['b']\nTrue"
+        },
+        {
+          "id": "rag-advanced-diagnose-retrieval-incidents",
+          "code_hash": "f61a8980d31599ee40b1f9ca6ed1a369c5ca57d80f07b7ff63360f903e298fd7",
+          "ran": true,
+          "ok": true,
+          "output": "[]\n['exception']"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "llm-security-eval",
+      "fingerprint": "4b6c9cfe58dd2cdd18c7512cf6585be97cc07c1d5f737e3781d3789ccc7f735e",
+      "course_hash": "b5ad90bbaf40d4f2ece490bb05cb78cb3ca5300700e4f7dfead4c4167c655650",
+      "bank_hash": "337da7521a4e9a1c390936e353f52ecd7a924a520f4aaf37f8915ce160be6a28",
+      "prerequisites": [
+        "rag-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "llm-security-eval-trust-boundaries",
+          "code_hash": "197a88135ade20d94c7a118cbc6f41a496765a8eedfc21a553e38b527346e2ae",
+          "ran": true,
+          "ok": true,
+          "output": "['lookup_policy']\n1"
+        },
+        {
+          "id": "llm-security-eval-data-minimization",
+          "code_hash": "a4cafb1e3fa43a0c1391f0b9c419a011ec981ac5ba1d545709009788db4de3b0",
+          "ran": true,
+          "ok": true,
+          "output": "['department', 'policy']\nFalse"
+        },
+        {
+          "id": "llm-security-eval-tenant-isolation",
+          "code_hash": "88a2367ded9f78964f8a9ceae313a82f10b849c8fc424b5855d27a741e5373eb",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 3]\n1"
+        },
+        {
+          "id": "llm-security-eval-semantic-validation",
+          "code_hash": "ef37a128f6e5642f0dcb18bbccb3422d850a5b2dbcdb6a4e577fc8a63a8a4292",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "llm-security-eval-fallbacks",
+          "code_hash": "d9f71ca76143388da2f2056e072c1bf05326456e1b9928151860eabed8676939",
+          "ran": true,
+          "ok": true,
+          "output": "2\nescalate"
+        },
+        {
+          "id": "llm-security-eval-release-gates",
+          "code_hash": "1760236e7931b6999574e331797cb866d03ef44984a846b9d32da725618a16e3",
+          "ran": true,
+          "ok": true,
+          "output": "False\nFalse"
+        },
+        {
+          "id": "llm-security-eval-evaluation-design",
+          "code_hash": "7d5e80389682da0461617b29061e92105633b5ab46dd9faf1be6f47ecef9dbdf",
+          "ran": true,
+          "ok": true,
+          "output": "['cancel-exception']\n['privacy']"
+        },
+        {
+          "id": "llm-security-eval-metrics",
+          "code_hash": "2f5fdfdb28b3fe3706c6de41ebdbc5148dc90c69b1e3431149bbcd1e5bdaf1e1",
+          "ran": true,
+          "ok": true,
+          "output": "0.75\n0.60"
+        },
+        {
+          "id": "llm-security-eval-regression-evidence",
+          "code_hash": "6e5ad4a4dd432c11f1250bcc0801846dc07e2735197f9b4e57469ea1872cc18d",
+          "ran": true,
+          "ok": true,
+          "output": "['b']\nFalse"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "llm-deployment-cost",
+      "fingerprint": "29b3a03fd1ffdf1c61205525807dc36cc7de603377259e1d615d1b7fa7b21014",
+      "course_hash": "76ac415a3adde1282a78238fe420bf0fa46f44c380ac72db7d2fe32f7f2d8cb3",
+      "bank_hash": "16f935d6aeacf2a6ebe0739e06704f2eca5c8287cbf03be988a06d5d0a69b477",
+      "prerequisites": [
+        "ai-api-integration"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "llm-deployment-cost-deployment-constraints",
+          "code_hash": "d783ada86bc3a0d07c20b8ee1717636fc5207cf7fdba67f073009e7a24ab59eb",
+          "ran": true,
+          "ok": true,
+          "output": "local-b\n2"
+        },
+        {
+          "id": "llm-deployment-cost-capacity-economics",
+          "code_hash": "63e1163d07f57abe32c94d3449eb5d33c0a096977a99e7088633fa8f6001bdc4",
+          "ran": true,
+          "ok": true,
+          "output": "620 100\n800 1000"
+        },
+        {
+          "id": "llm-deployment-cost-rollout-routing",
+          "code_hash": "e794da3e03f626116b2f706d46e04198bb794f1930f69b28ddbaccea4df91bdb",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 10]\n0.1"
+        },
+        {
+          "id": "llm-deployment-cost-usage-cost",
+          "code_hash": "d77aba34469dae7785c8646829333477cda486b1d41ba12cd971c0e4396921c0",
+          "ran": true,
+          "ok": true,
+          "output": "0.40\n1.50"
+        },
+        {
+          "id": "llm-deployment-cost-cache-and-trim",
+          "code_hash": "d44067f21f15986650bb57e21d077d60ecfe4983ad7019985501122d087b3d1a",
+          "ran": true,
+          "ok": true,
+          "output": "False\nFalse"
+        },
+        {
+          "id": "llm-deployment-cost-streaming",
+          "code_hash": "73480c64260d0023ebdcaaba317484be858cedb095875c4a4a1e87b7889244f0",
+          "ran": true,
+          "ok": true,
+          "output": "Policy summary\nTrue"
+        },
+        {
+          "id": "llm-deployment-cost-latency-observability",
+          "code_hash": "1d30a35a62544b85ba8f155fc4e7a0bbf02c8c2870acd019ddea172c0c9b8e75",
+          "ran": true,
+          "ok": true,
+          "output": "900\n1"
+        },
+        {
+          "id": "llm-deployment-cost-quality-and-errors",
+          "code_hash": "2aec0a6e1fb25a50e46c71ed0527ca7aeb00fb653bbaae2a39eee325ad7304e8",
+          "ran": true,
+          "ok": true,
+          "output": "2\n1\n3"
+        },
+        {
+          "id": "llm-deployment-cost-budget-controls",
+          "code_hash": "82e9a483bbb1c62b0bd3d1949cee6de3c0d3480718a140cefcc45fea0a381041",
+          "ran": true,
+          "ok": true,
+          "output": "[4, 5]\n1"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "spreadsheet-analysis",
+      "fingerprint": "ba9388c4dc430c43a4cdf6f1e6066c8d420bb228a6ca7961622a5955054c9421",
+      "course_hash": "331e247b0766dc64ad05330177b7a3c98414dedddc440941d1ffc80918a933d4",
+      "bank_hash": "9fa8b520e51c5ea74f7068ee762b099990e5e40736dfc459d5d8e1a53fcf9eb2",
+      "prerequisites": [
+        "data-business-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 64,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "sheet-references",
+          "code_hash": "1fed79b64083e4ffbf4cac08758b2bde289b9c175e54d9b9b607385a2853c16b",
+          "ran": true,
+          "ok": true,
+          "output": "[20.0, 50.0]\nD3: =B3*$F$1"
+        },
+        {
+          "id": "sheet-criteria",
+          "code_hash": "b3b65f5576d6d3ac7be7133f01caba56468b4108fe281b9b420c8a59ea0cde77",
+          "ran": true,
+          "ok": true,
+          "output": "150 2\neligible"
+        },
+        {
+          "id": "sheet-dates",
+          "code_hash": "0534e03781cd1102be10e5b43569fa923429e821f9c69fa1b737fe06c0337e90",
+          "ran": true,
+          "ok": true,
+          "output": "'001'\n[True, False]"
+        },
+        {
+          "id": "sheet-lookup",
+          "code_hash": "42bc5de7049021143a9d86fe4582d92a12a8c2e0e19aa5a10f60cd1d881df7b8",
+          "ran": true,
+          "ok": true,
+          "output": "007 30\n009 0\n7 Missing"
+        },
+        {
+          "id": "sheet-missing",
+          "code_hash": "b87a665523bb130418c873cc370a59eb7766599b1f82267247c20f8259324365",
+          "ran": true,
+          "ok": true,
+          "output": "a 0\nb blank\nc unmatched\n1 3"
+        },
+        {
+          "id": "sheet-keys",
+          "code_hash": "84ff5418a2c2d00947034613e60f689a2d9aeea1b9f4f446788af73d82839681",
+          "ran": true,
+          "ok": true,
+          "output": "s1 ambiguous\ns2 15\nTrue"
+        },
+        {
+          "id": "sheet-pivots",
+          "code_hash": "8ead317cce6adc86fc1bb6cd50d1768f497d86a5e8e74513a7f605820f812d2e",
+          "ran": true,
+          "ok": true,
+          "output": "{'North': (25, 2), 'South': (20, 1)}\nTrue"
+        },
+        {
+          "id": "sheet-refresh",
+          "code_hash": "cb14c759eda7f40d2bf37bf240ced4e933873c4745907dcad590ae3e525f383a",
+          "ran": true,
+          "ok": true,
+          "output": "30 35\n35 3"
+        },
+        {
+          "id": "sheet-cleaning",
+          "code_hash": "60256ae9c6331ce017743a85ea19207f00285c924d311ebeb758b10ca7a7b3f7",
+          "ran": true,
+          "ok": true,
+          "output": "4 2 2\n15.50\n[('b', 'amount'), ('a', 'duplicate')]"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "data-storytelling",
+      "fingerprint": "5b0bbd87bf0a0e898229c024cded1165ee5231ee28e4a37bc88faa964c71f59a",
+      "course_hash": "4aa9752915be186470c1746d8c7be4e4942a631e07509be724d415dcbf048bbf",
+      "bank_hash": "41d30e623dc14a3582c571543e39d665fb0fe67c5265d3217e0e40bfcb40f9e2",
+      "prerequisites": [
+        "descriptive-stats-metrics"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "story-decision",
+          "code_hash": "bdaf2aed7c511d82e516d47b02620c7b09b41efbd98a6cf5251f4a8648137f35",
+          "ran": true,
+          "ok": true,
+          "output": "2.5\n25\ndescriptive; intervention effect unknown"
+        },
+        {
+          "id": "story-impact",
+          "code_hash": "1831f5eb984113bdbb171f55b3ee7b3585a70f659e52b513c9e5b4ac7ca7fc02",
+          "ran": true,
+          "ok": true,
+          "output": "-120\n840\n1.25"
+        },
+        {
+          "id": "story-confidence",
+          "code_hash": "b93eff90773af7060da51dd7124fdcac4c9936059574c9692e668788633c7d9f",
+          "ran": true,
+          "ok": true,
+          "output": "0.05\n0.022 0.112"
+        },
+        {
+          "id": "story-randomize",
+          "code_hash": "ad176f5e344d9ff8e5f804b0709d540efca90d0e51e8e1c20ffa377d9097af7d",
+          "ran": true,
+          "ok": true,
+          "output": "4 4 0\nTrue"
+        },
+        {
+          "id": "story-effects",
+          "code_hash": "eb54e6ce3e4959804813b0f226ef3145e70a02dc186c36d7bbf6d57a63ca6267",
+          "ran": true,
+          "ok": true,
+          "output": "2.0 25.0\n-0.51 4.51"
+        },
+        {
+          "id": "story-attribution",
+          "code_hash": "b7afaa61109651a94f9846c4a8ed5d3e94f0fa6447b7686e3a1bd754d54d8e42",
+          "ran": true,
+          "ok": true,
+          "output": "40 20\nparallel trends requires evidence"
+        },
+        {
+          "id": "story-executive",
+          "code_hash": "2fc2937a177ebb8eb66a219f52b6279ac9c3c6aacbe727f7a7ee23d76d7c05ad",
+          "ran": true,
+          "ok": true,
+          "output": "True\npilot in two depots four weeks"
+        },
+        {
+          "id": "story-operational",
+          "code_hash": "50fe0d203617fff19c64e4bdc860a66f5baecd9d6135dcf5c9dc6a50838f584d",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 3]\n0.5\n2"
+        },
+        {
+          "id": "story-technical",
+          "code_hash": "5d36891bd3e70219a0700ce3327ec230a4d7722dd2cea7dbc76f090e629bdc43",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "responsive-css",
+      "fingerprint": "e5cc9316466b2cac9aa3089f9a2f294f2ec7b5a48033980221c5e87348d6de07",
+      "course_hash": "d20c7996f83535fd616ee043ac1bab3773391e45598b810b4e5ce723fd6918f4",
+      "bank_hash": "ab94960c605d7de635183a27ac888b33968bc7582fbc15e4345ae2e668c5aad5",
+      "prerequisites": [
+        "css-fundamentals"
+      ],
+      "lessons": 10,
+      "modules": 3,
+      "formative": 80,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "responsive-flex-axes",
+          "code_hash": "85f856cf8f1bb918c69e006ac0c0bff3c1c746eb3069026d074f855f00937b50",
+          "ran": true,
+          "ok": true,
+          "output": "284\nrow: main=inline, cross=block",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-flex-sizing",
+          "code_hash": "c8815b3b693d69f9aecccfab9d1e9bed47aa8afd2d7d410fad519671ab913db2",
+          "ran": true,
+          "ok": true,
+          "output": "160,80",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-flex-wrapping",
+          "code_hash": "50aaa286a7858dedd6b5159445767ef3dfd78d8c5bdcf02349888bb3094ee4c4",
+          "ran": true,
+          "ok": true,
+          "output": "a,b\nc,d\ne",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-grid-tracks",
+          "code_hash": "422827dd6a97fb0d8ce858de1fd978b6c371c5a5f6ca634aafc03585f73d7c30",
+          "ran": true,
+          "ok": true,
+          "output": "840\n280,560\nminmax(0, 1fr)",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-grid-placement",
+          "code_hash": "30359ba86acdda4c75938feccc24eade6b2efdf8882d35500ddf6ebef0c8632b",
+          "ran": true,
+          "ok": true,
+          "output": "true\n2\nnav,main",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-layout-choice",
+          "code_hash": "916252e3dfd24c80ff57348a1ce94b828a884fd5ac3ab20df976a2e72ae3ced8",
+          "ran": true,
+          "ok": true,
+          "output": "filters:flex\ncatalog:grid",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-viewport",
+          "code_hash": "2479aad667c814a0560dfe8dfa34ddf38a4057d64451dea43a1b8ea4085959e9",
+          "ran": true,
+          "ok": true,
+          "output": "360:stack\n800:row",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-fluid-units",
+          "code_hash": "bddfa12f4da216e4c40bc4f629ff221313360fd3119024fc9d7de33bdf97d2ca",
+          "ran": true,
+          "ok": true,
+          "output": "24\n32\n40",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-image-sources",
+          "code_hash": "249dcd104724acb05afcfe7095d9e5cc54e75e1f1ce5bde54c02af47b353baec",
+          "ran": true,
+          "ok": true,
+          "output": "640\n640",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "responsive-media-priority",
+          "code_hash": "d96ec2747773bebb1aa36baa3c3cb55a342f72f2e7313e2fd5d163271483a3ee",
+          "ran": true,
+          "ok": true,
+          "output": "hero:eager\ngallery:lazy",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "frontend-api-security",
+      "fingerprint": "e78e0ce79db6b7adcd9b1323254fe642dbacf713be8d4920b4a87c44e1b48153",
+      "course_hash": "6703c0a2dff1e879aeb0ecbf6490c4420d289b7f96194d72cff2bba53f6db8a0",
+      "bank_hash": "e4193ce4bcba3db3b7f859968b542224af3a6faa81843251e23710d9dfad1ace",
+      "prerequisites": [
+        "js-dom-async"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 72,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "api-response-contract",
+          "code_hash": "5f4c8788708c0493b28c445fde1dc87dedaabdeeb540469c195e037fd8707551",
+          "ran": true,
+          "ok": true,
+          "output": "error\nempty\ndata",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "api-retry-policy",
+          "code_hash": "a06d5359eedc53136ba33f5fb0cc2e13526d179afdbc010f4ec8c59271df4c44",
+          "ran": true,
+          "ok": true,
+          "output": "0,200,400\nbounded retry\nfix input",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "api-race-ownership",
+          "code_hash": "a4b8a46fdad2a3df3072dd48534dfa25eb2b11cf40d1de2e3718dc01a790e5d2",
+          "ran": true,
+          "ok": true,
+          "output": "new",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "auth-cookie-boundary",
+          "code_hash": "98df88ff8d0476737db8169f5eea38e792102d32169e8326a098581806270614",
+          "ran": true,
+          "ok": true,
+          "output": "not readable through document.cookie\nsecure transport",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "auth-session-lifecycle",
+          "code_hash": "03582da6db2b23e250c8afe4ccc17d324cf3da45f2978877ffbc2020ef98ac14",
+          "ran": true,
+          "ok": true,
+          "output": "2\nrecover session\npermission denied",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "auth-fetch-credentials",
+          "code_hash": "befbc5ba859c4329155dc1ebbd810429481e8a84e2587b355afaafe656da37b7",
+          "ran": true,
+          "ok": true,
+          "output": "false\nhttps://app.example.test",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "security-xss-sinks",
+          "code_hash": "9e6ebd03906036971e75c006f4cb402f6cce1db6dca9241e854f11e0bf3d062e",
+          "ran": true,
+          "ok": true,
+          "output": "false\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "security-csrf-cors",
+          "code_hash": "6fbf8ef7f3116dd98ae86d37b4786d8cd0a1ed9753bea1f97b2530d17082191a",
+          "ran": true,
+          "ok": true,
+          "output": "false\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "security-csp-scripts",
+          "code_hash": "8739e559ab4f4dbef8e4e53663168ca398e44e9bb9ffbdba456fe7d5a840da8b",
+          "ran": true,
+          "ok": true,
+          "output": "violation reported only\nviolation blocked\nintegrity verifies bytes, not intent",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "frontend-quality",
+      "fingerprint": "152e475e36420301384667c9dd78a7d1234f7f410f5510af4bbb10b10f5b231d",
+      "course_hash": "c7cf67b58bbce7f4a76a9e9c8cf5404e5e4971a7cfaee746888dc6c54a680a97",
+      "bank_hash": "7db57573475e99e8f66ccb1149ad1c7f336c77837345bca5455cfa8943bea57f",
+      "prerequisites": [
+        "react-fundamentals"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 96,
+      "comprehensive": 90,
+      "objectives": 8,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "quality-keyboard-focus",
+          "code_hash": "4f9d7e92b64fc28d07cd551ea79c633974fe1ecd6443f78f7fd78ae543835ec3",
+          "ran": true,
+          "ok": true,
+          "output": "email -> pay",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-labels-contrast",
+          "code_hash": "80d16cc01096387ea27ca328f327984a9a7dbbf8d52e18a397efb6aaebf9c909",
+          "ran": true,
+          "ok": true,
+          "output": "fail normal-text threshold\npass normal-text threshold",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-native-aria",
+          "code_hash": "b6ca66850a1cc8ccc99dfb24af89d086c10e692088d6a6a2c2591b939f95b376",
+          "ran": true,
+          "ok": true,
+          "output": "true\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-component-contract",
+          "code_hash": "9ba6f1d75f14129648b02ceff408a87ac40e465750b6bd81e0b2e65f3c1fab77",
+          "ran": true,
+          "ok": true,
+          "output": "2 assertions passed",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-end-to-end",
+          "code_hash": "69c2e88e04ec250b10c6d8c1528a309c5aeff6a4e7d3b603202e7ca6161b96fb",
+          "ran": true,
+          "ok": true,
+          "output": "journey contract checked",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-test-layers",
+          "code_hash": "3caf709f0d3b01f4394872e280357a1fd38ed4c2b21e9ee88c042b21ff9c173b",
+          "ran": true,
+          "ok": true,
+          "output": "zero-value contract asserted",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-vitals-diagnosis",
+          "code_hash": "bce6449386523dd0ed93fa25bb3b35cef0a5beafe25a9ede6f9587ef0e193f33",
+          "ran": true,
+          "ok": true,
+          "output": "2400\ngood LCP sample",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-resource-delivery",
+          "code_hash": "6c34ecd54c5a117139ebb5a38360b68e6222e6bfd0e5d49988cfe83f8653a7db",
+          "ran": true,
+          "ok": true,
+          "output": "true\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-performance-experiment",
+          "code_hash": "543d9a1ef7fb5d5118288107d08d4958c04f624556519782509f7c12f9dc423a",
+          "ran": true,
+          "ok": true,
+          "output": "90",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-release-pipeline",
+          "code_hash": "b89b139db9f64bdfb15ccfffb244bd661d546eac3a3a59814bb5b5ceacf5a4a3",
+          "ran": true,
+          "ok": true,
+          "output": "true",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-error-monitoring",
+          "code_hash": "5237ddc2c0e9f336dd57979bee698dcae977dc26c3b3bd9ad9c70e81787bf4a5",
+          "ran": true,
+          "ok": true,
+          "output": "5.0%\n{\"category\":\"api_timeout\",\"release\":\"synthetic-r1\"}",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "quality-rollback-assets",
+          "code_hash": "aac6c5750038b8f427dba204eceef9a30d8b9feeecaebffc928bec060e58ce9a",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfrontend rollback is not data rollback",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "web-deployment-cicd",
+      "fingerprint": "9a2ebb61d743fa1cc041e31b13fa90ba2a57bfbff9129e4c483efd4a04ba2535",
+      "course_hash": "cf1e445cb90b43fdbfe15b8cd8a3484fef1e98ebc4c0a3433c7b53e125056072",
+      "bank_hash": "40addffa7440fbe2b24ef448014a90271d8808eab1a235f9a826c7646daab739",
+      "prerequisites": [
+        "backend-deployment-ops"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 48,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "web-deployment-cicd.l01",
+          "code_hash": "4882dadb2b6aaaf116029fc15a948819ca17be639d9267df2016ba341ed37020",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "web-deployment-cicd.l02",
+          "code_hash": "17811b99b9f529179b138e74481422b275497edb203a46ede4a88e14178ceaf3",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "web-deployment-cicd.l03",
+          "code_hash": "d314929b0625fa47767fa45eb025fdd8e0d4ad66c5b38d5be83c81e34bf0d21a",
+          "ran": true,
+          "ok": true,
+          "output": "{\"tests\":true,\"deploy\":false}\n{\"tests\":true,\"deploy\":true}",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "web-deployment-cicd.l04",
+          "code_hash": "56c5e0a471e9374494bc76d42120c7db69490247bb6d31d25e13d316e6baf23c",
+          "ran": true,
+          "ok": true,
+          "output": "false\ninvalid flag",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "web-deployment-cicd.l05",
+          "code_hash": "83f2d0441fb74be8823370a1fb22ee04cbff0a2eb87315af4702c2f9156e65c8",
+          "ran": true,
+          "ok": true,
+          "output": "true true\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "web-deployment-cicd.l06",
+          "code_hash": "292e168951e829e10099005afc3e5ea51a9642d7029aeb6dcacbad0a920015bc",
+          "ran": true,
+          "ok": true,
+          "output": "false\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "web-deployment-cicd.l07",
+          "code_hash": "b23c24378873efd2dfcf748d1f56cd7c5dda900b172c88c9f871aeaf5d2eef3e",
+          "ran": true,
+          "ok": true,
+          "output": "1.0%\n10.0",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "web-deployment-cicd.l08",
+          "code_hash": "a340af6f8b5a136effb6596c8efd059087e067ee9af1c7e62dc1eb573e6692a1",
+          "ran": true,
+          "ok": true,
+          "output": "submit -> api-failed",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "web-deployment-cicd.l09",
+          "code_hash": "38ba2855c36a50b6849115491a7ac06cdfc0a6bb093f0b316e9bcc156edeeec6",
+          "ran": true,
+          "ok": true,
+          "output": "3\n1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "fullstack-architecture",
+      "fingerprint": "cf98d6b0eea18418507fd99e248ce9d918621f5fc8724eb4c6c263a93e1672f6",
+      "course_hash": "d5559846c6b4ebbda0d6fb98584eb7a6a996dbdb56e11456d5a54204808f3f4b",
+      "bank_hash": "3578fa985efda57b1643945d2fe60fb7606b42249bdac0f96e34e03ee862a138",
+      "prerequisites": [
+        "fullstack-integration-state",
+        "database-design"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 48,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "fullstack-architecture.l01",
+          "code_hash": "330d3aca896a8db038898aa593084da0a54d42c534429425964aaf026e5aa427",
+          "ran": true,
+          "ok": true,
+          "output": "650\ninvalid refund",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-architecture.l02",
+          "code_hash": "f271f4c14593129fbe95f1e3e88f3f085850ad682bd61d6cebc3d67a2c4f95d6",
+          "ran": true,
+          "ok": true,
+          "output": "modular baseline\nconsider extraction",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-architecture.l03",
+          "code_hash": "4d37ca0d6ca9e0f138716241ba6a0f69d2431412b751aec09f22208e192a5b3f",
+          "ran": true,
+          "ok": true,
+          "output": "0 0\n1 1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-architecture.l04",
+          "code_hash": "3ba230844cad8ff0a271cf0fad991f590b6760a9f964b53ebfa50e45402bd790",
+          "ran": true,
+          "ok": true,
+          "output": "{\"id\":\"i1\"}\nforbidden",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-architecture.l05",
+          "code_hash": "8f2ab86ea156d3138a486ec7f46bd1dbf42bef17c67d9753e6ecf82f2b25751a",
+          "ran": true,
+          "ok": true,
+          "output": "false\ntrue",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-architecture.l06",
+          "code_hash": "4496fc46b167b26b96917dfb4f3a5150b6a5d7b8da78ea8944a9794ecdf520f8",
+          "ran": true,
+          "ok": true,
+          "output": "applied duplicate 1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-architecture.l07",
+          "code_hash": "5565122c69050f3467e0e0dc8d17843dcc67f7621a56987c020c6e436d0f3e96",
+          "ran": true,
+          "ok": true,
+          "output": "700 700\ndiverged",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-architecture.l08",
+          "code_hash": "a0808ec8f304168258d8bcaa7756160976a2cd55d18115c68c9818af3f4aa6e8",
+          "ran": true,
+          "ok": true,
+          "output": "fresh",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "fullstack-architecture.l09",
+          "code_hash": "d585bda1f92e1ddfc6553b48063ab5ccaff17e738411951ed6f492afc08a7622",
+          "ran": true,
+          "ok": true,
+          "output": "3\n300 301",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "feature-eng-evaluation",
+      "fingerprint": "1f20977f91a45897bf38a7e1a541d0aea590fc20675831875e64ed501498bf41",
+      "course_hash": "57dbe6e60d2c40ad2348ec6b31412fa490a56048869b8f327ec37b6494d7d527",
+      "bank_hash": "73363297b034e586425c6a09087fdaeedd3602caf33a148c65edca3d5e68012d",
+      "prerequisites": [
+        "supervised-learning"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 58,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "feature-eng-evaluation-decision-time-features",
+          "code_hash": "08ec7626fcdbf2cb5058828c06d7da0eb52085ed888a63e434df4627cb65b13a",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 1, 0]\n[4]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "feature-eng-evaluation-text-representation",
+          "code_hash": "fc709a3d49f0042109d04b231e9621510b92a54fb64366d5853b9e746ce6dede",
+          "ran": true,
+          "ok": true,
+          "output": "['arrived', 'late', 'parcel']\n[[0, 0, 1]]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "feature-eng-evaluation-selection-cardinality",
+          "code_hash": "d5b6d9345e61b3c7e65045329f5c4948d67e2851e99c0d19164ae5fc84b98189",
+          "ran": true,
+          "ok": true,
+          "output": "[True, False]\n[8.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "feature-eng-evaluation-confusion-costs",
+          "code_hash": "ef9b83a44edc328a4127d0ed4d676221fcdcba1f85c37903bb392738abf90cc9",
+          "ran": true,
+          "ok": true,
+          "output": "[[2, 1], [1, 2]]\n0.6667 0.6667 0.6667",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "feature-eng-evaluation-ranking-regression",
+          "code_hash": "e7db53f1c7768a2f76dbe7b125652e2af92aa85490697bdd587bd85dd322b86c",
+          "ran": true,
+          "ok": true,
+          "output": "2.0\n2.828427\n1.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "feature-eng-evaluation-imbalance-protocol",
+          "code_hash": "906cdef960e8ac4ef0965c5646fb39d888fa876bcc451d213befb43aec18242b",
+          "ran": true,
+          "ok": true,
+          "output": "0.9\n0.0\n[0.555556, 5.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "feature-eng-evaluation-segment-audit",
+          "code_hash": "0e46f737e98448d3024a9d858ed579a2ca95b3a0fd5022e1ced3f1a53e9b0777",
+          "ran": true,
+          "ok": true,
+          "output": "{'day': 1.0, 'night': 3.0}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "feature-eng-evaluation-calibration",
+          "code_hash": "bb5cebd0e839d2fa2e4a5a4f7dd021b65967e59ea50a9821839dd2a915e096b6",
+          "ran": true,
+          "ok": true,
+          "output": "0.3125\n[0.5, 0.5] [0.25, 0.75]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "feature-eng-evaluation-threshold-policy",
+          "code_hash": "6410157b816c2f33219a155b6b647da1ddeeb7bb71d44a1cad2f0a5be0d0c60d",
+          "ran": true,
+          "ok": true,
+          "output": "0.3 3 [[1, 1], [0, 2]]\n0.7 1 [[2, 0], [1, 1]]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "agents-tool-calling",
+      "fingerprint": "f562dce546baf8ad5b8111098b25ec243fed899a5241fa89f20b8f12ff4d8575",
+      "course_hash": "c7dbebb5b15033b186ad7311a966ee91d7881c6d4eba3e05cae282357f9ea7a5",
+      "bank_hash": "5fa0d60a36176a7a18f11a67d6e215e2cb859d0df6695ea0f6e8aa504b3bba32",
+      "prerequisites": [
+        "prompting-structured-output"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 58,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "agents-tool-calling-argument-contract",
+          "code_hash": "757cb2c44fc0466103e3f801976a09c8c44ccd437d260231792446618a8450b0",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "agents-tool-calling-dispatch-results",
+          "code_hash": "e300148f045e610a72cd5a56a79826d4cd02e31dd72c8d0ecc0180d156c2279b",
+          "ran": true,
+          "ok": true,
+          "output": "c7 3\nFalse"
+        },
+        {
+          "id": "agents-tool-calling-multi-call-state",
+          "code_hash": "9fda75690eb16bc94f295677893b09779afd719c0131bc9e56f2b31aa985b3cb",
+          "ran": true,
+          "ok": true,
+          "output": "['member', 'sun']"
+        },
+        {
+          "id": "agents-tool-calling-bounded-loop",
+          "code_hash": "f591faed62b9ce1eb6ac7f955cfb164c23ac035014c69ad859993f259d19ed78",
+          "ran": true,
+          "ok": true,
+          "output": "3 budget_exhausted"
+        },
+        {
+          "id": "agents-tool-calling-error-contract",
+          "code_hash": "8c9624121b71e6322e5dd4192dc1c30fd2f6a0a6d6e68c2c6cbff3940556974b",
+          "ran": true,
+          "ok": true,
+          "output": "invalid_arguments False\ndenied False\ntemporarily_unavailable True"
+        },
+        {
+          "id": "agents-tool-calling-idempotent-recovery",
+          "code_hash": "e09ad73f2bd308bb1d4b127dba0509de7a784f3949048c84174dafda6db43fe5",
+          "ran": true,
+          "ok": true,
+          "output": "shipment-1\nshipment-1\nconflict"
+        },
+        {
+          "id": "agents-tool-calling-scoped-permissions",
+          "code_hash": "ee24a1416e837ad234a9b81bed9cc4c04ba1a04084198319bd532193ebe00fb1",
+          "ran": true,
+          "ok": true,
+          "output": "parcel\ndenied"
+        },
+        {
+          "id": "agents-tool-calling-approval-binding",
+          "code_hash": "33a6d15061b59a3b234aaaf4527d5fd27509fa8bd28adf0867fcfa59b404773d",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "agents-tool-calling-untrusted-tool-data",
+          "code_hash": "e639a75298d9d896cba450e027795ca9a88b12997f609a616c6119d8ab6a16ab",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "infrastructure-as-code",
+      "fingerprint": "0e8ea34bed39fd5862ff0a61807928da0c09710502433082bcf61fc094900c9f",
+      "course_hash": "97f97cdf9de1acc86990963bc29125a2f0f225206e1cca322f5e556553abec51",
+      "bank_hash": "1117163a6c061bb0cdd46c51bf51b5db799f68651304d9a5ecc5e403a135c8fd",
+      "prerequisites": [
+        "cloud-aws-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "infrastructure-as-code-l1",
+          "code_hash": "53c9f8f79bcdead836fa0ade91b609fe84d349e98f67be908f2a011f1df37180",
+          "ran": true,
+          "ok": true,
+          "output": "network\nsubnet\napp"
+        },
+        {
+          "id": "infrastructure-as-code-l2",
+          "code_hash": "5623b3fad13a5b93af0e69def9730617e07e639d540fe286f8b209b929764fea",
+          "ran": true,
+          "ok": true,
+          "output": "3:True\n0:False\n2.5:False\nTrue:False"
+        },
+        {
+          "id": "infrastructure-as-code-l3",
+          "code_hash": "47246295022dbae7b512065878a92d3a52e5d396a7256eaa14485506284a3886",
+          "ran": true,
+          "ok": true,
+          "output": "tag:update\ndatabase:replacement\nqueue:create"
+        },
+        {
+          "id": "infrastructure-as-code-l4",
+          "code_hash": "7ac2be40b661f39719202956ee9eb0d3c81bbada5febb5f14c97b66b02e23da7",
+          "ran": true,
+          "ok": true,
+          "output": "unbound:queue.jobs\norphan:queue.old"
+        },
+        {
+          "id": "infrastructure-as-code-l5",
+          "code_hash": "ec7f7c4e29b28425e737cb6743d785d02172e9640e50405252e3c6d8fe814c44",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nTrue"
+        },
+        {
+          "id": "infrastructure-as-code-l6",
+          "code_hash": "7ce2703ce59acde2287c1b1708adbfe01f3773ad7cc108134dfb249d18cc7cc7",
+          "ran": true,
+          "ok": true,
+          "output": "['worker.app']\nTrue"
+        },
+        {
+          "id": "infrastructure-as-code-l7",
+          "code_hash": "600ccd0743c7fa7a58dea09629daf020e4eaf64caab79b104338a1f97c17372e",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "infrastructure-as-code-l8",
+          "code_hash": "8b8f2a8ab780de5fe0cadf06dae724066664bb241a1e280a962655209b398965",
+          "ran": true,
+          "ok": true,
+          "output": "8\nFalse"
+        },
+        {
+          "id": "infrastructure-as-code-l9",
+          "code_hash": "e3abf081727e6e5d973708037a2021bf99ff7e2944e29033cad722d12cd2fab2",
+          "ran": true,
+          "ok": true,
+          "output": "stale-review\ncritical-delete\neligible-for-review"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "reliability-incident-cost",
+      "fingerprint": "80fd4836422afdcfcafaa614dace32f44590e452296e031529a8df6493f5ceb0",
+      "course_hash": "1db8b4aee485c8ce60593e804d1ac61b0bb9476d2b4c478f6d5d1d607b783ca2",
+      "bank_hash": "b5275d1f96cd3803cbe9070b048a2948292fd4ffd3691e2b8427ce848a2fdfb8",
+      "prerequisites": [
+        "observability"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 58,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "reliability-incident-cost-l1",
+          "code_hash": "e146b40f9150d04919a00b72a48fed0f92af24448877c02f5b0040539c49b436",
+          "ran": true,
+          "ok": true,
+          "output": "0.9975\n100\n2.5"
+        },
+        {
+          "id": "reliability-incident-cost-l2",
+          "code_hash": "b208b4418bd4a10c39676f4f29f59f3ae915608c2bd5e51956767795d1027146",
+          "ran": true,
+          "ok": true,
+          "output": "a:True\nb:True\nc:True"
+        },
+        {
+          "id": "reliability-incident-cost-l3",
+          "code_hash": "141a6387765ab68bd7a79f3060390a79cc6b0ae9387157ef4d0fc4c044dee475",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "reliability-incident-cost-l4",
+          "code_hash": "d055e49afeacbaba0c9aba46dd5bbb3aa446529d7dabca3715ee2246591c402f",
+          "ran": true,
+          "ok": true,
+          "output": "command:True\noperations:True\ncommunications:False"
+        },
+        {
+          "id": "reliability-incident-cost-l5",
+          "code_hash": "663554868e4ddd342d33bcc5a3e78f9ee02193e5c8b5d0d298be8f60d1cd555b",
+          "ran": true,
+          "ok": true,
+          "output": "rollback:True\nglobal-delete:False\ncanary-limit:True"
+        },
+        {
+          "id": "reliability-incident-cost-l6",
+          "code_hash": "88e7bfbb8d27f3cb9519398740964670de1f513770a04f3e58dfebe4b1d68484",
+          "ran": true,
+          "ok": true,
+          "output": "guard:True\nbe careful:False"
+        },
+        {
+          "id": "reliability-incident-cost-l7",
+          "code_hash": "0037a43d6e02ed5c0ae21dde7e81d5e05681de6eadb8c1522acd8ac3df0bac55",
+          "ran": true,
+          "ok": true,
+          "output": "before:0.100\nafter:0.075"
+        },
+        {
+          "id": "reliability-incident-cost-l8",
+          "code_hash": "7e8f1d1cbb19e14363d07411033de42c541816384639d7c26d669b6c67179f0a",
+          "ran": true,
+          "ok": true,
+          "output": "8:False\n12:True\n16:True"
+        },
+        {
+          "id": "reliability-incident-cost-l9",
+          "code_hash": "3a5f7156e7a0d9baceb1c6647d4b8548bbcc53bfd74ca3cd7e1a6e474b3f3176",
+          "ran": true,
+          "ok": true,
+          "output": "6000\n4000:False\n8000:True"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "data-modeling-warehousing",
+      "fingerprint": "aaea6c645ef43c254ae45a1994580f726dc06e4c09c5e8a78041ceec5a446a7e",
+      "course_hash": "af5f184106a0030d0a1bdbc04c5931d0ec913d5bfab6d77d4d3f4430be876d1c",
+      "bank_hash": "1d19eeb0e8798f6dee52301358488a528308313ad0b8a33d969c6aa5ee01a472",
+      "prerequisites": [
+        "database-design"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "warehouse-grain",
+          "code_hash": "329b578a70f897051ca6cf5000fcfe3053246351bf79734d11fa9a1ef3bc2421",
+          "ran": true,
+          "ok": true,
+          "output": "2 150\n300"
+        },
+        {
+          "id": "warehouse-scd",
+          "code_hash": "4b5d00560d77490b9494dbde69d20460e3cdc99cd9935d0900d4ecfd6bb28db2",
+          "ran": true,
+          "ok": true,
+          "output": "11 north\n12 south\n12 south"
+        },
+        {
+          "id": "warehouse-fact-types",
+          "code_hash": "547bd8c3c30ece0651e7903b176f9ddc986d69387fb41165027c96c78a6cb6af",
+          "ran": true,
+          "ok": true,
+          "output": "220 120\n{'email': 50, 'search': 150}"
+        },
+        {
+          "id": "warehouse-storage",
+          "code_hash": "726cb75a02e6bbd0727022321911caa152bfc485da94a907dc843a3879345541",
+          "ran": true,
+          "ok": true,
+          "output": "operational True\nscan_mart False"
+        },
+        {
+          "id": "warehouse-partitions",
+          "code_hash": "31038a8c9655e1aaa0d4b763c5a17f38a1c105290588bc18b2bdc7d480f8f07b",
+          "ran": true,
+          "ok": true,
+          "output": "['feb']\nTrue"
+        },
+        {
+          "id": "warehouse-cluster",
+          "code_hash": "813b8c5c3bd184533cfc0f4a085c7537adbee8d864367a94aa65df4be56bd1b4",
+          "ran": true,
+          "ok": true,
+          "output": "grouped 1\nmixed 2"
+        },
+        {
+          "id": "warehouse-metric-contract",
+          "code_hash": "0c6462dc510ec62693d601d8236fd941bb31bfb38f7b0ac8adb4c23956bd5fe5",
+          "ran": true,
+          "ok": true,
+          "output": "80\n130"
+        },
+        {
+          "id": "warehouse-semantic-joins",
+          "code_hash": "c92c3db0e6d3bbbf4993faf5b826d8803f6b859e102acf99a9b6ab0b56ce0dfc",
+          "ran": true,
+          "ok": true,
+          "output": "6 300\n100 3"
+        },
+        {
+          "id": "warehouse-governed-release",
+          "code_hash": "012a789dae2a3789fee6052eab071e2cbde662d3290ad7f23d80becd219b4207",
+          "ran": true,
+          "ok": true,
+          "output": "0\n{'north': 10, 'south': -10}"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "etl-elt-architecture",
+      "fingerprint": "b67cd2de291f1e2eacc47b7434b9c762e1ef38076d012f2f4e784f89f98dc259",
+      "course_hash": "9e27f90fc0311e076b710c0fe91a55e151b9b0b3efbc4a9e47a5906cdfc10633",
+      "bank_hash": "0589e6c5e8be837a2e67ec8c2a0eeb61f12108f8cd93d89005b7a3a03303655a",
+      "prerequisites": [
+        "sql-fundamentals",
+        "python-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 64,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "etl-placement",
+          "code_hash": "37176b46af9461f507a868e2b1a7a8eaf89a4d79e9caa7905813c7afb6eba352",
+          "ran": true,
+          "ok": true,
+          "output": "[{'region': 'west', 'visits': 3}]"
+        },
+        {
+          "id": "etl-incremental",
+          "code_hash": "a79b982110a20fb70766c851b90edc761733972f91bd8fd5787dd9dccce0517c",
+          "ran": true,
+          "ok": true,
+          "output": "['c']\n['b', 'c']"
+        },
+        {
+          "id": "etl-cdc",
+          "code_hash": "927c800a54cf6e3ec108241c69951143e01f0f247a945b87ba06ed04ceec9979",
+          "ran": true,
+          "ok": true,
+          "output": "{}\n[1, 2, 3]"
+        },
+        {
+          "id": "etl-idempotent",
+          "code_hash": "3bfbef6b2972277c64cf337f3d0da73a18747223bcf1b455f29e313e8d87535a",
+          "ran": true,
+          "ok": true,
+          "output": "(1, 40)"
+        },
+        {
+          "id": "etl-late-events",
+          "code_hash": "12081cd08f25d9b7bd4dc43110d00e153fe0751faa608d13e8d1ad9522089b41",
+          "ran": true,
+          "ok": true,
+          "output": "{'2026-03-01': 2}\n{'2026-03-01': 1, '2026-03-03': 1}"
+        },
+        {
+          "id": "etl-atomic-batch",
+          "code_hash": "70ab91ba15445bbdc50ddd1d425df0b85019d72bc4420662e9b5d216937ede34",
+          "ran": true,
+          "ok": true,
+          "output": "[(1, 10)]"
+        },
+        {
+          "id": "etl-api-integration",
+          "code_hash": "da190768746b631320034df957acddb0c66e3344ece5d06ebdd58e6896ae0a24",
+          "ran": true,
+          "ok": true,
+          "output": "s1 True\ns2 False"
+        },
+        {
+          "id": "etl-file-database",
+          "code_hash": "3deaea1d6114c47bd0196a7e99998dc771ebc13d9455a68ab845b7be3a40b706",
+          "ran": true,
+          "ok": true,
+          "output": "s1 1250 fragile, handle carefully"
+        },
+        {
+          "id": "etl-contract-release",
+          "code_hash": "c1375d1cd73a6875c692ab861d56aef373cd7e656348829d2ff424a3559738fb",
+          "ran": true,
+          "ok": true,
+          "output": "['south']\n5 3\nFalse"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    }
+  ],
+  "duplication": {
+    "errors": [],
+    "warnings": []
+  },
+  "completed": [
+    "node-express",
+    "react-fundamentals",
+    "fullstack-integration-state",
+    "numpy-arrays",
+    "ml-preprocessing",
+    "ml-fundamentals",
+    "data-visualization",
+    "scripting-automation",
+    "observability",
+    "supervised-learning",
+    "rag-advanced",
+    "llm-security-eval",
+    "llm-deployment-cost",
+    "spreadsheet-analysis",
+    "data-storytelling",
+    "responsive-css",
+    "frontend-api-security",
+    "frontend-quality",
+    "web-deployment-cicd",
+    "fullstack-architecture",
+    "feature-eng-evaluation",
+    "agents-tool-calling",
+    "infrastructure-as-code",
+    "reliability-incident-cost",
+    "data-modeling-warehousing",
+    "etl-elt-architecture"
+  ],
+  "pending": [
+    "react-advanced",
+    "nextjs-architecture",
+    "mobile-ui-fundamentals",
+    "dart-programming",
+    "flutter-fundamentals",
+    "flutter-layout-nav-state",
+    "kotlin-android",
+    "react-native",
+    "mobile-apis-networking",
+    "mobile-storage",
+    "mobile-auth-security",
+    "mobile-architecture",
+    "mobile-testing-debugging",
+    "mobile-performance-platform",
+    "app-distribution",
+    "unsupervised-learning",
+    "deep-learning",
+    "computer-vision",
+    "nlp-fundamentals",
+    "mlops-deployment",
+    "responsible-ai-monitoring",
+    "agent-workflows",
+    "powerbi-modeling",
+    "dashboards-reporting",
+    "data-transformation-pipelines",
+    "workflow-orchestration",
+    "data-quality-testing",
+    "batch-streaming",
+    "cloud-data-platforms",
+    "data-reliability-recovery",
+    "data-governance-security",
+    "security-foundations",
+    "identity-access-control",
+    "cryptography-secure-comms",
+    "vulnerabilities-defense",
+    "security-logging-monitoring",
+    "soc-siem",
+    "incident-response",
+    "network-endpoint-cloud-security",
+    "security-grc",
+    "kubernetes",
+    "playwright-automation",
+    "automation-frameworks",
+    "ci-test-reporting",
+    "performance-quality-engineering",
+    "oop-principles",
+    "java-fundamentals",
+    "complexity-analysis",
+    "arrays-strings-hashing",
+    "linear-structures",
+    "recursion-backtracking",
+    "searching-sorting",
+    "trees-bst",
+    "graphs",
+    "greedy-dp",
+    "debugging-testing",
+    "software-design",
+    "engineering-problem-solving"
+  ],
+  "human_approved": false,
+  "published": false
+}

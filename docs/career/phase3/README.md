@@ -1,4 +1,4 @@
-The latest [resumed mass-scale wave](mass-scale-wave2/README.md) records 48 authored drafts and the exact continuation state.
+The latest [mass-scale Wave 3 report](mass-scale-wave3/README.md) records 74 authored drafts, 15 complete job-role drafts and the exact 58-subtrack continuation inventory.
 
 # Phase 3: content engine and first two authoring batches
 

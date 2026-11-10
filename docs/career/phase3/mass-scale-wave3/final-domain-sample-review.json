@@ -1,0 +1,1321 @@
+{
+  "schema_version": 1,
+  "review_kind": "AI/editorial substantive domain sample review",
+  "human_approval": false,
+  "human_approved": [],
+  "publication_approval": false,
+  "created_at": "2026-11-10T14:58:30.950Z",
+  "scope": {
+    "course_ids": [
+      "fullstack-architecture",
+      "feature-eng-evaluation",
+      "agents-tool-calling",
+      "infrastructure-as-code"
+    ],
+    "formal_items_per_course": 2,
+    "lesson_example_boundaries_per_course": 1,
+    "selection": "Deterministic midpoint of hard items, midpoint of advanced items, and midpoint lesson in each frozen package.",
+    "content_files_edited": true,
+    "limitations": [
+      "A sample review cannot establish the correctness or difficulty calibration of all bank items.",
+      "No live infrastructure, model endpoint, distributed cache, browser integration or production ML evaluation was executed for this review.",
+      "Worked-example execution results are read from the existing private CLI artifacts; this review did not rerun those examples.",
+      "Difficulty judgments require subject-matter review and eventual learner performance evidence.",
+      "No human educational approval or publication approval is inferred."
+    ],
+    "content_files_edited_in_remediation": [
+      "/workspace/echolens-lms/career/curriculum/learning/wave1/fullstack-architecture.js",
+      "/workspace/echolens-lms/career/curriculum/learning/wave1/feature-eng-evaluation.js",
+      "/workspace/echolens-lms/career/curriculum/learning/wave1/agents-tool-calling.js",
+      "/workspace/echolens-lms/career/curriculum/learning/wave1/infrastructure-as-code.js"
+    ],
+    "original_sample_was_read_only": true,
+    "no_shared_helpers_registries_or_tests_edited": true
+  },
+  "courses": [
+    {
+      "id": "fullstack-architecture",
+      "source_files": [
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/learning/wave1/fullstack-architecture.js",
+          "sha256": "7b4b3bc50511790bec86f1a7f1fed3a59629486e7ed0dfe31bfac01abeead8d5"
+        },
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/questions/wave1/fullstack-architecture.js",
+          "sha256": "98aae78b4ee01aed1397ecca60f5bac814a664cb5785e4a5b8697075dd1e9558"
+        }
+      ],
+      "sampled_formal_items": [
+        {
+          "id": "fullstack-architecture.w3.056",
+          "difficulty": "hard",
+          "prompt": "A paused worker resumes with lease generation 41 after generation 42 has taken ownership. Both can reach the storage service. Which control prevents generation 41 from committing after the transfer?",
+          "options": [
+            "Serialize queue delivery while allowing both workers to write to storage directly",
+            "Enforce generation 42 at storage and reject older generations on every commit",
+            "Check generation 41 in worker memory before beginning the next long operation",
+            "Renew generation 42 more frequently while accepting writes without generation checks"
+          ],
+          "answer_index": 1,
+          "answer": "Enforce generation 42 at storage and reject older generations on every commit",
+          "technical_review": "The revised hard case specifies generations 41 and 42 and a stale writer reaching storage. Only a destination-enforced generation check on commits prevents the obsolete writer; local checks, heartbeat frequency and queue serialization do not fence a previously delivered operation.",
+          "technical_key_defensible": true,
+          "option_lengths": [
+            81,
+            77,
+            77,
+            84
+          ],
+          "difficulty_requires_sme_calibration": true
+        },
+        {
+          "id": "fullstack-architecture.w3.050",
+          "difficulty": "advanced",
+          "prompt": "A cache accepts arbitrary tenant and invoice strings, including colons. Concatenating tenant=a,id=bc and tenant=ab,id=c aliases both to abc. Summary and private views must also remain distinct. Which key design prevents both tuple aliasing and cross-view reuse without restricting these strings?",
+          "options": [
+            "Join tenant, id and view with colons and hash the joined string",
+            "Serialize [tenant+id,view] and hash the serialized value",
+            "Serialize [tenant,id] and let TTL distinguish summary from private",
+            "Serialize [tenant,id,view] as a JSON tuple before optional hashing"
+          ],
+          "answer_index": 3,
+          "answer": "Serialize [tenant,id,view] as a JSON tuple before optional hashing",
+          "technical_review": "The revised advanced case requires preserving arbitrary string tuple boundaries and a distinct permission-dependent view. JSON tuple encoding preserves all three string dimensions; delimiter joining, concatenation before serialization and omitted view each violate a stated constraint.",
+          "technical_key_defensible": true,
+          "option_lengths": [
+            63,
+            56,
+            66,
+            66
+          ],
+          "difficulty_requires_sme_calibration": true
+        }
+      ],
+      "sampled_lesson": {
+        "id": "fullstack-architecture.l05",
+        "title": "Cache representations with ownership and freshness rules",
+        "worked_code_sha256": "5e4e1b84231a22ca21daedb30f2d4d4f7bcdf39975c5954bfd9b12043c5fa91d",
+        "expected_output": "false\ntrue",
+        "boundary_review": "The tuple fixture prints false then true and distinguishes tenant strings for the supplied tuples. It does not implement a cache, permission checks, eviction, distributed locking or a general encoder for arbitrary JavaScript values. The lesson explicitly limits the result to the shown dimensions and inputs.",
+        "execution_limit_accurate": true,
+        "prior_execution_evidence": {
+          "artifact": "/tmp/wave3-final-fullstack.json",
+          "ran": true,
+          "ok": true,
+          "code_hash_matches": true
+        },
+        "post_remediation_execution_evidence": {
+          "artifact": "/tmp/wave3-final-domain-remediation-validation.json",
+          "ran": true,
+          "ok": true,
+          "code_hash_matches": true
+        }
+      },
+      "technical_error_confirmed": false,
+      "pre_remediation_source_files": [
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/learning/wave1/fullstack-architecture.js",
+          "sha256": "38a6c99f68d16231af1def3291feaa2d7b665d0f6a1ec43923230888fc51eae4"
+        },
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/questions/wave1/fullstack-architecture.js",
+          "sha256": "98aae78b4ee01aed1397ecca60f5bac814a664cb5785e4a5b8697075dd1e9558"
+        }
+      ]
+    },
+    {
+      "id": "feature-eng-evaluation",
+      "source_files": [
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/learning/wave1/feature-eng-evaluation.js",
+          "sha256": "2f8e9af587922dca51a9984659e7ac9ba9769f59de5ba0c3c4ba01a1538ec364"
+        },
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/questions/wave1/feature-eng-evaluation.js",
+          "sha256": "7e5d79fb3bee4620ef733b2699698d57d7f7b6d3c0484aa70e4b7d5f9b42bc69"
+        }
+      ],
+      "sampled_formal_items": [
+        {
+          "id": "feature-eng-evaluation.f56",
+          "difficulty": "hard",
+          "prompt": "A balanced validation set yields high precision, but production prevalence is one percent. Sensitivity is 0.8 and specificity 0.9. Approximate production precision is what?",
+          "options": [
+            "7.5 percent",
+            "80 percent",
+            "89 percent",
+            "50 percent"
+          ],
+          "answer_index": 0,
+          "answer": "7.5 percent",
+          "technical_review": "At prevalence 0.01, TP proportion is 0.8*0.01=0.008 and FP proportion is (1-0.9)*0.99=0.099. Precision is 0.008/(0.008+0.099)=0.074766..., so 7.5 percent is correct.",
+          "technical_key_defensible": true,
+          "option_lengths": [
+            11,
+            10,
+            10,
+            10
+          ],
+          "difficulty_requires_sme_calibration": true
+        },
+        {
+          "id": "feature-eng-evaluation.f50",
+          "difficulty": "advanced",
+          "prompt": "Two held-out accounts have true costs $100 and $1000. Model A predicts $100 and $1600; B predicts $200 and $1200. Natural-log RMSE is about 0.33 for A and 0.51 for B. Deployment instead requires minimum weighted currency MAE using weights 1 and 5, and at most $250 absolute error on the high-value account. Which assessment follows that policy?",
+          "options": [
+            "B; weighted MAEs A=$300, B=$150; both satisfy the cap",
+            "Neither; weighted MAEs A=$500, B≈$183; both violate the cap",
+            "B; weighted MAEs A=$500, B≈$183; only B meets the cap",
+            "A; weighted MAEs A=$100, B≈$117; lower log RMSE decides"
+          ],
+          "answer_index": 2,
+          "answer": "B; weighted MAEs A=$500, B≈$183; only B meets the cap",
+          "technical_review": "The advanced item now requires computing A=(0+5*600)/6=$500, B=(100+5*200)/6≈$183.33, checking high-value absolute errors $600 versus $200 against the $250 cap, and applying the stated objective despite A having lower log RMSE.",
+          "technical_key_defensible": true,
+          "option_lengths": [
+            53,
+            59,
+            53,
+            55
+          ],
+          "difficulty_requires_sme_calibration": true
+        }
+      ],
+      "sampled_lesson": {
+        "id": "feature-eng-evaluation-ranking-regression",
+        "title": "Distinguish ranking metrics from numeric error",
+        "worked_code_sha256": "7e64f9f53de06b2eb03534ae5eb69def5d83853dcccc33cee07805cc7812709f",
+        "expected_output": "2.0\n2.828427\n1.0",
+        "boundary_review": "MAE([0,0],[0,4]) is 2.0; RMSE is sqrt(8)=2.828427 rounded; all positive ranking scores exceed all negative scores, yielding ROC-AUC 1.0. The fixture uses scikit-learn metrics on supplied data and explicitly does not establish production accuracy, representative sampling, causal impact or business cost acceptability.",
+        "execution_limit_accurate": true,
+        "prior_execution_evidence": {
+          "artifact": "/tmp/wave3-final-ml-llm.json",
+          "ran": true,
+          "ok": true,
+          "code_hash_matches": true
+        },
+        "post_remediation_execution_evidence": {
+          "artifact": "/tmp/wave3-final-domain-remediation-validation.json",
+          "ran": true,
+          "ok": true,
+          "code_hash_matches": true
+        }
+      },
+      "technical_error_confirmed": false,
+      "pre_remediation_source_files": [
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/learning/wave1/feature-eng-evaluation.js",
+          "sha256": "76c06d52907d2504343eff50db646ab9d2cd088da1c235cd4047ff415ad57661"
+        },
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/questions/wave1/feature-eng-evaluation.js",
+          "sha256": "7e5d79fb3bee4620ef733b2699698d57d7f7b6d3c0484aa70e4b7d5f9b42bc69"
+        }
+      ]
+    },
+    {
+      "id": "agents-tool-calling",
+      "source_files": [
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/learning/wave1/agents-tool-calling.js",
+          "sha256": "aef35126c53898feefd7fa5e0b6ef08e14062cb219b5bbc76eeb78e8d4f38969"
+        },
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/questions/wave1/agents-tool-calling.js",
+          "sha256": "856d0af8c31c83e18fadfd4a2a4e497c57b8a715ee1fff8d949210e5a0299064"
+        }
+      ],
+      "sampled_formal_items": [
+        {
+          "id": "agents-tool-calling.f56",
+          "difficulty": "hard",
+          "prompt": "The server stores idempotency keys for one day. A timed-out write is retried after two days and its state is unknown. What assumption is unsafe?",
+          "options": [
+            "The old key still prevents duplicates",
+            "A different key can bypass the old deduplication record",
+            "Authoritative status can aid recovery",
+            "The prior call may already have run"
+          ],
+          "answer_index": 0,
+          "answer": "The old key still prevents duplicates",
+          "technical_review": "The ambiguous new logical action phrase is replaced by A different key can bypass the old deduplication record. This states server deduplication behavior without claiming a new key necessarily represents new user intent.",
+          "technical_key_defensible": true,
+          "option_lengths": [
+            37,
+            55,
+            37,
+            35
+          ],
+          "difficulty_requires_sme_calibration": true
+        },
+        {
+          "id": "agents-tool-calling.f50",
+          "difficulty": "advanced",
+          "prompt": "Two tool calls fail: a quote rejects quantity=7 before execution because its range is 1–5; a shipment times out with unknown commit status under key K. Raw diagnostics contain credentials. Policy allows one argument correction and a status lookup, but no second shipment until reconciliation. Which planner-visible feedback and next action respect all constraints?",
+          "options": [
+            "Expose redacted stack frames and retryable=true for both; replay both calls using their prior keys",
+            "Expose only generic failure and mark both calls unexecuted; rerun the original calls without lookup",
+            "Expose quantity range and opaque traces; correct once and reconcile shipment K before retrying",
+            "Expose quantity range and opaque traces; correct once and resend the shipment under a fresh key"
+          ],
+          "answer_index": 2,
+          "answer": "Expose quantity range and opaque traces; correct once and reconcile shipment K before retrying",
+          "technical_review": "The advanced item now distinguishes rejected-before-execution validation from an uncertain committed shipment; the answer must preserve safe feedback, a single bounded quote correction, and reconciliation of shipment K before replay. All alternatives violate at least one explicit constraint.",
+          "technical_key_defensible": true,
+          "option_lengths": [
+            98,
+            99,
+            94,
+            95
+          ],
+          "difficulty_requires_sme_calibration": true
+        }
+      ],
+      "sampled_lesson": {
+        "id": "agents-tool-calling-error-contract",
+        "title": "Classify tool failures and return actionable safe feedback",
+        "worked_code_sha256": "a96ad241f5456e0a6cee8ad118f682ae85ad13350e59377cfe0b04fa97b4a606",
+        "expected_output": "invalid_arguments False\ndenied False\ntemporarily_unavailable True",
+        "boundary_review": "The Python classify function returns a category and a boolean based solely on three supplied category strings. Output is invalid_arguments False, denied False, temporarily_unavailable True. The prose separately discusses timeouts with unknown write status and bounds retries; the example does not execute a model, tool backend, authorization service or retry loop, and explicitly calls itself an offline mock.",
+        "execution_limit_accurate": true,
+        "prior_execution_evidence": {
+          "artifact": "/tmp/wave3-final-ml-llm.json",
+          "ran": true,
+          "ok": true,
+          "code_hash_matches": true
+        },
+        "post_remediation_execution_evidence": {
+          "artifact": "/tmp/wave3-final-domain-remediation-validation.json",
+          "ran": true,
+          "ok": true,
+          "code_hash_matches": true
+        }
+      },
+      "technical_error_confirmed": false,
+      "pre_remediation_source_files": [
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/learning/wave1/agents-tool-calling.js",
+          "sha256": "7b0d78cc559094d2111217b10687ba318ba89cb21512d677cf962d6a0317c0aa"
+        },
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/questions/wave1/agents-tool-calling.js",
+          "sha256": "856d0af8c31c83e18fadfd4a2a4e497c57b8a715ee1fff8d949210e5a0299064"
+        }
+      ]
+    },
+    {
+      "id": "infrastructure-as-code",
+      "source_files": [
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/learning/wave1/infrastructure-as-code.js",
+          "sha256": "4aa1acc5a847ec5b844aec000d8fec032e5a751da1fb02647d85f107f5db0a59"
+        },
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/questions/wave1/infrastructure-as-code.js",
+          "sha256": "14a9cef5048152949f69d75c9c4465364866d2a509277beb0e060e0f7cb64094"
+        }
+      ],
+      "sampled_formal_items": [
+        {
+          "id": "infrastructure-as-code.final066",
+          "difficulty": "hard",
+          "prompt": "A Terraform 1.9 child uses aws.primary for us-east-1 and aws.replica for eu-west-1. The root configures aws.us in us-east-1 and aws.eu in eu-west-1. Which child declaration and caller mapping satisfy both regional contracts?",
+          "options": [
+            "Declare both child aliases; map primary to aws.us and replica to aws.eu",
+            "Declare only the default; map primary to aws.us and replica to aws.eu",
+            "Declare both child aliases; map primary to aws.eu and replica to aws.us",
+            "Declare both child aliases; pass aws.us only through the default aws name"
+          ],
+          "answer_index": 0,
+          "answer": "Declare both child aliases; map primary to aws.us and replica to aws.eu",
+          "technical_review": "The hard item now specifies child aws.primary/aws.replica and root aws.us/aws.eu configurations with required regions. Only declaring both child aliases and mapping the intended regional root configurations meets both contracts.",
+          "technical_key_defensible": true,
+          "option_lengths": [
+            71,
+            69,
+            71,
+            73
+          ],
+          "difficulty_requires_sme_calibration": true
+        },
+        {
+          "id": "infrastructure-as-code.final086",
+          "difficulty": "advanced",
+          "prompt": "A reviewed Terraform apply creates a new database and records its binding in state, then fails updating DNS. Old traffic still reaches the healthy old database. The new database must be preserved, and traffic cannot move before its health is verified. Which recovery sequence respects these constraints?",
+          "options": [
+            "Keep old traffic; verify new DB health and state, then review a non-destructive DNS recovery plan",
+            "Keep old traffic; replay the previous saved plan because its earlier policy check approved all actions",
+            "Move traffic now; use refresh-only apply to perform the failed DNS update without resource actions",
+            "Revert source; approve deletion of the recorded new database because no traffic moved to it"
+          ],
+          "answer_index": 0,
+          "answer": "Keep old traffic; verify new DB health and state, then review a non-destructive DNS recovery plan",
+          "technical_review": "The advanced item now specifies a created database recorded in state, a failed DNS update, healthy old traffic, database retention and a health prerequisite. Correct recovery preserves current service and bindings, verifies health, then reviews a fresh non-destructive DNS recovery plan; stale replay, refresh-only as a DNS writer and source-revert deletion violate specific constraints.",
+          "technical_key_defensible": true,
+          "option_lengths": [
+            97,
+            102,
+            98,
+            91
+          ],
+          "difficulty_requires_sme_calibration": true
+        }
+      ],
+      "sampled_lesson": {
+        "id": "infrastructure-as-code-l5",
+        "title": "Coordinate writers with backend-supported locking",
+        "worked_code_sha256": "188efe717a7cf286aaa8f049c48de7c8d47fa86bb4eab6d07e5c8a36a34aa263",
+        "expected_output": "True\nFalse\nTrue",
+        "boundary_review": "The sequential Python owner variable yields True, False, True. It simulates one owner and release only, rather than real atomic distributed locking or failure recovery. The lesson explicitly excludes distributed processes, backend durability and Terraform operations, and pins S3 locking guidance to the Terraform 1.9 DynamoDB-era documentation instead of claiming later lockfile support.",
+        "execution_limit_accurate": true,
+        "prior_execution_evidence": {
+          "artifact": "/tmp/wave3-final-iac.json",
+          "ran": true,
+          "ok": true,
+          "code_hash_matches": true
+        },
+        "post_remediation_execution_evidence": {
+          "artifact": "/tmp/wave3-final-domain-remediation-validation.json",
+          "ran": true,
+          "ok": true,
+          "code_hash_matches": true
+        }
+      },
+      "technical_error_confirmed": false,
+      "pre_remediation_source_files": [
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/learning/wave1/infrastructure-as-code.js",
+          "sha256": "b38ea1c8e1ae67e4b6df9187bfc38a510e476f5ddf3c258e483a941710129c7e"
+        },
+        {
+          "path": "/workspace/echolens-lms/career/curriculum/questions/wave1/infrastructure-as-code.js",
+          "sha256": "14a9cef5048152949f69d75c9c4465364866d2a509277beb0e060e0f7cb64094"
+        }
+      ]
+    }
+  ],
+  "confirmed_issues": [
+    {
+      "id": "domain-sample-1",
+      "course": "fullstack-architecture",
+      "item_id": "fullstack-architecture.w3.056",
+      "kind": "implausible_distractors",
+      "severity": "medium",
+      "evidence": "Three alternatives are Only a new DNS alias, Only an extra heartbeat and Only longer filenames. DNS aliases and filename length are unrelated to preventing stale writes, while a heartbeat alone cannot fence an already stale worker.",
+      "recommendation": "Replace unrelated alternatives with plausible concurrency mistakes such as lease renewal without resource-side checks, local ownership flags, or checking the lease only before a long operation.",
+      "status": "resolved_by_authored_revision",
+      "before_evidence": "Three alternatives are Only a new DNS alias, Only an extra heartbeat and Only longer filenames. DNS aliases and filename length are unrelated to preventing stale writes, while a heartbeat alone cannot fence an already stale worker.",
+      "remediation": "The revised hard case specifies generations 41 and 42 and a stale writer reaching storage. Only a destination-enforced generation check on commits prevents the obsolete writer; local checks, heartbeat frequency and queue serialization do not fence a previously delivered operation.",
+      "after_options": [
+        "Serialize queue delivery while allowing both workers to write to storage directly",
+        "Enforce generation 42 at storage and reject older generations on every commit",
+        "Check generation 41 in worker memory before beginning the next long operation",
+        "Renew generation 42 more frequently while accepting writes without generation checks"
+      ],
+      "after_option_lengths": [
+        81,
+        77,
+        77,
+        84
+      ],
+      "human_approval": false
+    },
+    {
+      "id": "domain-sample-2",
+      "course": "fullstack-architecture",
+      "item_id": "fullstack-architecture.w3.050",
+      "kind": "implausible_distractors",
+      "severity": "medium",
+      "evidence": "Alternatives Automatic schema drift, Guaranteed cache expiry and Missing TLS encryption do not describe a consequence of ambiguous tuple concatenation.",
+      "recommendation": "Use competing key-design failures and concrete tuple examples so the learner must reason about identity encoding.",
+      "status": "resolved_by_authored_revision",
+      "before_evidence": "Alternatives Automatic schema drift, Guaranteed cache expiry and Missing TLS encryption do not describe a consequence of ambiguous tuple concatenation.",
+      "remediation": "The revised advanced case requires preserving arbitrary string tuple boundaries and a distinct permission-dependent view. JSON tuple encoding preserves all three string dimensions; delimiter joining, concatenation before serialization and omitted view each violate a stated constraint.",
+      "after_options": [
+        "Join tenant, id and view with colons and hash the joined string",
+        "Serialize [tenant+id,view] and hash the serialized value",
+        "Serialize [tenant,id] and let TTL distinguish summary from private",
+        "Serialize [tenant,id,view] as a JSON tuple before optional hashing"
+      ],
+      "after_option_lengths": [
+        63,
+        56,
+        66,
+        66
+      ],
+      "human_approval": false
+    },
+    {
+      "id": "domain-sample-3",
+      "course": "feature-eng-evaluation",
+      "item_id": "feature-eng-evaluation.f50",
+      "kind": "implausible_distractors",
+      "severity": "medium",
+      "evidence": "The three alternatives assert Invalidity of all logarithmic targets, Guaranteed original-scale calibration, or Universal superiority of log fitting. Each makes an absolute conclusion unsupported by the two reported metrics.",
+      "recommendation": "Offer realistic but competing metric-selection and inverse-transform decisions rather than universal claims.",
+      "status": "resolved_by_authored_revision",
+      "before_evidence": "The three alternatives assert Invalidity of all logarithmic targets, Guaranteed original-scale calibration, or Universal superiority of log fitting. Each makes an absolute conclusion unsupported by the two reported metrics.",
+      "remediation": "The advanced item now requires computing A=(0+5*600)/6=$500, B=(100+5*200)/6≈$183.33, checking high-value absolute errors $600 versus $200 against the $250 cap, and applying the stated objective despite A having lower log RMSE.",
+      "after_options": [
+        "B; weighted MAEs A=$300, B=$150; both satisfy the cap",
+        "Neither; weighted MAEs A=$500, B≈$183; both violate the cap",
+        "B; weighted MAEs A=$500, B≈$183; only B meets the cap",
+        "A; weighted MAEs A=$100, B≈$117; lower log RMSE decides"
+      ],
+      "after_option_lengths": [
+        53,
+        59,
+        53,
+        55
+      ],
+      "human_approval": false
+    },
+    {
+      "id": "domain-sample-4",
+      "course": "agents-tool-calling",
+      "item_id": "agents-tool-calling.f50",
+      "kind": "implausible_distractors",
+      "severity": "medium",
+      "evidence": "Only an invented success value, Raw diagnostic query as instruction, and Full exception with secret strings are plainly inappropriate next to Safe hint and opaque trace id.",
+      "recommendation": "Compare realistic error envelopes that trade off redaction, retryability, field-level correction feedback and trace correlation.",
+      "status": "resolved_by_authored_revision",
+      "before_evidence": "Only an invented success value, Raw diagnostic query as instruction, and Full exception with secret strings are plainly inappropriate next to Safe hint and opaque trace id.",
+      "remediation": "The advanced item now distinguishes rejected-before-execution validation from an uncertain committed shipment; the answer must preserve safe feedback, a single bounded quote correction, and reconciliation of shipment K before replay. All alternatives violate at least one explicit constraint.",
+      "after_options": [
+        "Expose redacted stack frames and retryable=true for both; replay both calls using their prior keys",
+        "Expose only generic failure and mark both calls unexecuted; rerun the original calls without lookup",
+        "Expose quantity range and opaque traces; correct once and reconcile shipment K before retrying",
+        "Expose quantity range and opaque traces; correct once and resend the shipment under a fresh key"
+      ],
+      "after_option_lengths": [
+        98,
+        99,
+        94,
+        95
+      ],
+      "human_approval": false
+    },
+    {
+      "id": "domain-sample-5",
+      "course": "infrastructure-as-code",
+      "item_id": "infrastructure-as-code.final066",
+      "kind": "individual_length_cue_and_weak_distractors",
+      "severity": "medium",
+      "evidence": "The correct Explicit alias mapping is 22 characters. The incorrect choices are substantially longer; the two substantial alternatives add implausible automatic account/region selection or embedded shared credentials, while renaming a backend file is unrelated.",
+      "recommendation": "Use realistic Terraform provider-passing configurations of comparable specificity, including default inheritance versus declared configuration_aliases and explicit providers mappings.",
+      "option_lengths": [
+        22,
+        84,
+        79,
+        27
+      ],
+      "correct_option_length": 22,
+      "unique_shortest": true,
+      "status": "resolved_by_authored_revision",
+      "before_evidence": "The correct Explicit alias mapping is 22 characters. The incorrect choices are substantially longer; the two substantial alternatives add implausible automatic account/region selection or embedded shared credentials, while renaming a backend file is unrelated.",
+      "remediation": "The hard item now specifies child aws.primary/aws.replica and root aws.us/aws.eu configurations with required regions. Only declaring both child aliases and mapping the intended regional root configurations meets both contracts.",
+      "after_options": [
+        "Declare both child aliases; map primary to aws.us and replica to aws.eu",
+        "Declare only the default; map primary to aws.us and replica to aws.eu",
+        "Declare both child aliases; map primary to aws.eu and replica to aws.us",
+        "Declare both child aliases; pass aws.us only through the default aws name"
+      ],
+      "after_option_lengths": [
+        71,
+        69,
+        71,
+        73
+      ],
+      "before_option_lengths": [
+        22,
+        84,
+        79,
+        27
+      ],
+      "before_unique_shortest": true,
+      "after_unique_shortest": false,
+      "human_approval": false
+    },
+    {
+      "id": "domain-sample-6",
+      "course": "infrastructure-as-code",
+      "item_id": "infrastructure-as-code.final086",
+      "kind": "individual_length_cue_and_weak_distractors",
+      "severity": "medium",
+      "evidence": "The correct Inspect partial effects is 23 characters; the incorrect alternatives are substantially longer and assert atomic rollback, erasing state, or trusting a prior policy as health proof. These can be rejected without analyzing the particular partial apply.",
+      "recommendation": "Provide a concrete mixed-outcome plan/apply scenario and plausible inspect, refresh-only, import, retry or rollback choices whose safety depends on that evidence.",
+      "option_lengths": [
+        23,
+        77,
+        77,
+        41
+      ],
+      "correct_option_length": 23,
+      "unique_shortest": true,
+      "status": "resolved_by_authored_revision",
+      "before_evidence": "The correct Inspect partial effects is 23 characters; the incorrect alternatives are substantially longer and assert atomic rollback, erasing state, or trusting a prior policy as health proof. These can be rejected without analyzing the particular partial apply.",
+      "remediation": "The advanced item now specifies a created database recorded in state, a failed DNS update, healthy old traffic, database retention and a health prerequisite. Correct recovery preserves current service and bindings, verifies health, then reviews a fresh non-destructive DNS recovery plan; stale replay, refresh-only as a DNS writer and source-revert deletion violate specific constraints.",
+      "after_options": [
+        "Keep old traffic; verify new DB health and state, then review a non-destructive DNS recovery plan",
+        "Keep old traffic; replay the previous saved plan because its earlier policy check approved all actions",
+        "Move traffic now; use refresh-only apply to perform the failed DNS update without resource actions",
+        "Revert source; approve deletion of the recorded new database because no traffic moved to it"
+      ],
+      "after_option_lengths": [
+        97,
+        102,
+        98,
+        91
+      ],
+      "before_option_lengths": [
+        23,
+        77,
+        77,
+        41
+      ],
+      "before_unique_shortest": true,
+      "after_unique_shortest": false,
+      "human_approval": false
+    }
+  ],
+  "sme_judgment": [
+    {
+      "course": "fullstack-architecture",
+      "item_id": "fullstack-architecture.w3.056",
+      "topic": "difficulty_calibration",
+      "assessment": "Fencing is a legitimate advanced concurrency concept, but this prompt only asks for its label and offers weak alternatives. The current hard label is not well supported by required reasoning.",
+      "recommendation": "Require reasoning about a paused worker, lease generations and a resource-side conditional commit.",
+      "initial_assessment": "Fencing is a legitimate advanced concurrency concept, but this prompt only asks for its label and offers weak alternatives. The current hard label is not well supported by required reasoning.",
+      "authoring_response": "The revised hard case specifies generations 41 and 42 and a stale writer reaching storage. Only a destination-enforced generation check on commits prevents the obsolete writer; local checks, heartbeat frequency and queue serialization do not fence a previously delivered operation.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "fullstack-architecture",
+      "item_id": "fullstack-architecture.w3.050",
+      "topic": "difficulty_calibration",
+      "assessment": "The advanced item requires basic recognition of string-concatenation ambiguity rather than an advanced architectural decision.",
+      "recommendation": "Use a concrete cross-tenant cache collision and ask the learner to choose a safe encoding that also preserves permission and version scope.",
+      "initial_assessment": "The advanced item requires basic recognition of string-concatenation ambiguity rather than an advanced architectural decision.",
+      "authoring_response": "The revised advanced case requires preserving arbitrary string tuple boundaries and a distinct permission-dependent view. JSON tuple encoding preserves all three string dimensions; delimiter joining, concatenation before serialization and omitted view each violate a stated constraint.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "fullstack-architecture",
+      "item_id": "fullstack-architecture.l05",
+      "topic": "encoder_scope",
+      "assessment": "JSON.stringify on the supplied strings is appropriate. For arbitrary values it can merge undefined and null in arrays and needs a validated input domain; the lesson does not claim a general proof.",
+      "recommendation": "An SME may choose to make the string-only input contract explicit in the fixture function signature or prose.",
+      "initial_assessment": "JSON.stringify on the supplied strings is appropriate. For arbitrary values it can merge undefined and null in arrays and needs a validated input domain; the lesson does not claim a general proof.",
+      "authoring_status": "retained_for_sme_review",
+      "remaining_sme_judgment": "JSON.stringify on the supplied strings is appropriate. For arbitrary values it can merge undefined and null in arrays and needs a validated input domain; the lesson does not claim a general proof.",
+      "human_approved": false
+    },
+    {
+      "course": "feature-eng-evaluation",
+      "item_id": "feature-eng-evaluation.f56",
+      "topic": "difficulty_calibration",
+      "assessment": "The hard designation is reasonably supported by a base-rate calculation and distinguishing sensitivity from precision. Final calibration should use learner evidence.",
+      "recommendation": "Retain the numerical reasoning and consider showing a population size only if the intended level needs scaffolding.",
+      "initial_assessment": "The hard designation is reasonably supported by a base-rate calculation and distinguishing sensitivity from precision. Final calibration should use learner evidence.",
+      "authoring_status": "retained_for_sme_review",
+      "remaining_sme_judgment": "The hard designation is reasonably supported by a base-rate calculation and distinguishing sensitivity from precision. Final calibration should use learner evidence.",
+      "human_approved": false
+    },
+    {
+      "course": "feature-eng-evaluation",
+      "item_id": "feature-eng-evaluation.f50",
+      "topic": "difficulty_calibration",
+      "assessment": "The advanced item is currently a short metric-tradeoff recognition question, with no calculation, inverse-transform decision, error-cost comparison or evaluation-design constraint.",
+      "recommendation": "Add a concrete original-currency cost table or segment-risk constraint and require a defensible deployment decision.",
+      "initial_assessment": "The advanced item is currently a short metric-tradeoff recognition question, with no calculation, inverse-transform decision, error-cost comparison or evaluation-design constraint.",
+      "authoring_response": "The advanced item now requires computing A=(0+5*600)/6=$500, B=(100+5*200)/6≈$183.33, checking high-value absolute errors $600 versus $200 against the $250 cap, and applying the stated objective despite A having lower log RMSE.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "feature-eng-evaluation",
+      "item_id": "feature-eng-evaluation.f56",
+      "topic": "transportability_assumption",
+      "assessment": "The calculation treats sensitivity and specificity as operating characteristics applicable to production. That is conventional for this stated exercise, but under distribution shift it requires evidence.",
+      "recommendation": "An SME may add that these production-appropriate rates are assumed fixed, to distinguish a base-rate exercise from a claim of model transportability.",
+      "initial_assessment": "The calculation treats sensitivity and specificity as operating characteristics applicable to production. That is conventional for this stated exercise, but under distribution shift it requires evidence.",
+      "authoring_status": "retained_for_sme_review",
+      "remaining_sme_judgment": "The calculation treats sensitivity and specificity as operating characteristics applicable to production. That is conventional for this stated exercise, but under distribution shift it requires evidence.",
+      "human_approved": false
+    },
+    {
+      "course": "agents-tool-calling",
+      "item_id": "agents-tool-calling.f56",
+      "topic": "wording_ambiguity",
+      "assessment": "The alternative A new key names a new logical action could be read as another unsafe assumption: changing a transport key does not itself create new business intent. In the course contract it is intended to mean the backend treats a new key as a separately deduplicated operation.",
+      "recommendation": "Replace it with A different key can bypass the old deduplication record, which preserves the intended contrast without equating key identity and user intent.",
+      "initial_assessment": "The alternative A new key names a new logical action could be read as another unsafe assumption: changing a transport key does not itself create new business intent. In the course contract it is intended to mean the backend treats a new key as a separately deduplicated operation.",
+      "authoring_response": "The ambiguous new logical action phrase is replaced by A different key can bypass the old deduplication record. This states server deduplication behavior without claiming a new key necessarily represents new user intent.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the revised wording is clear to learners and matches intended deduplication semantics.",
+      "human_approved": false
+    },
+    {
+      "course": "agents-tool-calling",
+      "item_id": "agents-tool-calling.f56",
+      "topic": "difficulty_calibration",
+      "assessment": "Retention expiry plus an unknown write outcome provides a meaningful operational reasoning step. Hard may be appropriate once the alternate wording is tightened.",
+      "recommendation": "Use a concrete committed operation record or reconciliation result if deeper recovery reasoning is intended.",
+      "initial_assessment": "Retention expiry plus an unknown write outcome provides a meaningful operational reasoning step. Hard may be appropriate once the alternate wording is tightened.",
+      "authoring_response": "The ambiguous new logical action phrase is replaced by A different key can bypass the old deduplication record. This states server deduplication behavior without claiming a new key necessarily represents new user intent.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "agents-tool-calling",
+      "item_id": "agents-tool-calling.f50",
+      "topic": "difficulty_calibration",
+      "assessment": "The advanced designation is weak: ordinary confidentiality and error-reporting principles identify the answer without multi-step agent orchestration or recovery analysis.",
+      "recommendation": "Add a partial write outcome and require selecting a safe planner-visible error plus bounded reconciliation action.",
+      "initial_assessment": "The advanced designation is weak: ordinary confidentiality and error-reporting principles identify the answer without multi-step agent orchestration or recovery analysis.",
+      "authoring_response": "The advanced item now distinguishes rejected-before-execution validation from an uncertain committed shipment; the answer must preserve safe feedback, a single bounded quote correction, and reconciliation of shipment K before replay. All alternatives violate at least one explicit constraint.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "infrastructure-as-code",
+      "item_id": "infrastructure-as-code.final066",
+      "topic": "difficulty_calibration",
+      "assessment": "The hard label is weakly supported by recognizing explicit alias mapping without reading any HCL or resolving two provider configurations.",
+      "recommendation": "Ask the learner to select a valid child required_providers.configuration_aliases declaration and caller providers mapping for two regions.",
+      "initial_assessment": "The hard label is weakly supported by recognizing explicit alias mapping without reading any HCL or resolving two provider configurations.",
+      "authoring_response": "The hard item now specifies child aws.primary/aws.replica and root aws.us/aws.eu configurations with required regions. Only declaring both child aliases and mapping the intended regional root configurations meets both contracts.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "infrastructure-as-code",
+      "item_id": "infrastructure-as-code.final086",
+      "topic": "difficulty_calibration",
+      "assessment": "The advanced item asks only whether to inspect after failure, rather than evaluating an advanced recovery sequence.",
+      "recommendation": "Include actual state and remote observations, ownership and drift context, and ask for the safest next operation with a stated limitation.",
+      "initial_assessment": "The advanced item asks only whether to inspect after failure, rather than evaluating an advanced recovery sequence.",
+      "authoring_response": "The advanced item now specifies a created database recorded in state, a failed DNS update, healthy old traffic, database retention and a health prerequisite. Correct recovery preserves current service and bindings, verifies health, then reviews a fresh non-destructive DNS recovery plan; stale replay, refresh-only as a DNS writer and source-revert deletion violate specific constraints.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "infrastructure-as-code",
+      "item_id": "infrastructure-as-code.final066",
+      "topic": "terraform_contract_precision",
+      "assessment": "Explicit alias mapping is correct shorthand; a fuller teaching answer would distinguish a child module configuration_aliases declaration from the parent module providers mapping.",
+      "recommendation": "Subject-matter review should confirm this distinction is exercised in at least one actual HCL-reading assessment.",
+      "initial_assessment": "Explicit alias mapping is correct shorthand; a fuller teaching answer would distinguish a child module configuration_aliases declaration from the parent module providers mapping.",
+      "authoring_response": "The hard item now specifies child aws.primary/aws.replica and root aws.us/aws.eu configurations with required regions. Only declaring both child aliases and mapping the intended regional root configurations meets both contracts.",
+      "authoring_status": "addressed_for_draft",
+      "remaining_sme_judgment": "Confirm the alias declarations and caller provider mappings are adequately covered for the intended Terraform proficiency level.",
+      "human_approved": false
+    }
+  ],
+  "summary": {
+    "courses": 4,
+    "formal_items": 8,
+    "lesson_example_boundaries": 4,
+    "confirmed_technical_key_errors": 0,
+    "confirmed_execution_boundary_errors": 0,
+    "initial_confirmed_assessment_quality_findings": 6,
+    "resolved_confirmed_assessment_quality_findings": 6,
+    "unresolved_confirmed_assessment_quality_findings": 0,
+    "additional_ambiguity_revised": 1,
+    "formal_items_revised": 7,
+    "remaining_sme_judgments": 12,
+    "post_remediation_sample_example_executions_passing": 4,
+    "aggregate_examples_executed_and_passed": 36,
+    "aggregate_errors": 0,
+    "aggregate_warnings": 0,
+    "disposition": "Draft assessment revisions pass automated validation and AI/editorial re-review. Subject-matter difficulty calibration and human educational review remain pending; no human approval or publication is inferred."
+  },
+  "review_phase": "post-remediation AI/editorial sample review",
+  "updated_at": "2026-11-10T15:02:36.504Z",
+  "remediation": {
+    "authorized_scope": "Six confirmed assessment-quality findings plus agents f56 ambiguity in four new Wave 3 course/bank packages.",
+    "updated_at": "2026-11-10T15:02:36.504Z",
+    "changed_formal_items": [
+      {
+        "course": "fullstack-architecture",
+        "item_id": "fullstack-architecture.w3.050",
+        "before": {
+          "id": "fullstack-architecture.w3.050",
+          "comp": "m2.c2",
+          "difficulty": "advanced",
+          "type": "scenario",
+          "scenario": "Original synthetic full-stack engineering case",
+          "scenario_origin": "original",
+          "prompt": "A key concatenates tenant and id without delimiters. What boundary issue can appear?",
+          "code": null,
+          "options": [
+            "Automatic schema drift",
+            "Guaranteed cache expiry",
+            "Missing TLS encryption",
+            "Ambiguous key encoding"
+          ],
+          "answer": 3,
+          "explanation": "Different tuples can produce the same concatenated text unless encoding preserves boundaries.",
+          "why": [
+            "“Automatic schema drift” does not satisfy this case: Different tuples can produce the same concatenated text unless encoding preserves boundaries.",
+            "“Guaranteed cache expiry” does not satisfy this case: Different tuples can produce the same concatenated text unless encoding preserves boundaries.",
+            "“Missing TLS encryption” does not satisfy this case: Different tuples can produce the same concatenated text unless encoding preserves boundaries."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "subtrack": "fullstack-architecture",
+          "objective": "fullstack-architecture.m2.c2",
+          "status": "draft"
+        },
+        "after": {
+          "id": "fullstack-architecture.w3.050",
+          "comp": "m2.c2",
+          "difficulty": "advanced",
+          "type": "scenario",
+          "scenario": "Original synthetic full-stack engineering case",
+          "scenario_origin": "original",
+          "prompt": "A cache accepts arbitrary tenant and invoice strings, including colons. Concatenating tenant=a,id=bc and tenant=ab,id=c aliases both to abc. Summary and private views must also remain distinct. Which key design prevents both tuple aliasing and cross-view reuse without restricting these strings?",
+          "code": null,
+          "options": [
+            "Join tenant, id and view with colons and hash the joined string",
+            "Serialize [tenant+id,view] and hash the serialized value",
+            "Serialize [tenant,id] and let TTL distinguish summary from private",
+            "Serialize [tenant,id,view] as a JSON tuple before optional hashing"
+          ],
+          "answer": 3,
+          "explanation": "For the validated string inputs, ordered JSON array encoding preserves element boundaries and the view dimension. Colon joining can alias when inputs contain colons; hashing cannot repair an already ambiguous representation; concatenating tenant and id first retains the demonstrated collision; omitting view allows cross-view reuse regardless of TTL.",
+          "why": [
+            "“Join tenant, id and view with colons and hash the joined string” does not satisfy this case: For the validated string inputs, ordered JSON array encoding preserves element boundaries and the view dimension. Colon joining can alias when inputs contain colons; hashing cannot repair an already ambiguous representation; concatenating tenant and id first retains the demonstrated collision; omitting view allows cross-view reuse regardless of TTL.",
+            "“Serialize [tenant+id,view] and hash the serialized value” does not satisfy this case: For the validated string inputs, ordered JSON array encoding preserves element boundaries and the view dimension. Colon joining can alias when inputs contain colons; hashing cannot repair an already ambiguous representation; concatenating tenant and id first retains the demonstrated collision; omitting view allows cross-view reuse regardless of TTL.",
+            "“Serialize [tenant,id] and let TTL distinguish summary from private” does not satisfy this case: For the validated string inputs, ordered JSON array encoding preserves element boundaries and the view dimension. Colon joining can alias when inputs contain colons; hashing cannot repair an already ambiguous representation; concatenating tenant and id first retains the demonstrated collision; omitting view allows cross-view reuse regardless of TTL."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "subtrack": "fullstack-architecture",
+          "objective": "fullstack-architecture.m2.c2",
+          "status": "draft"
+        },
+        "remediation_review": "The revised advanced case requires preserving arbitrary string tuple boundaries and a distinct permission-dependent view. JSON tuple encoding preserves all three string dimensions; delimiter joining, concatenation before serialization and omitted view each violate a stated constraint.",
+        "single_defensible_key": true
+      },
+      {
+        "course": "fullstack-architecture",
+        "item_id": "fullstack-architecture.w3.056",
+        "before": {
+          "id": "fullstack-architecture.w3.056",
+          "comp": "m2.c2",
+          "difficulty": "hard",
+          "type": "scenario",
+          "scenario": "Original synthetic full-stack engineering case",
+          "scenario_origin": "original",
+          "prompt": "A worker loses its lease but continues writing beside a new owner. What additional mechanism may be needed?",
+          "code": null,
+          "options": [
+            "Only a new DNS alias",
+            "Fencing checks",
+            "Only an extra heartbeat",
+            "Only longer filenames"
+          ],
+          "answer": 1,
+          "explanation": "A stale worker must be prevented from committing effects after ownership has legitimately moved.",
+          "why": [
+            "“Only a new DNS alias” does not satisfy this case: A stale worker must be prevented from committing effects after ownership has legitimately moved.",
+            "“Only an extra heartbeat” does not satisfy this case: A stale worker must be prevented from committing effects after ownership has legitimately moved.",
+            "“Only longer filenames” does not satisfy this case: A stale worker must be prevented from committing effects after ownership has legitimately moved."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "subtrack": "fullstack-architecture",
+          "objective": "fullstack-architecture.m2.c2",
+          "status": "draft"
+        },
+        "after": {
+          "id": "fullstack-architecture.w3.056",
+          "comp": "m2.c2",
+          "difficulty": "hard",
+          "type": "scenario",
+          "scenario": "Original synthetic full-stack engineering case",
+          "scenario_origin": "original",
+          "prompt": "A paused worker resumes with lease generation 41 after generation 42 has taken ownership. Both can reach the storage service. Which control prevents generation 41 from committing after the transfer?",
+          "code": null,
+          "options": [
+            "Serialize queue delivery while allowing both workers to write to storage directly",
+            "Enforce generation 42 at storage and reject older generations on every commit",
+            "Check generation 41 in worker memory before beginning the next long operation",
+            "Renew generation 42 more frequently while accepting writes without generation checks"
+          ],
+          "answer": 1,
+          "explanation": "The destination must enforce the current fencing generation when accepting effects. A check in stale worker memory does not observe transferred ownership; more heartbeats do not stop an old worker already running; queue serialization does not fence writes from an existing delivery.",
+          "why": [
+            "“Serialize queue delivery while allowing both workers to write to storage directly” does not satisfy this case: The destination must enforce the current fencing generation when accepting effects. A check in stale worker memory does not observe transferred ownership; more heartbeats do not stop an old worker already running; queue serialization does not fence writes from an existing delivery.",
+            "“Check generation 41 in worker memory before beginning the next long operation” does not satisfy this case: The destination must enforce the current fencing generation when accepting effects. A check in stale worker memory does not observe transferred ownership; more heartbeats do not stop an old worker already running; queue serialization does not fence writes from an existing delivery.",
+            "“Renew generation 42 more frequently while accepting writes without generation checks” does not satisfy this case: The destination must enforce the current fencing generation when accepting effects. A check in stale worker memory does not observe transferred ownership; more heartbeats do not stop an old worker already running; queue serialization does not fence writes from an existing delivery."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "subtrack": "fullstack-architecture",
+          "objective": "fullstack-architecture.m2.c2",
+          "status": "draft"
+        },
+        "remediation_review": "The revised hard case specifies generations 41 and 42 and a stale writer reaching storage. Only a destination-enforced generation check on commits prevents the obsolete writer; local checks, heartbeat frequency and queue serialization do not fence a previously delivered operation.",
+        "single_defensible_key": true
+      },
+      {
+        "course": "feature-eng-evaluation",
+        "item_id": "feature-eng-evaluation.f50",
+        "before": {
+          "id": "feature-eng-evaluation.f50",
+          "comp": "m2.c1",
+          "difficulty": "advanced",
+          "type": "scenario",
+          "scenario": "Original synthetic offline ML engineering case",
+          "scenario_origin": "original",
+          "prompt": "A log-target regressor wins log RMSE and loses original-currency MAE on high-value accounts. What is justified?",
+          "code": null,
+          "options": [
+            "Invalidity of all logarithmic targets",
+            "Guaranteed original-scale calibration",
+            "Objective-dependent tradeoff",
+            "Universal superiority of log fitting"
+          ],
+          "answer": 2,
+          "explanation": "The metrics emphasize different errors; the business target scale and cost structure determine which performance matters.",
+          "why": [
+            "Invalidity of all logarithmic targets: The metrics emphasize different errors; the business target scale and cost structure determine which performance matters.",
+            "Guaranteed original-scale calibration: The metrics emphasize different errors; the business target scale and cost structure determine which performance matters.",
+            "Universal superiority of log fitting: The metrics emphasize different errors; the business target scale and cost structure determine which performance matters."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft"
+        },
+        "after": {
+          "id": "feature-eng-evaluation.f50",
+          "comp": "m2.c1",
+          "difficulty": "advanced",
+          "type": "scenario",
+          "scenario": "Original synthetic offline ML engineering case",
+          "scenario_origin": "original",
+          "prompt": "Two held-out accounts have true costs $100 and $1000. Model A predicts $100 and $1600; B predicts $200 and $1200. Natural-log RMSE is about 0.33 for A and 0.51 for B. Deployment instead requires minimum weighted currency MAE using weights 1 and 5, and at most $250 absolute error on the high-value account. Which assessment follows that policy?",
+          "code": null,
+          "options": [
+            "B; weighted MAEs A=$300, B=$150; both satisfy the cap",
+            "Neither; weighted MAEs A=$500, B≈$183; both violate the cap",
+            "B; weighted MAEs A=$500, B≈$183; only B meets the cap",
+            "A; weighted MAEs A=$100, B≈$117; lower log RMSE decides"
+          ],
+          "answer": 2,
+          "explanation": "Weighted MAE divides weighted absolute loss by total weight 6. A has (1*0+5*600)/6=$500 and high-value error $600; B has (1*100+5*200)/6≈$183.33 and high-value error $200. Only B satisfies the $250 error cap. The A=$100,B≈$117 calculation reverses the account weights; $300 and $150 are unweighted MAEs; the cap applies to prediction error, not the predicted amount or total weighted loss. Better log RMSE does not override the stated deployment policy.",
+          "why": [
+            "B; weighted MAEs A=$300, B=$150; both satisfy the cap: Weighted MAE divides weighted absolute loss by total weight 6. A has (1*0+5*600)/6=$500 and high-value error $600; B has (1*100+5*200)/6≈$183.33 and high-value error $200. Only B satisfies the $250 error cap. The A=$100,B≈$117 calculation reverses the account weights; $300 and $150 are unweighted MAEs; the cap applies to prediction error, not the predicted amount or total weighted loss. Better log RMSE does not override the stated deployment policy.",
+            "Neither; weighted MAEs A=$500, B≈$183; both violate the cap: Weighted MAE divides weighted absolute loss by total weight 6. A has (1*0+5*600)/6=$500 and high-value error $600; B has (1*100+5*200)/6≈$183.33 and high-value error $200. Only B satisfies the $250 error cap. The A=$100,B≈$117 calculation reverses the account weights; $300 and $150 are unweighted MAEs; the cap applies to prediction error, not the predicted amount or total weighted loss. Better log RMSE does not override the stated deployment policy.",
+            "A; weighted MAEs A=$100, B≈$117; lower log RMSE decides: Weighted MAE divides weighted absolute loss by total weight 6. A has (1*0+5*600)/6=$500 and high-value error $600; B has (1*100+5*200)/6≈$183.33 and high-value error $200. Only B satisfies the $250 error cap. The A=$100,B≈$117 calculation reverses the account weights; $300 and $150 are unweighted MAEs; the cap applies to prediction error, not the predicted amount or total weighted loss. Better log RMSE does not override the stated deployment policy."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft"
+        },
+        "remediation_review": "The advanced item now requires computing A=(0+5*600)/6=$500, B=(100+5*200)/6≈$183.33, checking high-value absolute errors $600 versus $200 against the $250 cap, and applying the stated objective despite A having lower log RMSE.",
+        "single_defensible_key": true
+      },
+      {
+        "course": "agents-tool-calling",
+        "item_id": "agents-tool-calling.f50",
+        "before": {
+          "id": "agents-tool-calling.f50",
+          "comp": "m2.c2",
+          "difficulty": "advanced",
+          "type": "scenario",
+          "scenario": "Original synthetic offline agent application case",
+          "scenario_origin": "original",
+          "prompt": "A service returns a safe error category plus private raw exception details. The planner needs a correction hint. Which output is appropriate?",
+          "code": null,
+          "options": [
+            "Only an invented success value",
+            "Raw diagnostic query as instruction",
+            "Safe hint and opaque trace id",
+            "Full exception with secret strings"
+          ],
+          "answer": 2,
+          "explanation": "Useful repair feedback should preserve confidentiality and distinguish failure from success.",
+          "why": [
+            "Only an invented success value: Useful repair feedback should preserve confidentiality and distinguish failure from success.",
+            "Raw diagnostic query as instruction: Useful repair feedback should preserve confidentiality and distinguish failure from success.",
+            "Full exception with secret strings: Useful repair feedback should preserve confidentiality and distinguish failure from success."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft"
+        },
+        "after": {
+          "id": "agents-tool-calling.f50",
+          "comp": "m2.c2",
+          "difficulty": "advanced",
+          "type": "scenario",
+          "scenario": "Original synthetic offline agent application case",
+          "scenario_origin": "original",
+          "prompt": "Two tool calls fail: a quote rejects quantity=7 before execution because its range is 1–5; a shipment times out with unknown commit status under key K. Raw diagnostics contain credentials. Policy allows one argument correction and a status lookup, but no second shipment until reconciliation. Which planner-visible feedback and next action respect all constraints?",
+          "code": null,
+          "options": [
+            "Expose redacted stack frames and retryable=true for both; replay both calls using their prior keys",
+            "Expose only generic failure and mark both calls unexecuted; rerun the original calls without lookup",
+            "Expose quantity range and opaque traces; correct once and reconcile shipment K before retrying",
+            "Expose quantity range and opaque traces; correct once and resend the shipment under a fresh key"
+          ],
+          "answer": 2,
+          "explanation": "Return the safe quantity constraint and opaque correlation identifiers, use the one allowed correction for the rejected quote, and query authoritative shipment status for K before any replay. A fresh shipment key can duplicate a committed shipment; marking both failures retryable ignores the invalid quantity and uncertain write; marking both unexecuted invents a fact about the timeout. Private raw diagnostics are not planner instructions.",
+          "why": [
+            "Expose redacted stack frames and retryable=true for both; replay both calls using their prior keys: Return the safe quantity constraint and opaque correlation identifiers, use the one allowed correction for the rejected quote, and query authoritative shipment status for K before any replay. A fresh shipment key can duplicate a committed shipment; marking both failures retryable ignores the invalid quantity and uncertain write; marking both unexecuted invents a fact about the timeout. Private raw diagnostics are not planner instructions.",
+            "Expose only generic failure and mark both calls unexecuted; rerun the original calls without lookup: Return the safe quantity constraint and opaque correlation identifiers, use the one allowed correction for the rejected quote, and query authoritative shipment status for K before any replay. A fresh shipment key can duplicate a committed shipment; marking both failures retryable ignores the invalid quantity and uncertain write; marking both unexecuted invents a fact about the timeout. Private raw diagnostics are not planner instructions.",
+            "Expose quantity range and opaque traces; correct once and resend the shipment under a fresh key: Return the safe quantity constraint and opaque correlation identifiers, use the one allowed correction for the rejected quote, and query authoritative shipment status for K before any replay. A fresh shipment key can duplicate a committed shipment; marking both failures retryable ignores the invalid quantity and uncertain write; marking both unexecuted invents a fact about the timeout. Private raw diagnostics are not planner instructions."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft"
+        },
+        "remediation_review": "The advanced item now distinguishes rejected-before-execution validation from an uncertain committed shipment; the answer must preserve safe feedback, a single bounded quote correction, and reconciliation of shipment K before replay. All alternatives violate at least one explicit constraint.",
+        "single_defensible_key": true
+      },
+      {
+        "course": "agents-tool-calling",
+        "item_id": "agents-tool-calling.f56",
+        "before": {
+          "id": "agents-tool-calling.f56",
+          "comp": "m2.c2",
+          "difficulty": "hard",
+          "type": "scenario",
+          "scenario": "Original synthetic offline agent application case",
+          "scenario_origin": "original",
+          "prompt": "The server stores idempotency keys for one day. A timed-out write is retried after two days and its state is unknown. What assumption is unsafe?",
+          "code": null,
+          "options": [
+            "The old key still prevents duplicates",
+            "A new key names a new logical action",
+            "Authoritative status can aid recovery",
+            "The prior call may already have run"
+          ],
+          "answer": 0,
+          "explanation": "Deduplication guarantees can expire; a retained client key alone is insufficient.",
+          "why": [
+            "A new key names a new logical action: Deduplication guarantees can expire; a retained client key alone is insufficient.",
+            "Authoritative status can aid recovery: Deduplication guarantees can expire; a retained client key alone is insufficient.",
+            "The prior call may already have run: Deduplication guarantees can expire; a retained client key alone is insufficient."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft"
+        },
+        "after": {
+          "id": "agents-tool-calling.f56",
+          "comp": "m2.c2",
+          "difficulty": "hard",
+          "type": "scenario",
+          "scenario": "Original synthetic offline agent application case",
+          "scenario_origin": "original",
+          "prompt": "The server stores idempotency keys for one day. A timed-out write is retried after two days and its state is unknown. What assumption is unsafe?",
+          "code": null,
+          "options": [
+            "The old key still prevents duplicates",
+            "A different key can bypass the old deduplication record",
+            "Authoritative status can aid recovery",
+            "The prior call may already have run"
+          ],
+          "answer": 0,
+          "explanation": "Deduplication retention has expired, so retaining the old client key does not guarantee duplicate suppression. A different key can be treated as a separate deduplication identity without establishing new business intent; an authoritative status lookup can aid reconciliation because the original call may already have committed.",
+          "why": [
+            "A different key can bypass the old deduplication record: Deduplication retention has expired, so retaining the old client key does not guarantee duplicate suppression. A different key can be treated as a separate deduplication identity without establishing new business intent; an authoritative status lookup can aid reconciliation because the original call may already have committed.",
+            "Authoritative status can aid recovery: Deduplication retention has expired, so retaining the old client key does not guarantee duplicate suppression. A different key can be treated as a separate deduplication identity without establishing new business intent; an authoritative status lookup can aid reconciliation because the original call may already have committed.",
+            "The prior call may already have run: Deduplication retention has expired, so retaining the old client key does not guarantee duplicate suppression. A different key can be treated as a separate deduplication identity without establishing new business intent; an authoritative status lookup can aid reconciliation because the original call may already have committed."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft"
+        },
+        "remediation_review": "The ambiguous new logical action phrase is replaced by A different key can bypass the old deduplication record. This states server deduplication behavior without claiming a new key necessarily represents new user intent.",
+        "single_defensible_key": true
+      },
+      {
+        "course": "infrastructure-as-code",
+        "item_id": "infrastructure-as-code.final066",
+        "before": {
+          "id": "infrastructure-as-code.final066",
+          "comp": "m3.c1",
+          "difficulty": "hard",
+          "type": "scenario",
+          "scenario": "Original synthetic operating decision: Compose modules around stable architectural contracts",
+          "scenario_origin": "original",
+          "prompt": "A child needs a second provider alias for another region. What should its contract include?",
+          "code": null,
+          "options": [
+            "Explicit alias mapping",
+            "A guessed default provider that automatically selects the correct account and region",
+            "Credentials embedded in the module so every caller silently shares one identity",
+            "A renamed backend file only"
+          ],
+          "answer": 0,
+          "explanation": "Aliases and their mappings must be intentional at the module boundary.",
+          "why": [
+            "“A guessed default provider that automatically selects the correct account and region” does not satisfy the stated condition. Aliases and their mappings must be intentional at the module boundary.",
+            "“Credentials embedded in the module so every caller silently shares one identity” does not satisfy the stated condition. Aliases and their mappings must be intentional at the module boundary.",
+            "“A renamed backend file only” does not satisfy the stated condition. Aliases and their mappings must be intentional at the module boundary."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft",
+          "subtrack": "infrastructure-as-code",
+          "objective": "infrastructure-as-code.m3.c1"
+        },
+        "after": {
+          "id": "infrastructure-as-code.final066",
+          "comp": "m3.c1",
+          "difficulty": "hard",
+          "type": "scenario",
+          "scenario": "Original synthetic operating decision: Compose modules around stable architectural contracts",
+          "scenario_origin": "original",
+          "prompt": "A Terraform 1.9 child uses aws.primary for us-east-1 and aws.replica for eu-west-1. The root configures aws.us in us-east-1 and aws.eu in eu-west-1. Which child declaration and caller mapping satisfy both regional contracts?",
+          "code": null,
+          "options": [
+            "Declare both child aliases; map primary to aws.us and replica to aws.eu",
+            "Declare only the default; map primary to aws.us and replica to aws.eu",
+            "Declare both child aliases; map primary to aws.eu and replica to aws.us",
+            "Declare both child aliases; pass aws.us only through the default aws name"
+          ],
+          "answer": 0,
+          "explanation": "The child required_providers configuration_aliases must declare aws.primary and aws.replica, and the caller providers map must assign aws.primary=aws.us and aws.replica=aws.eu. Declaring only a default omits the expected aliases; swapping mappings violates the required regions; passing only the default does not satisfy either explicitly aliased configuration.",
+          "why": [
+            "“Declare only the default; map primary to aws.us and replica to aws.eu” does not satisfy the stated condition. The child required_providers configuration_aliases must declare aws.primary and aws.replica, and the caller providers map must assign aws.primary=aws.us and aws.replica=aws.eu. Declaring only a default omits the expected aliases; swapping mappings violates the required regions; passing only the default does not satisfy either explicitly aliased configuration.",
+            "“Declare both child aliases; map primary to aws.eu and replica to aws.us” does not satisfy the stated condition. The child required_providers configuration_aliases must declare aws.primary and aws.replica, and the caller providers map must assign aws.primary=aws.us and aws.replica=aws.eu. Declaring only a default omits the expected aliases; swapping mappings violates the required regions; passing only the default does not satisfy either explicitly aliased configuration.",
+            "“Declare both child aliases; pass aws.us only through the default aws name” does not satisfy the stated condition. The child required_providers configuration_aliases must declare aws.primary and aws.replica, and the caller providers map must assign aws.primary=aws.us and aws.replica=aws.eu. Declaring only a default omits the expected aliases; swapping mappings violates the required regions; passing only the default does not satisfy either explicitly aliased configuration."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft",
+          "subtrack": "infrastructure-as-code",
+          "objective": "infrastructure-as-code.m3.c1"
+        },
+        "remediation_review": "The hard item now specifies child aws.primary/aws.replica and root aws.us/aws.eu configurations with required regions. Only declaring both child aliases and mapping the intended regional root configurations meets both contracts.",
+        "single_defensible_key": true
+      },
+      {
+        "course": "infrastructure-as-code",
+        "item_id": "infrastructure-as-code.final086",
+        "before": {
+          "id": "infrastructure-as-code.final086",
+          "comp": "m3.c1",
+          "difficulty": "advanced",
+          "type": "scenario",
+          "scenario": "Original synthetic operating decision: Build an auditable infrastructure change pipeline",
+          "scenario_origin": "original",
+          "prompt": "A plan policy passes but a partial apply fails. What recovery stance is appropriate?",
+          "code": null,
+          "options": [
+            "Inspect partial effects",
+            "Assume every provider operation rolled back atomically when one action failed",
+            "Erase state and rerun because a failed apply cannot leave real remote changes",
+            "Trust the prior policy as proof of health"
+          ],
+          "answer": 0,
+          "explanation": "Infrastructure operations can leave partial outcomes requiring evidence-based recovery.",
+          "why": [
+            "“Assume every provider operation rolled back atomically when one action failed” does not satisfy the stated condition. Infrastructure operations can leave partial outcomes requiring evidence-based recovery.",
+            "“Erase state and rerun because a failed apply cannot leave real remote changes” does not satisfy the stated condition. Infrastructure operations can leave partial outcomes requiring evidence-based recovery.",
+            "“Trust the prior policy as proof of health” does not satisfy the stated condition. Infrastructure operations can leave partial outcomes requiring evidence-based recovery."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft",
+          "subtrack": "infrastructure-as-code",
+          "objective": "infrastructure-as-code.m3.c1"
+        },
+        "after": {
+          "id": "infrastructure-as-code.final086",
+          "comp": "m3.c1",
+          "difficulty": "advanced",
+          "type": "scenario",
+          "scenario": "Original synthetic operating decision: Build an auditable infrastructure change pipeline",
+          "scenario_origin": "original",
+          "prompt": "A reviewed Terraform apply creates a new database and records its binding in state, then fails updating DNS. Old traffic still reaches the healthy old database. The new database must be preserved, and traffic cannot move before its health is verified. Which recovery sequence respects these constraints?",
+          "code": null,
+          "options": [
+            "Keep old traffic; verify new DB health and state, then review a non-destructive DNS recovery plan",
+            "Keep old traffic; replay the previous saved plan because its earlier policy check approved all actions",
+            "Move traffic now; use refresh-only apply to perform the failed DNS update without resource actions",
+            "Revert source; approve deletion of the recorded new database because no traffic moved to it"
+          ],
+          "answer": 0,
+          "explanation": "Partial apply is not atomic rollback: the new database exists and its recorded binding must be preserved. Inspect remote effects and state, verify new database health, and review a fresh non-destructive plan before moving DNS. The previous plan may be stale after state changes; a refresh-only apply updates recorded observations rather than performing the DNS write; reverting source can propose destroying the database that policy requires retaining.",
+          "why": [
+            "“Keep old traffic; replay the previous saved plan because its earlier policy check approved all actions” does not satisfy the stated condition. Partial apply is not atomic rollback: the new database exists and its recorded binding must be preserved. Inspect remote effects and state, verify new database health, and review a fresh non-destructive plan before moving DNS. The previous plan may be stale after state changes; a refresh-only apply updates recorded observations rather than performing the DNS write; reverting source can propose destroying the database that policy requires retaining.",
+            "“Move traffic now; use refresh-only apply to perform the failed DNS update without resource actions” does not satisfy the stated condition. Partial apply is not atomic rollback: the new database exists and its recorded binding must be preserved. Inspect remote effects and state, verify new database health, and review a fresh non-destructive plan before moving DNS. The previous plan may be stale after state changes; a refresh-only apply updates recorded observations rather than performing the DNS write; reverting source can propose destroying the database that policy requires retaining.",
+            "“Revert source; approve deletion of the recorded new database because no traffic moved to it” does not satisfy the stated condition. Partial apply is not atomic rollback: the new database exists and its recorded binding must be preserved. Inspect remote effects and state, verify new database health, and review a fresh non-destructive plan before moving DNS. The previous plan may be stale after state changes; a refresh-only apply updates recorded observations rather than performing the DNS write; reverting source can propose destroying the database that policy requires retaining."
+          ],
+          "expect": null,
+          "lang": null,
+          "version": 1,
+          "status": "draft",
+          "subtrack": "infrastructure-as-code",
+          "objective": "infrastructure-as-code.m3.c1"
+        },
+        "remediation_review": "The advanced item now specifies a created database recorded in state, a failed DNS update, healthy old traffic, database retention and a health prerequisite. Correct recovery preserves current service and bindings, verifies health, then reviews a fresh non-destructive DNS recovery plan; stale replay, refresh-only as a DNS writer and source-revert deletion violate specific constraints.",
+        "single_defensible_key": true
+      }
+    ],
+    "preservation": {
+      "lessons_and_prose": true,
+      "worked_examples": true,
+      "practice_items": true,
+      "formal_ids": true,
+      "competency_mappings": true,
+      "difficulty_blueprint": true,
+      "scenario_classification": true,
+      "answer_rotation": true,
+      "bank_count_per_course": 90
+    },
+    "validation": {
+      "artifact": "/tmp/wave3-final-domain-remediation-validation.json",
+      "artifact_sha256": "c9692aab0c980a57972a7f639c9f7e3f822e2c6544502ea070e7f9d84d9c7fa8",
+      "command": "node scripts/career-curriculum-wave.cjs check --ids fullstack-architecture,feature-eng-evaluation,agents-tool-calling,infrastructure-as-code --execute --output /tmp/wave3-final-domain-remediation-validation.json",
+      "courses": [
+        {
+          "id": "fullstack-architecture",
+          "errors": [],
+          "warnings": [],
+          "examples": 9,
+          "executed_and_passed": 9
+        },
+        {
+          "id": "feature-eng-evaluation",
+          "errors": [],
+          "warnings": [],
+          "examples": 9,
+          "executed_and_passed": 9
+        },
+        {
+          "id": "agents-tool-calling",
+          "errors": [],
+          "warnings": [],
+          "examples": 9,
+          "executed_and_passed": 9
+        },
+        {
+          "id": "infrastructure-as-code",
+          "errors": [],
+          "warnings": [],
+          "examples": 9,
+          "executed_and_passed": 9
+        }
+      ],
+      "errors": 0,
+      "warnings": 0
+    },
+    "human_approval": false
+  },
+  "remaining_sme_judgments": [
+    {
+      "course": "fullstack-architecture",
+      "item_id": "fullstack-architecture.w3.056",
+      "topic": "difficulty_calibration",
+      "judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "fullstack-architecture",
+      "item_id": "fullstack-architecture.w3.050",
+      "topic": "difficulty_calibration",
+      "judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "fullstack-architecture",
+      "item_id": "fullstack-architecture.l05",
+      "topic": "encoder_scope",
+      "judgment": "JSON.stringify on the supplied strings is appropriate. For arbitrary values it can merge undefined and null in arrays and needs a validated input domain; the lesson does not claim a general proof.",
+      "human_approved": false
+    },
+    {
+      "course": "feature-eng-evaluation",
+      "item_id": "feature-eng-evaluation.f56",
+      "topic": "difficulty_calibration",
+      "judgment": "The hard designation is reasonably supported by a base-rate calculation and distinguishing sensitivity from precision. Final calibration should use learner evidence.",
+      "human_approved": false
+    },
+    {
+      "course": "feature-eng-evaluation",
+      "item_id": "feature-eng-evaluation.f50",
+      "topic": "difficulty_calibration",
+      "judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "feature-eng-evaluation",
+      "item_id": "feature-eng-evaluation.f56",
+      "topic": "transportability_assumption",
+      "judgment": "The calculation treats sensitivity and specificity as operating characteristics applicable to production. That is conventional for this stated exercise, but under distribution shift it requires evidence.",
+      "human_approved": false
+    },
+    {
+      "course": "agents-tool-calling",
+      "item_id": "agents-tool-calling.f56",
+      "topic": "wording_ambiguity",
+      "judgment": "Confirm the revised wording is clear to learners and matches intended deduplication semantics.",
+      "human_approved": false
+    },
+    {
+      "course": "agents-tool-calling",
+      "item_id": "agents-tool-calling.f56",
+      "topic": "difficulty_calibration",
+      "judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "agents-tool-calling",
+      "item_id": "agents-tool-calling.f50",
+      "topic": "difficulty_calibration",
+      "judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "infrastructure-as-code",
+      "item_id": "infrastructure-as-code.final066",
+      "topic": "difficulty_calibration",
+      "judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "infrastructure-as-code",
+      "item_id": "infrastructure-as-code.final086",
+      "topic": "difficulty_calibration",
+      "judgment": "Confirm the revised constraints and calculations match the intended proficiency level; empirical item difficulty and discrimination remain unmeasured.",
+      "human_approved": false
+    },
+    {
+      "course": "infrastructure-as-code",
+      "item_id": "infrastructure-as-code.final066",
+      "topic": "terraform_contract_precision",
+      "judgment": "Confirm the alias declarations and caller provider mappings are adequately covered for the intended Terraform proficiency level.",
+      "human_approved": false
+    }
+  ]
+}

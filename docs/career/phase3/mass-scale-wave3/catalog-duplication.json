@@ -1,0 +1,29 @@
+{
+  "scope": "Whole catalogue vs prior48. Exact/numeric-only question and paragraph detection plus token-set near-duplicate heuristic. Does not establish semantic uniqueness.",
+  "baseline": {
+    "prose": {
+      "errors": [],
+      "warnings": []
+    },
+    "questions": {
+      "errors": [
+        "Repeated question or numeric-only variant: http-sessions-tokens.q5 / sec-sessions.q2"
+      ],
+      "warnings": []
+    }
+  },
+  "current": {
+    "prose": {
+      "errors": [],
+      "warnings": []
+    },
+    "questions": {
+      "errors": [
+        "Repeated question or numeric-only variant: http-sessions-tokens.q5 / sec-sessions.q2"
+      ],
+      "warnings": []
+    }
+  },
+  "new_errors": [],
+  "feedback_label_mismatches": []
+}

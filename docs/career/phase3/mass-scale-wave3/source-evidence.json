@@ -1,0 +1,1015 @@
+{
+  "scope": "Pinned Git bytes or captured official HTTPS bytes; not human approval or validation of every teaching statement. Bash official manual remains unavailable.",
+  "official_sources": [
+    {
+      "course": "node-express",
+      "repository": "https://github.com/nodejs/node",
+      "commit": "b009466555c360513b8012ce549f716501090ee5",
+      "references": [
+        {
+          "id": "node-loop",
+          "path": "doc/api/timers.md",
+          "sha256": "e39eae1df8b8c6a21c6e5f111c877bd0156c55139fa926376ebe34d6b1701bdf",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-modules",
+          "path": "doc/api/modules.md",
+          "sha256": "46d4d2e498378ea6569deb289d5ebb68b415ede5f9d6db5340a64340a767e807",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-streams",
+          "path": "doc/api/stream.md",
+          "sha256": "938b8188174345db45674b373783fc89fcc35be27afdf1278bcf22835088bb95",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "node-express",
+      "repository": "https://github.com/expressjs/express",
+      "commit": "1faf228935aa0a13111f92c28ee795be64ce3f0f",
+      "references": [
+        {
+          "id": "express-app",
+          "path": "lib/application.js",
+          "sha256": "5901b32f609ba349351bf7406dbdc0c4c57b77ce6f7215ea67ccca5ac2a28e88",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "express-router",
+          "path": "lib/router/index.js",
+          "sha256": "19c5ca9b025396612dbe464d07fbe7104ff9170c4d6a1c7e5507df4dbbf4d5cb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "express-layer",
+          "path": "lib/router/layer.js",
+          "sha256": "c90709dcba8d9a6cfd1f2b4ef6d7a22d833e317f0c876d884342cee5a96f8a02",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "react-fundamentals",
+      "repository": "https://github.com/reactjs/react.dev",
+      "commit": "7594a2b008489121bdf25f97320d11ac0422510e",
+      "references": [
+        {
+          "id": "react-components",
+          "path": "src/content/learn/describing-the-ui.md",
+          "sha256": "e60fe2bac558d200a5f03b7209a9fbada007436cc250a9205cf43faac670ad9f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-state",
+          "path": "src/content/learn/queueing-a-series-of-state-updates.md",
+          "sha256": "31227dbb30c6240e7cfa22b0619be7238a567205fc83d03307f281b30efa9c4d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-effects",
+          "path": "src/content/learn/synchronizing-with-effects.md",
+          "sha256": "64a36b73ed2aeac4822f32fb609255562c6e66890f0bb149394eacd4a9c606e7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-effect-api",
+          "path": "src/content/reference/react/useEffect.md",
+          "sha256": "9a6269a1450a4639828a6c0cc0868e8f8ddfe2dde6ae83e1426f084b4410b315",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-input",
+          "path": "src/content/reference/react-dom/components/input.md",
+          "sha256": "452755484b8856746a91b574a5975e54404ea193f91b72257a2caf163da75544",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-lists",
+          "path": "src/content/learn/rendering-lists.md",
+          "sha256": "efd1740b90e1a9ad427f4e38c9ca747691174d5d48e9e4b5988a10fa3b3f9480",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "fullstack-integration-state",
+      "repository": "https://github.com/reactjs/react.dev",
+      "commit": "7594a2b008489121bdf25f97320d11ac0422510e",
+      "references": [
+        {
+          "id": "react-effects",
+          "path": "src/content/learn/synchronizing-with-effects.md",
+          "sha256": "64a36b73ed2aeac4822f32fb609255562c6e66890f0bb149394eacd4a9c606e7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-state",
+          "path": "src/content/learn/choosing-the-state-structure.md",
+          "sha256": "5ff72fcf9858ff2552aec6aac1354b459ba037578672212d792d754e783720a7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "fullstack-integration-state",
+      "repository": "https://github.com/nodejs/node",
+      "commit": "b009466555c360513b8012ce549f716501090ee5",
+      "references": [
+        {
+          "id": "node-fetch",
+          "path": "doc/api/globals.md",
+          "sha256": "33c8f063e5b078c4241e7c020fa95f06f10cb7fe40b940b443ac28d54180b084",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-url",
+          "path": "doc/api/url.md",
+          "sha256": "98ef69de20000002b6ca956b84ac60c4313ac1b61ba5c1cdcc0aab4226a05134",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-errors",
+          "path": "doc/api/errors.md",
+          "sha256": "716131e014f70ca12f3c4cc69fcd1a005cce79733c44ad69fa7b9546bafe7e23",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "numpy-arrays",
+      "repository": "https://github.com/numpy/numpy",
+      "commit": "c3d60fc8393f3ca3306b8ce8b6453d43737e3d90",
+      "references": [
+        {
+          "id": "numpy-quickstart",
+          "path": "doc/source/user/quickstart.rst",
+          "sha256": "1a1369e31bffdf7f4af84c12a5048b36dabbc16c1808f641d3e164a22cd82329",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "numpy-indexing",
+          "path": "doc/source/user/basics.indexing.rst",
+          "sha256": "90c8b7c9b60bc2f6911726700025c2299dbd2e3d6066c5601b4c67395aea2658",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "numpy-copies",
+          "path": "doc/source/user/basics.copies.rst",
+          "sha256": "5e326d8368f56aa3ec78fcbbb5cfcf7eff0f0ca76cd9301b6d1cd3ad995eae2a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "numpy-broadcasting",
+          "path": "doc/source/user/basics.broadcasting.rst",
+          "sha256": "d1379801e96ec350b320d2929687d35b045e24bea962a29efb2259d080427048",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "numpy-types",
+          "path": "doc/source/user/basics.types.rst",
+          "sha256": "0e288c072dc1b8733326dc3094c11c344d0698cf6e9ff21ff2dd7fb57ccd8d89",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "ml-preprocessing",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "sklearn-0",
+          "path": "doc/modules/preprocessing.rst",
+          "sha256": "de780cd96a24a0b947ac3db305ccf4abe27a5f8610878c5b1e89d904e3850b6a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-1",
+          "path": "doc/modules/compose.rst",
+          "sha256": "d116a5d4852ca1c437805ebcc1021169d04c8dd9d15781198641c9f5da607045",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-2",
+          "path": "doc/modules/cross_validation.rst",
+          "sha256": "a785c904bfdf6a37b57839d17ec470533a0f94b90bfcb37ab41d671f3dd16583",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-3",
+          "path": "doc/modules/impute.rst",
+          "sha256": "c3e0eee330c9b2338bde545e2e8a91f3f435cc78deefaa2dad03921cdaf13918",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "ml-fundamentals",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "sklearn-0",
+          "path": "doc/modules/learning_curve.rst",
+          "sha256": "4de94b0e724f845184cc3702faf2733e1087f5cfe1c31688387cf5f6c25b4a2b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-1",
+          "path": "doc/modules/model_evaluation.rst",
+          "sha256": "d61349c80806b05dea0c6fb852abe028c7baae194154936613ee08b0096a6e0e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-2",
+          "path": "doc/modules/compose.rst",
+          "sha256": "d116a5d4852ca1c437805ebcc1021169d04c8dd9d15781198641c9f5da607045",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-3",
+          "path": "doc/modules/linear_model.rst",
+          "sha256": "e348a36c4ab2f4e108c3c9f3c5a33e129012a2fe2b884dea1507e5ecdd070f27",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "data-visualization",
+      "repository": "https://github.com/matplotlib/matplotlib",
+      "commit": "1392cbe3c79cdb93f9282747841d648770f60249",
+      "references": [
+        {
+          "id": "quickstart",
+          "path": "galleries/users_explain/quick_start.py",
+          "sha256": "d8c335626c92c2e07be78133e584ab450b12ceca09619f9e8f9e7a53915bc0fa",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "lifecycle",
+          "path": "galleries/tutorials/lifecycle.py",
+          "sha256": "b81cc5e073d5e5cbd5824dccbbddb456cab50bc5e060ad3e49dcc3e83786b027",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "colormaps",
+          "path": "galleries/users_explain/colors/colormaps.py",
+          "sha256": "5fccec884f0e53bc5e5ed3ea1d39e24f8134a013e2bc5d7b326c1f405128131b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "histograms",
+          "path": "galleries/examples/statistics/histogram_histtypes.py",
+          "sha256": "a80d9f82b01b510ddab5bf18ec84b7e826b1e048117c289162af3a88c72f1d54",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "scripting-automation",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-subprocess",
+          "path": "Doc/library/subprocess.rst",
+          "sha256": "eaf797f6e7c2f43d8aa6cd288e44e9a9966754d33368e35194816ace8dab6415",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-pathlib",
+          "path": "Doc/library/pathlib.rst",
+          "sha256": "ef79ce3541ae12a3919ca60e3a8bbd879958876c30e155aa2234112e8b6cca28",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-os",
+          "path": "Doc/library/os.rst",
+          "sha256": "1d54f83bb3f583e37bae07d820d16206cf02f4fb2ef281338635b4b7fd01ebe4",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-logging",
+          "path": "Doc/library/logging.rst",
+          "sha256": "b84325a6a1594d8398fd45d45b6dee35a6c5fd2bee864a719d700cbc22a50415",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-hashlib",
+          "path": "Doc/library/hashlib.rst",
+          "sha256": "bf23b9b1e5dc9ff5b0b86a7c88637d73e2c8496681dca125aa3df1da631ee106",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "observability",
+      "repository": "https://github.com/open-telemetry/opentelemetry.io",
+      "commit": "52bc572fc569401f35171b4138844754e5dac670",
+      "references": [
+        {
+          "id": "otel-traces",
+          "path": "content/en/docs/concepts/signals/traces.md",
+          "sha256": "e114163e1eecc33e146a502784c484ca482648a1f278c24ab4809262d2cc0061",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "observability",
+      "repository": "https://github.com/prometheus/docs",
+      "commit": "cc0672badce86173b9afaa95a59904576bcd6d6a",
+      "references": [
+        {
+          "id": "prom-histograms",
+          "path": "docs/practices/histograms.md",
+          "sha256": "ebe64305d7d6156ca6b7021604c84eb5eab1868f35510089670ffe6fe387dcd2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "prom-alerting",
+          "path": "docs/practices/alerting.md",
+          "sha256": "2df77104b4764de91fb3792ee81db29e54dd50db301b669eca4d0591da409786",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "prom-instrumentation",
+          "path": "docs/practices/instrumentation.md",
+          "sha256": "8f7f26690b5b1d590729183acbbae519786a958986bd76c2ba236ca9d4a35dfb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "supervised-learning",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "sklearn-0",
+          "path": "doc/modules/linear_model.rst",
+          "sha256": "e348a36c4ab2f4e108c3c9f3c5a33e129012a2fe2b884dea1507e5ecdd070f27",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-1",
+          "path": "doc/modules/tree.rst",
+          "sha256": "344afa2a750f43eb16dc2848d05591cbe466d132a11a29eafb2e77b964767333",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-2",
+          "path": "doc/modules/ensemble.rst",
+          "sha256": "0602da12207680e0f56573d8b0276ddfec3796ada4c3df0a05374dd6df8cdc8f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-3",
+          "path": "doc/modules/cross_validation.rst",
+          "sha256": "a785c904bfdf6a37b57839d17ec470533a0f94b90bfcb37ab41d671f3dd16583",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-4",
+          "path": "doc/modules/grid_search.rst",
+          "sha256": "68019bf3bb881bdbc69f77d91607d234c213d3be8d34cd3f2fbea832cc90bfb4",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "rag-advanced",
+      "repository": "https://github.com/openai/openai-cookbook",
+      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "references": [
+        {
+          "id": "reranking",
+          "path": "examples/Search_reranking_with_cross-encoders.ipynb",
+          "sha256": "14d981f63b63fb848c1847b97b5c14f0377c34b74373847483c26bf545b26e78",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "rag-evaluation",
+          "path": "examples/evaluation/Evaluate_RAG_with_LlamaIndex.ipynb",
+          "sha256": "ab04461a0ca63928fbd61d5425559253649aaf35e8ee85789970730f2c315831",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "pdf",
+          "path": "examples/Parse_PDF_docs_for_RAG.ipynb",
+          "sha256": "11253aeb531837f6e7c1c338a4cf7da680be5e10838d2d06434aff225829148b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "judge",
+          "path": "examples/Custom-LLM-as-a-Judge.ipynb",
+          "sha256": "c0863d3af73581fa257a0f66e751a5e63232e4c7e213616f984b566e9b8a50bc",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "llm-security-eval",
+      "repository": "https://github.com/openai/openai-cookbook",
+      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "references": [
+        {
+          "id": "guardrails",
+          "path": "examples/How_to_use_guardrails.ipynb",
+          "sha256": "feb61a4e97da2493759c89b6cc9860f91b03b7a63d145cfa459592214559322b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "hallucination",
+          "path": "examples/Developing_hallucination_guardrails.ipynb",
+          "sha256": "27f550676b24af3054667be6c03dac2ce23f3955e968bf9e74d543a739757bc9",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "llm-deployment-cost",
+      "repository": "https://github.com/openai/openai-cookbook",
+      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "references": [
+        {
+          "id": "streaming",
+          "path": "examples/How_to_stream_completions.ipynb",
+          "sha256": "c2aa466319c891f39f427ddf3ed74d6c2933c70bc27782ab16ad7f1b293b8afd",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "limits",
+          "path": "examples/How_to_handle_rate_limits.ipynb",
+          "sha256": "de228ec125143956ef0cab538f1f615b0af8405203c7ae4032ac3f6611028fcf",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "spreadsheet-analysis",
+      "repository": "https://github.com/MicrosoftDocs/office-developer-client-docs",
+      "commit": "eedbd61ca40689e7cfed5e1cfd9440a9dc3ab7a5",
+      "references": [
+        {
+          "id": "excel-recalculation",
+          "path": "docs/excel/excel-recalculation.md",
+          "sha256": "366678d8acf3b7080d56ee2f755568c50a739f2f3d23e37c617c74dc9c79f16d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "spreadsheet-analysis",
+      "repository": "https://github.com/MicrosoftDocs/VBA-Docs",
+      "commit": "cfee1b35b419270636defdbee0ac96e5ded071bb",
+      "references": [
+        {
+          "id": "excel-sumifs",
+          "path": "api/Excel.WorksheetFunction.SumIfs.md",
+          "sha256": "948303325b1c07fbb9d987b46993fb62b0176d3253f8d94828e0e3d3ec4334cb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "excel-countifs",
+          "path": "api/Excel.WorksheetFunction.CountIfs.md",
+          "sha256": "a3f3c16af48da654f51039714d025a0d90d745d00cc7197dbc1293715c643600",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "excel-match",
+          "path": "api/Excel.WorksheetFunction.Match.md",
+          "sha256": "8931275e34e21f54bebb5104474b5501814754ad5577a82929ee15c607ff357a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "excel-index",
+          "path": "api/Excel.WorksheetFunction.Index.md",
+          "sha256": "3ad806069d69f515dcdd3e822c20b8c2fcb105eadd5baeaedb5f52b37aec4078",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "excel-trim",
+          "path": "api/Excel.WorksheetFunction.Trim.md",
+          "sha256": "8235edf9648150b8eb7bd1d4dfded6847b400b4e05e2e04fd6436cb2839ab3fe",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "excel-clean",
+          "path": "api/Excel.WorksheetFunction.Clean.md",
+          "sha256": "3ff0246d8d3af9e352ac35127f6f857238a4aaf5f21b1b731675b7d660c840ce",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "excel-pivot-refresh",
+          "path": "api/Excel.PivotTable.RefreshTable.md",
+          "sha256": "89f2cd5f5d3bba1e8e694e075d5b328ec11401ea09f744147ef7591a23acf435",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "data-storytelling",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-statistics",
+          "path": "Doc/library/statistics.rst",
+          "sha256": "a09dac9e7bd1582f9405146c56412b4c5e9fc6424c8118a56c5eb37f6a0e0a7a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-random",
+          "path": "Doc/library/random.rst",
+          "sha256": "7af569ff7e82298bfa684ef0272080305c2b7309cfd37a61acc6db225cb4cf46",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-json",
+          "path": "Doc/library/json.rst",
+          "sha256": "1dabdd646bfbf961c3ffcf79dd41bd81dc6a2e1ed59428b32662ed16acff08df",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-hashlib",
+          "path": "Doc/library/hashlib.rst",
+          "sha256": "bf23b9b1e5dc9ff5b0b86a7c88637d73e2c8496681dca125aa3df1da631ee106",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "responsive-css",
+      "repository": "https://github.com/mdn/content",
+      "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
+      "references": [
+        {
+          "id": "responsive-flex",
+          "path": "files/en-us/web/css/guides/flexible_box_layout/basic_concepts/index.md",
+          "sha256": "897783287ad963742adc54c0a6df8bc2efc62fe10e34311457b89b688a7d054d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "responsive-grid",
+          "path": "files/en-us/web/css/guides/grid_layout/basic_concepts/index.md",
+          "sha256": "d8d83bdf14b0e12a86df22a661622965b0903bf116c0fe741ce8c09eaaa39b2e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "responsive-images",
+          "path": "files/en-us/web/html/guides/responsive_images/index.md",
+          "sha256": "660fbdd6eaea34ea0ddbe7b500af431f138ffe211214a3b3d0e9b44aa69ddc28",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "frontend-api-security",
+      "repository": "https://github.com/mdn/content",
+      "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
+      "references": [
+        {
+          "id": "security-fetch",
+          "path": "files/en-us/web/api/fetch_api/using_fetch/index.md",
+          "sha256": "d55e01146faefe211a025192a5911eacd166db6bdd853f5084ea6a6150967ab3",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "security-csp",
+          "path": "files/en-us/web/http/reference/headers/content-security-policy/index.md",
+          "sha256": "cf7e7e0d669c47beb63054c814b3ef963e853973f183e96bd58f782e00c74061",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "security-cors",
+          "path": "files/en-us/web/http/guides/cors/index.md",
+          "sha256": "7a8ce59efa4b8c9cb055d2eb44125ab85cd2d719e8c91b7993ef19ebd5f815df",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "security-cookies",
+          "path": "files/en-us/web/http/guides/cookies/index.md",
+          "sha256": "261c38888c427abda7c226b74f31199a17595de4e07cd049d58ac7d9f2918a0a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "frontend-quality",
+      "repository": "https://github.com/mdn/content",
+      "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
+      "references": [
+        {
+          "id": "quality-access",
+          "path": "files/en-us/learn_web_development/core/accessibility/html/index.md",
+          "sha256": "538c5f10a123e1a9e27402ca09e977f26497bbebdf3d14fd8ded1ec0458da99d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "quality-aria",
+          "path": "files/en-us/learn_web_development/core/accessibility/wai-aria_basics/index.md",
+          "sha256": "9e37dc15ad912a8d1fbccbed4570000be85803275d582344dc87915b16c0154d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "quality-performance",
+          "path": "files/en-us/web/performance/index.md",
+          "sha256": "00c94311b94941b065724684defcd5fa65a95e63a0ba71f4764ae2368434b3dc",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "quality-cache",
+          "path": "files/en-us/web/http/guides/caching/index.md",
+          "sha256": "95ca406025178d12948fddefb8257453ff962f37d24acb15716c8859b9a4efc5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "web-deployment-cicd",
+      "repository": "https://github.com/github/docs",
+      "commit": "7cd6f8ddde8ffab161fb41b1e33f5dfdac605d40",
+      "references": [
+        {
+          "id": "actions-syntax",
+          "path": "content/actions/reference/workflows-and-actions/workflow-syntax.md",
+          "sha256": "50c73cf50995a0c7641988b1f72ca9e3447ce2920f4a48cb468d7765eff0b6f1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "actions-env",
+          "path": "content/actions/concepts/workflows-and-actions/deployment-environments.md",
+          "sha256": "59d3f65d594bb1e300d87ed4cf0c2a0989e3919ddbe3740e6879ba0ce2ec6897",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "actions-secrets",
+          "path": "content/actions/concepts/security/secrets.md",
+          "sha256": "1724a7ba81b25882e6ae47adc709a4e20c387419f2998b2652296bdb14f55ee1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "web-deployment-cicd",
+      "repository": "https://github.com/nodejs/node",
+      "commit": "b009466555c360513b8012ce549f716501090ee5",
+      "references": [
+        {
+          "id": "node-process",
+          "path": "doc/api/process.md",
+          "sha256": "e2037bb8a00aef51c492ef73894b987ee7fa72c3477f26beedcabd60169c746c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "web-deployment-cicd",
+      "repository": "https://github.com/git/git",
+      "commit": "9a2fb147f2c61d0cab52c883e7e26f5b7948e3ed",
+      "references": [
+        {
+          "id": "git-revisions",
+          "path": "Documentation/revisions.adoc",
+          "sha256": "3835ec561d9f4052783c79541d86d16e644f7d8d0b8fb1bd1d3067ad021c38a7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "fullstack-architecture",
+      "repository": "https://github.com/reactjs/react.dev",
+      "commit": "7594a2b008489121bdf25f97320d11ac0422510e",
+      "references": [
+        {
+          "id": "react-state",
+          "path": "src/content/learn/choosing-the-state-structure.md",
+          "sha256": "5ff72fcf9858ff2552aec6aac1354b459ba037578672212d792d754e783720a7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "fullstack-architecture",
+      "repository": "https://github.com/nodejs/node",
+      "commit": "b009466555c360513b8012ce549f716501090ee5",
+      "references": [
+        {
+          "id": "node-errors",
+          "path": "doc/api/errors.md",
+          "sha256": "716131e014f70ca12f3c4cc69fcd1a005cce79733c44ad69fa7b9546bafe7e23",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "node-async",
+          "path": "doc/api/async_context.md",
+          "sha256": "2997286c29cf8a147db829d7c00920c0c650716f9b8a8d306852730615a803f5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "fullstack-architecture",
+      "repository": "https://github.com/expressjs/express",
+      "commit": "1faf228935aa0a13111f92c28ee795be64ce3f0f",
+      "references": [
+        {
+          "id": "express-routing",
+          "path": "lib/application.js",
+          "sha256": "5901b32f609ba349351bf7406dbdc0c4c57b77ce6f7215ea67ccca5ac2a28e88",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "express-errors",
+          "path": "test/app.router.js",
+          "sha256": "28b9f9c1ce372cdc3b0e9211e154ae50f42badfe89b0f123547e7ee93ffbb7c0",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "feature-eng-evaluation",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "sklearn-0",
+          "path": "doc/modules/feature_extraction.rst",
+          "sha256": "c1c3f7c223fee07a558daf74b9fbdfb33d13ec4d608211f86e73a0ddd567f9c9",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-1",
+          "path": "doc/modules/feature_selection.rst",
+          "sha256": "0fda777b7782c8650d9ad8d1daaf06a5f30664f08c379a1d8bedd16666aa7fef",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-2",
+          "path": "doc/modules/preprocessing.rst",
+          "sha256": "de780cd96a24a0b947ac3db305ccf4abe27a5f8610878c5b1e89d904e3850b6a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-3",
+          "path": "doc/modules/model_evaluation.rst",
+          "sha256": "d61349c80806b05dea0c6fb852abe028c7baae194154936613ee08b0096a6e0e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sklearn-4",
+          "path": "doc/modules/calibration.rst",
+          "sha256": "19c5879bc2c66250252ec25e48d2ea5c836faf50d1ccf52050ae57fb511c8f1a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "agents-tool-calling",
+      "repository": "https://github.com/openai/openai-cookbook",
+      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "references": [
+        {
+          "id": "agent-ref-0",
+          "path": "examples/reasoning_function_calls.ipynb",
+          "sha256": "7bc4ddc31d311c9d0698c39b28e4ff8ccb402af3f8ea4c5d4d0437164401989c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "agent-ref-1",
+          "path": "examples/Fine_tuning_for_function_calling.ipynb",
+          "sha256": "af9af7a394d483a776afe1012b851ada07afd539888d5c7df5cd9d684087998d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "infrastructure-as-code",
+      "repository": "https://github.com/hashicorp/terraform",
+      "commit": "e044e569c5bc81f82e9a4d7891f37c6fbb0a8a10",
+      "references": [
+        {
+          "id": "tf-variables",
+          "path": "website/docs/language/values/variables.mdx",
+          "sha256": "4b9c3ffb698b06e7a14e51a190f8039914f030ed8a2ebcf6b8cce5bd9b75bbe2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "tf-plan",
+          "path": "website/docs/cli/commands/plan.mdx",
+          "sha256": "b3fc0b2cd893798dd24d7a489a9ec1b341a5b8a04d312d7a29447f14d0a754a8",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "tf-locking",
+          "path": "website/docs/language/state/locking.mdx",
+          "sha256": "323f7aa52cc852a85c54a6cefa0f31b14efc438e9b7398cf9945ce20fad64c5c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "tf-modules",
+          "path": "website/docs/language/modules/develop/index.mdx",
+          "sha256": "72a5273951d436c87f44a9527b4119e0cda53d873f2c2b0b767003a81ecd653b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "tf-lifecycle",
+          "path": "website/docs/language/meta-arguments/lifecycle.mdx",
+          "sha256": "f96c6f2b2d2a4b9c50ff0b29ab201278b74fcd73973331a5e79e909be529441e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "tf-refactor",
+          "path": "website/docs/language/modules/develop/refactoring.mdx",
+          "sha256": "60e0593295f52789ed8cfb3c44fdd79d7d651760e1566ad8252d5b779ff6924a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "reliability-incident-cost",
+      "repository": "https://github.com/prometheus/docs",
+      "commit": "cc0672badce86173b9afaa95a59904576bcd6d6a",
+      "references": [
+        {
+          "id": "prom-alerts",
+          "path": "docs/practices/alerting.md",
+          "sha256": "2df77104b4764de91fb3792ee81db29e54dd50db301b669eca4d0591da409786",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "reliability-incident-cost",
+      "repository": "Official Google SRE HTTPS documentation",
+      "kind": "official-http-snapshot",
+      "references": [
+        {
+          "id": "sre-objectives",
+          "path": "objectives.html",
+          "url": "https://sre.google/sre-book/service-level-objectives/",
+          "sha256": "60851ff3487eef695bb59143b5123a79af081091ce8bf2909ad83ad924438365",
+          "fetched_at": "2026-11-10T14:54:59.817539+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "sre-incidents",
+          "path": "incidents.html",
+          "url": "https://sre.google/sre-book/managing-incidents/",
+          "sha256": "7f50d2472877739e24f2bb31de56d68ca46521463232ce58125fc2d4ea8583cb",
+          "fetched_at": "2026-11-10T14:55:00.255604+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "sre-postmortem",
+          "path": "postmortem.html",
+          "url": "https://sre.google/sre-book/postmortem-culture/",
+          "sha256": "ef876f0a0f09a88f3acc3294ec24eb922751b0059cba8be271aa6fe8474656c5",
+          "fetched_at": "2026-11-10T14:55:00.494905+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        }
+      ]
+    },
+    {
+      "course": "reliability-incident-cost",
+      "repository": "Official AWS HTTPS documentation",
+      "kind": "official-http-snapshot",
+      "references": [
+        {
+          "id": "aws-zones",
+          "path": "global-infrastructure.html",
+          "url": "https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html",
+          "sha256": "c9f3d179d619bfef8722b75b45fb1d5f3dec8f444f53506ca1e66216b946be31",
+          "fetched_at": "2026-11-09T17:12:01.371314+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-budgets",
+          "path": "cost-management.html",
+          "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html",
+          "sha256": "8ef78fef6163b8168f8409b47e7ded0f55649f6907cb487522b8138cc226a2c2",
+          "fetched_at": "2026-11-09T17:12:01.371523+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        }
+      ]
+    },
+    {
+      "course": "data-modeling-warehousing",
+      "repository": "https://github.com/postgres/postgres",
+      "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
+      "references": [
+        {
+          "id": "pg-ddl",
+          "path": "doc/src/sgml/ddl.sgml",
+          "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "pg-queries",
+          "path": "doc/src/sgml/queries.sgml",
+          "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "pg-cluster",
+          "path": "doc/src/sgml/ref/cluster.sgml",
+          "sha256": "345295d9ebfe0cc0f00d446170eeb64aa6f7314575863189301af654a0feeb87",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "data-modeling-warehousing",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-sqlite",
+          "path": "Doc/library/sqlite3.rst",
+          "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "etl-elt-architecture",
+      "repository": "https://github.com/postgres/postgres",
+      "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
+      "references": [
+        {
+          "id": "pg-ddl",
+          "path": "doc/src/sgml/ddl.sgml",
+          "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "pg-queries",
+          "path": "doc/src/sgml/queries.sgml",
+          "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "pg-logical",
+          "path": "doc/src/sgml/logicaldecoding.sgml",
+          "sha256": "1b86a7c4f99636eb4b833995132f72158708fa859f75c673efeac1910431175b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "pg-replication",
+          "path": "doc/src/sgml/logical-replication.sgml",
+          "sha256": "45ba6c2e5b1fe8b9ecf017de6be5bb3a4e5048fb6ed6ea8c83f33ebfdde41770",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "etl-elt-architecture",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-sqlite",
+          "path": "Doc/library/sqlite3.rst",
+          "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-json",
+          "path": "Doc/library/json.rst",
+          "sha256": "1dabdd646bfbf961c3ffcf79dd41bd81dc6a2e1ed59428b32662ed16acff08df",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-csv",
+          "path": "Doc/library/csv.rst",
+          "sha256": "2ebad38f5e1dc4387fa90cbeb105ce1709a8c8ef40a8f9a074930aa9e8c46d21",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-types",
+          "path": "Doc/builtins/stdtypes.rst",
+          "sha256": "3a5533d8d038ddcca6b4fd223b90f9d97ceaf1df9c43e1a33bca52acbb536bc7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    }
+  ],
+  "unavailable_sources": [
+    {
+      "course": "scripting-automation",
+      "id": "bash-manual",
+      "url": "https://www.gnu.org/software/bash/manual/bash.html",
+      "status": 503,
+      "checked_at": "2026-11-10",
+      "reason": "Official manual URL. Retrieval of full and chapter HTTPS pages returned 503 on 2026-11-10; no captured official response or immutable revision is claimed. Real installed Bash examples execute locally; expert Bash source review remains blocked.",
+      "verified": false,
+      "human_source_review_required": true
+    }
+  ],
+  "human_approved": false,
+  "published": false
+}

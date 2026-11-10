@@ -1,0 +1,12 @@
+{
+  "scope": "Heuristic SME review triage; flags are not confirmed defects or educational approval.",
+  "new_course_count": 26,
+  "signals": {
+    "depth_review": 209,
+    "difficulty_review": 1039,
+    "scenario_depth_review": 411
+  },
+  "note": "Signals overlap. Short prose excludes examples, takeaways and misconception notes; counts are expert-review prompts, not confirmed defects. Difficulty labels remain provisional.",
+  "human_approved": false,
+  "published": false
+}

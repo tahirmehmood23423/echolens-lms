@@ -1,0 +1,77 @@
+{
+  "targeted": {
+    "tests": 255,
+    "pass": 255,
+    "fail": 0,
+    "skipped": 0
+  },
+  "full": {
+    "tests": 412,
+    "pass": 400,
+    "fail": 11,
+    "skipped": 1
+  },
+  "browser_integration_checkpoint": {
+    "passed": true,
+    "checks": 482,
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "errors": [],
+    "production_published": false
+  },
+  "content": {
+    "courses": 74,
+    "lessons": 710,
+    "questions": 4984,
+    "examples_checked": 743,
+    "errors": [],
+    "warnings": [],
+    "unavailable_references": 1,
+    "human_approved": false,
+    "published": false
+  },
+  "existing_failures_match": true,
+  "existing_failures": [
+    "actual health and alert functions expose full error details without connecting to a database",
+    "admin login and role-specific browsing",
+    "all demo roles browse synthetic data; writes cannot alter the store or SQL",
+    "coord login and role-specific browsing",
+    "reminder settings and delivery history round-trip through the production Prisma JSON mapping",
+    "required ad choices and unresolved age/retention facts remain explicit",
+    "test/certificate-final-project.test.js",
+    "test/flush-step2.test.js",
+    "test/free-course-reminders.test.js",
+    "test/talent.test.js",
+    "test/trending-tech.test.js"
+  ],
+  "new_failures": [],
+  "human_approved": false,
+  "published": false,
+  "pushed": false,
+  "deployed": false,
+  "test_logs": {
+    "targeted": "wave3-refined-targeted.log",
+    "full": "wave3-refined-full.log",
+    "browser": "wave3-refined-browser.log"
+  },
+  "browser": {
+    "passed": true,
+    "checks": 482,
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "errors": [],
+    "production_published": false
+  },
+  "code_commit": "d6889de",
+  "browser_snapshot": "Final revised 26-package source snapshot; matches code checkpoint d6889de."
+}

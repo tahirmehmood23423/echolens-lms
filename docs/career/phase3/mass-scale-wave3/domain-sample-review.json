@@ -1,0 +1,605 @@
+{
+  "review_type": "AI-assisted read-only substantive sample review",
+  "human_review": false,
+  "human_approved": false,
+  "publication_approval": false,
+  "scope": "Exactly 12 formal questions: first hard and first advanced item in each of six assigned courses. This is a sample, not a complete bank audit.",
+  "sample_count": 12,
+  "summary": {
+    "sampled_keys": "No confirmed technically incorrect key among the 12 sampled items.",
+    "confirmed_issues": [
+      "Difficulty labels exceed demonstrated cognitive demand in the sampled hard and advanced items.",
+      "Three sampled LLM-domain hard items had misconception feedback ordered differently from the displayed wrong options; the sampled advanced rotations happened to align."
+    ],
+    "potential_issues": [
+      "data-storytelling.w1.7 leaves segment and pilot sizes implicit, allowing a plausible alternative feasibility interpretation."
+    ],
+    "changes_made": "No course, helper, registry, test or verification files changed during this review."
+  },
+  "samples": [
+    {
+      "course": "supervised-learning",
+      "question_id": "supervised-learning.f7",
+      "declared_difficulty": "hard",
+      "prompt": "A zero-input intercept refers to an impossible operating state. What limits interpretation?",
+      "options": [
+        "Target shape",
+        "Domain support",
+        "Estimator availability",
+        "Feature count"
+      ],
+      "answer_index": 1,
+      "answer": "Domain support",
+      "key_accuracy": "Domain support correctly limits substantive interpretation of an intercept outside feasible inputs. The numerical intercept remains well-defined.",
+      "ambiguity": "Low ambiguity; the stem explicitly concerns interpretation, not whether the model can calculate an intercept.",
+      "distractor_quality": "Weak: target shape, estimator availability, and feature count are remote alternatives to a domain-support problem.",
+      "difficulty_realism": "Overstated: this is easy-to-medium conceptual recognition, rather than hard analysis.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Overstated: this is easy-to-medium conceptual recognition, rather than hard analysis."
+        }
+      ],
+      "worked_example_verification_limit": "The executed synthetic scikit-learn fixtures establish displayed arithmetic/API behavior for the specified environment. They do not establish population accuracy, generalization, causal effects, calibration, or acceptable production costs. These two questions depend on statistical interpretation rather than a provider or changing API contract."
+    },
+    {
+      "course": "supervised-learning",
+      "question_id": "supervised-learning.f10",
+      "declared_difficulty": "advanced",
+      "prompt": "A correlated feature is removed and remaining coefficients change while predictions stay close. What is justified?",
+      "options": [
+        "All features are irrelevant",
+        "Prediction is impossible",
+        "Coefficients are conditional",
+        "The model is causal"
+      ],
+      "answer_index": 2,
+      "answer": "Coefficients are conditional",
+      "key_accuracy": "Removing a correlated predictor can redistribute coefficient weights with similar predictions. Conditional coefficients is a justified answer; no causal or universal irrelevance conclusion follows.",
+      "ambiguity": "The key is defensible; similar predictions alone do not establish exact collinearity or coefficient identifiability, and the answer does not claim either.",
+      "distractor_quality": "Weak: impossible prediction, universal irrelevance, and causality are readily rejected.",
+      "difficulty_realism": "Overstated: medium conceptual interpretation rather than advanced analysis.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Overstated: medium conceptual interpretation rather than advanced analysis."
+        }
+      ],
+      "worked_example_verification_limit": "The executed synthetic scikit-learn fixtures establish displayed arithmetic/API behavior for the specified environment. They do not establish population accuracy, generalization, causal effects, calibration, or acceptable production costs. These two questions depend on statistical interpretation rather than a provider or changing API contract."
+    },
+    {
+      "course": "rag-advanced",
+      "question_id": "rag-advanced.f007",
+      "declared_difficulty": "hard",
+      "prompt": "The same chunk arrives from lexical and dense retrieval. What should context construction avoid?",
+      "options": [
+        "Stable source ids",
+        "Explicit provenance",
+        "Repeated context",
+        "Multiple rank signals"
+      ],
+      "answer_index": 2,
+      "answer": "Repeated context",
+      "key_accuracy": "Deduplicating context while retaining independent rank contributions is technically sound. Stable identities and provenance should be retained.",
+      "ambiguity": "Clear single key.",
+      "distractor_quality": "Moderate: multiple rank signals tests a real confusion between score fusion and context duplication; identity/provenance alternatives are easier.",
+      "difficulty_realism": "Overstated: easy-to-medium distinction, without a difficult fusion calculation or trace.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "CONFIRMED: wrong-option notes are ordered by original card distractors rather than rotated displayed wrong-option order. Content-specific feedback can be attached to the wrong selected option.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Overstated: easy-to-medium distinction, without a difficult fusion calculation or trace."
+        },
+        {
+          "severity": "medium",
+          "category": "misconception_feedback_order",
+          "reasoning": "Displayed wrong options: [\"Stable source ids\",\"Explicit provenance\",\"Multiple rank signals\"]; notes: [\"“Multiple rank signals” does not satisfy the stated requirement. Multiple retrieval appearances can inform a score without duplicating the context text.\",\"“Stable source ids” does not satisfy the stated requirement. Multiple retrieval appearances can inform a score without duplicating the context text.\",\"“Explicit provenance” does not satisfy the stated requirement. Multiple retrieval appearances can inform a score without duplicating the context text.\"]"
+        }
+      ],
+      "worked_example_verification_limit": "Offline Python rank-fusion, relevance and context fixtures verify formulas and declared policy examples. They do not implement a production retriever, measure relevance gains, establish provider model behavior, or prove authorization enforcement in a deployed system. Historical pinned Cookbook material supports concepts, not a current API guarantee."
+    },
+    {
+      "course": "rag-advanced",
+      "question_id": "rag-advanced.f010",
+      "declared_difficulty": "advanced",
+      "prompt": "Lexical and dense lists use different scales and overlap on private chunks. Which hybrid design supports relevance while preserving scope?",
+      "options": [
+        "Sum raw scores then ask the model to hide leaks",
+        "Discard all lexical hits to avoid duplicates",
+        "Authorize by whichever retriever gives the higher score",
+        "Filter scope deduplicate ids and fuse ranks"
+      ],
+      "answer_index": 3,
+      "answer": "Filter scope deduplicate ids and fuse ranks",
+      "key_accuracy": "Scope enforcement is independent of retrieval relevance, deduplication avoids repeated evidence, and rank fusion avoids adding incompatible raw scores.",
+      "ambiguity": "The response names one valid design; calibrated score fusion could also be valid generally, but is not offered and the stated scales are unrelated.",
+      "distractor_quality": "Weak-to-moderate: discarding lexical evidence is a plausible overcorrection; authorizing by rank and asking the model to hide leaks are conspicuously unsafe.",
+      "difficulty_realism": "Some synthesis of three requirements, but medium rather than advanced because distractors expose basic errors.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Some synthesis of three requirements, but medium rather than advanced because distractors expose basic errors."
+        }
+      ],
+      "worked_example_verification_limit": "Offline Python rank-fusion, relevance and context fixtures verify formulas and declared policy examples. They do not implement a production retriever, measure relevance gains, establish provider model behavior, or prove authorization enforcement in a deployed system. Historical pinned Cookbook material supports concepts, not a current API guarantee."
+    },
+    {
+      "course": "llm-security-eval",
+      "question_id": "llm-security-eval.f007",
+      "declared_difficulty": "hard",
+      "prompt": "A team changes evidence formatting and sees one safe answer. What further evidence is required?",
+      "options": [
+        "Self-reported confidence",
+        "Only benign test cases",
+        "Owned regression cases",
+        "One successful refusal"
+      ],
+      "answer_index": 2,
+      "answer": "Owned regression cases",
+      "key_accuracy": "A single safe response does not establish robustness; regression tests are needed. Owned cases are an appropriate safe test context.",
+      "ambiguity": "The phrase owned regression cases does not itself require representative adversarial coverage; explanation should distinguish ownership from test adequacy.",
+      "distractor_quality": "Weak: the other choices are a single refusal, self-confidence, and benign-only tests.",
+      "difficulty_realism": "Overstated: basic evaluation reasoning rather than hard analysis.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "CONFIRMED: wrong-option notes are ordered by original card distractors rather than rotated displayed wrong-option order. Content-specific feedback can be attached to the wrong selected option.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Overstated: basic evaluation reasoning rather than hard analysis."
+        },
+        {
+          "severity": "medium",
+          "category": "misconception_feedback_order",
+          "reasoning": "Displayed wrong options: [\"Self-reported confidence\",\"Only benign test cases\",\"One successful refusal\"]; notes: [\"“One successful refusal” does not satisfy the stated requirement. A successful demonstration is insufficient to characterize injection resistance.\",\"“Self-reported confidence” does not satisfy the stated requirement. A successful demonstration is insufficient to characterize injection resistance.\",\"“Only benign test cases” does not satisfy the stated requirement. A successful demonstration is insufficient to characterize injection resistance.\"]"
+        }
+      ],
+      "worked_example_verification_limit": "Offline fixtures model authorization and scoring policies. They do not invoke or red-team a live model/provider, establish injection resistance, prove tenant isolation, or validate a classifier on representative adversarial traffic. A fluent or successful example is not an empirical safety evaluation."
+    },
+    {
+      "course": "llm-security-eval",
+      "question_id": "llm-security-eval.f010",
+      "declared_difficulty": "advanced",
+      "prompt": "An attachment is relevant and schema-valid but requests a customer export. The authenticated user can only read their own policy. Which design preserves useful answers and the action boundary?",
+      "options": [
+        "Reject every document containing a tool name",
+        "Authorize export when the citation is real",
+        "Let the model select the tenant then export",
+        "Summarize authorized evidence; deny export"
+      ],
+      "answer_index": 3,
+      "answer": "Summarize authorized evidence; deny export",
+      "key_accuracy": "Relevant schema-valid text has no authority to authorize an export; permitted summarization and server-enforced denial preserve the boundary.",
+      "ambiguity": "Authorized evidence is explicitly scoped to the user; the answer remains conditional on those permissions.",
+      "distractor_quality": "Moderate: rejecting every document with a tool name is a plausible excessive defense; the authorization alternatives are blatant failures.",
+      "difficulty_realism": "Medium scenario synthesis rather than advanced security reasoning.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Medium scenario synthesis rather than advanced security reasoning."
+        }
+      ],
+      "worked_example_verification_limit": "Offline fixtures model authorization and scoring policies. They do not invoke or red-team a live model/provider, establish injection resistance, prove tenant isolation, or validate a classifier on representative adversarial traffic. A fluent or successful example is not an empirical safety evaluation."
+    },
+    {
+      "course": "llm-deployment-cost",
+      "question_id": "llm-deployment-cost.f007",
+      "declared_difficulty": "hard",
+      "prompt": "A provider outage disables the only inference endpoint. What should the architecture account for?",
+      "options": [
+        "Only token vocabulary",
+        "Only prompt syntax",
+        "Provider risk",
+        "Only local disk use"
+      ],
+      "answer_index": 2,
+      "answer": "Provider risk",
+      "key_accuracy": "Loss of the only hosted inference endpoint is a provider dependency/availability risk. Recovery paths require testing.",
+      "ambiguity": "Clear single key.",
+      "distractor_quality": "Weak: local disk, token vocabulary and prompt syntax do not plausibly explain a provider outage.",
+      "difficulty_realism": "Substantially overstated: easy recognition labeled hard.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "CONFIRMED: wrong-option notes are ordered by original card distractors rather than rotated displayed wrong-option order. Content-specific feedback can be attached to the wrong selected option.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Substantially overstated: easy recognition labeled hard."
+        },
+        {
+          "severity": "medium",
+          "category": "misconception_feedback_order",
+          "reasoning": "Displayed wrong options: [\"Only token vocabulary\",\"Only prompt syntax\",\"Only local disk use\"]; notes: [\"“Only local disk use” does not satisfy the stated requirement. Hosted availability depends partly on external service health and tested recovery paths.\",\"“Only token vocabulary” does not satisfy the stated requirement. Hosted availability depends partly on external service health and tested recovery paths.\",\"“Only prompt syntax” does not satisfy the stated requirement. Hosted availability depends partly on external service health and tested recovery paths.\"]"
+        }
+      ],
+      "worked_example_verification_limit": "Offline arithmetic and accounting fixtures validate the declared model of costs, timings and state. They do not measure real latency, utilization, live billing, outage recovery, provider retention/location compliance, or current endpoint prices/contracts. Current terms and representative load evidence remain necessary."
+    },
+    {
+      "course": "llm-deployment-cost",
+      "question_id": "llm-deployment-cost.f010",
+      "declared_difficulty": "advanced",
+      "prompt": "A hosted option passes quality but fails data location; a local option meets location but misses peak latency. Which choice follows from both being mandatory?",
+      "options": [
+        "Choose the cheaper ineligible candidate",
+        "Average location and latency into one score",
+        "Declare the local benchmark sufficient at idle",
+        "Revise scope or architecture before selecting"
+      ],
+      "answer_index": 3,
+      "answer": "Revise scope or architecture before selecting",
+      "key_accuracy": "Neither candidate meets both mandatory constraints; revising supported scope or architecture is necessary before a feasible selection.",
+      "ambiguity": "Scope revision is acceptable only if authorized requirements can actually be revised; it does not itself waive mandatory data-location requirements.",
+      "distractor_quality": "Moderate: averaging constraints is a common scoring mistake, while idle benchmarking and selecting an ineligible option are obvious errors.",
+      "difficulty_realism": "Medium constraint reasoning, not advanced cost or capacity analysis.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Medium constraint reasoning, not advanced cost or capacity analysis."
+        }
+      ],
+      "worked_example_verification_limit": "Offline arithmetic and accounting fixtures validate the declared model of costs, timings and state. They do not measure real latency, utilization, live billing, outage recovery, provider retention/location compliance, or current endpoint prices/contracts. Current terms and representative load evidence remain necessary."
+    },
+    {
+      "course": "spreadsheet-analysis",
+      "question_id": "spreadsheet-analysis.w1.7",
+      "declared_difficulty": "hard",
+      "prompt": "A two-way table is copied down and across. What should tests cover?",
+      "options": [
+        "Only the grand total",
+        "Both copy directions",
+        "Only downward copies",
+        "Only the original formula cell"
+      ],
+      "answer_index": 1,
+      "answer": "Both copy directions",
+      "key_accuracy": "A two-dimensional copy requires testing both directions because mixed reference faults can be directional.",
+      "ambiguity": "Clear single key.",
+      "distractor_quality": "Weak: each alternative explicitly limits testing to an insufficient subset.",
+      "difficulty_realism": "Substantially overstated: easy copy-reference concept labeled hard.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Substantially overstated: easy copy-reference concept labeled hard."
+        }
+      ],
+      "worked_example_verification_limit": "Python fixtures model intended calculations/reference policies and verify those synthetic results. They do not execute native Excel/Sheets formula translation, date/coercion rules, calculation modes, pivot caches, connections or refresh workflows. Native application checks remain explicitly pending."
+    },
+    {
+      "course": "spreadsheet-analysis",
+      "question_id": "spreadsheet-analysis.w1.10",
+      "declared_difficulty": "advanced",
+      "prompt": "A workbook copy passes spot checks but a formula changes in the last row. Which review is useful?",
+      "options": [
+        "Only equal grand totals",
+        "Only the number format",
+        "Inspect edge formulas",
+        "Only the first formula cell"
+      ],
+      "answer_index": 2,
+      "answer": "Inspect edge formulas",
+      "key_accuracy": "Checking edge formulas is appropriate for a last-row reference or fill-boundary fault; grand totals can mask errors.",
+      "ambiguity": "A useful review is requested, so the key need not alone establish all workbook correctness.",
+      "distractor_quality": "Weak: first-cell-only and number-format-only review are obviously inadequate once the last-row location is given.",
+      "difficulty_realism": "Substantially overstated: easy-to-medium debugging recognition labeled advanced.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Substantially overstated: easy-to-medium debugging recognition labeled advanced."
+        }
+      ],
+      "worked_example_verification_limit": "Python fixtures model intended calculations/reference policies and verify those synthetic results. They do not execute native Excel/Sheets formula translation, date/coercion rules, calculation modes, pivot caches, connections or refresh workflows. Native application checks remain explicitly pending."
+    },
+    {
+      "course": "data-storytelling",
+      "question_id": "data-storytelling.w1.7",
+      "declared_difficulty": "hard",
+      "prompt": "A support manager can call 100 of 1000 customers. Which recommendation is feasible?",
+      "options": [
+        "Ignore capacity",
+        "A targeted pilot",
+        "Call all accounts",
+        "Pick largest segment"
+      ],
+      "answer_index": 1,
+      "answer": "A targeted pilot",
+      "key_accuracy": "A bounded targeted pilot can respect the 100-call constraint and generate evidence.",
+      "ambiguity": "Potential ambiguity: neither the pilot size nor the size of the largest observed segment is specified. Picking the largest segment could be feasible if it has at most 100 customers. The key is best under ordinary reading, but an explicit bounded size would remove this assumption.",
+      "distractor_quality": "Weak: ignoring capacity and calling all accounts are explicit violations; largest-segment selection is the only potentially plausible alternative.",
+      "difficulty_realism": "Substantially overstated: basic feasibility recognition labeled hard.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Substantially overstated: basic feasibility recognition labeled hard."
+        },
+        {
+          "severity": "low",
+          "category": "potential_ambiguity",
+          "reasoning": "Potential ambiguity: neither the pilot size nor the size of the largest observed segment is specified. Picking the largest segment could be feasible if it has at most 100 customers. The key is best under ordinary reading, but an explicit bounded size would remove this assumption."
+        }
+      ],
+      "worked_example_verification_limit": "Synthetic Python arithmetic can reproduce rates, intervals and decision examples. It does not validate real sampling, randomization, identification assumptions, business savings, policy eligibility, or actual causal effects. Reproducibility and causal validity remain separate."
+    },
+    {
+      "course": "data-storytelling",
+      "question_id": "data-storytelling.w1.10",
+      "declared_difficulty": "advanced",
+      "prompt": "A board must choose a pilot or no pilot under tight cash. Which addition makes evidence decision-ready?",
+      "options": [
+        "Ignore setup costs",
+        "Assume all excess saved",
+        "Costs and stop rules",
+        "Highest mean alone"
+      ],
+      "answer_index": 2,
+      "answer": "Costs and stop rules",
+      "key_accuracy": "Costs and stopping rules connect evidence to a cash-constrained pilot decision; descriptive excess is not guaranteed preventable loss.",
+      "ambiguity": "Clear best answer, although complete decision readiness also requires credible benefit and risk assumptions as the explanation acknowledges.",
+      "distractor_quality": "Weak-to-moderate: highest modeled mean alone is a familiar mistake, but ignoring setup and guaranteed savings are overtly deficient.",
+      "difficulty_realism": "Medium business reasoning, with no quantitative cash-flow or value-of-information tradeoff to justify advanced.",
+      "api_source_assumptions": "No live provider/API behavior is required to answer this item. Conceptual policy assumptions are assessed above; no external source re-verification was performed in this sample.",
+      "feedback_alignment": "Wrong-option notes align with displayed wrong-option order.",
+      "findings": [
+        {
+          "severity": "medium",
+          "category": "difficulty_calibration",
+          "reasoning": "Medium business reasoning, with no quantitative cash-flow or value-of-information tradeoff to justify advanced."
+        }
+      ],
+      "worked_example_verification_limit": "Synthetic Python arithmetic can reproduce rates, intervals and decision examples. It does not validate real sampling, randomization, identification assumptions, business savings, policy eligibility, or actual causal effects. Reproducibility and causal validity remain separate."
+    }
+  ],
+  "review_phase": "Original read-only findings retained below; authorized remediation is recorded separately.",
+  "remediation": {
+    "authorized_by": "Parent task explicitly extended read-only scope to fix feedback rotation, add regression coverage, and strengthen the 12 sampled hard/advanced items.",
+    "human_approved": false,
+    "changes": [
+      "llm-wave3-helper.js now derives misconception notes from displayed wrong options after rotation.",
+      "test/wave3-feedback-order.test.js verifies all four rotations in formative and formal banks for the three affected courses.",
+      "All 12 sampled questions now require application of multiple numeric, policy, boundary or evaluation constraints."
+    ],
+    "samples": [
+      {
+        "course": "supervised-learning",
+        "question_id": "supervised-learning.f7",
+        "difficulty": "hard",
+        "prompt": "A demand model fitted for 6–10 operating hours uses x=hours−8 and predicts kWh=12+3x. An analyst calls 12 the demand of a closed facility. Which interpretation follows from the encoding and data support?",
+        "options": [
+          "3 kWh is the expected demand at eight hours",
+          "12 kWh refers to eight operating hours",
+          "12 kWh refers to zero operating hours",
+          "−12 kWh is verified at zero operating hours"
+        ],
+        "answer_index": 1,
+        "answer": "12 kWh refers to eight operating hours",
+        "reasoning": "The encoded zero is eight hours, inside the observed range. Physical zero hours gives x=−8 and an extrapolated −12, not a validated closed-facility prediction.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "The executed synthetic scikit-learn fixtures establish displayed arithmetic/API behavior for the specified environment. They do not establish population accuracy, generalization, causal effects, calibration, or acceptable production costs. These two questions depend on statistical interpretation rather than a provider or changing API contract."
+      },
+      {
+        "course": "supervised-learning",
+        "question_id": "supervised-learning.f10",
+        "difficulty": "advanced",
+        "prompt": "A linear demand model uses hours and machine cycles, nearly proportional in training. Dropping cycles changes the hours slope but barely changes held-out error on the same operating regime. A new plant varies cycles independently. Which conclusion is justified?",
+        "options": [
+          "Unchanged error proves cycles add no value anywhere",
+          "The new plant can inherit the old calibration",
+          "Same-regime prediction held; transfer needs testing",
+          "Stable error establishes the hours slope as causal"
+        ],
+        "answer_index": 2,
+        "answer": "Same-regime prediction held; transfer needs testing",
+        "reasoning": "Correlated inputs can redistribute coefficient weight without changing predictions where their relation holds. Decoupling them changes support, so the new plant requires separate validation; stable error identifies neither causality nor universal redundancy.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "The executed synthetic scikit-learn fixtures establish displayed arithmetic/API behavior for the specified environment. They do not establish population accuracy, generalization, causal effects, calibration, or acceptable production costs. These two questions depend on statistical interpretation rather than a provider or changing API contract."
+      },
+      {
+        "course": "rag-advanced",
+        "question_id": "rag-advanced.f007",
+        "difficulty": "hard",
+        "prompt": "One query returns chunk A at lexical rank 1 and dense rank 2, and distinct chunks B and C below it. Both retrievers pass access checks. A three-chunk context budget applies. Which design retains both ranking evidence and evidence diversity?",
+        "options": [
+          "Keep only A’s lexical rank, then include B and C",
+          "Deduplicate by title before checking source ids",
+          "Fuse A’s ranks; include A, B and C once each",
+          "Keep both copies of A and one remaining chunk"
+        ],
+        "answer_index": 2,
+        "answer": "Fuse A’s ranks; include A, B and C once each",
+        "reasoning": "A can receive both reciprocal-rank contributions while occupying one context slot. Identity-based deduplication preserves separate evidence B and C; title-based merging can collapse different chunks.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Offline Python rank-fusion, relevance and context fixtures verify formulas and declared policy examples. They do not implement a production retriever, measure relevance gains, establish provider model behavior, or prove authorization enforcement in a deployed system. Historical pinned Cookbook material supports concepts, not a current API guarantee."
+      },
+      {
+        "course": "rag-advanced",
+        "question_id": "rag-advanced.f010",
+        "difficulty": "advanced",
+        "prompt": "Lexical search returns authorized A at rank 1 and restricted X at rank 2; dense search returns X at rank 1 and authorized B at rank 2. Raw scores use unrelated scales. The same X id appears twice. Which plan preserves scope and complementary evidence?",
+        "options": [
+          "Fuse raw scores; omit X only from visible citations",
+          "Fuse ranks; let duplicate X votes establish access",
+          "Discard dense results; lexical rank implies access",
+          "Filter each list; fuse eligible ranks by stable id"
+        ],
+        "answer_index": 3,
+        "answer": "Filter each list; fuse eligible ranks by stable id",
+        "reasoning": "Access eligibility must be enforced independently of rank and score. Stable ids support deduplication; rank contributions avoid combining incompatible raw scales. Neither citations, repeated hits nor lexical rank authorizes X.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Offline Python rank-fusion, relevance and context fixtures verify formulas and declared policy examples. They do not implement a production retriever, measure relevance gains, establish provider model behavior, or prove authorization enforcement in a deployed system. Historical pinned Cookbook material supports concepts, not a current API guarantee."
+      },
+      {
+        "course": "llm-security-eval",
+        "question_id": "llm-security-eval.f007",
+        "difficulty": "hard",
+        "prompt": "After reformatting retrieved evidence, one injected document no longer triggers an export. The old attack and legitimate export requests both use the same tool name. Which next evaluation best tests protection without mistaking blanket refusal for success?",
+        "options": [
+          "Remove exports from all tests and compare answer fluency",
+          "Test benign summaries and treat valid schemas as isolation",
+          "Test attack variants and authorized exports with server traces",
+          "Repeat the blocked document and count every refusal as safe"
+        ],
+        "answer_index": 2,
+        "answer": "Test attack variants and authorized exports with server traces",
+        "reasoning": "Use owned regression cases containing attack variants and permitted actions, and inspect server authorization traces. Repeating one refusal or removing legitimate exports cannot distinguish robust authorization from blanket denial.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Offline fixtures model authorization and scoring policies. They do not invoke or red-team a live model/provider, establish injection resistance, prove tenant isolation, or validate a classifier on representative adversarial traffic. A fluent or successful example is not an empirical safety evaluation."
+      },
+      {
+        "course": "llm-security-eval",
+        "question_id": "llm-security-eval.f010",
+        "difficulty": "advanced",
+        "prompt": "A user may read policy A but cannot export customers. A relevant attachment requests an export; its schema is valid. The model emits a valid export call, and ordinary authorized summaries must remain available. Which enforcement path meets both requirements?",
+        "options": [
+          "Run export after schema checks; redact its visible result",
+          "Reject all attachment requests, including permitted summaries",
+          "Allow export if a second model confirms the citation",
+          "Reject export by server scope; allow the policy summary"
+        ],
+        "answer_index": 3,
+        "answer": "Reject export by server scope; allow the policy summary",
+        "reasoning": "Schema validity and model agreement establish neither permission nor tenant scope. Server authorization must reject the export before execution while allowing the independently permitted policy summary.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Offline fixtures model authorization and scoring policies. They do not invoke or red-team a live model/provider, establish injection resistance, prove tenant isolation, or validate a classifier on representative adversarial traffic. A fluent or successful example is not an empirical safety evaluation."
+      },
+      {
+        "course": "llm-deployment-cost",
+        "question_id": "llm-deployment-cost.f007",
+        "difficulty": "hard",
+        "prompt": "A hosted primary and cheaper backup share one region and provider quota. Each passes isolated quality tests. The service must continue during that region’s outage, with a fixed data-location rule. Which missing evidence matters most?",
+        "options": [
+          "Separate API keys with matching single-request throughput",
+          "A cheaper backup price within the existing shared quota",
+          "Eligible independent recovery tested under outage load",
+          "Backup mean latency measured while the primary is healthy"
+        ],
+        "answer_index": 2,
+        "answer": "Eligible independent recovery tested under outage load",
+        "reasoning": "Shared region or quota failures can disable both routes. Recovery requires an eligible path with appropriate independence, quality, capacity and tested failover; separate keys, idle latency and price do not establish it.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Offline arithmetic and accounting fixtures validate the declared model of costs, timings and state. They do not measure real latency, utilization, live billing, outage recovery, provider retention/location compliance, or current endpoint prices/contracts. Current terms and representative load evidence remain necessary."
+      },
+      {
+        "course": "llm-deployment-cost",
+        "question_id": "llm-deployment-cost.f010",
+        "difficulty": "advanced",
+        "prompt": "Two deployments pass task-quality gates. Hosted costs $200/month and meets peak latency but violates a mandatory region rule. Local costs $500/month and satisfies location but breaches peak latency; idle latency passes. The $600 budget and both gates are hard. Which decision is justified?",
+        "options": [
+          "Select local because idle latency and budget already pass",
+          "Select hosted because its lower cost funds later remediation",
+          "Average both gate scores and choose the better total",
+          "Test a within-budget redesign against both gates before choice"
+        ],
+        "answer_index": 3,
+        "answer": "Test a within-budget redesign against both gates before choice",
+        "reasoning": "Neither evaluated deployment satisfies all hard constraints. A redesign or explicitly revised authorized scope must be tested against location, peak latency and budget; cost savings and idle measurements do not waive failed gates.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Offline arithmetic and accounting fixtures validate the declared model of costs, timings and state. They do not measure real latency, utilization, live billing, outage recovery, provider retention/location compliance, or current endpoint prices/contracts. Current terms and representative load evidence remain necessary."
+      },
+      {
+        "course": "spreadsheet-analysis",
+        "question_id": "spreadsheet-analysis.w1.7",
+        "difficulty": "hard",
+        "prompt": "In a two-way pricing grid, B2 contains =$A2*B$1. It is filled to C3. Row 3 has a different quantity and C1 a different rate. What formula and check jointly verify the intended mixed references?",
+        "options": [
+          "=$A2*C1; compare only the final grand total",
+          "=$A3*C$1; test distinct row and column inputs",
+          "=$A$2*C$1; test several rates on the first row",
+          "=$A3*$B$1; test quantities down the first column"
+        ],
+        "answer_index": 1,
+        "answer": "=$A3*C$1; test distinct row and column inputs",
+        "reasoning": "Filling one row and one column changes relative row 2 to 3 and relative column B to C. Column A and row 1 stay anchored. Distinct inputs in both directions expose either incorrectly fixed dimension.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Python fixtures model intended calculations/reference policies and verify those synthetic results. They do not execute native Excel/Sheets formula translation, date/coercion rules, calculation modes, pivot caches, connections or refresh workflows. Native application checks remain explicitly pending."
+      },
+      {
+        "course": "spreadsheet-analysis",
+        "question_id": "spreadsheet-analysis.w1.10",
+        "difficulty": "advanced",
+        "prompt": "A copied tax formula should multiply each row’s price by $F$1. The final row instead uses F20; F20 currently equals F1, and the grand total matches. Which controlled review can reveal the latent boundary fault?",
+        "options": [
+          "Change the final price only and verify its tax changes",
+          "Copy the final displayed value back into the same cell",
+          "Change F1 alone, recalculate, and inspect edge formulas",
+          "Compare the matching total with a second export unchanged"
+        ],
+        "answer_index": 2,
+        "answer": "Change F1 alone, recalculate, and inspect edge formulas",
+        "reasoning": "Equal current rate values conceal a shifted reference. Varying F1 while keeping F20 fixed distinguishes the intended absolute dependency; inspecting edge formulas identifies the fill error even before an observed total diverges.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Python fixtures model intended calculations/reference policies and verify those synthetic results. They do not execute native Excel/Sheets formula translation, date/coercion rules, calculation modes, pivot caches, connections or refresh workflows. Native application checks remain explicitly pending."
+      },
+      {
+        "course": "data-storytelling",
+        "question_id": "data-storytelling.w1.7",
+        "difficulty": "hard",
+        "prompt": "A team can call at most 100 customers this week. Segment A has 500 customers and 40% excess cancellations but no measured call effect; segment B has 80 customers and lower excess. Calls may cause complaints. Which proposal best respects capacity and learns decision-relevant evidence?",
+        "options": [
+          "Select 100 A customers; report all excess cases as saves",
+          "Randomize 100 eligible A customers to call/control; track harm",
+          "Call all 500 in A because its descriptive excess is largest",
+          "Call all 80 in B and attribute every later renewal to calls"
+        ],
+        "answer_index": 1,
+        "answer": "Randomize 100 eligible A customers to call/control; track harm",
+        "reasoning": "A bounded randomized pilot can respect the call limit, estimate assignment effects and monitor complaints. Descriptive excess alone does not identify preventable cancellations, and an uncontrolled follow-up cannot attribute every renewal to calls.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Synthetic Python arithmetic can reproduce rates, intervals and decision examples. It does not validate real sampling, randomization, identification assumptions, business savings, policy eligibility, or actual causal effects. Reproducibility and causal validity remain separate."
+      },
+      {
+        "course": "data-storytelling",
+        "question_id": "data-storytelling.w1.10",
+        "difficulty": "advanced",
+        "prompt": "A pilot has modeled net benefit +$800, but needs $900 cash upfront; only $600 is available. Savings range from $200 to $1,200, and complaints could offset gains. Which board recommendation connects evidence to the actual decision?",
+        "options": [
+          "Approve using the $1,200 case and defer complaint monitoring",
+          "Reject all experimentation because the savings are uncertain",
+          "Price a staged pilot within cash; predeclare benefit/harm stops",
+          "Approve the $900 pilot because expected net benefit is positive"
+        ],
+        "answer_index": 2,
+        "answer": "Price a staged pilot within cash; predeclare benefit/harm stops",
+        "reasoning": "Positive modeled value does not finance an unaffordable upfront outlay. A feasible staged design still needs credible benefit assumptions, costs and predeclared harm/benefit rules; uncertainty can justify bounded learning rather than either optimistic commitment or universal rejection.",
+        "feedback_aligned": true,
+        "assessment": "Key checked against the explicit constraints; distractors represent concrete alternative implementations or inferences that fail at least one stated condition. No provider benchmark, human difficulty calibration, or human approval is claimed.",
+        "worked_example_verification_limit": "Synthetic Python arithmetic can reproduce rates, intervals and decision examples. It does not validate real sampling, randomization, identification assumptions, business savings, policy eligibility, or actual causal effects. Reproducibility and causal validity remain separate."
+      }
+    ]
+  }
+}

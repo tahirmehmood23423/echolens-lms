@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "scope": "Read-only repository snapshots; authored coverage is separate from human review and release. No production-state or additional test claims.",
+  "wave": "shared-foundations-3",
+  "input_digests": {
+    "baseline": "42464487599c15bebbdb15df96efb71b82813604b0c71cf09c240a9e2a30b747",
+    "inventory": "f015f442e64890598d02de2f7758194d9f998eee083dafb36a90d48908385fc0",
+    "checkpoint": "442465caaeff0fc83b9468dc1027256919d236bcd44fd34d9e4a0bed1a72f815",
+    "manifest": "2d8417105c1128869322db296290e90a2545db18d42ad0ce1f066845c5991020"
+  },
+  "canonical_subtracks": 132,
+  "starting": {
+    "authored_subtracks": 48,
+    "modules": 153,
+    "lessons": 466,
+    "formative": 3322,
+    "formal": 4320,
+    "verified_worked_examples": 466,
+    "pending_human_reviews": 48
+  },
+  "added": {
+    "authored_subtracks": 19,
+    "modules": 60,
+    "lessons": 181,
+    "formative": 1259,
+    "formal": 1710,
+    "verified_worked_examples": 181,
+    "pending_human_reviews": 19,
+    "objectives": 99
+  },
+  "total": {
+    "authored_subtracks": 67,
+    "modules": 213,
+    "lessons": 647,
+    "formative": 4581,
+    "formal": 6030,
+    "verified_worked_examples": 647,
+    "pending_human_reviews": 67,
+    "states": {
+      "missing": 65,
+      "outline_only": 65,
+      "authored": 67,
+      "automatically_validated": 67,
+      "human_review_pending": 67,
+      "human_reviewed": 0,
+      "published": 0
+    }
+  },
+  "remaining_subtracks": 65,
+  "authored_complete_roles": {
+    "baseline": [
+      "junior-backend-developer",
+      "python-fastapi-developer",
+      "manual-qa-engineer",
+      "api-tester"
+    ],
+    "current": [
+      "junior-frontend-developer",
+      "junior-backend-developer",
+      "python-fastapi-developer",
+      "nodejs-developer",
+      "mern-stack-developer",
+      "python-fullstack-developer",
+      "llm-application-developer",
+      "rag-developer",
+      "junior-data-analyst",
+      "sql-analyst",
+      "junior-devops-engineer",
+      "manual-qa-engineer",
+      "api-tester"
+    ]
+  },
+  "released_roles": {
+    "baseline": [],
+    "current": []
+  }
+}

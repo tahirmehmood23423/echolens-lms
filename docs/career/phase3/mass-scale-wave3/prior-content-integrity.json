@@ -1,0 +1,10 @@
+{
+  "baseline": "4880f3a",
+  "prior_courses": 48,
+  "unchanged": 48,
+  "changed": [],
+  "method": "Current registered course JSON SHA256 compared with baseline course_hash",
+  "student_data_accessed": false,
+  "changed_prior_source_paths": [],
+  "prior_source_paths_compared": 96
+}

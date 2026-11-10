@@ -11,7 +11,17 @@
     "ml-fundamentals",
     "data-visualization",
     "scripting-automation",
-    "observability"
+    "observability",
+    "supervised-learning",
+    "rag-advanced",
+    "llm-security-eval",
+    "llm-deployment-cost",
+    "spreadsheet-analysis",
+    "data-storytelling",
+    "responsive-css",
+    "frontend-api-security",
+    "frontend-quality",
+    "web-deployment-cicd"
   ],
   "recovered_from_quarantine": [
     "react-fundamentals",

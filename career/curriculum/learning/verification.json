@@ -2879,8 +2879,7 @@
           "ran": true,
           "ok": true,
           "output": "23\n5\nfalse\ntrue",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-bindings-scope",
@@ -2888,8 +2887,7 @@
           "ran": true,
           "ok": true,
           "output": "3\n1\njavascript",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-truthy-defaults",
@@ -2897,8 +2895,7 @@
           "ran": true,
           "ok": true,
           "output": "10\n0\ntrue\nNot supplied",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-functions-closures",
@@ -2906,8 +2903,7 @@
           "ran": true,
           "ok": true,
           "output": "1 2 1",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-this-calls",
@@ -2915,8 +2911,7 @@
           "ran": true,
           "ok": true,
           "output": "Hello Demo\nMember Demo",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-arrows-return",
@@ -2924,8 +2919,7 @@
           "ran": true,
           "ok": true,
           "output": "[{\"id\":1,\"doubled\":4},{\"id\":2,\"doubled\":8}]\n12",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-array-transformations",
@@ -2933,8 +2927,7 @@
           "ran": true,
           "ok": true,
           "output": "[{\"id\":1,\"title\":\"Login\"}]\n2",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-reference-shallow-copy",
@@ -2942,8 +2935,7 @@
           "ran": true,
           "ok": true,
           "output": "B\nB C\nfalse",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-reduce-aggregation",
@@ -2951,8 +2943,7 @@
           "ran": true,
           "ok": true,
           "output": "[[\"North\",5],[\"South\",1]]\n0",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-modern-access",
@@ -2960,8 +2951,7 @@
           "ran": true,
           "ok": true,
           "output": "Demo: team\nNo email supplied\nbasic",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-errors-contracts",
@@ -2969,8 +2959,7 @@
           "ran": true,
           "ok": true,
           "output": "QuantityError: Enter a positive integer.\ncleanup checked",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
           "id": "js-module-boundaries",
@@ -2978,8 +2967,7 @@
           "ran": true,
           "ok": true,
           "output": "0.1\n110.00",
-          "runtime": "Node.js 24.22.1",
-          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
       "objectives": 8,
@@ -2987,46 +2975,693 @@
       "lessons": 12,
       "questions": 96,
       "human_approved": false
+    },
+    {
+      "id": "fastapi-backend",
+      "version": 1,
+      "course_hash": "c7903c7e9378574871c3e2ebf9d6d4d21255a99c140e5a266d435e25be6f975d",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "fa-routes",
+          "code_hash": "b67f0b23e8ad0ecbd81ae28d0b0af365912ee20519ed56b81945127f2512a1fa",
+          "ran": true,
+          "ok": true,
+          "output": "current\n42\n422",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-query-body",
+          "code_hash": "75650deaece280979cf5df90f54c6cb461970f20a35bbbfd4025670d9b9dd302",
+          "ran": true,
+          "ok": true,
+          "output": "5\n422\n422",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-models",
+          "code_hash": "55290cd8f9524409088c31864f9caab20b94182575c1038747210e2a75d62a77",
+          "ran": true,
+          "ok": true,
+          "output": "['display_name', 'id']\nFalse",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-routers",
+          "code_hash": "f1a88d0a5938c3fc10794dd94343d75f8eb313f985b0c429c098e33b608243c9",
+          "ran": true,
+          "ok": true,
+          "output": "fixture\n404",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-dependencies",
+          "code_hash": "586fa2b16b000bdfac70300b71fe204d50aa0bfae49ba2d290418a60ebca4f67",
+          "ran": true,
+          "ok": true,
+          "output": "401\n7\n401",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-service-boundary",
+          "code_hash": "18091e07b69cda3bd07496cfc793bea0a3ce4d1d1e809a06490a2c59ea4633da",
+          "ran": true,
+          "ok": true,
+          "output": "accepted\ncapacity rejected\n1"
+        },
+        {
+          "id": "fa-async-io",
+          "code_hash": "db7c112b4d99d5813c14e7112d0d863402c5bb9107ff28194e4e8cbf35905f81",
+          "ran": true,
+          "ok": true,
+          "output": "[]\n7\n['started', 'finished']"
+        },
+        {
+          "id": "fa-blocking",
+          "code_hash": "410b5a305270096adcea882437adf86ba6d6ba6ae117f3610aee9f3bba66c07d",
+          "ran": true,
+          "ok": true,
+          "output": "8\nfailure propagated"
+        },
+        {
+          "id": "fa-background",
+          "code_hash": "88765a8732ea47afb703419171c9b059d262961d10028165eb8f79a0eaa8760d",
+          "ran": true,
+          "ok": true,
+          "output": "202 accepted\n['local callback']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-errors",
+          "code_hash": "cf3e70eddea1b85b164b606d9e61bab22ac6aa79a8fa87bf9294ccc16604fed5",
+          "ran": true,
+          "ok": true,
+          "output": "409 capacity_conflict\nFalse",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-browser-policy",
+          "code_hash": "8b6ef3ed7d57af710fc590a0738779c28cf24178eff42f19bd70e90a4fb0965b",
+          "ran": true,
+          "ok": true,
+          "output": "https://portal.example.invalid\nabsent",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "fa-operations",
+          "code_hash": "3bc2f9597b60d096517f0fcdd469057a46aabe041f9c664d8c06da1bd81baa17",
+          "ran": true,
+          "ok": true,
+          "output": "200 {'live': True, 'ready': False}\n['live', 'ready']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 12,
+      "questions": 84,
+      "human_approved": false
+    },
+    {
+      "id": "embeddings-semantic-search",
+      "version": 1,
+      "course_hash": "9a151396ed45bc3330b63c4baa26a487986846c0a5e0bf4ff4ad3389dcba4203",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "embeddings-semantic-search-vector-meaning",
+          "code_hash": "ff36dcf2570db5d90af3bbd304639e9f41191987a5dcc61216872f84eee6892b",
+          "ran": true,
+          "ok": true,
+          "output": "1.0\n0.0"
+        },
+        {
+          "id": "embeddings-semantic-search-metric-contract",
+          "code_hash": "a637363c1b50caa7d50b0d56a2679caaf9d694599d3f06c1178946411787c128",
+          "ran": true,
+          "ok": true,
+          "output": "long\n1.0 1.0\n0.707"
+        },
+        {
+          "id": "embeddings-semantic-search-model-selection",
+          "code_hash": "5404310ff5263c358e6154edb38d6f42a4d864e6bc1671824f923e21a468eb4f",
+          "ran": true,
+          "ok": true,
+          "output": "['B']\n1"
+        },
+        {
+          "id": "embeddings-semantic-search-chunk-boundaries",
+          "code_hash": "f1b4d4e6b3e2a0178fe611ff607ce840ae49ed4ba59e30794d7c2a5f963d91a5",
+          "ran": true,
+          "ok": true,
+          "output": "[['p1', 'p2'], ['p3']]\n['p1', 'p2', 'p3']"
+        },
+        {
+          "id": "embeddings-semantic-search-overlap",
+          "code_hash": "f89b6bb1e2a12c02418ec7efb6080e5a8bce21ceb778b02e21de593e6ae64072",
+          "ran": true,
+          "ok": true,
+          "output": "[[0, 1, 2, 3], [3, 4, 5, 6], [6, 7, 8, 9], [9]]\nTrue\n13"
+        },
+        {
+          "id": "embeddings-semantic-search-hybrid",
+          "code_hash": "7eedf924f21b2bfdb80f58af5af52ff3bdbda39aa92617a11f0a5f3254fa294e",
+          "ran": true,
+          "ok": true,
+          "output": "['delivery-policy', 'code-guide', 'refund-policy']\n3"
+        },
+        {
+          "id": "embeddings-semantic-search-precision",
+          "code_hash": "6738a1252edcb8bdacf61c61ca72042629ad99510d55466326d2eaa99c281fdd",
+          "ran": true,
+          "ok": true,
+          "output": "2\n0.50\n['p1', 'p2', 'p3', 'p4']"
+        },
+        {
+          "id": "embeddings-semantic-search-recall",
+          "code_hash": "4e86c0e1ee63130f52bd91456fc22d7f338dd5d3f3cbf630ff44dc2dc2cf8b02",
+          "ran": true,
+          "ok": true,
+          "output": "precision=0.667\nrecall=0.500\n['e', 'f']"
+        },
+        {
+          "id": "embeddings-semantic-search-evaluation-cases",
+          "code_hash": "11cca2e5821de85a3de1330202775273f038c589574053f393074f2c81be4f88",
+          "ran": true,
+          "ok": true,
+          "output": "macro=0.625\npooled=0.400\nTrue"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "pandas-fundamentals",
+      "version": 1,
+      "course_hash": "6f3a68bf1fa73250f754cd85e0da21ff61ab15e36bba3d3555919cc32b11c3f8",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "pd-load",
+          "code_hash": "1e53914f590c4d63e88f4db561775c0945e3a581503e7303afb9cecee3f1fc72",
+          "ran": true,
+          "ok": true,
+          "output": "['001', '002']\n['001']\n2.2.3",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-types",
+          "code_hash": "aa4300de0396c0c32935d7f7433aee1297892d511b3d125f3d7333ff3bd9fecb",
+          "ran": true,
+          "ok": true,
+          "output": "Int64 1\n1\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-alignment",
+          "code_hash": "9299f1ec0b4d7c9ab99843fbead928caac2c525a214cf3474623ae6f2607df68",
+          "ran": true,
+          "ok": true,
+          "output": "23.0\n{'a': True, 'b': False, 'c': True}\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-group",
+          "code_hash": "557608b26245196b891b8df00b5770065fe70ed92e420e9113f92fe768d313a8",
+          "ran": true,
+          "ok": true,
+          "output": "[2.0, 1.0, 2.0]\n3",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-vector",
+          "code_hash": "07df665b320e115ed96902ca164206e015029dfb3841021d4bf040f93ac713c3",
+          "ran": true,
+          "ok": true,
+          "output": "[200, 0, 150]\n[True, False, True]\n[False, True, False]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-pivot",
+          "code_hash": "cfcab336f527a2f7e3e477a04a2753cbe68c6657ae1d9f88517499ae107a3dda",
+          "ran": true,
+          "ok": true,
+          "output": "duplicate cells\n5",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-merge",
+          "code_hash": "9c0f2d6c21bb1f092016af045cb14b806da3fc48ebff4cc2e216d333aaa7d5fe",
+          "ran": true,
+          "ok": true,
+          "output": "invalid lookup\n['both', 'left_only']\n30",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-concat",
+          "code_hash": "79851ad084f8805304601c494d5d50a345b204bcc1e04a36b7216de54b032b25",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2, 2, 3]\n2\n1",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "pd-reshape",
+          "code_hash": "9663706704fff26598ef975bb917790cef00c2eceb42bcbf63eadbc729f66c76",
+          "ran": true,
+          "ok": true,
+          "output": "4 2\nFalse\n[1, 3]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 63,
+      "human_approved": false
+    },
+    {
+      "id": "cloud-networking-iam",
+      "version": 1,
+      "course_hash": "8ce27419f8f0a1ea2cf22c33e83f60ad368e333bd9ed49b2a7eed278194717e4",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "cloud-networking-iam-l1",
+          "code_hash": "a9e1dfe403aa9ae81885ddb5c5ebf7f27abc3a3ef9442534ebbbdcb5c9f0f98d",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l2",
+          "code_hash": "890cdfd3c1eb8f9d5679e5c59f5524455e2e61a3ecb4935ee80fa240d2080bca",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l3",
+          "code_hash": "e596f77020e10ffbc210b75c9e041fb976d9bd3eacd4b1b5c7b778d5ec98ce47",
+          "ran": true,
+          "ok": true,
+          "output": "['storage']"
+        },
+        {
+          "id": "cloud-networking-iam-l4",
+          "code_hash": "087f1f8bc4832848408249741f76d274af0ae13ae4353e15737cf6b85631bd97",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l5",
+          "code_hash": "978560412a66bcb1e11e3c3c5fd8bdd229c9d3937b771ba189fde4e524d7bf8c",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l6",
+          "code_hash": "9133314ea415cadb925e79a2c6517daf75567135ade82b7bbec39047697af065",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "cloud-networking-iam-l7",
+          "code_hash": "69a9981723225f54fe3ddf7824b502ff03676a87760db4005d1a8850f23a5d71",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue"
+        },
+        {
+          "id": "cloud-networking-iam-l8",
+          "code_hash": "827101470031cc292152b4e05e31708d2849d0bd310756ea04bae904f7eadeef",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nTrue"
+        },
+        {
+          "id": "cloud-networking-iam-l9",
+          "code_hash": "0cc5b81a2d47756a2025a9e6ea5b2f45dacf960a99a9fbab63a666cc9a5c058a",
+          "ran": true,
+          "ok": true,
+          "output": "[{'actor': 'role-demo', 'action': 'policy-change', 'outcome': 'accepted'}]\nTrue"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "functional-regression-exploratory",
+      "version": 1,
+      "course_hash": "4071085e47f28f14b1add77b41ab01f2e40351caeee5b4d5cbbdfc108e597506",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "functional-regression-exploratory-functional-oracle",
+          "code_hash": "ad1e82a7d79d6976b396bf52f357f4b1c3dfaef2ff3d0fe2f6d46f6a4ffb6407",
+          "ran": true,
+          "ok": true,
+          "output": "True\ncancelled"
+        },
+        {
+          "id": "functional-regression-exploratory-negative",
+          "code_hash": "9edacd238885dfadaaef2000ae6eeb243b074e554b5cac8e036849c251f197fb",
+          "ran": true,
+          "ok": true,
+          "output": "False\nSynthetic"
+        },
+        {
+          "id": "functional-regression-exploratory-state-effects",
+          "code_hash": "7e2405e1a97af42f98d2dd892b3ce0f407fc5cdc75c91ed27f8fb07deacbced0",
+          "ran": true,
+          "ok": true,
+          "output": "accepted\naccepted\n1"
+        },
+        {
+          "id": "functional-regression-exploratory-impact-selection",
+          "code_hash": "c99d06c4b9720f6ecce477eec1aaec0c4ac33562acc499a1cfa5e03e16dd5929",
+          "ran": true,
+          "ok": true,
+          "output": "['export', 'invoice']"
+        },
+        {
+          "id": "functional-regression-exploratory-suite-maintenance",
+          "code_hash": "e5577d230dac8377d4dee5c2e9648ea3cc88fe619c9f51b934e89b711833cd24",
+          "ran": true,
+          "ok": true,
+          "output": "['old_caption']"
+        },
+        {
+          "id": "functional-regression-exploratory-flakiness",
+          "code_hash": "6652efc9a1d2c17b8550c07dc26cfc6dd1436b63e1f1c0669b5692f58ada8142",
+          "ran": true,
+          "ok": true,
+          "output": "2\nTrue\nFalse"
+        },
+        {
+          "id": "functional-regression-exploratory-charters",
+          "code_hash": "3498e47ab593e0a854c1a18afa7db89432dc2df0f187f75ef6792ff3a11c70e5",
+          "ran": true,
+          "ok": true,
+          "output": "['account_change']\n30"
+        },
+        {
+          "id": "functional-regression-exploratory-session-notes",
+          "code_hash": "af227da29ebe46d63ba063f834aeec2869d6988eeab41dfbb9af9d49aea90640",
+          "ran": true,
+          "ok": true,
+          "output": "['observation', 'hypothesis', 'question']\n1"
+        },
+        {
+          "id": "functional-regression-exploratory-debrief",
+          "code_hash": "a80416895352cc9b816df92edabf40220b3761881610a00959d421d8038627b9",
+          "ran": true,
+          "ok": true,
+          "output": "{'confirmed_issue': 1, 'question': 2, 'not_explored': 1}"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "data-cleaning",
+      "version": 1,
+      "course_hash": "b9f4a317949dd8b23c8ecbee23fa757a091e1d3146108eabde53508933e2bfd7",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dc-missing",
+          "code_hash": "92142aa8be1c95fa1e2378fe8bc14d3d2ee5e82125a6880349d879d5c857dcce",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True, False]\n[10.0, 20.0, 30.0]\n1 0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-invalid",
+          "code_hash": "4ebea026acb995736489704c8bd041dce6739e90fad30ed7e3bac75f9d33f7fb",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True, False]\n[False, False, True]\n[1.0, -2.0, 100.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-strategy",
+          "code_hash": "422c959d9b8b56fb38614c89459dac1a0d4be5a3cd6ac0bffddb0f253bf3131a",
+          "ran": true,
+          "ok": true,
+          "output": "1\n20.0\n13.333333333333334 46.666666666666664",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-standardize",
+          "code_hash": "39598e0f9a2255a6e2148d16014a8d96807ed6304314a7c5616b0d73ce2a69c8",
+          "ran": true,
+          "ok": true,
+          "output": "['north', 'north', 'UNMAPPED']\n[False, True]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-dedup",
+          "code_hash": "c0e31e916e5007054eb7238d42a60cbc2240b06582a6acc25db3a142b6d44b0e",
+          "ran": true,
+          "ok": true,
+          "output": "1\n{'a': 12, 'b': 5}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-consistency",
+          "code_hash": "849ed01b9201c9d59bba5c101d39f2756eb221de3ba39335de06036aa0aefbc4",
+          "ran": true,
+          "ok": true,
+          "output": "['A1', ' a1 ']\n['A1', 'A1', 'B2']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-rules",
+          "code_hash": "09aa0b300809c6c2f0da94bf1c9a66ffffecf8281e409461d114d1ee15314b78",
+          "ran": true,
+          "ok": true,
+          "output": "[('bad', ['status', 'amount'])]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-lineage",
+          "code_hash": "31fe2ac6d131f25a7166da831b6f2a30c29bd296eea57f0c30978105aaf68275",
+          "ran": true,
+          "ok": true,
+          "output": "{'source': 'synthetic-v1', 'rule': 'trim-region-v1', 'changed': 1, 'rows': 2}\n north",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "dc-idempotence",
+          "code_hash": "a5dcecd4deb574068efd738f97ead347b7aca9a266b9ef9568d16c53dde712fb",
+          "ran": true,
+          "ok": true,
+          "output": "True\n[1.0] [0.001]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 63,
+      "human_approved": false
+    },
+    {
+      "id": "db-integration-performance",
+      "version": 1,
+      "course_hash": "ac7b5c3d6a4ac0818b06e8a3e66a7f7bcdd23b9a92e62cc567bc7b66739e0d68",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dbi-atomic",
+          "code_hash": "9927c30a1f1211d29232043daf0124f17aa15083ff2efb0e901a9631301c1838",
+          "ran": true,
+          "ok": true,
+          "output": "[(100,), (100,)]"
+        },
+        {
+          "id": "dbi-races",
+          "code_hash": "2542b4d2766b3fe0554a2f79b51565ad33672fc7bc910e6fb9fbba967c2b1fd4",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 0]\n0"
+        },
+        {
+          "id": "dbi-isolation",
+          "code_hash": "4001aba5bc45b307737824e5933b56370ca1ec857a0665caaba4c99c846c1771",
+          "ran": true,
+          "ok": true,
+          "output": "100 120\n100 100"
+        },
+        {
+          "id": "dbi-index-patterns",
+          "code_hash": "26db3bf52c92b483de39bdd0c90b7f9be3817af9e9b50a4233a94b2975319800",
+          "ran": true,
+          "ok": true,
+          "output": "['customer', 'created']"
+        },
+        {
+          "id": "dbi-index-order",
+          "code_hash": "322d0506bf5818d64fd1e36f9ddfec2b320942f5583440abf59083a97390a4e2",
+          "ran": true,
+          "ok": true,
+          "output": "[5, 3, 9]"
+        },
+        {
+          "id": "dbi-explain",
+          "code_hash": "4c60a47e47b1f29d2d58e84a9d73e63bfa8abe74695e016b93120b6d4ccba211",
+          "ran": true,
+          "ok": true,
+          "output": "True"
+        },
+        {
+          "id": "dbi-nplusone",
+          "code_hash": "1443f53ae3b4b4c405e96d64767258ca29f746216ba0aacf09ac1d6575f21280",
+          "ran": true,
+          "ok": true,
+          "output": "True\n4 2"
+        },
+        {
+          "id": "dbi-pools-pages",
+          "code_hash": "3641ea87c4d5ae30147be86dad2ed0ca71a14406f5d2a6500e119c873a561b53",
+          "ran": true,
+          "ok": true,
+          "output": "[(90, 5), (100, 3)]\n[(100, 9), (110, 2)]\nTrue"
+        },
+        {
+          "id": "dbi-migrations",
+          "code_hash": "e70786a2f985c85d8e50efa4d3c9dfe92093b36f7226395d7f54c6579a22830a",
+          "ran": true,
+          "ok": true,
+          "output": "Synthetic Student\nSynthetic Student"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 9,
+      "questions": 56,
+      "human_approved": false
     }
   ],
   "official_source": {
-    "repository": "https://github.com/mdn/content",
-    "commit": "33afe694c61ec6a36bf2e363124c1210b25a5c0f",
+    "repository": "https://github.com/postgres/postgres",
+    "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
     "references": [
       {
-        "id": "js-grammar",
-        "path": "files/en-us/web/javascript/guide/grammar_and_types/index.md",
-        "sha256": "0fa7023008fb32cdc670d5138be2b21b64d90e0fc458a47fc6cf05b33433588a",
+        "id": "transactions",
+        "path": "doc/src/sgml/advanced.sgml",
+        "sha256": "5010d701eaa5e07d144f1271b521d51f39d769e73a23a8d55411aee179f28668",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "js-functions",
-        "path": "files/en-us/web/javascript/guide/functions/index.md",
-        "sha256": "11e59a5c148dd61a3e629c5792b7999a7ccce4a21ccb296dd91509b685a52ba9",
+        "id": "sqltransaction",
+        "path": "doc/src/sgml/ref/begin.sgml",
+        "sha256": "bb3e334d989dc8fedaf412168a6d6ea55ac42e21b41e1e18a24ef92b2bb30b4a",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "js-objects",
-        "path": "files/en-us/web/javascript/guide/working_with_objects/index.md",
-        "sha256": "0cc58e985a4ae1174ea081527540fc24d6ccce7ff28f2f3570682b5581513751",
+        "id": "locking",
+        "path": "doc/src/sgml/mvcc.sgml",
+        "sha256": "b0dafb2a3fd2d9204deb075ed2cb2d74b6496523bb5d4867a2f4a3d9758a6314",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "js-collections",
-        "path": "files/en-us/web/javascript/guide/indexed_collections/index.md",
-        "sha256": "0f8eceb4b2fab68bb582a94ee96acbc1f25c2f9a1613fd8f1cf7d64cb78c4a41",
+        "id": "constraints",
+        "path": "doc/src/sgml/ddl.sgml",
+        "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "js-modules",
-        "path": "files/en-us/web/javascript/guide/modules/index.md",
-        "sha256": "b0009c393e02c3a0343abefc2ab574fb580392e0f0bddf1373ff3070fc508711",
+        "id": "isolation",
+        "path": "doc/src/sgml/mvcc.sgml",
+        "sha256": "b0dafb2a3fd2d9204deb075ed2cb2d74b6496523bb5d4867a2f4a3d9758a6314",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "js-errors",
-        "path": "files/en-us/web/javascript/guide/control_flow_and_error_handling/index.md",
-        "sha256": "d600e0768242290add5045e599ff534a200a2891cb2f282253e6eab7a6388ffa",
+        "id": "indexes",
+        "path": "doc/src/sgml/indices.sgml",
+        "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "multicolumn",
+        "path": "doc/src/sgml/indices.sgml",
+        "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "ordering",
+        "path": "doc/src/sgml/queries.sgml",
+        "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "indexonly",
+        "path": "doc/src/sgml/indices.sgml",
+        "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "explain",
+        "path": "doc/src/sgml/perform.sgml",
+        "sha256": "f174f56a473afdf17d4297fda681952bd1cac37e9fb4830fc3e6352890432dba",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "planner",
+        "path": "doc/src/sgml/perform.sgml",
+        "sha256": "f174f56a473afdf17d4297fda681952bd1cac37e9fb4830fc3e6352890432dba",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "queries",
+        "path": "doc/src/sgml/queries.sgml",
+        "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "connections",
+        "path": "doc/src/sgml/runtime.sgml",
+        "sha256": "e1817faf34002bd9fc2ef3da052a0278c16b8fa3a02853caccc8c26cf8162ccb",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "limit",
+        "path": "doc/src/sgml/queries.sgml",
+        "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "ddl",
+        "path": "doc/src/sgml/ddl.sgml",
+        "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "alter",
+        "path": "doc/src/sgml/ref/alter_table.sgml",
+        "sha256": "697011574ec13f56482965f7622bce9be1e7414e673561059c98670b8fc69fa0",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -4151,6 +4786,462 @@
           "id": "js-errors",
           "path": "files/en-us/web/javascript/guide/control_flow_and_error_handling/index.md",
           "sha256": "d600e0768242290add5045e599ff534a200a2891cb2f282253e6eab7a6388ffa",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "fastapi-backend",
+      "repository": "https://github.com/fastapi/fastapi",
+      "commit": "95f8322ee1dcda7ceace7b1c4f6c9915b36d748f",
+      "references": [
+        {
+          "id": "path",
+          "path": "docs/en/docs/tutorial/path-params.md",
+          "sha256": "81e09015b7a5c40e460eca9939da240a66f8a9efd88ad21c7992146337426fea",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "order",
+          "path": "docs/en/docs/tutorial/path-params.md",
+          "sha256": "81e09015b7a5c40e460eca9939da240a66f8a9efd88ad21c7992146337426fea",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "query",
+          "path": "docs/en/docs/tutorial/query-params.md",
+          "sha256": "e521d3e41fd4b3c57adfcecadfd97fe68e64a20ea88fa6bee117bba4e183ec71",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "body",
+          "path": "docs/en/docs/tutorial/body.md",
+          "sha256": "1a3e0f7b9220dcee9a7379c999d57b49e126ed07725dbbc5566ee1278d4ec670",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "response",
+          "path": "docs/en/docs/tutorial/response-model.md",
+          "sha256": "40893b055f60ae81f2d149c6159ef98555ca05845d210a4c88f3824d66092be1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "bigger",
+          "path": "docs/en/docs/tutorial/bigger-applications.md",
+          "sha256": "943368d567d4a841ac0710f2a97bf0775c11e4f3b7e9ece2a9a76268eb618133",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "settings",
+          "path": "docs/en/docs/advanced/settings.md",
+          "sha256": "e25439be1e4468a444757378f4b65de038867df9bf969e1ddf64460dc3e8f79f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "lifespan",
+          "path": "docs/en/docs/advanced/events.md",
+          "sha256": "33de759da943ea437830d8c744d8c0a3887f40c54f738886314575805216afab",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dependencies",
+          "path": "docs/en/docs/tutorial/dependencies/index.md",
+          "sha256": "83319cc87297bb0959c5721a112133e6a3cd19900163c348a8ee6cf4818cd21f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "yield",
+          "path": "docs/en/docs/tutorial/dependencies/dependencies-with-yield.md",
+          "sha256": "93f58ceecafff1967c39047657ae08a020d2452c84d795dc777901c35b8a0d17",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "testingdeps",
+          "path": "docs/en/docs/advanced/testing-dependencies.md",
+          "sha256": "6d26e7728428a508c2a51ac8e53920d003cbc9ed83f63df2e20590b199f12c2a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "errors",
+          "path": "docs/en/docs/tutorial/handling-errors.md",
+          "sha256": "c0cb7aeafe8ed3802396f2421755cf1e740000347305c515a2c828c0c41f4b1a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "handlers",
+          "path": "docs/en/docs/tutorial/handling-errors.md",
+          "sha256": "c0cb7aeafe8ed3802396f2421755cf1e740000347305c515a2c828c0c41f4b1a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "async",
+          "path": "docs/en/docs/async.md",
+          "sha256": "1d4397242a6b63f64dd5106e36999dff6deacdc79bb0bb157aae6cc36f8a2c44",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "concurrency",
+          "path": "docs/en/docs/async.md",
+          "sha256": "1d4397242a6b63f64dd5106e36999dff6deacdc79bb0bb157aae6cc36f8a2c44",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "background",
+          "path": "docs/en/docs/tutorial/background-tasks.md",
+          "sha256": "7a34e7a4a7bd2cb9e0b465588b77cf007b0a5c8bdcf7530ff3619ff6b3642468",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "cors",
+          "path": "docs/en/docs/tutorial/cors.md",
+          "sha256": "da167c442cc3a73a776782a3e45936165c713e63cc40a9f0117d490a51a60b17",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "middleware",
+          "path": "docs/en/docs/tutorial/middleware.md",
+          "sha256": "58cb232d288a5bdfa6f91680f6615520748884e17463059a1f28e78273563c39",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "embeddings-semantic-search",
+      "repository": "https://github.com/openai/openai-cookbook",
+      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "references": [
+        {
+          "id": "stream",
+          "path": "examples/How_to_stream_completions.ipynb",
+          "sha256": "c2aa466319c891f39f427ddf3ed74d6c2933c70bc27782ab16ad7f1b293b8afd",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "retry",
+          "path": "examples/How_to_handle_rate_limits.ipynb",
+          "sha256": "de228ec125143956ef0cab538f1f615b0af8405203c7ae4032ac3f6611028fcf",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "tokens",
+          "path": "examples/How_to_count_tokens_with_tiktoken.ipynb",
+          "sha256": "b83aa4aebf80a432b0a93a54fe3056e09d768774f8914ea7bf8329129b6800d5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "structure",
+          "path": "examples/Structured_Outputs_Intro.ipynb",
+          "sha256": "05731b657039904eec7d55c5a69532a6227fe8b9747a54a19934d993e6d50dde",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "embedding-search",
+          "path": "examples/Semantic_text_search_using_embeddings.ipynb",
+          "sha256": "648f03f4a051f26d0e891f4699bf6f206380d1075346d6e35a4a66ec7e388efd",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "embedding-chunks",
+          "path": "examples/Embedding_long_inputs.ipynb",
+          "sha256": "7560ff19cd00af337268db054b4fb0d7344b65e354789adbaf67bce143709f15",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "embedding-qa",
+          "path": "examples/Question_answering_using_embeddings.ipynb",
+          "sha256": "3f0d2292123352829a99406edbbad34a074eee13e00d9e817bdd04ba7d343fb7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "pandas-fundamentals",
+      "repository": "https://github.com/pandas-dev/pandas",
+      "commit": "0691c5cf90477d3503834d983f69350f250a6ff7",
+      "references": [
+        {
+          "id": "indexing",
+          "path": "doc/source/user_guide/indexing.rst",
+          "sha256": "66f85b0ddf3e946bdca491dccbf876cae786204647a3415d733a86ea51715b0b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "basics",
+          "path": "doc/source/user_guide/basics.rst",
+          "sha256": "423726d298fbe6f3ed27e23232eb37f25ea28d6c9056fa0113feae71fc68e0a7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "groupby",
+          "path": "doc/source/user_guide/groupby.rst",
+          "sha256": "c1eb6e2a03ed42b343b314b795968f5ee51ccc0f9b716c7796782e722ed2c4c0",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "reshaping",
+          "path": "doc/source/user_guide/reshaping.rst",
+          "sha256": "a50d74707ef79966adf42da314bec42ae513f105c8670f1e4c8fbba3fc066bb0",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "merging",
+          "path": "doc/source/user_guide/merging.rst",
+          "sha256": "efe0814f9655974318fcb6b4fe5d8a55fbe658aa462a868436cf960b71e3fd35",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "missing-data",
+          "path": "doc/source/user_guide/missing_data.rst",
+          "sha256": "3243d5626b7ab32c42411b343b204f835a6860c08ce062ed68f98d895e31b777",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "cloud-networking-iam",
+      "repository": "Official AWS HTTPS documentation",
+      "kind": "official-http-snapshot",
+      "references": [
+        {
+          "id": "aws-vpc",
+          "path": "vpc.html",
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html",
+          "sha256": "de8b2629dbe58843a77003b9794be8ba853df48723d093fc044f5fb5ff07d3a8",
+          "fetched_at": "2026-11-09T17:12:01.371616+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-security-groups",
+          "path": "security-groups.html",
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html",
+          "sha256": "d747896a3bc71b2bb0bdd5262c11d55124d8198fbe3d22a8d36293e30bea6699",
+          "fetched_at": "2026-11-09T17:19:14.322047+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-network-acls",
+          "path": "network-acls.html",
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html",
+          "sha256": "85332c1c01af47c7a9947913aad1b305ac30bff77c66ba0699f94dfec96d4092",
+          "fetched_at": "2026-11-09T17:19:14.929384+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-iam",
+          "path": "iam.html",
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "sha256": "c24c12bd1137f869f3aae0affec5d2bf81d05b5f7bcae5fc8a1569edf2cea8b0",
+          "fetched_at": "2026-11-09T17:12:01.371827+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-policy-evaluation",
+          "path": "policy-evaluation.html",
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html",
+          "sha256": "e14e7f9015beadc33105468ceb68e4ce16f35b138ba4c35824d1f85f0e3aa969",
+          "fetched_at": "2026-11-09T17:19:15.596943+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-encryption",
+          "path": "encryption.html",
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+          "sha256": "914f10c092f01ed45da4713901d72d3f6d0a638ea136ab3eec1812cf1e3b3f93",
+          "fetched_at": "2026-11-09T17:12:01.371997+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-secrets",
+          "path": "secrets.html",
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "sha256": "3757433d2c77ad110c0ab2bfd30e6bd9b89a29b9b3f42630bb8bcd91b43034b1",
+          "fetched_at": "2026-11-09T17:19:15.972828+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "aws-audit",
+          "path": "audit.html",
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "sha256": "34fed5e2e38b4d781a3d1f916e9fec97ba69f37166a85b9e2847c885959bae3c",
+          "fetched_at": "2026-11-09T17:12:01.372130+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        }
+      ]
+    },
+    {
+      "course": "cloud-networking-iam",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-ipaddress",
+          "path": "Doc/library/ipaddress.rst",
+          "sha256": "15356f23e693b9f3333b49e91445d592c311b10cb0797ec403404415de205733",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-ssl",
+          "path": "Doc/library/ssl.rst",
+          "sha256": "47b3910ef17f460d3bfe54d5a22f3d01e3df86c1e1158562fb8b3db302a1b755",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "functional-regression-exploratory",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "unittest",
+          "path": "Doc/library/unittest.rst",
+          "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "itertools",
+          "path": "Doc/library/itertools.rst",
+          "sha256": "1c100cdb246d6281ba452bc230a9b05f4bc4838be3080e3e3b7a17cec8d728b1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "data-cleaning",
+      "repository": "https://github.com/pandas-dev/pandas",
+      "commit": "0691c5cf90477d3503834d983f69350f250a6ff7",
+      "references": [
+        {
+          "id": "missing-data",
+          "path": "doc/source/user_guide/missing_data.rst",
+          "sha256": "3243d5626b7ab32c42411b343b204f835a6860c08ce062ed68f98d895e31b777",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "text",
+          "path": "doc/source/user_guide/text.rst",
+          "sha256": "b4bb2012092ae7f8e070d773eba0667d94aa6be5c00c702d7e016bbed749055f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "timeseries",
+          "path": "doc/source/user_guide/timeseries.rst",
+          "sha256": "1d555be87e093329e2091259b9df75044b49283e044edfd46a76512ff87e1d51",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "duplicates",
+          "path": "doc/source/user_guide/duplicates.rst",
+          "sha256": "e7b7df98551dc67ff81b7e1c0836eb4fb6c750e67623f326246ffed483e15a52",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "merging",
+          "path": "doc/source/user_guide/merging.rst",
+          "sha256": "efe0814f9655974318fcb6b4fe5d8a55fbe658aa462a868436cf960b71e3fd35",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "db-integration-performance",
+      "repository": "https://github.com/postgres/postgres",
+      "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
+      "references": [
+        {
+          "id": "transactions",
+          "path": "doc/src/sgml/advanced.sgml",
+          "sha256": "5010d701eaa5e07d144f1271b521d51f39d769e73a23a8d55411aee179f28668",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "sqltransaction",
+          "path": "doc/src/sgml/ref/begin.sgml",
+          "sha256": "bb3e334d989dc8fedaf412168a6d6ea55ac42e21b41e1e18a24ef92b2bb30b4a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "locking",
+          "path": "doc/src/sgml/mvcc.sgml",
+          "sha256": "b0dafb2a3fd2d9204deb075ed2cb2d74b6496523bb5d4867a2f4a3d9758a6314",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "constraints",
+          "path": "doc/src/sgml/ddl.sgml",
+          "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "isolation",
+          "path": "doc/src/sgml/mvcc.sgml",
+          "sha256": "b0dafb2a3fd2d9204deb075ed2cb2d74b6496523bb5d4867a2f4a3d9758a6314",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "indexes",
+          "path": "doc/src/sgml/indices.sgml",
+          "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "multicolumn",
+          "path": "doc/src/sgml/indices.sgml",
+          "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "ordering",
+          "path": "doc/src/sgml/queries.sgml",
+          "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "indexonly",
+          "path": "doc/src/sgml/indices.sgml",
+          "sha256": "9c7cde42046310cb942190d3b73c24bcf886d755f5415119554c247f52de307b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "explain",
+          "path": "doc/src/sgml/perform.sgml",
+          "sha256": "f174f56a473afdf17d4297fda681952bd1cac37e9fb4830fc3e6352890432dba",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "planner",
+          "path": "doc/src/sgml/perform.sgml",
+          "sha256": "f174f56a473afdf17d4297fda681952bd1cac37e9fb4830fc3e6352890432dba",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "queries",
+          "path": "doc/src/sgml/queries.sgml",
+          "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "connections",
+          "path": "doc/src/sgml/runtime.sgml",
+          "sha256": "e1817faf34002bd9fc2ef3da052a0278c16b8fa3a02853caccc8c26cf8162ccb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "limit",
+          "path": "doc/src/sgml/queries.sgml",
+          "sha256": "21406147cb4723805167c9f1f3291b5e9cd4250fc821bf16148fe85de2044ce5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "ddl",
+          "path": "doc/src/sgml/ddl.sgml",
+          "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "alter",
+          "path": "doc/src/sgml/ref/alter_table.sgml",
+          "sha256": "697011574ec13f56482965f7622bce9be1e7414e673561059c98670b8fc69fa0",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

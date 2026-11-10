@@ -7,7 +7,14 @@
     "descriptive-stats-metrics",
     "cloud-aws-foundations",
     "defect-management",
-    "js-fundamentals"
+    "js-fundamentals",
+    "fastapi-backend",
+    "embeddings-semantic-search",
+    "pandas-fundamentals",
+    "cloud-networking-iam",
+    "functional-regression-exploratory",
+    "data-cleaning",
+    "db-integration-performance"
   ],
   "recovered_from_quarantine": [
     "prompting-structured-output",

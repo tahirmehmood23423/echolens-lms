@@ -19,3 +19,10 @@ test('additional runtime profiles reject wrong outputs and unsupported languages
  assert.equal(verifyCode({lang:'python-pandas',code:'print(4)',expect:'5'}).ok,false);
  assert.equal(verifyCode({lang:'untrusted-shell',code:'echo secret',expect:'secret'}).ran,false);
 });
+test('strict TypeScript checks real types before emitted JavaScript executes',()=>{
+ const valid=verifyCode({lang:'typescript',code:'const count: number = 3; console.log(count * 2);',expect:'6'});assert.equal(valid.ok,true,JSON.stringify(valid));assert.equal(valid.runtime,'TypeScript 5.9.3');
+ const invalid=verifyCode({lang:'typescript',code:'const count: number = "three"; console.log("must not run");',expect:'TS2322'});assert.equal(invalid.ok,true,JSON.stringify(invalid));
+});
+test('actual React server rendering escapes text and keeps host workspace unavailable',()=>{
+ const r=verifyCode({lang:'javascript-react',code:'const React=require("react"),{renderToStaticMarkup}=require("react-dom/server");console.log(renderToStaticMarkup(React.createElement("p",null,"<script>")));console.log(require("fs").existsSync("/workspace"));',expect:'<p>&lt;script&gt;</p>\nfalse'});assert.equal(r.ok,true,JSON.stringify(r));assert.equal(r.runtime,'React 19.2.0');assert.match(r.profile,/not evidence about browser effects/);
+});

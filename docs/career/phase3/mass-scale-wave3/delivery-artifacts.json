@@ -1,0 +1,22 @@
+[
+  {
+    "file": "/workspace/echolens-audit/wave3-private-review.zip",
+    "bytes": 7330580,
+    "sha256": "2919e96fa23d242e78b37ac319a2d7401c1236f236956f8bb51eb87d47fca796",
+    "entries": 225,
+    "integrity": "passed",
+    "contains_instructor_answer_keys": true,
+    "code_commit": "d6889de",
+    "report_commit": "171d121"
+  },
+  {
+    "file": "/workspace/echolens-audit/wave3-browser-evidence.zip",
+    "bytes": 38817459,
+    "sha256": "686f81b5612ebd027dfa833c4abbd443ee920b6cc7ae265fed9badf5f3480f58",
+    "entries": 86,
+    "integrity": "passed",
+    "contains_instructor_answer_keys": false,
+    "code_commit": "d6889de",
+    "report_commit": "171d121"
+  }
+]

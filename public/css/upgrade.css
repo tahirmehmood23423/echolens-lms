@@ -136,7 +136,7 @@ a.nav-item.active .ic{stroke:#2DD4BF}
    One primary action (teal), one secondary (outline). No competing gradients. */
 .btn-grad,.btn-enroll,.cmp-run{background:#0A7F73;color:#fff;box-shadow:none}
 .btn-grad:hover,.btn-enroll:hover{background:#075E55;box-shadow:none}
-.btn-book{background:#0A7F73;box-shadow:none;animation:none;min-height:52px;padding:0 28px;font-size:16px;font-weight:700}
+.btn-book{background:#0A7F73;box-shadow:none;animation:none;min-height:52px;padding:0 20px;font-size:15px;font-weight:700}
 .btn-book:hover{background:#075E55}
 .btn-book + .btn{background:#fff;color:#075E55;border:1px solid #0A7F73;box-shadow:none}
 .btn-book + .btn:hover{background:#F1FBF9}

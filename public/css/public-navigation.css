@@ -12,3 +12,10 @@
 .public-navigation .btn-primary{color:white;border-color:transparent;background:linear-gradient(110deg,#7440ee,#4c55ef)}
 .auth-body:has(>.public-navigation){display:block;padding:0 0 30px}
 .auth-body>.auth-wrap{margin:36px auto;padding:0 16px;box-sizing:border-box}
+
+/* Theme alignment (Nov 2026): teal active state and primary button, 40px targets. */
+.public-navigation .nlink{min-height:40px;display:inline-flex;align-items:center;padding:0 12px;font-size:14px;color:#4A5570}
+.public-navigation .nlink:hover,.public-navigation .nlink.active{color:#075E55;background:#E3F6F2}
+.public-navigation .btn{min-height:40px;padding:0 16px;font-size:14px}
+.public-navigation .btn-primary{background:#0A7F73;color:#fff}
+.public-navigation .btn-primary:hover{background:#075E55}

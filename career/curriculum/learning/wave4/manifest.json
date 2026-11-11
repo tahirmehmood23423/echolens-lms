@@ -2,5 +2,14 @@
   "wave": "canonical-completion-4",
   "starting_commit": "3d6da14",
   "starting_authored": 74,
-  "courses": []
+  "courses": [
+    "complexity-analysis",
+    "arrays-strings-hashing",
+    "data-transformation-pipelines",
+    "mobile-ui-fundamentals",
+    "playwright-automation",
+    "security-foundations",
+    "unsupervised-learning",
+    "agent-workflows"
+  ]
 }

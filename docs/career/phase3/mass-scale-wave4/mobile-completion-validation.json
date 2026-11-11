@@ -1,0 +1,447 @@
+{
+  "schema_version": 1,
+  "scope": "Repository-only content checks; no application store, human approval or publication",
+  "courses": [
+    {
+      "id": "flutter-fundamentals",
+      "fingerprint": "b055bcece9d92d2d5fabd972f29b2dc08eaebf15c690a90770ed01a354f137b6",
+      "course_hash": "35a9bf700e4bb6a3f0915c7df329f2e4b6cb5e5565e352ec90cbdfef1eea1bc7",
+      "bank_hash": "25c92f38c2c01bf23b9a1cfbe7bc6006807ce68ae3dbb8e384c57ac31d1e287d",
+      "prerequisites": [
+        "dart-programming",
+        "mobile-ui-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 64,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "flutter-fundamentals-composition",
+          "code_hash": "03ec7c59f03d91b799c97e056d98ca012d3bea59bcc08962a4c9788962f680dc",
+          "ran": true,
+          "ok": true,
+          "output": "Units:3\nTotal:1200",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-tree-identity",
+          "code_hash": "ec14a049247cec5fbff3d2b20dda5bb974fc7796055bfe0576f3b0f5c03543c2",
+          "ran": true,
+          "ok": true,
+          "output": "2\ntrue\nA",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-stateful-lifecycle",
+          "code_hash": "3b6db2fefd723628b6d526a3846830be9f81e67577b86270b47021f313360002",
+          "ran": true,
+          "ok": true,
+          "output": "false\ntrue\nfalse",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-setstate",
+          "code_hash": "024c5ff4dd0b1543c50efa8500cc38fd3a7cca9c9b766265537254032294fa42",
+          "ran": true,
+          "ok": true,
+          "output": "3/3",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-async-view",
+          "code_hash": "9d152d9aa1322a68cf4d4460142af3060308ccd7385cea2256f04ebc1e418917",
+          "ran": true,
+          "ok": true,
+          "output": "West:empty",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-rebuild-scope",
+          "code_hash": "bdd6928b28aa0d16e26f22c29f6ca1aed0bb7a1ff0232b2a47e44bdcd250e5b1",
+          "ran": true,
+          "ok": true,
+          "output": "200,200,300,360\n3",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-core-controls",
+          "code_hash": "3685aeb649a9077e1a11eaad50c8c3d279f0ee6148c52d9c1c1cbc8de5a88ff0",
+          "ran": true,
+          "ok": true,
+          "output": "1/done",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-lists-forms",
+          "code_hash": "b5fccc654c8574114955a90a999cd6dfa815a08f19cef55682308c1a18c287a6",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfalse\nfalse",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-themes",
+          "code_hash": "a1d4ff993de0dd89a5e374a68e989c2ded60949567afebfe987a77011601cd1a",
+          "ran": true,
+          "ok": true,
+          "output": "dark/blue\nlight",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f007",
+          "code_hash": "a1cb6d5ac467990be2837df7c5780145ac9913a83bda0fd3016b579b4baba0a6",
+          "ran": true,
+          "ok": true,
+          "output": "3/900",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f017",
+          "code_hash": "348b972c7e60e8a6ff8c5a7183648bb76359db92b6c9ca8565652318d6619a76",
+          "ran": true,
+          "ok": true,
+          "output": "c,d,a",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f027",
+          "code_hash": "75012eb9cb3d4e029045ef4761689ff2cf8ec58186fd4cfb5097678a38ff780b",
+          "ran": true,
+          "ok": true,
+          "output": "1/3",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f037",
+          "code_hash": "99373d43549d05d9240fcf93487d04e28464c12a021ab34fe14961d3d4e1387d",
+          "ran": true,
+          "ok": true,
+          "output": "2/done",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f047",
+          "code_hash": "bfa9e7bdd4e256f4c1949e687479e9ef3c6ad1425fba19dba259075784efce1e",
+          "ran": true,
+          "ok": true,
+          "output": "empty/success",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f057",
+          "code_hash": "2adb96c928508ea1b7f8758dc8dd40c0c5ca84a83b7564c47d0c79e4b1ab0917",
+          "ran": true,
+          "ok": true,
+          "output": "36 ms",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f067",
+          "code_hash": "cb2650c9d0fcf97bb0c809cf2e9ad7f871ebfc82b11541bee3dd1eb87fe73604",
+          "ran": true,
+          "ok": true,
+          "output": "36 px/1",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f077",
+          "code_hash": "94339faa0814edd8d1fdebc4fe99532cec82f7582b5f32621f16bead1c8e2042",
+          "ran": true,
+          "ok": true,
+          "output": "7/cleared",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f087",
+          "code_hash": "428ffeb6703d2314dd4d5307d1bf18f2ef06eb3192d0c16f7281ed7b8e98cbd4",
+          "ran": true,
+          "ok": true,
+          "output": "gray/orange/black",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "mobile-storage",
+      "fingerprint": "3a1d590f892dbe458cc495d69f7c8df33e0827c8048a86bfe2f50f4d80acb066",
+      "course_hash": "a714d68bb6a4857d06babfdded855a135746bda96437c4256555080fbcdba83e",
+      "bank_hash": "3bbe65ba847c69c1cd465fbd42316eae8c3e25fab50a057271561b47a79d86cd",
+      "prerequisites": [
+        "mobile-ui-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "mobile-storage-choose-store",
+          "code_hash": "30278db4f435833233b9a09ed87abf102170847906aa5e43c5817b2952328175",
+          "ran": true,
+          "ok": true,
+          "output": "('draft', 1)"
+        },
+        {
+          "id": "mobile-storage-directories",
+          "code_hash": "25c626864837a0831e3067834934c7290c27e7aa44be7c200233d48fb8879240",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse"
+        },
+        {
+          "id": "mobile-storage-file-commit",
+          "code_hash": "bb191ed5ccf8046f720c544d5f62a790cb2b0d0c76d3f40faa73e8e2a855ba8b",
+          "ran": true,
+          "ok": true,
+          "output": "new\nFalse"
+        },
+        {
+          "id": "mobile-storage-schema",
+          "code_hash": "104be03425576a7e26c4022e18fb342e4fe9b45ad36579326d480f8f30c06a92",
+          "ran": true,
+          "ok": true,
+          "output": "orphan rejected\n1"
+        },
+        {
+          "id": "mobile-storage-migrations",
+          "code_hash": "07c6ffa5bbe5262b8c47aa59ebf04980f94f68a5fd1a09f10676369e825a0dc0",
+          "ran": true,
+          "ok": true,
+          "output": "('roof', 'draft')\n2"
+        },
+        {
+          "id": "mobile-storage-transactions",
+          "code_hash": "dfc7ec9c5f91db2a80f89b5c7241525b69b3a577fd1684634cbe0f20fee873d4",
+          "ran": true,
+          "ok": true,
+          "output": "rolled back\n[(40,), (60,)]"
+        },
+        {
+          "id": "mobile-storage-outbox",
+          "code_hash": "eb43ec9a8bd9ebd39dbea9b0b19cee171b60d7aef094a692d408ec3cb4c36f5b",
+          "ran": true,
+          "ok": true,
+          "output": "left at desk\n0"
+        },
+        {
+          "id": "mobile-storage-conflicts",
+          "code_hash": "4eee271cd44551248d5dbc83135d080b3ca7bbb1cbb8cf2a0932445749127cbc",
+          "ran": true,
+          "ok": true,
+          "output": "local 2\nCONFLICT"
+        },
+        {
+          "id": "mobile-storage-recovery",
+          "code_hash": "84557fc2bb3aceb764e897ae16365a862533a71ff3bb1afa58aa1fbe51c75b5a",
+          "ran": true,
+          "ok": true,
+          "output": "100 0\n101 1"
+        },
+        {
+          "id": "mobile-storage.w4.f006",
+          "code_hash": "1977a0617ea130a82dbef23bdc103eca563a77ce0fda0ace4393f7bb7ec74ac5",
+          "ran": true,
+          "ok": true,
+          "output": "1/2"
+        },
+        {
+          "id": "mobile-storage.w4.f007",
+          "code_hash": "3f47cad885e428c7e88c7acbec5bb0f34fd553be9551ef2234c962ecf6e99b62",
+          "ran": true,
+          "ok": true,
+          "output": "20MB"
+        },
+        {
+          "id": "mobile-storage.w4.f016",
+          "code_hash": "c4a5998398b428e73c0eaa06f12865fbb51d2090eb0f10fce1ce84e111ac1db6",
+          "ran": true,
+          "ok": true,
+          "output": "D,S"
+        },
+        {
+          "id": "mobile-storage.w4.f017",
+          "code_hash": "354f76a2b0501daa41c175cde9e9cf19c7d7cec8dc5d9d7b1e6e50704ef17198",
+          "ran": true,
+          "ok": true,
+          "output": "1/3"
+        },
+        {
+          "id": "mobile-storage.w4.f026",
+          "code_hash": "40136376d739c1cb04f113b1bf01aea01eb3944c51d0a7389a9df1ef63ce931c",
+          "ran": true,
+          "ok": true,
+          "output": "published/complete"
+        },
+        {
+          "id": "mobile-storage.w4.f027",
+          "code_hash": "75c8fd3528fc96f5becfb3924ce8d0329890fb2fd3bfea2f2680f0b762da23e5",
+          "ran": true,
+          "ok": true,
+          "output": "15MB/old"
+        },
+        {
+          "id": "mobile-storage.w4.f036",
+          "code_hash": "973fbf786e0cafd2fbc5ad116ad6b4b4754b2f39118017eb27b9bd1197c8290a",
+          "ran": true,
+          "ok": true,
+          "output": "1"
+        },
+        {
+          "id": "mobile-storage.w4.f037",
+          "code_hash": "f44089f2ec53cfa1c2f25e4da0657c94f832299319ece8d0fbc20687ffea4469",
+          "ran": true,
+          "ok": true,
+          "output": "A"
+        },
+        {
+          "id": "mobile-storage.w4.f046",
+          "code_hash": "ff44865499b6f081ac1b594fa86d93e4da9472dfbd8b0d25dcab378dfe3a3858",
+          "ran": true,
+          "ok": true,
+          "output": "3"
+        },
+        {
+          "id": "mobile-storage.w4.f047",
+          "code_hash": "5a47c851e7de9c3921d3dc58f757d189edf7dda86c7f3e5a5497f5647d593204",
+          "ran": true,
+          "ok": true,
+          "output": "1/2/2"
+        },
+        {
+          "id": "mobile-storage.w4.f056",
+          "code_hash": "10d4d57ef3715ccd58003ad4c45b740f7c9cd6f2909fe1d2973143e688e6ffa6",
+          "ran": true,
+          "ok": true,
+          "output": "2"
+        },
+        {
+          "id": "mobile-storage.w4.f057",
+          "code_hash": "e1a3eac5cdd9f7d66b791d66972835b4752cde9501e5f773f1283d1a560b273d",
+          "ran": true,
+          "ok": true,
+          "output": "50/50/1"
+        },
+        {
+          "id": "mobile-storage.w4.f066",
+          "code_hash": "5b858a0670d0115c2a7151b6dfbf70b5180ec3945e51608123820b60429aec3b",
+          "ran": true,
+          "ok": true,
+          "output": "Q,R"
+        },
+        {
+          "id": "mobile-storage.w4.f067",
+          "code_hash": "7f8bd1ced86de64dc87d2a8c3782bb53e1fe2a4103a3e74105f6d46fc515cbbb",
+          "ran": true,
+          "ok": true,
+          "output": "1/0"
+        },
+        {
+          "id": "mobile-storage.w4.f076",
+          "code_hash": "34f08d639298a1eecca755a67854f505c882014a44e8d500f3a2e562cc4b7108",
+          "ran": true,
+          "ok": true,
+          "output": "8/12"
+        },
+        {
+          "id": "mobile-storage.w4.f077",
+          "code_hash": "6f8f36788e7733b2ca4e8ea31c365e9e42b3a47be1eed3fecc8f5e80dc776238",
+          "ran": true,
+          "ok": true,
+          "output": "conflict/2"
+        },
+        {
+          "id": "mobile-storage.w4.f086",
+          "code_hash": "13bf1fac4dc99ce7bb9d5d6990c634c9ad4c3deb25796e6943474989c94f5b4a",
+          "ran": true,
+          "ok": true,
+          "output": "52/2"
+        },
+        {
+          "id": "mobile-storage.w4.f087",
+          "code_hash": "9daa71d1b71197f24db97a7df128d63deee1f02f736189989f851036783b0f10",
+          "ran": true,
+          "ok": true,
+          "output": "C"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    }
+  ],
+  "duplication": {
+    "errors": [],
+    "warnings": []
+  },
+  "completed": [
+    "flutter-fundamentals",
+    "mobile-storage"
+  ],
+  "pending": [
+    "react-advanced",
+    "nextjs-architecture",
+    "flutter-layout-nav-state",
+    "react-native",
+    "mobile-apis-networking",
+    "mobile-auth-security",
+    "mobile-architecture",
+    "mobile-testing-debugging",
+    "mobile-performance-platform",
+    "app-distribution",
+    "responsible-ai-monitoring",
+    "powerbi-modeling",
+    "dashboards-reporting",
+    "workflow-orchestration",
+    "data-quality-testing",
+    "batch-streaming",
+    "cloud-data-platforms",
+    "data-reliability-recovery",
+    "data-governance-security",
+    "security-logging-monitoring",
+    "soc-siem",
+    "incident-response",
+    "network-endpoint-cloud-security",
+    "security-grc",
+    "kubernetes",
+    "oop-principles",
+    "java-fundamentals",
+    "greedy-dp",
+    "debugging-testing",
+    "software-design",
+    "engineering-problem-solving"
+  ],
+  "human_approved": false,
+  "published": false
+}

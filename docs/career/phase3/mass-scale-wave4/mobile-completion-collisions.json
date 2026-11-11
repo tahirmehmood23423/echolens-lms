@@ -1,0 +1,19 @@
+{
+  "checked_at": "2026-11-11T15:29:23.047Z",
+  "candidates": [
+    "flutter-fundamentals",
+    "mobile-storage"
+  ],
+  "courses": 107,
+  "unread": [],
+  "question": {
+    "errors": [
+      "Repeated question or numeric-only variant: http-sessions-tokens.q5 / sec-sessions.q2"
+    ],
+    "warnings": []
+  },
+  "prose": {
+    "errors": [],
+    "warnings": []
+  }
+}

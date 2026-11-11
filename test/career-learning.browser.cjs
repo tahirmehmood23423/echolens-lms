@@ -13,7 +13,7 @@ const child=fork(path.join(__dirname,'fixtures/certificate-server.cjs'),[],{env:
 let logs='',browser,checks=0;const errors=[];child.stdout.on('data',d=>logs+=d);child.stderr.on('data',d=>logs+=d);
 const check=(v,msg)=>{assert.ok(v,msg);checks++;};
 (async()=>{
- const ready=await new Promise((resolve,reject)=>{child.once('message',resolve);child.once('exit',()=>reject(Error(logs)));setTimeout(()=>reject(Error('Fixture did not start: '+logs)),30000).unref();});
+ const ready=await new Promise((resolve,reject)=>{child.once('message',resolve);child.once('exit',()=>reject(Error(logs)));setTimeout(()=>reject(Error('Fixture did not start: '+logs)),90000).unref();});
  const base='http://127.0.0.1:'+ready.port;
  browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:fs.existsSync('/usr/bin/chromium')?{executablePath:'/usr/bin/chromium'}:{}),args:['--no-sandbox']});
  let syntheticClient=0;

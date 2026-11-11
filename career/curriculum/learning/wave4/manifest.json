@@ -7,17 +7,23 @@
     "dart-programming",
     "flutter-fundamentals",
     "kotlin-android",
+    "mobile-storage",
     "unsupervised-learning",
     "deep-learning",
     "computer-vision",
     "nlp-fundamentals",
     "mlops-deployment",
+    "responsible-ai-monitoring",
     "agent-workflows",
     "data-transformation-pipelines",
+    "workflow-orchestration",
+    "data-quality-testing",
+    "batch-streaming",
     "security-foundations",
     "identity-access-control",
     "cryptography-secure-comms",
     "vulnerabilities-defense",
+    "security-logging-monitoring",
     "playwright-automation",
     "automation-frameworks",
     "ci-test-reporting",
@@ -28,6 +34,7 @@
     "recursion-backtracking",
     "searching-sorting",
     "trees-bst",
-    "graphs"
+    "graphs",
+    "greedy-dp"
   ]
 }

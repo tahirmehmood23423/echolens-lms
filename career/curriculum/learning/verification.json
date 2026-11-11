@@ -7375,6 +7375,92 @@
       "human_approved": false
     },
     {
+      "id": "mobile-storage",
+      "version": 1,
+      "course_hash": "a714d68bb6a4857d06babfdded855a135746bda96437c4256555080fbcdba83e",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "mobile-storage-choose-store",
+          "code_hash": "30278db4f435833233b9a09ed87abf102170847906aa5e43c5817b2952328175",
+          "ran": true,
+          "ok": true,
+          "output": "('draft', 1)",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-storage-directories",
+          "code_hash": "25c626864837a0831e3067834934c7290c27e7aa44be7c200233d48fb8879240",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-storage-file-commit",
+          "code_hash": "bb191ed5ccf8046f720c544d5f62a790cb2b0d0c76d3f40faa73e8e2a855ba8b",
+          "ran": true,
+          "ok": true,
+          "output": "new\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-storage-schema",
+          "code_hash": "104be03425576a7e26c4022e18fb342e4fe9b45ad36579326d480f8f30c06a92",
+          "ran": true,
+          "ok": true,
+          "output": "orphan rejected\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-storage-migrations",
+          "code_hash": "07c6ffa5bbe5262b8c47aa59ebf04980f94f68a5fd1a09f10676369e825a0dc0",
+          "ran": true,
+          "ok": true,
+          "output": "('roof', 'draft')\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-storage-transactions",
+          "code_hash": "dfc7ec9c5f91db2a80f89b5c7241525b69b3a577fd1684634cbe0f20fee873d4",
+          "ran": true,
+          "ok": true,
+          "output": "rolled back\n[(40,), (60,)]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-storage-outbox",
+          "code_hash": "eb43ec9a8bd9ebd39dbea9b0b19cee171b60d7aef094a692d408ec3cb4c36f5b",
+          "ran": true,
+          "ok": true,
+          "output": "left at desk\n0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-storage-conflicts",
+          "code_hash": "4eee271cd44551248d5dbc83135d080b3ca7bbb1cbb8cf2a0932445749127cbc",
+          "ran": true,
+          "ok": true,
+          "output": "local 2\nCONFLICT",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-storage-recovery",
+          "code_hash": "84557fc2bb3aceb764e897ae16365a862533a71ff3bb1afa58aa1fbe51c75b5a",
+          "ran": true,
+          "ok": true,
+          "output": "100 0\n101 1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
       "id": "unsupervised-learning",
       "version": 1,
       "course_hash": "602f193acca12c6f3cbc01a9f18dbba68df81d2ee36405c922b02db17e8e96a0",
@@ -7805,6 +7891,92 @@
       "human_approved": false
     },
     {
+      "id": "responsible-ai-monitoring",
+      "version": 1,
+      "course_hash": "c6ad34b6ad57bb8ce228b09cbe9543f38bda6e3c65813783b8907085367892ee",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "responsible-ai-monitoring-data-drift",
+          "code_hash": "8730c49761731fb263ccabeeec8901c64792e9be5f7146ef0bdc4dd224ed3068",
+          "ran": true,
+          "ok": true,
+          "output": "0.3\n0.09",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "responsible-ai-monitoring-concept-drift",
+          "code_hash": "3f7d2765b332bf98e0aab1bd37181268b10c7ac417a7ee1b0aa26f17ef28d8cb",
+          "ran": true,
+          "ok": true,
+          "output": "0.8 0.8\n0.5 0.833\npending 30",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "responsible-ai-monitoring-alert-policy",
+          "code_hash": "16adeeb2e40a6a8ca21ce5a67d45a2b8a6beaa03d546d80e2130bd9ee48110b5",
+          "ran": true,
+          "ok": true,
+          "output": "1 False\n0 False\n1 False\n2 True\nburn 3.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "responsible-ai-monitoring-group-fairness",
+          "code_hash": "cdbf4577c1b64a6aae38028c71473c3b9f343aa57a960a76851b2e245ab9306e",
+          "ran": true,
+          "ok": true,
+          "output": "0.8 0.6\n0.2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "responsible-ai-monitoring-explain-limits",
+          "code_hash": "23f16eb22959ab9d7f6a7aa6347ea2ceeac985c85097afe5dff88e1852b646a5",
+          "ran": true,
+          "ok": true,
+          "output": "[4.0, -1.0]\n1.5 4.5 4.5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "responsible-ai-monitoring-model-cards",
+          "code_hash": "f78456800102ecf286763af2c77762d543773f733e94ad4c6b32ebcc540a5a27",
+          "ran": true,
+          "ok": true,
+          "output": "['tpr_gap']\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "responsible-ai-monitoring-privacy-telemetry",
+          "code_hash": "0aa788ccd5cb4f22a22f8b7828a0d4b07f9017a92b38e78b361e27315323ab0f",
+          "ran": true,
+          "ok": true,
+          "output": "['latency_ms', 'model', 'status']\nFalse False",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "responsible-ai-monitoring-governance-lifecycle",
+          "code_hash": "0dc76c79af930ff7e865134361e9afd0a54e3c6b78b9c12b2acff168564ea033",
+          "ran": true,
+          "ok": true,
+          "output": "['b']\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "responsible-ai-monitoring-response-audit",
+          "code_hash": "d3a0d6784d59f0a01bee76189139ede8f08cc08adc5f0ac9965510faf5fd863c",
+          "ran": true,
+          "ok": true,
+          "output": "fallback\nreview\nnormal",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 56,
+      "human_approved": false
+    },
+    {
       "id": "agent-workflows",
       "version": 1,
       "course_hash": "861aa83903d0cf372fe21bec1998b97907217e28f77cded79dae3aad73a0d8c1",
@@ -7967,6 +8139,264 @@
           "ran": true,
           "ok": true,
           "output": "G1\n1000",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 63,
+      "human_approved": false
+    },
+    {
+      "id": "workflow-orchestration",
+      "version": 1,
+      "course_hash": "055e36b067c5018b5973fbb09c175d22e00482a7438184ba6525f677249983d7",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "workflow-orchestration-dependency-graph",
+          "code_hash": "cbf874a4da30e39a6683eb6c8093f4b620220e54918258356d42ea6135ef12b3",
+          "ran": true,
+          "ok": true,
+          "output": "{'extract': 4, 'rates': 7, 'join': 10, 'publish': 12}\n12",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "workflow-orchestration-intervals",
+          "code_hash": "c8ec110f362845de223ed535003d78cbcb41d7836fbebd75a614d55654598b73",
+          "ran": true,
+          "ok": true,
+          "output": "[False, True, False]\n2026-01-01T00:00:00+00:00 2026-01-02T00:00:00+00:00",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "workflow-orchestration-backfill",
+          "code_hash": "b03273967f1a9a227996b16f1fbc896db15e4cae831d5630dd773d28e6361ca5",
+          "ran": true,
+          "ok": true,
+          "output": "[('01', 110), ('02', 220), ('03', 300)]\n630",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "workflow-orchestration-retry-budget",
+          "code_hash": "61487b72202462b99a1e5cbd2b33ffacfe9218da2133f85db1c593b82e55d28b",
+          "ran": true,
+          "ok": true,
+          "output": "9\n['attempt', 'wait 2', 'attempt', 'wait 4', 'attempt']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "workflow-orchestration-failure-states",
+          "code_hash": "329def64357f0e71b37cffc70baa719defb6da477a606960d4eedd11b3af2891",
+          "ran": true,
+          "ok": true,
+          "output": "success success True\nfailed success False\nsuccess failed False",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "workflow-orchestration-deadlines",
+          "code_hash": "45b753ce50ca9d2bf195feabfab4d7df3aa15e37f48a8ad6cd28bb6333a859e9",
+          "ran": true,
+          "ok": true,
+          "output": "[True, True, False, True]\n0.75",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "workflow-orchestration-secrets",
+          "code_hash": "6c39e0e1ca79afc8ebeb4b8040da605aebdc40c57c5410ef611968f9699cfa3d",
+          "ran": true,
+          "ok": true,
+          "output": "sandbox\nreporting\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "workflow-orchestration-environment-promotion",
+          "code_hash": "065c1795bd1c037b52298c84955533283200bf52a10c31484bce2617da51c9f8",
+          "ran": true,
+          "ok": true,
+          "output": "['library']\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "workflow-orchestration-capacity-runbook",
+          "code_hash": "84fc5240cb6b12dfa880d497a15ab968aa95b99d4b5fde31b4e93c6c70a774b0",
+          "ran": true,
+          "ok": true,
+          "output": "30\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 63,
+      "human_approved": false
+    },
+    {
+      "id": "data-quality-testing",
+      "version": 1,
+      "course_hash": "733931ac7a4e97e883782086a79b682d12571b76a781a4a828f6d2ef4b904a38",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "data-quality-testing-dimension-tests",
+          "code_hash": "d32364b4b90c2448164195013128de83c80a83def3511d95f5469e9d148d361d",
+          "ran": true,
+          "ok": true,
+          "output": "1\n1\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-quality-testing-freshness-volume",
+          "code_hash": "0bccd1ccc813eb8e914d572f25f903d9f9acb8de75c1c026c3b1b9a609544552",
+          "ran": true,
+          "ok": true,
+          "output": "Mon 0.95\nTue missing\nWed 0.95",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-quality-testing-reconciliation",
+          "code_hash": "02d5835f6d0b3c440debba60edd13d2de5c3866154d1e783aa99af471c137fdd",
+          "ran": true,
+          "ok": true,
+          "output": "True True\n['B']\n['C']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-quality-testing-contract-schema",
+          "code_hash": "841c897f573749875e4ca474f8afa51d0ce9851ca77ff71ef172f950b9f7ee83",
+          "ran": true,
+          "ok": true,
+          "output": "[True, False, False, False]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-quality-testing-contract-delivery",
+          "code_hash": "cedabb9972babb00a77c907b053a99e5ee29dd409ac25e25f50bd37ab7454c18",
+          "ran": true,
+          "ok": true,
+          "output": "(4, None)\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-quality-testing-contract-ci",
+          "code_hash": "57ae6e8c9b2facc7c31432aad82c91b56c5d3ab51d219460a1b3f3e5cfca619e",
+          "ran": true,
+          "ok": true,
+          "output": "[('normal', True), ('full_refund', True), ('none', True)]\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-quality-testing-quarantine",
+          "code_hash": "b433517b09229c062ab875bbf8b45b80ca7b8b27bf68c4cc08e57bc380f54f35",
+          "ran": true,
+          "ok": true,
+          "output": "3 2\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-quality-testing-incident-impact",
+          "code_hash": "0fc0aaa0f4cee71d4a7da4e6b5e9bad9def8a9ca66f90369317f3a79a11ed4fe",
+          "ran": true,
+          "ok": true,
+          "output": "['dashboard', 'export', 'mart']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-quality-testing-repair-closure",
+          "code_hash": "eed42dfb6fe811b78fbae31f1e12ee2757dcff8c10a0d42e8b3fea9f2df0729c",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue\n300",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 63,
+      "human_approved": false
+    },
+    {
+      "id": "batch-streaming",
+      "version": 1,
+      "course_hash": "f23a257de6528981618eeea27bd66a60a2f624d6c4a7a944f0f83e73bb1a2137",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "batch-streaming-distributed-plan",
+          "code_hash": "6e2fde53b02858204a18c046f3b566650afe9080de0725e91d8edfe713bb55f3",
+          "ran": true,
+          "ok": true,
+          "output": "[(30, 2), (100, 1)]\n43.33 57.5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "batch-streaming-shuffle-skew",
+          "code_hash": "a3d7a71e66658af3e6438ae8a5f571a74437e2b67c2f5180b677ca9e78e7f2b4",
+          "ran": true,
+          "ok": true,
+          "output": "[(('hot', 0), 9), (('hot', 1), 12)]\n{'hot': 21}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "batch-streaming-batch-recovery",
+          "code_hash": "334bc96c8bd8a97c862dd7f8414294e43ef8334977df8dbb549f4da3e90f5630",
+          "ran": true,
+          "ok": true,
+          "output": "old\nnew_complete",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "batch-streaming-partitioned-log",
+          "code_hash": "cef9d1c67bc871424722271e3739a5d7cd3dadb9e6e4c2ff264ad50d99ffd10a",
+          "ran": true,
+          "ok": true,
+          "output": "[[0], [1], [2], [3], [], []]\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "batch-streaming-delivery-recovery",
+          "code_hash": "b39451b98ed2eae4a6ee13ec4565301d43cb5cf693cd656b04924486051c6e73",
+          "ran": true,
+          "ok": true,
+          "output": "2 1\n1000 500",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "batch-streaming-event-windows",
+          "code_hash": "66f2528534841387883dea081fb2ce1c33ea8427c64bf5addcd4fc89b83a5c21",
+          "ran": true,
+          "ok": true,
+          "output": "[(0, 10), (5, 15)]\n[False, True]\n610\n[(600, True), (610, False), (620, False)]\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "batch-streaming-requirements-choice",
+          "code_hash": "91c22fdfd54c541ca40aaa20e956314f2c9900b85500e106231f6ac612f6d2ab",
+          "ran": true,
+          "ok": true,
+          "output": "90\nTrue False",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "batch-streaming-backpressure",
+          "code_hash": "da8238701b45fbac96d469e86b8f57abdae93e159452416d2408cc10a4857733",
+          "ran": true,
+          "ok": true,
+          "output": "60\n200.0\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "batch-streaming-hybrid-corrections",
+          "code_hash": "0487ee580dc42201455a25f1396ea8f288959bfb44d58b66b7bbe6537e134d87",
+          "ran": true,
+          "ok": true,
+          "output": "280\n350\nTrue ['A', 'B', 'C']",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
@@ -8316,6 +8746,92 @@
       ],
       "objectives": 4,
       "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "security-logging-monitoring",
+      "version": 1,
+      "course_hash": "92a637ac6c53cd5ffa05c57ecadc4258bf1b92effe6d1fbb84d9f3c6da032ff1",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "slm-source-coverage",
+          "code_hash": "54eb28d2a6de88caf4116deee72bd603a3b108036d561f03024da62ac2507d53",
+          "ran": true,
+          "ok": true,
+          "output": "host",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "slm-event-contract",
+          "code_hash": "35f21eab9c28dd49f4d1bb04498c5704c7e8026420841b00822cb91ba63b8a45",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "slm-sensitive-data",
+          "code_hash": "26e47ad54229bfd7c9fb5deb9bfc5e613f0d0f4252b41c95c94deb996d714c67",
+          "ran": true,
+          "ok": true,
+          "output": "action,actor,result",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "slm-auth-patterns",
+          "code_hash": "0fbec5f6cf2fb767993a3d93323bc5596aa5d4e62d5f0446c28b0b695b47f991",
+          "ran": true,
+          "ok": true,
+          "output": "2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "slm-web-evidence",
+          "code_hash": "9eaf9acc1f95fe1e817237ce07a72b5f2792c6ea810db1cf4fd9d7e10d962ad8",
+          "ran": true,
+          "ok": true,
+          "output": "2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "slm-network-traces",
+          "code_hash": "d3420100e21c2719cdad3715ac27a4344ec53f5a3f2a61bc759ee2edf01f89e8",
+          "ran": true,
+          "ok": true,
+          "output": "allow\ndeny",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "slm-time-order",
+          "code_hash": "c0f56fb3e06add12bd767168d8451c2e872d35cfe95b408284e0ad76d1056116",
+          "ran": true,
+          "ok": true,
+          "output": "export,login",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "slm-integrity-delivery",
+          "code_hash": "16e720b95a5d17460a6eb47cf1a6ff13c7613247903b97e433247a5c5beb0764",
+          "ran": true,
+          "ok": true,
+          "output": "2\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "slm-retention-health",
+          "code_hash": "1eae283da45599c1a03e2a3037bd6a1e7c72b11e8b07403e6a11959352c0fe07",
+          "ran": true,
+          "ok": true,
+          "output": "6000000\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
       "lessons": 9,
       "questions": 54,
       "human_approved": false
@@ -9265,6 +9781,92 @@
       "lessons": 9,
       "questions": 54,
       "human_approved": false
+    },
+    {
+      "id": "greedy-dp",
+      "version": 1,
+      "course_hash": "a0024e974b51add7914a175012735c4073cc059a4feb3fedfeec9c62d672eb28",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "greedy-dp-exchange",
+          "code_hash": "61a101884f1ce721eb7f808391117a61bbfa39fbfbd3dd9e996ad532c5268732",
+          "ran": true,
+          "ok": true,
+          "output": "['intro', 'review', 'demo']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "greedy-dp-counterexamples",
+          "code_hash": "8fec1ee173a3ed59b4a08b9c23809194315e57e5f5f171ea3894a1f91cfc220c",
+          "ran": true,
+          "ok": true,
+          "output": "[4, 1, 1]\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "greedy-dp-fractional",
+          "code_hash": "cd87d33b28d655db7e0517af4f592266bc1a180568ad4e2f0ad60ec881922d9b",
+          "ran": true,
+          "ok": true,
+          "output": "240\n220",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "greedy-dp-memoization",
+          "code_hash": "c98a86ec2ae0eccba1522a4d4744f3ccd2a8ad603690a2ff5aab162a45e3774c",
+          "ran": true,
+          "ok": true,
+          "output": "13\n8\n13 8",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "greedy-dp-tabulation",
+          "code_hash": "91d27be72351f0665f28d347285f3999f5a08583832aaa9893a5d5a1750b493c",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 1, 2, 3, 5]\n[1, 1, 2, 2, 3]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "greedy-dp-space",
+          "code_hash": "d44714902542ac7d5670a8a2b10ea88e6afeaba1d2d9a73651d0d5772af25623",
+          "ran": true,
+          "ok": true,
+          "output": "13\n[0, 0, 3, 3, 6]\n[0, 0, 3, 3, 3]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "greedy-dp-knapsack",
+          "code_hash": "dd1195d5e935ef4da976258581386558e06d30d6ed16638abdd172ba6f5e393e",
+          "ran": true,
+          "ok": true,
+          "output": "7\n['A', 'B']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "greedy-dp-sequences",
+          "code_hash": "146eade19f7c6d6bd6fcb3e826fb26b9f8e7645d32de3c2d1a2adeb5bb5865f8",
+          "ran": true,
+          "ok": true,
+          "output": "4\nBCBA",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "greedy-dp-grids",
+          "code_hash": "052512bc6edf348ef9664e108ffbaffcd44684cccec616bfdac23d3e62dd6ab7",
+          "ran": true,
+          "ok": true,
+          "output": "2\n[1, 1, 2]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
     }
   ],
   "official_source": {
@@ -9272,19 +9874,19 @@
     "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
     "references": [
       {
-        "id": "graphs.ref0",
+        "id": "greedy-dp.ref0",
         "path": "Doc/library/collections.rst",
         "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "graphs.ref1",
+        "id": "greedy-dp.ref1",
         "path": "Doc/library/heapq.rst",
         "sha256": "d4af040814240446561ec71f310c0f0dd53b0371400df230c978ee6cab57f4ff",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "graphs.ref2",
+        "id": "greedy-dp.ref2",
         "path": "Doc/tutorial/datastructures.rst",
         "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
         "checked_by": "Pinned official Git object and matching local source file"
@@ -12601,6 +13203,43 @@
       ]
     },
     {
+      "course": "mobile-storage",
+      "repository": "https://github.com/flutter/website",
+      "commit": "35ed8c8d5caf1ff8b63a80bfe0f5b1b85e6e8e68",
+      "references": [
+        {
+          "id": "mobile-storage.ref0",
+          "path": "sites/docs/src/content/cookbook/persistence/reading-writing-files.md",
+          "sha256": "dcb17c2d4ca940e035d40997de542b565e52f5c4395bf84004a467d874395e95",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-storage.ref1",
+          "path": "sites/docs/src/content/cookbook/persistence/sqlite.md",
+          "sha256": "49d8f992f2c671e1c8d30f10a6557d0974c0a31fad0872bc0300aff17680f35f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-storage.ref2",
+          "path": "sites/docs/src/content/app-architecture/design-patterns/key-value-data.md",
+          "sha256": "2237993a8b818c9175aef1357e5c6b3f0762be6fe799d1c72edc38f5fe029d94",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-storage.ref3",
+          "path": "sites/docs/src/content/app-architecture/design-patterns/sql.md",
+          "sha256": "21e43f5a2019978c153f042f134ee0eebda84d83b87a825edc443790a5b56a00",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-storage.ref4",
+          "path": "sites/docs/src/content/app-architecture/design-patterns/offline-first.md",
+          "sha256": "88637b14901a82193f06d3044d28de01a09384eab195a18263e77fa28537672f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
       "course": "unsupervised-learning",
       "repository": "https://github.com/scikit-learn/scikit-learn",
       "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
@@ -12778,6 +13417,38 @@
       ]
     },
     {
+      "course": "responsible-ai-monitoring",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "ram-metrics",
+          "path": "sklearn/metrics/_classification.py",
+          "sha256": "88cade87eae97aae8214a5b9bdee8bf44a31653d5f72f62de3cef7bff9885c9d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "ram-importance",
+          "path": "sklearn/inspection/_permutation_importance.py",
+          "sha256": "766ad446e958105531378d51f3fe988a50e5853774a8d62810f8ff98eca4e015",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "responsible-ai-monitoring",
+      "repository": "https://github.com/OWASP/CheatSheetSeries",
+      "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
+      "references": [
+        {
+          "id": "ram-logs",
+          "path": "cheatsheets/Logging_Cheat_Sheet.md",
+          "sha256": "55ed0b4e9b2a68dba0f5a26c817a20760632d91b315aa42bb33ecfe36cc7195d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
       "course": "agent-workflows",
       "repository": "https://github.com/openai/openai-cookbook",
       "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
@@ -12831,6 +13502,133 @@
           "id": "python-sqlite",
           "path": "Doc/library/sqlite3.rst",
           "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "workflow-orchestration",
+      "repository": "https://github.com/apache/airflow",
+      "commit": "54bd5d8cd9f6f477cc83445737614dec81c4323c",
+      "references": [
+        {
+          "id": "airflow-runs",
+          "path": "airflow-core/docs/core-concepts/dag-run.rst",
+          "sha256": "b749d06d16260130c4ad62420207e90c202e1fcc681e7a8bea61799c21b6c916",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "airflow-tasks",
+          "path": "airflow-core/docs/core-concepts/tasks.rst",
+          "sha256": "7b504271d3c212724df1e5ca7cf8dccca78a533b2a1e03b48b101728c291dbe7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "airflow-deadlines",
+          "path": "airflow-core/docs/howto/deadline-alerts.rst",
+          "sha256": "080d8d7ddb285a7f5abe61432e95ddf20d2ce3c405d7496c222fb4233c1aa16d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "airflow-connections",
+          "path": "airflow-core/docs/security/secrets/secrets-backend/index.rst",
+          "sha256": "4c9a024f91942499315ce0eed363945c631fb991b327c05f6b21d36d0bb56bb7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "workflow-orchestration",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-datetime",
+          "path": "Doc/library/datetime.rst",
+          "sha256": "2a4591c351f0e4d2a81157a7eda36356730b312cf1df695debda30f2a9656fc2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "data-quality-testing",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-sqlite-quality",
+          "path": "Doc/library/sqlite3.rst",
+          "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-json-quality",
+          "path": "Doc/library/json.rst",
+          "sha256": "1dabdd646bfbf961c3ffcf79dd41bd81dc6a2e1ed59428b32662ed16acff08df",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "data-quality-testing",
+      "repository": "https://github.com/postgres/postgres",
+      "commit": "e6b2f7c2b41d6261dac15825dede55e94ca35614",
+      "references": [
+        {
+          "id": "postgres-constraints",
+          "path": "doc/src/sgml/ddl.sgml",
+          "sha256": "cea060a26fddc0b9b401e1a478941854d7e4bd9c1340f1d91f4beaa8a17207ed",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "batch-streaming",
+      "repository": "https://github.com/apache/spark",
+      "commit": "29434ea766b0fc3c3bf6eaadb43a8f931133649e",
+      "references": [
+        {
+          "id": "spark-rdd",
+          "path": "docs/rdd-programming-guide.md",
+          "sha256": "c691f7cd169ab6ca229a91bde7f01115d3de220835ccf9ab6027ac7a3fc48fe8",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "spark-streaming",
+          "path": "docs/streaming/apis-on-dataframes-and-datasets.md",
+          "sha256": "90c16aee914740a63ce85678422a1e3224dbcedc216f909fd2252e6efe5b47d5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "spark-kafka",
+          "path": "docs/streaming/structured-streaming-kafka-integration.md",
+          "sha256": "5bf652945831fea3848fa6b6f2f264b4078dce4a32be044fb2834ce67f23929a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "batch-streaming",
+      "repository": "https://github.com/apache/kafka",
+      "commit": "13f70256db3c994c590e5d262a7cc50b9e973204",
+      "references": [
+        {
+          "id": "kafka-design",
+          "path": "docs/design.html",
+          "sha256": "0348b867cbe83e3bfd1cadc5444e153fd595492708d11761d3da9eebba628bee",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "batch-streaming",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-collections-stream",
+          "path": "Doc/library/collections.rst",
+          "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
@@ -12961,6 +13759,25 @@
           "id": "vulnerabilities-defense-ref4",
           "path": "cheatsheets/Docker_Security_Cheat_Sheet.md",
           "sha256": "a38d27ad4444f54a467eb863a431080fbff77bd8eae445bd27c6d943175fb1bb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "security-logging-monitoring",
+      "repository": "https://github.com/OWASP/CheatSheetSeries",
+      "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
+      "references": [
+        {
+          "id": "security-logging-monitoring-ref0",
+          "path": "cheatsheets/Logging_Cheat_Sheet.md",
+          "sha256": "55ed0b4e9b2a68dba0f5a26c817a20760632d91b315aa42bb33ecfe36cc7195d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "security-logging-monitoring-ref1",
+          "path": "cheatsheets/Logging_Vocabulary_Cheat_Sheet.md",
+          "sha256": "3cf39e97ae23146663d92365442955186f4b4866432ece534dd1a133a124011a",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
@@ -13327,6 +14144,31 @@
         },
         {
           "id": "graphs.ref2",
+          "path": "Doc/tutorial/datastructures.rst",
+          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "greedy-dp",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "greedy-dp.ref0",
+          "path": "Doc/library/collections.rst",
+          "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "greedy-dp.ref1",
+          "path": "Doc/library/heapq.rst",
+          "sha256": "d4af040814240446561ec71f310c0f0dd53b0371400df230c978ee6cab57f4ff",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "greedy-dp.ref2",
           "path": "Doc/tutorial/datastructures.rst",
           "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
           "checked_by": "Pinned official Git object and matching local source file"

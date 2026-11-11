@@ -1,0 +1,39 @@
+{
+  "repository": "flutter/website",
+  "commit": "35ed8c8d5caf1ff8b63a80bfe0f5b1b85e6e8e68",
+  "root": "/tmp/echolens-flutter-wave4-mobile-reference",
+  "source_review": "Official references reviewed for key-value and file selection, directory retention, SQLite query mechanisms and offline-first repository responsibility. Transaction/migration/outbox fixtures execute host SQLite and pure protocol logic; Room/Hive/mobile plugin behavior and real background execution remain review-required.",
+  "files": [
+    {
+      "path": "sites/docs/src/content/cookbook/persistence/reading-writing-files.md",
+      "sha256": "dcb17c2d4ca940e035d40997de542b565e52f5c4395bf84004a467d874395e95",
+      "bytes": 6226,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/cookbook/persistence/sqlite.md",
+      "sha256": "49d8f992f2c671e1c8d30f10a6557d0974c0a31fad0872bc0300aff17680f35f",
+      "bytes": 15430,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/app-architecture/design-patterns/key-value-data.md",
+      "sha256": "2237993a8b818c9175aef1357e5c6b3f0762be6fe799d1c72edc38f5fe029d94",
+      "bytes": 10341,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/app-architecture/design-patterns/sql.md",
+      "sha256": "21e43f5a2019978c153f042f134ee0eebda84d83b87a825edc443790a5b56a00",
+      "bytes": 14876,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/app-architecture/design-patterns/offline-first.md",
+      "sha256": "88637b14901a82193f06d3044d28de01a09384eab195a18263e77fa28537672f",
+      "bytes": 17756,
+      "exact_pinned_git_bytes": true
+    }
+  ],
+  "human_review": "pending"
+}

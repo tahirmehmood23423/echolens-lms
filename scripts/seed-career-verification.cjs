@@ -7,12 +7,12 @@ const {digest,safeOutput}=require('./lib/curriculum-wave.cjs');
 function seed(previous,checkpoint){
  if(previous.human_approved||previous.published)throw Error('Technical cache must not contain approval/publication claims.');
  const rows=checkpoint.courses,ids=rows?.map(r=>r.id);
- if(!Array.isArray(rows)||!rows.length||new Set(ids).size!==ids.length||checkpoint.completed?.length!==rows.length||checkpoint.completed.some(id=>!ids.includes(id))||new Set(checkpoint.completed).size!==rows.length||checkpoint.duplication?.errors?.length||checkpoint.duplication?.warnings?.length)throw Error('A complete unique error-free batch checkpoint is required.');
+ if(!Array.isArray(rows)||!rows.length||new Set(ids).size!==ids.length||checkpoint.completed?.length!==rows.length||checkpoint.completed.some(id=>!ids.includes(id))||new Set(checkpoint.completed).size!==rows.length||!Array.isArray(checkpoint.duplication?.errors)||!Array.isArray(checkpoint.duplication?.warnings)||checkpoint.duplication.errors.length||checkpoint.duplication.warnings.length)throw Error('A complete unique error-free batch checkpoint is required.');
  const courses=[...(previous.courses||[])];
  for(const row of rows){
   const course=BUILTIN[row.id],bank=BANKS[row.id]?.questions;
   if(!course||!bank||row.fingerprint!==digest({course,bank}))throw Error('Stale or unregistered course/bank fingerprint: '+row.id);
-  if(!row.execution_passed||row.errors?.length!==0||row.warnings?.length!==0)throw Error('Batch execution did not pass: '+row.id);
+  if(row.execution_passed!==true||row.errors?.length!==0||row.warnings?.length!==0)throw Error('Batch execution did not pass: '+row.id);
   const result=validate(course);if(result.errors.length||result.warnings.length)throw Error('Current structural validation failed: '+row.id);
   const expected=[...course.lessons.map(l=>({id:l.id,code:l.worked.code,expect:l.worked.expect,lang:l.worked.lang||'python'})),...course.questions.filter(q=>q.code&&q.expect!=null)];
   if(!Array.isArray(row.examples)||row.examples.length!==expected.length||new Set(row.examples.map(e=>e.id)).size!==expected.length)throw Error('Incomplete executable evidence: '+row.id);

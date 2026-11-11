@@ -132,6 +132,7 @@ ${jsonld.map(jsonScript).join('\n')}
   .btn-light:hover{border-color:#7C3AED;color:#7C3AED}
 </style>
 <link rel="stylesheet" href="/css/public-navigation.css?v1">
+<link rel="stylesheet" href="/css/upgrade.css?v1">
 <link rel="stylesheet" href="/css/public-footer.css?v1">
 </head>
 <body>

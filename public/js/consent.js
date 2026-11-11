@@ -50,14 +50,15 @@
   background:#0B1530;color:#fff;box-shadow:0 -4px 24px rgba(11,21,48,.24);
   font:14px/1.5 Inter,system-ui,sans-serif}
 .cc-banner p{margin:0;max-width:70ch;flex:1 1 380px}
-.cc-banner a{color:#7FD6FF;text-decoration:underline}
+.cc-banner a{color:#7FE7D9;text-decoration:underline}
 .cc-actions{display:flex;gap:10px;flex:0 0 auto}
-.cc-btn{font:inherit;font-weight:600;padding:10px 20px;border-radius:10px;border:0;cursor:pointer}
-.cc-accept{background:linear-gradient(135deg,#6C4DFF,#3BA8FF);color:#fff}
+.cc-btn{font:inherit;font-weight:600;min-height:44px;padding:0 20px;border-radius:10px;border:0;cursor:pointer}
+.cc-accept{background:#2DD4BF;color:#04352F}
 .cc-decline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45)}
 .cc-btn:hover{opacity:.92}
 .cc-btn:focus-visible{outline:2px solid #7FD6FF;outline-offset:2px}
-@media(max-width:640px){.cc-banner{flex-direction:column;align-items:stretch;text-align:left}
+@media(max-width:640px){.cc-banner{flex-direction:column;align-items:stretch;text-align:left;gap:12px;padding:14px 16px;font-size:13px}
+  .cc-banner p{flex:0 0 auto}
   .cc-actions{justify-content:stretch}.cc-btn{flex:1}}`;
 
   let banner = null;

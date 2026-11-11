@@ -1,0 +1,162 @@
+/* ============================================================
+   EchoLens UI upgrade layer (loaded last on every page).
+   One job: make colour, button sizing and page/sidebar alignment
+   consistent without touching the 150 KB of component CSS below it.
+   - Colour: navy ink + teal primary + blue secondary. No purple glow.
+   - Buttons: one height per size, centred labels, visible focus ring.
+   - Layout: topbar and content share one gutter and one max width.
+   - Sidebar: every item the same height, icon column and label aligned.
+   Remove the <link> to this file to get the previous look back.
+   ============================================================ */
+
+:root{
+  /* primary action colour: teal, 4.9:1 against white text */
+  --primary:#0A7F73;
+  --primary-deep:#075E55;
+  --primary-grad:linear-gradient(135deg,#0A7F73 0%,#0A7F73 100%);
+  --primary-shadow:10,127,115;
+  --teal-deep:#0A7F73;
+  /* secondary accent: brand blue (replaces violet/indigo) */
+  --violet:#2F4BB8;
+  --violet-deep:#223A94;
+  --indigo:#16265C;
+  --violet-soft:#E8EEFB;
+  --stage-grad:linear-gradient(90deg,#0FBFA8 0%,#2F4BB8 100%);
+  --line:#E3E8F2;
+  --muted:#5B6680;          /* 5.9:1 on white; the old #66718A sat at the limit */
+  --muted-2:#7C879F;
+  /* landing.html tokens (it defines its own :root in an inline <style>) */
+  --grad:linear-gradient(94deg,#0A7F73,#0B5F8A);
+  --sh-md:0 6px 24px rgba(11,21,48,.10);
+  /* layout */
+  --gutter:32px;
+  --content-max:1320px;
+  --control-h:42px;
+  --control-h-sm:34px;
+}
+
+/* ------------------------------ focus ------------------------------ */
+:focus-visible{outline:2px solid #0A7F73;outline-offset:2px}
+.sidebar :focus-visible,.cc-banner :focus-visible{outline-color:#7FE7D9}
+
+/* ------------------------------ buttons ------------------------------
+   One height per size, label always centred, icon and text on one line. */
+.btn{min-height:var(--control-h);padding:0 18px;border-radius:10px;font-size:14px;font-weight:600;line-height:1.2;
+  justify-content:center;gap:8px;text-decoration:none;vertical-align:middle}
+.btn-sm{min-height:var(--control-h-sm);padding:0 12px;font-size:13px;border-radius:8px}
+.btn-block{display:flex;width:100%}
+.btn-primary,.btn-grad{background:#0A7F73;color:#fff;box-shadow:none}
+.btn-primary:hover,.btn-grad:hover{background:#075E55;box-shadow:none;filter:none}
+.btn-teal{background:#0A7F73}
+.btn-ghost,.btn-outline{background:#fff;border-color:#C8D0E0;color:var(--ink)}
+.btn-ghost:hover,.btn-outline:hover{border-color:#0A7F73;color:#075E55;background:#F1FBF9}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn svg{flex:none}
+/* groups of actions line up on one baseline and wrap cleanly */
+.card-head .btn,.modal .btn{flex:none}
+.card-head>div:last-child,.btn-row,.form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ------------------------------ form controls ------------------------------ */
+.field input:not([type=radio]):not([type=checkbox]):not([type=file]),.field select,
+.search-input,.search-box input{min-height:var(--control-h);font-size:14.5px}
+.field input:focus,.field select:focus,.field textarea:focus,.search-input:focus,.search-box input:focus{
+  border-color:#0A7F73;box-shadow:0 0 0 3px rgba(10,127,115,.16)}
+/* radio/checkbox rows: control and label side by side, label vertically centred */
+.choice-row{display:flex;align-items:flex-start;gap:12px;min-height:44px;padding:10px 12px;border-radius:10px;cursor:pointer;
+  font-size:14.5px;font-weight:500;color:var(--text);line-height:1.45}
+.choice-row:hover{background:#F1FBF9}
+.choice-row input{flex:none;width:18px;height:18px;margin:2px 0 0;accent-color:#0A7F73}
+
+/* ------------------------------ app shell ------------------------------ */
+.app{grid-template-columns:256px minmax(0,1fr)}
+.topbar{height:68px;padding:0 var(--gutter);gap:16px}
+.page-title{font-size:21px;white-space:nowrap}
+.content{padding:28px var(--gutter) 64px;max-width:calc(var(--content-max) + 2 * var(--gutter));margin:0 auto;box-sizing:border-box}
+.topbar .user{gap:10px}
+.role-pill{font-size:11px;padding:4px 10px}
+.avatar{width:38px;height:38px;background:#16265C;color:#fff}
+.bell-btn{width:40px;height:40px;border-radius:10px}
+.menu-toggle{min-height:40px;padding:0 14px;align-items:center}
+.card{border-color:var(--line);margin-bottom:24px}
+.card-head{padding:16px 22px;min-height:60px}
+.tab{min-height:40px;display:inline-flex;align-items:center;padding:0 15px}
+
+/* ------------------------------ sidebar ------------------------------
+   Left-aligned brand, a fixed 20px icon column, 44px rows, 12px inset. */
+.sidebar{background:#0B1530;border-right:0}
+.sidebar .brand{justify-content:flex-start;padding:20px 20px 14px}
+.logo-pill{padding:8px 12px;border-radius:12px;box-shadow:none}
+.logo-pill img{width:112px}
+.sidebar nav{padding:4px 12px 20px;scrollbar-width:thin;scrollbar-color:#2A3A6E transparent}
+.sidebar nav::-webkit-scrollbar{width:6px}
+.sidebar nav::-webkit-scrollbar-thumb{background:#2A3A6E;border-radius:6px}
+.nav-group{font-size:11px;letter-spacing:.1em;color:#93A2C6;padding:20px 12px 8px}
+a.nav-item{min-height:44px;padding:0 12px;gap:12px;margin-bottom:2px;border-radius:10px;
+  font-size:14.5px;font-weight:500;line-height:1.2;color:#C9D2E6;text-decoration:none;box-sizing:border-box}
+a.nav-item:hover{background:#16265C;color:#fff}
+a.nav-item.active{background:#16265C;color:#fff;font-weight:600;border-radius:10px;
+  box-shadow:inset 3px 0 0 #2DD4BF}
+a.nav-item.active .ic{stroke:#2DD4BF}
+.nav-item .ic{width:20px;height:20px;stroke-width:1.8}
+.nav-item .bell-badge{margin-left:auto}
+
+/* ------------------------------ modals ------------------------------ */
+.modal{border-radius:18px;padding:28px}
+.modal h3{font-size:20px;line-height:1.25}
+.modal .close{width:36px;height:36px}
+
+/* ------------------------------ small screens ------------------------------ */
+@media (max-width:900px){
+  :root{--gutter:16px;--control-h:44px;--control-h-sm:40px}
+  .app{grid-template-columns:minmax(0,1fr)}
+  .sidebar{width:272px}
+  .topbar{height:60px}
+  .content{padding:20px var(--gutter) 56px}
+  .modal-overlay{padding:16px 12px}
+  .modal{padding:20px}
+  .card-head{padding:14px 16px}
+  .role-pill{display:none}
+}
+
+/* ------------------------------ landing page ------------------------------ */
+.btn-grad{box-shadow:none}
+.nav .btn,.hero .btn{min-height:44px}
+
+/* ------------------------------ sidebar brand: compact ------------------------------ */
+.logo-pill img{width:84px}
+
+/* ------------------------------ public navigation ------------------------------ */
+.public-navigation .nlink{min-height:40px;display:inline-flex;align-items:center;padding:0 12px;font-size:14px;color:#4A5570}
+.public-navigation .nlink:hover,.public-navigation .nlink.active{color:#075E55;background:#E3F6F2}
+.public-navigation .btn{min-height:40px;padding:0 16px;font-size:14px}
+.public-navigation .btn-primary{background:#0A7F73;color:#fff}
+.public-navigation .btn-primary:hover{background:#075E55}
+
+/* ------------------------------ landing page ------------------------------
+   One primary action (teal), one secondary (outline). No competing gradients. */
+.btn-grad,.btn-enroll,.cmp-run{background:#0A7F73;color:#fff;box-shadow:none}
+.btn-grad:hover,.btn-enroll:hover{background:#075E55;box-shadow:none}
+.btn-book{background:#0A7F73;box-shadow:none;animation:none;min-height:52px;padding:0 28px;font-size:16px;font-weight:700}
+.btn-book:hover{background:#075E55}
+.btn-book + .btn{background:#fff;color:#075E55;border:1px solid #0A7F73;box-shadow:none}
+.btn-book + .btn:hover{background:#F1FBF9}
+.hero .btn,.hero-cta .btn{min-height:52px}
+.hero-badge{color:#16265C}
+.gem-float{filter:drop-shadow(0 10px 24px rgba(11,21,48,.18))}
+.learning-eyebrow{background:#E3F6F2;color:#075E55}
+.learning-selector button.active{background:#0B1530;color:#fff;box-shadow:none}
+.learning-table .lt-paid .learning-main-icon,.learning-table .cmp-badge.paid{background:#16265C;color:#fff}
+.learning-table .btn-primary{background:#0A7F73;color:#fff}
+.learning-table[data-choice="paid"] .lt-paid{background:#F3F6FC}
+.learning-table[data-choice="paid"] thead .lt-paid{box-shadow:inset 0 3px 0 0 #16265C}
+.home-learning a:focus-visible,.home-learning button:focus-visible{outline-color:#0A7F73}
+.home2-preview::before{background:radial-gradient(420px 220px at 90% -10%,rgba(45,212,191,.28),transparent 60%)}
+
+/* ------------------------------ course detail pages (/courses/:slug) ------------------------------ */
+.cp-crumb a:hover,.cp-foot a:hover{color:#0A7F73}
+.cp-hero:after{background:radial-gradient(circle,rgba(45,212,191,.30),transparent 65%)}
+.cp-badge{color:#E3F6F2}
+.cp-list li:before{background:#0A9384}
+.cp-rel a:hover{border-color:#0A7F73;box-shadow:0 10px 26px rgba(11,21,48,.10)}
+.btn-light:hover{border-color:#0A7F73;color:#075E55}
+.btn-grad,.btn-light{min-height:46px}

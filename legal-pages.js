@@ -137,13 +137,13 @@ function render(route) {
 <link rel="canonical" href="https://www.echolens.digital${route}"><link rel="icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v1430"><link rel="stylesheet" href="/css/public-navigation.css?v1"><link rel="stylesheet" href="/css/public-footer.css?v1"><link rel="stylesheet" href="/css/legal-pages.css?v1">
+<link rel="stylesheet" href="/css/styles.css?v1430"><link rel="stylesheet" href="/css/public-navigation.css?v1"><link rel="stylesheet" href="/css/public-footer.css?v1"><link rel="stylesheet" href="/css/upgrade.css?v1"><link rel="stylesheet" href="/css/legal-pages.css?v1">
 </head><body class="legal-body"><a class="legal-skip" href="#main">Skip to content</a>
 ${navigation.render()}
 <main id="main" class="legal-wrap"><nav class="legal-crumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true"> / </span><span>${page.title}</span></nav>
 <article class="legal-card"><header><h1>${page.title}</h1><p class="legal-updated">Last updated: <time datetime="${updated}">18 September 2026</time></p></header>${page.content}</article></main>
 ${footer.render()}
-<script src="/js/consent.js?v1"></script><script src="/js/public-navigation.js?v1"></script>${page.script ? `<script src="${page.script}" defer></script>` : ''}
+<script src="/js/consent.js?v2"></script><script src="/js/public-navigation.js?v1"></script>${page.script ? `<script src="${page.script}" defer></script>` : ''}
 </body></html>`;
 }
 function register(app) {

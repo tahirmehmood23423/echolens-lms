@@ -593,7 +593,7 @@ app.post('/api/me/profile', authRequired, (req, res) => {
 /* v16: admin portal - real system health checks (no fake "all green"). Each
  * check inspects an actual resource this process depends on. */
 function systemHealth() {
-  const checks = [{ name: 'Web Server', ok: true, detail: `Responding ? up ${Math.round(process.uptime() / 60)}m` }];
+  const checks = [{ name: 'Web Server', ok: true, detail: `Responding - up ${Math.round(process.uptime() / 60)}m` }];
   let dbOk = true; try { fs.accessSync(store.DB_PATH, fs.constants.R_OK | fs.constants.W_OK); } catch { dbOk = false; }
   checks.push({ name: 'Database', ok: db.enabled() ? store.flushHealth().consecutiveFlushFailures===0 : dbOk, status:db.enabled()?'configured':'test_mode', detail:db.enabled()?'PostgreSQL connected at startup; see flush status below.':'Local JSON store; PostgreSQL integration is not active.' });
   let storageOk = true; try { fs.accessSync(UPLOAD_DIR, fs.constants.R_OK | fs.constants.W_OK); } catch { storageOk = false; }

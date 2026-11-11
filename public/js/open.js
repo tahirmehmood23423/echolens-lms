@@ -419,10 +419,10 @@ function requireAgeDeclaration() {
   openModal('One question before you continue', `
     <form id="ageDeclForm">
       <p class="s" style="color:var(--muted);margin-bottom:12px">EchoLens is open to school and university learners. Tell us which applies to you. We record your answer with your account; we do not contact your parent or guardian to check it.</p>
-      <fieldset style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 12px">
+      <fieldset style="border:1px solid var(--line);border-radius:12px;padding:6px 8px 8px;margin:0 0 12px">
         <legend class="s" style="padding:0 6px;color:var(--ink);font-weight:600">Your age</legend>
-        <label class="field" style="margin-bottom:6px"><span><input type="radio" name="age_declaration" value="adult" style="width:auto" required> I am 18 or older</span></label>
-        <label class="field" style="margin-bottom:0"><span><input type="radio" name="age_declaration" value="minor" style="width:auto" required> I am under 18 and have my parent or guardian&rsquo;s permission to enroll</span></label>
+        <label class="choice-row"><input type="radio" name="age_declaration" value="adult" required><span>I am 18 or older</span></label>
+        <label class="choice-row"><input type="radio" name="age_declaration" value="minor" required><span>I am under 18 and have my parent or guardian&rsquo;s permission to enroll</span></label>
       </fieldset>
       <p class="hint" style="margin-bottom:12px">Accounts declared under 18 are kept out of public profiles, the Talent Marketplace and recruiter contact.</p>
       <button class="btn btn-primary btn-block" id="ageDeclBtn">Save and continue</button>

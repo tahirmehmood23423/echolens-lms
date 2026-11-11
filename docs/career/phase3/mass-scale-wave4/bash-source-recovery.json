@@ -1,0 +1,50 @@
+{
+  "scope": "Authoritative alternate acquired without modifying any prior course or granting human approval.",
+  "original_reference": {
+    "url": "https://www.gnu.org/software/bash/manual/bash.html",
+    "retrieval_status": 503
+  },
+  "alternate": {
+    "id": "bash-5-2-37-official-source",
+    "title": "GNU Bash5.2.37 source distribution with Bash Reference Manual",
+    "url": "https://ftp.gnu.org/gnu/bash/bash-5.2.37.tar.gz",
+    "source": {
+      "kind": "official-http-snapshot",
+      "repo": "gnu/official-documentation-snapshots",
+      "path": "bash-5.2.37.tar.gz",
+      "url": "https://ftp.gnu.org/gnu/bash/bash-5.2.37.tar.gz",
+      "http_status": 200,
+      "sha256": "9599b22ecd1d5787ad7d3b7bf0c59f312b3396d1e281175dd1f8a4014da621ff",
+      "fetched_at": "2026-11-11T04:53:33.041219+00:00"
+    }
+  },
+  "evidence": {
+    "id": "bash-5-2-37-official-source",
+    "path": "bash-5.2.37.tar.gz",
+    "url": "https://ftp.gnu.org/gnu/bash/bash-5.2.37.tar.gz",
+    "sha256": "9599b22ecd1d5787ad7d3b7bf0c59f312b3396d1e281175dd1f8a4014da621ff",
+    "fetched_at": "2026-11-11T04:53:33.041219+00:00",
+    "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+  },
+  "derived_document": {
+    "archive_path": "bash-5.2.37.tar.gz",
+    "member": "bash-5.2.37/doc/bashref.texi",
+    "document_sha256": "32ced60bb645d47be7bfa4e5767edb2ea1b0c840d8968c17f3eb9df960b44863",
+    "bash_version": "5.2.37",
+    "human_review_pending": true,
+    "original_manual_url_status": 503,
+    "note": "Authoritative version-matched alternate source acquired; prior course reference/content untouched. Expert review must map specific lesson claims to manual sections."
+  },
+  "read_sections": [
+    "Quoting",
+    "Pipelines",
+    "Shell Expansions",
+    "Exit Status",
+    "Bourne Shell Builtins",
+    "Bash Builtins",
+    "The Set Builtin"
+  ],
+  "remaining_review": "Match every version-specific course claim and example boundary to this manual before human approval; runtime evidence does not certify broader reliability claims.",
+  "human_approved": false,
+  "published": false
+}

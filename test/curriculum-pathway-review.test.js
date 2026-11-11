@@ -10,7 +10,7 @@ test('private role review includes exactly nine required packages without approv
 });
 test('official HTTPS evidence rejects changed bytes, substituted hosts and path escapes',()=>{
  const {verifyHttpSnapshot}=require('../scripts/lib/curriculum-sources.cjs'),root=fs.mkdtempSync(path.join(os.tmpdir(),'source-snapshot-'));try{
- for(const [repo,host] of [['aws/official-documentation-snapshots','docs.aws.amazon.com'],['gnu/official-documentation-snapshots','www.gnu.org'],['google/official-documentation-snapshots','sre.google']]){
+ for(const [repo,host] of [['aws/official-documentation-snapshots','docs.aws.amazon.com'],['gnu/official-documentation-snapshots','www.gnu.org'],['gnu/official-documentation-snapshots','ftp.gnu.org'],['google/official-documentation-snapshots','sre.google']]){
  const body='<html><title>Synthetic source fixture</title></html>',sha256=crypto.createHash('sha256').update(body).digest('hex'),url='https://'+host+'/example/fixture.html',fetched_at='2026-11-09T00:00:00Z';
  fs.writeFileSync(path.join(root,'source.html'),body);fs.writeFileSync(path.join(root,'manifest.json'),JSON.stringify({'source.html':{url,sha256,fetched_at,http_status:200}}));const ref={id:'fixture',source:{url,sha256,fetched_at,path:'source.html'}};
  assert.equal(verifyHttpSnapshot(root,ref,repo).sha256,sha256);

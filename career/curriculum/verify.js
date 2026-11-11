@@ -35,6 +35,7 @@ const SQL_RUNNER = [
 
 /** Returns { ran, ok, output, problem }. Non-executable questions return { ran: false }. */
 function verifyCode(q) {
+  if(q&&['dart','java','kotlin','python-torch'].includes(q.lang))return require('./verify-native').verifyNative(q,{sandbox:SANDBOX,python:PACKAGE_PYTHON,pythonRoot:PACKAGE_ROOT});
   if (!q || !q.code || q.expect == null || !['python', 'sql','javascript','python-pandas','python-fastapi','typescript','javascript-react'].includes(q.lang)) return { ran: false };
   const jsPackages=['typescript','javascript-react'].includes(q.lang);
   if(jsPackages&&!fs.existsSync(path.join(JS_PACKAGE_ROOT,q.lang==='typescript'?'typescript/package.json':'react-dom/package.json')))return {ran:true,ok:false,problem:'The read-only JavaScript package verification runtime is unavailable. No unsandboxed fallback is permitted.'};

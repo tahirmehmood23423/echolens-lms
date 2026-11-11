@@ -1,0 +1,84 @@
+{
+  "scope": "Seven independently computed sampled MCQ keys, not complete bank certification or human approval.",
+  "records": [
+    {
+      "course": "complexity-analysis",
+      "id": "complexity-analysis.w4.7",
+      "item_fingerprint": "5593d9f210032c7423df74e9838fbeffb0883ae703d65064f388e3b44f86d2ad",
+      "computed": 280,
+      "key": "280 operations; within budget",
+      "passed": true
+    },
+    {
+      "course": "complexity-analysis",
+      "id": "complexity-analysis.w4.10",
+      "item_fingerprint": "94486d5f8b48a9d5416a129bed25f79eab77b2678d7f05393674c92bb98f4d2e",
+      "computed": {
+        "firstCountCrossover": 13,
+        "timeDifference": "2n + 77 > 0 for all positive n"
+      },
+      "key": "A has fewer counts from n=13; B stays faster",
+      "passed": true
+    },
+    {
+      "course": "agent-workflows",
+      "id": "agent-workflows.w4.f040",
+      "item_fingerprint": "8f33a0655cdfc91adaaa2b21414a7a99011cb12bf97f501ce901103acb3eff53",
+      "computed": {
+        "names": [
+          "B",
+          "C"
+        ],
+        "tokens": 4000,
+        "utility": 10
+      },
+      "key": "Mandatory plus B and C: 4,000 tokens, utility 10",
+      "passed": true
+    },
+    {
+      "course": "agent-workflows",
+      "id": "agent-workflows.w4.f070",
+      "item_fingerprint": "80bf37a2887882c50820929c890ce8fe232a2b3ad406dea485c281aa7c1c6e07",
+      "computed": 60,
+      "key": "Observed children overlap60ms; missing spans prevent complete attribution",
+      "passed": true
+    },
+    {
+      "course": "agent-workflows",
+      "id": "agent-workflows.w4.f080",
+      "item_fingerprint": "036de6aad50426062494f1b606ff391db916fdbd0e2ba5a5545a189506313890",
+      "computed": {
+        "spent": 0.35,
+        "reserved": 0.6000000000000001,
+        "available": 0.050000000000000044
+      },
+      "key": "Spend0.35, reservations0.60, available0.05",
+      "passed": true
+    },
+    {
+      "course": "unsupervised-learning",
+      "id": "unsupervised-learning.w4.f010",
+      "item_fingerprint": "431b5d6e62adc22ba99eb0a73951747e611c0a4557c2b669d33407a77f7dc638",
+      "computed": 5,
+      "key": "Exclude P; weighted squared distance is5",
+      "passed": true
+    },
+    {
+      "course": "unsupervised-learning",
+      "id": "unsupervised-learning.w4.f080",
+      "item_fingerprint": "7102574aa7268fc5b32c1ef97e9ab9995c4701cc6429dad4d9abf650ab27c399",
+      "computed": {
+        "names": [
+          "A",
+          "C"
+        ],
+        "cost": 60,
+        "value": 1.4
+      },
+      "key": "A and C: cost60, expected confirmations1.4",
+      "passed": true
+    }
+  ],
+  "human_approved": false,
+  "published": false
+}

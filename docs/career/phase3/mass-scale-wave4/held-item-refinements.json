@@ -1,0 +1,102 @@
+{
+  "scope": "AI/editorial correction of sampled difficulty, distractor and terminology issues. Not a complete educational audit.",
+  "courses": [
+    {
+      "course": "agent-workflows",
+      "revisions": [
+        {
+          "lesson": 0,
+          "question_index": 6,
+          "before": "Two flows both finish in three steps; one executes unapproved writes and one performs only authorized reads. Why does step count not establish equivalent safety?|Effect policy differs between them|Three steps imply identical authority|All finite flows share one policy|Only total token count controls risk|Risk depends on what each step can do and whether its effects satisfy policy, not merely the number of steps.",
+          "after": "A workflow has used two of three allowed transitions. It is eligible but not approved; a model proposes setting approved=true, although only the reviewer endpoint may do that. Recording a blocked result consumes one transition. Which resulting state respects every rule?|Blocked at transition three; no effect|Refund completed at transition three|Blocked with counter reset to zero|Refund completed but audit omitted|The proposal cannot change authoritative approval. Persisting the blocked decision uses the final transition, preserving both the effect gate and the transition limit."
+        },
+        {
+          "lesson": 0,
+          "question_index": 9,
+          "before": "A service requires mandatory approval, a maximum of four transitions and a stable audit history; a model suggests an unapproved shortcut at transition three. Which response satisfies all constraints?|Reject shortcut and record blocked status|Execute because fewer than four steps|Delete history and restart approval|Treat the proposal as the approval record|The remaining step budget does not waive the approval gate, and the blocked decision should be retained for audit.",
+          "after": "A refund plan was built at revision 8 with approval bound to that revision. A cancellation commits revision 9 before execution. Three of four allowed transitions have been used; an atomic blocked-state update needs the final transition. Which action preserves current authorization, the limit and audit history?|Reject the stale effect and commit blocked state|Execute revision 8 approval before recording cancellation|Reset the transition count and reuse the approval|Apply the refund then append a compensating audit entry|Cancellation invalidates the stale plan. The final allowed transition can record the blocked decision without executing an effect under obsolete approval."
+        },
+        {
+          "lesson": 1,
+          "question_index": 9,
+          "before": "A review demands independent verification, bounded transfers and minimum disclosure. Which proposed architecture addresses all three?|Distinct evidence checks with bounded scoped handoffs|Many identical agents sharing the full raw transcript|Unlimited specialists using one unverified source|A privileged central agent that deletes failed transfers|Agent count alone satisfies none of those requirements; evidence independence, explicit bounds and context scoping are separate controls.",
+          "after": "A handoff policy allows three transfers, independent evidence and only case-id disclosure. A and B read source S; C can check independent source T. Which proposed route provides the required second evidence source within the disclosure and transfer limits?|A to B to C, sharing only the case id|A to B to A, repeating source S findings|A to B to C, sharing the complete private transcript|A to B to C to A to B, sharing only the case id|The first route uses two transfers and reaches independent source T with minimum disclosure. Repetition is not independence, full transcripts violate scope, and four transfers exceed the cap."
+        },
+        {
+          "lesson": 2,
+          "question_index": 9,
+          "before": "A supplier workflow must stop before30seconds, use at most4calls and never purchase; three searches already took29seconds. Which next-step requirement remains necessary?|A bounded wait within remaining time|One unrestricted call because count permits|Any purchase below the price budget|A new workflow id to reset all limits|The last permitted call still needs deadline-compatible waiting and scope checks; a remaining count slot does not waive other constraints.",
+          "after": "A read-only workflow has spent 26 of 30 seconds and three of four calls. Persisting the result needs a reserved one second. Which remaining call can be admitted under worst-case bounds without changing scope or budgets?|A read capped at two seconds, then persist|A read capped at four seconds, then persist|A purchase capped at one second, then persist|An eight-second read with the call counter reset|Four seconds remain. A two-second read plus one-second persistence fits and remains read-only; four plus one exceeds the deadline, a purchase violates scope, and resetting a counter does not create time."
+        },
+        {
+          "lesson": 3,
+          "question_index": 9,
+          "before": "A context builder has11000evidence tokens available but must retain a current authorization record and unresolved conflict; the full transcript is18000tokens. Which plan respects both constraints?|Scoped evidence plus durable source pointers|Truncate oldest text and infer approval|Drop authorization to fit the full evidence|Call the full transcript11000tokens|Select necessary current constraints and conflict evidence within the budget while retaining recoverable provenance outside working context.",
+          "after": "A context budget is 4,000 tokens. Mandatory authorization, conflict and citation records use 1,800. Optional indivisible evidence A uses 1,800 for utility 8; B uses 1,200 for utility 4; C uses 1,000 for utility 6. Which selection maximizes utility while retaining all mandatory evidence?|Mandatory plus B and C: 4,000 tokens, utility 10|Mandatory plus A and B: 4,800 tokens, utility 12|Mandatory plus A and C: 4,600 tokens, utility 14|A and B and C without mandatory authorization|B and C fill the remaining 2,200-token capacity and yield utility 10, exceeding A alone at utility 8. The higher-utility combinations exceed the cap; deleting mandatory constraints is forbidden."
+        },
+        {
+          "lesson": 4,
+          "question_index": 9,
+          "before": "An assistant needs continuity, tenant isolation and correction support. Which memory contract addresses all three?|Scoped records with versioned provenance|One unfiltered global transcript archive|A semantic index without access metadata|Permanent summaries with no correction path|Continuity requires retained evidence, while isolation and corrections require explicit scope and version/validity handling across uses.",
+          "after": "A memory query is for tenant A under policy revision 5 at time 12:00. R1 is A/revision4/current; R2 is B/revision5/current; R3 is A/revision5/valid until13:00; R4 is A/revision5/expired11:00. Which evidence may support the answer without bypassing tenant, correction or validity rules?|R3 with its revision and source pointer retained|R1 and R3 merged because both belong to tenant A|R2 and R3 merged because both use revision 5|R3 and R4 merged because revision overrides expiry|Only R3 meets tenant, current revision and time-validity checks. Revision and source provenance must remain attached so later correction and audit can identify the evidence used."
+        },
+        {
+          "lesson": 5,
+          "question_index": 9,
+          "before": "A system must survive crashes, reject stale workers and avoid duplicate refunds. Which evidence package addresses the distinct boundaries?|Durable versioned state plus effect reconciliation|Only a compressed transcript with agent names|Only an in-memory lock around model calls|A fresh refund identity on every restart|Durability, local concurrency and external duplicate effects are separate problems requiring matching state and operation protocols.",
+          "after": "State revision 7 records refund key K with unknown remote outcome. A stale worker expects revision 6; a status lookup now confirms K succeeded. Which recovery respects the local version check and avoids a second refund?|Reject the stale update and record K success conditionally at the current revision|Accept the revision-6 update because K has now succeeded|Create key K2 and refund again before updating revision 7|Retry K as a new operation and discard the old checkpoint|The stale compare-and-set cannot overwrite revision 7. Reconciliation establishes that K already succeeded; a current-version conditional update records that evidence without issuing another logical refund."
+        },
+        {
+          "lesson": 6,
+          "question_index": 9,
+          "before": "An incident review needs causal timing, tenant privacy and awareness of missing data. Which trace policy addresses all three?|Scoped metadata with parent links and loss indicators|Full raw transcripts copied to every public span|Unique ids used as bearer access credentials|Duration sums presented as request time always|Useful causal metadata, scoped access/redaction and explicit loss/sampling records meet the distinct requirements without unsupported inference.",
+          "after": "A parent span runs from 0 to120ms. Child A runs10 to90ms and B runs30 to110ms; the trace reports dropped spans. Which timing conclusion is supported without treating missing observations as idle time?|Observed children overlap60ms; missing spans prevent complete attribution|Child durations sum160ms, so parent latency must be160ms|Observed children overlap20ms and every uncovered interval is idle|Parent minus child-duration sum gives minus40ms of idle time|The overlap is min(90,110)-max(10,30)=60ms. Concurrent child durations can exceed parent duration, and dropped spans prevent assigning all unobserved time to idleness."
+        },
+        {
+          "lesson": 7,
+          "question_index": 9,
+          "before": "A business requires a cap1.0, exact task accounting and no silent scope changes; concurrent branches estimate0.6each. Which design addresses all constraints?|Reserve atomically, reconcile usage, enforce scope|Launch both then hide failed-call usage|Use final-output tokens as all task cost|Switch sensitive traffic to any cheaper endpoint|Prevent double admission of shared budget, retain actual chargeable usage and keep access/effect policy independent of price optimization.",
+          "after": "A cost cap is1.00. Settled spend is0.25 and A reserves0.30. B reserves0.40; C requests0.20 but is initially denied. A then settles at0.10 and releases its reservation, after which C retries. With B still pending, what accounting follows atomic admission?|Spend0.35, reservations0.60, available0.05|Spend0.55, reservations0.40, available0.05|Spend0.35, reservations0.90, available minus0.25|Spend0.25, reservations0.60, available0.15|Initially B fits but C does not. Settling A adds0.10 to0.25 and removes its0.30 reservation, permitting C. Pending B and C reserve0.60, leaving1.00-0.35-0.60=0.05."
+        },
+        {
+          "lesson": 8,
+          "question_index": 9,
+          "before": "A deployment gate requires supported answers, scoped tools and crash recovery; only fluency scores are supplied. Which next evidence is necessary?|Task rubric plus process and recovery fixtures|A longer response prompt on the same cases|More synonyms for successful completion|A count of how many agents were named|The supplied metric does not cover the required boundaries, so evaluate factual support, authorization and controlled recovery directly.",
+          "after": "A release requires at least95 completed tasks out of100, zero unauthorized effects and at least90% success on10 crash-recovery cases. Results are96 completions, one unauthorized effect and8 successful recoveries. What gate result follows from independent mandatory thresholds?|Completion passes; safety and recovery fail, so reject release|The96% completion score overrides the other two results|The three metrics may be averaged to waive the safety failure|Eight recovered cases satisfy90%, so only safety needs review|Completion reaches96%, but one unauthorized effect violates the zero-tolerance gate and8/10 is80%, below90%. Passing one metric cannot compensate for either independent failure."
+        }
+      ],
+      "human_approved": false
+    },
+    {
+      "course": "unsupervised-learning",
+      "revisions": [
+        {
+          "lesson": 0,
+          "question_index": 9,
+          "before": "Segmentation must exclude a prohibited proxy, compare spending relative to its population spread and limit influence of a noisy near-constant sensor. Which pipeline fits all three constraints?|Exclude proxy, scale spend, downweight sensor|Scale all three equally, including the proxy|Exclude proxy, use raw spend, amplify sensor|Keep proxy, scale spend, remove all other inputs|The constraints independently require excluding the proxy, intentional spending scale and controlled noisy-sensor influence; ordinary unit scaling does not resolve all three.",
+          "after": "A distance policy excludes proxy P, standardizes spending with reference standard deviation100 and sensor X with standard deviation0.01, then gives squared X differences weight0.25 while spending weight remains1. Two rows differ by200 spending units and0.02 X units. Which implementation and squared distance follow the policy?|Exclude P; weighted squared distance is5|Exclude P; unit-weight squared distance is8|Keep P; weighted spending-and-X distance is5|Exclude P; weight both squared differences0.25 to get2|Both standardized differences are2. The declared squared distance is1*(2 squared)+0.25*(2 squared)=5. Proxy exclusion and distinct feature weights are independent requirements."
+        },
+        {
+          "lesson": 7,
+          "question_index": 9,
+          "before": "A detector uses negative decision values for outliers, capacity2and an exclusive0boundary. Supplied scores areA:-0.3,B:-0.1,C:0,D:0.4. Which review set satisfies all rules?|A andB selected|C andD selected|A,BandC selected|OnlyD selected|OnlyAandBare below zero, and both fit the two-slot capacity; zero is excluded by the stated boundary.",
+          "after": "Only negative detector scores are eligible; zero is excluded. At most two reviews and60 minutes are allowed. A has score-0.8, cost40, expected confirmations0.8; B:-0.4,cost30,value0.7; C:-0.2,cost20,value0.6; D:0,cost10,value0.9. Using these supplied planning values, which set maximizes expected confirmations subject to all rules?|A and C: cost60, expected confirmations1.4|A and B: cost70, expected confirmations1.5|B and C: cost50, expected confirmations1.3|C and D: cost30, expected confirmations1.5|A+C fits both the count and time limits and yields1.4, more than B+C at1.3. A+B exceeds time, and D is ineligible at the exclusive zero boundary. Planning values are assumptions, not confirmed incident labels."
+        }
+      ],
+      "human_approved": false
+    },
+    {
+      "course": "security-foundations",
+      "revisions": [
+        {
+          "before": "A clinic’s two replicas share one administrator and apply deletes immediately. Nightly encrypted backups are untested and share that administrator. A destructive login deletes every copy. What evidence was missing before claiming recovery readiness?|Protected, tested restoration|A third synchronously deleted replica~Another copy under the same destructive path would not isolate recovery.|A stronger at-rest encryption algorithm~Encryption cannot restore copies deleted by an authorized destructive identity.|A second login prompt for ordinary readers~Reader authentication does not separate backup destructive authority.|Recoverability required both a surviving protected source and tested restoration; replication and encryption did not establish either under this common cause.",
+          "after": "A clinic requires recovery after a destructive administrator login and evidence that restoration meets its target. Which proposed design addresses both obligations rather than only one?|Protected recovery copy plus a successful timed restore test|Cross-region copy under the same destructive authority plus timed restore test~The restore test does not protect the source from the administrator’s deletion path.|Protected recovery copy with no restore test~Protection alone does not establish usable restoration within the target.|A tested second synchronous replica under the same administrator~A replica subject to the same destructive action can disappear before restoration.|The design needs both a surviving source outside the destructive authority and measured restoration capability; either property alone leaves a required boundary unproven."
+        }
+      ],
+      "terminology_correction": "Name the failed data-loss target explicitly rather than conflating it with CIA integrity.",
+      "human_approved": false
+    }
+  ],
+  "human_approved": false,
+  "published": false
+}

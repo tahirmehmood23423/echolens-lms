@@ -1,0 +1,81 @@
+{
+  "targeted": {
+    "tests": 271,
+    "pass": 271,
+    "fail": 0,
+    "skipped": 0
+  },
+  "full": {
+    "tests": 428,
+    "pass": 416,
+    "fail": 11,
+    "skipped": 1
+  },
+  "existing_failures_match": true,
+  "existing_failures": [
+    "actual health and alert functions expose full error details without connecting to a database",
+    "admin login and role-specific browsing",
+    "all demo roles browse synthetic data; writes cannot alter the store or SQL",
+    "coord login and role-specific browsing",
+    "reminder settings and delivery history round-trip through the production Prisma JSON mapping",
+    "required ad choices and unresolved age/retention facts remain explicit",
+    "test/certificate-final-project.test.js",
+    "test/flush-step2.test.js",
+    "test/free-course-reminders.test.js",
+    "test/talent.test.js",
+    "test/trending-tech.test.js"
+  ],
+  "new_failures": [],
+  "content": {
+    "courses": 82,
+    "lessons": 782,
+    "questions": 5425,
+    "examples_checked": 815,
+    "errors": [],
+    "warnings": [],
+    "unavailable_references": 1,
+    "human_approved": false,
+    "published": false
+  },
+  "browser": {
+    "passed": true,
+    "checks": 227,
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "errors": [],
+    "selected_subtracks": [
+      "complexity-analysis",
+      "arrays-strings-hashing",
+      "data-transformation-pipelines",
+      "mobile-ui-fundamentals",
+      "playwright-automation",
+      "security-foundations",
+      "unsupervised-learning",
+      "agent-workflows"
+    ],
+    "source_fingerprints": {
+      "complexity-analysis": "f370d3ac0c48b47d3934f1ff9d1aa93a15f47584345a9fff51815f09e792efb6",
+      "arrays-strings-hashing": "4227f1b74643d6089ab8ede635e749e3619737c2616c8215f4867bc5e73e8438",
+      "data-transformation-pipelines": "5f55b372caaefa25d4b250e1f5eec58ed2bc75c93910bfd8f1f48503704bff42",
+      "mobile-ui-fundamentals": "cb6186c84505402055401877dcdc6764fc2bc2bb1b1fb1320fafc87f9f9f1510",
+      "playwright-automation": "a60c1f16c51ba8b14648e8e999cd8f8b65e520331a6fca75cf2e1af477f3bd48",
+      "security-foundations": "c733c4ca78832b99a9187eda7a09553a6020e1774bdfa889702f27cebc984f15",
+      "unsupervised-learning": "1314fb11924837f392f31d9090a991baea3189f4780349325fa24aac0837d37f",
+      "agent-workflows": "66af32c169c01d6046931b89c770005a2c1dae9d32c0ae9d56112206b035188e"
+    },
+    "production_published": false
+  },
+  "human_approved": false,
+  "published": false,
+  "pushed": false,
+  "deployed": false,
+  "independent_sampled_numeric_keys": {
+    "checks": 7,
+    "passed": 7
+  }
+}

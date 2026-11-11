@@ -1,0 +1,794 @@
+{
+  "schema_version": 1,
+  "scope": "Repository-only content checks; no application store, human approval or publication",
+  "courses": [
+    {
+      "id": "complexity-analysis",
+      "fingerprint": "f370d3ac0c48b47d3934f1ff9d1aa93a15f47584345a9fff51815f09e792efb6",
+      "course_hash": "5505cad55f99f74fcd6411ecda334b12469b784e9033b0db7109791aa13e6f13",
+      "bank_hash": "c2f961edd9d5fd2282fe68cdbb6f2c2fbd65eb553ae8c35717511bf8191aa870",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "complexity-analysis-count-operations",
+          "code_hash": "8aacbfcb0b7e8da8788a2857a7c555c6ad4ffc44839b3f266ec91d36e808f0ac",
+          "ran": true,
+          "ok": true,
+          "output": "(3, [1, 2])\n(6, [])"
+        },
+        {
+          "id": "complexity-analysis-nested-and-dependent-loops",
+          "code_hash": "74151a5dadb3a7d094a053476e0bc7b370b573a8877fefdef701eb0022d0ac24",
+          "ran": true,
+          "ok": true,
+          "output": "10\n10\nTrue"
+        },
+        {
+          "id": "complexity-analysis-logarithms-and-recurrences",
+          "code_hash": "a22f6e7433cd6b8f88c2362e9d169e2947c5f045d69faf0350c48713a5b6168f",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 1, 3, 4, 5]"
+        },
+        {
+          "id": "complexity-analysis-auxiliary-and-output-space",
+          "code_hash": "a1ce33e68f0347c3eda2e1df054962d9c0cc00adb1eb9d3cf632b49c5ab79ffe",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 3, 5]\n1 3 5"
+        },
+        {
+          "id": "complexity-analysis-stack-and-recursive-space",
+          "code_hash": "b961d1ee54fa91c0957febe95a5e63a1240557c9347c1d9595bf6bb6bfa2afe0",
+          "ran": true,
+          "ok": true,
+          "output": "21\n6\nTrue"
+        },
+        {
+          "id": "complexity-analysis-amortized-growth",
+          "code_hash": "60ad72d48665298d2f3dbf3c66bc6ac191e074439792e71f14588367c79322e3",
+          "ran": true,
+          "ok": true,
+          "output": "8 8 7\n15"
+        },
+        {
+          "id": "complexity-analysis-crossovers-and-inputs",
+          "code_hash": "a54eec53bd2bbb2d49b043163665b77e7a9f0ac79933f322f2716a2e99f500ad",
+          "ran": true,
+          "ok": true,
+          "output": "5 50 1000 A\n20 800 2500 A\n100 20000 10500 B"
+        },
+        {
+          "id": "complexity-analysis-memory-and-output-budgets",
+          "code_hash": "b2e3fd88619f659663f1242a9539cfb10f9754344669d52291cf853e004604a3",
+          "ran": true,
+          "ok": true,
+          "output": "1 96768 True\n3 224768 True\n4 288768 False"
+        },
+        {
+          "id": "complexity-analysis-measure-with-models",
+          "code_hash": "d77d0d2857581255acb6c1b559a45b161da70764193fd751393130c26f1d03ff",
+          "ran": true,
+          "ok": true,
+          "output": "[(2, 4, 4), (4, 16, 16), (8, 64, 64)]"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "arrays-strings-hashing",
+      "fingerprint": "4227f1b74643d6089ab8ede635e749e3619737c2616c8215f4867bc5e73e8438",
+      "course_hash": "f7bbed18571463abada4da52e11bf1241ee6783c451f7514210ff2223adacb33",
+      "bank_hash": "6d31b409f0fc7f3d7d76887c74efe5749bf1560320898531b10942083041115c",
+      "prerequisites": [
+        "complexity-analysis"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 3,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "arrays-strings-hashing-sorted-two-pointers",
+          "code_hash": "6b67988689ea3bfd2a96d438dac33ce37c2b602ba42d63bff87a028264482b47",
+          "ran": true,
+          "ok": true,
+          "output": "(0, 2)\nNone"
+        },
+        {
+          "id": "arrays-strings-hashing-nonnegative-sliding-window",
+          "code_hash": "dddfd9e046595fcce68c48521d937729b64c31817842e41c982e0ccb429d37dd",
+          "ran": true,
+          "ok": true,
+          "output": "2\n2\n0"
+        },
+        {
+          "id": "arrays-strings-hashing-prefix-sums",
+          "code_hash": "44e3c4ac9e92a1eb90462f414277d0231f335f40d823f4a31359f61309e1f5dd",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 4, 3, 10, 12]\n6\n0\n12"
+        },
+        {
+          "id": "arrays-strings-hashing-immutable-text-assembly",
+          "code_hash": "ac532eac55873711b3a63fce2a4a7f8f4e5911971e22c0f6195878e967adc5d1",
+          "ran": true,
+          "ok": true,
+          "output": "AB-CD-EF\n6\n12"
+        },
+        {
+          "id": "arrays-strings-hashing-unicode-key-contracts",
+          "code_hash": "fe5223b9a8a2bf88fafe52a86eba557055890251509ffd74568564f911ddfa2a",
+          "ran": true,
+          "ok": true,
+          "output": "False 4 5\nTrue\nstrasse"
+        },
+        {
+          "id": "arrays-strings-hashing-substring-prefix-invariants",
+          "code_hash": "2aa02ead7b8e81d8b6b201f346ca28d8b3093ff8915c5b021934b8f90ff2f1e0",
+          "ran": true,
+          "ok": true,
+          "output": "([0, 0, 1], [0, 2])\n([0, 0], [])"
+        },
+        {
+          "id": "arrays-strings-hashing-frequency-maps",
+          "code_hash": "956499bffaa8b128d0df69b86525b390417008c00608d0af9351aeb4e587174a",
+          "ran": true,
+          "ok": true,
+          "output": "{'A': 2, 'B': 1}\n{'A': 1, 'B': 1, 'C': -1}\n{'A': 1, 'B': 1}"
+        },
+        {
+          "id": "arrays-strings-hashing-composite-grouping-keys",
+          "code_hash": "57f7d913b5b4aea3750f76b6dfa533465f0865978831380f90b94d2fc06c77a0",
+          "ran": true,
+          "ok": true,
+          "output": "True\n[(('A', 'BC'), 5), (('AB', 'C'), 5)]"
+        },
+        {
+          "id": "arrays-strings-hashing-hash-equality-collisions",
+          "code_hash": "37099c6709362fca2e6e389b85e95a310f11bfe397c002c0f6e3ed67cc7c9af7",
+          "ran": true,
+          "ok": true,
+          "output": "2 10 20\n1 count"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "data-transformation-pipelines",
+      "fingerprint": "5f55b372caaefa25d4b250e1f5eec58ed2bc75c93910bfd8f1f48503704bff42",
+      "course_hash": "b141d18072eb0bbe41853307c3bda6f658233f2e9275bcc640a12ab6512dbee7",
+      "bank_hash": "d5cb9d395118eb9a5ffbbec6c0d2cbbc364e828b5b75891658b3462e45e02fb5",
+      "prerequisites": [
+        "etl-elt-architecture",
+        "advanced-sql"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 63,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "data-transformation-pipelines-grain-contract",
+          "code_hash": "81b753dcfa5c1e9e328d564ab98ac0ae9d18e504069ffdcb8855c4502e40c466",
+          "ran": true,
+          "ok": true,
+          "output": "900"
+        },
+        {
+          "id": "data-transformation-pipelines-modular-sql",
+          "code_hash": "59e660ba4de0650724d351159144080ac80fef53847d7ceacc381fa5bdbde4f1",
+          "ran": true,
+          "ok": true,
+          "output": "1, 500; 2, 0"
+        },
+        {
+          "id": "data-transformation-pipelines-incremental-state",
+          "code_hash": "d4659ecb92f90519a383ac6ba77cfd9c1f120dbc18c46fe866a7acf31e66205b",
+          "ran": true,
+          "ok": true,
+          "output": "{'rev': 3, 'status': 'delivered'}\nTrue"
+        },
+        {
+          "id": "data-transformation-pipelines-vector-contract",
+          "code_hash": "da58761796ea9b0fc48bc263f50cf3b61ff088a905fd3c27ffffe8d1865d73c0",
+          "ran": true,
+          "ok": true,
+          "output": "[900, 700]\n1",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "data-transformation-pipelines-join-controls",
+          "code_hash": "fc01d13cae9fdae93c531aa78c2a9c274156193ba0ceccf038a331a31a2fe7f3",
+          "ran": true,
+          "ok": true,
+          "output": "cardinality rejected\n['both', 'left_only']",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "data-transformation-pipelines-group-chunks",
+          "code_hash": "cd442bbf55887537c9171aba9228852bec03d3de57c035840517a05291553101",
+          "ran": true,
+          "ok": true,
+          "output": "{'N': 50.0, 'S': 80.0}",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "data-transformation-pipelines-versioned-rules",
+          "code_hash": "6f9b7b9ada5d39f8962c44f67240b1c42515a536df1e5c7769d38988f3bf5ebf",
+          "ran": true,
+          "ok": true,
+          "output": "[('R1', 1500), ('R2', 600)]"
+        },
+        {
+          "id": "data-transformation-pipelines-pipeline-ci",
+          "code_hash": "d7c1cac0db9a8dc8d19b2375498d3c50a17b923f130d6d8d0960fef0178f3727",
+          "ran": true,
+          "ok": true,
+          "output": "3 contract cases passed"
+        },
+        {
+          "id": "data-transformation-pipelines-safe-promotion",
+          "code_hash": "5c195855920d98b17b499aac8a367f08f127f996b41d95fc60eba6e647188549",
+          "ran": true,
+          "ok": true,
+          "output": "G1\n1000"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "mobile-ui-fundamentals",
+      "fingerprint": "cb6186c84505402055401877dcdc6764fc2bc2bb1b1fb1320fafc87f9f9f1510",
+      "course_hash": "4db140f91bd8c5246c8e29529608795c29979f2c5bbf5b968e380a113842f80e",
+      "bank_hash": "bc5d351c58cc17d50e727757e515c2fd67974e052f9b0791b9d950c331991813",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 6,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "mobile-ui-platform-choice",
+          "code_hash": "f5777f93742d7f6d993059e9cf4c3097c10922c3510b0b7e6a5fbf97c006674f",
+          "ran": true,
+          "ok": true,
+          "output": "shared"
+        },
+        {
+          "id": "mobile-ui-lifecycle",
+          "code_hash": "d028ad6a7eaba7f5b960c536a5e09f4d933ea44abd6bab43c80618712fe81b54",
+          "ran": true,
+          "ok": true,
+          "output": "new address"
+        },
+        {
+          "id": "mobile-ui-restoration",
+          "code_hash": "c757ae7a69c4260f5c621f12bdcb9d838c94bfb28e7f28715ab0e5954c9c6b1d",
+          "ran": true,
+          "ok": true,
+          "output": "restore 7\nneeds_review True"
+        },
+        {
+          "id": "mobile-ui-touch-focus",
+          "code_hash": "2f52d0ff414360b6e92cf9f69ab8e3c7a376f6afc12c3ed1cead44c70ae6ae02",
+          "ran": true,
+          "ok": true,
+          "output": "(48, 48)\npadding per side 12"
+        },
+        {
+          "id": "mobile-ui-window-constraints",
+          "code_hash": "b9bf5ac3d50aea27f49175b511c85e5034da8d6886ffd56ce9d41e0b1ef5fd99",
+          "ran": true,
+          "ok": true,
+          "output": "672 328\ntwo columns True"
+        },
+        {
+          "id": "mobile-ui-navigation",
+          "code_hash": "af83f5a98d1d682c1437afc63082b6425c58bf3cc89ba98aa0ce5c6aee0e0cfe",
+          "ran": true,
+          "ok": true,
+          "output": "priority-dialog\nticket:42"
+        },
+        {
+          "id": "mobile-ui-network-states",
+          "code_hash": "dfd2938e9376c79f799f690b8450deeb1b16aa9f6db1a62075e4437c742d2861",
+          "ran": true,
+          "ok": true,
+          "output": "stale\nempty"
+        },
+        {
+          "id": "mobile-ui-resource-budgets",
+          "code_hash": "22f15aaae931472369ba89ecdd2e9f3adb496f9763a9b6efea8b08a1b0054131",
+          "ran": true,
+          "ok": true,
+          "output": "10 12 36000\n40 3 27000"
+        },
+        {
+          "id": "mobile-ui-platform-guidelines",
+          "code_hash": "3f6f16227b2fd90fd65801c5683838b948ff8eab852a06369da2e3667e323c2b",
+          "ran": true,
+          "ok": true,
+          "output": "bottom-bar\nrail"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "playwright-automation",
+      "fingerprint": "a60c1f16c51ba8b14648e8e999cd8f8b65e520331a6fca75cf2e1af477f3bd48",
+      "course_hash": "a625f47a9b8890e53ef1ea394c44b42da45569d380831c2e877ea8483cb2b216",
+      "bank_hash": "2d7f04125e8b8f02fd01878b65f3cc11c77472aa9a23db51e7c5af4cab1f6702",
+      "prerequisites": [
+        "js-fundamentals",
+        "web-api-testing"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "playwright-automation-semantic-locators",
+          "code_hash": "ed9b3c7983dde011ac902ad694651cb70027abfb8fc27ef2a3c0fdb2d4fbb00e",
+          "ran": true,
+          "ok": true,
+          "output": "1\nApply",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "playwright-automation-scope-and-strictness",
+          "code_hash": "8e4fa5380435b84cd56b77652ee7de70a64b4a8e5c169ceae30c5b6b70e14844",
+          "ran": true,
+          "ok": true,
+          "output": "1",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "playwright-automation-locator-lifetime",
+          "code_hash": "0199e22706fe2d7afc2d1dce05caf66487b6d5df7876af0f871de86687b95e42",
+          "ran": true,
+          "ok": true,
+          "output": "loading\nready",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "playwright-automation-readiness-contracts",
+          "code_hash": "fe5e6f451384e97a7aa943a40bc988aea397cd241f415e02d58ae9be609c2937",
+          "ran": true,
+          "ok": true,
+          "output": "2",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "playwright-automation-retrying-assertions",
+          "code_hash": "2b96a4a6cb1e746623f4b547b094104410ca4a572bf706681e12ab1fd897c54c",
+          "ran": true,
+          "ok": true,
+          "output": "2\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "playwright-automation-network-and-diagnostics",
+          "code_hash": "6104926cd968b3e8c2ca814c982f66396e20dacdf5ea142ecfab94a6c342d12d",
+          "ran": true,
+          "ok": true,
+          "output": "202\nflaky",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "playwright-automation-fixture-lifecycle",
+          "code_hash": "965fa1afadfd740e062258128b89ed168aefae8dd550ec1decf6e3da25aaa287",
+          "ran": true,
+          "ok": true,
+          "output": "closed open\nfalse",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "playwright-automation-authenticated-state",
+          "code_hash": "4d1ee257c334c417fab8e9322d89ab131ee11acbccc2a309a2b01ba458599b4d",
+          "ran": true,
+          "ok": true,
+          "output": "[ true, false ]",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        },
+        {
+          "id": "playwright-automation-browser-projects",
+          "code_hash": "1835810082319e972af99b79220af250a67b0e9bd37587494092cd53fbb903d5",
+          "ran": true,
+          "ok": true,
+          "output": "4\n3",
+          "runtime": "Node.js 24.22.1",
+          "profile": "Isolated Node; JIT disabled, 64 MiB heap, 2 GiB virtual address space, 2 CPU seconds, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "security-foundations",
+      "fingerprint": "c733c4ca78832b99a9187eda7a09553a6020e1774bdfa889702f27cebc984f15",
+      "course_hash": "08115932957d3bb28c2b59444bd8826cfb3eeae32a5697cde72e9fbbd16488eb",
+      "bank_hash": "0c3a952831cb712b56cc56529f8a58d69e20aff8f3d4cfa56bc0d2953086d6a7",
+      "prerequisites": [
+        "computing-os-foundations"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "sf-security-goals",
+          "code_hash": "b2e3c9ada6db8c0f64d6c91cb4c19ca041da0cb57f15b3fd5deb3cb8c2837882",
+          "ran": true,
+          "ok": true,
+          "output": "private_export confidentiality\nunauthorized_reschedule integrity\nscheduler_outage availability"
+        },
+        {
+          "id": "sf-least-privilege",
+          "code_hash": "9faf767f1d49615471194dfb997c5186d5993e7064273210217ab4adf290e969",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "sf-layered-controls",
+          "code_hash": "918f4b8cd6929c3df42764cb56147ea11b5d54bd0abfe2c448adb76a825ec160",
+          "ran": true,
+          "ok": true,
+          "output": "export_succeeds False\nreview_signal True"
+        },
+        {
+          "id": "sf-phishing-verification",
+          "code_hash": "ac47dacc291fcb63f85b4b673bda231faa756db96c74ebb795f5a30c16da0be5",
+          "ran": true,
+          "ok": true,
+          "output": "use_directory True\nchange_before_verification False"
+        },
+        {
+          "id": "sf-malware-recovery",
+          "code_hash": "2cd23be62557543c671cd91b14f17d9f331683da2a3d5b599f4e12cd635a4aed",
+          "ran": true,
+          "ok": true,
+          "output": "loss_target True\nrestore_target False"
+        },
+        {
+          "id": "sf-attacker-objectives",
+          "code_hash": "97287c853d09d8a7c9672c5dc7d82f46ba5655d78c2783d7bd839acb5045acd7",
+          "ran": true,
+          "ok": true,
+          "output": "exports_reachable True\nvisited 5"
+        },
+        {
+          "id": "sf-assets-boundaries",
+          "code_hash": "ea2ed094fc89926e7490e07447069e98fd610683adbfcf151cc21b9e328e8ec7",
+          "ran": true,
+          "ok": true,
+          "output": "browser->api\napi->db"
+        },
+        {
+          "id": "sf-risk-treatment",
+          "code_hash": "bd9d218611a22972ded1ba2327dd69b667a82b661744b5f0e57055d22dcc02b1",
+          "ran": true,
+          "ok": true,
+          "output": "student_export 20000\nstatus_page 800"
+        },
+        {
+          "id": "sf-model-validation",
+          "code_hash": "7cd8f1d1446d8828d742821110557aef5d247b6727552273f36d5b7bd66c50c2",
+          "ran": true,
+          "ok": true,
+          "output": "cases 4\npassed 4"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "unsupervised-learning",
+      "fingerprint": "1314fb11924837f392f31d9090a991baea3189f4780349325fa24aac0837d37f",
+      "course_hash": "602f193acca12c6f3cbc01a9f18dbba68df81d2ee36405c922b02db17e8e96a0",
+      "bank_hash": "f0cddd8aaff4f02bc3f8aef0582e699961ad61bde4fc88ed716f0450714708c2",
+      "prerequisites": [
+        "ml-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 4,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "unsupervised-learning-distance-centroids",
+          "code_hash": "f24b71b4537eccbf5d68bd070838deadbdb0442d76789c0f997e906c8338be3b",
+          "ran": true,
+          "ok": true,
+          "output": "[1.0, 11.0]\n4.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "unsupervised-learning-choose-k",
+          "code_hash": "3765a4bd3a9ee33c1f7106112ff946e646de8d1ebc2506a91153bada1948eea1",
+          "ran": true,
+          "ok": true,
+          "output": "0.8997\n2",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "unsupervised-learning-density-noise",
+          "code_hash": "1cbb707e08c7c0fcee4f48273ee8c0889f3cf19c42594ab0b2bb2aa9414bee69",
+          "ran": true,
+          "ok": true,
+          "output": "[3, 3]\n1",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "unsupervised-learning-pca-axes",
+          "code_hash": "160f56bf48829e269a27203deb5364c14435280e9fb96ba385b28905535f7862",
+          "ran": true,
+          "ok": true,
+          "output": "(3, 1)\n1.0\n0.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "unsupervised-learning-variance-budget",
+          "code_hash": "7e659cbf50a8c1f2e5d4a635e87b97dd55adccc5cabb49c057c7178d1495f4e9",
+          "ran": true,
+          "ok": true,
+          "output": "[0.8, 0.2]\n[0.8, 1.0]",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "unsupervised-learning-visual-projections",
+          "code_hash": "e5a69f4176271ad0c71644d8b5b0cc623f21fc710d3f171e4c12ceca6fa0eb26",
+          "ran": true,
+          "ok": true,
+          "output": "10.0\n0.0\n3.0",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "unsupervised-learning-novelty-reference",
+          "code_hash": "56f82c4c686ed31fea6e8894ed54a713aba0370c8ab3fc42282296e2d1d798f4",
+          "ran": true,
+          "ok": true,
+          "output": "[1, -1]\nTrue",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "unsupervised-learning-threshold-workload",
+          "code_hash": "0ab9007961993c980090b0cfaf20b89e8baf62fecb191000d969311f0f503614",
+          "ran": true,
+          "ok": true,
+          "output": "['a', 'b']\n3",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        },
+        {
+          "id": "unsupervised-learning-evaluate-without-labels",
+          "code_hash": "8ff06457d59f14931c2e043a5e946ddb9f7cfe16ad416258a7639851a3b231f7",
+          "ran": true,
+          "ok": true,
+          "output": "0.8\nreviewed=10/1000\npopulation recall: unknown",
+          "profile": "Isolated read-only Python package runtime; 1 GiB virtual address space, 2 CPU seconds, single-thread numerical libraries, no network"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": true,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    },
+    {
+      "id": "agent-workflows",
+      "fingerprint": "66af32c169c01d6046931b89c770005a2c1dae9d32c0ae9d56112206b035188e",
+      "course_hash": "861aa83903d0cf372fe21bec1998b97907217e28f77cded79dae3aad73a0d8c1",
+      "bank_hash": "f58222c64951936f1c50625de5fa30e92974c27e4fb3352b189b820ea7471f91",
+      "prerequisites": [
+        "agents-tool-calling"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 54,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "agent-workflows-bounded-design",
+          "code_hash": "6ad3f1ff8d4401fb4c46502eb2e7f1b7f30075c41273c38e10232893bfd85d5f",
+          "ran": true,
+          "ok": true,
+          "output": "await_review\nrefund_ready"
+        },
+        {
+          "id": "agent-workflows-typed-routing",
+          "code_hash": "806c1cfbf3497ec9139b47fb822edef8fe55b9593f90c7a0ae3421b4599d10d8",
+          "ran": true,
+          "ok": true,
+          "output": "fees:case-7\nescalate"
+        },
+        {
+          "id": "agent-workflows-bounded-search",
+          "code_hash": "1863fcb30ebe77cbda344912f45890adfc555a19ec8a7549c67fc75c7cc49b04",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse"
+        },
+        {
+          "id": "agent-workflows-context-provenance",
+          "code_hash": "420eb27a8444cb773cde58b347e08dc3312c01247409cf72f34fcd267f784189",
+          "ran": true,
+          "ok": true,
+          "output": "['e1', 'e2']\nTrue"
+        },
+        {
+          "id": "agent-workflows-scoped-memory",
+          "code_hash": "978841b9d4ea67fc519b51ae50abd2c67dc70047240167f029b3924b205f65b8",
+          "ran": true,
+          "ok": true,
+          "output": "['allowed']"
+        },
+        {
+          "id": "agent-workflows-checkpoint-resume",
+          "code_hash": "acfc56008d2b1df99e47a0cc96f5aa40b90769319d002548ae43976a500c79f2",
+          "ran": true,
+          "ok": true,
+          "output": "1 0\n1"
+        },
+        {
+          "id": "agent-workflows-trace-structure",
+          "code_hash": "5d03ca6ed7ef07b6bb6d86211700d0925bef2af06d92797fd86f28ba4bd00875",
+          "ran": true,
+          "ok": true,
+          "output": "8\n5\n{'root'}"
+        },
+        {
+          "id": "agent-workflows-cost-accounting",
+          "code_hash": "63474ec56423ea669114403498bdabe5905e99d60c754a00e544a162ac466be0",
+          "ran": true,
+          "ok": true,
+          "output": "0.00390\n1650"
+        },
+        {
+          "id": "agent-workflows-workflow-evaluation",
+          "code_hash": "11bd8868c7666fc9e37add887f04bc41d80ce5236ed301b11d518591c99b72ee",
+          "ran": true,
+          "ok": true,
+          "output": "1 3\n2"
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    }
+  ],
+  "duplication": {
+    "errors": [],
+    "warnings": []
+  },
+  "completed": [
+    "complexity-analysis",
+    "arrays-strings-hashing",
+    "data-transformation-pipelines",
+    "mobile-ui-fundamentals",
+    "playwright-automation",
+    "security-foundations",
+    "unsupervised-learning",
+    "agent-workflows"
+  ],
+  "pending": [
+    "react-advanced",
+    "nextjs-architecture",
+    "dart-programming",
+    "flutter-fundamentals",
+    "flutter-layout-nav-state",
+    "kotlin-android",
+    "react-native",
+    "mobile-apis-networking",
+    "mobile-storage",
+    "mobile-auth-security",
+    "mobile-architecture",
+    "mobile-testing-debugging",
+    "mobile-performance-platform",
+    "app-distribution",
+    "deep-learning",
+    "computer-vision",
+    "nlp-fundamentals",
+    "mlops-deployment",
+    "responsible-ai-monitoring",
+    "powerbi-modeling",
+    "dashboards-reporting",
+    "workflow-orchestration",
+    "data-quality-testing",
+    "batch-streaming",
+    "cloud-data-platforms",
+    "data-reliability-recovery",
+    "data-governance-security",
+    "identity-access-control",
+    "cryptography-secure-comms",
+    "vulnerabilities-defense",
+    "security-logging-monitoring",
+    "soc-siem",
+    "incident-response",
+    "network-endpoint-cloud-security",
+    "security-grc",
+    "kubernetes",
+    "automation-frameworks",
+    "ci-test-reporting",
+    "performance-quality-engineering",
+    "oop-principles",
+    "java-fundamentals",
+    "linear-structures",
+    "recursion-backtracking",
+    "searching-sorting",
+    "trees-bst",
+    "graphs",
+    "greedy-dp",
+    "debugging-testing",
+    "software-design",
+    "engineering-problem-solving"
+  ],
+  "human_approved": false,
+  "published": false
+}

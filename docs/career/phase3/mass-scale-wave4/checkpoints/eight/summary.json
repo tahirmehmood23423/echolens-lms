@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "scope": "Read-only repository snapshots; authored coverage is separate from human review and release. No production-state or additional test claims.",
+  "wave": "canonical-completion-4",
+  "input_digests": {
+    "baseline": "92ae6cfbd11da3a20e22154c46c7e5d5551feb3c8a9ae0ade2e326ff2cc9a35d",
+    "inventory": "51c48aaf4497e82c4a5e27f98fc3d240ca3a1938fb64a867b518d97c67000932",
+    "checkpoint": "3d6ac91128d585d29c23b9de8b658f003ee87fd85c2ed4e700afa928c8d48ab4",
+    "manifest": "b27dbdaa7457f463ad5bb9104cebd4afaa03b2de495900639b66ca2375cc55bb"
+  },
+  "canonical_subtracks": 132,
+  "starting": {
+    "authored_subtracks": 74,
+    "modules": 234,
+    "lessons": 710,
+    "formative": 4984,
+    "formal": 6660,
+    "verified_worked_examples": 710,
+    "pending_human_reviews": 74
+  },
+  "added": {
+    "authored_subtracks": 8,
+    "modules": 24,
+    "lessons": 72,
+    "formative": 441,
+    "formal": 720,
+    "verified_worked_examples": 72,
+    "pending_human_reviews": 8,
+    "objectives": 33
+  },
+  "total": {
+    "authored_subtracks": 82,
+    "modules": 258,
+    "lessons": 782,
+    "formative": 5425,
+    "formal": 7380,
+    "verified_worked_examples": 782,
+    "pending_human_reviews": 82,
+    "states": {
+      "missing": 50,
+      "outline_only": 50,
+      "authored": 82,
+      "automatically_validated": 82,
+      "human_review_pending": 82,
+      "human_reviewed": 0,
+      "published": 0
+    }
+  },
+  "remaining_subtracks": 50,
+  "authored_complete_roles": {
+    "baseline": [
+      "junior-frontend-developer",
+      "junior-backend-developer",
+      "python-fastapi-developer",
+      "nodejs-developer",
+      "mern-stack-developer",
+      "python-fullstack-developer",
+      "junior-ml-engineer",
+      "llm-application-developer",
+      "rag-developer",
+      "junior-data-analyst",
+      "sql-analyst",
+      "junior-devops-engineer",
+      "cloud-engineer",
+      "manual-qa-engineer",
+      "api-tester"
+    ],
+    "current": [
+      "junior-frontend-developer",
+      "junior-backend-developer",
+      "python-fastapi-developer",
+      "nodejs-developer",
+      "mern-stack-developer",
+      "python-fullstack-developer",
+      "junior-ml-engineer",
+      "llm-application-developer",
+      "rag-developer",
+      "ai-agent-developer",
+      "junior-data-analyst",
+      "sql-analyst",
+      "junior-devops-engineer",
+      "cloud-engineer",
+      "manual-qa-engineer",
+      "api-tester"
+    ]
+  },
+  "released_roles": {
+    "baseline": [],
+    "current": []
+  }
+}

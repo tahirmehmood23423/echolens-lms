@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "scope": "Repository-only content checks; no application store, human approval or publication",
+  "courses": [
+    {
+      "id": "flutter-fundamentals",
+      "fingerprint": "b055bcece9d92d2d5fabd972f29b2dc08eaebf15c690a90770ed01a354f137b6",
+      "course_hash": "35a9bf700e4bb6a3f0915c7df329f2e4b6cb5e5565e352ec90cbdfef1eea1bc7",
+      "bank_hash": "25c92f38c2c01bf23b9a1cfbe7bc6006807ce68ae3dbb8e384c57ac31d1e287d",
+      "prerequisites": [
+        "dart-programming",
+        "mobile-ui-fundamentals"
+      ],
+      "lessons": 9,
+      "modules": 3,
+      "formative": 64,
+      "comprehensive": 90,
+      "objectives": 5,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "flutter-fundamentals-composition",
+          "code_hash": "03ec7c59f03d91b799c97e056d98ca012d3bea59bcc08962a4c9788962f680dc",
+          "ran": true,
+          "ok": true,
+          "output": "Units:3\nTotal:1200",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-tree-identity",
+          "code_hash": "ec14a049247cec5fbff3d2b20dda5bb974fc7796055bfe0576f3b0f5c03543c2",
+          "ran": true,
+          "ok": true,
+          "output": "2\ntrue\nA",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-stateful-lifecycle",
+          "code_hash": "3b6db2fefd723628b6d526a3846830be9f81e67577b86270b47021f313360002",
+          "ran": true,
+          "ok": true,
+          "output": "false\ntrue\nfalse",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-setstate",
+          "code_hash": "024c5ff4dd0b1543c50efa8500cc38fd3a7cca9c9b766265537254032294fa42",
+          "ran": true,
+          "ok": true,
+          "output": "3/3",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-async-view",
+          "code_hash": "9d152d9aa1322a68cf4d4460142af3060308ccd7385cea2256f04ebc1e418917",
+          "ran": true,
+          "ok": true,
+          "output": "West:empty",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-rebuild-scope",
+          "code_hash": "bdd6928b28aa0d16e26f22c29f6ca1aed0bb7a1ff0232b2a47e44bdcd250e5b1",
+          "ran": true,
+          "ok": true,
+          "output": "200,200,300,360\n3",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-core-controls",
+          "code_hash": "3685aeb649a9077e1a11eaad50c8c3d279f0ee6148c52d9c1c1cbc8de5a88ff0",
+          "ran": true,
+          "ok": true,
+          "output": "1/done",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-lists-forms",
+          "code_hash": "b5fccc654c8574114955a90a999cd6dfa815a08f19cef55682308c1a18c287a6",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfalse\nfalse",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals-themes",
+          "code_hash": "a1d4ff993de0dd89a5e374a68e989c2ded60949567afebfe987a77011601cd1a",
+          "ran": true,
+          "ok": true,
+          "output": "dark/blue\nlight",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f007",
+          "code_hash": "a1cb6d5ac467990be2837df7c5780145ac9913a83bda0fd3016b579b4baba0a6",
+          "ran": true,
+          "ok": true,
+          "output": "3/900",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f017",
+          "code_hash": "348b972c7e60e8a6ff8c5a7183648bb76359db92b6c9ca8565652318d6619a76",
+          "ran": true,
+          "ok": true,
+          "output": "c,d,a",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f027",
+          "code_hash": "75012eb9cb3d4e029045ef4761689ff2cf8ec58186fd4cfb5097678a38ff780b",
+          "ran": true,
+          "ok": true,
+          "output": "1/3",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f037",
+          "code_hash": "99373d43549d05d9240fcf93487d04e28464c12a021ab34fe14961d3d4e1387d",
+          "ran": true,
+          "ok": true,
+          "output": "2/done",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f047",
+          "code_hash": "bfa9e7bdd4e256f4c1949e687479e9ef3c6ad1425fba19dba259075784efce1e",
+          "ran": true,
+          "ok": true,
+          "output": "empty/success",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f057",
+          "code_hash": "2adb96c928508ea1b7f8758dc8dd40c0c5ca84a83b7564c47d0c79e4b1ab0917",
+          "ran": true,
+          "ok": true,
+          "output": "36 ms",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f067",
+          "code_hash": "cb2650c9d0fcf97bb0c809cf2e9ad7f871ebfc82b11541bee3dd1eb87fe73604",
+          "ran": true,
+          "ok": true,
+          "output": "36 px/1",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f077",
+          "code_hash": "94339faa0814edd8d1fdebc4fe99532cec82f7582b5f32621f16bead1c8e2042",
+          "ran": true,
+          "ok": true,
+          "output": "7/cleared",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "flutter-fundamentals.w4.f087",
+          "code_hash": "428ffeb6703d2314dd4d5307d1bf18f2ef06eb3192d0c16f7281ed7b8e98cbd4",
+          "ran": true,
+          "ok": true,
+          "output": "gray/orange/black",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    }
+  ],
+  "duplication": {
+    "errors": [],
+    "warnings": []
+  },
+  "completed": [
+    "flutter-fundamentals"
+  ],
+  "pending": [
+    "react-advanced",
+    "nextjs-architecture",
+    "flutter-layout-nav-state",
+    "react-native",
+    "mobile-apis-networking",
+    "mobile-storage",
+    "mobile-auth-security",
+    "mobile-architecture",
+    "mobile-testing-debugging",
+    "mobile-performance-platform",
+    "app-distribution",
+    "computer-vision",
+    "responsible-ai-monitoring",
+    "powerbi-modeling",
+    "dashboards-reporting",
+    "workflow-orchestration",
+    "data-quality-testing",
+    "batch-streaming",
+    "cloud-data-platforms",
+    "data-reliability-recovery",
+    "data-governance-security",
+    "security-logging-monitoring",
+    "soc-siem",
+    "incident-response",
+    "network-endpoint-cloud-security",
+    "security-grc",
+    "kubernetes",
+    "performance-quality-engineering",
+    "oop-principles",
+    "java-fundamentals",
+    "trees-bst",
+    "graphs",
+    "greedy-dp",
+    "debugging-testing",
+    "software-design",
+    "engineering-problem-solving"
+  ],
+  "human_approved": false,
+  "published": false
+}

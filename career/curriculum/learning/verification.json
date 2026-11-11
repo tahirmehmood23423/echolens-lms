@@ -6983,6 +6983,1688 @@
       "human_approved": false
     },
     {
+      "id": "mobile-ui-fundamentals",
+      "version": 1,
+      "course_hash": "4db140f91bd8c5246c8e29529608795c29979f2c5bbf5b968e380a113842f80e",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "mobile-ui-platform-choice",
+          "code_hash": "f5777f93742d7f6d993059e9cf4c3097c10922c3510b0b7e6a5fbf97c006674f",
+          "ran": true,
+          "ok": true,
+          "output": "shared",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-ui-lifecycle",
+          "code_hash": "d028ad6a7eaba7f5b960c536a5e09f4d933ea44abd6bab43c80618712fe81b54",
+          "ran": true,
+          "ok": true,
+          "output": "new address",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-ui-restoration",
+          "code_hash": "c757ae7a69c4260f5c621f12bdcb9d838c94bfb28e7f28715ab0e5954c9c6b1d",
+          "ran": true,
+          "ok": true,
+          "output": "restore 7\nneeds_review True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-ui-touch-focus",
+          "code_hash": "2f52d0ff414360b6e92cf9f69ab8e3c7a376f6afc12c3ed1cead44c70ae6ae02",
+          "ran": true,
+          "ok": true,
+          "output": "(48, 48)\npadding per side 12",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-ui-window-constraints",
+          "code_hash": "b9bf5ac3d50aea27f49175b511c85e5034da8d6886ffd56ce9d41e0b1ef5fd99",
+          "ran": true,
+          "ok": true,
+          "output": "672 328\ntwo columns True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-ui-navigation",
+          "code_hash": "af83f5a98d1d682c1437afc63082b6425c58bf3cc89ba98aa0ce5c6aee0e0cfe",
+          "ran": true,
+          "ok": true,
+          "output": "priority-dialog\nticket:42",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-ui-network-states",
+          "code_hash": "dfd2938e9376c79f799f690b8450deeb1b16aa9f6db1a62075e4437c742d2861",
+          "ran": true,
+          "ok": true,
+          "output": "stale\nempty",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-ui-resource-budgets",
+          "code_hash": "22f15aaae931472369ba89ecdd2e9f3adb496f9763a9b6efea8b08a1b0054131",
+          "ran": true,
+          "ok": true,
+          "output": "10 12 36000\n40 3 27000",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-ui-platform-guidelines",
+          "code_hash": "3f6f16227b2fd90fd65801c5683838b948ff8eab852a06369da2e3667e323c2b",
+          "ran": true,
+          "ok": true,
+          "output": "bottom-bar\nrail",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "dart-programming",
+      "version": 1,
+      "course_hash": "ec9a38641fccd58b8e30bb74594edfce32f50f984b937f9852c1c3b835c31ec1",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dart-types-bindings",
+          "code_hash": "a6de38009aa3969281dfe4ee0fcc229fabc93f813488c20be0596a71432c6d0b",
+          "ran": true,
+          "ok": true,
+          "output": "11",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-nullable-values",
+          "code_hash": "2efba5ac88fa7eb0017172faafeff31b9cec07237b3b22445fc2c029d01f55ba",
+          "ran": true,
+          "ok": true,
+          "output": "-1\n0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-initialization",
+          "code_hash": "699e69ff0e72d5061bbd569cb64c68fef06076f4811b2b9d25a913ca0d99b77d",
+          "ran": true,
+          "ok": true,
+          "output": "7",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-collection-pipeline",
+          "code_hash": "6ab3337f4208440987b61f860f666d67c9395c5ffde03b10593e24a195368a05",
+          "ran": true,
+          "ok": true,
+          "output": "100",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-function-contracts",
+          "code_hash": "1eb9d8899666613b75046f7bc39870bba47ca33c8a7f2220ba962f4e47935bfd",
+          "ran": true,
+          "ok": true,
+          "output": "7\n21",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-collection-apis",
+          "code_hash": "b14150ab788a24221ca227f23c27fd9473d6a8701cda8b112cc6e6b7d6a82036",
+          "ran": true,
+          "ok": true,
+          "output": "[5, 8]\n[3, 8, 5]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-immutable-models",
+          "code_hash": "bc847cf765ea4fdb3fa11d8f222699da792a221e849b818e2e19579b07c26e0c",
+          "ran": true,
+          "ok": true,
+          "output": "10\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-abstract-contracts",
+          "code_hash": "a444bff0d4428846b954f4bd42b5d9ad12fc87fa19478b42c4a87e095765ab77",
+          "ran": true,
+          "ok": true,
+          "output": "10\nquoted",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-class-state-transitions",
+          "code_hash": "65cbb83aed8e07b68e3827891f3fda446a7da08410e5f1f84dd2db8b097ca9be",
+          "ran": true,
+          "ok": true,
+          "output": "9:2\n5:3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-future-sequencing",
+          "code_hash": "5da553268132d1bb3316a3e49cb7ba1009d1b590edf52a8426d0f67eb5d0011f",
+          "ran": true,
+          "ok": true,
+          "output": "11",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-stream-events",
+          "code_hash": "79d65004f18fd447f64b14a2d2b021bf8d25a9ab31c55080a41afb058988ef67",
+          "ran": true,
+          "ok": true,
+          "output": "10",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "dart-async-recovery",
+          "code_hash": "24a11cca01db800bc784056a6b73b80b1b1663919796f8f34a9e44730641d206",
+          "ran": true,
+          "ok": true,
+          "output": "retryable-read\ncleanup",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 12,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "flutter-fundamentals",
+      "version": 1,
+      "course_hash": "35a9bf700e4bb6a3f0915c7df329f2e4b6cb5e5565e352ec90cbdfef1eea1bc7",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "flutter-fundamentals-composition",
+          "code_hash": "03ec7c59f03d91b799c97e056d98ca012d3bea59bcc08962a4c9788962f680dc",
+          "ran": true,
+          "ok": true,
+          "output": "Units:3\nTotal:1200",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "flutter-fundamentals-tree-identity",
+          "code_hash": "ec14a049247cec5fbff3d2b20dda5bb974fc7796055bfe0576f3b0f5c03543c2",
+          "ran": true,
+          "ok": true,
+          "output": "2\ntrue\nA",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "flutter-fundamentals-stateful-lifecycle",
+          "code_hash": "3b6db2fefd723628b6d526a3846830be9f81e67577b86270b47021f313360002",
+          "ran": true,
+          "ok": true,
+          "output": "false\ntrue\nfalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "flutter-fundamentals-setstate",
+          "code_hash": "024c5ff4dd0b1543c50efa8500cc38fd3a7cca9c9b766265537254032294fa42",
+          "ran": true,
+          "ok": true,
+          "output": "3/3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "flutter-fundamentals-async-view",
+          "code_hash": "9d152d9aa1322a68cf4d4460142af3060308ccd7385cea2256f04ebc1e418917",
+          "ran": true,
+          "ok": true,
+          "output": "West:empty",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "flutter-fundamentals-rebuild-scope",
+          "code_hash": "bdd6928b28aa0d16e26f22c29f6ca1aed0bb7a1ff0232b2a47e44bdcd250e5b1",
+          "ran": true,
+          "ok": true,
+          "output": "200,200,300,360\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "flutter-fundamentals-core-controls",
+          "code_hash": "3685aeb649a9077e1a11eaad50c8c3d279f0ee6148c52d9c1c1cbc8de5a88ff0",
+          "ran": true,
+          "ok": true,
+          "output": "1/done",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "flutter-fundamentals-lists-forms",
+          "code_hash": "b5fccc654c8574114955a90a999cd6dfa815a08f19cef55682308c1a18c287a6",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfalse\nfalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "flutter-fundamentals-themes",
+          "code_hash": "a1d4ff993de0dd89a5e374a68e989c2ded60949567afebfe987a77011601cd1a",
+          "ran": true,
+          "ok": true,
+          "output": "dark/blue\nlight",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 64,
+      "human_approved": false
+    },
+    {
+      "id": "kotlin-android",
+      "version": 1,
+      "course_hash": "5ead82da9e88759b404126f39eb0e34e90d2a12ebcfe4d7ada6bec06adb9c86f",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "kotlin-nullable-models",
+          "code_hash": "d0325c5fa46f0418d606724dfaf46a7e8557dc58aeaaca6acc0bf799dde63696",
+          "ran": true,
+          "ok": true,
+          "output": "9\nGuest",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-suspend-boundaries",
+          "code_hash": "c60c7c8c98ee32bdc7bea5b92aa1dc0708e801549ffba8b08d2cf9193fe4a9ed",
+          "ran": true,
+          "ok": true,
+          "output": "9",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-typed-state",
+          "code_hash": "b3194bec9be0fd70901f27deadde3dbe7d8a965023e33bee1f4fbc9452b30cf0",
+          "ran": true,
+          "ok": true,
+          "output": "2:10",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-compose-hoisting",
+          "code_hash": "8b546f1c21d9edee878fc1949a08ef182ef511cf0eadd16dbee6921630dcee00",
+          "ran": true,
+          "ok": true,
+          "output": "3:21",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-recomposition-effects",
+          "code_hash": "d12637674619413a9f3482ac64ab2b16fbff5cd904c890dad9d5ddf6cc12f20a",
+          "ran": true,
+          "ok": true,
+          "output": "3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-compose-lists",
+          "code_hash": "6a73722dcadc350af8f2f386698ecd2e53a6640449c475ece703436142de8527",
+          "ran": true,
+          "ok": true,
+          "output": "2\n10",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-viewmodel-lifetimes",
+          "code_hash": "3ed15cf8a00f31ebc7f1e082469aedcdb5952a267fa7730212b8eae1743730c3",
+          "ran": true,
+          "ok": true,
+          "output": "13",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-navigation-contracts",
+          "code_hash": "c56b54b695d44d8dea3f587ce533379bf51c3ad197e4a7c9059fd4a06ee6b310",
+          "ran": true,
+          "ok": true,
+          "output": "home>list>edit",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-lifecycle-collection",
+          "code_hash": "ead84ea201cf503a20295dcd7f1eff8e8376eb0fad8b699969050314d4fe90b6",
+          "ran": true,
+          "ok": true,
+          "output": "7",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-runtime-permissions",
+          "code_hash": "96bbb13679cbbedfc0b84e91493f6ffcdd6a1a77607e90a3edda286f4a6ec631",
+          "ran": true,
+          "ok": true,
+          "output": "request\nfallback/settings\nuse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-durable-work",
+          "code_hash": "eca7cc410b29d9a5d20f6f617922797a624c39358f077b779ec3663d0936db08",
+          "ran": true,
+          "ok": true,
+          "output": "success,retry,retry,failure",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "kotlin-work-chains",
+          "code_hash": "98928469297b53237465fefc43dda55d6af6eb557a73cf7c7361c05099519584",
+          "ran": true,
+          "ok": true,
+          "output": "12",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 12,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "unsupervised-learning",
+      "version": 1,
+      "course_hash": "602f193acca12c6f3cbc01a9f18dbba68df81d2ee36405c922b02db17e8e96a0",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "unsupervised-learning-distance-centroids",
+          "code_hash": "f24b71b4537eccbf5d68bd070838deadbdb0442d76789c0f997e906c8338be3b",
+          "ran": true,
+          "ok": true,
+          "output": "[1.0, 11.0]\n4.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "unsupervised-learning-choose-k",
+          "code_hash": "3765a4bd3a9ee33c1f7106112ff946e646de8d1ebc2506a91153bada1948eea1",
+          "ran": true,
+          "ok": true,
+          "output": "0.8997\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "unsupervised-learning-density-noise",
+          "code_hash": "1cbb707e08c7c0fcee4f48273ee8c0889f3cf19c42594ab0b2bb2aa9414bee69",
+          "ran": true,
+          "ok": true,
+          "output": "[3, 3]\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "unsupervised-learning-pca-axes",
+          "code_hash": "160f56bf48829e269a27203deb5364c14435280e9fb96ba385b28905535f7862",
+          "ran": true,
+          "ok": true,
+          "output": "(3, 1)\n1.0\n0.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "unsupervised-learning-variance-budget",
+          "code_hash": "7e659cbf50a8c1f2e5d4a635e87b97dd55adccc5cabb49c057c7178d1495f4e9",
+          "ran": true,
+          "ok": true,
+          "output": "[0.8, 0.2]\n[0.8, 1.0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "unsupervised-learning-visual-projections",
+          "code_hash": "e5a69f4176271ad0c71644d8b5b0cc623f21fc710d3f171e4c12ceca6fa0eb26",
+          "ran": true,
+          "ok": true,
+          "output": "10.0\n0.0\n3.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "unsupervised-learning-novelty-reference",
+          "code_hash": "56f82c4c686ed31fea6e8894ed54a713aba0370c8ab3fc42282296e2d1d798f4",
+          "ran": true,
+          "ok": true,
+          "output": "[1, -1]\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "unsupervised-learning-threshold-workload",
+          "code_hash": "0ab9007961993c980090b0cfaf20b89e8baf62fecb191000d969311f0f503614",
+          "ran": true,
+          "ok": true,
+          "output": "['a', 'b']\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "unsupervised-learning-evaluate-without-labels",
+          "code_hash": "8ff06457d59f14931c2e043a5e946ddb9f7cfe16ad416258a7639851a3b231f7",
+          "ran": true,
+          "ok": true,
+          "output": "0.8\nreviewed=10/1000\npopulation recall: unknown",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "deep-learning",
+      "version": 1,
+      "course_hash": "f200b5c29f463e9ca78325c572795bd86759cfe93c7c47326f725131364cab78",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "deep-learning-affine-activations",
+          "code_hash": "d783afde89784b2d64aa781dedc85fbdb5883a0484090fbd4e64b69fb685927d",
+          "ran": true,
+          "ok": true,
+          "output": "[[2.0, 7.0], [0.0, 0.0]]\n6",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "deep-learning-loss-contracts",
+          "code_hash": "867003eea0be7e1cf1938776ea4051bf478ae1a6e6944b579ed65256f0dc5a4c",
+          "ran": true,
+          "ok": true,
+          "output": "1.098612\n[1.0, 1.0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "deep-learning-autograd-chain",
+          "code_hash": "f7a3ef29455613894695c517a613fae073ab63cd33a0f875b8c9c2502e0a8f34",
+          "ran": true,
+          "ok": true,
+          "output": "30.0\n60.0\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "deep-learning-stable-updates",
+          "code_hash": "64537ef5cbbeac1aaf50d900c5af3d43a4c7ad43f4d13453e5aca51e9be07623",
+          "ran": true,
+          "ok": true,
+          "output": "0.125\n-8.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "deep-learning-generalization-regularization",
+          "code_hash": "dd22eb661bf0388e339134c49be96d38a17d5906e1eb755a2fa0fbd3fa2bcbc7",
+          "ran": true,
+          "ok": true,
+          "output": "[2.0, 4.0]\n2.5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "deep-learning-schedules-validation",
+          "code_hash": "30785e5932d69fdc6afed9ab9f5e1db3929895608ab07982dfe8daa1c13d49d4",
+          "ran": true,
+          "ok": true,
+          "output": "[0.2, 0.1, 0.1, 0.05]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "deep-learning-training-loop",
+          "code_hash": "be088e62c07aea0db0247edd020a7e5d6b653525b5e3c30227a94a5a4e4cce4a",
+          "ran": true,
+          "ok": true,
+          "output": "10.0\nTrue\n2.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "deep-learning-transfer-heads",
+          "code_hash": "2140a5c251f8526f60eefaac07ee3cba869abdb5b0516c888f3261b2e98bdd15",
+          "ran": true,
+          "ok": true,
+          "output": "8\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "deep-learning-fine-tune-artifacts",
+          "code_hash": "33240593896a6b50974ae87a586f8b77d49cda2fdd6bf0562cc691c2cc229835",
+          "ran": true,
+          "ok": true,
+          "output": "True\n['bias', 'weight']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "computer-vision",
+      "version": 1,
+      "course_hash": "29e2ab92353250d4ca297b315eb6973c76ccf360e18f26ebeecf988cd7f0a930",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "computer-vision-pixel-contract",
+          "code_hash": "a87093b2757541b723b5b11f7553816904e1820ecd06a813052ac385d914e3a3",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 3, 1, 2]\n[1.0, -1.0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "computer-vision-resize-annotations",
+          "code_hash": "743ca8595784004717da976a78c463379b81de48773dced34f6ffb61e82d6eb2",
+          "ran": true,
+          "ok": true,
+          "output": "[4.0, 2.0, 12.0, 4.0]\n[0.0, 2.0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "computer-vision-augmentation-splits",
+          "code_hash": "03c2baf7a937a1a5fce9dfc147d7898b1322f8b5970238a7a253dd58d0826d65",
+          "ran": true,
+          "ok": true,
+          "output": "True\n[4.0, 1.0, 8.0, 4.0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "computer-vision-convolution-trace",
+          "code_hash": "a5fd1808302e0bd2e5c948ab9537ce401dbc14b8c927963027dbf1d7dcd570af",
+          "ran": true,
+          "ok": true,
+          "output": "[-4.0, -4.0, -4.0, -4.0]\n4",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "computer-vision-pooling-heads",
+          "code_hash": "cfd3441daedba031c828396d377f6fe07472a2ed46a59d31dddd4f7f06911677",
+          "ran": true,
+          "ok": true,
+          "output": "[6.0, 8.0, 14.0, 16.0]\n[3.5, 5.5, 11.5, 13.5]\n[8.5]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "computer-vision-transfer-vision",
+          "code_hash": "98f923cdf3c9917631b591aea85955fe808f2b735d5f490d8492011645782fc8",
+          "ran": true,
+          "ok": true,
+          "output": "[[1.0, 0.0], [0.0, 1.0]]\n[[0.20000000298023224, 0.4000000059604645]]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "computer-vision-task-contracts",
+          "code_hash": "9779e246b7361c63476868fbe234ba02e089e2ebce2f8b2e6b9d1340a75fad9a",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 1]\n[[1, 0, 0], [0, 1, 1]]\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "computer-vision-iou-matching",
+          "code_hash": "238c0d7a5827a4a15ea10fbaa90f909391389ebad5a8f0966a7b50c8bf752803",
+          "ran": true,
+          "ok": true,
+          "output": "0.333333\n0.5 1.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "computer-vision-ap-protocol",
+          "code_hash": "411e0571acea7e6b7b85ba18dfa4e91163a36be3045f857d8bbe7305c406c6ca",
+          "ran": true,
+          "ok": true,
+          "output": "0.833333\n0.7",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 58,
+      "human_approved": false
+    },
+    {
+      "id": "nlp-fundamentals",
+      "version": 1,
+      "course_hash": "4339854549c4a42aca89d1a4bc38e31d41fa7f4718e8a63bbf287f097cb095e9",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "nlp-fundamentals-tokens-contract",
+          "code_hash": "afa674c292880b873e8a72d2577cecd202f52ac2ccf241d9be786a37e769f72a",
+          "ran": true,
+          "ok": true,
+          "output": "['can', 'reset', 'pin']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nlp-fundamentals-normalization-negation",
+          "code_hash": "0443e53aab39b6fd3a2fd54da0c253835fb478c4022af53b4d74d7db885cefa8",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue\n['service', 'not', 'good']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nlp-fundamentals-vocabulary-leakage",
+          "code_hash": "fae0c1d1a98ea1032601ea7c33007c20150370ba7ea22a68d3a139d3b0135f1a",
+          "ran": true,
+          "ok": true,
+          "output": "['reset']\n[[2], [1]]\n[[0]]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nlp-fundamentals-bags-ngrams",
+          "code_hash": "f074400d274b199dad9cc86f5a66388f7475e1acc3efea3adfe01fbaf4dc2c24",
+          "ran": true,
+          "ok": true,
+          "output": "0\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nlp-fundamentals-tfidf-cosine",
+          "code_hash": "58d3c7545051c610f9ccae9754f19c4694d4f36cac5d289c50f8f474563d342a",
+          "ran": true,
+          "ok": true,
+          "output": "1.0\n1.693147\n[[1.0], [1.0], [1.0]]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nlp-fundamentals-embeddings-attention",
+          "code_hash": "ac08ddae495972f04a546fd61243c71c7be14da735aa6ed85d6e2ed708dba9ba",
+          "ran": true,
+          "ok": true,
+          "output": "1.0\n[1.34, 1.321]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nlp-fundamentals-text-pipeline",
+          "code_hash": "7317637a1a6aafe930dbcc2b2df027c088541cc469a47553edfa68ea795e863e",
+          "ran": true,
+          "ok": true,
+          "output": "['billing', 'access']\n['access', 'billing']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nlp-fundamentals-classification-metrics",
+          "code_hash": "3dc0806e9b7b9203ce30d5fc32b8481559bf13ccfdd485dd6cfb07a41b7d7325",
+          "ran": true,
+          "ok": true,
+          "output": "0.667\n0.667\n0.667",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nlp-fundamentals-roman-urdu-slices",
+          "code_hash": "98afdcb86b3252f525c82d16a93d284b70c2e18bd58cdd229d0f230fe7b29325",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 1]\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 58,
+      "human_approved": false
+    },
+    {
+      "id": "mlops-deployment",
+      "version": 1,
+      "course_hash": "2ca61a501327b7711a9c3f7b36ef0406a9e5df3aa4775d9bd8a5edc1ace3f9fd",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "mlops-deployment-model-bundle",
+          "code_hash": "4cd4579e7bc0cc7ded693746cabfbbe6780697a53116c6ccd49350b8f05880a7",
+          "ran": true,
+          "ok": true,
+          "output": "[7.0]\n[1.0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mlops-deployment-api-contract",
+          "code_hash": "b92daee995f1aac9734d3dad94e5183a4350cd416abab3370b9ce9af590bf900",
+          "ran": true,
+          "ok": true,
+          "output": "{'prediction': 7, 'model': 'demand-v1'}\nhours",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mlops-deployment-batch-latency",
+          "code_hash": "d107311448e73503813d83cadf092a6ee5500e9e8bdf71ad453fde5a8b9aec3e",
+          "ran": true,
+          "ok": true,
+          "output": "25\n12.0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mlops-deployment-data-lineage",
+          "code_hash": "48707da4c07b4100f982fdbcbdd2017a53c0a701244dffadebeb5c5794a91664",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mlops-deployment-experiment-record",
+          "code_hash": "2bb1cea1f67e86b4741aaf2a3427fedfe09328060820656841908e583fe76dc1",
+          "ran": true,
+          "ok": true,
+          "output": "c\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mlops-deployment-reproducibility-limits",
+          "code_hash": "c01f1d73c55a258f1bf947e6537236b07baf7db6f65d639d308204e62d0fc9b2",
+          "ran": true,
+          "ok": true,
+          "output": "True\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mlops-deployment-shadow-canary",
+          "code_hash": "bc1867b67325df9e5a2be8277e0fb5306976d70ddba69ef9a3a91010d8a76b5f",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 10]\n0.2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mlops-deployment-retrain-orchestration",
+          "code_hash": "7862e8905f727170cf14a087e59abc4967adb819e48004f4bc6fdc5ede577223",
+          "ran": true,
+          "ok": true,
+          "output": "['evaluate', 'features', 'register', 'train']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mlops-deployment-rollback-gates",
+          "code_hash": "96118a44ff38abfb6b0ac00dd7d0006985386d416f473a9a8d9aa4f54883bd00",
+          "ran": true,
+          "ok": true,
+          "output": "bundle-old\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 56,
+      "human_approved": false
+    },
+    {
+      "id": "agent-workflows",
+      "version": 1,
+      "course_hash": "861aa83903d0cf372fe21bec1998b97907217e28f77cded79dae3aad73a0d8c1",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "agent-workflows-bounded-design",
+          "code_hash": "6ad3f1ff8d4401fb4c46502eb2e7f1b7f30075c41273c38e10232893bfd85d5f",
+          "ran": true,
+          "ok": true,
+          "output": "await_review\nrefund_ready",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "agent-workflows-typed-routing",
+          "code_hash": "806c1cfbf3497ec9139b47fb822edef8fe55b9593f90c7a0ae3421b4599d10d8",
+          "ran": true,
+          "ok": true,
+          "output": "fees:case-7\nescalate",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "agent-workflows-bounded-search",
+          "code_hash": "1863fcb30ebe77cbda344912f45890adfc555a19ec8a7549c67fc75c7cc49b04",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "agent-workflows-context-provenance",
+          "code_hash": "420eb27a8444cb773cde58b347e08dc3312c01247409cf72f34fcd267f784189",
+          "ran": true,
+          "ok": true,
+          "output": "['e1', 'e2']\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "agent-workflows-scoped-memory",
+          "code_hash": "978841b9d4ea67fc519b51ae50abd2c67dc70047240167f029b3924b205f65b8",
+          "ran": true,
+          "ok": true,
+          "output": "['allowed']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "agent-workflows-checkpoint-resume",
+          "code_hash": "acfc56008d2b1df99e47a0cc96f5aa40b90769319d002548ae43976a500c79f2",
+          "ran": true,
+          "ok": true,
+          "output": "1 0\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "agent-workflows-trace-structure",
+          "code_hash": "5d03ca6ed7ef07b6bb6d86211700d0925bef2af06d92797fd86f28ba4bd00875",
+          "ran": true,
+          "ok": true,
+          "output": "8\n5\n{'root'}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "agent-workflows-cost-accounting",
+          "code_hash": "63474ec56423ea669114403498bdabe5905e99d60c754a00e544a162ac466be0",
+          "ran": true,
+          "ok": true,
+          "output": "0.00390\n1650",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "agent-workflows-workflow-evaluation",
+          "code_hash": "11bd8868c7666fc9e37add887f04bc41d80ce5236ed301b11d518591c99b72ee",
+          "ran": true,
+          "ok": true,
+          "output": "1 3\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 5,
+      "covered": 5,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "data-transformation-pipelines",
+      "version": 1,
+      "course_hash": "b141d18072eb0bbe41853307c3bda6f658233f2e9275bcc640a12ab6512dbee7",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "data-transformation-pipelines-grain-contract",
+          "code_hash": "81b753dcfa5c1e9e328d564ab98ac0ae9d18e504069ffdcb8855c4502e40c466",
+          "ran": true,
+          "ok": true,
+          "output": "900",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-transformation-pipelines-modular-sql",
+          "code_hash": "59e660ba4de0650724d351159144080ac80fef53847d7ceacc381fa5bdbde4f1",
+          "ran": true,
+          "ok": true,
+          "output": "1, 500; 2, 0",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-transformation-pipelines-incremental-state",
+          "code_hash": "d4659ecb92f90519a383ac6ba77cfd9c1f120dbc18c46fe866a7acf31e66205b",
+          "ran": true,
+          "ok": true,
+          "output": "{'rev': 3, 'status': 'delivered'}\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-transformation-pipelines-vector-contract",
+          "code_hash": "da58761796ea9b0fc48bc263f50cf3b61ff088a905fd3c27ffffe8d1865d73c0",
+          "ran": true,
+          "ok": true,
+          "output": "[900, 700]\n1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-transformation-pipelines-join-controls",
+          "code_hash": "fc01d13cae9fdae93c531aa78c2a9c274156193ba0ceccf038a331a31a2fe7f3",
+          "ran": true,
+          "ok": true,
+          "output": "cardinality rejected\n['both', 'left_only']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-transformation-pipelines-group-chunks",
+          "code_hash": "cd442bbf55887537c9171aba9228852bec03d3de57c035840517a05291553101",
+          "ran": true,
+          "ok": true,
+          "output": "{'N': 50.0, 'S': 80.0}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-transformation-pipelines-versioned-rules",
+          "code_hash": "6f9b7b9ada5d39f8962c44f67240b1c42515a536df1e5c7769d38988f3bf5ebf",
+          "ran": true,
+          "ok": true,
+          "output": "[('R1', 1500), ('R2', 600)]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-transformation-pipelines-pipeline-ci",
+          "code_hash": "d7c1cac0db9a8dc8d19b2375498d3c50a17b923f130d6d8d0960fef0178f3727",
+          "ran": true,
+          "ok": true,
+          "output": "3 contract cases passed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "data-transformation-pipelines-safe-promotion",
+          "code_hash": "5c195855920d98b17b499aac8a367f08f127f996b41d95fc60eba6e647188549",
+          "ran": true,
+          "ok": true,
+          "output": "G1\n1000",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 63,
+      "human_approved": false
+    },
+    {
+      "id": "security-foundations",
+      "version": 1,
+      "course_hash": "08115932957d3bb28c2b59444bd8826cfb3eeae32a5697cde72e9fbbd16488eb",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "sf-security-goals",
+          "code_hash": "b2e3c9ada6db8c0f64d6c91cb4c19ca041da0cb57f15b3fd5deb3cb8c2837882",
+          "ran": true,
+          "ok": true,
+          "output": "private_export confidentiality\nunauthorized_reschedule integrity\nscheduler_outage availability",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "sf-least-privilege",
+          "code_hash": "9faf767f1d49615471194dfb997c5186d5993e7064273210217ab4adf290e969",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "sf-layered-controls",
+          "code_hash": "918f4b8cd6929c3df42764cb56147ea11b5d54bd0abfe2c448adb76a825ec160",
+          "ran": true,
+          "ok": true,
+          "output": "export_succeeds False\nreview_signal True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "sf-phishing-verification",
+          "code_hash": "ac47dacc291fcb63f85b4b673bda231faa756db96c74ebb795f5a30c16da0be5",
+          "ran": true,
+          "ok": true,
+          "output": "use_directory True\nchange_before_verification False",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "sf-malware-recovery",
+          "code_hash": "2cd23be62557543c671cd91b14f17d9f331683da2a3d5b599f4e12cd635a4aed",
+          "ran": true,
+          "ok": true,
+          "output": "loss_target True\nrestore_target False",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "sf-attacker-objectives",
+          "code_hash": "97287c853d09d8a7c9672c5dc7d82f46ba5655d78c2783d7bd839acb5045acd7",
+          "ran": true,
+          "ok": true,
+          "output": "exports_reachable True\nvisited 5",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "sf-assets-boundaries",
+          "code_hash": "ea2ed094fc89926e7490e07447069e98fd610683adbfcf151cc21b9e328e8ec7",
+          "ran": true,
+          "ok": true,
+          "output": "browser->api\napi->db",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "sf-risk-treatment",
+          "code_hash": "bd9d218611a22972ded1ba2327dd69b667a82b661744b5f0e57055d22dcc02b1",
+          "ran": true,
+          "ok": true,
+          "output": "student_export 20000\nstatus_page 800",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "sf-model-validation",
+          "code_hash": "7cd8f1d1446d8828d742821110557aef5d247b6727552273f36d5b7bd66c50c2",
+          "ran": true,
+          "ok": true,
+          "output": "cases 4\npassed 4",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "identity-access-control",
+      "version": 1,
+      "course_hash": "5b64fcf369ecb680dbead41a3debc1db14eb618df10948f96af5d6cf4a53f6b5",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "iam-authn-methods",
+          "code_hash": "41e1cc0ec577f6e0d706ecad33ceed1b314229ace4173fb952d4fbbf09d5fa6f",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "iam-credential-attacks",
+          "code_hash": "64286e9aa3edd06a5d5225926b8945a0aeb8fc05983b601b3770dc10a36c11ab",
+          "ran": true,
+          "ok": true,
+          "output": "s1 3 True\ns2 1 False",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "iam-authn-lifecycle",
+          "code_hash": "014dbcb76f34488f7b47235ae406b655b31d8da99c2dd7455807ac11229da25f",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "iam-rbac-capabilities",
+          "code_hash": "cb767f4566a6c8329b8fb475e3eee7993e76f6f7b2693a951a64eeac2cfa31e8",
+          "ran": true,
+          "ok": true,
+          "output": "['initiate_refund', 'read_delivery']\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "iam-resource-context",
+          "code_hash": "06e2bcf3539056791490e0d1d8e146158260fb51aeb38f7a9714d205bd6212fc",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "iam-access-review",
+          "code_hash": "42b893d1bbca0dd8ca440ac447b9353f050810813f00fb508b015bba9145301b",
+          "ran": true,
+          "ok": true,
+          "output": "['support_read']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "iam-federation",
+          "code_hash": "915ed75fdf714618d0abafbb764a32014195352a1d3132de08068ff03b5359af",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "iam-directory",
+          "code_hash": "10a0c4314fcbc8d785d97a3fe70138f46b326b848277a6592062fa36d4530c07",
+          "ran": true,
+          "ok": true,
+          "output": "['billing', 'shared', 'support']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "iam-privileged-access",
+          "code_hash": "8579f5dbb4221d3d759fd9f788ca42cc6b42ede8103ac382aee50474a235d442",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "cryptography-secure-comms",
+      "version": 1,
+      "course_hash": "4692a3e6ff0d898f16064c5fade83c9bd283c28d63aba90f33938cd7b97c24bc",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "crypto-properties",
+          "code_hash": "1f19c9c8a49675218b344df82eaeffb80a31695b62d2b0371280f7953b5d7f8a",
+          "ran": true,
+          "ok": true,
+          "output": "64\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "crypto-authenticated-data",
+          "code_hash": "d05286e8678f5d9f0fa46c069710fc9f3f25c482beeb25adc1b75bba9c63156d",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "crypto-signing-trust",
+          "code_hash": "5fbd51a0e750db3a8105d06bcda8a543f46e56e366443ced20479e48ff9ac964",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "crypto-tls-trust",
+          "code_hash": "cced1663e8aac988fefe29c981e5ba50a2da6fb7f6264baaa1f8a9d5cd5d39e8",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "crypto-tls-boundaries",
+          "code_hash": "371ffa9c01f7690d48cdf97315e66066c61cc1a7e6926ed136fa500267a27a15",
+          "ran": true,
+          "ok": true,
+          "output": "False\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "crypto-cert-lifecycle",
+          "code_hash": "ad03d65f3eaec786a6b44a6b7c050d0241331bf048805eccd8ccd3794172cc2d",
+          "ran": true,
+          "ok": true,
+          "output": "ok\nrenew\nexpired",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "crypto-password-storage",
+          "code_hash": "c640505fda29f7446fe3cd4421072edf738362d4b368f13ca163e62fd8b6ad58",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "crypto-key-lifecycle",
+          "code_hash": "34456c176eb6c34caddd16d2d4599be685e0600b850122c5e57c3a7b5fe8482a",
+          "ran": true,
+          "ok": true,
+          "output": "['r1', 'r2']\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "crypto-randomness-design",
+          "code_hash": "a399af5e8a12740c46b356f6c0628f6530782329ef722cd3d63ad9a0aeac4e03",
+          "ran": true,
+          "ok": true,
+          "output": "True\n100",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "vulnerabilities-defense",
+      "version": 1,
+      "course_hash": "bd04a10d9eedd37eba898bff2c18775e82d55d03f35f5ae5ea35a22edafd799b",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "vuln-asset-evidence",
+          "code_hash": "0b7ad1e948e6087e242d0aca62fb91bae9219ca797ed58a15bb4483a433ad055",
+          "ran": true,
+          "ok": true,
+          "output": "['archive', 'portal']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "vuln-cve-cvss",
+          "code_hash": "f60fc93700775832ed96cdf006f942d54a1c2cfba5610c1a6cf70d5cd66ac11f",
+          "ran": true,
+          "ok": true,
+          "output": "['B', 'C', 'A']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "vuln-priority-treatment",
+          "code_hash": "c406ac80e7045222a9f42f6208bfd6d270a411aec78a163d07c16aec879ad596",
+          "ran": true,
+          "ok": true,
+          "output": "A 5\nB 7\nC 2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "vuln-sql-boundary",
+          "code_hash": "18a29e7ad04c68f1aaeb3b35f26fd38d9a5a5c88526e3f7a4a588fa36b7ecaf2",
+          "ran": true,
+          "ok": true,
+          "output": "0\n[('ada',)]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "vuln-xss-context",
+          "code_hash": "6e585038c6eaed06519a8cfd44ad1627f958bc8ba1c9a98211da38659f78e81b",
+          "ran": true,
+          "ok": true,
+          "output": "&lt;b&gt;note&lt;/b&gt;\nTrue\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "vuln-web-controls",
+          "code_hash": "1b5bf0983e632a01b176ee1588534639ae90b2a1cd6beb4df7e607ed98ada3b0",
+          "ran": true,
+          "ok": true,
+          "output": "True\nFalse\nFalse\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "vuln-hardening-baseline",
+          "code_hash": "80eb31a2d7780c07ef1a335257c04b6d00ff5254c921a4b1ce5189694c3b2597",
+          "ran": true,
+          "ok": true,
+          "output": "['privileged', 'readonly_root']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "vuln-patch-mitigate",
+          "code_hash": "0d435d1e4298c992a200babea7f964d37e0a5bc2e18deaf06b0c68431655eefe",
+          "ran": true,
+          "ok": true,
+          "output": "remaining 3\nall_paths False\nmissing ['batch']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "vuln-retest-closure",
+          "code_hash": "2065fb48c43b2812fe942ec7eca1a097a6fab49f0a5161fb43548a904a0074d4",
+          "ran": true,
+          "ok": true,
+          "output": "unverified ['rollback']\nFalse\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "playwright-automation",
+      "version": 1,
+      "course_hash": "a625f47a9b8890e53ef1ea394c44b42da45569d380831c2e877ea8483cb2b216",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "playwright-automation-semantic-locators",
+          "code_hash": "ed9b3c7983dde011ac902ad694651cb70027abfb8fc27ef2a3c0fdb2d4fbb00e",
+          "ran": true,
+          "ok": true,
+          "output": "1\nApply",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "playwright-automation-scope-and-strictness",
+          "code_hash": "8e4fa5380435b84cd56b77652ee7de70a64b4a8e5c169ceae30c5b6b70e14844",
+          "ran": true,
+          "ok": true,
+          "output": "1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "playwright-automation-locator-lifetime",
+          "code_hash": "0199e22706fe2d7afc2d1dce05caf66487b6d5df7876af0f871de86687b95e42",
+          "ran": true,
+          "ok": true,
+          "output": "loading\nready",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "playwright-automation-readiness-contracts",
+          "code_hash": "fe5e6f451384e97a7aa943a40bc988aea397cd241f415e02d58ae9be609c2937",
+          "ran": true,
+          "ok": true,
+          "output": "2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "playwright-automation-retrying-assertions",
+          "code_hash": "2b96a4a6cb1e746623f4b547b094104410ca4a572bf706681e12ab1fd897c54c",
+          "ran": true,
+          "ok": true,
+          "output": "2\nfalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "playwright-automation-network-and-diagnostics",
+          "code_hash": "6104926cd968b3e8c2ca814c982f66396e20dacdf5ea142ecfab94a6c342d12d",
+          "ran": true,
+          "ok": true,
+          "output": "202\nflaky",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "playwright-automation-fixture-lifecycle",
+          "code_hash": "965fa1afadfd740e062258128b89ed168aefae8dd550ec1decf6e3da25aaa287",
+          "ran": true,
+          "ok": true,
+          "output": "closed open\nfalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "playwright-automation-authenticated-state",
+          "code_hash": "4d1ee257c334c417fab8e9322d89ab131ee11acbccc2a309a2b01ba458599b4d",
+          "ran": true,
+          "ok": true,
+          "output": "[ true, false ]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "playwright-automation-browser-projects",
+          "code_hash": "1835810082319e972af99b79220af250a67b0e9bd37587494092cd53fbb903d5",
+          "ran": true,
+          "ok": true,
+          "output": "4\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "automation-frameworks",
+      "version": 1,
+      "course_hash": "120652cee906667d9f48d695436f6ce6bab02d236fe785873b7f6c7e3903fbeb",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "automation-frameworks-page-object-boundaries",
+          "code_hash": "031e6b12a72b48da2c059ed661b19293b3db726ddfd72f83608ea050727de851",
+          "ran": true,
+          "ok": true,
+          "output": "address=Depot 7 -> submit",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "automation-frameworks-fixture-composition",
+          "code_hash": "1b06b7931cc54039007ccb3288c28e145e61caa5b4439617f4174136f1771ba1",
+          "ran": true,
+          "ok": true,
+          "output": "appointment A7 -> user U7\nuser U7",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "automation-frameworks-data-and-determinism",
+          "code_hash": "0b2ced9050586c55817af9ed94003641cf570b88ca72930c7fa0ec9004cd0383",
+          "ran": true,
+          "ok": true,
+          "output": "1 10\nfalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "automation-frameworks-unit-boundaries",
+          "code_hash": "218897fc27f205db63e796d960ff0d0b76aba32d87ffb2a84d67ca36508db1df",
+          "ran": true,
+          "ok": true,
+          "output": "999 0\ninvalid percentage",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "automation-frameworks-adapter-and-api-checks",
+          "code_hash": "b4504439fee8ecf8ad5b92fc9406e38cef0de1d4f833dd898a304d19c9b8b872",
+          "ran": true,
+          "ok": true,
+          "output": "true\nfalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "automation-frameworks-portfolio-and-risk",
+          "code_hash": "9234a7b9071c7f78ba2fb042b7af439c88ea834676adddfbd75a25abf88a3fe3",
+          "ran": true,
+          "ok": true,
+          "output": "380\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "automation-frameworks-flake-classification",
+          "code_hash": "25bc1d5e1b60195b4702c0b7caae25e1978c07d3dddd33d1f71f344acbe1f746",
+          "ran": true,
+          "ok": true,
+          "output": "8\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "automation-frameworks-readiness-and-deadlines",
+          "code_hash": "bda5908eaafde31d0e514e386def26c85535488154044a9fc8b53a0fb2fd31bf",
+          "ran": true,
+          "ok": true,
+          "output": "7000",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "automation-frameworks-repair-and-quarantine",
+          "code_hash": "00e894358d1cdcb78a30f5b0fe29e62fd83687f586b11431dcc332631f8f5ede",
+          "ran": true,
+          "ok": true,
+          "output": "34.87",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "ci-test-reporting",
+      "version": 1,
+      "course_hash": "1d8ef6d05a53490c17ccdfa3d705853b885c420e1dbd8a617dd626cd17860773",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "ci-test-reporting-reproducible-runners",
+          "code_hash": "ba11d025ae45bd3c407cda8c84eaef55540a27e97c5a90cf1910c2708528067d",
+          "ran": true,
+          "ok": true,
+          "output": "lock,browser",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "ci-test-reporting-required-status-aggregation",
+          "code_hash": "9a5f56802a264138ff141087637c826643a26974341896607a5dd2be2ac43331",
+          "ran": true,
+          "ok": true,
+          "output": "false",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "ci-test-reporting-shards-and-critical-path",
+          "code_hash": "22f85943cced3a3a01fc43851f44f607908166dac693ad61d6fd0946b1e682ff",
+          "ran": true,
+          "ok": true,
+          "output": "10\n12",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "ci-test-reporting-report-contracts",
+          "code_hash": "a0b0d8e74a36231b0d0762313070d7005c01a030a701d679507a4be46378fda2",
+          "ran": true,
+          "ok": true,
+          "output": "98\n100",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "ci-test-reporting-artifact-provenance",
+          "code_hash": "6d6c27bde1617b117b1b8ef260ac698b45fc1d36bfc3580ec3234da627cb715c",
+          "ran": true,
+          "ok": true,
+          "output": "3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "ci-test-reporting-trace-driven-triage",
+          "code_hash": "d8ea0d3edef008d90750619f6fc43ef50149796c595c7e19cddc63d879a9856c",
+          "ran": true,
+          "ok": true,
+          "output": "setup",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "ci-test-reporting-release-criteria",
+          "code_hash": "00ea402c9b07dd6f81ac82ca5ea86626057afd72add8a79c24d6334040ad9a8b",
+          "ran": true,
+          "ok": true,
+          "output": "tenant-auth",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "ci-test-reporting-metric-validity",
+          "code_hash": "b37d15c9c86f3311e5968560c6ffd9dffe5d1593dcde8d392dd0ab3ac1c6806d",
+          "ran": true,
+          "ok": true,
+          "output": "2\n4",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "ci-test-reporting-exceptions-and-freshness",
+          "code_hash": "0e2ff9b846a00c4dec3a42d4fe5f14525a341ebd0d8a334c7a1e8baa22a7c1f4",
+          "ran": true,
+          "ok": true,
+          "output": "false",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 56,
+      "human_approved": false
+    },
+    {
+      "id": "performance-quality-engineering",
+      "version": 1,
+      "course_hash": "746bd588bbec16a06c76e2575d10af3cd161a04e503263742cb1d5f8f3cec961",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "performance-quality-engineering-workload-contracts",
+          "code_hash": "37a034e79730fd5cef14dff8de2dbeed2abcd4523dbd5ef004c8bea2043b39e4",
+          "ran": true,
+          "ok": true,
+          "output": "6",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "performance-quality-engineering-tails-and-throughput",
+          "code_hash": "53bd903dd5777bf85b780bb4a6c379fd90311f9aeb29289ec2d3fe9954a46073",
+          "ran": true,
+          "ok": true,
+          "output": "500\n9",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "performance-quality-engineering-saturation-and-soak",
+          "code_hash": "4c1724b0592e7cf69fb571cd1102cc068a4f75e1292b7d30c33f8da1249b2ba6",
+          "ran": true,
+          "ok": true,
+          "output": "20\n240",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "performance-quality-engineering-recovery-contracts",
+          "code_hash": "748c5e7fced01e03de4bca91b0f129f31c93b7e01a78cc2c9c9a061f4a96b517",
+          "ran": true,
+          "ok": true,
+          "output": "270\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "performance-quality-engineering-retry-and-breaker-budgets",
+          "code_hash": "a8933f891615de3ee469ffd6c183ce664c5281ebcccca98682aa7f2559134926",
+          "ran": true,
+          "ok": true,
+          "output": "6\n600",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "performance-quality-engineering-sli-and-resilience-experiments",
+          "code_hash": "84d56ba5f733e61201d06a6e9ac60dc3f04715daaf9ef45a664375eed0351d03",
+          "ran": true,
+          "ok": true,
+          "output": "100\n30",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "performance-quality-engineering-shift-left-risk-selection",
+          "code_hash": "4a3ad4101fb7a700cc4d8df985a8c6eab26585a6aaab406e841a2688af3622cd",
+          "ran": true,
+          "ok": true,
+          "output": "true\n9000",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "performance-quality-engineering-quality-metrics-denominators",
+          "code_hash": "7cff24184eab42cd9052c7d0b6040c4196bb6cec7208c528d8829098f412d2d7",
+          "ran": true,
+          "ok": true,
+          "output": "0.5\n0.75\n0.1",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "performance-quality-engineering-evidence-based-release-gates",
+          "code_hash": "ccf45570a6e6aec3411cf01018f49315e5d6b68db644a68d52d13ca015745b72",
+          "ran": true,
+          "ok": true,
+          "output": "0.15\nfalse\np95",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
       "id": "complexity-analysis",
       "version": 1,
       "course_hash": "5505cad55f99f74fcd6411ecda334b12469b784e9033b0db7109791aa13e6f13",
@@ -7155,517 +8837,431 @@
       "human_approved": false
     },
     {
-      "id": "data-transformation-pipelines",
+      "id": "linear-structures",
       "version": 1,
-      "course_hash": "b141d18072eb0bbe41853307c3bda6f658233f2e9275bcc640a12ab6512dbee7",
+      "course_hash": "119bfb89f7ded10fc2a9a2afbee8fd711b6c71e16424eba762281286a5cec894",
       "errors": [],
       "warnings": [],
       "examples": [
         {
-          "id": "data-transformation-pipelines-grain-contract",
-          "code_hash": "81b753dcfa5c1e9e328d564ab98ac0ae9d18e504069ffdcb8855c4502e40c466",
+          "id": "linear-structures-reverse-links",
+          "code_hash": "4f454f018523bd8bcb23b70736ec854ea8ab4689f96866f75a8b3b89d5308d8d",
           "ran": true,
           "ok": true,
-          "output": "900",
+          "output": "[9, 7, 4]\nNone",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "data-transformation-pipelines-modular-sql",
-          "code_hash": "59e660ba4de0650724d351159144080ac80fef53847d7ceacc381fa5bdbde4f1",
+          "id": "linear-structures-middle-two-runners",
+          "code_hash": "b72d4b6312dc8f75b1df9c9abe09abee0a076be4e0522b0ca57152697db8f208",
           "ran": true,
           "ok": true,
-          "output": "1, 500; 2, 0",
+          "output": "3\n2\nNone",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "data-transformation-pipelines-incremental-state",
-          "code_hash": "d4659ecb92f90519a383ac6ba77cfd9c1f120dbc18c46fe866a7acf31e66205b",
+          "id": "linear-structures-cycle-identity",
+          "code_hash": "4eeb4d9532cda5efdd6168ff70831935a3cc26fe5c7471f36e7412ce50b9176c",
           "ran": true,
           "ok": true,
-          "output": "{'rev': 3, 'status': 'delivered'}\nTrue",
+          "output": "True\nFalse\nTrue",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "data-transformation-pipelines-vector-contract",
-          "code_hash": "da58761796ea9b0fc48bc263f50cf3b61ff088a905fd3c27ffffe8d1865d73c0",
-          "ran": true,
-          "ok": true,
-          "output": "[900, 700]\n1",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "data-transformation-pipelines-join-controls",
-          "code_hash": "fc01d13cae9fdae93c531aa78c2a9c274156193ba0ceccf038a331a31a2fe7f3",
-          "ran": true,
-          "ok": true,
-          "output": "cardinality rejected\n['both', 'left_only']",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "data-transformation-pipelines-group-chunks",
-          "code_hash": "cd442bbf55887537c9171aba9228852bec03d3de57c035840517a05291553101",
-          "ran": true,
-          "ok": true,
-          "output": "{'N': 50.0, 'S': 80.0}",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "data-transformation-pipelines-versioned-rules",
-          "code_hash": "6f9b7b9ada5d39f8962c44f67240b1c42515a536df1e5c7769d38988f3bf5ebf",
-          "ran": true,
-          "ok": true,
-          "output": "[('R1', 1500), ('R2', 600)]",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "data-transformation-pipelines-pipeline-ci",
-          "code_hash": "d7c1cac0db9a8dc8d19b2375498d3c50a17b923f130d6d8d0960fef0178f3727",
-          "ran": true,
-          "ok": true,
-          "output": "3 contract cases passed",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "data-transformation-pipelines-safe-promotion",
-          "code_hash": "5c195855920d98b17b499aac8a367f08f127f996b41d95fc60eba6e647188549",
-          "ran": true,
-          "ok": true,
-          "output": "G1\n1000",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        }
-      ],
-      "objectives": 4,
-      "covered": 4,
-      "lessons": 9,
-      "questions": 63,
-      "human_approved": false
-    },
-    {
-      "id": "mobile-ui-fundamentals",
-      "version": 1,
-      "course_hash": "4db140f91bd8c5246c8e29529608795c29979f2c5bbf5b968e380a113842f80e",
-      "errors": [],
-      "warnings": [],
-      "examples": [
-        {
-          "id": "mobile-ui-platform-choice",
-          "code_hash": "f5777f93742d7f6d993059e9cf4c3097c10922c3510b0b7e6a5fbf97c006674f",
-          "ran": true,
-          "ok": true,
-          "output": "shared",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "mobile-ui-lifecycle",
-          "code_hash": "d028ad6a7eaba7f5b960c536a5e09f4d933ea44abd6bab43c80618712fe81b54",
-          "ran": true,
-          "ok": true,
-          "output": "new address",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "mobile-ui-restoration",
-          "code_hash": "c757ae7a69c4260f5c621f12bdcb9d838c94bfb28e7f28715ab0e5954c9c6b1d",
-          "ran": true,
-          "ok": true,
-          "output": "restore 7\nneeds_review True",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "mobile-ui-touch-focus",
-          "code_hash": "2f52d0ff414360b6e92cf9f69ab8e3c7a376f6afc12c3ed1cead44c70ae6ae02",
-          "ran": true,
-          "ok": true,
-          "output": "(48, 48)\npadding per side 12",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "mobile-ui-window-constraints",
-          "code_hash": "b9bf5ac3d50aea27f49175b511c85e5034da8d6886ffd56ce9d41e0b1ef5fd99",
-          "ran": true,
-          "ok": true,
-          "output": "672 328\ntwo columns True",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "mobile-ui-navigation",
-          "code_hash": "af83f5a98d1d682c1437afc63082b6425c58bf3cc89ba98aa0ce5c6aee0e0cfe",
-          "ran": true,
-          "ok": true,
-          "output": "priority-dialog\nticket:42",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "mobile-ui-network-states",
-          "code_hash": "dfd2938e9376c79f799f690b8450deeb1b16aa9f6db1a62075e4437c742d2861",
-          "ran": true,
-          "ok": true,
-          "output": "stale\nempty",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "mobile-ui-resource-budgets",
-          "code_hash": "22f15aaae931472369ba89ecdd2e9f3adb496f9763a9b6efea8b08a1b0054131",
-          "ran": true,
-          "ok": true,
-          "output": "10 12 36000\n40 3 27000",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "mobile-ui-platform-guidelines",
-          "code_hash": "3f6f16227b2fd90fd65801c5683838b948ff8eab852a06369da2e3667e323c2b",
-          "ran": true,
-          "ok": true,
-          "output": "bottom-bar\nrail",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        }
-      ],
-      "objectives": 6,
-      "covered": 6,
-      "lessons": 9,
-      "questions": 54,
-      "human_approved": false
-    },
-    {
-      "id": "playwright-automation",
-      "version": 1,
-      "course_hash": "a625f47a9b8890e53ef1ea394c44b42da45569d380831c2e877ea8483cb2b216",
-      "errors": [],
-      "warnings": [],
-      "examples": [
-        {
-          "id": "playwright-automation-semantic-locators",
-          "code_hash": "ed9b3c7983dde011ac902ad694651cb70027abfb8fc27ef2a3c0fdb2d4fbb00e",
-          "ran": true,
-          "ok": true,
-          "output": "1\nApply",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "playwright-automation-scope-and-strictness",
-          "code_hash": "8e4fa5380435b84cd56b77652ee7de70a64b4a8e5c169ceae30c5b6b70e14844",
-          "ran": true,
-          "ok": true,
-          "output": "1",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "playwright-automation-locator-lifetime",
-          "code_hash": "0199e22706fe2d7afc2d1dce05caf66487b6d5df7876af0f871de86687b95e42",
-          "ran": true,
-          "ok": true,
-          "output": "loading\nready",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "playwright-automation-readiness-contracts",
-          "code_hash": "fe5e6f451384e97a7aa943a40bc988aea397cd241f415e02d58ae9be609c2937",
-          "ran": true,
-          "ok": true,
-          "output": "2",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "playwright-automation-retrying-assertions",
-          "code_hash": "2b96a4a6cb1e746623f4b547b094104410ca4a572bf706681e12ab1fd897c54c",
-          "ran": true,
-          "ok": true,
-          "output": "2\nfalse",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "playwright-automation-network-and-diagnostics",
-          "code_hash": "6104926cd968b3e8c2ca814c982f66396e20dacdf5ea142ecfab94a6c342d12d",
-          "ran": true,
-          "ok": true,
-          "output": "202\nflaky",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "playwright-automation-fixture-lifecycle",
-          "code_hash": "965fa1afadfd740e062258128b89ed168aefae8dd550ec1decf6e3da25aaa287",
-          "ran": true,
-          "ok": true,
-          "output": "closed open\nfalse",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "playwright-automation-authenticated-state",
-          "code_hash": "4d1ee257c334c417fab8e9322d89ab131ee11acbccc2a309a2b01ba458599b4d",
-          "ran": true,
-          "ok": true,
-          "output": "[ true, false ]",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "playwright-automation-browser-projects",
-          "code_hash": "1835810082319e972af99b79220af250a67b0e9bd37587494092cd53fbb903d5",
-          "ran": true,
-          "ok": true,
-          "output": "4\n3",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        }
-      ],
-      "objectives": 4,
-      "covered": 4,
-      "lessons": 9,
-      "questions": 54,
-      "human_approved": false
-    },
-    {
-      "id": "security-foundations",
-      "version": 1,
-      "course_hash": "08115932957d3bb28c2b59444bd8826cfb3eeae32a5697cde72e9fbbd16488eb",
-      "errors": [],
-      "warnings": [],
-      "examples": [
-        {
-          "id": "sf-security-goals",
-          "code_hash": "b2e3c9ada6db8c0f64d6c91cb4c19ca041da0cb57f15b3fd5deb3cb8c2837882",
-          "ran": true,
-          "ok": true,
-          "output": "private_export confidentiality\nunauthorized_reschedule integrity\nscheduler_outage availability",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "sf-least-privilege",
-          "code_hash": "9faf767f1d49615471194dfb997c5186d5993e7064273210217ab4adf290e969",
+          "id": "linear-structures-balanced-delimiters",
+          "code_hash": "90e222c474672dc6c1b0b615535a15444743460e24ced99c676cf0347bff2455",
           "ran": true,
           "ok": true,
           "output": "True\nFalse\nFalse",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "sf-layered-controls",
-          "code_hash": "918f4b8cd6929c3df42764cb56147ea11b5d54bd0abfe2c448adb76a825ec160",
+          "id": "linear-structures-undo-stack",
+          "code_hash": "ff660c0816b518e8abb5d726f312aaf4180af2ceb634a1483bfc660ca001157a",
           "ran": true,
           "ok": true,
-          "output": "export_succeeds False\nreview_signal True",
+          "output": "4 [4] [7]\n6 [4, 2] []",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "sf-phishing-verification",
-          "code_hash": "ac47dacc291fcb63f85b4b673bda231faa756db96c74ebb795f5a30c16da0be5",
+          "id": "linear-structures-iterative-dfs",
+          "code_hash": "36882f4d581319897ff1b150c140088b7d22b410e113e4903e1c7288940df134",
           "ran": true,
           "ok": true,
-          "output": "use_directory True\nchange_before_verification False",
+          "output": "['left', 'right', 'root']",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "sf-malware-recovery",
-          "code_hash": "2cd23be62557543c671cd91b14f17d9f331683da2a3d5b599f4e12cd635a4aed",
+          "id": "linear-structures-fifo-bfs",
+          "code_hash": "2aee5c9540399673b5b828bd64f104fb6d6a953e736e4720235e957cb23febe1",
           "ran": true,
           "ok": true,
-          "output": "loss_target True\nrestore_target False",
+          "output": "{'A': 0, 'B': 1, 'C': 1, 'D': 2}\n4",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "sf-attacker-objectives",
-          "code_hash": "97287c853d09d8a7c9672c5dc7d82f46ba5655d78c2783d7bd839acb5045acd7",
+          "id": "linear-structures-deque-windows",
+          "code_hash": "eef1e8de89f941bb9096f5a4368d079834112af6f8ccd74e4645a4db0a39d498",
           "ran": true,
           "ok": true,
-          "output": "exports_reachable True\nvisited 5",
+          "output": "[3, 3, 5, 5, 6, 7]\n[2, 2]",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "sf-assets-boundaries",
-          "code_hash": "ea2ed094fc89926e7490e07447069e98fd610683adbfcf151cc21b9e328e8ec7",
+          "id": "linear-structures-priority-scheduling",
+          "code_hash": "f4e22bc6ee95411ab815fd06923a5ff1790b5bee0e6a9bce836003001b2aa2e2",
           "ran": true,
           "ok": true,
-          "output": "browser->api\napi->db",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "sf-risk-treatment",
-          "code_hash": "bd9d218611a22972ded1ba2327dd69b667a82b661744b5f0e57055d22dcc02b1",
-          "ran": true,
-          "ok": true,
-          "output": "student_export 20000\nstatus_page 800",
-          "verification": "Exact code/expected-output hash in the repository verification artifact"
-        },
-        {
-          "id": "sf-model-validation",
-          "code_hash": "7cd8f1d1446d8828d742821110557aef5d247b6727552273f36d5b7bd66c50c2",
-          "ran": true,
-          "ok": true,
-          "output": "cases 4\npassed 4",
+          "output": "['urgent-A', 'urgent-B', 'batch']",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
-      "objectives": 4,
-      "covered": 4,
+      "objectives": 3,
+      "covered": 3,
       "lessons": 9,
       "questions": 54,
       "human_approved": false
     },
     {
-      "id": "unsupervised-learning",
+      "id": "recursion-backtracking",
       "version": 1,
-      "course_hash": "602f193acca12c6f3cbc01a9f18dbba68df81d2ee36405c922b02db17e8e96a0",
+      "course_hash": "a5ea109048e2130c58d8819ed68e53ad93fcf3777ad7ed346619c9f82063b1dd",
       "errors": [],
       "warnings": [],
       "examples": [
         {
-          "id": "unsupervised-learning-distance-centroids",
-          "code_hash": "f24b71b4537eccbf5d68bd070838deadbdb0442d76789c0f997e906c8338be3b",
+          "id": "recursion-backtracking-base-contract",
+          "code_hash": "928d5a3ecde8087723ff9105bfaeb7fc4a4e43d5a2297c041bd0fdaa46120b80",
           "ran": true,
           "ok": true,
-          "output": "[1.0, 11.0]\n4.0",
+          "output": "[1, 1, 2, 6, 24, 120]\nrejected",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "unsupervised-learning-choose-k",
-          "code_hash": "3765a4bd3a9ee33c1f7106112ff946e646de8d1ebc2506a91153bada1948eea1",
+          "id": "recursion-backtracking-trace-branching",
+          "code_hash": "0c8fb8f1bab7a336e1c071633df658961bd7d52929bb52666dd961d84f8feaab",
           "ran": true,
           "ok": true,
-          "output": "0.8997\n2",
+          "output": "0 (1, 1)\n1 (3, 2)\n2 (7, 4)\n3 (15, 8)",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "unsupervised-learning-density-noise",
-          "code_hash": "1cbb707e08c7c0fcee4f48273ee8c0889f3cf19c42594ab0b2bb2aa9414bee69",
+          "id": "recursion-backtracking-recursive-structure",
+          "code_hash": "7d0d51d1b44e64ac017f0e766cc3b0f5852a548221fa0594135d18c48082b721",
           "ran": true,
           "ok": true,
-          "output": "[3, 3]\n1",
+          "output": "(14, 7)\n(0, 1)",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "unsupervised-learning-pca-axes",
-          "code_hash": "160f56bf48829e269a27203deb5364c14435280e9fb96ba385b28905535f7862",
+          "id": "recursion-backtracking-combinations-prune",
+          "code_hash": "fe871afdf90baf7be5f9962fe2f3dcd224fbbfec2d1098324b6978edffc31dc4",
           "ran": true,
           "ok": true,
-          "output": "(3, 1)\n1.0\n0.0",
+          "output": "[['A', 'B'], ['A', 'C'], ['A', 'D'], ['B', 'C'], ['B', 'D'], ['C', 'D']]\n[[]]\n[]",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "unsupervised-learning-variance-budget",
-          "code_hash": "7e659cbf50a8c1f2e5d4a635e87b97dd55adccc5cabb49c057c7178d1495f4e9",
+          "id": "recursion-backtracking-permutations-state",
+          "code_hash": "36cb12610fbdcc45e7f579f4f8ad6eab2c4774872a32337c85f01bd860d91d4a",
           "ran": true,
           "ok": true,
-          "output": "[0.8, 0.2]\n[0.8, 1.0]",
+          "output": "[[1, 1, 2], [1, 2, 1], [2, 1, 1]]\n[[]]",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "unsupervised-learning-visual-projections",
-          "code_hash": "e5a69f4176271ad0c71644d8b5b0cc623f21fc710d3f171e4c12ceca6fa0eb26",
+          "id": "recursion-backtracking-constraints-search",
+          "code_hash": "977259a85e2d76772e9d588f8926756e63a3f6ad381f964c79c4b3a536c4a980",
           "ran": true,
           "ok": true,
-          "output": "10.0\n0.0\n3.0",
+          "output": "[[1, 3, 0, 2], [2, 0, 3, 1]]\n[]",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "unsupervised-learning-novelty-reference",
-          "code_hash": "56f82c4c686ed31fea6e8894ed54a713aba0370c8ab3fc42282296e2d1d798f4",
+          "id": "recursion-backtracking-explicit-frames",
+          "code_hash": "af45980acc2bd3bc0cb5c36af7178009c2fdecba981a44ba7e304d239faea07c",
           "ran": true,
           "ok": true,
-          "output": "[1, -1]\nTrue",
+          "output": "[3]",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "unsupervised-learning-threshold-workload",
-          "code_hash": "0ab9007961993c980090b0cfaf20b89e8baf62fecb191000d969311f0f503614",
+          "id": "recursion-backtracking-tail-iteration",
+          "code_hash": "836e9a5bdf27f2395c0532a0c1ea7e9d2cd7c96cf6ebd2ca73e1d8f82cf80ba3",
           "ran": true,
           "ok": true,
-          "output": "['a', 'b']\n3",
+          "output": "15\n0\n5000050000",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "unsupervised-learning-evaluate-without-labels",
-          "code_hash": "8ff06457d59f14931c2e043a5e946ddb9f7cfe16ad416258a7639851a3b231f7",
+          "id": "recursion-backtracking-memo-state",
+          "code_hash": "2fcb1ef19ae147a2db641b7edd7f19340f9b6c579c468c3b7e8c9f7d8ff2eb69",
           "ran": true,
           "ok": true,
-          "output": "0.8\nreviewed=10/1000\npopulation recall: unknown",
+          "output": "34 34\n9\n1",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
-      "objectives": 4,
-      "covered": 4,
+      "objectives": 3,
+      "covered": 3,
       "lessons": 9,
       "questions": 54,
       "human_approved": false
     },
     {
-      "id": "agent-workflows",
+      "id": "searching-sorting",
       "version": 1,
-      "course_hash": "861aa83903d0cf372fe21bec1998b97907217e28f77cded79dae3aad73a0d8c1",
+      "course_hash": "bbd12b9bf90208699860bd0b622a9faac4bd5562eada922af2c019c654bc6d2e",
       "errors": [],
       "warnings": [],
       "examples": [
         {
-          "id": "agent-workflows-bounded-design",
-          "code_hash": "6ad3f1ff8d4401fb4c46502eb2e7f1b7f30075c41273c38e10232893bfd85d5f",
+          "id": "searching-sorting-binary-interval",
+          "code_hash": "31a66b3e7c2505de53f9bd19af46abb8fc21c9b344fd916ef89ffc4fa47a1750",
           "ran": true,
           "ok": true,
-          "output": "await_review\nrefund_ready",
+          "output": "2\nNone\nNone",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "agent-workflows-typed-routing",
-          "code_hash": "806c1cfbf3497ec9139b47fb822edef8fe55b9593f90c7a0ae3421b4599d10d8",
+          "id": "searching-sorting-duplicate-boundaries",
+          "code_hash": "484f689448b687145c5606f34968e1c6e878281263bf712c6fa4427e4143f632",
           "ran": true,
           "ok": true,
-          "output": "fees:case-7\nescalate",
+          "output": "1 4 3\n[2, 2, 2, 4]\n6",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "agent-workflows-bounded-search",
-          "code_hash": "1863fcb30ebe77cbda344912f45890adfc555a19ec8a7549c67fc75c7cc49b04",
+          "id": "searching-sorting-answer-monotone",
+          "code_hash": "1cff00b4f78141d3b4d5e7c7049bafc887885807d86cc410f378db6b58b115ac",
           "ran": true,
           "ok": true,
-          "output": "True\nFalse\nFalse",
+          "output": "6\n6",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "agent-workflows-context-provenance",
-          "code_hash": "420eb27a8444cb773cde58b347e08dc3312c01247409cf72f34fcd267f784189",
+          "id": "searching-sorting-merge-stability",
+          "code_hash": "7d42e36489cb7126b387d5602cf7cda8ed69eea54021ec2f6cb30d28e9a6b630",
           "ran": true,
           "ok": true,
-          "output": "['e1', 'e2']\nTrue",
+          "output": "[(1, 'L1'), (1, 'R1'), (2, 'L2'), (3, 'R3')]",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "agent-workflows-scoped-memory",
-          "code_hash": "978841b9d4ea67fc519b51ae50abd2c67dc70047240167f029b3924b205f65b8",
+          "id": "searching-sorting-quick-partitions",
+          "code_hash": "746da376eb2c16467843ad7af2dd8becabb081e1ba77f7c7692331bde9962955",
           "ran": true,
           "ok": true,
-          "output": "['allowed']",
+          "output": "[2, 1, 3, 4, 5] 2\nTrue True",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "agent-workflows-checkpoint-resume",
-          "code_hash": "acfc56008d2b1df99e47a0cc96f5aa40b90769319d002548ae43976a500c79f2",
+          "id": "searching-sorting-heap-guarantees",
+          "code_hash": "ddef4284bd1876e92cc81a23a5f96025dba990b48a094449b8b47be451515f68",
           "ran": true,
           "ok": true,
-          "output": "1 0\n1",
+          "output": "[1, 1, 3, 4, 5]\n[]",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "agent-workflows-trace-structure",
-          "code_hash": "5d03ca6ed7ef07b6bb6d86211700d0925bef2af06d92797fd86f28ba4bd00875",
+          "id": "searching-sorting-keys-stable",
+          "code_hash": "702e63690350e726f1e515647f6662afecfb62f4757cc8d8da867a98eef0dd02",
           "ran": true,
           "ok": true,
-          "output": "8\n5\n{'root'}",
+          "output": "[('A', 7, 'z'), ('A', 7, 'w'), ('A', 3, 'y'), ('B', 4, 'x')]\nTrue\nNone",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "agent-workflows-cost-accounting",
-          "code_hash": "63474ec56423ea669114403498bdabe5905e99d60c754a00e544a162ac466be0",
+          "id": "searching-sorting-missing-order",
+          "code_hash": "4306a4f8f0481b03a83ce4d27f80cfddb18c8db9dae2522912bb240cf8f6b337",
           "ran": true,
           "ok": true,
-          "output": "0.00390\n1650",
+          "output": "['C', 'B', 'E', 'A', 'D']\n['1', '2', '10']",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         },
         {
-          "id": "agent-workflows-workflow-evaluation",
-          "code_hash": "11bd8868c7666fc9e37add887f04bc41d80ce5236ed301b11d518591c99b72ee",
+          "id": "searching-sorting-sort-at-scale",
+          "code_hash": "a9c34c41ad58ba58e8ea3128835c61cb00434e1fddb6a423624c44897bb0b8d8",
           "ran": true,
           "ok": true,
-          "output": "1 3\n2",
+          "output": "[('B', 9), ('D', 8)]\n1 2\n[3, 4, 7, 9]",
           "verification": "Exact code/expected-output hash in the repository verification artifact"
         }
       ],
-      "objectives": 5,
-      "covered": 5,
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "trees-bst",
+      "version": 1,
+      "course_hash": "9292af2045a07ff23218e86481fbca85d2f9d9ddfdc827aa25abf2ba30f33c72",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "trees-bst-depth-orders",
+          "code_hash": "14ee61ec47afda606582cee5ccf2ca5c2aa2107126365b11fd855753d8f2e3da",
+          "ran": true,
+          "ok": true,
+          "output": "['A', 'B', 'C', 'D']\n['B', 'A', 'D', 'C']\n['B', 'D', 'C', 'A']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "trees-bst-breadth-shape",
+          "code_hash": "6f9ce57fbdb4af105c724a96f5d3e897fd4832be1e2c14922734794fde902697",
+          "ran": true,
+          "ok": true,
+          "output": "[['A'], ['B', 'C'], ['D']]\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "trees-bst-iterative-inorder",
+          "code_hash": "35fedb7173ef2b888e2fa7f82973f637789111349f10fed7a64798f4b3468b78",
+          "ran": true,
+          "ok": true,
+          "output": "1 2\n[3, 4, 6]\n[]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "trees-bst-bst-paths",
+          "code_hash": "882aad27f450e00645e419aae3345f4e07296b4325bd49ef6653deb3ab7eec0e",
+          "ran": true,
+          "ok": true,
+          "output": "True False\n2 3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "trees-bst-validate-bounds",
+          "code_hash": "0f4735e96881cfdeaeee52c7a302fb6f8bb731095c5815180aee387d2dffaaca",
+          "ran": true,
+          "ok": true,
+          "output": "False True\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "trees-bst-rotations-height",
+          "code_hash": "a058ca9a5b0ae71d61841cefb63f3500dad5beadb54d47705a680a8b9b0bfd79",
+          "ran": true,
+          "ok": true,
+          "output": "[1, 2, 3]\n2 [1, 2, 3]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "trees-bst-heap-topk",
+          "code_hash": "d3b4f449bd32d49651323f784e5f3cea23dc2c88b94958ee884451a14d76a8ff",
+          "ran": true,
+          "ok": true,
+          "output": "[9, 8, 7]\n[2, 1]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "trees-bst-trie-prefix",
+          "code_hash": "6b9f912a5b412f3fb0feedcaef1db0b96a73bb08b64b9585839302ad5532bd12",
+          "ran": true,
+          "ok": true,
+          "output": "True False\nTrue True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "trees-bst-trie-delete",
+          "code_hash": "f636de0c91ef96e5f14d72b914f2cbd40186daaedcbd2f71cc7462b2c7c395ae",
+          "ran": true,
+          "ok": true,
+          "output": "True True False\nTrue True\nFalse",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "graphs",
+      "version": 1,
+      "course_hash": "160ec77f99640d8d57626b8716feb48d857bd7beb08a8e2cdb0839c2853ecd80",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "graphs-relationships",
+          "code_hash": "d055d1a35b137a13f2f6a286c78527d539389d911f4b9e9005cb5e5a8dd1975c",
+          "ran": true,
+          "ok": true,
+          "output": "{'pay': 0, 'ledger': 2, 'risk': 1, 'audit': 0}\n3",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "graphs-storage",
+          "code_hash": "310eb08e757a1bf7f05aec82262768c5981901fbbcd0e47094e060b56c733d69",
+          "ran": true,
+          "ok": true,
+          "output": "[None, 0, None]\n{'hub': [], 'shop': ['hub'], 'port': ['shop']}",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "graphs-components",
+          "code_hash": "1b4a16b7da587653951226287bd1ed48fd23bfbd6956a511104745def04a8cdf",
+          "ran": true,
+          "ok": true,
+          "output": "[['A', 'B'], ['C'], ['D', 'E']]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "graphs-bfs",
+          "code_hash": "e01d95a3727943a622a1d80c329a6484f5b9d13be94c0ed559822caa1b214ed8",
+          "ran": true,
+          "ok": true,
+          "output": "3\n['A', 'B', 'D', 'E']",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "graphs-dfs",
+          "code_hash": "3812a82ebe082ab603e0868919a75a0b496fbb61f5f95525db7c8391ed5ca1d5",
+          "ran": true,
+          "ok": true,
+          "output": "True",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "graphs-multi-source",
+          "code_hash": "1e8656c91efae4d1065279ce2dde90a8f5ffd23dcab7d388146db64adb6391db",
+          "ran": true,
+          "ok": true,
+          "output": "[0, 1, None, 1]\n[1, 2, 1, 0]",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "graphs-dijkstra",
+          "code_hash": "519057b0fa0aff46b1021441eecde54cab5504023e969d3f754e8d168d2535e6",
+          "ran": true,
+          "ok": true,
+          "output": "{'A': 0, 'B': 3, 'C': 2, 'D': 4}\n2",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "graphs-topological",
+          "code_hash": "d4bd179219253dd32e413ed3648589cfae1143247eb703796773926b2c0cd619",
+          "ran": true,
+          "ok": true,
+          "output": "['fetch', 'docs', 'compile', 'test']\nNone",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "graphs-dag-paths",
+          "code_hash": "7d63e2cb21b846b2060ae47b580ff1474d43646fab68de5d5c8082a82ccbf930",
+          "ran": true,
+          "ok": true,
+          "output": "{'S': 0, 'A': 4, 'B': 1, 'T': 3}\nTrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
       "lessons": 9,
       "questions": 54,
       "human_approved": false
@@ -7676,9 +9272,21 @@
     "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
     "references": [
       {
-        "id": "workflow-sqlite",
-        "path": "Doc/library/sqlite3.rst",
-        "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
+        "id": "graphs.ref0",
+        "path": "Doc/library/collections.rst",
+        "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "graphs.ref1",
+        "path": "Doc/library/heapq.rst",
+        "sha256": "d4af040814240446561ec71f310c0f0dd53b0371400df230c978ee6cab57f4ff",
+        "checked_by": "Pinned official Git object and matching local source file"
+      },
+      {
+        "id": "graphs.ref2",
+        "path": "Doc/tutorial/datastructures.rst",
+        "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -10758,39 +12366,439 @@
       ]
     },
     {
-      "course": "complexity-analysis",
-      "repository": "https://github.com/python/cpython",
-      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "course": "mobile-ui-fundamentals",
+      "repository": "https://github.com/flutter/website",
+      "commit": "35ed8c8d5caf1ff8b63a80bfe0f5b1b85e6e8e68",
       "references": [
         {
-          "id": "dsa-ref-0",
-          "path": "Doc/tutorial/datastructures.rst",
-          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "id": "mobile-ui-fundamentals.ref0",
+          "path": "sites/docs/src/content/ui/adaptive-responsive/general.md",
+          "sha256": "9d687a5577c782384b5ae10bc72f9b52d440210e7fd67a7ae21f58a2cd5903cb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-ui-fundamentals.ref1",
+          "path": "sites/docs/src/content/ui/adaptive-responsive/platform-adaptations.md",
+          "sha256": "e309e0addd1c9e1f1f3f9c6b6cb7680c2cf58dea4b31d1e63f4e310a47979f5b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-ui-fundamentals.ref2",
+          "path": "sites/docs/src/content/ui/adaptive-responsive/safearea-mediaquery.md",
+          "sha256": "879aff5c4b77b27e6b83920a19a73a00d8067e642d5dfd47af177a5ba581fa9d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-ui-fundamentals.ref3",
+          "path": "sites/docs/src/content/ui/accessibility/ui-design-and-styling.md",
+          "sha256": "996054c539f6740509397f9f5c372db0c02ea3ae21f692f45fc97a49c815debe",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-ui-fundamentals.ref4",
+          "path": "sites/docs/src/content/app-architecture/design-patterns/offline-first.md",
+          "sha256": "88637b14901a82193f06d3044d28de01a09384eab195a18263e77fa28537672f",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
     },
     {
-      "course": "arrays-strings-hashing",
+      "course": "dart-programming",
+      "repository": "https://github.com/dart-lang/site-www",
+      "commit": "fc23978a6dc0cd59a690519c2284e5f5821656f3",
+      "references": [
+        {
+          "id": "dart-programming.ref0",
+          "path": "src/content/language/variables.md",
+          "sha256": "5680e8c081d45d5f6db7b4b533bece1fa64b0338684308fb0178d8e7ad511ee0",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dart-programming.ref1",
+          "path": "src/content/language/built-in-types.md",
+          "sha256": "bed64b0341d46e95c2d37339816b4d0cfde10e317a128c439945eb06548c4d6e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dart-programming.ref2",
+          "path": "src/content/language/functions.md",
+          "sha256": "b7d02cb5d1357ab68c644b618377c8b70ad8bc796be2fa6a30c68daffa77fba9",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dart-programming.ref3",
+          "path": "src/content/language/collections.md",
+          "sha256": "949f387b9c211e06c7714144bc503ab329e827a1f6a5ecc8972b6ba69a147244",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dart-programming.ref4",
+          "path": "src/content/language/classes.md",
+          "sha256": "1a0ba52b0c7392130732f788eb6a86712426d3bebf02c6fb3e05f3ef1a8a8797",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dart-programming.ref5",
+          "path": "src/content/language/mixins.md",
+          "sha256": "f3b60155574e9cb8b0870b9e2f2c006a061ff5a19d88c62abac741c9b28600bb",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dart-programming.ref6",
+          "path": "src/content/language/async.md",
+          "sha256": "b10b5d8ce4832320ed061c24ab7a92a71e2e88146d5ce43550a6a1d45343847c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dart-programming.ref7",
+          "path": "src/content/language/error-handling.md",
+          "sha256": "4048ff9965d6a15c637fab3364f483fc420a27c64093fcc7003c4655f76385cd",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "flutter-fundamentals",
+      "repository": "https://github.com/flutter/website",
+      "commit": "35ed8c8d5caf1ff8b63a80bfe0f5b1b85e6e8e68",
+      "references": [
+        {
+          "id": "flutter-fundamentals.ref0",
+          "path": "sites/docs/src/content/ui/index.md",
+          "sha256": "9a62769e8e7c2d20e8eb08f95d2a63a41602f519c20575256bd3df33386de144",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "flutter-fundamentals.ref1",
+          "path": "sites/docs/src/content/ui/interactivity/index.md",
+          "sha256": "7e30a70fe98ccb7bb385b3686371f4c69e4ba508c838320cc7b89b9c7be4a7ac",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "flutter-fundamentals.ref2",
+          "path": "sites/docs/src/content/ui/widgets/index.md",
+          "sha256": "5219b924ec53cc5ce675c11ec051f73b4fb34b91b9a5bde77b2bde9ac481cefc",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "flutter-fundamentals.ref3",
+          "path": "sites/docs/src/content/ui/layout/constraints.md",
+          "sha256": "602b50bfb65d57b79f77464641caad2ae01e3358b2e43b9698f8af5ac2620e9d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "flutter-fundamentals.ref4",
+          "path": "sites/docs/src/content/cookbook/forms/validation.md",
+          "sha256": "67046011f694b56cf1a5e2fdb948d99c9c17f802acfb1c041ec86f2b041811d6",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "flutter-fundamentals.ref5",
+          "path": "sites/docs/src/content/cookbook/lists/long-lists.md",
+          "sha256": "9c1323a14068d6d0c022797d59aa7d3cb1b0c381f663e86b651413e9be5738b8",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "flutter-fundamentals.ref6",
+          "path": "sites/docs/src/content/cookbook/design/themes.md",
+          "sha256": "17da63a7e6307aa7617d50d3a32d6380ad33fa9c55254af55c9c8a464182f44e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "flutter-fundamentals.ref7",
+          "path": "sites/docs/src/content/ui/assets/assets-and-images.md",
+          "sha256": "6a0518c8cc3d6bccb9f209dd221a7b7e80235e3a831d6fab469ff1b5ff337437",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "kotlin-android",
+      "repository": "https://github.com/JetBrains/kotlin-web-site",
+      "commit": "c0c20bb7efdb798e90b024d7de8d1078de3a4057",
+      "references": [
+        {
+          "id": "kotlin-android.ref0",
+          "path": "docs/topics/null-safety.md",
+          "sha256": "fd7c26a31eebbfe03430aa7ae855b03f3bcd6d35b88d3ef93f6f980e1c39fa20",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "kotlin-android.ref1",
+          "path": "docs/topics/data-classes.md",
+          "sha256": "55c41121fca39e11ee50749d39675e23806dc865fbdee8afc44c4d2231ae42e1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "kotlin-android.ref2",
+          "path": "docs/topics/collections/collections-overview.md",
+          "sha256": "696bb5e92e898ea3fd9c993811cd0c596f8abd444141a5a11da24df854f0f73d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "kotlin-android.ref3",
+          "path": "docs/topics/coroutines-overview.md",
+          "sha256": "946f3c8b2945ae0cbeadc349da7423518b6552d538e85ce6cb5d8e22c7389ffe",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "kotlin-android",
+      "repository": "https://github.com/android/architecture-samples",
+      "commit": "ee66e1526b84c026615df032c705842b7d2a521f",
+      "references": [
+        {
+          "id": "kotlin-android.android-ref0",
+          "path": "app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksScreen.kt",
+          "sha256": "34bf4bf29cb559b77a8348c23ec640e0abe7bc82df300583a1fdf92ee854816e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "kotlin-android.android-ref1",
+          "path": "app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksViewModel.kt",
+          "sha256": "b8d2544a85e286f0392bc2216a0d41bfd19541afbc89074e923cdfb013a330e0",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "kotlin-android.android-ref2",
+          "path": "app/src/main/java/com/example/android/architecture/blueprints/todoapp/TodoNavigation.kt",
+          "sha256": "c415007014c8ab0ae1221d83a0d352ce7093e5ea016256f165c9f1190dbc478a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "kotlin-android",
+      "repository": "https://github.com/android/permissions-samples",
+      "commit": "eb80f0faff479a34b5ee1ed1d246c1c94e3d0b01",
+      "references": [
+        {
+          "id": "kotlin-android.android-ref3",
+          "path": "PermissionsActivityResultKotlin/Application/src/main/java/com/example/android/basicpermissions/MainActivity.kt",
+          "sha256": "2006057b5a22975c5652c7f5532dbb7b71d0b7ac72d98341ad03ba0d0c013679",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "kotlin-android",
+      "repository": "https://github.com/android/codelab-android-workmanager",
+      "commit": "d0960a669598b985af0b7875062f6a27940d25f3",
+      "references": [
+        {
+          "id": "kotlin-android.android-ref4",
+          "path": "app/src/main/java/com/example/background/BlurViewModel.kt",
+          "sha256": "80116afd11cd3cc423a68deb208d41132311dc8064927d41837de754418d9b69",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "kotlin-android.android-ref5",
+          "path": "app/src/main/java/com/example/background/workers/BlurWorker.kt",
+          "sha256": "8ad6c414ec1aa3fd2e622d0a6685132a2dab1dd09c4f5ad4f63dd3c85beeb344",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "unsupervised-learning",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "unsup-clustering",
+          "path": "doc/modules/clustering.rst",
+          "sha256": "2b9da92852434aecf3a345e1b16eea93d1276a41941ce80d911c9183bb005142",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "unsup-decomposition",
+          "path": "doc/modules/decomposition.rst",
+          "sha256": "bea2521c56a2c6ff54d82052796eabe34196b16c678f4987abe0aa7af46c4efa",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "unsup-manifold",
+          "path": "doc/modules/manifold.rst",
+          "sha256": "d1ed23aad342a4ed52764e5907868ab190ddad444205a1074599892eb7a862d2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "unsup-outlier-detection",
+          "path": "doc/modules/outlier_detection.rst",
+          "sha256": "f96e20a0ead10015bf662f80e484bc6eeaf111cd37d5d12cd7e51950b2f99aad",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "deep-learning",
+      "repository": "https://github.com/pytorch/pytorch",
+      "commit": "31a77fc9c0a7c6fff15a1ff58c743f53b1a9d457",
+      "references": [
+        {
+          "id": "dl-linear",
+          "path": "torch/nn/modules/linear.py",
+          "sha256": "1961ad1a1f650e104b3c7f78d19af2d21bf977e7af6c3fdf2420aad563c9e202",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dl-loss",
+          "path": "torch/nn/modules/loss.py",
+          "sha256": "415e4ccbbab63b9cc2b79f09a338cca6fa191c07138a4fb419e3c841c4748ae0",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dl-optim",
+          "path": "torch/optim/sgd.py",
+          "sha256": "a187e9eded4e5b6ac269b8000fe18688b84a8bad53be9daa670f73ab5456fd08",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dl-module",
+          "path": "torch/nn/modules/module.py",
+          "sha256": "6e1d498b3b1997725aae48fcda347149d2fa093f4f5854490268bb4af75b1b81",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "computer-vision",
+      "repository": "https://github.com/pytorch/pytorch",
+      "commit": "31a77fc9c0a7c6fff15a1ff58c743f53b1a9d457",
+      "references": [
+        {
+          "id": "cv-conv",
+          "path": "torch/nn/modules/conv.py",
+          "sha256": "ef261d946378fcb5a047d2113ef715f04b2894eef2f2f7ad6009c920f2e9ebc1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "cv-pool",
+          "path": "torch/nn/modules/pooling.py",
+          "sha256": "c89240262a65de87bc4a2bd456b56aa76536df37601acb9552595ddd707d1a2c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "cv-resize",
+          "path": "torch/nn/functional.py",
+          "sha256": "5a3bacfc98d3a3b75696e7ee6814da3d3ca9e0a02b60fba5bbd15743141fa634",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "cv-state",
+          "path": "torch/nn/modules/module.py",
+          "sha256": "6e1d498b3b1997725aae48fcda347149d2fa093f4f5854490268bb4af75b1b81",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "nlp-fundamentals",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "nlp-text",
+          "path": "doc/modules/feature_extraction.rst",
+          "sha256": "c1c3f7c223fee07a558daf74b9fbdfb33d13ec4d608211f86e73a0ddd567f9c9",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "nlp-evaluation",
+          "path": "doc/modules/model_evaluation.rst",
+          "sha256": "d61349c80806b05dea0c6fb852abe028c7baae194154936613ee08b0096a6e0e",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "nlp-pipelines",
+          "path": "doc/modules/compose.rst",
+          "sha256": "d116a5d4852ca1c437805ebcc1021169d04c8dd9d15781198641c9f5da607045",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "nlp-fundamentals",
+      "repository": "https://github.com/huggingface/course",
+      "commit": "8b893f0ede6c781045692a7f892f25a0c92b4805",
+      "references": [
+        {
+          "id": "nlp-transformers",
+          "path": "chapters/en/chapter1/4.mdx",
+          "sha256": "95141044df4d7baca23bf8e0f60650ef2085a1ea043b3669567710b5bc6e7579",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "mlops-deployment",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "references": [
+        {
+          "id": "mlops-compose",
+          "path": "doc/modules/compose.rst",
+          "sha256": "d116a5d4852ca1c437805ebcc1021169d04c8dd9d15781198641c9f5da607045",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mlops-persistence",
+          "path": "doc/model_persistence.rst",
+          "sha256": "378e4377647bdbae47eac19bb696f4e4de5e25d8f970d0ccdf5e351e2c020397",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mlops-pitfalls",
+          "path": "doc/common_pitfalls.rst",
+          "sha256": "6e2b42374fbb521c35f29eeab05bcbfa9744eed344b5f92e41013338ff60a2f5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mlops-inspection",
+          "path": "doc/model_selection.rst",
+          "sha256": "2b343293fc961746cfa1f982013bf865fb01c759b7e095178533d773087b18d2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "mlops-deployment",
+      "repository": "Official Google SRE HTTPS documentation",
+      "kind": "official-http-snapshot",
+      "references": [
+        {
+          "id": "mlops-canary",
+          "path": "canarying-releases.html",
+          "url": "https://sre.google/workbook/canarying-releases/",
+          "sha256": "2129ec6fefdb7807073a7877344e7f0409c27e4fde1021d30114a38338fd039f",
+          "fetched_at": "2026-11-11T10:18:57.435364+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        }
+      ]
+    },
+    {
+      "course": "agent-workflows",
+      "repository": "https://github.com/openai/openai-cookbook",
+      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "references": [
+        {
+          "id": "workflow-orchestration",
+          "path": "examples/Orchestrating_agents.ipynb",
+          "sha256": "25220a90cde59e662ba6590841a92adce8ae1e99e9fc669b2a317c478333a6c5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "agent-workflows",
       "repository": "https://github.com/python/cpython",
       "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
       "references": [
         {
-          "id": "dsa-ref-0",
-          "path": "Doc/tutorial/datastructures.rst",
-          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
-          "checked_by": "Pinned official Git object and matching local source file"
-        },
-        {
-          "id": "dsa-ref-1",
-          "path": "Doc/library/collections.rst",
-          "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
-          "checked_by": "Pinned official Git object and matching local source file"
-        },
-        {
-          "id": "dsa-ref-2",
-          "path": "Doc/library/unicodedata.rst",
-          "sha256": "6ee133763805a5c4ee062f24787bee8460310e75579f008b9a5129cf64e3d67d",
+          "id": "workflow-sqlite",
+          "path": "Doc/library/sqlite3.rst",
+          "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
@@ -10828,38 +12836,131 @@
       ]
     },
     {
-      "course": "mobile-ui-fundamentals",
-      "repository": "https://github.com/flutter/website",
-      "commit": "35ed8c8d5caf1ff8b63a80bfe0f5b1b85e6e8e68",
+      "course": "security-foundations",
+      "repository": "https://github.com/OWASP/CheatSheetSeries",
+      "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
       "references": [
         {
-          "id": "mobile-ui-fundamentals.ref0",
-          "path": "sites/docs/src/content/ui/adaptive-responsive/general.md",
-          "sha256": "9d687a5577c782384b5ae10bc72f9b52d440210e7fd67a7ae21f58a2cd5903cb",
+          "id": "security-foundations-ref0",
+          "path": "cheatsheets/Threat_Modeling_Cheat_Sheet.md",
+          "sha256": "5102d1557d58fdc184e1cb07dbd796f063e8899318e7d83de5b6242cebf74233",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "mobile-ui-fundamentals.ref1",
-          "path": "sites/docs/src/content/ui/adaptive-responsive/platform-adaptations.md",
-          "sha256": "e309e0addd1c9e1f1f3f9c6b6cb7680c2cf58dea4b31d1e63f4e310a47979f5b",
+          "id": "security-foundations-ref1",
+          "path": "cheatsheets/Attack_Surface_Analysis_Cheat_Sheet.md",
+          "sha256": "239f4e4b29db5f8f03632e0ca70d61f1e44bce7dc4e0dbfee32eb0160b47f81b",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "mobile-ui-fundamentals.ref2",
-          "path": "sites/docs/src/content/ui/adaptive-responsive/safearea-mediaquery.md",
-          "sha256": "879aff5c4b77b27e6b83920a19a73a00d8067e642d5dfd47af177a5ba581fa9d",
+          "id": "security-foundations-ref2",
+          "path": "cheatsheets/Authorization_Cheat_Sheet.md",
+          "sha256": "fb8b6e5c60ed783025beefb5049142fd9da02d01f5c95de18a19d26479737975",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "mobile-ui-fundamentals.ref3",
-          "path": "sites/docs/src/content/ui/accessibility/ui-design-and-styling.md",
-          "sha256": "996054c539f6740509397f9f5c372db0c02ea3ae21f692f45fc97a49c815debe",
+          "id": "security-foundations-ref3",
+          "path": "cheatsheets/Multifactor_Authentication_Cheat_Sheet.md",
+          "sha256": "aa0c03c9d10c1facfaef0ace5f61536aab46e2a8ea409cf8527086d0d11132f2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "identity-access-control",
+      "repository": "https://github.com/OWASP/CheatSheetSeries",
+      "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
+      "references": [
+        {
+          "id": "identity-access-control-ref0",
+          "path": "cheatsheets/Authentication_Cheat_Sheet.md",
+          "sha256": "92f7483b28548679917a329c7b9be1824f33e934d9eed670aaf3e9a1e7b37e83",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "mobile-ui-fundamentals.ref4",
-          "path": "sites/docs/src/content/app-architecture/design-patterns/offline-first.md",
-          "sha256": "88637b14901a82193f06d3044d28de01a09384eab195a18263e77fa28537672f",
+          "id": "identity-access-control-ref1",
+          "path": "cheatsheets/Multifactor_Authentication_Cheat_Sheet.md",
+          "sha256": "aa0c03c9d10c1facfaef0ace5f61536aab46e2a8ea409cf8527086d0d11132f2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "identity-access-control-ref2",
+          "path": "cheatsheets/Session_Management_Cheat_Sheet.md",
+          "sha256": "c6dfdd81905de29eb149fa3826fa803da38e37f186b309dbdc85000c732aa514",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "identity-access-control-ref3",
+          "path": "cheatsheets/Authorization_Cheat_Sheet.md",
+          "sha256": "fb8b6e5c60ed783025beefb5049142fd9da02d01f5c95de18a19d26479737975",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "cryptography-secure-comms",
+      "repository": "https://github.com/OWASP/CheatSheetSeries",
+      "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
+      "references": [
+        {
+          "id": "cryptography-secure-comms-ref0",
+          "path": "cheatsheets/Cryptographic_Storage_Cheat_Sheet.md",
+          "sha256": "de48a9c65d23940f5f7335b315fc444f48f17dd1170f13f9c4875ba6d5353cfd",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "cryptography-secure-comms-ref1",
+          "path": "cheatsheets/Key_Management_Cheat_Sheet.md",
+          "sha256": "f0bc89eb98a60966ab985082fed75807ff8f39978ccabf28118fc5a08baab293",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "cryptography-secure-comms-ref2",
+          "path": "cheatsheets/Password_Storage_Cheat_Sheet.md",
+          "sha256": "5004d1ead2dfa8270df8be7789c9decb39746261639ddf271e24ba1ac68b32a1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "cryptography-secure-comms-ref3",
+          "path": "cheatsheets/Transport_Layer_Security_Cheat_Sheet.md",
+          "sha256": "1368bb1bfb1cc25e82e114105ab622bcc27e627bcda080c2078fe6c790ee0b9c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "vulnerabilities-defense",
+      "repository": "https://github.com/OWASP/CheatSheetSeries",
+      "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
+      "references": [
+        {
+          "id": "vulnerabilities-defense-ref0",
+          "path": "cheatsheets/Vulnerable_Dependency_Management_Cheat_Sheet.md",
+          "sha256": "77e7a460c4072442d524394109125391317d61961db78c3cdc2dd771c006872a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "vulnerabilities-defense-ref1",
+          "path": "cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md",
+          "sha256": "6c377eef95804d03ed29c27b8002a1d714ced833dfc651e1ee69ccf4abdadd6b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "vulnerabilities-defense-ref2",
+          "path": "cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.md",
+          "sha256": "e4bbeced6010bb9029061910e97f01f4391cb8b89d1a0f31a390ca5a00a5e9a8",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "vulnerabilities-defense-ref3",
+          "path": "cheatsheets/Authorization_Cheat_Sheet.md",
+          "sha256": "fb8b6e5c60ed783025beefb5049142fd9da02d01f5c95de18a19d26479737975",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "vulnerabilities-defense-ref4",
+          "path": "cheatsheets/Docker_Security_Cheat_Sheet.md",
+          "sha256": "a38d27ad4444f54a467eb863a431080fbff77bd8eae445bd27c6d943175fb1bb",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
@@ -10914,89 +13015,320 @@
       ]
     },
     {
-      "course": "security-foundations",
-      "repository": "https://github.com/OWASP/CheatSheetSeries",
-      "commit": "121e76561a58a28790fd7fa927236eec8d63ea59",
+      "course": "automation-frameworks",
+      "repository": "https://github.com/microsoft/playwright",
+      "commit": "54c711571a37de525377e6f3d3608c3e029b1829",
       "references": [
         {
-          "id": "security-foundations-ref0",
-          "path": "cheatsheets/Threat_Modeling_Cheat_Sheet.md",
-          "sha256": "5102d1557d58fdc184e1cb07dbd796f063e8899318e7d83de5b6242cebf74233",
+          "id": "af-page-objects",
+          "path": "docs/src/pom.md",
+          "sha256": "b871223adbf59821e86d1dd9264f6ff5c06796fab757b27a386d6c0e9e22fe26",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "security-foundations-ref1",
-          "path": "cheatsheets/Attack_Surface_Analysis_Cheat_Sheet.md",
-          "sha256": "239f4e4b29db5f8f03632e0ca70d61f1e44bce7dc4e0dbfee32eb0160b47f81b",
+          "id": "af-fixtures",
+          "path": "docs/src/test-fixtures-js.md",
+          "sha256": "0adc32648d696e3a5d79ce0da67a5242a367ee1f4d7b668d133fcd897c94c744",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "security-foundations-ref2",
-          "path": "cheatsheets/Authorization_Cheat_Sheet.md",
-          "sha256": "fb8b6e5c60ed783025beefb5049142fd9da02d01f5c95de18a19d26479737975",
+          "id": "af-retries",
+          "path": "docs/src/test-retries-js.md",
+          "sha256": "073b8a570b80e54a11f73a4277fc8b5d8b966aafbde3bba66cf8e48afe0e30d0",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "security-foundations-ref3",
-          "path": "cheatsheets/Multifactor_Authentication_Cheat_Sheet.md",
-          "sha256": "aa0c03c9d10c1facfaef0ace5f61536aab46e2a8ea409cf8527086d0d11132f2",
+          "id": "af-assertions",
+          "path": "docs/src/test-assertions-js.md",
+          "sha256": "560e0094906eb82404665122d0ec4225784f3013feb63f54a0b1bfac748c24ed",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "af-parallel",
+          "path": "docs/src/test-parallel-js.md",
+          "sha256": "c35267afc7222953e90f20de90eee9d1c04b14aaf74046713873d73d42c601af",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
     },
     {
-      "course": "unsupervised-learning",
-      "repository": "https://github.com/scikit-learn/scikit-learn",
-      "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
+      "course": "ci-test-reporting",
+      "repository": "https://github.com/microsoft/playwright",
+      "commit": "54c711571a37de525377e6f3d3608c3e029b1829",
       "references": [
         {
-          "id": "unsup-clustering",
-          "path": "doc/modules/clustering.rst",
-          "sha256": "2b9da92852434aecf3a345e1b16eea93d1276a41941ce80d911c9183bb005142",
+          "id": "ci-shards",
+          "path": "docs/src/test-sharding-js.md",
+          "sha256": "59bf38d08c790b3a4d77b178ae3b5c8514c99a7689bda444c34d8a5e898b0dbf",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "unsup-decomposition",
-          "path": "doc/modules/decomposition.rst",
-          "sha256": "bea2521c56a2c6ff54d82052796eabe34196b16c678f4987abe0aa7af46c4efa",
+          "id": "ci-reporters",
+          "path": "docs/src/test-reporters-js.md",
+          "sha256": "d5775791ff442da17ef6bb3a0b45c72a0e5261c6eae14194b75834795a654581",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "unsup-manifold",
-          "path": "doc/modules/manifold.rst",
-          "sha256": "d1ed23aad342a4ed52764e5907868ab190ddad444205a1074599892eb7a862d2",
+          "id": "ci-traces",
+          "path": "docs/src/trace-viewer.md",
+          "sha256": "d24762670ee6afa6427ef6eff1c419e250550cb91253d5f749461b120e9af002",
           "checked_by": "Pinned official Git object and matching local source file"
         },
         {
-          "id": "unsup-outlier-detection",
-          "path": "doc/modules/outlier_detection.rst",
-          "sha256": "f96e20a0ead10015bf662f80e484bc6eeaf111cd37d5d12cd7e51950b2f99aad",
+          "id": "ci-parallel",
+          "path": "docs/src/test-parallel-js.md",
+          "sha256": "c35267afc7222953e90f20de90eee9d1c04b14aaf74046713873d73d42c601af",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "ci-retries",
+          "path": "docs/src/test-retries-js.md",
+          "sha256": "073b8a570b80e54a11f73a4277fc8b5d8b966aafbde3bba66cf8e48afe0e30d0",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
     },
     {
-      "course": "agent-workflows",
-      "repository": "https://github.com/openai/openai-cookbook",
-      "commit": "2d5b1a9b6e706a732b03048d701c7086fda5f010",
+      "course": "performance-quality-engineering",
+      "repository": "Official Google SRE HTTPS documentation",
+      "kind": "official-http-snapshot",
       "references": [
         {
-          "id": "workflow-orchestration",
-          "path": "examples/Orchestrating_agents.ipynb",
-          "sha256": "25220a90cde59e662ba6590841a92adce8ae1e99e9fc669b2a317c478333a6c5",
+          "id": "pq-objectives",
+          "path": "objectives.html",
+          "url": "https://sre.google/sre-book/service-level-objectives/",
+          "sha256": "60851ff3487eef695bb59143b5123a79af081091ce8bf2909ad83ad924438365",
+          "fetched_at": "2026-11-10T14:54:59.817539+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "pq-incidents",
+          "path": "incidents.html",
+          "url": "https://sre.google/sre-book/managing-incidents/",
+          "sha256": "7f50d2472877739e24f2bb31de56d68ca46521463232ce58125fc2d4ea8583cb",
+          "fetched_at": "2026-11-10T14:55:00.255604+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "pq-postmortem",
+          "path": "postmortem.html",
+          "url": "https://sre.google/sre-book/postmortem-culture/",
+          "sha256": "ef876f0a0f09a88f3acc3294ec24eb922751b0059cba8be271aa6fe8474656c5",
+          "fetched_at": "2026-11-10T14:55:00.494905+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "pq-canarying-releases",
+          "path": "canarying-releases.html",
+          "url": "https://sre.google/workbook/canarying-releases/",
+          "sha256": "2129ec6fefdb7807073a7877344e7f0409c27e4fde1021d30114a38338fd039f",
+          "fetched_at": "2026-11-11T10:18:57.435364+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "pq-testing-reliability",
+          "path": "testing-reliability.html",
+          "url": "https://sre.google/sre-book/testing-reliability/",
+          "sha256": "090d12e171de30b49c4228c54314af1f95e021c00270adcff0e5d5609c8e4c2e",
+          "fetched_at": "2026-11-11T15:13:32.472894+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "pq-handling-overload",
+          "path": "handling-overload.html",
+          "url": "https://sre.google/sre-book/handling-overload/",
+          "sha256": "945d15db67ad15a7f5e75833f8c0d014c8dc61d57909f7a3abd48459ad12cc9e",
+          "fetched_at": "2026-11-11T15:13:32.616419+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "pq-addressing-cascading-failures",
+          "path": "addressing-cascading-failures.html",
+          "url": "https://sre.google/sre-book/addressing-cascading-failures/",
+          "sha256": "d67024d52d72a1254c830d3c29e6d1b2afade88e133ffcff64b94711c2aaa11a",
+          "fetched_at": "2026-11-11T15:13:32.856756+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        }
+      ]
+    },
+    {
+      "course": "performance-quality-engineering",
+      "repository": "https://github.com/prometheus/docs",
+      "commit": "cc0672badce86173b9afaa95a59904576bcd6d6a",
+      "references": [
+        {
+          "id": "pq-histograms",
+          "path": "docs/practices/histograms.md",
+          "sha256": "ebe64305d7d6156ca6b7021604c84eb5eab1868f35510089670ffe6fe387dcd2",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "pq-instrumentation",
+          "path": "docs/practices/instrumentation.md",
+          "sha256": "8f7f26690b5b1d590729183acbbae519786a958986bd76c2ba236ca9d4a35dfb",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]
     },
     {
-      "course": "agent-workflows",
+      "course": "complexity-analysis",
       "repository": "https://github.com/python/cpython",
       "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
       "references": [
         {
-          "id": "workflow-sqlite",
-          "path": "Doc/library/sqlite3.rst",
-          "sha256": "0f26e1fdc84c408c9710434349d422825607dfbb6de41eb0d48b733bb4c52ff6",
+          "id": "dsa-ref-0",
+          "path": "Doc/tutorial/datastructures.rst",
+          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "arrays-strings-hashing",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "dsa-ref-0",
+          "path": "Doc/tutorial/datastructures.rst",
+          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-1",
+          "path": "Doc/library/collections.rst",
+          "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-2",
+          "path": "Doc/library/unicodedata.rst",
+          "sha256": "6ee133763805a5c4ee062f24787bee8460310e75579f008b9a5129cf64e3d67d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "linear-structures",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "dsa-ref-0",
+          "path": "Doc/tutorial/datastructures.rst",
+          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-1",
+          "path": "Doc/library/collections.rst",
+          "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-2",
+          "path": "Doc/library/heapq.rst",
+          "sha256": "d4af040814240446561ec71f310c0f0dd53b0371400df230c978ee6cab57f4ff",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "recursion-backtracking",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "dsa-ref-0",
+          "path": "Doc/tutorial/controlflow.rst",
+          "sha256": "f0358f400e6535f69a0644ca3e12a6647a7f9ab73bf05641e2eaffab0e77d30c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-1",
+          "path": "Doc/library/functools.rst",
+          "sha256": "17e13f58611ad90c6aac266eaddcf61f33f468831c42c1811deacb6518607972",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-2",
+          "path": "Doc/library/sys.rst",
+          "sha256": "91825c95030c506eb3840249a9f7bc12a0ff7eeb2f66b980608d5bc5d1cdb568",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "searching-sorting",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "dsa-ref-0",
+          "path": "Doc/library/bisect.rst",
+          "sha256": "9d938c30b4c29cea8a57142872763191060d780012c631ff69d0b1324ad0f52f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-1",
+          "path": "Doc/howto/sorting.rst",
+          "sha256": "5416237197629d56d6dff21dc6ddd77b1ab4f82dd5b7a35e290c0798dec72647",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-2",
+          "path": "Doc/library/heapq.rst",
+          "sha256": "d4af040814240446561ec71f310c0f0dd53b0371400df230c978ee6cab57f4ff",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "trees-bst",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "dsa-ref-0",
+          "path": "Doc/tutorial/datastructures.rst",
+          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-1",
+          "path": "Doc/library/heapq.rst",
+          "sha256": "d4af040814240446561ec71f310c0f0dd53b0371400df230c978ee6cab57f4ff",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "dsa-ref-2",
+          "path": "Doc/builtins/stdtypes.rst",
+          "sha256": "3a5533d8d038ddcca6b4fd223b90f9d97ceaf1df9c43e1a33bca52acbb536bc7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "graphs",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "graphs.ref0",
+          "path": "Doc/library/collections.rst",
+          "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "graphs.ref1",
+          "path": "Doc/library/heapq.rst",
+          "sha256": "d4af040814240446561ec71f310c0f0dd53b0371400df230c978ee6cab57f4ff",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "graphs.ref2",
+          "path": "Doc/tutorial/datastructures.rst",
+          "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

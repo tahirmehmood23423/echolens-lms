@@ -1,0 +1,11 @@
+{
+  "file": "/workspace/echolens-audit/wave4-first-eight-review.zip",
+  "bytes": 15110603,
+  "sha256": "5fb96c2bcb01e1aa3e3dc7b28f053ef1fc7349b5789024967ff688955e699a4f",
+  "integrity": "passed",
+  "authored_courses": 82,
+  "new_courses": 8,
+  "contains_instructor_answer_keys": true,
+  "human_approved": false,
+  "published": false
+}

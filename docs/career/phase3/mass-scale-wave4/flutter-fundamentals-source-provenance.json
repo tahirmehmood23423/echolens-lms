@@ -1,0 +1,57 @@
+{
+  "repository": "flutter/website",
+  "commit": "35ed8c8d5caf1ff8b63a80bfe0f5b1b85e6e8e68",
+  "root": "/tmp/echolens-native-flutter-next-reference",
+  "source_review": "Widget composition, State lifecycle, setState, lists, form validators, asset loading and theme inheritance reviewed against these pinned files. Executed native Dart examples verify extracted business logic only; Flutter SDK, widget tests and device rendering are not executed.",
+  "files": [
+    {
+      "path": "sites/docs/src/content/ui/index.md",
+      "sha256": "9a62769e8e7c2d20e8eb08f95d2a63a41602f519c20575256bd3df33386de144",
+      "bytes": 36711,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/ui/interactivity/index.md",
+      "sha256": "7e30a70fe98ccb7bb385b3686371f4c69e4ba508c838320cc7b89b9c7be4a7ac",
+      "bytes": 24593,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/ui/widgets/index.md",
+      "sha256": "5219b924ec53cc5ce675c11ec051f73b4fb34b91b9a5bde77b2bde9ac481cefc",
+      "bytes": 3242,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/ui/layout/constraints.md",
+      "sha256": "602b50bfb65d57b79f77464641caad2ae01e3358b2e43b9698f8af5ac2620e9d",
+      "bytes": 66212,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/cookbook/forms/validation.md",
+      "sha256": "67046011f694b56cf1a5e2fdb948d99c9c17f802acfb1c041ec86f2b041811d6",
+      "bytes": 8865,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/cookbook/lists/long-lists.md",
+      "sha256": "9c1323a14068d6d0c022797d59aa7d3cb1b0c381f663e86b651413e9be5738b8",
+      "bytes": 3692,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/cookbook/design/themes.md",
+      "sha256": "17da63a7e6307aa7617d50d3a32d6380ad33fa9c55254af55c9c8a464182f44e",
+      "bytes": 8660,
+      "exact_pinned_git_bytes": true
+    },
+    {
+      "path": "sites/docs/src/content/ui/assets/assets-and-images.md",
+      "sha256": "6a0518c8cc3d6bccb9f209dd221a7b7e80235e3a831d6fab469ff1b5ff337437",
+      "bytes": 18488,
+      "exact_pinned_git_bytes": true
+    }
+  ],
+  "human_review": "pending"
+}

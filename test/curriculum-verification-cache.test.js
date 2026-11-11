@@ -9,3 +9,7 @@ test('verification cache rejects stale, failed, missing and partial batch eviden
  for(const mutate of [r=>r.courses[0].fingerprint='stale',r=>r.courses[0].examples[0].ok=false,r=>r.courses[0].examples.pop(),r=>r.courses[0].examples[0].output='forged wrong output',r=>r.completed.pop(),r=>r.courses[0].execution_passed='true',r=>delete r.duplication]){const r=structuredClone(passed);mutate(r);assert.throws(()=>seed({courses:[]},r));}
  assert.throws(()=>seed({courses:[],human_approved:true},passed),/approval/);
 });
+
+test("cache validates comprehensive native examples without mixing them into lesson evidence",()=>{
+ const checkpoint=require("../docs/career/phase3/mass-scale-wave4/checkpoints/native-dart/checkpoint.json");const result=seed({courses:[]},checkpoint);assert.equal(checkpoint.courses[0].examples.length,14);assert.equal(result.courses[0].examples.length,12);const bad=structuredClone(checkpoint);bad.courses[0].examples.find(e=>e.id.includes(".w4.f")).ok=false;assert.throws(()=>seed({courses:[]},bad),/evidence mismatch/);
+});

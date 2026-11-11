@@ -1,0 +1,162 @@
+{
+  "courses": [
+    {
+      "id": "dart-programming",
+      "fingerprint": "4d66ea67b3abd53eccbd78d58c89603b994d0c17aad6869bef8dd50c63927056",
+      "course_hash": "ec9a38641fccd58b8e30bb74594edfce32f50f984b937f9852c1c3b835c31ec1",
+      "bank_hash": "59b0840f35a351e2635e66d0d1c491477597f1eeb697819b0b0b2970497f2b3c",
+      "prerequisites": [
+        "programming-foundations"
+      ],
+      "lessons": 12,
+      "modules": 4,
+      "formative": 72,
+      "comprehensive": 96,
+      "objectives": 8,
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "dart-types-bindings",
+          "code_hash": "a6de38009aa3969281dfe4ee0fcc229fabc93f813488c20be0596a71432c6d0b",
+          "ran": true,
+          "ok": true,
+          "output": "11",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-nullable-values",
+          "code_hash": "2efba5ac88fa7eb0017172faafeff31b9cec07237b3b22445fc2c029d01f55ba",
+          "ran": true,
+          "ok": true,
+          "output": "-1\n0",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-initialization",
+          "code_hash": "699e69ff0e72d5061bbd569cb64c68fef06076f4811b2b9d25a913ca0d99b77d",
+          "ran": true,
+          "ok": true,
+          "output": "7",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-collection-pipeline",
+          "code_hash": "6ab3337f4208440987b61f860f666d67c9395c5ffde03b10593e24a195368a05",
+          "ran": true,
+          "ok": true,
+          "output": "100",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-function-contracts",
+          "code_hash": "1eb9d8899666613b75046f7bc39870bba47ca33c8a7f2220ba962f4e47935bfd",
+          "ran": true,
+          "ok": true,
+          "output": "7\n21",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-collection-apis",
+          "code_hash": "b14150ab788a24221ca227f23c27fd9473d6a8701cda8b112cc6e6b7d6a82036",
+          "ran": true,
+          "ok": true,
+          "output": "[5, 8]\n[3, 8, 5]",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-immutable-models",
+          "code_hash": "bc847cf765ea4fdb3fa11d8f222699da792a221e849b818e2e19579b07c26e0c",
+          "ran": true,
+          "ok": true,
+          "output": "10\n3",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-abstract-contracts",
+          "code_hash": "a444bff0d4428846b954f4bd42b5d9ad12fc87fa19478b42c4a87e095765ab77",
+          "ran": true,
+          "ok": true,
+          "output": "10\nquoted",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-class-state-transitions",
+          "code_hash": "65cbb83aed8e07b68e3827891f3fda446a7da08410e5f1f84dd2db8b097ca9be",
+          "ran": true,
+          "ok": true,
+          "output": "9:2\n5:3",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-future-sequencing",
+          "code_hash": "5da553268132d1bb3316a3e49cb7ba1009d1b590edf52a8426d0f67eb5d0011f",
+          "ran": true,
+          "ok": true,
+          "output": "11",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-stream-events",
+          "code_hash": "79d65004f18fd447f64b14a2d2b021bf8d25a9ab31c55080a41afb058988ef67",
+          "ran": true,
+          "ok": true,
+          "output": "10",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-async-recovery",
+          "code_hash": "24a11cca01db800bc784056a6b73b80b1b1663919796f8f34a9e44730641d206",
+          "ran": true,
+          "ok": true,
+          "output": "retryable-read\ncleanup",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-programming.w4.f003",
+          "code_hash": "a5dfed3a86f5ad977e5a0551a69f0c23e5a54672e6f629044514705c187027bd",
+          "ran": true,
+          "ok": true,
+          "output": "9",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        },
+        {
+          "id": "dart-programming.w4.f011",
+          "code_hash": "069a7343804df608b755325f7ed4f4c9c262cf498091d2cb4e4588bef0babace",
+          "ran": true,
+          "ok": true,
+          "output": "0",
+          "runtime": "Dart 3.13.7",
+          "profile": "Isolated native runtime; private environment, no host workspace/home or network; bounded CPU, memory, processes and output."
+        }
+      ],
+      "execution_passed": true,
+      "resumed_exact_checkpoint": false,
+      "human_review": "pending",
+      "human_approved": false,
+      "published": false
+    }
+  ],
+  "completed": [
+    "dart-programming"
+  ],
+  "duplication": {
+    "errors": [],
+    "warnings": []
+  },
+  "human_approved": false,
+  "published": false
+}

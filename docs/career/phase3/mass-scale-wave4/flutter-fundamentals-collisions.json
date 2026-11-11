@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-11-11T15:16:01.445Z",
+  "candidate": "flutter-fundamentals",
+  "courses": 103,
+  "unread": [],
+  "question": {
+    "errors": [
+      "Repeated question or numeric-only variant: http-sessions-tokens.q5 / sec-sessions.q2",
+      "Repeated question or numeric-only variant: etl-late-events.q1 / batch-streaming-event-windows.p1",
+      "Repeated question or numeric-only variant: ai-api-integration.p018 / performance-quality-engineering-retry-and-breaker-budgets.q3"
+    ],
+    "warnings": []
+  },
+  "prose": {
+    "errors": [],
+    "warnings": []
+  }
+}

@@ -14,11 +14,11 @@ function seed(previous,checkpoint){
   if(!course||!bank||row.fingerprint!==digest({course,bank}))throw Error('Stale or unregistered course/bank fingerprint: '+row.id);
   if(row.execution_passed!==true||row.errors?.length!==0||row.warnings?.length!==0)throw Error('Batch execution did not pass: '+row.id);
   const result=validate(course);if(result.errors.length||result.warnings.length)throw Error('Current structural validation failed: '+row.id);
-  const expected=[...course.lessons.map(l=>({id:l.id,code:l.worked.code,expect:l.worked.expect,lang:l.worked.lang||'python'})),...course.questions.filter(q=>q.code&&q.expect!=null)];
+  const expected=[...course.lessons.map(l=>({id:l.id,code:l.worked.code,expect:l.worked.expect,lang:l.worked.lang||'python'})),...course.questions.filter(q=>q.code&&q.expect!=null),...bank.filter(q=>q.code&&q.expect!=null)];
   if(!Array.isArray(row.examples)||row.examples.length!==expected.length||new Set(row.examples.map(e=>e.id)).size!==expected.length)throw Error('Incomplete executable evidence: '+row.id);
   for(const q of expected){const e=row.examples.find(e=>e.id===q.id);if(!e||e.ran!==true||e.ok!==true||e.code_hash!==hash({code:q.code,expect:q.expect,lang:q.lang})||e.output!==String(q.expect).trimEnd())throw Error('Executable evidence mismatch: '+q.id);}
   const current=courses.find(c=>c.id===row.id);if(current){if(current.course_hash!==hash(course))throw Error('Refusing to replace changed existing verification: '+row.id);continue;}
-  courses.push({id:row.id,version:course.version,course_hash:hash(course),...result,examples:row.examples,verification_origin:'Passed exact course/bank batch checkpoint; official sources require separate validation'});
+  courses.push({id:row.id,version:course.version,course_hash:hash(course),...result,examples:row.examples.filter(e=>course.lessons.some(l=>l.id===e.id)||course.questions.some(q=>q.id===e.id)),verification_origin:'Passed exact course/bank batch checkpoint; official sources require separate validation'});
  }
  return {...previous,courses,human_approved:false,published:false};
 }

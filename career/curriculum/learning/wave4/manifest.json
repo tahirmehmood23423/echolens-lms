@@ -8,6 +8,8 @@
     "flutter-fundamentals",
     "kotlin-android",
     "mobile-storage",
+    "mobile-architecture",
+    "mobile-testing-debugging",
     "unsupervised-learning",
     "deep-learning",
     "computer-vision",
@@ -35,6 +37,13 @@
     "searching-sorting",
     "trees-bst",
     "graphs",
-    "greedy-dp"
+    "greedy-dp",
+    "react-advanced",
+    "nextjs-architecture",
+    "oop-principles",
+    "java-fundamentals",
+    "debugging-testing",
+    "software-design",
+    "engineering-problem-solving"
   ]
 }

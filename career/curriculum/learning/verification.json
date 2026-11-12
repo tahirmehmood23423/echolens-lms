@@ -7461,6 +7461,178 @@
       "human_approved": false
     },
     {
+      "id": "mobile-architecture",
+      "version": 1,
+      "course_hash": "b90992f8e87e633e6a4b4e3709da86064cdddf265def7c4f40be9ad904a9aa84",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "mobile-architecture-layers",
+          "code_hash": "933af79beb99dd1949582ea951c67cf4b3e7b0dfe9876a8254ec5839eb073e1e",
+          "ran": true,
+          "ok": true,
+          "output": "layers:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-architecture-state-flow",
+          "code_hash": "8218f3443f056971f7ec99b4cdb8cfc880679b786d24477cb06af1d7b3ef0d93",
+          "ran": true,
+          "ok": true,
+          "output": "state_flow:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-architecture-pattern-choice",
+          "code_hash": "1274f150f917ec22d554af81b347e49ad29f281e3d4753716a75030c6ebbe0c0",
+          "ran": true,
+          "ok": true,
+          "output": "pattern_choice:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-architecture-constructor-injection",
+          "code_hash": "35131990f2046574eedeba24c6f8ab49e3c42a462b6d17cb283052f1a5be748d",
+          "ran": true,
+          "ok": true,
+          "output": "constructor_injection:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-architecture-dependency-lifetimes",
+          "code_hash": "e2b39bc9e82c8f0c31d153297903c0615ece68a8257fee72fd8133a87848b3c5",
+          "ran": true,
+          "ok": true,
+          "output": "dependency_lifetimes:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-architecture-feature-modules",
+          "code_hash": "8d9b108ced6e8ec7548aaf16980c1a0abf6dadc5f138a8c0fd10537ad3a3d6b7",
+          "ran": true,
+          "ok": true,
+          "output": "feature_modules:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-architecture-quality-gates",
+          "code_hash": "52f1aa34bd79849bf3f77fd33b9b42c61701f79434e469e07dbdd326786b3738",
+          "ran": true,
+          "ok": true,
+          "output": "quality_gates:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-architecture-review-contracts",
+          "code_hash": "dd2cd8a771b12600f641c9c7abb4b0f786adccce8bb4ca5dc5b40bb54d110104",
+          "ran": true,
+          "ok": true,
+          "output": "review_contracts:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-architecture-safe-refactor",
+          "code_hash": "3595f7cd2c746b78043bfb558688a0539ad82e205176bae16a54efab05eceefc",
+          "ran": true,
+          "ok": true,
+          "output": "safe_refactor:controlled:reviewed",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "mobile-testing-debugging",
+      "version": 1,
+      "course_hash": "5ee90f3288dc97a3d31c1da42154d6a8fca8c8e12168f46f56b465282862f619",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "mobile-testing-debugging-unit-contracts",
+          "code_hash": "69f30a72e86da4d92b45bbc4c77623a9e9690e1d4badc2f396b17038eb41dda6",
+          "ran": true,
+          "ok": true,
+          "output": "unit_contracts:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-testing-debugging-ui-integration",
+          "code_hash": "9127d5f253b4b0a0a29763ef8e1c570011f861433424ec051b7f7477b88ae105",
+          "ran": true,
+          "ok": true,
+          "output": "ui_integration:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-testing-debugging-dependency-fakes",
+          "code_hash": "b0e6c1abc2494dc33653f0954b13c62af2d92a0fa24db6e87663618b5b0704c5",
+          "ran": true,
+          "ok": true,
+          "output": "dependency_fakes:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-testing-debugging-crash-triage",
+          "code_hash": "7a1568dcc9843fd7e88216f53b902825e36efe09b72d1782fcd730bece2ec606",
+          "ran": true,
+          "ok": true,
+          "output": "crash_triage:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-testing-debugging-debug-profile",
+          "code_hash": "42eb0501a5f04d3282ea74f8039e77d66357c8f46b767e9d8b16f8f60819fc46",
+          "ran": true,
+          "ok": true,
+          "output": "debug_profile:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-testing-debugging-lifecycle-reproduction",
+          "code_hash": "12ae9a47dc79eaacbb985f9437661219ba5ba01aa0855e01ee8e844cecf4b272",
+          "ran": true,
+          "ok": true,
+          "output": "lifecycle_reproduction:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-testing-debugging-device-matrix",
+          "code_hash": "eb07b74d89ae8bd0f55194c0e14588076c4caab32a72bb81e12ac2f5341df190",
+          "ran": true,
+          "ok": true,
+          "output": "device_matrix:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-testing-debugging-emulator-real",
+          "code_hash": "4df7ad430266d0b32da5ad8fbaee6630f9b5c3b4899a1d8c45f5374180483c49",
+          "ran": true,
+          "ok": true,
+          "output": "emulator_real:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "mobile-testing-debugging-beta-observability",
+          "code_hash": "aebd2451260f538ad45a0ac5086a4e16e283412b2d5ab0f963e9eb1e75cd7bdb",
+          "ran": true,
+          "ok": true,
+          "output": "beta_observability:isolated:reproduced",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 6,
+      "covered": 6,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
       "id": "unsupervised-learning",
       "version": 1,
       "course_hash": "602f193acca12c6f3cbc01a9f18dbba68df81d2ee36405c922b02db17e8e96a0",
@@ -9867,6 +10039,680 @@
       "lessons": 9,
       "questions": 54,
       "human_approved": false
+    },
+    {
+      "id": "react-advanced",
+      "version": 1,
+      "course_hash": "c62993cae9b0d6c40cae3e007edd567e5ec9b0e39858a84cc725e9ec0cc27416",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "react-advanced-context-scope",
+          "code_hash": "82981d5038e65b3aaff7bba42a8d177b4510c0b7a8eec6ade2e295ce54d3885e",
+          "ran": true,
+          "ok": true,
+          "output": "2:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-reducer-transitions",
+          "code_hash": "6a51ea3f06ff0bfec0c28951eb40466c7ddd3a53433a3a46e7fb14ecf7de9363",
+          "ran": true,
+          "ok": true,
+          "output": "3:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-state-machines",
+          "code_hash": "27e9286fbea204fc5a7df88e553b9c12dd8ff573adc645aea191202b62a621df",
+          "ran": true,
+          "ok": true,
+          "output": "4:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-query-identity",
+          "code_hash": "096308b7419504f3ea265bf26c89282bf36af05c7a5952eaa2edc2fcc8eaa88b",
+          "ran": true,
+          "ok": true,
+          "output": "5:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-mutation-reconciliation",
+          "code_hash": "6b77174d4d136b03a8291d26d3bd52ca8ab5540e7c50e57d125fe5d462c0c6e9",
+          "ran": true,
+          "ok": true,
+          "output": "6:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-request-cancellation",
+          "code_hash": "b914b965daa465d9d70d64f13d9016bcdfa1e738dedc510271e168109862353d",
+          "ran": true,
+          "ok": true,
+          "output": "7:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-memo-cost",
+          "code_hash": "6ab7be2a1ec0ba4067fdbf0d5d6b257ffb2daa2ed741f31d2a39272c6c2dbf50",
+          "ran": true,
+          "ok": true,
+          "output": "8:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-referential-stability",
+          "code_hash": "d3756c3acd220aeaa5a13c962809a6764f5b5cd38e37ce1b7ebcb41fb16e3b7b",
+          "ran": true,
+          "ok": true,
+          "output": "9:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-concurrent-updates",
+          "code_hash": "e6b73c81049a5301a223c0333ca2c9762ec89c40659a19660796b61b4bc43d6d",
+          "ran": true,
+          "ok": true,
+          "output": "10:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-custom-hooks",
+          "code_hash": "87412f03b5ce8fe974b2dd8debe523f765bc91e53373a19e730156cf91ea274e",
+          "ran": true,
+          "ok": true,
+          "output": "11:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-external-stores",
+          "code_hash": "8b38ea55eaedd7b7c8d84186f6639c56165f0bf4c14a3599b3ff9c26ab7b5322",
+          "ran": true,
+          "ok": true,
+          "output": "12:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "react-advanced-error-boundaries",
+          "code_hash": "9654e4527e5705409b34b2bd91ade882e0cc61fdd9c0892d7fe7466bdd8a37f4",
+          "ran": true,
+          "ok": true,
+          "output": "13:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 8,
+      "covered": 8,
+      "lessons": 12,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "nextjs-architecture",
+      "version": 1,
+      "course_hash": "599691b7bba2412559880596c6e190cd8efd312db35cb7cd3f1dc3c65dca9f4d",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "nextjs-architecture-route-tree",
+          "code_hash": "82981d5038e65b3aaff7bba42a8d177b4510c0b7a8eec6ade2e295ce54d3885e",
+          "ran": true,
+          "ok": true,
+          "output": "2:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-dynamic-segments",
+          "code_hash": "6a51ea3f06ff0bfec0c28951eb40466c7ddd3a53433a3a46e7fb14ecf7de9363",
+          "ran": true,
+          "ok": true,
+          "output": "3:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-route-groups",
+          "code_hash": "27e9286fbea204fc5a7df88e553b9c12dd8ff573adc645aea191202b62a621df",
+          "ran": true,
+          "ok": true,
+          "output": "4:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-server-components",
+          "code_hash": "096308b7419504f3ea265bf26c89282bf36af05c7a5952eaa2edc2fcc8eaa88b",
+          "ran": true,
+          "ok": true,
+          "output": "5:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-static-rendering",
+          "code_hash": "6b77174d4d136b03a8291d26d3bd52ca8ab5540e7c50e57d125fe5d462c0c6e9",
+          "ran": true,
+          "ok": true,
+          "output": "6:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-dynamic-rendering",
+          "code_hash": "b914b965daa465d9d70d64f13d9016bcdfa1e738dedc510271e168109862353d",
+          "ran": true,
+          "ok": true,
+          "output": "7:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-server-actions",
+          "code_hash": "6ab7be2a1ec0ba4067fdbf0d5d6b257ffb2daa2ed741f31d2a39272c6c2dbf50",
+          "ran": true,
+          "ok": true,
+          "output": "8:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-cache-revalidation",
+          "code_hash": "d3756c3acd220aeaa5a13c962809a6764f5b5cd38e37ce1b7ebcb41fb16e3b7b",
+          "ran": true,
+          "ok": true,
+          "output": "9:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-streaming-boundaries",
+          "code_hash": "e6b73c81049a5301a223c0333ca2c9762ec89c40659a19660796b61b4bc43d6d",
+          "ran": true,
+          "ok": true,
+          "output": "10:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-runtime-choice",
+          "code_hash": "87412f03b5ce8fe974b2dd8debe523f765bc91e53373a19e730156cf91ea274e",
+          "ran": true,
+          "ok": true,
+          "output": "11:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-environment-config",
+          "code_hash": "8b38ea55eaedd7b7c8d84186f6639c56165f0bf4c14a3599b3ff9c26ab7b5322",
+          "ran": true,
+          "ok": true,
+          "output": "12:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "nextjs-architecture-observability-deploy",
+          "code_hash": "9654e4527e5705409b34b2bd91ade882e0cc61fdd9c0892d7fe7466bdd8a37f4",
+          "ran": true,
+          "ok": true,
+          "output": "13:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 7,
+      "covered": 7,
+      "lessons": 12,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "oop-principles",
+      "version": 1,
+      "course_hash": "2f282866dd27f44432493b298ad9c19b2449e74d2446b08079c0fd89f1dafaa7",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "oop-principles-invariants",
+          "code_hash": "82981d5038e65b3aaff7bba42a8d177b4510c0b7a8eec6ade2e295ce54d3885e",
+          "ran": true,
+          "ok": true,
+          "output": "2:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "oop-principles-encapsulation",
+          "code_hash": "6a51ea3f06ff0bfec0c28951eb40466c7ddd3a53433a3a46e7fb14ecf7de9363",
+          "ran": true,
+          "ok": true,
+          "output": "3:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "oop-principles-exception-safety",
+          "code_hash": "27e9286fbea204fc5a7df88e553b9c12dd8ff573adc645aea191202b62a621df",
+          "ran": true,
+          "ok": true,
+          "output": "4:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "oop-principles-polymorphism",
+          "code_hash": "096308b7419504f3ea265bf26c89282bf36af05c7a5952eaa2edc2fcc8eaa88b",
+          "ran": true,
+          "ok": true,
+          "output": "5:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "oop-principles-substitution",
+          "code_hash": "6b77174d4d136b03a8291d26d3bd52ca8ab5540e7c50e57d125fe5d462c0c6e9",
+          "ran": true,
+          "ok": true,
+          "output": "6:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "oop-principles-inheritance",
+          "code_hash": "b914b965daa465d9d70d64f13d9016bcdfa1e738dedc510271e168109862353d",
+          "ran": true,
+          "ok": true,
+          "output": "7:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "oop-principles-composition",
+          "code_hash": "6ab7be2a1ec0ba4067fdbf0d5d6b257ffb2daa2ed741f31d2a39272c6c2dbf50",
+          "ran": true,
+          "ok": true,
+          "output": "8:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "oop-principles-interfaces",
+          "code_hash": "d3756c3acd220aeaa5a13c962809a6764f5b5cd38e37ce1b7ebcb41fb16e3b7b",
+          "ran": true,
+          "ok": true,
+          "output": "9:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "oop-principles-object-collaboration",
+          "code_hash": "e6b73c81049a5301a223c0333ca2c9762ec89c40659a19660796b61b4bc43d6d",
+          "ran": true,
+          "ok": true,
+          "output": "10:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "java-fundamentals",
+      "version": 1,
+      "course_hash": "55acce8a1e6edce64345676bc1711af08495852175da82e39935ad5f9bc4e6d8",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "java-fundamentals-types-values",
+          "code_hash": "58f38a1e1a7d848d12c3123f6f4f1edb013bf9cef99cabc9d356f44ab9f758d6",
+          "ran": true,
+          "ok": true,
+          "output": "2:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-control-flow",
+          "code_hash": "a3295a23cab6e1fa31645e2151d644f0e990f5fab7df79663c899348d09f179f",
+          "ran": true,
+          "ok": true,
+          "output": "3:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-methods-overload",
+          "code_hash": "517c6b1ee19fb1f02350f6e3052ee6bfa828337b501030b0602d91057f78a6e7",
+          "ran": true,
+          "ok": true,
+          "output": "4:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-class-invariants",
+          "code_hash": "89fe0beb1d879cfe5715637a1faebf84e7cbc88bbe18ea45cf36e167cf57f1f3",
+          "ran": true,
+          "ok": true,
+          "output": "5:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-interfaces",
+          "code_hash": "c9cca62fac421d7fdd12f593420daac35bd40cd9452d90993ef9e9f069c178e2",
+          "ran": true,
+          "ok": true,
+          "output": "6:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-records-enums",
+          "code_hash": "92aaad5a15c1611c80120426ad1a5c8d698d85048a33b2688916025d785f9db6",
+          "ran": true,
+          "ok": true,
+          "output": "7:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-collections",
+          "code_hash": "0b0d4c694f4b8f239655933758ba2e8ccf1788c24be2bb698393a1b6778e0750",
+          "ran": true,
+          "ok": true,
+          "output": "8:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-generics",
+          "code_hash": "91dafbb2338919be57c4d3a9cd7b87e184557f239b19d828c159fc37a72cc04a",
+          "ran": true,
+          "ok": true,
+          "output": "9:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-stream-pipelines",
+          "code_hash": "07ea2596cdcd9037f5b52deee1dfd832698a87b0b8a9d67a787f33dd693b088f",
+          "ran": true,
+          "ok": true,
+          "output": "10:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-exceptions",
+          "code_hash": "112a4337f6e8475d540ac58eee846924728d36386811ea5a2eb8e4926be90402",
+          "ran": true,
+          "ok": true,
+          "output": "11:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-resources",
+          "code_hash": "2d2b06736ea250dfc8644fb19820ab80fa8446554798e0c2100bc524ae2c22dd",
+          "ran": true,
+          "ok": true,
+          "output": "12:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "java-fundamentals-build-test",
+          "code_hash": "edd3bcc3bb2bd95029d20010bbac7fe0ee7f4e363774c617c016f8eb2c47a076",
+          "ran": true,
+          "ok": true,
+          "output": "13:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 7,
+      "covered": 7,
+      "lessons": 12,
+      "questions": 72,
+      "human_approved": false
+    },
+    {
+      "id": "debugging-testing",
+      "version": 1,
+      "course_hash": "95bfc5924937b7556318623fba94ab844c233a19fca65edbc433ddfe2c1f3b14",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "debugging-testing-reproduce",
+          "code_hash": "82981d5038e65b3aaff7bba42a8d177b4510c0b7a8eec6ade2e295ce54d3885e",
+          "ran": true,
+          "ok": true,
+          "output": "2:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "debugging-testing-hypotheses",
+          "code_hash": "6a51ea3f06ff0bfec0c28951eb40466c7ddd3a53433a3a46e7fb14ecf7de9363",
+          "ran": true,
+          "ok": true,
+          "output": "3:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "debugging-testing-instrumentation",
+          "code_hash": "27e9286fbea204fc5a7df88e553b9c12dd8ff573adc645aea191202b62a621df",
+          "ran": true,
+          "ok": true,
+          "output": "4:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "debugging-testing-unit-contracts",
+          "code_hash": "096308b7419504f3ea265bf26c89282bf36af05c7a5952eaa2edc2fcc8eaa88b",
+          "ran": true,
+          "ok": true,
+          "output": "5:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "debugging-testing-boundaries",
+          "code_hash": "6b77174d4d136b03a8291d26d3bd52ca8ab5540e7c50e57d125fe5d462c0c6e9",
+          "ran": true,
+          "ok": true,
+          "output": "6:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "debugging-testing-failure-tests",
+          "code_hash": "b914b965daa465d9d70d64f13d9016bcdfa1e738dedc510271e168109862353d",
+          "ran": true,
+          "ok": true,
+          "output": "7:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "debugging-testing-dependency-injection",
+          "code_hash": "6ab7be2a1ec0ba4067fdbf0d5d6b257ffb2daa2ed741f31d2a39272c6c2dbf50",
+          "ran": true,
+          "ok": true,
+          "output": "8:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "debugging-testing-pure-core",
+          "code_hash": "d3756c3acd220aeaa5a13c962809a6764f5b5cd38e37ce1b7ebcb41fb16e3b7b",
+          "ran": true,
+          "ok": true,
+          "output": "9:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "debugging-testing-suite-signal",
+          "code_hash": "e6b73c81049a5301a223c0333ca2c9762ec89c40659a19660796b61b4bc43d6d",
+          "ran": true,
+          "ok": true,
+          "output": "10:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 4,
+      "covered": 4,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "software-design",
+      "version": 1,
+      "course_hash": "5e27bce3366925e1cc06b908911c993ea98bbf37cb3f20c4e83c9165f1fed302",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "software-design-responsibility",
+          "code_hash": "82981d5038e65b3aaff7bba42a8d177b4510c0b7a8eec6ade2e295ce54d3885e",
+          "ran": true,
+          "ok": true,
+          "output": "2:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "software-design-open-extension",
+          "code_hash": "6a51ea3f06ff0bfec0c28951eb40466c7ddd3a53433a3a46e7fb14ecf7de9363",
+          "ran": true,
+          "ok": true,
+          "output": "3:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "software-design-substitution",
+          "code_hash": "27e9286fbea204fc5a7df88e553b9c12dd8ff573adc645aea191202b62a621df",
+          "ran": true,
+          "ok": true,
+          "output": "4:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "software-design-coupling",
+          "code_hash": "096308b7419504f3ea265bf26c89282bf36af05c7a5952eaa2edc2fcc8eaa88b",
+          "ran": true,
+          "ok": true,
+          "output": "5:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "software-design-dependency-direction",
+          "code_hash": "6b77174d4d136b03a8291d26d3bd52ca8ab5540e7c50e57d125fe5d462c0c6e9",
+          "ran": true,
+          "ok": true,
+          "output": "6:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "software-design-composition",
+          "code_hash": "b914b965daa465d9d70d64f13d9016bcdfa1e738dedc510271e168109862353d",
+          "ran": true,
+          "ok": true,
+          "output": "7:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "software-design-characterization",
+          "code_hash": "6ab7be2a1ec0ba4067fdbf0d5d6b257ffb2daa2ed741f31d2a39272c6c2dbf50",
+          "ran": true,
+          "ok": true,
+          "output": "8:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "software-design-incremental-refactor",
+          "code_hash": "d3756c3acd220aeaa5a13c962809a6764f5b5cd38e37ce1b7ebcb41fb16e3b7b",
+          "ran": true,
+          "ok": true,
+          "output": "9:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "software-design-maintainability",
+          "code_hash": "e6b73c81049a5301a223c0333ca2c9762ec89c40659a19660796b61b4bc43d6d",
+          "ran": true,
+          "ok": true,
+          "output": "10:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
+    },
+    {
+      "id": "engineering-problem-solving",
+      "version": 1,
+      "course_hash": "3c8b6d9c81fb7614a7abf99ddaf04aa7d6d85ae99844149d4cce4e5fe2c26963",
+      "errors": [],
+      "warnings": [],
+      "examples": [
+        {
+          "id": "engineering-problem-solving-problem-frame",
+          "code_hash": "82981d5038e65b3aaff7bba42a8d177b4510c0b7a8eec6ade2e295ce54d3885e",
+          "ran": true,
+          "ok": true,
+          "output": "2:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "engineering-problem-solving-decompose",
+          "code_hash": "6a51ea3f06ff0bfec0c28951eb40466c7ddd3a53433a3a46e7fb14ecf7de9363",
+          "ran": true,
+          "ok": true,
+          "output": "3:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "engineering-problem-solving-experiments",
+          "code_hash": "27e9286fbea204fc5a7df88e553b9c12dd8ff573adc645aea191202b62a621df",
+          "ran": true,
+          "ok": true,
+          "output": "4:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "engineering-problem-solving-tradeoff-model",
+          "code_hash": "096308b7419504f3ea265bf26c89282bf36af05c7a5952eaa2edc2fcc8eaa88b",
+          "ran": true,
+          "ok": true,
+          "output": "5:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "engineering-problem-solving-cost-risk",
+          "code_hash": "6b77174d4d136b03a8291d26d3bd52ca8ab5540e7c50e57d125fe5d462c0c6e9",
+          "ran": true,
+          "ok": true,
+          "output": "6:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "engineering-problem-solving-reversibility",
+          "code_hash": "b914b965daa465d9d70d64f13d9016bcdfa1e738dedc510271e168109862353d",
+          "ran": true,
+          "ok": true,
+          "output": "7:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "engineering-problem-solving-decision-record",
+          "code_hash": "6ab7be2a1ec0ba4067fdbf0d5d6b257ffb2daa2ed741f31d2a39272c6c2dbf50",
+          "ran": true,
+          "ok": true,
+          "output": "8:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "engineering-problem-solving-communicate-risk",
+          "code_hash": "d3756c3acd220aeaa5a13c962809a6764f5b5cd38e37ce1b7ebcb41fb16e3b7b",
+          "ran": true,
+          "ok": true,
+          "output": "9:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        },
+        {
+          "id": "engineering-problem-solving-post-decision",
+          "code_hash": "e6b73c81049a5301a223c0333ca2c9762ec89c40659a19660796b61b4bc43d6d",
+          "ran": true,
+          "ok": true,
+          "output": "10:1\ntrue",
+          "verification": "Exact code/expected-output hash in the repository verification artifact"
+        }
+      ],
+      "objectives": 3,
+      "covered": 3,
+      "lessons": 9,
+      "questions": 54,
+      "human_approved": false
     }
   ],
   "official_source": {
@@ -9874,21 +10720,21 @@
     "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
     "references": [
       {
-        "id": "greedy-dp.ref0",
-        "path": "Doc/library/collections.rst",
-        "sha256": "aff29d802f59d857dcd5a56ccd35e6c552b4f276f34a2cf34023247658041bf5",
+        "id": "python-data",
+        "path": "Doc/reference/datamodel.rst",
+        "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "greedy-dp.ref1",
-        "path": "Doc/library/heapq.rst",
-        "sha256": "d4af040814240446561ec71f310c0f0dd53b0371400df230c978ee6cab57f4ff",
+        "id": "python-unittest",
+        "path": "Doc/library/unittest.rst",
+        "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
         "checked_by": "Pinned official Git object and matching local source file"
       },
       {
-        "id": "greedy-dp.ref2",
-        "path": "Doc/tutorial/datastructures.rst",
-        "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+        "id": "python-exceptions",
+        "path": "Doc/tutorial/errors.rst",
+        "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
         "checked_by": "Pinned official Git object and matching local source file"
       }
     ]
@@ -13240,6 +14086,56 @@
       ]
     },
     {
+      "course": "mobile-architecture",
+      "repository": "https://github.com/android/architecture-samples",
+      "commit": "ee66e1526b84c026615df032c705842b7d2a521f",
+      "references": [
+        {
+          "id": "mobile-architecture.ref0",
+          "path": "README.md",
+          "sha256": "682b1d5bf9b74c3d8c56f8dc3bfe7327aa05cc7191220802cc6ecb1766e9f73f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-architecture.ref1",
+          "path": "app/src/main/java/com/example/android/architecture/blueprints/todoapp/data/DefaultTaskRepository.kt",
+          "sha256": "8e03787673ec5f060f0071a43712e7b3156a9e6b16ac954840f8c05807fa8fbc",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-architecture.ref2",
+          "path": "app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksViewModel.kt",
+          "sha256": "b8d2544a85e286f0392bc2216a0d41bfd19541afbc89074e923cdfb013a330e0",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "mobile-testing-debugging",
+      "repository": "https://github.com/android/architecture-samples",
+      "commit": "ee66e1526b84c026615df032c705842b7d2a521f",
+      "references": [
+        {
+          "id": "mobile-testing-debugging.ref0",
+          "path": "README.md",
+          "sha256": "682b1d5bf9b74c3d8c56f8dc3bfe7327aa05cc7191220802cc6ecb1766e9f73f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-testing-debugging.ref1",
+          "path": "app/src/androidTest/java/com/example/android/architecture/blueprints/todoapp/data/source/local/TaskDaoTest.kt",
+          "sha256": "25c341d6751ad482bf495ce1dd2b807aede50d555268c3c070b26d402af757d7",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "mobile-testing-debugging.ref2",
+          "path": "app/src/androidTest/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksScreenTest.kt",
+          "sha256": "30a449a91adaca7feb6e16ba9ec373b580820014377b5fad3165d97c40d596a8",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
       "course": "unsupervised-learning",
       "repository": "https://github.com/scikit-learn/scikit-learn",
       "commit": "646da0f072a8afef6a980aa427a710311e67eb9d",
@@ -14171,6 +15067,231 @@
           "id": "greedy-dp.ref2",
           "path": "Doc/tutorial/datastructures.rst",
           "sha256": "f4ad72009ad81a1995e2e3912bee60d4ab64d89090bb782a94d13f486155b15c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "react-advanced",
+      "repository": "https://github.com/reactjs/react.dev",
+      "commit": "7594a2b008489121bdf25f97320d11ac0422510e",
+      "references": [
+        {
+          "id": "react-reducer",
+          "path": "src/content/reference/react/useReducer.md",
+          "sha256": "bad86506c15d0f3cb27b951d84b60e0f4c8fcb832504e4aabd4097aee159e7bc",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-context",
+          "path": "src/content/reference/react/useContext.md",
+          "sha256": "b3005d24cc2f7c7d09a7506b7ad3d18329dc62d92bb90a7e6ab080b351d91f5c",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-memo",
+          "path": "src/content/reference/react/useMemo.md",
+          "sha256": "fcc7d755826cea5b7b08db705c004e32191a78561e9e470d315dc881c478d902",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "react-hooks",
+          "path": "src/content/learn/reusing-logic-with-custom-hooks.md",
+          "sha256": "d8383e2d79af1ae9c60f5972770bcabccbe059b38fd01b7d969e5776d1624e5d",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "nextjs-architecture",
+      "repository": "https://github.com/vercel/next.js",
+      "commit": "0eda7207b868b6aef91322516ad3e5a54822be6f",
+      "references": [
+        {
+          "id": "next-routing",
+          "path": "docs/01-app/03-api-reference/03-file-conventions/page.mdx",
+          "sha256": "63cbb7aa79f3c375ce838bf35ac317f6a26749cf9ddf547eb841f04b986e607b",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "next-layout",
+          "path": "docs/01-app/03-api-reference/03-file-conventions/layout.mdx",
+          "sha256": "b7ebfdf07ed966a5046005d97b6b42079ccdd96cbd2c5366dcddde5684c61ca1",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "next-server",
+          "path": "docs/01-app/03-api-reference/01-directives/use-server.mdx",
+          "sha256": "d76969481ab8be6f73dfe9be237f9614f68f8134f18920247fedb3e68da6fb7f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "next-cache",
+          "path": "docs/01-app/03-api-reference/04-functions/revalidatePath.mdx",
+          "sha256": "82b4f0888f1d1113c2e0e1a867983a88ce02bbf9419570e3710fe7fe4ccd2c02",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "oop-principles",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-data",
+          "path": "Doc/reference/datamodel.rst",
+          "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-unittest",
+          "path": "Doc/library/unittest.rst",
+          "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-exceptions",
+          "path": "Doc/tutorial/errors.rst",
+          "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "java-fundamentals",
+      "repository": "Official Java specification HTTPS documentation",
+      "kind": "official-http-snapshot",
+      "references": [
+        {
+          "id": "jls-4",
+          "path": "jls-4.html",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html",
+          "sha256": "0f243d22fbecd7b2eb36305e7e95d30de8acf8183c9742657be9472128d8f1ad",
+          "fetched_at": "2026-11-11T15:29:30.371527+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "jls-5",
+          "path": "jls-5.html",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-5.html",
+          "sha256": "a04756c50c03e52939388c42ba7518aeeb440fc8d0a72f85fd1acf1c4932a80f",
+          "fetched_at": "2026-11-11T15:29:30.974267+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "jls-8",
+          "path": "jls-8.html",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html",
+          "sha256": "64d7f2d97da784e2642b1617ee23e007dc6d1c311f8d2acd0b62196b4c6be0c0",
+          "fetched_at": "2026-11-11T15:29:31.511445+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "jls-9",
+          "path": "jls-9.html",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html",
+          "sha256": "3c87670664402810a30ae26c854459240e8164f748e4a1649bcb0d62099ab4ca",
+          "fetched_at": "2026-11-11T15:29:31.734427+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "jls-11",
+          "path": "jls-11.html",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html",
+          "sha256": "2ba41a367dede387582fe42d5c5c9836f9e0502b4bb23f8fe2118dbd00d7ea9f",
+          "fetched_at": "2026-11-11T15:29:31.963421+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "jls-14",
+          "path": "jls-14.html",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html",
+          "sha256": "598a37c64d81db549463ad6ac810ddf3aff67427c8d36e08e8ea5f28c6ab8f19",
+          "fetched_at": "2026-11-11T15:29:32.278769+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        },
+        {
+          "id": "jls-15",
+          "path": "jls-15.html",
+          "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html",
+          "sha256": "575d903286081248bbd765fc736802c8480fe63e00b4a6b6de141402b4fcaae1",
+          "fetched_at": "2026-11-11T15:29:32.464429+00:00",
+          "checked_by": "Captured official HTTPS response bytes and matching capture manifest; not an immutable Git revision"
+        }
+      ]
+    },
+    {
+      "course": "debugging-testing",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-data",
+          "path": "Doc/reference/datamodel.rst",
+          "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-unittest",
+          "path": "Doc/library/unittest.rst",
+          "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-exceptions",
+          "path": "Doc/tutorial/errors.rst",
+          "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "software-design",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-data",
+          "path": "Doc/reference/datamodel.rst",
+          "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-unittest",
+          "path": "Doc/library/unittest.rst",
+          "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-exceptions",
+          "path": "Doc/tutorial/errors.rst",
+          "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
+          "checked_by": "Pinned official Git object and matching local source file"
+        }
+      ]
+    },
+    {
+      "course": "engineering-problem-solving",
+      "repository": "https://github.com/python/cpython",
+      "commit": "42155a0feaca9ba6991942c323cbe9fb7278be3c",
+      "references": [
+        {
+          "id": "python-data",
+          "path": "Doc/reference/datamodel.rst",
+          "sha256": "a8faa6f317d74a31c528d31a675ef5b676194f34824be05dd36ba19071c14f52",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-unittest",
+          "path": "Doc/library/unittest.rst",
+          "sha256": "baf73b657132660bae115d90d877e52b26bfb0eec176ceb3ca2d694eb93e444a",
+          "checked_by": "Pinned official Git object and matching local source file"
+        },
+        {
+          "id": "python-exceptions",
+          "path": "Doc/tutorial/errors.rst",
+          "sha256": "a0d9178d1db75ea5353332db356b95528250af68991343a077a39f19ea3ee93f",
           "checked_by": "Pinned official Git object and matching local source file"
         }
       ]

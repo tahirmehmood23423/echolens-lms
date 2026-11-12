@@ -20,7 +20,7 @@ for(const course of Object.values(BUILTIN)) {
     const courseSourceRoot=roots[repo];if(!courseSourceRoot){if(process.argv.includes('--require-sources'))throw Error('Missing pinned source checkout for '+course.id+': '+repo);continue;}
     if(refs.every(r=>r.source?.kind==='official-http-snapshot')){
       const references=refs.map(r=>require('./lib/curriculum-sources.cjs').verifyHttpSnapshot(courseSourceRoot,r,repo));
-      const source={repository:({'gnu/official-documentation-snapshots':'Official GNU HTTPS documentation','google/official-documentation-snapshots':'Official Google SRE HTTPS documentation','aws/official-documentation-snapshots':'Official AWS HTTPS documentation'})[refs[0].source.repo],kind:'official-http-snapshot',references};report.official_sources.push({course:course.id,...source});report.official_source=source;continue;
+      const source={repository:({'gnu/official-documentation-snapshots':'Official GNU HTTPS documentation','google/official-documentation-snapshots':'Official Google SRE HTTPS documentation','aws/official-documentation-snapshots':'Official AWS HTTPS documentation','java/official-documentation-snapshots':'Official Java specification HTTPS documentation'})[refs[0].source.repo],kind:'official-http-snapshot',references};report.official_sources.push({course:course.id,...source});report.official_source=source;continue;
     }
     const commit=execFileSync('git',['-C',courseSourceRoot,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
     const references=refs.map(r=>{

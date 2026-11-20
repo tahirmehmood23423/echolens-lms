@@ -3359,24 +3359,53 @@ const Events = {
     if (!en || t <= en) return 'live';
     return 'ended';
   },
-  // ShipLens runs on a fixed cadence derived entirely from when registration
-  // closes (ev.ends_at): the task opens the next day, submissions are open
-  // for two weeks after that, and results are due two weeks after submissions
-  // close. Pushing back the registration deadline automatically pushes every
-  // later date with it. The only stored override is an admin-set submission
-  // deadline, used exactly as chosen.
+  // ShipLens competition window is set by hand. Closing registration
+  // (ev.ends_at) no longer opens anything: the task stays hidden ("to be
+  // announced") until an admin sets when it opens and when submissions
+  // close. Results default to two weeks after submissions close unless the
+  // admin sets them too. Without a task-open date the later dates are
+  // withheld as well, so an old stored submission date never shows alone.
   shipLensSchedule(ev) {
-    const regCloses = ev.ends_at || null;
-    const taskOpensAt = addDaysToDateTime(regCloses, 1);
-    const submissionDeadline = ev.shiplens_submission_deadline || addDaysToDateTime(taskOpensAt, 14);
-    const resultsDueAt = addDaysToDateTime(submissionDeadline, 14);
-    return { reg_opens: ev.starts_at || null, reg_closes: regCloses, task_opens_at: taskOpensAt, submission_deadline: submissionDeadline, results_due_at: resultsDueAt };
+    const taskOpensAt = ev.shiplens_task_opens_at || null;
+    const submissionDeadline = taskOpensAt ? ev.shiplens_submission_deadline || null : null;
+    const resultsDueAt = submissionDeadline ? ev.shiplens_results_due_at || addDaysToDateTime(submissionDeadline, 14) : null;
+    return { reg_opens: ev.starts_at || null, reg_closes: ev.ends_at || null, task_opens_at: taskOpensAt,
+      submission_deadline: submissionDeadline, results_due_at: resultsDueAt, window_set: !!(taskOpensAt && submissionDeadline) };
   },
-  // Admin sets a ShipLens deadline to an exact date - later or earlier, so a
-  // mistaken extension can be undone. 'registration' moves ends_at, so the
-  // task release (and everything after it) follows the new date; it is
-  // refused once the brief has been released, since that would re-hide it.
-  // 'submission' sets the submission close exactly (results move with it).
+  // Admin opens/closes the ShipLens competition window manually, in any
+  // phase - including after registration has closed and after a window has
+  // already run. Clearing task_opens_at puts the series back to "awaiting
+  // admin" (brief hidden, submissions blocked). Existing submissions are
+  // never touched; the window only gates new submissions and edits.
+  setShipLensWindow(id, { task_opens_at, submission_deadline, results_due_at }) {
+    const ev = Events.byId(id);
+    if (!ev || ev.series_kind !== 'shiplens') return { error: 'ShipLens series not found.' };
+    const norm = (v) => String(v || '').trim().slice(0, 16);
+    const valid = (v) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v) && !isNaN(new Date(v));
+    const opens = norm(task_opens_at); const closes = norm(submission_deadline); const results = norm(results_due_at);
+    const previous = Events.shipLensSchedule(ev);
+    if (!opens) {
+      ev.shiplens_task_opens_at = null; ev.shiplens_submission_deadline = null; ev.shiplens_results_due_at = null;
+      save();
+      return { event: ev, previous, schedule: Events.shipLensSchedule(ev), cleared: true };
+    }
+    if (!valid(opens)) return { error: 'Choose a valid date and time for when the task opens.' };
+    if (!valid(closes)) return { error: 'Choose a valid date and time for when submissions close.' };
+    if (results && !valid(results)) return { error: 'Choose a valid results date, or leave it blank.' };
+    const regCloses = norm(ev.ends_at);
+    if (regCloses && opens < regCloses) return { error: `The task cannot open before registration closes (${regCloses.replace('T', ' ')}).` };
+    if (closes <= opens) return { error: 'Submissions must close after the task opens.' };
+    if (results && results < closes) return { error: 'Results cannot be due before submissions close.' };
+    ev.shiplens_task_opens_at = opens; ev.shiplens_submission_deadline = closes; ev.shiplens_results_due_at = results || null;
+    save();
+    return { event: ev, previous, schedule: Events.shipLensSchedule(ev) };
+  },
+  // Admin moves the ShipLens registration deadline to an exact date - later
+  // or earlier, so a mistaken extension can be undone. Allowed until the
+  // task window opens; it never moves the manually set competition dates, so
+  // it is refused if it would run past an already scheduled task opening.
+  // 'submission' is kept for older clients and only moves the close date of
+  // an already scheduled window.
   extendShipLens(id, { target, until }) {
     const ev = Events.byId(id);
     if (!ev || ev.series_kind !== 'shiplens') return { error: 'ShipLens series not found.' };
@@ -3387,16 +3416,16 @@ const Events = {
     if (target === 'registration') {
       if (!['upcoming', 'registration', 'pending'].includes(phase)) return { error: 'The task has already been released - extend the submission deadline instead.' };
       if (ev.starts_at && at <= String(ev.starts_at).slice(0, 16)) return { error: 'Registration must close after it opens.' };
+      if (s.task_opens_at && at > String(s.task_opens_at).slice(0, 16)) return { error: `The task is scheduled to open ${String(s.task_opens_at).replace('T', ' ')} - move the competition dates first.` };
       ev.ends_at = at;
-      // A new registration close re-derives every later date, so an old
-      // submission override must not linger from the previous plan.
-      ev.shiplens_submission_deadline = null;
       // Unpaid challans are payable until registration closes - keep their
       // pay-by date in step so fee reminders quote the extended date.
       const regIds = new Set(data.registrations.filter((r) => Number(r.status?.shiplens_event_id) === ev.id).map((r) => r.id));
       for (const ch of data.challans) if (regIds.has(Number(ch.registration_id)) && ch.status !== 'paid') ch.deadline = at.slice(0, 10);
     } else if (target === 'submission') {
-      if (s.task_opens_at && at <= String(s.task_opens_at).slice(0, 16)) return { error: `The submission deadline must be after the task opens (${String(s.task_opens_at).replace('T', ' ')}).` };
+      if (!s.task_opens_at) return { error: 'Set the competition dates (task opens and submissions close) first.' };
+      if (at <= String(s.task_opens_at).slice(0, 16)) return { error: `The submission deadline must be after the task opens (${String(s.task_opens_at).replace('T', ' ')}).` };
+      if (ev.shiplens_results_due_at && at > ev.shiplens_results_due_at) ev.shiplens_results_due_at = null;
       ev.shiplens_submission_deadline = at;
     } else return { error: 'Choose which deadline to extend.' };
     save();
@@ -3408,7 +3437,8 @@ const Events = {
     const at = (v) => String(v || '').replace('T', ' ');
     if (s.reg_opens && t < at(s.reg_opens)) return 'upcoming';
     if (!s.reg_closes || t <= at(s.reg_closes)) return 'registration';
-    if (t < at(s.task_opens_at)) return 'pending';
+    // No admin-set window yet: registration is over but nothing opens.
+    if (!s.window_set || t < at(s.task_opens_at)) return 'pending';
     if (t <= at(s.submission_deadline)) return 'submission';
     if (t <= at(s.results_due_at)) return 'grading';
     return 'closed';
@@ -3647,7 +3677,10 @@ const Events = {
     if (ev.series_kind === 'shiplens') {
       const phase = Events.shipLensPhase(ev);
       if (phase === 'registration' || phase === 'upcoming') return { error: 'Submissions open once registration closes and the task is released.' };
-      if (phase === 'pending') return { error: `The task opens on ${String(Events.shipLensSchedule(ev).task_opens_at || '').replace('T', ' ')}.` };
+      if (phase === 'pending') {
+        const opens = Events.shipLensSchedule(ev).task_opens_at;
+        return { error: opens ? `The task opens on ${String(opens).replace('T', ' ')}.` : 'The competition dates have not been announced yet.' };
+      }
       if (phase === 'grading' || phase === 'closed') return { error: 'The submission window for this series has closed.' };
       if (Number(pid) !== gate.entry.challenge_pid) return { error: 'Submit to the challenge your team selected at registration.' };
       if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(?:[/?#].*)?$/i.test(String(github_link || ''))) return { error: 'Add a valid GitHub repository URL.' };

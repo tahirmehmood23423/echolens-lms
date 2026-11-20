@@ -3003,6 +3003,7 @@ function renderEventDetail() {
 
   // ---- middle column sections ----
   const fmtDT = (v) => v ? esc(String(v).replace('T', ' ')) : '—';
+  const slTba = (v) => v ? esc(String(v).replace('T', ' ')) : 'to be announced';
   const banner = ev.auto_grade
     ? `<div class="evd-banner">${checkI}<span>Submissions are graded instantly. Correct logic earns at least a passing grade.</span></div>` : '';
 
@@ -3040,9 +3041,9 @@ function renderEventDetail() {
   const scheduleBox = ev.series_kind === 'shiplens' && ev.shiplens_schedule
     ? `<div class="evd-schedule"><svg viewBox="0 0 24 24" fill="none">${calI}</svg><div class="rows">
         <div>Registration closes ${fmtDT(ev.shiplens_schedule.reg_closes)}</div>
-        <div>Task opens ${fmtDT(ev.shiplens_schedule.task_opens_at)}</div>
-        <div>Submit by ${fmtDT(ev.shiplens_schedule.submission_deadline)}</div>
-        <div>Results by ${fmtDT(ev.shiplens_schedule.results_due_at)}</div>
+        <div>Task opens ${slTba(ev.shiplens_schedule.task_opens_at)}</div>
+        <div>Submit by ${slTba(ev.shiplens_schedule.submission_deadline)}</div>
+        <div>Results by ${slTba(ev.shiplens_schedule.results_due_at)}</div>
         ${calLink}
       </div></div>`
     : ev.ends_at ? `<div class="evd-schedule" style="background:var(--violet-soft);border-color:transparent"><svg viewBox="0 0 24 24" fill="none" style="color:var(--primary)">${calI}</svg><div class="rows" style="color:var(--primary-deep)">
@@ -3054,7 +3055,7 @@ function renderEventDetail() {
   const workReady = d.can_participate && (ev.series_kind !== 'shiplens' || ev.shiplens_phase === 'submission');
   const workMsg = !d.my_entry ? ev.series_kind === 'shiplens' && !regOpenNow ? 'Registration is closed. Registered builders can sign in to submit their projects.' : 'Register for this event to unlock the workspace and start submitting.'
     : !d.can_participate ? (d.participate_msg || 'Waiting for access.')
-    : ev.series_kind === 'shiplens' && ev.shiplens_phase === 'pending' ? `Your task opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.`
+    : ev.series_kind === 'shiplens' && ev.shiplens_phase === 'pending' ? (ev.shiplens_schedule.task_opens_at ? `Your task opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.` : 'Registration is closed. The competition dates will be announced soon.')
     : ev.series_kind === 'shiplens' && ['grading', 'closed'].includes(ev.shiplens_phase) ? 'The submission window for this series has closed.'
     : 'Ready — head to Submissions to send your work.';
   const cloudI = '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke-linecap="round" stroke-linejoin="round"/>';
@@ -3082,7 +3083,7 @@ function renderEventDetail() {
     ? `<div class="evd-chips" style="margin-bottom:12px">${ev.problems.map((x) =>
         `<span class="evd-chip" style="cursor:pointer;${x.pid === CUR_EV_PID ? 'border-color:var(--primary);color:var(--primary)' : ''}" onclick="evSelectProblem(${x.pid})">${esc(x.title)}</span>`).join('')}</div>` : '';
   const body = p
-    ? (p.locked ? `The full brief for <strong>${esc(p.title)}</strong> opens on ${fmtDT(ev.shiplens_schedule?.task_opens_at)}, right after registration closes.` : esc(p.description || 'No description provided.'))
+    ? (p.locked ? (ev.shiplens_schedule?.task_opens_at ? `The full brief for <strong>${esc(p.title)}</strong> opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.` : `The full brief for <strong>${esc(p.title)}</strong> opens once the competition dates are announced.`) : esc(p.description || 'No description provided.'))
     : esc(ev.description || 'See the instructions and documents for details.');
   const ioBlock = p && (p.input_spec || p.output_spec) ? `
     <h4>Input</h4><p>${esc(p.input_spec || 'No input is provided.')}</p>
@@ -3195,7 +3196,7 @@ function renderEventWorkspace() {
   // clock separate from Finance clearance.
   if (ev.series_kind === 'shiplens' && ev.shiplens_phase !== 'submission') {
     const s = ev.shiplens_schedule || {};
-    const msg = ev.shiplens_phase === 'pending' ? `Your task opens on ${esc(String(s.task_opens_at || '').replace('T', ' '))}.`
+    const msg = ev.shiplens_phase === 'pending' ? (s.task_opens_at ? `Your task opens on ${esc(String(s.task_opens_at).replace('T', ' '))}.` : 'Registration is closed. The competition dates will be announced soon.')
       : ev.shiplens_phase === 'grading' ? `Submissions closed on ${esc(String(s.submission_deadline || '').replace('T', ' '))}. Results are due by ${esc(String(s.results_due_at || '').replace('T', ' '))}.`
       : 'The submission window for this series has closed.';
     return `<div class="evd-work"><div class="evd-sec"><h3>Workspace</h3><p class="muted">${msg}</p></div></div>`;

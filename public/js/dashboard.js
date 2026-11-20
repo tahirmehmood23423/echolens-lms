@@ -6743,7 +6743,7 @@ async function openEvent(id) {
       ${ev.series_kind === 'shiplens' ? `
         <span class="ehd-pill">Team: 1-2 members</span>
         <span class="ehd-pill">Entry: PKR ${Number(ev.fee_pkr || 0).toLocaleString()}</span>
-        <span class="ehd-pill">Submit by ${fmtDT(ev.shiplens_schedule?.submission_deadline)}</span>`
+        <span class="ehd-pill">Submit by ${slTba(ev.shiplens_schedule?.submission_deadline)}</span>`
       : `<span class="ehd-pill">${clockI}${ev.starts_at ? fmtDT(ev.starts_at) + ' to ' + fmtDT(ev.ends_at) : ev.duration_minutes ? '~' + ev.duration_minutes + ' min' : 'No deadline'}</span>
         <span class="ehd-pill">${ev.entry === 'paid' ? 'PKR ' + ev.fee_pkr : 'Free'}</span>
         <span class="ehd-pill">Pass mark ${ev.pass_mark}%</span>
@@ -6771,15 +6771,15 @@ async function openEvent(id) {
 
   const scheduleBox = ev.series_kind === 'shiplens' && ev.shiplens_schedule ? `<div class="evd-schedule" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none"><path d="M8 2v4M16 2v4M3 8h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="rows">
       <div>Registration closes ${fmtDT(ev.shiplens_schedule.reg_closes)}</div>
-      <div>Task opens ${fmtDT(ev.shiplens_schedule.task_opens_at)}</div>
-      <div>Submit by ${fmtDT(ev.shiplens_schedule.submission_deadline)}</div>
-      <div>Results by ${fmtDT(ev.shiplens_schedule.results_due_at)}</div>
+      <div>Task opens ${slTba(ev.shiplens_schedule.task_opens_at)}</div>
+      <div>Submit by ${slTba(ev.shiplens_schedule.submission_deadline)}</div>
+      <div>Results by ${slTba(ev.shiplens_schedule.results_due_at)}</div>
     </div></div>` : '';
 
   const shipLensProblems = ev.series_kind === 'shiplens' ? `<div class="pub-sec">One project for this series</div>${probs.map((p) => ShipLensUI.projectCard(p, esc, ev.shiplens_schedule)).join('')}${d.my_entry ? `<div class="s" style="color:var(--muted);margin-top:8px">Team of ${(d.my_entry.team_details || []).length} · ${esc(probs[0]?.title || '')}</div>` : ''}` : '';
 
   const phaseWait = d.can_participate && ev.series_kind === 'shiplens' && ev.shiplens_phase !== 'submission'
-    ? `<div class="task-status wait">${ev.shiplens_phase === 'pending' ? `Your task opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.`
+    ? `<div class="task-status wait">${ev.shiplens_phase === 'pending' ? (ev.shiplens_schedule.task_opens_at ? `Your task opens on ${fmtDT(ev.shiplens_schedule.task_opens_at)}.` : 'Registration is closed. The competition dates will be announced soon.')
       : ev.shiplens_phase === 'grading' ? `Submissions closed. Results are due by ${fmtDT(ev.shiplens_schedule.results_due_at)}.`
       : 'The submission window for this series has closed.'}</div>` : '';
 
@@ -6992,20 +6992,33 @@ function formEventRegister(eid) {
 }
 
 /* --------------------------- admin event panel --------------------------- */
+const slTba = (v) => v ? esc(String(v).replace('T', ' ')) : 'to be announced';
 function adminEventPanel(d) {
   const ev = d.event;
   return `
     ${ev.series_kind === 'shiplens' ? `
     <div class="pub-sec">Schedule</div>
-    <div class="s" style="color:var(--muted);margin-bottom:10px">Registration closes ${esc(String(ev.shiplens_schedule?.reg_closes || '').replace('T', ' '))} &middot; Task opens ${esc(String(ev.shiplens_schedule?.task_opens_at || '').replace('T', ' '))} &middot; Submit by ${esc(String(ev.shiplens_schedule?.submission_deadline || '').replace('T', ' '))} &middot; Results by ${esc(String(ev.shiplens_schedule?.results_due_at || '').replace('T', ' '))} &middot; Phase: <strong>${esc(ev.shiplens_phase || '')}</strong></div>
-    <div class="pub-sec">Change deadline</div>
+    <div class="s" style="color:var(--muted);margin-bottom:10px">Registration closes ${slTba(ev.shiplens_schedule?.reg_closes)} &middot; Task opens ${slTba(ev.shiplens_schedule?.task_opens_at)} &middot; Submit by ${slTba(ev.shiplens_schedule?.submission_deadline)} &middot; Results by ${slTba(ev.shiplens_schedule?.results_due_at)} &middot; Phase: <strong>${esc(ev.shiplens_phase === 'pending' && !ev.shiplens_schedule?.window_set ? 'awaiting competition dates' : ev.shiplens_phase || '')}</strong></div>
+    ${['upcoming', 'registration', 'pending'].includes(ev.shiplens_phase) ? `
+    <div class="pub-sec">Registration deadline</div>
     <form id="slExtend" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px">
-      <label class="field" style="margin:0"><span>Deadline</span><select name="target">
-        ${['upcoming', 'registration', 'pending'].includes(ev.shiplens_phase) ? '<option value="registration">Registration (task release moves with it)</option>' : ''}
-        <option value="submission">Submission</option></select></label>
-      <label class="field" style="margin:0"><span>New date &amp; time</span><input name="until" type="datetime-local" required></label>
+      <input type="hidden" name="target" value="registration">
+      <label class="field" style="margin:0"><span>Registration closes</span><input name="until" type="datetime-local" required></label>
       <button class="btn btn-teal btn-sm">Set date &amp; notify teams</button>
+    </form>` : ''}
+    <div class="pub-sec">Competition dates <span class="s" style="color:var(--muted);font-weight:400">- nothing opens automatically when registration closes</span></div>
+    <form id="slWindow" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px">
+      <label class="field" style="margin:0"><span>Task opens</span><input name="task_opens_at" type="datetime-local"></label>
+      <label class="field" style="margin:0"><span>Submissions close</span><input name="submission_deadline" type="datetime-local"></label>
+      <label class="field" style="margin:0"><span>Results due (optional)</span><input name="results_due_at" type="datetime-local"></label>
+      <label class="s" style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><input type="checkbox" name="notify" checked> Email teams</label>
+      <button type="submit" class="btn btn-teal btn-sm">Save competition dates</button>
     </form>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      <button type="button" class="btn btn-ghost btn-sm" data-sl-now="task_opens_at">Open now</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-sl-now="submission_deadline">Close submissions now</button>
+      <button type="button" class="btn btn-danger btn-sm" id="slWindowClear">Clear dates (pause, awaiting admin)</button>
+    </div>
     <div class="pub-sec">Payment reminders</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
       <button class="btn btn-ghost btn-sm" onclick="shipLensPaymentNotice(${ev.id},'fee')">Fee reminder to unpaid (${(d.entries || []).flatMap((e) => e.member_challans || []).filter((c) => c && c.status !== 'paid').length})</button>
@@ -7064,19 +7077,49 @@ function wireAdminEventPanel(d) {
   const ext = $('slExtend');
   if (ext) {
     const s = d.event.shiplens_schedule || {};
-    const sync = () => { ext.until.value = String((ext.target.value === 'registration' ? s.reg_closes : s.submission_deadline) || '').slice(0, 16); };
-    ext.target.addEventListener('change', sync); sync();
+    ext.until.value = String(s.reg_closes || '').slice(0, 16);
     ext.addEventListener('submit', async (e) => {
       e.preventDefault(); const btn = ext.querySelector('button');
       const target = ext.target.value; const until = ext.until.value;
-      if (!confirm(target === 'registration'
-        ? `Set the registration deadline to ${until.replace('T', ' ')}?\n\nThe task will be shared the day after, and the submission and results dates are recalculated from it. Every registered team member will be emailed this date.`
-        : `Set the submission deadline to ${until.replace('T', ' ')}?\n\nEvery registered team member will be emailed this date.`)) return;
+      if (!confirm(`Set the registration deadline to ${until.replace('T', ' ')}?\n\nThe competition dates are not changed by this - set them separately. Every registered team member will be emailed this date.`)) return;
       btn.disabled = true;
       try {
         const out = await api(`/api/admin/events/${d.event.id}/extend`, { method: 'POST', body: JSON.stringify({ target, until }) });
         toast(`Deadline extended - ${out.notified} team member${out.notified === 1 ? '' : 's'} notified.`); openEvent(d.event.id);
       } catch (err) { toast(err.message, true); btn.disabled = false; }
+    });
+  }
+  const win = $('slWindow');
+  if (win) {
+    const ev = d.event; const s = ev.shiplens_schedule || {};
+    win.task_opens_at.value = String(s.task_opens_at || '').slice(0, 16);
+    win.submission_deadline.value = String(s.submission_deadline || '').slice(0, 16);
+    win.results_due_at.value = String(ev.shiplens_results_due_at || '').slice(0, 16);
+    // Local "now" in datetime-local shape, rounded down to the minute.
+    const nowLocal = () => { const n = new Date(); n.setSeconds(0, 0); return new Date(n - n.getTimezoneOffset() * 60000).toISOString().slice(0, 16); };
+    document.querySelectorAll('[data-sl-now]').forEach((b) => b.addEventListener('click', () => { win[b.dataset.slNow].value = nowLocal(); }));
+    const send = async (body, btn) => {
+      btn.disabled = true;
+      try {
+        const out = await api(`/api/admin/events/${ev.id}/shiplens-window`, { method: 'POST', body: JSON.stringify(body) });
+        toast(`Competition dates saved${body.notify ? ` - ${out.notified} team member${out.notified === 1 ? '' : 's'} notified` : ''}.`); openEvent(ev.id);
+      } catch (err) { toast(err.message, true); btn.disabled = false; }
+    };
+    win.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const body = { task_opens_at: win.task_opens_at.value, submission_deadline: win.submission_deadline.value, results_due_at: win.results_due_at.value, notify: win.notify.checked };
+      if (!body.task_opens_at || !body.submission_deadline) return toast('Set both when the task opens and when submissions close.', true);
+      const rehide = ['submission', 'grading', 'closed'].includes(ev.shiplens_phase) && body.task_opens_at > nowLocal();
+      if (!confirm(`Task opens: ${body.task_opens_at.replace('T', ' ')}\nSubmissions close: ${body.submission_deadline.replace('T', ' ')}\nResults due: ${body.results_due_at ? body.results_due_at.replace('T', ' ') : '14 days after submissions close'}\n\n`
+        + (rehide ? 'WARNING: the brief has already been released. Moving the opening into the future hides it again, but teams have already seen it.\n\n' : '')
+        + (body.notify ? 'Every registered team member will be emailed this schedule. ' : '') + 'Save?')) return;
+      send(body, win.querySelector('button[type=submit]'));
+    });
+    const clr = $('slWindowClear');
+    if (clr) clr.addEventListener('click', () => {
+      if (!confirm('Clear the competition dates?\n\nThe brief is hidden and submissions are blocked until you set new dates. Existing submissions are kept.'
+        + (win.notify.checked ? ' Teams will be emailed that the dates are being rescheduled.' : ''))) return;
+      send({ task_opens_at: '', notify: win.notify.checked }, clr);
     });
   }
   const fu = $('evFileUp');

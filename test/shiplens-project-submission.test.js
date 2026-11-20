@@ -15,7 +15,8 @@ test('ShipLens requires a live project and keeps an earlier attachment on link u
     email: 'shiplens-project@example.com', password: 'TestPassword123!' });
   const event = Events.create({ title: 'ShipLens project submission', kind: 'competition', series_kind: 'shiplens',
     entry: 'paid', scope: 'both', starts_at: '2026-01-01T00:00', ends_at: '2026-01-03T00:00', problems: [project] }, owner.id);
-  event.shiplens_submission_deadline = '2099-01-01T00:00';
+  // The competition window is set by an admin; it never opens on its own.
+  assert.equal(Events.setShipLensWindow(event.id, { task_opens_at: '2026-01-04T00:00', submission_deadline: '2099-01-01T00:00' }).error, undefined);
   allData().event_entries.push({ id: 401, event_id: event.id, user_id: owner.id, challenge_pid: 1,
     payment_status: 'confirmed', team_details: [{ name: owner.name, email: owner.email }] });
 

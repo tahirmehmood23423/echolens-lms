@@ -655,6 +655,10 @@ model Event {
   // Admin-extended ShipLens submission deadline, same raw "YYYY-MM-DDTHH:MM"
   // shape as ends_at but kept as text (store.js Events.extendShipLens).
   shiplensSubmissionDeadline String? @map("shiplens_submission_deadline")
+  // Admin-set ShipLens competition window (store.js Events.setShipLensWindow):
+  // when the task opens and when results are due. Null task-open = awaiting admin.
+  shiplensTaskOpensAt        String? @map("shiplens_task_opens_at")
+  shiplensResultsDueAt       String? @map("shiplens_results_due_at")
   createdBy       Int       @map("created_by")
   createdAt       DateTime  @map("created_at")
 

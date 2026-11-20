@@ -3503,14 +3503,35 @@ app.post('/api/admin/events/:id/extend', authRequired, adminRequired, (req, res)
   const b = req.body || {};
   const out = Events.extendShipLens(req.params.id, { target: b.target, until: b.until });
   if (out.error) return res.status(out.error.includes('not found') ? 404 : 400).json({ error: out.error });
-  const ev = out.event; const s = out.schedule; const fmt = (v) => String(v || '').replace('T', ' ');
+  const ev = out.event; const s = out.schedule; const fmt = (v) => v ? String(v).replace('T', ' ') : 'To be announced';
   const emails = [...new Set(Events.entries(ev.id).flatMap((e) => [e.email, ...(e.team_details || []).map((m) => m.email)])
     .filter(Boolean).map((e) => String(e).trim().toLowerCase()))];
   if (emails.length) {
     const what = b.target === 'registration'
-      ? `The registration deadline has been extended to ${fmt(s.reg_closes)}. Your project brief will now be shared on ${fmt(s.task_opens_at)}.`
+      ? `The registration deadline has been extended to ${fmt(s.reg_closes)}. ${s.task_opens_at ? `Your project brief will be shared on ${fmt(s.task_opens_at)}.` : 'The competition dates will be announced after registration closes.'}`
       : `The submission deadline has been extended to ${fmt(s.submission_deadline)}.`;
     mailer.notify(emails, `Deadline extended - ${ev.title}`,
+      `${what}\n\nUpdated schedule:\nRegistration closes: ${fmt(s.reg_closes)}\nTask opens: ${fmt(s.task_opens_at)}\nSubmit by: ${fmt(s.submission_deadline)}\nResults by: ${fmt(s.results_due_at)}\n\nOpen the series: ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
+  }
+  res.json({ ok: true, event: Events.decorate(ev), notified: emails.length });
+});
+// Admin opens / closes the ShipLens competition window by hand. Works in any
+// phase (also after registration closed, or to reopen a finished window).
+// An empty task_opens_at puts the series back to "awaiting admin". Every
+// registered team member is emailed the resulting schedule unless notify=false.
+app.post('/api/admin/events/:id/shiplens-window', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  const out = Events.setShipLensWindow(req.params.id, b);
+  if (out.error) return res.status(out.error.includes('not found') ? 404 : 400).json({ error: out.error });
+  const ev = out.event; const s = out.schedule;
+  const fmt = (v) => v ? String(v).replace('T', ' ') : 'To be announced';
+  const emails = b.notify === false ? [] : [...new Set(Events.entries(ev.id).flatMap((e) => [e.email, ...(e.team_details || []).map((m) => m.email)])
+    .filter(Boolean).map((e) => String(e).trim().toLowerCase()))];
+  if (emails.length) {
+    const what = out.cleared
+      ? 'The competition dates are being rescheduled. The project brief and submissions are paused until the new dates are announced.'
+      : `The competition window has been set: the task opens ${fmt(s.task_opens_at)} and submissions close ${fmt(s.submission_deadline)}.`;
+    mailer.notify(emails, `Competition dates updated - ${ev.title}`,
       `${what}\n\nUpdated schedule:\nRegistration closes: ${fmt(s.reg_closes)}\nTask opens: ${fmt(s.task_opens_at)}\nSubmit by: ${fmt(s.submission_deadline)}\nResults by: ${fmt(s.results_due_at)}\n\nOpen the series: ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
   }
   res.json({ ok: true, event: Events.decorate(ev), notified: emails.length });
@@ -3525,7 +3546,7 @@ app.post('/api/admin/shiplens/:id/payment-notice', authRequired, adminRequired, 
   const action = (req.body || {}).action;
   if (!['fee', 'deadline'].includes(action)) return res.status(400).json({ error: 'Choose a reminder to send.' });
   const regStage = ['upcoming', 'registration', 'pending'].includes(Events.shipLensPhase(ev));
-  const s = Events.shipLensSchedule(ev); const fmt = (v) => String(v || '').replace('T', ' ');
+  const s = Events.shipLensSchedule(ev); const fmt = (v) => v ? String(v).replace('T', ' ') : 'To be announced';
   const members = require('./shiplens-finance').shipLensFinanceEntries(Events.entries(ev.id), Registrations.all(), Challans.all())
     .flatMap((e) => (e.team_details || []).map((m, i) => ({ member: m, challan: e.member_challans?.[i] ? Challans.bySerial(e.member_challans[i].serial) : null })))
     .filter((x) => x.member.email);
@@ -3549,7 +3570,7 @@ app.post('/api/admin/shiplens/:id/payment-notice', authRequired, adminRequired, 
           `Hi ${member.name || 'there'},\n\nYou are registered for ${ev.title}, but your entry fee is still unpaid.\n\nChallan: ${challan.serial}\nAmount: PKR ${challan.net_fee}\nPay by: ${fmt(s.reg_closes)}\n\nView or download your challan: ${APP_URL}/challan?s=${encodeURIComponent(challan.serial)}\n\nAfter paying, send the proof to ${FINANCE_EMAIL}. Both partners must pay before your team can submit.\n\n${schedule}\n\n${link}`);
       } else {
         await mailer.notify(member.email, `Deadline extended - ${ev.title}`,
-          `Hi ${member.name || 'there'},\n\nThanks - your fee for ${ev.title} is confirmed. The ${regStage ? 'registration deadline has been extended to ' + fmt(s.reg_closes) + ', so your project brief will now be shared on ' + fmt(s.task_opens_at) : 'submission deadline has been extended to ' + fmt(s.submission_deadline)}.\n\nUpdated schedule:\n${schedule}\n\n${link}`);
+          `Hi ${member.name || 'there'},\n\nThanks - your fee for ${ev.title} is confirmed. The ${regStage ? 'registration deadline has been extended to ' + fmt(s.reg_closes) + (s.task_opens_at ? ', and your project brief will be shared on ' + fmt(s.task_opens_at) : ', and the competition dates will be announced after registration closes') : 'submission deadline has been extended to ' + fmt(s.submission_deadline)}.\n\nUpdated schedule:\n${schedule}\n\n${link}`);
       }
     }
   })().catch((e) => console.error('ShipLens payment notice failed:', e.message));

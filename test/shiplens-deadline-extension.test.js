@@ -114,3 +114,22 @@ test('a registration extension uses the exact chosen date and moves unpaid chall
   assert.equal(out.schedule.reg_closes, '2099-01-03T18:30');
   assert.equal(Challans.bySerial(reg.challan.serial).deadline, '2099-01-03');
 });
+
+test('admin edits the project brief: goal, deliverables, judging criteria and grading settings', () => {
+  const ev = series('2099-01-01T10:00');
+  const p = Events.byId(ev.id).problems[0];
+  Events.update(ev.id, { title: 'ShipLens 1.3', pass_mark: 70, auto_grade: true,
+    problems: [{ ...p, objective: 'New goal', deliverables: '1. Site\n2. README', acceptance_criteria: 'Works on phone\nREADME reproduces it', points: 150, difficulty: 'Medium' }] });
+  const after = Events.byId(ev.id);
+  assert.equal(after.title, 'ShipLens 1.3');
+  assert.equal(after.pass_mark, 70);
+  assert.equal(after.auto_grade, true);
+  assert.equal(after.problems.length, 1);
+  assert.equal(after.problems[0].pid, 1, 'registered teams keep pointing at the same project');
+  assert.equal(after.problems[0].objective, 'New goal');
+  assert.equal(after.problems[0].acceptance_criteria, 'Works on phone\nREADME reproduces it');
+  assert.equal(after.problems[0].points, 150);
+  assert.equal(after.problems[0].difficulty, 'Medium');
+  assert.equal(after.problems[0].title, p.title, 'untouched fields are kept');
+  assert.equal(after.problems[0].visual_url, p.visual_url);
+});

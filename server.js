@@ -3462,7 +3462,23 @@ app.patch('/api/admin/events/:id', authRequired, adminRequired, (req, res) => {
   }
   const ev = Events.update(req.params.id, req.body || {});
   if (!ev) return res.status(404).json({ error: 'Event not found.' });
-  res.json({ ok: true, event: Events.decorate(ev) });
+  // Optional heads-up to every registered ShipLens team member that the
+  // project details changed. The email never quotes the brief itself, so a
+  // brief that is still locked stays hidden until the task opens.
+  let notified = 0;
+  if (ev.series_kind === 'shiplens' && (req.body || {}).notify_teams) {
+    const emails = [...new Set(Events.entries(ev.id).flatMap((e) => [e.email, ...(e.team_details || []).map((m) => m.email)])
+      .filter(Boolean).map((e) => String(e).trim().toLowerCase()))];
+    const s = Events.shipLensSchedule(ev); const released = ['submission', 'grading', 'closed'].includes(Events.shipLensPhase(ev));
+    if (emails.length) {
+      mailer.notify(emails, `Project details updated - ${ev.title}`,
+        `The organisers have updated the project details for ${ev.title} (${(ev.problems || [])[0]?.title || 'ShipLens project'}).\n\n${released
+          ? 'Please re-read the goal, the required deliverables and how the project is judged before you submit.'
+          : s.task_opens_at ? `You will see the full brief when the task opens on ${String(s.task_opens_at).replace('T', ' ')}.` : 'You will see the full brief once the competition dates are announced.'}\n\nOpen the series: ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
+      notified = emails.length;
+    }
+  }
+  res.json({ ok: true, event: Events.decorate(ev), notified });
 });
 app.delete('/api/admin/events/:id', authRequired, adminRequired, asyncRoute(async (req, res) => {
   const ev = Events.byId(req.params.id);
@@ -3744,8 +3760,20 @@ app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (r
       if (!text && file_url) { const ex = await extractText(file_url); text = ex.text; }
       if (!text && out.submission.link) text = `The participant submitted only a link: ${out.submission.link}. Grade conservatively based on the task; you cannot open links.`;
       const evRubric = graderContext(pr, ev);
+      // ShipLens keeps its judging checklist as free text (one criterion per
+      // line) rather than a criteria array - feed it to the grader as the
+      // rubric, with the goal and deliverables in the brief, so the AI marks
+      // against exactly what the admin wrote and students were shown.
+      let brief = pr.description;
+      if (ev.series_kind === 'shiplens') {
+        if (!evRubric.criteria.length) evRubric.criteria = String(pr.acceptance_criteria || '').split(/\r?\n/).map((l) => l.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').trim()).filter(Boolean);
+        brief = [pr.description, pr.objective && `Goal: ${pr.objective}`, pr.deliverables && `Required deliverables:\n${pr.deliverables}`].filter(Boolean).join('\n\n');
+        const links = [out.submission.github_link && `GitHub: ${out.submission.github_link}`, out.submission.render_link && `Render: ${out.submission.render_link}`,
+          out.submission.vercel_link && `Vercel: ${out.submission.vercel_link}`, out.submission.link && `Walkthrough video: ${out.submission.link}`].filter(Boolean);
+        if (!out.submission.code && !file_url && links.length) text = `The team submitted links only (you cannot open them):\n${links.join('\n')}${out.submission.note ? `\nTeam note: ${out.submission.note}` : ''}\nGrade conservatively against the rubric.`;
+      }
       const g = await ai.autoGrade(req.user.id, {
-        eventTitle: ev.title, problemTitle: pr.title, problemBrief: pr.description,
+        eventTitle: ev.title, problemTitle: pr.title, problemBrief: brief,
         passMark: ev.pass_mark, code: out.submission.code, language: out.submission.language, text,
         criteria: evRubric.criteria, solution: evRubric.solution,
         expectedOutput: evRubric.expectedOutput, sampleInput: evRubric.sampleInput,

@@ -6997,6 +6997,8 @@ function adminEventPanel(d) {
   const ev = d.event;
   return `
     ${ev.series_kind === 'shiplens' ? `
+    <div class="pub-sec">Project brief <button class="btn btn-teal btn-sm" style="float:right" onclick="formShipLensBrief(${ev.id})">Edit project brief</button></div>
+    <div class="s" style="color:var(--muted);margin-bottom:10px">${esc((ev.problems || [])[0]?.title || 'No project set')} &middot; ${esc((ev.problems || [])[0]?.difficulty || '')} &middot; ${Number((ev.problems || [])[0]?.points || 0)} points &middot; pass mark ${Number(ev.pass_mark || 0)}% &middot; AI grading ${ev.auto_grade ? 'on' : 'off'}</div>
     <div class="pub-sec">Schedule</div>
     <div class="s" style="color:var(--muted);margin-bottom:10px">Registration closes ${slTba(ev.shiplens_schedule?.reg_closes)} &middot; Task opens ${slTba(ev.shiplens_schedule?.task_opens_at)} &middot; Submit by ${slTba(ev.shiplens_schedule?.submission_deadline)} &middot; Results by ${slTba(ev.shiplens_schedule?.results_due_at)} &middot; Phase: <strong>${esc(ev.shiplens_phase === 'pending' && !ev.shiplens_schedule?.window_set ? 'awaiting competition dates' : ev.shiplens_phase || '')}</strong></div>
     ${['upcoming', 'registration', 'pending'].includes(ev.shiplens_phase) ? `
@@ -7127,6 +7129,53 @@ function wireAdminEventPanel(d) {
     e.preventDefault(); const btn = fu.querySelector('button'); btn.disabled = true;
     try { await api(`/api/admin/events/${d.event.id}/files`, { method: 'POST', body: new FormData(fu) }); toast('Attached.'); openEvent(d.event.id); }
     catch (err) { toast(err.message, true); btn.disabled = false; }
+  });
+}
+// Admin edits a ShipLens series' details: the series text plus its single
+// project (goal, deliverables, how it is judged, visual, points) and the
+// grading settings. The judging criteria are also what AI grading marks
+// against, one criterion per line.
+async function formShipLensBrief(eid) {
+  const d = await api(`/api/events/${eid}`);
+  const ev = d.event; const p = (ev.problems || [])[0] || {};
+  const released = ['submission', 'grading', 'closed'].includes(ev.shiplens_phase);
+  openModal(`Edit project brief - ${ev.title}`, `
+    <form id="slBriefForm">
+      ${released ? '<div class="task-status wait" style="margin-bottom:10px">The brief is already released. Teams may be building against the current version - tell them what changed.</div>' : ''}
+      <label class="field"><span>Series title</span><input name="title" required maxlength="200" value="${esc(ev.title)}"></label>
+      <label class="field"><span>Series description (public overview)</span><textarea name="description" rows="4">${esc(ev.description || '')}</textarea></label>
+      <label class="field"><span>Project title</span><input name="p_title" required maxlength="200" value="${esc(p.title || '')}"></label>
+      <div class="form-grid">
+        <label class="field"><span>Difficulty</span><select name="difficulty">${['Easy', 'Medium', 'Hard'].map((x) => `<option ${p.difficulty === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+        <label class="field"><span>Points</span><input name="points" type="number" min="5" max="500" value="${Number(p.points || 100)}"></label>
+        <label class="field"><span>Pass mark (%)</span><input name="pass_mark" type="number" min="0" max="100" value="${Number(ev.pass_mark || 0)}"></label>
+      </div>
+      <label class="field"><span>Full brief (the scenario and what to build)</span><textarea name="p_description" rows="6" required>${esc(p.description || '')}</textarea></label>
+      <label class="field"><span>Goal</span><textarea name="objective" rows="2" required>${esc(p.objective || '')}</textarea></label>
+      <label class="field"><span>What to deliver (one item per line)</span><textarea name="deliverables" rows="5" required>${esc(p.deliverables || '')}</textarea></label>
+      <label class="field"><span>How it is judged (one criterion per line - AI grading marks against these)</span><textarea name="acceptance_criteria" rows="5" required>${esc(p.acceptance_criteria || '')}</textarea></label>
+      <label class="field"><span>Visual reference image URL (optional, HTTPS)</span><input name="visual_url" type="url" value="${esc(p.visual_url || '')}"></label>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 10px">
+        <label class="s" style="display:flex;gap:7px;align-items:center"><input type="checkbox" name="auto_grade" ${ev.auto_grade ? 'checked' : ''}> AI auto-grading on submit</label>
+        <label class="s" style="display:flex;gap:7px;align-items:center"><input type="checkbox" name="notify_teams" ${released ? 'checked' : ''}> Email registered teams that the details changed</label>
+      </div>
+      <button class="btn btn-primary btn-block">Save project brief</button>
+    </form>`, true);
+  $('slBriefForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button.btn-primary');
+    const body = {
+      title: f.title.value.trim(), description: f.description.value.trim(),
+      pass_mark: f.pass_mark.value, auto_grade: f.auto_grade.checked, notify_teams: f.notify_teams.checked,
+      // Keep every other stored project field as it was.
+      problems: [{ ...p, title: f.p_title.value.trim(), description: f.p_description.value.trim(), objective: f.objective.value.trim(),
+        deliverables: f.deliverables.value.trim(), acceptance_criteria: f.acceptance_criteria.value.trim(), visual_url: f.visual_url.value.trim() || null,
+        difficulty: f.difficulty.value, points: f.points.value }],
+    };
+    btn.disabled = true;
+    try {
+      const out = await api(`/api/admin/events/${eid}`, { method: 'PATCH', body: JSON.stringify(body) });
+      toast(`Project brief saved${out.notified ? ` - ${out.notified} team member${out.notified === 1 ? '' : 's'} notified` : ''}.`); closeModal(); openEvent(eid);
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
   });
 }
 async function shipLensRemind(eid, daysLeft) {

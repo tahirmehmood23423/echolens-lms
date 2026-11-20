@@ -3101,8 +3101,12 @@ function renderEventDetail() {
   </div>`;
 
   // instructions
-  const files = (ev.files || []).length
-    ? `<h4>Documents</h4><p>${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join(' &nbsp;·&nbsp; ')}</p>` : '';
+  // The server only sends the resources this viewer may see (ShipLens task
+  // resources open for paid teams with the brief).
+  const files = !(ev.files || []).length ? ''
+    : ev.series_kind === 'shiplens'
+      ? `<h4>Task resources</h4><ul style="padding-left:18px;margin:6px 0">${ev.files.map((f) => `<li style="margin:4px 0"><a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a> <span class="muted">(${f.kind === 'link' ? 'link' : 'document'})</span>${f.note ? `<br><span class="muted">${esc(f.note)}</span>` : ''}</li>`).join('')}</ul>`
+      : `<h4>Documents</h4><p>${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join(' &nbsp;·&nbsp; ')}</p>`;
   const instructionsSec = `<div class="evd-sec" id="evdSec-instructions">
     <h3>Instructions</h3>
     <p class="muted">${ev.series_kind === 'shiplens' ? 'Build your selected project with a team of one or two, then submit a GitHub repository and a live deployment link. Finance must confirm your challan payment first.' : `Reach the pass mark of <strong>${ev.pass_mark}%</strong> to clear this ${EV_KIND_LABEL[ev.kind].toLowerCase()}.${ev.auto_certificate ? ' A verified certificate is issued automatically when you pass.' : ''}${ev.entry === 'paid' ? ` Entry fee: PKR ${ev.fee_pkr}.` : ' This event is free to enter.'}`}</p>

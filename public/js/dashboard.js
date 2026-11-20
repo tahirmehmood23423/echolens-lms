@@ -6730,8 +6730,8 @@ async function openEvent(id) {
   const fmtDT = (v) => v ? esc(String(v).replace('T', ' ')) : '—';
   const checkI = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>';
   const clockI = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-  const filesHtml = (ev.files || []).length ? `
-    <div class="s" style="margin:8px 0"><strong>Documents &amp; datasets:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>${isAdmin ? ` <button class="btn btn-ghost btn-sm" onclick="evDelFile(${ev.id},'${esc(f.name).replace(/'/g, '&#39;')}')" title="Remove">&times;</button>` : ''}`).join(' &middot; ')}</div>` : '';
+  const filesHtml = ev.series_kind === 'shiplens' ? (isAdmin ? '' : slResourceList(ev, false)) : (ev.files || []).length ? `
+    <div class="s" style="margin:8px 0"><strong>Documents &amp; datasets:</strong> ${ev.files.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>${isAdmin ? ` <button class="btn btn-ghost btn-sm" onclick="evDelFile(${ev.id},'${esc(f.rid || f.name).replace(/'/g, '&#39;')}')" title="Remove">&times;</button>` : ''}`).join(' &middot; ')}</div>` : '';
 
   // ---- event hero ----
   const hero = `<div class="evd-hero${ev.series_kind === 'shiplens' ? ' sl-detail-hero' : ''}">
@@ -7068,12 +7068,44 @@ function adminEventPanel(d) {
           <button class="btn btn-ghost btn-sm" onclick="evScore(${s.id},${ev.id})">Score</button>
         </div>`).join('') || '<div class="empty">No submissions yet.</div>'}
     </div>
+    ${ev.series_kind === 'shiplens' ? `
+    <div class="pub-sec">Task resources <span class="s" style="color:var(--muted);font-weight:400">- documents and links teams need for the project</span></div>
+    ${slResourceList(ev, true)}
+    <form id="slResForm" style="display:grid;gap:8px;margin:8px 0 14px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <label class="field" style="margin:0"><span>Type</span><select name="kind"><option value="file">Document upload</option><option value="link">Link</option></select></label>
+        <label class="field" style="margin:0;flex:1;min-width:180px"><span>Title</span><input name="title" maxlength="200" placeholder="e.g. Branch data (CSV), Brand guide, API docs"></label>
+        <label class="field" style="margin:0"><span>Who can see it</span><select name="visibility">
+          <option value="task">Paid teams, once the task opens</option><option value="teams">Paid teams, any time</option><option value="public">Everyone (public)</option></select></label>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <label class="field sl-res-file" style="margin:0"><span>File (up to 50 MB)</span><input name="file" type="file" style="font-size:12.5px"></label>
+        <label class="field sl-res-link" style="margin:0;flex:1;min-width:220px;display:none"><span>URL</span><input name="url" type="url" placeholder="https://..."></label>
+        <label class="field" style="margin:0;flex:1;min-width:220px"><span>Note (optional)</span><input name="note" maxlength="500" placeholder="What it is for / how to use it"></label>
+        <button class="btn btn-teal btn-sm">Add resource</button>
+      </div>
+    </form>` : `
     <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
       <form id="evFileUp" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <input name="file" type="file" required style="font-size:12.5px">
         <button class="btn btn-teal btn-sm">Attach document / dataset</button>
       </form>
-    </div>`;
+    </div>`}`;
+}
+const SL_VIS_LABEL = { task: 'Teams, after task opens', teams: 'Teams, any time', public: 'Public' };
+// ShipLens resource list. Students only ever receive the resources the
+// server decided they may see; the admin view adds visibility and removal.
+function slResourceList(ev, isAdmin) {
+  const files = ev.files || [];
+  if (!files.length) return isAdmin ? '<div class="empty" style="padding:10px">No resources yet.</div>' : '';
+  return `<div class="sl-resources" style="margin:8px 0">${isAdmin ? '' : '<div class="pub-sec">Task resources</div>'}${files.map((f) => `
+    <div class="list-row" style="padding:8px 4px">
+      <div class="grow">
+        <div class="t"><a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a> <span class="role-pill">${f.kind === 'link' ? 'Link' : 'Document'}</span>${isAdmin ? ` <span class="s" style="color:var(--muted)">${esc(SL_VIS_LABEL[f.visibility] || SL_VIS_LABEL.task)}</span>` : ''}</div>
+        ${f.note ? `<div class="s" style="color:var(--muted)">${esc(f.note)}</div>` : ''}
+      </div>
+      ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="evDelFile(${ev.id},'${esc(f.rid || f.name).replace(/'/g, '&#39;')}')">Remove</button>` : ''}
+    </div>`).join('')}</div>`;
 }
 function wireAdminEventPanel(d) {
   const ext = $('slExtend');
@@ -7122,6 +7154,28 @@ function wireAdminEventPanel(d) {
       if (!confirm('Clear the competition dates?\n\nThe brief is hidden and submissions are blocked until you set new dates. Existing submissions are kept.'
         + (win.notify.checked ? ' Teams will be emailed that the dates are being rescheduled.' : ''))) return;
       send({ task_opens_at: '', notify: win.notify.checked }, clr);
+    });
+  }
+  const rf = $('slResForm');
+  if (rf) {
+    const sync = () => { const link = rf.kind.value === 'link'; rf.querySelector('.sl-res-file').style.display = link ? 'none' : ''; rf.querySelector('.sl-res-link').style.display = link ? '' : 'none'; };
+    rf.kind.addEventListener('change', sync); sync();
+    rf.addEventListener('submit', async (e) => {
+      e.preventDefault(); const btn = rf.querySelector('button'); const eid = d.event.id;
+      try {
+        if (rf.kind.value === 'link') {
+          if (!rf.url.value.trim()) return toast('Paste the link URL.', true);
+          btn.disabled = true;
+          await api(`/api/admin/events/${eid}/links`, { method: 'POST', body: JSON.stringify({ title: rf.title.value.trim(), url: rf.url.value.trim(), note: rf.note.value.trim(), visibility: rf.visibility.value }) });
+        } else {
+          if (!rf.file.files.length) return toast('Choose a file to upload.', true);
+          btn.disabled = true;
+          const fd = new FormData();
+          fd.append('title', rf.title.value.trim()); fd.append('note', rf.note.value.trim()); fd.append('visibility', rf.visibility.value); fd.append('file', rf.file.files[0]);
+          await api(`/api/admin/events/${eid}/files`, { method: 'POST', body: fd });
+        }
+        toast('Resource added.'); openEvent(eid);
+      } catch (err) { toast(err.message, true); btn.disabled = false; }
     });
   }
   const fu = $('evFileUp');
@@ -7247,7 +7301,7 @@ function certGapMsg(prog, ev) {
   return '';
 }
 async function evDelFile(eid, name) {
-  if (!confirm('Remove this document from the event?')) return;
+  if (!confirm('Remove this resource from the event?')) return;
   try { await api(`/api/admin/events/${eid}/files/${encodeURIComponent(name)}`, { method: 'DELETE' }); openEvent(eid); }
   catch (e) { toast(e.message, true); }
 }

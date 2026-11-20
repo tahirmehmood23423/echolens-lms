@@ -3347,6 +3347,7 @@ app.get('/api/events', authRequired, (req, res) => {
       // Same redaction as the detail endpoint - the list payload must not
       // leak the exact ShipLens brief to devtools before the task opens.
       problems: !isAdmin && ev.series_kind === 'shiplens' ? Events.shipLensProblems(ev, ['submission', 'grading', 'closed'].includes(ev.shiplens_phase)) : ev.problems,
+      files: isAdmin ? ev.files : Events.visibleFiles(ev, req.user),
       my_entry: Events.entryForUser(ev, req.user),
       my_progress: Events.entryForUser(ev, req.user) ? Events.progressFor(ev, req.user.id) : null,
     }));
@@ -3376,7 +3377,7 @@ app.get('/api/events/:id', authRequired, (req, res) => {
     ? Events.shipLensProblems(ev, ['submission', 'grading', 'closed'].includes(d.shiplens_phase))
     : d.problems;
   res.json({
-    event: { ...d, problems: problemsOut, meeting_link: showLink ? d.meeting_link : null, ...(req.user.role === 'free' ? { entries_count: undefined, submissions_count: undefined } : {}) },
+    event: { ...d, problems: problemsOut, files: isAdmin ? d.files : Events.visibleFiles(ev, req.user), meeting_link: showLink ? d.meeting_link : null, ...(req.user.role === 'free' ? { entries_count: undefined, submissions_count: undefined } : {}) },
     my_entry: entry, can_participate: gate.ok, participate_msg: gate.ok ? null : gate.why,
     my_submissions: mySubs,
     my_progress: entry ? Events.progressFor(ev, req.user.id) : null,
@@ -3595,9 +3596,18 @@ app.post('/api/admin/shiplens/:id/payment-notice', authRequired, adminRequired, 
 // Admin attaches documents (rules PDF, datasets, briefs) to any event.
 app.post('/api/admin/events/:id/files', authRequired, adminRequired, upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Choose a file first.' });
-  const ev = Events.addFile(req.params.id, { name: req.file.originalname, url: `/uploads/${req.file.filename}` });
-  if (!ev) return res.status(404).json({ error: 'Event not found.' });
+  const b = req.body || {};
+  const ev = Events.addFile(req.params.id, { name: String(b.title || '').trim() || req.file.originalname, url: `/uploads/${req.file.filename}`, note: b.note, visibility: b.visibility });
+  if (!ev) { try { fs.unlinkSync(req.file.path); } catch {} return res.status(404).json({ error: 'Event not found.' }); }
   res.json({ ok: true, files: ev.files });
+});
+// Admin adds an external resource link (Figma file, API docs, dataset,
+// Google Drive folder...) with the same visibility rules as documents.
+app.post('/api/admin/events/:id/links', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  const out = Events.addLink(req.params.id, { name: b.title, url: b.url, note: b.note, visibility: b.visibility });
+  if (out.error) return res.status(out.error.includes('not found') ? 404 : 400).json({ error: out.error });
+  res.json({ ok: true, files: out.event.files });
 });
 app.delete('/api/admin/events/:id/files/:name', authRequired, adminRequired, (req, res) => {
   const ev = Events.removeFile(req.params.id, req.params.name);
@@ -5488,6 +5498,17 @@ function authGate(req, res, next) {
   const current = currentUser(req);
   const user = current && !isDeactivatedAmbassador(current) ? current : null;
   const name = req.path.replace(/^\//, '');
+  // ShipLens resources follow the series' own visibility (task / teams /
+  // public) instead of the generic paid-event rule, which neither knows the
+  // second team member nor waits for the task to open.
+  const key = uploadAccess.uploadKey(name);
+  const slEv = key && (store.allData().events || []).find((e) => e.series_kind === 'shiplens' && (e.files || []).some((f) => uploadAccess.uploadKey(f.url) === key));
+  if (slEv) {
+    const f = slEv.files.find((x) => uploadAccess.uploadKey(x.url) === key);
+    if (!Events.resourceVisible(slEv, f, user)) return res.status(user ? 403 : 401).send(user ? 'This resource opens for registered teams when the task opens.' : 'Sign in to view this file.');
+    res.setHeader('Cache-Control', 'private, no-store');
+    return next();
+  }
   if (!uploadAccess.canAccessUpload(user, name, store.allData())) return res.status(user ? 403 : 401).send(user ? 'You do not have access to this file.' : 'Sign in to view this file.');
   res.setHeader('Cache-Control', 'private, no-store');
   next();

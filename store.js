@@ -3334,6 +3334,7 @@ function backupNow() {
 const EVENT_KINDS = ['quest', 'hackathon', 'competition', 'webinar'];
 const EVENT_SCOPES = ['portal', 'open', 'both'];
 const EVENT_LANGS = ['none', 'python', 'javascript', 'typescript', 'c', 'cpp', 'java', 'go', 'sql', 'web'];
+const RESOURCE_VISIBILITY = ['task', 'teams', 'public'];
 
 const Events = {
   byId(id) { return data.events.find((e) => e.id === Number(id)) || null; },
@@ -3551,19 +3552,46 @@ const Events = {
     save();
     return ev;
   },
-  addFile(id, { name, url }) {
+  // Event resources: uploaded documents and external links, both kept in
+  // ev.files. Each carries an rid, a display name, an optional note and (for
+  // ShipLens) a visibility: 'task' = paid teams once the task opens (the
+  // default, like the brief), 'teams' = paid teams any time, 'public' =
+  // anyone who can see the series.
+  addFile(id, { name, url, note, visibility, kind = 'file' }) {
     const ev = Events.byId(id); if (!ev) return null;
     ev.files = ev.files || [];
-    ev.files.push({ name: String(name).slice(0, 200), url });
+    ev.files.push({ rid: crypto.randomUUID().slice(0, 12), kind, name: String(name || 'Resource').slice(0, 200), url,
+      note: String(note || '').trim().slice(0, 500) || null,
+      visibility: RESOURCE_VISIBILITY.includes(visibility) ? visibility : 'task', added_at: now() });
     save();
     return ev;
   },
-  removeFile(id, name) {
+  addLink(id, { name, url, note, visibility }) {
+    const u = String(url || '').trim();
+    if (!/^https?:\/\/[^\s]+$/i.test(u)) return { error: 'Links must start with http:// or https://' };
+    if (!String(name || '').trim()) return { error: 'Give the link a title.' };
+    const ev = Events.addFile(id, { name, url: u.slice(0, 1000), note, visibility, kind: 'link' });
+    return ev ? { event: ev } : { error: 'Event not found.' };
+  },
+  // Removes by rid; resources attached before rids existed go by name.
+  removeFile(id, key) {
     const ev = Events.byId(id); if (!ev) return null;
-    ev.files = (ev.files || []).filter((f) => f.name !== name);
+    const files = ev.files || [];
+    ev.files = files.some((f) => f.rid === key) ? files.filter((f) => f.rid !== key) : files.filter((f) => f.name !== key);
     save();
     return ev;
   },
+  // Whether this viewer may see / download one resource. Non-ShipLens events
+  // keep their existing behaviour (upload-access.js decides downloads).
+  resourceVisible(ev, f, user) {
+    if (ev.series_kind !== 'shiplens') return true;
+    if (user?.role === 'admin') return true;
+    const vis = RESOURCE_VISIBILITY.includes(f.visibility) ? f.visibility : 'task';
+    if (vis === 'public') return true;
+    if (!user || !Events.canParticipate(ev, user.id).ok) return false;
+    return vis === 'teams' || ['submission', 'grading', 'closed'].includes(Events.shipLensPhase(ev));
+  },
+  visibleFiles(ev, user) { return (ev.files || []).filter((f) => Events.resourceVisible(ev, f, user)); },
   remove(id) {
     const eid = Number(id);
     data.events = data.events.filter((e) => e.id !== eid);

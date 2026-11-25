@@ -75,3 +75,23 @@ test('auto-certificate on a passing grade covers both team members', () => {
   assert.equal(out.issued.length, 2);
   assert.deepEqual(certsFor(ev).map((c) => c.user_id).sort(), [lead.id, partner.id].sort());
 });
+
+test('each member of a two-person team gets their own certificate', () => {
+  const { ev, entry, lead, partner } = team();
+  const a = Events.issueShipLensCertificate(ev.id, entry.id, 0, admin.id);
+  const b = Events.issueShipLensCertificate(ev.id, entry.id, 1, admin.id);
+  assert.notEqual(a.cert.serial, b.cert.serial);
+  assert.equal(a.user.id, lead.id);
+  assert.equal(b.user.id, partner.id);
+  const row = Events.shipLensResults(Events.byId(ev.id))[0];
+  assert.ok(row.members[0].certificate && row.members[1].certificate);
+  assert.notEqual(row.members[0].certificate.serial, row.members[1].certificate.serial);
+});
+
+test('the lead still gets a certificate when the team email differs from their account email', () => {
+  const { ev, entry, lead } = team();
+  entry.team_details[0].email = 'typed-differently@example.com';
+  const row = Events.shipLensResults(Events.byId(ev.id))[0];
+  assert.equal(row.members[0].has_account, true);
+  assert.equal(Events.issueShipLensCertificate(ev.id, entry.id, 0, admin.id).user.id, lead.id);
+});

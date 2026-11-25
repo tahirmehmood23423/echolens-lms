@@ -3875,20 +3875,20 @@ ${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
 // Admin issues one member's certificate. A member without a learner account
 // gets one only when the admin explicitly asks (create_account), and is
 // emailed their login details along with the certificate link.
-app.post('/api/admin/shiplens/:id/teams/:entryId/certificate', authRequired, adminRequired, (req, res) => {
-  const b = req.body || {};
-  let out = Events.issueShipLensCertificate(req.params.id, req.params.entryId, b.member, req.user.id);
+// Issue one member's own certificate (and email it to them alone). A member
+// without a learner account gets one only when createAccount is set.
+function issueShipLensMemberCert(ev, entryId, memberIndex, createAccount, by) {
+  let out = Events.issueShipLensCertificate(ev.id, entryId, memberIndex, by);
   let account = null;
   if (out.error === 'no_account') {
     const m = out.member;
-    if (!b.create_account) return res.status(409).json({ error: `${m.name || 'This member'} (${m.email || 'no email'}) has no EchoLens account yet.`, needs_account: true });
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(m.email || ''))) return res.status(400).json({ error: 'This member has no valid email, so an account cannot be created.' });
-    const created = Users.create({ name: m.name || m.email, role: 'free', email: String(m.email).trim().toLowerCase() });
-    account = created;
-    out = Events.issueShipLensCertificate(req.params.id, req.params.entryId, b.member, req.user.id);
+    if (!createAccount) return { status: 409, error: `${m.name || 'This member'} (${m.email || 'no email'}) has no EchoLens account yet.`, needs_account: true };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(m.email || ''))) return { status: 400, error: `${m.name || 'This member'} has no valid email, so an account cannot be created.` };
+    account = Users.create({ name: m.name || m.email, role: 'free', email: String(m.email).trim().toLowerCase() });
+    out = Events.issueShipLensCertificate(ev.id, entryId, memberIndex, by);
   }
-  if (out.error) return res.status(out.error.includes('not found') ? 404 : 400).json({ error: out.error });
-  const ev = Events.byId(req.params.id); const u = out.user;
+  if (out.error) return { status: out.error.includes('not found') ? 404 : 400, error: out.error };
+  const u = out.user;
   if (u.email && !out.existing) {
     mailer.notify(u.email, `Certificate issued - ${ev.title}`,
       `Congratulations ${u.name}!
@@ -3905,7 +3905,23 @@ Password: ${account.password}
 
 Sign in at ${APP_URL} and change your password from Profile after your first login.` : ''));
   }
-  res.json({ ok: true, serial: out.cert.serial, existing: out.existing, account_created: !!account, results: Events.shipLensResults(ev) });
+  return { serial: out.cert.serial, existing: out.existing, account_created: !!account, name: u.name };
+}
+app.post('/api/admin/shiplens/:id/teams/:entryId/certificate', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {}; const ev = Events.byId(req.params.id);
+  if (!ev || ev.series_kind !== 'shiplens') return res.status(404).json({ error: 'ShipLens series not found.' });
+  const r = issueShipLensMemberCert(ev, req.params.entryId, b.member, !!b.create_account, req.user.id);
+  if (r.error) return res.status(r.status).json({ error: r.error, needs_account: !!r.needs_account });
+  res.json({ ok: true, ...r, results: Events.shipLensResults(ev) });
+});
+// Whole team: every member gets their OWN certificate and their own email.
+app.post('/api/admin/shiplens/:id/teams/:entryId/certificates', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {}; const ev = Events.byId(req.params.id);
+  if (!ev || ev.series_kind !== 'shiplens') return res.status(404).json({ error: 'ShipLens series not found.' });
+  const entry = Events.entries(ev.id).find((e) => e.id === Number(req.params.entryId));
+  if (!entry) return res.status(404).json({ error: 'Team not found in this series.' });
+  const members = (entry.team_details || []).map((m, i) => ({ index: i, name: m.name || m.email, ...issueShipLensMemberCert(ev, entry.id, i, !!b.create_accounts, req.user.id) }));
+  res.json({ ok: true, members: members.map(({ status, ...m }) => m), results: Events.shipLensResults(ev) });
 });
 app.delete('/api/admin/shiplens/:id/certificates/:certId', authRequired, adminRequired, (req, res) => {
   const out = Events.revokeShipLensCertificate(req.params.id, req.params.certId);

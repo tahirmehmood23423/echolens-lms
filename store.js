@@ -3780,17 +3780,22 @@ const Events = {
   /* ---- ShipLens results: manual grading (email submissions) + certificates ---- */
   // The learner account behind one team member, matched by email (finance
   // clearance records the lead's id for both members, so it cannot be used).
-  shipLensMemberUser(member) {
+  // The lead (index 0) registered from their own account, so when the email
+  // they typed for the team differs from their account email, that account
+  // is still theirs.
+  shipLensMemberUser(member, entry, index) {
     const email = String(member?.email || '').trim().toLowerCase();
-    if (!email) return null;
-    const all = data.users.filter((u) => u.email && u.email.toLowerCase() === email);
-    return all.find((u) => ['free', 'student'].includes(u.role)) || all[0] || null;
+    const all = email ? data.users.filter((u) => u.email && u.email.toLowerCase() === email) : [];
+    const byEmail = all.find((u) => ['free', 'student'].includes(u.role)) || all[0] || null;
+    if (byEmail) return byEmail;
+    if (entry && Number(index) === 0 && entry.user_id) return Users.byId(entry.user_id) || null;
+    return null;
   },
   shipLensResults(ev) {
     return data.event_entries.filter((e) => e.event_id === ev.id).map((e) => {
       const s = data.event_submissions.find((x) => x.event_id === ev.id && x.entry_id === e.id) || null;
       const members = (e.team_details || []).map((m, index) => {
-        const u = Events.shipLensMemberUser(m);
+        const u = Events.shipLensMemberUser(m, e, index);
         const cert = u ? data.certificates.find((c) => c.user_id === u.id && c.source_kind === 'event' && String(c.source_id) === String(ev.id)) : null;
         return { index, name: m.name, email: m.email, has_account: !!u, certificate: cert ? { id: cert.id, serial: cert.serial, issued_at: cert.issued_at } : null };
       });
@@ -3841,8 +3846,12 @@ const Events = {
     const entry = data.event_entries.find((e) => e.id === Number(entryId) && e.event_id === ev.id);
     const member = entry?.team_details?.[Number(memberIndex)];
     if (!member) return { error: 'Team member not found.' };
-    const user = Events.shipLensMemberUser(member);
+    const user = Events.shipLensMemberUser(member, entry, memberIndex);
     if (!user) return { error: 'no_account', member };
+    // Two members must never share one certificate: if the other member
+    // already resolves to this same account, refuse rather than dedupe.
+    const otherIdx = (entry.team_details || []).findIndex((m, i) => i !== Number(memberIndex) && Events.shipLensMemberUser(m, entry, i)?.id === user.id);
+    if (otherIdx !== -1) return { error: `${member.name || 'This member'} resolves to the same account as their teammate (${user.email}). Fix the team emails first.` };
     const out = Certificates.issue({ user_id: user.id, batch_id: null, kind: 'competition', title: ev.title, completion_date: today(), detail: null,
       instructor_id: null, issued_by: by, source_kind: 'event', source_id: ev.id, partner: !!ev.partner });
     if (!out.ok) return { error: out.error || 'Could not issue the certificate.' };

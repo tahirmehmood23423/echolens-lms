@@ -7113,7 +7113,10 @@ function slResultsTable(ev, rows) {
           ? `<span class="grade-chip ok">Certificate ${esc(m.certificate.serial)}</span> <a class="s" href="/cert?s=${encodeURIComponent(m.certificate.serial)}" target="_blank" rel="noopener">View</a> <button class="btn btn-ghost btn-sm" onclick="slRevokeCert(${ev.id},${m.certificate.id},'${esc(m.certificate.serial)}')">Revoke</button>`
           : `<span class="s" style="color:var(--muted)">No certificate${m.has_account ? '' : ' &middot; no account yet'}</span> <button class="btn btn-teal btn-sm" onclick="slIssueCert(${ev.id},${r.entry_id},${m.index})">Issue certificate</button>`}</div>`).join('')}</div>
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="formSlGrade(${r.entry_id})">${graded ? 'Change grade' : 'Grade'}</button>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <button class="btn btn-ghost btn-sm" onclick="formSlGrade(${r.entry_id})">${graded ? 'Change grade' : 'Grade'}</button>
+        ${r.members.length > 1 && r.members.some((m) => !m.certificate) ? `<button class="btn btn-teal btn-sm" onclick="slIssueTeamCerts(${ev.id},${r.entry_id})">Certificate for each member</button>` : ''}
+      </div>
     </div>`;
   }).join('')}</div>`;
 }
@@ -7166,6 +7169,23 @@ async function slIssueCert(eid, entryId, memberIndex) {
       out = await send(true);
     }
     toast(`Certificate ${out.serial} ${out.existing ? 'already existed' : 'issued'}${out.account_created ? ' - account created' : ''}.`); slRefreshResults(out.results);
+  } catch (err) { toast(err.message, true); }
+}
+// Every member of the team gets their own certificate, in their own name,
+// emailed to their own address.
+async function slIssueTeamCerts(eid, entryId) {
+  const { ev, rows } = window.SL_RESULTS; const r = rows.find((x) => x.entry_id === entryId); if (!r) return;
+  const todo = r.members.filter((m) => !m.certificate); const s = r.submission;
+  const warn = !s || s.score == null ? 'This team has not been graded yet.' : !r.passed ? `This team scored ${s.score}%, below the ${Number(ev.pass_mark || 0)}% pass mark.` : '';
+  const noAcc = todo.filter((m) => !m.has_account);
+  const list = todo.map((m) => `- ${m.name || m.email} (${m.email || 'no email'})`).join('\n');
+  if (!confirm(`Issue a separate ${ev.title} certificate to each member:\n${list}${warn ? `\n\n${warn} Issue anyway?` : ''}\n\nEach member is emailed their own certificate link.`)) return;
+  const create_accounts = noAcc.length ? confirm(`${noAcc.map((m) => m.name || m.email).join(' & ')} ${noAcc.length > 1 ? 'have' : 'has'} no EchoLens account yet.\n\nCreate a learner account for them (login details are emailed with the certificate)? Cancel skips them.`) : false;
+  try {
+    const out = await api(`/api/admin/shiplens/${eid}/teams/${entryId}/certificates`, { method: 'POST', body: JSON.stringify({ create_accounts }) });
+    const ok = out.members.filter((m) => m.serial); const bad = out.members.filter((m) => m.error);
+    toast(`${ok.map((m) => `${m.name}: ${m.serial}${m.existing ? ' (already had it)' : ''}`).join(' | ')}${bad.length ? ` | Not issued - ${bad.map((m) => `${m.name}: ${m.error}`).join(' | ')}` : ''}`, !!bad.length && !ok.length);
+    slRefreshResults(out.results);
   } catch (err) { toast(err.message, true); }
 }
 async function slRevokeCert(eid, certId, serial) {

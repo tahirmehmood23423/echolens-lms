@@ -732,6 +732,9 @@ model EventSubmission {
   gradedByAi  Boolean   @default(false) @map("graded_by_ai")
   gradedAt    DateTime? @map("graded_at")
   certified   Boolean   @default(false)
+  // 'email' when an admin recorded a ShipLens project the team emailed in
+  // (store.js Events.gradeShipLensTeam); null/'portal' for portal submissions.
+  submittedVia String?  @map("submitted_via")
 
   event Event      @relation(fields: [eventId], references: [id])
   entry EventEntry @relation(fields: [entryId], references: [id])

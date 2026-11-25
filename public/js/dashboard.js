@@ -7033,6 +7033,8 @@ function adminEventPanel(d) {
       <span style="flex:1"></span>
       <button class="btn btn-danger btn-sm" onclick="delShipLens(${ev.id})">Delete this series</button>
     </div>` : ''}
+    ${ev.series_kind === 'shiplens' ? `<div class="pub-sec">Results &amp; certificates <span class="s" style="color:var(--muted);font-weight:400">- grade teams who emailed their project, and issue certificates</span></div>
+    <div id="slResults">${slResultsTable(ev, d.shiplens_results || [])}</div>` : ''}
     <div class="pub-sec">Admin - registrations${ev.entry === 'paid' && ev.series_kind !== 'shiplens' ? ' &amp; payment verification' : ''}${ev.series_kind === 'shiplens' ? ` <a class="btn btn-teal btn-sm" style="float:right" href="/api/admin/shiplens-report.pdf?event_id=${ev.id}" target="_blank" rel="noopener">Download candidates &amp; finance PDF</a>` : ''}</div>
     <div class="card-body tight" style="max-height:32vh;overflow-y:auto">
       ${(d.entries || []).map((e) => `
@@ -7091,6 +7093,85 @@ function adminEventPanel(d) {
         <button class="btn btn-teal btn-sm">Attach document / dataset</button>
       </form>
     </div>`}`;
+}
+// One row per registered team: how it submitted, its score against the
+// pass mark, and each member's certificate (issue / revoke).
+function slResultsTable(ev, rows) {
+  window.SL_RESULTS = { ev, rows };
+  if (!rows.length) return '<div class="empty" style="padding:10px">No registered teams yet.</div>';
+  const via = (s) => !s ? '<span class="grade-chip wait">No submission</span>' : s.via === 'email' ? '<span class="grade-chip wait">By email</span>' : '<span class="grade-chip ok">Portal</span>';
+  return `<div class="card-body tight" style="max-height:40vh;overflow-y:auto">${rows.map((r) => {
+    const s = r.submission; const graded = s && s.score != null;
+    const result = !graded ? '<span class="s" style="color:var(--muted)">Not graded</span>'
+      : `<strong>${s.score}%</strong> <span class="grade-chip ${r.passed ? 'ok' : 'wait'}">${r.passed ? 'Passed' : 'Not passed'}</span>`;
+    const links = s ? [s.github_link && `<a href="${esc(s.github_link)}" target="_blank" rel="noopener">GitHub</a>`, s.live_link && `<a href="${esc(s.live_link)}" target="_blank" rel="noopener">Live site</a>`].filter(Boolean).join(' &middot; ') : '';
+    return `<div class="list-row" style="padding:10px 4px;align-items:flex-start">
+      <div class="grow">
+        <div class="t">${r.members.map((m) => esc(m.name || m.email)).join(' &amp; ')} &nbsp;${via(s)} &nbsp;${result}</div>
+        ${links || s?.remarks ? `<div class="s" style="color:var(--muted)">${links}${s?.remarks ? `${links ? ' &middot; ' : ''}Notes: ${esc(s.remarks.slice(0, 160))}` : ''}</div>` : ''}
+        <div class="s" style="margin-top:6px;display:flex;flex-direction:column;gap:4px">${r.members.map((m) => `<div>${esc(m.name || '')} <span style="color:var(--muted)">${esc(m.email || '')}</span> - ${m.certificate
+          ? `<span class="grade-chip ok">Certificate ${esc(m.certificate.serial)}</span> <a class="s" href="/cert?s=${encodeURIComponent(m.certificate.serial)}" target="_blank" rel="noopener">View</a> <button class="btn btn-ghost btn-sm" onclick="slRevokeCert(${ev.id},${m.certificate.id},'${esc(m.certificate.serial)}')">Revoke</button>`
+          : `<span class="s" style="color:var(--muted)">No certificate${m.has_account ? '' : ' &middot; no account yet'}</span> <button class="btn btn-teal btn-sm" onclick="slIssueCert(${ev.id},${r.entry_id},${m.index})">Issue certificate</button>`}</div>`).join('')}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="formSlGrade(${r.entry_id})">${graded ? 'Change grade' : 'Grade'}</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+function slRefreshResults(results) {
+  const box = $('slResults'); if (box && window.SL_RESULTS) box.innerHTML = slResultsTable(window.SL_RESULTS.ev, results);
+}
+function formSlGrade(entryId) {
+  const { ev, rows } = window.SL_RESULTS; const r = rows.find((x) => x.entry_id === entryId); if (!r) return;
+  const s = r.submission; const viaEmail = !s || s.via === 'email';
+  openModal(`Grade - ${r.members.map((m) => m.name || m.email).join(' & ')}`, `
+    <form id="slGradeForm">
+      ${!s ? '<div class="task-status wait" style="margin-bottom:10px">No portal submission. Saving records the project the team sent by email, so it counts like a portal submission.</div>'
+        : s.via === 'email' ? '<div class="s" style="color:var(--muted);margin-bottom:8px">Recorded from an email submission.</div>' : '<div class="s" style="color:var(--muted);margin-bottom:8px">Submitted in the portal.</div>'}
+      ${viaEmail ? `<div class="form-grid">
+        <label class="field"><span>GitHub repository (from the email)</span><input name="github_link" type="url" value="${esc(s?.github_link || '')}" placeholder="https://github.com/..."></label>
+        <label class="field"><span>Live website (from the email)</span><input name="live_link" type="url" value="${esc(s?.live_link || '')}" placeholder="https://..."></label>
+      </div>
+      <label class="field"><span>Submission note</span><input name="note" maxlength="500" value="${esc(s?.note || 'Submitted by email')}"></label>` : ''}
+      <div class="form-grid">
+        <label class="field"><span>Score (0-100)</span><input name="score" type="number" min="0" max="100" required value="${s?.score ?? ''}"></label>
+        <div class="field"><span>Pass mark</span><div style="padding:9px 0"><strong>${Number(ev.pass_mark || 0)}%</strong></div></div>
+      </div>
+      <label class="field"><span>Reviewer notes (shown to the team)</span><textarea name="remarks" rows="4">${esc(s?.remarks || '')}</textarea></label>
+      <label class="s" style="display:flex;gap:7px;align-items:center;margin-bottom:10px"><input type="checkbox" name="notify"> Email the team their score and result</label>
+      <button class="btn btn-primary btn-block">Save grade</button>
+    </form>`, true);
+  $('slGradeForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const btn = f.querySelector('button.btn-primary');
+    const body = { score: f.score.value, remarks: f.remarks.value.trim(), notify: f.notify.checked };
+    if (viaEmail) Object.assign(body, { github_link: f.github_link.value.trim(), live_link: f.live_link.value.trim(), note: f.note.value.trim() });
+    btn.disabled = true;
+    try {
+      const out = await api(`/api/admin/shiplens/${ev.id}/teams/${entryId}/grade`, { method: 'POST', body: JSON.stringify(body) });
+      toast(`Grade saved - ${out.passed ? 'passed' : 'not passed'}${out.notified ? `, ${out.notified} emailed` : ''}.`); closeModal(); slRefreshResults(out.results);
+    } catch (err) { modalMsg(err.message); btn.disabled = false; }
+  });
+}
+async function slIssueCert(eid, entryId, memberIndex) {
+  const { ev, rows } = window.SL_RESULTS; const r = rows.find((x) => x.entry_id === entryId); const m = r?.members[memberIndex]; if (!m) return;
+  const s = r.submission;
+  const warn = !s || s.score == null ? 'This team has not been graded yet.' : !r.passed ? `This team scored ${s.score}%, below the ${Number(ev.pass_mark || 0)}% pass mark.` : '';
+  if (!confirm(`Issue the ${ev.title} certificate to ${m.name || m.email}?${warn ? `\n\n${warn} Issue it anyway?` : ''}\n\nThey will be emailed the certificate link.`)) return;
+  const send = (create_account) => api(`/api/admin/shiplens/${eid}/teams/${entryId}/certificate`, { method: 'POST', body: JSON.stringify({ member: memberIndex, create_account }) });
+  try {
+    let out;
+    try { out = await send(false); }
+    catch (err) {
+      if (!/no EchoLens account/.test(err.message)) throw err;
+      if (!confirm(`${err.message}\n\nCreate a learner account for them (login details are emailed with the certificate) and issue it?`)) return;
+      out = await send(true);
+    }
+    toast(`Certificate ${out.serial} ${out.existing ? 'already existed' : 'issued'}${out.account_created ? ' - account created' : ''}.`); slRefreshResults(out.results);
+  } catch (err) { toast(err.message, true); }
+}
+async function slRevokeCert(eid, certId, serial) {
+  if (!confirm(`Revoke certificate ${serial}? Its verification link stops working.`)) return;
+  try { const out = await api(`/api/admin/shiplens/${eid}/certificates/${certId}`, { method: 'DELETE' }); toast(`Certificate ${out.serial} revoked.`); slRefreshResults(out.results); }
+  catch (err) { toast(err.message, true); }
 }
 const SL_VIS_LABEL = { task: 'Teams, after task opens', teams: 'Teams, any time', public: 'Public' };
 // ShipLens resource list. Students only ever receive the resources the

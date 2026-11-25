@@ -3387,6 +3387,7 @@ app.get('/api/events/:id', authRequired, (req, res) => {
       ? require('./shiplens-finance').shipLensFinanceEntries(Events.entries(ev.id), Registrations.all(), Challans.all())
       : Events.entries(ev.id)) : undefined,
     submissions: isAdmin ? Events.submissionsForAdmin(ev.id) : undefined,
+    shiplens_results: isAdmin && ev.series_kind === 'shiplens' ? Events.shipLensResults(ev) : undefined,
     is_admin: isAdmin,
   });
 });
@@ -3791,7 +3792,12 @@ app.post('/api/events/:id/submit', authRequired, upload.single('file'), async (r
       });
       graded = Events.applyAiGrade(out.submission.id, g.score, g.feedback);
       const c = Events.maybeCertify(ev, req.user.id, ev.created_by);
-      if (c && c.cert && !c.existing) {
+      if (c && Array.isArray(c.issued)) {
+        // ShipLens: the whole team is certified; email each new certificate.
+        cert = (c.issued.find((r) => r.user?.id === req.user.id) || {}).cert || null;
+        for (const r of c.issued) if (r.user?.email) mailer.notify(r.user.email, `Certificate earned - ${ev.title}`,
+          `Congratulations ${r.user.name}!\n\nYou passed "${ev.title}" and your verified certificate has been issued automatically (serial ${r.cert.serial}).\n\nView, download and share it: ${APP_URL}/cert?s=${r.cert.serial}`);
+      } else if (c && c.cert && !c.existing) {
         cert = c.cert;
         if (req.user.email) mailer.notify(req.user.email, `Certificate earned - ${ev.title}`,
           `Congratulations ${req.user.name}!\n\nYou passed "${ev.title}" and your verified certificate has been issued automatically (serial ${cert.serial}).\n\nView, download and share it: ${APP_URL}/cert?s=${cert.serial}`);
@@ -3826,11 +3832,86 @@ app.post('/api/admin/event-submissions/:id/score', authRequired, adminRequired, 
   if (!s) return res.status(404).json({ error: 'Submission not found.' });
   const ev = Events.byId(s.event_id);
   const c = ev ? Events.maybeCertify(ev, s.user_id, req.user.id) : null;
-  if (c && c.cert && !c.existing) {
+  if (c && Array.isArray(c.issued)) {
+    // ShipLens: every newly certified team member gets their own link.
+    for (const r of c.issued) if (r.user?.email) mailer.notify(r.user.email, `Certificate earned - ${ev.title}`, `Congratulations ${r.user.name}! You passed "${ev.title}" - your verified certificate: ${APP_URL}/cert?s=${r.cert.serial}`);
+  } else if (c && c.cert && !c.existing) {
     const u = Users.byId(s.user_id);
     if (u && u.email) mailer.notify(u.email, `Certificate earned - ${ev.title}`, `Congratulations ${u.name}! You passed "${ev.title}" - your verified certificate: ${APP_URL}/cert?s=${c.cert.serial}`);
   }
   res.json({ ok: true, submission: s, cert: c && c.cert ? { serial: c.cert.serial } : null, progress: ev ? Events.progressFor(ev, s.user_id) : null });
+});
+
+/* ---------------- ShipLens results: manual grading + certificates ---------------- */
+// Admin grades a team - including one that emailed its project instead of
+// submitting in the portal (recorded as an 'email' submission). Optionally
+// emails every member their score and result.
+app.post('/api/admin/shiplens/:id/teams/:entryId/grade', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  const out = Events.gradeShipLensTeam(req.params.id, req.params.entryId, b, req.user.id);
+  if (out.error) return res.status(out.error.includes('not found') ? 404 : 400).json({ error: out.error });
+  const ev = Events.byId(req.params.id);
+  let notified = 0;
+  if (b.notify) {
+    const entry = Events.entries(ev.id).find((e) => e.id === Number(req.params.entryId));
+    const emails = [...new Set((entry?.team_details || []).map((m) => String(m.email || '').trim().toLowerCase()).filter(Boolean))];
+    if (emails.length) {
+      mailer.notify(emails, `Your result - ${ev.title}`,
+        `Your ${ev.title} project has been reviewed.
+
+Score: ${out.submission.score}%
+Pass mark: ${ev.pass_mark || 0}%
+Result: ${out.passed ? 'Passed' : 'Not passed'}${out.submission.ai_feedback ? `
+
+Reviewer notes:
+${out.submission.ai_feedback}` : ''}
+
+${APP_URL}${ev.scope === 'portal' ? '/dashboard' : '/open'}`);
+      notified = emails.length;
+    }
+  }
+  res.json({ ok: true, passed: out.passed, notified, results: Events.shipLensResults(ev) });
+});
+// Admin issues one member's certificate. A member without a learner account
+// gets one only when the admin explicitly asks (create_account), and is
+// emailed their login details along with the certificate link.
+app.post('/api/admin/shiplens/:id/teams/:entryId/certificate', authRequired, adminRequired, (req, res) => {
+  const b = req.body || {};
+  let out = Events.issueShipLensCertificate(req.params.id, req.params.entryId, b.member, req.user.id);
+  let account = null;
+  if (out.error === 'no_account') {
+    const m = out.member;
+    if (!b.create_account) return res.status(409).json({ error: `${m.name || 'This member'} (${m.email || 'no email'}) has no EchoLens account yet.`, needs_account: true });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(m.email || ''))) return res.status(400).json({ error: 'This member has no valid email, so an account cannot be created.' });
+    const created = Users.create({ name: m.name || m.email, role: 'free', email: String(m.email).trim().toLowerCase() });
+    account = created;
+    out = Events.issueShipLensCertificate(req.params.id, req.params.entryId, b.member, req.user.id);
+  }
+  if (out.error) return res.status(out.error.includes('not found') ? 404 : 400).json({ error: out.error });
+  const ev = Events.byId(req.params.id); const u = out.user;
+  if (u.email && !out.existing) {
+    mailer.notify(u.email, `Certificate issued - ${ev.title}`,
+      `Congratulations ${u.name}!
+
+Your verified certificate for ${ev.title} has been issued (serial ${out.cert.serial}).
+
+View, download and share it: ${APP_URL}/cert?s=${out.cert.serial}`
+      + (account ? `
+
+We also created your EchoLens account so the certificate appears on your profile:
+Username: ${account.user.username}
+Email: ${account.user.email}
+Password: ${account.password}
+
+Sign in at ${APP_URL} and change your password from Profile after your first login.` : ''));
+  }
+  res.json({ ok: true, serial: out.cert.serial, existing: out.existing, account_created: !!account, results: Events.shipLensResults(ev) });
+});
+app.delete('/api/admin/shiplens/:id/certificates/:certId', authRequired, adminRequired, (req, res) => {
+  const out = Events.revokeShipLensCertificate(req.params.id, req.params.certId);
+  if (out.error) return res.status(404).json({ error: out.error });
+  const ev = Events.byId(req.params.id);
+  res.json({ ok: true, serial: out.serial, results: ev ? Events.shipLensResults(ev) : [] });
 });
 
 /* ------------------------------ leads & email ------------------------------ */

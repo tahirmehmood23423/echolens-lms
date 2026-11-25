@@ -3777,8 +3777,96 @@ const Events = {
     const complete = graded.length >= total;
     return { submitted: mine.length, graded: graded.length, total, avg, complete, passed: complete && avg != null && avg >= (ev.pass_mark || 0) };
   },
+  /* ---- ShipLens results: manual grading (email submissions) + certificates ---- */
+  // The learner account behind one team member, matched by email (finance
+  // clearance records the lead's id for both members, so it cannot be used).
+  shipLensMemberUser(member) {
+    const email = String(member?.email || '').trim().toLowerCase();
+    if (!email) return null;
+    const all = data.users.filter((u) => u.email && u.email.toLowerCase() === email);
+    return all.find((u) => ['free', 'student'].includes(u.role)) || all[0] || null;
+  },
+  shipLensResults(ev) {
+    return data.event_entries.filter((e) => e.event_id === ev.id).map((e) => {
+      const s = data.event_submissions.find((x) => x.event_id === ev.id && x.entry_id === e.id) || null;
+      const members = (e.team_details || []).map((m, index) => {
+        const u = Events.shipLensMemberUser(m);
+        const cert = u ? data.certificates.find((c) => c.user_id === u.id && c.source_kind === 'event' && String(c.source_id) === String(ev.id)) : null;
+        return { index, name: m.name, email: m.email, has_account: !!u, certificate: cert ? { id: cert.id, serial: cert.serial, issued_at: cert.issued_at } : null };
+      });
+      return {
+        entry_id: e.id, members,
+        submission: s ? { id: s.id, via: s.submitted_via || 'portal', score: s.score, remarks: s.ai_feedback, graded_by: s.graded_by,
+          github_link: s.github_link, live_link: s.render_link || s.vercel_link || null, link: s.link, note: s.note, submitted_at: s.submitted_at } : null,
+        passed: !!(s && s.score != null && s.score >= (ev.pass_mark || 0)),
+      };
+    });
+  },
+  // Admin grades a team. With no portal submission (the team emailed its
+  // project) a submission is recorded on the team's behalf, marked
+  // submitted_via 'email', so it counts everywhere a portal one does.
+  gradeShipLensTeam(eid, entryId, { score, remarks, github_link, live_link, note }, by) {
+    const ev = Events.byId(eid);
+    if (!ev || ev.series_kind !== 'shiplens') return { error: 'ShipLens series not found.' };
+    const entry = data.event_entries.find((e) => e.id === Number(entryId) && e.event_id === ev.id);
+    if (!entry) return { error: 'Team not found in this series.' };
+    if (score === '' || score == null || isNaN(Number(score)) || Number(score) < 0 || Number(score) > 100) return { error: 'Enter a score from 0 to 100.' };
+    const url = (v) => { const t = String(v || '').trim(); return /^https?:\/\/[^\s]+$/i.test(t) ? t.slice(0, 400) : null; };
+    if (github_link && !url(github_link)) return { error: 'The GitHub link must start with http:// or https://' };
+    if (live_link && !url(live_link)) return { error: 'The live link must start with http:// or https://' };
+    let s = data.event_submissions.find((x) => x.event_id === ev.id && x.entry_id === entry.id);
+    if (!s) {
+      s = { id: nextId('event_submissions'), event_id: ev.id, entry_id: entry.id, user_id: entry.user_id, pid: entry.challenge_pid || 1,
+        code: null, language: null, output: null, file_url: null, file_name: null, link: null,
+        github_link: url(github_link), render_link: url(live_link), vercel_link: null, deployment_link: null,
+        note: String(note || 'Submitted by email').slice(0, 500), submitted_at: now(), submitted_via: 'email',
+        ai_score: null, score: null, ai_feedback: null, graded_by: null, graded_at: null, certified: false };
+      data.event_submissions.push(s);
+    } else if (s.submitted_via === 'email') {
+      if (github_link !== undefined) s.github_link = url(github_link);
+      if (live_link !== undefined) s.render_link = url(live_link);
+      if (note !== undefined) s.note = String(note || 'Submitted by email').slice(0, 500);
+    }
+    s.score = Math.round(Number(score));
+    s.ai_feedback = String(remarks || '').trim().slice(0, 2000) || null;
+    s.graded_by = by; s.graded_at = now();
+    save();
+    return { submission: s, passed: s.score >= (ev.pass_mark || 0) };
+  },
+  // Issue one member's certificate. An admin may issue it whatever the
+  // score (the UI confirms first); a member needs a learner account.
+  issueShipLensCertificate(eid, entryId, memberIndex, by) {
+    const ev = Events.byId(eid);
+    if (!ev || ev.series_kind !== 'shiplens') return { error: 'ShipLens series not found.' };
+    const entry = data.event_entries.find((e) => e.id === Number(entryId) && e.event_id === ev.id);
+    const member = entry?.team_details?.[Number(memberIndex)];
+    if (!member) return { error: 'Team member not found.' };
+    const user = Events.shipLensMemberUser(member);
+    if (!user) return { error: 'no_account', member };
+    const out = Certificates.issue({ user_id: user.id, batch_id: null, kind: 'competition', title: ev.title, completion_date: today(), detail: null,
+      instructor_id: null, issued_by: by, source_kind: 'event', source_id: ev.id, partner: !!ev.partner });
+    if (!out.ok) return { error: out.error || 'Could not issue the certificate.' };
+    for (const s of data.event_submissions) if (s.event_id === ev.id && s.entry_id === entry.id) s.certified = true;
+    save();
+    return { cert: out.cert, existing: !!out.existing, user };
+  },
+  revokeShipLensCertificate(eid, certId) {
+    const c = data.certificates.find((x) => x.id === Number(certId) && x.source_kind === 'event' && String(x.source_id) === String(Number(eid)));
+    if (!c) return { error: 'Certificate not found for this series.' };
+    Certificates.revoke(c.id);
+    return { ok: true, serial: c.serial };
+  },
   maybeCertify(ev, uid, issuedBy) {
     if (!ev.auto_certificate) return null;
+    // ShipLens: a passing team certifies EVERY member with an account, not
+    // only whoever's submission was scored.
+    if (ev.series_kind === 'shiplens') {
+      const u = Users.byId(uid); const entry = u ? Events.entryForUser(ev, u) : null;
+      if (!entry || !Events.progressFor(ev, uid).passed) return null;
+      const issued = (entry.team_details || []).map((m, i) => Events.issueShipLensCertificate(ev.id, entry.id, i, issuedBy || ev.created_by)).filter((r) => r.cert);
+      const fresh = issued.filter((r) => !r.existing);
+      return issued.length ? { cert: (fresh[0] || issued[0]).cert, existing: !fresh.length, issued: fresh } : null;
+    }
     const prog = Events.progressFor(ev, uid);
     if (!prog.passed) return null;
     // v18: dedup by THIS event's id, not by title - two different events
